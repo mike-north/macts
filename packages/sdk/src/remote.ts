@@ -2,7 +2,10 @@
  * The remote client: runs an app's operations on a macts service over HTTP.
  *
  * Each call posts the encoded input to `<url>/api/v1/rpc/<operation id>` with
- * the client's token as a bearer credential. The service runs the same
+ * the client's token as a bearer credential. Resolving a reference the client
+ * decoded posts `{ app, reference }`, the reference in its canonical wire
+ * form, to `<url>/references/v1/resolve` with the same credential and the
+ * same handling of every outcome (phases/13 D7). The service runs the same
  * invocation pipeline a local client does (verify the credential, check
  * permission, enforce governance, validate, execute); this module only carries
  * the call there and back and turns every outcome into the same canonical
@@ -31,9 +34,8 @@ import {
   type AppContract,
   type CallOptions,
   type OperationId,
-  type WireValue,
 } from '@macts/contracts'
-import { createCodecClientRuntime } from './codec-runtime.js'
+import { createCodecClientRuntime, type ClientTransport } from './codec-runtime.js'
 
 /** Options for a client that runs operations on a macts service. */
 export interface RemoteClientOptions {
@@ -41,7 +43,8 @@ export interface RemoteClientOptions {
   readonly token: string
   /**
    * The service root, for example `http://localhost:8372`. Operations are
-   * posted to `<url>/api/v1/rpc/<operation id>`.
+   * posted to `<url>/api/v1/rpc/<operation id>`, and references to resolve to
+   * `<url>/references/v1/resolve`.
    */
   readonly url: string | URL
   /**
@@ -55,6 +58,13 @@ export interface RemoteClientOptions {
 
 /** Path, under the service root, that operations are posted beneath. */
 const RPC_PATH = 'api/v1/rpc'
+
+/**
+ * Path, under the service root, that references are posted to for
+ * resolution: its own namespace beside `/api/v1`, because a resolution is not
+ * an operation call (phases/13 D7).
+ */
+const RESOLVE_PATH = 'references/v1/resolve'
 
 /**
  * Characters a bearer token may contain: visible ASCII. Anything else cannot
@@ -83,11 +93,21 @@ function parseServiceRoot(url: string | URL): URL {
   return root
 }
 
+/** The endpoint at `path` beneath the service root. */
+function endpointAt(root: URL, path: string): URL {
+  const endpoint = new URL(root)
+  endpoint.pathname = `${root.pathname.replace(/\/+$/, '')}/${path}`
+  return endpoint
+}
+
 /** The endpoint an operation is posted to, beneath the service root. */
 function rpcEndpoint(root: URL, operation: OperationId): URL {
-  const endpoint = new URL(root)
-  endpoint.pathname = `${root.pathname.replace(/\/+$/, '')}/${RPC_PATH}/${encodeURIComponent(operation)}`
-  return endpoint
+  return endpointAt(root, `${RPC_PATH}/${encodeURIComponent(operation)}`)
+}
+
+/** The endpoint references are posted to for resolution, beneath the service root. */
+function resolveEndpoint(root: URL): URL {
+  return endpointAt(root, RESOLVE_PATH)
 }
 
 /**
@@ -191,21 +211,30 @@ export function createClient<Client>(
     return new TransportError(message, { reason: 'invalid-response', status })
   }
 
-  async function transport(
-    operation: OperationId,
-    input: WireValue,
+  /**
+   * POST `body` to `endpoint` with the client's bearer credential and return
+   * the `result` of the success envelope.
+   *
+   * @remarks
+   * Every request the client makes goes through here, so operation calls and
+   * reference resolutions share one treatment of the credential, aborts,
+   * unreachable services, unusable responses, and error envelopes.
+   */
+  async function post(
+    endpoint: URL,
+    body: unknown,
     callOptions: CallOptions | undefined
   ): Promise<unknown> {
     const signal = callOptions?.signal
     let response: Response
     try {
-      response = await send(rpcEndpoint(root, operation), {
+      response = await send(endpoint, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(input),
+        body: JSON.stringify(body),
         ...(signal === undefined ? {} : { signal }),
       })
     } catch (error) {
@@ -226,9 +255,9 @@ export function createClient<Client>(
       )
     }
 
-    let body: unknown
+    let parsed: unknown
     try {
-      body = JSON.parse(text)
+      parsed = JSON.parse(text)
     } catch {
       throw response.ok
         ? invalidResponse('The macts service sent a result that is not JSON.', response.status)
@@ -236,13 +265,22 @@ export function createClient<Client>(
     }
 
     if (!response.ok) {
-      throw fromWireErrorEnvelope(body, { status: response.status })
+      throw fromWireErrorEnvelope(parsed, { status: response.status })
     }
-    if (!isRecord(body) || !Object.hasOwn(body, 'result')) {
+    if (!isRecord(parsed) || !Object.hasOwn(parsed, 'result')) {
       throw invalidResponse('The macts service sent a response without a result.', response.status)
     }
-    return body['result']
+    return parsed['result']
   }
 
-  return app.bind(createCodecClientRuntime(transport))
+  const transport: ClientTransport = {
+    invoke: (operation, input, callOptions) =>
+      post(rpcEndpoint(root, operation), input, callOptions),
+    // The body is exactly `app` and `reference`; the service refuses any
+    // other field (phases/13 D7, "Remote route").
+    resolve: (reference, callOptions) =>
+      post(resolveEndpoint(root), { app: app.app, reference }, callOptions),
+  }
+
+  return app.bind(createCodecClientRuntime(app, transport))
 }
