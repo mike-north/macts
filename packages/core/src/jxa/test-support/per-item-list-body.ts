@@ -16,6 +16,7 @@
 import type { OperationTarget } from '@macts/contracts'
 import {
   CANONICAL_IDENTIFIER_KEY,
+  resolveCanonicalIdentifierSource,
   resolveIdentifierTargeting,
   resolveListOutputProperties,
   resolvePrimaryIdentifierProperty,
@@ -108,10 +109,15 @@ export function buildPerItemListBody(
         : undefined
     )
 
+  // The canonical alias is left out when the resource has its own `id` field
+  // (see resolveCanonicalIdentifierSource), so it never overwrites that field.
+  const aliasSource = resolveCanonicalIdentifierSource(resource)
   const idAlias =
     identifierAliases && runtimeIdProperty !== undefined
       ? lines(
-          `${member('obj', CANONICAL_IDENTIFIER_KEY)} = ${member('obj', runtimeIdProperty)};`,
+          aliasSource === undefined
+            ? ''
+            : `${member('obj', CANONICAL_IDENTIFIER_KEY)} = ${member('obj', aliasSource)};`,
           declaredIdProperty !== undefined && declaredIdProperty !== runtimeIdProperty
             ? `${member('obj', declaredIdProperty)} = ${member('obj', runtimeIdProperty)};`
             : ''

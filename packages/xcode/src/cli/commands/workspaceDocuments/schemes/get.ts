@@ -14,7 +14,7 @@ export class GetSchemeCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  schemeId = Option.String({ required: true })
+  schemeId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

@@ -89,35 +89,38 @@ describe('the client of every real contract', () => {
     expect(methods).toBeGreaterThan(apps.length)
   })
 
-  it('leaves out exactly the Contacts and Mail methods whose required input admits no value', async () => {
+  it('leaves out the Mail method whose required input admits no value, and keeps those Contacts can satisfy', async () => {
     const byApp = new Map(apps.map((app) => [app.name, app]))
     const methodsOf = async (name: string): Promise<string[]> => {
       const app = byApp.get(name)
       if (app === undefined) throw new Error(`no ${name} app`)
       return [...(await invokedOperations(app)).keys()]
     }
-    // Hand-written from manifests/contacts/app.yaml and manifests/mail/app.yaml:
-    // the required `for` (a person) and `with` (an account) take resources
-    // that neither app can get. The operations' siblings stay.
-    const contacts = await methodsOf('contacts')
-    expect(contacts).not.toContain('actionTitle')
-    expect(contacts).not.toContain('performAction')
-    expect(contacts).not.toContain('shouldEnableAction')
-    expect(contacts).toContain('actionProperty')
+    // Hand-written from manifests/mail/app.yaml: synchronize's required `with`
+    // takes an account, and Mail has no operation that gets one. Its sibling
+    // stays.
     const mail = await methodsOf('mail')
     expect(mail).not.toContain('synchronize')
     expect(mail).toContain('checkForNewMail')
+    // Hand-written from manifests/contacts/app.yaml: the actions' required
+    // `for` takes a person, and `people.get` gets one, so they are offered.
+    const contacts = await methodsOf('contacts')
+    expect(contacts).toContain('actionTitle')
+    expect(contacts).toContain('performAction')
+    expect(contacts).toContain('shouldEnableAction')
+    expect(contacts).toContain('people.get')
   })
 })
 
-// The client interfaces have no such members either.
+// The client interfaces agree: no member for the unavailable Mail operation,
+// and members for the Contacts actions a person reference can satisfy.
 type HasMember<Client, Name extends string> = Name extends keyof Client ? true : false
 const contactsMembers: [
   HasMember<ContactsClient, 'actionTitle'>,
   HasMember<ContactsClient, 'performAction'>,
   HasMember<ContactsClient, 'shouldEnableAction'>,
   HasMember<ContactsClient, 'actionProperty'>,
-] = [false, false, false, true]
+] = [true, true, true, true]
 const mailMembers: [
   HasMember<MailClient, 'synchronize'>,
   HasMember<MailClient, 'checkForNewMail'>,

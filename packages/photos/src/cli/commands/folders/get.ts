@@ -14,7 +14,7 @@ export class GetFolderCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  folderId = Option.String({ required: true })
+  folderId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

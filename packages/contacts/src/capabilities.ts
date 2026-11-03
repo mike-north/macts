@@ -42,6 +42,52 @@ export interface CapabilityMetadata {
  */
 export const capabilities: readonly CapabilityMetadata[] = [
   {
+    name: 'contacts.addresses.get',
+    app: 'contacts',
+    appBundleId: 'com.apple.AddressBook',
+    resource: 'addresses',
+    operation: 'get',
+    description: 'Get one address of a person by its identifier',
+    permission: 'contacts:addresses:get',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        personId: {
+          description: 'Identifier of the person',
+          type: 'string',
+        },
+        id: {
+          description: 'Identifier of the address',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['personId', 'id'],
+    },
+  },
+  {
+    name: 'contacts.addresses.list',
+    app: 'contacts',
+    appBundleId: 'com.apple.AddressBook',
+    resource: 'addresses',
+    operation: 'list',
+    description: 'List the addresses of a person',
+    permission: 'contacts:addresses:list',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        personId: {
+          description: 'Identifier of the person',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['personId'],
+    },
+  },
+  {
     name: 'contacts.app.actionProperty',
     app: 'contacts',
     appBundleId: 'com.apple.AddressBook',
@@ -55,6 +101,31 @@ export const capabilities: readonly CapabilityMetadata[] = [
       type: 'object',
       properties: {},
       additionalProperties: false,
+    },
+  },
+  {
+    name: 'contacts.app.actionTitle',
+    app: 'contacts',
+    appBundleId: 'com.apple.AddressBook',
+    resource: 'app',
+    operation: 'actionTitle',
+    description: 'RollOver - Returns the title that will be placed in the menu for this roll over',
+    permission: 'contacts:app:actionTitle',
+    risk: 'execute',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        with: {
+          description: 'property that that was returned from the "action property" handler.',
+          type: 'string',
+        },
+        for: {
+          description: 'Currently selected person.',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['with', 'for'],
     },
   },
   {
@@ -112,6 +183,31 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
+    name: 'contacts.app.performAction',
+    app: 'contacts',
+    appBundleId: 'com.apple.AddressBook',
+    resource: 'app',
+    operation: 'performAction',
+    description: 'RollOver - Performs the action on the given person and value',
+    permission: 'contacts:app:performAction',
+    risk: 'execute',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        with: {
+          description: 'property that that was returned from the "action property" handler.',
+          type: 'string',
+        },
+        for: {
+          description: 'Currently selected person.',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['with', 'for'],
+    },
+  },
+  {
     name: 'contacts.app.remove',
     app: 'contacts',
     appBundleId: 'com.apple.AddressBook',
@@ -146,6 +242,196 @@ export const capabilities: readonly CapabilityMetadata[] = [
       type: 'object',
       properties: {},
       additionalProperties: false,
+    },
+  },
+  {
+    name: 'contacts.app.shouldEnableAction',
+    app: 'contacts',
+    appBundleId: 'com.apple.AddressBook',
+    resource: 'app',
+    operation: 'shouldEnableAction',
+    description:
+      'RollOver - Determines if the rollover action should be enabled for the given person and value',
+    permission: 'contacts:app:shouldEnableAction',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        with: {
+          description: 'property that that was returned from the "action property" handler.',
+          type: 'string',
+        },
+        for: {
+          description: 'Currently selected person.',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['with', 'for'],
+    },
+  },
+  {
+    name: 'contacts.emails.get',
+    app: 'contacts',
+    appBundleId: 'com.apple.AddressBook',
+    resource: 'emails',
+    operation: 'get',
+    description: 'Get one email address of a person by its identifier',
+    permission: 'contacts:emails:get',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        personId: {
+          description: 'Identifier of the person',
+          type: 'string',
+        },
+        id: {
+          description: 'Identifier of the email address',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['personId', 'id'],
+    },
+  },
+  {
+    name: 'contacts.emails.list',
+    app: 'contacts',
+    appBundleId: 'com.apple.AddressBook',
+    resource: 'emails',
+    operation: 'list',
+    description: 'List the email addresses of a person',
+    permission: 'contacts:emails:list',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        personId: {
+          description: 'Identifier of the person',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['personId'],
+    },
+  },
+  {
+    name: 'contacts.groups.get',
+    app: 'contacts',
+    appBundleId: 'com.apple.AddressBook',
+    resource: 'groups',
+    operation: 'get',
+    description: 'Get a group by identifier',
+    permission: 'contacts:groups:get',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: {
+          description: 'Identifier of the group',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['id'],
+    },
+  },
+  {
+    name: 'contacts.groups.list',
+    app: 'contacts',
+    appBundleId: 'com.apple.AddressBook',
+    resource: 'groups',
+    operation: 'list',
+    description: 'List every group',
+    permission: 'contacts:groups:list',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'contacts.people.get',
+    app: 'contacts',
+    appBundleId: 'com.apple.AddressBook',
+    resource: 'people',
+    operation: 'get',
+    description: 'Get a person by identifier',
+    permission: 'contacts:people:get',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: {
+          description: 'Identifier of the person',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['id'],
+    },
+  },
+  {
+    name: 'contacts.people.list',
+    app: 'contacts',
+    appBundleId: 'com.apple.AddressBook',
+    resource: 'people',
+    operation: 'list',
+    description: 'List every person',
+    permission: 'contacts:people:list',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'contacts.phones.get',
+    app: 'contacts',
+    appBundleId: 'com.apple.AddressBook',
+    resource: 'phones',
+    operation: 'get',
+    description: 'Get one phone number of a person by its identifier',
+    permission: 'contacts:phones:get',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        personId: {
+          description: 'Identifier of the person',
+          type: 'string',
+        },
+        id: {
+          description: 'Identifier of the phone number',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['personId', 'id'],
+    },
+  },
+  {
+    name: 'contacts.phones.list',
+    app: 'contacts',
+    appBundleId: 'com.apple.AddressBook',
+    resource: 'phones',
+    operation: 'list',
+    description: 'List the phone numbers of a person',
+    permission: 'contacts:phones:list',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        personId: {
+          description: 'Identifier of the person',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['personId'],
     },
   },
 ]

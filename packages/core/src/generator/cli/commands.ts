@@ -3,9 +3,16 @@ import type {
   Command as ManifestCommand,
   CommandParameter,
 } from '../../manifest/index.js'
+import { resolvePrimaryIdentifierProperty } from '../../manifest/index.js'
 import { usableProperties } from '../../manifest/unsupported.js'
 import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.js'
-import { identifierWords, resolveIdParams, resourceNamespace, safeIdentifier } from '../surface.js'
+import {
+  identifierWords,
+  resolveIdParams,
+  resourceNamespace,
+  safeIdentifier,
+  withArticle,
+} from '../surface.js'
 
 /**
  * Instance members of Clipanion's \`Command\` base class. A generated option whose
@@ -25,6 +32,46 @@ const CLIPANION_RESERVED_MEMBERS = new Set(['path', 'cli', 'context', 'help'])
 function safeParamProperty(paramName: string, commandName: string): string {
   if (!CLIPANION_RESERVED_MEMBERS.has(paramName)) return paramName
   return `${toCamelCase(commandName)}${toPascalCase(paramName)}`
+}
+
+/**
+ * The identifier a caller gives to address one item of a resource: the
+ * resource's primary identifier property, which every lookup of one item
+ * matches, whatever the get command calls its parameter (Calendar's get takes
+ * `id` and matches a calendar's `name`). A resource that declares no
+ * identifier is addressed by its get command's identifier parameter. With
+ * neither, the identifier is unknown and `undefined` is returned.
+ */
+function addressingIdentifier(
+  resource: Resource,
+  getCommand: ManifestCommand | undefined
+): string | undefined {
+  return (
+    resolvePrimaryIdentifierProperty(resource) ??
+    (getCommand === undefined ? undefined : resolveIdParams(getCommand).childParam)
+  )
+}
+
+/**
+ * An identifier in help prose, as {@link identifierWords} writes it, except
+ * that a bare `id` is written `ID`: `persistentID` → `persistent ID`, `name` →
+ * `name`, `id` → `ID`.
+ */
+function identifierProse(identifier: string): string {
+  const words = identifierWords(identifier)
+  return words === 'id' ? 'ID' : words
+}
+
+/**
+ * The declaration of the positional argument that carries an item's
+ * identifier. Its label in usage is the identifier in kebab case
+ * (`<persistent-id>`, `<name>`, `<id>`), so help shows what to pass. When the
+ * identifier is unknown, usage shows the property name, as it always did.
+ */
+function identifierPositional(property: string, identifier: string | undefined): string {
+  return identifier === undefined
+    ? `  ${property} = Option.String({ required: true });`
+    : `  ${property} = Option.String({ name: '${toKebabCase(identifier)}', required: true });`
 }
 
 /**
@@ -278,24 +325,28 @@ export function generateGetCommand(
     getCommand === undefined ? undefined : resolveIdParams(getCommand).parentParam
   const parentScopeParams = (getCommand?.parameters ?? []).filter((p) => p.name === parentParamName)
   const parentOptions = generateListParamOptions(parentScopeParams)
+  // A get command is generated only when a get command backs it, so its
+  // identifier parameter is always known here.
+  const identifier = addressingIdentifier(resource, getCommand) ?? 'id'
+  const summary = `Get ${withArticle(identifierWords(resource.name))} by ${identifierProse(identifier)}`
 
   const content = `import { Command, Option } from 'clipanion';
 import { getClient } from '${sdkImportPath}';
 import { createFormatter } from '${outputImportPath}';
 
 /**
- * Get a ${identifierWords(resource.name)} by ID.
+ * ${summary}.
  */
 export class Get${resource.name}Command extends Command {
   static override paths = [[${cliPath.map((p) => JSON.stringify(p)).join(', ')}]];
 
   static override usage = Command.Usage({
-    description: 'Get a ${identifierWords(resource.name)} by ID',
+    description: '${summary}',
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
 ${parentOptions}
-  ${idParamName} = Option.String({ required: true });
+${identifierPositional(idParamName, identifier)}
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false);
@@ -455,9 +506,12 @@ export function generateResourceCommand(
 
   // Only declare the implicit resource-ID option when no command parameter already
   // declares an identifier of the same name (otherwise we emit a duplicate field).
+  const getCommand = ctx
+    .getResourceCommands(hierarchyPath.resourceName)
+    .find((c) => c.name === 'get')
   const idOption = paramNames.has(idParamName)
     ? ''
-    : `  ${idParamName} = Option.String({ required: true });\n`
+    : `${identifierPositional(idParamName, addressingIdentifier(resource, getCommand))}\n`
 
   const needsTypanion = paramFlags.includes('t.isEnum')
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}

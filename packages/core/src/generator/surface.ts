@@ -175,6 +175,17 @@ export function identifierWords(identifier: string): string {
 }
 
 /**
+ * A noun phrase with its indefinite article, for generated prose: `a note`,
+ * `an event`, `an AIM handle`. The article follows the noun's first letter.
+ *
+ * @param noun - The noun phrase, such as {@link identifierWords} produces.
+ * @returns The phrase prefixed with `a` or `an`.
+ */
+export function withArticle(noun: string): string {
+  return `${/^[aeiou]/i.test(noun) ? 'an' : 'a'} ${noun}`
+}
+
+/**
  * The backing command for a CRUD shape among a resource's commands: the first,
  * in declaration order, whose `name` is `operation`. Returns `undefined` when
  * the manifest declares no such command, so the client has no such method.

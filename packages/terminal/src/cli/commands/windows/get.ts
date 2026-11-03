@@ -3,18 +3,18 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Get a window by ID.
+ * Get a window by name.
  */
 export class GetWindowCommand extends Command {
   static override paths = [['terminal', 'windows', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a window by ID',
+    description: 'Get a window by name',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  windowId = Option.String({ required: true })
+  windowId = Option.String({ name: 'name', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

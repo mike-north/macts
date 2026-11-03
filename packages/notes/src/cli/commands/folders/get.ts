@@ -3,18 +3,18 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Get a folder by ID.
+ * Get a folder by name.
  */
 export class GetFolderCommand extends Command {
   static override paths = [['notes', 'folders', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a folder by ID',
+    description: 'Get a folder by name',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  folderId = Option.String({ required: true })
+  folderId = Option.String({ name: 'name', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

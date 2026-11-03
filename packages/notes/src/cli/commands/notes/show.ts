@@ -13,7 +13,7 @@ export class ShowNoteCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  noteId = Option.String({ required: true })
+  noteId = Option.String({ name: 'name', required: true })
   name = Option.String('--name', { required: true, description: 'Note name' })
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

@@ -14,7 +14,7 @@ export class GetProjectCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  projectId = Option.String({ required: true })
+  projectId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

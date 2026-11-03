@@ -21,7 +21,7 @@ export class VariableResourceClient {
   }
 
   /**
-   * List all variables.
+   * List the variables of one workflow.
    */
   async list(workflowName: string): Promise<Variable[]> {
     return this.#http.rpc<Variable[]>(`${this.#app}.${this.#resource}.list`, { workflowName })

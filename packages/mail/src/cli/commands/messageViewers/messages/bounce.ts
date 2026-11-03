@@ -17,7 +17,7 @@ export class BounceMessageCommand extends Command {
     required: true,
     description: 'MessageViewer ID',
   })
-  messageId = Option.String({ required: true })
+  messageId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

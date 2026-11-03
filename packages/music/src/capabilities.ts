@@ -540,6 +540,42 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
+    name: 'music.playlists.get',
+    app: 'music',
+    appBundleId: 'com.apple.Music',
+    resource: 'playlists',
+    operation: 'get',
+    description: 'Get a playlist by its persistent ID',
+    permission: 'music:playlists:get',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        persistentID: {
+          description: 'Persistent ID of the playlist',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['persistentID'],
+    },
+  },
+  {
+    name: 'music.playlists.list',
+    app: 'music',
+    appBundleId: 'com.apple.Music',
+    resource: 'playlists',
+    operation: 'list',
+    description: 'List every playlist',
+    permission: 'music:playlists:list',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'music.playlists.move',
     app: 'music',
     appBundleId: 'com.apple.Music',
@@ -584,6 +620,53 @@ export const capabilities: readonly CapabilityMetadata[] = [
       },
       additionalProperties: false,
       required: ['for'],
+    },
+  },
+  {
+    name: 'music.tracks.get',
+    app: 'music',
+    appBundleId: 'com.apple.Music',
+    resource: 'tracks',
+    operation: 'get',
+    description: 'Get a track of a playlist by its persistent ID',
+    permission: 'music:tracks:get',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        playlistId: {
+          description: 'Persistent ID of the playlist',
+          type: 'string',
+        },
+        persistentID: {
+          description: 'Persistent ID of the track',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['playlistId', 'persistentID'],
+    },
+  },
+  {
+    name: 'music.tracks.list',
+    app: 'music',
+    appBundleId: 'com.apple.Music',
+    resource: 'tracks',
+    operation: 'list',
+    description:
+      'List the tracks of a playlist; the library playlist holds every track in the library',
+    permission: 'music:tracks:list',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        playlistId: {
+          description: 'Persistent ID of the playlist',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['playlistId'],
     },
   },
 ]

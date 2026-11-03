@@ -3,18 +3,18 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Get a inbox task by ID.
+ * Get an inbox task by ID.
  */
 export class GetInboxTaskCommand extends Command {
   static override paths = [['omnifocus', 'inboxTasks', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a inbox task by ID',
+    description: 'Get an inbox task by ID',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  inboxTaskId = Option.String({ required: true })
+  inboxTaskId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

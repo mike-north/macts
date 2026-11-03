@@ -13,7 +13,7 @@ export class TestWorkspaceDocumentCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  workspaceDocumentId = Option.String({ required: true })
+  workspaceDocumentId = Option.String({ name: 'name', required: true })
   workspaceName = Option.String('--workspace-name', {
     required: true,
     description: 'Workspace document name',

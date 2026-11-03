@@ -3,18 +3,18 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Get a workspace document by ID.
+ * Get a workspace document by name.
  */
 export class GetWorkspaceDocumentCommand extends Command {
   static override paths = [['xcode', 'workspaceDocuments', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a workspace document by ID',
+    description: 'Get a workspace document by name',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  workspaceDocumentId = Option.String({ required: true })
+  workspaceDocumentId = Option.String({ name: 'name', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

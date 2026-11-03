@@ -14,7 +14,7 @@ export class GetResourceCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  resourceId = Option.String({ required: true })
+  resourceId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

@@ -21,7 +21,7 @@ export class LineResourceClient {
   }
 
   /**
-   * List all lines.
+   * List the lines of one canvas.
    */
   async list(canvasId: string): Promise<Line[]> {
     return this.#http.rpc<Line[]>(`${this.#app}.${this.#resource}.list`, { canvasId })

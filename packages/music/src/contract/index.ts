@@ -26,6 +26,7 @@ import {
   type FileSource,
   type FileValue,
   type Integer,
+  type ObjectReferenceData,
   type ObjectReferenceVariant,
   type OperationDescriptor,
   type ValueType,
@@ -241,7 +242,7 @@ export interface BrowserWindow {
    * the playlist currently displayed in the window.
    * Nullable. No evidence that the app always sets it.
    */
-  view: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null
+  view: ObjectReferenceVariant<Playlist, string, 'Playlist'> | null
 }
 
 /** converts a track to a specific file format */
@@ -361,6 +362,21 @@ export interface MiniplayerWindow {
 /** a list of tracks/streams */
 export interface Playlist {
   /**
+   * the id of the item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
+  /**
+   * the index of the item in internal application order.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly index: Integer | null
+  /**
+   * the id of the item as a hexadecimal string. This id does not change over time.
+   * Never null: the primary identifier.
+   */
+  readonly persistentID: string
+  /**
    * the description of the playlist.
    * Nullable. No evidence that the app always sets it.
    */
@@ -385,11 +401,6 @@ export interface Playlist {
    * Nullable. No evidence that the app always sets it.
    */
   favorited: boolean | null
-  /**
-   * folder which contains this playlist (if any).
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly parent: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null
   /**
    * the total size of all tracks (in bytes).
    * Nullable. No evidence that the app always sets it.
@@ -423,7 +434,7 @@ export interface PlaylistWindow {
    * the playlist displayed in the window.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly view: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null
+  readonly view: ObjectReferenceVariant<Playlist, string, 'Playlist'> | null
 }
 
 /** the radio tuner playlist */
@@ -474,6 +485,26 @@ export interface SubscriptionPlaylist {
 
 /** playable audio source */
 export interface Track {
+  /**
+   * the id of the item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
+  /**
+   * the index of the item in internal application order.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly index: Integer | null
+  /**
+   * the name of the item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * the id of the item as a hexadecimal string. This id does not change over time.
+   * Never null: the primary identifier.
+   */
+  readonly persistentID: string
   /**
    * the album name of the track.
    * Nullable. No evidence that the app always sets it.
@@ -995,10 +1026,19 @@ export type AudioCDTrackCreateInput = Record<string, never>
 export type AudioCDTrackUpdateInput = Record<string, never>
 
 /** Input for creating a BrowserWindow. */
-export type BrowserWindowCreateInput = Record<string, never>
+export interface BrowserWindowCreateInput {
+  /** the playlist currently displayed in the window */
+  view?: ObjectReferenceData<string, 'Playlist'>
+}
 
 /** Input for updating a BrowserWindow. Omitted fields are left unchanged. */
-export type BrowserWindowUpdateInput = Record<string, never>
+export interface BrowserWindowUpdateInput {
+  /**
+   * the playlist currently displayed in the window.
+   * Cannot be reset: null is rejected.
+   */
+  view?: ObjectReferenceData<string, 'Playlist'>
+}
 
 /** Input for creating an Encoder. */
 export type EncoderCreateInput = Record<string, never>
@@ -1199,6 +1239,8 @@ export type SubscriptionPlaylistUpdateInput = Record<string, never>
 
 /** Input for creating a Track. */
 export interface TrackCreateInput {
+  /** the name of the item */
+  name?: string
   /** the album name of the track */
   album?: string
   /** the album artist of the track */
@@ -1311,6 +1353,11 @@ export interface TrackCreateInput {
 
 /** Input for updating a Track. Omitted fields are left unchanged. */
 export interface TrackUpdateInput {
+  /**
+   * the name of the item.
+   * Cannot be reset: null is rejected.
+   */
+  name?: string
   /**
    * the album name of the track.
    * Cannot be reset: null is rejected.
@@ -1628,6 +1675,14 @@ export interface FileTrackResourceClient {
 
 /** a list of tracks/streams */
 export interface PlaylistResourceClient {
+  /** List playlists. */
+  list(options?: CallOptions): Promise<readonly Playlist[]>
+  /**
+   * Read the playlist identified by `persistentID`.
+   *
+   * @param persistentID - Persistent ID of the playlist. Does not accept null.
+   */
+  get(persistentID: string, options?: CallOptions): Promise<Playlist>
   /**
    * Move playlist(s) to a new location
    *
@@ -1644,6 +1699,23 @@ export interface PlaylistResourceClient {
   search(_for: string, only?: string, options?: CallOptions): Promise<void>
 }
 
+/** playable audio source */
+export interface TrackResourceClient {
+  /**
+   * List tracks.
+   *
+   * @param playlistId - Persistent ID of the playlist. Does not accept null.
+   */
+  list(playlistId: string, options?: CallOptions): Promise<readonly Track[]>
+  /**
+   * Read the track identified by `persistentID` within `playlistId`.
+   *
+   * @param playlistId - Persistent ID of the playlist. Does not accept null.
+   * @param persistentID - Persistent ID of the track. Does not accept null.
+   */
+  get(playlistId: string, persistentID: string, options?: CallOptions): Promise<Track>
+}
+
 /**
  * The Music client: one namespace per resource that has operations, plus the app's own commands. A
  * client factory creates one from {@link musicContract}.
@@ -1653,6 +1725,8 @@ export interface MusicClient {
   readonly fileTracks: FileTrackResourceClient
   /** a list of tracks/streams */
   readonly playlists: PlaylistResourceClient
+  /** playable audio source */
+  readonly tracks: TrackResourceClient
   /**
    * Print the specified object(s)
    *
@@ -1826,7 +1900,7 @@ const browserWindowRecordType: ValueType<BrowserWindow> = t.record(
   {
     selection: t.nullable(t.string(), { description: 'the selected tracks' }),
     view: t.nullable(
-      t.reference<Playlist, never, 'Playlist'>(() => musicContract, 'Playlist', 'one'),
+      t.reference<Playlist, string, 'Playlist'>(() => musicContract, 'Playlist', 'one'),
       { description: 'the playlist currently displayed in the window' }
     ),
   },
@@ -1916,6 +1990,13 @@ const miniplayerWindowRecordType: ValueType<MiniplayerWindow> = t.record(
 
 const playlistRecordType: ValueType<Playlist> = t.record(
   {
+    id: t.nullable(t.integer(), { description: 'the id of the item' }),
+    index: t.nullable(t.integer(), {
+      description: 'the index of the item in internal application order',
+    }),
+    persistentID: t.string({
+      description: 'the id of the item as a hexadecimal string. This id does not change over time.',
+    }),
     description: t.nullable(t.string(), { description: 'the description of the playlist' }),
     disliked: t.nullable(t.boolean(), { description: 'is this playlist disliked?' }),
     duration: t.nullable(t.integer(), {
@@ -1923,10 +2004,6 @@ const playlistRecordType: ValueType<Playlist> = t.record(
     }),
     name: t.nullable(t.string(), { description: 'the name of the playlist' }),
     favorited: t.nullable(t.boolean(), { description: 'is this playlist favorited?' }),
-    parent: t.nullable(
-      t.reference<Playlist, never, 'Playlist'>(() => musicContract, 'Playlist', 'one'),
-      { description: 'folder which contains this playlist (if any)' }
-    ),
     size: t.nullable(t.integer(), { description: 'the total size of all tracks (in bytes)' }),
     specialKind: t.nullable(t.string(), { description: 'special playlist kind' }),
     time: t.nullable(t.string(), { description: 'the length of all tracks in MM:SS format' }),
@@ -1941,7 +2018,7 @@ const playlistWindowRecordType: ValueType<PlaylistWindow> = t.record(
   {
     selection: t.nullable(t.string(), { description: 'the selected tracks' }),
     view: t.nullable(
-      t.reference<Playlist, never, 'Playlist'>(() => musicContract, 'Playlist', 'one'),
+      t.reference<Playlist, string, 'Playlist'>(() => musicContract, 'Playlist', 'one'),
       { description: 'the playlist displayed in the window' }
     ),
   },
@@ -1984,6 +2061,14 @@ const subscriptionPlaylistRecordType: ValueType<SubscriptionPlaylist> = t.record
 
 const trackRecordType: ValueType<Track> = t.record(
   {
+    id: t.nullable(t.integer(), { description: 'the id of the item' }),
+    index: t.nullable(t.integer(), {
+      description: 'the index of the item in internal application order',
+    }),
+    name: t.nullable(t.string(), { description: 'the name of the item' }),
+    persistentID: t.string({
+      description: 'the id of the item as a hexadecimal string. This id does not change over time.',
+    }),
     album: t.nullable(t.string(), { description: 'the album name of the track' }),
     albumArtist: t.nullable(t.string(), { description: 'the album artist of the track' }),
     albumDisliked: t.nullable(t.boolean(), {
@@ -2205,6 +2290,11 @@ const resources: AppContract<MusicClient>['resources'] = {
   Playlist: {
     name: 'Playlist',
     record: playlistRecordType,
+    id: t.string({
+      description: 'the id of the item as a hexadecimal string. This id does not change over time.',
+    }),
+    get: 'music.playlists.get',
+    list: 'music.playlists.list',
   },
   PlaylistWindow: {
     name: 'PlaylistWindow',
@@ -2229,6 +2319,11 @@ const resources: AppContract<MusicClient>['resources'] = {
   Track: {
     name: 'Track',
     record: trackRecordType,
+    id: t.string({
+      description: 'the id of the item as a hexadecimal string. This id does not change over time.',
+    }),
+    get: 'music.tracks.get',
+    list: 'music.tracks.list',
   },
   URLTrack: {
     name: 'URLTrack',
@@ -2245,6 +2340,92 @@ const resources: AppContract<MusicClient>['resources'] = {
   Visual: {
     name: 'Visual',
     record: visualRecordType,
+  },
+}
+
+const playlistListPlaylistsOperation: OperationDescriptor<
+  Record<string, never>,
+  readonly Playlist[]
+> = {
+  id: 'music.playlists.list',
+  permission: 'music:playlists:list',
+  target: { command: 'listPlaylists', resource: 'Playlist' },
+  description: 'List every playlist',
+  input: t.record({}),
+  output: t.array(playlistRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
+}
+
+const playlistGetPlaylistOperation: OperationDescriptor<
+  { readonly persistentID: string },
+  Playlist
+> = {
+  id: 'music.playlists.get',
+  permission: 'music:playlists:get',
+  target: { command: 'getPlaylist', resource: 'Playlist' },
+  description: 'Get a playlist by its persistent ID',
+  input: t.record({
+    persistentID: t.string({ description: 'Persistent ID of the playlist' }),
+  }),
+  output: playlistRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { persistentID: { type: 'string', description: 'Persistent ID of the playlist' } },
+    required: ['persistentID'],
+    additionalProperties: false,
+  },
+}
+
+const trackListTracksOperation: OperationDescriptor<
+  { readonly playlistId: string },
+  readonly Track[]
+> = {
+  id: 'music.tracks.list',
+  permission: 'music:tracks:list',
+  target: { command: 'listTracks', resource: 'Track' },
+  description:
+    'List the tracks of a playlist; the library playlist holds every track in the library',
+  input: t.record({
+    playlistId: t.string({ description: 'Persistent ID of the playlist' }),
+  }),
+  output: t.array(trackRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { playlistId: { type: 'string', description: 'Persistent ID of the playlist' } },
+    required: ['playlistId'],
+    additionalProperties: false,
+  },
+}
+
+const trackGetTrackOperation: OperationDescriptor<
+  { readonly playlistId: string; readonly persistentID: string },
+  Track
+> = {
+  id: 'music.tracks.get',
+  permission: 'music:tracks:get',
+  target: { command: 'getTrack', resource: 'Track' },
+  description: 'Get a track of a playlist by its persistent ID',
+  input: t.record({
+    playlistId: t.string({ description: 'Persistent ID of the playlist' }),
+    persistentID: t.string({ description: 'Persistent ID of the track' }),
+  }),
+  output: trackRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      playlistId: { type: 'string', description: 'Persistent ID of the playlist' },
+      persistentID: { type: 'string', description: 'Persistent ID of the track' },
+    },
+    required: ['playlistId', 'persistentID'],
+    additionalProperties: false,
   },
 }
 
@@ -2908,6 +3089,10 @@ const appOpenLocationOperation: OperationDescriptor<Record<string, never>, undef
 
 /** Every operation, keyed by its identity. */
 const operations: AppContract<MusicClient>['operations'] = {
+  'music.playlists.list': playlistListPlaylistsOperation,
+  'music.playlists.get': playlistGetPlaylistOperation,
+  'music.tracks.list': trackListTracksOperation,
+  'music.tracks.get': trackGetTrackOperation,
   'music.app.print': appPrintOperation,
   'music.app.close': appCloseOperation,
   'music.app.count': appCountOperation,
@@ -2948,9 +3133,18 @@ function bind(runtime: ClientRuntime): MusicClient {
       refresh: (options) => runtime.invoke(fileTrackRefreshOperation, {}, options),
     },
     playlists: {
+      list: (options) => runtime.invoke(playlistListPlaylistsOperation, {}, options),
+      get: (persistentID, options) =>
+        runtime.invoke(playlistGetPlaylistOperation, { persistentID }, options),
       move: (to, options) => runtime.invoke(playlistMoveOperation, { to }, options),
       search: (_for, only, options) =>
         runtime.invoke(playlistSearchOperation, { for: _for, only }, options),
+    },
+    tracks: {
+      list: (playlistId, options) =>
+        runtime.invoke(trackListTracksOperation, { playlistId }, options),
+      get: (playlistId, persistentID, options) =>
+        runtime.invoke(trackGetTrackOperation, { playlistId, persistentID }, options),
     },
     print: (printDialog, withProperties, kind, theme, options) =>
       runtime.invoke(appPrintOperation, { printDialog, withProperties, kind, theme }, options),

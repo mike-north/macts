@@ -1784,6 +1784,12 @@ importers:
       '@macts/calendar':
         specifier: workspace:*
         version: link:../calendar
+      '@macts/contacts':
+        specifier: workspace:*
+        version: link:../contacts
+      '@macts/music':
+        specifier: workspace:*
+        version: link:../music
       '@macts/notes':
         specifier: workspace:*
         version: link:../notes

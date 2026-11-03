@@ -131,7 +131,9 @@ export interface BrowserWindow {
 }
 
 // @public
-export type BrowserWindowCreateInput = Record<string, never>;
+export interface BrowserWindowCreateInput {
+    view?: Playlist;
+}
 
 // @public (undocumented)
 export const BrowserWindowSchema: z.ZodObject<{
@@ -381,6 +383,7 @@ export class MusicClient {
     save(): Promise<void>;
     select(): Promise<void>;
     stop(): Promise<void>;
+    readonly tracks: TrackResourceClient;
 }
 
 // @public
@@ -402,8 +405,10 @@ export interface Playlist {
     disliked: boolean;
     duration: number;
     favorited: boolean;
+    id: number;
+    index: number;
     name: string;
-    parent: Playlist;
+    persistentID: string;
     size: number;
     specialKind: string;
     time: string;
@@ -421,18 +426,22 @@ export interface PlaylistCreateInput {
 // @public
 export class PlaylistResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
+    get(persistentID: string): Promise<Playlist>;
+    list(): Promise<Playlist[]>;
     move(to: string): Promise<void>;
     search(_for: string, only?: string): Promise<void>;
 }
 
 // @public (undocumented)
 export const PlaylistSchema: z.ZodObject<{
+    id: z.ZodNumber;
+    index: z.ZodNumber;
+    persistentID: z.ZodString;
     description: z.ZodString;
     disliked: z.ZodBoolean;
     duration: z.ZodNumber;
     name: z.ZodString;
     favorited: z.ZodBoolean;
-    parent: z.ZodString;
     size: z.ZodNumber;
     specialKind: z.ZodString;
     time: z.ZodString;
@@ -564,6 +573,8 @@ export interface Track {
     gapless: boolean;
     genre: string;
     grouping: string;
+    id: number;
+    index: number;
     kind: string;
     longDescription: string;
     lyrics: string;
@@ -572,6 +583,8 @@ export interface Track {
     movement: string;
     movementCount: number;
     movementNumber: number;
+    name: string;
+    persistentID: string;
     playedCount: number;
     playedDate: Date;
     purchaserAccount: string;
@@ -636,6 +649,7 @@ export interface TrackCreateInput {
     movement?: string;
     movementCount?: number;
     movementNumber?: number;
+    name?: string;
     playedCount?: number;
     playedDate?: Date;
     rating?: number;
@@ -659,8 +673,19 @@ export interface TrackCreateInput {
     year?: number;
 }
 
+// @public
+export class TrackResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(playlistId: string, persistentID: string): Promise<Track>;
+    list(playlistId: string): Promise<Track[]>;
+}
+
 // @public (undocumented)
 export const TrackSchema: z.ZodObject<{
+    id: z.ZodNumber;
+    index: z.ZodNumber;
+    name: z.ZodString;
+    persistentID: z.ZodString;
     album: z.ZodString;
     albumArtist: z.ZodString;
     albumDisliked: z.ZodBoolean;

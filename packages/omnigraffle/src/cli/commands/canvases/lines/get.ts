@@ -14,7 +14,7 @@ export class GetLineCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  lineId = Option.String({ required: true })
+  lineId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

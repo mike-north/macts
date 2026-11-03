@@ -21,7 +21,7 @@ export class ProjectResourceClient {
   }
 
   /**
-   * List all projects.
+   * List the projects of one workspace document.
    */
   async list(workspaceName: string): Promise<Project[]> {
     return this.#http.rpc<Project[]>(`${this.#app}.${this.#resource}.list`, { workspaceName })

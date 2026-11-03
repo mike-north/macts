@@ -218,7 +218,7 @@ export const manifest: unknown = {
           access: 'rw',
           type: 'string',
           description: 'The AIM handle value',
-          code: 'valL',
+          code: 'az17',
           optional: false,
         },
       },
@@ -259,7 +259,7 @@ export const manifest: unknown = {
           access: 'rw',
           type: 'date',
           description: 'The date value',
-          code: 'valL',
+          code: 'az17',
           optional: false,
         },
       },
@@ -289,19 +289,6 @@ export const manifest: unknown = {
           description: 'Unique identifier for this email',
           code: 'ID  ',
           optional: false,
-          nullable: false,
-          evidence: {
-            nullable: {
-              source: 'probe',
-              observedAt: '2026-11-01T16:38:08.485Z',
-              bundleId: 'com.apple.AddressBook',
-              appVersion: '14.0',
-              osVersion: '27.2',
-              sampleSize: 32,
-              nullCount: 0,
-              failedReads: 0,
-            },
-          },
         },
         label: {
           access: 'rw',
@@ -327,7 +314,7 @@ export const manifest: unknown = {
           access: 'rw',
           type: 'string',
           description: 'The email address',
-          code: 'valL',
+          code: 'az17',
           optional: false,
           nullable: false,
           evidence: {
@@ -344,6 +331,12 @@ export const manifest: unknown = {
           },
         },
       },
+      identifiers: [
+        {
+          property: 'id',
+          primary: true,
+        },
+      ],
       nullabilityProbe: {
         observedAt: '2026-11-01T16:38:08.485Z',
         bundleId: 'com.apple.AddressBook',
@@ -364,6 +357,13 @@ export const manifest: unknown = {
       description: 'A Group Record in the address book database',
       code: 'azf5',
       properties: {
+        id: {
+          access: 'r',
+          type: 'string',
+          description: 'Unique and persistent identifier for this record.',
+          code: 'ID  ',
+          optional: false,
+        },
         name: {
           access: 'rw',
           type: 'string',
@@ -371,7 +371,27 @@ export const manifest: unknown = {
           code: 'pnam',
           optional: false,
         },
+        creationDate: {
+          access: 'r',
+          type: 'date',
+          description: 'When the contact was created.',
+          code: 'az35',
+          optional: false,
+        },
+        modificationDate: {
+          access: 'r',
+          type: 'date',
+          description: 'When the contact was last modified.',
+          code: 'az34',
+          optional: false,
+        },
       },
+      identifiers: [
+        {
+          property: 'id',
+          primary: true,
+        },
+      ],
       nullabilityProbe: {
         observedAt: '2026-11-01T16:38:08.485Z',
         bundleId: 'com.apple.AddressBook',
@@ -409,7 +429,7 @@ export const manifest: unknown = {
           access: 'rw',
           type: 'string',
           description: 'The ICQ handle value',
-          code: 'valL',
+          code: 'az17',
           optional: false,
         },
       },
@@ -504,7 +524,7 @@ export const manifest: unknown = {
           access: 'rw',
           type: 'string',
           description: 'The Jabber handle value',
-          code: 'valL',
+          code: 'az17',
           optional: false,
         },
       },
@@ -546,7 +566,7 @@ export const manifest: unknown = {
           access: 'rw',
           type: 'string',
           description: 'The MSN handle value',
-          code: 'valL',
+          code: 'az17',
           optional: false,
         },
       },
@@ -569,6 +589,27 @@ export const manifest: unknown = {
       description: 'A person in the address book database.',
       code: 'azf4',
       properties: {
+        id: {
+          access: 'r',
+          type: 'string',
+          description: 'Unique and persistent identifier for this record.',
+          code: 'ID  ',
+          optional: false,
+        },
+        creationDate: {
+          access: 'r',
+          type: 'date',
+          description: 'When the contact was created.',
+          code: 'az35',
+          optional: false,
+        },
+        modificationDate: {
+          access: 'r',
+          type: 'date',
+          description: 'When the contact was last modified.',
+          code: 'az34',
+          optional: false,
+        },
         nickname: {
           access: 'rw',
           type: 'string',
@@ -649,14 +690,6 @@ export const manifest: unknown = {
             },
           },
         },
-        vcard: {
-          access: 'r',
-          type: 'string',
-          description:
-            'Person information in vCard format, this always returns a card in version 3.0 format.',
-          code: 'az49',
-          optional: false,
-        },
         homePage: {
           access: 'rw',
           type: 'string',
@@ -679,7 +712,7 @@ export const manifest: unknown = {
         },
         birthDate: {
           access: 'rw',
-          type: 'string',
+          type: 'date',
           description: 'The birth date of this person.',
           code: 'az11',
           optional: false,
@@ -776,13 +809,6 @@ export const manifest: unknown = {
               failedReads: 0,
             },
           },
-        },
-        image: {
-          access: 'rw',
-          type: 'string',
-          description: 'Image for person.',
-          code: 'az50',
-          optional: false,
         },
         name: {
           access: 'r',
@@ -920,6 +946,12 @@ export const manifest: unknown = {
           },
         },
       },
+      identifiers: [
+        {
+          property: 'id',
+          primary: true,
+        },
+      ],
       nullabilityProbe: {
         observedAt: '2026-11-01T16:38:08.485Z',
         bundleId: 'com.apple.AddressBook',
@@ -946,19 +978,6 @@ export const manifest: unknown = {
           description: 'Unique identifier for this phone',
           code: 'ID  ',
           optional: false,
-          nullable: false,
-          evidence: {
-            nullable: {
-              source: 'probe',
-              observedAt: '2026-11-01T16:38:08.485Z',
-              bundleId: 'com.apple.AddressBook',
-              appVersion: '14.0',
-              osVersion: '27.2',
-              sampleSize: 48,
-              nullCount: 0,
-              failedReads: 0,
-            },
-          },
         },
         label: {
           access: 'rw',
@@ -984,7 +1003,7 @@ export const manifest: unknown = {
           access: 'rw',
           type: 'string',
           description: 'The phone number',
-          code: 'valL',
+          code: 'az17',
           optional: false,
           nullable: false,
           evidence: {
@@ -1001,6 +1020,12 @@ export const manifest: unknown = {
           },
         },
       },
+      identifiers: [
+        {
+          property: 'id',
+          primary: true,
+        },
+      ],
       nullabilityProbe: {
         observedAt: '2026-11-01T16:38:08.485Z',
         bundleId: 'com.apple.AddressBook',
@@ -1039,7 +1064,7 @@ export const manifest: unknown = {
           access: 'rw',
           type: 'string',
           description: 'The related name value',
-          code: 'valL',
+          code: 'az17',
           optional: false,
         },
       },
@@ -1143,7 +1168,7 @@ export const manifest: unknown = {
           access: 'rw',
           type: 'string',
           description: 'The URL value',
-          code: 'valL',
+          code: 'az17',
           optional: false,
         },
       },
@@ -1185,7 +1210,7 @@ export const manifest: unknown = {
           access: 'rw',
           type: 'string',
           description: 'The Yahoo handle value',
-          code: 'valL',
+          code: 'az17',
           optional: false,
         },
       },
@@ -1436,6 +1461,184 @@ export const manifest: unknown = {
   },
   relationships: [],
   commands: {
+    listPeople: {
+      name: 'list',
+      description: 'List every person',
+      scope: 'resource',
+      resourceType: 'Person',
+      parameters: [],
+      routeName: 'list',
+    },
+    getPerson: {
+      name: 'get',
+      description: 'Get a person by identifier',
+      scope: 'resource',
+      resourceType: 'Person',
+      parameters: [
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Identifier of the person',
+          required: true,
+        },
+      ],
+      routeName: 'get',
+    },
+    listGroups: {
+      name: 'list',
+      description: 'List every group',
+      scope: 'resource',
+      resourceType: 'Group',
+      parameters: [],
+      routeName: 'list',
+    },
+    getGroup: {
+      name: 'get',
+      description: 'Get a group by identifier',
+      scope: 'resource',
+      resourceType: 'Group',
+      parameters: [
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Identifier of the group',
+          required: true,
+        },
+      ],
+      routeName: 'get',
+    },
+    listEmails: {
+      name: 'list',
+      description: 'List the email addresses of a person',
+      scope: 'resource',
+      resourceType: 'Email',
+      parameters: [
+        {
+          name: 'personId',
+          type: 'string',
+          description: 'Identifier of the person',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Person',
+        parameter: 'personId',
+      },
+      routeName: 'list',
+    },
+    getEmail: {
+      name: 'get',
+      description: 'Get one email address of a person by its identifier',
+      scope: 'resource',
+      resourceType: 'Email',
+      parameters: [
+        {
+          name: 'personId',
+          type: 'string',
+          description: 'Identifier of the person',
+          required: true,
+        },
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Identifier of the email address',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Person',
+        parameter: 'personId',
+      },
+      routeName: 'get',
+    },
+    listPhones: {
+      name: 'list',
+      description: 'List the phone numbers of a person',
+      scope: 'resource',
+      resourceType: 'Phone',
+      parameters: [
+        {
+          name: 'personId',
+          type: 'string',
+          description: 'Identifier of the person',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Person',
+        parameter: 'personId',
+      },
+      routeName: 'list',
+    },
+    getPhone: {
+      name: 'get',
+      description: 'Get one phone number of a person by its identifier',
+      scope: 'resource',
+      resourceType: 'Phone',
+      parameters: [
+        {
+          name: 'personId',
+          type: 'string',
+          description: 'Identifier of the person',
+          required: true,
+        },
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Identifier of the phone number',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Person',
+        parameter: 'personId',
+      },
+      routeName: 'get',
+    },
+    listAddresses: {
+      name: 'list',
+      description: 'List the addresses of a person',
+      scope: 'resource',
+      resourceType: 'Address',
+      parameters: [
+        {
+          name: 'personId',
+          type: 'string',
+          description: 'Identifier of the person',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Person',
+        parameter: 'personId',
+      },
+      routeName: 'list',
+    },
+    getAddress: {
+      name: 'get',
+      description: 'Get one address of a person by its identifier',
+      scope: 'resource',
+      resourceType: 'Address',
+      parameters: [
+        {
+          name: 'personId',
+          type: 'string',
+          description: 'Identifier of the person',
+          required: true,
+        },
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Identifier of the address',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Person',
+        parameter: 'personId',
+      },
+      routeName: 'get',
+    },
     make: {
       name: 'make',
       description: 'Create a new object.',

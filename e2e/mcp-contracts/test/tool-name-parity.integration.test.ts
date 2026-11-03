@@ -103,8 +103,9 @@ describe('MCP tool names of every real operation', () => {
   })
 
   it('leave out exactly the operations a required input makes unavailable', () => {
-    // Contacts has no operation that gets one person, and Mail none that gets
-    // one account, so each listed operation's required reference admits no value.
+    // Mail has no operation that gets one account, so synchronize's required
+    // reference admits no value. Contacts gets one person (`people.get`), so
+    // its actions, whose required `for` is a person, stay available.
     const unavailable = apps.flatMap(({ contract }) =>
       Object.values(contract.operations).flatMap((operation) =>
         operation.unavailable === undefined
@@ -112,11 +113,6 @@ describe('MCP tool names of every real operation', () => {
           : [{ id: operation.id, positions: operation.unavailable.positions }]
       )
     )
-    expect(unavailable).toEqual([
-      { id: 'contacts.app.actionTitle', positions: ['for'] },
-      { id: 'contacts.app.performAction', positions: ['for'] },
-      { id: 'contacts.app.shouldEnableAction', positions: ['for'] },
-      { id: 'mail.app.synchronize', positions: ['with'] },
-    ])
+    expect(unavailable).toEqual([{ id: 'mail.app.synchronize', positions: ['with'] }])
   })
 })

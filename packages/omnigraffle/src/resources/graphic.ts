@@ -21,7 +21,7 @@ export class GraphicResourceClient {
   }
 
   /**
-   * List all graphics.
+   * List the graphics of one canvas.
    */
   async list(canvasId: string): Promise<Graphic[]> {
     return this.#http.rpc<Graphic[]>(`${this.#app}.${this.#resource}.list`, { canvasId })

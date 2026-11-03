@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ObjectReferenceData } from '@macts/contracts';
 
 // @public
 export interface Address {
@@ -30,6 +31,12 @@ export interface AddressCreateInput {
     state?: string;
     street?: string;
     zip?: string;
+}
+
+// @public
+export interface AddressResourceClient {
+    get(personId: string, id: string, options?: CallOptions): Promise<Address>;
+    list(personId: string, options?: CallOptions): Promise<readonly Address[]>;
 }
 
 // @public
@@ -66,10 +73,18 @@ export interface AIMHandleUpdateInput {
 // @public
 export interface ContactsClient {
     actionProperty(options?: CallOptions): Promise<void>;
+    actionTitle(_with: unknown, _for: ObjectReferenceData<string, 'Person'>, options?: CallOptions): Promise<void>;
     add(to: string, options?: CallOptions): Promise<void>;
+    readonly addresses: AddressResourceClient;
+    readonly emails: EmailResourceClient;
+    readonly groups: GroupResourceClient;
     make(_new: string, at?: string, withData?: unknown, withProperties?: unknown, options?: CallOptions): Promise<void>;
+    readonly people: PersonResourceClient;
+    performAction(_with: unknown, _for: ObjectReferenceData<string, 'Person'>, options?: CallOptions): Promise<void>;
+    readonly phones: PhoneResourceClient;
     remove(from: string, options?: CallOptions): Promise<void>;
     save(options?: CallOptions): Promise<void>;
+    shouldEnableAction(_with: unknown, _for: ObjectReferenceData<string, 'Person'>, options?: CallOptions): Promise<void>;
 }
 
 // @public
@@ -108,6 +123,12 @@ export interface EmailCreateInput {
 }
 
 // @public
+export interface EmailResourceClient {
+    get(personId: string, id: string, options?: CallOptions): Promise<Email>;
+    list(personId: string, options?: CallOptions): Promise<readonly Email[]>;
+}
+
+// @public
 export interface EmailUpdateInput {
     label?: string;
     value?: string;
@@ -115,12 +136,21 @@ export interface EmailUpdateInput {
 
 // @public
 export interface Group {
+    readonly creationDate: Date | null;
+    readonly id: string;
+    readonly modificationDate: Date | null;
     name: string | null;
 }
 
 // @public
 export interface GroupCreateInput {
     name?: string;
+}
+
+// @public
+export interface GroupResourceClient {
+    get(id: string, options?: CallOptions): Promise<Group>;
+    list(options?: CallOptions): Promise<readonly Group[]>;
 }
 
 // @public
@@ -190,16 +220,18 @@ export interface MSNHandleUpdateInput {
 
 // @public
 export interface Person {
-    birthDate: string | null;
+    birthDate: Date | null;
     company: boolean | null;
+    readonly creationDate: Date | null;
     department: string | null;
     firstName: string | null;
     homePage: string | null;
-    image: string | null;
+    readonly id: string;
     jobTitle: string | null;
     lastName: string | null;
     maidenName: string | null;
     middleName: string | null;
+    readonly modificationDate: Date | null;
     readonly name: string | null;
     nickname: string | null;
     note: string | null;
@@ -209,17 +241,15 @@ export interface Person {
     phoneticMiddleName: string | null;
     suffix: string | null;
     title: string | null;
-    readonly vcard: string | null;
 }
 
 // @public
 export interface PersonCreateInput {
-    birthDate?: string;
+    birthDate?: Date;
     company?: boolean;
     department?: string;
     firstName?: string;
     homePage?: string;
-    image?: string;
     jobTitle?: string;
     lastName?: string;
     maidenName?: string;
@@ -235,13 +265,18 @@ export interface PersonCreateInput {
 }
 
 // @public
+export interface PersonResourceClient {
+    get(id: string, options?: CallOptions): Promise<Person>;
+    list(options?: CallOptions): Promise<readonly Person[]>;
+}
+
+// @public
 export interface PersonUpdateInput {
-    birthDate?: string;
+    birthDate?: Date;
     company?: boolean;
     department?: string;
     firstName?: string;
     homePage?: string;
-    image?: string;
     jobTitle?: string;
     lastName?: string;
     maidenName?: string;
@@ -267,6 +302,12 @@ export interface Phone {
 export interface PhoneCreateInput {
     label?: string;
     value?: string;
+}
+
+// @public
+export interface PhoneResourceClient {
+    get(personId: string, id: string, options?: CallOptions): Promise<Phone>;
+    list(personId: string, options?: CallOptions): Promise<readonly Phone[]>;
 }
 
 // @public

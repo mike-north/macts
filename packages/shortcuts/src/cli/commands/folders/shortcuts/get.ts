@@ -14,7 +14,7 @@ export class GetShortcutCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  shortcutId = Option.String({ required: true })
+  shortcutId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

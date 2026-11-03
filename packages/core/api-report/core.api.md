@@ -2887,6 +2887,9 @@ export function resolveActivePolicyPath(home: string): string;
 export function resolveApprovalConfigPath(home: string): string;
 
 // @public
+export function resolveCanonicalIdentifierSource(resource: Resource | undefined): string | undefined;
+
+// @public
 export function resolveCommandRoutes(manifest: AppManifest, commandKey: string, command: Command): ManifestRoute[];
 
 // @public
