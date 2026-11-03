@@ -1446,6 +1446,49 @@ The contract, HTTP client and CLI generators, the capability registry and the
 permission listing take this judgment from one manifest-level function.
 Generation fails if the contract disagrees with it.
 
+Generated contracts never declare an output position whose reference a
+caller could not use, either. Every reference a manifest type describes is a
+single reference, and an array of them is a list of single references, so
+each needs its target's `get`. An output reference cannot be used when:
+
+- its target has no usable `get`, so no reference to it can be resolved;
+- that `get` records a parent (D10, command parents): native reads emit no
+  container (container scoping, below), so a reference read from the app to a
+  target identified only within its container could not be resolved;
+- or its target is name-keyed and its name is not claimed unique (name-keyed
+  resources, below), so the reference would resolve to whichever object has
+  that name, not necessarily the one the app returned.
+
+A position that holds such a reference anywhere, bare, in an array, or as the
+non-null case of a nullable value, is left out of output; generation does not
+fail. `null` and the empty array do not rescue it, as they do an input,
+because the app decides what it returns and every other value would be
+unusable. Leaving it out means:
+
+- A record field holding one is declared by no record type: not the
+  contract's record and its value type, not the HTTP client's read type and
+  its schema, and not what the CLI prints. The native get, list, create and
+  update bodies do not read it.
+- An operation whose result holds one declares no result.
+- Generation warns once per position, naming the app, the resource and field
+  (or the command), the target and the reason. A warning for a missing or
+  parent-scoped `get` cites #219; one for a name that is not claimed unique
+  cites this decision. The field returns once its target gains a `get` that
+  records no parent, or a unique claim with evidence.
+
+Input positions follow the input rule above, so a field left out of output
+may still be settable through create and update. The contract, HTTP client
+and CLI generators and the native reads take this judgment from one
+manifest-level function too, and generation fails if the contract disagrees
+with it. A manifest that is inconsistent, such as an identifier claimed
+unique without evidence, is still rejected. The exact set of output positions
+the shipped contracts leave out, each with its reason, is pinned by hand in
+`packages/core/src/generator/contract/index.test.ts`, so a new omission, or a
+field returning, is reviewed rather than silent.
+`e2e/mcp-contracts/test/output-references.integration.test.ts` checks that no
+output reference left in a shipped contract is one a caller could not use,
+and pins those that remain.
+
 **Encoding.** Encoding reads only the data fields (`app`, `resource`, `form`,
 `cardinality`, and `id`, `selector`, `entries`, or `container`). It never
 calls `resolve` or any other live member, so a bound reference and a plain
@@ -1480,19 +1523,24 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   parent. A native read emits a container exactly when resolving the object
   by id needs that parent. An object that is identified globally but reached
   only through a container emits no container. Examples are Chrome and Edge
-  tabs, Arc spaces, iTerm sessions, and nested Photos folders. An output
-  position whose target's identity is scoped to its container fails
-  generation. Until outputs to such targets are generated, no native read
-  emits a container.
+  tabs, Arc spaces, iTerm sessions, and nested Photos folders. Native reads
+  emit no container yet, so an output position whose target's identity is
+  scoped to its container is left out of output (resolvable targets, above)
+  until reads emit containers (#242).
 - **Name-keyed resources.** A resource whose primary identifier is its name
   keeps `ResourceDescriptor.id`. Resolving an identity reference to it means
   the same as a name selector: it resolves to whichever object has that name
   when it is resolved. When several objects share the name, the app defines
-  which one that is, so the reference does not pin one object. A name-keyed
-  target fails generation only at an output position. Input positions to it
-  are generated. Manifest evidence that a name is the app's identity for a
-  resource is not recorded, so no name-keyed target is exempt at output
-  positions.
+  which one that is, so the reference does not pin one object. An output
+  position referencing a name-keyed target is left out of output when the
+  name is not claimed unique (resolvable targets, above). Input positions to it are generated. A
+  resource is name-keyed when the property its identity references carry and
+  are resolved by (its targeting property, D10) is `name`. The manifest's
+  evidence that a name is the app's identity for a resource is its primary
+  identifier's `unique: true` claim, with the evidence for that claim (D9,
+  _Bounded list pages_). With the claim, the target is used at output
+  positions like any other. Without it, including a resource matched on its
+  name and claimed not unique, such as Calendar's calendars, it is not.
 
 **Native conversion scope.** The macOS provider converts a reference inside
 the automation process (D4, reference conversion) when it is a single
@@ -1630,8 +1678,8 @@ is rejected wherever it appears, so no bound reference to it ever exists:
   `input.wire` rejects it with `ValidationError` (D11).
 - **Returned by an operation.** This is a defect on our side, never the
   caller's. A contract may declare an output reference position only when its
-  target has its resolving operation, so such a reference means the contract
-  is wrong.
+  target has its resolving operation, which generation enforces (resolvable
+  targets, above), so such a reference means the contract is wrong.
   The runtime's check of the result against `output.wire` rejects it with
   `UnexpectedValueError` (step 8 above), and so does the client's decoding.
 - **Sent to the resolve route.** A target resource that records no resolving
