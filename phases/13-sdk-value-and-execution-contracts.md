@@ -1535,20 +1535,23 @@ plus identity collections whose entries are in it:
   single references, so each is found the same way, all before any record is
   read, and read the same way, in entry order, in one automation process. The
   result is validated against the `list` item plan although it is read with
-  the get record read; that is correct because the two plans are equal for
-  every resource with both, which a test over every shipped contract
-  enforces. A missing entry is `TargetNotFoundError` with `entryIndex`, the first missing
-  entry. An identity collection with no entries is authorized, governed and
-  audited like any other resolution, as a call of the resource's `list`
-  (resolution, steps 1 to 6, below), and then resolves to `[]` with no
-  automation run: the executor answers it without starting a process.
+  the get record read. That is correct because, for every resource with both,
+  the get record plan equals the list item plan and the get body reads the
+  same properties as the list body; a test over every shipped contract
+  enforces both. A missing entry is `TargetNotFoundError` with `entryIndex`,
+  the first missing entry.
+- An identity collection with no entries resolves to `[]` without starting an
+  automation process. Permission, governance, approval and audit still run
+  for it, as for any resolution: the runtime runs them as the resource's
+  `list` (resolution, steps 1 to 6, below) before the executor is called, and
+  only the automation process is skipped.
 - Every other reference fails as `InternalError` whose message names the form
   the provider does not resolve, before any automation runs: every selector
   form; a reference, or an identity-collection entry, with a container; and a
-  reference to a resource that is not top-level, has no identifier, or has no
-  entry in `resourcePlans`. Whether the resource is in scope is read from the
-  script's reference table, the one the codec reads, so resolution and
-  conversion share one boundary.
+  reference to a resource that is not top-level, has no identifier, has no
+  `get`, or has no entry in `resourcePlans`. Whether the resource is in scope
+  is read from the script's reference table, the one the codec reads, so
+  resolution and conversion share one boundary.
 
 Identity collections at operation positions still do not convert: only
 resolution reads them, entry by entry.
