@@ -9,7 +9,6 @@ import { CallOptions } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
-import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 
 // @public
@@ -47,14 +46,10 @@ export interface BrowserWindow {
 }
 
 // @public
-export interface BrowserWindowCreateInput {
-    view?: ObjectReferenceData<never, 'Playlist'>;
-}
+export type BrowserWindowCreateInput = Record<string, never>;
 
 // @public
-export interface BrowserWindowUpdateInput {
-    view?: ObjectReferenceData<never, 'Playlist'>;
-}
+export type BrowserWindowUpdateInput = Record<string, never>;
 
 // @public
 export type EMdK = 'homeVideo' | 'movie' | 'tVShow' | 'unknown';

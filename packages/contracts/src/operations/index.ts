@@ -73,6 +73,34 @@ export interface OperationDescriptor<Input, Output> {
    * source of truth (phases/13 D9).
    */
   readonly inputJsonSchema?: Readonly<Record<string, unknown>>
+  /**
+   * Present when the operation cannot be called: a required position of its
+   * input admits no value.
+   *
+   * @remarks
+   * The descriptor stays in the contract, so the operation keeps its identity
+   * and its input still rejects every request. Surfaces that offer operations
+   * to agents (MCP tools, generated CLI commands, capability discovery) leave
+   * an unavailable operation out, so they never offer a call that must fail.
+   */
+  readonly unavailable?: OperationUnavailability
+}
+
+/**
+ * Why an operation cannot be called.
+ *
+ * @remarks
+ * Each listed position takes a reference to a resource the app has no
+ * operation to resolve, so its value type accepts no reference
+ * (phases/13 D7, "Resolvable targets"). An optional position like that is
+ * left out of the input instead; only a required one makes the operation
+ * unavailable.
+ */
+export interface OperationUnavailability {
+  /** The input fields that admit no value, by request field name, in input order. */
+  readonly positions: readonly string[]
+  /** Why, in words for the operation's documentation. */
+  readonly reason: string
 }
 
 /** A descriptor whose input and output types are not statically known. */

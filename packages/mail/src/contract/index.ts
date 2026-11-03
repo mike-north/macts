@@ -1108,8 +1108,6 @@ export interface MessageViewerUpdateInput {
 export interface MessageCreateInput {
   /** The background color of the message */
   backgroundColor?: string
-  /** The mailbox in which this message is filed */
-  mailbox?: ObjectReferenceData<never, 'Mailbox'>
   /** Indicates whether the message is deleted or not */
   deletedStatus?: boolean
   /** Indicates whether the message is flagged or not */
@@ -1132,11 +1130,6 @@ export interface MessageUpdateInput {
    * Cannot be reset: null is rejected.
    */
   backgroundColor?: string
-  /**
-   * The mailbox in which this message is filed.
-   * Cannot be reset: null is rejected.
-   */
-  mailbox?: ObjectReferenceData<never, 'Mailbox'>
   /**
    * Indicates whether the message is deleted or not.
    * Cannot be reset: null is rejected.
@@ -1369,10 +1362,6 @@ export interface RuleCreateInput {
   runScript?: string
   /** Indicates whether all conditions must be met for rule to execute */
   allConditionsMustBeMet?: boolean
-  /** If rule matches, copy to this mailbox */
-  copyMessage?: ObjectReferenceData<never, 'Mailbox'>
-  /** If rule matches, move to this mailbox */
-  moveMessage?: ObjectReferenceData<never, 'Mailbox'>
   /**
    * Indicates whether the color will be used to highlight the text or background of a message in
    * the message list
@@ -1457,16 +1446,6 @@ export interface RuleUpdateInput {
    * Cannot be reset: null is rejected.
    */
   allConditionsMustBeMet?: boolean
-  /**
-   * If rule matches, copy to this mailbox.
-   * Cannot be reset: null is rejected.
-   */
-  copyMessage?: ObjectReferenceData<never, 'Mailbox'>
-  /**
-   * If rule matches, move to this mailbox.
-   * Cannot be reset: null is rejected.
-   */
-  moveMessage?: ObjectReferenceData<never, 'Mailbox'>
   /**
    * Indicates whether the color will be used to highlight the text or background of a message in
    * the message list.
@@ -1664,15 +1643,8 @@ export interface MailClient {
    * @param to - The new location for the object(s). Does not accept null.
    */
   move(to: string, options?: CallOptions): Promise<void>
-  /**
-   * Triggers a check for email.
-   *
-   * @param _for - Specify the account that you wish to check for mail. Does not accept null.
-   */
-  checkForNewMail(
-    _for?: ObjectReferenceData<string, 'Account'>,
-    options?: CallOptions
-  ): Promise<void>
+  /** Triggers a check for email. */
+  checkForNewMail(options?: CallOptions): Promise<void>
   /**
    * Command to get the full name out of a fully specified email address. E.g. Calling this with
    * "John Doe <jdoe@example.com>" as the direct object would return "John Doe"
@@ -1696,20 +1668,13 @@ export interface MailClient {
   /**
    * Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of
    * this handler is a list of messages being acted upon.
-   *
-   * @param inMailboxes - If the script is being executed by the user selecting an item in the
-   * scripts menu, this argument will specify the mailboxes that are currently selected. Otherwise
-   * it will not be specified. Does not accept null.
-   * @param forRule - If the script is being executed by a rule action, this argument will be the
-   * rule being invoked. Otherwise it will not be specified. Does not accept null.
    */
-  performMailActionWithMessages(
-    inMailboxes?: ObjectReferenceData<never, 'Mailbox'>,
-    forRule?: ObjectReferenceData<never, 'Rule'>,
-    options?: CallOptions
-  ): Promise<void>
+  performMailActionWithMessages(options?: CallOptions): Promise<void>
   /**
    * Command to trigger synchronizing of an IMAP account with the server.
+   *
+   * Not available: `with` takes a reference to an account, which the app has no operation to get,
+   * so the operation cannot be called.
    *
    * @param _with - The account to synchronize. Does not accept null.
    */
@@ -2351,34 +2316,17 @@ const messageBounceOperation: OperationDescriptor<Record<string, never>, undefin
   },
 }
 
-const appCheckForNewMailOperation: OperationDescriptor<
-  { readonly for?: ObjectReferenceData<string, 'Account'> | undefined },
-  undefined
-> = {
+const appCheckForNewMailOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'mail.app.checkForNewMail',
   permission: 'mail:app:checkForNewMail',
   target: { command: 'checkForNewMail' },
   description: 'Triggers a check for email.',
-  input: t.record({
-    for: t.optional(
-      t.reference<Account, string, 'Account'>(() => mailContract, 'Account', 'one', {
-        description: 'Specify the account that you wish to check for mail',
-      })
-    ),
-  }),
+  input: t.record({}),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      for: {
-        description: 'Specify the account that you wish to check for mail',
-        type: 'object',
-        properties: { reference: { not: {} } },
-        required: ['reference'],
-        additionalProperties: false,
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
@@ -2526,10 +2474,7 @@ const appMailtoOperation: OperationDescriptor<Record<string, never>, undefined> 
 }
 
 const appPerformMailActionWithMessagesOperation: OperationDescriptor<
-  {
-    readonly inMailboxes?: ObjectReferenceData<never, 'Mailbox'> | undefined
-    readonly forRule?: ObjectReferenceData<never, 'Rule'> | undefined
-  },
+  Record<string, never>,
   undefined
 > = {
   id: 'mail.app.performMailActionWithMessages',
@@ -2537,42 +2482,12 @@ const appPerformMailActionWithMessagesOperation: OperationDescriptor<
   target: { command: 'performMailActionWithMessages' },
   description:
     'Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of this handler is a list of messages being acted upon.',
-  input: t.record({
-    inMailboxes: t.optional(
-      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one', {
-        description:
-          'If the script is being executed by the user selecting an item in the scripts menu, this argument will specify the mailboxes that are currently selected. Otherwise it will not be specified.',
-      })
-    ),
-    forRule: t.optional(
-      t.reference<Rule, never, 'Rule'>(() => mailContract, 'Rule', 'one', {
-        description:
-          'If the script is being executed by a rule action, this argument will be the rule being invoked. Otherwise it will not be specified.',
-      })
-    ),
-  }),
+  input: t.record({}),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      inMailboxes: {
-        description:
-          'If the script is being executed by the user selecting an item in the scripts menu, this argument will specify the mailboxes that are currently selected. Otherwise it will not be specified.',
-        type: 'object',
-        properties: { reference: { not: {} } },
-        required: ['reference'],
-        additionalProperties: false,
-      },
-      forRule: {
-        description:
-          'If the script is being executed by a rule action, this argument will be the rule being invoked. Otherwise it will not be specified.',
-        type: 'object',
-        properties: { reference: { not: {} } },
-        required: ['reference'],
-        additionalProperties: false,
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
@@ -2692,6 +2607,11 @@ const appSynchronizeOperation: OperationDescriptor<
     required: ['with'],
     additionalProperties: false,
   },
+  unavailable: {
+    positions: ['with'],
+    reason:
+      'Not available: `with` takes a reference to an account, which the app has no operation to get, so the operation cannot be called.',
+  },
 }
 
 /** Every operation, keyed by its identity. */
@@ -2733,16 +2653,15 @@ function bind(runtime: ClientRuntime): MailClient {
     duplicate: (to, withProperties, options) =>
       runtime.invoke(appDuplicateOperation, { to, withProperties }, options),
     move: (to, options) => runtime.invoke(appMoveOperation, { to }, options),
-    checkForNewMail: (_for, options) =>
-      runtime.invoke(appCheckForNewMailOperation, { for: _for }, options),
+    checkForNewMail: (options) => runtime.invoke(appCheckForNewMailOperation, {}, options),
     extractNameFrom: (options) => runtime.invoke(appExtractNameFromOperation, {}, options),
     extractAddressFrom: (options) => runtime.invoke(appExtractAddressFromOperation, {}, options),
     getURL: (options) => runtime.invoke(appGetURLOperation, {}, options),
     importMailMailbox: (at, options) =>
       runtime.invoke(appImportMailMailboxOperation, { at }, options),
     mailto: (options) => runtime.invoke(appMailtoOperation, {}, options),
-    performMailActionWithMessages: (inMailboxes, forRule, options) =>
-      runtime.invoke(appPerformMailActionWithMessagesOperation, { inMailboxes, forRule }, options),
+    performMailActionWithMessages: (options) =>
+      runtime.invoke(appPerformMailActionWithMessagesOperation, {}, options),
     synchronize: (_with, options) =>
       runtime.invoke(appSynchronizeOperation, { with: _with }, options),
   }

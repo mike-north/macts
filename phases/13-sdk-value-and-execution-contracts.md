@@ -1290,6 +1290,23 @@ entry fails at its `resource`, for example `[...path, 'container',
 'resource']` or `[...path, 'entries', 0, 'resource']`, at every depth. An
 empty identity collection has no entry to resolve, so it is admitted.
 
+Generated surfaces never publish an operation an agent cannot call. Some input
+positions admit no value at all: those that take a single reference to a
+resource with no `get`. A position that also admits `null`, or that takes an
+array (which may be empty), is not one of them. What happens depends on
+whether the position is optional:
+
+- An optional one is left out of the input: the SDK types, the value types and
+  their JSON Schemas, the CLI flags, and the capability schema.
+- A required one means the operation can never be called. Generation warns,
+  naming the app, the operation and the position. The descriptor stays,
+  marked `unavailable` with the positions and the reason. The MCP adapter, the
+  generated CLI and capability discovery leave the operation out.
+
+The contract generator, the CLI generator and the capability registry take
+this judgment from one manifest-level function. Generation fails if the
+contract disagrees with it.
+
 **Encoding.** Encoding reads only the data fields (`app`, `resource`, `form`,
 `cardinality`, and `id`, `selector`, `entries`, or `container`). It never
 calls `resolve` or any other live member, so a bound reference and a plain

@@ -24,7 +24,6 @@ import {
   type CallOptions,
   type ClientRuntime,
   type Integer,
-  type ObjectReferenceData,
   type ObjectReferenceVariant,
   type OperationDescriptor,
   type Rectangle,
@@ -1676,35 +1675,19 @@ export interface LocationUpdateInput {
 }
 
 /** Input for creating a NetworkPreferencesObject. */
-export interface NetworkPreferencesObjectCreateInput {
-  /** the current location */
-  currentLocation?: ObjectReferenceData<string, 'Location'>
-}
+export type NetworkPreferencesObjectCreateInput = Record<string, never>
 
 /** Input for updating a NetworkPreferencesObject. Omitted fields are left unchanged. */
-export interface NetworkPreferencesObjectUpdateInput {
-  /**
-   * the current location.
-   * Cannot be reset: null is rejected.
-   */
-  currentLocation?: ObjectReferenceData<string, 'Location'>
-}
+export type NetworkPreferencesObjectUpdateInput = Record<string, never>
 
 /** Input for creating a Service. */
 export interface ServiceCreateInput {
-  /** the currently selected configuration */
-  currentConfiguration?: ObjectReferenceData<string, 'Configuration'>
   /** the name of the service */
   name?: string
 }
 
 /** Input for updating a Service. Omitted fields are left unchanged. */
 export interface ServiceUpdateInput {
-  /**
-   * the currently selected configuration.
-   * Cannot be reset: null is rejected.
-   */
-  currentConfiguration?: ObjectReferenceData<string, 'Configuration'>
   /**
    * the name of the service.
    * Cannot be reset: null is rejected.

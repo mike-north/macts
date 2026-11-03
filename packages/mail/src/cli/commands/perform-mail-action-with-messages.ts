@@ -14,25 +14,13 @@ export class PerformMailActionWithMessagesCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  inMailboxes = Option.String('--in-mailboxes', {
-    required: false,
-    description:
-      'If the script is being executed by the user selecting an item in the scripts menu, this argument will specify the mailboxes that are currently selected. Otherwise it will not be specified.',
-  })
-  forRule = Option.String('--for-rule', {
-    required: false,
-    description:
-      'If the script is being executed by a rule action, this argument will be the rule being invoked. Otherwise it will not be specified.',
-  })
+
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      await client.performMailActionWithMessages(
-        this.inMailboxes as unknown as Parameters<typeof client.performMailActionWithMessages>[0],
-        this.forRule as unknown as Parameters<typeof client.performMailActionWithMessages>[1]
-      )
+      await client.performMailActionWithMessages(undefined, undefined)
 
       const output = formatter.formatSuccess('performMailActionWithMessages completed successfully')
       this.context.stdout.write(output + '\n')

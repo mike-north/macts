@@ -232,7 +232,7 @@ export interface MailboxUpdateInput {
 
 // @public
 export interface MailClient {
-    checkForNewMail(_for?: ObjectReferenceData<string, 'Account'>, options?: CallOptions): Promise<void>;
+    checkForNewMail(options?: CallOptions): Promise<void>;
     _delete(options?: CallOptions): Promise<void>;
     duplicate(to?: string, withProperties?: unknown, options?: CallOptions): Promise<void>;
     extractAddressFrom(options?: CallOptions): Promise<void>;
@@ -243,7 +243,7 @@ export interface MailClient {
     readonly messages: MessageResourceClient;
     move(to: string, options?: CallOptions): Promise<void>;
     readonly outgoingMessages: OutgoingMessageResourceClient;
-    performMailActionWithMessages(inMailboxes?: ObjectReferenceData<never, 'Mailbox'>, forRule?: ObjectReferenceData<never, 'Rule'>, options?: CallOptions): Promise<void>;
+    performMailActionWithMessages(options?: CallOptions): Promise<void>;
     synchronize(_with: ObjectReferenceData<string, 'Account'>, options?: CallOptions): Promise<void>;
 }
 
@@ -285,7 +285,6 @@ export interface MessageCreateInput {
     flaggedStatus?: boolean;
     flagIndex?: Integer;
     junkMailStatus?: boolean;
-    mailbox?: ObjectReferenceData<never, 'Mailbox'>;
     readStatus?: boolean;
 }
 
@@ -304,7 +303,6 @@ export interface MessageUpdateInput {
     flaggedStatus?: boolean;
     flagIndex?: Integer;
     junkMailStatus?: boolean;
-    mailbox?: ObjectReferenceData<never, 'Mailbox'>;
     readStatus?: boolean;
 }
 
@@ -502,7 +500,6 @@ export interface RuleConditionUpdateInput {
 export interface RuleCreateInput {
     allConditionsMustBeMet?: boolean;
     colorMessage?: string;
-    copyMessage?: ObjectReferenceData<never, 'Mailbox'>;
     deleteMessage?: boolean;
     enabled?: boolean;
     forwardMessage?: string;
@@ -511,7 +508,6 @@ export interface RuleCreateInput {
     markFlagged?: boolean;
     markFlagIndex?: Integer;
     markRead?: boolean;
-    moveMessage?: ObjectReferenceData<never, 'Mailbox'>;
     name?: string;
     playSound?: string;
     redirectMessage?: string;
@@ -532,7 +528,6 @@ export type RuleType = 'account' | 'anyRecipient' | 'ccHeader' | 'matchesEveryMe
 export interface RuleUpdateInput {
     allConditionsMustBeMet?: boolean;
     colorMessage?: string;
-    copyMessage?: ObjectReferenceData<never, 'Mailbox'>;
     deleteMessage?: boolean;
     enabled?: boolean;
     forwardMessage?: string;
@@ -541,7 +536,6 @@ export interface RuleUpdateInput {
     markFlagged?: boolean;
     markFlagIndex?: Integer;
     markRead?: boolean;
-    moveMessage?: ObjectReferenceData<never, 'Mailbox'>;
     name?: string;
     playSound?: string;
     redirectMessage?: string;

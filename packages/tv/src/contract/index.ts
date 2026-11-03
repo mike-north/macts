@@ -26,7 +26,6 @@ import {
   type FileSource,
   type FileValue,
   type Integer,
-  type ObjectReferenceData,
   type ObjectReferenceVariant,
   type OperationDescriptor,
   type ValueType,
@@ -578,19 +577,10 @@ export interface ArtworkUpdateInput {
 }
 
 /** Input for creating a BrowserWindow. */
-export interface BrowserWindowCreateInput {
-  /** the playlist currently displayed in the window */
-  view?: ObjectReferenceData<never, 'Playlist'>
-}
+export type BrowserWindowCreateInput = Record<string, never>
 
 /** Input for updating a BrowserWindow. Omitted fields are left unchanged. */
-export interface BrowserWindowUpdateInput {
-  /**
-   * the playlist currently displayed in the window.
-   * Cannot be reset: null is rejected.
-   */
-  view?: ObjectReferenceData<never, 'Playlist'>
-}
+export type BrowserWindowUpdateInput = Record<string, never>
 
 /** Input for creating a FileTrack. */
 export interface FileTrackCreateInput {

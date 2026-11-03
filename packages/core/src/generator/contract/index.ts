@@ -62,6 +62,7 @@ import {
   isCrudName,
   listMethodParameters,
   resolveIdParams,
+  resolvingCommand,
   resourceCommandEntries,
   resourceHasOperations,
   resourceNamespace,
@@ -69,6 +70,7 @@ import {
   type CrudOperation,
   type DeclaredType,
 } from '../surface.js'
+import { unsatisfiableInputs, unsatisfiableTarget } from '../input-satisfiability.js'
 import {
   ValueBuilder,
   ValueRenderer,
@@ -111,6 +113,12 @@ interface ContractDiagnosticBase {
  *   resource's primary identifier property. The contract keeps the identifier
  *   non-null, since a reference cannot exist without it; evidence that it is
  *   sometimes empty means the identifier choice is wrong.
+ * - `unavailable-operation`: a required input position of an operation takes
+ *   a reference to a resource the app cannot resolve, so the operation can
+ *   never be called. Its descriptor is marked `unavailable`, and MCP tools,
+ *   generated CLI commands and capability discovery leave it out. The fix is
+ *   to give the resource a `get`, with evidence, or to mark the command
+ *   unsupported.
  */
 export type ContractDiagnostic =
   | (ContractDiagnosticBase & {
@@ -122,6 +130,13 @@ export type ContractDiagnostic =
       readonly kind: 'identifier-nullability-ignored'
       /** The ignored claim's evidence. */
       readonly evidence: NullabilityEvidence
+    })
+  | (ContractDiagnosticBase & {
+      readonly kind: 'unavailable-operation'
+      /** The operation that cannot be called. */
+      readonly operation: OperationId
+      /** The manifest key of the resource the position references. */
+      readonly resource: string
     })
 
 /** The generated contract modules and what generation found. */
@@ -165,7 +180,8 @@ export function contractNames(manifest: AppManifest): ContractNames {
  * Report every manifest type that does not resolve, once per declaration
  * site (resource properties, command parameters, and command results), and
  * every nullability claim on a primary identifier property, which the
- * contract ignores.
+ * contract ignores, and every required input position that makes its
+ * operation unavailable.
  */
 export function collectContractDiagnostics(manifest: AppManifest): ContractDiagnostic[] {
   const app = normalizeAppRouteSegment(manifest.app.name)
@@ -202,6 +218,23 @@ export function collectContractDiagnostics(manifest: AppManifest): ContractDiagn
       check(param.type, `commands.${commandKey}.parameters.${param.name}`)
     }
     if (command.returns !== undefined) check(command.returns, `commands.${commandKey}.returns`)
+  }
+  for (const route of resolveManifestRoutes(manifest)) {
+    for (const input of unsatisfiableInputs(manifest, route.command, route.resourceType)) {
+      if (!input.required) continue
+      const position =
+        input.source === 'property' && route.resourceType !== undefined
+          ? `resources.${route.resourceType}.properties.${input.name}`
+          : `commands.${route.commandKey}.parameters.${input.name}`
+      diagnostics.push({
+        kind: 'unavailable-operation',
+        app,
+        position,
+        operation: operationId(route.route),
+        resource: input.resource,
+        message: `${app}: ${position}: ${route.route} cannot be called and is left out of MCP tools, CLI commands and capability discovery: the required input "${input.name}" takes a reference to "${input.resource}", which the app has no operation to get.`,
+      })
+    }
   }
   return diagnostics
 }
@@ -289,6 +322,12 @@ interface OperationModel {
   readonly binding: string
   readonly input: InputModel
   readonly output: OutputModel
+  /**
+   * The required input fields that admit no value, each with the resource it
+   * references (see `../input-satisfiability.ts`); empty when the operation
+   * can be called.
+   */
+  readonly unavailable: readonly { readonly name: string; readonly resource: string }[]
 }
 
 /** One client method, and the operation it invokes. */
@@ -431,10 +470,9 @@ class ContractBuilder {
    * generated value types.
    */
   #resolvingRoutes(resourceKey: string): { get?: OperationId; list?: OperationId } {
-    const commands = resourceCommandEntries(this.#manifest, resourceKey)
     const routes: { get?: OperationId; list?: OperationId } = {}
     for (const shape of ['get', 'list'] as const) {
-      const found = findCrudCommand(commands, shape)
+      const found = resolvingCommand(this.#manifest, resourceKey, shape)
       const operation =
         found === undefined
           ? undefined
@@ -525,11 +563,18 @@ class ContractBuilder {
           `${route.route}: the permission ${JSON.stringify(route.permission)} is not of the form app:resource:operation.`
         )
       }
+      const input = this.#inputModel(route)
+      const unavailable = this.#inputFields(input).flatMap(({ name, shape }) => {
+        const resource = unsatisfiableTarget(this.#manifest, shape)
+        return resource === undefined ? [] : [{ name, resource }]
+      })
+      this.#checkSatisfiability(route, input, unavailable)
       const operation: OperationModel = {
         route,
         binding,
-        input: this.#inputModel(route),
+        input,
         output: this.#outputModel(route),
+        unavailable,
       }
       this.#operations.push(operation)
       this.#operationsByRoute.set(this.#routeOf(route.commandKey, route.resourceType), operation)
@@ -556,9 +601,62 @@ class ContractBuilder {
   }
 
   /**
+   * Whether an input field admits a value. A field that admits none takes a
+   * reference to a resource the app cannot resolve (see
+   * `../input-satisfiability.ts`).
+   */
+  #admits(field: FieldModel): boolean {
+    return unsatisfiableTarget(this.#manifest, field.shape) === undefined
+  }
+
+  /**
+   * Whether an input field is part of its input: every field except an
+   * optional one that admits no value, which is left out so that the
+   * operation stays callable without it.
+   */
+  #keeps(field: FieldModel): boolean {
+    return !field.optional || this.#admits(field)
+  }
+
+  /** The fields of an input record, as its value type declares them. */
+  #inputFields(input: InputModel): readonly FieldModel[] {
+    return input.kind === 'create' ? this.#createInputFields(input.resourceKey) : input.fields
+  }
+
+  /**
+   * Check the input of a route against the manifest-level judgment the CLI
+   * generator and the capability registry use, so that every surface leaves
+   * out the same positions and operations. A disagreement is a generator
+   * defect, reported as an error so the contract is not published.
+   */
+  #checkSatisfiability(
+    route: ManifestRoute,
+    input: InputModel,
+    unavailable: OperationModel['unavailable']
+  ): void {
+    const judged = unsatisfiableInputs(this.#manifest, route.command, route.resourceType)
+    const required = judged.filter((position) => position.required).map(({ name }) => name)
+    const kept = new Set(this.#inputFields(input).map(({ name }) => name))
+    const omittedButKept = judged.filter(
+      (position) => !position.required && kept.has(position.name)
+    )
+    const unavailableNames = unavailable.map(({ name }) => name)
+    if (
+      omittedButKept.length > 0 ||
+      required.length !== unavailableNames.length ||
+      required.some((name, index) => unavailableNames[index] !== name)
+    ) {
+      this.errors.push(
+        `${route.route}: the input positions that admit no value disagree with the shared judgment (required ${JSON.stringify(required)}, contract ${JSON.stringify(unavailableNames)}; optional but kept ${JSON.stringify(omittedButKept.map(({ name }) => name))}).`
+      )
+    }
+  }
+
+  /**
    * The input record of a route: the command's parameters, plus whatever the
    * client method sends for the route's CRUD shape (identifier parameters, and
-   * create or update input fields), keyed exactly as sent.
+   * create or update input fields), keyed exactly as sent. Optional fields
+   * that admit no value are left out.
    */
   #inputModel(route: ManifestRoute): InputModel {
     const shape = this.#crudShape(route)
@@ -576,13 +674,13 @@ class ContractBuilder {
     }
     for (const [name, field] of identifiers) fields.set(name, field)
     if (shape === 'update' && resourceKey !== undefined && this.#isChosenCrud(route, shape)) {
-      for (const field of this.#updateInputFields(resourceKey)) fields.set(field.name, field)
+      for (const field of this.#updateFields(resourceKey)) fields.set(field.name, field)
     }
     for (const param of route.command.parameters) {
       if (fields.has(param.name)) continue
       fields.set(param.name, this.#parameterField(param))
     }
-    return { kind: 'fields', fields: [...fields.values()] }
+    return { kind: 'fields', fields: [...fields.values()].filter((field) => this.#keeps(field)) }
   }
 
   /**
@@ -641,9 +739,18 @@ class ContractBuilder {
   /**
    * The create input fields of a resource. They are never nullable (D10): a
    * property's `nullable` claim describes reads, not what a create accepts,
-   * and there is no claim kind for create inputs.
+   * and there is no claim kind for create inputs. An optional field that
+   * admits no value is left out.
    */
   #createInputFields(resourceKey: string): FieldModel[] {
+    return this.#createFields(resourceKey).filter((field) => this.#keeps(field))
+  }
+
+  /**
+   * Every create input field of a resource, including optional ones that
+   * admit no value.
+   */
+  #createFields(resourceKey: string): FieldModel[] {
     return [...createInputFields(this.#manifest, resourceKey)].map(([name, field]) => ({
       name,
       shape: this.#map(field.type, 'input'),
@@ -657,9 +764,14 @@ class ContractBuilder {
    * identifiers the update command takes positionally, all optional, so an
    * omitted field is unchanged. A field accepts `null`, meaning "reset", only
    * when the property of that name is verified resettable; elsewhere `null` is
-   * rejected rather than attempted.
+   * rejected rather than attempted. A field that admits no value is left out.
    */
   #updateInputFields(resourceKey: string): FieldModel[] {
+    return this.#updateFields(resourceKey).filter((field) => this.#keeps(field))
+  }
+
+  /** Every update input field of a resource, including those that admit no value. */
+  #updateFields(resourceKey: string): FieldModel[] {
     const update = findCrudCommand(resourceCommandEntries(this.#manifest, resourceKey), 'update')
     const positional = new Set<string>()
     if (update !== undefined) {
@@ -669,7 +781,7 @@ class ContractBuilder {
     }
     const properties: Readonly<Record<string, Property>> =
       this.#manifest.resources[resourceKey]?.properties ?? {}
-    return this.#createInputFields(resourceKey)
+    return this.#createFields(resourceKey)
       .filter((field) => !positional.has(field.name))
       .map((field) => {
         const property = Object.hasOwn(properties, field.name) ? properties[field.name] : undefined
@@ -845,7 +957,13 @@ class ContractBuilder {
 
   /** A method for an app command or a resource command that is not a CRUD shape. */
   #commandMethod(command: Command, operation: OperationModel): MethodModel {
-    const { signature, body } = commandMethodParameters(command)
+    // The method takes exactly the fields of its operation's input, so a
+    // parameter left out of the input is left out of the signature too.
+    const inputFields = new Set(this.#inputFields(operation.input).map(({ name }) => name))
+    const { signature, body } = commandMethodParameters({
+      ...command,
+      parameters: command.parameters.filter(({ name }) => inputFields.has(name)),
+    })
     const output = operation.output
     return {
       name: safeIdentifier(command.name),
@@ -1015,7 +1133,9 @@ class ContractBuilder {
       ),
       ...(method.returnsDoc === undefined ? [] : [`@returns ${method.returnsDoc}`]),
     ]
-    const doc = tags.length === 0 ? method.doc : `${method.doc}\n\n${tags.join('\n')}`
+    const unavailable = unavailableReason(method.operation)
+    const text = unavailable === undefined ? method.doc : `${method.doc}\n\n${unavailable}`
+    const doc = tags.length === 0 ? text : `${text}\n\n${tags.join('\n')}`
     return `${docComment(doc, '  ')}  ${method.name}(${params}): Promise<${method.returnType}>`
   }
 
@@ -1174,9 +1294,21 @@ ${entries.join('\n')}
   description: ${stringLiteral(route.command.description)},
   input: ${input},
   output: ${this.#outputExpression(operation.output)},
-  inputJsonSchema: ${this.#inputJsonSchema(operation.input)},
+  inputJsonSchema: ${this.#inputJsonSchema(operation.input)},${this.#renderUnavailable(operation)}
 }
 `
+  }
+
+  /** The descriptor's `unavailable` member, for an operation that cannot be called. */
+  #renderUnavailable(operation: OperationModel): string {
+    const reason = unavailableReason(operation)
+    if (reason === undefined) return ''
+    const positions = operation.unavailable.map(({ name }) => stringLiteral(name)).join(', ')
+    return `
+  unavailable: {
+    positions: [${positions}],
+    reason: ${stringLiteral(reason)},
+  },`
   }
 
   #renderOperationTable(): string {
@@ -1293,6 +1425,20 @@ export const ${contract}: AppContract<${client}> = {
 
 /** The `@returns` text of a command result, which is nullable by default. */
 const RESULT_NULLABILITY_NOTE = 'Nullable. No evidence that the app always returns a value.'
+
+/**
+ * Why an operation cannot be called, in user-facing words, or `undefined`
+ * when it can: each required input field that admits no value, with the
+ * resource it references.
+ */
+function unavailableReason(operation: OperationModel): string | undefined {
+  if (operation.unavailable.length === 0) return undefined
+  const causes = operation.unavailable.map(
+    ({ name, resource }) =>
+      `\`${name}\` takes a reference to ${withArticle(identifierWords(resource))}, which the app has no operation to get`
+  )
+  return `Not available: ${causes.join('; ')}, so the operation cannot be called.`
+}
 
 /**
  * A field's documentation: its description, then its nullability note, on

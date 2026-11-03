@@ -58,31 +58,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'contacts.app.actionTitle',
-    app: 'contacts',
-    appBundleId: 'com.apple.AddressBook',
-    resource: 'app',
-    operation: 'actionTitle',
-    description: 'RollOver - Returns the title that will be placed in the menu for this roll over',
-    permission: 'contacts:app:actionTitle',
-    risk: 'execute',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        with: {
-          description: 'property that that was returned from the "action property" handler.',
-          type: 'string',
-        },
-        for: {
-          description: 'Currently selected person.',
-          type: 'string',
-        },
-      },
-      additionalProperties: false,
-      required: ['with', 'for'],
-    },
-  },
-  {
     name: 'contacts.app.add',
     app: 'contacts',
     appBundleId: 'com.apple.AddressBook',
@@ -137,31 +112,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'contacts.app.performAction',
-    app: 'contacts',
-    appBundleId: 'com.apple.AddressBook',
-    resource: 'app',
-    operation: 'performAction',
-    description: 'RollOver - Performs the action on the given person and value',
-    permission: 'contacts:app:performAction',
-    risk: 'execute',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        with: {
-          description: 'property that that was returned from the "action property" handler.',
-          type: 'string',
-        },
-        for: {
-          description: 'Currently selected person.',
-          type: 'string',
-        },
-      },
-      additionalProperties: false,
-      required: ['with', 'for'],
-    },
-  },
-  {
     name: 'contacts.app.remove',
     app: 'contacts',
     appBundleId: 'com.apple.AddressBook',
@@ -196,32 +146,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
       type: 'object',
       properties: {},
       additionalProperties: false,
-    },
-  },
-  {
-    name: 'contacts.app.shouldEnableAction',
-    app: 'contacts',
-    appBundleId: 'com.apple.AddressBook',
-    resource: 'app',
-    operation: 'shouldEnableAction',
-    description:
-      'RollOver - Determines if the rollover action should be enabled for the given person and value',
-    permission: 'contacts:app:shouldEnableAction',
-    risk: 'read',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        with: {
-          description: 'property that that was returned from the "action property" handler.',
-          type: 'string',
-        },
-        for: {
-          description: 'Currently selected person.',
-          type: 'string',
-        },
-      },
-      additionalProperties: false,
-      required: ['with', 'for'],
     },
   },
 ]

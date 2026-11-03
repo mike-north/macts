@@ -14,7 +14,6 @@ import { GetURLCommand } from './commands/get-url.js'
 import { ImportMailMailboxCommand } from './commands/import-mail-mailbox.js'
 import { MailtoCommand } from './commands/mailto.js'
 import { PerformMailActionWithMessagesCommand } from './commands/perform-mail-action-with-messages.js'
-import { SynchronizeCommand } from './commands/synchronize.js'
 
 /**
  * CLI plugin for Mail.
@@ -38,6 +37,5 @@ export const plugin: CliPlugin = {
     ImportMailMailboxCommand,
     MailtoCommand,
     PerformMailActionWithMessagesCommand,
-    SynchronizeCommand,
   ],
 }

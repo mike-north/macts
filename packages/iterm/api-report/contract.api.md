@@ -8,7 +8,6 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
-import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Point } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
@@ -183,14 +182,12 @@ export interface Tab {
 
 // @public
 export interface TabCreateInput {
-    currentSession?: ObjectReferenceData<string, 'Session'>;
     index?: Integer;
     title?: string;
 }
 
 // @public
 export interface TabUpdateInput {
-    currentSession?: ObjectReferenceData<string, 'Session'>;
     index?: Integer;
     title?: string;
 }
@@ -223,8 +220,6 @@ export interface Window {
 // @public
 export interface WindowCreateInput {
     bounds?: Rectangle;
-    currentSession?: ObjectReferenceData<string, 'Session'>;
-    currentTab?: ObjectReferenceData<never, 'Tab'>;
     frame?: Rectangle;
     frontmost?: boolean;
     hotkeyWindowProfile?: string;
@@ -241,8 +236,6 @@ export interface WindowCreateInput {
 // @public
 export interface WindowUpdateInput {
     bounds?: Rectangle;
-    currentSession?: ObjectReferenceData<string, 'Session'>;
-    currentTab?: ObjectReferenceData<never, 'Tab'>;
     frame?: Rectangle;
     frontmost?: boolean;
     hotkeyWindowProfile?: string;

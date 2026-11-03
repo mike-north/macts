@@ -179,11 +179,19 @@ export function generateCreateCommand(
   // Build parameter options for parent IDs
   const parentOptions = generateParentOptions(hierarchyPath.parentParams)
 
-  // Build flag options for writable properties
-  const propertyFlags = generatePropertyFlags(resource, ctx)
+  // Build flag options for writable properties, except inputs left out
+  // because they admit no value
+  const createCommand = ctx
+    .getResourceCommands(hierarchyPath.resourceName)
+    .find((c) => c.name === 'create')
+  const omitted =
+    createCommand === undefined
+      ? new Set<string>()
+      : ctx.omittedInputs(createCommand, hierarchyPath.resourceName)
+  const propertyFlags = generatePropertyFlags(resource, ctx, omitted)
 
   // Build create input object
-  const createInput = generateCreateInput(resource)
+  const createInput = generateCreateInput(resource, omitted)
 
   const needsTypanion = propertyFlags.includes('t.isEnum')
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
@@ -337,8 +345,13 @@ export function generateAppCommand(
     return 0
   })
 
-  // Build parameter flags
-  const paramFlags = sortedParams.map((p) => generateParameterFlag(p, ctx, cmd.name)).join('\n')
+  // Build parameter flags. An input left out because it admits no value has
+  // no flag, and its positional argument is passed as undefined.
+  const omitted = ctx.omittedInputs(cmd, undefined)
+  const paramFlags = sortedParams
+    .filter((p) => !omitted.has(p.name))
+    .map((p) => generateParameterFlag(p, ctx, cmd.name))
+    .join('\n')
 
   // Use safe identifier for method name (e.g., 'delete' → '_delete', 'export' → '_export')
   const safeMethodName = safeIdentifier(cmd.name)
@@ -348,12 +361,12 @@ export function generateAppCommand(
   // values as broad primitives (string/boolean) which may not structurally overlap the
   // SDK's narrower types (enums, Date, number, arrays), so we assert via \`unknown\`.
   // The RPC layer validates/coerces the value at runtime.
-  const methodArgs = sortedParams
-    .map(
-      (p, i) =>
-        `this.${safeParamProperty(p.name, cmd.name)} as unknown as Parameters<typeof client.${safeMethodName}>[${String(i)}]`
-    )
-    .join(', ')
+  const methodArgs = positionalArgs(
+    sortedParams,
+    omitted,
+    (p, i) =>
+      `this.${safeParamProperty(p.name, cmd.name)} as unknown as Parameters<typeof client.${safeMethodName}>[${String(i)}]`
+  )
 
   const needsTypanion = paramFlags.includes('t.isEnum')
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
@@ -432,8 +445,13 @@ export function generateResourceCommand(
     hierarchyPath.parentParams.filter((p) => p.name !== idParamName && !paramNames.has(p.name))
   )
 
-  // Build parameter flags for command parameters
-  const paramFlags = cmd.parameters.map((p) => generateParameterFlag(p, ctx, cmd.name)).join('\n')
+  // Build parameter flags for command parameters, except inputs left out
+  // because they admit no value
+  const omitted = ctx.omittedInputs(cmd, hierarchyPath.resourceName)
+  const paramFlags = cmd.parameters
+    .filter((p) => !omitted.has(p.name))
+    .map((p) => generateParameterFlag(p, ctx, cmd.name))
+    .join('\n')
 
   // Only declare the implicit resource-ID option when no command parameter already
   // declares an identifier of the same name (otherwise we emit a duplicate field).
@@ -463,7 +481,7 @@ ${parentOptions}${idOption}${paramFlags}
 
     try {
       const client = getClient();
-      await client.${resourceAccess}.${safeIdentifier(cmd.name)}(${generateResourceCommandArgs(cmd, `client.${resourceAccess}.${safeIdentifier(cmd.name)}`)});
+      await client.${resourceAccess}.${safeIdentifier(cmd.name)}(${generateResourceCommandArgs(cmd, omitted, `client.${resourceAccess}.${safeIdentifier(cmd.name)}`)});
 
       const output = formatter.formatSuccess('${cmd.name} completed successfully');
       this.context.stdout.write(output + '\\n');
@@ -494,7 +512,11 @@ ${parentOptions}${idOption}${paramFlags}
  * primitives (string/boolean) which may not structurally overlap the SDK's narrower
  * types (enums, Date, number, arrays); the RPC layer validates/coerces at runtime.
  */
-function generateResourceCommandArgs(cmd: ManifestCommand, methodRef: string): string {
+function generateResourceCommandArgs(
+  cmd: ManifestCommand,
+  omitted: ReadonlySet<string>,
+  methodRef: string
+): string {
   if (cmd.parameters.length === 0) return ''
 
   const sorted = [...cmd.parameters].sort((a, b) => {
@@ -503,12 +525,25 @@ function generateResourceCommandArgs(cmd: ManifestCommand, methodRef: string): s
     return 0
   })
 
-  return sorted
-    .map(
-      (p, i) =>
-        `this.${safeParamProperty(p.name, cmd.name)} as unknown as Parameters<typeof ${methodRef}>[${String(i)}]`
-    )
-    .join(', ')
+  return positionalArgs(
+    sorted,
+    omitted,
+    (p, i) =>
+      `this.${safeParamProperty(p.name, cmd.name)} as unknown as Parameters<typeof ${methodRef}>[${String(i)}]`
+  )
+}
+
+/**
+ * The positional arguments of an SDK method call, one per parameter in
+ * signature order. A parameter left out of the operation's input has no flag,
+ * so its position is passed as `undefined`.
+ */
+function positionalArgs(
+  params: readonly CommandParameter[],
+  omitted: ReadonlySet<string>,
+  render: (param: CommandParameter, index: number) => string
+): string {
+  return params.map((p, i) => (omitted.has(p.name) ? 'undefined' : render(p, i))).join(', ')
 }
 
 function generateParentOptions(parentParams: ParentParam[]): string {
@@ -545,11 +580,15 @@ function generateListParamOptions(params: CommandParameter[]): string {
   )
 }
 
-function generatePropertyFlags(resource: Resource, ctx: CliGeneratorContext): string {
+function generatePropertyFlags(
+  resource: Resource,
+  ctx: CliGeneratorContext,
+  omitted: ReadonlySet<string>
+): string {
   const flags: string[] = []
 
   for (const [propName, prop] of usableProperties(resource)) {
-    if (prop.access !== 'rw') continue
+    if (prop.access !== 'rw' || omitted.has(propName)) continue
 
     const flagName = toKebabCase(propName)
     const required = !prop.optional
@@ -613,11 +652,11 @@ function generateListFieldMapping(resource: Resource, indent = '        '): stri
   return fields.join('\n')
 }
 
-function generateCreateInput(resource: Resource): string {
+function generateCreateInput(resource: Resource, omitted: ReadonlySet<string>): string {
   const fields: string[] = []
 
   for (const [propName, prop] of usableProperties(resource)) {
-    if (prop.access === 'rw') {
+    if (prop.access === 'rw' && !omitted.has(propName)) {
       fields.push(`        ${propName}: this.${propName},`)
     }
   }

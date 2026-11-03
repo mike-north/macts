@@ -5,6 +5,7 @@ import {
   usableHierarchyChildren,
   usableResources,
 } from '../../manifest/unsupported.js'
+import { isOperationAvailable, omittedInputs } from '../input-satisfiability.js'
 
 export interface CliGeneratorOptions {
   /** Package name (e.g., @macts/calendar) */
@@ -45,6 +46,19 @@ export interface CliGeneratorContext {
 
   /** Get the hierarchy as a flat list of paths */
   getHierarchyPaths(): HierarchyPath[]
+
+  /**
+   * Whether the operation `cmd` performs on `resourceName` (`undefined` for an
+   * application command) can be called. One that cannot gets no CLI command
+   * (see `../input-satisfiability.ts`).
+   */
+  isOperationAvailable(cmd: Command, resourceName: string | undefined): boolean
+
+  /**
+   * The input fields of that operation that are left out because they admit
+   * no value, so their flags are not generated.
+   */
+  omittedInputs(cmd: Command, resourceName: string | undefined): ReadonlySet<string>
 }
 
 /**
@@ -131,6 +145,14 @@ export function createCliGeneratorContext(
 
     getHierarchyPaths(): HierarchyPath[] {
       return hierarchyPaths
+    },
+
+    isOperationAvailable(cmd: Command, resourceName: string | undefined): boolean {
+      return isOperationAvailable(manifest, cmd, resourceName)
+    },
+
+    omittedInputs(cmd: Command, resourceName: string | undefined): ReadonlySet<string> {
+      return omittedInputs(manifest, cmd, resourceName)
     },
   }
 }

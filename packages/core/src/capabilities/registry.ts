@@ -25,6 +25,7 @@ import {
   type JsonSchema,
 } from './operation-schema.js'
 import { usableHierarchyChildren } from '../manifest/unsupported.js'
+import { isOperationAvailable, omittedInputs } from '../generator/input-satisfiability.js'
 import { classifyCommandRisk } from './risk.js'
 import type { Capability, CapabilityRegistry } from './types.js'
 
@@ -211,6 +212,21 @@ function indexRoutePermissions(manifest: AppManifest): RoutePermissionLookup {
 }
 
 /**
+ * An input schema without the named fields: the inputs an operation leaves
+ * out because they admit no value (see `../generator/input-satisfiability.ts`),
+ * so a capability never advertises a field no request can fill.
+ */
+function withoutInputs(schema: JsonSchema, omitted: ReadonlySet<string>): JsonSchema {
+  if (omitted.size === 0) return schema
+  const properties = Object.fromEntries(
+    Object.entries(schema.properties ?? {}).filter(([name]) => !omitted.has(name))
+  )
+  const required = (schema.required ?? []).filter((name) => !omitted.has(name))
+  const { required: _required, ...rest } = schema
+  return { ...rest, properties, ...(required.length > 0 ? { required } : {}) }
+}
+
+/**
  * Derive a single capability from a resource-scoped command.
  */
 function deriveResourceCapability(
@@ -219,10 +235,11 @@ function deriveResourceCapability(
   resource: Resource,
   command: Command,
   cliPath: ResourceCliPath,
-  permission: string
+  permission: string,
+  omitted: ReadonlySet<string>
 ): Capability {
   const resourceName = normalizeResourceRouteSegment(resource.plural)
-  const inputSchema = generateResourceOperationSchema(command, resource)
+  const inputSchema = withoutInputs(generateResourceOperationSchema(command, resource), omitted)
   const name = `${app}.${resourceName}.${command.name}`
 
   return {
@@ -254,9 +271,10 @@ function deriveAppCapability(
   app: string,
   bundleId: string,
   command: Command,
-  permission: string
+  permission: string,
+  omitted: ReadonlySet<string>
 ): Capability {
-  const inputSchema = generateAppCommandSchema(command)
+  const inputSchema = withoutInputs(generateAppCommandSchema(command), omitted)
   const name = `${app}.app.${command.name}`
 
   return {
@@ -287,7 +305,9 @@ function deriveAppCapability(
  * One capability per operation the manifest exposes: one per resource command
  * per matching resource, plus one per application command. These are the same
  * operations the app's generated contract describes, so every capability has
- * exactly one contract operation and shares its MCP tool name.
+ * exactly one contract operation and shares its MCP tool name. An operation
+ * that cannot be called, because a required input admits no value, has no
+ * capability, as it has no MCP tool and no CLI command.
  *
  * @param manifest - The app manifest
  * @returns Capabilities derived from this manifest, in stable name order
@@ -308,6 +328,7 @@ export function deriveCapabilities(manifest: AppManifest): Capability[] {
       parentFlags: [],
     }
     for (const command of commands) {
+      if (!isOperationAvailable(manifest, command, resource.name)) continue
       capabilities.push(
         deriveResourceCapability(
           app,
@@ -315,14 +336,24 @@ export function deriveCapabilities(manifest: AppManifest): Capability[] {
           resource,
           command,
           cliPath,
-          permissionOf(command, resource)
+          permissionOf(command, resource),
+          omittedInputs(manifest, command, resource.name)
         )
       )
     }
   }
 
   for (const command of getAppCommands(manifest)) {
-    capabilities.push(deriveAppCapability(app, bundleId, command, permissionOf(command, undefined)))
+    if (!isOperationAvailable(manifest, command, undefined)) continue
+    capabilities.push(
+      deriveAppCapability(
+        app,
+        bundleId,
+        command,
+        permissionOf(command, undefined),
+        omittedInputs(manifest, command, undefined)
+      )
+    )
   }
 
   return capabilities.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))

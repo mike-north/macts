@@ -25,7 +25,6 @@ import {
   type ClientRuntime,
   type FileSource,
   type Integer,
-  type ObjectReferenceData,
   type ObjectReferenceVariant,
   type OperationDescriptor,
   type Point,
@@ -385,10 +384,6 @@ export interface WindowCreateInput {
   zoomed?: boolean
   /** Whether the window is currently the frontmost window. */
   frontmost?: boolean
-  /** The currently selected tab */
-  currentTab?: ObjectReferenceData<never, 'Tab'>
-  /** The current session in a window */
-  currentSession?: ObjectReferenceData<string, 'Session'>
   /** Whether the window is a hotkey window. */
   isHotkeyWindow?: boolean
   /**
@@ -438,16 +433,6 @@ export interface WindowUpdateInput {
    */
   frontmost?: boolean
   /**
-   * The currently selected tab.
-   * Cannot be reset: null is rejected.
-   */
-  currentTab?: ObjectReferenceData<never, 'Tab'>
-  /**
-   * The current session in a window.
-   * Cannot be reset: null is rejected.
-   */
-  currentSession?: ObjectReferenceData<string, 'Session'>
-  /**
    * Whether the window is a hotkey window.
    * Cannot be reset: null is rejected.
    */
@@ -481,8 +466,6 @@ export interface WindowUpdateInput {
 
 /** Input for creating a Tab. */
 export interface TabCreateInput {
-  /** The current session in a tab */
-  currentSession?: ObjectReferenceData<string, 'Session'>
   /** Index of tab in parent tab view control */
   index?: Integer
   /** The title property */
@@ -491,11 +474,6 @@ export interface TabCreateInput {
 
 /** Input for updating a Tab. Omitted fields are left unchanged. */
 export interface TabUpdateInput {
-  /**
-   * The current session in a tab.
-   * Cannot be reset: null is rejected.
-   */
-  currentSession?: ObjectReferenceData<string, 'Session'>
   /**
    * Index of tab in parent tab view control.
    * Cannot be reset: null is rejected.

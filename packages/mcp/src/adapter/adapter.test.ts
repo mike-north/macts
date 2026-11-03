@@ -153,6 +153,46 @@ describe('listTools', () => {
   })
 })
 
+describe('an operation marked unavailable', () => {
+  // Mail cannot get one account, so synchronize's required `with` admits no
+  // value and the generated descriptor marks the operation unavailable.
+  const base = fakeOperation(
+    'mail.app.synchronize',
+    z.object({ with: z.object({ reference: z.never() }).strict() }).strict(),
+    'Synchronize an account'
+  )
+  const SYNCHRONIZE = {
+    ...base,
+    descriptor: {
+      ...base.descriptor,
+      unavailable: {
+        positions: ['with'],
+        reason:
+          'Not available: `with` takes a reference to an account, which the app has no operation to get, so the operation cannot be called.',
+      },
+    },
+  }
+
+  it('is not listed as a tool, while the operations around it are', () => {
+    const runtime = createStubRuntime([LIST, SYNCHRONIZE, GET], () => Promise.resolve(null))
+    const names = createMcpAdapter(runtime)
+      .listTools()
+      .map((tool) => tool.name)
+    expect(names).toEqual(['macts__notes__notes_list', 'macts__notes__notes_get'])
+  })
+
+  it('is an unknown tool when called by its derived name, and never reaches the runtime', async () => {
+    const runtime = createStubRuntime([SYNCHRONIZE], () => Promise.resolve(null))
+    const outcome = createMcpAdapter(runtime).callTool(
+      'macts__mail__app_synchronize',
+      { with: { reference: {} } },
+      CONTEXT
+    )
+    await expect(outcome).rejects.toMatchObject({ code: ErrorCode.InvalidParams })
+    expect(runtime.calls).toEqual([])
+  })
+})
+
 describe('createMcpAdapter refuses operations it cannot serve', () => {
   it('refuses two operations that derive the same tool name, naming both', () => {
     // `getURL` and `getUrl` both snake-case to `get_url`.

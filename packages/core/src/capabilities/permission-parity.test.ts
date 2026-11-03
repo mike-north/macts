@@ -14,7 +14,9 @@
  *
  * A capability carries no route string, so the suite joins each route to its
  * capability by what both identify: the resource (`app` for application
- * commands) and the operation name. It checks the join is one to one.
+ * commands) and the operation name. It checks the join is one to one, over the
+ * routes of operations that can be called: an operation whose required input
+ * admits no value has no capability (see `../generator/input-satisfiability.ts`).
  *
  * @see ../manifest/route.ts
  * @see https://github.com/mike-north/macts/issues/148
@@ -29,6 +31,7 @@ import { normalizeResourceRouteSegment, resolveManifestRoutes } from '../manifes
 import type { ManifestRoute } from '../manifest/route.js'
 import type { AppManifest } from '../manifest/schemas/index.js'
 import { deriveCapabilities } from './registry.js'
+import { isOperationAvailable } from '../generator/input-satisfiability.js'
 
 const MANIFESTS_DIR = resolve(process.cwd(), '../../manifests')
 
@@ -45,6 +48,13 @@ beforeAll(async () => {
       }))
   )
 })
+
+/** The routes of a manifest's operations that can be called, which discovery lists. */
+function availableRoutes(manifest: AppManifest): ManifestRoute[] {
+  return resolveManifestRoutes(manifest).filter((route) =>
+    isOperationAvailable(manifest, route.command, route.resourceType)
+  )
+}
 
 /** The fields of one capability this suite compares, from either source. */
 interface CapabilityPermission {
@@ -148,7 +158,7 @@ describe('capability permissions match the enforced route permissions', () => {
     const found: string[] = []
     let compared = 0
     for (const { dir, manifest } of manifests) {
-      const routes = resolveManifestRoutes(manifest)
+      const routes = availableRoutes(manifest)
       compared += routes.length
       found.push(...permissionMismatches(dir, 'registry', routes, deriveCapabilities(manifest)))
     }
@@ -161,7 +171,7 @@ describe('capability permissions match the enforced route permissions', () => {
     const found: string[] = []
     let compared = 0
     for (const { dir, manifest } of manifests) {
-      const routes = resolveManifestRoutes(manifest)
+      const routes = availableRoutes(manifest)
       compared += routes.length
       found.push(
         ...permissionMismatches(dir, 'generated module', routes, generatedCapabilities(manifest))

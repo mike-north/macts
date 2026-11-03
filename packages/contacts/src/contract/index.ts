@@ -939,6 +939,9 @@ export interface ContactsClient {
   /**
    * RollOver - Returns the title that will be placed in the menu for this roll over
    *
+   * Not available: `for` takes a reference to a person, which the app has no operation to get, so
+   * the operation cannot be called.
+   *
    * @param _with - property that that was returned from the "action property" handler. Does not
    * accept null.
    * @param _for - Currently selected person. Does not accept null.
@@ -951,6 +954,9 @@ export interface ContactsClient {
   /**
    * RollOver - Performs the action on the given person and value
    *
+   * Not available: `for` takes a reference to a person, which the app has no operation to get, so
+   * the operation cannot be called.
+   *
    * @param _with - property that that was returned from the "action property" handler. Does not
    * accept null.
    * @param _for - Currently selected person. Does not accept null.
@@ -962,6 +968,9 @@ export interface ContactsClient {
   ): Promise<void>
   /**
    * RollOver - Determines if the rollover action should be enabled for the given person and value
+   *
+   * Not available: `for` takes a reference to a person, which the app has no operation to get, so
+   * the operation cannot be called.
    *
    * @param _with - property that that was returned from the "action property" handler. Does not
    * accept null.
@@ -1510,6 +1519,11 @@ const appActionTitleOperation: OperationDescriptor<
       },
     },
   },
+  unavailable: {
+    positions: ['for'],
+    reason:
+      'Not available: `for` takes a reference to a person, which the app has no operation to get, so the operation cannot be called.',
+  },
 }
 
 const appPerformActionOperation: OperationDescriptor<
@@ -1618,6 +1632,11 @@ const appPerformActionOperation: OperationDescriptor<
         ],
       },
     },
+  },
+  unavailable: {
+    positions: ['for'],
+    reason:
+      'Not available: `for` takes a reference to a person, which the app has no operation to get, so the operation cannot be called.',
   },
 }
 
@@ -1728,6 +1747,11 @@ const appShouldEnableActionOperation: OperationDescriptor<
         ],
       },
     },
+  },
+  unavailable: {
+    positions: ['for'],
+    reason:
+      'Not available: `for` takes a reference to a person, which the app has no operation to get, so the operation cannot be called.',
   },
 }
 

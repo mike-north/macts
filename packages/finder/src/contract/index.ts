@@ -24,7 +24,6 @@ import {
   type CallOptions,
   type ClientRuntime,
   type Integer,
-  type ObjectReferenceData,
   type ObjectReferenceVariant,
   type OperationDescriptor,
   type ValueType,
@@ -584,8 +583,6 @@ export interface ListViewOptionsCreateInput {
   iconSize?: string
   /** the size of the text displayed in the list view */
   textSize?: Integer
-  /** the column that the list view is sorted on */
-  sortColumn?: ObjectReferenceData<never, 'Column'>
   /** Are relative dates (e.g., today, yesterday) shown in the list view? */
   usesRelativeDates?: boolean
 }
@@ -612,11 +609,6 @@ export interface ListViewOptionsUpdateInput {
    * Cannot be reset: null is rejected.
    */
   textSize?: Integer
-  /**
-   * the column that the list view is sorted on.
-   * Cannot be reset: null is rejected.
-   */
-  sortColumn?: ObjectReferenceData<never, 'Column'>
   /**
    * Are relative dates (e.g., today, yesterday) shown in the list view?
    * Cannot be reset: null is rejected.

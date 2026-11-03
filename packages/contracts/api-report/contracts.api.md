@@ -517,6 +517,7 @@ export interface OperationDescriptor<Input, Output> {
     readonly output: ValueType<Output>;
     readonly permission: PermissionString;
     readonly target: OperationTarget;
+    readonly unavailable?: OperationUnavailability;
 }
 
 // @public
@@ -534,6 +535,12 @@ export class OperationTimeoutError extends MactsError<'TIMEOUT'> {
     readonly code = "TIMEOUT";
     // (undocumented)
     readonly name = "OperationTimeoutError";
+}
+
+// @public
+export interface OperationUnavailability {
+    readonly positions: readonly string[];
+    readonly reason: string;
 }
 
 // @public

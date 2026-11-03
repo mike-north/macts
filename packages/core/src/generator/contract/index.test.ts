@@ -592,6 +592,7 @@ describe('real app manifests', () => {
     // uses an unresolvable bare type name.
     const found = apps
       .flatMap(({ manifest }) => collectContractDiagnostics(manifest))
+      .filter((diagnostic) => diagnostic.kind !== 'unavailable-operation')
       .map((diagnostic) => ({
         kind: diagnostic.kind,
         app: diagnostic.app,
@@ -618,6 +619,52 @@ describe('real app manifests', () => {
         app: 'system-events',
         position: 'resources.ScriptingCommand.properties.scriptingResult',
         type: { resource: 'scripting result object' },
+      },
+    ])
+  })
+
+  it('report exactly the operations a required input makes unavailable', () => {
+    // Audited by hand against the manifests: each position is a required
+    // parameter whose type is a resource with no `get` command. Contacts has
+    // no command that gets one person; Mail none that gets one account.
+    const found = apps
+      .flatMap(({ manifest }) => collectContractDiagnostics(manifest))
+      .flatMap((diagnostic) =>
+        diagnostic.kind === 'unavailable-operation'
+          ? [
+              {
+                app: diagnostic.app,
+                operation: diagnostic.operation,
+                position: diagnostic.position,
+                resource: diagnostic.resource,
+              },
+            ]
+          : []
+      )
+    expect(found).toEqual([
+      {
+        app: 'contacts',
+        operation: 'contacts.app.actionTitle',
+        position: 'commands.actionTitle.parameters.for',
+        resource: 'Person',
+      },
+      {
+        app: 'contacts',
+        operation: 'contacts.app.performAction',
+        position: 'commands.performAction.parameters.for',
+        resource: 'Person',
+      },
+      {
+        app: 'contacts',
+        operation: 'contacts.app.shouldEnableAction',
+        position: 'commands.shouldEnableAction.parameters.for',
+        resource: 'Person',
+      },
+      {
+        app: 'mail',
+        operation: 'mail.app.synchronize',
+        position: 'commands.synchronize.parameters.with',
+        resource: 'Account',
       },
     ])
   })

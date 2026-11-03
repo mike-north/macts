@@ -7,7 +7,6 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
-import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
 
@@ -564,14 +563,10 @@ export interface NetworkPreferencesObject {
 }
 
 // @public
-export interface NetworkPreferencesObjectCreateInput {
-    currentLocation?: ObjectReferenceData<string, 'Location'>;
-}
+export type NetworkPreferencesObjectCreateInput = Record<string, never>;
 
 // @public
-export interface NetworkPreferencesObjectUpdateInput {
-    currentLocation?: ObjectReferenceData<string, 'Location'>;
-}
+export type NetworkPreferencesObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface Outline {
@@ -887,13 +882,11 @@ export interface Service {
 
 // @public
 export interface ServiceCreateInput {
-    currentConfiguration?: ObjectReferenceData<string, 'Configuration'>;
     name?: string;
 }
 
 // @public
 export interface ServiceUpdateInput {
-    currentConfiguration?: ObjectReferenceData<string, 'Configuration'>;
     name?: string;
 }
 

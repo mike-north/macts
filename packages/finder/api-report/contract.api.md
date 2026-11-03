@@ -7,7 +7,6 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
-import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 
 // @public
@@ -277,7 +276,6 @@ export interface ListViewOptionsCreateInput {
     calculatesFolderSizes?: boolean;
     iconSize?: string;
     showsIconPreview?: boolean;
-    sortColumn?: ObjectReferenceData<never, 'Column'>;
     textSize?: Integer;
     usesRelativeDates?: boolean;
 }
@@ -287,7 +285,6 @@ export interface ListViewOptionsUpdateInput {
     calculatesFolderSizes?: boolean;
     iconSize?: string;
     showsIconPreview?: boolean;
-    sortColumn?: ObjectReferenceData<never, 'Column'>;
     textSize?: Integer;
     usesRelativeDates?: boolean;
 }
