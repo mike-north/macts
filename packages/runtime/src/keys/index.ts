@@ -96,6 +96,9 @@ export {
   getKeyMetadata,
   revokeKey,
   deleteKeyMetadata,
+  getKeyRecordStatus,
+  // Deprecated, and kept so existing callers keep working.
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   isKeyRevoked,
   generateKeyId,
   setKeyPolicy,
@@ -104,3 +107,4 @@ export {
   listKeyPolicyIds,
   KeyPolicyError,
 } from './storage.js'
+export type { KeyRecordStatus } from './storage.js'
