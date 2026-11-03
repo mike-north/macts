@@ -616,7 +616,10 @@ describe('every constructor', () => {
     ['nullable', t.nullable(t.double())],
     ['unknown', t.unknown()],
     ['none', t.none()],
-    ['reference', t.reference(() => ({ note: { id: t.string() } }), 'note', 'one')],
+    [
+      'reference',
+      t.reference(() => ({ app: 'notes', resources: { note: { id: t.string() } } }), 'note', 'one'),
+    ],
     ['file', t.file()],
     ['fileSource', t.fileSource()],
   ]

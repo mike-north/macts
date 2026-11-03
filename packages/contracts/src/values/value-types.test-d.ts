@@ -26,6 +26,10 @@ import {
   type FileValue,
   type ObjectReferenceVariant,
   type ReferenceRegistry,
+  type ReferenceScope,
+  type AppContract,
+  type ObjectReferenceData,
+  type CollectionReferenceData,
   type CodecResult,
   type DecodeContext,
   type InferSdk,
@@ -142,14 +146,23 @@ expectNotAssignable<ValueType<unknown>>(t.optional(t.string()))
 expectNotAssignable<Parameters<typeof t.array>[0]>(t.optional(t.string()))
 expectNotAssignable<Parameters<typeof t.nullable>[0]>(t.optional(t.string()))
 
-// References: the cardinality overload fixes the bound union, and the record
-// and identifier types default to unknown.
-declare const registry: () => ReferenceRegistry
+// References: the cardinality overload fixes the bound union, the resource key
+// is inferred as a literal, and the record and identifier types default to
+// unknown.
+declare const registry: () => ReferenceScope
 interface Note {
   readonly title: string
 }
-expectType<ValueType<ObjectReferenceVariant<unknown>>>(t.reference(registry, 'note', 'one'))
-expectType<ValueType<CollectionReferenceVariant<unknown>>>(t.reference(registry, 'note', 'many'))
+expectType<ValueType<ObjectReferenceVariant<unknown, unknown, 'note'>>>(
+  t.reference(registry, 'note', 'one')
+)
+expectType<ValueType<CollectionReferenceVariant<unknown, unknown, 'note'>>>(
+  t.reference(registry, 'note', 'many')
+)
+// Explicit type arguments state the resource key too, as generated code does.
+expectType<ValueType<ObjectReferenceVariant<Note, string, 'note'>>>(
+  t.reference<Note, string, 'note'>(registry, 'note', 'one')
+)
 const noteRef = t.reference<Note, string>(registry, 'note', 'one')
 expectType<ValueType<ObjectReferenceVariant<Note, string>>>(noteRef)
 expectType<ValueType<CollectionReferenceVariant<Note, string>>>(
@@ -167,10 +180,26 @@ expectType<{
   readonly pinned?: ObjectReferenceVariant<Note, string> | null
 }>(null as unknown as InferSdk<typeof folder>)
 
-// Negative: a cardinality must be a literal; the registry is a thunk, not a table.
+// An input position is typed by the data form: the bound value type is
+// assignable to a value type of the data form of the same resource and
+// cardinality, and of no other.
+const typedNoteRef = t.reference<Note, string, 'note'>(registry, 'note', 'one')
+expectAssignable<ValueType<ObjectReferenceData<string, 'note'>>>(typedNoteRef)
+expectNotAssignable<ValueType<ObjectReferenceData<string, 'folder'>>>(typedNoteRef)
+expectNotAssignable<ValueType<CollectionReferenceData<string, 'note'>>>(typedNoteRef)
+expectAssignable<ValueType<{ readonly note: ObjectReferenceData<string, 'note'> }>>(
+  t.record({ note: typedNoteRef })
+)
+
+// Negative: a cardinality must be a literal; the scope is a thunk returning
+// the app and its resource table, not the scope itself and not a bare table.
 expectNotAssignable<Parameters<typeof t.reference>[2]>('some')
 declare const table: ReferenceRegistry
-expectNotAssignable<Parameters<typeof t.reference>[0]>(table)
+declare const scope: ReferenceScope
+expectNotAssignable<Parameters<typeof t.reference>[0]>(scope)
+expectNotAssignable<Parameters<typeof t.reference>[0]>(() => table)
+declare const contract: AppContract<unknown>
+expectAssignable<Parameters<typeof t.reference>[0]>(() => contract)
 
 // Files.
 expectType<ValueType<FileValue>>(t.file())

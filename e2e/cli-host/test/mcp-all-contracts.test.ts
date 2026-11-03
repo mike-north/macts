@@ -13,12 +13,17 @@
  *
  * - phases/13 D5: every installed host package is registered from its
  *   generated contract; an app that fails is reported, not served.
- * - phases/13 D9 and `toolNameFor`: one tool per registered operation, named
- *   `macts__<app>__…` from the operation id, with the app segment kept
- *   exactly as it is.
- * - The number of operations of each app is the number of entries in its
- *   contract's `operations` table, read from the same built package the
- *   server loads.
+ * - phases/13 D9 and `toolNameFor`: one tool per registered operation that
+ *   can be called, named `macts__<app>__…` from the operation id, with the app
+ *   segment kept exactly as it is.
+ * - The number of tools of each app is the number of entries in its
+ *   contract's `operations` table not marked `unavailable`, read from the same
+ *   built package the server loads.
+ * - phases/13 D7, "Resolvable targets": an operation whose required input
+ *   admits no value is neither a tool nor a discoverable capability. Contacts
+ *   has no operation that gets one person and Mail none that gets one
+ *   account, so the Contacts action commands and Mail's synchronize are left
+ *   out, and Mail's check for new mail takes no account.
  *
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md (D5, D9)
  * @see https://github.com/mike-north/macts/issues/101
@@ -29,11 +34,13 @@ import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import {
+  callTool,
   connectMcpStdio,
   createKey,
   createMactsHome,
   type MactsHome,
   type McpSession,
+  toolDocument,
 } from '../src/harness.js'
 
 /** Starting the server loads every app's contract and manifest. */
@@ -58,7 +65,10 @@ afterAll(async () => {
   home.dispose()
 })
 
-/** The `operations` table of an app's built contract, loaded from its package. */
+/**
+ * The number of operations in an app's built contract, loaded from its
+ * package, that can be called: those not marked `unavailable`.
+ */
 async function operationCount(app: string): Promise<number> {
   const packageDir = join(home.path, 'plugins', 'node_modules', '@macts', app)
   const pkg = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf-8')) as {
@@ -71,11 +81,13 @@ async function operationCount(app: string): Promise<number> {
     unknown
   >
   const contract = Object.values(module).find(
-    (value): value is { app: string; operations: Record<string, unknown> } =>
+    (value): value is { app: string; operations: Record<string, { unavailable?: unknown }> } =>
       typeof value === 'object' && value !== null && (value as { app?: unknown }).app === app
   )
   if (contract === undefined) throw new Error(`@macts/${app}'s contract module has no contract`)
-  return Object.keys(contract.operations).length
+  return Object.values(contract.operations).filter(
+    (operation) => operation.unavailable === undefined
+  ).length
 }
 
 describe('macts --mcp (UAT) with every workspace app installed', () => {
@@ -93,7 +105,7 @@ describe('macts --mcp (UAT) with every workspace app installed', () => {
     expect(stderr).not.toContain('without their server package')
   })
 
-  it('lists one tool for every operation of every app, beside the discovery tool', async () => {
+  it('lists one tool for every operation of every app that can be called, beside the discovery tool', async () => {
     const { tools } = await session.client.listTools()
     const names = tools.map((tool) => tool.name)
 
@@ -114,5 +126,44 @@ describe('macts --mcp (UAT) with every workspace app installed', () => {
     for (const tool of tools) {
       expect(tool.inputSchema.type, tool.name).toBe('object')
     }
+  })
+})
+
+describe('macts --mcp (UAT): operations that cannot be called', () => {
+  it('lists no tool for them', async () => {
+    const { tools } = await session.client.listTools()
+    const names = tools.map((tool) => tool.name)
+    for (const name of [
+      'macts__contacts__app_action_title',
+      'macts__contacts__app_perform_action',
+      'macts__contacts__app_should_enable_action',
+      'macts__mail__app_synchronize',
+    ]) {
+      expect(names, name).not.toContain(name)
+    }
+    // Their neighbours are served.
+    expect(names).toContain('macts__mail__app_check_for_new_mail')
+  })
+
+  it('does not find them through discovery', async () => {
+    const result = await callTool(session, 'macts__capabilities__discover', {
+      capability: 'mail.app.synchronize',
+    })
+    expect(toolDocument(result)).toMatchObject({ found: false, capability: 'mail.app.synchronize' })
+  })
+
+  it('advertises no input that admits no value', async () => {
+    const { tools } = await session.client.listTools()
+    const checkForNewMail = tools.find(
+      (tool) => tool.name === 'macts__mail__app_check_for_new_mail'
+    )
+    expect(checkForNewMail?.inputSchema.properties).toEqual({})
+    const result = await callTool(session, 'macts__capabilities__discover', {
+      capability: 'mail.app.checkForNewMail',
+    })
+    expect(toolDocument(result)).toMatchObject({
+      found: true,
+      capability: { inputSchema: { type: 'object', properties: {} } },
+    })
   })
 })

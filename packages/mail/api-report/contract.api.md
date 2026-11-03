@@ -213,8 +213,8 @@ export type MailAttachmentUpdateInput = Record<string, never>;
 
 // @public
 export interface Mailbox {
-    readonly account: ObjectReferenceVariant<Account, string> | null;
-    readonly container: ObjectReferenceVariant<Mailbox, never> | null;
+    readonly account: ObjectReferenceVariant<Account, string, 'Account'> | null;
+    readonly container: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     name: string | null;
     readonly unreadCount: Integer | null;
 }
@@ -231,7 +231,7 @@ export interface MailboxUpdateInput {
 
 // @public
 export interface MailClient {
-    checkForNewMail(_for?: ObjectReferenceVariant<Account, string>, options?: CallOptions): Promise<void>;
+    checkForNewMail(options?: CallOptions): Promise<void>;
     _delete(options?: CallOptions): Promise<void>;
     duplicate(to?: string, withProperties?: unknown, options?: CallOptions): Promise<void>;
     extractAddressFrom(options?: CallOptions): Promise<void>;
@@ -242,8 +242,7 @@ export interface MailClient {
     readonly messages: MessageResourceClient;
     move(to: string, options?: CallOptions): Promise<void>;
     readonly outgoingMessages: OutgoingMessageResourceClient;
-    performMailActionWithMessages(inMailboxes?: ObjectReferenceVariant<Mailbox, never>, forRule?: ObjectReferenceVariant<Rule, never>, options?: CallOptions): Promise<void>;
-    synchronize(_with: ObjectReferenceVariant<Account, string>, options?: CallOptions): Promise<void>;
+    performMailActionWithMessages(options?: CallOptions): Promise<void>;
 }
 
 // @public
@@ -253,7 +252,7 @@ export const mailContract: AppContract<MailClient>;
 export interface Message {
     readonly allHeaders: string | null;
     backgroundColor: string | null;
-    readonly content: ObjectReferenceVariant<RichText, never> | null;
+    readonly content: ObjectReferenceVariant<RichText, never, 'RichText'> | null;
     readonly dateReceived: Date | null;
     readonly dateSent: Date | null;
     deletedStatus: boolean | null;
@@ -261,7 +260,7 @@ export interface Message {
     flagIndex: Integer | null;
     readonly id: Integer;
     junkMailStatus: boolean | null;
-    mailbox: ObjectReferenceVariant<Mailbox, never> | null;
+    mailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     readonly messageId: string | null;
     readonly messageSize: Integer | null;
     readStatus: boolean | null;
@@ -284,7 +283,6 @@ export interface MessageCreateInput {
     flaggedStatus?: boolean;
     flagIndex?: Integer;
     junkMailStatus?: boolean;
-    mailbox?: ObjectReferenceVariant<Mailbox, never>;
     readStatus?: boolean;
 }
 
@@ -303,25 +301,24 @@ export interface MessageUpdateInput {
     flaggedStatus?: boolean;
     flagIndex?: Integer;
     junkMailStatus?: boolean;
-    mailbox?: ObjectReferenceVariant<Mailbox, never>;
     readStatus?: boolean;
 }
 
 // @public
 export interface MessageViewer {
-    readonly draftsMailbox: ObjectReferenceVariant<Mailbox, never> | null;
+    readonly draftsMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     readonly id: Integer;
-    readonly inbox: ObjectReferenceVariant<Mailbox, never> | null;
-    readonly junkMailbox: ObjectReferenceVariant<Mailbox, never> | null;
+    readonly inbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
+    readonly junkMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     mailboxListVisible: boolean | null;
-    readonly outbox: ObjectReferenceVariant<Mailbox, never> | null;
+    readonly outbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     previewPaneIsVisible: boolean | null;
     selectedMailboxes: string | null;
     selectedMessages: string | null;
-    readonly sentMailbox: ObjectReferenceVariant<Mailbox, never> | null;
+    readonly sentMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     sortColumn: string | null;
     sortedAscending: boolean | null;
-    readonly trashMailbox: ObjectReferenceVariant<Mailbox, never> | null;
+    readonly trashMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     visibleColumns: string | null;
     visibleMessages: string | null;
 }
@@ -453,7 +450,7 @@ export interface RichTextUpdateInput {
 export interface Rule {
     allConditionsMustBeMet: boolean | null;
     colorMessage: string | null;
-    copyMessage: ObjectReferenceVariant<Mailbox, never> | null;
+    copyMessage: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     deleteMessage: boolean | null;
     enabled: boolean | null;
     forwardMessage: string | null;
@@ -462,7 +459,7 @@ export interface Rule {
     markFlagged: boolean | null;
     markFlagIndex: Integer | null;
     markRead: boolean | null;
-    moveMessage: ObjectReferenceVariant<Mailbox, never> | null;
+    moveMessage: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     name: string | null;
     playSound: string | null;
     redirectMessage: string | null;
@@ -501,7 +498,6 @@ export interface RuleConditionUpdateInput {
 export interface RuleCreateInput {
     allConditionsMustBeMet?: boolean;
     colorMessage?: string;
-    copyMessage?: ObjectReferenceVariant<Mailbox, never>;
     deleteMessage?: boolean;
     enabled?: boolean;
     forwardMessage?: string;
@@ -510,7 +506,6 @@ export interface RuleCreateInput {
     markFlagged?: boolean;
     markFlagIndex?: Integer;
     markRead?: boolean;
-    moveMessage?: ObjectReferenceVariant<Mailbox, never>;
     name?: string;
     playSound?: string;
     redirectMessage?: string;
@@ -531,7 +526,6 @@ export type RuleType = 'account' | 'anyRecipient' | 'ccHeader' | 'matchesEveryMe
 export interface RuleUpdateInput {
     allConditionsMustBeMet?: boolean;
     colorMessage?: string;
-    copyMessage?: ObjectReferenceVariant<Mailbox, never>;
     deleteMessage?: boolean;
     enabled?: boolean;
     forwardMessage?: string;
@@ -540,7 +534,6 @@ export interface RuleUpdateInput {
     markFlagged?: boolean;
     markFlagIndex?: Integer;
     markRead?: boolean;
-    moveMessage?: ObjectReferenceVariant<Mailbox, never>;
     name?: string;
     playSound?: string;
     redirectMessage?: string;

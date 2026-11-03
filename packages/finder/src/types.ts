@@ -341,8 +341,6 @@ export interface ListViewOptionsCreateInput {
   iconSize?: string
   /** the size of the text displayed in the list view */
   textSize?: number
-  /** the column that the list view is sorted on */
-  sortColumn?: Column
   /** Are relative dates (e.g., today, yesterday) shown in the list view? */
   usesRelativeDates?: boolean
 }

@@ -4,7 +4,8 @@
  *
  * The adapter translates each HTTP request into one `runtime.invoke` call and
  * the outcome back into an HTTP response. It owns routing only:
- * `POST /rpc/<operation id>` for every registered operation, and nothing else
+ * `POST /rpc/<operation id>` for every registered operation that can be called
+ * (not marked `unavailable`), and nothing else
  * under `/rpc/`, plus the unauthenticated introspection listings. Everything
  * else about a request (the invocation context, the JSON body, the
  * per-client-address limit, the success envelope, and the D6 error mapping)
@@ -113,7 +114,7 @@ function detail(operation: RegisteredOperation): DetailedEndpoint {
  * Registers, relative to wherever the returned app is mounted:
  *
  * - `POST /rpc/<id>` for each operation registered on the runtime when the
- *   adapter is built. The body is the operation's input record in wire form (a
+ *   adapter is built, except one whose descriptor is marked `unavailable`. The body is the operation's input record in wire form (a
  *   missing or blank body is `{}`); `Authorization: Bearer <token>` carries
  *   the credential; `X-Request-Id` optionally supplies the correlation id.
  *   Success is `200 { result }`; failure is the D6 error envelope with the
@@ -123,7 +124,8 @@ function detail(operation: RegisteredOperation): DetailedEndpoint {
  *   manifest descriptions, parameters, and return types.
  * - `GET /introspect/all`: every registered app's operations.
  *
- * Any other route, including `POST /rpc/<unregistered id>`, is a 404 whose
+ * Any other route, including `POST /rpc/<unregistered id>` and the route of an
+ * unavailable operation, is a 404 whose
  * code `NOT_FOUND` is deliberately outside the error registry, and never
  * reaches the runtime. Operations registered on the runtime after this call
  * are not routed.
@@ -136,8 +138,12 @@ export function createHttpAdapter(runtime: MactsRuntime, options: HttpAdapterOpt
   const transport = createCallTransport(options)
 
   // Routes and introspection share one snapshot, so the listing never names an
-  // operation this adapter does not serve.
-  const operations = runtime.operations()
+  // operation this adapter does not serve. An operation marked `unavailable`
+  // (a required input admits no value) is neither routed nor listed, as no
+  // request to it could succeed; a call to it is an unknown route.
+  const operations = runtime
+    .operations()
+    .filter((operation) => operation.descriptor.unavailable === undefined)
   const apps = groupByApp(operations)
   const app = new Hono()
 

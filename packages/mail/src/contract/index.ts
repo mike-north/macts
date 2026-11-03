@@ -26,6 +26,7 @@ import {
   type FileSource,
   type FileValue,
   type Integer,
+  type ObjectReferenceData,
   type ObjectReferenceVariant,
   type OperationDescriptor,
   type Rgb,
@@ -280,32 +281,32 @@ export interface MessageViewer {
    * The top level Drafts mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly draftsMailbox: ObjectReferenceVariant<Mailbox, never> | null
+  readonly draftsMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * The top level In mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly inbox: ObjectReferenceVariant<Mailbox, never> | null
+  readonly inbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * The top level Junk mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly junkMailbox: ObjectReferenceVariant<Mailbox, never> | null
+  readonly junkMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * The top level Out mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly outbox: ObjectReferenceVariant<Mailbox, never> | null
+  readonly outbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * The top level Sent mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly sentMailbox: ObjectReferenceVariant<Mailbox, never> | null
+  readonly sentMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * The top level Trash mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly trashMailbox: ObjectReferenceVariant<Mailbox, never> | null
+  readonly trashMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * The column that is currently sorted in the viewer.
    * Nullable. No evidence that the app always sets it.
@@ -375,12 +376,12 @@ export interface Message {
    * The mailbox in which this message is filed.
    * Nullable. No evidence that the app always sets it.
    */
-  mailbox: ObjectReferenceVariant<Mailbox, never> | null
+  mailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * Contents of an email message.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly content: ObjectReferenceVariant<RichText, never> | null
+  readonly content: ObjectReferenceVariant<RichText, never, 'RichText'> | null
   /**
    * The date a message was received.
    * Nullable. No evidence that the app always sets it.
@@ -599,12 +600,12 @@ export interface Mailbox {
    * The account property.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly account: ObjectReferenceVariant<Account, string> | null
+  readonly account: ObjectReferenceVariant<Account, string, 'Account'> | null
   /**
    * The container property.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly container: ObjectReferenceVariant<Mailbox, never> | null
+  readonly container: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
 }
 
 /** Class for message rules */
@@ -678,12 +679,12 @@ export interface Rule {
    * If rule matches, copy to this mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  copyMessage: ObjectReferenceVariant<Mailbox, never> | null
+  copyMessage: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * If rule matches, move to this mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  moveMessage: ObjectReferenceVariant<Mailbox, never> | null
+  moveMessage: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * Indicates whether the color will be used to highlight the text or background of a message in
    * the message list.
@@ -1107,8 +1108,6 @@ export interface MessageViewerUpdateInput {
 export interface MessageCreateInput {
   /** The background color of the message */
   backgroundColor?: string
-  /** The mailbox in which this message is filed */
-  mailbox?: ObjectReferenceVariant<Mailbox, never>
   /** Indicates whether the message is deleted or not */
   deletedStatus?: boolean
   /** Indicates whether the message is flagged or not */
@@ -1131,11 +1130,6 @@ export interface MessageUpdateInput {
    * Cannot be reset: null is rejected.
    */
   backgroundColor?: string
-  /**
-   * The mailbox in which this message is filed.
-   * Cannot be reset: null is rejected.
-   */
-  mailbox?: ObjectReferenceVariant<Mailbox, never>
   /**
    * Indicates whether the message is deleted or not.
    * Cannot be reset: null is rejected.
@@ -1368,10 +1362,6 @@ export interface RuleCreateInput {
   runScript?: string
   /** Indicates whether all conditions must be met for rule to execute */
   allConditionsMustBeMet?: boolean
-  /** If rule matches, copy to this mailbox */
-  copyMessage?: ObjectReferenceVariant<Mailbox, never>
-  /** If rule matches, move to this mailbox */
-  moveMessage?: ObjectReferenceVariant<Mailbox, never>
   /**
    * Indicates whether the color will be used to highlight the text or background of a message in
    * the message list
@@ -1456,16 +1446,6 @@ export interface RuleUpdateInput {
    * Cannot be reset: null is rejected.
    */
   allConditionsMustBeMet?: boolean
-  /**
-   * If rule matches, copy to this mailbox.
-   * Cannot be reset: null is rejected.
-   */
-  copyMessage?: ObjectReferenceVariant<Mailbox, never>
-  /**
-   * If rule matches, move to this mailbox.
-   * Cannot be reset: null is rejected.
-   */
-  moveMessage?: ObjectReferenceVariant<Mailbox, never>
   /**
    * Indicates whether the color will be used to highlight the text or background of a message in
    * the message list.
@@ -1663,15 +1643,8 @@ export interface MailClient {
    * @param to - The new location for the object(s). Does not accept null.
    */
   move(to: string, options?: CallOptions): Promise<void>
-  /**
-   * Triggers a check for email.
-   *
-   * @param _for - Specify the account that you wish to check for mail. Does not accept null.
-   */
-  checkForNewMail(
-    _for?: ObjectReferenceVariant<Account, string>,
-    options?: CallOptions
-  ): Promise<void>
+  /** Triggers a check for email. */
+  checkForNewMail(options?: CallOptions): Promise<void>
   /**
    * Command to get the full name out of a fully specified email address. E.g. Calling this with
    * "John Doe <jdoe@example.com>" as the direct object would return "John Doe"
@@ -1695,24 +1668,8 @@ export interface MailClient {
   /**
    * Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of
    * this handler is a list of messages being acted upon.
-   *
-   * @param inMailboxes - If the script is being executed by the user selecting an item in the
-   * scripts menu, this argument will specify the mailboxes that are currently selected. Otherwise
-   * it will not be specified. Does not accept null.
-   * @param forRule - If the script is being executed by a rule action, this argument will be the
-   * rule being invoked. Otherwise it will not be specified. Does not accept null.
    */
-  performMailActionWithMessages(
-    inMailboxes?: ObjectReferenceVariant<Mailbox, never>,
-    forRule?: ObjectReferenceVariant<Rule, never>,
-    options?: CallOptions
-  ): Promise<void>
-  /**
-   * Command to trigger synchronizing of an IMAP account with the server.
-   *
-   * @param _with - The account to synchronize. Does not accept null.
-   */
-  synchronize(_with: ObjectReferenceVariant<Account, string>, options?: CallOptions): Promise<void>
+  performMailActionWithMessages(options?: CallOptions): Promise<void>
 }
 
 const richTextRecordType: ValueType<RichText> = t.record(
@@ -1789,27 +1746,27 @@ const outgoingMessageRecordType: ValueType<OutgoingMessage> = t.record(
 const messageViewerRecordType: ValueType<MessageViewer> = t.record(
   {
     draftsMailbox: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The top level Drafts mailbox' }
     ),
     inbox: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The top level In mailbox' }
     ),
     junkMailbox: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The top level Junk mailbox' }
     ),
     outbox: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The top level Out mailbox' }
     ),
     sentMailbox: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The top level Sent mailbox' }
     ),
     trashMailbox: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The top level Trash mailbox' }
     ),
     sortColumn: t.nullable(t.string(), {
@@ -1849,11 +1806,11 @@ const messageRecordType: ValueType<Message> = t.record(
     allHeaders: t.nullable(t.string(), { description: 'All the headers of the message' }),
     backgroundColor: t.nullable(t.string(), { description: 'The background color of the message' }),
     mailbox: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The mailbox in which this message is filed' }
     ),
     content: t.nullable(
-      t.reference<RichText, never>(() => resources, 'RichText', 'one'),
+      t.reference<RichText, never, 'RichText'>(() => mailContract, 'RichText', 'one'),
       { description: 'Contents of an email message' }
     ),
     dateReceived: t.nullable(t.date(), { description: 'The date a message was received' }),
@@ -1971,11 +1928,11 @@ const mailboxRecordType: ValueType<Mailbox> = t.record(
       description: 'The number of unread messages in the mailbox',
     }),
     account: t.nullable(
-      t.reference<Account, string>(() => resources, 'Account', 'one'),
+      t.reference<Account, string, 'Account'>(() => mailContract, 'Account', 'one'),
       { description: 'The account property' }
     ),
     container: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The container property' }
     ),
   },
@@ -2021,11 +1978,11 @@ const ruleRecordType: ValueType<Rule> = t.record(
       description: 'Indicates whether all conditions must be met for rule to execute',
     }),
     copyMessage: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'If rule matches, copy to this mailbox' }
     ),
     moveMessage: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'If rule matches, move to this mailbox' }
     ),
     highlightTextUsingColor: t.nullable(t.boolean(), {
@@ -2350,374 +2307,18 @@ const messageBounceOperation: OperationDescriptor<Record<string, never>, undefin
   },
 }
 
-const appCheckForNewMailOperation: OperationDescriptor<
-  { readonly for?: ObjectReferenceVariant<Account, string> | undefined },
-  undefined
-> = {
+const appCheckForNewMailOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'mail.app.checkForNewMail',
   permission: 'mail:app:checkForNewMail',
   target: { command: 'checkForNewMail' },
   description: 'Triggers a check for email.',
-  input: t.record({
-    for: t.optional(
-      t.reference<Account, string>(() => resources, 'Account', 'one', {
-        description: 'Specify the account that you wish to check for mail',
-      })
-    ),
-  }),
+  input: t.record({}),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      for: {
-        description: 'Specify the account that you wish to check for mail',
-        type: 'object',
-        properties: {
-          reference: {
-            anyOf: [
-              {
-                type: 'object',
-                properties: {
-                  resource: { type: 'string', const: 'Account' },
-                  form: { type: 'string', const: 'identity' },
-                  cardinality: { type: 'string', const: 'one' },
-                  id: { type: 'string', description: 'The unique identifier of the account' },
-                  container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-                },
-                required: ['resource', 'form', 'cardinality', 'id'],
-                additionalProperties: false,
-              },
-              {
-                type: 'object',
-                properties: {
-                  resource: { type: 'string', const: 'Account' },
-                  form: { type: 'string', const: 'selector' },
-                  cardinality: { type: 'string', const: 'one' },
-                  selector: {
-                    oneOf: [
-                      {
-                        type: 'object',
-                        properties: {
-                          by: { type: 'string', const: 'name' },
-                          name: { type: 'string' },
-                        },
-                        required: ['by', 'name'],
-                        additionalProperties: false,
-                      },
-                      {
-                        type: 'object',
-                        properties: {
-                          by: { type: 'string', const: 'index' },
-                          index: {
-                            type: 'object',
-                            properties: {
-                              integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' },
-                            },
-                            required: ['integer'],
-                            additionalProperties: false,
-                          },
-                        },
-                        required: ['by', 'index'],
-                        additionalProperties: false,
-                      },
-                    ],
-                  },
-                  container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-                },
-                required: ['resource', 'form', 'cardinality', 'selector'],
-                additionalProperties: false,
-              },
-            ],
-          },
-        },
-        required: ['reference'],
-        additionalProperties: false,
-      },
-    },
+    properties: {},
     additionalProperties: false,
-    definitions: {
-      __schema0: {
-        anyOf: [
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'OutgoingMessage' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MessageViewer' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message viewer',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Message' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message.',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Account' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the account' },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MailAttachment' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the attachment.' },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: {
-                type: 'string',
-                enum: [
-                  'RichText',
-                  'Attachment',
-                  'Paragraph',
-                  'Word',
-                  'Character',
-                  'AttributeRun',
-                  'OutgoingMessage',
-                  'MessageViewer',
-                  'Message',
-                  'Account',
-                  'Mailbox',
-                  'Rule',
-                  'RuleCondition',
-                  'Recipient',
-                  'BccRecipient',
-                  'CcRecipient',
-                  'ToRecipient',
-                  'Header',
-                  'MailAttachment',
-                ],
-              },
-              form: { type: 'string', const: 'selector' },
-              cardinality: { type: 'string', const: 'one' },
-              selector: {
-                oneOf: [
-                  {
-                    type: 'object',
-                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
-                    required: ['by', 'name'],
-                    additionalProperties: false,
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      by: { type: 'string', const: 'index' },
-                      index: {
-                        type: 'object',
-                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                        required: ['integer'],
-                        additionalProperties: false,
-                      },
-                    },
-                    required: ['by', 'index'],
-                    additionalProperties: false,
-                  },
-                ],
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'selector'],
-            additionalProperties: false,
-          },
-        ],
-      },
-      __schema1: {
-        anyOf: [
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'OutgoingMessage' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MessageViewer' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message viewer',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Message' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message.',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Account' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the account' },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MailAttachment' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the attachment.' },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: {
-                type: 'string',
-                enum: [
-                  'RichText',
-                  'Attachment',
-                  'Paragraph',
-                  'Word',
-                  'Character',
-                  'AttributeRun',
-                  'OutgoingMessage',
-                  'MessageViewer',
-                  'Message',
-                  'Account',
-                  'Mailbox',
-                  'Rule',
-                  'RuleCondition',
-                  'Recipient',
-                  'BccRecipient',
-                  'CcRecipient',
-                  'ToRecipient',
-                  'Header',
-                  'MailAttachment',
-                ],
-              },
-              form: { type: 'string', const: 'selector' },
-              cardinality: { type: 'string', const: 'one' },
-              selector: {
-                oneOf: [
-                  {
-                    type: 'object',
-                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
-                    required: ['by', 'name'],
-                    additionalProperties: false,
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      by: { type: 'string', const: 'index' },
-                      index: {
-                        type: 'object',
-                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                        required: ['integer'],
-                        additionalProperties: false,
-                      },
-                    },
-                    required: ['by', 'index'],
-                    additionalProperties: false,
-                  },
-                ],
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'selector'],
-            additionalProperties: false,
-          },
-        ],
-      },
-    },
   },
 }
 
@@ -2864,10 +2465,7 @@ const appMailtoOperation: OperationDescriptor<Record<string, never>, undefined> 
 }
 
 const appPerformMailActionWithMessagesOperation: OperationDescriptor<
-  {
-    readonly inMailboxes?: ObjectReferenceVariant<Mailbox, never> | undefined
-    readonly forRule?: ObjectReferenceVariant<Rule, never> | undefined
-  },
+  Record<string, never>,
   undefined
 > = {
   id: 'mail.app.performMailActionWithMessages',
@@ -2875,677 +2473,13 @@ const appPerformMailActionWithMessagesOperation: OperationDescriptor<
   target: { command: 'performMailActionWithMessages' },
   description:
     'Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of this handler is a list of messages being acted upon.',
-  input: t.record({
-    inMailboxes: t.optional(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one', {
-        description:
-          'If the script is being executed by the user selecting an item in the scripts menu, this argument will specify the mailboxes that are currently selected. Otherwise it will not be specified.',
-      })
-    ),
-    forRule: t.optional(
-      t.reference<Rule, never>(() => resources, 'Rule', 'one', {
-        description:
-          'If the script is being executed by a rule action, this argument will be the rule being invoked. Otherwise it will not be specified.',
-      })
-    ),
-  }),
+  input: t.record({}),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      inMailboxes: {
-        description:
-          'If the script is being executed by the user selecting an item in the scripts menu, this argument will specify the mailboxes that are currently selected. Otherwise it will not be specified.',
-        type: 'object',
-        properties: {
-          reference: {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Mailbox' },
-              form: { type: 'string', const: 'selector' },
-              cardinality: { type: 'string', const: 'one' },
-              selector: {
-                oneOf: [
-                  {
-                    type: 'object',
-                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
-                    required: ['by', 'name'],
-                    additionalProperties: false,
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      by: { type: 'string', const: 'index' },
-                      index: {
-                        type: 'object',
-                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                        required: ['integer'],
-                        additionalProperties: false,
-                      },
-                    },
-                    required: ['by', 'index'],
-                    additionalProperties: false,
-                  },
-                ],
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'selector'],
-            additionalProperties: false,
-          },
-        },
-        required: ['reference'],
-        additionalProperties: false,
-      },
-      forRule: {
-        description:
-          'If the script is being executed by a rule action, this argument will be the rule being invoked. Otherwise it will not be specified.',
-        type: 'object',
-        properties: {
-          reference: {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Rule' },
-              form: { type: 'string', const: 'selector' },
-              cardinality: { type: 'string', const: 'one' },
-              selector: {
-                oneOf: [
-                  {
-                    type: 'object',
-                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
-                    required: ['by', 'name'],
-                    additionalProperties: false,
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      by: { type: 'string', const: 'index' },
-                      index: {
-                        type: 'object',
-                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                        required: ['integer'],
-                        additionalProperties: false,
-                      },
-                    },
-                    required: ['by', 'index'],
-                    additionalProperties: false,
-                  },
-                ],
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'selector'],
-            additionalProperties: false,
-          },
-        },
-        required: ['reference'],
-        additionalProperties: false,
-      },
-    },
+    properties: {},
     additionalProperties: false,
-    definitions: {
-      __schema0: {
-        anyOf: [
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'OutgoingMessage' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MessageViewer' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message viewer',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Message' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message.',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Account' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the account' },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MailAttachment' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the attachment.' },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: {
-                type: 'string',
-                enum: [
-                  'RichText',
-                  'Attachment',
-                  'Paragraph',
-                  'Word',
-                  'Character',
-                  'AttributeRun',
-                  'OutgoingMessage',
-                  'MessageViewer',
-                  'Message',
-                  'Account',
-                  'Mailbox',
-                  'Rule',
-                  'RuleCondition',
-                  'Recipient',
-                  'BccRecipient',
-                  'CcRecipient',
-                  'ToRecipient',
-                  'Header',
-                  'MailAttachment',
-                ],
-              },
-              form: { type: 'string', const: 'selector' },
-              cardinality: { type: 'string', const: 'one' },
-              selector: {
-                oneOf: [
-                  {
-                    type: 'object',
-                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
-                    required: ['by', 'name'],
-                    additionalProperties: false,
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      by: { type: 'string', const: 'index' },
-                      index: {
-                        type: 'object',
-                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                        required: ['integer'],
-                        additionalProperties: false,
-                      },
-                    },
-                    required: ['by', 'index'],
-                    additionalProperties: false,
-                  },
-                ],
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'selector'],
-            additionalProperties: false,
-          },
-        ],
-      },
-      __schema1: {
-        anyOf: [
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'OutgoingMessage' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MessageViewer' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message viewer',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Message' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message.',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Account' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the account' },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MailAttachment' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the attachment.' },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: {
-                type: 'string',
-                enum: [
-                  'RichText',
-                  'Attachment',
-                  'Paragraph',
-                  'Word',
-                  'Character',
-                  'AttributeRun',
-                  'OutgoingMessage',
-                  'MessageViewer',
-                  'Message',
-                  'Account',
-                  'Mailbox',
-                  'Rule',
-                  'RuleCondition',
-                  'Recipient',
-                  'BccRecipient',
-                  'CcRecipient',
-                  'ToRecipient',
-                  'Header',
-                  'MailAttachment',
-                ],
-              },
-              form: { type: 'string', const: 'selector' },
-              cardinality: { type: 'string', const: 'one' },
-              selector: {
-                oneOf: [
-                  {
-                    type: 'object',
-                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
-                    required: ['by', 'name'],
-                    additionalProperties: false,
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      by: { type: 'string', const: 'index' },
-                      index: {
-                        type: 'object',
-                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                        required: ['integer'],
-                        additionalProperties: false,
-                      },
-                    },
-                    required: ['by', 'index'],
-                    additionalProperties: false,
-                  },
-                ],
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'selector'],
-            additionalProperties: false,
-          },
-        ],
-      },
-      __schema2: {
-        anyOf: [
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'OutgoingMessage' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MessageViewer' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message viewer',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Message' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message.',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Account' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the account' },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MailAttachment' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the attachment.' },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: {
-                type: 'string',
-                enum: [
-                  'RichText',
-                  'Attachment',
-                  'Paragraph',
-                  'Word',
-                  'Character',
-                  'AttributeRun',
-                  'OutgoingMessage',
-                  'MessageViewer',
-                  'Message',
-                  'Account',
-                  'Mailbox',
-                  'Rule',
-                  'RuleCondition',
-                  'Recipient',
-                  'BccRecipient',
-                  'CcRecipient',
-                  'ToRecipient',
-                  'Header',
-                  'MailAttachment',
-                ],
-              },
-              form: { type: 'string', const: 'selector' },
-              cardinality: { type: 'string', const: 'one' },
-              selector: {
-                oneOf: [
-                  {
-                    type: 'object',
-                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
-                    required: ['by', 'name'],
-                    additionalProperties: false,
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      by: { type: 'string', const: 'index' },
-                      index: {
-                        type: 'object',
-                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                        required: ['integer'],
-                        additionalProperties: false,
-                      },
-                    },
-                    required: ['by', 'index'],
-                    additionalProperties: false,
-                  },
-                ],
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'selector'],
-            additionalProperties: false,
-          },
-        ],
-      },
-      __schema3: {
-        anyOf: [
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'OutgoingMessage' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema3' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MessageViewer' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message viewer',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema3' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Message' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message.',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema3' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Account' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the account' },
-              container: { allOf: [{ $ref: '#/definitions/__schema3' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MailAttachment' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the attachment.' },
-              container: { allOf: [{ $ref: '#/definitions/__schema3' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: {
-                type: 'string',
-                enum: [
-                  'RichText',
-                  'Attachment',
-                  'Paragraph',
-                  'Word',
-                  'Character',
-                  'AttributeRun',
-                  'OutgoingMessage',
-                  'MessageViewer',
-                  'Message',
-                  'Account',
-                  'Mailbox',
-                  'Rule',
-                  'RuleCondition',
-                  'Recipient',
-                  'BccRecipient',
-                  'CcRecipient',
-                  'ToRecipient',
-                  'Header',
-                  'MailAttachment',
-                ],
-              },
-              form: { type: 'string', const: 'selector' },
-              cardinality: { type: 'string', const: 'one' },
-              selector: {
-                oneOf: [
-                  {
-                    type: 'object',
-                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
-                    required: ['by', 'name'],
-                    additionalProperties: false,
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      by: { type: 'string', const: 'index' },
-                      index: {
-                        type: 'object',
-                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                        required: ['integer'],
-                        additionalProperties: false,
-                      },
-                    },
-                    required: ['by', 'index'],
-                    additionalProperties: false,
-                  },
-                ],
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema3' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'selector'],
-            additionalProperties: false,
-          },
-        ],
-      },
-    },
   },
 }
 
@@ -3636,7 +2570,7 @@ const outgoingMessageSendOperation: OperationDescriptor<Record<string, never>, u
 }
 
 const appSynchronizeOperation: OperationDescriptor<
-  { readonly with: ObjectReferenceVariant<Account, string> },
+  { readonly with: ObjectReferenceData<string, 'Account'> },
   undefined
 > = {
   id: 'mail.app.synchronize',
@@ -3644,7 +2578,7 @@ const appSynchronizeOperation: OperationDescriptor<
   target: { command: 'synchronize' },
   description: 'Command to trigger synchronizing of an IMAP account with the server.',
   input: t.record({
-    with: t.reference<Account, string>(() => resources, 'Account', 'one', {
+    with: t.reference<Account, string, 'Account'>(() => mailContract, 'Account', 'one', {
       description: 'The account to synchronize',
     }),
   }),
@@ -3656,352 +2590,18 @@ const appSynchronizeOperation: OperationDescriptor<
       with: {
         description: 'The account to synchronize',
         type: 'object',
-        properties: {
-          reference: {
-            anyOf: [
-              {
-                type: 'object',
-                properties: {
-                  resource: { type: 'string', const: 'Account' },
-                  form: { type: 'string', const: 'identity' },
-                  cardinality: { type: 'string', const: 'one' },
-                  id: { type: 'string', description: 'The unique identifier of the account' },
-                  container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-                },
-                required: ['resource', 'form', 'cardinality', 'id'],
-                additionalProperties: false,
-              },
-              {
-                type: 'object',
-                properties: {
-                  resource: { type: 'string', const: 'Account' },
-                  form: { type: 'string', const: 'selector' },
-                  cardinality: { type: 'string', const: 'one' },
-                  selector: {
-                    oneOf: [
-                      {
-                        type: 'object',
-                        properties: {
-                          by: { type: 'string', const: 'name' },
-                          name: { type: 'string' },
-                        },
-                        required: ['by', 'name'],
-                        additionalProperties: false,
-                      },
-                      {
-                        type: 'object',
-                        properties: {
-                          by: { type: 'string', const: 'index' },
-                          index: {
-                            type: 'object',
-                            properties: {
-                              integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' },
-                            },
-                            required: ['integer'],
-                            additionalProperties: false,
-                          },
-                        },
-                        required: ['by', 'index'],
-                        additionalProperties: false,
-                      },
-                    ],
-                  },
-                  container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-                },
-                required: ['resource', 'form', 'cardinality', 'selector'],
-                additionalProperties: false,
-              },
-            ],
-          },
-        },
+        properties: { reference: { not: {} } },
         required: ['reference'],
         additionalProperties: false,
       },
     },
     required: ['with'],
     additionalProperties: false,
-    definitions: {
-      __schema0: {
-        anyOf: [
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'OutgoingMessage' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MessageViewer' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message viewer',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Message' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message.',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Account' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the account' },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MailAttachment' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the attachment.' },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: {
-                type: 'string',
-                enum: [
-                  'RichText',
-                  'Attachment',
-                  'Paragraph',
-                  'Word',
-                  'Character',
-                  'AttributeRun',
-                  'OutgoingMessage',
-                  'MessageViewer',
-                  'Message',
-                  'Account',
-                  'Mailbox',
-                  'Rule',
-                  'RuleCondition',
-                  'Recipient',
-                  'BccRecipient',
-                  'CcRecipient',
-                  'ToRecipient',
-                  'Header',
-                  'MailAttachment',
-                ],
-              },
-              form: { type: 'string', const: 'selector' },
-              cardinality: { type: 'string', const: 'one' },
-              selector: {
-                oneOf: [
-                  {
-                    type: 'object',
-                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
-                    required: ['by', 'name'],
-                    additionalProperties: false,
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      by: { type: 'string', const: 'index' },
-                      index: {
-                        type: 'object',
-                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                        required: ['integer'],
-                        additionalProperties: false,
-                      },
-                    },
-                    required: ['by', 'index'],
-                    additionalProperties: false,
-                  },
-                ],
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema0' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'selector'],
-            additionalProperties: false,
-          },
-        ],
-      },
-      __schema1: {
-        anyOf: [
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'OutgoingMessage' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MessageViewer' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message viewer',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Message' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'object',
-                properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                required: ['integer'],
-                additionalProperties: false,
-                description: 'The unique identifier of the message.',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Account' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the account' },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'MailAttachment' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: { type: 'string', description: 'The unique identifier of the attachment.' },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: {
-                type: 'string',
-                enum: [
-                  'RichText',
-                  'Attachment',
-                  'Paragraph',
-                  'Word',
-                  'Character',
-                  'AttributeRun',
-                  'OutgoingMessage',
-                  'MessageViewer',
-                  'Message',
-                  'Account',
-                  'Mailbox',
-                  'Rule',
-                  'RuleCondition',
-                  'Recipient',
-                  'BccRecipient',
-                  'CcRecipient',
-                  'ToRecipient',
-                  'Header',
-                  'MailAttachment',
-                ],
-              },
-              form: { type: 'string', const: 'selector' },
-              cardinality: { type: 'string', const: 'one' },
-              selector: {
-                oneOf: [
-                  {
-                    type: 'object',
-                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
-                    required: ['by', 'name'],
-                    additionalProperties: false,
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      by: { type: 'string', const: 'index' },
-                      index: {
-                        type: 'object',
-                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                        required: ['integer'],
-                        additionalProperties: false,
-                      },
-                    },
-                    required: ['by', 'index'],
-                    additionalProperties: false,
-                  },
-                ],
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'selector'],
-            additionalProperties: false,
-          },
-        ],
-      },
-    },
+  },
+  unavailable: {
+    positions: ['with'],
+    reason:
+      'Not available: `with` takes a reference to an account, which the app has no operation to get, so the operation cannot be called.',
   },
 }
 
@@ -4044,18 +2644,15 @@ function bind(runtime: ClientRuntime): MailClient {
     duplicate: (to, withProperties, options) =>
       runtime.invoke(appDuplicateOperation, { to, withProperties }, options),
     move: (to, options) => runtime.invoke(appMoveOperation, { to }, options),
-    checkForNewMail: (_for, options) =>
-      runtime.invoke(appCheckForNewMailOperation, { for: _for }, options),
+    checkForNewMail: (options) => runtime.invoke(appCheckForNewMailOperation, {}, options),
     extractNameFrom: (options) => runtime.invoke(appExtractNameFromOperation, {}, options),
     extractAddressFrom: (options) => runtime.invoke(appExtractAddressFromOperation, {}, options),
     getURL: (options) => runtime.invoke(appGetURLOperation, {}, options),
     importMailMailbox: (at, options) =>
       runtime.invoke(appImportMailMailboxOperation, { at }, options),
     mailto: (options) => runtime.invoke(appMailtoOperation, {}, options),
-    performMailActionWithMessages: (inMailboxes, forRule, options) =>
-      runtime.invoke(appPerformMailActionWithMessagesOperation, { inMailboxes, forRule }, options),
-    synchronize: (_with, options) =>
-      runtime.invoke(appSynchronizeOperation, { with: _with }, options),
+    performMailActionWithMessages: (options) =>
+      runtime.invoke(appPerformMailActionWithMessagesOperation, {}, options),
   }
 }
 

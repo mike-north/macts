@@ -376,8 +376,6 @@ export interface Message {
 export interface MessageCreateInput {
   /** The background color of the message */
   backgroundColor?: string
-  /** The mailbox in which this message is filed */
-  mailbox?: Mailbox
   /** Indicates whether the message is deleted or not */
   deletedStatus?: boolean
   /** Indicates whether the message is flagged or not */
@@ -577,10 +575,6 @@ export interface RuleCreateInput {
   runScript?: string
   /** Indicates whether all conditions must be met for rule to execute */
   allConditionsMustBeMet?: boolean
-  /** If rule matches, copy to this mailbox */
-  copyMessage?: Mailbox
-  /** If rule matches, move to this mailbox */
-  moveMessage?: Mailbox
   /** Indicates whether the color will be used to highlight the text or background of a message in the message list */
   highlightTextUsingColor?: boolean
   /** Indicates whether the rule is enabled */

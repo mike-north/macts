@@ -73,6 +73,36 @@ export interface OperationDescriptor<Input, Output> {
    * source of truth (phases/13 D9).
    */
   readonly inputJsonSchema?: Readonly<Record<string, unknown>>
+  /**
+   * Present when the operation cannot be called: a required position of its
+   * input admits no value.
+   *
+   * @remarks
+   * The descriptor stays in the contract, so the operation keeps its identity
+   * and its input still rejects every request. The surfaces that offer
+   * operations (MCP tools, HTTP routes, the methods of the generated clients,
+   * CLI commands, capability discovery) leave an unavailable operation out, so
+   * they never offer a call that must fail, and the runtime answers a call to
+   * it exactly as one to an unknown operation.
+   */
+  readonly unavailable?: OperationUnavailability
+}
+
+/**
+ * Why an operation cannot be called.
+ *
+ * @remarks
+ * Each listed position takes a reference to a resource the app has no
+ * operation to resolve, so its value type accepts no reference
+ * (phases/13 D7, "Resolvable targets"). An optional position like that is
+ * left out of the input instead; only a required one makes the operation
+ * unavailable.
+ */
+export interface OperationUnavailability {
+  /** The input fields that admit no value, by request field name, in input order. */
+  readonly positions: readonly string[]
+  /** Why, in words for the operation's documentation. */
+  readonly reason: string
 }
 
 /** A descriptor whose input and output types are not statically known. */
@@ -99,6 +129,12 @@ export interface ResourceDescriptor<RecordType, Id = unknown> {
    * Absent when the resource has no identifier. Such a resource can be
    * referenced only by selector forms (name, index, every, or range); an
    * identity reference to it is rejected when encoding and decoding.
+   *
+   * When the identifier is the object's name (a name-keyed resource),
+   * resolving an identity reference has the meaning of a name selector: it
+   * resolves to whatever object has that name when it is resolved. Which
+   * object that is when several share the name is defined by the app, so
+   * such a reference does not pin one particular object.
    */
   readonly id?: ValueType<Id>
   /** Operation that reads one object, used to resolve single references. */
@@ -140,9 +176,10 @@ export interface AppContract<Client> {
    *
    * @remarks
    * This table is the app's reference registry: it is assignable to
-   * {@link ReferenceRegistry}, and reference value types read identifier
-   * types from it (through a lazy thunk), so generated code builds no
-   * parallel table.
+   * {@link ReferenceRegistry}. The contract itself is assignable to
+   * {@link ReferenceScope}, and reference value types read the app and its
+   * identifier types from it through a lazy thunk, so generated code builds
+   * no parallel table.
    */
   readonly resources: Readonly<Record<string, ResourceDescriptor<unknown>>>
   /**

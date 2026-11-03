@@ -189,6 +189,23 @@ export function findCrudCommand(
 }
 
 /**
+ * The command whose operation resolves references to a resource: its first
+ * usable `get` (single references, containers, and identity-collection
+ * entries) or `list` (collections), as a `[commandKey, command]` pair.
+ *
+ * It is the one place this choice is made. The contract's resource table
+ * records the operations of these commands, and the input satisfiability
+ * judgment asks whether a `get` exists, so the two cannot disagree.
+ */
+export function resolvingCommand(
+  manifest: AppManifest,
+  resourceName: string,
+  shape: 'get' | 'list'
+): [string, Command] | undefined {
+  return findCrudCommand(resourceCommandEntries(manifest, resourceName), shape)
+}
+
+/**
  * The backing `create` command of a resource, if any: the command whose
  * parameters, together with the writable properties, form the create input.
  */

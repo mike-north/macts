@@ -109,18 +109,14 @@ export type AudioCDTrackUpdateInput = Record<string, never>;
 // @public
 export interface BrowserWindow {
     readonly selection: string | null;
-    view: ObjectReferenceVariant<Playlist, never> | null;
+    view: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null;
 }
 
 // @public
-export interface BrowserWindowCreateInput {
-    view?: ObjectReferenceVariant<Playlist, never>;
-}
+export type BrowserWindowCreateInput = Record<string, never>;
 
 // @public
-export interface BrowserWindowUpdateInput {
-    view?: ObjectReferenceVariant<Playlist, never>;
-}
+export type BrowserWindowUpdateInput = Record<string, never>;
 
 // @public
 export type EAPD = 'computer' | 'airPortExpress' | 'appleTV' | 'airPlayDevice' | 'bluetoothDevice' | 'homePod' | 'tV' | 'unknown';
@@ -318,7 +314,7 @@ export interface Playlist {
     readonly duration: Integer | null;
     favorited: boolean | null;
     name: string | null;
-    readonly parent: ObjectReferenceVariant<Playlist, never> | null;
+    readonly parent: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null;
     readonly size: Integer | null;
     readonly specialKind: string | null;
     readonly time: string | null;
@@ -350,7 +346,7 @@ export interface PlaylistUpdateInput {
 // @public
 export interface PlaylistWindow {
     readonly selection: string | null;
-    readonly view: ObjectReferenceVariant<Playlist, never> | null;
+    readonly view: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null;
 }
 
 // @public

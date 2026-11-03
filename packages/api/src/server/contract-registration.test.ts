@@ -28,13 +28,24 @@ import {
   type OperationDescriptor,
   type OperationId,
 } from '@macts/contracts'
+import type { AppManifest } from '@macts/core'
 import { OperationRegistrationError } from '@macts/runtime'
 import { createMultiServer, type AppRegistrar } from './index.js'
+import {
+  DUNE,
+  LIBRARIAN,
+  LIBRARIAN_TOKEN,
+  LIBRARY_MANIFEST,
+  SCIENCE_FICTION_SHELF,
+  libraryContract,
+  wire,
+} from './library-fixture.js'
 import {
   CALENDAR_MANIFEST,
   NOTES_MANIFEST,
   READER_TOKEN,
   WRITER_TOKEN,
+  createFakeVerifier,
   createRecordingExecutor,
   createTestServer,
   errorBody,
@@ -73,6 +84,149 @@ function calendarContract(operation: AnyOperationDescriptor = createEvent): AppC
 function registerCalendar(registrar: AppRegistrar): void {
   registrar.registerContract(calendarContract(), CALENDAR_MANIFEST)
 }
+
+/**
+ * The library fixture plus `shelve` on books (`library.books.shelve`,
+ * `library:books:shelve`), whose input takes a book (a resource with a get)
+ * and a shelf (a resource with no get).
+ */
+function shelvingLibrary(): { contract: AppContract<unknown>; manifest: AppManifest } {
+  const base = libraryContract()
+  const scope = (): AppContract<unknown> => contract
+  const shelve: AnyOperationDescriptor = {
+    id: 'library.books.shelve',
+    permission: 'library:books:shelve',
+    target: { command: 'shelve', resource: 'Book' },
+    description: 'Shelve a book',
+    input: t.record({
+      book: t.optional(t.reference(scope, 'Book', 'one')),
+      shelf: t.optional(t.reference(scope, 'Shelf', 'one')),
+    }),
+    output: t.none(),
+  }
+  const contract: AppContract<unknown> = {
+    ...base,
+    operations: { ...base.operations, [shelve.id]: shelve },
+  }
+  const manifest: AppManifest = {
+    ...LIBRARY_MANIFEST,
+    commands: {
+      ...LIBRARY_MANIFEST.commands,
+      shelve: {
+        name: 'shelve',
+        description: 'Shelve a book',
+        scope: 'resource',
+        resourceType: 'Book',
+        parameters: [],
+      },
+    },
+  }
+  return { contract, manifest }
+}
+
+describe('a reference in raw operation input (phases/13 D7, "Resolvable targets")', () => {
+  // Every expected outcome is from D7: a reference, and each of its
+  // containers, must name a resource the app can get, and the runtime's check
+  // of raw input against `input.wire` applies the rule (D11), reporting a
+  // reference that matches no wire form as one issue at the reference itself.
+  const server = (): ReturnType<typeof createTestServer> => {
+    const { contract, manifest } = shelvingLibrary()
+    return createTestServer({
+      manifests: [],
+      register: (registrar) => {
+        registrar.registerContract(contract, manifest)
+      },
+      executor: createRecordingExecutor(() => Promise.resolve(null)),
+      verifier: createFakeVerifier({
+        [LIBRARIAN_TOKEN]: {
+          ...LIBRARIAN,
+          permissions: [...LIBRARIAN.permissions, 'library:books:shelve'],
+        },
+      }),
+    })
+  }
+
+  it('is accepted when it names a resource the app can get', async () => {
+    const { app, executor } = server()
+
+    const res = await post(app, 'library.books.shelve', { book: wire(DUNE) }, LIBRARIAN_TOKEN)
+
+    expect(res.status).toBe(200)
+    expect(executor.requests).toHaveLength(1)
+  })
+
+  it('fails with 400 VALIDATION_FAILED when its own resource has no get, executing nothing', async () => {
+    const { app, executor } = server()
+
+    const res = await post(
+      app,
+      'library.books.shelve',
+      { shelf: wire(SCIENCE_FICTION_SHELF) },
+      LIBRARIAN_TOKEN
+    )
+
+    expect(res.status).toBe(400)
+    // An array in toMatchObject matches only at the same length: one issue.
+    expect(await errorBody(res)).toMatchObject({
+      error: { code: 'VALIDATION_FAILED', details: { issues: [{ path: ['shelf', 'reference'] }] } },
+    })
+    expect(executor.requests).toHaveLength(0)
+  })
+
+  it('fails with 400 VALIDATION_FAILED when its container has no get, executing nothing', async () => {
+    const { app, executor } = server()
+
+    const res = await post(
+      app,
+      'library.books.shelve',
+      { book: wire({ ...DUNE, container: SCIENCE_FICTION_SHELF }) },
+      LIBRARIAN_TOKEN
+    )
+
+    expect(res.status).toBe(400)
+    // An array in toMatchObject matches only at the same length: one issue.
+    expect(await errorBody(res)).toMatchObject({
+      error: { code: 'VALIDATION_FAILED', details: { issues: [{ path: ['book', 'reference'] }] } },
+    })
+    expect(executor.requests).toHaveLength(0)
+  })
+})
+
+describe('an operation marked unavailable', () => {
+  // A required input of this create admits no value (phases/13 D7,
+  // "Resolvable targets"), so the descriptor marks the operation unavailable.
+  const unavailableCreate: AnyOperationDescriptor = {
+    ...createEvent,
+    unavailable: {
+      positions: ['summary'],
+      reason: 'Not available: `summary` admits no value, so the operation cannot be called.',
+    },
+  }
+  const register = (registrar: AppRegistrar): void => {
+    registrar.registerContract(calendarContract(unavailableCreate), CALENDAR_MANIFEST)
+  }
+
+  it('is not routed: a call gets the same 404 as an unknown operation, never reaching the runtime', async () => {
+    const { app, verifier, executor } = createTestServer({ manifests: [], register })
+
+    const res = await post(app, 'calendar.events.create', { summary: 'Standup' }, WRITER_TOKEN)
+    const unknown = await post(app, 'calendar.events.nope', {}, WRITER_TOKEN)
+
+    expect(res.status).toBe(404)
+    expect(await errorBody(res)).toEqual(await errorBody(unknown))
+    expect(verifier.calls()).toBe(0)
+    expect(executor.requests).toHaveLength(0)
+  })
+
+  it('is not listed by introspection', async () => {
+    const { app } = createTestServer({ manifests: [], register })
+
+    const res = await app.request('/api/v1/introspect/all')
+
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ apps: [] })
+  })
+})
 
 describe('a server with contract-registered apps', () => {
   it('validates input against the contract wire schema, not the manifest request schema', async () => {

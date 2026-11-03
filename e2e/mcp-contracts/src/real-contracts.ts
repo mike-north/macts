@@ -13,7 +13,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { loadManifest, type AppManifest } from '@macts/core'
-import type { AnyOperationDescriptor, OperationId } from '@macts/contracts'
+import type { AnyOperationDescriptor, ClientRuntime, OperationId } from '@macts/contracts'
 
 /** The repository's `manifests/` directory. */
 const MANIFESTS_DIR = fileURLToPath(new URL('../../../manifests/', import.meta.url))
@@ -29,6 +29,8 @@ export interface RealContract {
   /** The app's route segment, as the contract names it. */
   readonly app: string
   readonly operations: Readonly<Record<OperationId, AnyOperationDescriptor>>
+  /** Build the app's client on top of a client runtime. */
+  readonly bind: (runtime: ClientRuntime) => unknown
 }
 
 /** One app: its package directory name, manifest and contract. */
@@ -47,7 +49,10 @@ export const APP_NAMES: readonly string[] = readdirSync(MANIFESTS_DIR, { withFil
   .map((entry) => entry.name)
   .sort()
 
-/** Whether a value is a contract: an object with an `app` name and an `operations` table. */
+/**
+ * Whether a value is a contract: an object with an `app` name, an `operations`
+ * table and a `bind` function.
+ */
 function isContract(value: unknown): value is RealContract {
   return (
     typeof value === 'object' &&
@@ -56,7 +61,9 @@ function isContract(value: unknown): value is RealContract {
     typeof value.app === 'string' &&
     'operations' in value &&
     typeof value.operations === 'object' &&
-    value.operations !== null
+    value.operations !== null &&
+    'bind' in value &&
+    typeof value.bind === 'function'
   )
 }
 

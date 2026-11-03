@@ -78,7 +78,7 @@ function renderer(): ValueRenderer {
     enumMembers: (enumKey) => `${enumKey.charAt(0).toLowerCase()}${enumKey.slice(1)}Members`,
     recordInterface: (resourceKey) => resourceKey,
     identifier: (resourceKey) => IDENTIFIERS[resourceKey],
-    resourcesBinding: 'resources',
+    scopeBinding: 'notesContract',
   })
 }
 
@@ -88,8 +88,22 @@ function render(type: DeclaredType, position: ValuePosition) {
   const r = renderer()
   return {
     expression: r.expression(mapped.shape),
-    sdk: r.sdkType(mapped.shape),
+    sdk: r.sdkType(mapped.shape, position),
     resolved: mapped.resolved,
+  }
+}
+
+/**
+ * Assert a reference type renders the same expression at both positions, a
+ * bound SDK type at outputs, and a data-form SDK type at inputs.
+ */
+function expectReference(
+  type: DeclaredType,
+  expression: string,
+  sdk: { readonly output: string; readonly input: string }
+): void {
+  for (const position of ['output', 'input'] as const) {
+    expect(render(type, position)).toEqual({ expression, sdk: sdk[position], resolved: true })
   }
 }
 
@@ -177,47 +191,59 @@ describe('enums', () => {
 })
 
 describe('references', () => {
-  it('map { resource: R } to a single reference read through the lazy resource table', () => {
-    expectBoth(
+  it('map { resource: R } to a single reference read through the lazy app contract', () => {
+    expectReference(
       { resource: 'TextItem' },
-      "t.reference<TextItem, string>(() => resources, 'TextItem', 'one')",
-      'ObjectReferenceVariant<TextItem, string>'
+      "t.reference<TextItem, string, 'TextItem'>(() => notesContract, 'TextItem', 'one')",
+      {
+        output: "ObjectReferenceVariant<TextItem, string, 'TextItem'>",
+        input: "ObjectReferenceData<string, 'TextItem'>",
+      }
     )
   })
 
   it("type the identifier by the target resource's identifier", () => {
-    expectBoth(
+    expectReference(
       { resource: 'Window' },
-      "t.reference<Window, Integer>(() => resources, 'Window', 'one')",
-      'ObjectReferenceVariant<Window, Integer>'
+      "t.reference<Window, Integer, 'Window'>(() => notesContract, 'Window', 'one')",
+      {
+        output: "ObjectReferenceVariant<Window, Integer, 'Window'>",
+        input: "ObjectReferenceData<Integer, 'Window'>",
+      }
     )
   })
 
   it('type the identifier as never when the target has none (selector forms only)', () => {
-    expectBoth(
+    expectReference(
       { resource: 'Tag' },
-      "t.reference<Tag, never>(() => resources, 'Tag', 'one')",
-      'ObjectReferenceVariant<Tag, never>'
+      "t.reference<Tag, never, 'Tag'>(() => notesContract, 'Tag', 'one')",
+      {
+        output: "ObjectReferenceVariant<Tag, never, 'Tag'>",
+        input: "ObjectReferenceData<never, 'Tag'>",
+      }
     )
   })
 
   it('resolve by normalized key, name, or plural', () => {
     for (const name of ['textitem', 'text item', 'Text Items', 'text-items', 'TEXT_ITEM']) {
       expect(render({ resource: name }, 'output').expression).toBe(
-        "t.reference<TextItem, string>(() => resources, 'TextItem', 'one')"
+        "t.reference<TextItem, string, 'TextItem'>(() => notesContract, 'TextItem', 'one')"
       )
     }
   })
 
   it('resolve a bare name that names only a resource', () => {
-    expect(render('window', 'output').sdk).toBe('ObjectReferenceVariant<Window, Integer>')
+    expect(render('window', 'output').sdk).toBe("ObjectReferenceVariant<Window, Integer, 'Window'>")
   })
 
   it('map an array of references to a materialized reference list', () => {
-    expectBoth(
+    expectReference(
       { array: { resource: 'Window' } },
-      "t.array(t.reference<Window, Integer>(() => resources, 'Window', 'one'))",
-      'readonly ObjectReferenceVariant<Window, Integer>[]'
+      "t.array(t.reference<Window, Integer, 'Window'>(() => notesContract, 'Window', 'one'))",
+      {
+        output: "readonly ObjectReferenceVariant<Window, Integer, 'Window'>[]",
+        input: "readonly ObjectReferenceData<Integer, 'Window'>[]",
+      }
     )
   })
 })
@@ -225,7 +251,7 @@ describe('references', () => {
 describe('resolution precedence', () => {
   it('checks resources first for { resource }', () => {
     expect(render({ resource: 'Shared' }, 'output').expression).toBe(
-      "t.reference<Shared, never>(() => resources, 'Shared', 'one')"
+      "t.reference<Shared, never, 'Shared'>(() => notesContract, 'Shared', 'one')"
     )
   })
 
@@ -239,7 +265,7 @@ describe('resolution precedence', () => {
       't.enumeration(saveOptionMembers)'
     )
     expect(render({ enum: 'Tag' }, 'output').expression).toBe(
-      "t.reference<Tag, never>(() => resources, 'Tag', 'one')"
+      "t.reference<Tag, never, 'Tag'>(() => notesContract, 'Tag', 'one')"
     )
   })
 })
@@ -264,7 +290,7 @@ describe('nullable shapes', () => {
     const shape = nullableShape({ kind: 'date' })
     expect(r.expression(shape)).toBe('t.nullable(t.date())')
     expect(r.expression(shape, 'When')).toBe("t.nullable(t.date(), { description: 'When' })")
-    expect(r.sdkType(shape)).toBe('Date | null')
+    expect(r.sdkType(shape, 'output')).toBe('Date | null')
   })
 
   it('wrap lists and references whole: a nullable list is not a list of nullables', () => {
@@ -274,26 +300,29 @@ describe('nullable shapes', () => {
       item: { kind: 'reference', resourceKey: 'Window' },
     })
     expect(r.expression(list)).toBe(
-      "t.nullable(t.array(t.reference<Window, Integer>(() => resources, 'Window', 'one')))"
+      "t.nullable(t.array(t.reference<Window, Integer, 'Window'>(() => notesContract, 'Window', 'one')))"
     )
-    expect(r.sdkType(list)).toBe('readonly ObjectReferenceVariant<Window, Integer>[] | null')
+    expect(r.sdkType(list, 'output')).toBe(
+      "readonly ObjectReferenceVariant<Window, Integer, 'Window'>[] | null"
+    )
     const reference = nullableShape({ kind: 'reference', resourceKey: 'Tag' })
-    expect(r.sdkType(reference)).toBe('ObjectReferenceVariant<Tag, never> | null')
+    expect(r.sdkType(reference, 'output')).toBe("ObjectReferenceVariant<Tag, never, 'Tag'> | null")
+    expect(r.sdkType(reference, 'input')).toBe("ObjectReferenceData<never, 'Tag'> | null")
   })
 
   it('parenthesize a nullable array item in the SDK type', () => {
     const r = renderer()
     const shape: ValueShape = { kind: 'array', item: nullableShape({ kind: 'string' }) }
-    expect(r.sdkType(shape)).toBe('readonly (string | null)[]')
+    expect(r.sdkType(shape, 'output')).toBe('readonly (string | null)[]')
   })
 
   it('apply to enums, booleans, and numbers alike', () => {
     const r = renderer()
-    expect(r.sdkType(nullableShape({ kind: 'enum', enumKey: 'SaveOption' }))).toBe(
+    expect(r.sdkType(nullableShape({ kind: 'enum', enumKey: 'SaveOption' }), 'output')).toBe(
       'SaveOption | null'
     )
-    expect(r.sdkType(nullableShape({ kind: 'boolean' }))).toBe('boolean | null')
-    expect(r.sdkType(nullableShape({ kind: 'integer' }))).toBe('Integer | null')
+    expect(r.sdkType(nullableShape({ kind: 'boolean' }), 'output')).toBe('boolean | null')
+    expect(r.sdkType(nullableShape({ kind: 'integer' }), 'output')).toBe('Integer | null')
   })
 
   it('leave unknown unwrapped, since unknown already admits null', () => {
@@ -349,7 +378,7 @@ describe('descriptions', () => {
       "t.enumeration(saveOptionMembers, { description: 'Save?' })"
     )
     expect(r.expression({ kind: 'reference', resourceKey: 'Tag' }, 'Owner')).toBe(
-      "t.reference<Tag, never>(() => resources, 'Tag', 'one', { description: 'Owner' })"
+      "t.reference<Tag, never, 'Tag'>(() => notesContract, 'Tag', 'one', { description: 'Owner' })"
     )
   })
 })
@@ -357,11 +386,17 @@ describe('descriptions', () => {
 describe('usage tracking', () => {
   it('records the contract types and enum tuples rendered output refers to', () => {
     const r = renderer()
-    r.sdkType({ kind: 'integer' })
-    r.sdkType({ kind: 'array', item: { kind: 'reference', resourceKey: 'Window' } })
+    r.sdkType({ kind: 'integer' }, 'output')
+    r.sdkType({ kind: 'array', item: { kind: 'reference', resourceKey: 'Window' } }, 'output')
     r.expression({ kind: 'enum', enumKey: 'SaveOption' })
-    r.sdkType({ kind: 'string' })
+    r.sdkType({ kind: 'string' }, 'output')
     expect([...r.usedTypes].sort()).toEqual(['Integer', 'ObjectReferenceVariant'])
+    r.sdkType({ kind: 'reference', resourceKey: 'Tag' }, 'input')
+    expect([...r.usedTypes].sort()).toEqual([
+      'Integer',
+      'ObjectReferenceData',
+      'ObjectReferenceVariant',
+    ])
     expect([...r.usedEnums]).toEqual(['SaveOption'])
   })
 })

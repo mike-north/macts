@@ -27,7 +27,7 @@
 
 import {
   ValueTypes as t,
-  type ReferenceRegistry,
+  type ReferenceScope,
   type ValueType,
   type ValueTypeOptions,
 } from '@macts/contracts'
@@ -225,6 +225,7 @@ export type ContractTypeName =
   | 'FileValue'
   | 'FileSource'
   | 'ObjectReferenceVariant'
+  | 'ObjectReferenceData'
 
 /** What rendering needs to know about the generated module around it. */
 export interface RenderContext {
@@ -237,8 +238,11 @@ export interface RenderContext {
    * resource has no identifier.
    */
   identifier(resourceKey: string): ValueShape | undefined
-  /** The binding of the app's resource table, which references read lazily. */
-  readonly resourcesBinding: string
+  /**
+   * The binding of the app contract, which references read lazily as their
+   * scope: the app they belong to and its resource table.
+   */
+  readonly scopeBinding: string
 }
 
 /**
@@ -296,18 +300,28 @@ export class ValueRenderer {
         return `t.nullable(${withOptions(this.expression(shape.inner))})`
       case 'reference': {
         const typeArgs = this.#referenceTypeArguments(shape.resourceKey)
-        const args = `() => ${this.#context.resourcesBinding}, ${stringLiteral(shape.resourceKey)}, 'one'`
+        const args = `() => ${this.#context.scopeBinding}, ${stringLiteral(shape.resourceKey)}, 'one'`
         return `t.reference<${typeArgs}>(${withOptions(args)})`
       }
     }
   }
 
-  /** The SDK type of `shape`, e.g. `readonly Date[]`. */
-  sdkType(shape: ValueShape): string {
-    return this.#sdkType(shape, new Set())
+  /**
+   * The SDK type of `shape` at `position`, e.g. `readonly Date[]`.
+   *
+   * @remarks
+   * Only references differ by position. An output holds a bound reference
+   * (`ObjectReferenceVariant<Record, Id, 'Key'>`), which a client decoded and
+   * can resolve. An input takes the data form
+   * (`ObjectReferenceData<Id, 'Key'>`), so a caller can pass a reference it
+   * built, in either form, or one it received. The resource key is a literal
+   * type in both, so a reference to another resource does not type-check.
+   */
+  sdkType(shape: ValueShape, position: ValuePosition): string {
+    return this.#sdkType(shape, position, new Set())
   }
 
-  #sdkType(shape: ValueShape, visiting: ReadonlySet<string>): string {
+  #sdkType(shape: ValueShape, position: ValuePosition, visiting: ReadonlySet<string>): string {
     switch (shape.kind) {
       case 'string':
       case 'boolean':
@@ -332,30 +346,43 @@ export class ValueRenderer {
       case 'enum':
         return shape.enumKey
       case 'array': {
-        const item = this.#sdkType(shape.item, visiting)
+        const item = this.#sdkType(shape.item, position, visiting)
         const grouped = item.startsWith('readonly ') || item.endsWith(' | null')
         return `readonly ${grouped ? `(${item})` : item}[]`
       }
       case 'nullable':
-        return `${this.#sdkType(shape.inner, visiting)} | null`
-      case 'reference':
-        return `${this.#use('ObjectReferenceVariant')}<${this.#referenceTypeArguments(shape.resourceKey, visiting)}>`
+        return `${this.#sdkType(shape.inner, position, visiting)} | null`
+      case 'reference': {
+        const key = stringLiteral(shape.resourceKey)
+        const id = this.#identifierType(shape.resourceKey, visiting)
+        return position === 'output'
+          ? `${this.#use('ObjectReferenceVariant')}<${this.#context.recordInterface(shape.resourceKey)}, ${id}, ${key}>`
+          : `${this.#use('ObjectReferenceData')}<${id}, ${key}>`
+      }
     }
   }
 
   /**
-   * `Record, Id` for a reference to `resourceKey`: its record interface and
-   * the SDK type of its identifier (`never` when it has none, since such a
-   * resource can be referenced only by selector).
+   * `Record, Id, 'Key'` for a reference to `resourceKey`: its record
+   * interface, the SDK type of its identifier, and its key as a literal type.
    */
-  #referenceTypeArguments(resourceKey: string, visiting: ReadonlySet<string> = new Set()): string {
+  #referenceTypeArguments(resourceKey: string): string {
     const record = this.#context.recordInterface(resourceKey)
+    return `${record}, ${this.#identifierType(resourceKey, new Set())}, ${stringLiteral(resourceKey)}`
+  }
+
+  /**
+   * The SDK type of `resourceKey`'s identifier: `never` when it has none,
+   * since such a resource can be referenced only by selector. An identifier
+   * is what an object returns, so it is typed as an output.
+   */
+  #identifierType(resourceKey: string, visiting: ReadonlySet<string>): string {
     const identifier = this.#context.identifier(resourceKey)
-    if (identifier === undefined) return `${record}, never`
+    if (identifier === undefined) return 'never'
     // An identifier that is itself a reference back to a resource on the
     // current path has no finite SDK type; describe it as `unknown`.
-    if (visiting.has(resourceKey)) return `${record}, unknown`
-    return `${record}, ${this.#sdkType(identifier, new Set([...visiting, resourceKey]))}`
+    if (visiting.has(resourceKey)) return 'unknown'
+    return this.#sdkType(identifier, 'output', new Set([...visiting, resourceKey]))
   }
 
   #use(name: ContractTypeName): string {
@@ -369,11 +396,12 @@ export interface BuildContext {
   /** The members of an enum, in the order the generated tuple lists them. */
   enumMembers(enumKey: string): readonly string[]
   /**
-   * The app's resource table as references read it: every resource the
-   * generated table lists, in its order, with the identifier value type of
-   * each one that has an identifier. Read lazily, as the generated table is.
+   * The scope references read: the app's route segment and its resource
+   * table, listing every resource the generated table lists, in its order,
+   * with the identifier value type of each one that has an identifier. Read
+   * lazily, as the generated contract is.
    */
-  registry(): ReferenceRegistry
+  scope(): ReferenceScope
 }
 
 /**
@@ -430,7 +458,7 @@ export class ValueBuilder {
       case 'nullable':
         return t.nullable(this.build(shape.inner), options)
       case 'reference':
-        return t.reference(() => this.#context.registry(), shape.resourceKey, 'one', options)
+        return t.reference(() => this.#context.scope(), shape.resourceKey, 'one', options)
     }
   }
 }

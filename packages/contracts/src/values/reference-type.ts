@@ -8,7 +8,16 @@
  * table (the {@link ReferenceRegistry}). Containers usually belong to other
  * resources, so the whole table is consulted, not only the declared resource.
  *
- * The table is supplied as a thunk because record types of mutually
+ * Every reference also names the app it belongs to, because resource keys
+ * repeat across apps. The table and the app arrive together as the
+ * {@link ReferenceScope}, which an app contract satisfies. The app is part of
+ * the SDK data form only: encoding requires it at every level (the
+ * reference, each container, and each entry) and rejects one that differs
+ * from the scope's app, and it never writes it to the wire, where the route
+ * already names the app. Decoding rejects an `app` key on the wire and stamps
+ * the scope's app on everything it produces.
+ *
+ * The scope is supplied as a thunk because record types of mutually
  * referencing resources form cycles: a note record holds folder references
  * while a folder record holds note references. Constructing a reference value
  * type never calls the thunk; encoding, decoding, and schema use do.
@@ -35,9 +44,18 @@
  *   `start <= end` (`start === end` is a valid empty range);
  * - a container is a single-object reference.
  *
- * Issue paths follow the reference's own data layout (`id`, `selector`,
- * `entries/<i>`, `container`), which is the same in SDK and wire form, so both
- * directions report the same location. The `reference` control-record
+ * Every resolvable object has its resolving operation: a single-object
+ * reference, every container, and every identity-collection entry name a
+ * resource with `get`, and a collection names a resource with `list`. Both
+ * directions check it, and the wire and SDK schemas admit only the resources
+ * that satisfy it, so the JSON Schema of a position lists exactly the keys it
+ * accepts. A caller-built reference that could never be resolved is rejected
+ * before any call, a raw request carrying one is rejected by the wire schema,
+ * and a returned one can only come from a defect of the contract.
+ *
+ * Issue paths follow the reference's own data layout (`app`, `id`,
+ * `selector`, `entries/<i>`, `container`), which is the same in SDK and wire
+ * form apart from `app`, so both directions report the same location. The `reference` control-record
  * envelope adds no path segment.
  *
  * This module is not part of the package's public surface.
@@ -54,6 +72,7 @@ import type {
   ReferenceData,
   ReferenceForm,
   ReferenceRegistry,
+  ReferenceScope,
   ReferenceWire,
 } from '../references/index.js'
 import {
@@ -71,6 +90,7 @@ import { INTEGER_LIMITS, type Integer } from './integer.js'
 import {
   declaredFields,
   openSdkObject,
+  type DeclaredFields,
   openWireObject,
   type FieldReader,
 } from './declared-fields.js'
@@ -82,18 +102,20 @@ import type { ValueTypeOptions } from './value-types.js'
 import { wireIntegerSchema } from './wire-checks.js'
 import type { WireValue } from './wire.js'
 
-/** A lazy view of the app's resource table; see the module documentation. */
-export type ReferenceRegistryThunk = () => ReferenceRegistry
+/** A lazy view of the app and its resource table; see the module documentation. */
+export type ReferenceScopeThunk = () => ReferenceScope
 
 /** What a reference position holds once bound, before the contract fixes `T` and `Id`. */
 type BoundReference = ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown>
 
 /*
  * Reference shapes, generic over the representation of identifiers and
- * selector positions. Encoding produces them with wire leaves (`Shape<WireValue,
- * WireValue>`, a wire value); decoding produces them with SDK leaves
- * (`Shape<unknown, Integer>`, which is exactly `ReferenceData`). The structure
- * is the same in both directions; only the leaves differ.
+ * selector positions and over the app tag every level carries. Encoding
+ * produces them with wire leaves and no tag (`Shape<WireValue, WireValue,
+ * WireTag>`, a wire value); decoding produces them with SDK leaves and the app
+ * (`Shape<unknown, Integer, AppTag>`, which is exactly `ReferenceData`). The
+ * structure is the same in both directions; only the leaves and the tag
+ * differ.
  */
 /* eslint-disable @typescript-eslint/consistent-type-definitions -- type aliases, so the wire
    instantiation is assignable to `WireValue` */
@@ -103,36 +125,42 @@ type ObjectSelectorShape<Position> =
 type CollectionSelectorShape<Position> =
   | { readonly by: 'every' }
   | { readonly by: 'range'; readonly start: Position; readonly end: Position }
-type IdentityShape<Id, Position> = {
+/** The app every data-form level carries. */
+type AppTag = { readonly app: string }
+/** The wire form carries no app: the route names it. */
+type WireTag = Readonly<Record<never, never>>
+type IdentityShape<Id, Position, Tag> = Tag & {
   readonly resource: string
   readonly form: 'identity'
   readonly cardinality: 'one'
   readonly id: Id
-  readonly container?: ObjectShape<Id, Position>
+  readonly container?: ObjectShape<Id, Position, Tag>
 }
-type SelectorShape<Id, Position> = {
+type SelectorShape<Id, Position, Tag> = Tag & {
   readonly resource: string
   readonly form: 'selector'
   readonly cardinality: 'one'
   readonly selector: ObjectSelectorShape<Position>
-  readonly container?: ObjectShape<Id, Position>
+  readonly container?: ObjectShape<Id, Position, Tag>
 }
-type ObjectShape<Id, Position> = IdentityShape<Id, Position> | SelectorShape<Id, Position>
-type CollectionShape<Id, Position> =
-  | {
+type ObjectShape<Id, Position, Tag> =
+  | IdentityShape<Id, Position, Tag>
+  | SelectorShape<Id, Position, Tag>
+type CollectionShape<Id, Position, Tag> =
+  | (Tag & {
       readonly resource: string
       readonly form: 'identity'
       readonly cardinality: 'many'
-      readonly entries: readonly IdentityShape<Id, Position>[]
-    }
-  | {
+      readonly entries: readonly IdentityShape<Id, Position, Tag>[]
+    })
+  | (Tag & {
       readonly resource: string
       readonly form: 'selector'
       readonly cardinality: 'many'
       readonly selector: CollectionSelectorShape<Position>
-      readonly container?: ObjectShape<Id, Position>
-    }
-type Shape<Id, Position> = ObjectShape<Id, Position> | CollectionShape<Id, Position>
+      readonly container?: ObjectShape<Id, Position, Tag>
+    })
+type Shape<Id, Position, Tag> = ObjectShape<Id, Position, Tag> | CollectionShape<Id, Position, Tag>
 /* eslint-enable @typescript-eslint/consistent-type-definitions */
 
 /** The fields of an object being read; see `declared-fields`. */
@@ -144,10 +172,21 @@ interface Position<Converted> {
   readonly converted: Converted
 }
 
-/** How one direction reads objects and converts identifiers and positions. */
-interface Direction<Id, Pos> {
+/**
+ * How one direction reads objects, converts identifiers and positions, and
+ * handles the app each level belongs to.
+ */
+interface Direction<Id, Pos, Tag> {
   /** Open `value` as an object, or record why it is not one. */
   open(value: unknown, path: IssuePath, issues: Issues, expected: string): Source | Invalid
+  /** The fields a variant declares in the form this direction reads. */
+  fields(variant: VariantFields): DeclaredFields
+  /**
+   * The app tag of one level being read, given the scope: encoding checks the
+   * level's `app` against the scope and produces no tag, decoding supplies
+   * the scope's app.
+   */
+  tag(source: Source, path: IssuePath, scope: ReferenceScope, issues: Issues): Tag | Invalid
   /** Convert an identifier with its resource's identifier value type. */
   id(type: ValueType<unknown>, value: unknown, path: IssuePath, issues: Issues): Id | Invalid
   /** Convert a selector position. */
@@ -159,14 +198,42 @@ interface Direction<Id, Pos> {
 /** Selector positions: zero-based, non-negative integers. */
 const POSITION_CODEC = integerCodec(0, INTEGER_LIMITS.max)
 
+/** The tag of a wire level: none. */
+const NO_TAG: WireTag = Object.freeze({})
+
 /**
  * Encoding: read the declared fields of any object by property access,
  * ignoring functions and non-own or non-enumerable properties, and rejecting
  * other own data properties.
  */
-const ENCODING: Direction<WireValue, WireValue> = {
+const ENCODING: Direction<WireValue, WireValue, WireTag> = {
   open: (value, path, issues, expected) =>
     openSdkObject(value) ?? mismatch(value, path, issues, expected),
+  fields: (variant) => variant.sdk,
+  tag(source, path, scope, issues) {
+    const app = source.read('app')
+    if (typeof app !== 'string') {
+      return fieldMismatch(
+        app,
+        [...path, 'app'],
+        issues,
+        `the app the reference belongs to (${quote(scope.app)})`
+      )
+    }
+    if (app !== scope.app) {
+      issues.push(
+        issue(
+          [...path, 'app'],
+          'invalid-type',
+          `Expected a reference to an object of ${quote(scope.app)}; received a reference ` +
+            `to an object of ${quote(app)}. A reference can be used only with the app it ` +
+            'belongs to.'
+        )
+      )
+      return INVALID
+    }
+    return NO_TAG
+  },
   id: (type, value, path, issues) => codecOf(type).encode(value, path, issues),
   position(value, path, issues) {
     const wire = POSITION_CODEC.encode(value, path, issues)
@@ -178,10 +245,13 @@ const ENCODING: Direction<WireValue, WireValue> = {
 }
 
 /** Decoding: read a strict JSON object, rejecting keys the wire form does not declare. */
-function decoding(context: DecodeContext): Direction<unknown, Integer> {
+function decoding(context: DecodeContext): Direction<unknown, Integer, AppTag> {
   return {
     open: (value, path, issues, expected) =>
       openWireObject(value) ?? mismatch(value, path, issues, expected),
+    fields: (variant) => variant.wire,
+    // The wire form never carries the app; it is the scope's at every level.
+    tag: (_source, _path, scope) => ({ app: scope.app }),
     id: (type, value, path, issues) => codecOf(type).decode(value, path, context, issues),
     position(value, path, issues) {
       const integer = POSITION_CODEC.decode(value, path, context, issues)
@@ -203,10 +273,10 @@ interface Want {
   readonly role: 'reference' | 'entry' | 'container'
 }
 
-/** One pass of reading references: the resource table and the direction. */
-interface Walk<Id, Pos> {
-  readonly registry: ReferenceRegistry
-  readonly direction: Direction<Id, Pos>
+/** One pass of reading references: the app and its resource table, and the direction. */
+interface Walk<Id, Pos, Tag> {
+  readonly scope: ReferenceScope
+  readonly direction: Direction<Id, Pos, Tag>
 }
 
 /**
@@ -215,24 +285,51 @@ interface Walk<Id, Pos> {
  * an identity reference to a resource without one is rejected while reading
  * the header.
  */
-type Header =
+type Header<Tag> =
   | {
       readonly source: Source
+      readonly tag: Tag
       readonly resource: string
       readonly form: 'identity'
       /** The identifier value type of `resource`. */
       readonly idType: ValueType<unknown>
     }
-  | { readonly source: Source; readonly resource: string; readonly form: 'selector' }
+  | {
+      readonly source: Source
+      readonly tag: Tag
+      readonly resource: string
+      readonly form: 'selector'
+    }
 
 /** A header for an identity-form reference. */
-type IdentityHeader = Extract<Header, { readonly form: 'identity' }>
+type IdentityHeader<Tag> = Extract<Header<Tag>, { readonly form: 'identity' }>
 
 const HEADER_FIELDS = ['resource', 'form', 'cardinality']
 const ENTRIES_BELONG = 'entries belong to an identity collection (cardinality "many")'
+const APP_NOT_ON_WIRE = "the route names the app, so a reference's wire form does not carry it"
 
-/* The declared fields of each reference variant, in SDK and wire form alike. */
-const IDENTITY_FIELDS = declaredFields(
+/** The fields one reference variant declares in its SDK and its wire form. */
+interface VariantFields {
+  /** The SDK data form: the wire fields plus `app`. */
+  readonly sdk: DeclaredFields
+  /** The wire form, which never carries `app`. */
+  readonly wire: DeclaredFields
+}
+
+/** Declare a reference variant's fields in both forms. */
+function variantFields(
+  label: string,
+  fields: readonly string[],
+  misplaced: Readonly<Record<string, string>>
+): VariantFields {
+  return Object.freeze({
+    sdk: declaredFields(label, ['app', ...fields], misplaced),
+    wire: declaredFields(label, fields, { ...misplaced, app: APP_NOT_ON_WIRE }),
+  })
+}
+
+/* The declared fields of each reference variant. */
+const IDENTITY_FIELDS = variantFields(
   'an identity reference',
   [...HEADER_FIELDS, 'id', 'container'],
   {
@@ -240,7 +337,7 @@ const IDENTITY_FIELDS = declaredFields(
     entries: ENTRIES_BELONG,
   }
 )
-const SELECTOR_FIELDS = declaredFields(
+const SELECTOR_FIELDS = variantFields(
   'a selector reference',
   [...HEADER_FIELDS, 'selector', 'container'],
   {
@@ -248,7 +345,7 @@ const SELECTOR_FIELDS = declaredFields(
     entries: ENTRIES_BELONG,
   }
 )
-const IDENTITY_COLLECTION_FIELDS = declaredFields(
+const IDENTITY_COLLECTION_FIELDS = variantFields(
   'an identity collection',
   [...HEADER_FIELDS, 'entries'],
   {
@@ -257,7 +354,7 @@ const IDENTITY_COLLECTION_FIELDS = declaredFields(
     id: 'each entry carries its own id',
   }
 )
-const SELECTOR_COLLECTION_FIELDS = declaredFields(
+const SELECTOR_COLLECTION_FIELDS = variantFields(
   'a selector collection',
   [...HEADER_FIELDS, 'selector', 'container'],
   {
@@ -289,15 +386,16 @@ const RANGE_SELECTOR_FIELDS = declaredFields('a "range" selector', ['by', 'start
   index: 'its positions are its start and end',
 })
 
-function readHeader<Id, Pos>(
+function readHeader<Id, Pos, Tag>(
   value: unknown,
   path: IssuePath,
   want: Want,
-  walk: Walk<Id, Pos>,
+  walk: Walk<Id, Pos, Tag>,
   issues: Issues
-): Header | Invalid {
+): Header<Tag> | Invalid {
   const source = walk.direction.open(value, path, issues, expectedReference(want))
   if (source === INVALID) return INVALID
+  const tag = walk.direction.tag(source, path, walk.scope, issues)
 
   const resource = source.read('resource')
   if (typeof resource !== 'string') {
@@ -316,7 +414,8 @@ function readHeader<Id, Pos>(
     )
     return INVALID
   }
-  const entry = Object.hasOwn(walk.registry, resource) ? walk.registry[resource] : undefined
+  const { resources } = walk.scope
+  const entry = Object.hasOwn(resources, resource) ? resources[resource] : undefined
   if (entry === undefined) {
     issues.push(
       issue(
@@ -332,6 +431,13 @@ function readHeader<Id, Pos>(
   const cardinality = source.read('cardinality')
   if (cardinality !== want.cardinality) {
     issues.push(issue(path, 'invalid-type', cardinalityMessage(want, cardinality)))
+    return INVALID
+  }
+  if (!resolvable(entry, want.role, want.cardinality)) {
+    // A container or an entry is admitted by its resource, so the issue names
+    // that field; a position's own reference fails as a whole.
+    const at = want.role === 'reference' ? path : [...path, 'resource']
+    issues.push(issue(at, 'unsupported', unresolvableMessage(resource, want)))
     return INVALID
   }
 
@@ -360,7 +466,8 @@ function readHeader<Id, Pos>(
     )
     return INVALID
   }
-  if (form === 'selector') return { source, resource, form }
+  if (tag === INVALID) return INVALID
+  if (form === 'selector') return { source, tag, resource, form }
   if (entry.id === undefined) {
     issues.push(
       issue(
@@ -372,7 +479,62 @@ function readHeader<Id, Pos>(
     )
     return INVALID
   }
-  return { source, resource, form, idType: entry.id }
+  return { source, tag, resource, form, idType: entry.id }
+}
+
+/**
+ * The operation that resolves an object at `role` with `cardinality`: every
+ * resolvable object has one. A single-object reference, a container, and an
+ * identity-collection entry (itself a resolvable single reference) resolve
+ * through the resource's `get`; a collection resolves through its `list`.
+ *
+ * This is the one statement of the rule. The walker checks it in both
+ * directions, and the wire and SDK schemas admit only the resources it
+ * allows, so the codecs and the schemas (and the JSON Schemas derived from
+ * them) cannot disagree about it.
+ */
+function resolvingOperation(role: Want['role'], cardinality: ReferenceCardinality): 'get' | 'list' {
+  return role === 'reference' && cardinality === 'many' ? 'list' : 'get'
+}
+
+/** Whether a resource with table entry `entry` can be resolved at `role`; see {@link resolvingOperation}. */
+function resolvable(
+  entry: ReferenceRegistry[string] | undefined,
+  role: Want['role'],
+  cardinality: ReferenceCardinality
+): boolean {
+  return entry?.[resolvingOperation(role, cardinality)] !== undefined
+}
+
+/** The resources of `registry` that can be resolved at `role`, as a table of the same shape. */
+function resolvableResources(
+  registry: ReferenceRegistry,
+  role: Want['role'],
+  cardinality: ReferenceCardinality
+): ReferenceRegistry {
+  return Object.fromEntries(
+    Object.entries(registry).filter(([, entry]) => resolvable(entry, role, cardinality))
+  )
+}
+
+function unresolvableMessage(resource: string, want: Want): string {
+  if (want.role === 'container') {
+    return (
+      `${quote(resource)} cannot be a container: the app has no operation that gets one ` +
+      `${quote(resource)}, so the reference could never be resolved within it.`
+    )
+  }
+  if (want.role === 'entry') {
+    return (
+      `An identity collection of ${quote(resource)} cannot list its entries: the app has no ` +
+      `operation that gets one ${quote(resource)}, so an entry could never be resolved.`
+    )
+  }
+  return want.cardinality === 'one'
+    ? `The app has no operation that gets one ${quote(resource)}, so a reference to one cannot ` +
+        'be resolved.'
+    : `The app has no operation that lists ${quote(resource)} objects, so a collection of them ` +
+        'cannot be resolved.'
 }
 
 function expectedReference(want: Want): string {
@@ -409,13 +571,13 @@ function cardinalityMessage(want: Want, received: unknown): string {
 }
 
 /** Read a single-object reference of either form. */
-function convertObject<Id, Pos>(
+function convertObject<Id, Pos, Tag>(
   value: unknown,
   path: IssuePath,
   want: Want,
-  walk: Walk<Id, Pos>,
+  walk: Walk<Id, Pos, Tag>,
   issues: Issues
-): ObjectShape<Id, Pos> | Invalid {
+): ObjectShape<Id, Pos, Tag> | Invalid {
   const header = readHeader(value, path, want, walk, issues)
   if (header === INVALID) return INVALID
   return header.form === 'identity'
@@ -423,51 +585,51 @@ function convertObject<Id, Pos>(
     : selectorBody(header, path, walk, issues)
 }
 
-function identityBody<Id, Pos>(
-  header: IdentityHeader,
+function identityBody<Id, Pos, Tag>(
+  header: IdentityHeader<Tag>,
   path: IssuePath,
-  walk: Walk<Id, Pos>,
+  walk: Walk<Id, Pos, Tag>,
   issues: Issues
-): IdentityShape<Id, Pos> | Invalid {
-  const { source, resource } = header
+): IdentityShape<Id, Pos, Tag> | Invalid {
+  const { source, tag, resource } = header
   const raw = source.read('id')
   const id =
     raw === undefined
       ? fieldMismatch(raw, [...path, 'id'], issues, 'the object identifier')
       : walk.direction.id(header.idType, raw, [...path, 'id'], issues)
   const container = readContainer(source, path, walk, issues)
-  const unknown = source.rejectUnknown(IDENTITY_FIELDS, path, issues)
+  const unknown = source.rejectUnknown(walk.direction.fields(IDENTITY_FIELDS), path, issues)
   if (id === INVALID || container === INVALID || unknown) return INVALID
-  const base = { resource, form: 'identity', cardinality: 'one', id } as const
+  const base = { ...tag, resource, form: 'identity', cardinality: 'one', id } as const
   return container === undefined ? base : { ...base, container }
 }
 
-function selectorBody<Id, Pos>(
-  header: Extract<Header, { readonly form: 'selector' }>,
+function selectorBody<Id, Pos, Tag>(
+  header: Extract<Header<Tag>, { readonly form: 'selector' }>,
   path: IssuePath,
-  walk: Walk<Id, Pos>,
+  walk: Walk<Id, Pos, Tag>,
   issues: Issues
-): SelectorShape<Id, Pos> | Invalid {
-  const { source, resource } = header
+): SelectorShape<Id, Pos, Tag> | Invalid {
+  const { source, tag, resource } = header
   const selector = objectSelector(source.read('selector'), [...path, 'selector'], walk, issues)
   const container = readContainer(source, path, walk, issues)
-  const unknown = source.rejectUnknown(SELECTOR_FIELDS, path, issues)
+  const unknown = source.rejectUnknown(walk.direction.fields(SELECTOR_FIELDS), path, issues)
   if (selector === INVALID || container === INVALID || unknown) return INVALID
-  const base = { resource, form: 'selector', cardinality: 'one', selector } as const
+  const base = { ...tag, resource, form: 'selector', cardinality: 'one', selector } as const
   return container === undefined ? base : { ...base, container }
 }
 
 /** Read a collection reference of either form. */
-function convertCollection<Id, Pos>(
+function convertCollection<Id, Pos, Tag>(
   value: unknown,
   path: IssuePath,
   want: Want,
-  walk: Walk<Id, Pos>,
+  walk: Walk<Id, Pos, Tag>,
   issues: Issues
-): CollectionShape<Id, Pos> | Invalid {
+): CollectionShape<Id, Pos, Tag> | Invalid {
   const header = readHeader(value, path, want, walk, issues)
   if (header === INVALID) return INVALID
-  const { source, resource } = header
+  const { source, tag, resource } = header
 
   if (header.form === 'identity') {
     const entries = readEntries(
@@ -477,26 +639,34 @@ function convertCollection<Id, Pos>(
       walk,
       issues
     )
-    const unknown = source.rejectUnknown(IDENTITY_COLLECTION_FIELDS, path, issues)
+    const unknown = source.rejectUnknown(
+      walk.direction.fields(IDENTITY_COLLECTION_FIELDS),
+      path,
+      issues
+    )
     if (entries === INVALID || unknown) return INVALID
-    return { resource, form: 'identity', cardinality: 'many', entries }
+    return { ...tag, resource, form: 'identity', cardinality: 'many', entries }
   }
 
   const selector = collectionSelector(source.read('selector'), [...path, 'selector'], walk, issues)
   const container = readContainer(source, path, walk, issues)
-  const unknown = source.rejectUnknown(SELECTOR_COLLECTION_FIELDS, path, issues)
+  const unknown = source.rejectUnknown(
+    walk.direction.fields(SELECTOR_COLLECTION_FIELDS),
+    path,
+    issues
+  )
   if (selector === INVALID || container === INVALID || unknown) return INVALID
-  const base = { resource, form: 'selector', cardinality: 'many', selector } as const
+  const base = { ...tag, resource, form: 'selector', cardinality: 'many', selector } as const
   return container === undefined ? base : { ...base, container }
 }
 
 /** Read the optional container of a reference: absent, or a single-object reference. */
-function readContainer<Id, Pos>(
+function readContainer<Id, Pos, Tag>(
   source: Source,
   path: IssuePath,
-  walk: Walk<Id, Pos>,
+  walk: Walk<Id, Pos, Tag>,
   issues: Issues
-): ObjectShape<Id, Pos> | undefined | Invalid {
+): ObjectShape<Id, Pos, Tag> | undefined | Invalid {
   const raw = source.read('container')
   if (raw === undefined) return undefined
   return convertObject(
@@ -508,19 +678,19 @@ function readContainer<Id, Pos>(
   )
 }
 
-function readEntries<Id, Pos>(
+function readEntries<Id, Pos, Tag>(
   raw: unknown,
   path: IssuePath,
   resource: string,
-  walk: Walk<Id, Pos>,
+  walk: Walk<Id, Pos, Tag>,
   issues: Issues
-): IdentityShape<Id, Pos>[] | Invalid {
+): IdentityShape<Id, Pos, Tag>[] | Invalid {
   if (!Array.isArray(raw)) {
     return fieldMismatch(raw, path, issues, 'an array of identity references')
   }
   const items: readonly unknown[] = raw
   const want: Want = { resource, cardinality: 'one', form: 'identity', role: 'entry' }
-  const entries: IdentityShape<Id, Pos>[] = []
+  const entries: IdentityShape<Id, Pos, Tag>[] = []
   let valid = true
   for (const [index, item] of items.entries()) {
     const entryPath = [...path, index]
@@ -536,10 +706,10 @@ function readEntries<Id, Pos>(
   return valid ? entries : INVALID
 }
 
-function objectSelector<Id, Pos>(
+function objectSelector<Id, Pos, Tag>(
   raw: unknown,
   path: IssuePath,
-  walk: Walk<Id, Pos>,
+  walk: Walk<Id, Pos, Tag>,
   issues: Issues
 ): ObjectSelectorShape<Pos> | Invalid {
   if (raw === undefined) return fieldMismatch(raw, path, issues, 'a selector')
@@ -570,10 +740,10 @@ function objectSelector<Id, Pos>(
   }
 }
 
-function collectionSelector<Id, Pos>(
+function collectionSelector<Id, Pos, Tag>(
   raw: unknown,
   path: IssuePath,
-  walk: Walk<Id, Pos>,
+  walk: Walk<Id, Pos, Tag>,
   issues: Issues
 ): CollectionSelectorShape<Pos> | Invalid {
   if (raw === undefined) return fieldMismatch(raw, path, issues, 'a selector')
@@ -612,11 +782,11 @@ function collectionSelector<Id, Pos>(
   }
 }
 
-function readPosition<Id, Pos>(
+function readPosition<Id, Pos, Tag>(
   source: Source,
   key: string,
   path: IssuePath,
-  walk: Walk<Id, Pos>,
+  walk: Walk<Id, Pos, Tag>,
   issues: Issues
 ): Position<Pos> | Invalid {
   const raw = source.read(key)
@@ -714,25 +884,33 @@ function wireSelector(
 }
 
 /**
- * Wire schema of a container: a single-object reference to any resource in
- * the table. Identity branches exist only for resources with an identifier;
- * the selector branch admits every resource, so the union is never empty
- * while the table has a resource.
+ * Wire schema of a container: a single-object reference to a resource in the
+ * table that can be resolved as a container (one with `get`; see
+ * {@link resolvingOperation}). Identity branches exist only for those that
+ * also have an identifier; the selector branch admits every one of them, so
+ * the union is empty only when no resource can contain.
  */
 function wireContainer(registry: ReferenceRegistry): ZodType<ReferenceWire> {
   const schema: ZodType<ReferenceWire> = z.lazy(() => {
-    const [first, ...rest] = Object.keys(registry)
-    if (first === undefined)
-      return z.never({ error: 'The app has no resources to contain a reference.' })
+    const containers = resolvableResources(registry, 'container', 'one')
+    const [first, ...rest] = Object.keys(containers)
+    if (first === undefined) {
+      return z.never({ error: 'The app has no resource that can contain a reference.' })
+    }
     return z.union([
-      ...identified(registry).map(([key, id]) => wireIdentity(key, id.wire, schema)),
+      ...identified(containers).map(([key, id]) => wireIdentity(key, id.wire, schema)),
       wireSelector(z.enum([first, ...rest]), schema),
     ])
   })
   return schema
 }
 
-/** Wire schema of the payload of a reference to `resource` with `cardinality`. */
+/**
+ * Wire schema of the payload of a reference to `resource` with `cardinality`.
+ * It admits only what can be resolved (see {@link resolvingOperation}): a
+ * position whose resource lacks its resolving operation admits nothing, and
+ * an identity collection admits entries only when its resource can be got.
+ */
 function wirePayload(
   registry: ReferenceRegistry,
   resource: string,
@@ -741,14 +919,21 @@ function wirePayload(
   if (!Object.hasOwn(registry, resource)) {
     return z.never({ error: `The app has no resource ${quote(resource)}.` })
   }
+  const entry = registry[resource]
+  if (!resolvable(entry, 'reference', cardinality)) {
+    return z.never({
+      error: unresolvableMessage(resource, unresolvableWant(resource, cardinality)),
+    })
+  }
   const container = wireContainer(registry)
   // A resource without an identifier has no identity forms; the selector
   // branch alone remains, so the union is never empty.
-  const id = registry[resource]?.id
-  const identity = id === undefined ? undefined : wireIdentity(resource, id.wire, container)
+  const id = entry?.id
   if (cardinality === 'one') {
     const selector = wireSelector(z.literal(resource), container)
-    return identity === undefined ? selector : z.union([identity, selector])
+    return id === undefined
+      ? selector
+      : z.union([wireIdentity(resource, id.wire, container), selector])
   }
   const selector = z.strictObject({
     resource: z.literal(resource),
@@ -757,22 +942,38 @@ function wirePayload(
     selector: WIRE_COLLECTION_SELECTOR_SCHEMA,
     container: container.exactOptional(),
   })
-  if (identity === undefined) return selector
+  if (id === undefined) return selector
+  // Entries are single references, so they need `get`; without it only an
+  // empty identity collection is admitted, as the walker admits it.
+  const member = resolvable(entry, 'entry', 'one')
+    ? wireIdentity(resource, id.wire, container)
+    : z.never({ error: unresolvableMessage(resource, entryWant(resource)) })
   return z.union([
     z.strictObject({
       resource: z.literal(resource),
       form: z.literal('identity'),
       cardinality: z.literal('many'),
-      entries: z.array(identity),
+      entries: z.array(member),
     }),
     selector,
   ])
 }
 
+/** What a position's own reference to `resource` with `cardinality` must be, for messages. */
+function unresolvableWant(resource: string, cardinality: ReferenceCardinality): Want {
+  return { resource, cardinality, form: undefined, role: 'reference' }
+}
+
+/** What an identity-collection entry of `resource` must be, for messages. */
+function entryWant(resource: string): Want {
+  return { resource, cardinality: 'one', form: 'identity', role: 'entry' }
+}
+
 /*
  * SDK schemas. They accept the same structural data encoding accepts: declared
- * fields are validated, function members (such as `resolve` on a bound
- * reference) are allowed, and any other own data property is rejected.
+ * fields are validated (including `app`, which must be the scope's at every
+ * level), function members (such as `resolve` on a bound reference) are
+ * allowed, and any other own data property is rejected.
  */
 
 /** SDK schema of a selector position: a non-negative integer. */
@@ -796,8 +997,9 @@ const SDK_COLLECTION_SELECTOR_SCHEMA = z.discriminatedUnion('by', [
   }),
 ])
 
-function sdkIdentity(resource: string, id: ZodType, container: ZodType): ZodType {
+function sdkIdentity(app: string, resource: string, id: ZodType, container: ZodType): ZodType {
   return sdkObject({
+    app: z.literal(app),
     resource: z.literal(resource),
     form: z.literal('identity'),
     cardinality: z.literal('one'),
@@ -806,8 +1008,9 @@ function sdkIdentity(resource: string, id: ZodType, container: ZodType): ZodType
   })
 }
 
-function sdkSelector(resource: ZodType<string>, container: ZodType): ZodType {
+function sdkSelector(app: string, resource: ZodType<string>, container: ZodType): ZodType {
   return sdkObject({
+    app: z.literal(app),
     resource,
     form: z.literal('selector'),
     cardinality: z.literal('one'),
@@ -816,33 +1019,43 @@ function sdkSelector(resource: ZodType<string>, container: ZodType): ZodType {
   })
 }
 
-/** SDK schema of a container; identity branches only for resources with an identifier. */
-function sdkContainer(registry: ReferenceRegistry): ZodType {
+/**
+ * SDK schema of a container: a single-object reference to a resource that
+ * can be resolved as a container (see {@link resolvingOperation}). Identity
+ * branches exist only for those resources that also have an identifier.
+ */
+function sdkContainer(scope: ReferenceScope): ZodType {
+  const { app, resources } = scope
   const schema: ZodType = z.lazy(() => {
-    const [first, ...rest] = Object.keys(registry)
+    const containers = resolvableResources(resources, 'container', 'one')
+    const [first, ...rest] = Object.keys(containers)
     if (first === undefined) return z.never()
     return z.union([
-      ...identified(registry).map(([key, id]) => sdkIdentity(key, id.sdk, schema)),
-      sdkSelector(z.enum([first, ...rest]), schema),
+      ...identified(containers).map(([key, id]) => sdkIdentity(app, key, id.sdk, schema)),
+      sdkSelector(app, z.enum([first, ...rest]), schema),
     ])
   })
   return schema
 }
 
 function sdkReference(
-  registry: ReferenceRegistry,
+  scope: ReferenceScope,
   resource: string,
   cardinality: ReferenceCardinality
 ): ZodType {
-  if (!Object.hasOwn(registry, resource)) return z.never()
-  const container = sdkContainer(registry)
-  const id = registry[resource]?.id
-  const identity = id === undefined ? undefined : sdkIdentity(resource, id.sdk, container)
+  const { app, resources } = scope
+  if (!Object.hasOwn(resources, resource)) return z.never()
+  const entry = resources[resource]
+  if (!resolvable(entry, 'reference', cardinality)) return z.never()
+  const container = sdkContainer(scope)
+  const id = entry?.id
+  const identity = id === undefined ? undefined : sdkIdentity(app, resource, id.sdk, container)
   if (cardinality === 'one') {
-    const selector = sdkSelector(z.literal(resource), container)
+    const selector = sdkSelector(app, z.literal(resource), container)
     return identity === undefined ? selector : z.union([identity, selector])
   }
   const selector = sdkObject({
+    app: z.literal(app),
     resource: z.literal(resource),
     form: z.literal('selector'),
     cardinality: z.literal('many'),
@@ -852,10 +1065,11 @@ function sdkReference(
   if (identity === undefined) return selector
   return z.union([
     sdkObject({
+      app: z.literal(app),
       resource: z.literal(resource),
       form: z.literal('identity'),
       cardinality: z.literal('many'),
-      entries: z.array(identity),
+      entries: z.array(resolvable(entry, 'entry', 'one') ? identity : z.never()),
     }),
     selector,
   ])
@@ -870,7 +1084,35 @@ function identified(registry: ReferenceRegistry): [string, ValueType<unknown>][]
 }
 
 /**
- * Build `t.reference(registry, resource, cardinality)`; see
+ * Call the scope thunk and check that it returned an app and a resource
+ * table. A thunk that returns something else (such as the bare resource
+ * table) is a defect of the contract that built the value type, so it throws
+ * rather than reporting an issue about the value.
+ */
+function readScope(scope: ReferenceScopeThunk): ReferenceScope {
+  const value: unknown = scope()
+  if (
+    typeof value !== 'object' ||
+    value === null ||
+    !('app' in value) ||
+    typeof value.app !== 'string' ||
+    value.app === '' ||
+    !('resources' in value) ||
+    typeof value.resources !== 'object' ||
+    value.resources === null
+  ) {
+    throw new TypeError(
+      "t.reference(…) needs its scope function to return the app contract, with the app's " +
+        `name and its resource table; received ${describeReceived(value)}.`
+    )
+  }
+  // Checked above: a non-empty `app` string and a `resources` object, whose
+  // entries the walker checks as it reads them.
+  return value as ReferenceScope
+}
+
+/**
+ * Build `t.reference(scope, resource, cardinality)`; see
  * `ValueTypeConstructors.reference`.
  *
  * @remarks
@@ -879,29 +1121,29 @@ function identified(registry: ReferenceRegistry): [string, ValueType<unknown>][]
  * binder's result is the bound form of the decoded data, whose identifier was
  * decoded by the resource's own identifier value type.
  */
-export function referenceType<T = unknown, Id = unknown>(
-  registry: ReferenceRegistryThunk,
-  resource: string,
+export function referenceType<T = unknown, Id = unknown, R extends string = string>(
+  scope: ReferenceScopeThunk,
+  resource: R,
   cardinality: 'one',
   options?: ValueTypeOptions
-): ValueType<ObjectReferenceVariant<T, Id>>
-export function referenceType<T = unknown, Id = unknown>(
-  registry: ReferenceRegistryThunk,
-  resource: string,
+): ValueType<ObjectReferenceVariant<T, Id, R>>
+export function referenceType<T = unknown, Id = unknown, R extends string = string>(
+  scope: ReferenceScopeThunk,
+  resource: R,
   cardinality: 'many',
   options?: ValueTypeOptions
-): ValueType<CollectionReferenceVariant<T, Id>>
+): ValueType<CollectionReferenceVariant<T, Id, R>>
 export function referenceType(
-  registry: ReferenceRegistryThunk,
+  scope: ReferenceScopeThunk,
   resource: string,
   // Wider than the overloads, so that a cardinality that bypassed the static
   // types is rejected rather than trusted.
   cardinality: string,
   options?: ValueTypeOptions
 ): ValueType<BoundReference> {
-  if (typeof registry !== 'function') {
+  if (typeof scope !== 'function') {
     throw new TypeError(
-      `t.reference(…) needs a function returning the app's resource table; received ${describeReceived(registry)}.`
+      `t.reference(…) needs a function returning the app contract; received ${describeReceived(scope)}.`
     )
   }
   if (typeof resource !== 'string' || resource === '') {
@@ -916,19 +1158,19 @@ export function referenceType(
   }
 
   const want: Want = { resource, cardinality, form: undefined, role: 'reference' }
-  const convert = <Id, Pos>(
+  const convert = <Id, Pos, Tag>(
     value: unknown,
     path: IssuePath,
-    walk: Walk<Id, Pos>,
+    walk: Walk<Id, Pos, Tag>,
     issues: Issues
-  ): Shape<Id, Pos> | Invalid =>
+  ): Shape<Id, Pos, Tag> | Invalid =>
     cardinality === 'one'
       ? convertObject(value, path, want, walk, issues)
       : convertCollection(value, path, want, walk, issues)
 
   const codec: Codec<BoundReference> = {
     encode(value, path, issues) {
-      const shape = convert(value, path, { registry: registry(), direction: ENCODING }, issues)
+      const shape = convert(value, path, { scope: readScope(scope), direction: ENCODING }, issues)
       return shape === INVALID ? INVALID : { reference: shape }
     },
     decode(wire, path, context, issues) {
@@ -937,7 +1179,7 @@ export function referenceType(
       const data: ReferenceData | Invalid = convert(
         payload,
         path,
-        { registry: registry(), direction: decoding(context) },
+        { scope: readScope(scope), direction: decoding(context) },
         issues
       )
       return data === INVALID ? INVALID : context.bindReference(data)
@@ -950,9 +1192,13 @@ export function referenceType(
       // The SDK schema validates the data fields that encoding reads. A bound
       // reference's `resolve` is the binder's, never validated or called here,
       // so the schema's output is asserted to be the bound type it accepts.
-      sdk: z.lazy(() => sdkReference(registry(), resource, cardinality)) as ZodType<BoundReference>,
+      sdk: z.lazy(() =>
+        sdkReference(readScope(scope), resource, cardinality)
+      ) as ZodType<BoundReference>,
       wire: z.lazy(() =>
-        z.strictObject({ reference: wirePayload(registry(), resource, cardinality) })
+        z.strictObject({
+          reference: wirePayload(readScope(scope).resources, resource, cardinality),
+        })
       ),
       codec,
     },

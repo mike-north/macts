@@ -12,9 +12,11 @@
  * as the CLI and MCP discovery surfaces build it. Each contract operation is
  * matched to its capability by its manifest target, not by its id: the target's
  * command gives the capability's operation, and its resource (or the
- * application) gives the capability's resource segment. Every operation must
- * match exactly one capability, every capability must be matched, and the
- * matched pair must carry the same tool name.
+ * application) gives the capability's resource segment. Every operation that
+ * can be called must match exactly one capability, every capability must be
+ * matched, and the matched pair must carry the same tool name. An operation
+ * marked `unavailable` (a required input admits no value) has neither a tool
+ * nor a capability.
  *
  * @see phases/13-sdk-value-and-execution-contracts.md (D9)
  * @see https://modelcontextprotocol.io/specification/2025-11-25/server/tools#tool-names
@@ -78,6 +80,11 @@ describe('MCP tool names of every real operation', () => {
 
       for (const operation of Object.values(contract.operations)) {
         const label = `${name}: ${operation.id}`
+        if (operation.unavailable !== undefined) {
+          const capability = byKey.get(targetKey(manifest, operation.target))
+          expect(capability, `${label} is unavailable but has a capability`).toBeUndefined()
+          continue
+        }
         const capability = byKey.get(targetKey(manifest, operation.target))
         expect(capability, `${label} has no capability`).toBeDefined()
         if (capability === undefined) continue
@@ -93,5 +100,23 @@ describe('MCP tool names of every real operation', () => {
     // Guards against a vacuous pass: the shipped contracts have hundreds of operations.
     expect(compared).toBeGreaterThan(300)
     expect(compared).toBe(capabilities.length)
+  })
+
+  it('leave out exactly the operations a required input makes unavailable', () => {
+    // Contacts has no operation that gets one person, and Mail none that gets
+    // one account, so each listed operation's required reference admits no value.
+    const unavailable = apps.flatMap(({ contract }) =>
+      Object.values(contract.operations).flatMap((operation) =>
+        operation.unavailable === undefined
+          ? []
+          : [{ id: operation.id, positions: operation.unavailable.positions }]
+      )
+    )
+    expect(unavailable).toEqual([
+      { id: 'contacts.app.actionTitle', positions: ['for'] },
+      { id: 'contacts.app.performAction', positions: ['for'] },
+      { id: 'contacts.app.shouldEnableAction', positions: ['for'] },
+      { id: 'mail.app.synchronize', positions: ['with'] },
+    ])
   })
 })
