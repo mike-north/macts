@@ -183,27 +183,37 @@ export interface LibraryClient {
   resolve(reference: ReferenceData, options?: CallOptions): Promise<unknown>
 }
 
+/**
+ * The library resource table, declared as a generator declares one: its
+ * literal type keeps each key, which of `get` and `list` it records, and its
+ * record and identifier types. `Branch` records `get` but no `list`.
+ */
+const LIBRARY_RESOURCES = {
+  Branch: { name: 'Branch', record: BRANCH_RECORD, id: t.string(), get: 'library.branches.get' },
+  Shelf: {
+    name: 'Shelf',
+    record: SHELF_RECORD,
+    id: t.string(),
+    get: 'library.shelves.get',
+    list: 'library.shelves.list',
+  },
+  Book: {
+    name: 'Book',
+    record: BOOK_RECORD,
+    id: t.string(),
+    get: 'library.books.get',
+    list: 'library.books.list',
+  },
+} as const satisfies AppContract<LibraryClient>['resources']
+
+/** The type of the library resource table, as a generated contract exports it. */
+export type LibraryResources = typeof LIBRARY_RESOURCES
+
 /** A hand-built contract for {@link LIBRARY_MANIFEST}, standing in for a generated one. */
-export const libraryContract: AppContract<LibraryClient> = {
+export const libraryContract: AppContract<LibraryClient, LibraryResources> = {
   app: 'library',
   operations: Object.fromEntries(LIBRARY_OPERATIONS.map((op) => [op.id, op])),
-  resources: {
-    Branch: { name: 'Branch', record: BRANCH_RECORD, id: t.string(), get: 'library.branches.get' },
-    Shelf: {
-      name: 'Shelf',
-      record: SHELF_RECORD,
-      id: t.string(),
-      get: 'library.shelves.get',
-      list: 'library.shelves.list',
-    },
-    Book: {
-      name: 'Book',
-      record: BOOK_RECORD,
-      id: t.string(),
-      get: 'library.books.get',
-      list: 'library.books.list',
-    },
-  },
+  resources: LIBRARY_RESOURCES,
   loadManifest: () => Promise.resolve(LIBRARY_MANIFEST),
   bind(runtime: ClientRuntime): LibraryClient {
     return {

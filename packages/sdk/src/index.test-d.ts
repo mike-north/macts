@@ -14,12 +14,16 @@
  * `null`: no property is resettable (phases/13 D10), so a reset is not
  * expressible.
  *
+ * A generated HTTP client's list returns the contract's `Page` type, so its
+ * pages cannot drift from the contract's (phases/13 D2).
+ *
  * @see phases/13-sdk-value-and-execution-contracts.md (D1, D2)
  */
 
 import { expectAssignable, expectNotAssignable, expectType } from 'tsd'
 import type { EventUpdateInput } from '@macts/calendar/contract'
-import type { AppContract, ClientFactory } from '@macts/contracts'
+import type { AppContract, ClientBrand, ClientFactory, Page, ResourceTable } from '@macts/contracts'
+import type { Note as HttpNote, NotesClient as NotesHttpClient } from '@macts/notes'
 import * as remote from './index.js'
 import * as local from './local.js'
 import type { FixtureClient } from './test-helpers.js'
@@ -30,11 +34,13 @@ declare const contract: AppContract<FixtureClient>
 expectAssignable<ClientFactory<remote.RemoteClientOptions>>(remote.createClient)
 expectAssignable<ClientFactory<local.LocalClientOptions>>(local.createClient)
 
-// The same contract yields the same client type in both localities.
-expectType<FixtureClient>(
+// The same contract yields the same client type in both localities, which
+// carries the contract's resource table type.
+expectType<FixtureClient & ClientBrand<ResourceTable>>(
   remote.createClient(contract, { token: 't', url: 'http://localhost:8372' })
 )
-expectType<FixtureClient>(local.createClient(contract, { token: 't' }))
+expectType<FixtureClient & ClientBrand<ResourceTable>>(local.createClient(contract, { token: 't' }))
+expectAssignable<FixtureClient>(local.createClient(contract, { token: 't' }))
 
 // Remote options require the service URL; local options need only the token.
 expectAssignable<remote.RemoteClientOptions>({ token: 't', url: new URL('http://localhost:8372') })
@@ -55,3 +61,9 @@ expectNotAssignable<local.Integer>(7)
 // Update fields are never nullable while no property is resettable (D10).
 expectAssignable<EventUpdateInput>({ summary: 'Standup' })
 expectNotAssignable<EventUpdateInput>({ summary: null })
+
+// A generated HTTP client's list returns the shared page type: read-only
+// items, and a cursor exactly when more remain.
+declare const notesHttp: NotesHttpClient
+expectType<Promise<Page<HttpNote>>>(notesHttp.notes.list())
+expectNotAssignable<Promise<{ items: HttpNote[]; nextCursor?: string }>>(notesHttp.notes.list())

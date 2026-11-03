@@ -5,17 +5,18 @@
 ```ts
 
 import { AppContract } from '@macts/contracts';
-import { CollectionReferenceVariant } from '@macts/contracts';
+import { BoundReferenceOf } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Executor } from '@macts/core';
 import { GovernanceContext } from '@macts/runtime';
-import { ObjectReferenceVariant } from '@macts/contracts';
-import { ReferenceData } from '@macts/contracts';
+import { ResolvableReferenceData } from '@macts/contracts';
+import { ResourceTable } from '@macts/contracts';
 
 // @public
-export function bindReference(client: object, data: ReferenceData): ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown>;
+export function bindReference<Resources extends ResourceTable, const Data extends ResolvableReferenceData<Resources>>(client: ClientBrand<Resources>, data: Data): BoundReferenceOf<Resources, Data>;
 
 // @public
-export function createClient<Client>(app: AppContract<Client>, options: LocalClientOptions): Client;
+export function createClient<Client, Resources extends ResourceTable>(app: AppContract<Client, Resources>, options: LocalClientOptions): Client & ClientBrand<Resources>;
 
 // @public
 export interface LocalClientOptions {

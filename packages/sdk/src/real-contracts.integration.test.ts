@@ -270,3 +270,46 @@ describe('remote client over the real Notes contract and the real API app', () =
     expect(error).toBeInstanceOf(MactsError)
   })
 })
+
+describe('clients of a contract that declares its resource table type', () => {
+  // The Notes client's members, from its manifest: one namespace per resource
+  // with operations, and no app-level commands.
+  const NOTES_CLIENT_MEMBERS = ['accounts', 'attachments', 'folders', 'notes']
+
+  it('carry the table only in their type: no member is added, under any key', async () => {
+    const token = await keyWith('notes:attachments:get')
+    const executor = answering(ATTACHMENT_WIRE)
+    const clients = [
+      createLocalClient(notesContract, { token, executor, governance: ALLOW_ALL }),
+      await remoteNotes(token, executor),
+    ]
+
+    for (const client of clients) {
+      expect(Object.getOwnPropertySymbols(client)).toEqual([])
+      expect(Reflect.ownKeys(client).map(String).sort()).toEqual(NOTES_CLIENT_MEMBERS)
+      expect(Object.keys(JSON.parse(JSON.stringify(client)) as object).sort()).toEqual(
+        NOTES_CLIENT_MEMBERS
+      )
+    }
+  })
+
+  it('bind references to them through either entry point, making no call', async () => {
+    const token = await keyWith('notes:attachments:get')
+    const executor = answering(ATTACHMENT_WIRE)
+    const client = createLocalClient(notesContract, { token, executor, governance: ALLOW_ALL })
+    const data = {
+      app: 'notes',
+      resource: 'Attachment',
+      form: 'identity',
+      cardinality: 'one',
+      id: ATTACHMENT_ID,
+    } as const
+
+    for (const bind of [remote.bindReference, local.bindReference]) {
+      const attachment = bind(client, data)
+      expect(attachment).toEqual(data)
+      expect(Object.getOwnPropertySymbols(attachment)).toEqual([])
+    }
+    expect(executor.requests).toHaveLength(0)
+  })
+})

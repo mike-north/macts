@@ -25,12 +25,12 @@ export class AppAuthorizationRequiredError extends MactsError<'APP_AUTHORIZATION
 }
 
 // @public
-export interface AppContract<Client> {
+export interface AppContract<Client, Resources extends ResourceTable = ResourceTable> {
     readonly app: string;
-    bind(runtime: ClientRuntime): Client;
+    bind(runtime: ClientRuntime): Client & ClientBrand<Resources>;
     loadManifest(): Promise<unknown>;
     readonly operations: Readonly<Record<OperationId, AnyOperationDescriptor>>;
-    readonly resources: Readonly<Record<string, ResourceDescriptor<unknown>>>;
+    readonly resources: Resources;
 }
 
 // @public
@@ -88,6 +88,9 @@ export interface Authority {
 }
 
 // @public
+export type BoundReferenceOf<Resources extends ResourceTable, Data extends ReferenceData> = Data extends IdentityReferenceData ? IdentityReference<ResourceRecordOf<Resources, Data['resource']>, ResourceIdOf<Resources, Data['resource']>, Data['resource']> : Data extends SelectorReferenceData ? SelectorReference<ResourceRecordOf<Resources, Data['resource']>, Data['resource']> : Data extends IdentityCollectionReferenceData ? IdentityCollectionReference<ResourceRecordOf<Resources, Data['resource']>, ResourceIdOf<Resources, Data['resource']>, Data['resource']> : Data extends SelectorCollectionReferenceData ? SelectorCollectionReference<ResourceRecordOf<Resources, Data['resource']>, Data['resource']> : never;
+
+// @public
 export interface CallerOwnedFile {
     readonly kind: 'caller-owned-file';
     readonly path: string;
@@ -99,7 +102,12 @@ export interface CallOptions {
 }
 
 // @public
-export type ClientFactory<Options> = <Client>(app: AppContract<Client>, options: Options) => Client;
+export interface ClientBrand<Resources extends ResourceTable> {
+    readonly [clientResources]?: Resources;
+}
+
+// @public
+export type ClientFactory<Options> = <Client, Resources extends ResourceTable>(app: AppContract<Client, Resources>, options: Options) => Client & ClientBrand<Resources>;
 
 // @public
 export interface ClientRuntime {
@@ -697,6 +705,7 @@ export type ReferenceList<R extends ObjectReference<unknown>> = readonly R[];
 
 // @public
 export type ReferenceRegistry = Readonly<Record<string, {
+    readonly name?: string;
     readonly id?: ValueType<unknown>;
     readonly get?: OperationId;
     readonly list?: OperationId;
@@ -743,6 +752,31 @@ export interface Resolvable<Result> {
 }
 
 // @public
+export type ResolvableCollectionReferenceData<Resources extends ResourceTable> = {
+    [Key in ResolvableResourceKey<Resources, 'many'>]: (Key extends ResolvableResourceKey<Resources, 'one'> ? IdentityCollectionReferenceData<ResourceIdOf<Resources, Key>, Key> & {
+        readonly entries: readonly (IdentityReferenceData<ResourceIdOf<Resources, Key>, Key> & ResolvableContainment<Resources>)[];
+    } : never) | (SelectorCollectionReferenceData<Key> & ResolvableContainment<Resources>);
+}[ResolvableResourceKey<Resources, 'many'>];
+
+// @public
+export interface ResolvableContainment<Resources extends ResourceTable> {
+    readonly container?: ResolvableObjectReferenceData<Resources> | ObjectReferenceVariant<unknown>;
+}
+
+// @public
+export type ResolvableObjectReferenceData<Resources extends ResourceTable> = {
+    [Key in ResolvableResourceKey<Resources, 'one'>]: (IdentityReferenceData<ResourceIdOf<Resources, Key>, Key> & ResolvableContainment<Resources>) | (SelectorReferenceData<Key> & ResolvableContainment<Resources>);
+}[ResolvableResourceKey<Resources, 'one'>];
+
+// @public
+export type ResolvableReferenceData<Resources extends ResourceTable> = ResolvableObjectReferenceData<Resources> | ResolvableCollectionReferenceData<Resources>;
+
+// @public
+export type ResolvableResourceKey<Resources extends ResourceTable, Cardinality extends ReferenceCardinality> = string extends keyof Resources ? string : {
+    [Key in keyof Resources & string]: Resources[Key] extends Readonly<Record<Cardinality extends 'one' ? 'get' : 'list', OperationId>> ? Key : never;
+}[keyof Resources & string];
+
+// @public
 export function resolvingOperationKey(cardinality: ReferenceCardinality): 'get' | 'list';
 
 // @public
@@ -753,6 +787,19 @@ export interface ResourceDescriptor<RecordType, Id = unknown> {
     readonly name: string;
     readonly record: ValueType<RecordType>;
 }
+
+// @public
+export type ResourceIdOf<Resources extends ResourceTable, Key extends string> = string extends keyof Resources ? unknown : Key extends keyof Resources ? Resources[Key] extends {
+    readonly id: ValueType<infer Id>;
+} ? Id : never : never;
+
+// @public
+export type ResourceRecordOf<Resources extends ResourceTable, Key extends string> = Key extends keyof Resources ? Resources[Key] extends {
+    readonly record: ValueType<infer RecordType>;
+} ? RecordType : unknown : unknown;
+
+// @public
+export type ResourceTable = Readonly<Record<string, ResourceDescriptor<unknown>>>;
 
 // @public
 export interface Rgb {

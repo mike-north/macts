@@ -466,11 +466,18 @@ export type CollectionReferenceVariant<T, Id = unknown, R extends string = strin
  * types enforce this in their wire schema, so every boundary applies it. An
  * app contract's `resources` table is assignable to this
  * type; reference value types read it through the {@link ReferenceScope}.
+ *
+ * An entry may also carry the manifest resource key, as every entry of a
+ * contract's resource table does. Reference value types never read it, but
+ * it is what a table entry that records neither an identifier nor a
+ * resolving operation shares with this type, so such an entry is admitted
+ * here even when the table is typed by its literal entries.
  */
 export type ReferenceRegistry = Readonly<
   Record<
     string,
     {
+      readonly name?: string
       readonly id?: ValueType<unknown>
       readonly get?: OperationId
       readonly list?: OperationId
