@@ -41,9 +41,18 @@ if (result.valid) {
 Every operation runs through one pipeline, in this order, for every caller:
 verify the credential, admit the call against the optional per-subject rate
 limit, check the operation's permission, enforce governance policy (auditing
-the decision and, for a held call, asking a human), validate the input, then
-hand the request to the executor the runtime was built with. Failures are the
-structured errors from `@macts/contracts`.
+the decision and, for a held call, asking a human), validate the input, hand
+the request to the executor the runtime was built with, then validate the
+result against the operation's output contract. Failures are the structured
+errors from `@macts/contracts`.
+
+A result that does not match the operation's output contract fails with
+`UnexpectedValueError`, whichever executor produced it. The operation has
+already run by then, so it may have changed the app; the error says so, and a
+caller should not retry a write as if nothing happened. The error's issues
+name paths into the result but never repeat its values. Operations whose
+output has no wire encoding (a `passthrough` plan, as for operations
+registered from a manifest alone) are not checked.
 
 A runtime is built from an executor and the governance it enforces. Both are
 required: omitting governance is a compile error, never a silent allow-all.
@@ -74,6 +83,16 @@ const result = await runtime.invoke(
   { credential: createBearerCredential(token) }
 )
 ```
+
+### Reserved app names
+
+`introspect`, `rpc`, `references`, and `transfers` name routes a macts host
+serves, or will serve, beside the apps (the operation listings, the operation
+routes, reference resolution, and binary transfers), so none of them is ever
+an app's route segment.
+`registerManifest` and `registerContract` throw `OperationRegistrationError`
+for an app whose normalized name is one of them, and register nothing. The
+names are exported as `RESERVED_APP_ROUTE_SEGMENTS`.
 
 ## This Mac's governance
 

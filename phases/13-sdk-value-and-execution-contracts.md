@@ -1060,7 +1060,32 @@ table. The HTTP adapter applies a coarse per-client-address request limit
 before calling the runtime, because step 1b never counts failed
 authentication. It answers with the same `RATE_LIMITED` envelope and
 `Retry-After`, and is skipped when the request has no network peer (an
-in-process request).
+in-process request). Every HTTP route that calls the runtime (operations and
+reference resolution) shares one limiter, so one budget covers an address
+across namespaces.
+
+**HTTP namespaces.** Each kind of call has its own top-level namespace on the
+HTTP server:
+
+- `/api/v1` holds app operations at `POST /api/v1/rpc/<operation id>`, and
+  the unauthenticated listings at `/api/v1` and `/api/v1/introspect`;
+- `/references/v1` holds reference resolution (D7);
+- `/transfers/v1` will hold binary transfers (D8). Nothing is served there
+  yet; the namespace is reserved now so that no app can claim it first.
+
+`/references/v1` and `/transfers/v1` are siblings of `/api/v1`, never segments
+under it: `/api/v1` is the namespace of app operations, and these calls are
+not app operations. Under `/api/v1` itself, `rpc` holds the operations and
+`introspect` the listings. The listings predate this namespace rule and stay
+there for compatibility.
+
+So that no app is ever spelled like one of these namespaces or routes on any
+surface, `introspect`, `rpc`, `references` and `transfers` are reserved: none
+is ever an app's route segment. The runtime refuses an app with a reserved
+segment at registration (`registerManifest` and `registerContract` raise
+`OperationRegistrationError`, and nothing registers), so every host refuses
+it, not only HTTP. The reserved names are exported as
+`RESERVED_APP_ROUTE_SEGMENTS` from `@macts/runtime`.
 
 Locality changes only where the pipeline runs. In remote mode the client
 presents the credential over HTTP and the service runs the same pipeline.
@@ -1094,9 +1119,11 @@ it, and reads its `contract` export: the host package is the install opt-in and
 re-exports the contract of the app it serves. Node resolves `@macts/<app>`
 through the host package's own dependencies; the host does not locate the app
 package itself. The function then validates the manifest the contract loads and
-calls `registerContract(contract, manifest)`. A host package without a
-`contract` export was installed by an older macts: it is reported with the
-command that reinstalls it (`macts mcp install <app>`) and skipped, with no
+calls `registerContract(contract, manifest)`. An app has at most one registered
+contract, because the contract's resource table is the app's reference
+registry (D7); a second contract for the same app is refused. A host package
+without a `contract` export was installed by an older macts: it is reported
+with the command that reinstalls it (`macts mcp install <app>`) and skipped, with no
 fallback to another way of finding the contract. Any other app that fails to
 load or register is likewise reported with its reason and skipped, and the other
 apps still register. An app installed without its host package is reported at
@@ -1127,7 +1154,7 @@ narrows `details`.
 | `PolicyDeniedError`             | `POLICY_DENIED`              | Governance policy forbids the call (`permission`, `layer`)                                                                         | 403                                               |
 | `ApprovalPendingError`          | `APPROVAL_PENDING`           | Held for confirmation with nobody to ask; not executed                                                                             | 409                                               |
 | `ApprovalRejectedError`         | `APPROVAL_REJECTED`          | Held, put to a human, and not approved (`state`)                                                                                   | 403                                               |
-| `TargetNotFoundError`           | `TARGET_NOT_FOUND`           | A singular target does not exist                                                                                                   | 404                                               |
+| `TargetNotFoundError`           | `TARGET_NOT_FOUND`           | A singular target does not exist (`entryIndex` for a missing identity-collection entry)                                            | 404                                               |
 | `FileNotFoundError`             | `FILE_NOT_FOUND`             | A referenced file does not exist or disappeared                                                                                    | 404                                               |
 | `InvalidSelectionError`         | `INVALID_SELECTION`          | A range or index selection is invalid for the collection                                                                           | 400                                               |
 | `AppUnavailableError`           | `APP_UNAVAILABLE`            | The app is not installed or cannot be reached                                                                                      | 503                                               |
@@ -1140,9 +1167,11 @@ narrows `details`.
 | `TransportError`                | `TRANSPORT_FAILED`           | **Client-side only.** The service was unreachable, sent an invalid response, or uses a different protocol.                         | n/a                                               |
 
 **Wire codec.** An error response body is
-`{ "error": { "code", "message", "details" } }`. The error envelope is protocol
-metadata with its own per-code schemas, not the value codec. Its fields are
-strings, booleans, and small integers, which JSON represents exactly.
+`{ "error": { "code", "message", "details" } }`. Over HTTP, a 401 also
+carries `WWW-Authenticate: Bearer` (RFC 7235 §4.1, RFC 6750 §3), and a 429
+carries `Retry-After`. The error envelope is protocol metadata with its own
+per-code schemas, not the value codec. Its fields are strings, booleans, and
+small integers, which JSON represents exactly.
 
 **Route misses.** A request that matches no HTTP route, including
 `POST /rpc/<unregistered id>`, is answered 404 with
@@ -1368,9 +1397,65 @@ wire it received. A binder keeps its client state in `#private` fields, non-enum
 properties, or prototype members. Under the encode strictness rule (D8), an
 own enumerable data property that is not a declared field would make the
 reference fail to encode. Hydration therefore follows the factory, with no separate
-API. Resolution is a runtime-level call executed by
-the provider. A single reference requires the resource's `get` permission, and
-a collection reference requires the resource's `list` permission.
+API.
+
+**Resolution.** Resolution is a runtime-level call,
+`MactsRuntime.resolveReference(app, reference, context)`, executed by the
+provider. `reference` is the wire form, the `{"reference": …}` control record
+that encoding produces, and `context` is the same `InvocationContext` that
+`invoke` takes. A single reference resolves as the target resource's `get`
+operation, and a collection reference as its `list` operation. The runtime
+reads which operation that is from the registered contract, whose resource
+table records it (`ResourceDescriptor.get` and `.list`, chosen when the
+contract is generated); it never re-derives the choice from the manifest, so
+the contract stays the single source of truth. A resource that records no such
+operation is not resolvable, and its references fail with
+`InvalidSelectionError`. `registerContract` checks every recorded id when the
+app registers, before anything is added: it must name one of the contract's
+operations, and that operation must target the resource that records it.
+Otherwise the contract is inconsistent and must be regenerated, and
+registration fails with `OperationRegistrationError`, registering nothing.
+
+Resolution runs the full D5 pipeline as that operation, so it can never
+bypass policy:
+
+1. The credential is verified, and admission applies.
+2. The app's registered contract is found. An unknown app is a
+   `ValidationError`, like an unknown operation in `invoke`. An app registered
+   from its manifest alone has no resource table and is unknown here.
+3. The reference's `resource` (a key of the contract's resource table) and
+   `cardinality` are read. They select the operation, as an operation id does
+   for `invoke`, so they are checked first, and a malformed one is a
+   `ValidationError`.
+4. The caller's key must hold the operation's permission. Only the target
+   resource's permission is checked. Container traversal needs no container
+   permission, because a container only locates the target and contributes no
+   data to the result.
+5. Governance, approval, and audit run exactly as for a direct call of the
+   operation: the same permission string and the same decision. The audit
+   record has the same capability, app, key, and decision as a direct call;
+   it differs only in `argsSummary`, which holds the redacted reference
+   payload. Nested values in that summary are reduced to a key count, so a
+   selector is summarized as an object and the name a name selector looked up
+   is not recorded. Nothing else marks the record as a resolution.
+6. The whole reference is validated with
+   `t.reference(() => contract, resource, cardinality)`, after governance
+   as in `invoke` (D11). A malformed reference is a `ValidationError`.
+7. The executor's `resolve` runs (D9).
+8. The result is validated against the operation's `output.wire`, as every
+   `invoke` result is, unless its output plan is `passthrough` (D11). For an
+   identity collection it must also hold exactly one record per entry,
+   whatever the plan, which enforces that no entry is silently dropped. A
+   mismatch is an `UnexpectedValueError`.
+
+**Resolution errors.** A single reference whose identity `id` or name selector
+matches nothing raises `TargetNotFoundError`. An index past the end raises
+`InvalidSelectionError`. A collection reference resolves to an array that may
+be empty. A range past the end raises `InvalidSelectionError`. An identity
+collection resolves its entries in order. When an entry's target no longer
+exists, it raises `TargetNotFoundError` whose `entryIndex` detail is that
+entry's zero-based position; the entry is never silently dropped. An identity
+collection with no entries resolves to `[]`.
 
 A reference whose target, container, or entry lacks its resolving operation
 is rejected wherever it appears, so no bound reference to it ever exists:
@@ -1382,11 +1467,12 @@ is rejected wherever it appears, so no bound reference to it ever exists:
 - **Returned by an operation.** This is a defect on our side, never the
   caller's. The generator emits a reference position only when its target has
   its resolving operation, so such a reference means the contract is wrong.
-  Decoding rejects the result against the output contract, which the client
-  reports as `UnexpectedValueError`.
-
-Resolution therefore never meets a target without its operation. If it ever
-did, that would be a defect, reported as `InternalError`.
+  The runtime's check of the result against `output.wire` rejects it with
+  `UnexpectedValueError` (step 8 above), and so does the client's decoding.
+- **Sent to the resolve route.** A target resource that records no resolving
+  operation fails with `InvalidSelectionError` when the operation is selected
+  (step 3 above). A container or entry whose resource has no `get` fails the
+  reference validation with `ValidationError` (step 6 above).
 
 Ownership:
 
@@ -1395,6 +1481,52 @@ Ownership:
 
 The remote route lives in its own namespace, separate from RPC operations and
 transfers.
+
+**Remote route.** The HTTP server resolves references at
+`POST /references/v1/resolve`. `/references/v1` is a top-level namespace
+beside `/api/v1`, never under it (D5, HTTP namespaces). The request body is:
+
+```json
+{
+  "app": "library",
+  "reference": {
+    "reference": {
+      "resource": "Book",
+      "form": "identity",
+      "cardinality": "one",
+      "id": "978-0441013593"
+    }
+  }
+}
+```
+
+`app` is the app's route segment, and `reference` is the control record
+exactly as encoding produces it. The body has exactly these two fields: an
+older server refuses a field it does not know rather than ignoring it, so a
+request that depends on a later field never resolves without it. The route
+builds the `InvocationContext` as
+the RPC routes do: the bearer credential from `Authorization`, the request's
+abort signal, and the correlation id from `X-Request-Id`. It then calls
+`resolveReference(app, reference, context)`. It shares the RPC routes'
+per-client-address limit, one budget per address across both namespaces.
+
+- **Success** is `200 { "result": … }`, the same envelope as an operation
+  result. The result is the resolved record for a single reference, and an
+  array of records, possibly empty, for a collection reference.
+- **Failure** is the D6 envelope, with the same statuses and headers as the
+  RPC routes. For example, 401 `UNAUTHENTICATED` carries
+  `WWW-Authenticate: Bearer`; 403 is `PERMISSION_DENIED` or `POLICY_DENIED`;
+  404 is `TARGET_NOT_FOUND`, keeping `entryIndex`; 400 is
+  `INVALID_SELECTION` or `VALIDATION_FAILED`; 502 is `UNEXPECTED_VALUE`.
+- **Framing.** A body that is not JSON, is not an object, lacks a string
+  `app` or a `reference`, or has any other field is answered 400
+  `VALIDATION_FAILED` before the runtime is called, as an unreadable RPC body
+  is (D6). Each missing, mistyped, or unknown field is one issue at its path. An unknown app and a
+  malformed reference are the runtime's `ValidationError`s.
+- **Routing.** The route answers only `POST`. Any other method, and any other
+  path under `/references/v1`, is a route miss (404 `NOT_FOUND`), as in the
+  RPC namespace. The unauthenticated listings (`/api/v1` and
+  `/api/v1/introspect`) list operations only, never this route.
 
 ## D8. Binary Transfer Handle Shapes
 
@@ -1491,7 +1623,7 @@ discriminant lets a later rule tell sources apart without changing the shape.
 
 **Executor seam ([#101](https://github.com/mike-north/macts/issues/101)).**
 `packages/core/src/execution/executor.ts` declares `Executor { provider,
-execute(request) }`.
+execute(request), resolve(request) }`.
 
 - An `ExecutionRequest` carries:
   - the validated `AppManifest`
@@ -1503,8 +1635,22 @@ execute(request) }`.
 
   It carries no authority, because authorization has already happened.
 
-- `execute` resolves to a `WireValue` or throws canonical errors.
-- The native JXA executor is one implementation.
+- `execute` resolves to a `WireValue` or throws canonical errors. The runtime
+  validates that value against the operation's output contract before any
+  adapter emits it (D11).
+- `resolve(request)` resolves one reference (D7). A `ResolutionRequest`
+  carries the validated `AppManifest`, the `reference` in wire form (already
+  validated by `t.reference` over the app contract's resources), the
+  `outputPlan` of the operation it resolves as (the resource's `get` output
+  for cardinality `'one'`, its `list` output for `'many'`), and an optional
+  `signal`. Like `ExecutionRequest`, it carries no authority. Container chains
+  are evaluated natively and contribute no data to the result. It follows the
+  D7 error rules: `TargetNotFoundError` for a missing identity or name match,
+  `InvalidSelectionError` for an index or range past the end,
+  `TargetNotFoundError` with `entryIndex` for a missing identity-collection
+  entry, and `[]` for an empty identity collection.
+- The native JXA executor is one implementation. Its `resolve` fails with
+  `InternalError`: the macOS provider does not resolve references.
 - The runtime is constructed with an executor
   (`createRuntime({ executor, … })`), and every adapter dispatches through the
   runtime.
@@ -1532,6 +1678,9 @@ through `Executor` first, without waiting. `@macts/contracts` therefore exports
 - The native executor runs every plan through the codec (D4), passthrough
   included, so a derived plan is never silently ignored. Under passthrough
   the codec converts nothing.
+- The runtime does not validate a passthrough result against `output.wire`
+  (D11), because that schema does not describe a value with no wire
+  encoding. Every other result is validated, whichever executor produced it.
 - Generated descriptors never use it. Value contracts replaces each
   passthrough use with derived plans as descriptors land, and removes the
   `passthrough` kind once none remain. A9 acceptance is not met for any
@@ -1669,7 +1818,7 @@ A marked property carries no nullability or resettability claim, and a resource'
 
 Each record carries dictionary evidence: the source (`dictionary`), the app's bundle identifier, app version and macOS version, and the term exactly as the dictionary writes it. Recording the default is redundant and rejected, as is a native name on a property marked unsupported or a native collection on a resource marked unsupported.
 
-Native bodies resolve every name they address through `resolveCollectionAccessor` and `resolvePropertyAccessor` in `manifest/native-accessor.ts`. A body uses the app's spelling wherever it touches the app (reads, the identifier inside a property match, the record handed to a class constructor, and assignments) and the public key wherever it builds a record for the caller. Get, create and update all return the item's usable properties read this way, so no app spelling reaches the caller: one shared read takes them from a single `properties()` record, by the app's names. It reads on its own, guarded, any usable property the record leaves out (Finder's container record has no `entireContents`), and falls back to a guarded read of each property when the record cannot be read, as a list does. A list's record read takes properties only from the record, and omits one the record leaves out.
+Native bodies resolve every name they address through `resolveCollectionAccessor` and `resolvePropertyAccessor` in `manifest/native-accessor.ts`. A body uses the app's spelling wherever it touches the app (reads, the identifier inside a property match, the record handed to a class constructor, and assignments) and the public key wherever it builds a record for the caller. Get, create and update all return the item's usable properties read this way, so no app spelling reaches the caller: one shared read takes them from a single `properties()` record, by the app's names. It reads on its own, guarded, any usable property the record leaves out (Finder's container record has no `entireContents`), and falls back to a guarded read of each property when the record cannot be read. A list reads differently: it reads each usable property once across the whole collection, by the app's name, and assembles records by position, after checking that every read gave one value per item and that the identifiers, read again after the properties, are unchanged element by element. A resource with no identifier is counted again instead, which catches items added or removed but not items that swap places. A collection that changes while it is read is read once more from the start; if it changes again, the list fails with an unexpected-value error rather than pairing values from different items. A missing value stays `null` at its position. A property the collection cannot report is read item by item, guarded, for that property alone. Neither that fallback nor the guard absorbs a communication failure (the app not running, an invalid connection, no reply, a user cancel, or missing authorization): it fails the list.
 
 The probes (`macts probe`, identifiers and `--nullability`) address the app the same way, through the same two functions, and report every observation under the manifest key, so evidence is recorded against the public name. They never probe a resource marked unsupported, even when asked to: the app has none to read.
 
@@ -1708,14 +1857,44 @@ Live evidence, for a resource the dictionary declares but the running app fails 
 
 Values are validated at every trust boundary, using the same schemas:
 
-| Boundary                     | Check                                                |
-| ---------------------------- | ---------------------------------------------------- |
-| Client `encode`              | Before any network or native call. It catches casts. |
-| Runtime against `input.wire` | Catches raw HTTP and MCP requests.                   |
-| Native codec inside JXA      | Against the plan, in both directions.                |
-| Client `decode`              | Against the operation's output contract.             |
+| Boundary                      | Check                                                                                                                                                                                                                                                                               |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Client `encode`               | Before any network or native call. It catches casts.                                                                                                                                                                                                                                |
+| Runtime against `input.wire`  | Catches raw HTTP and MCP requests.                                                                                                                                                                                                                                                  |
+| Runtime against `t.reference` | A reference to resolve, after governance (D7).                                                                                                                                                                                                                                      |
+| Runtime against `output.wire` | Every executor result whose output plan is not `passthrough`, on `invoke` and on resolution, before any adapter (HTTP, MCP, CLI) emits it. It catches executors that don't encode, or encode wrongly. A resolution result also holds one record per identity-collection entry (D7). |
+| Native codec inside JXA       | Against the plan, in both directions.                                                                                                                                                                                                                                               |
+| Client `decode`               | Against the operation's output contract.                                                                                                                                                                                                                                            |
 
-Validation failures happen before app mutation.
+**Output validation.** The runtime's check of `output.wire` is the same for
+every executor: the native executor, a custom one, a remote one, and a test
+stub. Whether it applies is decided by the operation's output plan, which the
+runtime holds, and never by anything an executor sets or declares about
+itself. A `passthrough` result has no wire encoding, so `output.wire` does not
+describe it and it is not checked (D9). The identity-collection count check
+applies whatever the plan.
+
+A result passes these steps in order:
+
+1. The executor returns its result.
+2. The grant-free file observation the native codec produces is replaced by
+   the `file` wire form with its grant (D8). A missed grant therefore fails
+   the next step, which keeps the file design fail-closed. This step is
+   pending the D8 executor wire: until it lands, results go straight from
+   step 1 to step 3.
+3. The result is validated against `output.wire`.
+4. The adapter emits it.
+
+A mismatch is an `UnexpectedValueError`, the same class a client `decode`
+raises (D2). Its issues give paths into the result, and messages built from
+the issue code and the schema's own expectations, but never a received value:
+values may be user content, and the error crosses to remote callers.
+
+Validation failures happen before app mutation. That covers inputs only: an
+output mismatch on a mutating operation means the operation ran. The app's
+state may have changed, and only the result is unusable. The error message
+says so, so a caller never retries a create or a send on the assumption that
+nothing happened.
 
 ---
 

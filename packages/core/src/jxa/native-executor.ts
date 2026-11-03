@@ -41,7 +41,7 @@ import {
   type OperationTarget,
   type WireValue,
 } from '@macts/contracts'
-import type { ExecutionRequest, Executor } from '../execution/executor.js'
+import type { ExecutionRequest, Executor, ResolutionRequest } from '../execution/executor.js'
 import { isWireValue, JxaExecutionError, MAX_OUTPUT_BYTES, runNativeScript } from './executor.js'
 import {
   NATIVE_CODEC,
@@ -51,6 +51,7 @@ import {
 } from './native-codec.js'
 import {
   assertRequiredArguments,
+  COMMUNICATION_FAILURE_ERROR_NUMBERS,
   NO_SUCH_OBJECT_ERROR_NUMBER,
   planNativeInvocation,
 } from './native-scripts.js'
@@ -138,6 +139,10 @@ export type NativeRunFailure =
  * stays done: whether it completed the operation is unknown after a mid-run
  * abort.
  *
+ * Reference resolution: the macOS provider does not resolve references.
+ * `resolve` fails every request with `InternalError`, before any automation
+ * runs.
+ *
  * @param options - Time limit and, for tests, the transport.
  * @returns An `Executor` whose provider is `'macos'`.
  */
@@ -182,6 +187,11 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
         throw new InternalError('The operation produced a result that is not valid JSON.', {})
       }
       return value
+    },
+    resolve(_request: ResolutionRequest): Promise<WireValue> {
+      return Promise.reject(
+        new InternalError('The macOS provider does not resolve references.', {})
+      )
     },
   }
 }
@@ -254,16 +264,16 @@ const NativeErrorNumber = {
   /** An index or range selection is invalid for its collection. */
   invalidIndex: -1719,
   /** The operating system has not authorized sending events to the app. */
-  notAuthorized: -1743,
+  notAuthorized: COMMUNICATION_FAILURE_ERROR_NUMBERS.notAuthorized,
   /**
    * The app did not answer an event within its own event timeout, often
    * because a permission prompt is open.
    */
-  noReply: -1712,
+  noReply: COMMUNICATION_FAILURE_ERROR_NUMBERS.noReply,
   /** The app is not running. */
-  appNotRunning: -600,
+  appNotRunning: COMMUNICATION_FAILURE_ERROR_NUMBERS.appNotRunning,
   /** The connection to the app is no longer valid. */
-  connectionInvalid: -609,
+  connectionInvalid: COMMUNICATION_FAILURE_ERROR_NUMBERS.connectionInvalid,
   /**
    * A script-level error. Reported, among other things, when the app cannot be
    * found, with the text "Application can't be found."

@@ -111,6 +111,9 @@ export function createStubRuntime(
       calls.push(call)
       return respond(call)
     },
+    resolveReference() {
+      return Promise.reject(new Error('The stub runtime does not resolve references'))
+    },
   }
 }
 

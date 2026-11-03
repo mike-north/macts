@@ -28,8 +28,13 @@
  * @packageDocumentation
  */
 
-import { createNativeExecutor, type ExecutionRequest, type Executor } from '@macts/core'
-import type { WireRecord, WireValue } from '@macts/contracts'
+import {
+  createNativeExecutor,
+  type ExecutionRequest,
+  type Executor,
+  type ResolutionRequest,
+} from '@macts/core'
+import { TargetNotFoundError, type WireRecord, type WireValue } from '@macts/contracts'
 
 /** The environment variable that selects a built-in test executor. */
 export const TEST_EXECUTOR_ENV = 'MACTS_TEST_EXECUTOR'
@@ -38,14 +43,33 @@ export const TEST_EXECUTOR_ENV = 'MACTS_TEST_EXECUTOR'
 export const TEST_STUB_PROVIDER = 'test-stub'
 
 /**
- * The built-in `stub` test executor: it automates no app and answers every
- * operation with a deterministic description of the request it received.
+ * The built-in `stub` test executor: it automates no app, and answers every
+ * operation and every reference resolution with a value its output plan
+ * admits, or with the canonical error for a target that does not exist.
  *
  * @remarks
- * The result is `{ executor: 'test-stub', target, input }`: the operation's
- * manifest target and the validated wire input. A subprocess test can
- * therefore prove that a call passed every runtime step and was dispatched,
- * and which operation and input reached the executor, without any Mac app.
+ * The runtime validates every result against the operation's output contract
+ * unless the output plan is `passthrough` (phases/13 D11), and that check
+ * applies to this executor as to any other. The stub therefore answers as an
+ * app with no objects would, keyed by the output plan it is handed:
+ *
+ * - An `array` plan (a list) yields `[]`, which every list contract admits.
+ * - A `passthrough` plan yields `{ executor: 'test-stub', target, input }`:
+ *   the operation's manifest target and the validated wire input. A value
+ *   under that plan has no wire encoding and is not validated, so a test can
+ *   use a contract with a passthrough output to see exactly what reached the
+ *   executor.
+ * - Any other plan (a get, create, update, delete, or command) fails with
+ *   `TargetNotFoundError`: there is no app, so there is nothing to act on.
+ *
+ * Resolution follows the same rule: a collection resolves to `[]`, except an
+ * identity collection with entries, whose first entry is missing
+ * (`TargetNotFoundError` with `entryIndex` 0, as D7 requires); a single
+ * reference fails with `TargetNotFoundError`; and a passthrough plan yields
+ * `{ executor: 'test-stub', reference }`.
+ *
+ * A subprocess test can therefore prove that a call passed every runtime step,
+ * including output validation, and was dispatched, without any Mac app.
  *
  * @returns An executor whose provider is {@link TEST_STUB_PROVIDER}.
  */
@@ -53,13 +77,51 @@ export function createTestStubExecutor(): Executor {
   return {
     provider: TEST_STUB_PROVIDER,
     execute(request: ExecutionRequest): Promise<WireValue> {
-      const target: WireRecord =
-        request.target.resource === undefined
-          ? { command: request.target.command }
-          : { command: request.target.command, resource: request.target.resource }
-      return Promise.resolve({ executor: TEST_STUB_PROVIDER, target, input: request.input })
+      const { target, outputPlan } = request
+      if (outputPlan.kind === 'passthrough') {
+        const echoed: WireRecord =
+          target.resource === undefined
+            ? { command: target.command }
+            : { command: target.command, resource: target.resource }
+        return Promise.resolve({
+          executor: TEST_STUB_PROVIDER,
+          target: echoed,
+          input: request.input,
+        })
+      }
+      if (outputPlan.kind === 'array') {
+        return Promise.resolve([])
+      }
+      return Promise.reject(noTarget(target.resource))
+    },
+    resolve(request: ResolutionRequest): Promise<WireValue> {
+      const { reference, outputPlan } = request
+      if (outputPlan.kind === 'passthrough') {
+        return Promise.resolve({ executor: TEST_STUB_PROVIDER, reference })
+      }
+      if (reference.cardinality === 'one') {
+        return Promise.reject(noTarget(reference.resource))
+      }
+      if (reference.form === 'identity' && reference.entries.length > 0) {
+        return Promise.reject(noTarget(reference.resource, 0))
+      }
+      return Promise.resolve([])
     },
   }
+}
+
+/**
+ * The stub's answer for an operation or reference that needs an existing
+ * object: there is no app, so none exists.
+ */
+function noTarget(resource: string | undefined, entryIndex?: number): TargetNotFoundError {
+  return new TargetNotFoundError(
+    'The test executor automates no app, so the target does not exist.',
+    {
+      ...(resource === undefined ? {} : { resource }),
+      ...(entryIndex === undefined ? {} : { entryIndex }),
+    }
+  )
 }
 
 /**

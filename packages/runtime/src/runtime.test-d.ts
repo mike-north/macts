@@ -4,8 +4,8 @@
  * They complement the runtime tests in runtime.test.ts by pinning what the
  * compiler accepts: a runtime cannot be built without an executor and
  * governance, every
- * invocation requires a credential-bearing context, and results are wire
- * values.
+ * invocation and reference resolution requires a credential-bearing context,
+ * and results are wire values.
  *
  * Invalid usage is expressed with `expectNotAssignable` rather than
  * `expectError`, because `src/**` is also compiled by `tsc --noEmit`.
@@ -56,3 +56,23 @@ expectNotAssignable<InvocationContext>({ signal: new AbortController().signal })
 type InvokedId = Parameters<MactsRuntime['invoke']>[0]
 expectAssignable<InvokedId>('calendar.events.list')
 expectNotAssignable<InvokedId>('list')
+
+// Reference resolution requires a context carrying a credential, and resolves
+// to a wire value. The reference itself is untrusted wire input.
+expectType<Promise<WireValue>>(
+  runtime.resolveReference(
+    'notes',
+    {
+      reference: {
+        resource: 'Note',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'name', name: 'Groceries' },
+      },
+    },
+    context
+  )
+)
+declare const resolveParameters: Parameters<MactsRuntime['resolveReference']>
+expectType<unknown>(resolveParameters[1])
+expectType<InvocationContext>(resolveParameters[2])

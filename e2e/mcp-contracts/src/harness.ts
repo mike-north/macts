@@ -8,7 +8,7 @@
  * expected failures out of the test output.
  */
 
-import type { ExecutionRequest, Executor } from '@macts/core'
+import type { ExecutionRequest, Executor, ResolutionRequest } from '@macts/core'
 import {
   AuthenticationError,
   type Authority,
@@ -19,21 +19,31 @@ import type { CredentialVerifier, RuntimeLogger } from '@macts/runtime'
 
 /** An executor that records every request and answers with `respond`. */
 export interface RecordingExecutor extends Executor {
-  /** Every request received, in order. */
+  /** Every execution request received, in order. */
   readonly requests: ExecutionRequest[]
+  /** Every resolution request received, in order. */
+  readonly resolutions: ResolutionRequest[]
 }
 
-/** Build a {@link RecordingExecutor}. */
+/** Build a {@link RecordingExecutor}; by default every execution and resolution returns `null`. */
 export function createRecordingExecutor(
-  respond: (request: ExecutionRequest) => Promise<WireValue> = () => Promise.resolve(null)
+  respond: (request: ExecutionRequest) => Promise<WireValue> = () => Promise.resolve(null),
+  respondToResolution: (request: ResolutionRequest) => Promise<WireValue> = () =>
+    Promise.resolve(null)
 ): RecordingExecutor {
   const requests: ExecutionRequest[] = []
+  const resolutions: ResolutionRequest[] = []
   return {
     provider: 'recording-stub',
     requests,
+    resolutions,
     execute(request) {
       requests.push(request)
       return respond(request)
+    },
+    resolve(request) {
+      resolutions.push(request)
+      return respondToResolution(request)
     },
   }
 }

@@ -5,11 +5,20 @@
  * `Executor` (so no Mac app is needed and every request that reaches execution
  * is observable) and a fake `CredentialVerifier` (so authentication outcomes
  * are chosen per token without a key store). Production code has neither.
+ * Tests that need a real socket serve the app with a {@link ListenerPool}.
  */
 
+import type { AddressInfo } from 'node:net'
+import { serve, type ServerType } from '@hono/node-server'
 import type { Hono } from 'hono'
 import pino from 'pino'
-import type { AppManifest, ExecutionRequest, Executor, GovernancePolicy } from '@macts/core'
+import type {
+  AppManifest,
+  ExecutionRequest,
+  Executor,
+  GovernancePolicy,
+  ResolutionRequest,
+} from '@macts/core'
 import {
   AuthenticationError,
   type AuthenticationFailureReason,
@@ -183,21 +192,36 @@ export function createFakeVerifier(
 
 /** An executor that records every request it receives and answers with `respond`. */
 export interface RecordingExecutor extends Executor {
-  /** Every request received, in order. */
+  /** Every execution request received, in order. */
   readonly requests: ExecutionRequest[]
+  /** Every resolution request received, in order. */
+  readonly resolutions: ResolutionRequest[]
 }
 
-/** Build a {@link RecordingExecutor}; by default every call returns `{ events: [] }`. */
+/**
+ * Build a {@link RecordingExecutor}; by default every execution returns
+ * `{ events: [] }`, a single reference resolves to `{}`, and a collection to
+ * `[]`.
+ */
 export function createRecordingExecutor(
-  respond: (request: ExecutionRequest) => Promise<WireValue> = () => Promise.resolve({ events: [] })
+  respond: (request: ExecutionRequest) => Promise<WireValue> = () =>
+    Promise.resolve({ events: [] }),
+  respondToResolution: (request: ResolutionRequest) => Promise<WireValue> = (request) =>
+    Promise.resolve(request.reference.cardinality === 'many' ? [] : {})
 ): RecordingExecutor {
   const requests: ExecutionRequest[] = []
+  const resolutions: ResolutionRequest[] = []
   return {
     provider: 'recording-stub',
     requests,
+    resolutions,
     execute(request) {
       requests.push(request)
       return respond(request)
+    },
+    resolve(request) {
+      resolutions.push(request)
+      return respondToResolution(request)
     },
   }
 }
@@ -350,4 +374,48 @@ export interface ErrorBody {
 /** Parse a response body as an error envelope. */
 export async function errorBody(res: Response): Promise<ErrorBody> {
   return (await res.json()) as ErrorBody
+}
+
+/** A server listening on an ephemeral loopback port. */
+export interface Listener {
+  /** Base URL of the listener, without a trailing slash. */
+  readonly url: string
+}
+
+/** Real `@hono/node-server` listeners started by one test file, closed together. */
+export interface ListenerPool {
+  /** Serve `app` on an ephemeral 127.0.0.1 port, resolving once it accepts connections. */
+  listen(app: Hono): Promise<Listener>
+  /** Close every listener this pool started, dropping open connections. */
+  closeAll(): Promise<void>
+}
+
+/** Build a {@link ListenerPool}; call `closeAll` from `afterEach`. */
+export function createListenerPool(): ListenerPool {
+  const open: ServerType[] = []
+  return {
+    async listen(app) {
+      const server = await new Promise<ServerType>((resolve) => {
+        const started = serve({ fetch: app.fetch, port: 0, hostname: '127.0.0.1' }, () => {
+          resolve(started)
+        })
+      })
+      open.push(server)
+      const { port } = server.address() as AddressInfo
+      return { url: `http://127.0.0.1:${String(port)}` }
+    },
+    async closeAll() {
+      const closing = open.splice(0).map(
+        (server) =>
+          new Promise<void>((resolve) => {
+            // Drop keep-alive and any still-open request so close() can finish.
+            if ('closeAllConnections' in server) server.closeAllConnections()
+            server.close(() => {
+              resolve()
+            })
+          })
+      )
+      await Promise.all(closing)
+    },
+  }
 }

@@ -80,9 +80,8 @@ describe('macts mcp serve (UAT): each request’s bearer governs its own calls',
     const result = await callTool(granted, LIST_TOOL, {})
 
     expect(result.isError).toBeUndefined()
-    expect(toolDocument(result)).toEqual({
-      result: { executor: 'test-stub', target: { command: 'list', resource: 'Note' }, input: {} },
-    })
+    // The stub executor answers a list with `[]`, as an app with no notes would.
+    expect(toolDocument(result)).toEqual({ result: [] })
   })
 
   it('denies the other key on the same tool of the same daemon', async () => {
@@ -158,8 +157,6 @@ describe('macts mcp serve (UAT): governance fails closed', () => {
         expect(toolDocument(result)).toEqual({
           error: { code: 'INTERNAL', message: 'Governance could not be loaded.', details: {} },
         })
-        // The stub executor's answer never appears: the call stopped at governance.
-        expect(JSON.stringify(result)).not.toContain('test-stub')
       } finally {
         await session?.close()
         await brokenDaemon?.stop()

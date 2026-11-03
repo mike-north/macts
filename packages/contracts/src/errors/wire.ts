@@ -87,7 +87,10 @@ export const WIRE_ERROR_DETAILS_SCHEMAS: {
     layer: policyLayerSchema,
     state: z.enum(['rejected', 'timeout']),
   }),
-  TARGET_NOT_FOUND: z.object({ resource: z.exactOptional(z.string()) }),
+  TARGET_NOT_FOUND: z.object({
+    resource: z.exactOptional(z.string()),
+    entryIndex: z.exactOptional(z.number().int().nonnegative()),
+  }),
   FILE_NOT_FOUND: z.object({ path: z.exactOptional(z.string()) }),
   INVALID_SELECTION: z.object({ resource: z.exactOptional(z.string()) }),
   APP_UNAVAILABLE: z.object({

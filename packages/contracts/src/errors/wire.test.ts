@@ -336,6 +336,18 @@ describe('wire JSON', () => {
     })
   })
 
+  it('decodes TARGET_NOT_FOUND naming the missing identity-collection entry', () => {
+    // D7: a missing identity-collection entry is reported with its zero-based
+    // position, so the caller can tell which explicit entry no longer exists.
+    const decoded = fromWireErrorEnvelope(
+      JSON.parse(
+        '{"error":{"code":"TARGET_NOT_FOUND","message":"m","details":{"resource":"Note","entryIndex":2}}}'
+      )
+    )
+    expect(decoded).toBeInstanceOf(TargetNotFoundError)
+    expect(decoded.details).toEqual({ resource: 'Note', entryIndex: 2 })
+  })
+
   it('decodes APP_OPERATION_FAILED with appErrorCode', () => {
     const decoded = fromWireErrorEnvelope({
       error: {
@@ -415,6 +427,14 @@ describe('decode failures become protocol-mismatch', () => {
       { code: 'RATE_LIMITED', message: 'm', details: { retryAfterSeconds: '30' } },
     ],
     ['missing retryAfterSeconds', { code: 'RATE_LIMITED', message: 'm', details: {} }],
+    [
+      'negative entryIndex',
+      { code: 'TARGET_NOT_FOUND', message: 'm', details: { entryIndex: -1 } },
+    ],
+    [
+      'fractional entryIndex',
+      { code: 'TARGET_NOT_FOUND', message: 'm', details: { entryIndex: 0.5 } },
+    ],
     [
       'non-finite appErrorCode',
       { code: 'APP_OPERATION_FAILED', message: 'm', details: { app: 'A', appErrorCode: Infinity } },

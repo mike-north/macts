@@ -330,6 +330,7 @@ export interface MactsRuntime {
     operations(): readonly RegisteredOperation[];
     registerContract(contract: AppContract<unknown>, manifest: AppManifest): void;
     registerManifest(manifest: AppManifest): void;
+    resolveReference(app: string, reference: unknown, context: InvocationContext): Promise<WireValue>;
 }
 
 // @public
@@ -382,6 +383,9 @@ export interface RegisteredOperation {
     readonly permissionHistory?: PermissionHistoryEntry[];
     readonly risk: RiskClass;
 }
+
+// @public
+export const RESERVED_APP_ROUTE_SEGMENTS: readonly string[];
 
 // @public
 export type ResolvedGovernanceContext = GovernanceContext & {

@@ -218,6 +218,7 @@ export interface ErrorDetailsByCode {
     };
     readonly TARGET_NOT_FOUND: {
         readonly resource?: string;
+        readonly entryIndex?: number;
     };
     readonly TIMEOUT: {
         readonly timeoutMs: number;

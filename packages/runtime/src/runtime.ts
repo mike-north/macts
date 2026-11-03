@@ -15,19 +15,35 @@
  * 3. enforce governance policy, auditing the decision and, for a held call,
  *    seeking and recording a human decision;
  * 4. validate the input against the operation's wire contract;
- * 5. hand the authorized, validated request to the executor.
+ * 5. hand the authorized, validated request to the executor;
+ * 6. validate the executor's result against the operation's output contract,
+ *    unless its output plan is `passthrough` (a value with no wire encoding),
+ *    before any adapter emits it.
  *
  * No step can be skipped: there is no trusted-caller mode, and a local caller
  * presents a credential exactly as a remote one does. Every failure is raised
  * as a canonical structured error, and any failure the runtime did not
  * anticipate denies the call rather than letting it through.
  *
+ * {@link MactsRuntime.resolveReference} runs the same steps, through the same
+ * code, as a call of the referenced resource's `get` operation (a single
+ * reference) or `list` operation (a collection reference): the same
+ * permission, the same governance and approval decision, the same audit
+ * record, and the same output validation. Its executor step is
+ * `Executor.resolve`. Resolution is therefore never a way around policy.
+ *
  * @packageDocumentation
  */
 
 import { randomUUID } from 'node:crypto'
 import type { Logger } from 'pino'
-import type { AppManifest, ApprovalRequest, ExecutionRequest, Executor } from '@macts/core'
+import type {
+  AppManifest,
+  ApprovalRequest,
+  ExecutionRequest,
+  Executor,
+  ResolutionRequest,
+} from '@macts/core'
 import {
   DEFAULT_APPROVAL_TIMEOUT_MS,
   enforceCall,
@@ -41,17 +57,22 @@ import {
   ApprovalPendingError,
   ApprovalRejectedError,
   InternalError,
+  InvalidSelectionError,
   MactsError,
   OperationCancelledError,
   PermissionDeniedError,
   PolicyDeniedError,
   RateLimitedError,
+  UnexpectedValueError,
   ValidationError,
+  ValueTypes,
   type AppContract,
   type Authority,
   type Credential,
   type InvocationContext,
   type OperationId,
+  type ReferenceCardinality,
+  type ReferenceWire,
   type WireRecord,
   type WireValue,
 } from '@macts/contracts'
@@ -61,7 +82,9 @@ import { createKeyStoreVerifier, type CredentialVerifier } from './invocation/ve
 import { hasPermission } from './keys/validator.js'
 import { getLogger } from './logger.js'
 import { toValidationIssues } from './operations/passthrough.js'
+import { toValueFreeIssues } from './operations/value-free-issues.js'
 import {
+  OperationRegistrationError,
   OperationRegistry,
   operationsFromContract,
   operationsFromManifest,
@@ -140,17 +163,28 @@ export interface MactsRuntime {
    * Register every operation an app manifest exposes, with passthrough value
    * types.
    *
-   * @throws `OperationRegistrationError` when an operation id is already
-   *   registered or the manifest yields a malformed id or permission.
+   * @throws `OperationRegistrationError` when the app's route segment is
+   *   reserved (`RESERVED_APP_ROUTE_SEGMENTS`), an operation id is already
+   *   registered, or the manifest yields a malformed id or permission. A
+   *   refused registration adds nothing.
    */
   registerManifest(manifest: AppManifest): void
   /**
    * Register a generated contract's operations after checking each against the
    * manifest.
    *
-   * @throws `OperationRegistrationError` when a descriptor's permission or
+   * @remarks
+   * The contract's resource table also becomes the app's reference registry,
+   * against which {@link MactsRuntime.resolveReference} validates references,
+   * so an app has at most one registered contract.
+   *
+   * @throws `OperationRegistrationError` when the app's route segment is
+   *   reserved (`RESERVED_APP_ROUTE_SEGMENTS`), a descriptor's permission or
    *   target disagrees with the manifest, names an operation the manifest does
-   *   not expose, or an id is already registered.
+   *   not expose, an id is already registered, a contract for the same app
+   *   is already registered, or the contract's resource table records a `get`
+   *   or `list` operation that is not one of its operations targeting that
+   *   resource. A refused registration adds nothing.
    */
   registerContract(contract: AppContract<unknown>, manifest: AppManifest): void
   /** Every registered operation, in registration order. */
@@ -164,12 +198,95 @@ export interface MactsRuntime {
    * @param input - The input record in wire form, as received.
    * @param context - The caller's credential, and optional cancellation and
    *   correlation.
-   * @returns The operation's result in wire form.
+   * @returns The operation's result in wire form, unchanged from the
+   *   executor's.
    * @throws A canonical structured error from `@macts/contracts` for every
-   *   failure.
+   *   failure. `UnexpectedValueError` reports a result that violates the
+   *   operation's output contract (checked unless its output plan is
+   *   `passthrough`): the operation ran in the app, so it may have had an
+   *   effect, and only its result is unusable. The error's issues give
+   *   paths into the result but never its values.
    */
   invoke(id: OperationId, input: unknown, context: InvocationContext): Promise<WireValue>
+  /**
+   * Resolve one reference into the record or records it denotes, through the
+   * full invocation pipeline.
+   *
+   * @remarks
+   * The reference resolves as a call of its resource's `get` operation
+   * (cardinality `'one'`) or `list` operation (`'many'`): the operation the
+   * app contract records for that resource (`ResourceDescriptor.get` and
+   * `.list`), never one re-derived from the manifest. The caller's key must hold that operation's permission, and the
+   * call is governed, approved, and audited exactly as a direct call of that
+   * operation. Only the target resource's permission is required: containers
+   * locate the target and contribute no data, so they need none.
+   *
+   * The reference is validated by the app contract's reference value type
+   * (`t.reference` over its resource table) after governance, as `invoke`
+   * validates input, and the executor's result is validated against the
+   * operation's output contract, unless its output plan is `passthrough`, as
+   * `invoke` validates results. An identity collection's result must hold
+   * exactly one record per entry, so an entry is never silently dropped.
+   *
+   * @param app - The app's route segment, as its contract names it (for
+   *   example `'notes'`).
+   * @param reference - The reference in wire form, as received: the reference
+   *   control record `{"reference": {…}}` that encoding a reference produces.
+   * @param context - The caller's credential, and optional cancellation and
+   *   correlation.
+   * @returns A single record for a single reference; an array of records,
+   *   possibly empty, for a collection reference.
+   * @throws A canonical structured error from `@macts/contracts` for every
+   *   failure: `ValidationError` for an unknown app or a malformed reference,
+   *   `InvalidSelectionError` when the resource has no operation to resolve
+   *   the reference as, the same errors as `invoke` for authentication,
+   *   permission, and governance, `TargetNotFoundError` and
+   *   `InvalidSelectionError` from the executor unchanged, and
+   *   `UnexpectedValueError` when the result violates the operation's output
+   *   contract or an identity collection's result does not hold one record per
+   *   entry.
+   */
+  resolveReference(app: string, reference: unknown, context: InvocationContext): Promise<WireValue>
 }
+
+/**
+ * The registered operations references to one resource resolve as, by
+ * cardinality: the `get` operation the contract records for a single
+ * reference, the `list` operation for a collection. Absent when the contract
+ * records none.
+ */
+type ResolvingOperations = Readonly<Partial<Record<ReferenceCardinality, RegisteredOperation>>>
+
+/**
+ * An app registered from its generated contract: what reference resolution
+ * needs beyond the operation registry.
+ */
+interface RegisteredApp {
+  /** The app's contract; its resource table is the app's reference registry. */
+  readonly contract: AppContract<unknown>
+  /**
+   * The operations each resource's references resolve as, keyed by resource
+   * key; checked against the contract's operations when the app registered.
+   */
+  readonly resolving: ReadonlyMap<string, ResolvingOperations>
+}
+
+/** The resource and cardinality a reference names, read before any authorization. */
+interface ReferenceTarget {
+  /** The manifest resource key, present in the app's resource table. */
+  readonly resource: string
+  /** Whether the reference denotes one object or a collection. */
+  readonly cardinality: ReferenceCardinality
+  /** The reference payload: the content of the `reference` control record. */
+  readonly payload: Readonly<Record<string, unknown>>
+}
+
+/**
+ * What operator logs say about the call a pipeline step belongs to: the
+ * operation id for `invoke`, the app for a reference resolution whose
+ * operation is not yet known.
+ */
+type CallLabel = Readonly<Record<string, string>>
 
 /** Whether `value` is a plain record (not `null`, not an array). */
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
@@ -204,6 +321,8 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   const clock = options.clock ?? (() => new Date())
   const log = (): RuntimeLogger => options.logger ?? getLogger()
   const registry = new OperationRegistry()
+  /** Apps registered from a contract, keyed by the contract's app segment. */
+  const apps = new Map<string, RegisteredApp>()
 
   /** Details for an internal failure, carrying the caller's correlation id when given. */
   function internalDetails(context: InvocationContext): { correlationId?: string } {
@@ -230,7 +349,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   }
 
   /** Step 1: verify the credential. Anything but a canonical failure is internal. */
-  async function verify(context: InvocationContext, id: OperationId): Promise<Authority> {
+  async function verify(context: InvocationContext, call: CallLabel): Promise<Authority> {
     try {
       return await verifier.verify(context.credential)
     } catch (error) {
@@ -238,7 +357,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
         throw error
       }
       log().error(
-        { err: loggableError(error, context.credential), operation: id },
+        { err: loggableError(error, context.credential), ...call },
         'Credential verification failed unexpectedly'
       )
       throw new InternalError('Credential verification failed.', internalDetails(context), {
@@ -251,7 +370,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
    * Step 1b: admission. Counts the call against the subject's limit and turns
    * it away when the limit is exhausted. Never alters the authority.
    */
-  function admit(authority: Authority, context: InvocationContext, id: OperationId): void {
+  function admit(authority: Authority, context: InvocationContext, call: CallLabel): void {
     if (options.rateLimiter === undefined) {
       return
     }
@@ -262,7 +381,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       // Fail closed. Not a rate-limit denial: the caller exceeded nothing, and a
       // 429 would invite a retry that cannot help.
       log().error(
-        { err: error, operation: id, subject: authority.subject },
+        { err: error, ...call, subject: authority.subject },
         'Rate limiter failed; denying the call'
       )
       throw new InternalError('Admission control failed.', internalDetails(context), {
@@ -276,7 +395,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     if (!Number.isSafeInteger(retryAfterSeconds) || retryAfterSeconds < 0) {
       // A denial whose delay cannot be stated truthfully is a limiter defect.
       log().error(
-        { operation: id, subject: authority.subject, retryAfterSeconds },
+        { ...call, subject: authority.subject, retryAfterSeconds },
         'Rate limiter returned an invalid retry delay; denying the call'
       )
       throw new InternalError('Admission control failed.', internalDetails(context))
@@ -518,7 +637,43 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     return parsed.data
   }
 
-  /** Step 5: dispatch through the executor. Non-canonical failures are sanitized. */
+  /**
+   * Step 5, shared by execution and resolution: run one executor call.
+   * Canonical failures pass through unchanged; anything else is sanitized.
+   */
+  async function dispatch(
+    operation: RegisteredOperation,
+    context: InvocationContext,
+    call: CallLabel,
+    run: () => Promise<WireValue>
+  ): Promise<WireValue> {
+    try {
+      return await run()
+    } catch (error) {
+      if (error instanceof MactsError) {
+        throw error
+      }
+      // The raw failure may carry native or third-party detail; it stays in the
+      // operator log and the local `cause`, never in the caller's message.
+      log().error(
+        {
+          err: loggableError(error, context.credential),
+          ...call,
+          operation: operation.descriptor.id,
+          provider: executor.provider,
+        },
+        'Executor failed with a non-canonical error'
+      )
+      throw new InternalError('The operation failed unexpectedly.', internalDetails(context), {
+        cause: error,
+      })
+    }
+  }
+
+  /**
+   * Step 5 of `invoke`: execute the operation, then validate its result
+   * against the operation's output contract ({@link validateOutput}).
+   */
   async function execute(
     operation: RegisteredOperation,
     input: WireRecord,
@@ -533,26 +688,230 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       outputPlan: descriptor.output.plan,
       ...(context.signal === undefined ? {} : { signal: context.signal }),
     }
-    try {
-      return await executor.execute(request)
-    } catch (error) {
-      if (error instanceof MactsError) {
-        throw error
-      }
-      // The raw failure may carry native or third-party detail; it stays in the
-      // operator log and the local `cause`, never in the caller's message.
-      log().error(
-        {
-          err: loggableError(error, context.credential),
-          operation: descriptor.id,
-          provider: executor.provider,
-        },
-        'Executor failed with a non-canonical error'
-      )
-      throw new InternalError('The operation failed unexpectedly.', internalDetails(context), {
-        cause: error,
+    const result = await dispatch(operation, context, { operation: descriptor.id }, () =>
+      executor.execute(request)
+    )
+    return validateOutput(operation, result)
+  }
+
+  /**
+   * Read the resource and cardinality a reference names, which select the
+   * operation it resolves as. Only these routing fields are checked here; the
+   * whole reference is validated after governance ({@link validateReference}).
+   */
+  function readReferenceTarget(app: RegisteredApp, reference: unknown): ReferenceTarget {
+    const payload = isRecord(reference) ? reference['reference'] : undefined
+    if (!isRecord(payload)) {
+      throw new ValidationError('A reference must be a reference control record.', {
+        issues: [{ path: [], message: 'Expected a reference control record, {"reference": {…}}' }],
       })
     }
+    const resource = payload['resource']
+    if (typeof resource !== 'string' || !Object.hasOwn(app.contract.resources, resource)) {
+      throw new ValidationError('The reference names no resource of the app.', {
+        issues: [
+          {
+            path: ['reference', 'resource'],
+            message:
+              typeof resource === 'string'
+                ? `The ${app.contract.app} app has no resource "${resource}"`
+                : 'Expected a resource key',
+          },
+        ],
+      })
+    }
+    const cardinality = payload['cardinality']
+    if (cardinality !== 'one' && cardinality !== 'many') {
+      throw new ValidationError('The reference has no valid cardinality.', {
+        issues: [{ path: ['reference', 'cardinality'], message: 'Expected "one" or "many"' }],
+      })
+    }
+    return { resource, cardinality, payload }
+  }
+
+  /**
+   * The registered operation a reference resolves as: the resource's `get`
+   * operation for a single reference, its `list` operation for a collection.
+   *
+   * @remarks
+   * The contract records which operation that is (`ResourceDescriptor.get` and
+   * `.list`, chosen when the contract was generated), so the runtime reads it
+   * from the contract, the source of truth, and never re-derives it from the
+   * manifest. Registration has already checked every recorded id against the
+   * contract's operations. A resource that records no such operation is not
+   * resolvable.
+   */
+  function resolvingOperation(app: RegisteredApp, target: ReferenceTarget): RegisteredOperation {
+    const { resource, cardinality } = target
+    const operation = app.resolving.get(resource)?.[cardinality]
+    if (operation === undefined) {
+      const shape = cardinality === 'one' ? 'get' : 'list'
+      throw new InvalidSelectionError(
+        `References to "${resource}" cannot be resolved: the ${app.contract.app} app has no ${shape} operation for it.`,
+        { resource }
+      )
+    }
+    return operation
+  }
+
+  /**
+   * Validate the whole reference with the app contract's reference value type,
+   * `t.reference(resources, resource, cardinality)`, and return its payload in
+   * wire form.
+   */
+  function validateReference(
+    app: RegisteredApp,
+    target: ReferenceTarget,
+    reference: unknown
+  ): ReferenceWire {
+    const type =
+      target.cardinality === 'one'
+        ? ValueTypes.reference(() => app.contract.resources, target.resource, 'one')
+        : ValueTypes.reference(() => app.contract.resources, target.resource, 'many')
+    const parsed = type.wire.safeParse(reference)
+    if (!parsed.success) {
+      throw new ValidationError('The reference failed validation.', {
+        issues: toValidationIssues(parsed.error.issues),
+      })
+    }
+    // The schema admits exactly `{ reference: ReferenceWire }`; its declared
+    // output type (`WireValue`) cannot say so.
+    return (parsed.data as { readonly reference: ReferenceWire }).reference
+  }
+
+  /**
+   * Validate an executor result against the operation's output contract
+   * (D11), and return it unchanged when it conforms.
+   *
+   * @remarks
+   * Every result is checked, on `invoke` and on resolution alike, unless the
+   * operation's output plan is `passthrough`: such a value has no wire
+   * encoding, so `output.wire` does not describe it (D9). The skip is decided
+   * by the operation's descriptor, which the runtime holds; nothing an
+   * executor returns or declares about itself can turn the check off.
+   *
+   * A mismatch means the app operation ran: whatever it changed in the app has
+   * happened, and only the result is unusable. The error says so, so a caller
+   * never retries a create or a send on the assumption that nothing happened.
+   * Its issues name paths and expectations but never repeat the result, which
+   * may hold user content and crosses to remote callers. The operator log
+   * records each mismatch at warn level, with the operation, the executor's
+   * provider, and the same value-free issues.
+   *
+   * @param purpose - Why the operation ran, when it ran on the caller's
+   *   behalf for something other than a direct call (`'to resolve a
+   *   reference'`); named in the error message.
+   */
+  function validateOutput(
+    operation: RegisteredOperation,
+    result: WireValue,
+    purpose?: string
+  ): WireValue {
+    const output = operation.descriptor.output
+    if (output.plan.kind === 'passthrough') {
+      return result
+    }
+    const parsed = output.wire.safeParse(result)
+    if (!parsed.success) {
+      const id = operation.descriptor.id
+      const issues = toValueFreeIssues(parsed.error.issues, result)
+      // Nothing else records a mismatch: governance has already audited the
+      // call as allowed, and adapters log only non-canonical failures. The
+      // value-free issues are logged, never the result.
+      log().warn(
+        { operation: id, provider: executor.provider, issues },
+        'Executor result violates the output contract'
+      )
+      throw new UnexpectedValueError(
+        `The "${id}" operation ran in the app${purpose === undefined ? '' : ` ${purpose}`}, but its result does not match its contract; do not assume it had no effect.`,
+        { issues }
+      )
+    }
+    return result
+  }
+
+  /**
+   * Validate a resolution result against the output contract of the operation
+   * it resolved as ({@link validateOutput}), and, for an identity collection,
+   * that it holds exactly one record per entry. A mismatch is an app result
+   * that violated the contract.
+   *
+   * @remarks
+   * The count check enforces at the runtime boundary that an identity
+   * collection's entry is never silently dropped (D7): an executor must report
+   * a missing entry as `TargetNotFoundError`, not omit it. It applies whatever
+   * the output plan, because it is about the reference, not the record shape.
+   */
+  function validateResolution(
+    operation: RegisteredOperation,
+    reference: ReferenceWire,
+    result: WireValue
+  ): WireValue {
+    const id = operation.descriptor.id
+    validateOutput(operation, result, 'to resolve a reference')
+    if (reference.form === 'identity' && reference.cardinality === 'many') {
+      const expected = reference.entries.length
+      const received = Array.isArray(result) ? result.length : undefined
+      if (received !== expected) {
+        const got = received === undefined ? 'a value that is not an array' : String(received)
+        throw new UnexpectedValueError(
+          `The result of resolving an identity collection as "${id}" must hold one record per entry: expected ${String(expected)} records, received ${got}.`,
+          {
+            issues: [
+              {
+                path: [],
+                message: `Expected ${String(expected)} records, one per entry, but received ${got}`,
+              },
+            ],
+          }
+        )
+      }
+    }
+    return result
+  }
+
+  /**
+   * Check that every operation the contract's resource table records as how
+   * a resource's references resolve is one of the contract's operations and
+   * targets that resource, and index them by resource and cardinality.
+   *
+   * @throws {@link OperationRegistrationError} naming the resource, the field,
+   *   and the id, when a recorded id is not one of the contract's operations or
+   *   targets a different resource: the contract is inconsistent and must be
+   *   regenerated.
+   */
+  function resolvingOperationsOf(
+    contract: AppContract<unknown>,
+    operations: readonly RegisteredOperation[]
+  ): Map<string, ResolvingOperations> {
+    const byId = new Map(operations.map((operation) => [operation.descriptor.id, operation]))
+    const resolving = new Map<string, ResolvingOperations>()
+    for (const [resource, descriptor] of Object.entries(contract.resources)) {
+      const entry: Partial<Record<ReferenceCardinality, RegisteredOperation>> = {}
+      for (const [field, cardinality] of [
+        ['get', 'one'],
+        ['list', 'many'],
+      ] as const) {
+        const id = descriptor[field]
+        if (id === undefined) continue
+        const operation = byId.get(id)
+        const targeted = operation?.descriptor.target.resource
+        if (operation === undefined || targeted !== resource) {
+          const problem =
+            operation === undefined
+              ? 'which is not one of its operations'
+              : targeted === undefined
+                ? 'which targets no resource'
+                : `which targets resource "${targeted}"`
+          throw new OperationRegistrationError(
+            `The ${contract.app} contract is inconsistent: resource "${resource}" records "${id}" as its ${field} operation, ${problem}. Regenerate the contract.`
+          )
+        }
+        entry[cardinality] = operation
+      }
+      resolving.set(resource, entry)
+    }
+    return resolving
   }
 
   return {
@@ -561,7 +920,16 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     },
 
     registerContract(contract, manifest) {
-      registry.add(operationsFromContract(contract, manifest))
+      const operations = operationsFromContract(contract, manifest)
+      if (apps.has(contract.app)) {
+        throw new OperationRegistrationError(
+          `A contract for app "${contract.app}" is already registered. A runtime serves one contract per app, because that contract's resource table is the app's reference registry; register each app once, or create a separate runtime for a different contract of the same app.`
+        )
+      }
+      // Checked before anything is added, so a refused contract registers nothing.
+      const resolving = resolvingOperationsOf(contract, operations)
+      registry.add(operations)
+      apps.set(contract.app, { contract, resolving })
     },
 
     operations() {
@@ -577,8 +945,8 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       // The credential is verified before anything else, including the
       // operation lookup: an unauthenticated caller learns nothing beyond the
       // authentication failure, as on every other step.
-      const authority = await verify(context, id)
-      admit(authority, context, id)
+      const authority = await verify(context, { operation: id })
+      admit(authority, context, { operation: id })
 
       const operation = registry.get(id)
       if (operation === undefined) {
@@ -596,6 +964,52 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
 
       throwIfCancelled(context)
       return execute(operation, validated, context)
+    },
+
+    async resolveReference(appName, reference, context) {
+      throwIfCancelled(context)
+      const call: CallLabel = { app: appName, call: 'resolveReference' }
+      // As in `invoke`, the credential is verified before anything is looked
+      // up, so an unauthenticated caller learns nothing about registered apps.
+      const authority = await verify(context, call)
+      admit(authority, context, call)
+
+      const app = apps.get(appName)
+      if (app === undefined) {
+        // The counterpart of an unknown operation id in `invoke`: a caller
+        // error about the request as a whole.
+        throw new ValidationError(`Unknown app "${appName}".`, {
+          issues: [{ path: [], message: `No app contract is registered for "${appName}"` }],
+        })
+      }
+
+      // The resource and cardinality are routing, like `invoke`'s operation id:
+      // they select the operation whose permission and policy apply, so they
+      // are read first. Everything else about the reference is validated after
+      // governance, in the same place `invoke` validates input (D11): an
+      // unauthorized caller is denied before the app's reference contract (its
+      // resources and identifier types) is used to judge its request, and a
+      // malformed reference from an authorized caller is still governed and
+      // audited like any other call of that operation.
+      const target = readReferenceTarget(app, reference)
+      const operation = resolvingOperation(app, target)
+
+      // Only the target resource's permission is checked. A container chain
+      // only locates the target natively and contributes no data to the
+      // result, so it needs no permission of its own.
+      checkPermission(operation, authority)
+      await enforceGovernance(operation, authority, target.payload, context)
+      const validated = validateReference(app, target, reference)
+
+      throwIfCancelled(context)
+      const request: ResolutionRequest = {
+        manifest: operation.manifest,
+        reference: validated,
+        outputPlan: operation.descriptor.output.plan,
+        ...(context.signal === undefined ? {} : { signal: context.signal }),
+      }
+      const result = await dispatch(operation, context, call, () => executor.resolve(request))
+      return validateResolution(operation, validated, result)
     },
   }
 }
