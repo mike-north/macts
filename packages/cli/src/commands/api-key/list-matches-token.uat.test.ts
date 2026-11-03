@@ -12,6 +12,8 @@
  * `calendar:events:list`, `calendar:events:get` and `calendar:events:show`.
  *
  * @see https://www.rfc-editor.org/rfc/rfc7519#section-4.1.4 (JWT `exp`, Unix seconds)
+ * @see https://www.rfc-editor.org/rfc/rfc7519#section-4.1.6 (JWT `iat`, Unix seconds)
+ * @see https://www.rfc-editor.org/rfc/rfc7515#section-7.1 (JWS compact serialization: base64url payload)
  */
 
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
@@ -52,7 +54,24 @@ interface VerifiedToken {
   keyId: string
   name: string | null
   permissions: string[]
+  issuedAt: string
   expiresAt: string | null
+}
+
+/** `--expires 30d` in seconds: 30 days of 86400 seconds. */
+const THIRTY_DAYS_S = 30 * 86400
+
+/**
+ * The `iat` and `exp` claims of a key this test created, read straight from
+ * the token's JWT payload. The signature is not checked here; `verify` checks
+ * it, and this reads the claims it reports from the token itself.
+ */
+function tokenClaims(token: string): { iat: number; exp: number } {
+  const payload = token.replace(/^macts_sk_/, '').split('.')[1] ?? ''
+  return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as {
+    iat: number
+    exp: number
+  }
 }
 
 let mactsHome = ''
@@ -129,7 +148,15 @@ describe('macts api-key list (UAT): shows the grant the token carries', () => {
       'calendar:events:list',
       'calendar:events:show',
     ])
-    expect(verified.expiresAt).not.toBeNull()
+    // The token's own claims: `exp` is the instant verify reports, and it lies
+    // 30 days after `iat` (30 × 86400 s). Issue time and expiry are each
+    // rounded down to whole seconds from separate clock reads, so the gap may
+    // be one second longer.
+    const claims = tokenClaims(token)
+    expect(verified.expiresAt).toBe(new Date(claims.exp * 1000).toISOString())
+    expect(verified.issuedAt).toBe(new Date(claims.iat * 1000).toISOString())
+    expect(claims.exp - claims.iat).toBeGreaterThanOrEqual(THIRTY_DAYS_S)
+    expect(claims.exp - claims.iat).toBeLessThanOrEqual(THIRTY_DAYS_S + 1)
 
     expect(listed).toBeDefined()
     expect(listed?.permissions).toEqual(verified.permissions)

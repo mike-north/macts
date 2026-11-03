@@ -536,30 +536,38 @@ export function addKeyMetadata(metadata: ApiKeyMetadata): void {
  * that grant, so the grant cannot be edited. To narrow what a key may do, set
  * its policy with {@link setKeyPolicy}. To change its grant, revoke it with
  * {@link revokeKey} and issue a new one.
+ *
+ * Every other `ApiKeyMetadata` field is declared as `never`, derived from
+ * `ApiKeyMetadata` itself, so a value that carries one is a type error even
+ * when it is not a fresh object literal (a variable holding
+ * `{ name, permissions }`, or a `Partial<ApiKeyMetadata>`), and a field added
+ * to `ApiKeyMetadata` later is refused the same way.
  */
-export interface KeyMetadataUpdate {
+export interface KeyMetadataUpdate extends Readonly<
+  Partial<Record<Exclude<keyof ApiKeyMetadata, 'name'>, never>>
+> {
   /** A new human-readable name for the key. */
   readonly name?: string
 }
 
-/** The {@link KeyMetadataUpdate} fields, checked at runtime for JavaScript callers. */
-const UPDATABLE_KEY_FIELDS: ReadonlySet<string> = new Set<keyof KeyMetadataUpdate>(['name'])
+/** The only field an update may carry, checked at runtime for JavaScript callers. */
+const UPDATABLE_KEY_FIELD = 'name'
 
 /**
- * Refuse an update that is not a {@link KeyMetadataUpdate}.
+ * Validate an update that may not have been type-checked, and return the new
+ * name it carries, if any.
  *
- * The type already excludes every other field; this guards callers that are
- * not type-checked, so a stored grant can never drift from the token it
- * describes.
+ * `name` is read exactly once, so the value checked is the value written.
  *
+ * @returns The new name, or `undefined` when the update leaves the name as is.
  * @throws TypeError when `updates` is not an object, names a field other than
  *   `name`, or carries a `name` that is not a string.
  */
-function assertKeyMetadataUpdate(updates: unknown): asserts updates is KeyMetadataUpdate {
+function readKeyMetadataUpdate(updates: unknown): string | undefined {
   if (typeof updates !== 'object' || updates === null || Array.isArray(updates)) {
     throw new TypeError('updateKeyMetadata expects an object of fields to update.')
   }
-  const refused = Object.keys(updates).filter((field) => !UPDATABLE_KEY_FIELDS.has(field))
+  const refused = Object.keys(updates).filter((field) => field !== UPDATABLE_KEY_FIELD)
   if (refused.length > 0) {
     const fields = refused.map((field) => `"${field}"`).join(', ')
     throw new TypeError(
@@ -572,6 +580,7 @@ function assertKeyMetadataUpdate(updates: unknown): asserts updates is KeyMetada
   if (name !== undefined && typeof name !== 'string') {
     throw new TypeError('updateKeyMetadata expects "name" to be a string.')
   }
+  return name
 }
 
 /**
@@ -591,12 +600,10 @@ export function updateKeyMetadata(
   keyId: string,
   updates: KeyMetadataUpdate
 ): ApiKeyMetadata | undefined {
-  assertKeyMetadataUpdate(updates)
+  const name = readKeyMetadataUpdate(updates)
 
-  if (updates.name !== undefined) {
-    const result = getDb()
-      .prepare('UPDATE api_keys SET name = ? WHERE id = ?')
-      .run(updates.name, keyId)
+  if (name !== undefined) {
+    const result = getDb().prepare('UPDATE api_keys SET name = ? WHERE id = ?').run(name, keyId)
     if (result.changes === 0) {
       return undefined
     }

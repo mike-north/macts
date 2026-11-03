@@ -31,9 +31,20 @@ expectAssignable<UpdateParameter>({})
 // Negative: the grant cannot be updated
 // =============================================================================
 
-// `name` is the only field, so no other field can appear in an update, with or
-// without a name beside it.
-expectType<'name'>({} as keyof UpdateParameter)
+// `name` is the only field that can hold a value: every other ApiKeyMetadata
+// field is declared, and is `never`.
+expectType<keyof ApiKeyMetadata>({} as keyof UpdateParameter)
+expectType<string | undefined>({} as UpdateParameter['name'])
+expectType<never>({} as Exclude<UpdateParameter[Exclude<keyof ApiKeyMetadata, 'name'>], undefined>)
+
+// Not only fresh object literals: a variable holding a name and a grant field,
+// or a value typed as the old `Partial<ApiKeyMetadata>`, is refused too.
+const renameAndRegrant = { name: 'Renamed', permissions: ['calendar:*:*'] }
+expectNotAssignable<UpdateParameter>(renameAndRegrant)
+declare const partialMetadata: Partial<ApiKeyMetadata>
+expectNotAssignable<UpdateParameter>(partialMetadata)
+const renameOnly = { name: 'Renamed' }
+expectAssignable<UpdateParameter>(renameOnly)
 
 expectNotAssignable<UpdateParameter>({ permissions: ['calendar:*:*'] })
 expectNotAssignable<UpdateParameter>({ originalPermissions: ['calendar:*:*'] })

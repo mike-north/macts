@@ -256,7 +256,7 @@ export { hasPermission }
 export function isKeyRevoked(keyId: string): boolean;
 
 // @public
-export interface KeyMetadataUpdate {
+export interface KeyMetadataUpdate extends Readonly<Partial<Record<Exclude<keyof ApiKeyMetadata, 'name'>, never>>> {
     readonly name?: string;
 }
 

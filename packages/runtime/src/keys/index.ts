@@ -7,13 +7,13 @@
  * The token is the grant. A key's permissions and expiry are signed into its
  * token when it is issued, and validation reads them only from the token. The
  * stored record is the receipt of what was issued plus the key's status
- * (active, revoked, or missing when no record is stored), so its permissions
- * and expiry cannot be edited and always match the token. To narrow what a key
- * may do, set its per-key governance policy with `setKeyPolicy`: the policy
- * intersects with the host policy and is read at call time. To shorten or
- * otherwise change a key's grant, revoke the key with `revokeKey` and issue a
- * new one. `createApiKey` is the only way to store a key, and it stores exactly
- * the grant it signed.
+ * (active, revoked, or missing when no record is stored). `createApiKey` is the
+ * only way to store a key, and it stores exactly the grant it signed; the
+ * record's permissions and expiry cannot be edited afterwards, so they match
+ * the grant `createApiKey` signed. To narrow what a key may do, set its per-key
+ * governance policy with `setKeyPolicy`: the policy intersects with the host
+ * policy and is resolved per request. To shorten or otherwise change a key's
+ * grant, revoke the key with `revokeKey` and issue a new one.
  *
  * @example
  * ```typescript
