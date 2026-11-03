@@ -374,13 +374,17 @@ export const manifest: unknown = {
       },
       rangeRead: {
         supported: true,
+        read: 'column',
         evidence: {
           source: 'probe',
           observedAt: '2026-11-03T17:58:55.000Z',
           bundleId: 'com.apple.Notes',
           appVersion: '4.13',
           osVersion: '27.2',
-          note: 'Read-only pages of the attachments at the application: a first page of 25, and pages of 2 continued by cursor across a page boundary, each read as a range of the collection.',
+          pageMs: 1136,
+          columnMs: 224,
+          items: 25,
+          note: 'Read-only pages of the attachments at the application: a first page of 25, and pages of 2 continued by cursor across a page boundary, each read as a range of the collection. Timed on 2026-11-03 at 21:20 UTC: a first page of 25 read by range and by column, median of three each.',
         },
       },
     },

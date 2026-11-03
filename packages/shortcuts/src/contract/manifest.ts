@@ -152,13 +152,17 @@ export const manifest: unknown = {
       ],
       rangeRead: {
         supported: true,
+        read: 'range',
         evidence: {
           source: 'probe',
           observedAt: '2026-11-03T17:59:44.000Z',
           bundleId: 'com.apple.shortcuts',
           appVersion: '10.0',
           osVersion: '27.2',
-          note: 'Read-only pages of the folders at the application, at page sizes 25, 2 and 1. The collection held one folder, so no page continued past the first.',
+          pageMs: 192,
+          columnMs: 217,
+          items: 1,
+          note: 'Read-only pages of the folders at the application, at page sizes 25, 2 and 1. The collection held one folder, so no page continued past the first. Timed on 2026-11-03 at 21:20 UTC: a first page of 25 read by range and by column, median of three each.',
         },
       },
     },
