@@ -110,9 +110,20 @@ expectAssignable<ReferenceRegistry>({ paragraphs: {} })
 // Negative: a present identifier must be a value type.
 expectNotAssignable<ReferenceRegistry>({ paragraphs: { id: 'paragraph-id' } })
 
-// A contract may declare its table's literal type, which its clients carry.
+// A contract may declare its table's type, which its clients carry. Each
+// entry builds on `ResourceDescriptor` and narrows the fields it has to
+// required literals, as a generated contract declares it.
 declare const calendarRecord: ValueType<CalendarEvent>
 declare const eventId: ValueType<Integer>
+type CalendarResources = Readonly<{
+  events: ResourceDescriptor<CalendarEvent, Integer> & {
+    readonly id: ValueType<Integer>
+    readonly get: 'calendar.events.get'
+    readonly list: 'calendar.events.list'
+  }
+  calendars: ResourceDescriptor<CalendarEvent> & { readonly get: 'calendar.calendars.get' }
+  attendees: ResourceDescriptor<CalendarEvent>
+}>
 const calendarResources = {
   events: {
     name: 'events',
@@ -123,8 +134,9 @@ const calendarResources = {
   },
   calendars: { name: 'calendars', record: calendarRecord, get: 'calendar.calendars.get' },
   attendees: { name: 'attendees', record: calendarRecord },
-} as const satisfies ResourceTable
-type CalendarResources = typeof calendarResources
+} satisfies CalendarResources
+expectAssignable<CalendarResources>(calendarResources)
+expectAssignable<ResourceTable>(calendarResources)
 declare const typedCalendar: AppContract<CalendarClient, CalendarResources>
 expectType<CalendarClient & ClientBrand<CalendarResources>>(
   createClient(typedCalendar, { token: 'macts_sk_example' })
@@ -135,7 +147,12 @@ expectType<CalendarClient & ClientBrand<CalendarResources>>(
 expectAssignable<AppContract<CalendarClient>>(typedCalendar)
 expectAssignable<AppContract<unknown>>(typedCalendar)
 expectAssignable<ReferenceScope>(typedCalendar)
-expectAssignable<ReferenceRegistry>(calendarResources)
+expectAssignable<ReferenceRegistry>(typedCalendar.resources)
+expectAssignable<ReferenceRegistry>(null as unknown as CalendarResources)
+// An entry typed only by fields the registry does not declare (here one with
+// neither an identifier nor an operation) shares none with it, which is why
+// entries build on `ResourceDescriptor`.
+expectNotAssignable<ReferenceRegistry>({ attendees: { name: 'attendees', record: calendarRecord } })
 // Negative: a table of the wrong shape is not a resource table.
 expectNotAssignable<ResourceTable>({ events: { name: 'events' } })
 

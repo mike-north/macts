@@ -39,6 +39,7 @@ import {
   type OperationId,
   type PermissionString,
   type ReferenceData,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -184,10 +185,29 @@ export interface LibraryClient {
 }
 
 /**
- * The library resource table, declared as a generator declares one: its
- * literal type keeps each key, which of `get` and `list` it records, and its
- * record and identifier types. `Branch` records `get` but no `list`.
+ * The type of the library resource table, declared as a generated contract
+ * declares one: each entry builds on `ResourceDescriptor` and narrows the
+ * identifier and the resolving operations it has to required literals.
+ * `Branch` records `get` but no `list`.
  */
+export type LibraryResources = Readonly<{
+  Branch: ResourceDescriptor<Branch, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'library.branches.get'
+  }
+  Shelf: ResourceDescriptor<Shelf, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'library.shelves.get'
+    readonly list: 'library.shelves.list'
+  }
+  Book: ResourceDescriptor<Book, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'library.books.get'
+    readonly list: 'library.books.list'
+  }
+}>
+
+/** The library resource table, the implementation of {@link LibraryResources}. */
 const LIBRARY_RESOURCES = {
   Branch: { name: 'Branch', record: BRANCH_RECORD, id: t.string(), get: 'library.branches.get' },
   Shelf: {
@@ -204,10 +224,7 @@ const LIBRARY_RESOURCES = {
     get: 'library.books.get',
     list: 'library.books.list',
   },
-} as const satisfies AppContract<LibraryClient>['resources']
-
-/** The type of the library resource table, as a generated contract exports it. */
-export type LibraryResources = typeof LIBRARY_RESOURCES
+} satisfies LibraryResources
 
 /** A hand-built contract for {@link LIBRARY_MANIFEST}, standing in for a generated one. */
 export const libraryContract: AppContract<LibraryClient, LibraryResources> = {

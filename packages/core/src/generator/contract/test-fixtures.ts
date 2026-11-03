@@ -11,6 +11,9 @@
  *   get operation, so a single tag cannot be referenced at all; tags can be
  *   listed, so a collection of them can.
  * - `Folder` can be got and listed, so it can be referenced and can contain.
+ * - `Sticker` has neither a get nor a list operation, so no reference to one
+ *   can be resolved and the resource table leaves it out; a folder's
+ *   `sticker` field still names it, so a reference to one is rejected.
  * - `Note.uid` is claimed unique, so the note list pages; `Folder.folderId`
  *   makes no uniqueness claim and `Tag` has no identifier, so their lists
  *   return their whole collection as one page.
@@ -162,6 +165,11 @@ resources:
         type: { resource: tag }
         description: The tag that owns the folder
         optional: true
+      sticker:
+        access: r
+        type: { resource: Sticker }
+        description: The sticker on the folder
+        optional: true
       color:
         access: r
         type: string
@@ -192,6 +200,15 @@ resources:
           nullable:
             source: curated
             note: Jotter names every tag when it is created
+  Sticker:
+    name: Sticker
+    plural: Stickers
+    description: A sticker
+    properties:
+      label:
+        access: r
+        type: string
+        description: The sticker's label
 enums:
   Priority:
     name: Priority

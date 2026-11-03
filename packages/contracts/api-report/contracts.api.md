@@ -705,7 +705,6 @@ export type ReferenceList<R extends ObjectReference<unknown>> = readonly R[];
 
 // @public
 export type ReferenceRegistry = Readonly<Record<string, {
-    readonly name?: string;
     readonly id?: ValueType<unknown>;
     readonly get?: OperationId;
     readonly list?: OperationId;

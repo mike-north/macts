@@ -78,8 +78,11 @@ export interface ClientBrand<Resources extends ResourceTable> {
  *
  * @remarks
  * A container and an identity-collection entry are single-object references,
- * so their resource must be a key for `'one'`. For a table whose keys are not
- * known, this is `string`.
+ * so their resource must be a key for `'one'`. The field counts as present
+ * only when the entry's type requires it: an entry built on
+ * `ResourceDescriptor`, which declares `get` and `list` optional, records
+ * one by narrowing it to required. For a table whose keys are not known, this
+ * is `string`.
  *
  * @typeParam Resources - The contract's resource table type.
  * @typeParam Cardinality - The cardinality of the reference.

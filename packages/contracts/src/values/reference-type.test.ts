@@ -165,6 +165,30 @@ describe('the resource table', () => {
     expect(type.wire.safeParse({ reference: { resource: 'calendar' } }).success).toBe(false)
   })
 
+  it('says why a reference to a resource missing from the table is rejected, in each direction', () => {
+    // A table lists only resources that resolve references (D7, "Resolvable
+    // targets"), so a missing one is either not the app's or has neither a
+    // get nor a list operation. Neither direction blames an identifier type,
+    // since a selector reference has none.
+    const type = t.reference(registry, 'calendar', 'one')
+    const selector = { form: 'selector', cardinality: 'one', selector: { by: 'name', name: 'C' } }
+    const reason =
+      'The app has no resource "calendar" that references can resolve through ' +
+      '(one with a get or list operation)'
+    expect(messagesOf(type.encode({ app: APP, resource: 'calendar', ...selector }))).toBe(
+      `${reason}, so a reference to it cannot be encoded.`
+    )
+    expect(
+      messagesOf(
+        type.decode({ reference: { resource: 'calendar', ...selector } }, VECTOR_DECODE_CONTEXT)
+      )
+    ).toBe(`${reason}, so a reference to it cannot be decoded.`)
+    const wire = type.wire.safeParse({ reference: { resource: 'calendar', ...selector } })
+    expect(wire.success ? [] : wire.error.issues.map(({ message }) => message)).toEqual([
+      `${reason}.`,
+    ])
+  })
+
   it('does not treat inherited object keys as resources', () => {
     const type = t.reference(registry, 'note', 'one')
     expectEncodeIssues(

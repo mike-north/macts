@@ -419,12 +419,52 @@ describe('generateContract: resource table', () => {
   },`)
   })
 
-  it('keeps the literal type of the table and exports it, with no second table', () => {
+  it('declares the table as an exported type, one entry per resource, which the table satisfies', () => {
+    // Each entry builds on ResourceDescriptor<Record, Id> and narrows to
+    // required, literal members exactly the identifier and resolving
+    // operations the resource has, so the type says which are present.
+    expect(contract).toContain(`export type JotterResources = Readonly<{
+  Note: ResourceDescriptor<Note, string> & { readonly id: ValueType<string>; readonly get: 'jotter.notes.getNote'; readonly list: 'jotter.notes.listNotes' }
+  Folder: ResourceDescriptor<Folder, Integer> & { readonly id: ValueType<Integer>; readonly get: 'jotter.folders.getFolder'; readonly list: 'jotter.folders.listFolders' }
+  Tag: ResourceDescriptor<Tag> & { readonly list: 'jotter.tags.listTags' }
+}>
+`)
+    expect(contract).toMatch(
+      /^import \{[^}]*\btype ResourceDescriptor\b[^}]*\} from '@macts\/contracts'/m
+    )
+    // The value is checked against the declared type rather than declaring
+    // one of its own, so there is one table.
     expect(contract).toContain('const resources = {\n')
-    expect(contract).toContain("} as const satisfies AppContract<JotterClient>['resources']\n")
-    expect(contract).toContain('export type JotterResources = typeof resources\n')
+    expect(contract).toContain('\n} satisfies JotterResources\n')
+    expect(contract).not.toContain('typeof resources')
     expect(contract.match(/^const resources\b/gm)).toHaveLength(1)
+    expect(contract.match(/^export type JotterResources\b/gm)).toHaveLength(1)
     expect(contract).toContain('  resources,\n')
+  })
+
+  it('leaves out a resource with neither a get nor a list operation, in the type and the value (D7)', () => {
+    // Sticker records no resolving operation, so no reference to one can be
+    // resolved at any position.
+    expect(contract).not.toMatch(/^ {2}Sticker:/m)
+    // Nothing reads a sticker record, so it has no record value type…
+    expect(contract).not.toContain('stickerRecordType')
+    // …but the record interface stays, since the reference field's type names it.
+    expect(contract).toContain('export interface Sticker {\n')
+    expect(contract).toContain("(() => jotterContract, 'Sticker', 'one')")
+  })
+
+  it('declares an empty table for an app whose resources are all unresolvable', () => {
+    const manifest = jotterManifest()
+    const sticker = manifest.resources['Sticker']
+    if (sticker === undefined) throw new Error('fixture has no Sticker resource')
+    manifest.resources = { Sticker: sticker }
+    manifest.commands = {}
+    const generated = generateContract(manifest)
+    expect(generated.errors).toEqual([])
+    const text = moduleText(generated, CONTRACT_MODULE_PATH)
+    expect(text).toContain('export type JotterResources = Readonly<Record<never, never>>\n')
+    expect(text).toContain('const resources = {\n\n} satisfies JotterResources\n')
+    expect(text).not.toContain('ResourceDescriptor')
   })
 })
 

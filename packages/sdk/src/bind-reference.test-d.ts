@@ -40,6 +40,7 @@ import type {
   ReferenceData,
   ResolvableReferenceData,
   ResolvableResourceKey,
+  ResourceDescriptor,
   SelectorCollectionReference,
   SelectorReference,
   ValueType,
@@ -280,26 +281,25 @@ interface Tag {
 }
 /**
  * `Item` records both operations, `Tag` only `list` (and no identifier), and
- * `Aisle` neither.
+ * `Aisle` neither. Entries are declared as a generated contract declares
+ * them: each builds on `ResourceDescriptor`, which declares `id`, `get` and
+ * `list` optional, and narrows to required literals the ones it records, so
+ * the optional fields it inherits do not count as recorded. (A generated table
+ * leaves out a resource like `Aisle`; a declared one may list it.)
  */
-interface CatalogTable {
-  readonly Item: {
-    readonly name: 'Item'
-    readonly record: ValueType<Item>
+type CatalogResources = Readonly<{
+  Item: ResourceDescriptor<Item, Integer> & {
     readonly id: ValueType<Integer>
     readonly get: 'catalog.items.get'
     readonly list: 'catalog.items.list'
   }
-  readonly Tag: {
-    readonly name: 'Tag'
-    readonly record: ValueType<Tag>
-    readonly list: 'catalog.tags.list'
-  }
-  readonly Aisle: { readonly name: 'Aisle'; readonly record: ValueType<unknown> }
-}
-// A table type is an anonymous object type, as `typeof` a generated table is.
-type CatalogResources = Pick<CatalogTable, keyof CatalogTable>
+  Tag: ResourceDescriptor<Tag> & { readonly list: 'catalog.tags.list' }
+  Aisle: ResourceDescriptor<unknown>
+}>
 declare const catalog: Record<string, never> & ClientBrand<CatalogResources>
+// Only a narrowed, required `get` or `list` counts as recorded.
+expectType<'Item'>(null as unknown as ResolvableResourceKey<CatalogResources, 'one'>)
+expectType<'Item' | 'Tag'>(null as unknown as ResolvableResourceKey<CatalogResources, 'many'>)
 declare const sku: Integer
 
 const tags = bindReference(catalog, {
@@ -361,6 +361,13 @@ const aisles = {
 } as const
 // @ts-expect-error -- `Aisle` records no `list`
 bindReference(catalog, aisles)
+const oneAisle = { ...aisles, cardinality: 'one', selector: { by: 'name', name: 'A1' } } as const
+// @ts-expect-error -- `Aisle` records no `get`
+bindReference(catalog, oneAisle)
+// A resource absent from the table.
+const shelves = { ...aisles, resource: 'Shelf' } as const
+// @ts-expect-error -- the table has no `Shelf`
+bindReference(catalog, shelves)
 
 // --- A contract that declares no table type --------------------------------
 

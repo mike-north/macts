@@ -422,8 +422,9 @@ function readHeader<Id, Pos, Tag>(
       issue(
         path,
         'unsupported',
-        `The app has no resource ${quote(resource)}, so a reference to it cannot be ` +
-          `${walk.direction.verb}: its identifier type is unknown.`
+        `The app has no resource ${quote(resource)} that references can resolve through ` +
+          `(one with a get or list operation), so a reference to it cannot be ` +
+          `${walk.direction.verb}.`
       )
     )
     return INVALID
@@ -918,7 +919,11 @@ function wirePayload(
   cardinality: ReferenceCardinality
 ): ZodType<ReferenceWire> {
   if (!Object.hasOwn(registry, resource)) {
-    return z.never({ error: `The app has no resource ${quote(resource)}.` })
+    return z.never({
+      error:
+        `The app has no resource ${quote(resource)} that references can resolve through ` +
+        '(one with a get or list operation).',
+    })
   }
   const entry = registry[resource]
   if (!resolvable(entry, 'reference', cardinality)) {
