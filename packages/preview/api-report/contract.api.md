@@ -7,6 +7,7 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Document {
@@ -37,7 +38,12 @@ export interface PreviewClient {
 }
 
 // @public
-export const previewContract: AppContract<PreviewClient>;
+export const previewContract: AppContract<PreviewClient, PreviewResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type PreviewResources = typeof resources;
 
 // (No @packageDocumentation comment for this package)
 

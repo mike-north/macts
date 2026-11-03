@@ -105,7 +105,7 @@ const anchorRecordType: ValueType<Anchor> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<SystemSettingsClient>['resources'] = {
+const resources = {
   Pane: {
     name: 'Pane',
     record: paneRecordType,
@@ -115,7 +115,15 @@ const resources: AppContract<SystemSettingsClient>['resources'] = {
     name: 'Anchor',
     record: anchorRecordType,
   },
-}
+} as const satisfies AppContract<SystemSettingsClient>['resources']
+
+/**
+ * The type of the resource table of {@link systemSettingsContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type SystemSettingsResources = typeof resources
 
 const appRevealOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'system-settings.app.reveal',
@@ -185,7 +193,7 @@ function bind(runtime: ClientRuntime): SystemSettingsClient {
  * The System Settings contract. Pass it to a client factory to obtain a
  * {@link SystemSettingsClient}.
  */
-export const systemSettingsContract: AppContract<SystemSettingsClient> = {
+export const systemSettingsContract: AppContract<SystemSettingsClient, SystemSettingsResources> = {
   app: 'system-settings',
   operations,
   resources,

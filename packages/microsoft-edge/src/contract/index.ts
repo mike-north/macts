@@ -555,7 +555,7 @@ const tabCreateInputType: ValueType<TabCreateInput> = t.record({
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<MicrosoftEdgeClient>['resources'] = {
+const resources = {
   Window: {
     name: 'Window',
     record: windowRecordType,
@@ -584,7 +584,15 @@ const resources: AppContract<MicrosoftEdgeClient>['resources'] = {
     get: 'microsoft-edge.bookmarkItems.get',
     list: 'microsoft-edge.bookmarkItems.list',
   },
-}
+} as const satisfies AppContract<MicrosoftEdgeClient>['resources']
+
+/**
+ * The type of the resource table of {@link microsoftEdgeContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type MicrosoftEdgeResources = typeof resources
 
 const windowListWindowsOperation: OperationDescriptor<PageRequest, Page<Window>> = {
   id: 'microsoft-edge.windows.list',
@@ -1210,7 +1218,7 @@ function bind(runtime: ClientRuntime): MicrosoftEdgeClient {
  * The Microsoft Edge contract. Pass it to a client factory to obtain a
  * {@link MicrosoftEdgeClient}.
  */
-export const microsoftEdgeContract: AppContract<MicrosoftEdgeClient> = {
+export const microsoftEdgeContract: AppContract<MicrosoftEdgeClient, MicrosoftEdgeResources> = {
   app: 'microsoft-edge',
   operations,
   resources,

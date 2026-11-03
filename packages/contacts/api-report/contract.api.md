@@ -9,6 +9,7 @@ import { CallOptions } from '@macts/contracts';
 import { ObjectReferenceData } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Address {
@@ -90,7 +91,12 @@ export interface ContactsClient {
 }
 
 // @public
-export const contactsContract: AppContract<ContactsClient>;
+export const contactsContract: AppContract<ContactsClient, ContactsResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type ContactsResources = typeof resources;
 
 // @public
 export interface CustomDate {

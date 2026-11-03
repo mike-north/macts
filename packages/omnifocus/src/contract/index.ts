@@ -1278,7 +1278,7 @@ const inboxTaskCreateInputType: ValueType<InboxTaskCreateInput> = t.record({
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<OmniFocusClient>['resources'] = {
+const resources = {
   Task: {
     name: 'Task',
     record: taskRecordType,
@@ -1321,7 +1321,15 @@ const resources: AppContract<OmniFocusClient>['resources'] = {
     get: 'omnifocus.perspectives.get',
     list: 'omnifocus.perspectives.list',
   },
-}
+} as const satisfies AppContract<OmniFocusClient>['resources']
+
+/**
+ * The type of the resource table of {@link omniFocusContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type OmniFocusResources = typeof resources
 
 const folderListFoldersOperation: OperationDescriptor<Record<string, never>, Page<Folder>> = {
   id: 'omnifocus.folders.list',
@@ -2174,7 +2182,7 @@ function bind(runtime: ClientRuntime): OmniFocusClient {
  * The OmniFocus contract. Pass it to a client factory to obtain a
  * {@link OmniFocusClient}.
  */
-export const omniFocusContract: AppContract<OmniFocusClient> = {
+export const omniFocusContract: AppContract<OmniFocusClient, OmniFocusResources> = {
   app: 'omnifocus',
   operations,
   resources,

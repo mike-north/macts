@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { List, ListCreateInput } from '../types.js'
 
@@ -24,16 +25,11 @@ export class ListResourceClient {
    * List lists, one page at a time. When the result has a `nextCursor`,
    * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(
-    page: { pageSize?: number; cursor?: string } = {}
-  ): Promise<{ items: List[]; nextCursor?: string }> {
-    return this.#http.rpc<{ items: List[]; nextCursor?: string }>(
-      `${this.#app}.${this.#resource}.list`,
-      {
-        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-      }
-    )
+  async list(page: { pageSize?: number; cursor?: string } = {}): Promise<Page<List>> {
+    return this.#http.rpc<Page<List>>(`${this.#app}.${this.#resource}.list`, {
+      ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+      ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+    })
   }
 
   /**

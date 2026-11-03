@@ -1852,7 +1852,7 @@ const layerCreateInputType: ValueType<LayerCreateInput> = t.record({
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<OmniGraffleClient>['resources'] = {
+const resources = {
   Canvas: {
     name: 'Canvas',
     record: canvasRecordType,
@@ -1916,7 +1916,15 @@ const resources: AppContract<OmniGraffleClient>['resources'] = {
     name: 'ExportSettings',
     record: exportSettingsRecordType,
   },
-}
+} as const satisfies AppContract<OmniGraffleClient>['resources']
+
+/**
+ * The type of the resource table of {@link omniGraffleContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type OmniGraffleResources = typeof resources
 
 const canvasListCanvasesOperation: OperationDescriptor<Record<string, never>, Page<Canvas>> = {
   id: 'omnigraffle.canvases.list',
@@ -2707,7 +2715,7 @@ function bind(runtime: ClientRuntime): OmniGraffleClient {
  * The OmniGraffle contract. Pass it to a client factory to obtain a
  * {@link OmniGraffleClient}.
  */
-export const omniGraffleContract: AppContract<OmniGraffleClient> = {
+export const omniGraffleContract: AppContract<OmniGraffleClient, OmniGraffleResources> = {
   app: 'omnigraffle',
   operations,
   resources,

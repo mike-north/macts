@@ -2250,7 +2250,7 @@ const visualRecordType: ValueType<Visual> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<MusicClient>['resources'] = {
+const resources = {
   AirPlayDevice: {
     name: 'AirPlayDevice',
     record: airPlayDeviceRecordType,
@@ -2349,7 +2349,15 @@ const resources: AppContract<MusicClient>['resources'] = {
     name: 'Visual',
     record: visualRecordType,
   },
-}
+} as const satisfies AppContract<MusicClient>['resources']
+
+/**
+ * The type of the resource table of {@link musicContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type MusicResources = typeof resources
 
 const playlistListPlaylistsOperation: OperationDescriptor<PageRequest, Page<Playlist>> = {
   id: 'music.playlists.list',
@@ -3203,7 +3211,7 @@ function bind(runtime: ClientRuntime): MusicClient {
  * The Music contract. Pass it to a client factory to obtain a
  * {@link MusicClient}.
  */
-export const musicContract: AppContract<MusicClient> = {
+export const musicContract: AppContract<MusicClient, MusicResources> = {
   app: 'music',
   operations,
   resources,

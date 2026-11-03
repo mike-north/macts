@@ -1147,7 +1147,7 @@ const resourceCreateInputType: ValueType<ResourceCreateInput> = t.record({
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<OmniPlanClient>['resources'] = {
+const resources = {
   Project: {
     name: 'Project',
     record: projectRecordType,
@@ -1206,7 +1206,15 @@ const resources: AppContract<OmniPlanClient>['resources'] = {
     name: 'Currency',
     record: currencyRecordType,
   },
-}
+} as const satisfies AppContract<OmniPlanClient>['resources']
+
+/**
+ * The type of the resource table of {@link omniPlanContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type OmniPlanResources = typeof resources
 
 const projectListProjectsOperation: OperationDescriptor<Record<string, never>, Page<Project>> = {
   id: 'omniplan.projects.list',
@@ -2038,7 +2046,7 @@ function bind(runtime: ClientRuntime): OmniPlanClient {
  * The OmniPlan contract. Pass it to a client factory to obtain a
  * {@link OmniPlanClient}.
  */
-export const omniPlanContract: AppContract<OmniPlanClient> = {
+export const omniPlanContract: AppContract<OmniPlanClient, OmniPlanResources> = {
   app: 'omniplan',
   operations,
   resources,

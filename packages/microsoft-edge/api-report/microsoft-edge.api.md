@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -25,10 +26,7 @@ export class BookmarkFolderResourceClient {
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: BookmarkFolder[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<BookmarkFolder>>;
 }
 
 // @public (undocumented)
@@ -62,10 +60,7 @@ export class BookmarkItemResourceClient {
     list(folderId: string, page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: BookmarkItem[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<BookmarkItem>>;
 }
 
 // @public (undocumented)
@@ -154,10 +149,7 @@ export class TabResourceClient {
     list(windowId: string, page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Tab[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Tab>>;
     pasteSelection(tabId: string): Promise<void>;
     redo(tabId: string): Promise<void>;
     reload(tabId: string): Promise<void>;
@@ -227,10 +219,7 @@ export class WindowResourceClient {
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Window[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Window>>;
 }
 
 // @public (undocumented)

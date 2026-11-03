@@ -9,6 +9,7 @@ import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Bookmark {
@@ -200,7 +201,12 @@ export interface MicrosoftWordClient {
 }
 
 // @public
-export const microsoftWordContract: AppContract<MicrosoftWordClient>;
+export const microsoftWordContract: AppContract<MicrosoftWordClient, MicrosoftWordResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type MicrosoftWordResources = typeof resources;
 
 // @public
 export interface PageSetup {

@@ -7,6 +7,7 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export type DetailLevel = 'mini' | 'basic' | 'full';
@@ -42,7 +43,12 @@ export interface SystemInformationClient {
 }
 
 // @public
-export const systemInformationContract: AppContract<SystemInformationClient>;
+export const systemInformationContract: AppContract<SystemInformationClient, SystemInformationResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type SystemInformationResources = typeof resources;
 
 // (No @packageDocumentation comment for this package)
 

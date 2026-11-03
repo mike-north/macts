@@ -9,6 +9,7 @@ import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Attendee {
@@ -42,7 +43,7 @@ export interface CalendarClient {
 }
 
 // @public
-export const calendarContract: AppContract<CalendarClient>;
+export const calendarContract: AppContract<CalendarClient, CalendarResources>;
 
 // @public
 export interface CalendarCreateInput {
@@ -61,6 +62,11 @@ export interface CalendarResourceClient {
     get(id: string, options?: CallOptions): Promise<Calendar>;
     list(options?: CallOptions): Promise<Page<Calendar>>;
 }
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type CalendarResources = typeof resources;
 
 // @public
 export interface CalendarUpdateInput {

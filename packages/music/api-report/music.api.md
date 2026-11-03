@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -430,10 +431,7 @@ export class PlaylistResourceClient {
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Playlist[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Playlist>>;
     move(to: string): Promise<void>;
     search(_for: string, only?: string): Promise<void>;
 }
@@ -683,9 +681,7 @@ export interface TrackCreateInput {
 export class TrackResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(playlistId: string, persistentID: string): Promise<Track>;
-    list(playlistId: string): Promise<{
-        items: Track[];
-    }>;
+    list(playlistId: string): Promise<Page<Track>>;
 }
 
 // @public (undocumented)

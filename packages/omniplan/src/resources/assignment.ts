@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Assignment } from '../types.js'
 
@@ -23,7 +24,7 @@ export class AssignmentResourceClient {
   /**
    * List all assignments, as one page.
    */
-  async list(): Promise<{ items: Assignment[] }> {
-    return this.#http.rpc<{ items: Assignment[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Assignment>> {
+    return this.#http.rpc<Page<Assignment>>(`${this.#app}.${this.#resource}.list`)
   }
 }

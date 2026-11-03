@@ -101,7 +101,7 @@ const documentRecordType: ValueType<Document> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<PreviewClient>['resources'] = {
+const resources = {
   Document: {
     name: 'Document',
     record: documentRecordType,
@@ -109,7 +109,15 @@ const resources: AppContract<PreviewClient>['resources'] = {
     get: 'preview.documents.get',
     list: 'preview.documents.list',
   },
-}
+} as const satisfies AppContract<PreviewClient>['resources']
+
+/**
+ * The type of the resource table of {@link previewContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type PreviewResources = typeof resources
 
 const documentListOperation: OperationDescriptor<Record<string, never>, Page<Document>> = {
   id: 'preview.documents.list',
@@ -164,7 +172,7 @@ function bind(runtime: ClientRuntime): PreviewClient {
  * The Preview contract. Pass it to a client factory to obtain a
  * {@link PreviewClient}.
  */
-export const previewContract: AppContract<PreviewClient> = {
+export const previewContract: AppContract<PreviewClient, PreviewResources> = {
   app: 'preview',
   operations,
   resources,

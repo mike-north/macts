@@ -325,7 +325,7 @@ const noteCreateInputType: ValueType<NoteCreateInput> = t.record({
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<NotesClient>['resources'] = {
+const resources = {
   Account: {
     name: 'Account',
     record: accountRecordType,
@@ -354,7 +354,15 @@ const resources: AppContract<NotesClient>['resources'] = {
     get: 'notes.attachments.get',
     list: 'notes.attachments.list',
   },
-}
+} as const satisfies AppContract<NotesClient>['resources']
+
+/**
+ * The type of the resource table of {@link notesContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type NotesResources = typeof resources
 
 const accountListOperation: OperationDescriptor<Record<string, never>, Page<Account>> = {
   id: 'notes.accounts.list',
@@ -581,7 +589,7 @@ function bind(runtime: ClientRuntime): NotesClient {
  * The Notes contract. Pass it to a client factory to obtain a
  * {@link NotesClient}.
  */
-export const notesContract: AppContract<NotesClient> = {
+export const notesContract: AppContract<NotesClient, NotesResources> = {
   app: 'notes',
   operations,
   resources,

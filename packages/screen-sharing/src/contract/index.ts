@@ -46,7 +46,15 @@ export interface ScreenSharingClient {
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<ScreenSharingClient>['resources'] = {}
+const resources = {} as const satisfies AppContract<ScreenSharingClient>['resources']
+
+/**
+ * The type of the resource table of {@link screenSharingContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type ScreenSharingResources = typeof resources
 
 const appGetURLOperation: OperationDescriptor<{ readonly url: string }, undefined> = {
   id: 'screen-sharing.app.getURL',
@@ -82,7 +90,7 @@ function bind(runtime: ClientRuntime): ScreenSharingClient {
  * The Screen Sharing contract. Pass it to a client factory to obtain a
  * {@link ScreenSharingClient}.
  */
-export const screenSharingContract: AppContract<ScreenSharingClient> = {
+export const screenSharingContract: AppContract<ScreenSharingClient, ScreenSharingResources> = {
   app: 'screen-sharing',
   operations,
   resources,

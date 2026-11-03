@@ -1278,7 +1278,7 @@ const yahooHandleRecordType: ValueType<YahooHandle> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<ContactsClient>['resources'] = {
+const resources = {
   Address: {
     name: 'Address',
     record: addressRecordType,
@@ -1351,7 +1351,15 @@ const resources: AppContract<ContactsClient>['resources'] = {
     name: 'YahooHandle',
     record: yahooHandleRecordType,
   },
-}
+} as const satisfies AppContract<ContactsClient>['resources']
+
+/**
+ * The type of the resource table of {@link contactsContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type ContactsResources = typeof resources
 
 const personListPeopleOperation: OperationDescriptor<PageRequest, Page<Person>> = {
   id: 'contacts.people.list',
@@ -3026,7 +3034,7 @@ function bind(runtime: ClientRuntime): ContactsClient {
  * The Contacts contract. Pass it to a client factory to obtain a
  * {@link ContactsClient}.
  */
-export const contactsContract: AppContract<ContactsClient> = {
+export const contactsContract: AppContract<ContactsClient, ContactsResources> = {
   app: 'contacts',
   operations,
   resources,

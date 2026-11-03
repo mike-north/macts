@@ -11,6 +11,7 @@ import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Folder {
@@ -65,7 +66,12 @@ export interface ShortcutsClient {
 }
 
 // @public
-export const shortcutsContract: AppContract<ShortcutsClient>;
+export const shortcutsContract: AppContract<ShortcutsClient, ShortcutsResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type ShortcutsResources = typeof resources;
 
 // @public
 export interface ShortcutUpdateInput {

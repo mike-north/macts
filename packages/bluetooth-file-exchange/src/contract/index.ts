@@ -77,13 +77,21 @@ const applicationRecordType: ValueType<Application> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<BluetoothFileExchangeClient>['resources'] = {
+const resources = {
   Application: {
     name: 'Application',
     record: applicationRecordType,
     id: t.string({ description: 'The name of the application' }),
   },
-}
+} as const satisfies AppContract<BluetoothFileExchangeClient>['resources']
+
+/**
+ * The type of the resource table of {@link bluetoothFileExchangeContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type BluetoothFileExchangeResources = typeof resources
 
 const appBrowseOperation: OperationDescriptor<{ readonly device?: string | undefined }, undefined> =
   {
@@ -178,7 +186,10 @@ function bind(runtime: ClientRuntime): BluetoothFileExchangeClient {
  * The Bluetooth File Exchange contract. Pass it to a client factory to obtain a
  * {@link BluetoothFileExchangeClient}.
  */
-export const bluetoothFileExchangeContract: AppContract<BluetoothFileExchangeClient> = {
+export const bluetoothFileExchangeContract: AppContract<
+  BluetoothFileExchangeClient,
+  BluetoothFileExchangeResources
+> = {
   app: 'bluetooth-file-exchange',
   operations,
   resources,

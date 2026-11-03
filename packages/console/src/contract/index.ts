@@ -42,7 +42,15 @@ export interface ConsoleClient {
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<ConsoleClient>['resources'] = {}
+const resources = {} as const satisfies AppContract<ConsoleClient>['resources']
+
+/**
+ * The type of the resource table of {@link consoleContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type ConsoleResources = typeof resources
 
 const appSelectDeviceOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'console.app.selectDevice',
@@ -75,7 +83,7 @@ function bind(runtime: ClientRuntime): ConsoleClient {
  * The Console contract. Pass it to a client factory to obtain a
  * {@link ConsoleClient}.
  */
-export const consoleContract: AppContract<ConsoleClient> = {
+export const consoleContract: AppContract<ConsoleClient, ConsoleResources> = {
   app: 'console',
   operations,
   resources,

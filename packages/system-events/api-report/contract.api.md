@@ -9,6 +9,7 @@ import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export type Accs = 'none' | 'readOnly' | 'readWrite' | 'writeOnly';
@@ -991,7 +992,12 @@ export interface SystemEventsClient {
 }
 
 // @public
-export const systemEventsContract: AppContract<SystemEventsClient>;
+export const systemEventsContract: AppContract<SystemEventsClient, SystemEventsResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type SystemEventsResources = typeof resources;
 
 // @public
 export interface TabGroup {

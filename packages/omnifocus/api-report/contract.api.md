@@ -8,6 +8,7 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Folder {
@@ -104,7 +105,12 @@ export interface OmniFocusClient {
 }
 
 // @public
-export const omniFocusContract: AppContract<OmniFocusClient>;
+export const omniFocusContract: AppContract<OmniFocusClient, OmniFocusResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type OmniFocusResources = typeof resources;
 
 // @public
 export interface Perspective {

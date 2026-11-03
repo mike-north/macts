@@ -2071,7 +2071,7 @@ const mailAttachmentRecordType: ValueType<MailAttachment> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<MailClient>['resources'] = {
+const resources = {
   RichText: {
     name: 'RichText',
     record: richTextRecordType,
@@ -2153,7 +2153,15 @@ const resources: AppContract<MailClient>['resources'] = {
     record: mailAttachmentRecordType,
     id: t.string({ description: 'The unique identifier of the attachment.' }),
   },
-}
+} as const satisfies AppContract<MailClient>['resources']
+
+/**
+ * The type of the resource table of {@link mailContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type MailResources = typeof resources
 
 const appDeleteOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'mail.app.delete',
@@ -2660,7 +2668,7 @@ function bind(runtime: ClientRuntime): MailClient {
  * The Mail contract. Pass it to a client factory to obtain a
  * {@link MailClient}.
  */
-export const mailContract: AppContract<MailClient> = {
+export const mailContract: AppContract<MailClient, MailResources> = {
   app: 'mail',
   operations,
   resources,

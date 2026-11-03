@@ -1452,7 +1452,7 @@ const testFailureRecordType: ValueType<TestFailure> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<XcodeClient>['resources'] = {
+const resources = {
   WorkspaceDocument: {
     name: 'WorkspaceDocument',
     record: workspaceDocumentRecordType,
@@ -1548,7 +1548,15 @@ const resources: AppContract<XcodeClient>['resources'] = {
     record: testFailureRecordType,
     id: t.string({ description: 'The text of the issue' }),
   },
-}
+} as const satisfies AppContract<XcodeClient>['resources']
+
+/**
+ * The type of the resource table of {@link xcodeContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type XcodeResources = typeof resources
 
 const workspaceDocumentListWorkspaceDocumentsOperation: OperationDescriptor<
   Record<string, never>,
@@ -2316,7 +2324,7 @@ function bind(runtime: ClientRuntime): XcodeClient {
  * The Xcode contract. Pass it to a client factory to obtain a
  * {@link XcodeClient}.
  */
-export const xcodeContract: AppContract<XcodeClient> = {
+export const xcodeContract: AppContract<XcodeClient, XcodeResources> = {
   app: 'xcode',
   operations,
   resources,

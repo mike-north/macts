@@ -573,7 +573,7 @@ const requiredResourceRecordType: ValueType<RequiredResource> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<AutomatorClient>['resources'] = {
+const resources = {
   Workflow: {
     name: 'Workflow',
     record: workflowRecordType,
@@ -607,7 +607,15 @@ const resources: AppContract<AutomatorClient>['resources'] = {
     id: t.string({ description: 'The name of the required resource' }),
     list: 'automator.requiredResources.list',
   },
-}
+} as const satisfies AppContract<AutomatorClient>['resources']
+
+/**
+ * The type of the resource table of {@link automatorContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type AutomatorResources = typeof resources
 
 const workflowListOperation: OperationDescriptor<Record<string, never>, Page<Workflow>> = {
   id: 'automator.workflows.list',
@@ -1129,7 +1137,7 @@ function bind(runtime: ClientRuntime): AutomatorClient {
  * The Automator contract. Pass it to a client factory to obtain a
  * {@link AutomatorClient}.
  */
-export const automatorContract: AppContract<AutomatorClient> = {
+export const automatorContract: AppContract<AutomatorClient, AutomatorResources> = {
   app: 'automator',
   operations,
   resources,

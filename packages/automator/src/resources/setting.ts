@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Setting } from '../types.js'
 
@@ -23,7 +24,7 @@ export class SettingResourceClient {
   /**
    * List the settings of one automator action, as one page.
    */
-  async list(actionId: string): Promise<{ items: Setting[] }> {
-    return this.#http.rpc<{ items: Setting[] }>(`${this.#app}.${this.#resource}.list`, { actionId })
+  async list(actionId: string): Promise<Page<Setting>> {
+    return this.#http.rpc<Page<Setting>>(`${this.#app}.${this.#resource}.list`, { actionId })
   }
 }

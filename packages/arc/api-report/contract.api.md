@@ -8,6 +8,7 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface ArcClient {
@@ -24,7 +25,12 @@ export interface ArcClient {
 }
 
 // @public
-export const arcContract: AppContract<ArcClient>;
+export const arcContract: AppContract<ArcClient, ArcResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type ArcResources = typeof resources;
 
 // @public
 export interface Space {

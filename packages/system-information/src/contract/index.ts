@@ -119,7 +119,7 @@ const documentRecordType: ValueType<Document> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<SystemInformationClient>['resources'] = {
+const resources = {
   Document: {
     name: 'Document',
     record: documentRecordType,
@@ -127,7 +127,15 @@ const resources: AppContract<SystemInformationClient>['resources'] = {
     get: 'system-information.documents.get',
     list: 'system-information.documents.list',
   },
-}
+} as const satisfies AppContract<SystemInformationClient>['resources']
+
+/**
+ * The type of the resource table of {@link systemInformationContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type SystemInformationResources = typeof resources
 
 const documentListOperation: OperationDescriptor<Record<string, never>, Page<Document>> = {
   id: 'system-information.documents.list',
@@ -199,7 +207,10 @@ function bind(runtime: ClientRuntime): SystemInformationClient {
  * The System Information contract. Pass it to a client factory to obtain a
  * {@link SystemInformationClient}.
  */
-export const systemInformationContract: AppContract<SystemInformationClient> = {
+export const systemInformationContract: AppContract<
+  SystemInformationClient,
+  SystemInformationResources
+> = {
   app: 'system-information',
   operations,
   resources,

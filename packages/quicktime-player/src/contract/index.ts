@@ -160,13 +160,21 @@ const documentRecordType: ValueType<Document> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<QuickTimePlayerClient>['resources'] = {
+const resources = {
   Document: {
     name: 'Document',
     record: documentRecordType,
     id: t.string({ description: 'The unique identifier of the document' }),
   },
-}
+} as const satisfies AppContract<QuickTimePlayerClient>['resources']
+
+/**
+ * The type of the resource table of {@link quickTimePlayerContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type QuickTimePlayerResources = typeof resources
 
 const appOpenURLOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'quicktime-player.app.openURL',
@@ -542,10 +550,11 @@ function bind(runtime: ClientRuntime): QuickTimePlayerClient {
  * The QuickTime Player contract. Pass it to a client factory to obtain a
  * {@link QuickTimePlayerClient}.
  */
-export const quickTimePlayerContract: AppContract<QuickTimePlayerClient> = {
-  app: 'quicktime-player',
-  operations,
-  resources,
-  loadManifest: async () => (await import('./manifest.js')).manifest,
-  bind,
-}
+export const quickTimePlayerContract: AppContract<QuickTimePlayerClient, QuickTimePlayerResources> =
+  {
+    app: 'quicktime-player',
+    operations,
+    resources,
+    loadManifest: async () => (await import('./manifest.js')).manifest,
+    bind,
+  }

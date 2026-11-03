@@ -3399,7 +3399,7 @@ const scriptingSuiteRecordType: ValueType<ScriptingSuite> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<SystemEventsClient>['resources'] = {
+const resources = {
   Configuration: {
     name: 'Configuration',
     record: configurationRecordType,
@@ -3708,7 +3708,15 @@ const resources: AppContract<SystemEventsClient>['resources'] = {
     record: scriptingSuiteRecordType,
     id: t.string({ description: 'The unique identifier of the suite' }),
   },
-}
+} as const satisfies AppContract<SystemEventsClient>['resources']
+
+/**
+ * The type of the resource table of {@link systemEventsContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type SystemEventsResources = typeof resources
 
 const appAbortTransactionOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'system-events.app.abortTransaction',
@@ -4539,7 +4547,7 @@ function bind(runtime: ClientRuntime): SystemEventsClient {
  * The System Events contract. Pass it to a client factory to obtain a
  * {@link SystemEventsClient}.
  */
-export const systemEventsContract: AppContract<SystemEventsClient> = {
+export const systemEventsContract: AppContract<SystemEventsClient, SystemEventsResources> = {
   app: 'system-events',
   operations,
   resources,

@@ -187,7 +187,7 @@ const tabRecordType: ValueType<Tab> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<SafariClient>['resources'] = {
+const resources = {
   Document: {
     name: 'Document',
     record: documentRecordType,
@@ -198,7 +198,15 @@ const resources: AppContract<SafariClient>['resources'] = {
     record: tabRecordType,
     id: t.string({ description: 'The unique identifier of the tab' }),
   },
-}
+} as const satisfies AppContract<SafariClient>['resources']
+
+/**
+ * The type of the resource table of {@link safariContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type SafariResources = typeof resources
 
 const appAddReadingListItemOperation: OperationDescriptor<
   { readonly andPreviewText?: string | undefined; readonly withTitle?: string | undefined },
@@ -440,7 +448,7 @@ function bind(runtime: ClientRuntime): SafariClient {
  * The Safari contract. Pass it to a client factory to obtain a
  * {@link SafariClient}.
  */
-export const safariContract: AppContract<SafariClient> = {
+export const safariContract: AppContract<SafariClient, SafariResources> = {
   app: 'safari',
   operations,
   resources,

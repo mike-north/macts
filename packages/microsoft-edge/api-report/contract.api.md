@@ -11,6 +11,7 @@ import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface BookmarkFolder {
@@ -70,7 +71,12 @@ export interface MicrosoftEdgeClient {
 }
 
 // @public
-export const microsoftEdgeContract: AppContract<MicrosoftEdgeClient>;
+export const microsoftEdgeContract: AppContract<MicrosoftEdgeClient, MicrosoftEdgeResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type MicrosoftEdgeResources = typeof resources;
 
 // @public
 export interface Tab {

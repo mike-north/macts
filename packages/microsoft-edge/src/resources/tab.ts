@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Tab, TabCreateInput } from '../types.js'
 
@@ -27,15 +28,12 @@ export class TabResourceClient {
   async list(
     windowId: string,
     page: { pageSize?: number; cursor?: string } = {}
-  ): Promise<{ items: Tab[]; nextCursor?: string }> {
-    return this.#http.rpc<{ items: Tab[]; nextCursor?: string }>(
-      `${this.#app}.${this.#resource}.list`,
-      {
-        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-        windowId,
-      }
-    )
+  ): Promise<Page<Tab>> {
+    return this.#http.rpc<Page<Tab>>(`${this.#app}.${this.#resource}.list`, {
+      ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+      ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+      windowId,
+    })
   }
 
   /**

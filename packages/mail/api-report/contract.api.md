@@ -11,6 +11,7 @@ import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Account {
@@ -246,7 +247,12 @@ export interface MailClient {
 }
 
 // @public
-export const mailContract: AppContract<MailClient>;
+export const mailContract: AppContract<MailClient, MailResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type MailResources = typeof resources;
 
 // @public
 export interface Message {

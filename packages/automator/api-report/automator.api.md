@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -49,10 +50,7 @@ export class AutomatorActionResourceClient {
     list(workflowName: string, page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: AutomatorAction[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<AutomatorAction>>;
 }
 
 // @public (undocumented)
@@ -151,9 +149,7 @@ export type RequiredResourceCreateInput = Record<string, never>;
 // @public
 export class RequiredResourceResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    list(actionId: string): Promise<{
-        items: RequiredResource[];
-    }>;
+    list(actionId: string): Promise<Page<RequiredResource>>;
 }
 
 // @public (undocumented)
@@ -184,9 +180,7 @@ export interface SettingCreateInput {
 // @public
 export class SettingResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    list(actionId: string): Promise<{
-        items: Setting[];
-    }>;
+    list(actionId: string): Promise<Page<Setting>>;
 }
 
 // @public (undocumented)
@@ -218,9 +212,7 @@ export interface VariableCreateInput {
 export class VariableResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Variable>;
-    list(workflowName: string): Promise<{
-        items: Variable[];
-    }>;
+    list(workflowName: string): Promise<Page<Variable>>;
 }
 
 // @public (undocumented)
@@ -256,9 +248,7 @@ export class WorkflowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     execute(workflow: unknown): Promise<void>;
     get(name: string): Promise<Workflow>;
-    list(): Promise<{
-        items: Workflow[];
-    }>;
+    list(): Promise<Page<Workflow>>;
 }
 
 // @public (undocumented)

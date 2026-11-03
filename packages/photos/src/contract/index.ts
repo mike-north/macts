@@ -500,7 +500,7 @@ const momentRecordType: ValueType<Moment> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<PhotosClient>['resources'] = {
+const resources = {
   MediaItem: {
     name: 'MediaItem',
     record: mediaItemRecordType,
@@ -532,7 +532,15 @@ const resources: AppContract<PhotosClient>['resources'] = {
     record: momentRecordType,
     id: t.string({ description: 'The unique ID of the Moment' }),
   },
-}
+} as const satisfies AppContract<PhotosClient>['resources']
+
+/**
+ * The type of the resource table of {@link photosContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type PhotosResources = typeof resources
 
 const mediaItemListMediaItemsOperation: OperationDescriptor<PageRequest, Page<MediaItem>> = {
   id: 'photos.mediaItems.list',
@@ -1049,7 +1057,7 @@ function bind(runtime: ClientRuntime): PhotosClient {
  * The Photos contract. Pass it to a client factory to obtain a
  * {@link PhotosClient}.
  */
-export const photosContract: AppContract<PhotosClient> = {
+export const photosContract: AppContract<PhotosClient, PhotosResources> = {
   app: 'photos',
   operations,
   resources,

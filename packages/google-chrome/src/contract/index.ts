@@ -459,7 +459,7 @@ const bookmarkItemRecordType: ValueType<BookmarkItem> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<GoogleChromeClient>['resources'] = {
+const resources = {
   Window: {
     name: 'Window',
     record: windowRecordType,
@@ -480,7 +480,15 @@ const resources: AppContract<GoogleChromeClient>['resources'] = {
     record: bookmarkItemRecordType,
     id: t.string({ description: 'Unique ID of the bookmark item.' }),
   },
-}
+} as const satisfies AppContract<GoogleChromeClient>['resources']
+
+/**
+ * The type of the resource table of {@link googleChromeContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type GoogleChromeResources = typeof resources
 
 const appSaveOperation: OperationDescriptor<
   { readonly in?: FileSource | undefined; readonly as?: string | undefined },
@@ -1136,7 +1144,7 @@ function bind(runtime: ClientRuntime): GoogleChromeClient {
  * The Google Chrome contract. Pass it to a client factory to obtain a
  * {@link GoogleChromeClient}.
  */
-export const googleChromeContract: AppContract<GoogleChromeClient> = {
+export const googleChromeContract: AppContract<GoogleChromeClient, GoogleChromeResources> = {
   app: 'google-chrome',
   operations,
   resources,

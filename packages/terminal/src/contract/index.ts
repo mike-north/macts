@@ -350,7 +350,7 @@ const settingsSetRecordType: ValueType<SettingsSet> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<TerminalClient>['resources'] = {
+const resources = {
   Window: {
     name: 'Window',
     record: windowRecordType,
@@ -372,7 +372,15 @@ const resources: AppContract<TerminalClient>['resources'] = {
     get: 'terminal.settingsSets.get',
     list: 'terminal.settingsSets.list',
   },
-}
+} as const satisfies AppContract<TerminalClient>['resources']
+
+/**
+ * The type of the resource table of {@link terminalContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type TerminalResources = typeof resources
 
 const windowListOperation: OperationDescriptor<Record<string, never>, Page<Window>> = {
   id: 'terminal.windows.list',
@@ -533,7 +541,7 @@ function bind(runtime: ClientRuntime): TerminalClient {
  * The Terminal contract. Pass it to a client factory to obtain a
  * {@link TerminalClient}.
  */
-export const terminalContract: AppContract<TerminalClient> = {
+export const terminalContract: AppContract<TerminalClient, TerminalResources> = {
   app: 'terminal',
   operations,
   resources,

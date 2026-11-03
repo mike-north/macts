@@ -241,7 +241,7 @@ const chatRecordType: ValueType<Chat> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<MessagesClient>['resources'] = {
+const resources = {
   Participant: {
     name: 'Participant',
     record: participantRecordType,
@@ -260,7 +260,15 @@ const resources: AppContract<MessagesClient>['resources'] = {
     record: chatRecordType,
     id: t.string({ description: 'A guid identifier for this chat.' }),
   },
-}
+} as const satisfies AppContract<MessagesClient>['resources']
+
+/**
+ * The type of the resource table of {@link messagesContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type MessagesResources = typeof resources
 
 const appSendOperation: OperationDescriptor<{ readonly to: string }, undefined> = {
   id: 'messages.app.send',
@@ -330,7 +338,7 @@ function bind(runtime: ClientRuntime): MessagesClient {
  * The Messages contract. Pass it to a client factory to obtain a
  * {@link MessagesClient}.
  */
-export const messagesContract: AppContract<MessagesClient> = {
+export const messagesContract: AppContract<MessagesClient, MessagesResources> = {
   app: 'messages',
   operations,
   resources,

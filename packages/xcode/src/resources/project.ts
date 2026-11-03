@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Project } from '../types.js'
 
@@ -27,15 +28,12 @@ export class ProjectResourceClient {
   async list(
     workspaceName: string,
     page: { pageSize?: number; cursor?: string } = {}
-  ): Promise<{ items: Project[]; nextCursor?: string }> {
-    return this.#http.rpc<{ items: Project[]; nextCursor?: string }>(
-      `${this.#app}.${this.#resource}.list`,
-      {
-        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-        workspaceName,
-      }
-    )
+  ): Promise<Page<Project>> {
+    return this.#http.rpc<Page<Project>>(`${this.#app}.${this.#resource}.list`, {
+      ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+      ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+      workspaceName,
+    })
   }
 
   /**

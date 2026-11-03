@@ -13,6 +13,7 @@ import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface AirPlayDevice {
@@ -313,7 +314,12 @@ export interface MusicClient {
 }
 
 // @public
-export const musicContract: AppContract<MusicClient>;
+export const musicContract: AppContract<MusicClient, MusicResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type MusicResources = typeof resources;
 
 // @public
 export interface Playlist {

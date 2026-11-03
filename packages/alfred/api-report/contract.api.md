@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface AlfredClient {
@@ -21,7 +22,12 @@ export interface AlfredClient {
 }
 
 // @public
-export const alfredContract: AppContract<AlfredClient>;
+export const alfredContract: AppContract<AlfredClient, AlfredResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type AlfredResources = typeof resources;
 
 // @public
 export interface Application {

@@ -162,13 +162,21 @@ const trackRecordType: ValueType<Track> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<SpotifyClient>['resources'] = {
+const resources = {
   Track: {
     name: 'Track',
     record: trackRecordType,
     id: t.string({ description: 'The unique identifier of the track' }),
   },
-}
+} as const satisfies AppContract<SpotifyClient>['resources']
+
+/**
+ * The type of the resource table of {@link spotifyContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type SpotifyResources = typeof resources
 
 const appNextTrackOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'spotify.app.nextTrack',
@@ -292,7 +300,7 @@ function bind(runtime: ClientRuntime): SpotifyClient {
  * The Spotify contract. Pass it to a client factory to obtain a
  * {@link SpotifyClient}.
  */
-export const spotifyContract: AppContract<SpotifyClient> = {
+export const spotifyContract: AppContract<SpotifyClient, SpotifyResources> = {
   app: 'spotify',
   operations,
   resources,

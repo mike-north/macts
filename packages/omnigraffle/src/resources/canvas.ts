@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Canvas, CanvasCreateInput } from '../types.js'
 
@@ -23,8 +24,8 @@ export class CanvasResourceClient {
   /**
    * List all canvases, as one page.
    */
-  async list(): Promise<{ items: Canvas[] }> {
-    return this.#http.rpc<{ items: Canvas[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Canvas>> {
+    return this.#http.rpc<Page<Canvas>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

@@ -1034,7 +1034,7 @@ const sessionRecordType: ValueType<Session> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<iTermClient>['resources'] = {
+const resources = {
   Window: {
     name: 'Window',
     record: windowRecordType,
@@ -1049,7 +1049,15 @@ const resources: AppContract<iTermClient>['resources'] = {
     record: sessionRecordType,
     id: t.string({ description: 'The unique identifier of the session.' }),
   },
-}
+} as const satisfies AppContract<iTermClient>['resources']
+
+/**
+ * The type of the resource table of {@link iTermContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type iTermResources = typeof resources
 
 const appCountOperation: OperationDescriptor<{ readonly each?: string | undefined }, undefined> = {
   id: 'iterm.app.count',
@@ -1906,7 +1914,7 @@ function bind(runtime: ClientRuntime): iTermClient {
  * The iTerm contract. Pass it to a client factory to obtain a
  * {@link iTermClient}.
  */
-export const iTermContract: AppContract<iTermClient> = {
+export const iTermContract: AppContract<iTermClient, iTermResources> = {
   app: 'iterm',
   operations,
   resources,

@@ -385,7 +385,7 @@ const reminderCreateInputType: ValueType<ReminderCreateInput> = t.record({
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<RemindersClient>['resources'] = {
+const resources = {
   Account: {
     name: 'Account',
     record: accountRecordType,
@@ -406,7 +406,15 @@ const resources: AppContract<RemindersClient>['resources'] = {
     get: 'reminders.reminders.get',
     list: 'reminders.reminders.list',
   },
-}
+} as const satisfies AppContract<RemindersClient>['resources']
+
+/**
+ * The type of the resource table of {@link remindersContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type RemindersResources = typeof resources
 
 const listListOperation: OperationDescriptor<PageRequest, Page<List>> = {
   id: 'reminders.lists.list',
@@ -717,7 +725,7 @@ function bind(runtime: ClientRuntime): RemindersClient {
  * The Reminders contract. Pass it to a client factory to obtain a
  * {@link RemindersClient}.
  */
-export const remindersContract: AppContract<RemindersClient> = {
+export const remindersContract: AppContract<RemindersClient, RemindersResources> = {
   app: 'reminders',
   operations,
   resources,

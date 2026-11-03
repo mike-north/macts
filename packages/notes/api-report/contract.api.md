@@ -8,6 +8,7 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Account {
@@ -107,7 +108,12 @@ export interface NotesClient {
 }
 
 // @public
-export const notesContract: AppContract<NotesClient>;
+export const notesContract: AppContract<NotesClient, NotesResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type NotesResources = typeof resources;
 
 // @public
 export interface NoteUpdateInput {

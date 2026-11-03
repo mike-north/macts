@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Perspective } from '../types.js'
 
@@ -23,8 +24,8 @@ export class PerspectiveResourceClient {
   /**
    * List all perspectives, as one page.
    */
-  async list(): Promise<{ items: Perspective[] }> {
-    return this.#http.rpc<{ items: Perspective[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Perspective>> {
+    return this.#http.rpc<Page<Perspective>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

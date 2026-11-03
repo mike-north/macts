@@ -8,6 +8,7 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Document {
@@ -51,7 +52,12 @@ export interface QuickTimePlayerClient {
 }
 
 // @public
-export const quickTimePlayerContract: AppContract<QuickTimePlayerClient>;
+export const quickTimePlayerContract: AppContract<QuickTimePlayerClient, QuickTimePlayerResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type QuickTimePlayerResources = typeof resources;
 
 // (No @packageDocumentation comment for this package)
 

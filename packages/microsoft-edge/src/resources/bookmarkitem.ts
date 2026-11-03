@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { BookmarkItem } from '../types.js'
 
@@ -27,15 +28,12 @@ export class BookmarkItemResourceClient {
   async list(
     folderId: string,
     page: { pageSize?: number; cursor?: string } = {}
-  ): Promise<{ items: BookmarkItem[]; nextCursor?: string }> {
-    return this.#http.rpc<{ items: BookmarkItem[]; nextCursor?: string }>(
-      `${this.#app}.${this.#resource}.list`,
-      {
-        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-        folderId,
-      }
-    )
+  ): Promise<Page<BookmarkItem>> {
+    return this.#http.rpc<Page<BookmarkItem>>(`${this.#app}.${this.#resource}.list`, {
+      ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+      ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+      folderId,
+    })
   }
 
   /**

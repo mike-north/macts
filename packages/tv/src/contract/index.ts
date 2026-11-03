@@ -1285,7 +1285,7 @@ const videoWindowRecordType: ValueType<VideoWindow> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<TVClient>['resources'] = {
+const resources = {
   Artwork: {
     name: 'Artwork',
     record: artworkRecordType,
@@ -1334,7 +1334,15 @@ const resources: AppContract<TVClient>['resources'] = {
     name: 'VideoWindow',
     record: videoWindowRecordType,
   },
-}
+} as const satisfies AppContract<TVClient>['resources']
+
+/**
+ * The type of the resource table of {@link tvContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type TVResources = typeof resources
 
 const appCloseOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'tv.app.close',
@@ -1982,7 +1990,7 @@ function bind(runtime: ClientRuntime): TVClient {
  * The TV contract. Pass it to a client factory to obtain a
  * {@link TVClient}.
  */
-export const tvContract: AppContract<TVClient> = {
+export const tvContract: AppContract<TVClient, TVResources> = {
   app: 'tv',
   operations,
   resources,

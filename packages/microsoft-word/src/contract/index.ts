@@ -1392,7 +1392,7 @@ const fieldRecordType: ValueType<Field> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<MicrosoftWordClient>['resources'] = {
+const resources = {
   Document: {
     name: 'Document',
     record: documentRecordType,
@@ -1449,7 +1449,15 @@ const resources: AppContract<MicrosoftWordClient>['resources'] = {
     name: 'Field',
     record: fieldRecordType,
   },
-}
+} as const satisfies AppContract<MicrosoftWordClient>['resources']
+
+/**
+ * The type of the resource table of {@link microsoftWordContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type MicrosoftWordResources = typeof resources
 
 const documentListOperation: OperationDescriptor<Record<string, never>, Page<Document>> = {
   id: 'microsoft-word.documents.list',
@@ -1883,7 +1891,7 @@ function bind(runtime: ClientRuntime): MicrosoftWordClient {
  * The Microsoft Word contract. Pass it to a client factory to obtain a
  * {@link MicrosoftWordClient}.
  */
-export const microsoftWordContract: AppContract<MicrosoftWordClient> = {
+export const microsoftWordContract: AppContract<MicrosoftWordClient, MicrosoftWordResources> = {
   app: 'microsoft-word',
   operations,
   resources,

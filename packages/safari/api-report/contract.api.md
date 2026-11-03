@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Document {
@@ -39,7 +40,12 @@ export interface SafariClient {
 }
 
 // @public
-export const safariContract: AppContract<SafariClient>;
+export const safariContract: AppContract<SafariClient, SafariResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type SafariResources = typeof resources;
 
 // @public
 export interface Tab {

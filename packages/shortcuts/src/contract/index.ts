@@ -208,7 +208,7 @@ const folderRecordType: ValueType<Folder> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<ShortcutsClient>['resources'] = {
+const resources = {
   Shortcut: {
     name: 'Shortcut',
     record: shortcutRecordType,
@@ -223,7 +223,15 @@ const resources: AppContract<ShortcutsClient>['resources'] = {
     get: 'shortcuts.folders.get',
     list: 'shortcuts.folders.list',
   },
-}
+} as const satisfies AppContract<ShortcutsClient>['resources']
+
+/**
+ * The type of the resource table of {@link shortcutsContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type ShortcutsResources = typeof resources
 
 const shortcutListOperation: OperationDescriptor<PageRequest, Page<Shortcut>> = {
   id: 'shortcuts.shortcuts.list',
@@ -451,7 +459,7 @@ function bind(runtime: ClientRuntime): ShortcutsClient {
  * The Shortcuts contract. Pass it to a client factory to obtain a
  * {@link ShortcutsClient}.
  */
-export const shortcutsContract: AppContract<ShortcutsClient> = {
+export const shortcutsContract: AppContract<ShortcutsClient, ShortcutsResources> = {
   app: 'shortcuts',
   operations,
   resources,

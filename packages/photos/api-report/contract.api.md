@@ -10,6 +10,7 @@ import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Album {
@@ -152,7 +153,12 @@ export interface PhotosClient {
 }
 
 // @public
-export const photosContract: AppContract<PhotosClient>;
+export const photosContract: AppContract<PhotosClient, PhotosResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type PhotosResources = typeof resources;
 
 // (No @packageDocumentation comment for this package)
 

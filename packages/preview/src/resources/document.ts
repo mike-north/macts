@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Document } from '../types.js'
 
@@ -23,8 +24,8 @@ export class DocumentResourceClient {
   /**
    * List all documents, as one page.
    */
-  async list(): Promise<{ items: Document[] }> {
-    return this.#http.rpc<{ items: Document[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Document>> {
+    return this.#http.rpc<Page<Document>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

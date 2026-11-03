@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -43,10 +44,7 @@ export class FolderResourceClient {
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Folder[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Folder>>;
 }
 
 // @public (undocumented)
@@ -92,10 +90,7 @@ export class ShortcutResourceClient {
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Shortcut[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Shortcut>>;
     run(id: string, withInput?: unknown): Promise<void>;
 }
 

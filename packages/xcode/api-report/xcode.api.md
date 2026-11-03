@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -243,10 +244,7 @@ export class ProjectResourceClient {
     list(workspaceName: string, page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Project[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Project>>;
 }
 
 // @public (undocumented)
@@ -298,9 +296,7 @@ export type RunDestinationCreateInput = Record<string, never>;
 export class RunDestinationResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<RunDestination>;
-    list(workspaceName: string): Promise<{
-        items: RunDestination[];
-    }>;
+    list(workspaceName: string): Promise<Page<RunDestination>>;
 }
 
 // @public (undocumented)
@@ -363,10 +359,7 @@ export class SchemeResourceClient {
     list(workspaceName: string, page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Scheme[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Scheme>>;
 }
 
 // @public (undocumented)
@@ -536,9 +529,7 @@ export class WorkspaceDocumentResourceClient {
     clean(workspaceName: string): Promise<void>;
     debug(workspaceName: string, scheme?: string, runDestinationSpecifier?: string, skipBuilding?: boolean, commandLineArguments?: unknown, environmentVariables?: unknown): Promise<void>;
     get(name: string): Promise<WorkspaceDocument>;
-    list(): Promise<{
-        items: WorkspaceDocument[];
-    }>;
+    list(): Promise<Page<WorkspaceDocument>>;
     run(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void>;
     stop(workspaceName: string): Promise<void>;
     test(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void>;

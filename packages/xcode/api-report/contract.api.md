@@ -12,6 +12,7 @@ import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface AnalyzerIssue {
@@ -412,7 +413,12 @@ export interface XcodeClient {
 }
 
 // @public
-export const xcodeContract: AppContract<XcodeClient>;
+export const xcodeContract: AppContract<XcodeClient, XcodeResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type XcodeResources = typeof resources;
 
 // (No @packageDocumentation comment for this package)
 

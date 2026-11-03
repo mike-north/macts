@@ -335,7 +335,7 @@ const spaceRecordType: ValueType<Space> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<ArcClient>['resources'] = {
+const resources = {
   Window: {
     name: 'Window',
     record: windowRecordType,
@@ -351,7 +351,15 @@ const resources: AppContract<ArcClient>['resources'] = {
     record: spaceRecordType,
     id: t.string({ description: 'The unique identifier of the space.' }),
   },
-}
+} as const satisfies AppContract<ArcClient>['resources']
+
+/**
+ * The type of the resource table of {@link arcContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type ArcResources = typeof resources
 
 const appMakeOperation: OperationDescriptor<
   { readonly new: string; readonly withProperties?: unknown },
@@ -633,7 +641,7 @@ function bind(runtime: ClientRuntime): ArcClient {
  * The Arc contract. Pass it to a client factory to obtain a
  * {@link ArcClient}.
  */
-export const arcContract: AppContract<ArcClient> = {
+export const arcContract: AppContract<ArcClient, ArcResources> = {
   app: 'arc',
   operations,
   resources,

@@ -9,6 +9,7 @@ import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Assignment {
@@ -125,7 +126,12 @@ export interface OmniPlanClient {
 }
 
 // @public
-export const omniPlanContract: AppContract<OmniPlanClient>;
+export const omniPlanContract: AppContract<OmniPlanClient, OmniPlanResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type OmniPlanResources = typeof resources;
 
 // @public
 export interface Project {

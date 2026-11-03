@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Event, EventCreateInput, EventUpdateInput } from '../types.js'
 
@@ -23,8 +24,8 @@ export class EventResourceClient {
   /**
    * List the events of one calendar, as one page.
    */
-  async list(calendarId: string): Promise<{ items: Event[] }> {
-    return this.#http.rpc<{ items: Event[] }>(`${this.#app}.${this.#resource}.list`, { calendarId })
+  async list(calendarId: string): Promise<Page<Event>> {
+    return this.#http.rpc<Page<Event>>(`${this.#app}.${this.#resource}.list`, { calendarId })
   }
 
   /**

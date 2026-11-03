@@ -706,7 +706,7 @@ const eventCreateInputType: ValueType<EventCreateInput> = t.record({
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<CalendarClient>['resources'] = {
+const resources = {
   Calendar: {
     name: 'Calendar',
     record: calendarRecordType,
@@ -741,7 +741,15 @@ const resources: AppContract<CalendarClient>['resources'] = {
     name: 'OpenFileAlarm',
     record: openFileAlarmRecordType,
   },
-}
+} as const satisfies AppContract<CalendarClient>['resources']
+
+/**
+ * The type of the resource table of {@link calendarContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type CalendarResources = typeof resources
 
 const calendarListOperation: OperationDescriptor<Record<string, never>, Page<Calendar>> = {
   id: 'calendar.calendars.list',
@@ -1233,7 +1241,7 @@ function bind(runtime: ClientRuntime): CalendarClient {
  * The Calendar contract. Pass it to a client factory to obtain a
  * {@link CalendarClient}.
  */
-export const calendarContract: AppContract<CalendarClient> = {
+export const calendarContract: AppContract<CalendarClient, CalendarResources> = {
   app: 'calendar',
   operations,
   resources,

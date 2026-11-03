@@ -1003,7 +1003,7 @@ const columnRecordType: ValueType<Column> = t.record(
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<FinderClient>['resources'] = {
+const resources = {
   Container: {
     name: 'Container',
     record: containerRecordType,
@@ -1065,7 +1065,15 @@ const resources: AppContract<FinderClient>['resources'] = {
     name: 'Column',
     record: columnRecordType,
   },
-}
+} as const satisfies AppContract<FinderClient>['resources']
+
+/**
+ * The type of the resource table of {@link finderContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type FinderResources = typeof resources
 
 const appOpenOperation: OperationDescriptor<
   { readonly using?: string | undefined; readonly withProperties?: unknown },
@@ -1952,7 +1960,7 @@ function bind(runtime: ClientRuntime): FinderClient {
  * The Finder contract. Pass it to a client factory to obtain a
  * {@link FinderClient}.
  */
-export const finderContract: AppContract<FinderClient> = {
+export const finderContract: AppContract<FinderClient, FinderResources> = {
   app: 'finder',
   operations,
   resources,

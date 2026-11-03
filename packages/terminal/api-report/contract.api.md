@@ -7,6 +7,7 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface SettingsSet {
@@ -86,7 +87,12 @@ export interface TerminalClient {
 }
 
 // @public
-export const terminalContract: AppContract<TerminalClient>;
+export const terminalContract: AppContract<TerminalClient, TerminalResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type TerminalResources = typeof resources;
 
 // @public
 export interface Window {

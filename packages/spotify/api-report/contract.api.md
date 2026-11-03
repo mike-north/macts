@@ -7,6 +7,7 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export type PlayerState = 'stopped' | 'playing' | 'paused';
@@ -22,7 +23,12 @@ export interface SpotifyClient {
 }
 
 // @public
-export const spotifyContract: AppContract<SpotifyClient>;
+export const spotifyContract: AppContract<SpotifyClient, SpotifyResources>;
+
+// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type SpotifyResources = typeof resources;
 
 // @public
 export interface Track {

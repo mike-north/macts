@@ -139,7 +139,7 @@ const documentCreateInputType: ValueType<DocumentCreateInput> = t.record({
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<ScriptEditorClient>['resources'] = {
+const resources = {
   Document: {
     name: 'Document',
     record: documentRecordType,
@@ -147,7 +147,15 @@ const resources: AppContract<ScriptEditorClient>['resources'] = {
     get: 'script-editor.documents.get',
     list: 'script-editor.documents.list',
   },
-}
+} as const satisfies AppContract<ScriptEditorClient>['resources']
+
+/**
+ * The type of the resource table of {@link scriptEditorContract}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so `bindReference`
+ * admits only references the contract can resolve.
+ */
+export type ScriptEditorResources = typeof resources
 
 const documentListOperation: OperationDescriptor<Record<string, never>, Page<Document>> = {
   id: 'script-editor.documents.list',
@@ -226,7 +234,7 @@ function bind(runtime: ClientRuntime): ScriptEditorClient {
  * The Script Editor contract. Pass it to a client factory to obtain a
  * {@link ScriptEditorClient}.
  */
-export const scriptEditorContract: AppContract<ScriptEditorClient> = {
+export const scriptEditorContract: AppContract<ScriptEditorClient, ScriptEditorResources> = {
   app: 'script-editor',
   operations,
   resources,
