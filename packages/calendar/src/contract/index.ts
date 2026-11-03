@@ -643,8 +643,9 @@ const eventCreateInputType: ValueType<EventCreateInput> = t.record({
 /**
  * The type of the resource table of {@link calendarContract}: every resource a
  * reference can name, keyed by manifest resource key, with its record type,
- * its identifier type (when it has one), and the operations that resolve
- * references to it. A client created from the contract carries it, so
+ * its identifier type (when it has one), the operations that resolve
+ * references to it, and, for a resource the app finds only within another,
+ * that parent resource. A client created from the contract carries it, so
  * `bindReference` admits only references the contract can resolve.
  */
 export type CalendarResources = Readonly<{
@@ -657,6 +658,7 @@ export type CalendarResources = Readonly<{
     readonly id: ValueType<string>
     readonly get: 'calendar.events.get'
     readonly list: 'calendar.events.list'
+    readonly parent: 'Calendar'
   }
 }>
 
@@ -682,6 +684,7 @@ const resources = {
     id: t.string({ description: 'A unique event key' }),
     get: 'calendar.events.get',
     list: 'calendar.events.list',
+    parent: 'Calendar',
   },
 } satisfies CalendarResources
 

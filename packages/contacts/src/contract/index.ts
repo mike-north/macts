@@ -1191,8 +1191,9 @@ const phoneRecordType: ValueType<Phone> = t.record(
 /**
  * The type of the resource table of {@link contactsContract}: every resource a
  * reference can name, keyed by manifest resource key, with its record type,
- * its identifier type (when it has one), and the operations that resolve
- * references to it. A client created from the contract carries it, so
+ * its identifier type (when it has one), the operations that resolve
+ * references to it, and, for a resource the app finds only within another,
+ * that parent resource. A client created from the contract carries it, so
  * `bindReference` admits only references the contract can resolve.
  */
 export type ContactsResources = Readonly<{
@@ -1200,11 +1201,13 @@ export type ContactsResources = Readonly<{
     readonly id: ValueType<string>
     readonly get: 'contacts.addresses.get'
     readonly list: 'contacts.addresses.list'
+    readonly parent: 'Person'
   }
   Email: ResourceDescriptor<Email, string> & {
     readonly id: ValueType<string>
     readonly get: 'contacts.emails.get'
     readonly list: 'contacts.emails.list'
+    readonly parent: 'Person'
   }
   Group: ResourceDescriptor<Group, string> & {
     readonly id: ValueType<string>
@@ -1220,6 +1223,7 @@ export type ContactsResources = Readonly<{
     readonly id: ValueType<string>
     readonly get: 'contacts.phones.get'
     readonly list: 'contacts.phones.list'
+    readonly parent: 'Person'
   }
 }>
 
@@ -1238,6 +1242,7 @@ const resources = {
     id: t.string({ description: 'unique identifier for this address.' }),
     get: 'contacts.addresses.get',
     list: 'contacts.addresses.list',
+    parent: 'Person',
   },
   Email: {
     name: 'Email',
@@ -1245,6 +1250,7 @@ const resources = {
     id: t.string({ description: 'Unique identifier for this email' }),
     get: 'contacts.emails.get',
     list: 'contacts.emails.list',
+    parent: 'Person',
   },
   Group: {
     name: 'Group',
@@ -1266,6 +1272,7 @@ const resources = {
     id: t.string({ description: 'Unique identifier for this phone' }),
     get: 'contacts.phones.get',
     list: 'contacts.phones.list',
+    parent: 'Person',
   },
 } satisfies ContactsResources
 
@@ -1908,9 +1915,23 @@ const appActionTitleOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'unique identifier for this address.' },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
@@ -1920,9 +1941,23 @@ const appActionTitleOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'Unique identifier for this email' },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
@@ -1962,15 +1997,29 @@ const appActionTitleOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'Unique identifier for this phone' },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
+              resource: { type: 'string', enum: ['Group', 'Person'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -2000,6 +2049,153 @@ const appActionTitleOperation: OperationDescriptor<
               container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
             },
             required: ['resource', 'form', 'cardinality', 'selector'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Address' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Email' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Phone' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
             additionalProperties: false,
           },
         ],
@@ -2013,9 +2209,23 @@ const appActionTitleOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'unique identifier for this address.' },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
@@ -2025,9 +2235,23 @@ const appActionTitleOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'Unique identifier for this email' },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
@@ -2067,15 +2291,29 @@ const appActionTitleOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'Unique identifier for this phone' },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
+              resource: { type: 'string', enum: ['Group', 'Person'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -2105,6 +2343,153 @@ const appActionTitleOperation: OperationDescriptor<
               container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
             },
             required: ['resource', 'form', 'cardinality', 'selector'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Address' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Email' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Phone' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
             additionalProperties: false,
           },
         ],
@@ -2287,9 +2672,23 @@ const appPerformActionOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'unique identifier for this address.' },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
@@ -2299,9 +2698,23 @@ const appPerformActionOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'Unique identifier for this email' },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
@@ -2341,15 +2754,29 @@ const appPerformActionOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'Unique identifier for this phone' },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
+              resource: { type: 'string', enum: ['Group', 'Person'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -2379,6 +2806,153 @@ const appPerformActionOperation: OperationDescriptor<
               container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
             },
             required: ['resource', 'form', 'cardinality', 'selector'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Address' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Email' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Phone' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
             additionalProperties: false,
           },
         ],
@@ -2392,9 +2966,23 @@ const appPerformActionOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'unique identifier for this address.' },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
@@ -2404,9 +2992,23 @@ const appPerformActionOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'Unique identifier for this email' },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
@@ -2446,15 +3048,29 @@ const appPerformActionOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'Unique identifier for this phone' },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
+              resource: { type: 'string', enum: ['Group', 'Person'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -2484,6 +3100,153 @@ const appPerformActionOperation: OperationDescriptor<
               container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
             },
             required: ['resource', 'form', 'cardinality', 'selector'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Address' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Email' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Phone' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
             additionalProperties: false,
           },
         ],
@@ -2667,9 +3430,23 @@ const appShouldEnableActionOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'unique identifier for this address.' },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
@@ -2679,9 +3456,23 @@ const appShouldEnableActionOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'Unique identifier for this email' },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
@@ -2721,15 +3512,29 @@ const appShouldEnableActionOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'Unique identifier for this phone' },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
+              resource: { type: 'string', enum: ['Group', 'Person'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -2759,6 +3564,153 @@ const appShouldEnableActionOperation: OperationDescriptor<
               container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
             },
             required: ['resource', 'form', 'cardinality', 'selector'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Address' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Email' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Phone' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
             additionalProperties: false,
           },
         ],
@@ -2772,9 +3724,23 @@ const appShouldEnableActionOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'unique identifier for this address.' },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
@@ -2784,9 +3750,23 @@ const appShouldEnableActionOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'Unique identifier for this email' },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
@@ -2826,15 +3806,29 @@ const appShouldEnableActionOperation: OperationDescriptor<
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: { type: 'string', description: 'Unique identifier for this phone' },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
             },
-            required: ['resource', 'form', 'cardinality', 'id'],
+            required: ['resource', 'form', 'cardinality', 'id', 'container'],
             additionalProperties: false,
           },
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
+              resource: { type: 'string', enum: ['Group', 'Person'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -2864,6 +3858,153 @@ const appShouldEnableActionOperation: OperationDescriptor<
               container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
             },
             required: ['resource', 'form', 'cardinality', 'selector'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Address' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Email' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Phone' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
+                  },
+                  container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector', 'container'],
             additionalProperties: false,
           },
         ],

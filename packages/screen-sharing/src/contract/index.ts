@@ -47,8 +47,9 @@ export interface ScreenSharingClient extends ClientBrand<ScreenSharingResources>
 /**
  * The type of the resource table of {@link screenSharingContract}: every resource a
  * reference can name, keyed by manifest resource key, with its record type,
- * its identifier type (when it has one), and the operations that resolve
- * references to it. A client created from the contract carries it, so
+ * its identifier type (when it has one), the operations that resolve
+ * references to it, and, for a resource the app finds only within another,
+ * that parent resource. A client created from the contract carries it, so
  * `bindReference` admits only references the contract can resolve.
  */
 export type ScreenSharingResources = Readonly<Record<never, never>>
