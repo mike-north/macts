@@ -372,6 +372,17 @@ export const manifest: unknown = {
         status: 'probed',
         skipped: [],
       },
+      rangeRead: {
+        supported: true,
+        evidence: {
+          source: 'probe',
+          observedAt: '2026-11-03T17:58:55.000Z',
+          bundleId: 'com.apple.Notes',
+          appVersion: '4.13',
+          osVersion: '27.2',
+          note: 'Read-only pages of the attachments at the application: a first page of 25, and pages of 2 continued by cursor across a page boundary, each read as a range of the collection.',
+        },
+      },
     },
   },
   enums: {},

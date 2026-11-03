@@ -150,6 +150,17 @@ export const manifest: unknown = {
           },
         },
       ],
+      rangeRead: {
+        supported: true,
+        evidence: {
+          source: 'probe',
+          observedAt: '2026-11-03T17:59:44.000Z',
+          bundleId: 'com.apple.shortcuts',
+          appVersion: '10.0',
+          osVersion: '27.2',
+          note: 'Read-only pages of the folders at the application, at page sizes 25, 2 and 1. The collection held one folder, so no page continued past the first.',
+        },
+      },
     },
   },
   enums: {},

@@ -22,18 +22,10 @@ export class TabResourceClient {
   }
 
   /**
-   * List the tabs of one window, one page at a time. When the result has a `nextCursor`,
-   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
+   * List the tabs of one window, as one page.
    */
-  async list(
-    windowId: string,
-    page: { pageSize?: number; cursor?: string } = {}
-  ): Promise<Page<Tab>> {
-    return this.#http.rpc<Page<Tab>>(`${this.#app}.${this.#resource}.list`, {
-      ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-      ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-      windowId,
-    })
+  async list(windowId: string): Promise<Page<Tab>> {
+    return this.#http.rpc<Page<Tab>>(`${this.#app}.${this.#resource}.list`, { windowId })
   }
 
   /**

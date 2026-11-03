@@ -107,7 +107,7 @@ export interface MediaItemCreateInput {
 export interface MediaItemResourceClient {
     duplicate(id: string, options?: CallOptions): Promise<void>;
     get(id: string, options?: CallOptions): Promise<MediaItem>;
-    list(page?: PageRequest, options?: CallOptions): Promise<Page<MediaItem>>;
+    list(options?: CallOptions): Promise<Page<MediaItem>>;
 }
 
 // @public

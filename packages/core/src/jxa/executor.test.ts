@@ -22,7 +22,12 @@ import {
   runWithApp,
   JxaExecutionError,
 } from './executor.js'
-import { NATIVE_CODEC, type NativeCodec, type NativeScript } from './native-codec.js'
+import {
+  NATIVE_CODEC,
+  type NativeCodec,
+  type NativeReferenceTable,
+  type NativeScript,
+} from './native-codec.js'
 
 describe('runJxa', () => {
   it('should execute simple JXA code', async () => {
@@ -180,6 +185,7 @@ const HOST_TEST_TIMEOUT_MS = 30000
 const INTEGER: ValuePlan = { kind: 'integer' }
 const DOUBLE: ValuePlan = { kind: 'double' }
 const DATE: ValuePlan = { kind: 'date' }
+const PERSON_REF: ValuePlan = { kind: 'reference', resource: 'Person', cardinality: 'one' }
 const recordOf = (fields: Record<string, FieldPlan>): ValuePlan => ({ kind: 'record', fields })
 const required = (value: ValuePlan): FieldPlan => ({ value, presence: 'required' })
 
@@ -191,38 +197,75 @@ function nativeScript(overrides: Partial<NativeScript>): NativeScript {
     input: {},
     inputPlan: PASSTHROUGH_PLAN,
     outputPlan: PASSTHROUGH_PLAN,
+    references: {},
     ...overrides,
   }
 }
 
 describe('composeNativeScript', () => {
-  it('embeds input and plans as JSON string literals, never as object literals or code', () => {
+  it('embeds input, plans and references as JSON string literals, never as object literals or code', () => {
     const input = { first: 'SENTINEL_FIRST_3c1d', second: 'SENTINEL_SECOND_8e2a' }
     const inputPlan = recordOf({
       first: required({ kind: 'string' }),
       second: required({ kind: 'string' }),
     })
+    const references: NativeReferenceTable = {
+      SENTINEL_RESOURCE_51f0: {
+        id: { kind: 'string' },
+        addressing: { collection: 'people', lookup: 'byId', property: 'id' },
+      },
+    }
     const source = composeNativeScript(
-      nativeScript({ bundleId: 'com.apple.Notes', body: 'return args;', input, inputPlan }),
+      nativeScript({
+        bundleId: 'com.apple.Notes',
+        body: 'return args;',
+        input,
+        inputPlan,
+        references,
+      }),
       NATIVE_CODEC
     )
     const lines = source.split('\n')
     const argsLine = lines.find((line) => line.trimStart().startsWith('var args = '))
+    const envLine = lines.find((line) => line.trimStart().startsWith('var env = '))
     expect(argsLine?.trim()).toBe(
-      `var args = __mactsDecode(JSON.parse(${JSON.stringify(JSON.stringify(input))}), JSON.parse(${JSON.stringify(JSON.stringify(inputPlan))}));`
+      `var args = __mactsDecode(JSON.parse(${JSON.stringify(JSON.stringify(input))}), JSON.parse(${JSON.stringify(JSON.stringify(inputPlan))}), env);`
     )
-    const others = lines.filter((line) => line !== argsLine).join('\n')
-    for (const sentinel of Object.values(input)) {
+    expect(envLine?.trim()).toBe(
+      `var env = { app: app, references: JSON.parse(${JSON.stringify(JSON.stringify(references))}) };`
+    )
+    const others = lines.filter((line) => line !== argsLine && line !== envLine).join('\n')
+    for (const sentinel of [...Object.values(input), 'SENTINEL_RESOURCE_51f0']) {
       expect(others).not.toContain(sentinel)
     }
     expect(source).toContain('Application("com.apple.Notes")')
-    // Decoding comes before the app is addressed, so input the codec cannot
-    // convert never reaches the app.
-    expect(source.indexOf('var args = ')).toBeLessThan(source.indexOf('Application('))
+    expect(source).toContain(
+      'return { ok: true, value: __mactsEncode(value, JSON.parse("{\\"kind\\":\\"passthrough\\"}"), env) };'
+    )
     expect(source).toContain('(function (app, args, page) {\nreturn args;\n')
     // With no page window, the body's `page` argument is embedded null.
     expect(source).toContain(`})(app, args, JSON.parse(${JSON.stringify('null')}));`)
     expect(source.trimEnd().endsWith('JSON.stringify(__mactsOutcome);')).toBe(true)
+  })
+
+  it('creates the app before decoding, and runs the body only after the input decoded', () => {
+    // Addressing a reference needs the app, so decoding follows it. Creating
+    // the app object sends it nothing; the body, which sends the command,
+    // runs only once the whole input has decoded.
+    const source = composeNativeScript(
+      nativeScript({ body: 'return SENTINEL_BODY_77aa;' }),
+      NATIVE_CODEC
+    )
+    const app = source.indexOf('var app = Application(')
+    const env = source.indexOf('var env = ')
+    const decode = source.indexOf('var args = __mactsDecode(')
+    const body = source.indexOf('SENTINEL_BODY_77aa')
+    const encode = source.indexOf('__mactsEncode(value, ')
+    expect(app).toBeGreaterThan(-1)
+    expect(app).toBeLessThan(env)
+    expect(env).toBeLessThan(decode)
+    expect(decode).toBeLessThan(body)
+    expect(body).toBeLessThan(encode)
   })
 
   it('embeds a page window as a JSON string literal, never as code', () => {
@@ -410,19 +453,20 @@ describe('runNativeScript', () => {
   )
 
   it(
-    'reports a reference input as a codec decode failure marked with its kind, before the app is addressed',
+    'reports a reference it cannot convert as a marked decode failure, and never runs the body',
     async () => {
-      // Regression: a reference position failed decode like invalid input.
-      // The bundle identifier has no installed app, so addressing it would
-      // fail as an app failure; a decode failure proves decode came first.
+      // The script lists no reference table entry for Person, so the codec
+      // cannot address the person; the body, which would send the command,
+      // must not run.
       const outcome = await runNativeScript(
         nativeScript({
-          bundleId: 'com.example.macts.not-installed',
           body: "var error = new Error('the body ran'); error.errorNumber = -1; throw error;",
-          input: { for: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' } },
-          inputPlan: recordOf({
-            for: required({ kind: 'reference', resource: 'Person', cardinality: 'one' }),
-          }),
+          input: {
+            for: {
+              reference: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' },
+            },
+          },
+          inputPlan: recordOf({ for: required(PERSON_REF) }),
         }),
         NATIVE_CODEC
       )
@@ -432,8 +476,63 @@ describe('runNativeScript', () => {
           source: 'codec',
           direction: 'decode',
           path: ['for'],
-          message: 'Reference values have no conversion in this codec',
+          message:
+            'References to "Person" have no conversion in this codec: the app does not find its objects at the application by their identifier',
           unsupportedKind: 'reference',
+        },
+      })
+    },
+    HOST_TEST_TIMEOUT_MS
+  )
+
+  it(
+    'encodes an object at a reference position with the reference table it carries',
+    async () => {
+      // The body returns a stand-in object with an identifier member, as an
+      // app object has; the codec reads it through the table's addressing.
+      const outcome = await runNativeScript(
+        nativeScript({
+          body: "return { id: function () { return 'p-1'; } };",
+          outputPlan: PERSON_REF,
+          references: {
+            Person: {
+              id: { kind: 'string' },
+              addressing: { collection: 'people', lookup: 'byId', property: 'id' },
+            },
+          },
+        }),
+        NATIVE_CODEC
+      )
+      expect(outcome).toEqual({
+        ok: true,
+        value: {
+          reference: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' },
+        },
+      })
+    },
+    HOST_TEST_TIMEOUT_MS
+  )
+
+  it(
+    'keeps the missing resource of a codec failure in the outcome',
+    async () => {
+      // The catch clause describes a missing referenced object exactly as the
+      // codec throws it; the body throws that shape itself, so no app is
+      // addressed.
+      const outcome = await runNativeScript(
+        nativeScript({
+          body: "throw { name: 'MactsCodecError', direction: 'decode', path: ['for'], message: 'missing', missingResource: 'Person' };",
+        }),
+        NATIVE_CODEC
+      )
+      expect(outcome).toEqual({
+        ok: false,
+        failure: {
+          source: 'codec',
+          direction: 'decode',
+          path: ['for'],
+          message: 'missing',
+          missingResource: 'Person',
         },
       })
     },
@@ -570,6 +669,14 @@ describe('runNativeScript', () => {
       [
         'a codec failure with a non-text unsupported kind',
         '{"ok":false,"failure":{"source":"codec","direction":"decode","path":[],"message":"m","unsupportedKind":1}}',
+      ],
+      [
+        'a codec failure with a non-text missing resource',
+        '{"ok":false,"failure":{"source":"codec","direction":"decode","path":[],"message":"m","missingResource":1}}',
+      ],
+      [
+        'a codec failure that is both unsupported and missing',
+        '{"ok":false,"failure":{"source":"codec","direction":"decode","path":[],"message":"m","unsupportedKind":"reference","missingResource":"Person"}}',
       ],
     ])(
       'rejects %s as a malformed outcome',

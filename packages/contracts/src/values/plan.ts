@@ -100,3 +100,34 @@ export type ValuePlanKind = ValuePlan['kind']
 export const PASSTHROUGH_PLAN: Extract<ValuePlan, { readonly kind: 'passthrough' }> = Object.freeze(
   { kind: 'passthrough' }
 )
+
+/**
+ * The value plans of an app's resources, keyed by manifest resource key: what
+ * an executor needs to convert references to them inside the automation
+ * process.
+ *
+ * @remarks
+ * It mirrors the app contract's resource table (`ReferenceRegistry`) and is
+ * derived from it (`resourcePlanTable`), so the two cannot disagree. `id` is
+ * the plan of the resource's identifier value type, the one a reference's
+ * `id` is wire-encoded by; it is absent for a resource with no identifier,
+ * whose references have only selector forms. Each entry is an
+ * object, so a later per-resource field does not change the table's shape.
+ *
+ * It holds plans only. Which native property carries an identifier, and how
+ * an object is found from it, is manifest knowledge that stays with the
+ * executor.
+ *
+ * A caller with no contract for the app (an app registered from its manifest
+ * alone) passes {@link EMPTY_RESOURCE_PLAN_TABLE}: no reference converts.
+ */
+export type ResourcePlanTable = Readonly<Record<string, ResourcePlans>>
+
+/** The value plans of one resource in a {@link ResourcePlanTable}. */
+export interface ResourcePlans {
+  /** The plan of the resource's identifier; absent when it has none. */
+  readonly id?: ValuePlan
+}
+
+/** The table of an app that has no contract: no resource has plans. */
+export const EMPTY_RESOURCE_PLAN_TABLE: ResourcePlanTable = Object.freeze({})

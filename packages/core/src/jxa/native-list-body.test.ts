@@ -31,6 +31,7 @@
 import { createContext, runInContext } from 'node:vm'
 import { describe, expect, it } from 'vitest'
 import {
+  EMPTY_RESOURCE_PLAN_TABLE,
   PASSTHROUGH_PLAN,
   TargetNotFoundError,
   UnexpectedValueError,
@@ -108,6 +109,14 @@ resources:
         primary: true
         unique: true
         evidence: { unique: { source: curated, note: Every task has its own uid } }
+    rangeRead:
+      supported: true
+      evidence:
+        source: probe
+        observedAt: '2026-01-15T10:30:00.000Z'
+        bundleId: com.example.planner
+        appVersion: '1.0'
+        osVersion: '27.2'
   Folder:
     name: Folder
     plural: Folders
@@ -426,6 +435,7 @@ async function listBoth(
     input: options.input ?? {},
     inputPlan: PASSTHROUGH_PLAN,
     outputPlan,
+    resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
   }
   const batchedApp = fakePlanner(rows, options.faults)
   const batched = await settle(
@@ -840,6 +850,7 @@ describe('list bodies: the identifier read is never guarded', () => {
         input: SHELF_INPUT,
         inputPlan: PASSTHROUGH_PLAN,
         outputPlan: PASSTHROUGH_PLAN,
+        resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
       })
     )
     expect(errorOf(result)).toBeInstanceOf(AppOperationError)
@@ -1143,6 +1154,7 @@ async function readWindow(
       input: SHELF_INPUT,
       inputPlan: PASSTHROUGH_PLAN,
       outputPlan,
+      resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
       page,
     })
   )
@@ -1183,11 +1195,21 @@ describe('paged list bodies: which lists may page', () => {
     { label: 'whose resource has no identifier', target: MEMOS },
   ])('refuses to build a paged body for a list $label', ({ target }) => {
     expect(() => buildNativeBody(planner, target, { paged: true })).toThrow(
-      'A list whose primary identifier is not claimed unique cannot be paged.'
+      'A list cannot be paged unless its primary identifier is claimed unique and its collection is known to read ranges.'
     )
   })
 
-  it('builds a paged body for a list whose identifier is claimed unique', () => {
+  it('refuses to build a paged body for a unique identifier whose range read is not recorded', () => {
+    const unobserved = structuredClone(planner)
+    const tasks = unobserved.resources['Task']
+    if (tasks === undefined) throw new Error('fixture has no Task resource')
+    delete tasks.rangeRead
+    expect(() => buildNativeBody(unobserved, TASKS, { paged: true })).toThrow(
+      'A list cannot be paged unless its primary identifier is claimed unique and its collection is known to read ranges.'
+    )
+  })
+
+  it('builds a paged body for a list whose identifier is claimed unique and whose range reads passed', () => {
     expect(buildNativeBody(planner, TASKS, { paged: true })).toContain('anchorHolds')
   })
 })
@@ -1425,6 +1447,7 @@ describe('paged list bodies: what can page', () => {
         input: {},
         inputPlan: PASSTHROUGH_PLAN,
         outputPlan: PASSTHROUGH_PLAN,
+        resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
         page: { offset: 0, size: 25 },
       })
     )

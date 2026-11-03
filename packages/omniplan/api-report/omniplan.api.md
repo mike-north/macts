@@ -305,10 +305,7 @@ export interface ScenarioCreateInput {
 export class ScenarioResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Scenario>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<Page<Scenario>>;
+    list(): Promise<Page<Scenario>>;
 }
 
 // @public (undocumented)

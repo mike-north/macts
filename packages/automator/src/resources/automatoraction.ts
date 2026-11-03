@@ -22,16 +22,10 @@ export class AutomatorActionResourceClient {
   }
 
   /**
-   * List the automator actions of one workflow, one page at a time. When the result has a `nextCursor`,
-   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
+   * List the automator actions of one workflow, as one page.
    */
-  async list(
-    workflowName: string,
-    page: { pageSize?: number; cursor?: string } = {}
-  ): Promise<Page<AutomatorAction>> {
+  async list(workflowName: string): Promise<Page<AutomatorAction>> {
     return this.#http.rpc<Page<AutomatorAction>>(`${this.#app}.${this.#resource}.list`, {
-      ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-      ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
       workflowName,
     })
   }

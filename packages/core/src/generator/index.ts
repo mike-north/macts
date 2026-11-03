@@ -89,6 +89,9 @@ export {
   type GenerateServerPackageResult,
 } from './server/index.js'
 
+// The resource plans a generated contract carries, for hosts that check a contract against its manifest
+export { contractResourcePlans } from './contract/index.js'
+
 // Capability metadata module generator (per-app machine-readable risk metadata)
 export { generateCapabilitiesModule } from './capabilities/index.js'
 

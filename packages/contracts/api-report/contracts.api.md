@@ -182,6 +182,9 @@ export type DynamicWireValue = string | boolean | null | WireInteger | WireDoubl
 export const DynamicWireValueSchema: z.ZodType<DynamicWireValue>;
 
 // @public
+export const EMPTY_RESOURCE_PLAN_TABLE: ResourcePlanTable;
+
+// @public
 export const ERROR_CLASSES: {
     readonly [C in WireErrorCode]: MactsErrorConstructor<C>;
 };
@@ -791,6 +794,17 @@ export interface ResourceDescriptor<RecordType, Id = unknown> {
 export type ResourceIdOf<Resources extends ResourceTable, Key extends string> = string extends keyof Resources ? unknown : Key extends keyof Resources ? Resources[Key] extends {
     readonly id: ValueType<infer Id>;
 } ? Id : never : never;
+
+// @public
+export interface ResourcePlans {
+    readonly id?: ValuePlan;
+}
+
+// @public
+export type ResourcePlanTable = Readonly<Record<string, ResourcePlans>>;
+
+// @public
+export function resourcePlanTable(resources: ReferenceRegistry): ResourcePlanTable;
 
 // @public
 export type ResourceRecordOf<Resources extends ResourceTable, Key extends string> = Key extends keyof Resources ? Resources[Key] extends {

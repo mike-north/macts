@@ -84,6 +84,17 @@ export const manifest: unknown = {
         status: 'probed',
         skipped: [],
       },
+      rangeRead: {
+        supported: true,
+        evidence: {
+          source: 'probe',
+          observedAt: '2026-11-03T17:59:10.000Z',
+          bundleId: 'com.apple.reminders',
+          appVersion: '7.0',
+          osVersion: '27.2',
+          note: 'Read-only pages of the accounts at the application, at page sizes 25, 2 and 1. The collection held one account, so no page continued past the first.',
+        },
+      },
     },
     List: {
       name: 'List',
@@ -169,6 +180,17 @@ export const manifest: unknown = {
         sampledParents: 1,
         status: 'probed',
         skipped: [],
+      },
+      rangeRead: {
+        supported: true,
+        evidence: {
+          source: 'probe',
+          observedAt: '2026-11-03T17:59:10.000Z',
+          bundleId: 'com.apple.reminders',
+          appVersion: '7.0',
+          osVersion: '27.2',
+          note: 'Read-only pages of the lists at the application: a first page of 25, and pages of 2 continued by cursor to the last list, each read as a range of the collection.',
+        },
       },
     },
     Reminder: {
@@ -414,6 +436,17 @@ export const manifest: unknown = {
         sampledParents: 2,
         status: 'probed',
         skipped: ['body'],
+      },
+      rangeRead: {
+        supported: true,
+        evidence: {
+          source: 'probe',
+          observedAt: '2026-11-03T17:59:10.000Z',
+          bundleId: 'com.apple.reminders',
+          appVersion: '7.0',
+          osVersion: '27.2',
+          note: 'Read-only pages of the reminders of a list: a first page of 25 continued by cursor, and pages of 2 continued by cursor, each read as a range of the collection.',
+        },
       },
     },
   },

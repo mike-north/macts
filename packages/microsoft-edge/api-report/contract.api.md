@@ -9,7 +9,6 @@ import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
-import { PageRequest } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
 import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
@@ -29,7 +28,7 @@ export interface BookmarkFolderCreateInput {
 // @public
 export interface BookmarkFolderResourceClient {
     get(id: string, options?: CallOptions): Promise<BookmarkFolder>;
-    list(page?: PageRequest, options?: CallOptions): Promise<Page<BookmarkFolder>>;
+    list(options?: CallOptions): Promise<Page<BookmarkFolder>>;
 }
 
 // @public
@@ -54,7 +53,7 @@ export interface BookmarkItemCreateInput {
 // @public
 export interface BookmarkItemResourceClient {
     get(id: string, options?: CallOptions): Promise<BookmarkItem>;
-    list(folderId: string, page?: PageRequest, options?: CallOptions): Promise<Page<BookmarkItem>>;
+    list(folderId: string, options?: CallOptions): Promise<Page<BookmarkItem>>;
 }
 
 // @public
@@ -121,7 +120,7 @@ export interface TabResourceClient {
     get(id: string, options?: CallOptions): Promise<Tab>;
     goBack(tabId: string, options?: CallOptions): Promise<void>;
     goForward(tabId: string, options?: CallOptions): Promise<void>;
-    list(windowId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Tab>>;
+    list(windowId: string, options?: CallOptions): Promise<Page<Tab>>;
     pasteSelection(tabId: string, options?: CallOptions): Promise<void>;
     redo(tabId: string, options?: CallOptions): Promise<void>;
     reload(tabId: string, options?: CallOptions): Promise<void>;
@@ -172,7 +171,7 @@ export interface WindowCreateInput {
 export interface WindowResourceClient {
     create(input: WindowCreateInput, options?: CallOptions): Promise<Window>;
     get(id: string, options?: CallOptions): Promise<Window>;
-    list(page?: PageRequest, options?: CallOptions): Promise<Page<Window>>;
+    list(options?: CallOptions): Promise<Page<Window>>;
 }
 
 // @public

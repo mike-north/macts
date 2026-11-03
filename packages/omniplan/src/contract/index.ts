@@ -26,7 +26,6 @@ import {
   type Integer,
   type OperationDescriptor,
   type Page,
-  type PageRequest,
   type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
@@ -810,14 +809,8 @@ export interface ViolationResourceClient {
 
 /** An alternative project plan */
 export interface ScenarioResourceClient {
-  /**
-   * List scenarios, one page at a time.
-   *
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
-   */
-  list(page?: PageRequest, options?: CallOptions): Promise<Page<Scenario>>
+  /** List scenarios, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Scenario>>
   /**
    * Read the scenario identified by `id`.
    *
@@ -1707,32 +1700,17 @@ const violationListViolationsOperation: OperationDescriptor<
   },
 }
 
-const scenarioListScenariosOperation: OperationDescriptor<PageRequest, Page<Scenario>> = {
+const scenarioListScenariosOperation: OperationDescriptor<Record<string, never>, Page<Scenario>> = {
   id: 'omniplan.scenarios.list',
   permission: 'omniplan:scenarios:list',
   target: { command: 'listScenarios', resource: 'Scenario' },
   description: 'List all scenarios',
-  input: t.record({
-    ...t.pageInputs(),
-  }),
+  input: t.record({}),
   output: t.page(scenarioRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
@@ -2033,7 +2011,7 @@ function bind(runtime: ClientRuntime): OmniPlanClient {
       fix: (options) => runtime.invoke(violationFixOperation, {}, options),
     },
     scenarios: {
-      list: (page, options) => runtime.invoke(scenarioListScenariosOperation, { ...page }, options),
+      list: (options) => runtime.invoke(scenarioListScenariosOperation, {}, options),
       get: (id, options) => runtime.invoke(scenarioGetScenarioOperation, { id }, options),
     },
     _export: (to, options) => runtime.invoke(appExportOperation, { to }, options),

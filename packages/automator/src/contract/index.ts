@@ -26,7 +26,6 @@ import {
   type Integer,
   type OperationDescriptor,
   type Page,
-  type PageRequest,
   type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
@@ -369,18 +368,11 @@ export interface WorkflowResourceClient {
 /** A single step in a workflow */
 export interface AutomatorActionResourceClient {
   /**
-   * List automator actions, one page at a time.
+   * List automator actions, as one page holding all of them.
    *
    * @param workflowName - Workflow name. Does not accept null.
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
    */
-  list(
-    workflowName: string,
-    page?: PageRequest,
-    options?: CallOptions
-  ): Promise<Page<AutomatorAction>>
+  list(workflowName: string, options?: CallOptions): Promise<Page<AutomatorAction>>
   /**
    * Read the automator action identified by `id`.
    *
@@ -771,7 +763,7 @@ const workflowExecuteOperation: OperationDescriptor<{ readonly workflow: unknown
 }
 
 const automatorActionListActionsOperation: OperationDescriptor<
-  { readonly workflowName: string } & PageRequest,
+  { readonly workflowName: string },
   Page<AutomatorAction>
 > = {
   id: 'automator.automatorActions.list',
@@ -780,27 +772,12 @@ const automatorActionListActionsOperation: OperationDescriptor<
   description: 'List all actions in a workflow',
   input: t.record({
     workflowName: t.string({ description: 'Workflow name' }),
-    ...t.pageInputs(),
   }),
   output: t.page(automatorActionRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      workflowName: { type: 'string', description: 'Workflow name' },
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: { workflowName: { type: 'string', description: 'Workflow name' } },
     required: ['workflowName'],
     additionalProperties: false,
   },
@@ -1139,8 +1116,8 @@ function bind(runtime: ClientRuntime): AutomatorClient {
         runtime.invoke(workflowExecuteOperation, { workflow }, options),
     },
     automatorActions: {
-      list: (workflowName, page, options) =>
-        runtime.invoke(automatorActionListActionsOperation, { ...page, workflowName }, options),
+      list: (workflowName, options) =>
+        runtime.invoke(automatorActionListActionsOperation, { workflowName }, options),
       get: (id, options) => runtime.invoke(automatorActionGetActionOperation, { id }, options),
     },
     variables: {

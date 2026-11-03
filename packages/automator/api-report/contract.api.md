@@ -8,7 +8,6 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
-import { PageRequest } from '@macts/contracts';
 import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
 
@@ -51,7 +50,7 @@ export interface AutomatorActionCreateInput {
 // @public
 export interface AutomatorActionResourceClient {
     get(id: string, options?: CallOptions): Promise<AutomatorAction>;
-    list(workflowName: string, page?: PageRequest, options?: CallOptions): Promise<Page<AutomatorAction>>;
+    list(workflowName: string, options?: CallOptions): Promise<Page<AutomatorAction>>;
 }
 
 // @public

@@ -56,7 +56,7 @@ export interface ShortcutCreateInput {
 // @public
 export interface ShortcutResourceClient {
     get(id: string, options?: CallOptions): Promise<Shortcut>;
-    list(page?: PageRequest, options?: CallOptions): Promise<Page<Shortcut>>;
+    list(options?: CallOptions): Promise<Page<Shortcut>>;
     run(id: string, withInput?: unknown, options?: CallOptions): Promise<void>;
 }
 

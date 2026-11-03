@@ -13,24 +13,15 @@ export class ListWindowsCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  pageSize = Option.String('--page-size', {
-    description: 'The most items to show, from 1 to 100 (default 25)',
-  })
-  cursor = Option.String('--cursor', {
-    description: 'Continue from the previous page, as its output says',
-  })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      const page = await client.windows.list({
-        ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }),
-        ...(this.cursor === undefined ? {} : { cursor: this.cursor }),
-      })
+      const page = await client.windows.list()
 
-      const output = formatter.formatPage(
+      const output = formatter.formatList(
         page.items.map((item) => ({
           givenName: item.givenName,
           name: item.name,
@@ -47,8 +38,7 @@ export class ListWindowsCommand extends Command {
           activeTab: item.activeTab,
           mode: item.mode,
           activeTabIndex: item.activeTabIndex,
-        })),
-        page.nextCursor
+        }))
       )
 
       this.context.stdout.write(output + '\n')

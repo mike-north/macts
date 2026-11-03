@@ -36,6 +36,7 @@
 
 import { describe, it, expect } from 'vitest'
 import type { AppManifest, Command, Resource } from '../../manifest/index.js'
+import { RANGE_READ_SUPPORTED } from '../../manifest/test-support/unique-claim.js'
 import { generateHttpClientSdk } from './http-client.js'
 
 // ---------------------------------------------------------------------------
@@ -239,6 +240,7 @@ const remindersManifest: AppManifest = {
           evidence: { unique: { source: 'sdef', note: 'The unique identifier of the reminder' } },
         },
       ],
+      ...RANGE_READ_SUPPORTED,
     },
   },
   enums: {},

@@ -645,6 +645,18 @@ export const manifest: unknown = {
           },
         },
       ],
+      rangeRead: {
+        supported: false,
+        evidence: {
+          source: 'probe',
+          observedAt: '2026-11-03T17:58:53.000Z',
+          bundleId: 'com.apple.Music',
+          appVersion: '1.7.2',
+          osVersion: '27.2',
+          errorNumbers: [-1708],
+          note: 'A page of 25 and a page of 2 of the playlists at the application both failed with -1708, the request not understood. Range reads of the persistent IDs, of the names and of whole items also failed with -1708, at the application and under a source, while counting the playlists, reading the whole persistent ID column, and reading one playlist by its position all worked.',
+        },
+      },
     },
     PlaylistWindow: {
       name: 'PlaylistWindow',

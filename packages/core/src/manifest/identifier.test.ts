@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest'
 import type { Resource } from './schemas/resource.js'
-import { UNIQUE_CLAIM } from './test-support/unique-claim.js'
+import { RANGE_READ_SUPPORTED, UNIQUE_CLAIM } from './test-support/unique-claim.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
   listOperationPages,
@@ -220,10 +220,17 @@ describe('listOperationPages', () => {
     unique: false,
     evidence: { unique: { source: 'curated' as const, note: 'Values repeat' } },
   }
+  const RANGE_READ_FAILED = {
+    rangeRead: {
+      supported: false,
+      evidence: { ...RANGE_READ_SUPPORTED.rangeRead.evidence, errorNumbers: [-1708] },
+    },
+  }
 
-  it('pages a list whose primary identifier is claimed unique', () => {
+  it('pages a list whose primary identifier is claimed unique and whose range read passed', () => {
     const resource = makeResource({
       identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
+      ...RANGE_READ_SUPPORTED,
     })
     expect(listOperationPages(LIST, resource)).toBe(true)
   })
@@ -231,8 +238,26 @@ describe('listOperationPages', () => {
   it('pages a byProperty identifier claimed unique: uniqueness, not targeting, decides', () => {
     const resource = makeResource({
       identifiers: [{ property: 'id', primary: true, targeting: 'byProperty', ...UNIQUE_CLAIM }],
+      ...RANGE_READ_SUPPORTED,
     })
     expect(listOperationPages(LIST, resource)).toBe(true)
+  })
+
+  it('does not page a unique identifier whose resource records no range read', () => {
+    // Regression: a list paged on the uniqueness claim alone, and an app whose
+    // collection rejects range reads (Music playlists, -1708) failed every page.
+    const resource = makeResource({
+      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
+    })
+    expect(listOperationPages(LIST, resource)).toBe(false)
+  })
+
+  it('does not page a unique identifier whose range read was observed to fail', () => {
+    const resource = makeResource({
+      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
+      ...RANGE_READ_FAILED,
+    })
+    expect(listOperationPages(LIST, resource)).toBe(false)
   })
 
   it.each([
@@ -252,12 +277,17 @@ describe('listOperationPages', () => {
         { property: 'name', primary: true },
       ],
     },
-  ])('does not page a list whose primary identifier $label', ({ identifiers }) => {
-    expect(listOperationPages(LIST, makeResource({ identifiers }))).toBe(false)
-  })
+  ])(
+    'does not page a list whose primary identifier $label, even with a supported range read',
+    ({ identifiers }) => {
+      expect(listOperationPages(LIST, makeResource({ identifiers, ...RANGE_READ_SUPPORTED }))).toBe(
+        false
+      )
+    }
+  )
 
   it('does not page a list of a resource with no identifier, or no resource', () => {
-    expect(listOperationPages(LIST, makeResource({}))).toBe(false)
+    expect(listOperationPages(LIST, makeResource({ ...RANGE_READ_SUPPORTED }))).toBe(false)
     expect(listOperationPages(LIST, undefined)).toBe(false)
   })
 
@@ -267,6 +297,7 @@ describe('listOperationPages', () => {
   ])('never pages $label', ({ command }) => {
     const resource = makeResource({
       identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
+      ...RANGE_READ_SUPPORTED,
     })
     expect(listOperationPages(command, resource)).toBe(false)
   })

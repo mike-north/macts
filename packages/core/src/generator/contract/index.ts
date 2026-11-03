@@ -28,10 +28,12 @@ import { z } from 'zod'
 import {
   PAGING_INPUT_NAMES,
   ValueTypes as t,
+  resourcePlanTable,
   type RecordField,
   type ReferenceRegistry,
   type OperationId,
   type ReferenceScope,
+  type ResourcePlanTable,
   type ValueType,
 } from '@macts/contracts'
 import type {
@@ -57,6 +59,7 @@ import {
 import { lowerCamel } from '../../manifest/lower-camel.js'
 import { manifestGeneratedNotice } from '../generated-header.js'
 import { usableCommands, usableProperties, usableResources } from '../../manifest/unsupported.js'
+import { resolvingCommand } from '../../manifest/resource-commands.js'
 import {
   appCommandEntries,
   commandMethodParameters,
@@ -66,7 +69,6 @@ import {
   isCrudName,
   listMethodParameters,
   resolveIdParams,
-  resolvingCommand,
   resourceCommandEntries,
   resourceHasOperations,
   resourceNamespace,
@@ -267,6 +269,23 @@ export function generateContract(manifest: AppManifest): GeneratedContract {
     diagnostics: collectContractDiagnostics(manifest),
     errors: builder.errors,
   }
+}
+
+/**
+ * The value plans of the resources in the contract generated from `manifest`:
+ * what `resourcePlanTable(contract.resources)` gives for that contract.
+ *
+ * @remarks
+ * A host that registers a contract compares the contract's table with this
+ * one, so a contract whose identifier types disagree with its manifest (a
+ * stale or altered package) is refused instead of converting identifiers by
+ * the wrong plan.
+ *
+ * @param manifest - The validated app manifest.
+ * @returns One entry per resource the contract lists, in its order.
+ */
+export function contractResourcePlans(manifest: AppManifest): ResourcePlanTable {
+  return new ContractBuilder(manifest).resourcePlans()
 }
 
 /** The manifest data module, imported lazily by `loadManifest`. */
@@ -477,12 +496,8 @@ class ContractBuilder {
   #buildRegistry(): ReferenceRegistry {
     const registry: Record<string, ReferenceRegistry[string]> = {}
     for (const { resourceKey, resource, routes } of this.#tableResources()) {
-      const identifier = this.#identifierProperty(resource)
-      const identifierShape = this.#identifiers.get(resourceKey)
-      registry[resourceKey] =
-        identifier !== undefined && identifierShape !== undefined
-          ? { id: this.#builder.build(identifierShape, identifier.description), ...routes }
-          : routes
+      const id = this.#identifierValueType(resourceKey, resource)
+      registry[resourceKey] = id !== undefined ? { id, ...routes } : routes
     }
     return registry
   }
@@ -511,6 +526,30 @@ class ContractBuilder {
         ? []
         : [{ resourceKey, resource, routes }]
     })
+  }
+
+  /**
+   * The value plans of the resources the generated table lists, in its order:
+   * what `resourcePlanTable` derives from the generated contract's
+   * `resources`. Built from the same identifier value types as the table, so a
+   * contract generated from this manifest has exactly these plans.
+   */
+  resourcePlans(): ResourcePlanTable {
+    const registry: Record<string, ReferenceRegistry[string]> = {}
+    for (const { resourceKey, resource } of this.#tableResources()) {
+      const id = this.#identifierValueType(resourceKey, resource)
+      registry[resourceKey] = id !== undefined ? { id } : {}
+    }
+    return resourcePlanTable(registry)
+  }
+
+  /** The identifier value type the resource table records for a resource, if it has one. */
+  #identifierValueType(resourceKey: string, resource: Resource): ValueType<unknown> | undefined {
+    const identifier = this.#identifierProperty(resource)
+    const identifierShape = this.#identifiers.get(resourceKey)
+    return identifier !== undefined && identifierShape !== undefined
+      ? this.#builder.build(identifierShape, identifier.description)
+      : undefined
   }
 
   /**
@@ -745,8 +784,9 @@ class ContractBuilder {
 
   /**
    * Whether the route is a list that pages (see `listOperationPages`): a list
-   * whose resource's primary identifier is claimed unique. Any other list
-   * takes no paging inputs and returns its whole collection as one page.
+   * whose resource's primary identifier is claimed unique and whose app is
+   * known to read ranges of its collection. Any other list takes no paging
+   * inputs and returns its whole collection as one page.
    */
   #pages(route: ManifestRoute): boolean {
     return listOperationPages(route.command, route.resource)

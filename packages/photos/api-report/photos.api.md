@@ -150,10 +150,7 @@ export class MediaItemResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     duplicate(id: string): Promise<void>;
     get(id: string): Promise<MediaItem>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<Page<MediaItem>>;
+    list(): Promise<Page<MediaItem>>;
 }
 
 // @public (undocumented)

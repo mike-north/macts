@@ -12,8 +12,9 @@
  *   process (`/usr/bin/osascript -l JavaScript`), composing the script the same
  *   way the native executor does: prelude, decode of the wire input, the body
  *   invoked as `(app, args)`, encode of its result, and one try/catch that
- *   reports a {@link NativeOutcome}. The body receives `app = null`; the harness
- *   never addresses an application, so it needs no automation permission.
+ *   reports a {@link NativeOutcome}. The body and the codec receive
+ *   `app = null`; the harness never addresses an application, so it needs no
+ *   automation permission.
  *
  * This module is not exported from the package.
  *
@@ -22,21 +23,27 @@
 
 import { execFile } from 'node:child_process'
 import { createContext, runInContext } from 'node:vm'
-import type { IssuePath, ValuePlan, WireRecord, WireValue } from '@macts/contracts'
+import type { ValuePlan, WireRecord } from '@macts/contracts'
+import { parseNativeOutcome as parseExecutorOutcome } from '../executor.js'
 import {
   NATIVE_CODEC_ERROR_NAME,
   NATIVE_DECODE_FUNCTION,
   NATIVE_ENCODE_FUNCTION,
   type NativeCodec,
-  type NativeFailure,
+  type NativeCodecEnvironment,
   type NativeOutcome,
+  type NativeReferenceTable,
 } from '../native-codec.js'
 
 /** Identity tag marking embedded automation-process JavaScript for tooling. */
 const js = String.raw
 
 /** A codec function as seen from outside the realm that defines it. */
-export type CodecFunction = (value: unknown, plan: ValuePlan) => unknown
+export type CodecFunction = (
+  value: unknown,
+  plan: ValuePlan,
+  env?: NativeCodecEnvironment
+) => unknown
 
 /** What evaluating a prelude in an isolated context produced. */
 export interface EvaluatedPrelude {
@@ -63,8 +70,8 @@ function contextFunction(context: object, name: string): CodecFunction {
   if (typeof fn !== 'function') {
     throw new Error(`The prelude did not define a function named ${name}`)
   }
-  return (value, plan) => {
-    const result: unknown = Reflect.apply(fn, undefined, [value, plan])
+  return (value, plan, env) => {
+    const result: unknown = Reflect.apply(fn, undefined, [value, plan, env])
     return result
   }
 }
@@ -97,6 +104,12 @@ export interface HarnessScript {
   readonly inputPlan: ValuePlan
   /** Plan for encoding the body's result. */
   readonly outputPlan: ValuePlan
+  /**
+   * The reference table the codec is given, with no application: an encoded
+   * reference reads its identifier from the object, and a decoded one fails
+   * as unsupported because there is no app to address. Empty when omitted.
+   */
+  readonly references?: NativeReferenceTable
 }
 
 /**
@@ -109,16 +122,20 @@ export function composeNativeScript(codec: NativeCodec, script: HarnessScript): 
 ${codec.prelude}
 var __mactsOutcome = (function () {
   try {
-    var args = ${NATIVE_DECODE_FUNCTION}(${JSON.stringify(script.input)}, ${JSON.stringify(script.inputPlan)});
+    var env = { app: null, references: ${JSON.stringify(script.references ?? {})} };
+    var args = ${NATIVE_DECODE_FUNCTION}(${JSON.stringify(script.input)}, ${JSON.stringify(script.inputPlan)}, env);
     var value = (function (app, args) {
 ${script.body}
     })(null, args);
-    return { ok: true, value: ${NATIVE_ENCODE_FUNCTION}(value, ${JSON.stringify(script.outputPlan)}) };
+    return { ok: true, value: ${NATIVE_ENCODE_FUNCTION}(value, ${JSON.stringify(script.outputPlan)}, env) };
   } catch (e) {
     if (e !== null && typeof e === 'object' && e.name === ${JSON.stringify(NATIVE_CODEC_ERROR_NAME)}) {
       var codecFailure = { source: 'codec', direction: e.direction, path: e.path, message: e.message };
       if (typeof e.unsupportedKind === 'string') {
         codecFailure.unsupportedKind = e.unsupportedKind;
+      }
+      if (typeof e.missingResource === 'string') {
+        codecFailure.missingResource = e.missingResource;
       }
       return { ok: false, failure: codecFailure };
     }
@@ -133,66 +150,19 @@ JSON.stringify(__mactsOutcome);
 `
 }
 
-/** Whether a value is a non-array object. */
-function isObject(value: unknown): value is Readonly<Record<string, unknown>> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
-
-/** Whether a value is an issue path: strings and numbers only. */
-function isIssuePath(value: unknown): value is IssuePath {
-  return (
-    Array.isArray(value) &&
-    value.every((step) => typeof step === 'string' || typeof step === 'number')
-  )
-}
-
-/** Validates the failure half of a parsed outcome. */
-function parseFailure(value: unknown): NativeFailure {
-  if (!isObject(value) || typeof value['message'] !== 'string') {
-    throw new Error(`Malformed native failure: ${JSON.stringify(value)}`)
-  }
-  const message = value['message']
-  if (value['source'] === 'codec') {
-    const direction = value['direction']
-    const path = value['path']
-    if ((direction !== 'decode' && direction !== 'encode') || !isIssuePath(path)) {
-      throw new Error(`Malformed codec failure: ${JSON.stringify(value)}`)
-    }
-    const unsupportedKind = value['unsupportedKind']
-    if (unsupportedKind === undefined) return { source: 'codec', direction, path, message }
-    if (typeof unsupportedKind !== 'string') {
-      throw new Error(`Malformed codec failure: ${JSON.stringify(value)}`)
-    }
-    return { source: 'codec', direction, path, message, unsupportedKind }
-  }
-  if (value['source'] === 'collection') return { source: 'collection', message }
-  if (value['source'] === 'app') {
-    const errorNumber = value['errorNumber']
-    return typeof errorNumber === 'number'
-      ? { source: 'app', message, errorNumber }
-      : { source: 'app', message }
-  }
-  throw new Error(`Malformed native failure source: ${JSON.stringify(value)}`)
-}
-
 /**
- * Parses the automation process's stdout into a {@link NativeOutcome}.
- * The `value` of a success is returned as parsed JSON.
+ * Parses the automation process's stdout into a {@link NativeOutcome}, by the
+ * same rules the native executor reads it with (`parseNativeOutcome` in
+ * `../executor.ts`): an outcome real execution would refuse as malformed is
+ * refused here too, so a test cannot pass on it. A malformed outcome throws,
+ * naming what is wrong with it.
  */
 export function parseNativeOutcome(stdout: string): NativeOutcome {
-  const parsed: unknown = JSON.parse(stdout.trim())
-  if (!isObject(parsed)) {
-    throw new Error(`Malformed native outcome: ${stdout}`)
+  const outcome = parseExecutorOutcome(stdout)
+  if (typeof outcome === 'string') {
+    throw new Error(`Malformed native outcome: ${outcome}`)
   }
-  if (parsed['ok'] === true) {
-    // The outcome was produced by `JSON.stringify`, so its value is JSON.
-    const value = parsed['value'] as WireValue
-    return { ok: true, value }
-  }
-  if (parsed['ok'] === false) {
-    return { ok: false, failure: parseFailure(parsed['failure']) }
-  }
-  throw new Error(`Malformed native outcome: ${stdout}`)
+  return outcome
 }
 
 /** Options for {@link runNativeScript}. */

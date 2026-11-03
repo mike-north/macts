@@ -11,7 +11,6 @@ import { Integer } from '@macts/contracts';
 import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
-import { PageRequest } from '@macts/contracts';
 import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
 
@@ -176,7 +175,7 @@ export type ProjectCreateInput = Record<string, never>;
 // @public
 export interface ProjectResourceClient {
     get(id: string, options?: CallOptions): Promise<Project>;
-    list(workspaceName: string, page?: PageRequest, options?: CallOptions): Promise<Page<Project>>;
+    list(workspaceName: string, options?: CallOptions): Promise<Page<Project>>;
 }
 
 // @public
@@ -259,7 +258,7 @@ export type SchemeCreateInput = Record<string, never>;
 // @public
 export interface SchemeResourceClient {
     get(id: string, options?: CallOptions): Promise<Scheme>;
-    list(workspaceName: string, page?: PageRequest, options?: CallOptions): Promise<Page<Scheme>>;
+    list(workspaceName: string, options?: CallOptions): Promise<Page<Scheme>>;
 }
 
 // @public

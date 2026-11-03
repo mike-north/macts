@@ -22,14 +22,10 @@ export class PlaylistResourceClient {
   }
 
   /**
-   * List playlists, one page at a time. When the result has a `nextCursor`,
-   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
+   * List all playlists, as one page.
    */
-  async list(page: { pageSize?: number; cursor?: string } = {}): Promise<Page<Playlist>> {
-    return this.#http.rpc<Page<Playlist>>(`${this.#app}.${this.#resource}.list`, {
-      ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-      ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-    })
+  async list(): Promise<Page<Playlist>> {
+    return this.#http.rpc<Page<Playlist>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

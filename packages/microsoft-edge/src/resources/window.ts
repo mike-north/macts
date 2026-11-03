@@ -22,14 +22,10 @@ export class WindowResourceClient {
   }
 
   /**
-   * List windows, one page at a time. When the result has a `nextCursor`,
-   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
+   * List all windows, as one page.
    */
-  async list(page: { pageSize?: number; cursor?: string } = {}): Promise<Page<Window>> {
-    return this.#http.rpc<Page<Window>>(`${this.#app}.${this.#resource}.list`, {
-      ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-      ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-    })
+  async list(): Promise<Page<Window>> {
+    return this.#http.rpc<Page<Window>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

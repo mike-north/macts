@@ -22,14 +22,10 @@ export class ShortcutResourceClient {
   }
 
   /**
-   * List shortcuts, one page at a time. When the result has a `nextCursor`,
-   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
+   * List all shortcuts, as one page.
    */
-  async list(page: { pageSize?: number; cursor?: string } = {}): Promise<Page<Shortcut>> {
-    return this.#http.rpc<Page<Shortcut>>(`${this.#app}.${this.#resource}.list`, {
-      ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-      ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-    })
+  async list(): Promise<Page<Shortcut>> {
+    return this.#http.rpc<Page<Shortcut>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

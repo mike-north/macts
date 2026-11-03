@@ -110,7 +110,8 @@ export const CALENDAR_MANIFEST: AppManifest = {
  *   keyed `lookupBook` declares the CRUD shape `get`), list
  *   `library.books.list`.
  *
- * Shelf and book identifiers are claimed unique, so their lists page.
+ * Shelf and book identifiers are claimed unique and both record a supported
+ * range read, so their lists page.
  * - `Page` (no identifier, so selector forms only): list `library.pages.list`,
  *   and no get.
  * - `Stamp` (integer identifier `serial`): get `library.stamps.get`, and no
@@ -121,11 +122,29 @@ export const CALENDAR_MANIFEST: AppManifest = {
  */
 /**
  * A uniqueness claim, with its evidence, for a fixture identifier: a list
- * pages only when its resource's primary identifier is claimed unique.
+ * pages only when its resource's primary identifier is claimed unique, and its
+ * resource records a supported range read ({@link RANGE_READ_SUPPORTED}).
  */
 export const UNIQUE_CLAIM = {
   unique: true,
   evidence: { unique: { source: 'curated', note: 'Test fixture: no two items share an id' } },
+} as const
+
+/**
+ * A range read marker for a fixture resource: a list pages only when its
+ * resource also records that the app reads ranges of its collection.
+ */
+export const RANGE_READ_SUPPORTED = {
+  rangeRead: {
+    supported: true,
+    evidence: {
+      source: 'probe',
+      observedAt: '2026-01-15T10:30:00.000Z',
+      bundleId: 'com.example.library',
+      appVersion: '1.0',
+      osVersion: '27.2',
+    },
+  },
 } as const
 
 export const LIBRARY_MANIFEST: AppManifest = {
@@ -138,6 +157,7 @@ export const LIBRARY_MANIFEST: AppManifest = {
       description: 'A shelf',
       properties: {},
       identifiers: [{ property: 'code', primary: true, ...UNIQUE_CLAIM }],
+      ...RANGE_READ_SUPPORTED,
     },
     Book: {
       name: 'Book',
@@ -145,13 +165,18 @@ export const LIBRARY_MANIFEST: AppManifest = {
       description: 'A book',
       properties: {},
       identifiers: [{ property: 'isbn', primary: true, ...UNIQUE_CLAIM }],
+      ...RANGE_READ_SUPPORTED,
     },
     Page: { name: 'Page', plural: 'Pages', description: 'A page', properties: {} },
     Stamp: {
       name: 'Stamp',
       plural: 'Stamps',
       description: 'A stamp',
-      properties: {},
+      // Declared so the manifest's identifier type agrees with the contract's
+      // `t.integer()` identifier, which registration checks.
+      properties: {
+        serial: { access: 'r', type: 'integer', optional: false, description: 'The serial' },
+      },
       identifiers: [{ property: 'serial', primary: true }],
     },
   },

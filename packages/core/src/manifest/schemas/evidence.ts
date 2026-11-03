@@ -407,6 +407,55 @@ export const IdentifierUniquenessEvidenceSchema = z
   .strict()
 export type IdentifierUniquenessEvidence = z.infer<typeof IdentifierUniquenessEvidenceSchema>
 
+/**
+ * Evidence for a claim that the running app does, or does not, read a range
+ * of a resource's collection: a live, read-only observation of the collection
+ * read by position, from a start index to an end index, in one request.
+ *
+ * A list pages only on positive evidence (phases/13 D9, _Bounded list pages_):
+ * a page is read as a range of the collection, and an app whose collection
+ * rejects that read fails every page, so paging is never inferred from the
+ * dictionary, which does not say whether ranges work. Like the other live
+ * evidence it records the app build and macOS version it holds for, and never
+ * a value. When the reads failed it lists the distinct error numbers they
+ * raised, which tell a request the app does not understand (`-1708`) from a
+ * permission problem; when they passed it lists none.
+ */
+export const RangeReadEvidenceSchema = z
+  .object({
+    source: z.literal('probe'),
+    /** When the observation was made: an ISO 8601 UTC timestamp. */
+    observedAt: ObservedAtSchema,
+    /** The bundle identifier of the observed app. */
+    bundleId: z.string().min(1),
+    /** The observed app's version. */
+    appVersion: z.string().min(1),
+    /** The macOS product version the app ran on, e.g. `27.2`. */
+    osVersion: z.string().min(1),
+    /**
+     * The distinct error numbers the failed range reads raised, each once.
+     * Present exactly when the reads failed.
+     */
+    errorNumbers: z.array(z.number().int()).min(1).optional(),
+    /**
+     * What was read, in words and never as a value, e.g. which collection,
+     * which page sizes, and whether a following page was read.
+     */
+    note: z.string().min(1).optional(),
+  })
+  .strict()
+  .superRefine((evidence, ctx) => {
+    const numbers = evidence.errorNumbers ?? []
+    if (new Set(numbers).size !== numbers.length) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'errorNumbers lists each distinct error number once.',
+        path: ['errorNumbers'],
+      })
+    }
+  })
+export type RangeReadEvidence = z.infer<typeof RangeReadEvidenceSchema>
+
 /** The parts of a field that make or support a nullability claim. */
 interface NullabilityClaim {
   readonly nullable?: boolean | undefined

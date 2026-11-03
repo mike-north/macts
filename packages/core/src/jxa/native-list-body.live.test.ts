@@ -56,6 +56,7 @@ import { fileURLToPath } from 'node:url'
 import { isDeepStrictEqual } from 'node:util'
 import { beforeAll, describe, expect, it } from 'vitest'
 import {
+  EMPTY_RESOURCE_PLAN_TABLE,
   PASSTHROUGH_PLAN,
   type OperationTarget,
   type WireRecord,
@@ -143,6 +144,7 @@ function reader(manifest: AppManifest): Reader {
     input,
     inputPlan: PASSTHROUGH_PLAN,
     outputPlan: PASSTHROUGH_PLAN,
+    resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
   })
   return {
     list: (target, input) => executor.execute(request(target, input)),

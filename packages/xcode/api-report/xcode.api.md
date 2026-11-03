@@ -241,10 +241,7 @@ export type ProjectCreateInput = Record<string, never>;
 export class ProjectResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Project>;
-    list(workspaceName: string, page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<Page<Project>>;
+    list(workspaceName: string): Promise<Page<Project>>;
 }
 
 // @public (undocumented)
@@ -356,10 +353,7 @@ export type SchemeCreateInput = Record<string, never>;
 export class SchemeResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Scheme>;
-    list(workspaceName: string, page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<Page<Scheme>>;
+    list(workspaceName: string): Promise<Page<Scheme>>;
 }
 
 // @public (undocumented)

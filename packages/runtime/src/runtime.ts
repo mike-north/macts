@@ -191,7 +191,9 @@ export interface MactsRuntime {
    * @remarks
    * The contract's resource table also becomes the app's reference registry,
    * against which {@link MactsRuntime.resolveReference} validates references,
-   * so an app has at most one registered contract.
+   * so an app has at most one registered contract. Its resources' value plans
+   * (`resourcePlanTable`) go with every execution and resolution request of
+   * the app, so the executor can convert references.
    *
    * @throws `OperationRegistrationError` when the app's route segment is
    *   reserved (`RESERVED_APP_ROUTE_SEGMENTS`), a descriptor's permission or
@@ -199,7 +201,9 @@ export interface MactsRuntime {
    *   not expose, an id is already registered, a contract for the same app
    *   is already registered, or the contract's resource table records a `get`
    *   or `list` operation that is not one of its operations targeting that
-   *   resource. A refused registration adds nothing.
+   *   resource, or a resource the manifest does not declare, or an identifier
+   *   type that differs from the manifest's primary identifier property. A
+   *   refused registration adds nothing.
    */
   registerContract(contract: AppContract<unknown>, manifest: AppManifest): void
   /**
@@ -796,6 +800,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       manifest,
       target: descriptor.target,
       inputPlan: descriptor.input.plan,
+      resourcePlans: operation.resourcePlans,
       ...(context.signal === undefined ? {} : { signal: context.signal }),
     }
     const run = (request: ExecutionRequest): Promise<WireValue> =>
@@ -1263,6 +1268,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
         manifest: operation.manifest,
         reference: validated,
         outputPlan: resolving.result.plan,
+        resourcePlans: operation.resourcePlans,
         ...(context.signal === undefined ? {} : { signal: context.signal }),
       }
       const result = await dispatch(operation, context, call, () => executor.resolve(request))

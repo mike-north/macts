@@ -54,6 +54,7 @@ import {
   FIXED_NOW,
   BOOK_RECORD,
   LIBRARY_MANIFEST,
+  PAGE_RECORD,
   createFakeVerifier,
   createMemoryAuditWriter,
   createRecordingApprovalProvider,
@@ -325,6 +326,14 @@ describe('resolveReference: allowed resolutions', () => {
           container: { resource: 'Shelf', form: 'identity', cardinality: 'one', id: 'SF-1' },
         },
         outputPlan: BOOK_PLAN,
+        // The app's resource plans, from its contract's resource table: each
+        // resource's identifier plan, and none for Page, which has no identifier.
+        resourcePlans: {
+          Shelf: { id: { kind: 'string' } },
+          Book: { id: { kind: 'string' } },
+          Page: {},
+          Stamp: { id: { kind: 'integer' } },
+        },
       },
     ])
     expect(executor.resolutions[0]?.manifest).toBe(LIBRARY_MANIFEST)
@@ -1330,6 +1339,69 @@ describe('registerContract: recorded resolving operations', () => {
     }).toThrow(
       'The library contract is inconsistent: resource "Book" records "library.shelves.list" as its list operation, which targets resource "Shelf". Regenerate the contract.'
     )
+    expect(runtime.operations()).toEqual([])
+  })
+})
+
+describe('registerContract: resource plans', () => {
+  /** The plans the library contract's resource table holds, by hand. */
+  const LIBRARY_PLANS = {
+    Shelf: { id: { kind: 'string' } },
+    Book: { id: { kind: 'string' } },
+    Page: {},
+    Stamp: { id: { kind: 'integer' } },
+  }
+
+  it("derives the app's resource plans from the contract and sends them with every call", async () => {
+    const { runtime, executor } = harness()
+
+    expect(runtime.operation('library.books.lookupBook')?.resourcePlans).toEqual(LIBRARY_PLANS)
+    // An app registered from its manifest alone has no plans.
+    expect(runtime.operation('calendar.events.list')?.resourcePlans).toEqual({})
+
+    // Only the request matters here, not whether the recorded result fits.
+    await runtime
+      .invoke('library.books.lookupBook', {}, as(LIBRARIAN_SECRET))
+      .catch(() => undefined)
+    expect(executor.requests).toHaveLength(1)
+    expect(executor.requests[0]?.resourcePlans).toEqual(LIBRARY_PLANS)
+  })
+
+  it.each([
+    [
+      'an identifier of another type than the manifest declares',
+      libraryContractWithResource('Stamp', (stamp) => ({ ...stamp, id: t.string() })),
+      'The library contract gives resource "Stamp" the identifier plan {"kind":"string"}, but its manifest gives it the identifier plan {"kind":"integer"}. Regenerate the contract.',
+    ],
+    [
+      'an identifier for a resource whose manifest declares none',
+      libraryContractWithResource('Page', (page) => ({ ...page, id: t.string() })),
+      'The library contract gives resource "Page" the identifier plan {"kind":"string"}, but its manifest gives it no identifier. Regenerate the contract.',
+    ],
+    [
+      'no identifier for a resource whose manifest declares one',
+      libraryContractWithResource('Book', ({ id: _id, ...book }) => book),
+      'The library contract gives resource "Book" no identifier, but its manifest gives it the identifier plan {"kind":"string"}. Regenerate the contract.',
+    ],
+    [
+      'a resource the manifest does not declare',
+      {
+        ...libraryContract(),
+        resources: {
+          ...libraryContract().resources,
+          Ghost: { name: 'Ghost', record: PAGE_RECORD, id: t.string() },
+        },
+      },
+      'The library contract lists resource "Ghost", which the manifest does not declare. Regenerate the contract.',
+    ],
+  ] as const)('refuses a contract with %s, registering nothing', (_case, contract, message) => {
+    const runtime = bareRuntime()
+    expect(() => {
+      runtime.registerContract(contract, LIBRARY_MANIFEST)
+    }).toThrow(OperationRegistrationError)
+    expect(() => {
+      runtime.registerContract(contract, LIBRARY_MANIFEST)
+    }).toThrow(message)
     expect(runtime.operations()).toEqual([])
   })
 })

@@ -186,9 +186,10 @@ describe('HTTP listener: responses over a real socket', () => {
 })
 
 /**
- * The test calendar manifest with its event identifier claimed unique, so its
- * event list pages. A list pages only when its identifier is claimed unique
- * (phases/13 D9); this fixture app makes that claim, unlike the real Calendar.
+ * The test calendar manifest with its event identifier claimed unique and its
+ * event range reads recorded as working, so its event list pages. A list pages
+ * only on both (phases/13 D9); this fixture app makes those claims, unlike the
+ * real Calendar.
  */
 const PAGED_CALENDAR_MANIFEST: AppManifest = {
   ...CALENDAR_MANIFEST,
@@ -208,6 +209,16 @@ const PAGED_CALENDAR_MANIFEST: AppManifest = {
           },
         },
       ],
+      rangeRead: {
+        supported: true,
+        evidence: {
+          source: 'probe',
+          observedAt: '2026-01-15T10:30:00.000Z',
+          bundleId: 'com.apple.iCal',
+          appVersion: '1.0',
+          osVersion: '27.2',
+        },
+      },
     },
   },
 }

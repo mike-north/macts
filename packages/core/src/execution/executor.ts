@@ -15,6 +15,7 @@
 import type {
   OperationTarget,
   ReferenceWire,
+  ResourcePlanTable,
   ValuePlan,
   WireRecord,
   WireValue,
@@ -52,6 +53,13 @@ export interface ExecutionRequest {
    * assembles the page and its cursor around them.
    */
   readonly outputPlan: ValuePlan
+  /**
+   * The value plans of the app's resources, from its registered contract:
+   * what converting a reference in `input` or in the result needs. Always
+   * present: an app registered without a contract passes
+   * `EMPTY_RESOURCE_PLAN_TABLE`, and then no reference converts.
+   */
+  readonly resourcePlans: ResourcePlanTable
   /**
    * The window of a list to read, present exactly when the operation pages
    * (a list of a resource that has an identifier). Absent for every other
@@ -144,6 +152,12 @@ export interface ResolutionRequest {
    * selection.
    */
   readonly outputPlan: ValuePlan
+  /**
+   * The value plans of the app's resources, from its registered contract, as
+   * on {@link ExecutionRequest.resourcePlans}: what converting the reference, its
+   * containers, and any reference in the result needs. Always present.
+   */
+  readonly resourcePlans: ResourcePlanTable
   /** Abort the resolution. */
   readonly signal?: AbortSignal
 }

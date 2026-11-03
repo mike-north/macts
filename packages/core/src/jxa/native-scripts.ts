@@ -59,7 +59,12 @@ import {
 } from '../manifest/identifier.js'
 import { resolveCollectionAccessor, resolvePropertyAccessor } from '../manifest/native-accessor.js'
 import { usableProperties } from '../manifest/unsupported.js'
-import { NATIVE_CODEC_ERROR_NAME, NATIVE_COLLECTION_CHANGED_ERROR_NAME } from './native-codec.js'
+import { resolvingCommand } from '../manifest/resource-commands.js'
+import {
+  NATIVE_CODEC_ERROR_NAME,
+  NATIVE_COLLECTION_CHANGED_ERROR_NAME,
+  type NativeAddressing,
+} from './native-codec.js'
 
 /**
  * Everything needed to run one operation natively, derived from the manifest
@@ -379,12 +384,62 @@ function lookupInCollection(
   collection: string,
   valueExpression: string
 ): string {
-  const targeting = resolveIdentifierTargeting(resource)
-  if (targeting?.strategy === 'byProperty') {
-    const property = nativePropertyName(resource, targeting.property)
-    return `${collection}.whose({ ${literal(property)}: ${valueExpression} })[0]`
+  const lookup = identifierLookup(resource)
+  if (lookup?.lookup === 'byProperty') {
+    return `${collection}.whose({ ${literal(lookup.property)}: ${valueExpression} })[0]`
   }
   return `${collection}.byId(${valueExpression})`
+}
+
+/**
+ * How a resource's collection finds an item from its identifier, by the
+ * resource's identifier targeting, and the app's spelling of the property
+ * that holds the identifier; `undefined` for a resource with no identifier.
+ * Bodies ({@link lookupInCollection}) and reference conversion
+ * ({@link referenceAddressing}) both take it from here, so an object a
+ * reference names is the one a get of its identifier finds.
+ */
+function identifierLookup(
+  resource: Resource | undefined
+): Pick<NativeAddressing, 'lookup' | 'property'> | undefined {
+  const targeting = resolveIdentifierTargeting(resource)
+  if (targeting === undefined) return undefined
+  return {
+    lookup: targeting.strategy,
+    property: nativePropertyName(resource, targeting.property),
+  }
+}
+
+/**
+ * How the app finds an object of `resourceKey` from the identifier a reference
+ * carries, and reads that identifier back, or `undefined` when references to
+ * it cannot be converted at the application.
+ *
+ * @remarks
+ * The object is addressed as the resource's get addresses its item: in the
+ * resource's collection at the application ({@link resolveCollectionAccessor}),
+ * by its identifier targeting. That holds only when the get records no parent;
+ * a resource whose get is parent-scoped (a Music track under its playlist, a
+ * Calendar event under its calendar) is identified within its container, and
+ * a reference to it needs that container (phases/13 D7, container scoping).
+ * There is no addressing for such a resource, for one with no identifier, or
+ * for one with no get.
+ *
+ * @param manifest - The validated app manifest.
+ * @param resourceKey - The manifest resource key a reference names.
+ */
+export function referenceAddressing(
+  manifest: AppManifest,
+  resourceKey: string
+): NativeAddressing | undefined {
+  const resource = Object.hasOwn(manifest.resources, resourceKey)
+    ? manifest.resources[resourceKey]
+    : undefined
+  const lookup = identifierLookup(resource)
+  if (resource === undefined || lookup === undefined) return undefined
+  const get = resolvingCommand(manifest, resourceKey, 'get')
+  if (get === undefined || get[1].parent !== undefined) return undefined
+  return { collection: resolveCollectionAccessor(resource), ...lookup }
 }
 
 /**
@@ -960,8 +1015,8 @@ function listAttempts(): string {
  * `PageWindowResult`): the window's records, the collection's length when it
  * was read, and the identifier of the last record, which anchors the next
  * window (see {@link pagedAttemptReader}). Only a list that pages (see
- * `listOperationPages`: its primary identifier is claimed unique) can read
- * a window. Any other list reads the whole collection and returns
+ * `listOperationPages`: its primary identifier is claimed unique and its
+ * collection is known to read ranges) can read a window. Any other list reads the whole collection and returns
  * its records as an array. Every read goes through the one specifier the body
  * binds ({@link COLLECTION_LOCAL}), so all reads cover the same items.
  *
@@ -1023,7 +1078,8 @@ function listAttempts(): string {
  * app's name for it; every item is keyed by the public names.
  *
  * @throws `InternalError` when `paged` is set for a list that does not page
- *   (see `listOperationPages`): its items cannot be anchored reliably.
+ *   (see `listOperationPages`): its items cannot be anchored reliably, or the
+ *   app is not known to read a range of its collection.
  */
 function buildListBody(
   command: Command,
@@ -1039,7 +1095,7 @@ function buildListBody(
   const declaredIdProperty = resolvePrimaryIdentifierProperty(resource)
   if (paged && (runtimeIdProperty === undefined || !listOperationPages(command, resource))) {
     throw new InternalError(
-      'A list whose primary identifier is not claimed unique cannot be paged.',
+      'A list cannot be paged unless its primary identifier is claimed unique and its collection is known to read ranges.',
       {}
     )
   }
