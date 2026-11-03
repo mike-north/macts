@@ -1787,12 +1787,18 @@ importers:
       '@macts/contacts':
         specifier: workspace:*
         version: link:../contacts
+      '@macts/microsoft-edge':
+        specifier: workspace:*
+        version: link:../microsoft-edge
       '@macts/music':
         specifier: workspace:*
         version: link:../music
       '@macts/notes':
         specifier: workspace:*
         version: link:../notes
+      '@macts/reminders':
+        specifier: workspace:*
+        version: link:../reminders
       tsd:
         specifier: 'catalog:'
         version: 0.31.2

@@ -33,6 +33,7 @@ import {
   type ReferenceRegistry,
   type OperationId,
   type ReferenceScope,
+  type ResourceParents,
   type ResourcePlanTable,
   type ValueType,
 } from '@macts/contracts'
@@ -497,12 +498,12 @@ class ContractBuilder {
    */
   #buildRegistry(): ReferenceRegistry {
     const registry: Record<string, ReferenceRegistry[string]> = {}
-    for (const { resourceKey, resource, routes, parent } of this.#tableResources()) {
+    for (const { resourceKey, resource, routes, parents } of this.#tableResources()) {
       const id = this.#identifierValueType(resourceKey, resource)
       registry[resourceKey] = {
         ...(id === undefined ? {} : { id }),
         ...routes,
-        ...(parent === undefined ? {} : { parent }),
+        ...(parents === undefined ? {} : { parents }),
       }
     }
     return registry
@@ -521,44 +522,66 @@ class ContractBuilder {
    * value type pointing at such a resource rejects every reference to it, as
    * one naming no resource of the app.
    *
-   * `parent` is the resource the recorded `get` finds the resource within
-   * (D10, command parents), when it records one: a reference to the resource
-   * then needs an identity reference to that parent as its container
-   * (phases/13 D7, "Resolvable targets").
+   * `parents` names, for each of the two routes, the resource whose object
+   * the command behind it finds the resource's objects within (D10, command
+   * parents), when that command records one; it is absent when neither does.
+   * A reference resolved through a route with a parent then needs an identity
+   * reference to that parent as its container (phases/13 D7, "Resolvable
+   * targets"). The two parents are read independently and may differ.
    */
   #tableResources(): {
     resourceKey: string
     resource: Resource
     routes: { get?: OperationId; list?: OperationId }
-    parent: string | undefined
+    parents: ResourceParents | undefined
   }[] {
     return usableResources(this.#manifest).flatMap(([resourceKey, resource]) => {
       const routes = this.#resolvingRoutes(resourceKey)
       if (routes.get === undefined && routes.list === undefined) return []
-      const parent =
-        routes.get === undefined
-          ? undefined
-          : resolvingCommand(this.#manifest, resourceKey, 'get')?.[1].parent?.resource
-      return [{ resourceKey, resource, routes, parent }]
+      const parents: { get?: string; list?: string } = {}
+      for (const route of ['get', 'list'] as const) {
+        if (routes[route] === undefined) continue
+        const parent = resolvingCommand(this.#manifest, resourceKey, route)?.[1].parent?.resource
+        if (parent !== undefined) parents[route] = parent
+      }
+      return [
+        {
+          resourceKey,
+          resource,
+          routes,
+          parents: Object.keys(parents).length === 0 ? undefined : parents,
+        },
+      ]
     })
   }
 
   /**
-   * Fail generation when a parent-scoped resource's parent could not be its
-   * container: the parent must be a table resource with `get` and an
-   * identifier, since the container is an identity reference resolved through
-   * that `get`. Otherwise no reference to the resource could ever be valid.
+   * Fail generation when a route's parent could not be the container of the
+   * references resolved through that route: the parent must be a table
+   * resource with `get` and an identifier, since the container is an identity
+   * reference resolved through that `get`. Otherwise no reference resolved
+   * through the route could ever be valid.
    */
   #checkParents(): void {
     const table = new Map(this.#tableResources().map((entry) => [entry.resourceKey, entry]))
-    for (const { resourceKey, parent } of table.values()) {
-      if (parent === undefined) continue
-      const found = table.get(parent)
-      const identified =
-        found !== undefined && this.#identifierValueType(parent, found.resource) !== undefined
-      if (found?.routes.get === undefined || !identified) {
+    for (const { resourceKey, parents } of table.values()) {
+      for (const [route, parent] of routeParents(parents)) {
+        const found = table.get(parent)
+        const identified =
+          found !== undefined && this.#identifierValueType(parent, found.resource) !== undefined
+        if (found?.routes.get !== undefined && identified) continue
+        const [within, unresolved] =
+          route === 'get'
+            ? [
+                `gets a ${resourceKey} only within its ${parent}`,
+                `no reference to a ${resourceKey}`,
+              ]
+            : [
+                `lists ${resourceKey} objects only within a ${parent}`,
+                `no collection of ${resourceKey} objects`,
+              ]
         this.errors.push(
-          `${this.#names.app}: resources.${resourceKey}: the app gets a ${resourceKey} only within its ${parent}, but references cannot name a ${parent} by its identifier and resolve it through a get, so no reference to a ${resourceKey} could be resolved (phases/13 D7, resolvable targets).`
+          `${this.#names.app}: resources.${resourceKey}: the app ${within}, but references cannot name a ${parent} by its identifier and resolve it through a get, so ${unresolved} could be resolved (phases/13 D7, resolvable targets).`
         )
       }
     }
@@ -1445,7 +1468,7 @@ class ContractBuilder {
 
   #renderResourceTable(): string {
     const resources = this.#tableResources()
-    const typeEntries = resources.map(({ resourceKey, resource, routes, parent }) => {
+    const typeEntries = resources.map(({ resourceKey, resource, routes, parents }) => {
       const identifierShape = this.#identifiers.get(resourceKey)
       const identified =
         this.#identifierProperty(resource) !== undefined && identifierShape !== undefined
@@ -1458,12 +1481,18 @@ class ContractBuilder {
         ...Object.entries(routes).map(
           ([field, route]) => `readonly ${field}: ${stringLiteral(route)}`
         ),
-        ...(parent === undefined ? [] : [`readonly parent: ${stringLiteral(parent)}`]),
+        ...(parents === undefined
+          ? []
+          : [
+              `readonly parents: { ${routeParents(parents)
+                .map(([route, parent]) => `readonly ${route}: ${stringLiteral(parent)}`)
+                .join('; ')} }`,
+            ]),
       ]
       const type = present.length === 0 ? descriptor : `${descriptor} & { ${present.join('; ')} }`
       return `  ${propertyKey(resourceKey)}: ${type}`
     })
-    const valueEntries = resources.map(({ resourceKey, resource, routes, parent }) => {
+    const valueEntries = resources.map(({ resourceKey, resource, routes, parents }) => {
       const members = [
         `name: ${stringLiteral(resourceKey)}`,
         `record: ${this.#recordBinding(resourceKey)}`,
@@ -1476,7 +1505,12 @@ class ContractBuilder {
       for (const [field, route] of Object.entries(routes)) {
         members.push(`${field}: ${stringLiteral(route)}`)
       }
-      if (parent !== undefined) members.push(`parent: ${stringLiteral(parent)}`)
+      if (parents !== undefined) {
+        const fields = routeParents(parents).map(
+          ([route, parent]) => `${route}: ${stringLiteral(parent)}`
+        )
+        members.push(`parents: { ${fields.join(', ')} }`)
+      }
       return `  ${propertyKey(resourceKey)}: {\n${members.map((m) => `    ${m},`).join('\n')}\n  },`
     })
     const { contract, resources: typeName } = this.#names
@@ -1488,9 +1522,10 @@ class ContractBuilder {
  * The type of the resource table of {@link ${contract}}: every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
- * references to it, and, for a resource the app finds only within another,
- * that parent resource. A client created from the contract carries it, so
- * \`bindReference\` admits only references the contract can resolve.
+ * references to it, and, for each of those operations that finds the
+ * resource only within another resource, that parent. A client created from
+ * the contract carries it, so \`bindReference\` admits only references the
+ * contract can resolve.
  */
 export type ${typeName} = ${type}
 
@@ -1944,4 +1979,12 @@ function reportDuplicates(
     if (seen.has(name)) errors.push(`${app}: the name ${name} is declared twice in ${scope}.`)
     seen.add(name)
   }
+}
+
+/** The `[route, parent]` pairs `parents` records, in route order (`get`, then `list`). */
+function routeParents(parents: ResourceParents | undefined): ['get' | 'list', string][] {
+  return (['get', 'list'] as const).flatMap((route): ['get' | 'list', string][] => {
+    const parent = parents?.[route]
+    return parent === undefined ? [] : [[route, parent]]
+  })
 }

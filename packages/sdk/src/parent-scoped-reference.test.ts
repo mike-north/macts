@@ -1,18 +1,24 @@
 /**
- * Tests for binding and resolving caller-built references to a parent-scoped
- * resource, over the real Music contract: a track is found only within a
- * playlist, so its resource table entry names `parent: 'Playlist'`.
+ * Tests for binding and resolving caller-built references resolved through an
+ * operation that records a parent, over real generated contracts: Music gets
+ * and lists a track only within a playlist (`parents: { get: 'Playlist',
+ * list: 'Playlist' }`); Reminders lists reminders only within a list and
+ * Microsoft Edge tabs only within a window, while getting one at the
+ * application (`parents: { list: … }`).
  *
- * Expected values are written by hand from phases/13 D7 ("Resolvable
+ * Expected values are written by hand from phases/13 D7 ("Parent-scoped
  * targets", "Caller-built references"): `bindReference` encodes the data, so
- * a track reference without its playlist container is a `ValidationError`
- * at `container` and nothing is sent; with it, the reference binds and its
- * `resolve()` sends the container to the transport unchanged.
+ * a reference without the container its resolving operation needs is a
+ * `ValidationError` at `container` and nothing is sent; with it, the
+ * reference binds and its `resolve()` sends the container to the transport
+ * unchanged.
  *
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md §D7
  */
 
+import { microsoftEdgeContract } from '@macts/microsoft-edge/contract'
 import { musicContract } from '@macts/music/contract'
+import { remindersContract } from '@macts/reminders/contract'
 import {
   ValidationError,
   type ClientBrand,
@@ -39,8 +45,16 @@ function recordingMusicClient(answer: unknown): {
   client: ClientBrand<ResourceTable>
   sent: Sent[]
 } {
+  return recordingClient(musicContract, answer)
+}
+
+/** A client of `contract` whose transport records each request; see {@link recordingMusicClient}. */
+function recordingClient(
+  contract: Parameters<typeof createCodecClient>[0],
+  answer: unknown
+): { client: ClientBrand<ResourceTable>; sent: Sent[] } {
   const sent: Sent[] = []
-  const client = createCodecClient(musicContract, {
+  const client = createCodecClient(contract, {
     invoke: (_operation, wire) => {
       sent.push({ kind: 'invoke', wire })
       return Promise.resolve(answer)
@@ -117,5 +131,92 @@ describe('bindReference with a parent-scoped resource', () => {
   it('leaves a playlist, found at the application, without a container', () => {
     const { client } = recordingMusicClient({})
     expect(bindReference(client, PLAYLIST)).toMatchObject(PLAYLIST)
+  })
+})
+
+/** The issues of the `ValidationError` binding `data` to `client` raises. */
+function bindingIssues(
+  client: ClientBrand<ResourceTable>,
+  data: unknown
+): { path: readonly (string | number)[]; message: string }[] {
+  // A caller that bypassed the static types.
+  const error = thrownBy(() => bindReference(client, data as ReferenceData))
+  expect(error).toBeInstanceOf(ValidationError)
+  if (!(error instanceof ValidationError)) return []
+  return error.details.issues.map(({ path, message }) => ({ path, message }))
+}
+
+describe('bindReference with a collection the app lists only within a parent', () => {
+  const everyReminder = {
+    app: 'reminders',
+    resource: 'Reminder',
+    form: 'selector',
+    cardinality: 'many',
+    selector: { by: 'every' },
+  } as const
+  const list = {
+    app: 'reminders',
+    resource: 'List',
+    form: 'identity',
+    cardinality: 'one',
+    id: 'x-apple-reminder-list://ABC',
+  } as const
+
+  it('raises ValidationError naming the list when every reminder has no container', () => {
+    const { client, sent } = recordingClient(remindersContract, [])
+    expect(bindingIssues(client, everyReminder)).toEqual([
+      {
+        path: ['container'],
+        message:
+          'The required field "container" is missing; expected an identity reference to the ' +
+          '"List" whose "Reminder" objects are selected, because the app lists "Reminder" ' +
+          'objects only within a "List".',
+      },
+    ])
+    expect(sent).toEqual([])
+  })
+
+  it('raises ValidationError naming the window when every tab has no container', () => {
+    const { client } = recordingClient(microsoftEdgeContract, [])
+    const everyTab = { ...everyReminder, app: 'microsoft-edge', resource: 'Tab' }
+    expect(bindingIssues(client, everyTab)).toEqual([
+      {
+        path: ['container'],
+        message:
+          'The required field "container" is missing; expected an identity reference to the ' +
+          '"Window" whose "Tab" objects are selected, because the app lists "Tab" objects only ' +
+          'within a "Window".',
+      },
+    ])
+  })
+
+  it('binds every reminder within a list, and resolves it with the container', async () => {
+    const { client, sent } = recordingClient(remindersContract, [])
+    const reminders = bindReference(client, { ...everyReminder, container: list })
+    await reminders.resolve().catch(() => undefined)
+    expect(sent[0]).toEqual({
+      kind: 'resolve',
+      wire: {
+        reference: {
+          resource: 'Reminder',
+          form: 'selector',
+          cardinality: 'many',
+          selector: { by: 'every' },
+          container: { resource: 'List', form: 'identity', cardinality: 'one', id: list.id },
+        },
+      },
+    })
+  })
+
+  it('binds one reminder with no container, because the get works at the application', () => {
+    const { client } = recordingClient(remindersContract, {})
+    const reminder = {
+      app: 'reminders',
+      resource: 'Reminder',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'x-apple-reminder://R1',
+    } as const
+    expect(bindReference(client, reminder)).toMatchObject(reminder)
   })
 })

@@ -43,17 +43,19 @@
  * - selector positions are non-negative integers, and a range has
  *   `start <= end` (`start === end` is a valid empty range);
  * - a container is a single-object reference;
- * - a reference to a parent-scoped resource (one whose table entry names a
- *   `parent`), wherever it resolves through its resource's `get` or `list`,
- *   carries a container, and that container is an identity reference to the
- *   parent resource; the container is itself read by the same rules, so a
- *   chain of parents is checked level by level.
+ * - a reference resolved through an operation that records a parent (the
+ *   table entry's `parents` names one for that operation: `get` for a
+ *   single-object reference, a container and an identity-collection entry;
+ *   `list` for a selector collection) carries a container, and that container
+ *   is an identity reference to the parent resource; the container is itself
+ *   read by the same rules, so a chain of parents is checked level by level.
  *
  * Every resolvable object has its resolving operation: a single-object
  * reference, every container, and every identity-collection entry name a
- * resource with `get`, and a collection names a resource with `list`. A
- * parent-scoped resource is resolvable only within its parent, so its
- * references also need the parent's identity container. Both directions check
+ * resource with `get`, and a collection names a resource with `list`. An
+ * operation that finds objects only within a parent can resolve a reference
+ * only within that parent, so such references also need the parent's
+ * identity container. Both directions check
  * it, and the wire and SDK schemas admit only the references that satisfy it,
  * so the JSON Schema of a position lists exactly the keys it accepts and
  * requires the container where one is needed. A caller-built reference that could never be resolved is rejected
@@ -293,13 +295,24 @@ interface Walk<Id, Pos, Tag> {
  * an identity reference to a resource without one is rejected while reading
  * the header.
  */
+/**
+ * The parent the operation resolving a reference finds its object or objects
+ * within, which the reference's container must be an identity reference to.
+ */
+interface ParentScope {
+  /** The parent resource key. */
+  readonly resource: string
+  /** The resolving operation that records it. */
+  readonly operation: 'get' | 'list'
+}
+
 type Header<Tag> =
   | {
       readonly source: Source
       readonly tag: Tag
       readonly resource: string
-      /** The parent resource `resource` is found within, when it is parent-scoped. */
-      readonly parent: string | undefined
+      /** The parent of the operation resolving this reference, when it records one. */
+      readonly parent: ParentScope | undefined
       readonly form: 'identity'
       /** The identifier value type of `resource`. */
       readonly idType: ValueType<unknown>
@@ -308,8 +321,8 @@ type Header<Tag> =
       readonly source: Source
       readonly tag: Tag
       readonly resource: string
-      /** The parent resource `resource` is found within, when it is parent-scoped. */
-      readonly parent: string | undefined
+      /** The parent of the operation resolving this reference, when it records one. */
+      readonly parent: ParentScope | undefined
       readonly form: 'selector'
     }
 
@@ -480,7 +493,7 @@ function readHeader<Id, Pos, Tag>(
     return INVALID
   }
   if (tag === INVALID) return INVALID
-  const { parent } = entry
+  const parent = parentScope(entry, want.role, want.cardinality)
   if (form === 'selector') return { source, tag, resource, parent, form }
   if (entry.id === undefined) {
     issues.push(
@@ -518,6 +531,20 @@ function resolvable(
   cardinality: ReferenceCardinality
 ): boolean {
   return entry?.[resolvingOperation(role, cardinality)] !== undefined
+}
+
+/**
+ * The parent the operation resolving a reference at `role` with `cardinality`
+ * finds objects within, when the entry records one for it.
+ */
+function parentScope(
+  entry: ReferenceRegistry[string] | undefined,
+  role: Want['role'],
+  cardinality: ReferenceCardinality
+): ParentScope | undefined {
+  const operation = resolvingOperation(role, cardinality)
+  const resource = entry?.parents?.[operation]
+  return resource === undefined ? undefined : { resource, operation }
 }
 
 /** The resources of `registry` that can be resolved at `role`, as a table of the same shape. */
@@ -675,9 +702,22 @@ function convertCollection<Id, Pos, Tag>(
 }
 
 /**
+ * Why a reference to `resource` needs an identity container of `parent`, as
+ * the predicate of "the app …" the container messages share: the resolving
+ * operation finds the object (`get`) or selects the objects (`list`) only
+ * within one.
+ */
+function withinClause(resource: string, parent: ParentScope): string {
+  return parent.operation === 'get'
+    ? `finds a ${quote(resource)} only within its ${quote(parent.resource)}`
+    : `lists ${quote(resource)} objects only within a ${quote(parent.resource)}`
+}
+
+/**
  * Read the container of the reference `header` heads: optional, and a
- * single-object reference, for a resource found at the application; required,
- * and an identity reference to the parent, for a parent-scoped one.
+ * single-object reference, when the operation resolving it works at the
+ * application; required, and an identity reference to the parent, when that
+ * operation records one.
  */
 function readContainer<Id, Pos, Tag>(
   header: Header<Tag>,
@@ -690,12 +730,15 @@ function readContainer<Id, Pos, Tag>(
   const raw = header.source.read('container')
   if (raw === undefined) {
     if (parent === undefined) return undefined
+    const what =
+      parent.operation === 'get'
+        ? `the ${quote(parent.resource)} the ${quote(resource)} is in`
+        : `the ${quote(parent.resource)} whose ${quote(resource)} objects are selected`
     return fieldMismatch(
       raw,
       at,
       issues,
-      `an identity reference to the ${quote(parent)} the ${quote(resource)} is in, because ` +
-        `the app finds a ${quote(resource)} only within its ${quote(parent)}`
+      `an identity reference to ${what}, because the app ${withinClause(resource, parent)}`
     )
   }
   const container = convertObject(
@@ -706,7 +749,7 @@ function readContainer<Id, Pos, Tag>(
     issues
   )
   if (container === INVALID || parent === undefined) return container
-  if (container.resource !== parent || container.form !== 'identity') {
+  if (container.resource !== parent.resource || container.form !== 'identity') {
     const received =
       container.form === 'identity'
         ? `a reference to ${quote(container.resource)}`
@@ -715,9 +758,9 @@ function readContainer<Id, Pos, Tag>(
       issue(
         at,
         'invalid-type',
-        `The app finds a ${quote(resource)} only within its ${quote(parent)}, by that ` +
-          `${quote(parent)}'s identifier, so the container must be an identity reference to a ` +
-          `${quote(parent)}; received ${received}.`
+        `The app ${withinClause(resource, parent)}, by that ${quote(parent.resource)}'s ` +
+          'identifier, so the container must be an identity reference to a ' +
+          `${quote(parent.resource)}; received ${received}.`
       )
     )
     return INVALID
@@ -904,9 +947,10 @@ const WIRE_COLLECTION_SELECTOR_SCHEMA = z.discriminatedUnion('by', [
 ])
 
 /**
- * How a reference to one resource carries its container in a schema: for a
- * resource found at the application, any resolvable container, optionally;
- * for a parent-scoped one, an identity reference to its parent, required.
+ * How a reference to one resource carries its container in a schema: when the
+ * operation resolving it works at the application, any resolvable container,
+ * optionally; when that operation records a parent, an identity reference to
+ * the parent, required.
  */
 interface ContainerSlot {
   readonly schema: ZodType
@@ -928,8 +972,8 @@ function unionOf(members: readonly ZodType[], error: string): ZodType {
  * being built.
  */
 interface ObjectSchemas {
-  /** How a reference to `resource` carries its container. */
-  slot(resource: string): ContainerSlot
+  /** How a reference to `resource` resolved through `operation` carries its container. */
+  slot(resource: string, operation: 'get' | 'list'): ContainerSlot
   /** An identity reference to `resource`, which must have identifier type `id`. */
   identity(resource: string, id: ValueType<unknown>): ZodType
   /** A selector reference to `resource`. */
@@ -959,12 +1003,12 @@ function objectSchemas(registry: ReferenceRegistry, form: SchemaForm): ObjectSch
    * Any container: a single-object reference to a resource that can be
    * resolved as a container (see {@link resolvingOperation}). Identity
    * branches exist only for those that also have an identifier. Resources
-   * found at the application share one selector branch; each parent-scoped one
-   * has its own, which requires its parent.
+   * whose `get` works at the application share one selector branch; each whose
+   * `get` records a parent has its own, which requires that parent.
    */
   const anyContainer: ZodType = z.lazy(() => {
     const keys = Object.keys(containers)
-    const topLevel = keys.filter((key) => containers[key]?.parent === undefined)
+    const topLevel = keys.filter((key) => containers[key]?.parents?.get === undefined)
     const [first, ...rest] = topLevel
     const shared =
       first === undefined
@@ -989,8 +1033,10 @@ function objectSchemas(registry: ReferenceRegistry, form: SchemaForm): ObjectSch
   })
 
   const self: ObjectSchemas = {
-    slot(resource) {
-      const parent = Object.hasOwn(registry, resource) ? registry[resource]?.parent : undefined
+    slot(resource, operation) {
+      const parent = Object.hasOwn(registry, resource)
+        ? registry[resource]?.parents?.[operation]
+        : undefined
       return parent === undefined
         ? { schema: anyContainer, required: false }
         : { schema: parentContainer(parent), required: true }
@@ -1001,7 +1047,7 @@ function objectSchemas(registry: ReferenceRegistry, form: SchemaForm): ObjectSch
         form: z.literal('identity'),
         cardinality: z.literal('one'),
         id: form.id(id),
-        container: containerField(form, self.slot(resource)),
+        container: containerField(form, self.slot(resource, 'get')),
       })
     },
     selector(resource) {
@@ -1010,14 +1056,15 @@ function objectSchemas(registry: ReferenceRegistry, form: SchemaForm): ObjectSch
         form: z.literal('selector'),
         cardinality: z.literal('one'),
         selector: form.objectSelector,
-        container: containerField(form, self.slot(resource)),
+        container: containerField(form, self.slot(resource, 'get')),
       })
     },
   }
 
   /**
-   * The container of a reference to a child of `parent`: an identity reference
-   * to `parent`, which therefore needs `get` and an identifier.
+   * The container of a reference whose resolving operation finds objects
+   * within `parent`: an identity reference to `parent`, which therefore needs
+   * `get` and an identifier.
    */
   function parentContainer(parent: string): ZodType {
     return z.lazy(() => {
@@ -1044,8 +1091,8 @@ const WIRE_FORM: SchemaForm = {
  * It admits only what can be resolved (see {@link resolvingOperation}): a
  * position whose resource lacks its resolving operation admits nothing, an
  * identity collection admits entries only when its resource can be got, and
- * a reference to a parent-scoped resource needs its parent's identity
- * container.
+ * a reference whose resolving operation records a parent needs that parent's
+ * identity container.
  */
 function wirePayload(
   registry: ReferenceRegistry,
@@ -1098,7 +1145,7 @@ function referencePayload(
     form: z.literal('selector'),
     cardinality: z.literal('many'),
     selector: extra.collectionSelector,
-    container: containerField(form, schemas.slot(resource)),
+    container: containerField(form, schemas.slot(resource, 'list')),
   })
   if (id === undefined) return selector
   // Entries are single references, so they need `get`; without it only an

@@ -1,15 +1,15 @@
 /**
- * Unit tests for references to parent-scoped resources: resources the app
- * finds only within an object of another resource, whose table entry names
- * that `parent`.
+ * Unit tests for references resolved through an operation that finds objects
+ * only within an object of another resource: the table entry's `parents`
+ * names that parent for the operation (`get` or `list`).
  *
- * Expected values are written by hand from phases/13 D7 ("Resolvable
- * targets"): wherever such a reference resolves through its resource's `get`
- * or `list` (a position's own reference, a container, an identity-collection
- * entry, or a selector collection), it must carry as its container an
- * identity reference to the parent, which is itself read by the same rules.
- * Encoding, decoding, and the wire and SDK schemas (and the JSON Schema
- * derived from the wire schema) all apply it.
+ * Expected values are written by hand from phases/13 D7 ("Parent-scoped
+ * targets"): a reference takes the parent of the operation that resolves it
+ * (a single-object reference, a container and an identity-collection entry
+ * its resource's `get`; a selector collection its `list`), and must then carry
+ * as its container an identity reference to that parent, which is itself read
+ * by the same rules. Encoding, decoding, and the wire and SDK schemas (and the
+ * JSON Schema derived from the wire schema) all apply it.
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md §D7
  * @see https://json-schema.org/draft-07/json-schema-validation#rfc.section.6.5.3
@@ -26,9 +26,12 @@ import { VECTOR_DECODE_CONTEXT } from './vectors/index.js'
 const APP = 'music'
 
 /**
- * A music app: tracks are found only within a playlist; playlists and people
- * at the application. A book is found within a shelf, which is found within
- * a library, for a chain of parents.
+ * A music app: tracks are got and listed only within a playlist; playlists
+ * and people at the application. A book is found within a shelf, which is
+ * found within a library, for a chain of parents. A reminder is got at the
+ * application but listed only within a list, so only its collections need a
+ * container. A message is got within its mailbox but listed within its
+ * account, so each form needs the parent of the operation resolving it.
  */
 const REGISTRY: ReferenceRegistry = {
   Playlist: { id: t.string(), get: 'music.playlists.get', list: 'music.playlists.list' },
@@ -36,12 +39,32 @@ const REGISTRY: ReferenceRegistry = {
     id: t.string(),
     get: 'music.tracks.get',
     list: 'music.tracks.list',
-    parent: 'Playlist',
+    parents: { get: 'Playlist', list: 'Playlist' },
   },
   Person: { id: t.string(), get: 'music.people.get' },
   Library: { id: t.string(), get: 'music.libraries.get' },
-  Shelf: { id: t.string(), get: 'music.shelves.get', parent: 'Library' },
-  Book: { id: t.string(), get: 'music.books.get', list: 'music.books.list', parent: 'Shelf' },
+  Shelf: { id: t.string(), get: 'music.shelves.get', parents: { get: 'Library' } },
+  Book: {
+    id: t.string(),
+    get: 'music.books.get',
+    list: 'music.books.list',
+    parents: { get: 'Shelf', list: 'Shelf' },
+  },
+  List: { id: t.string(), get: 'music.lists.get', list: 'music.lists.list' },
+  Reminder: {
+    id: t.string(),
+    get: 'music.reminders.get',
+    list: 'music.reminders.list',
+    parents: { list: 'List' },
+  },
+  Account: { id: t.string(), get: 'music.accounts.get' },
+  Mailbox: { id: t.string(), get: 'music.mailboxes.get' },
+  Message: {
+    id: t.string(),
+    get: 'music.messages.get',
+    list: 'music.messages.list',
+    parents: { get: 'Mailbox', list: 'Account' },
+  },
 }
 
 const SCOPE: ReferenceScope = { app: APP, resources: REGISTRY }
@@ -51,6 +74,8 @@ const track = t.reference(scope, 'Track', 'one')
 const tracks = t.reference(scope, 'Track', 'many')
 const book = t.reference(scope, 'Book', 'one')
 const playlist = t.reference(scope, 'Playlist', 'one')
+const reminder = t.reference(scope, 'Reminder', 'one')
+const reminders = t.reference(scope, 'Reminder', 'many')
 
 /** Identity reference data to `resource`, with an optional container. */
 function identity(resource: string, id: string, container?: object): object {
@@ -167,8 +192,16 @@ describe('encoding a reference to a parent-scoped resource', () => {
       cardinality: 'many',
       selector: { by: 'every' },
     }
+    // A selector collection resolves through the list, whose parent is also the playlist.
     expect(failures(tracks.encode(every))).toEqual([
-      { path: ['container'], code: 'missing-field', message: MISSING_PLAYLIST },
+      {
+        path: ['container'],
+        code: 'missing-field',
+        message:
+          'The required field "container" is missing; expected an identity reference to the ' +
+          '"Playlist" whose "Track" objects are selected, because the app lists "Track" objects ' +
+          'only within a "Playlist".',
+      },
     ])
     expect(tracks.encode({ ...every, container: identity('Playlist', 'P1') }).ok).toBe(true)
   })
@@ -210,6 +243,159 @@ describe('decoding a reference to a parent-scoped resource', () => {
   it('accepts one with its parent container', () => {
     const wire = { reference: wireIdentity('Track', 'T1', wireIdentity('Playlist', 'P1')) }
     expect(track.decode(wire, VECTOR_DECODE_CONTEXT).ok).toBe(true)
+  })
+})
+
+const MISSING_LIST =
+  'The required field "container" is missing; expected an identity reference to the ' +
+  '"List" whose "Reminder" objects are selected, because the app lists "Reminder" objects ' +
+  'only within a "List".'
+
+describe('a reference to a resource listed, but not got, within a parent', () => {
+  const every = {
+    app: APP,
+    resource: 'Reminder',
+    form: 'selector',
+    cardinality: 'many',
+    selector: { by: 'every' },
+  }
+
+  it('rejects a selector collection with no container, naming the list parent', () => {
+    expect(failures(reminders.encode(every))).toEqual([
+      { path: ['container'], code: 'missing-field', message: MISSING_LIST },
+    ])
+    const range = { ...every, selector: { by: 'range', start: 0, end: 2 } }
+    expect(failures(reminders.encode(range))).toEqual([
+      { path: ['container'], code: 'missing-field', message: MISSING_LIST },
+    ])
+  })
+
+  it('rejects a selector collection within another resource', () => {
+    expect(failures(reminders.encode({ ...every, container: identity('Person', 'P1') }))).toEqual([
+      {
+        path: ['container'],
+        code: 'invalid-type',
+        message:
+          'The app lists "Reminder" objects only within a "List", by that "List"\'s ' +
+          'identifier, so the container must be an identity reference to a "List"; received a ' +
+          'reference to "Person".',
+      },
+    ])
+  })
+
+  it("accepts a selector collection within the list parent's identity", () => {
+    expect(reminders.encode({ ...every, container: identity('List', 'L1') }).ok).toBe(true)
+  })
+
+  it('needs no container where the get resolves it: one reminder, or identity entries', () => {
+    expect(reminder.encode(identity('Reminder', 'R1')).ok).toBe(true)
+    const byName = {
+      app: APP,
+      resource: 'Reminder',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'name', name: 'Call' },
+    }
+    expect(reminder.encode(byName).ok).toBe(true)
+    const entries = {
+      app: APP,
+      resource: 'Reminder',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [identity('Reminder', 'R1')],
+    }
+    expect(reminders.encode(entries).ok).toBe(true)
+  })
+
+  it('rejects the collection with no container when decoding too', () => {
+    const wire = {
+      reference: {
+        resource: 'Reminder',
+        form: 'selector',
+        cardinality: 'many',
+        selector: { by: 'every' },
+      },
+    }
+    expect(failures(reminders.decode(wire, VECTOR_DECODE_CONTEXT))).toEqual([
+      { path: ['container'], code: 'missing-field', message: MISSING_LIST },
+    ])
+  })
+
+  it('requires the container only in the selector collection branch of its JSON Schema', () => {
+    const schema = z.toJSONSchema(reminders.wire, { target: 'draft-7' })
+    const payload = (schema.properties as Record<string, { anyOf: Record<string, unknown>[] }>)[
+      'reference'
+    ]
+    // Identity collection first, then selector collection (D7, wire forms).
+    expect(payload?.anyOf.map((branch) => branch['required'])).toEqual([
+      ['resource', 'form', 'cardinality', 'entries'],
+      ['resource', 'form', 'cardinality', 'selector', 'container'],
+    ])
+    const container = (
+      payload?.anyOf[1]?.['properties'] as Record<string, Record<string, unknown>>
+    )['container']
+    expect(container?.['properties']).toMatchObject({
+      resource: { type: 'string', const: 'List' },
+      form: { type: 'string', const: 'identity' },
+    })
+    expect(wireAccepts(reminder, { reference: wireIdentity('Reminder', 'R1') })).toBe(true)
+  })
+})
+
+describe('a resource whose get and list parents differ', () => {
+  const message = t.reference(scope, 'Message', 'one')
+  const messages = t.reference(scope, 'Message', 'many')
+  const every = {
+    app: APP,
+    resource: 'Message',
+    form: 'selector',
+    cardinality: 'many',
+    selector: { by: 'every' },
+  }
+
+  it("takes the get's parent for a single reference, an entry, and a container", () => {
+    expect(message.encode(identity('Message', 'M1', identity('Mailbox', 'X1'))).ok).toBe(true)
+    expect(failures(message.encode(identity('Message', 'M1', identity('Account', 'A1'))))).toEqual([
+      {
+        path: ['container'],
+        code: 'invalid-type',
+        message:
+          'The app finds a "Message" only within its "Mailbox", by that "Mailbox"\'s ' +
+          'identifier, so the container must be an identity reference to a "Mailbox"; ' +
+          'received a reference to "Account".',
+      },
+    ])
+    const entries = {
+      app: APP,
+      resource: 'Message',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [identity('Message', 'M1', identity('Account', 'A1'))],
+    }
+    expect(failures(messages.encode(entries)).map(({ path }) => path)).toEqual([
+      ['entries', 0, 'container'],
+    ])
+    const inMessage = identity(
+      'Playlist',
+      'P1',
+      identity('Message', 'M1', identity('Account', 'A1'))
+    )
+    expect(failures(playlist.encode(inMessage)).map(({ path }) => path)).toEqual([
+      ['container', 'container'],
+    ])
+  })
+
+  it("takes the list's parent for a selector collection", () => {
+    expect(messages.encode({ ...every, container: identity('Account', 'A1') }).ok).toBe(true)
+    expect(
+      failures(messages.encode({ ...every, container: identity('Mailbox', 'X1') })).map(
+        ({ message: text }) => text
+      )
+    ).toEqual([
+      'The app lists "Message" objects only within a "Account", by that "Account"\'s ' +
+        'identifier, so the container must be an identity reference to a "Account"; received a ' +
+        'reference to "Mailbox".',
+    ])
   })
 })
 

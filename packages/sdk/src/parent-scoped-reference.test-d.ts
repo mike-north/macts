@@ -1,12 +1,15 @@
 /**
- * Type tests for `bindReference` with a parent-scoped resource of a real
- * generated contract: Music's tracks are found only within a playlist, so
- * the Music resource table types `Track` with `parent: 'Playlist'`.
+ * Type tests for `bindReference` with references resolved through an
+ * operation that records a parent, over real generated contracts: Music gets
+ * and lists tracks only within a playlist (`Track` is typed with
+ * `parents: { get: 'Playlist'; list: 'Playlist' }`); Reminders lists reminders
+ * only within a list and Microsoft Edge tabs only within a window
+ * (`parents: { list: … }`), while getting one at the application.
  *
- * phases/13 D7, "Resolvable targets" and "Caller-built references": data
- * for such a resource type-checks only with an identity reference to the
- * parent as its container; resources found at the application are
- * unaffected. A missing container is shown with `@ts-expect-error` on the
+ * phases/13 D7, "Parent-scoped targets" and "Caller-built references": data
+ * resolved through such an operation type-checks only with an identity
+ * reference to that parent as its container; references resolved through an
+ * operation at the application are unaffected. A missing container is shown with `@ts-expect-error` on the
  * call itself, which both `tsc --noEmit` and tsd enforce.
  *
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md §D7
@@ -19,7 +22,13 @@ import {
   type Playlist,
   type Track,
 } from '@macts/music/contract'
-import type { IdentityReference, ResolvableReferenceData } from '@macts/contracts'
+import { microsoftEdgeContract } from '@macts/microsoft-edge/contract'
+import { remindersContract, type Reminder } from '@macts/reminders/contract'
+import type {
+  IdentityReference,
+  ResolvableReferenceData,
+  SelectorCollectionReference,
+} from '@macts/contracts'
 import * as remote from './index.js'
 import { bindReference } from './index.js'
 
@@ -62,3 +71,61 @@ expectType<IdentityReference<Playlist, string, 'Playlist'>>(boundPlaylist)
 expectType<IdentityReference<Track, string, 'Track'>>(
   bindReference(music, { ...looseTrack, container: boundPlaylist })
 )
+
+const reminders = remote.createClient(remindersContract, {
+  token: 'macts_sk_example',
+  url: 'http://localhost:8372',
+})
+const edge = remote.createClient(microsoftEdgeContract, {
+  token: 'macts_sk_example',
+  url: 'http://localhost:8372',
+})
+
+const everyReminder = {
+  app: 'reminders',
+  resource: 'Reminder',
+  form: 'selector',
+  cardinality: 'many',
+  selector: { by: 'every' },
+} as const
+
+// @ts-expect-error -- every reminder is listed within a list, so it needs one as its container
+bindReference(reminders, everyReminder)
+// With the list, it binds to a collection of reminders.
+expectType<SelectorCollectionReference<Reminder, 'Reminder'>>(
+  bindReference(reminders, {
+    ...everyReminder,
+    container: {
+      app: 'reminders',
+      resource: 'List',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'x-apple-reminder-list://ABC',
+    },
+  })
+)
+// One reminder is got at the application, so it needs no container.
+expectType<IdentityReference<Reminder, string, 'Reminder'>>(
+  bindReference(reminders, {
+    app: 'reminders',
+    resource: 'Reminder',
+    form: 'identity',
+    cardinality: 'one',
+    id: 'x-apple-reminder://R1',
+  })
+)
+
+// @ts-expect-error -- every tab is listed within a window, so it needs one as its container
+bindReference(edge, { ...everyReminder, app: 'microsoft-edge', resource: 'Tab' })
+bindReference(edge, {
+  ...everyReminder,
+  app: 'microsoft-edge',
+  resource: 'Tab',
+  container: {
+    app: 'microsoft-edge',
+    resource: 'Window',
+    form: 'identity',
+    cardinality: 'one',
+    id: 'W1',
+  },
+})
