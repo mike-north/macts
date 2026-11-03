@@ -21,7 +21,7 @@ export class AddressResourceClient {
   }
 
   /**
-   * List all addresses.
+   * List the addresses of one person.
    */
   async list(personId: string): Promise<Address[]> {
     return this.#http.rpc<Address[]>(`${this.#app}.${this.#resource}.list`, { personId })

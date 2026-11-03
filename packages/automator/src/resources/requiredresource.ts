@@ -21,7 +21,7 @@ export class RequiredResourceResourceClient {
   }
 
   /**
-   * List all required resources.
+   * List the required resources of one automator action.
    */
   async list(actionId: string): Promise<RequiredResource[]> {
     return this.#http.rpc<RequiredResource[]>(`${this.#app}.${this.#resource}.list`, { actionId })

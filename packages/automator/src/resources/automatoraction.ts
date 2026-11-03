@@ -21,7 +21,7 @@ export class AutomatorActionResourceClient {
   }
 
   /**
-   * List all automator actions.
+   * List the automator actions of one workflow.
    */
   async list(workflowName: string): Promise<AutomatorAction[]> {
     return this.#http.rpc<AutomatorAction[]>(`${this.#app}.${this.#resource}.list`, {

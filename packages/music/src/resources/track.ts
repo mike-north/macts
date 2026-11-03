@@ -21,7 +21,7 @@ export class TrackResourceClient {
   }
 
   /**
-   * List all tracks.
+   * List the tracks of one playlist.
    */
   async list(playlistId: string): Promise<Track[]> {
     return this.#http.rpc<Track[]>(`${this.#app}.${this.#resource}.list`, { playlistId })

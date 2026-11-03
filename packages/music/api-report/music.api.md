@@ -131,7 +131,9 @@ export interface BrowserWindow {
 }
 
 // @public
-export type BrowserWindowCreateInput = Record<string, never>;
+export interface BrowserWindowCreateInput {
+    view?: Playlist;
+}
 
 // @public (undocumented)
 export const BrowserWindowSchema: z.ZodObject<{

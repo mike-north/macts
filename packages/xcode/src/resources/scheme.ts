@@ -21,7 +21,7 @@ export class SchemeResourceClient {
   }
 
   /**
-   * List all schemes.
+   * List the schemes of one workspace document.
    */
   async list(workspaceName: string): Promise<Scheme[]> {
     return this.#http.rpc<Scheme[]>(`${this.#app}.${this.#resource}.list`, { workspaceName })

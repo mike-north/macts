@@ -690,14 +690,6 @@ export const manifest: unknown = {
             },
           },
         },
-        vcard: {
-          access: 'r',
-          type: 'string',
-          description:
-            'Person information in vCard format, this always returns a card in version 3.0 format.',
-          code: 'az49',
-          optional: false,
-        },
         homePage: {
           access: 'rw',
           type: 'string',
@@ -817,13 +809,6 @@ export const manifest: unknown = {
               failedReads: 0,
             },
           },
-        },
-        image: {
-          access: 'rw',
-          type: 'string',
-          description: 'Image for person.',
-          code: 'az50',
-          optional: false,
         },
         name: {
           access: 'r',

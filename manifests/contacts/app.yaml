@@ -132,6 +132,11 @@ resources:
         type: string
         description: State, Province, or Region part of the address.
         code: az30
+    # The dictionary's `address` class (az27) declares its own `id` ('ID  '):
+    # "unique identifier for this address." Unlike the entry and contact-info
+    # ids, it is not documented as persistent, and its stability across
+    # relaunches of Contacts has not been observed. It is looked up under its
+    # person.
     identifiers:
       - property: id
         primary: true
@@ -491,6 +496,12 @@ resources:
     # person is looked up by that id. The entry's `selected` (selE) is not
     # declared: it is window selection state, and reading it across 295 people
     # took 5.4 s on Contacts 14.0 (macOS 27.2), a fifth of a list's time limit.
+    # The person's `vcard` (az49) and `image` (az50) are not declared either,
+    # though the app provides both: a list would carry them for every person,
+    # and the app reports them only one person at a time. On Contacts 14.0
+    # (macOS 27.2), a list of 295 people that read them took 8.2 s and carried
+    # 12,612,397 bytes of vCard text; 135 of the vCards embedded a photo, and
+    # the largest was 1,161,851 bytes.
     identifiers:
       - property: id
         primary: true
@@ -574,11 +585,6 @@ resources:
             sampleSize: 23
             nullCount: 23
             failedReads: 0
-      vcard:
-        access: r
-        type: string
-        description: Person information in vCard format, this always returns a card in version 3.0 format.
-        code: az49
       homePage:
         access: rw
         type: string
@@ -597,6 +603,7 @@ resources:
             failedReads: 0
       birthDate:
         access: rw
+        # sdef `birth date` (az11): <type type="date" /> or missing value.
         type: date
         description: The birth date of this person.
         code: az11
@@ -675,11 +682,6 @@ resources:
             sampleSize: 23
             nullCount: 23
             failedReads: 0
-      image:
-        access: rw
-        type: string
-        description: Image for person.
-        code: az50
       name:
         access: r
         type: string
@@ -845,7 +847,7 @@ resources:
             sampleSize: 48
             nullCount: 0
             failedReads: 0
-    # The dictionary's `contact info` class (az16), which an phone inherits,
+    # The dictionary's `contact info` class (az16), which a phone inherits,
     # declares `id` ('ID  '): "unique identifier for this entry, this is
     # persistent, and stays with the record". It is looked up under its person.
     identifiers:

@@ -11,6 +11,7 @@ Contacts:
 - `people.list` and `people.get`, and `groups.list` and `groups.get`, by each record's `id`, which the app keeps with the record.
 - `emails`, `phones` and `addresses` of one person: `list(personId)` and `get(personId, id)`.
 - People and groups now include their `id`, `creationDate` and `modificationDate`. A person's `birthDate` is now a date, as the app reports it, instead of a string.
+- People no longer include `vcard` or `image`, and a person's create and update inputs no longer take `image`. The app reports both only one person at a time, so a list of a few hundred people took several seconds and carried megabytes of card and photo data.
 
 Music:
 

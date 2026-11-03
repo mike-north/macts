@@ -452,10 +452,12 @@ resources:
           resource: playlist
         description: folder which contains this playlist (if any)
         code: pPlP
-        # No playlist read was in a folder. For a playlist with no folder the
-        # app fails the read (-1728, both across the collection and for each
-        # playlist) instead of reporting a missing value, and the record then
-        # lacks the field, so every playlist read would fail its contract.
+        # Observed on 3 playlists, none of them in a folder. For a playlist in
+        # no folder the app fails the read (-1728, both across the collection
+        # and for each playlist) instead of reporting a missing value, and the
+        # record then lacks the field, so every playlist read would fail its
+        # contract. A playlist inside a folder was not observed; it may report
+        # its folder.
         unsupported:
           reason: The app fails the read for a playlist that is in no folder instead of reporting a missing value.
           evidence:
@@ -1449,6 +1451,10 @@ hierarchy:
 commands:
   # Reads. Playlists are elements of the application; tracks are read under
   # a playlist, and the library playlist holds every track in the library.
+  # The dictionary also lists `track` as an element of the application, but
+  # tracks are not read from there: a track's numeric `id` names its entry in
+  # one playlist, so a track is always read in a playlist, and the library
+  # playlist already stands for "all tracks".
   listPlaylists:
     name: list
     routeName: list

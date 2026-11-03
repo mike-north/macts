@@ -813,6 +813,8 @@ ${methodBody}
  * Identifier resolution follows the same unified path as other CRUD branches:
  * required parameters from the manifest command definition (see
  * `listMethodParameters`), so SDK and server always agree on parameter names.
+ * The doc comment of a list under a command parent says it lists the items of
+ * one parent.
  */
 function generateListMethod(
   routeSegment: string,
@@ -848,10 +850,15 @@ function generateListMethod(
     })
     .join(', ')
   const bodyArg = `{ ${bodyProps} }`
+  // A list under a command parent returns that parent's items, not all of them.
+  const listed =
+    command.parent === undefined
+      ? `all ${pluralWords}`
+      : `the ${pluralWords} of one ${identifierWords(command.parent.resource)}`
 
   return `
   /**
-   * List all ${pluralWords}.
+   * List ${listed}.
    */
   async list(${signature}): Promise<${resourceName}[]> {
     return this.#http.rpc<${resourceName}[]>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, ${bodyArg});

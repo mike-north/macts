@@ -65,9 +65,7 @@ const liveAppsEnabled = process.env['MACTS_LIVE_APPS'] === '1'
 
 /**
  * Per-test limit: a cold app launch plus the executor's own 30 s limit, for a
- * test that runs a list and a get twice each. A Contacts people list reads two
- * properties item by item (the app cannot report them across the collection),
- * so it takes several seconds on a few hundred people.
+ * test that runs a list and a get twice each.
  */
 const LIVE_TEST_TIMEOUT_MS = 180_000
 

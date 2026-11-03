@@ -229,8 +229,6 @@ export interface Person {
   maidenName: string
   /** The Suffix of this person. */
   suffix: string
-  /** Person information in vCard format, this always returns a card in version 3.0 format. */
-  vcard: string
   /** The home page of this person. */
   homePage: string
   /** The birth date of this person. */
@@ -243,8 +241,6 @@ export interface Person {
   phoneticMiddleName: string
   /** Department that this person works for. */
   department: string
-  /** Image for person. */
-  image: string
   /** First/Last name of the person, uses the name display order preference setting in Contacts. */
   name: string
   /** Notes for this person. */
@@ -285,8 +281,6 @@ export interface PersonCreateInput {
   phoneticMiddleName?: string
   /** Department that this person works for. */
   department?: string
-  /** Image for person. */
-  image?: string
   /** Notes for this person. */
   note?: string
   /** Is the current record a company or a person. */
@@ -484,14 +478,12 @@ export const PersonSchema = z.object({
   organization: z.string(),
   maidenName: z.string(),
   suffix: z.string(),
-  vcard: z.string(),
   homePage: z.string(),
   birthDate: z.string(),
   phoneticLastName: z.string(),
   title: z.string(),
   phoneticMiddleName: z.string(),
   department: z.string(),
-  image: z.string(),
   name: z.string(),
   note: z.string(),
   company: z.boolean(),

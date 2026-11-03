@@ -21,7 +21,7 @@ export class PhoneResourceClient {
   }
 
   /**
-   * List all phones.
+   * List the phones of one person.
    */
   async list(personId: string): Promise<Phone[]> {
     return this.#http.rpc<Phone[]>(`${this.#app}.${this.#resource}.list`, { personId })

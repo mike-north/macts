@@ -21,7 +21,7 @@ export class EmailResourceClient {
   }
 
   /**
-   * List all emails.
+   * List the emails of one person.
    */
   async list(personId: string): Promise<Email[]> {
     return this.#http.rpc<Email[]>(`${this.#app}.${this.#resource}.list`, { personId })

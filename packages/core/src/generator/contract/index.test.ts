@@ -625,8 +625,9 @@ describe('real app manifests', () => {
 
   it('report exactly the operations a required input makes unavailable', () => {
     // Audited by hand against the manifests: each position is a required
-    // parameter whose type is a resource with no `get` command. Contacts has
-    // no command that gets one person; Mail none that gets one account.
+    // parameter whose type is a resource with no `get` command. Mail has no
+    // command that gets one account. Contacts' actions take a person, which
+    // `people.get` gets, so they are not reported.
     const found = apps
       .flatMap(({ manifest }) => collectContractDiagnostics(manifest))
       .flatMap((diagnostic) =>
@@ -642,24 +643,6 @@ describe('real app manifests', () => {
           : []
       )
     expect(found).toEqual([
-      {
-        app: 'contacts',
-        operation: 'contacts.app.actionTitle',
-        position: 'commands.actionTitle.parameters.for',
-        resource: 'Person',
-      },
-      {
-        app: 'contacts',
-        operation: 'contacts.app.performAction',
-        position: 'commands.performAction.parameters.for',
-        resource: 'Person',
-      },
-      {
-        app: 'contacts',
-        operation: 'contacts.app.shouldEnableAction',
-        position: 'commands.shouldEnableAction.parameters.for',
-        resource: 'Person',
-      },
       {
         app: 'mail',
         operation: 'mail.app.synchronize',

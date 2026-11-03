@@ -53,16 +53,13 @@ Generated surfaces never offer an operation that cannot be called. An input posi
 - the MCP adapter lists no tool for it, and calling its tool name is an unknown-tool call;
 - the HTTP API neither routes nor lists it: `POST /rpc/<id>` gets the same 404 as an unknown operation, and introspection leaves it out;
 - neither generated client has a method for it, the generated CLI has no command for it, and capability discovery lists no capability for it;
-- its permission is no longer a known permission: `macts api-key create` rejects a grant naming it (for example `contacts:app:actionTitle`) as an unknown permission, and `macts permissions expand` no longer lists or suggests it. These permissions never authorized anything that could be called.
+- its permission is no longer a known permission: `macts api-key create` rejects a grant naming it (for example `mail:app:synchronize`) as an unknown permission, and `macts permissions expand` no longer lists or suggests it. These permissions never authorized anything that could be called.
 
 A left-out position has no parameter in either generated client, no CLI flag, and no field in the capability schema.
 
 None of the affected positions ever worked through the native runtime, because it cannot yet encode references. What changes is how a request that uses them is treated. A request that sends a left-out field used to reach the server, and is now rejected as an unknown field. An unavailable operation is no longer offered as a tool, a route, a client method, a command or a capability.
 
-Operations that become unavailable:
-
-- Contacts `contacts.app.actionTitle`, `contacts.app.performAction` and `contacts.app.shouldEnableAction`: their required `for` takes a person, and Contacts has no operation that gets one. The `actionTitle`, `performAction` and `shouldEnableAction` methods of both the contract client and the `ContactsClient` HTTP client, and the CLI commands `macts contacts action-title`, `perform-action` and `should-enable-action`, are removed.
-- Mail `mail.app.synchronize`: its required `with` takes an account, and Mail has no operation that gets one. The `synchronize` method of both the contract client and the `MailClient` HTTP client, and the CLI command `macts mail synchronize`, are removed.
+The operation that becomes unavailable is Mail `mail.app.synchronize`: its required `with` takes an account, and Mail has no operation that gets one. The `synchronize` method of both the contract client and the `MailClient` HTTP client, and the CLI command `macts mail synchronize`, are removed.
 
 Operations that lose an optional position:
 
@@ -74,7 +71,7 @@ Create and update input types that no operation takes lose the same kind of fiel
 - Finder `ListViewOptionsCreateInput` and `ListViewOptionsUpdateInput` lose `sortColumn`.
 - iTerm `WindowCreateInput` and `WindowUpdateInput` lose `currentTab` and `currentSession`, and `TabCreateInput` and `TabUpdateInput` lose `currentSession`.
 - Mail `MessageCreateInput` and `MessageUpdateInput` lose `mailbox`, and `RuleCreateInput` and `RuleUpdateInput` lose `copyMessage` and `moveMessage`.
-- Music and TV `BrowserWindowCreateInput` and `BrowserWindowUpdateInput` lose `view`, and become `Record<string, never>`.
+- TV `BrowserWindowCreateInput` and `BrowserWindowUpdateInput` lose `view`, and become `Record<string, never>`.
 - System Events `NetworkPreferencesObjectCreateInput` and `NetworkPreferencesObjectUpdateInput` lose `currentLocation`, and become `Record<string, never>`. `ServiceCreateInput` and `ServiceUpdateInput` lose `currentConfiguration`.
 
 `CliGeneratorContext` gains `isOperationAvailable` and `omittedInputs`, which the CLI generator uses to apply the rule.

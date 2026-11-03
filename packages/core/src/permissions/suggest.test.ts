@@ -171,28 +171,32 @@ describe('listKnownPermissions', () => {
 })
 
 describe('listKnownPermissions of the shipped manifests', () => {
-  // Hand-written from manifests/contacts/app.yaml and manifests/mail/app.yaml:
-  // `actionTitle`, `performAction` and `shouldEnableAction` require `for`, a
-  // `person`, and Mail's `synchronize` requires `with`, an `account`; neither
-  // app has a `get` for that resource, so those inputs admit no value and the
-  // operations can never be called (phases/13 D7, "Resolvable targets").
-  it.each([
-    [
-      'contacts',
-      ['contacts:app:actionTitle', 'contacts:app:performAction', 'contacts:app:shouldEnableAction'],
-    ],
-    ['mail', ['mail:app:synchronize']],
-  ])(
-    'leaves out the permissions of the %s operations that cannot be called',
-    async (app, absent) => {
-      const known = listKnownPermissions(
-        await loadManifest(resolve(MANIFESTS_DIR, app, 'app.yaml'))
-      )
-      for (const permission of absent) expect(known).not.toContain(permission)
-      // The app's other application commands stay, so the list is not vacuous.
-      expect(known).toContain(`${app}:app:*`)
+  it('leaves out the permission of an operation that cannot be called', async () => {
+    // manifests/mail/app.yaml: `synchronize` requires `with`, an `account`, and
+    // Mail has no `get` for accounts, so the input admits no value and the
+    // operation can never be called (phases/13 D7, "Resolvable targets").
+    const known = listKnownPermissions(
+      await loadManifest(resolve(MANIFESTS_DIR, 'mail', 'app.yaml'))
+    )
+    expect(known).not.toContain('mail:app:synchronize')
+    // The app's other application commands stay, so the list is not vacuous.
+    expect(known).toContain('mail:app:*')
+  })
+
+  it('keeps the permissions of operations whose required reference has a get', async () => {
+    // manifests/contacts/app.yaml: `actionTitle`, `performAction` and
+    // `shouldEnableAction` require `for`, a `person`, and `people.get` gets one.
+    const known = listKnownPermissions(
+      await loadManifest(resolve(MANIFESTS_DIR, 'contacts', 'app.yaml'))
+    )
+    for (const permission of [
+      'contacts:app:actionTitle',
+      'contacts:app:performAction',
+      'contacts:app:shouldEnableAction',
+    ]) {
+      expect(known).toContain(permission)
     }
-  )
+  })
 
   it('keeps the permission of an operation whose unsatisfiable input is optional', async () => {
     // manifests/mail/app.yaml: `checkForNewMail` takes an optional `for`, an

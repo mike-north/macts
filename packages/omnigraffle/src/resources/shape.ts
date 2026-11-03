@@ -21,7 +21,7 @@ export class ShapeResourceClient {
   }
 
   /**
-   * List all shapes.
+   * List the shapes of one canvas.
    */
   async list(canvasId: string): Promise<Shape[]> {
     return this.#http.rpc<Shape[]>(`${this.#app}.${this.#resource}.list`, { canvasId })

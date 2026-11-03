@@ -271,11 +271,6 @@ export interface Person {
    */
   suffix: string | null
   /**
-   * Person information in vCard format, this always returns a card in version 3.0 format.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly vcard: string | null
-  /**
    * The home page of this person.
    * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
@@ -305,11 +300,6 @@ export interface Person {
    * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   department: string | null
-  /**
-   * Image for person.
-   * Nullable. No evidence that the app always sets it.
-   */
-  image: string | null
   /**
    * First/Last name of the person, uses the name display order preference setting in Contacts.
    * Nullable. No evidence that the app always sets it.
@@ -690,8 +680,6 @@ export interface PersonCreateInput {
   phoneticMiddleName?: string
   /** Department that this person works for. */
   department?: string
-  /** Image for person. */
-  image?: string
   /** Notes for this person. */
   note?: string
   /** Is the current record a company or a person. */
@@ -760,11 +748,6 @@ export interface PersonUpdateInput {
    * Cannot be reset: null is rejected.
    */
   department?: string
-  /**
-   * Image for person.
-   * Cannot be reset: null is rejected.
-   */
-  image?: string
   /**
    * Notes for this person.
    * Cannot be reset: null is rejected.
@@ -1185,10 +1168,6 @@ const personRecordType: ValueType<Person> = t.record(
     organization: t.nullable(t.string(), { description: 'Organization that employs this person.' }),
     maidenName: t.nullable(t.string(), { description: 'The Maiden name of this person.' }),
     suffix: t.nullable(t.string(), { description: 'The Suffix of this person.' }),
-    vcard: t.nullable(t.string(), {
-      description:
-        'Person information in vCard format, this always returns a card in version 3.0 format.',
-    }),
     homePage: t.nullable(t.string(), { description: 'The home page of this person.' }),
     birthDate: t.nullable(t.date(), { description: 'The birth date of this person.' }),
     phoneticLastName: t.nullable(t.string(), {
@@ -1199,7 +1178,6 @@ const personRecordType: ValueType<Person> = t.record(
       description: 'The Phonetic version of the Middle name of this person.',
     }),
     department: t.nullable(t.string(), { description: 'Department that this person works for.' }),
-    image: t.nullable(t.string(), { description: 'Image for person.' }),
     name: t.nullable(t.string(), {
       description:
         'First/Last name of the person, uses the name display order preference setting in Contacts.',
