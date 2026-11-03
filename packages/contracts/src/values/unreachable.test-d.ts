@@ -78,6 +78,7 @@ export function describeCode(code: ErrorCode): string {
     case 'TARGET_NOT_FOUND':
     case 'FILE_NOT_FOUND':
     case 'INVALID_SELECTION':
+    case 'COLLECTION_CHANGED':
     case 'APP_UNAVAILABLE':
     case 'APP_AUTHORIZATION_REQUIRED':
     case 'APP_OPERATION_FAILED':
@@ -107,6 +108,7 @@ export function isClientOnly(code: ErrorCode): boolean {
     case 'TARGET_NOT_FOUND':
     case 'FILE_NOT_FOUND':
     case 'INVALID_SELECTION':
+    case 'COLLECTION_CHANGED':
     case 'APP_UNAVAILABLE':
     case 'APP_AUTHORIZATION_REQUIRED':
     case 'APP_OPERATION_FAILED':

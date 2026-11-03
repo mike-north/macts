@@ -46,6 +46,18 @@ describe('JsonFormatter', () => {
     })
   })
 
+  describe('formatPage', () => {
+    it('carries the items and the next cursor when more remain', () => {
+      const parsed = JSON.parse(formatter.formatPage([{ id: 1 }], 'next-1')) as unknown
+      expect(parsed).toEqual({ data: [{ id: 1 }], nextCursor: 'next-1' })
+    })
+
+    it('omits nextCursor on the last page', () => {
+      const parsed = JSON.parse(formatter.formatPage([{ id: 1 }], undefined)) as unknown
+      expect(parsed).toEqual({ data: [{ id: 1 }] })
+    })
+  })
+
   describe('formatError', () => {
     it('should format error messages', () => {
       const result = formatter.formatError('Something went wrong')

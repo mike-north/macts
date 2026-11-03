@@ -19,10 +19,10 @@ export class ListWorkflowsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.workflows.list()
+      const page = await client.workflows.list()
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           name: item.name,
           currentAction: item.currentAction,
           executionResult: item.executionResult,

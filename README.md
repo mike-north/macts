@@ -76,9 +76,9 @@ const client = new CalendarClient({
   apiKey: process.env.MACTS_API_KEY!,
 })
 
-// List all calendars
+// List all calendars: a list returns a page, whose items are the calendars
 const calendars = await client.calendars.list()
-console.log(calendars)
+console.log(calendars.items)
 
 // Create an event
 const event = await client.events.create({

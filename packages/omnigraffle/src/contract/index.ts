@@ -25,6 +25,7 @@ import {
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
+  type Page,
   type Point,
   type Rgb,
   type ValueType,
@@ -1347,8 +1348,8 @@ export interface ExportSettingsUpdateInput {
 
 /** A drawing page/canvas in OmniGraffle */
 export interface CanvasResourceClient {
-  /** List canvases. */
-  list(options?: CallOptions): Promise<readonly Canvas[]>
+  /** List canvases, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Canvas>>
   /**
    * Read the canvas identified by `id`.
    *
@@ -1362,11 +1363,11 @@ export interface CanvasResourceClient {
 /** Base class for visual elements in OmniGraffle */
 export interface GraphicResourceClient {
   /**
-   * List graphics.
+   * List graphics, as one page holding all of them.
    *
    * @param canvasId - Canvas identifier. Does not accept null.
    */
-  list(canvasId: string, options?: CallOptions): Promise<readonly Graphic[]>
+  list(canvasId: string, options?: CallOptions): Promise<Page<Graphic>>
   /**
    * Read the graphic identified by `id`.
    *
@@ -1378,11 +1379,11 @@ export interface GraphicResourceClient {
 /** A shape graphic in OmniGraffle */
 export interface ShapeResourceClient {
   /**
-   * List shapes.
+   * List shapes, as one page holding all of them.
    *
    * @param canvasId - Canvas identifier. Does not accept null.
    */
-  list(canvasId: string, options?: CallOptions): Promise<readonly Shape[]>
+  list(canvasId: string, options?: CallOptions): Promise<Page<Shape>>
   /**
    * Read the shape identified by `id`.
    *
@@ -1396,11 +1397,11 @@ export interface ShapeResourceClient {
 /** A line/connector in OmniGraffle */
 export interface LineResourceClient {
   /**
-   * List lines.
+   * List lines, as one page holding all of them.
    *
    * @param canvasId - Canvas identifier. Does not accept null.
    */
-  list(canvasId: string, options?: CallOptions): Promise<readonly Line[]>
+  list(canvasId: string, options?: CallOptions): Promise<Page<Line>>
   /**
    * Read the line identified by `id`.
    *
@@ -1412,11 +1413,11 @@ export interface LineResourceClient {
 /** A drawing layer in OmniGraffle */
 export interface LayerResourceClient {
   /**
-   * List layers.
+   * List layers, as one page holding all of them.
    *
    * @param canvasId - Canvas identifier. Does not accept null.
    */
-  list(canvasId: string, options?: CallOptions): Promise<readonly Layer[]>
+  list(canvasId: string, options?: CallOptions): Promise<Page<Layer>>
   /**
    * Read the layer identified by `name`.
    *
@@ -1917,13 +1918,13 @@ const resources: AppContract<OmniGraffleClient>['resources'] = {
   },
 }
 
-const canvasListCanvasesOperation: OperationDescriptor<Record<string, never>, readonly Canvas[]> = {
+const canvasListCanvasesOperation: OperationDescriptor<Record<string, never>, Page<Canvas>> = {
   id: 'omnigraffle.canvases.list',
   permission: 'omnigraffle:canvases:list',
   target: { command: 'listCanvases', resource: 'Canvas' },
   description: 'List all canvases',
   input: t.record({}),
-  output: t.array(canvasRecordType),
+  output: t.page(canvasRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -2065,7 +2066,7 @@ const canvasCreateCanvasOperation: OperationDescriptor<CanvasCreateInput, Canvas
 
 const graphicListGraphicsOperation: OperationDescriptor<
   { readonly canvasId: string },
-  readonly Graphic[]
+  Page<Graphic>
 > = {
   id: 'omnigraffle.graphics.list',
   permission: 'omnigraffle:graphics:list',
@@ -2074,7 +2075,7 @@ const graphicListGraphicsOperation: OperationDescriptor<
   input: t.record({
     canvasId: t.string({ description: 'Canvas identifier' }),
   }),
-  output: t.array(graphicRecordType),
+  output: t.page(graphicRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -2102,10 +2103,7 @@ const graphicGetGraphicOperation: OperationDescriptor<{ readonly id: string }, G
   },
 }
 
-const shapeListShapesOperation: OperationDescriptor<
-  { readonly canvasId: string },
-  readonly Shape[]
-> = {
+const shapeListShapesOperation: OperationDescriptor<{ readonly canvasId: string }, Page<Shape>> = {
   id: 'omnigraffle.shapes.list',
   permission: 'omnigraffle:shapes:list',
   target: { command: 'listShapes', resource: 'Shape' },
@@ -2113,7 +2111,7 @@ const shapeListShapesOperation: OperationDescriptor<
   input: t.record({
     canvasId: t.string({ description: 'Canvas identifier' }),
   }),
-  output: t.array(shapeRecordType),
+  output: t.page(shapeRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -2344,24 +2342,23 @@ const shapeCreateShapeOperation: OperationDescriptor<ShapeCreateInput, Shape> = 
   },
 }
 
-const lineListLinesOperation: OperationDescriptor<{ readonly canvasId: string }, readonly Line[]> =
-  {
-    id: 'omnigraffle.lines.list',
-    permission: 'omnigraffle:lines:list',
-    target: { command: 'listLines', resource: 'Line' },
-    description: 'List all lines on a canvas',
-    input: t.record({
-      canvasId: t.string({ description: 'Canvas identifier' }),
-    }),
-    output: t.array(lineRecordType),
-    inputJsonSchema: {
-      $schema: 'http://json-schema.org/draft-07/schema#',
-      type: 'object',
-      properties: { canvasId: { type: 'string', description: 'Canvas identifier' } },
-      required: ['canvasId'],
-      additionalProperties: false,
-    },
-  }
+const lineListLinesOperation: OperationDescriptor<{ readonly canvasId: string }, Page<Line>> = {
+  id: 'omnigraffle.lines.list',
+  permission: 'omnigraffle:lines:list',
+  target: { command: 'listLines', resource: 'Line' },
+  description: 'List all lines on a canvas',
+  input: t.record({
+    canvasId: t.string({ description: 'Canvas identifier' }),
+  }),
+  output: t.page(lineRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { canvasId: { type: 'string', description: 'Canvas identifier' } },
+    required: ['canvasId'],
+    additionalProperties: false,
+  },
+}
 
 const lineGetLineOperation: OperationDescriptor<{ readonly id: string }, Line> = {
   id: 'omnigraffle.lines.get',
@@ -2381,10 +2378,7 @@ const lineGetLineOperation: OperationDescriptor<{ readonly id: string }, Line> =
   },
 }
 
-const layerListLayersOperation: OperationDescriptor<
-  { readonly canvasId: string },
-  readonly Layer[]
-> = {
+const layerListLayersOperation: OperationDescriptor<{ readonly canvasId: string }, Page<Layer>> = {
   id: 'omnigraffle.layers.list',
   permission: 'omnigraffle:layers:list',
   target: { command: 'listLayers', resource: 'Layer' },
@@ -2392,7 +2386,7 @@ const layerListLayersOperation: OperationDescriptor<
   input: t.record({
     canvasId: t.string({ description: 'Canvas identifier' }),
   }),
-  output: t.array(layerRecordType),
+  output: t.page(layerRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',

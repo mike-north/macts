@@ -56,7 +56,12 @@ const LIBRARIAN_SECRET = 'macts_sk_librarian-secret-never-logged'
 /** Holds the permissions of every library operation these tests call. */
 const LIBRARIAN: Authority = {
   subject: 'key_librarian',
-  permissions: ['library:books:lookupBook', 'library:books:list', 'library:shelves:get'],
+  permissions: [
+    'library:books:lookupBook',
+    'library:books:list',
+    'library:pages:list',
+    'library:shelves:get',
+  ],
 }
 
 /** The message every output mismatch carries, by operation and purpose (D11). */
@@ -350,7 +355,7 @@ describe('output validation of collections through resolveReference (D7, D11)', 
   it('rejects a list result whose record violates the list output contract', async () => {
     const { runtime } = harness(
       [DUNE_WIRE, { isbn: '978-0553293357', condition: 'secret-7f3a' }],
-      libraryContractWithOutputs({ 'library.books.list': t.array(GRADED_BOOK) })
+      libraryContractWithOutputs({ 'library.books.list': t.page(GRADED_BOOK) })
     )
 
     const error = await unexpectedValue(
@@ -379,22 +384,33 @@ describe('output validation of collections through resolveReference (D7, D11)', 
 })
 
 describe('output validation through invoke of a list operation (D11)', () => {
-  it('rejects a single record where the list output contract requires an array', async () => {
-    const { runtime } = harness(DUNE_WIRE)
+  it('rejects a page item that violates the list item contract, at its path within the page', async () => {
+    // `pages` arrives as a bare number instead of an integer control record.
+    const { runtime } = harness({ items: [{ ...DUNE_WIRE, pages: 412 }], length: 1, last: 'x' })
 
     const error = await unexpectedValue(runtime.invoke('library.books.list', {}, asLibrarian()))
 
     expect(error.message).toBe(ranMessage('library.books.list'))
+    expect(error.details.issues.map((issue) => issue.path)).toEqual([['items', 0, 'pages']])
+  })
+
+  it('rejects a single record where a list of a resource with no identifier requires an array', async () => {
+    const { runtime } = harness({ text: 'one page' })
+
+    const error = await unexpectedValue(runtime.invoke('library.pages.list', {}, asLibrarian()))
+
+    expect(error.message).toBe(ranMessage('library.pages.list'))
     expect(error.details.issues).toEqual([
-      { path: [], message: 'Expected a value of type array.', code: 'invalid_type' },
+      { path: ['items'], message: 'Expected a value of type array.', code: 'invalid_type' },
     ])
   })
 
-  it('returns a conforming list unchanged', async () => {
-    const result = [DUNE_WIRE]
-    const { runtime } = harness(result)
+  it('returns the conforming items of a window as a page', async () => {
+    const { runtime } = harness({ items: [DUNE_WIRE], length: 1, last: DUNE_WIRE.isbn })
 
-    await expect(runtime.invoke('library.books.list', {}, asLibrarian())).resolves.toBe(result)
+    await expect(runtime.invoke('library.books.list', {}, asLibrarian())).resolves.toEqual({
+      items: [DUNE_WIRE],
+    })
     expect(BOOK_RECORD.wire.safeParse(DUNE_WIRE).success).toBe(true)
   })
 })

@@ -21,10 +21,10 @@ export class MilestoneResourceClient {
   }
 
   /**
-   * List all milestones.
+   * List all milestones, as one page.
    */
-  async list(): Promise<Milestone[]> {
-    return this.#http.rpc<Milestone[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Milestone[] }> {
+    return this.#http.rpc<{ items: Milestone[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

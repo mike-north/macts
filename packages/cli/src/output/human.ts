@@ -87,6 +87,17 @@ export class HumanFormatter implements OutputFormatter {
     return lines.join('\n')
   }
 
+  /** The page as a table, then how to read more when more items remain. */
+  formatPage(
+    data: readonly unknown[],
+    nextCursor: string | undefined,
+    options?: TableOptions
+  ): string {
+    const table = this.formatList(data, options)
+    if (nextCursor === undefined) return table
+    return `${table}\n\nMore items remain. To see them, run the same command again with --cursor ${nextCursor}`
+  }
+
   formatError(error: Error | string): string {
     const message = error instanceof Error ? error.message : error
     return `Error: ${message}`

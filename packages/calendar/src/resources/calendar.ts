@@ -21,10 +21,10 @@ export class CalendarResourceClient {
   }
 
   /**
-   * List all calendars.
+   * List all calendars, as one page.
    */
-  async list(): Promise<Calendar[]> {
-    return this.#http.rpc<Calendar[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Calendar[] }> {
+    return this.#http.rpc<{ items: Calendar[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

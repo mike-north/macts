@@ -29,6 +29,8 @@ import {
   type ObjectReferenceData,
   type ObjectReferenceVariant,
   type OperationDescriptor,
+  type Page,
+  type PageRequest,
   type ValueType,
 } from '@macts/contracts'
 
@@ -1675,8 +1677,14 @@ export interface FileTrackResourceClient {
 
 /** a list of tracks/streams */
 export interface PlaylistResourceClient {
-  /** List playlists. */
-  list(options?: CallOptions): Promise<readonly Playlist[]>
+  /**
+   * List playlists, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Playlist>>
   /**
    * Read the playlist identified by `persistentID`.
    *
@@ -1702,11 +1710,11 @@ export interface PlaylistResourceClient {
 /** playable audio source */
 export interface TrackResourceClient {
   /**
-   * List tracks.
+   * List tracks, as one page holding all of them.
    *
    * @param playlistId - Persistent ID of the playlist. Does not accept null.
    */
-  list(playlistId: string, options?: CallOptions): Promise<readonly Track[]>
+  list(playlistId: string, options?: CallOptions): Promise<Page<Track>>
   /**
    * Read the track identified by `persistentID` within `playlistId`.
    *
@@ -2343,20 +2351,32 @@ const resources: AppContract<MusicClient>['resources'] = {
   },
 }
 
-const playlistListPlaylistsOperation: OperationDescriptor<
-  Record<string, never>,
-  readonly Playlist[]
-> = {
+const playlistListPlaylistsOperation: OperationDescriptor<PageRequest, Page<Playlist>> = {
   id: 'music.playlists.list',
   permission: 'music:playlists:list',
   target: { command: 'listPlaylists', resource: 'Playlist' },
   description: 'List every playlist',
-  input: t.record({}),
-  output: t.array(playlistRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(playlistRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -2384,7 +2404,7 @@ const playlistGetPlaylistOperation: OperationDescriptor<
 
 const trackListTracksOperation: OperationDescriptor<
   { readonly playlistId: string },
-  readonly Track[]
+  Page<Track>
 > = {
   id: 'music.tracks.list',
   permission: 'music:tracks:list',
@@ -2394,7 +2414,7 @@ const trackListTracksOperation: OperationDescriptor<
   input: t.record({
     playlistId: t.string({ description: 'Persistent ID of the playlist' }),
   }),
-  output: t.array(trackRecordType),
+  output: t.page(trackRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -3133,7 +3153,7 @@ function bind(runtime: ClientRuntime): MusicClient {
       refresh: (options) => runtime.invoke(fileTrackRefreshOperation, {}, options),
     },
     playlists: {
-      list: (options) => runtime.invoke(playlistListPlaylistsOperation, {}, options),
+      list: (page, options) => runtime.invoke(playlistListPlaylistsOperation, { ...page }, options),
       get: (persistentID, options) =>
         runtime.invoke(playlistGetPlaylistOperation, { persistentID }, options),
       move: (to, options) => runtime.invoke(playlistMoveOperation, { to }, options),

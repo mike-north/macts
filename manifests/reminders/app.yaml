@@ -34,6 +34,11 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "The unique identifier of the account"'
     properties:
       name:
         access: r
@@ -64,6 +69,11 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "The unique identifier of the list"'
     properties:
       name:
         access: rw
@@ -128,6 +138,11 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "The unique identifier of the reminder"'
     properties:
       name:
         access: rw

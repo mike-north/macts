@@ -22,7 +22,13 @@ export interface BookmarkFolderCreateInput {
 export class BookmarkFolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<BookmarkFolder>;
-    list(): Promise<BookmarkFolder[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: BookmarkFolder[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -53,7 +59,13 @@ export interface BookmarkItemCreateInput {
 export class BookmarkItemResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<BookmarkItem>;
-    list(folderId: string): Promise<BookmarkItem[]>;
+    list(folderId: string, page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: BookmarkItem[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -139,7 +151,13 @@ export class TabResourceClient {
     get(id: string): Promise<Tab>;
     goBack(tabId: string): Promise<void>;
     goForward(tabId: string): Promise<void>;
-    list(windowId: string): Promise<Tab[]>;
+    list(windowId: string, page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Tab[];
+        nextCursor?: string;
+    }>;
     pasteSelection(tabId: string): Promise<void>;
     redo(tabId: string): Promise<void>;
     reload(tabId: string): Promise<void>;
@@ -206,7 +224,13 @@ export class WindowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: WindowCreateInput): Promise<Window>;
     get(id: string): Promise<Window>;
-    list(): Promise<Window[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Window[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)

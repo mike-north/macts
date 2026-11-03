@@ -36,6 +36,7 @@ import type { AppManifest } from '../manifest/index.js'
 import { generateHttpClientSdk } from './sdk/http-client.js'
 import { generateCliPlugin } from './cli/index.js'
 import { generateResourceOperationSchema } from '../capabilities/operation-schema.js'
+import { UNIQUE_CLAIM } from '../manifest/test-support/unique-claim.js'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -80,7 +81,7 @@ const manifest: AppManifest = {
         id: { access: 'r', type: 'string', description: 'Window id', optional: false },
         name: { access: 'rw', type: 'string', description: 'Window name', optional: false },
       },
-      identifiers: [{ property: 'id', primary: true }],
+      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
     },
     Tab: {
       name: 'Tab',
@@ -90,7 +91,7 @@ const manifest: AppManifest = {
         id: { access: 'r', type: 'string', description: 'Tab id', optional: false },
         url: { access: 'rw', type: 'string', description: 'Tab URL', optional: false },
       },
-      identifiers: [{ property: 'id', primary: true }],
+      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
     },
     // Regression fixture for issue #94: a resource NESTED in the hierarchy (so
     // the CLI derives a parent param from nesting) whose list command declares
@@ -104,7 +105,7 @@ const manifest: AppManifest = {
         id: { access: 'r', type: 'string', description: 'Bookmark id', optional: false },
         title: { access: 'rw', type: 'string', description: 'Bookmark title', optional: false },
       },
-      identifiers: [{ property: 'id', primary: true }],
+      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
     },
   },
   enums: {},
@@ -180,12 +181,16 @@ describe('parent-scoped list: Tab.list(windowId) coherence across surfaces', () 
   it('SDK list() signature accepts the parent-scope param', () => {
     const tabClient = fileContent(sdk.files, 'src/resources/tab.ts')
     // spec: listTabs declares a required `windowId` param
-    expect(tabClient).toContain(`async list(${PARENT_SCOPE_PARAM}: string): Promise<Tab[]>`)
+    // Tab has a primary identifier, so its list also takes the trailing page.
+    expect(tabClient).toContain(
+      `async list(${PARENT_SCOPE_PARAM}: string, page: { pageSize?: number; cursor?: string } = {}): Promise<{ items: Tab[]; nextCursor?: string }>`
+    )
   })
 
   it('SDK list() forwards the parent-scope param in the request body', () => {
     const tabClient = fileContent(sdk.files, 'src/resources/tab.ts')
-    expect(tabClient).toContain(`{ ${PARENT_SCOPE_PARAM} }`)
+    // The parent scope comes last in the body, after the paging inputs.
+    expect(tabClient).toContain(`, ${PARENT_SCOPE_PARAM} }`)
     // It must NOT discard the param with a void statement.
     expect(tabClient).not.toContain(`void ${PARENT_SCOPE_PARAM}`)
   })
@@ -202,20 +207,23 @@ describe('parent-scoped list: Tab.list(windowId) coherence across surfaces', () 
   it('CLI list command exposes a --window-id option and passes it to list()', () => {
     const cliList = fileContent(cli.files, 'src/commands/windows/tabs/list.ts')
     expect(cliList).toContain(`Option.String('--window-id'`)
-    expect(cliList).toContain(`client.tabs.list(this.${PARENT_SCOPE_PARAM})`)
+    expect(cliList).toContain(`client.tabs.list(this.${PARENT_SCOPE_PARAM}, {`)
   })
 })
 
 describe('non-parent-scoped list: Window.list() takes no argument (negative)', () => {
-  it('SDK list() signature is argument-free', () => {
+  it('SDK list() signature takes only the page', () => {
     const windowClient = fileContent(sdk.files, 'src/resources/window.ts')
     // spec: listWindows declares NO required params
-    expect(windowClient).toContain('async list(): Promise<Window[]>')
+    expect(windowClient).toContain(
+      'async list(page: { pageSize?: number; cursor?: string } = {}): Promise<{ items: Window[]; nextCursor?: string }>'
+    )
   })
 
   it('CLI list command calls list() with no argument and no window-id option', () => {
     const cliList = fileContent(cli.files, 'src/commands/windows/list.ts')
-    expect(cliList).toContain('client.windows.list()')
+    // The only argument is the page.
+    expect(cliList).toContain('client.windows.list({ ...(this.pageSize')
     // Window is a top-level resource: there is no parent scope to forward, and
     // its list command declares no params, so no scope option should appear.
     expect(cliList).not.toContain('client.windows.list(this.')
@@ -227,7 +235,7 @@ describe('non-parent-scoped list: Window.list() takes no argument (negative)', (
     // no params, so the SDK `list()` takes 0 args — forwarding the hierarchy
     // parent produced `TS2554: Expected 0 arguments, but got 1`.
     const cliList = fileContent(cli.files, 'src/commands/windows/bookmarks/list.ts')
-    expect(cliList).toContain('client.bookmarks.list()')
+    expect(cliList).toContain('client.bookmarks.list({ ...(this.pageSize')
     expect(cliList).not.toContain('client.bookmarks.list(this.')
   })
 })

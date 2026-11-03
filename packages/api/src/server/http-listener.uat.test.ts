@@ -17,6 +17,11 @@
  * - 429 `RATE_LIMITED` with `Retry-After` and `retryAfterSeconds`
  * - 502 `UNEXPECTED_VALUE` for a result that violates the operation's output
  *   contract (D11), with issue paths but no values
+ * - a list returns one page `{ items, nextCursor? }`; `nextCursor` is absent
+ *   exactly on the last page, and a page size above 100 is 400
+ *   `VALIDATION_FAILED` at `pageSize`
+ * - 409 `COLLECTION_CHANGED` with empty details for a collection that changed
+ *   while it was read
  *
  * Time is fixed by the rate limiters' injected clock, so `Retry-After` is exact:
  * a window that opens at the fixed instant lasts the full 60 seconds.
@@ -31,12 +36,14 @@ import { Hono } from 'hono'
 import pino from 'pino'
 import { afterEach, describe, expect, it } from 'vitest'
 import {
+  CollectionChangedError,
   OperationCancelledError,
   ValueTypes as t,
   type AnyOperationDescriptor,
   type AppContract,
   type WireValue,
 } from '@macts/contracts'
+import type { AppManifest } from '@macts/core'
 import { createRateLimiter, createRuntime, type RateLimiter } from '@macts/runtime'
 import { createHttpAdapter } from './adapter.js'
 import {
@@ -179,6 +186,33 @@ describe('HTTP listener: responses over a real socket', () => {
 })
 
 /**
+ * The test calendar manifest with its event identifier claimed unique, so its
+ * event list pages. A list pages only when its identifier is claimed unique
+ * (phases/13 D9); this fixture app makes that claim, unlike the real Calendar.
+ */
+const PAGED_CALENDAR_MANIFEST: AppManifest = {
+  ...CALENDAR_MANIFEST,
+  resources: {
+    Event: {
+      name: 'Event',
+      plural: 'Events',
+      description: 'An event',
+      properties: {},
+      identifiers: [
+        {
+          property: 'uid',
+          primary: true,
+          unique: true,
+          evidence: {
+            unique: { source: 'curated', note: 'Test fixture: no two events share a uid' },
+          },
+        },
+      ],
+    },
+  },
+}
+
+/**
  * A calendar contract whose list operation returns typed event records, so
  * the runtime checks every result against it (D11). Ids, permission, and
  * target are hand-derived from the test calendar manifest.
@@ -193,14 +227,14 @@ function typedCalendarContract(): AppContract<unknown> {
     permission: 'calendar:events:list',
     target: { command: 'list', resource: 'Event' },
     description: 'List events',
-    input: t.record({}),
-    output: t.array(event),
+    input: t.record({ ...t.pageInputs() }),
+    output: t.page(event),
   }
   return {
     app: 'calendar',
     operations: { [list.id]: list },
     resources: { Event: { name: 'Event', record: event, id: t.string(), list: list.id } },
-    loadManifest: () => Promise.resolve(CALENDAR_MANIFEST),
+    loadManifest: () => Promise.resolve(PAGED_CALENDAR_MANIFEST),
     bind: () => ({}),
   }
 }
@@ -212,12 +246,15 @@ describe('HTTP listener: results that violate the output contract', () => {
     const SECRET_KEY = 'secret-key-7f3a'
     const SECRET_STATUS = 'secret-status-7f3a'
     const executor = createRecordingExecutor(() =>
-      Promise.resolve([{ uid: 'evt-1', status: SECRET_STATUS, [SECRET_KEY]: 'secret-value-7f3a' }])
+      Promise.resolve({
+        items: [{ uid: 'evt-1', status: SECRET_STATUS, [SECRET_KEY]: 'secret-value-7f3a' }],
+        length: 1,
+      })
     )
     const listener = await listenServer({
       manifests: [],
       register: (registrar) => {
-        registrar.registerContract(typedCalendarContract(), CALENDAR_MANIFEST)
+        registrar.registerContract(typedCalendarContract(), PAGED_CALENDAR_MANIFEST)
       },
       executor,
     })
@@ -235,12 +272,12 @@ describe('HTTP listener: results that violate the output contract', () => {
     expect(body.error.details).toEqual({
       issues: [
         {
-          path: [0, 'status'],
+          path: ['items', 0, 'status'],
           message: 'Expected one of "confirmed" | "cancelled".',
           code: 'invalid_value',
         },
         {
-          path: [0],
+          path: ['items', 0],
           message: 'The record has 1 key its contract does not declare.',
           code: 'unrecognized_keys',
         },
@@ -248,6 +285,122 @@ describe('HTTP listener: results that violate the output contract', () => {
     })
     expect(text).not.toContain('secret')
     expect(executor.requests).toHaveLength(1)
+  })
+})
+
+/** Five confirmed events in wire form, identified by `uid` `evt-1` … `evt-5`. */
+const FIVE_EVENTS = Array.from({ length: 5 }, (_, i) => ({
+  uid: `evt-${String(i + 1)}`,
+  status: 'confirmed',
+}))
+
+/**
+ * An executor that serves page windows of {@link FIVE_EVENTS} the way a native
+ * executor does: it answers with the window's items, the collection length,
+ * and the last item's identifier.
+ */
+function eventWindows(): RecordingExecutor {
+  return createRecordingExecutor((request) => {
+    const window = request.page
+    if (window === undefined) return Promise.reject(new Error('expected a page window'))
+    const items = FIVE_EVENTS.slice(window.offset, window.offset + window.size)
+    const last = items.at(-1)
+    return Promise.resolve({
+      items,
+      length: FIVE_EVENTS.length,
+      ...(last === undefined ? {} : { last: last.uid }),
+    })
+  })
+}
+
+/** The `result` of a successful call, narrowed to a page. */
+async function pageBody(res: Response): Promise<{ items: unknown[]; nextCursor?: string }> {
+  const body = (await res.json()) as { result: { items: unknown[]; nextCursor?: string } }
+  return body.result
+}
+
+describe('HTTP listener: paged lists', () => {
+  it('pages through a list with pageSize and cursor, every item once and no cursor at the end', async () => {
+    const listener = await listenServer({
+      manifests: [],
+      register: (registrar) => {
+        registrar.registerContract(typedCalendarContract(), PAGED_CALENDAR_MANIFEST)
+      },
+      executor: eventWindows(),
+    })
+
+    const pages: { items: unknown[]; nextCursor?: string }[] = []
+    let cursor: string | undefined
+    do {
+      const res = await rpc(listener, 'calendar.events.list', READER_TOKEN, {
+        body: { pageSize: { integer: '2' }, ...(cursor === undefined ? {} : { cursor }) },
+      })
+      expect(res.status).toBe(200)
+      const page = await pageBody(res)
+      pages.push(page)
+      cursor = page.nextCursor
+    } while (cursor !== undefined && pages.length < 10)
+
+    // Five items at two per page: 2, 2, 1; only the last page has no cursor.
+    expect(pages.map((page) => page.items.length)).toEqual([2, 2, 1])
+    expect(pages.map((page) => typeof page.nextCursor)).toEqual(['string', 'string', 'undefined'])
+    expect(pages.flatMap((page) => page.items)).toEqual(FIVE_EVENTS)
+    expect(listener.executor.requests.map((request) => request.page)).toEqual([
+      { offset: 0, size: 2 },
+      { offset: 2, size: 2, anchor: 'evt-2' },
+      { offset: 4, size: 2, anchor: 'evt-4' },
+    ])
+  })
+
+  it('answers 400 VALIDATION_FAILED at pageSize for a page size above the maximum', async () => {
+    const listener = await listenServer({
+      manifests: [],
+      register: (registrar) => {
+        registrar.registerContract(typedCalendarContract(), PAGED_CALENDAR_MANIFEST)
+      },
+      executor: eventWindows(),
+    })
+
+    const res = await rpc(listener, 'calendar.events.list', READER_TOKEN, {
+      body: { pageSize: { integer: '101' } },
+    })
+
+    expect(res.status).toBe(400)
+    const body = await errorBody(res)
+    expect(body.error.code).toBe('VALIDATION_FAILED')
+    expect(body.error.details).toMatchObject({ issues: [{ path: ['pageSize'] }] })
+    expect(listener.executor.requests).toHaveLength(0)
+  })
+
+  it('answers 409 COLLECTION_CHANGED with no details when the collection changed', async () => {
+    const executor = createRecordingExecutor(() =>
+      Promise.reject(
+        new CollectionChangedError(
+          'The Event collection in Calendar changed while it was being read, so no consistent result exists. The same request can be retried, from the first page if it was paged.',
+          {}
+        )
+      )
+    )
+    const listener = await listenServer({
+      manifests: [],
+      register: (registrar) => {
+        registrar.registerContract(typedCalendarContract(), PAGED_CALENDAR_MANIFEST)
+      },
+      executor,
+    })
+
+    const res = await rpc(listener, 'calendar.events.list', READER_TOKEN)
+
+    // D6: COLLECTION_CHANGED is 409 and carries no details.
+    expect(res.status).toBe(409)
+    expect(await res.json()).toEqual({
+      error: {
+        code: 'COLLECTION_CHANGED',
+        message:
+          'The Event collection in Calendar changed while it was being read, so no consistent result exists. The same request can be retried, from the first page if it was paged.',
+        details: {},
+      },
+    })
   })
 })
 

@@ -133,6 +133,11 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "The unique identifier of the window."'
 
   Tab:
     name: Tab
@@ -163,6 +168,11 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "Unique ID of the tab."'
 
   BookmarkFolder:
     name: BookmarkFolder
@@ -188,6 +198,11 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "Unique ID of the bookmark folder."'
 
   BookmarkItem:
     name: BookmarkItem
@@ -218,6 +233,11 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "Unique ID of the bookmark item."'
 
 hierarchy:
   children:

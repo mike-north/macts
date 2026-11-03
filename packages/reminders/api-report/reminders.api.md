@@ -18,7 +18,13 @@ export type AccountCreateInput = Record<string, never>;
 // @public
 export class AccountResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    list(): Promise<Account[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Account[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -75,7 +81,13 @@ export class ListResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: ListCreateInput): Promise<List>;
     get(id: string): Promise<List>;
-    list(): Promise<List[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: List[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -128,7 +140,13 @@ export class ReminderResourceClient {
     create(input: ReminderCreateInput): Promise<Reminder>;
     delete(id: string): Promise<void>;
     get(id: string): Promise<Reminder>;
-    list(listId: string): Promise<Reminder[]>;
+    list(listId: string, page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Reminder[];
+        nextCursor?: string;
+    }>;
     show(): Promise<void>;
 }
 

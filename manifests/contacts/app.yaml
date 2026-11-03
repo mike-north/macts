@@ -140,6 +140,11 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "unique identifier for this address."'
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook
@@ -278,6 +283,11 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "unique identifier for this entry, this is persistent, and stays with the record."'
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook
@@ -303,6 +313,11 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "unique and persistent identifier for this record."'
     properties:
       id:
         access: r
@@ -505,6 +520,11 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "unique and persistent identifier for this record."'
     properties:
       id:
         access: r
@@ -853,6 +873,11 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "unique identifier for this entry, this is persistent, and stays with the record."'
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook

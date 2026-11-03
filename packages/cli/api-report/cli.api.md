@@ -87,6 +87,7 @@ export class HumanFormatter implements OutputFormatter {
     formatError(error: Error | string): string;
     // (undocumented)
     formatList(data: readonly unknown[], options?: TableOptions): string;
+    formatPage(data: readonly unknown[], nextCursor: string | undefined, options?: TableOptions): string;
     // (undocumented)
     formatSuccess(message: string): string;
 }
@@ -102,6 +103,7 @@ export class JsonFormatter implements OutputFormatter {
     formatError(error: Error | string): string;
     // (undocumented)
     formatList(data: readonly unknown[], _options?: TableOptions): string;
+    formatPage(data: readonly unknown[], nextCursor: string | undefined, _options?: TableOptions): string;
     // (undocumented)
     formatSuccess(message: string): string;
 }
@@ -124,6 +126,7 @@ export interface OutputFormatter {
     format(data: unknown): string;
     formatError(error: Error | string): string;
     formatList(data: readonly unknown[], options?: TableOptions): string;
+    formatPage(data: readonly unknown[], nextCursor: string | undefined, options?: TableOptions): string;
     formatSuccess(message: string): string;
 }
 

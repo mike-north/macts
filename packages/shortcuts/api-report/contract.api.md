@@ -8,6 +8,8 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { Page } from '@macts/contracts';
+import { PageRequest } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
 
 // @public
@@ -24,7 +26,7 @@ export interface FolderCreateInput {
 // @public
 export interface FolderResourceClient {
     get(id: string, options?: CallOptions): Promise<Folder>;
-    list(options?: CallOptions): Promise<readonly Folder[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Folder>>;
 }
 
 // @public
@@ -52,7 +54,7 @@ export interface ShortcutCreateInput {
 // @public
 export interface ShortcutResourceClient {
     get(id: string, options?: CallOptions): Promise<Shortcut>;
-    list(options?: CallOptions): Promise<readonly Shortcut[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Shortcut>>;
     run(id: string, withInput?: unknown, options?: CallOptions): Promise<void>;
 }
 

@@ -2,8 +2,10 @@
  * Native invocation bodies: the automation-process JavaScript that carries out
  * one manifest-defined operation against a target app.
  *
- * Each body is a function body run as `(app, args)` (see `NativeScript.body`):
- * `app` is the target application and `args` is the operation's input record.
+ * Each body is a function body run as `(app, args, page)` (see
+ * `NativeScript.body`): `app` is the target application, `args` is the
+ * operation's input record, and `page` is the window a paged list reads
+ * (`null` for every other body).
  * The bodies encode live-app behavior that the manifest alone does not express:
  *
  * - a command on a nested resource reaches its target through the parent the
@@ -15,9 +17,10 @@
  *   its resource's collection at the application;
  * - an identifier is targeted by id or by matching a working property, as the
  *   manifest's identifier targeting declares;
- * - lists read each property once across the whole collection and assemble
+ * - lists read each property once across the items they list and assemble
  *   records by index, checking that every read covers the same items in the
- *   same order;
+ *   same order; a list that pages reads one window of its collection, checked
+ *   against the previous page's last item in the same request;
  * - a child is created inside its parent by appending it to the parent's
  *   collection;
  * - the request parameter that carries an identifier is distinct from the
@@ -34,8 +37,8 @@
  * emitted as JSON string literals in bracket form wherever the syntax allows, so
  * an unusual manifest key cannot change the meaning of the script.
  *
- * A body references only `app`, `args`, its own locals, and standard ECMAScript
- * built-ins: no host globals, no codec bindings, and no per-call state. That
+ * A body references only `app`, `args`, `page`, its own locals, and standard
+ * ECMAScript built-ins: no host globals, no codec bindings, and no per-call state. That
  * keeps a body independent of how it is run, so a long-lived automation
  * process can compile it once and invoke it for many calls.
  *
@@ -48,6 +51,7 @@ import type { Command, CommandParameter } from '../manifest/schemas/command.js'
 import type { Resource } from '../manifest/schemas/resource.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
+  listOperationPages,
   resolveCanonicalIdentifierSource,
   resolveIdentifierTargeting,
   resolveListOutputProperties,
@@ -55,14 +59,14 @@ import {
 } from '../manifest/identifier.js'
 import { resolveCollectionAccessor, resolvePropertyAccessor } from '../manifest/native-accessor.js'
 import { usableProperties } from '../manifest/unsupported.js'
-import { NATIVE_CODEC_ERROR_NAME } from './native-codec.js'
+import { NATIVE_CODEC_ERROR_NAME, NATIVE_COLLECTION_CHANGED_ERROR_NAME } from './native-codec.js'
 
 /**
  * Everything needed to run one operation natively, derived from the manifest
  * and the operation target alone.
  */
 export interface NativeInvocationPlan {
-  /** Function body run as `(app, args)`. */
+  /** Function body run as `(app, args, page)`. */
   readonly body: string
   /**
    * Input keys the body cannot run without. The command's required parameters,
@@ -91,6 +95,14 @@ export interface NativeBodyOptions {
    * the declared fields, each holding its own value. Defaults to `false`.
    */
   readonly identifierAliases?: boolean
+  /**
+   * Build a list body that reads one page window, given as the body's third
+   * argument, and returns a page window result, instead of reading the whole
+   * collection into an array (see `PageWindow` and `PageWindowResult`).
+   * Meaningful only for a list command of a resource with an identifier.
+   * Defaults to `false`.
+   */
+  readonly paged?: boolean
 }
 
 /**
@@ -99,7 +111,7 @@ export interface NativeBodyOptions {
  * @param manifest - The validated manifest of the target app.
  * @param target - The manifest command (and resource) to run.
  * @param options - How returned records are shaped.
- * @returns A function body run as `(app, args)`.
+ * @returns A function body run as `(app, args, page)`.
  * @throws `InternalError` when `target` names a command the manifest does not
  *   declare.
  */
@@ -142,7 +154,8 @@ export function planNativeInvocation(
     command,
     resource,
     manifest,
-    options.identifierAliases === true
+    options.identifierAliases === true,
+    options.paged === true
   )
   return {
     body,
@@ -557,12 +570,16 @@ function buildResourceBody(
   command: Command,
   resource: Resource | undefined,
   manifest: AppManifest,
-  identifierAliases: boolean
+  identifierAliases: boolean,
+  paged: boolean
 ): ResourceBody {
   const resourcePlural = resource === undefined ? 'items' : resolveCollectionAccessor(resource)
+  if (paged && command.name !== 'list') {
+    throw new InternalError('Only a list operation can read a page.', {})
+  }
   switch (command.name) {
     case 'list':
-      return buildListBody(command, resource, resourcePlural, manifest, identifierAliases)
+      return buildListBody(command, resource, resourcePlural, manifest, identifierAliases, paged)
     case 'get':
       return buildGetBody(command, resource, resourcePlural, manifest)
     case 'delete':
@@ -589,37 +606,58 @@ function resolveIdentifierParam(command: Command, parentScope: ParentScope | und
   )
 }
 
-/** Local that holds the listed collection's specifier inside a list body. */
+/** Local that holds the specifier a list body reads its items through. */
 const COLLECTION_LOCAL = 'col'
+/** Local that holds the whole listed collection inside a paged list body. */
+const WHOLE_LOCAL = 'whole'
 /** Local that holds the number of items a list body returns. */
 const COUNT_LOCAL = 'count'
 /** Local that holds the runtime identifier of each listed item, by index. */
 const IDS_LOCAL = 'ids'
+/** Local that holds the collection's length a paged list body read. */
+const LENGTH_LOCAL = 'total'
+/**
+ * The body's third parameter: the page window of a paged list (see
+ * `NativeScript.page`), `null` for every other body.
+ */
+const PAGE_PARAMETER = 'page'
 
 /**
- * The message a list fails with when its collection kept changing while it
- * was read, so no consistent set of reads could be assembled.
+ * The native error number for an index or range a collection does not reach.
+ * A paged list reads by range, so inside its read this number means the
+ * collection shrank while it was read, never that the caller's request was
+ * wrong.
+ */
+const INVALID_RANGE_ERROR_NUMBER = -1719
+
+/**
+ * The message a list fails with when its collection changed while it was
+ * read, so no consistent set of reads exists.
  */
 const COLLECTION_CHANGED_MESSAGE =
-  'The collection changed while it was being read, so the records cannot be assembled.'
+  'The collection changed while it was being read, so no consistent result exists.'
 
 /**
- * Statements declaring the helpers a list body reads its collection through.
- * They close over {@link COLLECTION_LOCAL} and {@link COUNT_LOCAL}, which an
- * attempt sets before it reads any property.
+ * Statements declaring the helpers a list body reads its items through. They
+ * close over {@link COLLECTION_LOCAL} and {@link COUNT_LOCAL}, which an attempt
+ * sets before it reads any property.
  *
  * - `unassemblable(message)` fails the list with a codec error: the app's
- *   reads cannot be assembled into records. The error is the codec's encode
- *   failure, the class for an app result that breaks the operation's
- *   contract, so it is reported as an unexpected value rather than as an app
- *   failure, and never as records.
- * - `Inconsistent(message)` is thrown, never returned, when one attempt's
- *   reads do not describe the same items: a read gave a number of values
- *   other than the item count, or the identifiers changed while the attempt
- *   read. {@link listAttempts} redoes such an attempt.
+ *   reads cannot be assembled into records although the items stayed the same.
+ *   The error is the codec's encode failure, the class for an app result that
+ *   breaks the operation's contract, so it is reported as an unexpected value
+ *   rather than as an app failure, and never as records.
+ * - `collectionChanged(message)` fails the list with the collection-changed
+ *   marker ({@link NATIVE_COLLECTION_CHANGED_ERROR_NAME}): the items changed
+ *   while they were read, so the same request can be retried.
+ * - `Inconsistent(message, changed)` is thrown, never returned, when one
+ *   attempt's reads do not describe the same items. `changed` says whether the
+ *   items themselves changed (the identifiers, or the count, differ between
+ *   reads) or only a read disagreed with them (a read gave a number of values
+ *   other than the item count). {@link listAttempts} redoes such an attempt.
  * - `aligned(what, values)` returns `values` when it is an array with one
- *   element per item, and otherwise throws `Inconsistent`. `what` names the
- *   read in the message.
+ *   element per item, and otherwise throws a misaligned `Inconsistent`. `what`
+ *   names the read in the message.
  * - `itemList()` lists the item specifiers once per attempt, on first use,
  *   checked against the item count. Only reads that fall back to one request
  *   per item need them.
@@ -630,7 +668,7 @@ const COLLECTION_CHANGED_MESSAGE =
  *   `list`, one request per item. A guarded read the item cannot answer
  *   leaves `undefined` at its position, so the record omits that property; an
  *   unguarded failure, or a communication failure, fails the list.
- * - `readColumn(what, name)` reads one property across the collection in one
+ * - `readColumn(what, name)` reads one property across the items in one
  *   request. When that request fails other than by a communication failure,
  *   it falls back to `readEach` with every read guarded.
  */
@@ -640,7 +678,10 @@ function listReadHelpers(): string {
     'function unassemblable(message) {',
     `  throw { name: ${literal(NATIVE_CODEC_ERROR_NAME)}, direction: "encode", path: [], message: message };`,
     '}',
-    'function Inconsistent(message) { this.message = message; }',
+    'function collectionChanged(message) {',
+    `  throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: message };`,
+    '}',
+    'function Inconsistent(message, changed) { this.message = message; this.changed = changed; }',
     '// These error numbers mean a request to the app failed (it quit, the connection broke,',
     '// it did not answer, the user cancelled, or automation is not authorized), not that a',
     '// property cannot be read, so no guard or fallback absorbs them.',
@@ -652,7 +693,7 @@ function listReadHelpers(): string {
     'function aligned(what, values) {',
     `  if (!Array.isArray(values) || values.length !== ${COUNT_LOCAL}) {`,
     '    throw new Inconsistent("Reading " + what + " gave " + (Array.isArray(values) ? String(values.length) : "no") +',
-    `      " values for " + String(${COUNT_LOCAL}) + " items, so the records cannot be assembled.");`,
+    `      " values for " + String(${COUNT_LOCAL}) + " items, so the records cannot be assembled.", false);`,
     '  }',
     '  return values;',
     '}',
@@ -687,14 +728,15 @@ function listReadHelpers(): string {
 
 /**
  * Statements declaring `readIdentifiers()`, which reads the runtime
- * identifier `nativeIdName` of every item, in item order.
+ * identifier `nativeIdName` of every item {@link COLLECTION_LOCAL} addresses,
+ * in item order.
  *
- * The identifier read is never guarded. When the read across the collection
- * fails other than by a communication failure (which fails the list at once),
- * the item specifiers are listed and the identifier is read once per item,
- * still unguarded, so a misconfigured identifier fails the list with a
- * real error rather than returning records with no usable id. The listed
- * specifiers become the attempt's item list.
+ * The identifier read is never guarded. When the read across the items fails
+ * other than by a communication failure (which fails the list at once), the
+ * item specifiers are listed and the identifier is read once per item, still
+ * unguarded, so a misconfigured identifier fails the list with a real error
+ * rather than returning records with no usable id. The listed specifiers
+ * become the attempt's item list.
  */
 function identifierReader(nativeIdName: string): string {
   return lines(
@@ -714,9 +756,48 @@ function identifierReader(nativeIdName: string): string {
 }
 
 /**
- * Statements declaring `readAll()`, one attempt at reading the whole list:
- * the item count, the identifiers, every property, then a check that the
- * collection did not change meanwhile. It throws `Inconsistent` when it did.
+ * Statements that read every property column, then judge the attempt by a
+ * second read of the items' identity (`stillSame`, an expression that is true
+ * when the identifiers, or the count, are unchanged).
+ *
+ * A column that disagrees with the item count does not end the attempt at
+ * once: the identity is read again first, so the attempt reports whether the
+ * items themselves changed (a changed `Inconsistent`) or only a read
+ * disagreed with unchanged items (the misaligned `Inconsistent` the column
+ * raised).
+ */
+function readColumnsThenCheck(columnReads: readonly string[], stillSame: string): string {
+  return lines(
+    '  var misaligned = null;',
+    '  try {',
+    ...columnReads.map((read) => `    ${read}`),
+    '  } catch (e) {',
+    '    if (!(e instanceof Inconsistent)) { throw e; }',
+    '    misaligned = e;',
+    '  }',
+    `  if (!(${stillSame})) { throw new Inconsistent(${literal(COLLECTION_CHANGED_MESSAGE)}, true); }`,
+    '  if (misaligned !== null) { throw misaligned; }'
+  )
+}
+
+/** Statement declaring `sameIdentifiers(again)`: whether `again` equals the attempt's identifiers. */
+function sameIdentifiersHelper(): string {
+  return lines(
+    'function sameIdentifiers(again) {',
+    `  if (again.length !== ${COUNT_LOCAL}) { return false; }`,
+    `  for (var j = 0; j < ${COUNT_LOCAL}; j++) {`,
+    `    if (again[j] !== ${IDS_LOCAL}[j]) { return false; }`,
+    '  }',
+    '  return true;',
+    '}'
+  )
+}
+
+/**
+ * Statements declaring `readAll()`, one attempt at reading the whole
+ * collection: the item count, the identifiers, every property, then a check
+ * that the collection did not change meanwhile. It throws `Inconsistent` when
+ * the reads disagree.
  *
  * The item count comes from the identifier read itself when there is one: one
  * request reads every identifier, and its length is the number of items, so
@@ -736,61 +817,153 @@ function identifierReader(nativeIdName: string): string {
  * attempt that saw a different collection.
  */
 function attemptReader(nativeIdName: string | undefined, columnReads: readonly string[]): string {
-  const changed = `throw new Inconsistent(${literal(COLLECTION_CHANGED_MESSAGE)});`
   if (nativeIdName === undefined) {
     return lines(
       'function readAll() {',
       '  items = null;',
       `  ${COUNT_LOCAL} = ${COLLECTION_LOCAL}.length;`,
       `  if (typeof ${COUNT_LOCAL} !== "number") { unassemblable("Counting the items gave no number, so the records cannot be assembled."); }`,
-      ...columnReads.map((read) => `  ${read}`),
-      `  if (${COLLECTION_LOCAL}.length !== ${COUNT_LOCAL}) { ${changed} }`,
+      readColumnsThenCheck(columnReads, `${COLLECTION_LOCAL}.length === ${COUNT_LOCAL}`),
       '}'
     )
   }
   return lines(
     identifierReader(nativeIdName),
+    sameIdentifiersHelper(),
     'function readAll() {',
     '  items = null;',
     `  ${IDS_LOCAL} = readIdentifiers();`,
     `  ${COUNT_LOCAL} = ${IDS_LOCAL}.length;`,
-    ...columnReads.map((read) => `  ${read}`),
-    '  var again = readIdentifiers();',
-    `  if (again.length !== ${COUNT_LOCAL}) { ${changed} }`,
-    `  for (var j = 0; j < ${COUNT_LOCAL}; j++) {`,
-    `    if (again[j] !== ${IDS_LOCAL}[j]) { ${changed} }`,
+    readColumnsThenCheck(columnReads, 'sameIdentifiers(readIdentifiers())'),
+    '}'
+  )
+}
+
+/**
+ * Statements declaring `readAll()` for a paged list: one attempt at reading
+ * the window {@link PAGE_PARAMETER} names, in the same native request as the
+ * check that the window still continues the previous page.
+ *
+ * An attempt reads the collection's length, then checks the anchor: when the
+ * window does not start at the first item, the item just before it must still
+ * have the identifier of the last item the previous page returned. A
+ * collection that no longer reaches that position, or an item there with
+ * another identifier, fails the list at once as a changed collection
+ * (`collectionChanged`): the anchor moved, so the window would skip or repeat
+ * items, and reading again cannot help. Inserts and deletes after the anchor
+ * leave it in place and are harmless; a pair of compensating moves across the
+ * anchor goes undetected.
+ *
+ * The window is then read as a range of the collection, so every read costs
+ * what the page holds, not what the collection holds: the page's identifiers,
+ * each property, and the identifiers again, exactly as an unpaged attempt
+ * reads the whole collection. The anchor is checked again after the reads,
+ * so a move during them is detected too. The whole identifier column is
+ * never read.
+ *
+ * `window(start, end)` is the one place the body's half-open, zero-based
+ * positions become the app's range form, which is zero-based and includes its
+ * end, fails rather than clamps past the last item, and gives odd ranges for
+ * negative positions. Every caller passes `0 <= start < end <= length`.
+ * Inside a paged read a range the collection no longer reaches means it shrank
+ * meanwhile, so it is a changed `Inconsistent`, never an app failure.
+ */
+function pagedAttemptReader(nativeIdName: string, columnReads: readonly string[]): string {
+  const offset = `${PAGE_PARAMETER}.offset`
+  return lines(
+    identifierReader(nativeIdName),
+    sameIdentifiersHelper(),
+    'function window(start, end) {',
+    `  return ${WHOLE_LOCAL}.slice(start, end - 1);`,
+    '}',
+    'function outOfRange(e) {',
+    `  return e !== null && e !== undefined && e.errorNumber === ${String(INVALID_RANGE_ERROR_NUMBER)};`,
+    '}',
+    'function anchorHolds() {',
+    `  if (${offset} === 0) { return true; }`,
+    `  if (${offset} > ${LENGTH_LOCAL}) { return false; }`,
+    '  var at;',
+    `  try { at = ${member(`window(${offset} - 1, ${offset})`, nativeIdName)}(); } catch (e) {`,
+    '    if (outOfRange(e)) { return false; }',
+    '    throw e;',
     '  }',
+    `  return Array.isArray(at) && at.length === 1 && at[0] === ${PAGE_PARAMETER}.anchor;`,
+    '}',
+    'function readAll() {',
+    '  items = null;',
+    `  ${LENGTH_LOCAL} = ${WHOLE_LOCAL}.length;`,
+    `  if (typeof ${LENGTH_LOCAL} !== "number") { unassemblable("Counting the items gave no number, so the records cannot be assembled."); }`,
+    `  if (!anchorHolds()) { collectionChanged(${literal(COLLECTION_CHANGED_MESSAGE)}); }`,
+    `  var end = Math.min(${offset} + ${PAGE_PARAMETER}.size, ${LENGTH_LOCAL});`,
+    `  if (end <= ${offset}) { ${COUNT_LOCAL} = 0; ${IDS_LOCAL} = []; return; }`,
+    `  ${COUNT_LOCAL} = end - ${offset};`,
+    '  try {',
+    `    ${COLLECTION_LOCAL} = window(${offset}, end);`,
+    `    ${IDS_LOCAL} = readIdentifiers();`,
+    `    if (${IDS_LOCAL}.length !== ${COUNT_LOCAL}) { throw new Inconsistent(${literal(COLLECTION_CHANGED_MESSAGE)}, true); }`,
+    readColumnsThenCheck(columnReads, 'sameIdentifiers(readIdentifiers())'),
+    '  } catch (e) {',
+    `    if (outOfRange(e)) { throw new Inconsistent(${literal(COLLECTION_CHANGED_MESSAGE)}, true); }`,
+    '    throw e;',
+    '  }',
+    `  if (!anchorHolds()) { collectionChanged(${literal(COLLECTION_CHANGED_MESSAGE)}); }`,
     '}'
   )
 }
 
 /**
  * Statements that run `readAll()` until one attempt is consistent, at most
- * twice. A collection that changes during the first attempt is read again
- * from the start; one that changes during the second fails the list through
- * `unassemblable`, with the reason the last attempt gave, rather than
- * returning records assembled from reads of different items.
+ * twice, and classify a list whose two attempts both failed.
+ *
+ * A collection whose reads disagree during the first attempt is read again
+ * from the start. When the second attempt also disagrees, the list fails,
+ * rather than returning records assembled from reads of different items:
+ *
+ * - as a changed collection (`collectionChanged`) when either attempt saw the
+ *   items themselves change (the identifiers, or for a resource without one
+ *   the count, differed between its reads). The same request can be retried.
+ * - as an unexpected value (`unassemblable`) when both attempts saw the same
+ *   items but a read disagreed with them both times: the app answered
+ *   inconsistently, so retrying will not help.
+ *
+ * Two transient additions and removals in a row, each undone before the
+ * attempt's second identity read, leave the identity unchanged in both
+ * attempts and are therefore reported as an unexpected value; that case is
+ * accepted.
  */
 function listAttempts(): string {
   return lines(
     'function attempt() {',
     '  try { readAll(); return null; } catch (e) {',
-    '    if (e instanceof Inconsistent) { return e.message; }',
+    '    if (e instanceof Inconsistent) { return e; }',
     '    throw e;',
     '  }',
     '}',
-    'var problem = attempt();',
-    'if (problem !== null) { problem = attempt(); }',
-    'if (problem !== null) { unassemblable(problem); }'
+    'var first = attempt();',
+    'if (first !== null) {',
+    '  var second = attempt();',
+    '  if (second !== null) {',
+    '    if (first.changed || second.changed) { collectionChanged(second.changed ? second.message : first.message); }',
+    '    unassemblable(second.message);',
+    '  }',
+    '}'
   )
 }
 
 /**
- * List every item of the resource's collection at the application, or, for a
+ * List the items of the resource's collection at the application, or, for a
  * command that records a parent, of the collection under the parent item.
- * Every read goes through the one collection specifier the body binds, so a
- * list that narrowed its collection (a `whose` filter) would have to narrow
- * that specifier, and every read would cover the same narrowed items.
+ *
+ * A paged list (`paged`) reads one window of the collection, named by the
+ * body's {@link PAGE_PARAMETER} (`{ offset, size, anchor? }`, see
+ * `PageWindow`), and returns `{ items, length, last? }` (see
+ * `PageWindowResult`): the window's records, the collection's length when it
+ * was read, and the identifier of the last record, which anchors the next
+ * window (see {@link pagedAttemptReader}). Only a list that pages (see
+ * `listOperationPages`: its primary identifier is claimed unique) can read
+ * a window. Any other list reads the whole collection and returns
+ * its records as an array. Every read goes through the one specifier the body
+ * binds ({@link COLLECTION_LOCAL}), so all reads cover the same items.
  *
  * Each item carries every declared property, the primary identifier (even when
  * it is declared only under `identifiers`), and a canonical `id` mirroring the
@@ -798,39 +971,42 @@ function listAttempts(): string {
  * that value is the working property (`name`), and the declared identifier key
  * is mirrored from it rather than read, because reading it fails.
  *
- * Reads go across the collection: within one body, each property is read once
- * for every item in one request (`col["name"]()`), and the records are
- * assembled by index. A list therefore costs one request per property, plus
- * one to read the identifiers again (or count the items again), however many
- * items it has. Reading every item's record one item at a time cost one
- * request per item, at seconds each in some apps (a Reminders list of 80
+ * Reads go across the items: within one body, each property is read once for
+ * every item in one request (`col["name"]()`), and the records are assembled
+ * by index. A list therefore costs one request per property, plus one to read
+ * the identifiers again (or count the items again), however many items it
+ * has, and a paged list two more: the length, and the anchor (checked before
+ * and after the reads). Reading every item's record one item at a time cost
+ * one request per item, at seconds each in some apps (a Reminders list of 80
  * items took over four minutes), and reading the whole property record across
  * the collection in one request fails in Reminders (-1728), so each property
- * is its own request.
+ * is its own request. The cost of a read across a range follows the range's
+ * size, not the collection's, so a page costs what it holds.
  *
  * Index assembly is only correct while every read describes the same items in
  * the same order. Every read is checked against the item count, and the
  * identifiers are read again after the properties and must not have changed
  * (see {@link attemptReader}). A collection that changes while it is read is
- * read once more from the start, and if it changes again the list fails with
- * a codec error (see {@link listAttempts}): never misaligned records. A
- * missing value keeps its position in its read: the app reports it as `null`
- * there, as it does in an item's property record, so it maps to the same
- * `null` field the per-item record gave; only an `undefined` position is
- * omitted.
+ * read once more from the start, and if the second read also disagrees the
+ * list fails, as a changed collection when the items changed and as an
+ * unexpected value when they did not (see {@link listAttempts}): never
+ * misaligned records. A missing value keeps its position in its read: the app
+ * reports it as `null` there, as it does in an item's property record, so it
+ * maps to the same `null` field the per-item record gave; only an `undefined`
+ * position is omitted.
  *
- * A property whose read across the collection fails falls back to one guarded
- * read per item, for that property alone, so one property the app cannot
- * read across the collection neither empties a record nor fails the list, and
- * the other properties stay one request each. Known cases: a Notes note's
- * `body` cannot be read across the collection (-1741) but can per item, so a
- * notes list reads it per item. A Calendar calendar's `calendarIdentifier`
- * fails both ways (-1728 across the collection, -1700 per item), but no list
- * reads it: the Calendar manifest marks it unsupported, with probe evidence,
- * and a list reads only usable properties. The fallback is detected at run
- * time: a property not yet known to fail only across the collection costs
- * speed, and one that fails both ways is omitted from its records, as it was
- * when each item's record was read. A communication failure
+ * A property whose read across the items fails falls back to one guarded read
+ * per item, for that property alone, so one property the app cannot read
+ * across the collection neither empties a record nor fails the list, and the
+ * other properties stay one request each. Known cases: a Notes note's `body`
+ * cannot be read across the collection (-1741) but can per item, so a notes
+ * list reads it per item. A Calendar calendar's `calendarIdentifier` fails
+ * both ways (-1728 across the collection, -1700 per item), but no list reads
+ * it: the Calendar manifest marks it unsupported, with probe evidence, and a
+ * list reads only usable properties. The fallback is detected at run time: a
+ * property not yet known to fail only across the collection costs speed, and
+ * one that fails both ways is omitted from its records, as it was when each
+ * item's record was read. A communication failure
  * ({@link COMMUNICATION_FAILURE_ERROR_NUMBERS}) is never either: it always
  * fails the list. The runtime identifier read is never guarded (see
  * {@link identifierReader}).
@@ -845,18 +1021,28 @@ function listAttempts(): string {
  *
  * Every read uses the app's name for the property, and the collection the
  * app's name for it; every item is keyed by the public names.
+ *
+ * @throws `InternalError` when `paged` is set for a list that does not page
+ *   (see `listOperationPages`): its items cannot be anchored reliably.
  */
 function buildListBody(
   command: Command,
   resource: Resource | undefined,
   resourcePlural: string,
   manifest: AppManifest,
-  identifierAliases: boolean
+  identifierAliases: boolean,
+  paged: boolean
 ): ResourceBody {
   const allPropNames = resolveListOutputProperties(resource)
   const targeting = resolveIdentifierTargeting(resource)
   const runtimeIdProperty = targeting?.property
   const declaredIdProperty = resolvePrimaryIdentifierProperty(resource)
+  if (paged && (runtimeIdProperty === undefined || !listOperationPages(command, resource))) {
+    throw new InternalError(
+      'A list whose primary identifier is not claimed unique cannot be paged.',
+      {}
+    )
+  }
 
   // For a byProperty resource the declared identifier is exactly the property
   // whose read fails, so it is never read. With identifier aliases the working
@@ -909,19 +1095,26 @@ function buildListBody(
     collectionExpression = member(PARENT_LOCAL, resourcePlural)
   }
 
+  const nativeIdName = runtimeIdProperty === undefined ? undefined : native(runtimeIdProperty)
+  const pagedIdName = paged ? nativeIdName : undefined
   const body = lines(
     parentBinding,
-    `var ${COLLECTION_LOCAL} = ${collectionExpression};`,
+    pagedIdName === undefined
+      ? `var ${COLLECTION_LOCAL} = ${collectionExpression};`
+      : lines(
+          `var ${WHOLE_LOCAL} = ${collectionExpression};`,
+          `var ${COLLECTION_LOCAL} = null;`,
+          `var ${LENGTH_LOCAL} = 0;`
+        ),
     `var ${COUNT_LOCAL} = 0;`,
     runtimeIdProperty === undefined ? '' : `var ${IDS_LOCAL};`,
     bestEffortProps.length === 0
       ? ''
       : `var ${bestEffortProps.map((_p, index) => columnLocal(index)).join(', ')};`,
     listReadHelpers(),
-    attemptReader(
-      runtimeIdProperty === undefined ? undefined : native(runtimeIdProperty),
-      columnReads
-    ),
+    pagedIdName === undefined
+      ? attemptReader(nativeIdName, columnReads)
+      : pagedAttemptReader(pagedIdName, columnReads),
     listAttempts(),
     'var result = [];',
     `for (var i = 0; i < ${COUNT_LOCAL}; i++) {`,
@@ -931,7 +1124,13 @@ function buildListBody(
     idAlias,
     'result.push(obj);',
     '}',
-    'return result;'
+    pagedIdName === undefined
+      ? 'return result;'
+      : lines(
+          `var windowResult = { items: result, length: ${LENGTH_LOCAL} };`,
+          `if (${COUNT_LOCAL} > 0) { windowResult.last = ${IDS_LOCAL}[${COUNT_LOCAL} - 1]; }`,
+          'return windowResult;'
+        )
   )
   return {
     body,

@@ -25,6 +25,7 @@ import {
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
+  type Page,
   type ValueType,
 } from '@macts/contracts'
 
@@ -826,8 +827,8 @@ export type PerspectiveUpdateInput = Record<string, never>
 
 /** A task within OmniFocus */
 export interface TaskResourceClient {
-  /** List tasks. */
-  list(options?: CallOptions): Promise<readonly Task[]>
+  /** List tasks, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Task>>
   /**
    * Read the task identified by `id`.
    *
@@ -840,8 +841,8 @@ export interface TaskResourceClient {
 
 /** A project in OmniFocus */
 export interface ProjectResourceClient {
-  /** List projects. */
-  list(options?: CallOptions): Promise<readonly Project[]>
+  /** List projects, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Project>>
   /**
    * Read the project identified by `id`.
    *
@@ -854,8 +855,8 @@ export interface ProjectResourceClient {
 
 /** A group of projects and sub-folders representing an area of responsibility */
 export interface FolderResourceClient {
-  /** List folders. */
-  list(options?: CallOptions): Promise<readonly Folder[]>
+  /** List folders, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Folder>>
   /**
    * Read the folder identified by `id`.
    *
@@ -868,8 +869,8 @@ export interface FolderResourceClient {
 
 /** A tag for organizing and filtering tasks */
 export interface TagResourceClient {
-  /** List tags. */
-  list(options?: CallOptions): Promise<readonly Tag[]>
+  /** List tags, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Tag>>
   /**
    * Read the tag identified by `id`.
    *
@@ -882,8 +883,8 @@ export interface TagResourceClient {
 
 /** A task that is in the document's inbox */
 export interface InboxTaskResourceClient {
-  /** List inbox tasks. */
-  list(options?: CallOptions): Promise<readonly InboxTask[]>
+  /** List inbox tasks, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<InboxTask>>
   /**
    * Read the inbox task identified by `id`.
    *
@@ -896,8 +897,8 @@ export interface InboxTaskResourceClient {
 
 /** A saved view or filter configuration */
 export interface PerspectiveResourceClient {
-  /** List perspectives. */
-  list(options?: CallOptions): Promise<readonly Perspective[]>
+  /** List perspectives, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Perspective>>
   /**
    * Read the perspective identified by `id`.
    *
@@ -1322,13 +1323,13 @@ const resources: AppContract<OmniFocusClient>['resources'] = {
   },
 }
 
-const folderListFoldersOperation: OperationDescriptor<Record<string, never>, readonly Folder[]> = {
+const folderListFoldersOperation: OperationDescriptor<Record<string, never>, Page<Folder>> = {
   id: 'omnifocus.folders.list',
   permission: 'omnifocus:folders:list',
   target: { command: 'listFolders', resource: 'Folder' },
   description: 'List all folders',
   input: t.record({}),
-  output: t.array(folderRecordType),
+  output: t.page(folderRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -1375,16 +1376,13 @@ const folderCreateFolderOperation: OperationDescriptor<FolderCreateInput, Folder
   },
 }
 
-const projectListProjectsOperation: OperationDescriptor<
-  Record<string, never>,
-  readonly Project[]
-> = {
+const projectListProjectsOperation: OperationDescriptor<Record<string, never>, Page<Project>> = {
   id: 'omnifocus.projects.list',
   permission: 'omnifocus:projects:list',
   target: { command: 'listProjects', resource: 'Project' },
   description: 'List all projects',
   input: t.record({}),
-  output: t.array(projectRecordType),
+  output: t.page(projectRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -1555,13 +1553,13 @@ const projectCreateProjectOperation: OperationDescriptor<ProjectCreateInput, Pro
   },
 }
 
-const taskListTasksOperation: OperationDescriptor<Record<string, never>, readonly Task[]> = {
+const taskListTasksOperation: OperationDescriptor<Record<string, never>, Page<Task>> = {
   id: 'omnifocus.tasks.list',
   permission: 'omnifocus:tasks:list',
   target: { command: 'listTasks', resource: 'Task' },
   description: 'List all tasks',
   input: t.record({}),
-  output: t.array(taskRecordType),
+  output: t.page(taskRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -1695,13 +1693,13 @@ const taskCreateTaskOperation: OperationDescriptor<TaskCreateInput, Task> = {
   },
 }
 
-const tagListTagsOperation: OperationDescriptor<Record<string, never>, readonly Tag[]> = {
+const tagListTagsOperation: OperationDescriptor<Record<string, never>, Page<Tag>> = {
   id: 'omnifocus.tags.list',
   permission: 'omnifocus:tags:list',
   target: { command: 'listTags', resource: 'Tag' },
   description: 'List all tags',
   input: t.record({}),
-  output: t.array(tagRecordType),
+  output: t.page(tagRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -1755,14 +1753,14 @@ const tagCreateTagOperation: OperationDescriptor<TagCreateInput, Tag> = {
 
 const inboxTaskListInboxTasksOperation: OperationDescriptor<
   Record<string, never>,
-  readonly InboxTask[]
+  Page<InboxTask>
 > = {
   id: 'omnifocus.inboxTasks.list',
   permission: 'omnifocus:inboxTasks:list',
   target: { command: 'listInboxTasks', resource: 'InboxTask' },
   description: 'List all inbox tasks',
   input: t.record({}),
-  output: t.array(inboxTaskRecordType),
+  output: t.page(inboxTaskRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -1847,14 +1845,14 @@ const inboxTaskCreateInboxTaskOperation: OperationDescriptor<InboxTaskCreateInpu
 
 const perspectiveListPerspectivesOperation: OperationDescriptor<
   Record<string, never>,
-  readonly Perspective[]
+  Page<Perspective>
 > = {
   id: 'omnifocus.perspectives.list',
   permission: 'omnifocus:perspectives:list',
   target: { command: 'listPerspectives', resource: 'Perspective' },
   description: 'List all perspectives',
   input: t.record({}),
-  output: t.array(perspectiveRecordType),
+  output: t.page(perspectiveRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',

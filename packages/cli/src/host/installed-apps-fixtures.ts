@@ -9,7 +9,7 @@
  * Each fixture app has one resource, `Widget` (plural `Widgets`, route segment
  * `widgets`), and one operation derived by hand from the manifest route rules:
  * `<app>.widgets.list`, permission `<app>:widgets:list`, target command `list`
- * on resource `Widget`, input an empty record.
+ * on resource `Widget`, input the paging inputs, output a page of widgets.
  */
 
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
@@ -101,7 +101,17 @@ function validManifestSource(app: string): string {
         plural: 'Widgets',
         description: 'A widget',
         properties: {},
-        identifiers: [{ property: 'id', primary: true }],
+        // Claimed unique, so the widget list pages, as its contract declares.
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+            unique: true,
+            evidence: {
+              unique: { source: 'curated', note: 'Test fixture: no two widgets share an id' },
+            },
+          },
+        ],
       },
     },
     enums: {},
@@ -131,8 +141,8 @@ const list = {
   permission: '${permission}',
   target: { command: 'list', resource: 'Widget' },
   description: 'List widgets',
-  input: t.record({}),
-  output: t.array(widget),
+  input: t.record({ ...t.pageInputs() }),
+  output: t.page(widget),
 }
 
 export const ${app}Contract = {

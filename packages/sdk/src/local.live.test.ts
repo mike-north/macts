@@ -92,12 +92,12 @@ describe.skipIf(!liveAppsEnabled)('local client against Notes.app (local only)',
   })
 
   it(
-    'lists accounts whose entries have a string name',
+    'lists a page of accounts whose entries have a string name',
     async () => {
       const accounts = await notes.accounts.list()
 
-      expect(Array.isArray(accounts)).toBe(true)
-      for (const account of accounts) {
+      expect(Array.isArray(accounts.items)).toBe(true)
+      for (const account of accounts.items) {
         expect(typeof account.name).toBe('string')
       }
     },
@@ -105,10 +105,10 @@ describe.skipIf(!liveAppsEnabled)('local client against Notes.app (local only)',
   )
 
   it(
-    'gets a listed attachment by its identifier',
+    'gets an attachment from the first page by its identifier',
     async () => {
       const attachments = await notes.attachments.list()
-      const first = attachments[0]
+      const first = attachments.items[0]
       if (first === undefined) {
         // No attachment exists on this Mac, so there is nothing to get.
         return

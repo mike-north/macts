@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { Page } from '@macts/contracts';
 
 // @public
 export interface SettingsSet {
@@ -29,7 +30,7 @@ export interface SettingsSetCreateInput {
 // @public
 export interface SettingsSetResourceClient {
     get(name: string, options?: CallOptions): Promise<SettingsSet>;
-    list(options?: CallOptions): Promise<readonly SettingsSet[]>;
+    list(options?: CallOptions): Promise<Page<SettingsSet>>;
 }
 
 // @public
@@ -65,7 +66,7 @@ export interface TabCreateInput {
 // @public
 export interface TabResourceClient {
     get(name: string, options?: CallOptions): Promise<Tab>;
-    list(options?: CallOptions): Promise<readonly Tab[]>;
+    list(options?: CallOptions): Promise<Page<Tab>>;
 }
 
 // @public
@@ -105,7 +106,7 @@ export interface WindowCreateInput {
 // @public
 export interface WindowResourceClient {
     get(name: string, options?: CallOptions): Promise<Window>;
-    list(options?: CallOptions): Promise<readonly Window[]>;
+    list(options?: CallOptions): Promise<Page<Window>>;
 }
 
 // @public

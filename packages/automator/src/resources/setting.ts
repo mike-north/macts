@@ -21,9 +21,9 @@ export class SettingResourceClient {
   }
 
   /**
-   * List the settings of one automator action.
+   * List the settings of one automator action, as one page.
    */
-  async list(actionId: string): Promise<Setting[]> {
-    return this.#http.rpc<Setting[]>(`${this.#app}.${this.#resource}.list`, { actionId })
+  async list(actionId: string): Promise<{ items: Setting[] }> {
+    return this.#http.rpc<{ items: Setting[] }>(`${this.#app}.${this.#resource}.list`, { actionId })
   }
 }

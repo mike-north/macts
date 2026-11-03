@@ -19,10 +19,10 @@ export class ListNotesCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.notes.list()
+      const page = await client.notes.list()
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           name: item.name,
           id: item.id,
           body: item.body,

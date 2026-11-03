@@ -46,7 +46,13 @@ export interface AutomatorActionCreateInput {
 export class AutomatorActionResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<AutomatorAction>;
-    list(workflowName: string): Promise<AutomatorAction[]>;
+    list(workflowName: string, page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: AutomatorAction[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -145,7 +151,9 @@ export type RequiredResourceCreateInput = Record<string, never>;
 // @public
 export class RequiredResourceResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    list(actionId: string): Promise<RequiredResource[]>;
+    list(actionId: string): Promise<{
+        items: RequiredResource[];
+    }>;
 }
 
 // @public (undocumented)
@@ -176,7 +184,9 @@ export interface SettingCreateInput {
 // @public
 export class SettingResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    list(actionId: string): Promise<Setting[]>;
+    list(actionId: string): Promise<{
+        items: Setting[];
+    }>;
 }
 
 // @public (undocumented)
@@ -208,7 +218,9 @@ export interface VariableCreateInput {
 export class VariableResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Variable>;
-    list(workflowName: string): Promise<Variable[]>;
+    list(workflowName: string): Promise<{
+        items: Variable[];
+    }>;
 }
 
 // @public (undocumented)
@@ -244,7 +256,9 @@ export class WorkflowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     execute(workflow: unknown): Promise<void>;
     get(name: string): Promise<Workflow>;
-    list(): Promise<Workflow[]>;
+    list(): Promise<{
+        items: Workflow[];
+    }>;
 }
 
 // @public (undocumented)

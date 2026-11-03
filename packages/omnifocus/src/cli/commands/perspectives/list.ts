@@ -19,10 +19,10 @@ export class ListPerspectivesCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.perspectives.list()
+      const page = await client.perspectives.list()
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           id: item.id,
           name: item.name,
         }))

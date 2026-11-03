@@ -21,10 +21,10 @@ export class CanvasResourceClient {
   }
 
   /**
-   * List all canvases.
+   * List all canvases, as one page.
    */
-  async list(): Promise<Canvas[]> {
-    return this.#http.rpc<Canvas[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Canvas[] }> {
+    return this.#http.rpc<{ items: Canvas[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

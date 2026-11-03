@@ -231,7 +231,14 @@ const remindersManifest: AppManifest = {
         id: { access: 'r', type: 'string', description: 'Reminder id', optional: false },
         name: { access: 'rw', type: 'string', description: 'Name', optional: false },
       },
-      identifiers: [{ property: 'id', primary: true }],
+      identifiers: [
+        {
+          property: 'id',
+          primary: true,
+          unique: true,
+          evidence: { unique: { source: 'sdef', note: 'The unique identifier of the reminder' } },
+        },
+      ],
     },
   },
   enums: {},
@@ -376,13 +383,15 @@ describe('cross-surface body-coherence: SDK vs. server required params', () => {
     it('SDK list() method signature includes required parent param calendarId', () => {
       // The generated list() must accept calendarId so the server's scoping
       // JXA (app.calendars.byId(calendarId).events()) has the value to use.
+      // Event's uid makes no uniqueness claim (recurring occurrences share
+      // it), so the list does not page: the parent scope is its only argument.
       expect(eventClient).toMatch(/async list\(calendarId:\s*string\)/)
     })
 
     it('SDK list() method body forwards calendarId in the request body', () => {
       // The server's buildListCommandCode reads calendarId from the request body;
       // if the SDK omits it the server gets undefined and emits byId(undefined).
-      expect(eventClient).toContain('{ calendarId }')
+      expect(eventClient).toContain('listEvents`, { calendarId })')
     })
 
     it('server required param matches SDK sent param (calendarId)', () => {
@@ -410,11 +419,11 @@ describe('cross-surface body-coherence: SDK vs. server required params', () => {
     const reminderClient = findFile(result.files, 'src/resources/reminder.ts').content
 
     it('SDK list() method signature includes required parent param listId', () => {
-      expect(reminderClient).toMatch(/async list\(listId:\s*string\)/)
+      expect(reminderClient).toMatch(/async list\(listId:\s*string, page:/)
     })
 
     it('SDK list() method body forwards listId in the request body', () => {
-      expect(reminderClient).toContain('{ listId }')
+      expect(reminderClient).toContain(', listId })')
     })
 
     it('server required param matches SDK sent param (listId)', () => {
@@ -587,7 +596,7 @@ describe('cross-surface body-coherence: SDK vs. server required params', () => {
       expect(listEvents).toBeDefined()
       if (listEvents !== undefined) {
         expect(requiredParams(listEvents)).toEqual(['calendarId'])
-        expect(eventClient).toContain('{ calendarId }')
+        expect(eventClient).toContain('listEvents`, { calendarId })')
       }
 
       // create (Event): manifest requires calendarId + summary + startDate + endDate;

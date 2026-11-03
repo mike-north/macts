@@ -24,6 +24,7 @@ import {
   type CallOptions,
   type ClientRuntime,
   type OperationDescriptor,
+  type Page,
   type ValueType,
 } from '@macts/contracts'
 
@@ -89,8 +90,8 @@ export interface DocumentUpdateInput {
 
 /** A Script Editor document */
 export interface DocumentResourceClient {
-  /** List documents. */
-  list(options?: CallOptions): Promise<readonly Document[]>
+  /** List documents, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Document>>
   /**
    * Read the document identified by `name`.
    *
@@ -148,13 +149,13 @@ const resources: AppContract<ScriptEditorClient>['resources'] = {
   },
 }
 
-const documentListOperation: OperationDescriptor<Record<string, never>, readonly Document[]> = {
+const documentListOperation: OperationDescriptor<Record<string, never>, Page<Document>> = {
   id: 'script-editor.documents.list',
   permission: 'script-editor:documents:list',
   target: { command: 'list', resource: 'Document' },
   description: 'List all open script documents',
   input: t.record({}),
-  output: t.array(documentRecordType),
+  output: t.page(documentRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',

@@ -20,10 +20,10 @@ export class ListGraphicsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.graphics.list(this.canvasId)
+      const page = await client.graphics.list(this.canvasId)
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           id: item.id,
           origin: item.origin,
           size: item.size,

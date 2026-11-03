@@ -49,6 +49,11 @@ resources:
       - property: name
         primary: true
         targeting: byProperty
+        unique: false
+        evidence:
+          unique:
+            source: curated
+            note: 'A calendar name is a title the user chooses; two calendars can share one.'
     properties:
       name:
         access: rw
@@ -115,6 +120,11 @@ resources:
     identifiers:
       - property: uid
         primary: true
+        unique: false
+        evidence:
+          unique:
+            source: curated
+            note: 'Every occurrence of a recurring event shares its uid: twelve events sharing one uid were observed on one calendar.'
     properties:
       summary:
         access: rw

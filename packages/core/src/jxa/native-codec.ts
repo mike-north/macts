@@ -19,6 +19,7 @@
  */
 
 import type { IssuePath, ValuePlan, WireRecord, WireValue } from '@macts/contracts'
+import type { PageWindow } from '../execution/executor.js'
 import { createNativeCodecFunctions } from './native-codec-functions.js'
 
 /**
@@ -71,6 +72,14 @@ export interface NativeCodec {
   readonly prelude: string
 }
 
+/**
+ * Marker `name` of the object a list body throws when its collection changed
+ * while it was read, so no consistent result exists. The executor reports it
+ * as a changed collection, distinct from both an app failure and a result
+ * that breaks the contract.
+ */
+export const NATIVE_COLLECTION_CHANGED_ERROR_NAME = 'MactsCollectionChanged'
+
 /** Identity tag marking embedded automation-process JavaScript for tooling. */
 const js = String.raw
 
@@ -116,16 +125,17 @@ export const NATIVE_CODEC: NativeCodec = Object.freeze({
  * text.
  *
  * @remarks
- * `body` is a function body invoked as `(app, args)`, where `app` is the target
- * application and `args` is the decoded input record. The executor composes the
- * script as: codec prelude, then decode of `input` against `inputPlan`, then
- * `body`, then encode of its result against `outputPlan`, all inside one
- * try/catch that yields a {@link NativeOutcome}.
+ * `body` is a function body invoked as `(app, args, page)`, where `app` is the
+ * target application, `args` is the decoded input record, and `page` is the
+ * page window a paged list reads (`null` when there is none). The executor
+ * composes the script as: codec prelude, then decode of `input` against
+ * `inputPlan`, then `body`, then encode of its result against `outputPlan`,
+ * all inside one try/catch that yields a {@link NativeOutcome}.
  */
 export interface NativeScript {
   /** Bundle identifier of the target application. */
   readonly bundleId: string
-  /** Function body run as `(app, args)`. */
+  /** Function body run as `(app, args, page)`. */
   readonly body: string
   /** Validated wire input record (plain JSON under a passthrough plan). */
   readonly input: WireRecord
@@ -133,6 +143,11 @@ export interface NativeScript {
   readonly inputPlan: ValuePlan
   /** Plan for encoding the native result into wire form. */
   readonly outputPlan: ValuePlan
+  /**
+   * The window a paged list body reads, passed to the body as its `page`
+   * argument as plain data. Absent for every other body.
+   */
+  readonly page?: PageWindow | undefined
 }
 
 /**
@@ -148,9 +163,13 @@ export interface NativeScript {
  *   produced from already-validated input. With `unsupportedKind`, the plan
  *   has a kind the codec has no conversion for, so no value at that position
  *   could be converted.
+ * - `collection`: the collection a list read changed while it was read, so no
+ *   consistent result exists (raised by list bodies with
+ *   {@link NATIVE_COLLECTION_CHANGED_ERROR_NAME}).
  */
 export type NativeFailure =
   | { readonly source: 'app'; readonly message: string; readonly errorNumber?: number }
+  | { readonly source: 'collection'; readonly message: string }
   | {
       readonly source: 'codec'
       readonly direction: 'decode' | 'encode'

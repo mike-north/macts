@@ -6,14 +6,14 @@
  * - `widgets.widgets.get`  — permission `widgets:widgets:get`, input `{ id }`,
  *   result one widget `{ name, count }` where `count` is an integer
  * - `widgets.widgets.list` — permission `widgets:widgets:list`, input `{}`,
- *   result a list of widgets
+ *   result one page of widgets `{ items, nextCursor? }`
  *
  * An integer travels as `{ "integer": "<decimal>" }` and decodes to a number
  * inside `INTEGER_LIMITS` from `@macts/contracts`.
  */
 
 import { z } from 'zod'
-import { INTEGER_LIMITS } from '@macts/contracts'
+import { INTEGER_LIMITS, ValueTypes } from '@macts/contracts'
 
 const INTEGER_TEXT = /^(0|-?[1-9][0-9]*)$/
 const integerWire = z.strictObject({ integer: z.string().regex(INTEGER_TEXT) })
@@ -89,26 +89,12 @@ const WIDGET = {
   decode: (wire) => decodeWidget(wire, []),
 }
 
-const WIDGET_LIST = {
-  plan: { kind: 'array', items: WIDGET_PLAN },
-  sdk: z.array(widgetSdk),
-  wire: z.array(widgetWire),
-  encode: () => ({
-    ok: false,
-    issues: [{ path: [], message: 'Widget lists are only ever results' }],
-  }),
-  decode(wire) {
-    if (!Array.isArray(wire))
-      return { ok: false, issues: [{ path: [], message: 'Expected a list' }] }
-    const widgets = []
-    for (const [index, element] of wire.entries()) {
-      const widget = decodeWidget(element, [index])
-      if (!widget.ok) return widget
-      widgets.push(widget.value)
-    }
-    return { ok: true, value: widgets }
-  },
-}
+/**
+ * One page of widgets, the result of every list. Widget has no identifier in
+ * the resource table, so its list takes no paging inputs and its one page
+ * holds every widget.
+ */
+const WIDGET_PAGE = ValueTypes.page(WIDGET)
 
 const GET = {
   id: 'widgets.widgets.get',
@@ -128,7 +114,7 @@ const LIST = {
   target: { command: 'list', resource: 'Widget' },
   description: 'List widgets',
   input: recordInput(emptyInput, { kind: 'record', fields: {} }),
-  output: WIDGET_LIST,
+  output: WIDGET_PAGE,
 }
 
 /** The widgets app contract. */

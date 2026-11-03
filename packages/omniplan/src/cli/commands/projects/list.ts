@@ -19,10 +19,10 @@ export class ListProjectsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.projects.list()
+      const page = await client.projects.list()
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           id: item.id,
           name: item.name,
           startingDate: item.startingDate,

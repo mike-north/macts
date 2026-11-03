@@ -137,7 +137,7 @@ describe('packed install: identity across entry points', () => {
     const report = await runConsumer(consumer, 'full-install.mjs')
 
     expect(report).toMatchObject({
-      listed: [{ name: 'Sprocket', count: 7 }],
+      listed: { items: [{ name: 'Sprocket', count: 7 }] },
       integerAcceptedByLocal: true,
       authorizations: [
         'Bearer macts_sk_packed-install-token',
@@ -161,7 +161,7 @@ describe('packed install: remote only', () => {
     const report = await runConsumer(remoteOnly, 'remote-only.mjs')
 
     expect(report).toMatchObject({
-      listed: [{ name: 'Sprocket', count: 7 }],
+      listed: { items: [{ name: 'Sprocket', count: 7 }] },
       errorIsTargetNotFound: true,
       local: { loaded: false, code: 'ERR_MODULE_NOT_FOUND' },
     })

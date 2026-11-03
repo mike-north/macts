@@ -40,7 +40,13 @@ export interface FolderCreateInput {
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Folder>;
-    list(): Promise<Folder[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Folder[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -83,7 +89,13 @@ export interface ShortcutCreateInput {
 export class ShortcutResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Shortcut>;
-    list(): Promise<Shortcut[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Shortcut[];
+        nextCursor?: string;
+    }>;
     run(id: string, withInput?: unknown): Promise<void>;
 }
 

@@ -25,6 +25,7 @@ import {
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
+  type Page,
   type Rgb,
   type ValueType,
 } from '@macts/contracts'
@@ -493,8 +494,8 @@ export interface OpenFileAlarmUpdateInput {
 
 /** A calendar containing events */
 export interface CalendarResourceClient {
-  /** List calendars. */
-  list(options?: CallOptions): Promise<readonly Calendar[]>
+  /** List calendars, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Calendar>>
   /**
    * Read the calendar identified by `id`.
    *
@@ -508,11 +509,11 @@ export interface CalendarResourceClient {
 /** A calendar event */
 export interface EventResourceClient {
   /**
-   * List events.
+   * List events, as one page holding all of them.
    *
    * @param calendarId - Calendar identifier. Does not accept null.
    */
-  list(calendarId: string, options?: CallOptions): Promise<readonly Event[]>
+  list(calendarId: string, options?: CallOptions): Promise<Page<Event>>
   /**
    * Read the event identified by `id` within `calendarId`.
    *
@@ -742,13 +743,13 @@ const resources: AppContract<CalendarClient>['resources'] = {
   },
 }
 
-const calendarListOperation: OperationDescriptor<Record<string, never>, readonly Calendar[]> = {
+const calendarListOperation: OperationDescriptor<Record<string, never>, Page<Calendar>> = {
   id: 'calendar.calendars.list',
   permission: 'calendar:calendars:list',
   target: { command: 'list', resource: 'Calendar' },
   description: 'List all calendars',
   input: t.record({}),
-  output: t.array(calendarRecordType),
+  output: t.page(calendarRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -823,7 +824,7 @@ const calendarCreateOperation: OperationDescriptor<CalendarCreateInput, Calendar
 
 const eventListEventsOperation: OperationDescriptor<
   { readonly calendarId: string },
-  readonly Event[]
+  Page<Event>
 > = {
   id: 'calendar.events.list',
   permission: 'calendar:events:list',
@@ -832,7 +833,7 @@ const eventListEventsOperation: OperationDescriptor<
   input: t.record({
     calendarId: t.string({ description: 'Calendar identifier' }),
   }),
-  output: t.array(eventRecordType),
+  output: t.page(eventRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',

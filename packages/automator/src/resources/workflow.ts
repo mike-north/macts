@@ -21,10 +21,10 @@ export class WorkflowResourceClient {
   }
 
   /**
-   * List all workflows.
+   * List all workflows, as one page.
    */
-  async list(): Promise<Workflow[]> {
-    return this.#http.rpc<Workflow[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Workflow[] }> {
+    return this.#http.rpc<{ items: Workflow[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

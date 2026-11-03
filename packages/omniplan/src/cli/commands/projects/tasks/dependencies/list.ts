@@ -19,10 +19,10 @@ export class ListDependenciesCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.dependencies.list()
+      const page = await client.dependencies.list()
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           dependencyType: item.dependencyType,
           leadTime: item.leadTime,
           leadPercentage: item.leadPercentage,

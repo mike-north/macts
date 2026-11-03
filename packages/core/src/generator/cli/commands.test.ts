@@ -21,6 +21,7 @@
 import { describe, it, expect } from 'vitest'
 import { generateCliPlugin } from './index.js'
 import type { AppManifest } from '../../manifest/index.js'
+import { UNIQUE_CLAIM } from '../../manifest/test-support/unique-claim.js'
 
 /** Build a minimal manifest exercising each generator code path under test. */
 function buildManifest(): AppManifest {
@@ -50,7 +51,7 @@ function buildManifest(): AppManifest {
           // A writable boolean — surfaces as `boolean | undefined` from the flag.
           shared: { access: 'rw', type: 'boolean', description: 'Is shared', optional: true },
         },
-        identifiers: [{ property: 'calendarIdentifier', primary: true }],
+        identifiers: [{ property: 'calendarIdentifier', primary: true, ...UNIQUE_CLAIM }],
       },
       Folder: {
         name: 'Folder',
@@ -149,5 +150,57 @@ describe('generateCliPlugin command casts', () => {
 
     const folderIdDeclarations = content.match(/^\s*folderId = Option\./gm) ?? []
     expect(folderIdDeclarations).toHaveLength(1)
+  })
+})
+
+describe('generateCliPlugin list commands: paging', () => {
+  const options = {
+    packageName: '@macts/testapp',
+    sdkPackageName: '@macts/sdk-testapp',
+  }
+
+  it('gives a list whose identifier is claimed unique --page-size and --cursor, forwarded as the page', () => {
+    const list = fileContent(generateCliPlugin(buildManifest(), options), 'calendars/list.ts')
+
+    expect(list).toContain(
+      'pageSize = Option.String(\'--page-size\', { description: "The most items to show, from 1 to 100 (default 25)" });'
+    )
+    expect(list).toContain(
+      'cursor = Option.String(\'--cursor\', { description: "Continue from the previous page, as its output says" });'
+    )
+    expect(list).toContain(
+      'client.calendars.list({ ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }), ...(this.cursor === undefined ? {} : { cursor: this.cursor }) })'
+    )
+    // The output says how to read the next page when more remain.
+    expect(list).toContain('formatter.formatPage(page.items.map(')
+    expect(list).toContain('page.nextCursor);')
+  })
+
+  it('gives the list of a resource whose identifier makes no uniqueness claim no paging flags', () => {
+    const manifest = buildManifest()
+    const calendar = manifest.resources['Calendar']
+    if (calendar === undefined) throw new Error('fixture has no Calendar')
+    calendar.identifiers = [{ property: 'calendarIdentifier', primary: true }]
+
+    const list = fileContent(generateCliPlugin(manifest, options), 'calendars/list.ts')
+
+    expect(list).not.toContain('--page-size')
+    expect(list).not.toContain('--cursor')
+    expect(list).toContain('client.calendars.list();')
+  })
+
+  it('gives the list of a resource with no identifier no paging flags, and prints its one page', () => {
+    const manifest = buildManifest()
+    const calendar = manifest.resources['Calendar']
+    if (calendar === undefined) throw new Error('fixture has no Calendar')
+    const { identifiers: _identifiers, ...unidentified } = calendar
+    manifest.resources['Calendar'] = unidentified
+
+    const list = fileContent(generateCliPlugin(manifest, options), 'calendars/list.ts')
+
+    expect(list).not.toContain('--page-size')
+    expect(list).not.toContain('--cursor')
+    expect(list).toContain('client.calendars.list();')
+    expect(list).toContain('formatter.formatList(page.items.map(')
   })
 })

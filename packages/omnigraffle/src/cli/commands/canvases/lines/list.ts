@@ -20,10 +20,10 @@ export class ListLinesCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.lines.list(this.canvasId)
+      const page = await client.lines.list(this.canvasId)
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           id: item.id,
           lineType: item.lineType,
           hopType: item.hopType,

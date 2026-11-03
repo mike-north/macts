@@ -21,10 +21,10 @@ export class TagResourceClient {
   }
 
   /**
-   * List all tags.
+   * List all tags, as one page.
    */
-  async list(): Promise<Tag[]> {
-    return this.#http.rpc<Tag[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Tag[] }> {
+    return this.#http.rpc<{ items: Tag[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

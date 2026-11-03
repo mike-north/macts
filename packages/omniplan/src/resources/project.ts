@@ -21,10 +21,10 @@ export class ProjectResourceClient {
   }
 
   /**
-   * List all projects.
+   * List all projects, as one page.
    */
-  async list(): Promise<Project[]> {
-    return this.#http.rpc<Project[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Project[] }> {
+    return this.#http.rpc<{ items: Project[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

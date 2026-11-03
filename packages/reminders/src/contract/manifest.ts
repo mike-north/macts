@@ -64,6 +64,13 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "The unique identifier of the account"',
+            },
+          },
         },
       ],
       nullabilityProbe: {
@@ -143,6 +150,13 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "The unique identifier of the list"',
+            },
+          },
         },
       ],
       nullabilityProbe: {
@@ -381,6 +395,13 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "The unique identifier of the reminder"',
+            },
+          },
         },
       ],
       nullabilityProbe: {

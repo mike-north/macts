@@ -252,6 +252,11 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "The unique identifier for the project."'
     properties:
       id:
         access: r
@@ -358,6 +363,11 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "The unique identifier for the scheme."'
     properties:
       id:
         access: r

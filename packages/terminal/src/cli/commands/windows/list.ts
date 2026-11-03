@@ -19,10 +19,10 @@ export class ListWindowsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.windows.list()
+      const page = await client.windows.list()
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           name: item.name,
           id: item.id,
           position: item.position,

@@ -162,6 +162,8 @@ export function httpStatusForError(error: AnyMactsError): number {
       return 403
     case 'APPROVAL_PENDING':
       return 409
+    case 'COLLECTION_CHANGED':
+      return 409
     case 'APPROVAL_REJECTED':
       return 403
     case 'TARGET_NOT_FOUND':

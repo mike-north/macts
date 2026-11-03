@@ -190,3 +190,37 @@ export function resolveListOutputProperties(resource: Resource | undefined): str
 
   return [...names]
 }
+
+/**
+ * Whether a manifest list operation returns bounded pages, taking `pageSize`
+ * and `cursor` inputs, rather than its whole collection as one page.
+ *
+ * This is the single paging-eligibility rule. The contract generator, the
+ * generated SDK and CLI surfaces, the capability registry, the native list
+ * body, and the runtime's contract registration check all ask it, so they
+ * agree by construction.
+ *
+ * A list pages exactly when its command is the resource-scoped `list` and the
+ * resource's primary identifier is claimed unique, with evidence
+ * (`unique: true`). Each page is anchored on the identifier of the item just
+ * before it, and the anchor check can detect a shift of the collection only if
+ * no two items share that value; with adjacent duplicates a shift by one
+ * leaves the same value in place, and a page would silently skip or repeat an
+ * item. So uniqueness is opt-in: an identifier with no claim, or one claimed
+ * not unique, gives a list that reads its whole collection, and so does a
+ * resource with no identifier. The claim is independent of how the identifier
+ * is targeted.
+ *
+ * @param command - The manifest command, by its scope and name.
+ * @param resource - The resource the command lists, if any.
+ * @returns `true` when the list operation pages.
+ *
+ * @see phases/13-sdk-value-and-execution-contracts.md §D9 (Bounded list pages)
+ */
+export function listOperationPages(
+  command: { readonly scope: string; readonly name: string },
+  resource: Resource | undefined
+): boolean {
+  if (command.scope !== 'resource' || command.name !== 'list') return false
+  return resolvePrimaryIdentifier(resource)?.unique === true
+}

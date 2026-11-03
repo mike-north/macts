@@ -23,10 +23,10 @@ export class ListRunDestinationsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.runDestinations.list(this.workspaceName)
+      const page = await client.runDestinations.list(this.workspaceName)
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           name: item.name,
           architecture: item.architecture,
           platform: item.platform,

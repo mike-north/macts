@@ -19,10 +19,10 @@ export class ListAccountsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.accounts.list()
+      const page = await client.accounts.list()
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           name: item.name,
           id: item.id,
           upgraded: item.upgraded,

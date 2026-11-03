@@ -1,5 +1,8 @@
 /**
  * Tests for capability operation input schemas and MCP tool names.
+ *
+ * @see https://json-schema.org/draft-07/json-schema-validation (minimum, maximum, default)
+ * @see phases/13-sdk-value-and-execution-contracts.md §D9 (Bounded list pages)
  */
 
 import { describe, it, expect } from 'vitest'
@@ -9,6 +12,7 @@ import {
   generateAppCommandSchema,
 } from './operation-schema.js'
 import type { Resource, Command } from '../manifest/index.js'
+import { UNIQUE_CLAIM } from '../manifest/test-support/unique-claim.js'
 
 describe('generateToolName', () => {
   it('should generate correct tool name format', () => {
@@ -309,6 +313,88 @@ describe('generateResourceOperationSchema', () => {
       items: { type: 'string' },
       description: 'Tag filters',
     })
+  })
+})
+
+describe('generateResourceOperationSchema: paging inputs', () => {
+  const list: Command = {
+    name: 'list',
+    description: 'List items',
+    scope: 'resource',
+    parameters: [],
+  }
+
+  /** An item resource whose primary identifier entry is `identifier`. */
+  function item(identifier: NonNullable<Resource['identifiers']>[number]): Resource {
+    return {
+      name: 'Item',
+      plural: 'Items',
+      description: 'An item',
+      properties: { id: { access: 'r', type: 'string', description: 'Item ID', optional: false } },
+      identifiers: [identifier],
+    }
+  }
+
+  // Hand-written from page.ts: pageSize is an optional integer from 1 to 100,
+  // 25 by default; cursor is an optional string. Neither is required.
+  const PAGE_SIZE = {
+    type: 'integer',
+    minimum: 1,
+    maximum: 100,
+    default: 25,
+    description: 'The most items to return, from 1 to 100 (default 25).',
+  }
+
+  it('shows pageSize, with its 1 to 100 range, and cursor for a list that pages', () => {
+    const schema = generateResourceOperationSchema(
+      list,
+      item({ property: 'id', primary: true, ...UNIQUE_CLAIM })
+    )
+
+    expect(schema.properties?.['pageSize']).toEqual(PAGE_SIZE)
+    expect(schema.properties?.['cursor']).toEqual({
+      type: 'string',
+      description:
+        "The previous page's nextCursor, to read the page after it. Omit it to read the first page.",
+    })
+    expect(schema.required).toBeUndefined()
+  })
+
+  it('shows the paging inputs for a byProperty identifier claimed unique', () => {
+    const schema = generateResourceOperationSchema(
+      list,
+      item({ property: 'id', primary: true, targeting: 'byProperty', ...UNIQUE_CLAIM })
+    )
+
+    expect(Object.keys(schema.properties ?? {})).toEqual(['pageSize', 'cursor'])
+  })
+
+  it.each([
+    { label: 'makes no uniqueness claim', identifier: { property: 'id', primary: true } },
+    {
+      label: 'is claimed not unique',
+      identifier: {
+        property: 'id',
+        primary: true,
+        unique: false,
+        evidence: { unique: { source: 'curated' as const, note: 'Ids repeat' } },
+      },
+    },
+  ])('shows neither paging input for a list whose identifier $label', ({ identifier }) => {
+    const schema = generateResourceOperationSchema(list, item(identifier))
+
+    expect(schema.properties).toEqual({})
+  })
+
+  it('shows neither paging input for a command that is not a list', () => {
+    const get: Command = { ...list, name: 'get' }
+    const schema = generateResourceOperationSchema(
+      get,
+      item({ property: 'id', primary: true, ...UNIQUE_CLAIM })
+    )
+
+    expect(schema.properties).not.toHaveProperty('pageSize')
+    expect(schema.properties).not.toHaveProperty('cursor')
   })
 })
 

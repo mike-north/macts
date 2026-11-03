@@ -26,7 +26,16 @@ import {
   type PermissionString,
 } from '@macts/contracts'
 
-/** The library app's manifest. */
+/**
+ * A uniqueness claim, with its evidence, for the fixture's identifiers: a list
+ * pages only when its resource's primary identifier is claimed unique.
+ */
+const UNIQUE_CLAIM = {
+  unique: true,
+  evidence: { unique: { source: 'curated', note: 'Test fixture: no two items share an id' } },
+} as const
+
+/** The library app's manifest; shelf and book lists page. */
 export const LIBRARY_MANIFEST: AppManifest = {
   version: '1.0',
   app: { name: 'Library', bundleId: 'com.example.library', tccEntitlements: [] },
@@ -36,14 +45,14 @@ export const LIBRARY_MANIFEST: AppManifest = {
       plural: 'Shelves',
       description: 'A shelf',
       properties: {},
-      identifiers: [{ property: 'code', primary: true }],
+      identifiers: [{ property: 'code', primary: true, ...UNIQUE_CLAIM }],
     },
     Book: {
       name: 'Book',
       plural: 'Books',
       description: 'A book',
       properties: {},
-      identifiers: [{ property: 'isbn', primary: true }],
+      identifiers: [{ property: 'isbn', primary: true, ...UNIQUE_CLAIM }],
     },
   },
   enums: {},
@@ -81,12 +90,14 @@ function libraryOperation(
   resource: string,
   output: AnyOperationDescriptor['output']
 ): AnyOperationDescriptor {
+  // A list whose identifier is claimed unique takes the paging inputs and returns a page.
+  const input = command === 'list' ? t.record({ ...t.pageInputs() }) : t.record({})
   return {
     id,
     permission,
     target: { command, resource },
     description: `${command} ${resource}`,
-    input: t.record({}),
+    input,
     output,
   }
 }
@@ -94,19 +105,13 @@ function libraryOperation(
 /** The descriptors of the library's operations, as a generator would emit them. */
 const LIBRARY_OPERATIONS: readonly AnyOperationDescriptor[] = [
   libraryOperation('library.books.get', 'library:books:get', 'get', 'Book', BOOK_RECORD),
-  libraryOperation(
-    'library.books.list',
-    'library:books:list',
-    'list',
-    'Book',
-    t.array(BOOK_RECORD)
-  ),
+  libraryOperation('library.books.list', 'library:books:list', 'list', 'Book', t.page(BOOK_RECORD)),
   libraryOperation(
     'library.shelves.list',
     'library:shelves:list',
     'list',
     'Shelf',
-    t.array(SHELF_RECORD)
+    t.page(SHELF_RECORD)
   ),
 ]
 

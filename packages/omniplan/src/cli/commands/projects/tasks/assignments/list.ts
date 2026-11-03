@@ -19,10 +19,10 @@ export class ListAssignmentsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.assignments.list()
+      const page = await client.assignments.list()
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           units: item.units,
         }))
       )

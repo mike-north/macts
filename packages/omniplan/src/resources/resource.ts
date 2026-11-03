@@ -21,10 +21,10 @@ export class ResourceResourceClient {
   }
 
   /**
-   * List all resources.
+   * List all resources, as one page.
    */
-  async list(): Promise<Resource[]> {
-    return this.#http.rpc<Resource[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Resource[] }> {
+    return this.#http.rpc<{ items: Resource[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

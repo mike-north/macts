@@ -9,4 +9,11 @@
  * @packageDocumentation
  */
 
-export type { Executor, ExecutionRequest, ResolutionRequest } from './executor.js'
+export type {
+  Executor,
+  ExecutionRequest,
+  PageAnchor,
+  PageWindow,
+  PageWindowResult,
+  ResolutionRequest,
+} from './executor.js'

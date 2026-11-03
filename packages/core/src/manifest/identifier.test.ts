@@ -12,8 +12,10 @@
 
 import { describe, it, expect } from 'vitest'
 import type { Resource } from './schemas/resource.js'
+import { UNIQUE_CLAIM } from './test-support/unique-claim.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
+  listOperationPages,
   resolveCanonicalIdentifierSource,
   resolveIdentifierTargeting,
   resolvePrimaryIdentifierProperty,
@@ -209,6 +211,64 @@ describe('resolveListOutputProperties', () => {
   it('falls back to ["name"] for an empty resource with no identifier', () => {
     expect(resolveListOutputProperties(makeResource({}))).toEqual(['name'])
     expect(resolveListOutputProperties(undefined)).toEqual(['name'])
+  })
+})
+
+describe('listOperationPages', () => {
+  const LIST = { scope: 'resource', name: 'list' }
+  const NOT_UNIQUE = {
+    unique: false,
+    evidence: { unique: { source: 'curated' as const, note: 'Values repeat' } },
+  }
+
+  it('pages a list whose primary identifier is claimed unique', () => {
+    const resource = makeResource({
+      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
+    })
+    expect(listOperationPages(LIST, resource)).toBe(true)
+  })
+
+  it('pages a byProperty identifier claimed unique: uniqueness, not targeting, decides', () => {
+    const resource = makeResource({
+      identifiers: [{ property: 'id', primary: true, targeting: 'byProperty', ...UNIQUE_CLAIM }],
+    })
+    expect(listOperationPages(LIST, resource)).toBe(true)
+  })
+
+  it.each([
+    { label: 'makes no uniqueness claim', identifiers: [{ property: 'id', primary: true }] },
+    {
+      label: 'is claimed not unique',
+      identifiers: [{ property: 'id', primary: true, ...NOT_UNIQUE }],
+    },
+    {
+      label: 'is a byProperty identifier with no claim',
+      identifiers: [{ property: 'name', primary: true, targeting: 'byProperty' as const }],
+    },
+    {
+      label: 'is not the claimed one: only the primary identifier counts',
+      identifiers: [
+        { property: 'id', primary: false, ...UNIQUE_CLAIM },
+        { property: 'name', primary: true },
+      ],
+    },
+  ])('does not page a list whose primary identifier $label', ({ identifiers }) => {
+    expect(listOperationPages(LIST, makeResource({ identifiers }))).toBe(false)
+  })
+
+  it('does not page a list of a resource with no identifier, or no resource', () => {
+    expect(listOperationPages(LIST, makeResource({}))).toBe(false)
+    expect(listOperationPages(LIST, undefined)).toBe(false)
+  })
+
+  it.each([
+    { label: 'another resource command', command: { scope: 'resource', name: 'get' } },
+    { label: 'an application command named list', command: { scope: 'application', name: 'list' } },
+  ])('never pages $label', ({ command }) => {
+    const resource = makeResource({
+      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
+    })
+    expect(listOperationPages(command, resource)).toBe(false)
   })
 })
 

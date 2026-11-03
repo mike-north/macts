@@ -21,10 +21,10 @@ export class GraphicResourceClient {
   }
 
   /**
-   * List the graphics of one canvas.
+   * List the graphics of one canvas, as one page.
    */
-  async list(canvasId: string): Promise<Graphic[]> {
-    return this.#http.rpc<Graphic[]>(`${this.#app}.${this.#resource}.list`, { canvasId })
+  async list(canvasId: string): Promise<{ items: Graphic[] }> {
+    return this.#http.rpc<{ items: Graphic[] }>(`${this.#app}.${this.#resource}.list`, { canvasId })
   }
 
   /**

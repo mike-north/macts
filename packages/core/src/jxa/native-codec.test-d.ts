@@ -22,14 +22,17 @@ if (outcome.ok) {
   expectType<NativeFailure>(outcome.failure)
 }
 
-// `source` separates app failures from codec failures.
+// `source` separates app failures, codec failures, and changed collections.
 declare const failure: NativeFailure
 if (failure.source === 'app') {
   expectType<string>(failure.message)
   expectType<number | undefined>(failure.errorNumber)
-} else {
+} else if (failure.source === 'codec') {
   expectType<'decode' | 'encode'>(failure.direction)
   expectType<IssuePath>(failure.path)
+} else {
+  expectType<'collection'>(failure.source)
+  expectType<string>(failure.message)
 }
 
 // Negative: a success carries no failure, a codec failure has a direction,
@@ -37,6 +40,7 @@ if (failure.source === 'app') {
 expectNotAssignable<NativeOutcome>({ ok: true, failure: { source: 'app', message: 'x' } })
 expectNotAssignable<NativeFailure>({ source: 'codec', path: [], message: 'x' })
 expectNotAssignable<NativeFailure>({ source: 'app', message: 'x', direction: 'encode' })
+expectNotAssignable<NativeFailure>({ source: 'collection' })
 
 // Edge: a successful outcome may carry `null`, the wire form of "no value".
 expectAssignable<NativeOutcome>({ ok: true, value: null })
@@ -50,4 +54,13 @@ expectAssignable<NativeScript>({
   input: {},
   inputPlan: PASSTHROUGH_PLAN,
   outputPlan: PASSTHROUGH_PLAN,
+})
+// A paged list's script also carries its page window.
+expectAssignable<NativeScript>({
+  bundleId: 'com.apple.reminders',
+  body: 'return null',
+  input: {},
+  inputPlan: PASSTHROUGH_PLAN,
+  outputPlan: PASSTHROUGH_PLAN,
+  page: { offset: 25, size: 25, anchor: 'x' },
 })

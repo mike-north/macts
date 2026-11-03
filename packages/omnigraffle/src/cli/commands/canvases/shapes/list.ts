@@ -20,10 +20,10 @@ export class ListShapesCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.shapes.list(this.canvasId)
+      const page = await client.shapes.list(this.canvasId)
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           id: item.id,
           name: item.name,
           text: item.text,

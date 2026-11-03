@@ -7,6 +7,7 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { Page } from '@macts/contracts';
 import { Point } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
 
@@ -45,7 +46,7 @@ export interface CanvasCreateInput {
 export interface CanvasResourceClient {
     create(input: CanvasCreateInput, options?: CallOptions): Promise<Canvas>;
     get(id: string, options?: CallOptions): Promise<Canvas>;
-    list(options?: CallOptions): Promise<readonly Canvas[]>;
+    list(options?: CallOptions): Promise<Page<Canvas>>;
 }
 
 // @public
@@ -169,7 +170,7 @@ export interface GraphicCreateInput {
 // @public
 export interface GraphicResourceClient {
     get(id: string, options?: CallOptions): Promise<Graphic>;
-    list(canvasId: string, options?: CallOptions): Promise<readonly Graphic[]>;
+    list(canvasId: string, options?: CallOptions): Promise<Page<Graphic>>;
 }
 
 // @public
@@ -315,7 +316,7 @@ export interface LayerCreateInput {
 export interface LayerResourceClient {
     create(input: LayerCreateInput, options?: CallOptions): Promise<Layer>;
     get(name: string, options?: CallOptions): Promise<Layer>;
-    list(canvasId: string, options?: CallOptions): Promise<readonly Layer[]>;
+    list(canvasId: string, options?: CallOptions): Promise<Page<Layer>>;
 }
 
 // @public
@@ -361,7 +362,7 @@ export interface LineCreateInput {
 // @public
 export interface LineResourceClient {
     get(id: string, options?: CallOptions): Promise<Line>;
-    list(canvasId: string, options?: CallOptions): Promise<readonly Line[]>;
+    list(canvasId: string, options?: CallOptions): Promise<Page<Line>>;
 }
 
 // @public
@@ -458,7 +459,7 @@ export interface ShapeCreateInput {
 export interface ShapeResourceClient {
     create(input: ShapeCreateInput, options?: CallOptions): Promise<Shape>;
     get(id: string, options?: CallOptions): Promise<Shape>;
-    list(canvasId: string, options?: CallOptions): Promise<readonly Shape[]>;
+    list(canvasId: string, options?: CallOptions): Promise<Page<Shape>>;
 }
 
 // @public

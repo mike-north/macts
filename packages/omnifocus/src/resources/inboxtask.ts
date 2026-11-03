@@ -21,10 +21,10 @@ export class InboxTaskResourceClient {
   }
 
   /**
-   * List all inbox tasks.
+   * List all inbox tasks, as one page.
    */
-  async list(): Promise<InboxTask[]> {
-    return this.#http.rpc<InboxTask[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: InboxTask[] }> {
+    return this.#http.rpc<{ items: InboxTask[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
