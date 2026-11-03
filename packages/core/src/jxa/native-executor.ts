@@ -30,6 +30,7 @@ import {
   AppAuthorizationRequiredError,
   AppOperationError,
   AppUnavailableError,
+  CollectionChangedError,
   InternalError,
   InvalidSelectionError,
   OperationCancelledError,
@@ -37,8 +38,10 @@ import {
   TargetNotFoundError,
   UnexpectedValueError,
   ValidationError,
+  PASSTHROUGH_PLAN,
   type AnyMactsError,
   type OperationTarget,
+  type ValuePlan,
   type WireValue,
 } from '@macts/contracts'
 import type { ExecutionRequest, Executor, ResolutionRequest } from '../execution/executor.js'
@@ -153,13 +156,14 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
   return {
     provider: 'macos',
     async execute(request: ExecutionRequest): Promise<WireValue> {
-      const { manifest, target, input, inputPlan, outputPlan, signal } = request
+      const { manifest, target, input, inputPlan, outputPlan, page, signal } = request
       throwIfAborted(signal)
 
       // Legacy identifier aliases belong only to results that pass through
       // unconverted; a typed result contract receives exactly its fields.
       const plan = planNativeInvocation(manifest, target, {
         identifierAliases: outputPlan.kind === 'passthrough',
+        paged: page !== undefined,
       })
       assertRequiredArguments(plan.requiredArguments, input)
       const script: NativeScript = {
@@ -167,7 +171,8 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
         body: plan.body,
         input,
         inputPlan,
-        outputPlan,
+        outputPlan: page === undefined ? outputPlan : pageWindowPlan(outputPlan),
+        ...(page === undefined ? {} : { page }),
       }
 
       const context: NativeFailureContext = { app: manifest.app.name, operation: target, timeoutMs }
@@ -192,6 +197,23 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       return Promise.reject(
         new InternalError('The macOS provider does not resolve references.', {})
       )
+    },
+  }
+}
+
+/**
+ * The plan a paged list's result is encoded with: the items by the operation's
+ * item array plan, and the collection's length and the last item's identifier
+ * as plain data (see `PageWindowResult`), which the runtime reads and never
+ * passes to a caller.
+ */
+function pageWindowPlan(itemsPlan: ValuePlan): ValuePlan {
+  return {
+    kind: 'record',
+    fields: {
+      items: { presence: 'required', value: itemsPlan },
+      length: { presence: 'required', value: PASSTHROUGH_PLAN },
+      last: { presence: 'optional', value: PASSTHROUGH_PLAN },
     },
   }
 }
@@ -306,6 +328,7 @@ const COMPILE_ERROR_PATTERN = /^\s*(?:\d+:\d+:\s*)?syntax error:/m
  * | -------------------------------------------------------- | ---------------------------------------- |
  * | codec, `decode`                                          | `ValidationError` with `issues`          |
  * | codec, `encode`                                          | `UnexpectedValueError` with `issues`     |
+ * | collection changed while a list read it                  | `CollectionChangedError`                 |
  * | app, -1728 (no such object)                              | `TargetNotFoundError`                    |
  * | app, -1719 (invalid index)                               | `InvalidSelectionError`                  |
  * | app, -1743 (not authorized)                              | `AppAuthorizationRequiredError`          |
@@ -368,6 +391,12 @@ function describeReportedFailure(
   context: NativeFailureContext
 ): AnyMactsError {
   const { app } = context
+  if (failure.source === 'collection') {
+    return new CollectionChangedError(
+      `The ${context.operation.resource ?? 'item'} collection in ${app} changed while it was being read, so no consistent result exists. The same request can be retried, from the first page if it was paged.`,
+      {}
+    )
+  }
   if (failure.source === 'codec') {
     const issues = [{ path: failure.path, message: failure.message }]
     return failure.direction === 'encode'

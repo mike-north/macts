@@ -156,6 +156,7 @@ function parseFailure(value: unknown): NativeFailure {
     }
     return { source: 'codec', direction, path, message }
   }
+  if (value['source'] === 'collection') return { source: 'collection', message }
   if (value['source'] === 'app') {
     const errorNumber = value['errorNumber']
     return typeof errorNumber === 'number'

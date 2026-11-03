@@ -216,8 +216,25 @@ describe('composeNativeScript', () => {
       expect(others).not.toContain(sentinel)
     }
     expect(source).toContain('Application("com.apple.Notes")')
-    expect(source).toContain('(function (app, args) {\nreturn args;\n')
+    expect(source).toContain('(function (app, args, page) {\nreturn args;\n')
+    // With no page window, the body's `page` argument is embedded null.
+    expect(source).toContain(`})(app, args, JSON.parse(${JSON.stringify('null')}));`)
     expect(source.trimEnd().endsWith('JSON.stringify(__mactsOutcome);')).toBe(true)
+  })
+
+  it('embeds a page window as a JSON string literal, never as code', () => {
+    const page = { offset: 25, size: 25, anchor: 'SENTINEL_ANCHOR_77f1' }
+    const source = composeNativeScript(
+      { ...nativeScript({ body: 'return page;' }), page },
+      NATIVE_CODEC
+    )
+    const callLine = source
+      .split('\n')
+      .find((line) => line.trimStart().startsWith('})(app, args, '))
+    expect(callLine?.trim()).toBe(
+      `})(app, args, JSON.parse(${JSON.stringify(JSON.stringify(page))}));`
+    )
+    expect(source.split('\n').filter((line) => line.includes(page.anchor))).toEqual([callLine])
   })
 })
 

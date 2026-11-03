@@ -29,6 +29,7 @@ import {
   AppUnavailableError,
   InternalError,
   InvalidSelectionError,
+  CollectionChangedError,
   MactsError,
   OperationCancelledError,
   OperationTimeoutError,
@@ -177,6 +178,39 @@ describe('createNativeExecutor', () => {
       expect(passthrough).toBe(buildNativeBody(notes, LIST_ACCOUNTS, { identifierAliases: true }))
       expect(typed).toBe(buildNativeBody(notes, LIST_ACCOUNTS, { identifierAliases: false }))
       expect(passthrough).not.toBe(typed)
+    })
+
+    it('reads a page window with the paged list body, encoding items by the item plan and the window facts as plain data', async () => {
+      const window = { items: [], length: 0 }
+      const run = mockRun().mockResolvedValue({ ok: true, value: window })
+      const itemsPlan: ValuePlan = { kind: 'array', items: { kind: 'unknown' } }
+      const page = { offset: 25, size: 25, anchor: 'A-25' }
+      const result = await createNativeExecutor({ transport: { run } }).execute(
+        request({ target: LIST_ACCOUNTS, input: {}, outputPlan: itemsPlan, page })
+      )
+      expect(result).toEqual(window)
+      const [script] = run.mock.calls[0] ?? []
+      expect(script?.body).toBe(buildNativeBody(notes, LIST_ACCOUNTS, { paged: true }))
+      expect(script?.page).toEqual(page)
+      expect(script?.outputPlan).toEqual({
+        kind: 'record',
+        fields: {
+          items: { presence: 'required', value: itemsPlan },
+          length: { presence: 'required', value: PASSTHROUGH_PLAN },
+          last: { presence: 'optional', value: PASSTHROUGH_PLAN },
+        },
+      })
+    })
+
+    it('refuses a page window for an operation that is not a list, before running', async () => {
+      const run = mockRun()
+      const error = await rejectionOf(
+        createNativeExecutor({ transport: { run } }).execute(
+          request({ page: { offset: 0, size: 25 } })
+        )
+      )
+      expect(error).toBeInstanceOf(InternalError)
+      expect(run).not.toHaveBeenCalled()
     })
 
     it('executes operations whose plans are not passthrough, passing the plans through', async () => {
@@ -354,6 +388,20 @@ describe('createNativeExecutor', () => {
         issues: [{ path: ['items', 2, 'count'], message: 'Expected an integer' }],
       })
       expect(error.message).toContain('Notes')
+    })
+
+    it('reports a changed collection as CollectionChangedError with no details and none of the reported text', async () => {
+      const run = mockRun().mockResolvedValue(failed({ source: 'collection', message: APP_TEXT }))
+      const error = await rejectionOf(
+        createNativeExecutor({ transport: { run } }).execute(
+          request({ target: LIST_ACCOUNTS, input: {} })
+        )
+      )
+      expect(error).toBeInstanceOf(CollectionChangedError)
+      if (!(error instanceof CollectionChangedError)) return
+      expect(error.details).toEqual({})
+      expect(error.message).toContain('Notes')
+      expect(error.message).not.toContain(APP_TEXT)
     })
 
     it('reports a codec decode failure as ValidationError with its issue', async () => {

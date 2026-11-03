@@ -271,7 +271,7 @@ function identifierReads(nativeName: string): readonly string[] {
     `try { values = col[${JSON.stringify(nativeName)}](); } catch (e) {`,
     `return readEach(list, ${JSON.stringify(nativeName)}, false);`,
     'ids = readIdentifiers();',
-    'var again = readIdentifiers();',
+    'sameIdentifiers(readIdentifiers())',
   ]
 }
 
@@ -615,7 +615,7 @@ describe('list bodies: identifier population', () => {
     expect(body).toMatch(columnField('label'))
     // With no identifier to count by, the items are counted.
     expect(body).toContain('count = col.length;')
-    expect(body).toContain('if (col.length !== count) {')
+    expect(body).toContain('if (!(col.length === count)) {')
     expect(body).not.toContain('obj["id"] =')
   })
 
