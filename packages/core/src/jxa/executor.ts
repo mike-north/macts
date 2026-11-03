@@ -336,14 +336,16 @@ const DESCRIBE_THROWN = [
  * body inside its own `(function (app, args, page) { ... })`, called with the
  * page window (or `null`) embedded the same way.
  *
- * The application object comes first, because decoding a reference addresses
- * the app: the codec functions receive `{ app, references }`. Creating it
- * sends the app nothing, and the body runs only after the whole input
- * decoded, so a decode failure still means no command was sent.
+ * The application object comes first, because finding a referenced object
+ * needs it: the codec functions receive `{ app, references }`. Nothing else
+ * reaches the app until the whole input has converted: decoding converts every
+ * value before it uses the app to find referenced objects, and the body runs
+ * after that. So an input value that cannot convert fails before the app
+ * receives any event.
  *
- * {@link runNativeScript} runs this program in the automation host. A
- * transport that runs native scripts in a host of its own composes them with
- * this function and reads what they print with {@link parseNativeOutcome}.
+ * {@link runNativeScript} runs this program in the automation host. Tests
+ * that evaluate the program elsewhere reach this function through the
+ * internal `@macts/core/testing` entry; it is not public API.
  */
 export function composeNativeScript(script: NativeScript, codec: NativeCodec): string {
   return [
@@ -457,8 +459,8 @@ function parseNativeFailure(value: unknown): NativeFailure | string {
  * Read the outcome a composed native script printed (see
  * {@link composeNativeScript}): the {@link NativeOutcome}, or a description of
  * why the output is malformed. The description never quotes the output, which
- * may hold app data. A transport that runs composed scripts in a host of its
- * own uses this to read what the script printed.
+ * may hold app data. Like {@link composeNativeScript}, it is reached by tests
+ * through the internal `@macts/core/testing` entry and is not public API.
  */
 export function parseNativeOutcome(stdout: string): NativeOutcome | string {
   let parsed: unknown

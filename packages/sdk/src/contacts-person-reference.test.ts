@@ -22,13 +22,14 @@ import { createContext, runInContext } from 'node:vm'
 import { afterAll, describe, expect, it, vi } from 'vitest'
 import {
   NATIVE_CODEC,
-  composeNativeScript,
   createNativeExecutor,
-  parseNativeOutcome,
+  runNativeScript,
   type NativeScript,
   type NativeTransport,
 } from '@macts/core'
+import { composeNativeScript, parseNativeOutcome } from '@macts/core/testing'
 import {
+  AppUnavailableError,
   InternalError,
   TargetNotFoundError,
   toWireErrorEnvelope,
@@ -240,5 +241,47 @@ describe('a Contacts action given a person reference', () => {
       })
       expect(commands).toEqual([])
     }
+  )
+})
+
+/** A bundle identifier no app has: the app cannot be found. */
+const NOT_INSTALLED_BUNDLE_ID = 'com.example.macts.not-installed'
+
+// Replaces the check that a reference input failed with InternalError in the
+// real automation process for an app that is not installed. The application
+// object is now created before the input is decoded, so a missing app is
+// reported as missing whatever the input holds; nothing is sent to any app.
+describe('a Contacts action for an app that is not installed, in the real automation host (replaces the InternalError check for references)', () => {
+  it.skipIf(process.platform !== 'darwin').each([
+    ['a person reference it can convert', PERSON],
+    [
+      'a person reference it cannot convert yet',
+      {
+        app: 'contacts',
+        resource: 'Person',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'name', name: 'Ada' },
+      } satisfies ObjectReferenceData<string, 'Person'>,
+    ],
+  ])(
+    'fails with AppUnavailableError (not-installed), not InternalError, given %s',
+    async (_label, reference) => {
+      const client = await contactsClient('contacts.app.actionTitle', {
+        run: (script, options) =>
+          runNativeScript({ ...script, bundleId: NOT_INSTALLED_BUNDLE_ID }, NATIVE_CODEC, {
+            timeout: options.timeoutMs,
+          }),
+      })
+
+      const error = await rejectionOf(client.actionTitle('value', reference))
+
+      expect(error).toBeInstanceOf(AppUnavailableError)
+      expect(error).not.toBeInstanceOf(InternalError)
+      if (!(error instanceof AppUnavailableError)) return
+      expect(error.code).toBe('APP_UNAVAILABLE')
+      expect(error.details).toEqual({ app: 'Contacts', reason: 'not-installed' })
+    },
+    30_000
   )
 })

@@ -1013,9 +1013,6 @@ export interface ComposedRestrictions {
 export function composedRestrictionsPermit(composed: ComposedRestrictions, kind: RestrictionKind, candidate: string, matches: RestrictionPatternMatcher): boolean;
 
 // @public
-export function composeNativeScript(script: NativeScript, codec: NativeCodec): string;
-
-// @public
 export function composePolicyEvaluations(host: PolicyEvaluation, key: PolicyEvaluation | undefined): LayeredPolicyEvaluation;
 
 // @public
@@ -2325,9 +2322,6 @@ export type ParsedPermission = FinePermission | CoarsePermission | WildcardPermi
 
 // @public
 export function parseManifestYaml(yamlContent: string): AppManifest;
-
-// @public
-export function parseNativeOutcome(stdout: string): NativeOutcome | string;
 
 // @public
 export function parsePermission(permission: string): ParsedPermission;
