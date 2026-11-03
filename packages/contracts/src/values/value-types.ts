@@ -35,7 +35,15 @@ import type {
   ReferenceRegistry,
 } from '../references/index.js'
 import { RGB_CHANNEL_MAX, type Rgb } from './color.js'
-import { INVALID, codecOf, defineValueType, mismatch, type Codec, type Issues } from './codec.js'
+import {
+  INVALID,
+  codecOf,
+  defineValueType,
+  mismatch,
+  withMembers,
+  type Codec,
+  type Issues,
+} from './codec.js'
 import { DYNAMIC_CODEC } from './dynamic-codec.js'
 import { fileSourceType, fileType } from './file-types.js'
 import type { Point, Rectangle } from './geometry.js'
@@ -49,11 +57,12 @@ import {
   enumCodec,
   integerCodec,
 } from './leaf-codecs.js'
+import { PAGE_SIZE_LIMITS, type Page, type PageInputFields, type PageValueType } from './page.js'
 import type { FieldPlan, ValuePlan } from './plan.js'
 import { referenceType } from './reference-type.js'
 import type { ValueType } from './value-type.js'
 import { dateSdkSchema, integerSdkSchema } from './sdk-schemas.js'
-import { wireIntegerSchema } from './wire-checks.js'
+import { INTEGER_TEXT_PATTERN, checkIntegerText, wireIntegerSchema } from './wire-checks.js'
 import {
   DynamicWireValueSchema,
   WireDateSchema,
@@ -304,6 +313,31 @@ export interface ValueTypeConstructors {
    * resolved by the service from the wire form, so decoding one fails.
    */
   fileSource(options?: ValueTypeOptions): ValueType<FileSource>
+  /**
+   * One {@link Page} of `item`s: the result of every list operation.
+   *
+   * @remarks
+   * A strict record: `items`, an array of `item`, and an optional
+   * `nextCursor` string, present exactly when more items remain. `nextCursor`
+   * is never `null`; absence means the listing is complete. The result also
+   * exposes `item`, so code that needs the items without the page (a
+   * collection reference resolves to an array of items) derives it from this
+   * same composition.
+   *
+   * @throws `TypeError` when `item` is a `none` type.
+   */
+  page<Sdk>(item: ValueType<Sdk>, options?: ValueTypeOptions): PageValueType<Sdk>
+  /**
+   * The paging inputs of a list operation, as record fields to spread into
+   * its input record: an optional `pageSize` and an optional `cursor`.
+   *
+   * @remarks
+   * `pageSize` is an integer from 1 to {@link PAGE_SIZE_LIMITS}.maximum; any
+   * other value is a validation issue at the field itself, never clamped.
+   * `cursor` is the `nextCursor` of the previous page. Every list operation
+   * that pages takes exactly these fields, so they are built once here.
+   */
+  pageInputs(): PageInputFields
 }
 
 const DOUBLE_SDK_SCHEMA = z.union([
@@ -737,6 +771,98 @@ function noneType(options?: ValueTypeOptions): ValueType<undefined> {
   )
 }
 
+/** What a page's `items` field means, in every page's schemas. */
+const PAGE_ITEMS_DESCRIPTION = 'The items of this page, in collection order.'
+
+/** What a page's `nextCursor` field means, in every page's schemas. */
+const NEXT_CURSOR_DESCRIPTION =
+  'Present when more items remain: send the same inputs again with this value as cursor to read the next page. Absent when the listing is complete.'
+
+/** What the `pageSize` input means. */
+const PAGE_SIZE_DESCRIPTION = `The most items to return, from 1 to ${String(PAGE_SIZE_LIMITS.maximum)}. Defaults to ${String(PAGE_SIZE_LIMITS.default)}.`
+
+/** What the `cursor` input means. */
+const CURSOR_DESCRIPTION =
+  'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.'
+
+/** The issue a page size outside its bounds reports, which never repeats the value. */
+const PAGE_SIZE_RANGE_MESSAGE = `The page size must be an integer from 1 to ${String(PAGE_SIZE_LIMITS.maximum)}.`
+
+function pageType<Sdk>(item: ValueType<Sdk>, options?: ValueTypeOptions): PageValueType<Sdk> {
+  rejectNone(item, 'A page item')
+  const page: ValueType<Page<Sdk>> = recordType(
+    {
+      items: arrayType(item, { description: PAGE_ITEMS_DESCRIPTION }),
+      nextCursor: optionalField(stringType({ description: NEXT_CURSOR_DESCRIPTION })),
+    },
+    options
+  )
+  return withMembers(page, { item })
+}
+
+/**
+ * The page size input: an integer in `1..PAGE_SIZE_LIMITS.maximum`.
+ *
+ * @remarks
+ * Its wire schema reports a size outside the bounds, or integer text that is
+ * not canonical, at the field itself rather than inside its integer control
+ * record, so the caller learns which input to fix.
+ */
+function pageSizeType(): ValueType<Integer> {
+  const { maximum } = PAGE_SIZE_LIMITS
+  const wire = z
+    .strictObject({
+      integer: z
+        .string({ error: 'An integer payload must be decimal text, for example "25".' })
+        .meta({ pattern: INTEGER_TEXT_PATTERN.source }),
+    })
+    .superRefine((value, ctx) => {
+      if (!checkIntegerText(value.integer, 1, maximum).ok) {
+        ctx.addIssue({ code: 'custom', message: PAGE_SIZE_RANGE_MESSAGE })
+      }
+    })
+  return defineValueType(
+    {
+      plan: { kind: 'integer' },
+      sdk: integerSdkSchema(1, maximum),
+      wire,
+      codec: integerCodec(1, maximum),
+    },
+    PAGE_SIZE_DESCRIPTION
+  )
+}
+
+function pageInputs(): PageInputFields {
+  return Object.freeze({
+    pageSize: optionalField(pageSizeType()),
+    cursor: optionalField(stringType({ description: CURSOR_DESCRIPTION })),
+  })
+}
+
+/**
+ * Whether `type` is a page value type: one {@link ValueTypeConstructors.page}
+ * made, with its page shape and the item type it exposes.
+ *
+ * @remarks
+ * Decided from the value type's own composition (its plan and its exposed
+ * item type), so it holds for a page built by any copy of this package.
+ */
+export function isPageValueType(type: ValueType<unknown>): type is PageValueType<unknown> {
+  const plan = type.plan
+  if (plan.kind !== 'record' || !('item' in type) || !isValueType(type.item)) return false
+  const keys = Object.keys(plan.fields)
+  const items = plan.fields['items']
+  const nextCursor = plan.fields['nextCursor']
+  return (
+    keys.length === 2 &&
+    items?.presence === 'required' &&
+    items.value.kind === 'array' &&
+    items.value.items === type.item.plan &&
+    nextCursor?.presence === 'optional' &&
+    nextCursor.value.kind === 'string'
+  )
+}
+
 /**
  * The value-type constructors, as one namespace so generated code can alias
  * it (`const t = ValueTypes`).
@@ -768,4 +894,6 @@ export const ValueTypes: ValueTypeConstructors = Object.freeze({
   reference: referenceType,
   file: fileType,
   fileSource: fileSourceType,
+  page: pageType,
+  pageInputs,
 })

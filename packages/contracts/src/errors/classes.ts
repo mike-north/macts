@@ -110,6 +110,17 @@ export class InvalidSelectionError extends MactsError<'INVALID_SELECTION'> {
   override readonly name = 'InvalidSelectionError'
 }
 
+/**
+ * The collection changed while it was being read, so no consistent result
+ * exists. The same request is correct and can be retried, from the first page
+ * if it was paged. Distinct from an invalid selection, which the caller must
+ * fix.
+ */
+export class CollectionChangedError extends MactsError<'COLLECTION_CHANGED'> {
+  override readonly code = 'COLLECTION_CHANGED'
+  override readonly name = 'CollectionChangedError'
+}
+
 /** The app is not installed or is not responding. */
 export class AppUnavailableError extends MactsError<'APP_UNAVAILABLE'> {
   override readonly code = 'APP_UNAVAILABLE'
@@ -178,6 +189,7 @@ export interface MactsErrorByCode {
   readonly TARGET_NOT_FOUND: TargetNotFoundError
   readonly FILE_NOT_FOUND: FileNotFoundError
   readonly INVALID_SELECTION: InvalidSelectionError
+  readonly COLLECTION_CHANGED: CollectionChangedError
   readonly APP_UNAVAILABLE: AppUnavailableError
   readonly APP_AUTHORIZATION_REQUIRED: AppAuthorizationRequiredError
   readonly APP_OPERATION_FAILED: AppOperationError

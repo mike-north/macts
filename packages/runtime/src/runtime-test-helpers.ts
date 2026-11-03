@@ -189,12 +189,20 @@ export const PAGE_RECORD = t.record({ text: t.string() })
 /** A stamp record. */
 export const STAMP_RECORD = t.record({ serial: t.integer() })
 
-/** One library operation descriptor, with an input the tests never exercise. */
+/** The input of a list of an identified resource: the paging inputs only. */
+export const PAGED_LIST_INPUT = t.record({ ...t.pageInputs() })
+
+/**
+ * One library operation descriptor. Its input is empty unless given; the
+ * lists of identified resources take the paging inputs, as a generator emits
+ * them.
+ */
 function libraryOperation(
   id: OperationId,
   command: string,
   resource: string,
-  output: AnyOperationDescriptor['output']
+  output: AnyOperationDescriptor['output'],
+  input: AnyOperationDescriptor['input'] = t.record({})
 ): AnyOperationDescriptor {
   const [app = '', segment = '', commandSegment = ''] = id.split('.')
   return {
@@ -202,7 +210,7 @@ function libraryOperation(
     permission: `${app}:${segment}:${commandSegment}`,
     target: { command, resource },
     description: `${command} ${resource}`,
-    input: t.record({}),
+    input,
     output,
   }
 }
@@ -210,11 +218,11 @@ function libraryOperation(
 /** The descriptors of {@link LIBRARY_MANIFEST}'s operations, as a generator would emit them. */
 const LIBRARY_OPERATIONS: readonly AnyOperationDescriptor[] = [
   libraryOperation('library.shelves.get', 'get', 'Shelf', SHELF_RECORD),
-  libraryOperation('library.shelves.list', 'list', 'Shelf', t.array(SHELF_RECORD)),
+  libraryOperation('library.shelves.list', 'list', 'Shelf', t.page(SHELF_RECORD), PAGED_LIST_INPUT),
   libraryOperation('library.books.lookupBook', 'lookupBook', 'Book', BOOK_RECORD),
   libraryOperation('library.books.describeBook', 'describeBook', 'Book', t.string()),
-  libraryOperation('library.books.list', 'list', 'Book', t.array(BOOK_RECORD)),
-  libraryOperation('library.pages.list', 'list', 'Page', t.array(PAGE_RECORD)),
+  libraryOperation('library.books.list', 'list', 'Book', t.page(BOOK_RECORD), PAGED_LIST_INPUT),
+  libraryOperation('library.pages.list', 'list', 'Page', t.page(PAGE_RECORD)),
   libraryOperation('library.stamps.get', 'get', 'Stamp', STAMP_RECORD),
 ]
 

@@ -93,6 +93,7 @@ export const WIRE_ERROR_DETAILS_SCHEMAS: {
   }),
   FILE_NOT_FOUND: z.object({ path: z.exactOptional(z.string()) }),
   INVALID_SELECTION: z.object({ resource: z.exactOptional(z.string()) }),
+  COLLECTION_CHANGED: z.object({}),
   APP_UNAVAILABLE: z.object({
     app: z.string(),
     reason: z.enum(['not-installed', 'not-responding']),

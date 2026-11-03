@@ -30,6 +30,7 @@ import {
   FileNotFoundError,
   InternalError,
   InvalidSelectionError,
+  CollectionChangedError,
   OperationCancelledError,
   OperationTimeoutError,
   PolicyDeniedError,
@@ -64,6 +65,7 @@ const SAMPLES: Record<WireErrorCode, () => MactsError<WireErrorCode>> = {
   TARGET_NOT_FOUND: () => new TargetNotFoundError('missing', { resource: 'note' }),
   FILE_NOT_FOUND: () => new FileNotFoundError('no file', { path: 'a/b.txt' }),
   INVALID_SELECTION: () => new InvalidSelectionError('bad range', { resource: 'notes' }),
+  COLLECTION_CHANGED: () => new CollectionChangedError('changed', {}),
   APP_UNAVAILABLE: () =>
     new AppUnavailableError('gone', { app: 'Notes', reason: 'not-responding' }),
   APP_AUTHORIZATION_REQUIRED: () => new AppAuthorizationRequiredError('tcc', { app: 'Notes' }),
@@ -174,6 +176,12 @@ const DECODE_TABLE: readonly {
     expectedDetails: { resource: 'notes' },
   },
   {
+    json: '{"error":{"code":"COLLECTION_CHANGED","message":"m","details":{}}}',
+    expectedClass: CollectionChangedError,
+    expectedName: 'CollectionChangedError',
+    expectedDetails: {},
+  },
+  {
     json: '{"error":{"code":"APP_UNAVAILABLE","message":"m","details":{"app":"Calendar","reason":"not-installed"}}}',
     expectedClass: AppUnavailableError,
     expectedName: 'AppUnavailableError',
@@ -231,6 +239,7 @@ describe('hand-written decode table', () => {
         'APP_OPERATION_FAILED',
         'APP_UNAVAILABLE',
         'CANCELLED',
+        'COLLECTION_CHANGED',
         'FILE_NOT_FOUND',
         'INTERNAL',
         'INVALID_SELECTION',

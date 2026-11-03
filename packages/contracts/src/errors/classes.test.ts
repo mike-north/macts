@@ -30,6 +30,7 @@ const EXPECTED_WIRE_CLASSES: Record<WireErrorCode, string> = {
   TARGET_NOT_FOUND: 'TargetNotFoundError',
   FILE_NOT_FOUND: 'FileNotFoundError',
   INVALID_SELECTION: 'InvalidSelectionError',
+  COLLECTION_CHANGED: 'CollectionChangedError',
   APP_UNAVAILABLE: 'AppUnavailableError',
   APP_AUTHORIZATION_REQUIRED: 'AppAuthorizationRequiredError',
   APP_OPERATION_FAILED: 'AppOperationError',

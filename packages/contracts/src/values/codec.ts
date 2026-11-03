@@ -85,6 +85,25 @@ export function defineValueType<Sdk>(
 }
 
 /**
+ * A copy of `type` with `members` added, sharing its codec, so a composite
+ * built on it treats it exactly as `type`.
+ *
+ * @remarks
+ * For value types that expose more of their composition than the
+ * {@link ValueType} interface declares (a page exposes its item type). The
+ * members must not shadow a value-type member.
+ */
+export function withMembers<Sdk, Members extends object>(
+  type: ValueType<Sdk>,
+  members: Members
+): ValueType<Sdk> & Readonly<Members> {
+  const extended: ValueType<Sdk> & Readonly<Members> = Object.freeze({ ...type, ...members })
+  const registered = CODECS.get(type)
+  if (registered !== undefined) CODECS.set(extended, registered)
+  return extended
+}
+
+/**
  * The path-aware codec of `type`: its registered codec when it was built by
  * {@link defineValueType}, otherwise an adapter over its public methods that
  * prefixes the issues it reports with the current path.

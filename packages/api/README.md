@@ -601,6 +601,7 @@ class from `code` with `fromWireErrorEnvelope`. The HTTP status is advisory.
 | `TARGET_NOT_FOUND`           | 404             | A singular target does not exist. `resource?`, `entryIndex?` for an identity-collection entry.                                    |
 | `FILE_NOT_FOUND`             | 404             | A referenced file does not exist. `path?`.                                                                                        |
 | `INVALID_SELECTION`          | 400             | A range or index selection is invalid. `resource?`.                                                                               |
+| `COLLECTION_CHANGED`         | 409             | The collection changed while being read; no consistent result exists. Retry the same request, from the first page if paged.       |
 | `UNEXPECTED_VALUE`           | 502             | The app returned a value outside the operation contract. `issues[]`.                                                              |
 | `APP_UNAVAILABLE`            | 503             | The app is not installed or not responding. `app`, `reason`.                                                                      |
 | `APP_AUTHORIZATION_REQUIRED` | 503             | macOS has not authorized automating the app. `app`.                                                                               |

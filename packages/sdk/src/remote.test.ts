@@ -125,7 +125,7 @@ describe('remote client: request', () => {
   })
 
   it('passes the caller signal to fetch', async () => {
-    const { fetch, requests } = fakeFetch(() => json({ result: [] }))
+    const { fetch, requests } = fakeFetch(() => json({ result: { items: [] } }))
     const controller = new AbortController()
 
     await client(fetch).widgets.list({ signal: controller.signal })
@@ -157,7 +157,7 @@ describe('remote client: request', () => {
       'http://127.0.0.1:9000/api/v1/rpc/fixture.widgets.list',
     ],
   ])('joins the RPC path onto a service root with %s', async (_label, url, expected) => {
-    const { fetch, requests } = fakeFetch(() => json({ result: [] }))
+    const { fetch, requests } = fakeFetch(() => json({ result: { items: [] } }))
 
     await client(fetch, { url }).widgets.list()
 
@@ -165,7 +165,7 @@ describe('remote client: request', () => {
   })
 
   it('uses the global fetch when none is injected', async () => {
-    const { fetch, requests } = fakeFetch(() => json({ result: [] }))
+    const { fetch, requests } = fakeFetch(() => json({ result: { items: [] } }))
     vi.stubGlobal('fetch', fetch)
 
     await createClient(fixtureContract(), { token: TOKEN, url: URL_ROOT }).widgets.list()
@@ -175,13 +175,13 @@ describe('remote client: request', () => {
   })
 
   it('refuses a service URL that is not absolute, at construction', () => {
-    const { fetch } = fakeFetch(() => json({ result: [] }))
+    const { fetch } = fakeFetch(() => json({ result: { items: [] } }))
     expect(() => client(fetch, { url: 'localhost:8372/' })).not.toThrow()
     expect(() => client(fetch, { url: '/relative/only' })).toThrow(TypeError)
   })
 
   it('refuses a token that cannot be sent in a header, at construction, without repeating it', () => {
-    const { fetch } = fakeFetch(() => json({ result: [] }))
+    const { fetch } = fakeFetch(() => json({ result: { items: [] } }))
     const badToken = `${TOKEN}\r\nX-Injected: yes`
 
     let thrown: unknown
@@ -238,16 +238,16 @@ describe('remote client: values', () => {
     expect(error.details.issues[0]?.path).toEqual(['count'])
   })
 
-  it('rejects a result element that fails its contract, locating it in the list', async () => {
+  it('rejects a page item that fails its contract, locating it in the page', async () => {
     const { fetch } = fakeFetch(() =>
-      json({ result: [SPROCKET_WIRE, { name: 'Cog', count: { integer: '007' } }] })
+      json({ result: { items: [SPROCKET_WIRE, { name: 'Cog', count: { integer: '007' } }] } })
     )
 
     const error = await rejection(client(fetch).widgets.list())
 
     expect(error).toBeInstanceOf(UnexpectedValueError)
     if (!(error instanceof UnexpectedValueError)) return
-    expect(error.details.issues[0]?.path).toEqual([1, 'count'])
+    expect(error.details.issues[0]?.path).toEqual(['items', 1, 'count'])
   })
 
   it('refuses reference values in a result with InternalError', async () => {

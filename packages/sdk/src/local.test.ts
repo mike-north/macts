@@ -47,8 +47,8 @@ import { createClient, type LocalClientOptions } from './local-client.js'
 import {
   FIXTURE_MANIFEST,
   GET,
-  LIST,
   SPROCKET_WIRE,
+  WIDGET_TYPE,
   createRecordingExecutor,
   fixtureContract,
   rejection,
@@ -138,12 +138,15 @@ describe('local client: allowed calls', () => {
     expect(request?.signal).toBe(controller.signal)
   })
 
-  it('decodes a list result', async () => {
+  it('decodes a list result as one page', async () => {
     const token = await keyWith('fixture:widgets:list')
     const { client, executor } = localClient(token, { governance: ALLOW_ALL })
 
-    expect(await client.widgets.list()).toEqual([{ name: 'Sprocket', count: 7 }])
-    expect(executor.requests[0]?.outputPlan).toBe(LIST.output.plan)
+    // Widget has no identifier, so its list reads the whole collection as one
+    // page: the executor reads an array of the item plan, without a window.
+    expect(await client.widgets.list()).toEqual({ items: [{ name: 'Sprocket', count: 7 }] })
+    expect(executor.requests[0]?.outputPlan).toEqual({ kind: 'array', items: WIDGET_TYPE.plan })
+    expect(executor.requests[0]?.page).toBeUndefined()
   })
 
   it('passes a canonical executor failure through as the same class', async () => {

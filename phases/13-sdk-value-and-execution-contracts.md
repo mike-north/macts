@@ -651,7 +651,12 @@ and its manifest module is imported only by `loadManifest`.
 Manifest types map to value types as follows:
 
 - Resource-typed properties and parameters are references (D7). A `get`
-  returns the record, and a `list` returns an array of records.
+  returns the record, and a `list` returns one page of records:
+  `t.page(record)`, whose SDK type is `Page<T>`, `{ items, nextCursor? }`
+  (D9, _Bounded list pages_). The list of a resource with an identifier also
+  takes the optional paging inputs `pageSize` and `cursor`
+  (`t.pageInputs()`); the list of a resource without one takes neither and
+  returns its whole collection as one page with no `nextCursor`.
 - `file` and `data` are file values in outputs and file sources in inputs
   (D8).
 - Update inputs are optional at every field, and accept `null` only where the
@@ -1144,27 +1149,28 @@ abstract `MactsError<Code>` and carries:
 `AnyMactsError` is the union of all classes. A `switch (error.code)` over it
 narrows `details`.
 
-| Class                           | `code`                       | Distinct meaning                                                                                                                   | Default HTTP                                      |
-| ------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| `ValidationError`               | `VALIDATION_FAILED`          | Caller input violated the operation contract (`issues[]`)                                                                          | 400                                               |
-| `UnexpectedValueError`          | `UNEXPECTED_VALUE`           | An app result violated the contract. This includes an enum member the SDK does not know and an out-of-policy integer (`issues[]`). | 502                                               |
-| `AuthenticationError`           | `UNAUTHENTICATED`            | Credential missing or unusable (`reason`)                                                                                          | 401                                               |
-| `RateLimitedError`              | `RATE_LIMITED`               | The caller exceeded its admission limit; not evaluated further (`retryAfterSeconds`, a non-negative integer)                       | 429                                               |
-| `PermissionDeniedError`         | `PERMISSION_DENIED`          | Credential lacks the required permission                                                                                           | 403                                               |
-| `PolicyDeniedError`             | `POLICY_DENIED`              | Governance policy forbids the call (`permission`, `layer`)                                                                         | 403                                               |
-| `ApprovalPendingError`          | `APPROVAL_PENDING`           | Held for confirmation with nobody to ask; not executed                                                                             | 409                                               |
-| `ApprovalRejectedError`         | `APPROVAL_REJECTED`          | Held, put to a human, and not approved (`state`)                                                                                   | 403                                               |
-| `TargetNotFoundError`           | `TARGET_NOT_FOUND`           | A singular target does not exist (`entryIndex` for a missing identity-collection entry)                                            | 404                                               |
-| `FileNotFoundError`             | `FILE_NOT_FOUND`             | A referenced file does not exist or disappeared                                                                                    | 404                                               |
-| `InvalidSelectionError`         | `INVALID_SELECTION`          | A range or index selection is invalid for the collection                                                                           | 400                                               |
-| `AppUnavailableError`           | `APP_UNAVAILABLE`            | The app is not installed or cannot be reached                                                                                      | 503                                               |
-| `AppAuthorizationRequiredError` | `APP_AUTHORIZATION_REQUIRED` | macOS has not authorized automating the app. This is distinct from macts permission denial.                                        | 503                                               |
-| `AppOperationError`             | `APP_OPERATION_FAILED`       | The app reported a failure not covered above (`appErrorCode?`)                                                                     | 502                                               |
-| `OperationTimeoutError`         | `TIMEOUT`                    | The operation exceeded its time budget                                                                                             | 504                                               |
-| `OperationCancelledError`       | `CANCELLED`                  | The caller aborted the operation                                                                                                   | n/a (the caller stopped waiting); recorded as 499 |
-| `TransferError`                 | `TRANSFER_FAILED`            | A transfer expired, was incomplete, was too large, or is unknown                                                                   | 400 / 410 / 413                                   |
-| `InternalError`                 | `INTERNAL`                   | An unexpected macts failure, with a sanitized message                                                                              | 500                                               |
-| `TransportError`                | `TRANSPORT_FAILED`           | **Client-side only.** The service was unreachable, sent an invalid response, or uses a different protocol.                         | n/a                                               |
+| Class                           | `code`                       | Distinct meaning                                                                                                                                                     | Default HTTP                                      |
+| ------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `ValidationError`               | `VALIDATION_FAILED`          | Caller input violated the operation contract (`issues[]`)                                                                                                            | 400                                               |
+| `UnexpectedValueError`          | `UNEXPECTED_VALUE`           | An app result violated the contract. This includes an enum member the SDK does not know and an out-of-policy integer (`issues[]`).                                   | 502                                               |
+| `AuthenticationError`           | `UNAUTHENTICATED`            | Credential missing or unusable (`reason`)                                                                                                                            | 401                                               |
+| `RateLimitedError`              | `RATE_LIMITED`               | The caller exceeded its admission limit; not evaluated further (`retryAfterSeconds`, a non-negative integer)                                                         | 429                                               |
+| `PermissionDeniedError`         | `PERMISSION_DENIED`          | Credential lacks the required permission                                                                                                                             | 403                                               |
+| `PolicyDeniedError`             | `POLICY_DENIED`              | Governance policy forbids the call (`permission`, `layer`)                                                                                                           | 403                                               |
+| `ApprovalPendingError`          | `APPROVAL_PENDING`           | Held for confirmation with nobody to ask; not executed                                                                                                               | 409                                               |
+| `ApprovalRejectedError`         | `APPROVAL_REJECTED`          | Held, put to a human, and not approved (`state`)                                                                                                                     | 403                                               |
+| `TargetNotFoundError`           | `TARGET_NOT_FOUND`           | A singular target does not exist (`entryIndex` for a missing identity-collection entry)                                                                              | 404                                               |
+| `FileNotFoundError`             | `FILE_NOT_FOUND`             | A referenced file does not exist or disappeared                                                                                                                      | 404                                               |
+| `InvalidSelectionError`         | `INVALID_SELECTION`          | A range or index selection is invalid for the collection                                                                                                             | 400                                               |
+| `CollectionChangedError`        | `COLLECTION_CHANGED`         | The collection changed while it was being read, so no consistent result exists; the same request is correct and can be retried, from the first page if it was paged. | 409                                               |
+| `AppUnavailableError`           | `APP_UNAVAILABLE`            | The app is not installed or cannot be reached                                                                                                                        | 503                                               |
+| `AppAuthorizationRequiredError` | `APP_AUTHORIZATION_REQUIRED` | macOS has not authorized automating the app. This is distinct from macts permission denial.                                                                          | 503                                               |
+| `AppOperationError`             | `APP_OPERATION_FAILED`       | The app reported a failure not covered above (`appErrorCode?`)                                                                                                       | 502                                               |
+| `OperationTimeoutError`         | `TIMEOUT`                    | The operation exceeded its time budget                                                                                                                               | 504                                               |
+| `OperationCancelledError`       | `CANCELLED`                  | The caller aborted the operation                                                                                                                                     | n/a (the caller stopped waiting); recorded as 499 |
+| `TransferError`                 | `TRANSFER_FAILED`            | A transfer expired, was incomplete, was too large, or is unknown                                                                                                     | 400 / 410 / 413                                   |
+| `InternalError`                 | `INTERNAL`                   | An unexpected macts failure, with a sanitized message                                                                                                                | 500                                               |
+| `TransportError`                | `TRANSPORT_FAILED`           | **Client-side only.** The service was unreachable, sent an invalid response, or uses a different protocol.                                                           | n/a                                               |
 
 **Wire codec.** An error response body is
 `{ "error": { "code", "message", "details" } }`. Over HTTP, a 401 also
@@ -1343,7 +1349,14 @@ bypass policy:
    `invoke` result is, unless its output plan is `passthrough` (D11). For an
    identity collection it must also hold exactly one record per entry,
    whatever the plan, which enforces that no entry is silently dropped. A
-   mismatch is an `UnexpectedValueError`.
+   mismatch is an `UnexpectedValueError`. A collection is not paged: its
+   result is validated as an array of the `list` operation's item type, never
+   as its page (`referenceResultType` in `@macts/contracts` states what a
+   reference resolves to, and the runtime uses it).
+
+Unpaged collection resolution can still be slow on a very large selection:
+it reads the whole selection in one executor call, under the same time limit
+as any call, where a paged list would read it a page at a time.
 
 **Resolution errors.** A single reference whose identity `id` or name selector
 matches nothing raises `TargetNotFoundError`. An index past the end raises
@@ -1510,7 +1523,10 @@ execute(request), resolve(request) }`.
   - the operation `target`
   - the `input`, a `WireRecord`, because operation input is always
     record-shaped (D2)
-  - the input and output `ValuePlan`s, both required
+  - the input and output `ValuePlan`s, both required; for a list, the output
+    plan is an array of the list's item plan, not its page plan
+  - an optional `page` window, for a list that pages (see _Bounded list
+    pages_ below)
   - an optional `signal`
 
   It carries no authority, because authorization has already happened.
@@ -1521,9 +1537,9 @@ execute(request), resolve(request) }`.
 - `resolve(request)` resolves one reference (D7). A `ResolutionRequest`
   carries the validated `AppManifest`, the `reference` in wire form (already
   validated by `t.reference` over the app contract's resources), the
-  `outputPlan` of the operation it resolves as (the resource's `get` output
-  for cardinality `'one'`, its `list` output for `'many'`), and an optional
-  `signal`. Like `ExecutionRequest`, it carries no authority. Container chains
+  `outputPlan` of what it resolves to (the resource's `get` output for
+  cardinality `'one'`; for `'many'`, an array of the item plan of its `list`
+  output, because resolution is never paged), and an optional `signal`. Like `ExecutionRequest`, it carries no authority. Container chains
   are evaluated natively and contribute no data to the result. It follows the
   D7 error rules: `TargetNotFoundError` for a missing identity or name match,
   `InvalidSelectionError` for an index or range past the end,
@@ -1586,6 +1602,48 @@ is not needed until a second provider coexists. #101's dependency on the
 dictionary abstraction ([#100](https://github.com/mike-north/macts/issues/100))
 is unaffected: `ExecutionRequest` takes the manifest type that core defines.
 
+**Bounded list pages.** Every list returns one page, `{ items, nextCursor? }`
+(D2). Paging bounds the size and the latency of each call; it does not make a
+full listing cheaper in total. The runtime owns the protocol and the executor
+reads windows:
+
+- The paging inputs are operation inputs, not call options, so every surface
+  derives them from the contract: SDK methods take a trailing `page`
+  argument, HTTP and MCP callers send `pageSize` and `cursor` in the input,
+  and generated CLI list commands take `--page-size` and `--cursor`. The
+  generator reserves both names on every list operation and fails on an app
+  parameter that uses one.
+- `pageSize` is an integer from 1 to the maximum (D10); anything else is a
+  `ValidationError` at `["pageSize"]`, never clamped.
+- The cursor is opaque and stateless: nothing is stored, it is not signed, and
+  it never expires. It holds a format version, the operation id, a digest of
+  the call's other inputs, an empty slot for a digest of filter inputs, the
+  offset of the next page, and the anchor, the identifier of the last item
+  returned. A malformed cursor, an unknown version, or a cursor from another
+  operation or for other inputs is a `ValidationError` at `["cursor"]`,
+  never `COLLECTION_CHANGED`. Every page runs the full D5 pipeline, so a
+  cursor carries no authority. Audit and logs record only `cursor: true`, and
+  no message or issue repeats a cursor, since its anchor can be user content.
+- The runtime hands the executor a half-open window `{ offset, size, anchor? }`
+  and an output plan that is an array of the item plan. The executor answers
+  `{ items, length, last? }`: the window's items, the collection's length when
+  it was read, and the identifier of the last item. The page has a
+  `nextCursor` exactly when `offset + size < length`.
+- The native body reads the length, checks the anchor and reads the page in
+  one request. The app's range read is zero-based and end-inclusive, and an
+  end past the last item fails rather than clamping, so the body translates
+  from half-open in one place and never passes a negative position. An offset
+  equal to the length gives an empty page with no cursor. The item at
+  `offset - 1` must still have the anchor's identifier; if it is missing or
+  different, the read is `COLLECTION_CHANGED`. The whole identifier column is
+  never read per page.
+- The anchor check has documented limits: items added or removed after the
+  anchor are harmless, any move of the anchor is detected, and a pair of
+  compensating moves (one item removed before the anchor and another added
+  before it) goes undetected.
+- A list of a resource without an identifier cannot be anchored, so it never
+  pages: it reads its whole collection as one page.
+
 **Zod as the single schema source
 ([#121](https://github.com/mike-north/macts/issues/121), `phases/12`).**
 The value library's constructors produce each `ValueType`'s `sdk` and `wire`
@@ -1643,6 +1701,7 @@ These remain in #121, to be re-scoped after the value contracts land:
 | Bridge host objects in results                              | Only ordinary records encode as records: tagged `Object` and with a prototype that is `null` or a root prototype. Anything else in a result, such as a path object or an app object reference, is a codec encode failure, which becomes `UnexpectedValueError`; it is never encoded as an empty record. Typed reference results are converted only by the reference codec.                                                                                                                                                                                               | Observed (macOS 27.2): path objects are tagged `Object` but inherit from their own prototype; app objects and object references are functions (Finder's startup disk); records apps return inherit from `Object.prototype` (Finder desktop position). Both host-object cases are covered by native-boundary tests.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | RGB bridge form                                             | 16-bit channel arrays where the app uses them; normalized `0..1` only where a specific app interface does. The bridge form is selected per app by the plan.                                                                                                                                                                                                                                                                                                                                                                                                              | Per-app confirmation (value contracts)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Transfer lifecycle defaults                                 | Size limit, TTLs, and cleanup cadence are bounded defaults chosen with tests. Five minutes is illustrative only.                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Execution                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Bounded list page size                                      | Default 25 items, maximum 100, the same on every transport (`PAGE_SIZE_LIMITS` in `@macts/contracts`). A page size outside 1 to 100 is a `ValidationError`, never clamped. The values may be lowered, never raised.                                                                                                                                                                                                                                                                                                                                                      | Measured read-only on Reminders (Execution): a page of 25 took 2.8 s quiet and 4.3 s worst of three, so it stays inside the 30 s native timeout even at 8× noise (22 s); a page of 100 took 8.6 s quiet and 9.1 s worst of three, under the 15 s bound, and 8.8 s deep in the list. Paging a 332-item list at the default took 14 pages, 3.6 s at most each and 36 s in total; an 80-item list took 4 pages, 3.5 s at most and 9.7 s in total. Every item appeared exactly once. Re-measure on other apps with large collections (Execution).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
 ### Nullability and resettability evidence
 
@@ -1698,7 +1757,7 @@ A marked property carries no nullability or resettability claim, and a resource'
 
 Each record carries dictionary evidence: the source (`dictionary`), the app's bundle identifier, app version and macOS version, and the term exactly as the dictionary writes it. Recording the default is redundant and rejected, as is a native name on a property marked unsupported or a native collection on a resource marked unsupported.
 
-Native bodies resolve every name they address through `resolveCollectionAccessor` and `resolvePropertyAccessor` in `manifest/native-accessor.ts`. A body uses the app's spelling wherever it touches the app (reads, the identifier inside a property match, the record handed to a class constructor, and assignments) and the public key wherever it builds a record for the caller. Get, create and update all return the item's usable properties read this way, so no app spelling reaches the caller: one shared read takes them from a single `properties()` record, by the app's names. It reads on its own, guarded, any usable property the record leaves out (Finder's container record has no `entireContents`), and falls back to a guarded read of each property when the record cannot be read. A list reads differently: it reads each usable property once across the whole collection, by the app's name, and assembles records by position, after checking that every read gave one value per item and that the identifiers, read again after the properties, are unchanged element by element. A resource with no identifier is counted again instead, which catches items added or removed but not items that swap places. A collection that changes while it is read is read once more from the start; if it changes again, the list fails with an unexpected-value error rather than pairing values from different items. A missing value stays `null` at its position. A property the collection cannot report is read item by item, guarded, for that property alone. Neither that fallback nor the guard absorbs a communication failure (the app not running, an invalid connection, no reply, a user cancel, or missing authorization): it fails the list.
+Native bodies resolve every name they address through `resolveCollectionAccessor` and `resolvePropertyAccessor` in `manifest/native-accessor.ts`. A body uses the app's spelling wherever it touches the app (reads, the identifier inside a property match, the record handed to a class constructor, and assignments) and the public key wherever it builds a record for the caller. Get, create and update all return the item's usable properties read this way, so no app spelling reaches the caller: one shared read takes them from a single `properties()` record, by the app's names. It reads on its own, guarded, any usable property the record leaves out (Finder's container record has no `entireContents`), and falls back to a guarded read of each property when the record cannot be read. A list reads differently: it reads each usable property once across the whole collection, by the app's name, and assembles records by position, after checking that every read gave one value per item and that the identifiers, read again after the properties, are unchanged element by element. A resource with no identifier is counted again instead, which catches items added or removed but not items that swap places. A collection that changes while it is read is read once more from the start; if either read finds the identifiers changed (or, for a resource with no identifier, the count), the list fails with `COLLECTION_CHANGED`, never pairing values from different items. When the identifiers are the same on both reads and a property column has the wrong length on both, the app returned something malformed and the list fails with `UnexpectedValueError`; two different native errors are each mapped as the runtime maps them. Two transient additions-and-removals in a row that leave the identifiers unchanged both times are reported as `UnexpectedValueError` rather than `COLLECTION_CHANGED`, an accepted misclassification. A paged list reads its window the same way, with the anchor checked in the same request (D9, _Bounded list pages_). A missing value stays `null` at its position. A property the collection cannot report is read item by item, guarded, for that property alone. Neither that fallback nor the guard absorbs a communication failure (the app not running, an invalid connection, no reply, a user cancel, or missing authorization): it fails the list.
 
 The probes (`macts probe`, identifiers and `--nullability`) address the app the same way, through the same two functions, and report every observation under the manifest key, so evidence is recorded against the public name. They never probe a resource marked unsupported, even when asked to: the app has none to read.
 

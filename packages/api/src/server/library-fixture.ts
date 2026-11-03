@@ -81,12 +81,14 @@ function libraryOperation(
   resource: string,
   output: AnyOperationDescriptor['output']
 ): AnyOperationDescriptor {
+  // A list of an identified resource takes the paging inputs and returns a page.
+  const input = command === 'list' ? t.record({ ...t.pageInputs() }) : t.record({})
   return {
     id,
     permission,
     target: { command, resource },
     description: `${command} ${resource}`,
-    input: t.record({}),
+    input,
     output,
   }
 }
@@ -94,19 +96,13 @@ function libraryOperation(
 /** The descriptors of the library's operations, as a generator would emit them. */
 const LIBRARY_OPERATIONS: readonly AnyOperationDescriptor[] = [
   libraryOperation('library.books.get', 'library:books:get', 'get', 'Book', BOOK_RECORD),
-  libraryOperation(
-    'library.books.list',
-    'library:books:list',
-    'list',
-    'Book',
-    t.array(BOOK_RECORD)
-  ),
+  libraryOperation('library.books.list', 'library:books:list', 'list', 'Book', t.page(BOOK_RECORD)),
   libraryOperation(
     'library.shelves.list',
     'library:shelves:list',
     'list',
     'Shelf',
-    t.array(SHELF_RECORD)
+    t.page(SHELF_RECORD)
   ),
 ]
 

@@ -33,6 +33,7 @@
 import type { CallOptions } from '../call-options.js'
 import type { Integer } from '../values/integer.js'
 import type { ValueType } from '../values/value-type.js'
+import { ValueTypes, isPageValueType } from '../values/value-types.js'
 import type { WireInteger, WireValue } from '../values/wire.js'
 
 /** Whether a reference identifies objects or selects them by rule. */
@@ -344,6 +345,42 @@ export type CollectionReferenceVariant<T, Id = unknown> =
  * passes that table rather than building a parallel one.
  */
 export type ReferenceRegistry = Readonly<Record<string, { readonly id?: ValueType<unknown> }>>
+
+/**
+ * The value type of what a reference resolves to, from the output of the
+ * operation it resolves as: for `'one'`, that operation's (a `get`'s) output;
+ * for `'many'`, an array of the items of that operation's (a `list`'s) page.
+ *
+ * @remarks
+ * This is the one statement of what a resolution returns. A collection
+ * reference is not paged: it resolves to every member of its selection, an
+ * array possibly empty, never one page of it, even though the `list`
+ * operation it resolves as returns pages when called directly. The runtime
+ * validates a resolution's result against this type and hands its plan to the
+ * executor, and a client decodes the result with it.
+ *
+ * An output with a `passthrough` plan has no wire encoding and is returned
+ * unchanged for either cardinality.
+ *
+ * @param cardinality - The cardinality of the reference being resolved.
+ * @param output - The output value type of the operation it resolves as.
+ * @returns The value type of the resolution's result.
+ * @throws `TypeError` when `cardinality` is `'many'` and `output` is neither
+ *   a page (`t.page(…)`) nor `passthrough`: the contract's list operation
+ *   does not have the shape every list has, so it must be regenerated.
+ */
+export function referenceResultType(
+  cardinality: ReferenceCardinality,
+  output: ValueType<unknown>
+): ValueType<unknown> {
+  if (cardinality === 'one' || output.plan.kind === 'passthrough') return output
+  if (!isPageValueType(output)) {
+    throw new TypeError(
+      'A collection reference resolves as a list operation, whose output must be a page (t.page(…)).'
+    )
+  }
+  return ValueTypes.array(output.item)
+}
 
 /**
  * A materialized collection: an array whose reference entries are already

@@ -11,7 +11,8 @@
  * - `fixture.widgets.get`  — `fixture:widgets:get`, target `{ get, Widget }`,
  *   input `{ id }`, result one widget
  * - `fixture.widgets.list` — `fixture:widgets:list`, target `{ list, Widget }`,
- *   input `{}`, result a list of widgets
+ *   input `{}`, result one page of widgets (Widget has no identifier, so the
+ *   list does not page and the page holds every widget)
  *
  * Production code has no fixture contract; generated app packages supply real
  * ones.
@@ -23,6 +24,9 @@ import { z } from 'zod'
 import type { AppManifest, ExecutionRequest, Executor, ResolutionRequest } from '@macts/core'
 import {
   INTEGER_LIMITS,
+  ValueTypes,
+  type Page,
+  type PageValueType,
   type AppContract,
   type CallOptions,
   type ClientRuntime,
@@ -80,7 +84,7 @@ export interface Widget {
 export interface FixtureClient {
   readonly widgets: {
     get(id: string, options?: CallOptions): Promise<Widget>
-    list(options?: CallOptions): Promise<readonly Widget[]>
+    list(options?: CallOptions): Promise<Page<Widget>>
   }
 }
 
@@ -166,25 +170,12 @@ export const WIDGET_TYPE: ValueType<Widget> = {
   decode: (wire) => decodeWidget(wire, []),
 }
 
-/** Value type of a list of widgets. */
-export const WIDGET_LIST_TYPE: ValueType<readonly Widget[]> = {
-  plan: { kind: 'array', items: WIDGET_PLAN },
-  sdk: z.array(widgetSdkSchema),
-  wire: z.array(widgetWireSchema) as z.ZodType<WireValue>,
-  encode() {
-    return failure([], 'Widget lists are only ever results')
-  },
-  decode(wire) {
-    if (!Array.isArray(wire)) return failure([], 'Expected a list')
-    const widgets: Widget[] = []
-    for (const [index, element] of wire.entries()) {
-      const widget = decodeWidget(element, [index])
-      if (!widget.ok) return widget
-      widgets.push(widget.value)
-    }
-    return { ok: true, value: widgets }
-  },
-}
+/**
+ * Value type of a page of widgets, the result of every list. Widget has no
+ * identifier in the resource table, so its list takes no paging inputs and
+ * answers its whole collection as one page.
+ */
+export const WIDGET_PAGE_TYPE: PageValueType<Widget> = ValueTypes.page(WIDGET_TYPE)
 
 /** SDK and wire schema of the `get` input: one non-empty `id`. */
 const getInputSchema = z.strictObject({ id: z.string().min(1) })
@@ -237,13 +228,13 @@ export const GET: OperationDescriptor<{ readonly id: string }, Widget> = {
 }
 
 /** The `list` descriptor. */
-export const LIST: OperationDescriptor<Readonly<Record<string, never>>, readonly Widget[]> = {
+export const LIST: OperationDescriptor<Readonly<Record<string, never>>, Page<Widget>> = {
   id: 'fixture.widgets.list',
   permission: 'fixture:widgets:list',
   target: { command: 'list', resource: 'Widget' },
   description: 'List widgets',
   input: EMPTY_INPUT_TYPE,
-  output: WIDGET_LIST_TYPE,
+  output: WIDGET_PAGE_TYPE,
 }
 
 /** What a test varies about the fixture contract. */
