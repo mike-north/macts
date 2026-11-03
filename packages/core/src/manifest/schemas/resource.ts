@@ -229,42 +229,117 @@ export const ResourceUnsupportedSchema = z
 export type ResourceUnsupported = z.infer<typeof ResourceUnsupportedSchema>
 
 /**
+ * How a list that pages reads the items of one page, chosen per resource from
+ * live measurement.
+ *
+ * - `range`: each property is read once over the page's items, as a range of
+ *   the collection. A page costs what it holds, whatever the collection's
+ *   size.
+ * - `column`: each property is read once over the whole collection, and the
+ *   values are cut to the page inside the automation process. Some apps
+ *   answer a range read item by item but a whole-collection read at once
+ *   (Contacts people), so this is the faster page there. A page costs what
+ *   the whole collection costs, so it grows with the collection.
+ *
+ * Both give the same page, cursor, anchor check and changed-collection
+ * failure; only how the values are fetched differs.
+ */
+export const PAGE_READS = ['range', 'column'] as const
+/** One way a list that pages reads a page (see {@link PAGE_READS}). */
+export type PageRead = (typeof PAGE_READS)[number]
+
+/** The page-cost fields a passing observation records and a failing one cannot. */
+const PAGE_COST_FIELDS = ['pageMs', 'columnMs', 'items'] as const
+
+/**
  * The marker recording whether the running app reads a range of a resource's
- * collection, by position, in one request, with the live evidence.
+ * collection, by position, in one request, with the live evidence, and how a
+ * page of it is read.
  *
  * A list pages only when its resource carries `supported: true` (see
- * `listOperationPages`): each page is read as such a range, so an app that
- * rejects the read would fail every page. `supported: false` records a range
- * read observed to fail, with the error numbers it raised; absent means no
- * observation, and the resource's lists do not page. The marker is curated
- * from a read-only observation of the app: no probe writes or changes it.
- * It covers the collection wherever the resource's lists read it, at the
- * application or under a parent item.
+ * `listOperationPages`): paging is enabled only on a live observation of the
+ * collection read page by page, since an app that rejects range reads failed
+ * every page (Music playlists). `supported: false` records a range read
+ * observed to fail, with the error numbers it raised; absent means no
+ * observation, and the resource's lists do not page. The marker is curated from a read-only
+ * observation of the app: no probe writes or changes it. It covers the
+ * collection wherever the resource's lists read it, at the application or
+ * under a parent item.
+ *
+ * A passing marker records `read` (see {@link PAGE_READS}) and the evidence's
+ * page costs (`pageMs`, `columnMs`, `items`), and `read` must be the faster
+ * of the two measured reads: `column` only when the column page took less
+ * time than the range page, `range` otherwise. The choice holds at the
+ * recorded collection size; a column page costs more as the collection grows.
  */
 export const ResourceRangeReadSchema = z
-  .object({
-    /** Whether the observed range reads succeeded. */
-    supported: z.boolean(),
-    /** The observation that shows it. */
-    evidence: RangeReadEvidenceSchema,
-  })
-  .strict()
-  .superRefine((marker, ctx) => {
-    const failed = marker.evidence.errorNumbers !== undefined
-    if (!marker.supported && !failed) {
-      ctx.addIssue({
-        code: 'custom',
-        message:
-          'A range read observed to fail records the error numbers it raised: set evidence.errorNumbers.',
-        path: ['evidence', 'errorNumbers'],
+  .discriminatedUnion('supported', [
+    z
+      .object({
+        /** The observed range reads succeeded. */
+        supported: z.literal(true),
+        /** How a page of the collection is read (see {@link PAGE_READS}). */
+        read: z.enum(PAGE_READS),
+        /** The observation that shows it, with the measured page costs. */
+        evidence: RangeReadEvidenceSchema,
       })
+      .strict(),
+    z
+      .object({
+        /** The observed range reads failed. */
+        supported: z.literal(false),
+        /** The observation that shows it. */
+        evidence: RangeReadEvidenceSchema,
+      })
+      .strict(),
+  ])
+  .superRefine((marker, ctx) => {
+    const evidence = marker.evidence
+    const failed = evidence.errorNumbers !== undefined
+    if (!marker.supported) {
+      if (!failed) {
+        ctx.addIssue({
+          code: 'custom',
+          message:
+            'A range read observed to fail records the error numbers it raised: set evidence.errorNumbers.',
+          path: ['evidence', 'errorNumbers'],
+        })
+      }
+      for (const field of PAGE_COST_FIELDS) {
+        if (evidence[field] !== undefined) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `evidence.${field} records the cost of a page, which a failed range read cannot have.`,
+            path: ['evidence', field],
+          })
+        }
+      }
+      return
     }
-    if (marker.supported && failed) {
+    if (failed) {
       ctx.addIssue({
         code: 'custom',
         message:
           'evidence.errorNumbers records failed range reads, so it cannot support supported: true.',
         path: ['evidence', 'errorNumbers'],
+      })
+    }
+    const missing = PAGE_COST_FIELDS.filter((field) => evidence[field] === undefined)
+    for (const field of missing) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `A list that pages records what a page cost, both ways it can be read, and the collection size it was measured at: set evidence.${field}.`,
+        path: ['evidence', field],
+      })
+    }
+    const { pageMs, columnMs } = evidence
+    if (pageMs === undefined || columnMs === undefined) return
+    const faster: PageRead = columnMs < pageMs ? 'column' : 'range'
+    if (marker.read !== faster) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `read must be the faster measured page read: ${faster} (pageMs ${String(pageMs)}, columnMs ${String(columnMs)}).`,
+        path: ['read'],
       })
     }
   })

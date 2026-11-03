@@ -12,7 +12,11 @@ import {
   generateAppCommandSchema,
 } from './operation-schema.js'
 import type { Resource, Command } from '../manifest/index.js'
-import { RANGE_READ_SUPPORTED, UNIQUE_CLAIM } from '../manifest/test-support/unique-claim.js'
+import {
+  RANGE_READ_FAILED,
+  RANGE_READ_SUPPORTED,
+  UNIQUE_CLAIM,
+} from '../manifest/test-support/unique-claim.js'
 
 describe('generateToolName', () => {
   it('should generate correct tool name format', () => {
@@ -396,13 +400,11 @@ describe('generateResourceOperationSchema: paging inputs', () => {
 
   it('shows neither paging input for a unique identifier whose range read was not observed to work', () => {
     const unique = { property: 'id', primary: true, ...UNIQUE_CLAIM }
-    const failed = {
-      supported: false,
-      evidence: { ...RANGE_READ_SUPPORTED.rangeRead.evidence, errorNumbers: [-1708] },
-    }
 
     expect(generateResourceOperationSchema(list, item(unique, null)).properties).toEqual({})
-    expect(generateResourceOperationSchema(list, item(unique, failed)).properties).toEqual({})
+    expect(
+      generateResourceOperationSchema(list, item(unique, RANGE_READ_FAILED.rangeRead)).properties
+    ).toEqual({})
   })
 
   it('shows neither paging input for a command that is not a list', () => {

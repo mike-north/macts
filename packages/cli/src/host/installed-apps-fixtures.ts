@@ -115,12 +115,16 @@ function validManifestSource(app: string): string {
         ],
         rangeRead: {
           supported: true,
+          read: 'range',
           evidence: {
             source: 'probe',
             observedAt: '2026-01-15T10:30:00.000Z',
             bundleId: 'com.example.widgets',
             appVersion: '1.0',
             osVersion: '27.2',
+            pageMs: 400,
+            columnMs: 900,
+            items: 120,
           },
         },
       },

@@ -6,9 +6,11 @@
  * is read as such a range, and an app that rejects it fails every page. This
  * suite takes the lists that page from the capability listing, the surface an
  * agent discovers them on, and checks that each one's resource records a
- * supported range read with probe evidence of the same app. It also pins the
- * set of lists that page, so a list that starts or stops paging is a visible,
- * reviewed change.
+ * supported range read with probe evidence of the same app, and how a page is
+ * read (`read`) with the measured page costs it was chosen from. It also pins
+ * the set of lists that page and the page read of each, so a list that starts
+ * or stops paging, or changes how its pages are read, is a visible, reviewed
+ * change.
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md
  * @see ../manifest/schemas/resource.ts (ResourceRangeReadSchema)
@@ -19,7 +21,7 @@ import { resolve } from 'node:path'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { loadManifest } from '../manifest/loader.js'
 import { normalizeResourceRouteSegment } from '../manifest/route.js'
-import type { AppManifest, Resource } from '../manifest/schemas/index.js'
+import type { AppManifest, PageRead, Resource } from '../manifest/schemas/index.js'
 import { deriveCapabilities } from './registry.js'
 
 const MANIFESTS_DIR = resolve(process.cwd(), '../../manifests')
@@ -42,6 +44,26 @@ const PAGED_LISTS = [
   'reminders.reminders.list',
   'shortcuts.folders.list',
 ]
+
+/**
+ * How each list that pages reads a page, as chosen from the live cost sweep:
+ * `column` where a page read over the whole collection was the faster,
+ * `range` where a page read over its own items was.
+ */
+const PAGE_READ_BY_LIST: Readonly<Record<string, PageRead>> = {
+  'contacts.addresses.list': 'column',
+  'contacts.emails.list': 'column',
+  'contacts.groups.list': 'column',
+  'contacts.people.list': 'column',
+  'contacts.phones.list': 'range',
+  'notes.attachments.list': 'column',
+  'photos.albums.list': 'column',
+  'photos.folders.list': 'column',
+  'reminders.accounts.list': 'column',
+  'reminders.lists.list': 'column',
+  'reminders.reminders.list': 'range',
+  'shortcuts.folders.list': 'range',
+}
 
 let manifests: AppManifest[] = []
 
@@ -94,6 +116,36 @@ describe('paging on shipped manifests rests on live range-read evidence', () => 
       })
       expect(list.resource?.rangeRead?.evidence.errorNumbers, list.name).toBeUndefined()
     }
+  })
+
+  it('records, for every list that pages, its page read and the measured costs it was chosen from', () => {
+    const reads: Record<string, PageRead | undefined> = {}
+    for (const list of pagedLists()) {
+      const marker = list.resource?.rangeRead
+      if (marker?.supported !== true) throw new Error(`${list.name}: no supported range read`)
+      const { pageMs, columnMs, items } = marker.evidence
+      expect(pageMs, `${list.name}: pageMs`).toBeTypeOf('number')
+      expect(columnMs, `${list.name}: columnMs`).toBeTypeOf('number')
+      expect(items, `${list.name}: items`).toBeTypeOf('number')
+      reads[list.name] = marker.read
+    }
+    expect(reads).toEqual(PAGE_READ_BY_LIST)
+  })
+
+  it('reads Contacts people by column and Reminders reminders by range, each the faster for its app', () => {
+    // Regression: Contacts answers a range read item by item, so a page of
+    // 25 people read by range took about 1 s per person and hit the 30 s
+    // limit, while a read over all its people takes about as long as one
+    // page. Reminders is the reverse: a whole-list read costs seconds per
+    // property, and a range read of the page is the cheap one.
+    const people = manifests.find((m) => m.app.bundleId === 'com.apple.AddressBook')?.resources[
+      'Person'
+    ]?.rangeRead
+    const reminders = manifests.find((m) => m.app.bundleId === 'com.apple.reminders')?.resources[
+      'Reminder'
+    ]?.rangeRead
+    expect(people).toMatchObject({ supported: true, read: 'column' })
+    expect(reminders).toMatchObject({ supported: true, read: 'range' })
   })
 
   it('does not page Music playlists, whose range reads fail', () => {

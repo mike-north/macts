@@ -137,12 +137,16 @@ export const UNIQUE_CLAIM = {
 export const RANGE_READ_SUPPORTED = {
   rangeRead: {
     supported: true,
+    read: 'range',
     evidence: {
       source: 'probe',
       observedAt: '2026-01-15T10:30:00.000Z',
       bundleId: 'com.example.library',
       appVersion: '1.0',
       osVersion: '27.2',
+      pageMs: 400,
+      columnMs: 900,
+      items: 120,
     },
   },
 } as const

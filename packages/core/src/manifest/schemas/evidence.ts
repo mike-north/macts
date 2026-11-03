@@ -420,6 +420,15 @@ export type IdentifierUniquenessEvidence = z.infer<typeof IdentifierUniquenessEv
  * a value. When the reads failed it lists the distinct error numbers they
  * raised, which tell a request the app does not understand (`-1708`) from a
  * permission problem; when they passed it lists none.
+ *
+ * When the reads passed it also records what one page cost, measured live at
+ * the default page size through the real list body, both ways a page can be
+ * read: `pageMs` by range (each property read over the page's items), and
+ * `columnMs` by column (each property read over the whole collection, then
+ * cut to the page). `items` is the size of the collection the page was read
+ * from. The resource's marker chooses its page read from these two times
+ * (see `ResourceRangeReadSchema`). A column page costs what the whole
+ * collection costs, so its time holds only near the recorded size.
  */
 export const RangeReadEvidenceSchema = z
   .object({
@@ -437,6 +446,21 @@ export const RangeReadEvidenceSchema = z
      * Present exactly when the reads failed.
      */
     errorNumbers: z.array(z.number().int()).min(1).optional(),
+    /**
+     * Milliseconds one page at the default size took, read by range. Present
+     * exactly when the reads passed.
+     */
+    pageMs: CountSchema.optional(),
+    /**
+     * Milliseconds the same page took, read by column. Present exactly when
+     * the reads passed.
+     */
+    columnMs: CountSchema.optional(),
+    /**
+     * How many items the collection held when the page was timed. Present
+     * exactly when the reads passed.
+     */
+    items: z.number().int().min(1).optional(),
     /**
      * What was read, in words and never as a value, e.g. which collection,
      * which page sizes, and whether a following page was read.

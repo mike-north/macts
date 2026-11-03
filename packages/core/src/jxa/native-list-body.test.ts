@@ -49,6 +49,8 @@ import { parseManifestYaml } from '../manifest/loader.js'
 import { composeNativeScript } from './executor.js'
 import { NATIVE_CODEC, NATIVE_CODEC_ERROR_NAME } from './native-codec.js'
 import type { PageWindow } from '../execution/executor.js'
+import type { AppManifest } from '../manifest/schemas/app.js'
+import { PAGE_READS, type PageRead } from '../manifest/schemas/resource.js'
 import { createNativeExecutor, type NativeTransport } from './native-executor.js'
 import { buildNativeBody, COMMUNICATION_FAILURE_ERROR_NUMBERS } from './native-scripts.js'
 import { parseNativeOutcome } from './test-support/native-harness.js'
@@ -111,12 +113,16 @@ resources:
         evidence: { unique: { source: curated, note: Every task has its own uid } }
     rangeRead:
       supported: true
+      read: range
       evidence:
         source: probe
         observedAt: '2026-01-15T10:30:00.000Z'
         bundleId: com.example.planner
         appVersion: '1.0'
         osVersion: '27.2'
+        pageMs: 400
+        columnMs: 900
+        items: 120
   Folder:
     name: Folder
     plural: Folders
@@ -1141,15 +1147,48 @@ function isWindowResult(value: unknown): value is WindowResult {
   )
 }
 
-/** Read one page window of the tasks through the executor, against `app`. */
+/**
+ * The planner app with its tasks read by `read`, with measured costs that
+ * agree with that choice.
+ */
+function plannerReading(read: PageRead): AppManifest {
+  const manifest = structuredClone(planner)
+  const tasks = manifest.resources['Task']
+  if (tasks?.rangeRead?.supported !== true) throw new Error('fixture tasks do not page')
+  const costs = read === 'column' ? { pageMs: 900, columnMs: 400 } : { pageMs: 400, columnMs: 900 }
+  tasks.rangeRead = {
+    ...tasks.rangeRead,
+    read,
+    evidence: { ...tasks.rangeRead.evidence, ...costs },
+  }
+  return manifest
+}
+
+/** The planner app for each page read. */
+const PLANNERS: Readonly<Record<PageRead, AppManifest>> = {
+  range: plannerReading('range'),
+  column: plannerReading('column'),
+}
+
+/**
+ * How the stand-in logs the read of the property `name` (the app's name) that
+ * a page makes over the positions `first` to `last`, inclusive: by range, a
+ * read of exactly that range; by column, a read of the whole collection.
+ */
+function pageRequest(read: PageRead, first: number, last: number, name: string): string {
+  return read === 'range' ? `[${String(first)}..${String(last)}] column ${name}` : `column ${name}`
+}
+
+/** Read one page window of the tasks through the executor, against `app`, by `read`. */
 async function readWindow(
   app: FakeApp,
   page: PageWindow,
+  read: PageRead,
   outputPlan: ValuePlan = PASSTHROUGH_PLAN
 ): Promise<Settled> {
   return settle(
     createNativeExecutor({ transport: vmTransport(app.app) }).execute({
-      manifest: planner,
+      manifest: PLANNERS[read],
       target: TASKS,
       input: SHELF_INPUT,
       inputPlan: PASSTHROUGH_PLAN,
@@ -1172,11 +1211,11 @@ function windowOf(settled: Settled): WindowResult {
  * last item would: the next window starts after the items returned and is
  * anchored on the last of them, until `offset + size` reaches the length.
  */
-async function pageThrough(app: FakeApp, size: number): Promise<WindowResult[]> {
+async function pageThrough(app: FakeApp, size: number, read: PageRead): Promise<WindowResult[]> {
   const pages: WindowResult[] = []
   let page: PageWindow = { offset: 0, size }
   for (;;) {
-    const result = windowOf(await readWindow(app, page))
+    const result = windowOf(await readWindow(app, page, read))
     pages.push(result)
     if (page.offset + size >= result.length) return pages
     if (result.last === undefined) throw new Error('a page with more remaining had no last item')
@@ -1214,10 +1253,93 @@ describe('paged list bodies: which lists may page', () => {
   })
 })
 
-describe('paged list bodies: reading pages of an unchanged collection', () => {
+/** The properties of a task a page reads besides its identifier, in the app's spelling. */
+const TASK_PROPERTY_READS = ['title', 'done', 'priority', 'url', 'secret'] as const
+
+/** Thirty tasks, enough for a page of the default size with more after it. */
+const THIRTY_TASKS: readonly Row[] = Array.from({ length: 30 }, (_unused, i) => ({
+  title: `Task ${String(i + 1)}`,
+  done: false,
+  priority: i,
+  url: null,
+  secret: null,
+  uid: `T${String(i + 1)}`,
+}))
+
+describe.each(PAGE_READS)('paged list bodies read by %s: the requests a page makes', (read) => {
+  // The page-cost regression: a page must cost a fixed number of requests,
+  // one per property and the fixed length, anchor and identifier reads,
+  // whatever its size and however the app answers each read. A read that
+  // went item by item would grow with the page.
+  const fixed = (continuing: boolean): number =>
+    // The parent, the length, the identifiers before and after the properties,
+    // and for a continuing page the anchor before and after the reads.
+    1 + 1 + 2 + (continuing ? 2 : 0)
+
+  it.each([2, 25])(
+    'reads a first page of %i in one request per property plus the fixed reads, and none per item',
+    async (size) => {
+      const app = fakePlanner(THIRTY_TASKS)
+      const result = windowOf(await readWindow(app, { offset: 0, size }, read))
+      expect(result.items).toHaveLength(size)
+      expect(app.requests).toHaveLength(fixed(false) + TASK_PROPERTY_READS.length)
+      expect(app.requests.filter((request) => request.startsWith('item '))).toEqual([])
+      expect(app.requests).toEqual([
+        'shelf todos',
+        'count',
+        pageRequest(read, 0, size - 1, 'uid'),
+        ...TASK_PROPERTY_READS.map((name) => pageRequest(read, 0, size - 1, name)),
+        pageRequest(read, 0, size - 1, 'uid'),
+      ])
+    }
+  )
+
+  it.each([2, 25])(
+    'reads a continuing page of %i in the same requests plus the anchor before and after',
+    async (size) => {
+      const app = fakePlanner(THIRTY_TASKS)
+      const result = windowOf(await readWindow(app, { offset: 3, size, anchor: 'T3' }, read))
+      expect(result.items).toHaveLength(size)
+      expect(app.requests).toHaveLength(fixed(true) + TASK_PROPERTY_READS.length)
+      expect(app.requests).toEqual([
+        'shelf todos',
+        'count',
+        pageRequest(read, 2, 2, 'uid'),
+        pageRequest(read, 3, 3 + size - 1, 'uid'),
+        ...TASK_PROPERTY_READS.map((name) => pageRequest(read, 3, 3 + size - 1, name)),
+        pageRequest(read, 3, 3 + size - 1, 'uid'),
+        pageRequest(read, 2, 2, 'uid'),
+      ])
+    }
+  )
+})
+
+describe('paged list bodies: what each page read covers', () => {
+  it('by range, reads only the window, never the whole collection', async () => {
+    const app = fakePlanner(THIRTY_TASKS)
+    windowOf(await readWindow(app, { offset: 3, size: 25, anchor: 'T3' }, 'range'))
+    expect(app.requests.filter((request) => request.startsWith('column '))).toEqual([])
+  })
+
+  it('by column, reads the whole collection, never a range', async () => {
+    const app = fakePlanner(THIRTY_TASKS)
+    windowOf(await readWindow(app, { offset: 3, size: 25, anchor: 'T3' }, 'column'))
+    expect(app.requests.filter((request) => request.startsWith('['))).toEqual([])
+  })
+
+  it('gives the same page either way', async () => {
+    const page = { offset: 3, size: 4, anchor: 'T3' }
+    const byRange = windowOf(await readWindow(fakePlanner(SEVEN_TASKS), page, 'range'))
+    const byColumn = windowOf(await readWindow(fakePlanner(SEVEN_TASKS), page, 'column'))
+    expect(byColumn).toEqual(byRange)
+    expect(uidsOf(byColumn)).toEqual(['T4', 'T5', 'T6', 'T7'])
+  })
+})
+
+describe.each(PAGE_READS)('paged list bodies read by %s: an unchanged collection', (read) => {
   it('pages together hold every item exactly once, and only the last page reaches the end', async () => {
     const app = fakePlanner(SEVEN_TASKS)
-    const pages = await pageThrough(app, 3)
+    const pages = await pageThrough(app, 3, read)
     expect(pages.map(uidsOf)).toEqual([['T1', 'T2', 'T3'], ['T4', 'T5', 'T6'], ['T7']])
     expect(pages.map((page) => page.length)).toEqual([7, 7, 7])
     expect(pages.map((page) => page.last)).toEqual(['T3', 'T6', 'T7'])
@@ -1225,7 +1347,7 @@ describe('paged list bodies: reading pages of an unchanged collection', () => {
 
   it('returns the same records a whole-collection read gives for the same items, through a typed plan', async () => {
     const app = fakePlanner(TASK_ROWS)
-    const result = windowOf(await readWindow(app, { offset: 0, size: 25 }, TASK_LIST_PLAN))
+    const result = windowOf(await readWindow(app, { offset: 0, size: 25 }, read, TASK_LIST_PLAN))
     const whole = await listBoth(TASKS, TASK_ROWS, {
       input: SHELF_INPUT,
       outputPlan: TASK_LIST_PLAN,
@@ -1234,208 +1356,223 @@ describe('paged list bodies: reading pages of an unchanged collection', () => {
     expect(result.length).toBe(3)
   })
 
-  it('reads the first page as the range from zero, with no anchor read', async () => {
+  it('returns a window from the middle of the collection with its values aligned', async () => {
     const app = fakePlanner(SEVEN_TASKS)
-    windowOf(await readWindow(app, { offset: 0, size: 3 }))
-    expect(app.requests).toEqual([
-      'shelf todos',
-      'count',
-      '[0..2] column uid',
-      '[0..2] column title',
-      '[0..2] column done',
-      '[0..2] column priority',
-      '[0..2] column url',
-      '[0..2] column secret',
-      '[0..2] column uid',
+    const result = windowOf(await readWindow(app, { offset: 2, size: 3, anchor: 'T2' }, read))
+    expect(result.items).toEqual([
+      { title: 'Task 3', done: false, priority: 2, uRL: null, secret: null, uID: 'T3', id: 'T3' },
+      { title: 'Task 4', done: false, priority: 3, uRL: null, secret: null, uID: 'T4', id: 'T4' },
+      { title: 'Task 5', done: false, priority: 4, uRL: null, secret: null, uID: 'T5', id: 'T5' },
     ])
+    expect(result).toMatchObject({ length: 7, last: 'T5' })
   })
 
-  it('checks the anchor before and after reading a continuing page, by a one-item range', async () => {
+  it('reads the first page with no anchor read', async () => {
     const app = fakePlanner(SEVEN_TASKS)
-    const result = windowOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' }))
-    expect(uidsOf(result)).toEqual(['T4', 'T5', 'T6'])
+    windowOf(await readWindow(app, { offset: 0, size: 3 }, read))
     expect(app.requests).toEqual([
       'shelf todos',
       'count',
-      '[2..2] column uid',
-      '[3..5] column uid',
-      '[3..5] column title',
-      '[3..5] column done',
-      '[3..5] column priority',
-      '[3..5] column url',
-      '[3..5] column secret',
-      '[3..5] column uid',
-      '[2..2] column uid',
+      pageRequest(read, 0, 2, 'uid'),
+      ...TASK_PROPERTY_READS.map((name) => pageRequest(read, 0, 2, name)),
+      pageRequest(read, 0, 2, 'uid'),
     ])
   })
 
   it('reads an exact last page up to the last item, never past it', async () => {
     const app = fakePlanner(SEVEN_TASKS.slice(0, 6))
-    const result = windowOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' }))
+    const result = windowOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' }, read))
     expect(uidsOf(result)).toEqual(['T4', 'T5', 'T6'])
     expect(result.length).toBe(6)
     expect(result.last).toBe('T6')
-    expect(app.requests).toContain('[3..5] column title')
+    expect(app.requests).toContain(pageRequest(read, 3, 5, 'title'))
   })
 
   it('shortens a page the collection ends inside to the items that remain', async () => {
     const app = fakePlanner(SEVEN_TASKS)
-    const result = windowOf(await readWindow(app, { offset: 6, size: 3, anchor: 'T6' }))
+    const result = windowOf(await readWindow(app, { offset: 6, size: 3, anchor: 'T6' }, read))
     expect(uidsOf(result)).toEqual(['T7'])
-    expect(app.requests).toContain('[6..6] column title')
+    expect(result).toMatchObject({ length: 7, last: 'T7' })
+    expect(app.requests).toContain(pageRequest(read, 6, 6, 'title'))
   })
 
-  it('returns an empty page, reading no range of items, when the window starts one past the last item', async () => {
+  it('returns an empty page with no cursor anchor, reading no items, when the window starts one past the last item', async () => {
     const app = fakePlanner(SEVEN_TASKS.slice(0, 6))
-    const result = windowOf(await readWindow(app, { offset: 6, size: 3, anchor: 'T6' }))
+    const result = windowOf(await readWindow(app, { offset: 6, size: 3, anchor: 'T6' }, read))
     expect(result).toEqual({ items: [], length: 6 })
-    expect(app.requests).toEqual(['shelf todos', 'count', '[5..5] column uid'])
+    expect(app.requests).toEqual(['shelf todos', 'count', pageRequest(read, 5, 5, 'uid')])
   })
 
-  it('reads a page of one item as a one-item range', async () => {
+  it('reads every page of one item', async () => {
     const app = fakePlanner(SEVEN_TASKS)
-    const pages = await pageThrough(app, 1)
+    const pages = await pageThrough(app, 1, read)
     expect(pages.map(uidsOf)).toEqual([['T1'], ['T2'], ['T3'], ['T4'], ['T5'], ['T6'], ['T7']])
-    expect(app.requests).toContain('[4..4] column title')
+    expect(app.requests).toContain(pageRequest(read, 4, 4, 'title'))
   })
 
   it('returns an empty page for an empty collection', async () => {
     const app = fakePlanner([])
-    const result = windowOf(await readWindow(app, { offset: 0, size: 25 }))
+    const result = windowOf(await readWindow(app, { offset: 0, size: 25 }, read))
     expect(result).toEqual({ items: [], length: 0 })
   })
 })
 
-describe('paged list bodies: the collection changes between pages', () => {
-  const added = (uid: string): Row => ({
-    title: `Added ${uid}`,
-    done: false,
-    priority: 0,
-    url: null,
-    secret: null,
-    uid,
-  })
-
-  it('an item inserted right after the anchor is read on the next page, with nothing skipped or repeated', async () => {
-    const app = fakePlanner(SEVEN_TASKS, {
-      mutate: {
-        after: '[0..2] column uid',
-        times: 'once',
-        change: (rows) => [...rows.slice(0, 3), added('N1'), ...rows.slice(3)],
-      },
+describe.each(PAGE_READS)(
+  'paged list bodies read by %s: the collection changes between pages',
+  (read) => {
+    const added = (uid: string): Row => ({
+      title: `Added ${uid}`,
+      done: false,
+      priority: 0,
+      url: null,
+      secret: null,
+      uid,
     })
-    // The insert lands during the first page's first identifier read, after
-    // the anchor T3, so it shifts nothing the first page returns.
-    const first = windowOf(await readWindow(app, { offset: 0, size: 3 }))
-    expect(uidsOf(first)).toEqual(['T1', 'T2', 'T3'])
-    const second = windowOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' }))
-    expect(uidsOf(second)).toEqual(['N1', 'T4', 'T5'])
-  })
 
-  it('an item removed after the anchor is harmless', async () => {
-    const shrunk = fakePlanner(SEVEN_TASKS.filter((row) => row['uid'] !== 'T5'))
-    const second = windowOf(await readWindow(shrunk, { offset: 3, size: 3, anchor: 'T3' }))
-    expect(uidsOf(second)).toEqual(['T4', 'T6', 'T7'])
-  })
-
-  it('fails as a changed collection when the anchor was deleted', async () => {
-    const app = fakePlanner(SEVEN_TASKS.filter((row) => row['uid'] !== 'T3'))
-    expectCollectionChanged(errorOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' })))
-    // Detected by the anchor check, before any item of the window is read.
-    expect(app.requests).toEqual(['shelf todos', 'count', '[2..2] column uid'])
-  })
-
-  it('fails as a changed collection when the anchor moved', async () => {
-    const app = fakePlanner([...SEVEN_TASKS].reverse())
-    expectCollectionChanged(errorOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' })))
-  })
-
-  it('fails as a changed collection when the collection shrank below the anchor', async () => {
-    const app = fakePlanner(SEVEN_TASKS.slice(0, 2))
-    expectCollectionChanged(errorOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' })))
-    // The length already shows the anchor's position is gone; no range is read.
-    expect(app.requests).toEqual(['shelf todos', 'count'])
-  })
-
-  it('fails as a changed collection when the anchor range fails because the collection shrank after it was counted', async () => {
-    const app = fakePlanner(SEVEN_TASKS, {
-      mutate: { after: 'count', times: 'once', change: (rows) => rows.slice(0, 2) },
+    it('an item inserted right after the anchor is read on the next page, with nothing skipped or repeated', async () => {
+      const app = fakePlanner(SEVEN_TASKS, {
+        mutate: {
+          after: pageRequest(read, 0, 2, 'uid'),
+          times: 'once',
+          change: (rows) => [...rows.slice(0, 3), added('N1'), ...rows.slice(3)],
+        },
+      })
+      // The insert lands during the first page's first identifier read, after
+      // the anchor T3, so it shifts nothing the first page returns.
+      const first = windowOf(await readWindow(app, { offset: 0, size: 3 }, read))
+      expect(uidsOf(first)).toEqual(['T1', 'T2', 'T3'])
+      const second = windowOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' }, read))
+      expect(uidsOf(second)).toEqual(['N1', 'T4', 'T5'])
     })
-    expectCollectionChanged(errorOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' })))
-  })
 
-  it('fails as a changed collection, never as an invalid selection, when the window range fails because the collection shrank during the read', async () => {
-    // Three items go after every anchor check, so in each attempt the window
-    // computed from the length just read runs past the end: [3..5] over four
-    // items, then [3..3] over one.
-    const app = fakePlanner(SEVEN_TASKS, {
-      mutate: {
-        after: '[2..2] column uid',
-        times: 'always',
-        change: (rows) => rows.slice(0, Math.max(0, rows.length - 3)),
-      },
+    it('an item removed after the anchor is harmless', async () => {
+      const shrunk = fakePlanner(SEVEN_TASKS.filter((row) => row['uid'] !== 'T5'))
+      const second = windowOf(await readWindow(shrunk, { offset: 3, size: 3, anchor: 'T3' }, read))
+      expect(uidsOf(second)).toEqual(['T4', 'T6', 'T7'])
     })
-    const error = errorOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' }))
-    expect(error).not.toBeInstanceOf(InvalidSelectionError)
-    expectCollectionChanged(error)
-  })
 
-  it('fails as a changed collection when the anchor moves while the page is read', async () => {
-    // Everything before the window reverses after the page's identifiers are
-    // first read: the page's own items stay put, but the anchor no longer
-    // sits just before them, which the check after the reads detects.
-    const app = fakePlanner(SEVEN_TASKS, {
-      mutate: {
-        after: '[3..5] column title',
-        times: 'once',
-        change: (rows) => [...rows.slice(0, 3).reverse(), ...rows.slice(3)],
-      },
+    it('fails as a changed collection when the anchor was deleted', async () => {
+      const app = fakePlanner(SEVEN_TASKS.filter((row) => row['uid'] !== 'T3'))
+      expectCollectionChanged(
+        errorOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' }, read))
+      )
+      // Detected by the anchor check, before any item of the window is read.
+      expect(app.requests).toEqual(['shelf todos', 'count', pageRequest(read, 2, 2, 'uid')])
     })
-    expectCollectionChanged(errorOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' })))
-  })
-})
 
-describe('paged list bodies: reads that disagree within a page', () => {
-  it('fails as a changed collection when the page identifiers change in both attempts', async () => {
-    const app = fakePlanner(SEVEN_TASKS, {
-      mutate: {
-        after: '[0..2] column uid',
-        times: 'always',
-        change: (rows) => [...rows.slice(0, 3).reverse(), ...rows.slice(3)],
-      },
+    it('fails as a changed collection when the anchor moved', async () => {
+      const app = fakePlanner([...SEVEN_TASKS].reverse())
+      expectCollectionChanged(
+        errorOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' }, read))
+      )
     })
-    expectCollectionChanged(errorOf(await readWindow(app, { offset: 0, size: 3 })))
-  })
 
-  it('fails as an unexpected value when a column of the page is short in both attempts while its identifiers hold', async () => {
-    const app = fakePlanner(SEVEN_TASKS, { short: ['title'] })
-    const error = errorOf(await readWindow(app, { offset: 0, size: 3 }))
-    expect(error).toBeInstanceOf(UnexpectedValueError)
-    expect(error).toMatchObject({
-      details: {
-        issues: [
-          {
-            path: [],
-            message:
-              'Reading the property "title" gave 2 values for 3 items, so the records cannot be assembled.',
-          },
-        ],
-      },
+    it('fails as a changed collection when the collection shrank below the anchor', async () => {
+      const app = fakePlanner(SEVEN_TASKS.slice(0, 2))
+      expectCollectionChanged(
+        errorOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' }, read))
+      )
+      // The length already shows the anchor's position is gone; no item is read.
+      expect(app.requests).toEqual(['shelf todos', 'count'])
     })
-  })
 
-  it('reads the page again when its identifiers change once, and returns the consistent read', async () => {
-    const app = fakePlanner(SEVEN_TASKS, {
-      mutate: {
-        after: '[0..2] column title',
-        times: 'once',
-        change: (rows) => [rows[1], rows[0], ...rows.slice(2)].flatMap((row) => (row ? [row] : [])),
-      },
+    it('fails as a changed collection when the anchor read fails because the collection shrank after it was counted', async () => {
+      const app = fakePlanner(SEVEN_TASKS, {
+        mutate: { after: 'count', times: 'once', change: (rows) => rows.slice(0, 2) },
+      })
+      expectCollectionChanged(
+        errorOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' }, read))
+      )
     })
-    const result = windowOf(await readWindow(app, { offset: 0, size: 3 }))
-    expect(uidsOf(result)).toEqual(['T2', 'T1', 'T3'])
-  })
-})
+
+    it('fails as a changed collection, never as an invalid selection, when the window is gone because the collection shrank during the read', async () => {
+      // Three items go after every anchor check (and, by column, after every
+      // identifier read), so in each attempt the window computed from the
+      // length just read runs past the end.
+      const app = fakePlanner(SEVEN_TASKS, {
+        mutate: {
+          after: pageRequest(read, 2, 2, 'uid'),
+          times: 'always',
+          change: (rows) => rows.slice(0, Math.max(0, rows.length - 3)),
+        },
+      })
+      const error = errorOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' }, read))
+      expect(error).not.toBeInstanceOf(InvalidSelectionError)
+      expectCollectionChanged(error)
+    })
+
+    it('fails as a changed collection when the anchor moves while the page is read', async () => {
+      // Everything before the window reverses after the page's titles are
+      // read: the page's own items stay put, but the anchor no longer sits just
+      // before them, which the check after the reads detects.
+      const app = fakePlanner(SEVEN_TASKS, {
+        mutate: {
+          after: pageRequest(read, 3, 5, 'title'),
+          times: 'once',
+          change: (rows) => [...rows.slice(0, 3).reverse(), ...rows.slice(3)],
+        },
+      })
+      expectCollectionChanged(
+        errorOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' }, read))
+      )
+    })
+  }
+)
+
+describe.each(PAGE_READS)(
+  'paged list bodies read by %s: reads that disagree within a page',
+  (read) => {
+    it('fails as a changed collection when the page identifiers change in both attempts', async () => {
+      const app = fakePlanner(SEVEN_TASKS, {
+        mutate: {
+          after: pageRequest(read, 0, 2, 'uid'),
+          times: 'always',
+          change: (rows) => [...rows.slice(0, 3).reverse(), ...rows.slice(3)],
+        },
+      })
+      expectCollectionChanged(errorOf(await readWindow(app, { offset: 0, size: 3 }, read)))
+    })
+
+    it('fails as an unexpected value when a read is short in both attempts while the identifiers hold', async () => {
+      // By range the short read is the page's; by column it is the whole
+      // collection's, so even a value missing past the window is caught.
+      const app = fakePlanner(SEVEN_TASKS, { short: ['title'] })
+      const error = errorOf(await readWindow(app, { offset: 0, size: 3 }, read))
+      const counts = read === 'range' ? '2 values for 3 items' : '6 values for 7 items'
+      expect(error).toBeInstanceOf(UnexpectedValueError)
+      expect(error).toMatchObject({
+        details: {
+          issues: [
+            {
+              path: [],
+              message: `Reading the property "title" gave ${counts}, so the records cannot be assembled.`,
+            },
+          ],
+        },
+      })
+    })
+
+    it('reads the page again when its identifiers change once, and returns the consistent read', async () => {
+      const app = fakePlanner(SEVEN_TASKS, {
+        mutate: {
+          after: pageRequest(read, 0, 2, 'title'),
+          times: 'once',
+          change: (rows) =>
+            [rows[1], rows[0], ...rows.slice(2)].flatMap((row) => (row ? [row] : [])),
+        },
+      })
+      const result = windowOf(await readWindow(app, { offset: 0, size: 3 }, read))
+      expect(uidsOf(result)).toEqual(['T2', 'T1', 'T3'])
+    })
+
+    it('falls back to per-item reads for a property that fails across the items, and keeps the page aligned', async () => {
+      const app = fakePlanner(SEVEN_TASKS, { bulk: ['title'] })
+      const result = windowOf(await readWindow(app, { offset: 2, size: 3, anchor: 'T2' }, read))
+      expect(result.items.map((item) => item['title'])).toEqual(['Task 3', 'Task 4', 'Task 5'])
+      expect(uidsOf(result)).toEqual(['T3', 'T4', 'T5'])
+    })
+  }
+)
 
 describe('paged list bodies: what can page', () => {
   it('refuses to page a resource with no identifier, before anything runs', async () => {
