@@ -114,20 +114,30 @@ async function contactsClient(app: object, scripts: NativeScript[] = []) {
   })
 }
 
-/** A reference to the person with `id`, as a caller builds one. */
-function person(id: string): IdentityReferenceData<string, 'Person'> {
-  return { app: 'contacts', resource: 'Person', form: 'identity', cardinality: 'one', id }
+/**
+ * A reference to the person with `id`, as a caller builds one: a literal with
+ * no container, so the typed client admits it (a value widened to
+ * `IdentityReferenceData` could carry any container, which it does not).
+ */
+function person(id: string) {
+  return {
+    app: 'contacts',
+    resource: 'Person',
+    form: 'identity',
+    cardinality: 'one',
+    id,
+  } as const satisfies IdentityReferenceData<string, 'Person'>
 }
 
 /** An identity collection of the people with `ids`, as a caller builds one. */
-function people(...ids: string[]): IdentityCollectionReferenceData<string, 'Person'> {
+function people(...ids: string[]) {
   return {
     app: 'contacts',
     resource: 'Person',
     form: 'identity',
     cardinality: 'many',
     entries: ids.map(person),
-  }
+  } as const satisfies IdentityCollectionReferenceData<string, 'Person'>
 }
 
 /** What a call rejected with; fails if it resolved. */
