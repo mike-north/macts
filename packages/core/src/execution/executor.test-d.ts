@@ -33,7 +33,7 @@ expectAssignable<ExecutionRequest>({
   input: { calendar: 'Home' },
   inputPlan: PASSTHROUGH_PLAN,
   outputPlan: PASSTHROUGH_PLAN,
-  resources: EMPTY_RESOURCE_PLAN_TABLE,
+  resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
 })
 
 // Negative: plans cannot be omitted.
@@ -50,7 +50,7 @@ expectNotAssignable<ExecutionRequest>({
   input: ['Home'],
   inputPlan: PASSTHROUGH_PLAN,
   outputPlan: PASSTHROUGH_PLAN,
-  resources: EMPTY_RESOURCE_PLAN_TABLE,
+  resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
 })
 
 // A resolution request carries the reference in wire form.
@@ -66,7 +66,7 @@ expectAssignable<ResolutionRequest>({
     selector: { by: 'range', start: { integer: '0' }, end: { integer: '10' } },
   },
   outputPlan: PASSTHROUGH_PLAN,
-  resources: EMPTY_RESOURCE_PLAN_TABLE,
+  resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
 })
 
 // Negative: the output plan cannot be omitted.
@@ -91,7 +91,7 @@ expectNotAssignable<ResolutionRequest>({
     selector: { by: 'index', index: 0 },
   },
   outputPlan: PASSTHROUGH_PLAN,
-  resources: EMPTY_RESOURCE_PLAN_TABLE,
+  resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
 })
 
 declare function execute(request: ExecutionRequest): Promise<WireValue>

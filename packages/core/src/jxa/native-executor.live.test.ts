@@ -85,7 +85,7 @@ describe.skipIf(!liveAppsEnabled)('native executor against Notes.app (local only
       input,
       inputPlan: PASSTHROUGH_PLAN,
       outputPlan: PASSTHROUGH_PLAN,
-      resources: EMPTY_RESOURCE_PLAN_TABLE,
+      resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
     })
 
   it(
@@ -149,7 +149,7 @@ describe.skipIf(!liveAppsEnabled)('native executor against Calendar.app (local o
       input,
       inputPlan: PASSTHROUGH_PLAN,
       outputPlan: PASSTHROUGH_PLAN,
-      resources: EMPTY_RESOURCE_PLAN_TABLE,
+      resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
     })
 
   it(

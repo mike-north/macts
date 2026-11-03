@@ -71,7 +71,7 @@ export function fakeOperation(
     },
     manifest: UNUSED_MANIFEST,
     risk: 'read',
-    resources: EMPTY_RESOURCE_PLAN_TABLE,
+    resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
   }
 }
 
@@ -94,7 +94,7 @@ export function fakeListOperation(id: OperationId): RegisteredOperation {
     },
     manifest: UNUSED_MANIFEST,
     risk: 'read',
-    resources: EMPTY_RESOURCE_PLAN_TABLE,
+    resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
   }
 }
 

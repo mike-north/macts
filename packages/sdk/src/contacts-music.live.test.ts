@@ -136,7 +136,7 @@ async function wireReader<Client>(contract: AppContract<Client>): Promise<WireRe
         input,
         inputPlan: operation.input.plan,
         outputPlan: page === undefined ? operation.output.plan : ValueTypes.array(page.item).plan,
-        resources: EMPTY_RESOURCE_PLAN_TABLE,
+        resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
       })
       const wire = page === undefined ? result : { items: result }
       const parsed = operation.output.wire.safeParse(wire)

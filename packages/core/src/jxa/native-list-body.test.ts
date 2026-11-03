@@ -427,7 +427,7 @@ async function listBoth(
     input: options.input ?? {},
     inputPlan: PASSTHROUGH_PLAN,
     outputPlan,
-    resources: EMPTY_RESOURCE_PLAN_TABLE,
+    resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
   }
   const batchedApp = fakePlanner(rows, options.faults)
   const batched = await settle(
@@ -842,7 +842,7 @@ describe('list bodies: the identifier read is never guarded', () => {
         input: SHELF_INPUT,
         inputPlan: PASSTHROUGH_PLAN,
         outputPlan: PASSTHROUGH_PLAN,
-        resources: EMPTY_RESOURCE_PLAN_TABLE,
+        resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
       })
     )
     expect(errorOf(result)).toBeInstanceOf(AppOperationError)
@@ -1146,7 +1146,7 @@ async function readWindow(
       input: SHELF_INPUT,
       inputPlan: PASSTHROUGH_PLAN,
       outputPlan,
-      resources: EMPTY_RESOURCE_PLAN_TABLE,
+      resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
       page,
     })
   )
@@ -1429,7 +1429,7 @@ describe('paged list bodies: what can page', () => {
         input: {},
         inputPlan: PASSTHROUGH_PLAN,
         outputPlan: PASSTHROUGH_PLAN,
-        resources: EMPTY_RESOURCE_PLAN_TABLE,
+        resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
         page: { offset: 0, size: 25 },
       })
     )

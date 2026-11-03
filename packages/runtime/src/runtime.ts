@@ -801,7 +801,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       manifest,
       target: descriptor.target,
       inputPlan: descriptor.input.plan,
-      resources: operation.resources,
+      resourcePlans: operation.resourcePlans,
       ...(context.signal === undefined ? {} : { signal: context.signal }),
     }
     const run = (request: ExecutionRequest): Promise<WireValue> =>
@@ -1254,7 +1254,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
         manifest: operation.manifest,
         reference: validated,
         outputPlan: resolving.result.plan,
-        resources: operation.resources,
+        resourcePlans: operation.resourcePlans,
         ...(context.signal === undefined ? {} : { signal: context.signal }),
       }
       const result = await dispatch(operation, context, call, () => executor.resolve(request))

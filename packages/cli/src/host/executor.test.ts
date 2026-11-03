@@ -113,7 +113,7 @@ function executionRequest(
     input,
     inputPlan: PASSTHROUGH_PLAN,
     outputPlan,
-    resources: EMPTY_RESOURCE_PLAN_TABLE,
+    resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
   }
 }
 
@@ -201,7 +201,7 @@ describe('createTestStubExecutor: resolve', () => {
   it('resolves a selector collection to an empty array', async () => {
     const result = await createTestStubExecutor().resolve({
       manifest: MANIFEST,
-      resources: EMPTY_RESOURCE_PLAN_TABLE,
+      resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
       reference: {
         resource: 'Widget',
         form: 'selector',
@@ -217,7 +217,7 @@ describe('createTestStubExecutor: resolve', () => {
   it('resolves an identity collection with no entries to an empty array', async () => {
     const result = await createTestStubExecutor().resolve({
       manifest: MANIFEST,
-      resources: EMPTY_RESOURCE_PLAN_TABLE,
+      resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
       reference: { resource: 'Widget', form: 'identity', cardinality: 'many', entries: [] },
       outputPlan: LIST_PLAN,
     })
@@ -229,7 +229,7 @@ describe('createTestStubExecutor: resolve', () => {
     const error = await rejectionOf(
       createTestStubExecutor().resolve({
         manifest: MANIFEST,
-        resources: EMPTY_RESOURCE_PLAN_TABLE,
+        resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
         reference: {
           resource: 'Widget',
           form: 'identity',
@@ -251,7 +251,7 @@ describe('createTestStubExecutor: resolve', () => {
     const error = await rejectionOf(
       createTestStubExecutor().resolve({
         manifest: MANIFEST,
-        resources: EMPTY_RESOURCE_PLAN_TABLE,
+        resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
         reference: { ...identity, cardinality: 'one' },
         outputPlan: RECORD_PLAN,
       })
@@ -266,7 +266,7 @@ describe('createTestStubExecutor: resolve', () => {
 
     const result = await createTestStubExecutor().resolve({
       manifest: MANIFEST,
-      resources: EMPTY_RESOURCE_PLAN_TABLE,
+      resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
       reference,
       outputPlan: PASSTHROUGH_PLAN,
     })

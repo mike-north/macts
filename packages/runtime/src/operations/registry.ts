@@ -64,7 +64,7 @@ export interface RegisteredOperation {
    * was registered from one, and empty when it was registered from the
    * manifest alone, so no reference converts.
    */
-  readonly resources: ResourcePlanTable
+  readonly resourcePlans: ResourcePlanTable
 }
 
 /**
@@ -192,12 +192,12 @@ function toRegisteredOperation(
   descriptor: AnyOperationDescriptor,
   manifest: AppManifest,
   command: Command,
-  resources: ResourcePlanTable
+  resourcePlans: ResourcePlanTable
 ): RegisteredOperation {
   return {
     descriptor,
     manifest,
-    resources,
+    resourcePlans,
     risk: classifyCommandRisk(command),
     ...(command.permissionHistory === undefined
       ? {}
@@ -295,7 +295,7 @@ export function operationsFromContract(
     )
   }
 
-  const resources = checkedResourcePlans(contract, manifest)
+  const resourcePlans = checkedResourcePlans(contract, manifest)
   const derived = new Map(deriveManifestOperations(manifest).map((op) => [op.id, op]))
   return Object.entries(contract.operations).map(([key, descriptor]) => {
     if (key !== descriptor.id) {
@@ -326,7 +326,7 @@ export function operationsFromContract(
           : `Contract operation "${descriptor.id}" takes the paging inputs, but the manifest says it does not page: its resource's primary identifier is not claimed unique. Regenerate the contract.`
       )
     }
-    return toRegisteredOperation(descriptor, manifest, expected.command, resources)
+    return toRegisteredOperation(descriptor, manifest, expected.command, resourcePlans)
   })
 }
 

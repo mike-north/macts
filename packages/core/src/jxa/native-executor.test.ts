@@ -97,7 +97,7 @@ function request(overrides: Partial<ExecutionRequest> = {}): ExecutionRequest {
     input: { name: 'Groceries' },
     inputPlan: PASSTHROUGH_PLAN,
     outputPlan: PASSTHROUGH_PLAN,
-    resources: EMPTY_RESOURCE_PLAN_TABLE,
+    resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
     ...overrides,
   }
 }
@@ -207,7 +207,7 @@ describe('createNativeExecutor', () => {
           input: { with: 'phone', for: 'p-1' },
           inputPlan: { kind: 'record', fields: { for: required(reference('Person')) } },
           outputPlan: { kind: 'array', items: reference('Email') },
-          resources: { Person: STRING_ID, Email: STRING_ID, Group: STRING_ID },
+          resourcePlans: { Person: STRING_ID, Email: STRING_ID, Group: STRING_ID },
         })
         expect(references).toEqual({
           Person: {
@@ -234,7 +234,7 @@ describe('createNativeExecutor', () => {
               track: required(reference('Track')),
             },
           },
-          resources: { Playlist: STRING_ID, Track: STRING_ID },
+          resourcePlans: { Playlist: STRING_ID, Track: STRING_ID },
         })
         expect(references).toEqual({
           Playlist: {
@@ -250,14 +250,14 @@ describe('createNativeExecutor', () => {
         // reference converts.
         const references = await scriptReferences({
           inputPlan: { kind: 'record', fields: { note: required(reference('Note')) } },
-          resources: EMPTY_RESOURCE_PLAN_TABLE,
+          resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
         })
         expect(references).toEqual({})
       })
 
       it('carries an empty table when the plans hold no reference, whatever the request lists', async () => {
         const references = await scriptReferences({
-          resources: { Note: STRING_ID, Folder: STRING_ID },
+          resourcePlans: { Note: STRING_ID, Folder: STRING_ID },
         })
         expect(references).toEqual({})
       })
@@ -267,7 +267,7 @@ describe('createNativeExecutor', () => {
         // folder reference makes the folder reachable too.
         const references = await scriptReferences({
           inputPlan: { kind: 'record', fields: { note: required(reference('Note')) } },
-          resources: { Note: { id: reference('Folder') }, Folder: STRING_ID },
+          resourcePlans: { Note: { id: reference('Folder') }, Folder: STRING_ID },
         })
         expect(Object.keys(references).sort()).toEqual(['Folder', 'Note'])
         expect(references['Note']).toEqual({
@@ -346,7 +346,7 @@ describe('createNativeExecutor', () => {
           input: { name: 'Groceries', limit: { integer: '3' } },
           inputPlan,
           outputPlan: INTEGER_PLAN,
-          resources: EMPTY_RESOURCE_PLAN_TABLE,
+          resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
         })
       )
       expect(result).toEqual({ integer: '7' })
@@ -652,7 +652,7 @@ describe('createNativeExecutor', () => {
             selector: { by: 'name', name: 'Groceries' },
           },
           outputPlan: PASSTHROUGH_PLAN,
-          resources: EMPTY_RESOURCE_PLAN_TABLE,
+          resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
         })
       )
       expect(error).toBeInstanceOf(InternalError)
@@ -1048,7 +1048,7 @@ describe('against the real automation host (no app events)', () => {
             fields: { name: required(STRING_PLAN), limit: required(INTEGER_PLAN) },
           },
           outputPlan: INTEGER_PLAN,
-          resources: EMPTY_RESOURCE_PLAN_TABLE,
+          resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
         })
       )
       expect(result).toEqual({ integer: '42' })

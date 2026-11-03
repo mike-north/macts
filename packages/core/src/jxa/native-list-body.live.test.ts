@@ -144,7 +144,7 @@ function reader(manifest: AppManifest): Reader {
     input,
     inputPlan: PASSTHROUGH_PLAN,
     outputPlan: PASSTHROUGH_PLAN,
-    resources: EMPTY_RESOURCE_PLAN_TABLE,
+    resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
   })
   return {
     list: (target, input) => executor.execute(request(target, input)),

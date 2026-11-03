@@ -164,7 +164,8 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
   return {
     provider: 'macos',
     async execute(request: ExecutionRequest): Promise<WireValue> {
-      const { manifest, target, input, inputPlan, outputPlan, page, resources, signal } = request
+      const { manifest, target, input, inputPlan, outputPlan, page, resourcePlans, signal } =
+        request
       throwIfAborted(signal)
 
       // Legacy identifier aliases belong only to results that pass through
@@ -181,7 +182,7 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
         inputPlan,
         outputPlan: page === undefined ? outputPlan : pageWindowPlan(outputPlan),
         ...(page === undefined ? {} : { page }),
-        references: nativeReferenceTable(manifest, resources, [inputPlan, outputPlan]),
+        references: nativeReferenceTable(manifest, resourcePlans, [inputPlan, outputPlan]),
       }
 
       const context: NativeFailureContext = { app: manifest.app.name, operation: target, timeoutMs }
@@ -213,7 +214,7 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
 /**
  * The reference table of a native script: an entry for every resource a
  * reference in `plans` names, directly or inside another resource's
- * identifier, with the identifier plan `resources` holds for it and the
+ * identifier, with the identifier plan `resourcePlans` holds for it and the
  * addressing the manifest gives it ({@link referenceAddressing}).
  *
  * @remarks
@@ -224,14 +225,14 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
  */
 function nativeReferenceTable(
   manifest: AppManifest,
-  resources: ResourcePlanTable,
+  resourcePlans: ResourcePlanTable,
   plans: readonly ValuePlan[]
 ): NativeReferenceTable {
   const table = new Map<string, NativeReferencePlans>()
   const pending = plans.flatMap(referencedResources)
   for (let resource = pending.pop(); resource !== undefined; resource = pending.pop()) {
-    if (table.has(resource) || !Object.hasOwn(resources, resource)) continue
-    const id = resources[resource]?.id
+    if (table.has(resource) || !Object.hasOwn(resourcePlans, resource)) continue
+    const id = resourcePlans[resource]?.id
     const addressing = referenceAddressing(manifest, resource)
     table.set(resource, {
       ...(id === undefined ? {} : { id }),

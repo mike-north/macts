@@ -59,7 +59,7 @@ export interface ExecutionRequest {
    * present: an app registered without a contract passes
    * `EMPTY_RESOURCE_PLAN_TABLE`, and then no reference converts.
    */
-  readonly resources: ResourcePlanTable
+  readonly resourcePlans: ResourcePlanTable
   /**
    * The window of a list to read, present exactly when the operation pages
    * (a list of a resource that has an identifier). Absent for every other
@@ -154,10 +154,10 @@ export interface ResolutionRequest {
   readonly outputPlan: ValuePlan
   /**
    * The value plans of the app's resources, from its registered contract, as
-   * on {@link ExecutionRequest.resources}: what converting the reference, its
+   * on {@link ExecutionRequest.resourcePlans}: what converting the reference, its
    * containers, and any reference in the result needs. Always present.
    */
-  readonly resources: ResourcePlanTable
+  readonly resourcePlans: ResourcePlanTable
   /** Abort the resolution. */
   readonly signal?: AbortSignal
 }
