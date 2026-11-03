@@ -44,9 +44,6 @@ export class ActivePolicyError extends Error {
 }
 
 // @public
-export function addKeyMetadata(metadata: ApiKeyMetadata): void;
-
-// @public
 export const ALLOW_ALL_POLICY: GovernancePolicy;
 
 export { ApiKeyMetadata }

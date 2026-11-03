@@ -491,9 +491,15 @@ export function loadKeyMetadata(): ApiKeyMetadata[] {
 }
 
 /**
- * Add key metadata to storage.
+ * Store the record of a newly issued key.
  *
- * @param metadata - Key metadata to add
+ * Internal to the package: `createApiKey` is the only caller, and it passes
+ * exactly the grant it signed into the token, so the stored record always
+ * matches the token. It is deliberately not exported from the package entry
+ * point; a public way to insert arbitrary records would let a stored grant
+ * differ from the token it describes.
+ *
+ * @param metadata - The issued key's metadata
  */
 export function addKeyMetadata(metadata: ApiKeyMetadata): void {
   const database = getDb()

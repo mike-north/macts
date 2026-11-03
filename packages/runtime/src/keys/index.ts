@@ -12,7 +12,8 @@
  * may do, set its per-key governance policy with `setKeyPolicy`: the policy
  * intersects with the host policy and is read at call time. To shorten or
  * otherwise change a key's grant, revoke the key with `revokeKey` and issue a
- * new one.
+ * new one. `createApiKey` is the only way to store a key, and it stores exactly
+ * the grant it signed.
  *
  * @example
  * ```typescript
@@ -94,13 +95,16 @@ export { TtlCache } from './cache.js'
 export { deriveEncryptionKey, encrypt, decrypt } from './encryption.js'
 
 // Storage
+//
+// Nothing here writes a key's grant: records are stored only by `createApiKey`,
+// which stores exactly what it signed, and a stored record can only be renamed,
+// revoked or deleted afterwards.
 export {
   closeKeyStore,
   getSigningSecret,
   setSigningSecret,
   generateSecret,
   loadKeyMetadata,
-  addKeyMetadata,
   updateKeyMetadata,
   getKeyMetadata,
   revokeKey,
