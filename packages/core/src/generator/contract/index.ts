@@ -165,6 +165,12 @@ export interface ContractNames {
   readonly client: string
   /** The exported contract binding, e.g. `googleChromeContract`. */
   readonly contract: string
+  /**
+   * The exported type of the contract's resource table, e.g.
+   * `GoogleChromeResources`: the literal type of the table, which client
+   * factories carry into the client's type.
+   */
+  readonly resources: string
 }
 
 /**
@@ -178,6 +184,7 @@ export function contractNames(manifest: AppManifest): ContractNames {
     app: normalizeAppRouteSegment(manifest.app.name),
     client: `${appName}Client`,
     contract: `${lowerCamel(appName)}Contract`,
+    resources: `${appName}Resources`,
   }
 }
 
@@ -1319,15 +1326,23 @@ class ContractBuilder {
       }
       return `  ${propertyKey(resourceKey)}: {\n${members.map((m) => `    ${m},`).join('\n')}\n  },`
     })
-    const { client } = this.#names
+    const { client, resources } = this.#names
     return `/**
  * Every resource, keyed by manifest resource key: its record, its identifier
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<${client}>['resources'] = {
+const resources = {
 ${entries.join('\n')}
-}
+} as const satisfies AppContract<${client}>['resources']
+
+/**
+ * The type of the resource table of {@link ${this.#names.contract}}: each resource key,
+ * the operations that resolve references to it, and its record and identifier
+ * types. A client created from the contract carries it, so \`bindReference\`
+ * admits only references the contract can resolve.
+ */
+export type ${resources} = typeof resources
 `
   }
 
@@ -1485,12 +1500,12 @@ ${members.join('\n')}
   }
 
   #renderContract(): string {
-    const { app, client, contract } = this.#names
+    const { app, client, contract, resources } = this.#names
     return `/**
  * The ${this.#manifest.app.name} contract. Pass it to a client factory to obtain a
  * {@link ${client}}.
  */
-export const ${contract}: AppContract<${client}> = {
+export const ${contract}: AppContract<${client}, ${resources}> = {
   app: ${stringLiteral(app)},
   operations,
   resources,
@@ -1518,6 +1533,7 @@ export const ${contract}: AppContract<${client}> = {
       ...namespaces.map((namespace) => namespace.interfaceName),
       this.#names.client,
       this.#names.contract,
+      this.#names.resources,
     ]
     const imported = [
       ...CONTRACT_VALUE_IMPORTS,
@@ -1728,12 +1744,13 @@ function upperFirst(name: string): string {
 }
 
 /**
- * The local names of the paging types in an app's contract module: `Page` and
+ * The local names of the paging types of `@macts/contracts` in an app's
+ * generated modules (its contract and its HTTP client): `Page` and
  * `PageRequest`, unless the manifest declares a type of that name (an enum, a
  * resource, or a resource's create or update input), in which case the import
  * is aliased `MactsPage` / `MactsPageRequest` (numbered if those are taken too).
  */
-function pagingTypeNames(manifest: AppManifest): { page: string; pageRequest: string } {
+export function pagingTypeNames(manifest: AppManifest): { page: string; pageRequest: string } {
   const declared = new Set<string>(Object.keys(manifest.enums))
   for (const [key] of usableResources(manifest)) {
     declared.add(key)

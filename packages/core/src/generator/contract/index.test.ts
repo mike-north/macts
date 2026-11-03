@@ -63,8 +63,10 @@ describe('generateContract: files', () => {
     expect(jotter.errors).toEqual([])
   })
 
-  it('exports the contract as <camelApp>Contract typed AppContract<<PascalApp>Client>', () => {
-    expect(contract).toContain('export const jotterContract: AppContract<JotterClient> = {')
+  it('exports the contract as <camelApp>Contract typed AppContract<<PascalApp>Client, <PascalApp>Resources>', () => {
+    expect(contract).toContain(
+      'export const jotterContract: AppContract<JotterClient, JotterResources> = {'
+    )
     expect(contract).toContain("  app: 'jotter',")
     expect(contract).toContain('export interface JotterClient {')
   })
@@ -416,6 +418,14 @@ describe('generateContract: resource table', () => {
     list: 'jotter.tags.listTags',
   },`)
   })
+
+  it('keeps the literal type of the table and exports it, with no second table', () => {
+    expect(contract).toContain('const resources = {\n')
+    expect(contract).toContain("} as const satisfies AppContract<JotterClient>['resources']\n")
+    expect(contract).toContain('export type JotterResources = typeof resources\n')
+    expect(contract.match(/^const resources\b/gm)).toHaveLength(1)
+    expect(contract).toContain('  resources,\n')
+  })
 })
 
 describe('generateContract: client', () => {
@@ -704,6 +714,18 @@ describe('generateContract: errors', () => {
     ])
   })
 
+  it('reports a manifest name that collides with the resource table type', () => {
+    const result = withChanges((manifest) => {
+      manifest.enums['JotterResources'] = {
+        name: 'JotterResources',
+        values: [{ name: 'a', value: 'a' }],
+      }
+    })
+    expect(result.errors).toEqual([
+      'jotter: the name JotterResources is declared twice in module scope.',
+    ])
+  })
+
   it('reports two methods with the same name in one namespace', () => {
     const result = withChanges((manifest) => {
       manifest.commands['archiveAgain'] = {
@@ -751,12 +773,19 @@ describe('contractNames', () => {
       app: 'google-chrome',
       client: 'GoogleChromeClient',
       contract: 'googleChromeContract',
+      resources: 'GoogleChromeResources',
     })
-    expect(named('TV')).toEqual({ app: 'tv', client: 'TVClient', contract: 'tvContract' })
+    expect(named('TV')).toEqual({
+      app: 'tv',
+      client: 'TVClient',
+      contract: 'tvContract',
+      resources: 'TVResources',
+    })
     expect(named('iTerm')).toEqual({
       app: 'iterm',
       client: 'iTermClient',
       contract: 'iTermContract',
+      resources: 'iTermResources',
     })
   })
 })
