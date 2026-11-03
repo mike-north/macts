@@ -3,18 +3,18 @@ import { getClient } from '../../../sdk.js'
 import { createFormatter } from '../../../output/index.js'
 
 /**
- * Get a automator action by ID.
+ * Get an automator action by ID.
  */
 export class GetAutomatorActionCommand extends Command {
   static override paths = [['automator', 'workflows', 'actions', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a automator action by ID',
+    description: 'Get an automator action by ID',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  automatorActionId = Option.String({ required: true })
+  automatorActionId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

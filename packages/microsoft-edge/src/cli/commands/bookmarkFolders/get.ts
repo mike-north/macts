@@ -14,7 +14,7 @@ export class GetBookmarkFolderCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  bookmarkFolderId = Option.String({ required: true })
+  bookmarkFolderId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

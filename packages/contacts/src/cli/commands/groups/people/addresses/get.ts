@@ -3,13 +3,13 @@ import { getClient } from '../../../../sdk.js'
 import { createFormatter } from '../../../../output/index.js'
 
 /**
- * Get a address by ID.
+ * Get an address by ID.
  */
 export class GetAddressCommand extends Command {
   static override paths = [['contacts', 'groups', 'people', 'addresses', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a address by ID',
+    description: 'Get an address by ID',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -18,7 +18,7 @@ export class GetAddressCommand extends Command {
     description: 'Identifier of the person',
   })
 
-  addressId = Option.String({ required: true })
+  addressId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

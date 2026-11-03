@@ -14,7 +14,7 @@ export class GetMilestoneCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  milestoneId = Option.String({ required: true })
+  milestoneId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

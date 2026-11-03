@@ -14,7 +14,7 @@ export class SaveAsDocumentCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  documentId = Option.String({ required: true })
+  documentId = Option.String({ name: 'name', required: true })
   fileName = Option.String('--file-name', {
     required: true,
     description: 'The file name for the document',

@@ -13,7 +13,7 @@ export class CloseDocumentCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  documentId = Option.String({ required: true })
+  documentId = Option.String({ name: 'name', required: true })
   saving = Option.Boolean('--saving', { description: 'Whether to save changes before closing' })
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

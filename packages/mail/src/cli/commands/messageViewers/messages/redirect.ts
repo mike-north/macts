@@ -17,7 +17,7 @@ export class RedirectMessageCommand extends Command {
     required: true,
     description: 'MessageViewer ID',
   })
-  messageId = Option.String({ required: true })
+  messageId = Option.String({ name: 'id', required: true })
   openingWindow = Option.Boolean('--opening-window', {
     description:
       'Whether the window for the redirected message is shown. Default is to not show the window.',

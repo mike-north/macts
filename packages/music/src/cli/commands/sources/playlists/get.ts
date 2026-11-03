@@ -3,18 +3,18 @@ import { getClient } from '../../../sdk.js'
 import { createFormatter } from '../../../output/index.js'
 
 /**
- * Get a playlist by ID.
+ * Get a playlist by persistent ID.
  */
 export class GetPlaylistCommand extends Command {
   static override paths = [['music', 'sources', 'playlists', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a playlist by ID',
+    description: 'Get a playlist by persistent ID',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  playlistId = Option.String({ required: true })
+  playlistId = Option.String({ name: 'persistent-id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

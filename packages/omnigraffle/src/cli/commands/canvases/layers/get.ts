@@ -3,18 +3,18 @@ import { getClient } from '../../../sdk.js'
 import { createFormatter } from '../../../output/index.js'
 
 /**
- * Get a layer by ID.
+ * Get a layer by name.
  */
 export class GetLayerCommand extends Command {
   static override paths = [['omnigraffle', 'canvases', 'layers', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a layer by ID',
+    description: 'Get a layer by name',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  layerId = Option.String({ required: true })
+  layerId = Option.String({ name: 'name', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

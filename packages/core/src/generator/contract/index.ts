@@ -69,6 +69,7 @@ import {
   resourceHasOperations,
   resourceNamespace,
   safeIdentifier,
+  withArticle,
   type CrudOperation,
   type DeclaredType,
 } from '../surface.js'
@@ -1608,11 +1609,6 @@ function wrap(line: string, width: number): string[] {
 
 function upperFirst(name: string): string {
   return name.charAt(0).toUpperCase() + name.slice(1)
-}
-
-/** `a note`, `an event`: the noun with an indefinite article. */
-function withArticle(noun: string): string {
-  return `${/^[aeiou]/i.test(noun) ? 'an' : 'a'} ${noun}`
 }
 
 /** `base`, or `base2`, `base3`, … : the first not in `used`, which it joins. */

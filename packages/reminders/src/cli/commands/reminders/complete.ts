@@ -13,7 +13,7 @@ export class CompleteReminderCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  reminderId = Option.String({ required: true })
+  reminderId = Option.String({ name: 'id', required: true })
   id = Option.String('--id', { required: true, description: 'Reminder identifier' })
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

@@ -14,7 +14,7 @@ export class GetPerspectiveCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  perspectiveId = Option.String({ required: true })
+  perspectiveId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

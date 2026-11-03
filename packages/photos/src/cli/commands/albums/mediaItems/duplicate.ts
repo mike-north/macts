@@ -14,7 +14,7 @@ export class DuplicateMediaItemCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   albumId = Option.String('--album-id', { required: true, description: 'Album ID' })
-  mediaItemId = Option.String({ required: true })
+  mediaItemId = Option.String({ name: 'id', required: true })
   id = Option.String('--id', { required: true, description: 'The media item to duplicate' })
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

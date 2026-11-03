@@ -18,7 +18,7 @@ export class GetPhoneCommand extends Command {
     description: 'Identifier of the person',
   })
 
-  phoneId = Option.String({ required: true })
+  phoneId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

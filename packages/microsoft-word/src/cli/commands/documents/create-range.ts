@@ -13,7 +13,7 @@ export class CreateRangeDocumentCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  documentId = Option.String({ required: true })
+  documentId = Option.String({ name: 'name', required: true })
   start = Option.String('--start', {
     required: false,
     description: 'The starting character position',

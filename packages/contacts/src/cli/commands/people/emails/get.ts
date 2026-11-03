@@ -3,13 +3,13 @@ import { getClient } from '../../../sdk.js'
 import { createFormatter } from '../../../output/index.js'
 
 /**
- * Get a email by ID.
+ * Get an email by ID.
  */
 export class GetEmailCommand extends Command {
   static override paths = [['contacts', 'people', 'emails', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a email by ID',
+    description: 'Get an email by ID',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -18,7 +18,7 @@ export class GetEmailCommand extends Command {
     description: 'Identifier of the person',
   })
 
-  emailId = Option.String({ required: true })
+  emailId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
