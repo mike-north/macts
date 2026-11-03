@@ -186,7 +186,7 @@ describe('parent-scoped list: Tab.list(windowId) coherence across surfaces', () 
     // spec: listTabs declares a required `windowId` param
     // Tab has a primary identifier, so its list also takes the trailing page.
     expect(tabClient).toContain(
-      `async list(${PARENT_SCOPE_PARAM}: string, page: { pageSize?: number; cursor?: string } = {}): Promise<{ items: Tab[]; nextCursor?: string }>`
+      `async list(${PARENT_SCOPE_PARAM}: string, page: { pageSize?: number; cursor?: string } = {}): Promise<Page<Tab>>`
     )
   })
 
@@ -219,7 +219,7 @@ describe('non-parent-scoped list: Window.list() takes no argument (negative)', (
     const windowClient = fileContent(sdk.files, 'src/resources/window.ts')
     // spec: listWindows declares NO required params
     expect(windowClient).toContain(
-      'async list(page: { pageSize?: number; cursor?: string } = {}): Promise<{ items: Window[]; nextCursor?: string }>'
+      'async list(page: { pageSize?: number; cursor?: string } = {}): Promise<Page<Window>>'
     )
   })
 

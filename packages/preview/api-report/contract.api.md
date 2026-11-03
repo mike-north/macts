@@ -6,7 +6,10 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Document {
@@ -32,12 +35,21 @@ export interface DocumentUpdateInput {
 }
 
 // @public
-export interface PreviewClient {
+export interface PreviewClient extends ClientBrand<PreviewResources> {
     readonly documents: DocumentResourceClient;
 }
 
 // @public
-export const previewContract: AppContract<PreviewClient>;
+export const previewContract: AppContract<PreviewClient, PreviewResources>;
+
+// @public
+export type PreviewResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'preview.documents.get';
+        readonly list: 'preview.documents.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

@@ -35,7 +35,9 @@
  * binds a reference the caller built (an identifier or a selector), or one
  * bound to another client of the same app, to `client` in the same way,
  * without making a call. Both entry points export it, and it accepts clients
- * from either.
+ * from either. A client's type carries its contract's resource table, so
+ * `bindReference` admits only references the contract can resolve, and types
+ * the result with the resource's record.
  *
  * ## Environment variables
  *

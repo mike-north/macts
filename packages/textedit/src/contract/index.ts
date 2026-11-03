@@ -22,9 +22,11 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
   type Page,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -92,9 +94,11 @@ export interface DocumentResourceClient {
 
 /**
  * The TextEdit client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link textEditContract}.
+ * A client factory creates one from {@link textEditContract}. Its type carries the contract's
+ * resource table, {@link TextEditResources}, so references can be bound to it by resource; the
+ * brand has no runtime member.
  */
-export interface TextEditClient {
+export interface TextEditClient extends ClientBrand<TextEditResources> {
   /** A TextEdit document */
   readonly documents: DocumentResourceClient
 }
@@ -117,11 +121,29 @@ const documentCreateInputType: ValueType<DocumentCreateInput> = t.record({
 })
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link textEditContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
  */
-const resources: AppContract<TextEditClient>['resources'] = {
+export type TextEditResources = Readonly<{
+  Document: ResourceDescriptor<Document, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'textedit.documents.get'
+    readonly list: 'textedit.documents.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link TextEditResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
+ */
+const resources = {
   Document: {
     name: 'Document',
     record: documentRecordType,
@@ -129,7 +151,7 @@ const resources: AppContract<TextEditClient>['resources'] = {
     get: 'textedit.documents.get',
     list: 'textedit.documents.list',
   },
-}
+} satisfies TextEditResources
 
 const documentListOperation: OperationDescriptor<Record<string, never>, Page<Document>> = {
   id: 'textedit.documents.list',
@@ -204,7 +226,7 @@ function bind(runtime: ClientRuntime): TextEditClient {
  * The TextEdit contract. Pass it to a client factory to obtain a
  * {@link TextEditClient}.
  */
-export const textEditContract: AppContract<TextEditClient> = {
+export const textEditContract: AppContract<TextEditClient, TextEditResources> = {
   app: 'textedit',
   operations,
   resources,

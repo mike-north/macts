@@ -22,11 +22,11 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type FileSource,
   type Integer,
   type OperationDescriptor,
-  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -89,9 +89,11 @@ export interface DocumentUpdateInput {
 
 /**
  * The QuickTime Player client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link quickTimePlayerContract}.
+ * commands. A client factory creates one from {@link quickTimePlayerContract}. Its type carries the
+ * contract's resource table, {@link QuickTimePlayerResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface QuickTimePlayerClient {
+export interface QuickTimePlayerClient extends ClientBrand<QuickTimePlayerResources> {
   /** Open a URL. */
   openURL(options?: CallOptions): Promise<void>
   /** Play the movie. */
@@ -143,30 +145,24 @@ export interface QuickTimePlayerClient {
   showRemoteHud(options?: CallOptions): Promise<void>
 }
 
-const documentRecordType: ValueType<Document> = t.record(
-  {
-    name: t.nullable(t.string(), { description: 'The document name' }),
-    id: t.string({ description: 'The unique identifier of the document' }),
-    path: t.nullable(t.string(), { description: 'The file path of the document' }),
-    playing: t.nullable(t.boolean(), { description: 'Whether the document is currently playing' }),
-    duration: t.nullable(t.double(), { description: 'The duration of the document in seconds' }),
-    currentTime: t.nullable(t.double(), { description: 'The current playback time in seconds' }),
-  },
-  { description: 'A QuickTime Player document' }
-)
+/**
+ * The type of the resource table of {@link quickTimePlayerContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type QuickTimePlayerResources = Readonly<Record<never, never>>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link QuickTimePlayerResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
-const resources: AppContract<QuickTimePlayerClient>['resources'] = {
-  Document: {
-    name: 'Document',
-    record: documentRecordType,
-    id: t.string({ description: 'The unique identifier of the document' }),
-  },
-}
+const resources = {} satisfies QuickTimePlayerResources
 
 const appOpenURLOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'quicktime-player.app.openURL',
@@ -542,10 +538,11 @@ function bind(runtime: ClientRuntime): QuickTimePlayerClient {
  * The QuickTime Player contract. Pass it to a client factory to obtain a
  * {@link QuickTimePlayerClient}.
  */
-export const quickTimePlayerContract: AppContract<QuickTimePlayerClient> = {
-  app: 'quicktime-player',
-  operations,
-  resources,
-  loadManifest: async () => (await import('./manifest.js')).manifest,
-  bind,
-}
+export const quickTimePlayerContract: AppContract<QuickTimePlayerClient, QuickTimePlayerResources> =
+  {
+    app: 'quicktime-player',
+    operations,
+    resources,
+    loadManifest: async () => (await import('./manifest.js')).manifest,
+    bind,
+  }

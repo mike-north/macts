@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 
@@ -32,7 +33,7 @@ export interface DocumentUpdateInput {
 }
 
 // @public
-export interface QuickTimePlayerClient {
+export interface QuickTimePlayerClient extends ClientBrand<QuickTimePlayerResources> {
     _export(_in: FileSource, usingSettingsPreset: string, options?: CallOptions): Promise<void>;
     newAudioRecording(options?: CallOptions): Promise<void>;
     newMovieRecording(options?: CallOptions): Promise<void>;
@@ -51,7 +52,10 @@ export interface QuickTimePlayerClient {
 }
 
 // @public
-export const quickTimePlayerContract: AppContract<QuickTimePlayerClient>;
+export const quickTimePlayerContract: AppContract<QuickTimePlayerClient, QuickTimePlayerResources>;
+
+// @public
+export type QuickTimePlayerResources = Readonly<Record<never, never>>;
 
 // (No @packageDocumentation comment for this package)
 

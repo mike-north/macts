@@ -6,7 +6,10 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Document {
@@ -39,12 +42,21 @@ export interface DocumentUpdateInput {
 }
 
 // @public
-export interface ScriptEditorClient {
+export interface ScriptEditorClient extends ClientBrand<ScriptEditorResources> {
     readonly documents: DocumentResourceClient;
 }
 
 // @public
-export const scriptEditorContract: AppContract<ScriptEditorClient>;
+export const scriptEditorContract: AppContract<ScriptEditorClient, ScriptEditorResources>;
+
+// @public
+export type ScriptEditorResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'script-editor.documents.get';
+        readonly list: 'script-editor.documents.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

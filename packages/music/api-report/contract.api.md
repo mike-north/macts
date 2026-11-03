@@ -6,12 +6,15 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface AirPlayDevice {
@@ -277,7 +280,7 @@ export type MiniplayerWindowCreateInput = Record<string, never>;
 export type MiniplayerWindowUpdateInput = Record<string, never>;
 
 // @public
-export interface MusicClient {
+export interface MusicClient extends ClientBrand<MusicResources> {
     add(to?: string, options?: CallOptions): Promise<void>;
     backTrack(options?: CallOptions): Promise<void>;
     close(options?: CallOptions): Promise<void>;
@@ -312,7 +315,21 @@ export interface MusicClient {
 }
 
 // @public
-export const musicContract: AppContract<MusicClient>;
+export const musicContract: AppContract<MusicClient, MusicResources>;
+
+// @public
+export type MusicResources = Readonly<{
+    Playlist: ResourceDescriptor<Playlist, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'music.playlists.get';
+        readonly list: 'music.playlists.list';
+    };
+    Track: ResourceDescriptor<Track, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'music.tracks.get';
+        readonly list: 'music.tracks.list';
+    };
+}>;
 
 // @public
 export interface Playlist {

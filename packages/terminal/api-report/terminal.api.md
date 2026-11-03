@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -54,9 +55,7 @@ export interface SettingsSetCreateInput {
 export class SettingsSetResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<SettingsSet>;
-    list(): Promise<{
-        items: SettingsSet[];
-    }>;
+    list(): Promise<Page<SettingsSet>>;
 }
 
 // @public (undocumented)
@@ -98,9 +97,7 @@ export interface TabCreateInput {
 export class TabResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<Tab>;
-    list(): Promise<{
-        items: Tab[];
-    }>;
+    list(): Promise<Page<Tab>>;
 }
 
 // @public (undocumented)
@@ -162,9 +159,7 @@ export interface WindowCreateInput {
 export class WindowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<Window>;
-    list(): Promise<{
-        items: Window[];
-    }>;
+    list(): Promise<Page<Window>>;
 }
 
 // @public (undocumented)

@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -21,10 +22,7 @@ export class AccountResourceClient {
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Account[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Account>>;
 }
 
 // @public (undocumented)
@@ -84,10 +82,7 @@ export class ListResourceClient {
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: List[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<List>>;
 }
 
 // @public (undocumented)
@@ -143,10 +138,7 @@ export class ReminderResourceClient {
     list(listId: string, page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Reminder[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Reminder>>;
     show(): Promise<void>;
 }
 

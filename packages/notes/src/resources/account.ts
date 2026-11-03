@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Account } from '../types.js'
 
@@ -23,8 +24,8 @@ export class AccountResourceClient {
   /**
    * List all accounts, as one page.
    */
-  async list(): Promise<{ items: Account[] }> {
-    return this.#http.rpc<{ items: Account[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Account>> {
+    return this.#http.rpc<Page<Account>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

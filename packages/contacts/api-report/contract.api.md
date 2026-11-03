@@ -6,9 +6,12 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { ObjectReferenceData } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Address {
@@ -73,7 +76,7 @@ export interface AIMHandleUpdateInput {
 }
 
 // @public
-export interface ContactsClient {
+export interface ContactsClient extends ClientBrand<ContactsResources> {
     actionProperty(options?: CallOptions): Promise<void>;
     actionTitle(_with: unknown, _for: ObjectReferenceData<string, 'Person'>, options?: CallOptions): Promise<void>;
     add(to: string, options?: CallOptions): Promise<void>;
@@ -90,7 +93,36 @@ export interface ContactsClient {
 }
 
 // @public
-export const contactsContract: AppContract<ContactsClient>;
+export const contactsContract: AppContract<ContactsClient, ContactsResources>;
+
+// @public
+export type ContactsResources = Readonly<{
+    Address: ResourceDescriptor<Address, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'contacts.addresses.get';
+        readonly list: 'contacts.addresses.list';
+    };
+    Email: ResourceDescriptor<Email, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'contacts.emails.get';
+        readonly list: 'contacts.emails.list';
+    };
+    Group: ResourceDescriptor<Group, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'contacts.groups.get';
+        readonly list: 'contacts.groups.list';
+    };
+    Person: ResourceDescriptor<Person, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'contacts.people.get';
+        readonly list: 'contacts.people.list';
+    };
+    Phone: ResourceDescriptor<Phone, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'contacts.phones.get';
+        readonly list: 'contacts.phones.list';
+    };
+}>;
 
 // @public
 export interface CustomDate {

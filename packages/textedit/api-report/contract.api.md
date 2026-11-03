@@ -6,7 +6,10 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Document {
@@ -36,12 +39,21 @@ export interface DocumentUpdateInput {
 }
 
 // @public
-export interface TextEditClient {
+export interface TextEditClient extends ClientBrand<TextEditResources> {
     readonly documents: DocumentResourceClient;
 }
 
 // @public
-export const textEditContract: AppContract<TextEditClient>;
+export const textEditContract: AppContract<TextEditClient, TextEditResources>;
+
+// @public
+export type TextEditResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'textedit.documents.get';
+        readonly list: 'textedit.documents.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

@@ -6,9 +6,12 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Bookmark {
@@ -185,7 +188,7 @@ export interface FontUpdateInput {
 }
 
 // @public
-export interface MicrosoftWordClient {
+export interface MicrosoftWordClient extends ClientBrand<MicrosoftWordResources> {
     copyObject(options?: CallOptions): Promise<void>;
     createNewDocument(attachedTemplate?: string, options?: CallOptions): Promise<void>;
     cutObject(options?: CallOptions): Promise<void>;
@@ -200,7 +203,16 @@ export interface MicrosoftWordClient {
 }
 
 // @public
-export const microsoftWordContract: AppContract<MicrosoftWordClient>;
+export const microsoftWordContract: AppContract<MicrosoftWordClient, MicrosoftWordResources>;
+
+// @public
+export type MicrosoftWordResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'microsoft-word.documents.get';
+        readonly list: 'microsoft-word.documents.list';
+    };
+}>;
 
 // @public
 export interface PageSetup {

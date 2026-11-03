@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -38,10 +39,7 @@ export class AddressResourceClient {
     list(personId: string, page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Address[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Address>>;
 }
 
 // @public (undocumented)
@@ -177,10 +175,7 @@ export class EmailResourceClient {
     list(personId: string, page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Email[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Email>>;
 }
 
 // @public (undocumented)
@@ -213,10 +208,7 @@ export class GroupResourceClient {
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Group[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Group>>;
 }
 
 // @public (undocumented)
@@ -361,10 +353,7 @@ export class PersonResourceClient {
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Person[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Person>>;
 }
 
 // @public (undocumented)
@@ -415,10 +404,7 @@ export class PhoneResourceClient {
     list(personId: string, page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Phone[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Phone>>;
 }
 
 // @public (undocumented)

@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -130,9 +131,7 @@ export class DocumentResourceClient {
     close(saving?: boolean): Promise<void>;
     createRange(start?: number, end?: number): Promise<void>;
     get(id: string): Promise<Document>;
-    list(): Promise<{
-        items: Document[];
-    }>;
+    list(): Promise<Page<Document>>;
     print(): Promise<void>;
     save(): Promise<void>;
     saveAs(fileName: string, fileFormat?: SaveFormat): Promise<void>;

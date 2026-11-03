@@ -41,8 +41,10 @@ import {
   ValueTypes as t,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ReferenceData,
   type ResourceDescriptor,
+  type ResourceTable,
   type WireValue,
 } from '@macts/contracts'
 import { bindReference, createCodecClient } from './codec-runtime.js'
@@ -54,6 +56,7 @@ import {
   SCIENCE_FICTION_WIRE,
   libraryContract,
   type LibraryClient,
+  type LibraryResources,
 } from './library-fixture.js'
 import { rejection, thrownBy } from './test-helpers.js'
 
@@ -64,11 +67,18 @@ interface Sent {
   readonly options: CallOptions | undefined
 }
 
-/** A library client over a transport that records what it is sent and answers `answer`. */
+/**
+ * A library client over a transport that records what it is sent and answers
+ * `answer`.
+ *
+ * @remarks
+ * Its type carries the widest resource table, because `app` may differ from
+ * the library contract, so binding is checked here only at runtime.
+ */
 function recordingClient(
   answer: (sent: Sent) => unknown,
   app: AppContract<LibraryClient> = libraryContract
-): { client: LibraryClient; sent: Sent[] } {
+): { client: LibraryClient & ClientBrand<ResourceTable>; sent: Sent[] } {
   const sent: Sent[] = []
   const record = (request: Sent): Promise<unknown> => {
     sent.push(request)
@@ -486,7 +496,10 @@ function withoutOperation(
 }
 
 /** The library contract with one resource's `get` or `list` operation removed from its table. */
-function libraryWithout(resource: string, key: 'get' | 'list'): AppContract<LibraryClient> {
+function libraryWithout(
+  resource: keyof LibraryResources,
+  key: 'get' | 'list'
+): AppContract<LibraryClient> {
   return {
     ...libraryContract,
     resources: {
@@ -614,9 +627,7 @@ describe('bindReference', () => {
       'container',
     ])
     expect(typeof shelf.resolve).toBe('function')
-    expect(shelf.cardinality === 'one' ? typeof shelf.container?.resolve : undefined).toBe(
-      'function'
-    )
+    expect(typeof shelf.container?.resolve).toBe('function')
     expect(sent).toHaveLength(0)
   })
 
@@ -654,8 +665,7 @@ describe('bindReference', () => {
     }
 
     const bound = bindReference(client, sequels)
-    const entries = bound.cardinality === 'many' && bound.form === 'identity' ? bound.entries : []
-    const first = await entries[0]?.resolve()
+    const first = await bound.entries[0]?.resolve()
 
     expect(bound).toEqual(sequels)
     expect(first).toMatchObject({ isbn: DUNE_ISBN, title: 'Dune' })

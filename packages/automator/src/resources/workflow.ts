@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Workflow } from '../types.js'
 
@@ -23,8 +24,8 @@ export class WorkflowResourceClient {
   /**
    * List all workflows, as one page.
    */
-  async list(): Promise<{ items: Workflow[] }> {
-    return this.#http.rpc<{ items: Workflow[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Workflow>> {
+    return this.#http.rpc<Page<Workflow>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

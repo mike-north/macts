@@ -1401,7 +1401,10 @@ without a second constructor.
 bound entry is itself a resolvable single reference), and `list` for a
 collection. There is no exception. The contract's `resources` table already
 records both operations, so a reference value type reads them from its scope,
-and no further field is needed.
+and no further field is needed. A generated table lists only the resources
+that record `get` or `list`: no reference to any other resource is valid at
+any position or in any form, so a reference naming one is rejected as naming
+no resource the app can resolve references through.
 
 The rule is part of the wire schema, so one rule serves every boundary. A
 reference position's wire schema admits only resources with the operation the
@@ -1590,7 +1593,7 @@ reference's cardinality (`resolvingOperationKey`: `get` for a single object,
 `list` for a collection). A mismatch is an `UnexpectedValueError`, and
 references inside the result bind to the same client.
 
-**Caller-built references.** `@macts/sdk` and `@macts/sdk/local` export `bindReference(client, data)`, which binds reference data the caller built, or a reference bound to another client of the same app, to `client`. It encodes `data` with `t.reference` over the client's contract scope and decodes the result with that client's `DecodeContext`, so the result is indistinguishable from a reference the client decoded, and `resolve()` stays the only hydration API. Binding makes no call. It raises `ValidationError` for everything encoding rejects: a reference to another app, a malformed or other-form field, and a target, container or entry without its resolving operation. Whether the target exists is learned only at `resolve()`. It is a free function rather than a client member, because a client's members are the app's operations.
+**Caller-built references.** `@macts/sdk` and `@macts/sdk/local` export `bindReference(client, data)`, which binds reference data the caller built, or a reference bound to another client of the same app, to `client`. It encodes `data` with `t.reference` over the client's contract scope and decodes the result with that client's `DecodeContext`, so the result is indistinguishable from a reference the client decoded, and `resolve()` stays the only hydration API. Binding makes no call. It raises `ValidationError` for everything encoding rejects: a reference to another app, a malformed or other-form field, and a target, container or entry without its resolving operation. Its type admits only the contract's resolvable resource keys and returns the bound variant for that key, form and cardinality. Whether the target exists is learned only at `resolve()`. It is a free function rather than a client member, because a client's members are the app's operations.
 
 **Resolution.** Resolution is a runtime-level call,
 `MactsRuntime.resolveReference(app, reference, context)`, executed by the
@@ -1601,9 +1604,12 @@ operation, and a collection reference as its `list` operation. The runtime
 reads which operation that is from the registered contract, whose resource
 table records it (`ResourceDescriptor.get` and `.list`, chosen when the
 contract is generated); it never re-derives the choice from the manifest, so
-the contract stays the single source of truth. A resource that records no such
-operation is not resolvable, and its references fail with
-`InvalidSelectionError`. `registerContract` checks every recorded id when the
+the contract stays the single source of truth. A reference whose target
+resource is absent from the table, or records no resolving operation for the
+reference's cardinality, is invalid against the contract and fails with
+`ValidationError` at the reference's `resource`. `InvalidSelectionError` is
+reserved for an index or range the collection cannot satisfy, which only the
+app can tell. `registerContract` checks every recorded id when the
 app registers, before anything is added: it must name one of the contract's
 operations, and that operation must target the resource that records it.
 Otherwise the contract is inconsistent and must be regenerated, and
@@ -1618,8 +1624,9 @@ bypass policy:
    from its manifest alone has no resource table and is unknown here.
 3. The reference's `resource` (a key of the contract's resource table) and
    `cardinality` are read. They select the operation, as an operation id does
-   for `invoke`, so they are checked first, and a malformed one is a
-   `ValidationError`.
+   for `invoke`, so they are checked first. A malformed one, a resource absent
+   from the table, or one that records no resolving operation for the
+   cardinality is a `ValidationError` at the reference.
 4. The caller's key must hold the operation's permission. Only the target
    resource's permission is checked. Container traversal needs no container
    permission, because a container only locates the target and contributes no
@@ -1670,9 +1677,10 @@ is rejected wherever it appears, so no bound reference to it ever exists:
   is wrong.
   The runtime's check of the result against `output.wire` rejects it with
   `UnexpectedValueError` (step 8 above), and so does the client's decoding.
-- **Sent to the resolve route.** A target resource that records no resolving
-  operation fails with `InvalidSelectionError` when the operation is selected
-  (step 3 above). A container or entry whose resource has no `get` fails the
+- **Sent to the resolve route.** A target whose resource is absent from the
+  table, or records no resolving operation for the cardinality, fails with
+  `ValidationError` at the reference when the operation is selected (step 3
+  above). A container or entry whose resource has no `get` fails the
   reference validation with `ValidationError` (step 6 above).
 
 Ownership:
@@ -1722,8 +1730,9 @@ per-client-address limit, one budget per address across both namespaces.
 - **Framing.** A body that is not JSON, is not an object, lacks a string
   `app` or a `reference`, or has any other field is answered 400
   `VALIDATION_FAILED` before the runtime is called, as an unreadable RPC body
-  is (D6). Each missing, mistyped, or unknown field is one issue at its path. An unknown app and a
-  malformed reference are the runtime's `ValidationError`s.
+  is (D6). Each missing, mistyped, or unknown field is one issue at its path. An unknown app, a
+  malformed reference, and a target the contract cannot resolve are the
+  runtime's `ValidationError`s.
 - **Routing.** The route answers only `POST`. Any other method, and any other
   path under `/references/v1`, is a route miss (404 `NOT_FOUND`), as in the
   RPC namespace. The unauthenticated listings (`/api/v1` and

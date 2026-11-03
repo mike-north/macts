@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Project, ProjectCreateInput } from '../types.js'
 
@@ -23,8 +24,8 @@ export class ProjectResourceClient {
   /**
    * List all projects, as one page.
    */
-  async list(): Promise<{ items: Project[] }> {
-    return this.#http.rpc<{ items: Project[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Project>> {
+    return this.#http.rpc<Page<Project>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

@@ -39,6 +39,7 @@ import {
   type OperationId,
   type PermissionString,
   type ReferenceData,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -183,27 +184,53 @@ export interface LibraryClient {
   resolve(reference: ReferenceData, options?: CallOptions): Promise<unknown>
 }
 
+/**
+ * The type of the library resource table, declared as a generated contract
+ * declares one: each entry builds on `ResourceDescriptor` and narrows the
+ * identifier and the resolving operations it has to required literals.
+ * `Branch` records `get` but no `list`.
+ */
+export type LibraryResources = Readonly<{
+  Branch: ResourceDescriptor<Branch, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'library.branches.get'
+  }
+  Shelf: ResourceDescriptor<Shelf, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'library.shelves.get'
+    readonly list: 'library.shelves.list'
+  }
+  Book: ResourceDescriptor<Book, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'library.books.get'
+    readonly list: 'library.books.list'
+  }
+}>
+
+/** The library resource table, the implementation of {@link LibraryResources}. */
+const LIBRARY_RESOURCES = {
+  Branch: { name: 'Branch', record: BRANCH_RECORD, id: t.string(), get: 'library.branches.get' },
+  Shelf: {
+    name: 'Shelf',
+    record: SHELF_RECORD,
+    id: t.string(),
+    get: 'library.shelves.get',
+    list: 'library.shelves.list',
+  },
+  Book: {
+    name: 'Book',
+    record: BOOK_RECORD,
+    id: t.string(),
+    get: 'library.books.get',
+    list: 'library.books.list',
+  },
+} satisfies LibraryResources
+
 /** A hand-built contract for {@link LIBRARY_MANIFEST}, standing in for a generated one. */
-export const libraryContract: AppContract<LibraryClient> = {
+export const libraryContract: AppContract<LibraryClient, LibraryResources> = {
   app: 'library',
   operations: Object.fromEntries(LIBRARY_OPERATIONS.map((op) => [op.id, op])),
-  resources: {
-    Branch: { name: 'Branch', record: BRANCH_RECORD, id: t.string(), get: 'library.branches.get' },
-    Shelf: {
-      name: 'Shelf',
-      record: SHELF_RECORD,
-      id: t.string(),
-      get: 'library.shelves.get',
-      list: 'library.shelves.list',
-    },
-    Book: {
-      name: 'Book',
-      record: BOOK_RECORD,
-      id: t.string(),
-      get: 'library.books.get',
-      list: 'library.books.list',
-    },
-  },
+  resources: LIBRARY_RESOURCES,
   loadManifest: () => Promise.resolve(LIBRARY_MANIFEST),
   bind(runtime: ClientRuntime): LibraryClient {
     return {

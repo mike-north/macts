@@ -211,7 +211,7 @@ describe('generateHttpClientSdk', () => {
     // Check CRUD methods (named by operation, routed by command KEY)
     // Item has a primary identifier, so its list pages and returns one page.
     expect(content).toContain(
-      'async list(page: { pageSize?: number; cursor?: string } = {}): Promise<{ items: Item[]; nextCursor?: string }>'
+      'async list(page: { pageSize?: number; cursor?: string } = {}): Promise<Page<Item>>'
     )
     expect(content).toContain('async get(id: string): Promise<Item>')
     expect(content).toContain('async create(input: ItemCreateInput): Promise<Item>')
@@ -228,6 +228,29 @@ describe('generateHttpClientSdk', () => {
     // Check custom command method, routed by its key (`show`).
     expect(content).toContain('async show(id: string)')
     expect(content).toContain('${this.#app}.${this.#resource}.show`')
+  })
+
+  it('returns the page type of @macts/contracts from a list, never an inline copy', () => {
+    const result = generateHttpClientSdk(testManifest, { packageName: '@macts/sdk-testapp' })
+    const content = findFile(result.files, 'src/resources/item.ts').content
+    expect(content).toContain("import type { Page } from '@macts/contracts';\n")
+    expect(content).toContain('return this.#http.rpc<Page<Item>>(')
+    expect(content).not.toContain('items:')
+  })
+
+  it('imports the page type under an alias when the manifest declares a type named Page', () => {
+    const manifest: AppManifest = {
+      ...testManifest,
+      enums: { ...testManifest.enums, Page: { name: 'Page', values: [{ name: 'a', value: 'a' }] } },
+    }
+    const content = findFile(
+      generateHttpClientSdk(manifest, { packageName: '@macts/sdk-testapp' }).files,
+      'src/resources/item.ts'
+    ).content
+    expect(content).toContain("import type { Page as MactsPage } from '@macts/contracts';\n")
+    expect(content).toContain(
+      'async list(page: { pageSize?: number; cursor?: string } = {}): Promise<MactsPage<Item>>'
+    )
   })
 
   it('sends the page size in its integer wire form and the cursor as given, before the scope', () => {
@@ -251,7 +274,7 @@ describe('generateHttpClientSdk', () => {
       generateHttpClientSdk(manifest, { packageName: '@macts/sdk-testapp' }).files,
       'src/resources/item.ts'
     ).content
-    expect(content).toContain('async list(): Promise<{ items: Item[] }>')
+    expect(content).toContain('async list(): Promise<Page<Item>>')
   })
 
   it('omits CRUD methods with no backing manifest command', () => {
@@ -274,11 +297,33 @@ describe('generateHttpClientSdk', () => {
     const content = findFile(result.files, 'src/resources/item.ts').content
     // Item has a primary identifier, so its list pages and returns one page.
     expect(content).toContain(
-      'async list(page: { pageSize?: number; cursor?: string } = {}): Promise<{ items: Item[]; nextCursor?: string }>'
+      'async list(page: { pageSize?: number; cursor?: string } = {}): Promise<Page<Item>>'
     )
     expect(content).not.toContain('async create(')
     expect(content).not.toContain('async get(')
     expect(content).not.toContain('async delete(')
+  })
+
+  it('imports no page type for a resource without a list', () => {
+    const manifestNoList: AppManifest = {
+      ...testManifest,
+      commands: {
+        getItem: {
+          name: 'get',
+          description: 'Get an item',
+          scope: 'resource',
+          resourceType: 'Item',
+          parameters: [{ name: 'id', type: 'string', required: true, description: 'Item id' }],
+          permission: 'testapp:items:get',
+        },
+      },
+    }
+    const content = findFile(
+      generateHttpClientSdk(manifestNoList, { packageName: '@macts/sdk-testapp' }).files,
+      'src/resources/item.ts'
+    ).content
+    expect(content).toContain('async get(')
+    expect(content).not.toContain('@macts/contracts')
   })
 
   it('omits resources that declare no operations', () => {
@@ -367,7 +412,7 @@ describe('generateHttpClientSdk', () => {
     const result = generateHttpClientSdk(manifestWithParent, { packageName: '@macts/sdk-testapp' })
     const items = findFile(result.files, 'src/resources/item.ts').content
     expect(items).toContain(
-      'async list(boxId: string, page: { pageSize?: number; cursor?: string } = {}): Promise<{ items: Item[]; nextCursor?: string }>'
+      'async list(boxId: string, page: { pageSize?: number; cursor?: string } = {}): Promise<Page<Item>>'
     )
     expect(items).toContain('List the items of one box, one page at a time.')
     expect(items).not.toContain('List all items.')
@@ -412,6 +457,8 @@ describe('generateHttpClientSdk', () => {
     expect(pkg.name).toBe('@macts/sdk-testapp')
     expect(pkg.version).toBe('2.0.0')
     expect(pkg.dependencies).toHaveProperty('zod')
+    // Resource clients import the contract's page type.
+    expect(pkg.dependencies['@macts/contracts']).toBe('workspace:*')
     expect(pkg.keywords).toEqual(['macts-sdk'])
     expect(pkg.scripts['api-extractor']).toBe('api-extractor run --local')
     expect(pkg.scripts['api-extractor:ci']).toBe('api-extractor run')

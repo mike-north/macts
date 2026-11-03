@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { SettingsSet } from '../types.js'
 
@@ -23,8 +24,8 @@ export class SettingsSetResourceClient {
   /**
    * List all settings sets, as one page.
    */
-  async list(): Promise<{ items: SettingsSet[] }> {
-    return this.#http.rpc<{ items: SettingsSet[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<SettingsSet>> {
+    return this.#http.rpc<Page<SettingsSet>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

@@ -33,7 +33,9 @@ import {
   TransportError,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type OperationId,
+  type ResourceTable,
 } from '@macts/contracts'
 import { createCodecClient, type ClientTransport } from './codec-runtime.js'
 
@@ -172,14 +174,15 @@ function mentionsSecret(value: unknown, secret: string): boolean {
  *
  * @param app - The app's generated contract.
  * @param options - The token, the service root, and an optional `fetch`.
- * @returns The app's client.
+ * @returns The app's client. Its type also carries the contract's resource
+ *   table, which `bindReference` reads; the client has no member for it.
  * @throws `TypeError` when `url` is not an absolute URL or `token` contains
  *   characters that cannot be sent in a header.
  */
-export function createClient<Client>(
-  app: AppContract<Client>,
+export function createClient<Client, Resources extends ResourceTable>(
+  app: AppContract<Client, Resources>,
   options: RemoteClientOptions
-): Client {
+): Client & ClientBrand<Resources> {
   const { token } = options
   if (!HEADER_SAFE_TOKEN.test(token)) {
     throw new TypeError('The token contains characters that cannot be sent in a request header.')
