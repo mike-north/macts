@@ -5,9 +5,8 @@
  * one query per request. Two parties share it and nothing else touches it:
  *
  * - the validator, which reads it and fills it after a store lookup;
- * - the key store, which invalidates a key's entry whenever it changes or
- *   removes that key's record, and clears every entry when it replaces the
- *   whole key set or closes.
+ * - the key store, which invalidates a key's entry whenever it revokes or
+ *   removes that key's record, and clears every entry when it closes.
  *
  * So a revocation or deletion made in this process is seen by the very next
  * validation in this process. A change made by another process (the CLI

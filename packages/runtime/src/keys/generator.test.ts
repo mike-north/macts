@@ -137,6 +137,33 @@ describe('createApiKey', () => {
     })
   })
 
+  /**
+   * Regression: the stored record took the caller's permissions array and name
+   * by reference after awaiting the signing secret, so a caller that changed
+   * its options during that await stored a request different from the one
+   * validated, expanded and signed.
+   */
+  it('stores the request as it was when createApiKey was called, even if the caller changes it during signing', async () => {
+    const permissions = ['calendar:events:read']
+    const options = { name: 'Snapshot Key', permissions }
+    vi.mocked(storage.getSigningSecret).mockImplementationOnce(() => {
+      permissions.splice(0, permissions.length, 'calendar:*:*')
+      options.name = 'Changed'
+      return Promise.resolve('test-secret-key-for-testing')
+    })
+
+    const result = await createApiKey(options, testPermissions)
+
+    const expected = expect.objectContaining({
+      name: 'Snapshot Key',
+      // testPermissions groups calendar:events:read as list and get.
+      permissions: ['calendar:events:list', 'calendar:events:get'],
+      originalPermissions: ['calendar:events:read'],
+    }) as unknown
+    expect(storage.addKeyMetadata).toHaveBeenCalledWith(expected)
+    expect(result.metadata).toEqual(expected)
+  })
+
   describe('without permissions section', () => {
     it('should keep permissions as-is without mapping', async () => {
       const result = await createApiKeySimple({
