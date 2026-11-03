@@ -28,6 +28,15 @@
  * }
  * ```
  *
+ * ## References
+ *
+ * A reference in a result is bound to the client that decoded it, and its
+ * `resolve()` hydrates it through that client. `bindReference(client, data)`
+ * binds a reference the caller built (an identifier or a selector), or one
+ * bound to another client of the same app, to `client` in the same way,
+ * without making a call. Both entry points export it, and it accepts clients
+ * from either.
+ *
  * ## Environment variables
  *
  * | Variable | Required | Description |
@@ -49,4 +58,5 @@
 
 export * from '@macts/contracts'
 export { createClient, type RemoteClientOptions } from './remote.js'
+export { bindReference } from './codec-runtime.js'
 export { resolveApiKey, resolveBaseUrl, resolveClientOptions, DEFAULT_BASE_URL } from './resolve.js'

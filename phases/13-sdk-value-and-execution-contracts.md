@@ -1402,14 +1402,35 @@ them, via `DecodeContext.bindReference`. The binder receives decoded
 contract at every level, ids decoded through the resource table, selector
 positions as `Integer`, and containers as nested data. It
 never receives wire encodings. Each bound reference type is its data form
-plus `Resolvable`, so a bound reference is itself valid encode input. A
-remote `resolve()` sends the reference by re-encoding its data through the
-same value type, which yields the canonical wire form. It never replays the
-wire it received. A binder keeps its client state in `#private` fields, non-enumerable
+plus `Resolvable`, so a bound reference is itself valid encode input. A binder keeps its client state in `#private` fields, non-enumerable
 properties, or prototype members. Under the encode strictness rule (D8), an
 own enumerable data property that is not a declared field would make the
 reference fail to encode. Hydration therefore follows the factory, with no separate
 API.
+
+`resolve()` on a bound reference, container, or entry calls
+`ClientRuntime.resolve(reference, options)` of the client that decoded it.
+That member sends the reference by re-encoding its data through the app's
+reference value type, which yields the canonical wire form. It never replays
+the wire it received. A reference that fails encoding, including one whose
+`app` is another app's at any level, is a `ValidationError` before anything is
+sent. Each client sends the wire form where its operations run:
+
+- The **remote** client posts `{ app, reference }` to
+  `POST /references/v1/resolve` (the remote route below), with the same
+  bearer credential, abort handling, and error-envelope decoding as its RPC
+  calls.
+- The **local** client calls its runtime's
+  `resolveReference(app, reference, context)`, with the same
+  `InvocationContext` it builds for `invoke`.
+
+The client decodes the result with the output contract of the operation the
+reference resolves as: the one its contract's resource table records for the
+reference's cardinality (`resolvingOperationKey`: `get` for a single object,
+`list` for a collection). A mismatch is an `UnexpectedValueError`, and
+references inside the result bind to the same client.
+
+**Caller-built references.** `@macts/sdk` and `@macts/sdk/local` export `bindReference(client, data)`, which binds reference data the caller built, or a reference bound to another client of the same app, to `client`. It encodes `data` with `t.reference` over the client's contract scope and decodes the result with that client's `DecodeContext`, so the result is indistinguishable from a reference the client decoded, and `resolve()` stays the only hydration API. Binding makes no call. It raises `ValidationError` for everything encoding rejects: a reference to another app, a malformed or other-form field, and a target, container or entry without its resolving operation. Whether the target exists is learned only at `resolve()`. It is a free function rather than a client member, because a client's members are the app's operations.
 
 **Resolution.** Resolution is a runtime-level call,
 `MactsRuntime.resolveReference(app, reference, context)`, executed by the

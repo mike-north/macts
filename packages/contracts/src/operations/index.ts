@@ -16,6 +16,7 @@
  */
 
 import type { CallOptions } from '../call-options.js'
+import type { ReferenceData } from '../references/index.js'
 import type { ValueType } from '../values/value-type.js'
 
 /**
@@ -147,9 +148,13 @@ export interface ResourceDescriptor<RecordType, Id = unknown> {
  * The capability a client factory hands to a generated contract.
  *
  * @remarks
- * Local and remote factories each implement this. `invoke` encodes the input,
- * runs the operation under the client's credential, and decodes the result,
- * throwing canonical structured errors on failure.
+ * Local and remote factories each implement this, and references a client
+ * decodes are bound to it. Both members run under the client's credential and
+ * throw canonical structured errors on failure:
+ *
+ * - `invoke` encodes the input, runs the operation, and decodes the result;
+ * - `resolve` encodes a reference, resolves it where the client's operations
+ *   run, and decodes the result.
  */
 export interface ClientRuntime {
   /** Run one operation and return its SDK result. */
@@ -158,6 +163,31 @@ export interface ClientRuntime {
     input: Input,
     options?: CallOptions
   ): Promise<Output>
+  /**
+   * Resolve one reference of the client's app and return its SDK result.
+   *
+   * @remarks
+   * The reference is re-encoded from its data fields through the app's
+   * reference value type, so what is sent is always the canonical wire form
+   * (phases/13 D7). A reference that fails encoding, including one whose `app`
+   * is not the client's app at any level, raises `ValidationError` before
+   * anything is sent.
+   *
+   * The reference resolves as the operation its resource records for its
+   * cardinality (`get` for a single object, `list` for a collection; see
+   * `resolvingOperationKey`), under that operation's permission and policy,
+   * and the result is decoded with that operation's output contract: the
+   * record for a single reference, an array of records (possibly empty) for a
+   * collection. A result that violates the contract raises
+   * `UnexpectedValueError`, and references inside the result are bound to the
+   * same client.
+   *
+   * @param reference - The reference's data: a bound reference or one built by
+   *   hand.
+   * @param options - Per-call options, such as an abort signal.
+   * @returns The resolved SDK value.
+   */
+  resolve(reference: ReferenceData, options?: CallOptions): Promise<unknown>
 }
 
 /**

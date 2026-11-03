@@ -498,6 +498,28 @@ export interface ReferenceScope {
 }
 
 /**
+ * The field of a resource's table entry ({@link ReferenceRegistry}, and so
+ * `ResourceDescriptor`) that names the operation a reference of
+ * `cardinality` resolves as: `get` for a single object, `list` for a
+ * collection.
+ *
+ * @remarks
+ * This is the one statement of which operation resolves a reference. Every
+ * resolvable object is a reference of one of the two cardinalities: a
+ * container and an identity-collection entry are single-object references, so
+ * they resolve through `get` like any other. Reference value types use it to
+ * admit only resolvable references, the runtime to pick the operation a
+ * resolution runs as, and clients to pick the output contract a resolution's
+ * result is decoded with.
+ *
+ * @param cardinality - The cardinality of the reference being resolved.
+ * @returns `'get'` for `'one'`, `'list'` for `'many'`.
+ */
+export function resolvingOperationKey(cardinality: ReferenceCardinality): 'get' | 'list' {
+  return cardinality === 'one' ? 'get' : 'list'
+}
+
+/**
  * A materialized collection: an array whose reference entries are already
  * decided.
  *

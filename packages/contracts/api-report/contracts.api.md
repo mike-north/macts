@@ -104,6 +104,7 @@ export type ClientFactory<Options> = <Client>(app: AppContract<Client>, options:
 // @public
 export interface ClientRuntime {
     invoke<Input, Output>(operation: OperationDescriptor<Input, Output>, input: Input, options?: CallOptions): Promise<Output>;
+    resolve(reference: ReferenceData, options?: CallOptions): Promise<unknown>;
 }
 
 // @public
@@ -691,6 +692,9 @@ export type ReferenceWire = {
 export interface Resolvable<Result> {
     resolve(options?: CallOptions): Promise<Result>;
 }
+
+// @public
+export function resolvingOperationKey(cardinality: ReferenceCardinality): 'get' | 'list';
 
 // @public
 export interface ResourceDescriptor<RecordType, Id = unknown> {

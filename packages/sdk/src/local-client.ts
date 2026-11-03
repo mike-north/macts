@@ -7,6 +7,11 @@
  * validate the input, execute. There is no local shortcut; a local call
  * presents its token and is governed exactly as a remote one is (phases/13 D5).
  *
+ * Resolving a reference the client decoded goes through the same runtime, as
+ * `resolveReference` with the same invocation context an operation call gets,
+ * so it is governed as the resource's `get` or `list` operation (phases/13
+ * D7).
+ *
  * The app is registered with the runtime on the first call, not at
  * construction: the manifest is loaded from the contract, validated, and
  * checked against every descriptor, so a contract whose permissions or targets
@@ -20,8 +25,7 @@ import {
   InternalError,
   type AppContract,
   type CallOptions,
-  type OperationId,
-  type WireValue,
+  type InvocationContext,
 } from '@macts/contracts'
 import {
   createBearerCredential,
@@ -29,7 +33,7 @@ import {
   loadHostGovernance,
   type GovernanceContext,
 } from '@macts/runtime'
-import { createCodecClientRuntime } from './codec-runtime.js'
+import { createCodecClient, type ClientTransport } from './codec-runtime.js'
 
 /** Options for a client that runs operations on this Mac. */
 export interface LocalClientOptions {
@@ -108,11 +112,11 @@ export function createClient<Client>(
     }
   }
 
-  async function transport(
-    operation: OperationId,
-    input: WireValue,
-    callOptions: CallOptions | undefined
-  ): Promise<WireValue> {
+  /**
+   * Register the app on first use, and reject every call once registration
+   * has failed.
+   */
+  async function ready(): Promise<void> {
     setup ??= register()
     const registered = await setup
     if (!registered.ok) {
@@ -122,12 +126,24 @@ export function createClient<Client>(
         { cause: registered.cause }
       )
     }
-    const signal = callOptions?.signal
-    return runtime.invoke(operation, input, {
-      credential,
-      ...(signal === undefined ? {} : { signal }),
-    })
   }
 
-  return app.bind(createCodecClientRuntime(transport))
+  /** The invocation context of one call: the client's credential and the call's signal. */
+  function invocationContext(callOptions: CallOptions | undefined): InvocationContext {
+    const signal = callOptions?.signal
+    return { credential, ...(signal === undefined ? {} : { signal }) }
+  }
+
+  const transport: ClientTransport = {
+    async invoke(operation, input, callOptions) {
+      await ready()
+      return runtime.invoke(operation, input, invocationContext(callOptions))
+    },
+    async resolve(reference, callOptions) {
+      await ready()
+      return runtime.resolveReference(app.app, reference, invocationContext(callOptions))
+    },
+  }
+
+  return createCodecClient(app, transport)
 }

@@ -65,15 +65,16 @@
 
 import { z, type ZodType } from 'zod'
 import type { IssuePath } from '../issues.js'
-import type {
-  CollectionReferenceVariant,
-  ObjectReferenceVariant,
-  ReferenceCardinality,
-  ReferenceData,
-  ReferenceForm,
-  ReferenceRegistry,
-  ReferenceScope,
-  ReferenceWire,
+import {
+  resolvingOperationKey,
+  type CollectionReferenceVariant,
+  type ObjectReferenceVariant,
+  type ReferenceCardinality,
+  type ReferenceData,
+  type ReferenceForm,
+  type ReferenceRegistry,
+  type ReferenceScope,
+  type ReferenceWire,
 } from '../references/index.js'
 import {
   INVALID,
@@ -484,17 +485,17 @@ function readHeader<Id, Pos, Tag>(
 
 /**
  * The operation that resolves an object at `role` with `cardinality`: every
- * resolvable object has one. A single-object reference, a container, and an
- * identity-collection entry (itself a resolvable single reference) resolve
- * through the resource's `get`; a collection resolves through its `list`.
+ * resolvable object has one. A container and an identity-collection entry are
+ * themselves resolvable single references, so they resolve through the
+ * resource's `get`; a position's own reference resolves by its cardinality,
+ * as {@link resolvingOperationKey} states.
  *
- * This is the one statement of the rule. The walker checks it in both
- * directions, and the wire and SDK schemas admit only the resources it
- * allows, so the codecs and the schemas (and the JSON Schemas derived from
- * them) cannot disagree about it.
+ * The walker checks it in both directions, and the wire and SDK schemas admit
+ * only the resources it allows, so the codecs and the schemas (and the JSON
+ * Schemas derived from them) cannot disagree about it.
  */
 function resolvingOperation(role: Want['role'], cardinality: ReferenceCardinality): 'get' | 'list' {
-  return role === 'reference' && cardinality === 'many' ? 'list' : 'get'
+  return resolvingOperationKey(role === 'reference' ? cardinality : 'one')
 }
 
 /** Whether a resource with table entry `entry` can be resolved at `role`; see {@link resolvingOperation}. */
