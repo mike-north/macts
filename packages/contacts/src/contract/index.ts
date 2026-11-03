@@ -1192,22 +1192,23 @@ const phoneRecordType: ValueType<Phone> = t.record(
  * The type of the resource table of {@link contactsContract}: every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
- * references to it, and, for a resource the app finds only within another,
- * that parent resource. A client created from the contract carries it, so
- * `bindReference` admits only references the contract can resolve.
+ * references to it, and, for each of those operations that finds the
+ * resource only within another resource, that parent. A client created from
+ * the contract carries it, so `bindReference` admits only references the
+ * contract can resolve.
  */
 export type ContactsResources = Readonly<{
   Address: ResourceDescriptor<Address, string> & {
     readonly id: ValueType<string>
     readonly get: 'contacts.addresses.get'
     readonly list: 'contacts.addresses.list'
-    readonly parent: 'Person'
+    readonly parents: { readonly get: 'Person'; readonly list: 'Person' }
   }
   Email: ResourceDescriptor<Email, string> & {
     readonly id: ValueType<string>
     readonly get: 'contacts.emails.get'
     readonly list: 'contacts.emails.list'
-    readonly parent: 'Person'
+    readonly parents: { readonly get: 'Person'; readonly list: 'Person' }
   }
   Group: ResourceDescriptor<Group, string> & {
     readonly id: ValueType<string>
@@ -1223,7 +1224,7 @@ export type ContactsResources = Readonly<{
     readonly id: ValueType<string>
     readonly get: 'contacts.phones.get'
     readonly list: 'contacts.phones.list'
-    readonly parent: 'Person'
+    readonly parents: { readonly get: 'Person'; readonly list: 'Person' }
   }
 }>
 
@@ -1242,7 +1243,7 @@ const resources = {
     id: t.string({ description: 'unique identifier for this address.' }),
     get: 'contacts.addresses.get',
     list: 'contacts.addresses.list',
-    parent: 'Person',
+    parents: { get: 'Person', list: 'Person' },
   },
   Email: {
     name: 'Email',
@@ -1250,7 +1251,7 @@ const resources = {
     id: t.string({ description: 'Unique identifier for this email' }),
     get: 'contacts.emails.get',
     list: 'contacts.emails.list',
-    parent: 'Person',
+    parents: { get: 'Person', list: 'Person' },
   },
   Group: {
     name: 'Group',
@@ -1272,7 +1273,7 @@ const resources = {
     id: t.string({ description: 'Unique identifier for this phone' }),
     get: 'contacts.phones.get',
     list: 'contacts.phones.list',
-    parent: 'Person',
+    parents: { get: 'Person', list: 'Person' },
   },
 } satisfies ContactsResources
 

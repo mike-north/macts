@@ -101,13 +101,19 @@ export type ContactsResources = Readonly<{
         readonly id: ValueType<string>;
         readonly get: 'contacts.addresses.get';
         readonly list: 'contacts.addresses.list';
-        readonly parent: 'Person';
+        readonly parents: {
+            readonly get: 'Person';
+            readonly list: 'Person';
+        };
     };
     Email: ResourceDescriptor<Email, string> & {
         readonly id: ValueType<string>;
         readonly get: 'contacts.emails.get';
         readonly list: 'contacts.emails.list';
-        readonly parent: 'Person';
+        readonly parents: {
+            readonly get: 'Person';
+            readonly list: 'Person';
+        };
     };
     Group: ResourceDescriptor<Group, string> & {
         readonly id: ValueType<string>;
@@ -123,7 +129,10 @@ export type ContactsResources = Readonly<{
         readonly id: ValueType<string>;
         readonly get: 'contacts.phones.get';
         readonly list: 'contacts.phones.list';
-        readonly parent: 'Person';
+        readonly parents: {
+            readonly get: 'Person';
+            readonly list: 'Person';
+        };
     };
 }>;
 

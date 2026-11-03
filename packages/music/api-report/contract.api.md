@@ -328,7 +328,10 @@ export type MusicResources = Readonly<{
         readonly id: ValueType<string>;
         readonly get: 'music.tracks.get';
         readonly list: 'music.tracks.list';
-        readonly parent: 'Playlist';
+        readonly parents: {
+            readonly get: 'Playlist';
+            readonly list: 'Playlist';
+        };
     };
 }>;
 

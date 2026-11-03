@@ -1,20 +1,21 @@
 /**
- * Integration: every shipped contract's resource table names the parent of
- * each resource the app finds only within another, and that parent can stand
- * as the container a reference to it needs.
+ * Integration: every shipped contract's resource table names, for each route
+ * that resolves references to a resource, the parent that route's command
+ * finds the resource's objects within, and that parent can stand as the
+ * container a reference resolved through the route needs.
  *
- * A resource is parent-scoped when the manifest command behind the `get` its
- * table entry records has a `parent` (D10, command parents). Its entry must
- * then name the same `parent`, and that parent must be in the table with a
- * `get` and an identifier, since the container is an identity reference
- * resolved through that `get` (phases/13 D7, "Resolvable targets"). An entry
- * of a resource found at the application names none.
+ * A route records a parent when the manifest command behind the `get` or
+ * `list` its table entry records has a `parent` (D10, command parents). The
+ * entry's `parents` must then name the same resource under the same route,
+ * and that parent must be in the table with a `get` and an identifier, since
+ * the container is an identity reference resolved through that `get`
+ * (phases/13 D7, "Parent-scoped targets"). An entry whose routes record no
+ * parent has no `parents`.
  *
  * Each contract is read at its app package's `/contract` subpath, and each
  * manifest from `manifests/<app>/app.yaml`; the parent is read from the
- * manifest command independently of the generator. The parent-scoped
- * resources are pinned by hand, so a resource gaining or losing a parent is
- * reviewed.
+ * manifest command independently of the generator. The parents are pinned by
+ * hand, per route, so a route gaining or losing a parent is reviewed.
  *
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md §D7
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md §D10
@@ -29,31 +30,56 @@ beforeAll(async () => {
   apps = await loadRealApps()
 })
 
-/** The parent the manifest records on the command behind a resource's recorded `get`. */
-function manifestParent({ manifest, contract }: RealApp, resource: string): string | undefined {
-  const get = contract.resources[resource]?.get
-  if (get === undefined) return undefined
-  const operation = contract.operations[get]
-  if (operation === undefined) throw new Error(`${contract.app}: ${get} is not an operation`)
+const ROUTES = ['get', 'list'] as const
+
+/** The parent the manifest records on the command behind a resource's recorded `route`. */
+function manifestParent(
+  { manifest, contract }: RealApp,
+  resource: string,
+  route: (typeof ROUTES)[number]
+): string | undefined {
+  const id = contract.resources[resource]?.[route]
+  if (id === undefined) return undefined
+  const operation = contract.operations[id]
+  if (operation === undefined) throw new Error(`${contract.app}: ${id} is not an operation`)
   return manifest.commands[operation.target.command]?.parent?.resource
 }
 
-describe('parent-scoped resources in every real contract', () => {
+/** Every `[app, resource, route, parent]` the tables record. */
+function tableParents(): [RealApp, string, (typeof ROUTES)[number], string][] {
+  return apps.flatMap((app) =>
+    Object.entries(app.contract.resources).flatMap(([resource, { parents }]) =>
+      ROUTES.flatMap((route): [RealApp, string, (typeof ROUTES)[number], string][] => {
+        const parent = parents?.[route]
+        return parent === undefined ? [] : [[app, resource, route, parent]]
+      })
+    )
+  )
+}
+
+describe('the parents of resolving routes in every real contract', () => {
   it('loads every app', () => {
     // Guards against a vacuous pass if the manifests directory moves.
     expect(apps.length).toBe(APP_NAMES.length)
     expect(apps.length).toBeGreaterThan(30)
   })
 
-  it('name in the table exactly the parent the get records', () => {
+  it('name in the table, per route, exactly the parent its command records', () => {
     const mismatched: string[] = []
     for (const app of apps) {
-      for (const [resource, descriptor] of Object.entries(app.contract.resources)) {
-        const expected = manifestParent(app, resource)
-        if (descriptor.parent !== expected) {
-          mismatched.push(
-            `${app.name} ${resource}: table ${String(descriptor.parent)}, get ${String(expected)}`
-          )
+      for (const [resource, { parents }] of Object.entries(app.contract.resources)) {
+        // An empty `parents` is never emitted: absent means neither route records one.
+        if (parents !== undefined && Object.keys(parents).length === 0) {
+          mismatched.push(`${app.name} ${resource}: empty parents`)
+        }
+        for (const route of ROUTES) {
+          const expected = manifestParent(app, resource, route)
+          const recorded = parents?.[route]
+          if (recorded !== expected) {
+            mismatched.push(
+              `${app.name} ${resource} ${route}: table ${String(recorded)}, command ${String(expected)}`
+            )
+          }
         }
       }
     }
@@ -61,35 +87,57 @@ describe('parent-scoped resources in every real contract', () => {
   })
 
   it('name only parents a reference can name by identifier and resolve', () => {
-    const unusable: string[] = []
-    for (const app of apps) {
-      for (const [resource, { parent }] of Object.entries(app.contract.resources)) {
-        if (parent === undefined) continue
-        const entry = app.contract.resources[parent]
-        if (entry?.get === undefined || entry.id === undefined) {
-          unusable.push(`${app.name} ${resource} → ${parent}`)
-        }
-      }
-    }
+    const unusable = tableParents().flatMap(([app, resource, route, parent]) => {
+      const entry = app.contract.resources[parent]
+      return entry?.get === undefined || entry.id === undefined
+        ? [`${app.name} ${resource} ${route} → ${parent}`]
+        : []
+    })
     expect(unusable).toEqual([])
   })
 
-  it('are exactly the hand-audited parent-scoped resources', () => {
-    // Audited by hand against the manifests: each resource's get command
-    // records the parent (calendar `getEvent`; contacts `getAddress`,
-    // `getEmail` and `getPhone`; music `getTrack`).
-    const found = apps.flatMap((app) =>
-      Object.entries(app.contract.resources).flatMap(([resource, { parent }]) =>
-        parent === undefined ? [] : [`${app.name} ${resource} → ${parent}`]
-      )
+  it('are exactly the hand-audited parents, by route', () => {
+    // Audited by hand against the manifests. Both routes record the parent
+    // for calendar `getEvent`/`listEvents`; contacts `getAddress`/
+    // `listAddresses`, `getEmail`/`listEmails` and `getPhone`/`listPhones`;
+    // music `getTrack`/`listTracks`. Only the list records one for the rest;
+    // their gets work at the application (Edge, OmniGraffle and Xcode await
+    // #173), and Automator's settings and required resources have no get.
+    const found = tableParents().map(
+      ([app, resource, route, parent]) => `${app.name} ${resource} ${route} → ${parent}`
     )
+    /** `[app, resource, parent]`, pinned once per route that records the parent. */
+    type Pin = readonly [string, string, string]
+    const both: Pin[] = [
+      ['calendar', 'Event', 'Calendar'],
+      ['contacts', 'Address', 'Person'],
+      ['contacts', 'Email', 'Person'],
+      ['contacts', 'Phone', 'Person'],
+      ['music', 'Track', 'Playlist'],
+    ]
+    const listOnly: Pin[] = [
+      ['automator', 'AutomatorAction', 'Workflow'],
+      ['automator', 'Variable', 'Workflow'],
+      ['automator', 'Setting', 'AutomatorAction'],
+      ['automator', 'RequiredResource', 'AutomatorAction'],
+      ['microsoft-edge', 'Tab', 'Window'],
+      ['microsoft-edge', 'BookmarkItem', 'BookmarkFolder'],
+      ['omnigraffle', 'Graphic', 'Canvas'],
+      ['omnigraffle', 'Shape', 'Canvas'],
+      ['omnigraffle', 'Line', 'Canvas'],
+      ['omnigraffle', 'Layer', 'Canvas'],
+      ['reminders', 'Reminder', 'List'],
+      ['xcode', 'Project', 'WorkspaceDocument'],
+      ['xcode', 'Scheme', 'WorkspaceDocument'],
+      ['xcode', 'RunDestination', 'WorkspaceDocument'],
+    ]
+    expect(both.length + listOnly.length).toBe(19)
+    const byRoute = ([app, resource, parent]: Pin, routes: readonly string[]) =>
+      routes.map((route) => `${app} ${resource} ${route} → ${parent}`)
     expect(found.sort()).toEqual(
       [
-        'calendar Event → Calendar',
-        'contacts Address → Person',
-        'contacts Email → Person',
-        'contacts Phone → Person',
-        'music Track → Playlist',
+        ...both.flatMap((pin) => byRoute(pin, ROUTES)),
+        ...listOnly.flatMap((pin) => byRoute(pin, ['list'])),
       ].sort()
     )
   })

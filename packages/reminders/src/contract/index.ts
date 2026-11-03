@@ -388,9 +388,10 @@ const reminderCreateInputType: ValueType<ReminderCreateInput> = t.record({
  * The type of the resource table of {@link remindersContract}: every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
- * references to it, and, for a resource the app finds only within another,
- * that parent resource. A client created from the contract carries it, so
- * `bindReference` admits only references the contract can resolve.
+ * references to it, and, for each of those operations that finds the
+ * resource only within another resource, that parent. A client created from
+ * the contract carries it, so `bindReference` admits only references the
+ * contract can resolve.
  */
 export type RemindersResources = Readonly<{
   Account: ResourceDescriptor<Account, string> & {
@@ -406,6 +407,7 @@ export type RemindersResources = Readonly<{
     readonly id: ValueType<string>
     readonly get: 'reminders.reminders.get'
     readonly list: 'reminders.reminders.list'
+    readonly parents: { readonly list: 'List' }
   }
 }>
 
@@ -437,6 +439,7 @@ const resources = {
     id: t.string({ description: 'The unique identifier of the reminder' }),
     get: 'reminders.reminders.get',
     list: 'reminders.reminders.list',
+    parents: { list: 'List' },
   },
 } satisfies RemindersResources
 
