@@ -14,7 +14,18 @@
  *   {@link NativeCodecFunctions.literals} so tests can hold them equal to the
  *   exported contract constants.
  * - **Host-neutral.** It uses only language built-ins: no `globalThis`,
- *   `console`, `ObjC`, `$`, `require`, or other host objects.
+ *   `console`, `ObjC`, `$`, `require`, or other host objects. The only host
+ *   objects it touches are the ones it is given: the application in its
+ *   environment, and app objects at reference positions, whose members it
+ *   calls to address an object and to read its identifier.
+ * - **Nothing reaches the app before the input converted.** Decoding runs in
+ *   two phases. The first converts the whole input without reading or calling
+ *   any member of the application: every validation failure and every
+ *   unsupported-kind failure happens there, and a reference it can convert
+ *   becomes a pending address. Only the second phase uses the application, to
+ *   find each pending address's object and check that it exists. So a value
+ *   that cannot convert fails before the app receives anything, wherever it
+ *   sits in the input.
  * - **Transpile-stable.** It avoids syntax that a build step could lower into
  *   calls to injected helpers (object spread, class fields, `async`,
  *   generators, decorators). The built-module test guards this.
@@ -26,6 +37,7 @@
  */
 
 import type { FieldPlan, IssuePath, ValuePlan } from '@macts/contracts'
+import type { NativeAddressing, NativeCodecEnvironment } from './native-codec.js'
 
 /** Which conversion a codec failure happened in. */
 export type NativeCodecDirection = 'decode' | 'encode'
@@ -41,13 +53,19 @@ export type NativeCodecDirection = 'decode' | 'encode'
  * content, a record's path steps are the user's keys; the envelope is not a
  * step. `message` is user-facing.
  *
- * There are two causes, and `unsupportedKind` tells them apart:
+ * There are three causes, told apart by `unsupportedKind` and
+ * `missingResource`:
  *
  * - The value violates its plan (a fractional value at an integer position).
- *   `unsupportedKind` is absent: the fault is the value's.
- * - The plan has a kind the codec has no conversion for (`reference`, `file`,
- *   `file-source`, or a kind it does not recognize). `unsupportedKind` holds
- *   that kind: the fault is the codec's, whatever the value is.
+ *   Neither is present: the fault is the value's.
+ * - The plan has a kind the codec has no conversion for (`file`,
+ *   `file-source`, or a kind it does not recognize), or a reference the codec
+ *   cannot convert: a selector, a collection, one located through a
+ *   container, or one to a resource the app does not find at the application
+ *   by its identifier. `unsupportedKind` holds the kind: the fault is the
+ *   codec's, whatever the value is.
+ * - A reference being decoded names an object the app does not have.
+ *   `missingResource` holds the reference's resource: the target is missing.
  */
 export interface NativeCodecError {
   readonly name: string
@@ -56,6 +74,8 @@ export interface NativeCodecError {
   readonly message: string
   /** The plan kind the codec cannot convert, when that is why it failed. */
   readonly unsupportedKind?: string
+  /** The resource of a referenced object the app does not have, when that is why it failed. */
+  readonly missingResource?: string
 }
 
 /**
@@ -75,6 +95,7 @@ export interface NativeCodecLiterals {
     readonly double: string
     readonly date: string
     readonly record: string
+    readonly reference: string
   }
   /** Mirrors `SPECIAL_DOUBLE_STATES`, in the same order. */
   readonly specialDoubleStates: readonly string[]
@@ -84,16 +105,20 @@ export interface NativeCodecLiterals {
 export interface NativeCodecFunctions {
   /**
    * Converts a wire value into the native value its plan describes. Throws a
-   * {@link NativeCodecError} with `direction: 'decode'` on a violation.
+   * {@link NativeCodecError} with `direction: 'decode'` on a violation. A
+   * reference becomes the app's object, addressed through `env`; without
+   * `env`, no reference converts.
    */
-  readonly decode: (wire: unknown, plan: ValuePlan) => unknown
+  readonly decode: (wire: unknown, plan: ValuePlan, env?: NativeCodecEnvironment) => unknown
   /**
    * Converts a native value into its JSON-safe wire form. Throws a
    * {@link NativeCodecError} with `direction: 'encode'` on a violation. Under a
    * passthrough plan the argument is returned unchanged, so the result is
-   * typed `unknown` rather than as a wire value.
+   * typed `unknown` rather than as a wire value. An app object at a reference
+   * position becomes an identity reference, its identifier read as `env`
+   * describes; without `env`, no reference converts.
    */
-  readonly encode: (native: unknown, plan: ValuePlan) => unknown
+  readonly encode: (native: unknown, plan: ValuePlan, env?: NativeCodecEnvironment) => unknown
   /** The literal constants the functions use. */
   readonly literals: NativeCodecLiterals
 }
@@ -109,6 +134,22 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   type Path = readonly (string | number)[]
   type Direction = 'decode' | 'encode'
   type Fields = Readonly<Record<string, FieldPlan>>
+  type Env = NativeCodecEnvironment | undefined
+  type ReferencePlan = Extract<ValuePlan, { readonly kind: 'reference' }>
+  /**
+   * A reference that converted in decoding's first phase and is yet to be
+   * found in the app: the addressing and decoded identifier of its object.
+   * It stands at the reference's position until the second phase replaces
+   * it with the object.
+   */
+  interface PendingAddress {
+    readonly pendingAddress: true
+    readonly resource: string
+    readonly addressing: NativeAddressing
+    readonly id: unknown
+  }
+  /** An object of the automation bridge: the application, or one of its objects. */
+  type HostObject = Readonly<Record<string, unknown>>
 
   /** Marker `name` of thrown codec failures. */
   const ERROR_NAME = 'MactsCodecError'
@@ -121,6 +162,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   const KEY_DOUBLE = 'double'
   const KEY_DATE = 'date'
   const KEY_RECORD = 'record'
+  const KEY_REFERENCE = 'reference'
 
   const STATE_NAN = 'NaN'
   const STATE_INFINITY = 'Infinity'
@@ -273,6 +315,23 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       path: path.slice(),
       message,
       unsupportedKind: kind,
+    }
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
+    throw error
+  }
+
+  /**
+   * Throws the decode failure for a referenced object the app does not have,
+   * marked with the reference's resource so it is reported as a missing
+   * target rather than as invalid input.
+   */
+  function failMissing(path: Path, resource: string): never {
+    const error: NativeCodecError = {
+      name: ERROR_NAME,
+      direction: 'decode',
+      path: path.slice(),
+      message: 'The app has no ' + quote(resource) + ' with this identifier',
+      missingResource: resource,
     }
     // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw error
@@ -503,7 +562,12 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
    *
    * No own property ever holds `undefined`.
    */
-  function encodeRecord(native: unknown, fields: Fields, path: Path): Record<string, unknown> {
+  function encodeRecord(
+    native: unknown,
+    fields: Fields,
+    path: Path,
+    env: Env
+  ): Record<string, unknown> {
     if (!isPlainObject(native)) {
       fail('encode', path, 'Expected an object, received ' + describeValue(native))
     }
@@ -534,7 +598,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         // Otherwise omitted: missing value at an optional non-nullable field.
         continue
       }
-      setOwn(out, key, encodeValue(value, field.value, fieldPath))
+      setOwn(out, key, encodeValue(value, field.value, fieldPath, env))
     }
     return out
   }
@@ -581,13 +645,274 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
 
   /** User-facing name of a kind that has no conversion in this codec. */
   function unconvertedKindName(kind: string): string {
-    if (kind === 'reference') return 'Reference'
     if (kind === 'file') return 'File'
     return 'File source'
   }
 
+  // -------------------------------------------------------------------------
+  // References: app objects and identity references
+  // -------------------------------------------------------------------------
+
+  /**
+   * Whether a value is an object of the automation bridge, whose members can
+   * be read and called. The bridge's objects are functions as often as plain
+   * objects.
+   */
+  function isHostObject(value: unknown): value is HostObject {
+    return (typeof value === 'object' || typeof value === 'function') && value !== null
+  }
+
+  /**
+   * Calls the member `name` of a bridge object with `object` as its receiver,
+   * as `object[name](...args)` does. A member that is not a function fails as
+   * `expected` at `path`.
+   */
+  function callMember(
+    direction: Direction,
+    object: HostObject,
+    name: string,
+    args: readonly unknown[],
+    path: Path,
+    expected: string
+  ): unknown {
+    const member = object[name]
+    if (typeof member !== 'function') {
+      fail(direction, path, 'Expected ' + expected + ', received ' + describeValue(object))
+    }
+    const result: unknown = Reflect.apply(member, object, args)
+    return result
+  }
+
+  /**
+   * What converting references to `resource` needs: its identifier plan and
+   * its addressing. A resource the environment has neither for (it has no
+   * identifier, the app finds it only within a container, or the script was
+   * given no environment) fails as unsupported at the reference's position.
+   */
+  function referencePlansOf(
+    direction: Direction,
+    env: Env,
+    resource: string,
+    path: Path
+  ): { readonly id: ValuePlan; readonly addressing: NativeAddressing } {
+    if (env === undefined) {
+      return failUnsupported(
+        direction,
+        path,
+        'reference',
+        'References have no conversion without the resources they name'
+      )
+    }
+    const references = env.references
+    const entry = hasOwn(references, resource) ? references[resource] : undefined
+    const id = entry === undefined ? undefined : entry.id
+    const addressing = entry === undefined ? undefined : entry.addressing
+    if (id === undefined || addressing === undefined) {
+      return failUnsupported(
+        direction,
+        path,
+        'reference',
+        'References to ' +
+          quote(resource) +
+          ' have no conversion in this codec: the app does not find its objects at the application by their identifier'
+      )
+    }
+    return { id, addressing }
+  }
+
+  /**
+   * The app's object of `addressing`'s resource whose identifier is `id`,
+   * found as a generated get finds it. The object must exist: a miss fails as
+   * a missing target, before any command uses it.
+   */
+  function addressObject(
+    app: HostObject,
+    addressing: NativeAddressing,
+    id: unknown,
+    resource: string,
+    path: Path
+  ): HostObject {
+    const expected = 'the application to have a collection ' + quote(addressing.collection)
+    const collection = app[addressing.collection]
+    if (!isHostObject(collection)) {
+      return fail(
+        'decode',
+        path,
+        'Expected ' + expected + ', received ' + describeValue(collection)
+      )
+    }
+    let object: unknown
+    if (addressing.lookup === 'byProperty') {
+      const match: Record<string, unknown> = {}
+      setOwn(match, addressing.property, id)
+      const matches = callMember('decode', collection, 'whose', [match], path, expected)
+      object = isHostObject(matches) ? matches[0] : undefined
+    } else {
+      object = callMember('decode', collection, 'byId', [id], path, expected)
+    }
+    if (!isHostObject(object)) {
+      return fail('decode', path, 'Expected ' + expected + ', received ' + describeValue(object))
+    }
+    if (callMember('decode', object, 'exists', [], path, 'an object') !== true) {
+      return failMissing(path, resource)
+    }
+    return object
+  }
+
+  /**
+   * Decodes a reference, in decoding's first phase, to the pending address of
+   * the app's object it names. Converted: a single identity reference, with no
+   * container, to a resource the app finds at the application by its
+   * identifier. Its `id` is decoded by the resource's identifier plan. Every
+   * other reference, including selectors and collections, fails as
+   * unsupported; a malformed one fails as invalid. The application is not
+   * used: only whether there is one to address is checked.
+   */
+  function decodeReference(
+    wire: unknown,
+    plan: ReferencePlan,
+    env: Env,
+    path: Path
+  ): PendingAddress {
+    const payload = controlPayload(wire, KEY_REFERENCE, 'a reference', path)
+    if (!isKeyed(payload)) {
+      return fail('decode', path, 'Expected a reference, received ' + describeValue(payload))
+    }
+    if (ownValue(payload, 'resource') !== plan.resource) {
+      fail('decode', path.concat(['resource']), 'Expected a reference to ' + quote(plan.resource))
+    }
+    if (ownValue(payload, 'cardinality') !== plan.cardinality) {
+      fail(
+        'decode',
+        path.concat(['cardinality']),
+        'Expected cardinality ' + quote(plan.cardinality)
+      )
+    }
+    const form = ownValue(payload, 'form')
+    if (form !== 'identity' && form !== 'selector') {
+      fail('decode', path.concat(['form']), 'Expected form "identity" or "selector"')
+    }
+    if (plan.cardinality !== 'one') {
+      return failUnsupported(
+        'decode',
+        path,
+        'reference',
+        'Collection references have no conversion in this codec'
+      )
+    }
+    if (form === 'selector') {
+      return failUnsupported(
+        'decode',
+        path,
+        'reference',
+        'Selector references have no conversion in this codec'
+      )
+    }
+    for (const key of Object.keys(payload)) {
+      if (key !== 'resource' && key !== 'form' && key !== 'cardinality' && key !== 'id') {
+        if (key === 'container') {
+          return failUnsupported(
+            'decode',
+            path,
+            'reference',
+            'References located through a container have no conversion in this codec'
+          )
+        }
+        fail('decode', path.concat([key]), 'Unexpected field ' + quote(key))
+      }
+    }
+    if (!hasOwn(payload, 'id')) fail('decode', path, 'Missing required field "id"')
+    const plans = referencePlansOf('decode', env, plan.resource, path)
+    const id = decodeValue(payload['id'], plans.id, path.concat(['id']), env)
+    if (env === undefined || !isHostObject(env.app)) {
+      return failUnsupported(
+        'decode',
+        path,
+        'reference',
+        'References have no conversion without an application to address'
+      )
+    }
+    return { pendingAddress: true, resource: plan.resource, addressing: plans.addressing, id }
+  }
+
+  /**
+   * Decoding's second phase: replaces each pending address that the first
+   * phase left in `value`, which `plan` describes, with the app's object it
+   * names, in input order. The records and lists are the ones the first phase
+   * built, so they are updated in place. A missing object fails as a missing
+   * target.
+   */
+  function resolvePending(value: unknown, plan: ValuePlan, path: Path, env: Env): unknown {
+    switch (plan.kind) {
+      case 'reference': {
+        if (!isPendingAddress(value) || env === undefined || !isHostObject(env.app)) {
+          return fail('decode', path, 'Expected a converted reference')
+        }
+        return addressObject(env.app, value.addressing, value.id, value.resource, path)
+      }
+      case 'array': {
+        if (!Array.isArray(value)) return value
+        const items: unknown[] = value
+        for (let i = 0; i < items.length; i++) {
+          items[i] = resolvePending(items[i], plan.items, path.concat([i]), env)
+        }
+        return items
+      }
+      case 'record': {
+        if (!isKeyed(value)) return value
+        for (const key of Object.keys(plan.fields)) {
+          const field = plan.fields[key]
+          if (field === undefined || !hasOwn(value, key)) continue
+          setOwn(value, key, resolvePending(value[key], field.value, path.concat([key]), env))
+        }
+        return value
+      }
+      case 'nullable':
+        return value === null ? null : resolvePending(value, plan.value, path, env)
+      default:
+        return value
+    }
+  }
+
+  /** Whether a value is a {@link PendingAddress} left by decoding's first phase. */
+  function isPendingAddress(value: unknown): value is PendingAddress {
+    return isKeyed(value) && value['pendingAddress'] === true
+  }
+
+  /**
+   * Encodes an app object at a reference position as the identity reference
+   * that finds it again: its identifier is read as the resource's addressing
+   * says and encoded by its identifier plan. A native read emits no container
+   * and no selector. Collections, and resources the app does not find at the
+   * application by their identifier, fail as unsupported.
+   */
+  function encodeReference(native: unknown, plan: ReferencePlan, env: Env, path: Path): unknown {
+    if (plan.cardinality !== 'one') {
+      return failUnsupported(
+        'encode',
+        path,
+        'reference',
+        'Collection references have no conversion in this codec'
+      )
+    }
+    const plans = referencePlansOf('encode', env, plan.resource, path)
+    const expected = 'an object of ' + quote(plan.resource)
+    if (!isHostObject(native)) {
+      return fail('encode', path, 'Expected ' + expected + ', received ' + describeValue(native))
+    }
+    const id = callMember('encode', native, plans.addressing.property, [], path, expected)
+    const payload: Record<string, unknown> = {}
+    setOwn(payload, 'resource', plan.resource)
+    setOwn(payload, 'form', 'identity')
+    setOwn(payload, 'cardinality', 'one')
+    setOwn(payload, 'id', encodeValue(id, plans.id, path.concat(['id']), env))
+    const out: Record<string, unknown> = {}
+    setOwn(out, KEY_REFERENCE, payload)
+    return out
+  }
+
   /** Encodes a native value by its plan. */
-  function encodeValue(native: unknown, plan: ValuePlan, path: Path): unknown {
+  function encodeValue(native: unknown, plan: ValuePlan, path: Path, env: Env): unknown {
     const kind: string = plan.kind
     switch (plan.kind) {
       case 'passthrough':
@@ -624,12 +949,12 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         }
         const items: unknown[] = []
         for (let i = 0; i < native.length; i++) {
-          items.push(encodeValue(native[i], plan.items, path.concat([i])))
+          items.push(encodeValue(native[i], plan.items, path.concat([i]), env))
         }
         return items
       }
       case 'record':
-        return encodeRecord(native, plan.fields, path)
+        return encodeRecord(native, plan.fields, path, env)
       case 'nullable':
         // Missing value (`null`) is data here; absence (`undefined`) is not
         // representable outside a record field, so it fails in the inner plan.
@@ -637,10 +962,11 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         if (native === undefined) {
           return fail('encode', path, 'Absent values cannot be represented outside a record field')
         }
-        return encodeValue(native, plan.value, path)
+        return encodeValue(native, plan.value, path, env)
       case 'unknown':
         return encodeDynamic(native, path)
       case 'reference':
+        return encodeReference(native, plan, env, path)
       case 'file':
       case 'file-source':
         return failUnsupported(
@@ -853,7 +1179,12 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
    * present and no other key may appear. Absent optional fields stay absent,
    * and a present `null` stays as data.
    */
-  function decodeRecord(wire: unknown, fields: Fields, path: Path): Record<string, unknown> {
+  function decodeRecord(
+    wire: unknown,
+    fields: Fields,
+    path: Path,
+    env: Env
+  ): Record<string, unknown> {
     if (!isKeyed(wire)) {
       return fail('decode', path, 'Expected an object, received ' + describeValue(wire))
     }
@@ -874,7 +1205,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         }
         continue
       }
-      setOwn(out, key, decodeValue(value, field.value, fieldPath))
+      setOwn(out, key, decodeValue(value, field.value, fieldPath, env))
     }
     return out
   }
@@ -923,7 +1254,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   }
 
   /** Decodes a wire value by its plan. */
-  function decodeValue(wire: unknown, plan: ValuePlan, path: Path): unknown {
+  function decodeValue(wire: unknown, plan: ValuePlan, path: Path, env: Env): unknown {
     const kind: string = plan.kind
     switch (plan.kind) {
       case 'passthrough':
@@ -960,17 +1291,18 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         }
         const items: unknown[] = []
         for (let i = 0; i < wire.length; i++) {
-          items.push(decodeValue(wire[i], plan.items, path.concat([i])))
+          items.push(decodeValue(wire[i], plan.items, path.concat([i]), env))
         }
         return items
       }
       case 'record':
-        return decodeRecord(wire, plan.fields, path)
+        return decodeRecord(wire, plan.fields, path, env)
       case 'nullable':
-        return wire === null ? null : decodeValue(wire, plan.value, path)
+        return wire === null ? null : decodeValue(wire, plan.value, path, env)
       case 'unknown':
         return decodeDynamic(wire, path)
       case 'reference':
+        return decodeReference(wire, plan, env, path)
       case 'file':
       case 'file-source':
         return failUnsupported(
@@ -985,13 +1317,19 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   }
 
   return {
-    decode: (wire, plan) => decodeValue(wire, plan, []),
-    encode: (native, plan) => encodeValue(native, plan, []),
+    decode: (wire, plan, env) => resolvePending(decodeValue(wire, plan, [], env), plan, [], env),
+    encode: (native, plan, env) => encodeValue(native, plan, [], env),
     literals: {
       errorName: ERROR_NAME,
       integerLimits: { min: -INTEGER_MAX, max: INTEGER_MAX },
       rgbChannelMax: CHANNEL_MAX,
-      wireKeys: { integer: KEY_INTEGER, double: KEY_DOUBLE, date: KEY_DATE, record: KEY_RECORD },
+      wireKeys: {
+        integer: KEY_INTEGER,
+        double: KEY_DOUBLE,
+        date: KEY_DATE,
+        record: KEY_RECORD,
+        reference: KEY_REFERENCE,
+      },
       specialDoubleStates: [
         STATE_NAN,
         STATE_INFINITY,

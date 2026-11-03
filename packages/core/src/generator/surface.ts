@@ -23,7 +23,24 @@ import {
   usableCommands,
   usableProperties,
 } from '../manifest/unsupported.js'
+import {
+  CRUD_OPERATIONS,
+  findCrudCommand,
+  resourceCommandEntries,
+  type CrudOperation,
+} from '../manifest/resource-commands.js'
 import type { PropertyType } from '../manifest/schemas/property.js'
+
+// Which commands apply to a resource and which backs each CRUD shape are
+// manifest knowledge (../manifest/resource-commands.ts). They are re-exported
+// here because every client surface derives its methods from them.
+export {
+  CRUD_OPERATIONS,
+  commandAppliesToResource,
+  findCrudCommand,
+  resourceCommandEntries,
+  type CrudOperation,
+} from '../manifest/resource-commands.js'
 
 /**
  * Words that cannot name a JavaScript binding or method without escaping.
@@ -88,44 +105,9 @@ export function safeIdentifier(name: string): string {
   return RESERVED_WORDS.has(name) ? `_${name}` : name
 }
 
-/**
- * The standard CRUD shapes. A resource command's `name` says which shape (if
- * any) it fulfils; its key in `manifest.commands` is what addresses its route.
- */
-export const CRUD_OPERATIONS = ['list', 'get', 'create', 'update', 'delete'] as const
-
-/** One of the standard CRUD shapes. */
-export type CrudOperation = (typeof CRUD_OPERATIONS)[number]
-
 /** Whether a command `name` is one of the standard CRUD shapes. */
 export function isCrudName(name: string): name is CrudOperation {
   return (CRUD_OPERATIONS as readonly string[]).includes(name)
-}
-
-/**
- * Whether a resource-scoped command applies to a resource: it names the
- * resource in `resourceType`, or omits `resourceType` and so applies to every
- * resource. This is the same rule the route derivation uses, so every client
- * method has a route.
- */
-export function commandAppliesToResource(cmd: Command, resourceName: string): boolean {
-  if (cmd.scope !== 'resource') return false
-  if (cmd.resourceType === undefined) return true
-  if (Array.isArray(cmd.resourceType)) return cmd.resourceType.includes(resourceName)
-  return cmd.resourceType === resourceName
-}
-
-/**
- * The commands that apply to a resource, as `[commandKey, command]` pairs in
- * manifest declaration order. None apply to a resource marked unsupported,
- * which has no routes, and none is marked unsupported itself.
- */
-export function resourceCommandEntries(
-  manifest: AppManifest,
-  resourceName: string
-): [string, Command][] {
-  if (isUnsupportedResourceKey(manifest, resourceName)) return []
-  return usableCommands(manifest).filter(([, cmd]) => commandAppliesToResource(cmd, resourceName))
 }
 
 /**
@@ -183,37 +165,6 @@ export function identifierWords(identifier: string): string {
  */
 export function withArticle(noun: string): string {
   return `${/^[aeiou]/i.test(noun) ? 'an' : 'a'} ${noun}`
-}
-
-/**
- * The backing command for a CRUD shape among a resource's commands: the first,
- * in declaration order, whose `name` is `operation`. Returns `undefined` when
- * the manifest declares no such command, so the client has no such method.
- * Later commands with the same CRUD name still have routes, but no client
- * method.
- */
-export function findCrudCommand(
-  resourceCommands: readonly [string, Command][],
-  operation: CrudOperation
-): [string, Command] | undefined {
-  return resourceCommands.find(([, cmd]) => cmd.name === operation)
-}
-
-/**
- * The command whose operation resolves references to a resource: its first
- * usable `get` (single references, containers, and identity-collection
- * entries) or `list` (collections), as a `[commandKey, command]` pair.
- *
- * It is the one place this choice is made. The contract's resource table
- * records the operations of these commands, and the input satisfiability
- * judgment asks whether a `get` exists, so the two cannot disagree.
- */
-export function resolvingCommand(
-  manifest: AppManifest,
-  resourceName: string,
-  shape: 'get' | 'list'
-): [string, Command] | undefined {
-  return findCrudCommand(resourceCommandEntries(manifest, resourceName), shape)
 }
 
 /**

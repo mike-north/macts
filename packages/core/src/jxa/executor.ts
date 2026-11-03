@@ -298,8 +298,9 @@ function embedJson(value: unknown): string {
 /**
  * The catch clause of a native script: describes what was thrown as a
  * {@link NativeFailure}. A codec error, recognized by its marker name, keeps its
- * direction, path, message, and unsupported kind if it has one; a changed
- * collection, recognized by its marker name, keeps its message; anything else
+ * direction, path, message, and its unsupported kind or missing resource if it
+ * has one; a changed collection, recognized by its marker name, keeps its
+ * message; anything else
  * is an app or bridge failure that keeps its message and, when it carries one,
  * its numeric error code.
  */
@@ -308,6 +309,9 @@ const DESCRIBE_THROWN = [
   "      var codecFailure = { source: 'codec', direction: e.direction, path: e.path, message: e.message };",
   "      if (typeof e.unsupportedKind === 'string') {",
   '        codecFailure.unsupportedKind = e.unsupportedKind;',
+  '      }',
+  "      if (typeof e.missingResource === 'string') {",
+  '        codecFailure.missingResource = e.missingResource;',
   '      }',
   '      return { ok: false, failure: codecFailure };',
   '    }',
@@ -327,10 +331,21 @@ const DESCRIBE_THROWN = [
  * The script imports the C standard library bridge, declares the codec's
  * functions, and evaluates one try/catch that yields a {@link NativeOutcome};
  * its final expression is that outcome serialized as JSON, which the host
- * prints. The input and both plans are embedded with {@link embedJson}, the
- * bundle identifier as a JSON string literal, and the body inside its own
- * `(function (app, args, page) { ... })`, called with the page window (or
- * `null`) embedded the same way.
+ * prints. The input, both plans, and the reference table are embedded as JSON
+ * text parsed inside the process, the bundle identifier as a JSON string literal, and the
+ * body inside its own `(function (app, args, page) { ... })`, called with the
+ * page window (or `null`) embedded the same way.
+ *
+ * The application object comes first, because finding a referenced object
+ * needs it: the codec functions receive `{ app, references }`. Nothing else
+ * reaches the app until the whole input has converted: decoding converts every
+ * value before it uses the app to find referenced objects, and the body runs
+ * after that. So an input value that cannot convert fails before the app
+ * receives any event.
+ *
+ * {@link runNativeScript} runs this program in the automation host. Tests
+ * that evaluate the program elsewhere reach this function through the
+ * internal `@macts/core/testing` entry; it is not public API.
  */
 export function composeNativeScript(script: NativeScript, codec: NativeCodec): string {
   return [
@@ -338,13 +353,14 @@ export function composeNativeScript(script: NativeScript, codec: NativeCodec): s
     codec.prelude,
     'var __mactsOutcome = (function () {',
     '  try {',
-    `    var args = ${NATIVE_DECODE_FUNCTION}(${embedJson(script.input)}, ${embedJson(script.inputPlan)});`,
     `    var app = Application(${JSON.stringify(script.bundleId)});`,
     '    app.includeStandardAdditions = true;',
+    `    var env = { app: app, references: ${embedJson(script.references)} };`,
+    `    var args = ${NATIVE_DECODE_FUNCTION}(${embedJson(script.input)}, ${embedJson(script.inputPlan)}, env);`,
     '    var value = (function (app, args, page) {',
     script.body,
     `    })(app, args, ${embedJson(script.page ?? null)});`,
-    `    return { ok: true, value: ${NATIVE_ENCODE_FUNCTION}(value, ${embedJson(script.outputPlan)}) };`,
+    `    return { ok: true, value: ${NATIVE_ENCODE_FUNCTION}(value, ${embedJson(script.outputPlan)}, env) };`,
     '  } catch (e) {',
     DESCRIBE_THROWN,
     '  }',
@@ -415,11 +431,24 @@ function parseNativeFailure(value: unknown): NativeFailure | string {
       }
       if (!isIssuePath(path)) return 'the codec failure has no path'
       const unsupportedKind = value['unsupportedKind']
-      if (unsupportedKind === undefined) return { source: 'codec', direction, path, message }
-      if (typeof unsupportedKind !== 'string') {
+      const missingResource = value['missingResource']
+      if (unsupportedKind !== undefined && typeof unsupportedKind !== 'string') {
         return 'the codec failure has a non-text unsupported kind'
       }
-      return { source: 'codec', direction, path, message, unsupportedKind }
+      if (missingResource !== undefined && typeof missingResource !== 'string') {
+        return 'the codec failure has a non-text missing resource'
+      }
+      if (unsupportedKind !== undefined && missingResource !== undefined) {
+        return 'the codec failure is both unsupported and missing'
+      }
+      return {
+        source: 'codec',
+        direction,
+        path,
+        message,
+        ...(unsupportedKind === undefined ? {} : { unsupportedKind }),
+        ...(missingResource === undefined ? {} : { missingResource }),
+      }
     }
     default:
       return 'the failure has an unknown source'
@@ -427,10 +456,13 @@ function parseNativeFailure(value: unknown): NativeFailure | string {
 }
 
 /**
- * The outcome the process printed, or a description of why it is malformed.
- * The description never quotes the output, which may hold app data.
+ * Read the outcome a composed native script printed (see
+ * {@link composeNativeScript}): the {@link NativeOutcome}, or a description of
+ * why the output is malformed. The description never quotes the output, which
+ * may hold app data. Like {@link composeNativeScript}, it is reached by tests
+ * through the internal `@macts/core/testing` entry and is not public API.
  */
-function parseNativeOutcome(stdout: string): NativeOutcome | string {
+export function parseNativeOutcome(stdout: string): NativeOutcome | string {
   let parsed: unknown
   try {
     parsed = JSON.parse(stdout.trim())

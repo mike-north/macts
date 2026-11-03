@@ -54,6 +54,7 @@ expectAssignable<NativeScript>({
   input: {},
   inputPlan: PASSTHROUGH_PLAN,
   outputPlan: PASSTHROUGH_PLAN,
+  references: {},
 })
 // A paged list's script also carries its page window.
 expectAssignable<NativeScript>({
@@ -62,5 +63,6 @@ expectAssignable<NativeScript>({
   input: {},
   inputPlan: PASSTHROUGH_PLAN,
   outputPlan: PASSTHROUGH_PLAN,
+  references: {},
   page: { offset: 25, size: 25, anchor: 'x' },
 })

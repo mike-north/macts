@@ -24,6 +24,7 @@
 import { fileURLToPath } from 'node:url'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import {
+  EMPTY_RESOURCE_PLAN_TABLE,
   AppAuthorizationRequiredError,
   AppOperationError,
   AppUnavailableError,
@@ -96,6 +97,7 @@ function request(overrides: Partial<ExecutionRequest> = {}): ExecutionRequest {
     input: { name: 'Groceries' },
     inputPlan: PASSTHROUGH_PLAN,
     outputPlan: PASSTHROUGH_PLAN,
+    resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
     ...overrides,
   }
 }
@@ -163,9 +165,116 @@ describe('createNativeExecutor', () => {
           input: { name: 'Groceries' },
           inputPlan: PASSTHROUGH_PLAN,
           outputPlan: PASSTHROUGH_PLAN,
+          references: {},
         },
         { timeoutMs: 1234 }
       )
+    })
+
+    describe('reference table', () => {
+      const CONTACTS_MANIFEST = fileURLToPath(
+        new URL('../../../../manifests/contacts/app.yaml', import.meta.url)
+      )
+      const MUSIC_MANIFEST = fileURLToPath(
+        new URL('../../../../manifests/music/app.yaml', import.meta.url)
+      )
+      const STRING_ID = { id: { kind: 'string' } } as const
+      const reference = (resource: string): ValuePlan => ({
+        kind: 'reference',
+        resource,
+        cardinality: 'one',
+      })
+
+      /** The `references` of the script the executor builds for `overrides`. */
+      async function scriptReferences(
+        overrides: Partial<ExecutionRequest>
+      ): Promise<NativeScript['references']> {
+        const run = mockRun().mockResolvedValue({ ok: true, value: null })
+        await createNativeExecutor({ transport: { run } }).execute(request(overrides))
+        const script = run.mock.calls[0]?.[0]
+        if (script === undefined) throw new Error('No script was run')
+        return script.references
+      }
+
+      it('merges the identifier plan with how the app finds the object, for each referenced resource only', async () => {
+        // Contacts: a person is found by id in the app's people (manifest
+        // identifier `id`, default targeting); an email is found only under
+        // its person (its get records the person as parent).
+        const contacts = await loadManifest(CONTACTS_MANIFEST)
+        const references = await scriptReferences({
+          manifest: contacts,
+          target: { command: 'actionTitle' },
+          input: { with: 'phone', for: 'p-1' },
+          inputPlan: { kind: 'record', fields: { for: required(reference('Person')) } },
+          outputPlan: { kind: 'array', items: reference('Email') },
+          resourcePlans: { Person: STRING_ID, Email: STRING_ID, Group: STRING_ID },
+        })
+        expect(references).toEqual({
+          Person: {
+            id: { kind: 'string' },
+            addressing: { collection: 'people', lookup: 'byId', property: 'id' },
+          },
+          Email: { id: { kind: 'string' } },
+        })
+      })
+
+      it('matches by property for a resource targeted by property, and drops a parent-scoped one', async () => {
+        // Music: playlists and tracks are both matched on `persistentID`
+        // (`targeting: byProperty`); a track's get records its playlist.
+        const music = await loadManifest(MUSIC_MANIFEST)
+        const references = await scriptReferences({
+          manifest: music,
+          target: { command: 'listPlaylists', resource: 'Playlist' },
+          input: {},
+          inputPlan: PASSTHROUGH_PLAN,
+          outputPlan: {
+            kind: 'record',
+            fields: {
+              playlist: required({ kind: 'nullable', value: reference('Playlist') }),
+              track: required(reference('Track')),
+            },
+          },
+          resourcePlans: { Playlist: STRING_ID, Track: STRING_ID },
+        })
+        expect(references).toEqual({
+          Playlist: {
+            id: { kind: 'string' },
+            addressing: { collection: 'playlists', lookup: 'byProperty', property: 'persistentID' },
+          },
+          Track: { id: { kind: 'string' } },
+        })
+      })
+
+      it('gives no entry to a resource the request has no plans for', async () => {
+        // An app registered without a contract passes an empty table, so no
+        // reference converts.
+        const references = await scriptReferences({
+          inputPlan: { kind: 'record', fields: { note: required(reference('Note')) } },
+          resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
+        })
+        expect(references).toEqual({})
+      })
+
+      it('carries an empty table when the plans hold no reference, whatever the request lists', async () => {
+        const references = await scriptReferences({
+          resourcePlans: { Note: STRING_ID, Folder: STRING_ID },
+        })
+        expect(references).toEqual({})
+      })
+
+      it('also carries a resource that another resource identifier refers to', async () => {
+        // Notes notes are found by name; a hypothetical identifier that is a
+        // folder reference makes the folder reachable too.
+        const references = await scriptReferences({
+          inputPlan: { kind: 'record', fields: { note: required(reference('Note')) } },
+          resourcePlans: { Note: { id: reference('Folder') }, Folder: STRING_ID },
+        })
+        expect(Object.keys(references).sort()).toEqual(['Folder', 'Note'])
+        expect(references['Note']).toEqual({
+          id: reference('Folder'),
+          addressing: { collection: 'notes', lookup: 'byId', property: 'name' },
+        })
+      })
     })
 
     it('adds the legacy identifier aliases to list items only for passthrough output', async () => {
@@ -237,6 +346,7 @@ describe('createNativeExecutor', () => {
           input: { name: 'Groceries', limit: { integer: '3' } },
           inputPlan,
           outputPlan: INTEGER_PLAN,
+          resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
         })
       )
       expect(result).toEqual({ integer: '7' })
@@ -452,7 +562,7 @@ describe('createNativeExecutor', () => {
         expect(error).toBeInstanceOf(InternalError)
         if (!(error instanceof InternalError)) return
         expect(error.message).toBe(
-          `The Notes operation "Note get" ${verb} reference values at \`for\`, which the macOS provider does not support yet.`
+          `The Notes operation "Note get" ${verb} a reference at \`for\` that the macOS provider cannot convert yet.`
         )
         expect(error.details).toEqual({})
         expect(error.cause).toBeInstanceOf(Error)
@@ -462,6 +572,49 @@ describe('createNativeExecutor', () => {
         })
       }
     )
+
+    it('names a file kind the codec cannot convert by its kind', async () => {
+      const run = mockRun().mockResolvedValue(
+        failed({
+          source: 'codec',
+          direction: 'encode',
+          path: ['attachment'],
+          message: 'File values have no conversion in this codec',
+          unsupportedKind: 'file',
+        })
+      )
+      const error = await rejectionOf(
+        createNativeExecutor({ transport: { run } }).execute(request())
+      )
+      expect(error).toBeInstanceOf(InternalError)
+      if (!(error instanceof InternalError)) return
+      expect(error.message).toBe(
+        'The Notes operation "Note get" returns file values at `attachment`, which the macOS provider does not support yet.'
+      )
+    })
+
+    it('reports a referenced object the app does not have as a missing target of that resource', async () => {
+      // The operation's own resource is Note; the missing object is the
+      // person the input referenced, so the error names Person.
+      const run = mockRun().mockResolvedValue(
+        failed({
+          source: 'codec',
+          direction: 'decode',
+          path: ['for'],
+          message: `The app has no "Person" with this identifier ${APP_TEXT}`,
+          missingResource: 'Person',
+        })
+      )
+      const error = await rejectionOf(
+        createNativeExecutor({ transport: { run } }).execute(request())
+      )
+      expect(error).toBeInstanceOf(TargetNotFoundError)
+      if (!(error instanceof TargetNotFoundError)) return
+      expect(error.message).toBe('Notes has no Person matching the reference at `for`.')
+      expect(error.details).toEqual({ resource: 'Person' })
+      expect(error.message).not.toContain(APP_TEXT)
+      expect(error.cause).toMatchObject({ path: ['for'] })
+    })
 
     it('classifies a process failure and keeps the raw failure only as cause', async () => {
       const failure = processFailure("execution error: Error: Error: Can't get object. (-1728)")
@@ -499,6 +652,7 @@ describe('createNativeExecutor', () => {
             selector: { by: 'name', name: 'Groceries' },
           },
           outputPlan: PASSTHROUGH_PLAN,
+          resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
         })
       )
       expect(error).toBeInstanceOf(InternalError)
@@ -894,6 +1048,7 @@ describe('against the real automation host (no app events)', () => {
             fields: { name: required(STRING_PLAN), limit: required(INTEGER_PLAN) },
           },
           outputPlan: INTEGER_PLAN,
+          resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
         })
       )
       expect(result).toEqual({ integer: '42' })

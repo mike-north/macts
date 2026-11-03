@@ -51,6 +51,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { contactsContract, type ContactsClient } from '@macts/contacts/contract'
 import { musicContract, type MusicClient } from '@macts/music/contract'
 import {
+  EMPTY_RESOURCE_PLAN_TABLE,
   Integer,
   ValueTypes,
   isPageValueType,
@@ -134,6 +135,7 @@ async function wireReader<Client>(contract: AppContract<Client>): Promise<WireRe
         input,
         inputPlan: operation.input.plan,
         outputPlan: page === undefined ? operation.output.plan : ValueTypes.array(page.item).plan,
+        resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
       })
       const wire = page === undefined ? result : { items: result }
       const parsed = operation.output.wire.safeParse(wire)

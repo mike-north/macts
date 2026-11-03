@@ -16,7 +16,12 @@ import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { createFileAuditWriter, loadManifest, type AppManifest } from '@macts/core'
-import { AuthenticationError, PASSTHROUGH_PLAN, type OperationId } from '@macts/contracts'
+import {
+  AuthenticationError,
+  EMPTY_RESOURCE_PLAN_TABLE,
+  PASSTHROUGH_PLAN,
+  type OperationId,
+} from '@macts/contracts'
 import { ALLOW_ALL_POLICY } from './governance/active-policy.js'
 import { createBearerCredential } from './invocation/credential.js'
 import { createApiKey } from './keys/generator.js'
@@ -86,6 +91,8 @@ describe('executor seam', () => {
       input: {},
       inputPlan: PASSTHROUGH_PLAN,
       outputPlan: PASSTHROUGH_PLAN,
+      // Registered from its manifest alone, the app has no resource plans.
+      resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
     })
 
     const audit = await readFile(auditPath, 'utf8')

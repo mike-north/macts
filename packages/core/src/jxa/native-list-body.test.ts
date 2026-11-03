@@ -31,6 +31,7 @@
 import { createContext, runInContext } from 'node:vm'
 import { describe, expect, it } from 'vitest'
 import {
+  EMPTY_RESOURCE_PLAN_TABLE,
   PASSTHROUGH_PLAN,
   TargetNotFoundError,
   UnexpectedValueError,
@@ -434,6 +435,7 @@ async function listBoth(
     input: options.input ?? {},
     inputPlan: PASSTHROUGH_PLAN,
     outputPlan,
+    resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
   }
   const batchedApp = fakePlanner(rows, options.faults)
   const batched = await settle(
@@ -848,6 +850,7 @@ describe('list bodies: the identifier read is never guarded', () => {
         input: SHELF_INPUT,
         inputPlan: PASSTHROUGH_PLAN,
         outputPlan: PASSTHROUGH_PLAN,
+        resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
       })
     )
     expect(errorOf(result)).toBeInstanceOf(AppOperationError)
@@ -1151,6 +1154,7 @@ async function readWindow(
       input: SHELF_INPUT,
       inputPlan: PASSTHROUGH_PLAN,
       outputPlan,
+      resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
       page,
     })
   )
@@ -1443,6 +1447,7 @@ describe('paged list bodies: what can page', () => {
         input: {},
         inputPlan: PASSTHROUGH_PLAN,
         outputPlan: PASSTHROUGH_PLAN,
+        resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
         page: { offset: 0, size: 25 },
       })
     )

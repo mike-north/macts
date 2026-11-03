@@ -8,6 +8,7 @@ import { IssuePath } from '@macts/contracts';
 import { JsonSchema7Type } from 'zod-to-json-schema';
 import { OperationTarget } from '@macts/contracts';
 import { ReferenceWire } from '@macts/contracts';
+import { ResourcePlanTable } from '@macts/contracts';
 import { ValuePlan } from '@macts/contracts';
 import { WireRecord } from '@macts/contracts';
 import { WireValue } from '@macts/contracts';
@@ -1042,6 +1043,9 @@ export const ConfidenceSchema: z.ZodObject<{
 export function connect(bundleId: string, _options?: AppConnectionOptions): Promise<AppConnection>;
 
 // @public
+export function contractResourcePlans(manifest: AppManifest): ResourcePlanTable;
+
+// @public
 export function createArrayCoercer<T>(elementCoercer: TypeCoercer<T>): TypeCoercer<T[]>;
 
 // @public
@@ -1252,6 +1256,7 @@ export interface ExecutionRequest {
     readonly manifest: AppManifest;
     readonly outputPlan: ValuePlan;
     readonly page?: PageWindow;
+    readonly resourcePlans: ResourcePlanTable;
     readonly signal?: AbortSignal;
     readonly target: OperationTarget;
 }
@@ -2033,6 +2038,13 @@ export const NATIVE_DECODE_FUNCTION = "__mactsDecode";
 export const NATIVE_ENCODE_FUNCTION = "__mactsEncode";
 
 // @public
+export interface NativeAddressing {
+    readonly collection: string;
+    readonly lookup: 'byId' | 'byProperty';
+    readonly property: string;
+}
+
+// @public
 export interface NativeBodyOptions {
     readonly identifierAliases?: boolean;
     readonly paged?: boolean;
@@ -2041,6 +2053,12 @@ export interface NativeBodyOptions {
 // @public
 export interface NativeCodec {
     readonly prelude: string;
+}
+
+// @public
+export interface NativeCodecEnvironment {
+    readonly app: unknown;
+    readonly references: NativeReferenceTable;
 }
 
 // @public
@@ -2063,6 +2081,7 @@ export type NativeFailure = {
     readonly path: IssuePath;
     readonly message: string;
     readonly unsupportedKind?: string;
+    readonly missingResource?: string;
 };
 
 // @public
@@ -2073,6 +2092,15 @@ export type NativeOutcome = {
     readonly ok: false;
     readonly failure: NativeFailure;
 };
+
+// @public
+export interface NativeReferencePlans {
+    readonly addressing?: NativeAddressing;
+    readonly id?: ValuePlan;
+}
+
+// @public
+export type NativeReferenceTable = Readonly<Record<string, NativeReferencePlans>>;
 
 // @public
 export interface NativeRunOptions {
@@ -2088,6 +2116,7 @@ export interface NativeScript {
     readonly inputPlan: ValuePlan;
     readonly outputPlan: ValuePlan;
     readonly page?: PageWindow | undefined;
+    readonly references: NativeReferenceTable;
 }
 
 // @public
@@ -2971,6 +3000,7 @@ export interface ResolutionRequest {
     readonly manifest: AppManifest;
     readonly outputPlan: ValuePlan;
     readonly reference: ReferenceWire;
+    readonly resourcePlans: ResourcePlanTable;
     readonly signal?: AbortSignal;
 }
 

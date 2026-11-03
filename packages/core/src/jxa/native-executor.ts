@@ -5,8 +5,10 @@
  * It owns three things and nothing else:
  *
  * - building the `NativeScript` for one operation from the native body (see
- *   `native-scripts.ts`), the app's bundle identifier, the input record, and
- *   the operation's input and output value plans;
+ *   `native-scripts.ts`), the app's bundle identifier, the input record, the
+ *   operation's input and output value plans, and the reference table: the
+ *   identifier plans the request carries for the app's resources, merged with
+ *   how the manifest says the app finds each resource's objects;
  * - running it through the {@link NativeTransport} with the in-process value
  *   codec, honoring the time limit and the caller's abort signal;
  * - classifying failures, whether reported by the automation process as a
@@ -42,15 +44,19 @@ import {
   type AnyMactsError,
   type IssuePath,
   type OperationTarget,
+  type ResourcePlanTable,
   type ValuePlan,
   type WireValue,
 } from '@macts/contracts'
+import type { AppManifest } from '../manifest/schemas/app.js'
 import type { ExecutionRequest, Executor, ResolutionRequest } from '../execution/executor.js'
 import { isWireValue, JxaExecutionError, MAX_OUTPUT_BYTES, runNativeScript } from './executor.js'
 import {
   NATIVE_CODEC,
   type NativeFailure,
   type NativeOutcome,
+  type NativeReferencePlans,
+  type NativeReferenceTable,
   type NativeScript,
 } from './native-codec.js'
 import {
@@ -58,6 +64,7 @@ import {
   COMMUNICATION_FAILURE_ERROR_NUMBERS,
   NO_SUCH_OBJECT_ERROR_NUMBER,
   planNativeInvocation,
+  referenceAddressing,
 } from './native-scripts.js'
 
 /** Time limit for one operation when none is configured, in milliseconds. */
@@ -157,7 +164,8 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
   return {
     provider: 'macos',
     async execute(request: ExecutionRequest): Promise<WireValue> {
-      const { manifest, target, input, inputPlan, outputPlan, page, signal } = request
+      const { manifest, target, input, inputPlan, outputPlan, page, resourcePlans, signal } =
+        request
       throwIfAborted(signal)
 
       // Legacy identifier aliases belong only to results that pass through
@@ -174,6 +182,7 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
         inputPlan,
         outputPlan: page === undefined ? outputPlan : pageWindowPlan(outputPlan),
         ...(page === undefined ? {} : { page }),
+        references: nativeReferenceTable(manifest, resourcePlans, [inputPlan, outputPlan]),
       }
 
       const context: NativeFailureContext = { app: manifest.app.name, operation: target, timeoutMs }
@@ -199,6 +208,56 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
         new InternalError('The macOS provider does not resolve references.', {})
       )
     },
+  }
+}
+
+/**
+ * The reference table of a native script: an entry for every resource a
+ * reference in `plans` names, directly or inside another resource's
+ * identifier, with the identifier plan `resourcePlans` holds for it and the
+ * addressing the manifest gives it ({@link referenceAddressing}).
+ *
+ * @remarks
+ * Only reachable resources are embedded, so a script carries no more than its
+ * plans can convert, and nothing when they hold no reference. A resource the
+ * request's table does not list (an app registered without a contract) gets no
+ * entry, so references to it do not convert.
+ */
+function nativeReferenceTable(
+  manifest: AppManifest,
+  resourcePlans: ResourcePlanTable,
+  plans: readonly ValuePlan[]
+): NativeReferenceTable {
+  const table = new Map<string, NativeReferencePlans>()
+  const pending = plans.flatMap(referencedResources)
+  for (let resource = pending.pop(); resource !== undefined; resource = pending.pop()) {
+    if (table.has(resource) || !Object.hasOwn(resourcePlans, resource)) continue
+    const id = resourcePlans[resource]?.id
+    const addressing = referenceAddressing(manifest, resource)
+    table.set(resource, {
+      ...(id === undefined ? {} : { id }),
+      ...(addressing === undefined ? {} : { addressing }),
+    })
+    if (id !== undefined) pending.push(...referencedResources(id))
+  }
+  // `Object.fromEntries` defines own properties, so no resource key can reach
+  // the table's prototype.
+  return Object.fromEntries(table)
+}
+
+/** The resources the reference plans inside `plan` name, outermost first. */
+function referencedResources(plan: ValuePlan): string[] {
+  switch (plan.kind) {
+    case 'reference':
+      return [plan.resource]
+    case 'array':
+      return referencedResources(plan.items)
+    case 'nullable':
+      return referencedResources(plan.value)
+    case 'record':
+      return Object.values(plan.fields).flatMap((field) => referencedResources(field.value))
+    default:
+      return []
   }
 }
 
@@ -328,6 +387,7 @@ const COMPILE_ERROR_PATTERN = /^\s*(?:\d+:\d+:\s*)?syntax error:/m
  * | Reported failure                                         | Error                                    |
  * | -------------------------------------------------------- | ---------------------------------------- |
  * | codec, either direction, with an unsupported kind        | `InternalError`                          |
+ * | codec, `decode`, with a missing resource                 | `TargetNotFoundError` for that resource  |
  * | codec, `decode`                                          | `ValidationError` with `issues`          |
  * | codec, `encode`                                          | `UnexpectedValueError` with `issues`     |
  * | collection changed while a list read it                  | `CollectionChangedError`                 |
@@ -403,6 +463,9 @@ function describeReportedFailure(
   if (failure.source === 'codec' && failure.unsupportedKind !== undefined) {
     return describeUnsupportedKind(failure, failure.unsupportedKind, context)
   }
+  if (failure.source === 'codec' && failure.missingResource !== undefined) {
+    return describeMissingReference(failure, failure.missingResource, context)
+  }
   if (failure.source === 'collection') {
     return new CollectionChangedError(
       `The ${context.operation.resource ?? 'item'} collection in ${app} changed while it was being read, so no consistent result exists. The same request can be retried, from the first page if it was paged.`,
@@ -430,7 +493,6 @@ function describeReportedFailure(
 /** Words for a value plan kind in a message: `file-source` → `file source`. */
 function kindWords(kind: string): string {
   switch (kind) {
-    case 'reference':
     case 'file':
       return kind
     case 'file-source':
@@ -471,11 +533,36 @@ function describeUnsupportedKind(
   const position = describePosition(failure.path)
   const verb = failure.direction === 'decode' ? 'takes' : 'returns'
   const at = position === '' ? '' : ` at \`${position}\``
+  // Some references convert, so the message speaks of this one, not of every
+  // reference; the codec's message, kept as the cause, says why it does not.
+  const message =
+    kind === 'reference'
+      ? `The ${app} operation "${name}" ${verb} a reference${at} that the macOS provider cannot convert yet.`
+      : `The ${app} operation "${name}" ${verb} ${kindWords(kind)} values${at}, which the macOS provider does not support yet.`
   return new InternalError(
-    `The ${app} operation "${name}" ${verb} ${kindWords(kind)} values${at}, which the macOS provider does not support yet.`,
+    message,
     {},
     // The codec's own message and path stay local: `cause` never reaches the
     // wire.
+    { cause: Object.assign(new Error(failure.message), { path: failure.path }) }
+  )
+}
+
+/**
+ * The error for an input reference whose object the app does not have: the
+ * reference's target is missing, so the failure names that resource, not the
+ * operation's own.
+ */
+function describeMissingReference(
+  failure: Extract<NativeFailure, { source: 'codec' }>,
+  resource: string,
+  context: NativeFailureContext
+): TargetNotFoundError {
+  const position = describePosition(failure.path)
+  const at = position === '' ? '' : ` at \`${position}\``
+  return new TargetNotFoundError(
+    `${context.app} has no ${resource} matching the reference${at}.`,
+    { resource },
     { cause: Object.assign(new Error(failure.message), { path: failure.path }) }
   )
 }

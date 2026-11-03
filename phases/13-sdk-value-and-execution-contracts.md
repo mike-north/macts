@@ -810,31 +810,80 @@ native values for arguments, and native results to wire values, before
   named by the exported constants `NATIVE_DECODE_FUNCTION` (`__mactsDecode`)
   and `NATIVE_ENCODE_FUNCTION` (`__mactsEncode`). `NATIVE_CODEC` is the
   implementation.
-  - `__mactsDecode(wire, plan)` returns native values. Dates become `Date`,
-    integer text becomes a number, double states become `NaN`, `Infinity`, or
-    `-0`, and app-specific bridge forms are produced where the plan says so.
-  - `__mactsEncode(native, plan)` returns JSON-safe wire values. The output
-    contains no raw `NaN`, `Infinity`, or `-0` numbers, no `Date` objects, and
-    no `undefined` own properties. Absent optional fields are omitted.
+  - Both take a third argument, the environment
+    `NativeCodecEnvironment { app, references }`: the application object and
+    the script's reference table (below). Only reference conversion reads it.
+  - `__mactsDecode(wire, plan, env)` returns native values. Dates become
+    `Date`, integer text becomes a number, double states become `NaN`,
+    `Infinity`, or `-0`, and app-specific bridge forms are produced where the
+    plan says so. A reference becomes the app's object it names (below).
+  - `__mactsEncode(native, plan, env)` returns JSON-safe wire values. The
+    output contains no raw `NaN`, `Infinity`, or `-0` numbers, no `Date`
+    objects, and no `undefined` own properties. Absent optional fields are
+    omitted. An app object at a reference position becomes the identity
+    reference that finds it again (below).
   - Under a `passthrough` plan (D9), both return their argument unchanged.
   - Under a `none` plan, `__mactsEncode` returns `null` whatever the native
     result was, and `__mactsDecode` returns `undefined` (D3).
   - Both throw an object with `name: 'MactsCodecError'`, plus `direction`,
     `path`, and `message`, when a value violates the plan. When the plan has a
-    kind the codec cannot convert (`reference`, `file`, `file-source`, or an
-    unrecognized kind), the object also carries `unsupportedKind`, that kind.
-- **`NativeScript`** — `{ bundleId, body, input, inputPlan, outputPlan }`.
+    kind the codec cannot convert (`file`, `file-source`, a reference form
+    outside the conversion scope below, or an unrecognized kind), the object
+    also carries `unsupportedKind`, that kind. When a reference names an
+    object the app does not have, the object instead carries
+    `missingResource`, the referenced resource.
+- **Reference conversion.** The codec converts a single identity reference
+  with no container, to a resource the app finds at the application by its
+  identifier (D7, native conversion scope). The environment's `references`
+  table, `NativeReferenceTable`, holds one entry per resource,
+  `NativeReferencePlans { id?, addressing? }`: `id` is the resource's
+  identifier plan from the request's `resourcePlans` (D9), and `addressing`,
+  `NativeAddressing { collection, lookup, property }`, is how the app finds
+  one of its objects from its identifier. The native executor derives
+  `addressing` from the manifest, by the resource's identifier targeting
+  (D10): `lookup: 'byId'` addresses `app[collection].byId(id)`, and
+  `lookup: 'byProperty'` addresses the first match of
+  `app[collection].whose({ [property]: id })`. Only a resource whose resolving
+  get records no parent (D10, command parents) has `addressing`.
+  - Decoding runs in two phases. The first converts the whole input with no
+    access to the application: the reference's form, its resource's `id` plan
+    and `addressing`, and its `id` are checked and converted there, and the
+    reference becomes a pending address. Every validation failure and every
+    `unsupportedKind` failure, at any position, happens in this phase. Only
+    then does the second phase address each pending address's object, in
+    input order, and require its `exists()` to be `true`. A miss throws the
+    codec error with `missingResource`, before any command uses the object.
+  - Encoding reads the object's identifier as `native[property]()`, converts
+    it by the `id` plan, and emits
+    `{ reference: { resource, form: 'identity', cardinality: 'one', id } }`.
+    The SDK stamps the app on decode; the wire form has none.
+  - A selector, a collection, a container, or a resource with no `id` plan or
+    no `addressing` throws the codec error with `unsupportedKind: 'reference'`,
+    in either direction. So does a reference when the codec is called with no
+    environment.
+  - The codec calls only members of the objects passed to it (the
+    application, its collections and objects) and reads no globals.
+- **`NativeScript`** — `{ bundleId, body, input, inputPlan, outputPlan, references, page? }`.
   - `input` is a `WireRecord`, because operation input is always
     record-shaped (D2).
-  - `body` is a JXA function body invoked as `(app, args)`. `args` is the
-    decoded input record.
+  - `body` is a JXA function body invoked as `(app, args, page)`. `args` is
+    the decoded input record; `page` is the page window a paged list reads,
+    or `null`.
+  - `references` is the script's `NativeReferenceTable`. The native executor
+    builds it from the request's `resourcePlans` and the manifest, pruned to
+    the resources the input and output plans reach, including resources
+    reached through an identifier plan. It is required; a script with no
+    reference positions carries an empty table.
   - Arguments are never interpolated into source text.
   - The bodies that `rpc.ts` builds today move into the native executor and
     read `args.<name>`.
 - **`NativeOutcome`** — `{ ok: true, value: WireValue } | { ok: false, failure: NativeFailure }`.
   A `NativeFailure` takes one of two forms:
   - `{ source: 'app', message, errorNumber? }`: raised by the app or the bridge.
-  - `{ source: 'codec', direction, path, message, unsupportedKind? }`: raised by the codec.
+  - `{ source: 'codec', direction, path, message, unsupportedKind?, missingResource? }`:
+    raised by the codec. At most one of the two optional fields is present.
+  - `{ source: 'collection', message }`: a paged read found its collection
+    changed between pages.
 
 **How `executor.ts` consumes it.** The executor gains a function,
 `runNativeScript(script, codec, { timeout, signal, maxOutputBytes })`, that runs
@@ -849,9 +898,12 @@ ObjC.import('stdlib');
 /* codec.prelude */
 var __mactsOutcome = (function () {
   try {
-    var args = __mactsDecode(JSON.parse("<input as JSON text>"), JSON.parse("<inputPlan as JSON text>"));
-    var value = (function (app, args) { /* body */ })(Application("<bundleId>"), args);
-    return { ok: true, value: __mactsEncode(value, JSON.parse("<outputPlan as JSON text>")) };
+    var app = Application("<bundleId>");
+    app.includeStandardAdditions = true;
+    var env = { app: app, references: JSON.parse("<references as JSON text>") };
+    var args = __mactsDecode(JSON.parse("<input as JSON text>"), JSON.parse("<inputPlan as JSON text>"), env);
+    var value = (function (app, args, page) { /* body */ })(app, args, JSON.parse("<page window or null as JSON text>"));
+    return { ok: true, value: __mactsEncode(value, JSON.parse("<outputPlan as JSON text>"), env) };
   } catch (e) {
     return { ok: false, failure: /* describe(e): codec marker → codec, else app with e.errorNumber */ };
   }
@@ -859,17 +911,39 @@ var __mactsOutcome = (function () {
 JSON.stringify(__mactsOutcome);
 ```
 
-The input and both plans are embedded as JSON string literals passed to
-`JSON.parse`, never as object literals: a `__proto__` key in an object literal
-sets the prototype instead of creating a field. The bundle ID is a JSON string
-literal, and the application object has `includeStandardAdditions` set before
-the body runs, as the bridge has always set it. The script is passed to `osascript` without shell interpolation
+The input, both plans, the reference table and the page window are embedded
+as JSON string literals passed to `JSON.parse`, never as object literals: a
+`__proto__` key in an object literal sets the prototype instead of creating a
+field. The bundle ID is a JSON string literal, and the application object has
+`includeStandardAdditions` set before the body runs, as the bridge has always
+set it. The application object is created before the input is decoded,
+because finding a referenced object needs it.
+
+**Nothing reaches the app before the input converted.** No member of the
+application, or of any object it hands out, is read or called until every
+input value has converted. Creating the application object and setting
+`includeStandardAdditions` on it are the only uses before that point. Decoding's
+first phase converts the whole input without touching the application; only
+its second phase finds referenced objects and checks they exist; only then
+does the body run and send its command. So a value that cannot convert, a
+file, a file source, a reference form the provider cannot convert yet, or an
+invalid value, fails before the app receives any event, wherever it sits in
+the input. An app that is not installed fails at creation, as
+`AppUnavailableError` (`not-installed`), whatever the input holds.
+
+The transport seam is `NativeTransport`, with `runNativeScript` as the
+built-in implementation. `composeNativeScript` and `parseNativeOutcome` are
+not public API: tests in other packages reach them through
+`@macts/core/testing`, an internal test-support entry that is outside the API
+report and not covered by semantic versioning.
+
+The script is passed to `osascript` without shell interpolation
 (`execFile` with an argument vector, script on stdin), so values never cross a
 shell.
 
 In the catch block, a thrown object whose `name` is the codec marker becomes a
-`codec` failure with its `direction`, `path`, `message`, and `unsupportedKind`
-when it has one. Anything else
+`codec` failure with its `direction`, `path`, `message`, and its
+`unsupportedKind` or `missingResource` when it has one. Anything else
 becomes an `app` failure whose `message` is `String(e && e.message || e)`, with
 `errorNumber` only when `e.errorNumber` is a number. An app error caught in
 the process carries its native number (a missing object gives -1728), and
@@ -891,6 +965,13 @@ The native `Executor` maps a `NativeOutcome` failure to canonical errors:
   `InternalError`, never `ValidationError` or `UnexpectedValueError`: no input
   or result at that position can be converted, so neither the caller nor the
   app is at fault. Its message names the operation, the kind and the position.
+  For a reference it reads: The Contacts operation "actionTitle" takes a
+  reference at `for` that the macOS provider cannot convert yet.
+- A codec `decode` failure with `missingResource` maps to
+  `TargetNotFoundError` with `details: { resource }`, the referenced resource,
+  and a message naming the position: Contacts has no Person matching the
+  reference at `for`. It is not read from an app error number; the codec
+  checks existence before any command runs.
 
 Native error numbers map to D6 classes as follows:
 
@@ -1413,6 +1494,32 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   resource is not recorded, so no name-keyed target is exempt at output
   positions.
 
+**Native conversion scope.** The macOS provider converts a reference inside
+the automation process (D4, reference conversion) when it is a single
+identity reference with no container, to a top-level resource with an
+identifier. A resource is top-level when its resolving `get` records no parent
+(D10, command parents); one helper answers it for both directions. In that
+scope, an input reference becomes the app's object, found as the resource's
+generated `get` finds it, and a missing one fails as `TargetNotFoundError`
+naming the referenced resource before any command runs. An app object at an
+output position becomes the identity reference above, with no container.
+
+Every other reference keeps the codec's unsupported marker and fails as
+`InternalError` (D4), in either direction:
+
+- every selector form, at any position;
+- identity collections;
+- a reference with a container, so a parent-scoped target cannot be passed;
+- a resource with no identifier, or with no `get`;
+- a resource with no entry in the request's `resourcePlans`, so none in the
+  script's reference table;
+- a resource whose `get` records a parent (Music tracks, Contacts emails,
+  phones and addresses, Calendar events).
+
+Selectors and collections address the app through mechanisms other than an
+identifier lookup, and container chains need the parent's own addressing, so
+each is a separate extension of this scope.
+
 **Binding.** References are live objects bound to the client that decoded
 them, via `DecodeContext.bindReference`. The binder receives decoded
 `ReferenceData` (the data-only form of each variant): `app` set from the
@@ -1692,6 +1799,8 @@ execute(request), resolve(request) }`.
     plan is an array of the list's item plan, not its page plan
   - an optional `page` window, for a list that pages (see _Bounded list
     pages_ below)
+  - the `resourcePlans`, a `ResourcePlanTable`, required (see _Resource plans_
+    below)
   - an optional `signal`
 
   It carries no authority, because authorization has already happened.
@@ -1704,14 +1813,39 @@ execute(request), resolve(request) }`.
   validated by `t.reference` over the app contract's resources), the
   `outputPlan` of what it resolves to (the resource's `get` output for
   cardinality `'one'`; for `'many'`, an array of the item plan of its `list`
-  output, because resolution is never paged), and an optional `signal`. Like `ExecutionRequest`, it carries no authority. Container chains
+  output, because resolution is never paged), the required `resourcePlans`,
+  and an optional `signal`. Like `ExecutionRequest`, it carries no authority. Container chains
   are evaluated natively and contribute no data to the result. It follows the
   D7 error rules: `TargetNotFoundError` for a missing identity or name match,
   `InvalidSelectionError` for an index or range past the end,
   `TargetNotFoundError` with `entryIndex` for a missing identity-collection
   entry, and `[]` for an empty identity collection.
 - The native JXA executor is one implementation. Its `resolve` fails with
-  `InternalError`: the macOS provider does not resolve references.
+  `InternalError`: the macOS provider does not resolve references. It does
+  convert references at operation positions, within the scope in D7 (native
+  conversion scope).
+- **Resource plans.** `ResourcePlanTable` is
+  `Readonly<Record<string, { readonly id?: ValuePlan }>>`, keyed by manifest
+  resource key and declared in `@macts/contracts` next to `ValuePlan`. `id` is
+  the plan of the resource's identifier value type, the one a reference's `id`
+  is wire-encoded by, and is absent for a resource with no identifier. Entries
+  are objects, so a later per-resource field does not change the table's
+  shape. The table holds plans only: which native property carries an
+  identifier, and how an object is found from it, stays manifest knowledge
+  inside the executor.
+  - `resourcePlanTable(resources)` derives it from an app contract's
+    `resources`, so the two cannot disagree. `registerContract` derives it
+    once per contract, carries it on every registered operation, and passes
+    it on every `ExecutionRequest` and `ResolutionRequest` for that app.
+  - `registerContract` fails closed with `OperationRegistrationError` when a
+    contract resource is missing from the manifest, or when its identifier
+    plan differs from the plan the generator's own type mapping derives from
+    the manifest's primary identifier property (`contractResourcePlans`).
+    A contract generated from another manifest is refused rather than run
+    with identifiers the app would misread.
+  - The field is required. A caller without a contract, such as an app
+    registered from its manifest alone, passes `EMPTY_RESOURCE_PLAN_TABLE`,
+    under which no reference converts.
 - The runtime is constructed with an executor
   (`createRuntime({ executor, … })`), and every adapter dispatches through the
   runtime.

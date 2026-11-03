@@ -32,6 +32,7 @@ import { PermissionCheckResult } from '@macts/core';
 import { PermissionHistoryEntry } from '@macts/core';
 import { PermissionsSection } from '@macts/core';
 import pino from 'pino';
+import { ResourcePlanTable } from '@macts/contracts';
 import { RiskClass } from '@macts/core';
 import { WireValue } from '@macts/contracts';
 import { z } from 'zod';
@@ -389,6 +390,7 @@ export interface RegisteredOperation {
     readonly descriptor: AnyOperationDescriptor;
     readonly manifest: AppManifest;
     readonly permissionHistory?: PermissionHistoryEntry[];
+    readonly resourcePlans: ResourcePlanTable;
     readonly risk: RiskClass;
 }
 

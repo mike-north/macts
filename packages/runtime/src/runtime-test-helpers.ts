@@ -172,7 +172,11 @@ export const LIBRARY_MANIFEST: AppManifest = {
       name: 'Stamp',
       plural: 'Stamps',
       description: 'A stamp',
-      properties: {},
+      // Declared so the manifest's identifier type agrees with the contract's
+      // `t.integer()` identifier, which registration checks.
+      properties: {
+        serial: { access: 'r', type: 'integer', optional: false, description: 'The serial' },
+      },
       identifiers: [{ property: 'serial', primary: true }],
     },
   },

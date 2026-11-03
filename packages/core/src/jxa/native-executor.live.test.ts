@@ -50,6 +50,7 @@
 import { fileURLToPath } from 'node:url'
 import { beforeAll, describe, expect, it } from 'vitest'
 import {
+  EMPTY_RESOURCE_PLAN_TABLE,
   AppUnavailableError,
   PASSTHROUGH_PLAN,
   TargetNotFoundError,
@@ -84,6 +85,7 @@ describe.skipIf(!liveAppsEnabled)('native executor against Notes.app (local only
       input,
       inputPlan: PASSTHROUGH_PLAN,
       outputPlan: PASSTHROUGH_PLAN,
+      resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
     })
 
   it(
@@ -147,6 +149,7 @@ describe.skipIf(!liveAppsEnabled)('native executor against Calendar.app (local o
       input,
       inputPlan: PASSTHROUGH_PLAN,
       outputPlan: PASSTHROUGH_PLAN,
+      resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
     })
 
   it(
