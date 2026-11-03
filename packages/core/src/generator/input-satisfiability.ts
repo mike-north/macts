@@ -36,10 +36,10 @@ import {
   findCrudCommand,
   isCrudName,
   resolveIdParams,
-  resolvingCommand,
   resourceCommandEntries,
   type DeclaredType,
 } from './surface.js'
+import { resolvingCommand } from '../manifest/resource-commands.js'
 import { createNameResolver, mapDeclaredType, type ValueShape } from './contract/value-mapping.js'
 
 /** An input position of an operation that admits no value. */

@@ -59,6 +59,7 @@ import {
 import { lowerCamel } from '../../manifest/lower-camel.js'
 import { manifestGeneratedNotice } from '../generated-header.js'
 import { usableCommands, usableProperties, usableResources } from '../../manifest/unsupported.js'
+import { resolvingCommand } from '../../manifest/resource-commands.js'
 import {
   appCommandEntries,
   commandMethodParameters,
@@ -68,7 +69,6 @@ import {
   isCrudName,
   listMethodParameters,
   resolveIdParams,
-  resolvingCommand,
   resourceCommandEntries,
   resourceHasOperations,
   resourceNamespace,

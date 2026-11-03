@@ -59,7 +59,7 @@ import {
 } from '../manifest/identifier.js'
 import { resolveCollectionAccessor, resolvePropertyAccessor } from '../manifest/native-accessor.js'
 import { usableProperties } from '../manifest/unsupported.js'
-import { resolvingCommand } from '../generator/surface.js'
+import { resolvingCommand } from '../manifest/resource-commands.js'
 import {
   NATIVE_CODEC_ERROR_NAME,
   NATIVE_COLLECTION_CHANGED_ERROR_NAME,
