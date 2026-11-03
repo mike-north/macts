@@ -99,7 +99,7 @@ export interface Window {
    * Returns the currently selected tab.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly activeTab: ObjectReferenceVariant<Tab, string> | null
+  readonly activeTab: ObjectReferenceVariant<Tab, string, 'Tab'> | null
   /**
    * Represents the mode of the window which can be 'normal' or 'incognito', can be set only once
    * during creation of the window.
@@ -409,7 +409,7 @@ const windowRecordType: ValueType<Window> = t.record(
     zoomable: t.nullable(t.boolean(), { description: 'Whether the window can be zoomed.' }),
     zoomed: t.nullable(t.boolean(), { description: 'Whether the window is currently zoomed.' }),
     activeTab: t.nullable(
-      t.reference<Tab, string>(() => resources, 'Tab', 'one'),
+      t.reference<Tab, string, 'Tab'>(() => googleChromeContract, 'Tab', 'one'),
       { description: 'Returns the currently selected tab' }
     ),
     mode: t.nullable(t.string(), {

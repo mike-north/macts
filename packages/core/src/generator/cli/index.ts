@@ -53,8 +53,17 @@ export function generateCliPlugin(
       // that operation. The SDK keys each method's route by the command key, and
       // omits methods that have no backing command, so emitting a CLI command
       // that calls a non-existent SDK method would not type-check.
+      //
+      // An operation that cannot be called (a required input admits no value)
+      // gets no CLI command either: a command that always fails would only
+      // mislead.
       const resourceCommands = ctx.getResourceCommands(hierarchyPath.resourceName)
-      const hasOp = (op: string): boolean => resourceCommands.some((c) => c.name === op)
+      const available = (c: (typeof resourceCommands)[number]): boolean =>
+        ctx.isOperationAvailable(c, hierarchyPath.resourceName)
+      const hasOp = (op: string): boolean => {
+        const chosen = resourceCommands.find((c) => c.name === op)
+        return chosen !== undefined && available(chosen)
+      }
 
       // List command
       if (hasOp('list')) {
@@ -78,13 +87,14 @@ export function generateCliPlugin(
       // Resource-level commands (like "show" for events)
       // Skip standard CRUD commands since they're already generated above
       for (const cmd of resourceCommands) {
-        if (standardOps.has(cmd.name)) continue
+        if (standardOps.has(cmd.name) || !available(cmd)) continue
         commands.push(generateResourceCommand(cmd, hierarchyPath, ctx))
       }
     }
 
     // Generate application-level commands
     for (const cmd of ctx.getAppCommands()) {
+      if (!ctx.isOperationAvailable(cmd, undefined)) continue
       commands.push(generateAppCommand(cmd, ctx))
     }
 

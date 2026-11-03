@@ -23,7 +23,7 @@ import {
   type AppContract,
   type CallOptions,
   type ClientRuntime,
-  type ObjectReferenceVariant,
+  type ObjectReferenceData,
   type OperationDescriptor,
   type ValueType,
 } from '@macts/contracts'
@@ -1060,7 +1060,7 @@ export interface ContactsClient {
    */
   actionTitle(
     _with: unknown,
-    _for: ObjectReferenceVariant<Person, string>,
+    _for: ObjectReferenceData<string, 'Person'>,
     options?: CallOptions
   ): Promise<void>
   /**
@@ -1072,7 +1072,7 @@ export interface ContactsClient {
    */
   performAction(
     _with: unknown,
-    _for: ObjectReferenceVariant<Person, string>,
+    _for: ObjectReferenceData<string, 'Person'>,
     options?: CallOptions
   ): Promise<void>
   /**
@@ -1084,7 +1084,7 @@ export interface ContactsClient {
    */
   shouldEnableAction(
     _with: unknown,
-    _for: ObjectReferenceVariant<Person, string>,
+    _for: ObjectReferenceData<string, 'Person'>,
     options?: CallOptions
   ): Promise<void>
 }
@@ -1743,7 +1743,7 @@ const appActionPropertyOperation: OperationDescriptor<Record<string, never>, und
 }
 
 const appActionTitleOperation: OperationDescriptor<
-  { readonly with: unknown; readonly for: ObjectReferenceVariant<Person, string> },
+  { readonly with: unknown; readonly for: ObjectReferenceData<string, 'Person'> },
   undefined
 > = {
   id: 'contacts.app.actionTitle',
@@ -1754,7 +1754,7 @@ const appActionTitleOperation: OperationDescriptor<
     with: t.unknown({
       description: 'property that that was returned from the "action property" handler.',
     }),
-    for: t.reference<Person, string>(() => resources, 'Person', 'one', {
+    for: t.reference<Person, string, 'Person'>(() => contactsContract, 'Person', 'one', {
       description: 'Currently selected person.',
     }),
   }),
@@ -1978,40 +1978,7 @@ const appActionTitleOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', const: 'SocialProfile' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'string',
-                description: 'The persistent unique identifier for this profile.',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: {
-                type: 'string',
-                enum: [
-                  'Address',
-                  'AIMHandle',
-                  'CustomDate',
-                  'Email',
-                  'Group',
-                  'ICQHandle',
-                  'JabberHandle',
-                  'MSNHandle',
-                  'Person',
-                  'Phone',
-                  'RelatedName',
-                  'SocialProfile',
-                  'Url',
-                  'YahooHandle',
-                ],
-              },
+              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -2116,40 +2083,7 @@ const appActionTitleOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', const: 'SocialProfile' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'string',
-                description: 'The persistent unique identifier for this profile.',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: {
-                type: 'string',
-                enum: [
-                  'Address',
-                  'AIMHandle',
-                  'CustomDate',
-                  'Email',
-                  'Group',
-                  'ICQHandle',
-                  'JabberHandle',
-                  'MSNHandle',
-                  'Person',
-                  'Phone',
-                  'RelatedName',
-                  'SocialProfile',
-                  'Url',
-                  'YahooHandle',
-                ],
-              },
+              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -2188,7 +2122,7 @@ const appActionTitleOperation: OperationDescriptor<
 }
 
 const appPerformActionOperation: OperationDescriptor<
-  { readonly with: unknown; readonly for: ObjectReferenceVariant<Person, string> },
+  { readonly with: unknown; readonly for: ObjectReferenceData<string, 'Person'> },
   undefined
 > = {
   id: 'contacts.app.performAction',
@@ -2199,7 +2133,7 @@ const appPerformActionOperation: OperationDescriptor<
     with: t.unknown({
       description: 'property that that was returned from the "action property" handler.',
     }),
-    for: t.reference<Person, string>(() => resources, 'Person', 'one', {
+    for: t.reference<Person, string, 'Person'>(() => contactsContract, 'Person', 'one', {
       description: 'Currently selected person.',
     }),
   }),
@@ -2423,40 +2357,7 @@ const appPerformActionOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', const: 'SocialProfile' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'string',
-                description: 'The persistent unique identifier for this profile.',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: {
-                type: 'string',
-                enum: [
-                  'Address',
-                  'AIMHandle',
-                  'CustomDate',
-                  'Email',
-                  'Group',
-                  'ICQHandle',
-                  'JabberHandle',
-                  'MSNHandle',
-                  'Person',
-                  'Phone',
-                  'RelatedName',
-                  'SocialProfile',
-                  'Url',
-                  'YahooHandle',
-                ],
-              },
+              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -2561,40 +2462,7 @@ const appPerformActionOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', const: 'SocialProfile' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'string',
-                description: 'The persistent unique identifier for this profile.',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: {
-                type: 'string',
-                enum: [
-                  'Address',
-                  'AIMHandle',
-                  'CustomDate',
-                  'Email',
-                  'Group',
-                  'ICQHandle',
-                  'JabberHandle',
-                  'MSNHandle',
-                  'Person',
-                  'Phone',
-                  'RelatedName',
-                  'SocialProfile',
-                  'Url',
-                  'YahooHandle',
-                ],
-              },
+              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -2633,7 +2501,7 @@ const appPerformActionOperation: OperationDescriptor<
 }
 
 const appShouldEnableActionOperation: OperationDescriptor<
-  { readonly with: unknown; readonly for: ObjectReferenceVariant<Person, string> },
+  { readonly with: unknown; readonly for: ObjectReferenceData<string, 'Person'> },
   undefined
 > = {
   id: 'contacts.app.shouldEnableAction',
@@ -2645,7 +2513,7 @@ const appShouldEnableActionOperation: OperationDescriptor<
     with: t.unknown({
       description: 'property that that was returned from the "action property" handler.',
     }),
-    for: t.reference<Person, string>(() => resources, 'Person', 'one', {
+    for: t.reference<Person, string, 'Person'>(() => contactsContract, 'Person', 'one', {
       description: 'Currently selected person.',
     }),
   }),
@@ -2869,40 +2737,7 @@ const appShouldEnableActionOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', const: 'SocialProfile' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'string',
-                description: 'The persistent unique identifier for this profile.',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: {
-                type: 'string',
-                enum: [
-                  'Address',
-                  'AIMHandle',
-                  'CustomDate',
-                  'Email',
-                  'Group',
-                  'ICQHandle',
-                  'JabberHandle',
-                  'MSNHandle',
-                  'Person',
-                  'Phone',
-                  'RelatedName',
-                  'SocialProfile',
-                  'Url',
-                  'YahooHandle',
-                ],
-              },
+              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -3007,40 +2842,7 @@ const appShouldEnableActionOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', const: 'SocialProfile' },
-              form: { type: 'string', const: 'identity' },
-              cardinality: { type: 'string', const: 'one' },
-              id: {
-                type: 'string',
-                description: 'The persistent unique identifier for this profile.',
-              },
-              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'id'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              resource: {
-                type: 'string',
-                enum: [
-                  'Address',
-                  'AIMHandle',
-                  'CustomDate',
-                  'Email',
-                  'Group',
-                  'ICQHandle',
-                  'JabberHandle',
-                  'MSNHandle',
-                  'Person',
-                  'Phone',
-                  'RelatedName',
-                  'SocialProfile',
-                  'Url',
-                  'YahooHandle',
-                ],
-              },
+              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {

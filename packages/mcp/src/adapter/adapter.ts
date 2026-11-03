@@ -6,6 +6,8 @@
  * and every tool call into one `runtime.invoke` call. It owns protocol
  * concerns only:
  *
+ * - leaving out an operation whose descriptor is marked `unavailable`: one
+ *   whose input admits no value, so that it is never offered as a tool;
  * - deriving each tool from its operation descriptor: the name from the
  *   operation id ({@link toolNameFor}), the description from the descriptor,
  *   and the input schema from the descriptor's wire contract (phases/13 D9);
@@ -171,7 +173,11 @@ function deriveInputSchema(operation: RegisteredOperation): McpToolInputSchema {
 }
 
 /**
- * Derive one tool per registered operation, in registration order.
+ * Derive one tool per registered operation that can be called, in
+ * registration order. An operation whose descriptor is marked `unavailable`
+ * (a required input admits no value) gets no tool: every call to it would
+ * fail, so offering it would only mislead an agent. Calling its tool name is
+ * an unknown-tool call.
  *
  * @throws {@link McpToolDerivationError} when any operation cannot be served,
  *   including two operations that derive the same tool name (naming both).
@@ -179,6 +185,7 @@ function deriveInputSchema(operation: RegisteredOperation): McpToolInputSchema {
 function deriveTools(operations: readonly RegisteredOperation[]): Map<string, ServedTool> {
   const tools = new Map<string, ServedTool>()
   for (const operation of operations) {
+    if (operation.descriptor.unavailable !== undefined) continue
     const { id, description } = operation.descriptor
     const name = toolNameFor(id)
     const existing = tools.get(name)
@@ -262,7 +269,8 @@ function failureResult(error: unknown, context: FailureContext): CallToolResult 
  *
  * @remarks
  * Derives one tool per operation registered on the runtime when the adapter is
- * built; operations registered later are not served. A call to a tool runs its
+ * built; operations registered later are not served, and neither is an
+ * operation whose descriptor is marked `unavailable`. A call to a tool runs its
  * operation through `runtime.invoke` with the caller's `InvocationContext`,
  * and its outcome becomes the tool result described on
  * {@link McpAdapter.callTool}.

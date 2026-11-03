@@ -801,9 +801,7 @@ export interface NetworkPreferencesObject {
 }
 
 // @public
-export interface NetworkPreferencesObjectCreateInput {
-    currentLocation?: Location;
-}
+export type NetworkPreferencesObjectCreateInput = Record<string, never>;
 
 // @public (undocumented)
 export const NetworkPreferencesObjectSchema: z.ZodObject<{
@@ -1279,7 +1277,6 @@ export interface Service {
 
 // @public
 export interface ServiceCreateInput {
-    currentConfiguration?: Configuration;
     name?: string;
 }
 

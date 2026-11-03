@@ -987,6 +987,39 @@ describe('resolveReference: resources without a resolving operation (D7)', () =>
     expect(executor.resolutions).toHaveLength(0)
   })
 
+  it('fails a reference whose container is a resource with no get operation with ValidationError, resolving nothing', async () => {
+    // A page cannot be got, so it cannot scope a book: the reference wire
+    // schema admits as containers only resources with get (D7, "Resolvable
+    // targets"), and the request fails before anything is resolved.
+    const { runtime, executor } = harness()
+
+    const error = await rejection(
+      runtime.resolveReference(
+        'library',
+        wire({
+          ...DUNE_BY_NAME,
+          container: {
+            resource: 'Page',
+            form: 'selector',
+            cardinality: 'one',
+            selector: { by: 'index', index: { integer: '0' } },
+          },
+        }),
+        as(LIBRARIAN_SECRET)
+      )
+    )
+
+    expect(error).toBeInstanceOf(ValidationError)
+    if (!(error instanceof ValidationError)) return
+    // The raw wire check reports the failed alternatives of the reference
+    // forms as one issue at the reference; only the codecs name the
+    // container's resource.
+    expect(error.details.issues).toEqual([
+      { path: ['reference'], message: 'Invalid input', code: 'invalid_union' },
+    ])
+    expect(executor.resolutions).toHaveLength(0)
+  })
+
   it('resolves as the operation the contract records, not one re-derived from the manifest', async () => {
     // The contract records Book's get as `library.books.describeBook` here,
     // although the manifest's CRUD-shaped get command is `lookupBook`: the

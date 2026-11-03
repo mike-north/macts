@@ -36,6 +36,7 @@ import type {
   ObjectReferenceVariant,
   ReferenceData,
   ReferenceRegistry,
+  ReferenceScope,
   SelectorReference,
   SelectorReferenceData,
 } from '../../references/index.js'
@@ -136,6 +137,13 @@ const update = t.record({ id: t.string(), note: t.optional(t.string()) })
 const event = t.record({ id: t.string(), count: t.integer() })
 
 /**
+ * The app every reference vector belongs to. Reference data carries it at
+ * every level (the reference, its container, its entries); a reference of
+ * any other app is rejected on encode, and the wire form never carries it.
+ */
+export const VECTOR_APP = 'vectors'
+
+/**
  * The `resolve` of every reference bound by {@link VECTOR_DECODE_CONTEXT}: a
  * marker that proves the binder ran. Vector references never resolve.
  */
@@ -150,14 +158,14 @@ export const VECTOR_FETCH = (): Promise<never> =>
   Promise.reject(new Error('vector files do not fetch'))
 
 function bindIdentity(data: IdentityReferenceData): IdentityReference<unknown> {
-  const { resource, form, cardinality, id } = data
-  const base = { resource, form, cardinality, id, resolve: VECTOR_RESOLVE }
+  const { app, resource, form, cardinality, id } = data
+  const base = { app, resource, form, cardinality, id, resolve: VECTOR_RESOLVE }
   return data.container === undefined ? base : { ...base, container: bindObject(data.container) }
 }
 
 function bindSelector(data: SelectorReferenceData): SelectorReference<unknown> {
-  const { resource, form, cardinality, selector } = data
-  const base = { resource, form, cardinality, selector, resolve: VECTOR_RESOLVE }
+  const { app, resource, form, cardinality, selector } = data
+  const base = { app, resource, form, cardinality, selector, resolve: VECTOR_RESOLVE }
   return data.container === undefined ? base : { ...base, container: bindObject(data.container) }
 }
 
@@ -169,9 +177,10 @@ function bindReference(
   data: ReferenceData
 ): ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown> {
   if (data.cardinality === 'one') return bindObject(data)
-  const { resource, form, cardinality } = data
+  const { app, resource, form, cardinality } = data
   if (form === 'identity') {
     return {
+      app,
       resource,
       form,
       cardinality,
@@ -179,7 +188,14 @@ function bindReference(
       resolve: VECTOR_RESOLVE,
     }
   }
-  const base = { resource, form, cardinality, selector: data.selector, resolve: VECTOR_RESOLVE }
+  const base = {
+    app,
+    resource,
+    form,
+    cardinality,
+    selector: data.selector,
+    resolve: VECTOR_RESOLVE,
+  }
   return data.container === undefined ? base : { ...base, container: bindObject(data.container) }
 }
 
@@ -199,20 +215,30 @@ export const VECTOR_DECODE_CONTEXT: DecodeContext = Object.freeze({
 })
 
 /**
- * The resource table of the reference vectors: notes with text identifiers,
- * folders with integer identifiers, and accounts with text identifiers. Notes
- * are contained in folders and folders in accounts. Paragraphs (in notes) and
- * words (in paragraphs) have no identifier, so they are referenced only by
- * selectors.
+ * The reference scope of the vectors: the app {@link VECTOR_APP} and its
+ * resource table. Notes have text identifiers, folders integer identifiers,
+ * and accounts text identifiers. Notes are contained in folders and folders in
+ * accounts. Paragraphs (in notes) and words (in paragraphs) have no
+ * identifier, so they are referenced only by selectors.
+ *
+ * Each of those resources has the operations its vectors resolve through:
+ * `get` for a single object or a container, `list` for a collection.
+ * Attachments have neither, and labels can only be listed, so references to
+ * them that could never be resolved are rejected in both directions.
  */
-const VECTOR_RESOURCES: ReferenceRegistry = Object.freeze({
-  note: { id: t.string() },
-  folder: { id: t.integer() },
-  account: { id: t.string() },
-  paragraph: {},
-  word: {},
+const VECTOR_SCOPE: ReferenceScope = Object.freeze({
+  app: VECTOR_APP,
+  resources: Object.freeze<ReferenceRegistry>({
+    note: { id: t.string(), get: 'vectors.notes.get', list: 'vectors.notes.list' },
+    folder: { id: t.integer(), get: 'vectors.folders.get', list: 'vectors.folders.list' },
+    account: { id: t.string(), get: 'vectors.accounts.get' },
+    paragraph: { get: 'vectors.paragraphs.get', list: 'vectors.paragraphs.list' },
+    word: { get: 'vectors.words.get' },
+    attachment: { id: t.string() },
+    label: { id: t.string(), list: 'vectors.labels.list' },
+  }),
 })
-const resources = (): ReferenceRegistry => VECTOR_RESOURCES
+const resources = (): ReferenceScope => VECTOR_SCOPE
 
 const noteRef = t.reference(resources, 'note', 'one')
 const noteRefs = t.reference(resources, 'note', 'many')
@@ -220,6 +246,10 @@ const folderRef = t.reference(resources, 'folder', 'one')
 const paragraphRef = t.reference(resources, 'paragraph', 'one')
 const paragraphRefs = t.reference(resources, 'paragraph', 'many')
 const wordRef = t.reference(resources, 'word', 'one')
+const attachmentRef = t.reference(resources, 'attachment', 'one')
+const attachmentRefs = t.reference(resources, 'attachment', 'many')
+const labelRef = t.reference(resources, 'label', 'one')
+const labelRefs = t.reference(resources, 'label', 'many')
 
 const file = t.file()
 const fileSource = t.fileSource()
@@ -607,10 +637,32 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
 
   // References.
   {
+    name: 'a collection of a resource that can be listed but not got',
+    see: 'phases/13 §D7',
+    type: labelRefs,
+    sdk: {
+      app: VECTOR_APP,
+      resource: 'label',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'every' },
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: {
+        resource: 'label',
+        form: 'selector',
+        cardinality: 'many',
+        selector: { by: 'every' },
+      },
+    },
+  },
+  {
     name: 'an identity reference with a text id',
     see: 'phases/13 §D7',
     type: noteRef,
     sdk: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'identity',
       cardinality: 'one',
@@ -624,6 +676,7 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: folderRef,
     sdk: {
+      app: VECTOR_APP,
       resource: 'folder',
       form: 'identity',
       cardinality: 'one',
@@ -639,6 +692,7 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRef,
     sdk: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'selector',
       cardinality: 'one',
@@ -659,6 +713,7 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRef,
     sdk: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'selector',
       cardinality: 'one',
@@ -679,6 +734,7 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRefs,
     sdk: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'selector',
       cardinality: 'many',
@@ -699,6 +755,7 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRefs,
     sdk: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'selector',
       cardinality: 'many',
@@ -719,6 +776,7 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRefs,
     sdk: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'selector',
       cardinality: 'many',
@@ -739,11 +797,13 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRefs,
     sdk: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'identity',
       cardinality: 'many',
       entries: [
         {
+          app: VECTOR_APP,
           resource: 'note',
           form: 'identity',
           cardinality: 'one',
@@ -751,6 +811,7 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
           resolve: VECTOR_RESOLVE,
         },
         {
+          app: VECTOR_APP,
           resource: 'note',
           form: 'identity',
           cardinality: 'one',
@@ -777,16 +838,19 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRef,
     sdk: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'identity',
       cardinality: 'one',
       id: 'N1',
       container: {
+        app: VECTOR_APP,
         resource: 'folder',
         form: 'identity',
         cardinality: 'one',
         id: Integer.validate(7),
         container: {
+          app: VECTOR_APP,
           resource: 'account',
           form: 'identity',
           cardinality: 'one',
@@ -818,11 +882,13 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRefs,
     sdk: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'selector',
       cardinality: 'many',
       selector: { by: 'every' },
       container: {
+        app: VECTOR_APP,
         resource: 'folder',
         form: 'selector',
         cardinality: 'one',
@@ -853,6 +919,7 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: paragraphRef,
     sdk: {
+      app: VECTOR_APP,
       resource: 'paragraph',
       form: 'selector',
       cardinality: 'one',
@@ -873,11 +940,13 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: paragraphRefs,
     sdk: {
+      app: VECTOR_APP,
       resource: 'paragraph',
       form: 'selector',
       cardinality: 'many',
       selector: { by: 'every' },
       container: {
+        app: VECTOR_APP,
         resource: 'note',
         form: 'identity',
         cardinality: 'one',
@@ -901,16 +970,19 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: wordRef,
     sdk: {
+      app: VECTOR_APP,
       resource: 'word',
       form: 'selector',
       cardinality: 'one',
       selector: { by: 'index', index: Integer.validate(0) },
       container: {
+        app: VECTOR_APP,
         resource: 'paragraph',
         form: 'selector',
         cardinality: 'one',
         selector: { by: 'index', index: Integer.validate(2) },
         container: {
+          app: VECTOR_APP,
           resource: 'note',
           form: 'identity',
           cardinality: 'one',
@@ -1395,10 +1467,281 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
 
   // References.
   {
+    name: 'a reference without its app',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' },
+    direction: 'encode',
+    expectedIssueCodes: ['missing-field'],
+    expectedIssuePaths: [['app']],
+  },
+  {
+    name: 'a reference of another app',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: { app: 'calendar', resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' },
+    direction: 'encode',
+    expectedIssueCodes: ['invalid-type'],
+    expectedIssuePaths: [['app']],
+  },
+  {
+    name: 'a container of another app',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      app: VECTOR_APP,
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'N1',
+      container: {
+        app: 'calendar',
+        resource: 'folder',
+        form: 'identity',
+        cardinality: 'one',
+        id: 7,
+      },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['invalid-type'],
+    expectedIssuePaths: [['container', 'app']],
+  },
+  {
+    name: 'an identity collection entry without its app',
+    see: 'phases/13 §D7',
+    type: noteRefs,
+    input: {
+      app: VECTOR_APP,
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [{ resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' }],
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['missing-field'],
+    expectedIssuePaths: [['entries', 0, 'app']],
+  },
+  {
+    // The route names the app, so the wire form has no app field to carry.
+    name: 'a wire reference carrying an app',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      reference: {
+        app: VECTOR_APP,
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'N1',
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['app']],
+  },
+  {
+    name: 'a wire container carrying an app',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      reference: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'N1',
+        container: {
+          app: VECTOR_APP,
+          resource: 'folder',
+          form: 'identity',
+          cardinality: 'one',
+          id: { integer: '7' },
+        },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['container', 'app']],
+  },
+  {
+    name: 'a reference to a resource that cannot be got',
+    see: 'phases/13 §D7',
+    type: attachmentRef,
+    input: {
+      app: VECTOR_APP,
+      resource: 'attachment',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'X1',
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a single reference to a resource that can only be listed',
+    see: 'phases/13 §D7',
+    type: labelRef,
+    input: {
+      app: VECTOR_APP,
+      resource: 'label',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'name', name: 'Urgent' },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a collection of a resource that cannot be listed',
+    see: 'phases/13 §D7',
+    type: attachmentRefs,
+    input: {
+      app: VECTOR_APP,
+      resource: 'attachment',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'every' },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a container that cannot be got',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      app: VECTOR_APP,
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'N1',
+      container: {
+        app: VECTOR_APP,
+        resource: 'label',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'L1',
+      },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['container', 'resource']],
+  },
+  {
+    name: 'an identity collection entry that cannot be got',
+    see: 'phases/13 §D7',
+    type: labelRefs,
+    input: {
+      app: VECTOR_APP,
+      resource: 'label',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [
+        { app: VECTOR_APP, resource: 'label', form: 'identity', cardinality: 'one', id: 'L1' },
+      ],
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['entries', 0, 'resource']],
+  },
+  {
+    // Such an output can only come from a defect of the contract, so the wire
+    // schema and decoding reject it as they reject a raw request carrying it.
+    name: 'a returned reference to a resource that cannot be got',
+    see: 'phases/13 §D7',
+    type: attachmentRef,
+    input: {
+      reference: { resource: 'attachment', form: 'identity', cardinality: 'one', id: 'X1' },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a returned collection of a resource that cannot be listed',
+    see: 'phases/13 §D7',
+    type: attachmentRefs,
+    input: {
+      reference: {
+        resource: 'attachment',
+        form: 'selector',
+        cardinality: 'many',
+        selector: { by: 'every' },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a returned reference in a container that cannot be got',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      reference: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'N1',
+        container: { resource: 'label', form: 'identity', cardinality: 'one', id: 'L1' },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['container', 'resource']],
+  },
+  {
+    name: 'a returned identity collection entry that cannot be got',
+    see: 'phases/13 §D7',
+    type: labelRefs,
+    input: {
+      reference: {
+        resource: 'label',
+        form: 'identity',
+        cardinality: 'many',
+        entries: [{ resource: 'label', form: 'identity', cardinality: 'one', id: 'L1' }],
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['entries', 0, 'resource']],
+  },
+  {
+    name: 'a nested container that cannot be got',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      app: VECTOR_APP,
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'N1',
+      container: {
+        app: VECTOR_APP,
+        resource: 'folder',
+        form: 'identity',
+        cardinality: 'one',
+        id: 7,
+        container: {
+          app: VECTOR_APP,
+          resource: 'attachment',
+          form: 'identity',
+          cardinality: 'one',
+          id: 'X1',
+        },
+      },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['container', 'container', 'resource']],
+  },
+  {
     name: 'a reference to another resource',
     see: 'phases/13 §D7',
     type: noteRef,
-    input: { resource: 'folder', form: 'identity', cardinality: 'one', id: 7 },
+    input: { app: VECTOR_APP, resource: 'folder', form: 'identity', cardinality: 'one', id: 7 },
     direction: 'encode',
     expectedIssueCodes: ['invalid-type'],
     expectedIssuePaths: [[]],
@@ -1418,7 +1761,13 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     name: 'a collection at a single-object position',
     see: 'phases/13 §D7',
     type: noteRef,
-    input: { resource: 'note', form: 'selector', cardinality: 'many', selector: { by: 'every' } },
+    input: {
+      app: VECTOR_APP,
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'every' },
+    },
     direction: 'encode',
     expectedIssueCodes: ['invalid-type'],
     expectedIssuePaths: [[]],
@@ -1428,6 +1777,7 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRef,
     input: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'selector',
       cardinality: 'one',
@@ -1458,6 +1808,7 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRef,
     input: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'selector',
       cardinality: 'one',
@@ -1472,6 +1823,7 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRefs,
     input: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'selector',
       cardinality: 'many',
@@ -1502,12 +1854,13 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRefs,
     input: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'identity',
       cardinality: 'many',
       entries: [
-        { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' },
-        { resource: 'folder', form: 'identity', cardinality: 'one', id: 7 },
+        { app: VECTOR_APP, resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' },
+        { app: VECTOR_APP, resource: 'folder', form: 'identity', cardinality: 'one', id: 7 },
       ],
     },
     direction: 'encode',
@@ -1519,11 +1872,13 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRefs,
     input: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'identity',
       cardinality: 'many',
       entries: [
         {
+          app: VECTOR_APP,
           resource: 'note',
           form: 'selector',
           cardinality: 'one',
@@ -1540,11 +1895,18 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRef,
     input: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'identity',
       cardinality: 'one',
       id: 'N1',
-      container: { resource: 'calendar', form: 'identity', cardinality: 'one', id: 'C1' },
+      container: {
+        app: VECTOR_APP,
+        resource: 'calendar',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'C1',
+      },
     },
     direction: 'encode',
     expectedIssueCodes: ['unsupported'],
@@ -1572,11 +1934,13 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRef,
     input: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'selector',
       cardinality: 'one',
       selector: { by: 'name', name: 'Groceries' },
       container: {
+        app: VECTOR_APP,
         resource: 'folder',
         form: 'selector',
         cardinality: 'many',
@@ -1627,6 +1991,7 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRef,
     input: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'identity',
       cardinality: 'one',
@@ -1659,6 +2024,7 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRef,
     input: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'selector',
       cardinality: 'one',
@@ -1691,12 +2057,19 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRefs,
     input: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'identity',
       cardinality: 'many',
       entries: [],
       selector: { by: 'every' },
-      container: { resource: 'account', form: 'identity', cardinality: 'one', id: 'A1' },
+      container: {
+        app: VECTOR_APP,
+        resource: 'account',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'A1',
+      },
     },
     direction: 'encode',
     expectedIssueCodes: ['unknown-field', 'unknown-field'],
@@ -1724,11 +2097,18 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRef,
     input: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'identity',
       cardinality: 'one',
       id: 'N1',
-      contianer: { resource: 'account', form: 'identity', cardinality: 'one', id: 'A1' },
+      contianer: {
+        app: VECTOR_APP,
+        resource: 'account',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'A1',
+      },
     },
     direction: 'encode',
     expectedIssueCodes: ['unknown-field'],
@@ -1756,6 +2136,7 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: noteRef,
     input: {
+      app: VECTOR_APP,
       resource: 'note',
       form: 'selector',
       cardinality: 'one',
@@ -1782,7 +2163,13 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     name: 'an identity reference to a resource without an identifier',
     see: 'phases/13 §D7',
     type: paragraphRef,
-    input: { resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' },
+    input: {
+      app: VECTOR_APP,
+      resource: 'paragraph',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'P1',
+    },
     direction: 'encode',
     expectedIssueCodes: ['unsupported'],
     expectedIssuePaths: [[]],
@@ -1805,10 +2192,13 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: paragraphRefs,
     input: {
+      app: VECTOR_APP,
       resource: 'paragraph',
       form: 'identity',
       cardinality: 'many',
-      entries: [{ resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' }],
+      entries: [
+        { app: VECTOR_APP, resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' },
+      ],
     },
     direction: 'encode',
     expectedIssueCodes: ['unsupported'],
@@ -1835,11 +2225,18 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     see: 'phases/13 §D7',
     type: wordRef,
     input: {
+      app: VECTOR_APP,
       resource: 'word',
       form: 'selector',
       cardinality: 'one',
       selector: { by: 'name', name: 'macts' },
-      container: { resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' },
+      container: {
+        app: VECTOR_APP,
+        resource: 'paragraph',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'P1',
+      },
     },
     direction: 'encode',
     expectedIssueCodes: ['unsupported'],

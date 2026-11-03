@@ -318,7 +318,7 @@ export type MailboxUpdateInput = Partial<MailboxCreateInput>;
 // @public
 export class MailClient {
     constructor(options: MailClientOptions);
-    checkForNewMail(_for?: Account): Promise<void>;
+    checkForNewMail(): Promise<void>;
     _delete(): Promise<void>;
     duplicate(to?: string, withProperties?: unknown): Promise<void>;
     extractAddressFrom(): Promise<void>;
@@ -330,8 +330,7 @@ export class MailClient {
     readonly messages: MessageResourceClient;
     move(to: string): Promise<void>;
     readonly outgoingMessages: OutgoingMessageResourceClient;
-    performMailActionWithMessages(inMailboxes?: Mailbox, forRule?: Rule): Promise<void>;
-    synchronize(_with: Account): Promise<void>;
+    performMailActionWithMessages(): Promise<void>;
 }
 
 // @public
@@ -382,7 +381,6 @@ export interface MessageCreateInput {
     flaggedStatus?: boolean;
     flagIndex?: number;
     junkMailStatus?: boolean;
-    mailbox?: Mailbox;
     readStatus?: boolean;
 }
 
@@ -668,7 +666,6 @@ export type RuleConditionUpdateInput = Partial<RuleConditionCreateInput>;
 export interface RuleCreateInput {
     allConditionsMustBeMet?: boolean;
     colorMessage?: string;
-    copyMessage?: Mailbox;
     deleteMessage?: boolean;
     enabled?: boolean;
     forwardMessage?: string;
@@ -677,7 +674,6 @@ export interface RuleCreateInput {
     markFlagged?: boolean;
     markFlagIndex?: number;
     markRead?: boolean;
-    moveMessage?: Mailbox;
     name?: string;
     playSound?: string;
     redirectMessage?: string;

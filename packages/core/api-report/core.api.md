@@ -776,8 +776,10 @@ export interface CliGeneratorContext {
     getResource(name: string): Resource | undefined;
     getResourceCommands(resourceName: string): Command[];
     getResources(): Resource[];
+    isOperationAvailable(cmd: Command, resourceName: string | undefined): boolean;
     // (undocumented)
     manifest: AppManifest;
+    omittedInputs(cmd: Command, resourceName: string | undefined): ReadonlySet<string>;
     // (undocumented)
     options: CliGeneratorOptions;
 }

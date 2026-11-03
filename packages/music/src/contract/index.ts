@@ -26,6 +26,7 @@ import {
   type FileSource,
   type FileValue,
   type Integer,
+  type ObjectReferenceData,
   type ObjectReferenceVariant,
   type OperationDescriptor,
   type ValueType,
@@ -241,7 +242,7 @@ export interface BrowserWindow {
    * the playlist currently displayed in the window.
    * Nullable. No evidence that the app always sets it.
    */
-  view: ObjectReferenceVariant<Playlist, string> | null
+  view: ObjectReferenceVariant<Playlist, string, 'Playlist'> | null
 }
 
 /** converts a track to a specific file format */
@@ -433,7 +434,7 @@ export interface PlaylistWindow {
    * the playlist displayed in the window.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly view: ObjectReferenceVariant<Playlist, string> | null
+  readonly view: ObjectReferenceVariant<Playlist, string, 'Playlist'> | null
 }
 
 /** the radio tuner playlist */
@@ -1027,7 +1028,7 @@ export type AudioCDTrackUpdateInput = Record<string, never>
 /** Input for creating a BrowserWindow. */
 export interface BrowserWindowCreateInput {
   /** the playlist currently displayed in the window */
-  view?: ObjectReferenceVariant<Playlist, string>
+  view?: ObjectReferenceData<string, 'Playlist'>
 }
 
 /** Input for updating a BrowserWindow. Omitted fields are left unchanged. */
@@ -1036,7 +1037,7 @@ export interface BrowserWindowUpdateInput {
    * the playlist currently displayed in the window.
    * Cannot be reset: null is rejected.
    */
-  view?: ObjectReferenceVariant<Playlist, string>
+  view?: ObjectReferenceData<string, 'Playlist'>
 }
 
 /** Input for creating an Encoder. */
@@ -1899,7 +1900,7 @@ const browserWindowRecordType: ValueType<BrowserWindow> = t.record(
   {
     selection: t.nullable(t.string(), { description: 'the selected tracks' }),
     view: t.nullable(
-      t.reference<Playlist, string>(() => resources, 'Playlist', 'one'),
+      t.reference<Playlist, string, 'Playlist'>(() => musicContract, 'Playlist', 'one'),
       { description: 'the playlist currently displayed in the window' }
     ),
   },
@@ -2017,7 +2018,7 @@ const playlistWindowRecordType: ValueType<PlaylistWindow> = t.record(
   {
     selection: t.nullable(t.string(), { description: 'the selected tracks' }),
     view: t.nullable(
-      t.reference<Playlist, string>(() => resources, 'Playlist', 'one'),
+      t.reference<Playlist, string, 'Playlist'>(() => musicContract, 'Playlist', 'one'),
       { description: 'the playlist displayed in the window' }
     ),
   },

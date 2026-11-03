@@ -116,17 +116,18 @@ export type CodecResult<T> = {
 };
 
 // @public
-export interface CollectionReference<T> extends Resolvable<readonly T[]> {
+export interface CollectionReference<T, R extends string = string> extends Resolvable<readonly T[]> {
+    readonly app: string;
     readonly cardinality: 'many';
     readonly form: ReferenceForm;
-    readonly resource: string;
+    readonly resource: R;
 }
 
 // @public
-export type CollectionReferenceData = IdentityCollectionReferenceData | SelectorCollectionReferenceData;
+export type CollectionReferenceData<Id = unknown, R extends string = string> = IdentityCollectionReferenceData<Id, R> | SelectorCollectionReferenceData<R>;
 
 // @public
-export type CollectionReferenceVariant<T, Id = unknown> = IdentityCollectionReference<T, Id> | SelectorCollectionReference<T>;
+export type CollectionReferenceVariant<T, Id = unknown, R extends string = string> = IdentityCollectionReference<T, Id, R> | SelectorCollectionReference<T, R>;
 
 // @public
 export type CollectionSelector = EverySelector | RangeSelector;
@@ -321,32 +322,34 @@ export interface FromWireErrorOptions {
 }
 
 // @public
-export interface IdentityCollectionReference<T, Id = unknown> extends IdentityCollectionReferenceData<Id>, CollectionReference<T> {
-    readonly entries: readonly IdentityReference<T, Id>[];
+export interface IdentityCollectionReference<T, Id = unknown, R extends string = string> extends IdentityCollectionReferenceData<Id, R>, CollectionReference<T, R> {
+    readonly entries: readonly IdentityReference<T, Id, R>[];
     readonly form: 'identity';
 }
 
 // @public
-export interface IdentityCollectionReferenceData<Id = unknown> {
+export interface IdentityCollectionReferenceData<Id = unknown, R extends string = string> {
+    readonly app: string;
     readonly cardinality: 'many';
-    readonly entries: readonly IdentityReferenceData<Id>[];
+    readonly entries: readonly IdentityReferenceData<Id, R>[];
     readonly form: 'identity';
-    readonly resource: string;
+    readonly resource: R;
 }
 
 // @public
-export interface IdentityReference<T, Id = unknown> extends IdentityReferenceData<Id>, ObjectReference<T> {
+export interface IdentityReference<T, Id = unknown, R extends string = string> extends IdentityReferenceData<Id, R>, ObjectReference<T, R> {
     readonly container?: ObjectReferenceVariant<unknown>;
     readonly form: 'identity';
 }
 
 // @public
-export interface IdentityReferenceData<Id = unknown> {
+export interface IdentityReferenceData<Id = unknown, R extends string = string> {
+    readonly app: string;
     readonly cardinality: 'one';
     readonly container?: ObjectReferenceData;
     readonly form: 'identity';
     readonly id: Id;
-    readonly resource: string;
+    readonly resource: R;
 }
 
 // @public
@@ -473,17 +476,18 @@ export interface NameSelector {
 export type NoDetails = Readonly<Record<string, never>>;
 
 // @public
-export interface ObjectReference<T> extends Resolvable<T> {
+export interface ObjectReference<T, R extends string = string> extends Resolvable<T> {
+    readonly app: string;
     readonly cardinality: 'one';
     readonly form: ReferenceForm;
-    readonly resource: string;
+    readonly resource: R;
 }
 
 // @public
-export type ObjectReferenceData = IdentityReferenceData | SelectorReferenceData;
+export type ObjectReferenceData<Id = unknown, R extends string = string> = IdentityReferenceData<Id, R> | SelectorReferenceData<R>;
 
 // @public
-export type ObjectReferenceVariant<T, Id = unknown> = IdentityReference<T, Id> | SelectorReference<T>;
+export type ObjectReferenceVariant<T, Id = unknown, R extends string = string> = IdentityReference<T, Id, R> | SelectorReference<T, R>;
 
 // @public
 export type ObjectSelector = NameSelector | IndexSelector;
@@ -514,6 +518,7 @@ export interface OperationDescriptor<Input, Output> {
     readonly output: ValueType<Output>;
     readonly permission: PermissionString;
     readonly target: OperationTarget;
+    readonly unavailable?: OperationUnavailability;
 }
 
 // @public
@@ -531,6 +536,12 @@ export class OperationTimeoutError extends MactsError<'TIMEOUT'> {
     readonly code = "TIMEOUT";
     // (undocumented)
     readonly name = "OperationTimeoutError";
+}
+
+// @public
+export interface OperationUnavailability {
+    readonly positions: readonly string[];
+    readonly reason: string;
 }
 
 // @public
@@ -640,7 +651,15 @@ export type ReferenceList<R extends ObjectReference<unknown>> = readonly R[];
 // @public
 export type ReferenceRegistry = Readonly<Record<string, {
     readonly id?: ValueType<unknown>;
+    readonly get?: OperationId;
+    readonly list?: OperationId;
 }>>;
+
+// @public
+export interface ReferenceScope {
+    readonly app: string;
+    readonly resources: ReferenceRegistry;
+}
 
 // @public
 export type ReferenceWire = {
@@ -715,32 +734,34 @@ export interface RgbHelpers {
 }
 
 // @public
-export interface SelectorCollectionReference<T> extends SelectorCollectionReferenceData, CollectionReference<T> {
+export interface SelectorCollectionReference<T, R extends string = string> extends SelectorCollectionReferenceData<R>, CollectionReference<T, R> {
     readonly container?: ObjectReferenceVariant<unknown>;
     readonly form: 'selector';
 }
 
 // @public
-export interface SelectorCollectionReferenceData {
+export interface SelectorCollectionReferenceData<R extends string = string> {
+    readonly app: string;
     readonly cardinality: 'many';
     readonly container?: ObjectReferenceData;
     readonly form: 'selector';
-    readonly resource: string;
+    readonly resource: R;
     readonly selector: CollectionSelector;
 }
 
 // @public
-export interface SelectorReference<T> extends SelectorReferenceData, ObjectReference<T> {
+export interface SelectorReference<T, R extends string = string> extends SelectorReferenceData<R>, ObjectReference<T, R> {
     readonly container?: ObjectReferenceVariant<unknown>;
     readonly form: 'selector';
 }
 
 // @public
-export interface SelectorReferenceData {
+export interface SelectorReferenceData<R extends string = string> {
+    readonly app: string;
     readonly cardinality: 'one';
     readonly container?: ObjectReferenceData;
     readonly form: 'selector';
-    readonly resource: string;
+    readonly resource: R;
     readonly selector: ObjectSelector;
 }
 
@@ -923,8 +944,8 @@ export interface ValueTypeConstructors {
     point(options?: ValueTypeOptions): ValueType<Point>;
     record<const Fields extends RecordFields>(fields: Fields, options?: ValueTypeOptions): ValueType<RecordSdk<Fields>>;
     rectangle(options?: ValueTypeOptions): ValueType<Rectangle>;
-    reference<T = unknown, Id = unknown>(registry: () => ReferenceRegistry, resource: string, cardinality: 'one', options?: ValueTypeOptions): ValueType<ObjectReferenceVariant<T, Id>>;
-    reference<T = unknown, Id = unknown>(registry: () => ReferenceRegistry, resource: string, cardinality: 'many', options?: ValueTypeOptions): ValueType<CollectionReferenceVariant<T, Id>>;
+    reference<T = unknown, Id = unknown, R extends string = string>(scope: () => ReferenceScope, resource: R, cardinality: 'one', options?: ValueTypeOptions): ValueType<ObjectReferenceVariant<T, Id, R>>;
+    reference<T = unknown, Id = unknown, R extends string = string>(scope: () => ReferenceScope, resource: R, cardinality: 'many', options?: ValueTypeOptions): ValueType<CollectionReferenceVariant<T, Id, R>>;
     rgb(options?: ValueTypeOptions): ValueType<Rgb>;
     string(options?: ValueTypeOptions): ValueType<string>;
     unknown(options?: ValueTypeOptions): ValueType<unknown>;

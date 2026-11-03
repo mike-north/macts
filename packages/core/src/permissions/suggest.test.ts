@@ -12,7 +12,11 @@ import {
   explainInvalidPermission,
   listKnownPermissions,
 } from './suggest.js'
+import { resolve } from 'node:path'
+import { loadManifest } from '../manifest/loader.js'
 import type { AppManifest } from '../manifest/schemas/index.js'
+
+const MANIFESTS_DIR = resolve(process.cwd(), '../../manifests')
 
 const PHOTOS = [
   'photos:mediaItems:list',
@@ -163,5 +167,39 @@ describe('listKnownPermissions', () => {
       'photos:app:*',
       'photos:*:*',
     ])
+  })
+})
+
+describe('listKnownPermissions of the shipped manifests', () => {
+  // Hand-written from manifests/contacts/app.yaml and manifests/mail/app.yaml:
+  // `actionTitle`, `performAction` and `shouldEnableAction` require `for`, a
+  // `person`, and Mail's `synchronize` requires `with`, an `account`; neither
+  // app has a `get` for that resource, so those inputs admit no value and the
+  // operations can never be called (phases/13 D7, "Resolvable targets").
+  it.each([
+    [
+      'contacts',
+      ['contacts:app:actionTitle', 'contacts:app:performAction', 'contacts:app:shouldEnableAction'],
+    ],
+    ['mail', ['mail:app:synchronize']],
+  ])(
+    'leaves out the permissions of the %s operations that cannot be called',
+    async (app, absent) => {
+      const known = listKnownPermissions(
+        await loadManifest(resolve(MANIFESTS_DIR, app, 'app.yaml'))
+      )
+      for (const permission of absent) expect(known).not.toContain(permission)
+      // The app's other application commands stay, so the list is not vacuous.
+      expect(known).toContain(`${app}:app:*`)
+    }
+  )
+
+  it('keeps the permission of an operation whose unsatisfiable input is optional', async () => {
+    // manifests/mail/app.yaml: `checkForNewMail` takes an optional `for`, an
+    // `account`; it stays callable without it.
+    const known = listKnownPermissions(
+      await loadManifest(resolve(MANIFESTS_DIR, 'mail', 'app.yaml'))
+    )
+    expect(known).toContain('mail:app:checkForNewMail')
   })
 })

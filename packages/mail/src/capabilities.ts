@@ -52,12 +52,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     risk: 'send',
     inputSchema: {
       type: 'object',
-      properties: {
-        for: {
-          description: 'Specify the account that you wish to check for mail',
-          type: 'string',
-        },
-      },
+      properties: {},
       additionalProperties: false,
     },
   },
@@ -216,40 +211,8 @@ export const capabilities: readonly CapabilityMetadata[] = [
     risk: 'send',
     inputSchema: {
       type: 'object',
-      properties: {
-        inMailboxes: {
-          description:
-            'If the script is being executed by the user selecting an item in the scripts menu, this argument will specify the mailboxes that are currently selected. Otherwise it will not be specified.',
-          type: 'string',
-        },
-        forRule: {
-          description:
-            'If the script is being executed by a rule action, this argument will be the rule being invoked. Otherwise it will not be specified.',
-          type: 'string',
-        },
-      },
+      properties: {},
       additionalProperties: false,
-    },
-  },
-  {
-    name: 'mail.app.synchronize',
-    app: 'mail',
-    appBundleId: 'com.apple.mail',
-    resource: 'app',
-    operation: 'synchronize',
-    description: 'Command to trigger synchronizing of an IMAP account with the server.',
-    permission: 'mail:app:synchronize',
-    risk: 'system-change',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        with: {
-          description: 'The account to synchronize',
-          type: 'string',
-        },
-      },
-      additionalProperties: false,
-      required: ['with'],
     },
   },
   {

@@ -61,8 +61,8 @@ export interface TabUpdateInput {
 
 // @public
 export interface Window {
-    readonly activeSpace: ObjectReferenceVariant<Space, string> | null;
-    readonly activeTab: ObjectReferenceVariant<Tab, string> | null;
+    readonly activeSpace: ObjectReferenceVariant<Space, string, 'Space'> | null;
+    readonly activeTab: ObjectReferenceVariant<Tab, string, 'Tab'> | null;
     readonly closeable: boolean | null;
     readonly id: string;
     incognito: boolean | null;

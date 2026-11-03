@@ -109,12 +109,12 @@ export interface Window {
    * The currently selected tab.
    * Nullable. No evidence that the app always sets it.
    */
-  currentTab: ObjectReferenceVariant<Tab, never> | null
+  currentTab: ObjectReferenceVariant<Tab, never, 'Tab'> | null
   /**
    * The current session in a window.
    * Nullable. No evidence that the app always sets it.
    */
-  currentSession: ObjectReferenceVariant<Session, string> | null
+  currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null
   /**
    * Whether the window is a hotkey window.
    * Nullable. No evidence that the app always sets it.
@@ -153,7 +153,7 @@ export interface Tab {
    * The current session in a tab.
    * Nullable. No evidence that the app always sets it.
    */
-  currentSession: ObjectReferenceVariant<Session, string> | null
+  currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null
   /**
    * Index of tab in parent tab view control.
    * Nullable. No evidence that the app always sets it.
@@ -384,10 +384,6 @@ export interface WindowCreateInput {
   zoomed?: boolean
   /** Whether the window is currently the frontmost window. */
   frontmost?: boolean
-  /** The currently selected tab */
-  currentTab?: ObjectReferenceVariant<Tab, never>
-  /** The current session in a window */
-  currentSession?: ObjectReferenceVariant<Session, string>
   /** Whether the window is a hotkey window. */
   isHotkeyWindow?: boolean
   /**
@@ -437,16 +433,6 @@ export interface WindowUpdateInput {
    */
   frontmost?: boolean
   /**
-   * The currently selected tab.
-   * Cannot be reset: null is rejected.
-   */
-  currentTab?: ObjectReferenceVariant<Tab, never>
-  /**
-   * The current session in a window.
-   * Cannot be reset: null is rejected.
-   */
-  currentSession?: ObjectReferenceVariant<Session, string>
-  /**
    * Whether the window is a hotkey window.
    * Cannot be reset: null is rejected.
    */
@@ -480,8 +466,6 @@ export interface WindowUpdateInput {
 
 /** Input for creating a Tab. */
 export interface TabCreateInput {
-  /** The current session in a tab */
-  currentSession?: ObjectReferenceVariant<Session, string>
   /** Index of tab in parent tab view control */
   index?: Integer
   /** The title property */
@@ -490,11 +474,6 @@ export interface TabCreateInput {
 
 /** Input for updating a Tab. Omitted fields are left unchanged. */
 export interface TabUpdateInput {
-  /**
-   * The current session in a tab.
-   * Cannot be reset: null is rejected.
-   */
-  currentSession?: ObjectReferenceVariant<Session, string>
   /**
    * Index of tab in parent tab view control.
    * Cannot be reset: null is rejected.
@@ -952,11 +931,11 @@ const windowRecordType: ValueType<Window> = t.record(
       description: 'Whether the window is currently the frontmost window.',
     }),
     currentTab: t.nullable(
-      t.reference<Tab, never>(() => resources, 'Tab', 'one'),
+      t.reference<Tab, never, 'Tab'>(() => iTermContract, 'Tab', 'one'),
       { description: 'The currently selected tab' }
     ),
     currentSession: t.nullable(
-      t.reference<Session, string>(() => resources, 'Session', 'one'),
+      t.reference<Session, string, 'Session'>(() => iTermContract, 'Session', 'one'),
       { description: 'The current session in a window' }
     ),
     isHotkeyWindow: t.nullable(t.boolean(), {
@@ -983,7 +962,7 @@ const windowRecordType: ValueType<Window> = t.record(
 const tabRecordType: ValueType<Tab> = t.record(
   {
     currentSession: t.nullable(
-      t.reference<Session, string>(() => resources, 'Session', 'one'),
+      t.reference<Session, string, 'Session'>(() => iTermContract, 'Session', 'one'),
       { description: 'The current session in a tab' }
     ),
     index: t.nullable(t.integer(), { description: 'Index of tab in parent tab view control' }),
