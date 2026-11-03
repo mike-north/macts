@@ -151,13 +151,15 @@ describe('createRuntime: allowed calls', () => {
     const request = executor.requests[0]
     // D9: an ExecutionRequest carries no credential or authority.
     expect(Object.keys(request ?? {}).sort()).toEqual(
-      ['input', 'inputPlan', 'manifest', 'outputPlan', 'signal', 'target'].sort()
+      ['input', 'inputPlan', 'manifest', 'outputPlan', 'resourcePlans', 'signal', 'target'].sort()
     )
     expect(request?.manifest).toBe(CALENDAR_MANIFEST)
     expect(request?.target).toEqual({ command: 'create', resource: 'Event' })
     expect(request?.input).toEqual({ summary: 'Standup', allDay: true })
     expect(request?.inputPlan).toBe(PASSTHROUGH_PLAN)
     expect(request?.outputPlan).toBe(PASSTHROUGH_PLAN)
+    // A manifest-only registration has no contract, so an empty table.
+    expect(request?.resourcePlans).toEqual({})
     expect(request?.signal).toBe(controller.signal)
     expect(JSON.stringify(request?.input)).not.toContain(WRITER_SECRET)
   })

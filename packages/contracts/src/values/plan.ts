@@ -107,10 +107,11 @@ export const PASSTHROUGH_PLAN: Extract<ValuePlan, { readonly kind: 'passthrough'
  * process.
  *
  * @remarks
- * It mirrors the app contract's resource table (`ReferenceRegistry`) and
- * is derived from it (`resourcePlanTable`), so the two cannot disagree. `id` is the plan of the resource's identifier value type, the one
- * a reference's `id` is wire-encoded by; it is absent for a resource with no
- * identifier, whose references have only selector forms. Each entry is an
+ * It mirrors the app contract's resource table (`ReferenceRegistry`) and is
+ * derived from it (`resourcePlanTable`), so the two cannot disagree. `id` is
+ * the plan of the resource's identifier value type, the one a reference's
+ * `id` is wire-encoded by; it is absent for a resource with no identifier,
+ * whose references have only selector forms. Each entry is an
  * object, so a later per-resource field does not change the table's shape.
  *
  * It holds plans only. Which native property carries an identifier, and how

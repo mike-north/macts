@@ -3,6 +3,8 @@ export {
   runJxa,
   runWithApp,
   runNativeScript,
+  composeNativeScript,
+  parseNativeOutcome,
   JxaExecutionError,
   MAX_OUTPUT_BYTES,
   type JxaExecutionErrorOptions,

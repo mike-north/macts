@@ -2,7 +2,8 @@
  * Type tests for the executor seam's request shapes.
  *
  * Plans are required: a caller without derived plans states that explicitly
- * with the passthrough plan rather than omitting them. Input is always a
+ * with the passthrough plan rather than omitting them, and a caller without a
+ * contract passes the empty resource plan table. Input is always a
  * record. A resolution request carries a reference in wire form and the
  * output plan of the operation it resolves as. Every executor resolves
  * references as well as executing operations.
@@ -41,6 +42,35 @@ expectNotAssignable<ExecutionRequest>({
   manifest,
   target: { command: 'list', resource: 'events' },
   input: {},
+})
+
+// Negative: the resource plan table cannot be omitted, even with both plans.
+expectNotAssignable<ExecutionRequest>({
+  manifest,
+  target: { command: 'list', resource: 'events' },
+  input: {},
+  inputPlan: PASSTHROUGH_PLAN,
+  outputPlan: PASSTHROUGH_PLAN,
+})
+
+// Positive: a table entry carries its resource's identifier plan, or none.
+expectAssignable<ExecutionRequest>({
+  manifest,
+  target: { command: 'list', resource: 'events' },
+  input: {},
+  inputPlan: PASSTHROUGH_PLAN,
+  outputPlan: PASSTHROUGH_PLAN,
+  resourcePlans: { Event: { id: { kind: 'string' } }, Attendee: {} },
+})
+
+// Negative: a table entry's identifier is a value plan, not a type name.
+expectNotAssignable<ExecutionRequest>({
+  manifest,
+  target: { command: 'list', resource: 'events' },
+  input: {},
+  inputPlan: PASSTHROUGH_PLAN,
+  outputPlan: PASSTHROUGH_PLAN,
+  resourcePlans: { Event: { id: 'string' } },
 })
 
 // Negative: input is a record, not an arbitrary wire value.
@@ -92,6 +122,13 @@ expectNotAssignable<ResolutionRequest>({
   },
   outputPlan: PASSTHROUGH_PLAN,
   resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
+})
+
+// Negative: the resource plan table cannot be omitted from a resolution.
+expectNotAssignable<ResolutionRequest>({
+  manifest,
+  reference: { resource: 'Event', form: 'identity', cardinality: 'one', id: 'e-1' },
+  outputPlan: PASSTHROUGH_PLAN,
 })
 
 declare function execute(request: ExecutionRequest): Promise<WireValue>

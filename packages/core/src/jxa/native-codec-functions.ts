@@ -129,7 +129,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   type Env = NativeCodecEnvironment | undefined
   type ReferencePlan = Extract<ValuePlan, { readonly kind: 'reference' }>
   /** An object of the automation bridge: the application, or one of its objects. */
-  type HostObject = { readonly [member: string]: unknown }
+  type HostObject = Readonly<Record<string, unknown>>
 
   /** Marker `name` of thrown codec failures. */
   const ERROR_NAME = 'MactsCodecError'
@@ -723,7 +723,11 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     const expected = 'the application to have a collection ' + quote(addressing.collection)
     const collection = app[addressing.collection]
     if (!isHostObject(collection)) {
-      return fail('decode', path, 'Expected ' + expected + ', received ' + describeValue(collection))
+      return fail(
+        'decode',
+        path,
+        'Expected ' + expected + ', received ' + describeValue(collection)
+      )
     }
     let object: unknown
     if (addressing.lookup === 'byProperty') {
@@ -759,7 +763,11 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       fail('decode', path.concat(['resource']), 'Expected a reference to ' + quote(plan.resource))
     }
     if (ownValue(payload, 'cardinality') !== plan.cardinality) {
-      fail('decode', path.concat(['cardinality']), 'Expected cardinality ' + quote(plan.cardinality))
+      fail(
+        'decode',
+        path.concat(['cardinality']),
+        'Expected cardinality ' + quote(plan.cardinality)
+      )
     }
     const form = ownValue(payload, 'form')
     if (form !== 'identity' && form !== 'selector') {
@@ -797,7 +805,13 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     if (!hasOwn(payload, 'id')) fail('decode', path, 'Missing required field "id"')
     const plans = referencePlansOf('decode', env, plan.resource, path)
     const id = decodeValue(payload['id'], plans.id, path.concat(['id']), env)
-    return addressObject(env === undefined ? undefined : env.app, plans.addressing, id, plan.resource, path)
+    return addressObject(
+      env === undefined ? undefined : env.app,
+      plans.addressing,
+      id,
+      plan.resource,
+      path
+    )
   }
 
   /**

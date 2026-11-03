@@ -1420,11 +1420,7 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
         { reference: { resource: 'Person', form: 'identity', cardinality: 'one' } },
         [],
       ],
-      [
-        'an identifier that violates its plan',
-        identity('Window', { integer: '1.5' }),
-        ['id'],
-      ],
+      ['an identifier that violates its plan', identity('Window', { integer: '1.5' }), ['id']],
     ] as const)('rejects %s as invalid input, unmarked', (_name, wire, path) => {
       const app = standInApp()
       const plan = path[0] === 'id' ? WINDOW_REF : PERSON_REF

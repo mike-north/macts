@@ -136,7 +136,9 @@ describe('built NATIVE_CODEC prelude', () => {
       },
     }
     const decoded = evaluated.decode(
-      { for: { reference: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' } } },
+      {
+        for: { reference: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' } },
+      },
       {
         kind: 'record',
         fields: {
@@ -296,7 +298,9 @@ describe.skipIf(process.platform !== 'darwin')(
         // Reached only if decoding succeeded.
         body: "throw new Error('the body ran');",
         input: {
-          for: { reference: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' } },
+          for: {
+            reference: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' },
+          },
         },
         inputPlan: {
           kind: 'record',

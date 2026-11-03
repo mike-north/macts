@@ -49,7 +49,8 @@ export const FIXTURE_MANIFEST: AppManifest = {
       plural: 'Widgets',
       description: 'A widget',
       properties: {},
-      identifiers: [{ property: 'id', primary: true }],
+      // No identifier, as the contract's resource table says: registration
+      // refuses a contract whose identifier plans disagree with its manifest.
     },
   },
   enums: {},

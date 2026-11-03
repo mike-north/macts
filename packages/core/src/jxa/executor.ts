@@ -331,8 +331,8 @@ const DESCRIBE_THROWN = [
  * The script imports the C standard library bridge, declares the codec's
  * functions, and evaluates one try/catch that yields a {@link NativeOutcome};
  * its final expression is that outcome serialized as JSON, which the host
- * prints. The input, both plans, and the reference table are embedded with
- * {@link embedJson}, the bundle identifier as a JSON string literal, and the
+ * prints. The input, both plans, and the reference table are embedded as JSON
+ * text parsed inside the process, the bundle identifier as a JSON string literal, and the
  * body inside its own `(function (app, args, page) { ... })`, called with the
  * page window (or `null`) embedded the same way.
  *
@@ -340,6 +340,10 @@ const DESCRIBE_THROWN = [
  * the app: the codec functions receive `{ app, references }`. Creating it
  * sends the app nothing, and the body runs only after the whole input
  * decoded, so a decode failure still means no command was sent.
+ *
+ * {@link runNativeScript} runs this program in the automation host. A
+ * transport that runs native scripts in a host of its own composes them with
+ * this function and reads what they print with {@link parseNativeOutcome}.
  */
 export function composeNativeScript(script: NativeScript, codec: NativeCodec): string {
   return [
@@ -450,10 +454,13 @@ function parseNativeFailure(value: unknown): NativeFailure | string {
 }
 
 /**
- * The outcome the process printed, or a description of why it is malformed.
- * The description never quotes the output, which may hold app data.
+ * Read the outcome a composed native script printed (see
+ * {@link composeNativeScript}): the {@link NativeOutcome}, or a description of
+ * why the output is malformed. The description never quotes the output, which
+ * may hold app data. A transport that runs composed scripts in a host of its
+ * own uses this to read what the script printed.
  */
-function parseNativeOutcome(stdout: string): NativeOutcome | string {
+export function parseNativeOutcome(stdout: string): NativeOutcome | string {
   let parsed: unknown
   try {
     parsed = JSON.parse(stdout.trim())

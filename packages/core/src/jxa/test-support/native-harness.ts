@@ -39,7 +39,11 @@ import {
 const js = String.raw
 
 /** A codec function as seen from outside the realm that defines it. */
-export type CodecFunction = (value: unknown, plan: ValuePlan, env?: NativeCodecEnvironment) => unknown
+export type CodecFunction = (
+  value: unknown,
+  plan: ValuePlan,
+  env?: NativeCodecEnvironment
+) => unknown
 
 /** What evaluating a prelude in an isolated context produced. */
 export interface EvaluatedPrelude {

@@ -8,6 +8,7 @@ import { IssuePath } from '@macts/contracts';
 import { JsonSchema7Type } from 'zod-to-json-schema';
 import { OperationTarget } from '@macts/contracts';
 import { ReferenceWire } from '@macts/contracts';
+import { ResourcePlanTable } from '@macts/contracts';
 import { ValuePlan } from '@macts/contracts';
 import { WireRecord } from '@macts/contracts';
 import { WireValue } from '@macts/contracts';
@@ -1012,6 +1013,9 @@ export interface ComposedRestrictions {
 export function composedRestrictionsPermit(composed: ComposedRestrictions, kind: RestrictionKind, candidate: string, matches: RestrictionPatternMatcher): boolean;
 
 // @public
+export function composeNativeScript(script: NativeScript, codec: NativeCodec): string;
+
+// @public
 export function composePolicyEvaluations(host: PolicyEvaluation, key: PolicyEvaluation | undefined): LayeredPolicyEvaluation;
 
 // @public
@@ -1028,6 +1032,9 @@ export const ConfidenceSchema: z.ZodObject<{
 
 // @public
 export function connect(bundleId: string, _options?: AppConnectionOptions): Promise<AppConnection>;
+
+// @public
+export function contractResourcePlans(manifest: AppManifest): ResourcePlanTable;
 
 // @public
 export function createArrayCoercer<T>(elementCoercer: TypeCoercer<T>): TypeCoercer<T[]>;
@@ -1240,6 +1247,7 @@ export interface ExecutionRequest {
     readonly manifest: AppManifest;
     readonly outputPlan: ValuePlan;
     readonly page?: PageWindow;
+    readonly resourcePlans: ResourcePlanTable;
     readonly signal?: AbortSignal;
     readonly target: OperationTarget;
 }
@@ -2021,6 +2029,13 @@ export const NATIVE_DECODE_FUNCTION = "__mactsDecode";
 export const NATIVE_ENCODE_FUNCTION = "__mactsEncode";
 
 // @public
+export interface NativeAddressing {
+    readonly collection: string;
+    readonly lookup: 'byId' | 'byProperty';
+    readonly property: string;
+}
+
+// @public
 export interface NativeBodyOptions {
     readonly identifierAliases?: boolean;
     readonly paged?: boolean;
@@ -2029,6 +2044,12 @@ export interface NativeBodyOptions {
 // @public
 export interface NativeCodec {
     readonly prelude: string;
+}
+
+// @public
+export interface NativeCodecEnvironment {
+    readonly app: unknown;
+    readonly references: NativeReferenceTable;
 }
 
 // @public
@@ -2051,6 +2072,7 @@ export type NativeFailure = {
     readonly path: IssuePath;
     readonly message: string;
     readonly unsupportedKind?: string;
+    readonly missingResource?: string;
 };
 
 // @public
@@ -2061,6 +2083,15 @@ export type NativeOutcome = {
     readonly ok: false;
     readonly failure: NativeFailure;
 };
+
+// @public
+export interface NativeReferencePlans {
+    readonly addressing?: NativeAddressing;
+    readonly id?: ValuePlan;
+}
+
+// @public
+export type NativeReferenceTable = Readonly<Record<string, NativeReferencePlans>>;
 
 // @public
 export interface NativeRunOptions {
@@ -2076,6 +2107,7 @@ export interface NativeScript {
     readonly inputPlan: ValuePlan;
     readonly outputPlan: ValuePlan;
     readonly page?: PageWindow | undefined;
+    readonly references: NativeReferenceTable;
 }
 
 // @public
@@ -2293,6 +2325,9 @@ export type ParsedPermission = FinePermission | CoarsePermission | WildcardPermi
 
 // @public
 export function parseManifestYaml(yamlContent: string): AppManifest;
+
+// @public
+export function parseNativeOutcome(stdout: string): NativeOutcome | string;
 
 // @public
 export function parsePermission(permission: string): ParsedPermission;
@@ -2945,6 +2980,7 @@ export interface ResolutionRequest {
     readonly manifest: AppManifest;
     readonly outputPlan: ValuePlan;
     readonly reference: ReferenceWire;
+    readonly resourcePlans: ResourcePlanTable;
     readonly signal?: AbortSignal;
 }
 

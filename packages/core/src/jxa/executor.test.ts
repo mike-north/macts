@@ -252,7 +252,10 @@ describe('composeNativeScript', () => {
     // Addressing a reference needs the app, so decoding follows it. Creating
     // the app object sends it nothing; the body, which sends the command,
     // runs only once the whole input has decoded.
-    const source = composeNativeScript(nativeScript({ body: 'return SENTINEL_BODY_77aa;' }), NATIVE_CODEC)
+    const source = composeNativeScript(
+      nativeScript({ body: 'return SENTINEL_BODY_77aa;' }),
+      NATIVE_CODEC
+    )
     const app = source.indexOf('var app = Application(')
     const env = source.indexOf('var env = ')
     const decode = source.indexOf('var args = __mactsDecode(')
@@ -459,7 +462,9 @@ describe('runNativeScript', () => {
         nativeScript({
           body: "var error = new Error('the body ran'); error.errorNumber = -1; throw error;",
           input: {
-            for: { reference: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' } },
+            for: {
+              reference: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' },
+            },
           },
           inputPlan: recordOf({ for: required(PERSON_REF) }),
         }),
