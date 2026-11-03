@@ -34,6 +34,7 @@ const DIST_ENTRY = fileURLToPath(new URL('../../dist/index.js', import.meta.url)
 
 const INTEGER: ValuePlan = { kind: 'integer' }
 const DOUBLE: ValuePlan = { kind: 'double' }
+const RGB: ValuePlan = { kind: 'rgb' }
 const DATE: ValuePlan = { kind: 'date' }
 const UNKNOWN: ValuePlan = { kind: 'unknown' }
 
@@ -83,6 +84,15 @@ describe('built NATIVE_CODEC prelude', () => {
     expect(encode(Number.NaN, DOUBLE)).toEqual({ double: 'NaN' })
     expect(encode(3, UNKNOWN)).toEqual({ double: 3 })
     expect(encode({ integer: '42' }, UNKNOWN)).toEqual({ record: { integer: '42' } })
+  })
+
+  it('encodes a color from its native fractions', () => {
+    // 0.5 * 65535 = 32767.5 rounds up to 32768; 0 and 1 are the channel limits.
+    expect(evaluated.encode([0.5, 0, 1], RGB)).toEqual({
+      r: { integer: '32768' },
+      g: { integer: '0' },
+      b: { integer: '65535' },
+    })
   })
 
   it('decodes dates with offsets and rejects non-canonical integers', () => {

@@ -580,56 +580,134 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
   // -------------------------------------------------------------------------
 
   describe('rgb', () => {
-    const wire = { r: { integer: '65535' }, g: { integer: '0' }, b: { integer: '257' } }
-
-    it('encodes a three-channel list and both object spellings', () => {
-      expect(encode([65535, 0, 257], RGB)).toEqual(wire)
-      expect(encode({ r: 65535, g: 0, b: 257 }, RGB)).toEqual(wire)
-      expect(encode({ red: 65535, green: 0, blue: 257 }, RGB)).toEqual(wire)
+    // A3 and D4: natively a color is three fractions in [0, 1]. Output is
+    // Math.round(f * 65535) per channel, input is c / 65535.
+    const channel = (n: string) => ({ integer: n })
+    const wireOf = (r: string, g: string, b: string) => ({
+      r: channel(r),
+      g: channel(g),
+      b: channel(b),
     })
 
-    it('rejects channels outside 0..65535 or fractional, with the channel path', () => {
-      expectCodecError(() => encode([65536, 0, 0], RGB), {
-        direction: 'encode',
-        path: [0],
-        includes: ['65536'],
+    describe('output (native fractions to wire integers)', () => {
+      it('maps 0 and 1 to the channel limits', () => {
+        expect(encode([0, 0, 0], RGB)).toEqual(wireOf('0', '0', '0'))
+        expect(encode([1, 1, 1], RGB)).toEqual(wireOf('65535', '65535', '65535'))
       })
-      expectCodecError(() => encode([0, 1.5, 0], RGB), {
-        direction: 'encode',
-        path: [1],
-        includes: ['1.5'],
+
+      it('rounds a tie up: 0.5 * 65535 = 32767.5 becomes 32768', () => {
+        expect(encode([0.5, 0.5, 0.5], RGB)).toEqual(wireOf('32768', '32768', '32768'))
       })
-      expectCodecError(() => encode([0, 0, -1], RGB), { direction: 'encode', path: [2] })
-      expectCodecError(() => encode({ r: 1, g: 2, b: 70000 }, RGB), {
-        direction: 'encode',
-        path: ['b'],
+
+      it('rounds a non-integer product to the nearest integer', () => {
+        // 65535 * 0.25 = 16383.75 -> 16384; 65535 * 0.2 = 13107 exactly;
+        // 65535 * 0.75 = 49151.25 -> 49151.
+        expect(encode([0.25, 0.2, 0.75], RGB)).toEqual(wireOf('16384', '13107', '49151'))
+      })
+
+      it('rounds 0.8234531283378601 by hand to 53965', () => {
+        // 65535 * 0.8234531283378601:
+        //   65535 * 0.8          = 52428
+        //   65535 * 0.02         = 1310.7
+        //   65535 * 0.003        = 196.605
+        //   65535 * 0.0004531283378601 = 29.6958...
+        //   sum = 53965.0008..., nearest integer 53965
+        expect(encode([0.8234531283378601, 0, 0], RGB)).toEqual(wireOf('53965', '0', '0'))
+      })
+
+      it('converts the live Calendar color reading', () => {
+        // Calendar reported [0.8234531283378601, 0, 0.884809672832489].
+        // 65535 * 0.884809672832489: 65535 * 0.88 = 57670.8, and
+        // 65535 * 0.004809672832489 = 315.2..., total 57986.0 -> 57986.
+        expect(encode([0.8234531283378601, 0, 0.884809672832489], RGB)).toEqual(
+          wireOf('53965', '0', '57986')
+        )
+      })
+
+      it('reads a signed zero channel as 0', () => {
+        expect(encode([-0, 0, 0], RGB)).toEqual(wireOf('0', '0', '0'))
+      })
+
+      it('recovers every 16-bit channel from its single-precision bridge reading', () => {
+        // The bridge divides the app's 16-bit channel k by 65535 in single
+        // precision (live Calendar readings are exactly Math.fround(k / 65535)),
+        // so rounding to the nearest integer needs no tolerance: every k comes
+        // back exactly.
+        for (let k = 0; k <= 65535; k++) {
+          const reading = Math.fround(k / 65535)
+          const wire = encode([reading, 0, 0], RGB) as { r: { integer: string } }
+          if (wire.r.integer !== String(k)) {
+            throw new Error(
+              `Channel ${String(k)} read as ${String(reading)} encoded to ${wire.r.integer}`
+            )
+          }
+        }
+      })
+
+      it('accepts the {r, g, b} and {red, green, blue} spellings', () => {
+        const expected = wireOf('65535', '0', '32768')
+        expect(encode({ r: 1, g: 0, b: 0.5 }, RGB)).toEqual(expected)
+        expect(encode({ red: 1, green: 0, blue: 0.5 }, RGB)).toEqual(expected)
+      })
+
+      it.each([
+        ['below zero', -0.01],
+        ['above one', 1.01],
+        ['NaN', Number.NaN],
+        ['Infinity', Number.POSITIVE_INFINITY],
+        ['a string', '0.5'],
+        ['a whole-number reading from a 16-bit bridge', 65535],
+      ])('rejects a channel that is %s, naming the channel and its path', (_name, bad) => {
+        expectCodecError(() => encode([0, bad, 0], RGB), {
+          direction: 'encode',
+          path: [1],
+          includes: ['channel g'],
+        })
+        expectCodecError(() => encode({ r: 0, g: 0, b: bad }, RGB), {
+          direction: 'encode',
+          path: ['b'],
+          includes: ['channel b'],
+        })
+      })
+
+      it('rejects lists of two or four channels and non-colors', () => {
+        expectCodecError(() => encode([0, 0], RGB), { direction: 'encode', path: [] })
+        expectCodecError(() => encode([0, 0, 0, 0], RGB), { direction: 'encode', path: [] })
+        expectCodecError(() => encode({ r: 1, g: 0 }, RGB), { direction: 'encode', path: ['b'] })
+        expectCodecError(() => encode('#ffffff', RGB), { direction: 'encode', path: [] })
       })
     })
 
-    it('rejects lists of the wrong length and incomplete objects', () => {
-      expectCodecError(() => encode([0, 0], RGB), { direction: 'encode', path: [] })
-      expectCodecError(() => encode([0, 0, 0, 0], RGB), { direction: 'encode', path: [] })
-      expectCodecError(() => encode({ r: 1, g: 2 }, RGB), { direction: 'encode', path: ['b'] })
-      expectCodecError(() => encode('#ffffff', RGB), { direction: 'encode', path: [] })
+    describe('input (wire integers to native fractions)', () => {
+      it('maps 0 to 0 and 65535 to 1', () => {
+        expect(decode(wireOf('0', '0', '0'), RGB)).toEqual([0, 0, 0])
+        expect(decode(wireOf('65535', '65535', '65535'), RGB)).toEqual([1, 1, 1])
+      })
+
+      it('divides by 65535', () => {
+        expect(decode(wireOf('32768', '0', '65535'), RGB)).toEqual([32768 / 65535, 0, 1])
+      })
+
+      it('rejects out-of-range channels, double channels, and extra members', () => {
+        expectCodecError(() => decode({ ...wireOf('0', '0', '0'), r: channel('65536') }, RGB), {
+          direction: 'decode',
+          path: ['r'],
+        })
+        expectCodecError(() => decode({ ...wireOf('0', '0', '0'), g: { double: 1 } }, RGB), {
+          direction: 'decode',
+          path: ['g'],
+        })
+        expectCodecError(() => decode({ ...wireOf('0', '0', '0'), a: channel('1') }, RGB), {
+          direction: 'decode',
+          path: [],
+        })
+      })
     })
 
-    it('decodes to the 16-bit channel list', () => {
-      expect(decode(wire, RGB)).toEqual([65535, 0, 257])
-    })
-
-    it('rejects out-of-range channels, double channels, and extra members on decode', () => {
-      expectCodecError(() => decode({ ...wire, r: { integer: '65536' } }, RGB), {
-        direction: 'decode',
-        path: ['r'],
-      })
-      expectCodecError(() => decode({ ...wire, g: { double: 1 } }, RGB), {
-        direction: 'decode',
-        path: ['g'],
-      })
-      expectCodecError(() => decode({ ...wire, a: { integer: '1' } }, RGB), {
-        direction: 'decode',
-        path: [],
-      })
+    it.each([0, 1, 32767, 32768, 65535])('round-trips wire channel %i unchanged', (n) => {
+      const text = String(n)
+      const wire = wireOf(text, text, text)
+      expect(encode(decode(wire, RGB), RGB)).toEqual(wire)
     })
   })
 
