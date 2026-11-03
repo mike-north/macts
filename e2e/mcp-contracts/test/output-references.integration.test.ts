@@ -20,6 +20,13 @@
  * `packages/core/src/generator/contract/index.test.ts` ("real app
  * manifests").
  *
+ * Only the records a contract carries at run time can be walked: those of
+ * its resource table, which lists only resources with a get or a list, and
+ * those its operations return. A resource with neither, such as Music's
+ * browser and playlist windows, Photos' Container or Xcode's Target, has a
+ * record type but no record value, and no operation returns it, so no caller
+ * receives a reference from one.
+ *
  * A failure means a regenerated contract is stale or the generator's output
  * rule regressed.
  *
@@ -83,7 +90,7 @@ describe('output references in every real contract', () => {
     expect(apps.length).toBeGreaterThan(30)
   })
 
-  it('declare record fields only to resources a reference read from the app can use', () => {
+  it('declare resource-table record fields only to resources a reference read from the app can use', () => {
     const found: string[] = []
     const positions: string[] = []
     for (const app of apps) {
@@ -101,19 +108,18 @@ describe('output references in every real contract', () => {
       }
     }
     expect(found).toEqual([])
-    // Every output record field that still holds a reference, audited by hand
-    // against the manifests: each target has a get with no parent, and none is
-    // identified by its name.
+    // Every field of a resource-table record that still holds a reference,
+    // audited by hand against the manifests: each target has a get with no
+    // parent, and none is identified by its name. Music BrowserWindow and
+    // PlaylistWindow `view`, Photos Container `parent` and Xcode Target
+    // `project` also stay in output, but their resources have neither a get
+    // nor a list, so the table carries no record for them.
     expect(positions.sort()).toEqual(
       [
         'microsoft-edge Window.activeTab → Tab',
-        'music BrowserWindow.view → Playlist',
-        'music PlaylistWindow.view → Playlist',
         'photos Album.parent → Folder',
-        'photos Container.parent → Folder',
         'photos Folder.parent → Folder',
         'xcode WorkspaceDocument.activeScheme → Scheme',
-        'xcode Target.project → Project',
       ].sort()
     )
   })
@@ -131,9 +137,8 @@ describe('output references in every real contract', () => {
       }
     }
     expect(found).toEqual([])
-    // Guards against a vacuous pass: the references above on records some
-    // operation returns. Music's window views and Xcode's Target.project are
-    // on records no operation returns.
+    // Guards against a vacuous pass: the references above, each on a record
+    // that some operation returns.
     expect([...checked].sort()).toEqual(
       [
         'microsoft-edge.windows.create → Tab',

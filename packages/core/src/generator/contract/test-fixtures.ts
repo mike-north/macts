@@ -13,7 +13,9 @@
  * - `Folder` can be got and listed, so it can be referenced and can contain.
  * - `Sticker` has neither a get nor a list operation, so no reference to one
  *   can be resolved and the resource table leaves it out; a folder's
- *   `sticker` field still names it, so a reference to one is rejected.
+ *   `sticker` field names it, so generation leaves that field out of output
+ *   with a warning, and a reference type built against the contract rejects
+ *   any reference to a sticker.
  * - `Note.uid` is claimed unique and notes record a supported range read, so
  *   the note list pages; `Folder.folderId`
  *   makes no uniqueness claim and `Tag` has no identifier, so their lists

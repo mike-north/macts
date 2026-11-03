@@ -12,7 +12,9 @@
  *
  * Xcode is the real case checked by hand: its manifest declares `Device` with
  * no commands, and a run destination's `device` and `companionDevice` fields
- * are references to one.
+ * are references to one. Generation leaves those two fields out of output, so
+ * the record rejects them as unknown, and a reference value type built
+ * directly against the contract still rejects any reference to a Device.
  *
  * The api-report check reads each app's committed `contract.api.md`, which
  * API Extractor writes from the contract's public declarations: the table's
@@ -83,13 +85,10 @@ describe('the resource table of every real contract', () => {
 
 describe('Xcode references to a device, which Xcode can neither get nor list', () => {
   const { record } = xcodeContract.resources.RunDestination
-  const destination = {
-    name: 'My Mac',
-    architecture: 'arm64',
-    platform: 'macosx',
-    device: null,
-    companionDevice: null,
-  }
+  // A run destination's `device` and `companionDevice` fields name a Device,
+  // which no reference can resolve through, so generation leaves both out of
+  // the output record (phases/13 D7, resolvable targets).
+  const destination = { name: 'My Mac', architecture: 'arm64', platform: 'macosx' }
   const toDevice = {
     app: 'xcode',
     resource: 'Device',
@@ -102,31 +101,19 @@ describe('Xcode references to a device, which Xcode can neither get nor list', (
     expect(Object.hasOwn(xcodeContract.resources, 'Device')).toBe(false)
   })
 
-  it('are rejected when encoding, in either field and any form', () => {
+  it('leave both fields out of the run destination record when encoding', () => {
     expect(record.encode(destination).ok).toBe(true)
-    const byIdentity = { ...toDevice, form: 'identity', id: 'D1' }
-    for (const [field, reference] of [
-      ['device', toDevice],
-      ['companionDevice', toDevice],
-      ['device', byIdentity],
-    ] as const) {
-      const result = record.encode({ ...destination, [field]: reference })
+    for (const field of ['device', 'companionDevice'] as const) {
+      const result = record.encode({ ...destination, [field]: toDevice })
       expect(result.ok).toBe(false)
-      if (!result.ok) {
-        expect(result.issues).toEqual([
-          {
-            path: [field],
-            code: 'unsupported',
-            message:
-              'The app has no resource "Device" that references can resolve through ' +
-              '(one with a get or list operation), so a reference to it cannot be encoded.',
-          },
+      if (!result.ok)
+        expect(result.issues.map(({ path, code }) => ({ path, code }))).toEqual([
+          { path: [field], code: 'unknown-field' },
         ])
-      }
     }
   })
 
-  it('are rejected when decoding', () => {
+  it('leave both fields out of the run destination record when decoding', () => {
     const { app: _app, ...wire } = toDevice
     const result = record.decode(
       {
@@ -141,12 +128,26 @@ describe('Xcode references to a device, which Xcode can neither get nor list', (
     expect(result.ok).toBe(false)
     if (!result.ok)
       expect(result.issues.map(({ path, code }) => ({ path, code }))).toEqual([
-        { path: ['device'], code: 'unsupported' },
+        { path: ['device'], code: 'unknown-field' },
+        { path: ['companionDevice'], code: 'unknown-field' },
       ])
   })
 
-  it('reject a reference built directly against the contract', () => {
+  it('reject a reference built directly against the contract, in any form', () => {
     const device = t.reference(() => xcodeContract, 'Device', 'one')
-    expect(device.encode(toDevice).ok).toBe(false)
+    for (const reference of [toDevice, { ...toDevice, form: 'identity', id: 'D1' }]) {
+      const result = device.encode(reference)
+      expect(result.ok).toBe(false)
+      if (!result.ok)
+        expect(result.issues).toEqual([
+          {
+            path: [],
+            code: 'unsupported',
+            message:
+              'The app has no resource "Device" that references can resolve through ' +
+              '(one with a get or list operation), so a reference to it cannot be encoded.',
+          },
+        ])
+    }
   })
 })

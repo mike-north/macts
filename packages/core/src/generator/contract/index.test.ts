@@ -463,9 +463,11 @@ describe('generateContract: resource table', () => {
     expect(contract).not.toMatch(/^ {2}Sticker:/m)
     // Nothing reads a sticker record, so it has no record value type…
     expect(contract).not.toContain('stickerRecordType')
-    // …but the record interface stays, since the reference field's type names it.
+    // …but its record interface stays, as every usable resource's does.
     expect(contract).toContain('export interface Sticker {\n')
-    expect(contract).toContain("(() => jotterContract, 'Sticker', 'one')")
+    // Folder.sticker, the one field that names a Sticker, is left out of
+    // output (#219), so no generated value type references one.
+    expect(contract).not.toContain("'Sticker'")
   })
 
   it('declares an empty table for an app whose resources are all unresolvable', () => {
@@ -782,9 +784,10 @@ describe('generateContract: identifier nullability', () => {
     ])
   })
 
-  it('reports only the output field the unmodified fixture leaves out', () => {
-    // Folder.owner holds a reference to a tag, and Jotter has no operation to
-    // get a tag, so the field is left out of output (phases/13 D7, #219).
+  it('reports only the output fields the unmodified fixture leaves out', () => {
+    // Folder.owner holds a reference to a tag and Folder.sticker one to a
+    // sticker. Jotter has no operation to get either, so both fields are left
+    // out of output (phases/13 D7, #219), in declaration order.
     expect(jotter.diagnostics).toEqual([
       {
         kind: 'omitted-output',
@@ -794,6 +797,15 @@ describe('generateContract: identifier nullability', () => {
         reason: 'no-get',
         message:
           'jotter: resources.Folder.properties.owner: the Folder field "owner" is left out of output: it holds a reference to "Tag", which the app has no operation to get (#219).',
+      },
+      {
+        kind: 'omitted-output',
+        app: 'jotter',
+        position: 'resources.Folder.properties.sticker',
+        target: 'Sticker',
+        reason: 'no-get',
+        message:
+          'jotter: resources.Folder.properties.sticker: the Folder field "sticker" is left out of output: it holds a reference to "Sticker", which the app has no operation to get (#219).',
       },
     ])
   })
