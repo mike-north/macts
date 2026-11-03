@@ -297,12 +297,17 @@ function embedJson(value: unknown): string {
 /**
  * The catch clause of a native script: describes what was thrown as a
  * {@link NativeFailure}. A codec error, recognized by its marker name, keeps its
- * direction, path, and message; anything else is an app or bridge failure that
- * keeps its message and, when it carries one, its numeric error code.
+ * direction, path, message, and unsupported kind if it has one; anything else
+ * is an app or bridge failure that keeps its message and, when it carries one,
+ * its numeric error code.
  */
 const DESCRIBE_THROWN = [
   `    if (e !== null && typeof e === 'object' && e.name === ${JSON.stringify(NATIVE_CODEC_ERROR_NAME)}) {`,
-  "      return { ok: false, failure: { source: 'codec', direction: e.direction, path: e.path, message: e.message } };",
+  "      var codecFailure = { source: 'codec', direction: e.direction, path: e.path, message: e.message };",
+  "      if (typeof e.unsupportedKind === 'string') {",
+  '        codecFailure.unsupportedKind = e.unsupportedKind;',
+  '      }',
+  '      return { ok: false, failure: codecFailure };',
   '    }',
   "    var failure = { source: 'app', message: String(e && e.message || e) };",
   "    if (e !== null && e !== undefined && typeof e.errorNumber === 'number') {",
@@ -401,7 +406,12 @@ function parseNativeFailure(value: unknown): NativeFailure | string {
         return 'the codec failure has no direction'
       }
       if (!isIssuePath(path)) return 'the codec failure has no path'
-      return { source: 'codec', direction, path, message }
+      const unsupportedKind = value['unsupportedKind']
+      if (unsupportedKind === undefined) return { source: 'codec', direction, path, message }
+      if (typeof unsupportedKind !== 'string') {
+        return 'the codec failure has a non-text unsupported kind'
+      }
+      return { source: 'codec', direction, path, message, unsupportedKind }
     }
     default:
       return 'the failure has an unknown source'

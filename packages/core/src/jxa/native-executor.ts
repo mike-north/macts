@@ -38,6 +38,7 @@ import {
   UnexpectedValueError,
   ValidationError,
   type AnyMactsError,
+  type IssuePath,
   type OperationTarget,
   type WireValue,
 } from '@macts/contracts'
@@ -304,6 +305,7 @@ const COMPILE_ERROR_PATTERN = /^\s*(?:\d+:\d+:\s*)?syntax error:/m
  *
  * | Reported failure                                         | Error                                    |
  * | -------------------------------------------------------- | ---------------------------------------- |
+ * | codec, either direction, with an unsupported kind        | `InternalError`                          |
  * | codec, `decode`                                          | `ValidationError` with `issues`          |
  * | codec, `encode`                                          | `UnexpectedValueError` with `issues`     |
  * | app, -1728 (no such object)                              | `TargetNotFoundError`                    |
@@ -319,6 +321,13 @@ const COMPILE_ERROR_PATTERN = /^\s*(?:\d+:\d+:\s*)?syntax error:/m
  * was already validated against its wire schema; it is still reported as the
  * input not meeting the contract. Codec `path` and `message` are written by
  * macts and describe the contract, so they become the error's `issues`.
+ *
+ * A codec failure with an unsupported kind is never blamed on the caller or
+ * the app: the operation's contract has a value kind (a reference, a file, a
+ * file source) that the macOS provider cannot convert yet, so no input and no
+ * result at that position could succeed. Its message names the operation,
+ * the kind, and the position, and never a value; the codec's own message and
+ * path are kept as `cause`, which stays local.
  *
  * A failure of the transport, with no outcome, by the rejection's `kind`:
  *
@@ -368,6 +377,9 @@ function describeReportedFailure(
   context: NativeFailureContext
 ): AnyMactsError {
   const { app } = context
+  if (failure.source === 'codec' && failure.unsupportedKind !== undefined) {
+    return describeUnsupportedKind(failure, failure.unsupportedKind, context)
+  }
   if (failure.source === 'codec') {
     const issues = [{ path: failure.path, message: failure.message }]
     return failure.direction === 'encode'
@@ -384,6 +396,59 @@ function describeReportedFailure(
     return new AppOperationError(`${app} could not complete the operation.`, { app }, options)
   }
   return classifyErrorNumber(failure.errorNumber, failure.message, context, options)
+}
+
+/** Words for a value plan kind in a message: `file-source` → `file source`. */
+function kindWords(kind: string): string {
+  switch (kind) {
+    case 'reference':
+    case 'file':
+      return kind
+    case 'file-source':
+      return 'file source'
+    default:
+      return JSON.stringify(kind)
+  }
+}
+
+/**
+ * A value position for a message, outermost first: `for`, `events[0].status`,
+ * `["odd key"]`. The value itself has no position, so it renders empty.
+ */
+function describePosition(path: IssuePath): string {
+  let rendered = ''
+  for (const step of path) {
+    if (typeof step === 'number') rendered += `[${String(step)}]`
+    else if (/^[A-Za-z_$][\w$]*$/.test(step)) rendered += rendered === '' ? step : `.${step}`
+    else rendered += `[${JSON.stringify(step)}]`
+  }
+  return rendered
+}
+
+/**
+ * The error for a value kind the macOS provider cannot convert: an internal
+ * limitation, never the caller's input or the app's result.
+ */
+function describeUnsupportedKind(
+  failure: Extract<NativeFailure, { source: 'codec' }>,
+  kind: string,
+  context: NativeFailureContext
+): InternalError {
+  const { app, operation } = context
+  const name =
+    operation.resource === undefined
+      ? operation.command
+      : `${operation.resource} ${operation.command}`
+  const position = describePosition(failure.path)
+  const verb = failure.direction === 'decode' ? 'takes' : 'returns'
+  const at = position === '' ? '' : ` at \`${position}\``
+  return new InternalError(
+    `The ${app} operation "${name}" ${verb} ${kindWords(kind)} values${at}, which the macOS provider does not support yet.`,
+    {},
+    // The codec's own message and path stay local: `cause` never reaches the
+    // wire.
+    { cause: Object.assign(new Error(failure.message), { path: failure.path }) }
+  )
 }
 
 function describeProcessFailure(error: unknown, context: NativeFailureContext): AnyMactsError {

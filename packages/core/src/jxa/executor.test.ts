@@ -216,6 +216,9 @@ describe('composeNativeScript', () => {
       expect(others).not.toContain(sentinel)
     }
     expect(source).toContain('Application("com.apple.Notes")')
+    // Decoding comes before the app is addressed, so input the codec cannot
+    // convert never reaches the app.
+    expect(source.indexOf('var args = ')).toBeLessThan(source.indexOf('Application('))
     expect(source).toContain('(function (app, args) {\nreturn args;\n')
     expect(source.trimEnd().endsWith('JSON.stringify(__mactsOutcome);')).toBe(true)
   })
@@ -390,6 +393,37 @@ describe('runNativeScript', () => {
   )
 
   it(
+    'reports a reference input as a codec decode failure marked with its kind, before the app is addressed',
+    async () => {
+      // Regression: a reference position failed decode like invalid input.
+      // The bundle identifier has no installed app, so addressing it would
+      // fail as an app failure; a decode failure proves decode came first.
+      const outcome = await runNativeScript(
+        nativeScript({
+          bundleId: 'com.example.macts.not-installed',
+          body: "var error = new Error('the body ran'); error.errorNumber = -1; throw error;",
+          input: { for: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' } },
+          inputPlan: recordOf({
+            for: required({ kind: 'reference', resource: 'Person', cardinality: 'one' }),
+          }),
+        }),
+        NATIVE_CODEC
+      )
+      expect(outcome).toEqual({
+        ok: false,
+        failure: {
+          source: 'codec',
+          direction: 'decode',
+          path: ['for'],
+          message: 'Reference values have no conversion in this codec',
+          unsupportedKind: 'reference',
+        },
+      })
+    },
+    HOST_TEST_TIMEOUT_MS
+  )
+
+  it(
     'reports an error thrown with a number as an app failure carrying that number',
     async () => {
       const outcome = await runNativeScript(
@@ -515,6 +549,10 @@ describe('runNativeScript', () => {
       [
         'a codec failure with an invalid path',
         '{"ok":false,"failure":{"source":"codec","direction":"encode","path":[{}],"message":"m"}}',
+      ],
+      [
+        'a codec failure with a non-text unsupported kind',
+        '{"ok":false,"failure":{"source":"codec","direction":"decode","path":[],"message":"m","unsupportedKind":1}}',
       ],
     ])(
       'rejects %s as a malformed outcome',
