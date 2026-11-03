@@ -44,6 +44,10 @@ async function invokedOperations(app: RealApp): Promise<Map<string, OperationId>
       invoked.push(operation.id)
       return Promise.resolve(undefined as never)
     },
+    // Client methods only invoke operations; none resolves a reference.
+    resolve() {
+      return Promise.reject(new Error('A client method resolved a reference'))
+    },
   }
   const client = app.contract.bind(runtime)
   if (!isObject(client)) throw new Error(`${app.name}: the client is not an object`)
