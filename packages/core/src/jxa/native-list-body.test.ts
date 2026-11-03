@@ -61,8 +61,9 @@ const EVIDENCE =
  * A planner app whose names exercise every list shape:
  *
  * - `Task`, listed under a `Shelf` matched by name, is identified by `uID`
- *   (app `uid`), lives in the collection the app spells `todos`, and has a
- *   property the app spells differently (`uRL`, app `url`).
+ *   (app `uid`), claimed unique so its list pages, lives in the collection
+ *   the app spells `todos`, and has a property the app spells differently
+ *   (`uRL`, app `url`).
  * - `Folder` is matched on `name` because its declared identifier
  *   `folderKey` fails at run time, so `folderKey` is never read and, with
  *   identifier aliases, mirrors `name`.
@@ -103,7 +104,10 @@ resources:
         description: The identifier
         native: { name: uid, evidence: ${EVIDENCE} }
     identifiers:
-      - { property: uID, primary: true }
+      - property: uID
+        primary: true
+        unique: true
+        evidence: { unique: { source: curated, note: Every task has its own uid } }
   Folder:
     name: Folder
     plural: Folders
@@ -1172,6 +1176,21 @@ async function pageThrough(app: FakeApp, size: number): Promise<WindowResult[]> 
 function uidsOf(result: WindowResult): unknown[] {
   return result.items.map((item) => item['uID'])
 }
+
+describe('paged list bodies: which lists may page', () => {
+  it.each([
+    { label: 'whose identifier makes no uniqueness claim', target: FOLDERS },
+    { label: 'whose resource has no identifier', target: MEMOS },
+  ])('refuses to build a paged body for a list $label', ({ target }) => {
+    expect(() => buildNativeBody(planner, target, { paged: true })).toThrow(
+      'A list whose primary identifier is not claimed unique cannot be paged.'
+    )
+  })
+
+  it('builds a paged body for a list whose identifier is claimed unique', () => {
+    expect(buildNativeBody(planner, TASKS, { paged: true })).toContain('anchorHolds')
+  })
+})
 
 describe('paged list bodies: reading pages of an unchanged collection', () => {
   it('pages together hold every item exactly once, and only the last page reaches the end', async () => {

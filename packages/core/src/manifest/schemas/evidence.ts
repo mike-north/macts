@@ -378,6 +378,35 @@ export const ResourceAbsenceEvidenceSchema = z.discriminatedUnion('source', [
 ])
 export type ResourceAbsenceEvidence = z.infer<typeof ResourceAbsenceEvidenceSchema>
 
+/**
+ * Evidence for a claim that an identifier's values are, or are not, unique
+ * within its resource's collection: no two items the collection holds at the
+ * same time share one value.
+ *
+ * Uniqueness decides whether a list can page (phases/13 D9, _Bounded list
+ * pages_): a page is anchored on the identifier of the item before it, and an
+ * identifier two items can share cannot show that the collection shifted by
+ * one position. The claim is never inferred, from the identifier's name or
+ * from how it is targeted; it is curated, and must say where it comes from:
+ *
+ * - `sdef`: the app's scripting dictionary describes the property as the
+ *   object's unique identifier. The note quotes or names that description.
+ * - `curated`: an observation or a structural fact, such as recurring event
+ *   occurrences sharing one identifier, or names the user chooses freely.
+ */
+export const IdentifierUniquenessEvidenceSchema = z
+  .object({
+    source: z.enum(['sdef', 'curated']),
+    /** Names the evidence for the claim. */
+    note: z.string().min(1),
+    /** When the claim was last confirmed (an ISO 8601 UTC timestamp), if recorded. */
+    observedAt: ObservedAtSchema.optional(),
+    /** The app version the claim was confirmed against, if recorded. */
+    appVersion: z.string().min(1).optional(),
+  })
+  .strict()
+export type IdentifierUniquenessEvidence = z.infer<typeof IdentifierUniquenessEvidenceSchema>
+
 /** The parts of a field that make or support a nullability claim. */
 interface NullabilityClaim {
   readonly nullable?: boolean | undefined

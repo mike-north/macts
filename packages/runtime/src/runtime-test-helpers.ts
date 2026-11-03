@@ -109,6 +109,8 @@ export const CALENDAR_MANIFEST: AppManifest = {
  * - `Book` (identifier `isbn`): get `library.books.lookupBook` (the command
  *   keyed `lookupBook` declares the CRUD shape `get`), list
  *   `library.books.list`.
+ *
+ * Shelf and book identifiers are claimed unique, so their lists page.
  * - `Page` (no identifier, so selector forms only): list `library.pages.list`,
  *   and no get.
  * - `Stamp` (integer identifier `serial`): get `library.stamps.get`, and no
@@ -117,6 +119,15 @@ export const CALENDAR_MANIFEST: AppManifest = {
  * `describeBook` reads a book too, but declares no CRUD shape, so it never
  * resolves references.
  */
+/**
+ * A uniqueness claim, with its evidence, for a fixture identifier: a list
+ * pages only when its resource's primary identifier is claimed unique.
+ */
+export const UNIQUE_CLAIM = {
+  unique: true,
+  evidence: { unique: { source: 'curated', note: 'Test fixture: no two items share an id' } },
+} as const
+
 export const LIBRARY_MANIFEST: AppManifest = {
   version: '1.0',
   app: { name: 'Library', bundleId: 'com.example.library', tccEntitlements: [] },
@@ -126,14 +137,14 @@ export const LIBRARY_MANIFEST: AppManifest = {
       plural: 'Shelves',
       description: 'A shelf',
       properties: {},
-      identifiers: [{ property: 'code', primary: true }],
+      identifiers: [{ property: 'code', primary: true, ...UNIQUE_CLAIM }],
     },
     Book: {
       name: 'Book',
       plural: 'Books',
       description: 'A book',
       properties: {},
-      identifiers: [{ property: 'isbn', primary: true }],
+      identifiers: [{ property: 'isbn', primary: true, ...UNIQUE_CLAIM }],
     },
     Page: { name: 'Page', plural: 'Pages', description: 'A page', properties: {} },
     Stamp: {
@@ -189,12 +200,12 @@ export const PAGE_RECORD = t.record({ text: t.string() })
 /** A stamp record. */
 export const STAMP_RECORD = t.record({ serial: t.integer() })
 
-/** The input of a list of an identified resource: the paging inputs only. */
+/** The input of a list whose identifier is claimed unique: the paging inputs only. */
 export const PAGED_LIST_INPUT = t.record({ ...t.pageInputs() })
 
 /**
  * One library operation descriptor. Its input is empty unless given; the
- * lists of identified resources take the paging inputs, as a generator emits
+ * lists whose identifiers are claimed unique take the paging inputs, as a generator emits
  * them.
  */
 function libraryOperation(

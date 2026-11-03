@@ -51,6 +51,7 @@ import type { Command, CommandParameter } from '../manifest/schemas/command.js'
 import type { Resource } from '../manifest/schemas/resource.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
+  listOperationPages,
   resolveIdentifierTargeting,
   resolveListOutputProperties,
   resolvePrimaryIdentifierProperty,
@@ -939,8 +940,9 @@ function listAttempts(): string {
  * `PageWindow`), and returns `{ items, length, last? }` (see
  * `PageWindowResult`): the window's records, the collection's length when it
  * was read, and the identifier of the last record, which anchors the next
- * window (see {@link pagedAttemptReader}). Only a resource with a runtime
- * identifier can page. Any other list reads the whole collection and returns
+ * window (see {@link pagedAttemptReader}). Only a list that pages (see
+ * `listOperationPages`: its primary identifier is claimed unique) can read
+ * a window. Any other list reads the whole collection and returns
  * its records as an array. Every read goes through the one specifier the body
  * binds ({@link COLLECTION_LOCAL}), so all reads cover the same items.
  *
@@ -1001,8 +1003,8 @@ function listAttempts(): string {
  * Every read uses the app's name for the property, and the collection the
  * app's name for it; every item is keyed by the public names.
  *
- * @throws `InternalError` when `paged` is set for a resource with no runtime
- *   identifier: such a list cannot be anchored, so it never pages.
+ * @throws `InternalError` when `paged` is set for a list that does not page
+ *   (see `listOperationPages`): its items cannot be anchored reliably.
  */
 function buildListBody(
   command: Command,
@@ -1016,8 +1018,11 @@ function buildListBody(
   const targeting = resolveIdentifierTargeting(resource)
   const runtimeIdProperty = targeting?.property
   const declaredIdProperty = resolvePrimaryIdentifierProperty(resource)
-  if (paged && runtimeIdProperty === undefined) {
-    throw new InternalError('A list of a resource with no identifier cannot be paged.', {})
+  if (paged && (runtimeIdProperty === undefined || !listOperationPages(command, resource))) {
+    throw new InternalError(
+      'A list whose primary identifier is not claimed unique cannot be paged.',
+      {}
+    )
   }
 
   // For a byProperty resource the declared identifier is exactly the property

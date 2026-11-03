@@ -8,6 +8,9 @@
  * - `Note` and `Folder` reference each other (a note's `folder`, a folder's
  *   `notes`), which the lazy resource table must allow.
  * - `Tag` has no identifier, so it can be referenced only by selector.
+ * - `Note.uid` is claimed unique, so the note list pages; `Folder.folderId`
+ *   makes no uniqueness claim and `Tag` has no identifier, so their lists
+ *   return their whole collection as one page.
  * - `Priority` is an enum, named in lower case by a property (`{ enum:
  *   priority }`), so it resolves only by normalized name.
  * - `Note.attachment` is a file property (a file value when read), and
@@ -127,6 +130,11 @@ resources:
     identifiers:
       - property: uid
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: The dictionary describes uid as the note's unique identifier
   Folder:
     name: Folder
     plural: Folders

@@ -43,6 +43,7 @@ import {
   type AppContract,
   type WireValue,
 } from '@macts/contracts'
+import type { AppManifest } from '@macts/core'
 import { createRateLimiter, createRuntime, type RateLimiter } from '@macts/runtime'
 import { createHttpAdapter } from './adapter.js'
 import {
@@ -185,6 +186,33 @@ describe('HTTP listener: responses over a real socket', () => {
 })
 
 /**
+ * The test calendar manifest with its event identifier claimed unique, so its
+ * event list pages. A list pages only when its identifier is claimed unique
+ * (phases/13 D9); this fixture app makes that claim, unlike the real Calendar.
+ */
+const PAGED_CALENDAR_MANIFEST: AppManifest = {
+  ...CALENDAR_MANIFEST,
+  resources: {
+    Event: {
+      name: 'Event',
+      plural: 'Events',
+      description: 'An event',
+      properties: {},
+      identifiers: [
+        {
+          property: 'uid',
+          primary: true,
+          unique: true,
+          evidence: {
+            unique: { source: 'curated', note: 'Test fixture: no two events share a uid' },
+          },
+        },
+      ],
+    },
+  },
+}
+
+/**
  * A calendar contract whose list operation returns typed event records, so
  * the runtime checks every result against it (D11). Ids, permission, and
  * target are hand-derived from the test calendar manifest.
@@ -206,7 +234,7 @@ function typedCalendarContract(): AppContract<unknown> {
     app: 'calendar',
     operations: { [list.id]: list },
     resources: { Event: { name: 'Event', record: event, id: t.string(), list: list.id } },
-    loadManifest: () => Promise.resolve(CALENDAR_MANIFEST),
+    loadManifest: () => Promise.resolve(PAGED_CALENDAR_MANIFEST),
     bind: () => ({}),
   }
 }
@@ -226,7 +254,7 @@ describe('HTTP listener: results that violate the output contract', () => {
     const listener = await listenServer({
       manifests: [],
       register: (registrar) => {
-        registrar.registerContract(typedCalendarContract(), CALENDAR_MANIFEST)
+        registrar.registerContract(typedCalendarContract(), PAGED_CALENDAR_MANIFEST)
       },
       executor,
     })
@@ -296,7 +324,7 @@ describe('HTTP listener: paged lists', () => {
     const listener = await listenServer({
       manifests: [],
       register: (registrar) => {
-        registrar.registerContract(typedCalendarContract(), CALENDAR_MANIFEST)
+        registrar.registerContract(typedCalendarContract(), PAGED_CALENDAR_MANIFEST)
       },
       executor: eventWindows(),
     })
@@ -328,7 +356,7 @@ describe('HTTP listener: paged lists', () => {
     const listener = await listenServer({
       manifests: [],
       register: (registrar) => {
-        registrar.registerContract(typedCalendarContract(), CALENDAR_MANIFEST)
+        registrar.registerContract(typedCalendarContract(), PAGED_CALENDAR_MANIFEST)
       },
       executor: eventWindows(),
     })
@@ -356,7 +384,7 @@ describe('HTTP listener: paged lists', () => {
     const listener = await listenServer({
       manifests: [],
       register: (registrar) => {
-        registrar.registerContract(typedCalendarContract(), CALENDAR_MANIFEST)
+        registrar.registerContract(typedCalendarContract(), PAGED_CALENDAR_MANIFEST)
       },
       executor,
     })

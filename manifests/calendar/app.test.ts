@@ -94,19 +94,26 @@ describe('Calendar manifest', () => {
       // Calendar is targeted by NAME via byProperty (#81): the dictionary
       // `calendarIdentifier` throws via JXA at runtime, so `name` (which works)
       // is the runtime identifier and the resource is matched on it.
+      // Calendar names are titles the user chooses, so the name is claimed
+      // not unique and the calendar list does not page.
       const calendar = manifest.resources.Calendar
-      expect(calendar.identifiers).toContainEqual({
-        property: 'name',
-        primary: true,
-        targeting: 'byProperty',
-      })
+      expect(calendar.identifiers).toContainEqual(
+        expect.objectContaining({
+          property: 'name',
+          primary: true,
+          targeting: 'byProperty',
+          unique: false,
+        })
+      )
 
-      // Event's `uid` IS runtime-valid, so it keeps the default byId targeting.
+      // Event's `uid` IS runtime-valid, so it keeps the default byId targeting,
+      // but every occurrence of a recurring event shares it, so it is claimed
+      // not unique and the event list does not page.
       const event = manifest.resources.Event
-      expect(event.identifiers).toContainEqual({
-        property: 'uid',
-        primary: true,
-      })
+      expect(event.identifiers).toContainEqual(
+        expect.objectContaining({ property: 'uid', primary: true, unique: false })
+      )
+      expect(event.identifiers?.[0]?.targeting).toBeUndefined()
     })
 
     it('should have deprecated properties on OpenFileAlarm', () => {

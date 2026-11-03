@@ -182,6 +182,60 @@ describe('IdentifierSchema', () => {
   })
 })
 
+describe('ResourceSchema identifier uniqueness claims', () => {
+  /** A resource whose only identifier is `identifier`. */
+  function withIdentifier(identifier: Record<string, unknown>) {
+    return ResourceSchema.safeParse({
+      name: 'Item',
+      plural: 'Items',
+      description: 'An item',
+      properties: { id: { access: 'r', description: 'Item id' } },
+      identifiers: [{ property: 'id', primary: true, ...identifier }],
+    })
+  }
+
+  it.each([
+    { label: 'unique, from the dictionary', unique: true, source: 'sdef' },
+    { label: 'not unique, from curation', unique: false, source: 'curated' },
+  ])('accepts a claim that the identifier is $label', ({ unique, source }) => {
+    const parsed = withIdentifier({ unique, evidence: { unique: { source, note: 'Why' } } })
+
+    expect(parsed.success).toBe(true)
+    expect(parsed.data?.identifiers?.[0]).toMatchObject({
+      unique,
+      evidence: { unique: { source } },
+    })
+  })
+
+  it('accepts an identifier that makes no claim', () => {
+    expect(withIdentifier({}).success).toBe(true)
+  })
+
+  it('rejects a claim with no evidence, at the missing evidence', () => {
+    const parsed = withIdentifier({ unique: true })
+
+    expect(parsed.success).toBe(false)
+    expect(parsed.error?.issues.map((issue) => issue.path)).toEqual([
+      ['identifiers', 0, 'evidence', 'unique'],
+    ])
+  })
+
+  it('rejects evidence with no claim, at the missing claim', () => {
+    const parsed = withIdentifier({ evidence: { unique: { source: 'sdef', note: 'Why' } } })
+
+    expect(parsed.success).toBe(false)
+    expect(parsed.error?.issues.map((issue) => issue.path)).toEqual([['identifiers', 0, 'unique']])
+  })
+
+  it.each([
+    { label: 'an empty note', evidence: { source: 'sdef', note: '' } },
+    { label: 'an unknown source', evidence: { source: 'guess', note: 'Why' } },
+    { label: 'an unknown field', evidence: { source: 'sdef', note: 'Why', extra: 1 } },
+  ])('rejects evidence with $label', ({ evidence }) => {
+    expect(withIdentifier({ unique: true, evidence: { unique: evidence } }).success).toBe(false)
+  })
+})
+
 describe('ResourceSchema plural', () => {
   // A plural is Pascal case letters only, so its lower camel case is always a
   // valid route and permission segment (design record D2; issue #154).

@@ -235,6 +235,18 @@ export const AppManifestSchema: z.ZodObject<{
                 byProperty: "byProperty";
             }>>;
             runtimeProperty: z.ZodOptional<z.ZodString>;
+            unique: z.ZodOptional<z.ZodBoolean>;
+            evidence: z.ZodOptional<z.ZodObject<{
+                unique: z.ZodOptional<z.ZodObject<{
+                    source: z.ZodEnum<{
+                        curated: "curated";
+                        sdef: "sdef";
+                    }>;
+                    note: z.ZodString;
+                    observedAt: z.ZodOptional<z.ZodISODateTime>;
+                    appVersion: z.ZodOptional<z.ZodString>;
+                }, z.core.$strict>>;
+            }, z.core.$strict>>;
         }, z.core.$strip>>>;
         probe: z.ZodOptional<z.ZodObject<{
             runtimeIdentifier: z.ZodOptional<z.ZodString>;
@@ -1710,6 +1722,18 @@ export const IdentifierSchema: z.ZodObject<{
         byProperty: "byProperty";
     }>>;
     runtimeProperty: z.ZodOptional<z.ZodString>;
+    unique: z.ZodOptional<z.ZodBoolean>;
+    evidence: z.ZodOptional<z.ZodObject<{
+        unique: z.ZodOptional<z.ZodObject<{
+            source: z.ZodEnum<{
+                curated: "curated";
+                sdef: "sdef";
+            }>;
+            note: z.ZodString;
+            observedAt: z.ZodOptional<z.ZodISODateTime>;
+            appVersion: z.ZodOptional<z.ZodString>;
+        }, z.core.$strict>>;
+    }, z.core.$strict>>;
 }, z.core.$strip>;
 
 // @public (undocumented)
@@ -1726,6 +1750,20 @@ export const IdentifierTargetingSchema: z.ZodEnum<{
     byId: "byId";
     byProperty: "byProperty";
 }>;
+
+// @public (undocumented)
+export type IdentifierUniquenessEvidence = z.infer<typeof IdentifierUniquenessEvidenceSchema>;
+
+// @public
+export const IdentifierUniquenessEvidenceSchema: z.ZodObject<{
+    source: z.ZodEnum<{
+        curated: "curated";
+        sdef: "sdef";
+    }>;
+    note: z.ZodString;
+    observedAt: z.ZodOptional<z.ZodISODateTime>;
+    appVersion: z.ZodOptional<z.ZodString>;
+}, z.core.$strict>;
 
 // @public
 export function ignoredIdentifierNullability(resource: Resource, propertyName: string, property: Property): NullabilityEvidence | undefined;
@@ -1866,6 +1904,12 @@ export interface LayeredPolicyEvaluation extends PolicyEvaluation {
 
 // @public
 export function listKnownPermissions(manifest: AppManifest): string[];
+
+// @public
+export function listOperationPages(command: {
+    readonly scope: string;
+    readonly name: string;
+}, resource: Resource | undefined): boolean;
 
 // @public (undocumented)
 export type LiveAbsenceEvidence = z.infer<typeof LiveAbsenceEvidenceSchema>;
@@ -3126,6 +3170,18 @@ export const ResourceSchema: z.ZodObject<{
             byProperty: "byProperty";
         }>>;
         runtimeProperty: z.ZodOptional<z.ZodString>;
+        unique: z.ZodOptional<z.ZodBoolean>;
+        evidence: z.ZodOptional<z.ZodObject<{
+            unique: z.ZodOptional<z.ZodObject<{
+                source: z.ZodEnum<{
+                    curated: "curated";
+                    sdef: "sdef";
+                }>;
+                note: z.ZodString;
+                observedAt: z.ZodOptional<z.ZodISODateTime>;
+                appVersion: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>>;
+        }, z.core.$strict>>;
     }, z.core.$strip>>>;
     probe: z.ZodOptional<z.ZodObject<{
         runtimeIdentifier: z.ZodOptional<z.ZodString>;

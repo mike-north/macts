@@ -36,6 +36,7 @@ import type { AppManifest } from '../manifest/index.js'
 import { generateHttpClientSdk } from './sdk/http-client.js'
 import { generateCliPlugin } from './cli/index.js'
 import { generateResourceOperationSchema } from '../capabilities/operation-schema.js'
+import { UNIQUE_CLAIM } from '../manifest/test-support/unique-claim.js'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -80,7 +81,7 @@ const manifest: AppManifest = {
         id: { access: 'r', type: 'string', description: 'Window id', optional: false },
         name: { access: 'rw', type: 'string', description: 'Window name', optional: false },
       },
-      identifiers: [{ property: 'id', primary: true }],
+      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
     },
     Tab: {
       name: 'Tab',
@@ -90,7 +91,7 @@ const manifest: AppManifest = {
         id: { access: 'r', type: 'string', description: 'Tab id', optional: false },
         url: { access: 'rw', type: 'string', description: 'Tab URL', optional: false },
       },
-      identifiers: [{ property: 'id', primary: true }],
+      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
     },
     // Regression fixture for issue #94: a resource NESTED in the hierarchy (so
     // the CLI derives a parent param from nesting) whose list command declares
@@ -104,7 +105,7 @@ const manifest: AppManifest = {
         id: { access: 'r', type: 'string', description: 'Bookmark id', optional: false },
         title: { access: 'rw', type: 'string', description: 'Bookmark title', optional: false },
       },
-      identifiers: [{ property: 'id', primary: true }],
+      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
     },
   },
   enums: {},

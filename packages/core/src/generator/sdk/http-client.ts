@@ -11,6 +11,7 @@ import type { AppManifest, Resource, Command } from '../../manifest/index.js'
 import type { PropertyType } from '../../manifest/schemas/property.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
+  listOperationPages,
   normalizeResourceRouteSegment,
   resolveIdentifierTargeting,
   resolvePrimaryIdentifierProperty,
@@ -649,7 +650,7 @@ function generateResourceClient(
           listCmd[1],
           resourceName,
           pluralWords,
-          resolvePrimaryIdentifierProperty(resource) !== undefined
+          listOperationPages(listCmd[1], resource)
         )
       : '',
     getCmd
@@ -759,11 +760,11 @@ ${methodBody}
  * required parameters from the manifest command definition (see
  * `listMethodParameters`), so SDK and server always agree on parameter names.
  *
- * Every list returns one page, `{ items, nextCursor? }`. A list of a resource
- * with a primary identifier pages: it takes a trailing `page` argument whose
+ * Every list returns one page, `{ items, nextCursor? }`. A list that pages
+ * (see `listOperationPages`) takes a trailing `page` argument whose
  * `pageSize` is sent in its integer wire form and whose `cursor` is sent as
- * given. A list of a resource without one takes no paging argument and its
- * page holds every item.
+ * given. Any other list takes no paging argument and its page holds every
+ * item.
  */
 function generateListMethod(
   routeSegment: string,

@@ -101,7 +101,17 @@ function validManifestSource(app: string): string {
         plural: 'Widgets',
         description: 'A widget',
         properties: {},
-        identifiers: [{ property: 'id', primary: true }],
+        // Claimed unique, so the widget list pages, as its contract declares.
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+            unique: true,
+            evidence: {
+              unique: { source: 'curated', note: 'Test fixture: no two widgets share an id' },
+            },
+          },
+        ],
       },
     },
     enums: {},

@@ -6,10 +6,13 @@
  * Expected outcomes are hand-written from the paging contract
  * (`@macts/contracts` `Page`, `PAGE_SIZE_LIMITS`) and phases/13:
  *
- * - D2: every list returns a page `{ items, nextCursor? }`; a list of an
- *   identified resource takes the optional `pageSize` and `cursor` inputs; a
- *   list of a resource with no identifier takes neither and returns one page
- *   with no `nextCursor`.
+ * - D2: every list returns a page `{ items, nextCursor? }`; a list whose
+ *   identifier is claimed unique takes the optional `pageSize` and `cursor`
+ *   inputs; a list of a resource with no identifier takes neither and returns
+ *   one page with no `nextCursor`.
+ * - D9: the cursor's input digest covers the validated wire input, so a cursor
+ *   issued for a raw wire input continues through the SDK encode path, and the
+ *   reverse.
  * - D9: the executor reads a window `{ offset, size, anchor? }` with an
  *   output plan that is an array of the list's items, and answers with the
  *   items, the collection length and the last item's identifier.
@@ -246,7 +249,7 @@ async function issuedCursor(runtime: MactsRuntime, input: WireRecord = {}): Prom
 }
 
 describe('paging contract of the fixture (D2)', () => {
-  it('gives the list of an identified resource both paging inputs, both optional', () => {
+  it('gives a list whose identifier is claimed unique both paging inputs, both optional', () => {
     const plan = PAGED_LIST_INPUT.plan
     expect(plan.kind === 'record' ? Object.keys(plan.fields) : []).toEqual(['pageSize', 'cursor'])
     expect(PAGED_LIST_INPUT.wire.safeParse({}).success).toBe(true)
@@ -528,6 +531,94 @@ describe('cursor validation (D6)', () => {
     )
 
     expect(rest.items.map(isbnOf)).toEqual(['isbn-4', 'isbn-5', 'isbn-6'])
+  })
+})
+
+describe('cursors across surfaces (D9)', () => {
+  /** The book list taking a shelf and an integer minimum besides the paging inputs. */
+  const SCOPED_INPUT = t.record({
+    shelf: t.string(),
+    minPages: t.optional(t.integer()),
+    ...t.pageInputs(),
+  })
+
+  function scopedContract(): AppContract<unknown> {
+    const base = libraryContract()
+    const list = base.operations['library.books.list']
+    if (list === undefined) throw new Error('fixture lost its book list')
+    return {
+      ...base,
+      operations: { ...base.operations, 'library.books.list': { ...list, input: SCOPED_INPUT } },
+    }
+  }
+
+  /** The wire input an SDK sends for SDK-side `value`: its encoded form. */
+  function encodedBySdk(value: Record<string, unknown>): WireRecord {
+    const encoded = SCOPED_INPUT.encode(value)
+    if (!encoded.ok) throw new Error('the SDK input did not encode')
+    return encoded.value as WireRecord
+  }
+
+  // A raw wire record, as an HTTP body or an MCP tool call carries it, in
+  // another key order than the SDK writes.
+  const RAW = { minPages: { integer: '7' }, shelf: 'SF-1' }
+  const SDK = { shelf: 'SF-1', minPages: 7 }
+
+  it('continues a cursor issued for a raw wire input through the SDK encode path', async () => {
+    const { runtime } = harness(
+      windowExecutor(() => books(6)),
+      scopedContract()
+    )
+    const cursor = await issuedCursor(runtime, RAW)
+
+    const rest = asPage(
+      await runtime.invoke('library.books.list', encodedBySdk({ ...SDK, cursor }), asLibrarian())
+    )
+
+    expect(rest.items.map(isbnOf)).toEqual(['isbn-4', 'isbn-5', 'isbn-6'])
+  })
+
+  it('continues a cursor issued through the SDK encode path for a raw wire input', async () => {
+    const { runtime } = harness(
+      windowExecutor(() => books(6)),
+      scopedContract()
+    )
+    const first = asPage(
+      await runtime.invoke(
+        'library.books.list',
+        encodedBySdk({ ...SDK, pageSize: 3 }),
+        asLibrarian()
+      )
+    )
+    if (first.nextCursor === undefined) throw new Error('expected a next cursor')
+
+    const rest = asPage(
+      await runtime.invoke(
+        'library.books.list',
+        { ...RAW, cursor: first.nextCursor },
+        asLibrarian()
+      )
+    )
+
+    expect(rest.items.map(isbnOf)).toEqual(['isbn-4', 'isbn-5', 'isbn-6'])
+  })
+
+  it('refuses the cursor when a non-paging input differs only in value', async () => {
+    const { runtime } = harness(
+      windowExecutor(() => books(6)),
+      scopedContract()
+    )
+    const cursor = await issuedCursor(runtime, RAW)
+
+    const error = await validationFailure(
+      runtime.invoke(
+        'library.books.list',
+        { ...RAW, minPages: { integer: '8' }, cursor },
+        asLibrarian()
+      )
+    )
+
+    expect(error.details.issues.map((issue) => issue.path)).toEqual([['cursor']])
   })
 })
 

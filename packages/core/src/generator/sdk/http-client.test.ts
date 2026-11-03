@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import type { AppManifest } from '../../manifest/index.js'
 import { generateHttpClientSdk } from './http-client.js'
+import { UNIQUE_CLAIM } from '../../manifest/test-support/unique-claim.js'
 
 function findFile(
   files: { path: string; content: string }[],
@@ -31,7 +32,7 @@ const testManifest: AppManifest = {
         name: { access: 'rw', type: 'string', description: 'Name', optional: false },
         count: { access: 'rw', type: 'integer', description: 'Count', optional: true },
       },
-      identifiers: [{ property: 'id', primary: true }],
+      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
     },
   },
   enums: {

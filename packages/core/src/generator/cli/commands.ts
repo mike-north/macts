@@ -4,7 +4,7 @@ import type {
   CommandParameter,
 } from '../../manifest/index.js'
 import { PAGE_SIZE_LIMITS } from '@macts/contracts'
-import { resolvePrimaryIdentifierProperty } from '../../manifest/index.js'
+import { listOperationPages } from '../../manifest/index.js'
 import { usableProperties } from '../../manifest/unsupported.js'
 import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.js'
 import { identifierWords, resolveIdParams, resourceNamespace, safeIdentifier } from '../surface.js'
@@ -111,11 +111,11 @@ export function generateListCommand(
   // match the SDK signature.
   const parentOptions = generateListParamOptions(listRequiredParams)
 
-  // A list of a resource with a primary identifier pages: the command takes
-  // `--page-size` and `--cursor`, forwards them as the SDK's trailing page
-  // argument, and says how to read the next page when more remain. Without an
-  // identifier the list's single page holds every item.
-  const paged = resolvePrimaryIdentifierProperty(resource) !== undefined
+  // A list that pages (see `listOperationPages`) takes `--page-size` and
+  // `--cursor`, forwards them as the SDK's trailing page argument, and says
+  // how to read the next page when more remain. Any other list's single page
+  // holds every item.
+  const paged = listCommand !== undefined && listOperationPages(listCommand, resource)
   const pageArgument =
     '{ ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }), ...(this.cursor === undefined ? {} : { cursor: this.cursor }) }'
   const listArgs = [

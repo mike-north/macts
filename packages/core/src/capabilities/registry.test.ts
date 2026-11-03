@@ -188,6 +188,33 @@ describe('deriveCapabilities — nested hierarchy CLI snippet (calendar)', () =>
   })
 })
 
+describe('deriveCapabilities — paging inputs on real manifests', () => {
+  const REMINDERS_MANIFEST = resolve(
+    dirname(fileURLToPath(import.meta.url)),
+    '../../../../manifests/reminders/app.yaml'
+  )
+
+  it('shows pageSize and cursor on reminders.reminders.list, whose id is claimed unique', async () => {
+    const caps = deriveCapabilities(await loadManifest(REMINDERS_MANIFEST))
+    const schema = caps.find((c) => c.name === 'reminders.reminders.list')?.inputSchema
+
+    expect(Object.keys(schema?.properties ?? {}).sort()).toEqual(['cursor', 'listId', 'pageSize'])
+    expect(schema?.properties?.['pageSize']).toMatchObject({ minimum: 1, maximum: 100 })
+  })
+
+  it.each(['calendar.events.list', 'calendar.calendars.list'])(
+    'shows neither paging input on %s, whose identifier is claimed not unique',
+    async (name) => {
+      const caps = deriveCapabilities(await loadManifest(CALENDAR_MANIFEST))
+      const schema = caps.find((c) => c.name === name)?.inputSchema
+
+      expect(schema).toBeDefined()
+      expect(schema?.properties).not.toHaveProperty('pageSize')
+      expect(schema?.properties).not.toHaveProperty('cursor')
+    }
+  )
+})
+
 describe('buildCapabilityRegistry', () => {
   it('indexes capabilities by stable name for O(1) lookup', () => {
     const registry = buildCapabilityRegistry([notebookManifest()])

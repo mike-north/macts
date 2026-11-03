@@ -285,6 +285,11 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "the unique identifier of the attachment"'
     nullabilityProbe:
       observedAt: '2026-11-01T08:33:35.626Z'
       bundleId: com.apple.Notes

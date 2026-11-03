@@ -121,8 +121,9 @@ export interface McpAdapter {
    *   locating the credential until a call needs it. If it throws, the call
    *   fails exactly as if the runtime had thrown that error.
    * @returns `{ content: [{ type: 'text', text: '{"result":…}' }] }` on
-   *   success, the text followed by one continuation line when a list's page
-   *   says more items remain; for any failure, `isError: true` with the text
+   *   success, followed by a second text block holding a note on reading the
+   *   next page when a list's page says more items remain (the first block
+   *   always parses as JSON); for any failure, `isError: true` with the text
    *   `{"error":{"code","message","details"}}`. Failures never reject.
    * @throws `McpError` with `ErrorCode.InvalidParams` when `name` is not a tool
    *   this adapter serves. The message is fixed and never echoes the name.
@@ -152,7 +153,7 @@ interface ServedTool {
 }
 
 /**
- * The line that follows a page's result when more items remain: how many
+ * The note that follows a page's result when more items remain: how many
  * items the page holds, and how to read more. It names the `cursor` argument
  * but repeats no data; the cursor itself is the result's `nextCursor`.
  */
@@ -162,9 +163,11 @@ function moreItemsNote(itemCount: number): string {
 }
 
 /**
- * The tool result of a successful call: the result document, followed by the
- * continuation line when the tool returns a page and the page says more
- * items remain.
+ * The tool result of a successful call. Its first text block is always
+ * exactly the JSON result document, so a client can parse it as JSON. When
+ * the tool returns a page and the page says more items remain, a second,
+ * separate text block carries the note on how to read the next page; the
+ * note never joins the document.
  */
 function successResult(result: unknown, pages: boolean): CallToolResult {
   const success = textResult({ result }, false)
@@ -172,11 +175,7 @@ function successResult(result: unknown, pages: boolean): CallToolResult {
   const { items, nextCursor } = result as { items?: unknown; nextCursor?: unknown }
   if (typeof nextCursor !== 'string' || !Array.isArray(items)) return success
   return {
-    content: success.content.map((block) =>
-      block.type === 'text'
-        ? { ...block, text: `${block.text}\n${moreItemsNote(items.length)}` }
-        : block
-    ),
+    content: [...success.content, { type: 'text', text: moreItemsNote(items.length) }],
   }
 }
 

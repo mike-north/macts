@@ -653,10 +653,11 @@ Manifest types map to value types as follows:
 - Resource-typed properties and parameters are references (D7). A `get`
   returns the record, and a `list` returns one page of records:
   `t.page(record)`, whose SDK type is `Page<T>`, `{ items, nextCursor? }`
-  (D9, _Bounded list pages_). The list of a resource with an identifier also
-  takes the optional paging inputs `pageSize` and `cursor`
-  (`t.pageInputs()`); the list of a resource without one takes neither and
-  returns its whole collection as one page with no `nextCursor`.
+  (D9, _Bounded list pages_). A list that pages, one whose resource's
+  primary identifier the manifest claims unique, also takes the optional
+  paging inputs `pageSize` and `cursor` (`t.pageInputs()`); any other list
+  takes neither and returns its whole collection as one page with no
+  `nextCursor`.
 - `file` and `data` are file values in outputs and file sources in inputs
   (D8).
 - Update inputs are optional at every field, and accept `null` only where the
@@ -1613,13 +1614,33 @@ reads windows:
   and generated CLI list commands take `--page-size` and `--cursor`. The
   generator reserves both names on every list operation and fails on an app
   parameter that uses one.
+- A list pages only when its anchor is unique: its resource's primary
+  identifier carries a curated `unique: true` claim with `evidence.unique`
+  (the app's dictionary describing it as the object's unique identifier, or
+  a curated observation). Uniqueness is opt-in and never inferred, from the
+  identifier's name or from its targeting: a `byProperty` identifier can be
+  unique, and an id the dictionary calls unique can repeat. An identifier
+  with no claim, or one claimed `unique: false`, gives a list that never
+  pages, as does a resource with no identifier: it reads its whole
+  collection as one page. One predicate, `listOperationPages` in
+  `manifest/identifier.ts`, decides it for the contract generator, the
+  generated SDK and CLI, the capability registry's input schemas (which show
+  `pageSize` as an integer from 1 to the maximum, and `cursor`, for exactly
+  the lists that page), the native list body, and the runtime, which refuses
+  to register a contract whose list takes the paging inputs when the
+  predicate says it does not page, or the reverse.
 - `pageSize` is an integer from 1 to the maximum (D10); anything else is a
   `ValidationError` at `["pageSize"]`, never clamped.
 - The cursor is opaque and stateless: nothing is stored, it is not signed, and
   it never expires. It holds a format version, the operation id, a digest of
   the call's other inputs, an empty slot for a digest of filter inputs, the
   offset of the next page, and the anchor, the identifier of the last item
-  returned. A malformed cursor, an unknown version, or a cursor from another
+  returned. The input digest is taken over the call's validated wire input
+  in canonical JSON (keys sorted at every level, paging inputs excluded), so
+  a cursor issued through one surface continues through any other for the
+  same inputs. It is a consistency check that the caller sent the same query
+  again, not a security control. A malformed cursor, an unknown version, or a
+  cursor from another
   operation or for other inputs is a `ValidationError` at `["cursor"]`,
   never `COLLECTION_CHANGED`. Every page runs the full D5 pipeline, so a
   cursor carries no authority. Audit and logs record only `cursor: true`, and
@@ -1641,8 +1662,10 @@ reads windows:
   anchor are harmless, any move of the anchor is detected, and a pair of
   compensating moves (one item removed before the anchor and another added
   before it) goes undetected.
-- A list of a resource without an identifier cannot be anchored, so it never
-  pages: it reads its whole collection as one page.
+- With adjacent duplicates of the anchor's value, a shift by one position
+  leaves the same value at `offset - 1`, so the check passes and the page
+  silently skips or repeats an item. That is why a list pages only when its
+  identifier is claimed unique (above).
 
 **Zod as the single schema source
 ([#121](https://github.com/mike-north/macts/issues/121), `phases/12`).**
@@ -1702,6 +1725,7 @@ These remain in #121, to be re-scoped after the value contracts land:
 | RGB bridge form                                             | 16-bit channel arrays where the app uses them; normalized `0..1` only where a specific app interface does. The bridge form is selected per app by the plan.                                                                                                                                                                                                                                                                                                                                                                                                              | Per-app confirmation (value contracts)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Transfer lifecycle defaults                                 | Size limit, TTLs, and cleanup cadence are bounded defaults chosen with tests. Five minutes is illustrative only.                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Execution                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | Bounded list page size                                      | Default 25 items, maximum 100, the same on every transport (`PAGE_SIZE_LIMITS` in `@macts/contracts`). A page size outside 1 to 100 is a `ValidationError`, never clamped. The values may be lowered, never raised.                                                                                                                                                                                                                                                                                                                                                      | Measured read-only on Reminders (Execution): a page of 25 took 2.8 s quiet and 4.3 s worst of three, so it stays inside the 30 s native timeout even at 8× noise (22 s); a page of 100 took 8.6 s quiet and 9.1 s worst of three, under the 15 s bound, and 8.8 s deep in the list. Paging a 332-item list at the default took 14 pages, 3.6 s at most each and 36 s in total; an 80-item list took 4 pages, 3.5 s at most and 9.7 s in total. Every item appeared exactly once. Re-measure on other apps with large collections (Execution).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| Calendar lists do not page                                  | `calendar.events.list` and `calendar.calendars.list` return their whole collection as one page. An event's `uid` repeats across the occurrences of a recurring event (twelve events sharing one `uid` were observed on one calendar), and calendar names are titles the user chooses, so both identifiers are claimed `unique: false`. With a repeated anchor value the anchor check cannot detect a one-position shift. Events become pageable once a unique per-occurrence key exists ([#217](https://github.com/mike-north/macts/issues/217)).                        | Execution                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 ### Nullability and resettability evidence
 

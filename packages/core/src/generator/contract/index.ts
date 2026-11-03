@@ -41,6 +41,7 @@ import type {
 } from '../../manifest/index.js'
 import {
   ignoredIdentifierNullability,
+  listOperationPages,
   normalizeAppRouteSegment,
   resolveManifestRoutes,
   resolveParameterNullability,
@@ -563,14 +564,12 @@ class ContractBuilder {
   }
 
   /**
-   * Whether the route is a list that pages: a list operation of a resource
-   * that has an identifier, which anchors each page on its last item. A list
-   * of a resource with no identifier takes no paging inputs and returns its
-   * whole collection as one page.
+   * Whether the route is a list that pages (see `listOperationPages`): a list
+   * whose resource's primary identifier is claimed unique. Any other list
+   * takes no paging inputs and returns its whole collection as one page.
    */
   #pages(route: ManifestRoute): boolean {
-    if (this.#crudShape(route) !== 'list' || route.resource === undefined) return false
-    return this.#identifierProperty(route.resource) !== undefined
+    return listOperationPages(route.command, route.resource)
   }
 
   /**

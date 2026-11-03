@@ -21,6 +21,7 @@
 import { describe, it, expect } from 'vitest'
 import { generateCliPlugin } from './index.js'
 import type { AppManifest } from '../../manifest/index.js'
+import { UNIQUE_CLAIM } from '../../manifest/test-support/unique-claim.js'
 
 /** Build a minimal manifest exercising each generator code path under test. */
 function buildManifest(): AppManifest {
@@ -50,7 +51,7 @@ function buildManifest(): AppManifest {
           // A writable boolean — surfaces as `boolean | undefined` from the flag.
           shared: { access: 'rw', type: 'boolean', description: 'Is shared', optional: true },
         },
-        identifiers: [{ property: 'calendarIdentifier', primary: true }],
+        identifiers: [{ property: 'calendarIdentifier', primary: true, ...UNIQUE_CLAIM }],
       },
       Folder: {
         name: 'Folder',
@@ -158,7 +159,7 @@ describe('generateCliPlugin list commands: paging', () => {
     sdkPackageName: '@macts/sdk-testapp',
   }
 
-  it('gives the list of an identified resource --page-size and --cursor, forwarded as the page', () => {
+  it('gives a list whose identifier is claimed unique --page-size and --cursor, forwarded as the page', () => {
     const list = fileContent(generateCliPlugin(buildManifest(), options), 'calendars/list.ts')
 
     expect(list).toContain(
@@ -173,6 +174,19 @@ describe('generateCliPlugin list commands: paging', () => {
     // The output says how to read the next page when more remain.
     expect(list).toContain('formatter.formatPage(page.items.map(')
     expect(list).toContain('page.nextCursor);')
+  })
+
+  it('gives the list of a resource whose identifier makes no uniqueness claim no paging flags', () => {
+    const manifest = buildManifest()
+    const calendar = manifest.resources['Calendar']
+    if (calendar === undefined) throw new Error('fixture has no Calendar')
+    calendar.identifiers = [{ property: 'calendarIdentifier', primary: true }]
+
+    const list = fileContent(generateCliPlugin(manifest, options), 'calendars/list.ts')
+
+    expect(list).not.toContain('--page-size')
+    expect(list).not.toContain('--cursor')
+    expect(list).toContain('client.calendars.list();')
   })
 
   it('gives the list of a resource with no identifier no paging flags, and prints its one page', () => {

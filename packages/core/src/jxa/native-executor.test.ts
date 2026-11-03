@@ -85,6 +85,8 @@ beforeAll(async () => {
 
 const GET_NOTE: OperationTarget = { command: 'get', resource: 'Note' }
 const LIST_ACCOUNTS: OperationTarget = { command: 'list', resource: 'Account' }
+/** A list that pages: Notes claims an attachment's id unique. */
+const LIST_ATTACHMENTS: OperationTarget = { command: 'list', resource: 'Attachment' }
 
 /** An execution request against Notes with passthrough plans unless overridden. */
 function request(overrides: Partial<ExecutionRequest> = {}): ExecutionRequest {
@@ -186,11 +188,11 @@ describe('createNativeExecutor', () => {
       const itemsPlan: ValuePlan = { kind: 'array', items: { kind: 'unknown' } }
       const page = { offset: 25, size: 25, anchor: 'A-25' }
       const result = await createNativeExecutor({ transport: { run } }).execute(
-        request({ target: LIST_ACCOUNTS, input: {}, outputPlan: itemsPlan, page })
+        request({ target: LIST_ATTACHMENTS, input: {}, outputPlan: itemsPlan, page })
       )
       expect(result).toEqual(window)
       const [script] = run.mock.calls[0] ?? []
-      expect(script?.body).toBe(buildNativeBody(notes, LIST_ACCOUNTS, { paged: true }))
+      expect(script?.body).toBe(buildNativeBody(notes, LIST_ATTACHMENTS, { paged: true }))
       expect(script?.page).toEqual(page)
       expect(script?.outputPlan).toEqual({
         kind: 'record',

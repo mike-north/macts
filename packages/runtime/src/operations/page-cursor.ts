@@ -169,8 +169,19 @@ function parsePayload(encoded: string): CursorPayload | undefined {
 /**
  * The digest of a call's non-paging inputs: SHA-256 over their canonical
  * JSON (object keys sorted at every level), truncated to
- * {@link INPUT_DIGEST_BYTES} and base64url-encoded. Equal inputs give equal
- * digests whatever order their keys arrived in.
+ * {@link INPUT_DIGEST_BYTES} and base64url-encoded.
+ *
+ * The runtime passes the call's input after validating it against the
+ * operation's wire contract, with the paging inputs removed. Wire values have
+ * one spelling per value (integers, for example, are canonical decimal text),
+ * so equal inputs give equal digests whatever surface sent them (an SDK's
+ * encoded input, an HTTP body, an MCP tool call) and whatever order their
+ * keys arrived in: a cursor issued through one surface continues through any
+ * other.
+ *
+ * The digest is a consistency check that the caller sent the same query
+ * again, not a security control: it is unkeyed, anyone can compute it, and a
+ * cursor carries no authority (every page runs the full invocation pipeline).
  */
 function inputDigest(inputs: WireRecord): string {
   return createHash('sha256')

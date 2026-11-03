@@ -20,7 +20,7 @@
 import { readdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { AppManifestSchema, type AppManifest } from '../../manifest/index.js'
+import { AppManifestSchema, type AppManifest, type Identifier } from '../../manifest/index.js'
 import { loadManifest } from '../../manifest/loader.js'
 import {
   CONTRACT_MANIFEST_MODULE_PATH,
@@ -434,7 +434,7 @@ describe('generateContract: client', () => {
 })
 
 describe('generateContract: list pages (D2)', () => {
-  it('gives the list of an identified resource the paging inputs and a page output', () => {
+  it('gives a list whose identifier is claimed unique the paging inputs and a page output', () => {
     expect(contract)
       .toContain(`const noteListNotesOperation: OperationDescriptor<PageRequest, Page<Note>> = {
   id: 'jotter.notes.listNotes',
@@ -457,6 +457,55 @@ describe('generateContract: list pages (D2)', () => {
   input: t.record({}),
   output: t.page(tagRecordType),`)
     expect(contract).toContain('  list(options?: CallOptions): Promise<Page<Tag>>\n')
+  })
+
+  it('gives the list of a resource whose identifier makes no uniqueness claim no paging inputs', () => {
+    expect(contract).toContain(`  id: 'jotter.folders.listFolders',
+  permission: 'jotter:folders:listFolders',
+  target: { command: 'listFolders', resource: 'Folder' },
+  description: 'List folders',
+  input: t.record({}),
+  output: t.page(folderRecordType),`)
+  })
+
+  /** The listFolders descriptor of a Jotter whose folder identifier is changed by `change`. */
+  function listFoldersWith(change: (identifier: Identifier) => void): string {
+    const manifest = jotterManifest()
+    const identifier = manifest.resources['Folder']?.identifiers?.[0]
+    if (identifier === undefined) throw new Error('fixture has no Folder identifier')
+    change(identifier)
+    const generated = generateContract(manifest)
+    expect(generated.errors).toEqual([])
+    const text = moduleText(generated, CONTRACT_MODULE_PATH)
+    const start = text.indexOf("  id: 'jotter.folders.listFolders',")
+    return text.slice(start, text.indexOf('output:', start))
+  }
+
+  it('pages a list whose identifier is targeted by property but claimed unique', () => {
+    const descriptor = listFoldersWith((identifier) => {
+      identifier.targeting = 'byProperty'
+      identifier.unique = true
+      identifier.evidence = { unique: { source: 'curated', note: 'Folder ids never repeat' } }
+    })
+
+    expect(descriptor).toContain('    ...t.pageInputs(),')
+  })
+
+  it('does not page a list whose identifier is claimed not unique', () => {
+    const descriptor = listFoldersWith((identifier) => {
+      identifier.unique = false
+      identifier.evidence = { unique: { source: 'curated', note: 'Folder ids can repeat' } }
+    })
+
+    expect(descriptor).toContain('  input: t.record({}),')
+  })
+
+  it('does not page a list whose identifier is targeted by property with no claim', () => {
+    const descriptor = listFoldersWith((identifier) => {
+      identifier.targeting = 'byProperty'
+    })
+
+    expect(descriptor).toContain('  input: t.record({}),')
   })
 
   it('documents the page parameter and how to continue', () => {
@@ -547,6 +596,33 @@ describe('generateContract: list pages (D2)', () => {
     )
     expect(text).toContain(
       '      list: (folderName, page, options) => runtime.invoke(noteListNotesOperation, { ...page, folderName }, options),'
+    )
+  })
+})
+
+describe('generateContract: paging on real manifests', () => {
+  /** The descriptor text of operation `id` in the contract generated for `app`. */
+  async function descriptorOf(app: string, id: string): Promise<string> {
+    const manifest = await loadManifest(resolve(MANIFESTS_DIR, app, 'app.yaml'))
+    const text = moduleText(generateContract(manifest), CONTRACT_MODULE_PATH)
+    const start = text.indexOf(`  id: '${id}',`)
+    if (start < 0) throw new Error(`no descriptor for ${id}`)
+    return text.slice(start, text.indexOf('\n}', start))
+  }
+
+  it.each(['calendar.events.list', 'calendar.calendars.list'])(
+    'does not page %s: its identifier is claimed not unique',
+    async (id) => {
+      const descriptor = await descriptorOf('calendar', id)
+
+      expect(descriptor).not.toContain('t.pageInputs()')
+      expect(descriptor).toContain('output: t.page(')
+    }
+  )
+
+  it('pages reminders.reminders.list: its id is claimed unique', async () => {
+    expect(await descriptorOf('reminders', 'reminders.reminders.list')).toContain(
+      '    ...t.pageInputs(),'
     )
   })
 })
