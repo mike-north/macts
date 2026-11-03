@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
@@ -1431,9 +1432,11 @@ export interface LayerResourceClient {
 
 /**
  * The OmniGraffle client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link omniGraffleContract}.
+ * commands. A client factory creates one from {@link omniGraffleContract}. Its type carries the
+ * contract's resource table, {@link OmniGraffleResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface OmniGraffleClient {
+export interface OmniGraffleClient extends ClientBrand<OmniGraffleResources> {
   /** A drawing page/canvas in OmniGraffle */
   readonly canvases: CanvasResourceClient
   /** Base class for visual elements in OmniGraffle */

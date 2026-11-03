@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
@@ -279,7 +280,7 @@ export type MiniplayerWindowCreateInput = Record<string, never>;
 export type MiniplayerWindowUpdateInput = Record<string, never>;
 
 // @public
-export interface MusicClient {
+export interface MusicClient extends ClientBrand<MusicResources> {
     add(to?: string, options?: CallOptions): Promise<void>;
     backTrack(options?: CallOptions): Promise<void>;
     close(options?: CallOptions): Promise<void>;

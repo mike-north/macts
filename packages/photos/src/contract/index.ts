@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type ObjectReferenceVariant,
@@ -333,9 +334,11 @@ export interface FolderResourceClient {
 
 /**
  * The Photos client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link photosContract}.
+ * client factory creates one from {@link photosContract}. Its type carries the contract's resource
+ * table, {@link PhotosResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
-export interface PhotosClient {
+export interface PhotosClient extends ClientBrand<PhotosResources> {
   /** A media item, such as a photo or video */
   readonly mediaItems: MediaItemResourceClient
   /** An album. A container that holds media items */

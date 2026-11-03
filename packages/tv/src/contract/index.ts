@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type FileSource,
   type FileValue,
@@ -959,9 +960,11 @@ export interface PlaylistResourceClient {
 
 /**
  * The TV client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link tvContract}.
+ * client factory creates one from {@link tvContract}. Its type carries the contract's resource
+ * table, {@link TVResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
-export interface TVClient {
+export interface TVClient extends ClientBrand<TVResources> {
   /** a track representing a video file */
   readonly fileTracks: FileTrackResourceClient
   /** a list of tracks/streams */

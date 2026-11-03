@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
   type Page,
@@ -87,9 +88,11 @@ export interface DocumentResourceClient {
 
 /**
  * The System Information client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link systemInformationContract}.
+ * commands. A client factory creates one from {@link systemInformationContract}. Its type carries
+ * the contract's resource table, {@link SystemInformationResources}, so references can be bound to
+ * it by resource; the brand has no runtime member.
  */
-export interface SystemInformationClient {
+export interface SystemInformationClient extends ClientBrand<SystemInformationResources> {
   /** A system profile document */
   readonly documents: DocumentResourceClient
   /** Send system information to AppleCare */

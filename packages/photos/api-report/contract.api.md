@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
@@ -134,7 +135,7 @@ export type MomentCreateInput = Record<string, never>;
 export type MomentUpdateInput = Record<string, never>;
 
 // @public
-export interface PhotosClient {
+export interface PhotosClient extends ClientBrand<PhotosResources> {
     add(mediaItems: readonly string[], to: string, options?: CallOptions): Promise<void>;
     readonly albums: AlbumResourceClient;
     _delete(target: string, options?: CallOptions): Promise<void>;

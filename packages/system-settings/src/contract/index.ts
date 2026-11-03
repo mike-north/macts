@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
 } from '@macts/contracts'
@@ -75,9 +76,11 @@ export interface PaneResourceClient {
 
 /**
  * The System Settings client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link systemSettingsContract}.
+ * commands. A client factory creates one from {@link systemSettingsContract}. Its type carries the
+ * contract's resource table, {@link SystemSettingsResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface SystemSettingsClient {
+export interface SystemSettingsClient extends ClientBrand<SystemSettingsResources> {
   /** A settings pane. */
   readonly panes: PaneResourceClient
   /** Reveals a settings pane or an anchor within a pane. */

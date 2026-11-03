@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
@@ -821,9 +822,11 @@ export interface ScenarioResourceClient {
 
 /**
  * The OmniPlan client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link omniPlanContract}.
+ * A client factory creates one from {@link omniPlanContract}. Its type carries the contract's
+ * resource table, {@link OmniPlanResources}, so references can be bound to it by resource; the
+ * brand has no runtime member.
  */
-export interface OmniPlanClient {
+export interface OmniPlanClient extends ClientBrand<OmniPlanResources> {
   /** An OmniPlan project */
   readonly projects: ProjectResourceClient
   /** A task within an OmniPlan project */

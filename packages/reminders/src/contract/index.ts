@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
@@ -314,9 +315,11 @@ export interface ReminderResourceClient {
 
 /**
  * The Reminders client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link remindersContract}.
+ * commands. A client factory creates one from {@link remindersContract}. Its type carries the
+ * contract's resource table, {@link RemindersResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface RemindersClient {
+export interface RemindersClient extends ClientBrand<RemindersResources> {
   /** An account in the Reminders application */
   readonly accounts: AccountResourceClient
   /** A list of reminders */

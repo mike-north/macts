@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceData } from '@macts/contracts';
@@ -405,7 +406,7 @@ export interface WorkspaceDocumentUpdateInput {
 }
 
 // @public
-export interface XcodeClient {
+export interface XcodeClient extends ClientBrand<XcodeResources> {
     readonly projects: ProjectResourceClient;
     readonly runDestinations: RunDestinationResourceClient;
     readonly schemes: SchemeResourceClient;

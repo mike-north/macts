@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type ObjectReferenceVariant,
@@ -234,9 +235,11 @@ export type SpaceUpdateInput = Record<string, never>
 
 /**
  * The Arc client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link arcContract}.
+ * client factory creates one from {@link arcContract}. Its type carries the contract's resource
+ * table, {@link ArcResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
-export interface ArcClient {
+export interface ArcClient extends ClientBrand<ArcResources> {
   /**
    * Make a new object.
    *

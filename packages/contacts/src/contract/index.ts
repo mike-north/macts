@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type ObjectReferenceData,
   type OperationDescriptor,
@@ -1010,9 +1011,11 @@ export interface PhoneResourceClient {
 
 /**
  * The Contacts client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link contactsContract}.
+ * A client factory creates one from {@link contactsContract}. Its type carries the contract's
+ * resource table, {@link ContactsResources}, so references can be bound to it by resource; the
+ * brand has no runtime member.
  */
-export interface ContactsClient {
+export interface ContactsClient extends ClientBrand<ContactsResources> {
   /** Address for the given record. */
   readonly addresses: AddressResourceClient
   /** Email address for a person. */

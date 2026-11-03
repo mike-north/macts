@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
   type Page,
@@ -282,9 +283,11 @@ export interface SettingsSetResourceClient {
 
 /**
  * The Terminal client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link terminalContract}.
+ * A client factory creates one from {@link terminalContract}. Its type carries the contract's
+ * resource table, {@link TerminalResources}, so references can be bound to it by resource; the
+ * brand has no runtime member.
  */
-export interface TerminalClient {
+export interface TerminalClient extends ClientBrand<TerminalResources> {
   /** A Terminal window */
   readonly windows: WindowResourceClient
   /** A Terminal tab */

@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
 } from '@macts/contracts'
@@ -30,9 +31,11 @@ const t = ValueTypes
 
 /**
  * The Console client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link consoleContract}.
+ * A client factory creates one from {@link consoleContract}. Its type carries the contract's
+ * resource table, {@link ConsoleResources}, so references can be bound to it by resource; the brand
+ * has no runtime member.
  */
-export interface ConsoleClient {
+export interface ConsoleClient extends ClientBrand<ConsoleResources> {
   /** Select a device. */
   selectDevice(options?: CallOptions): Promise<void>
 }

@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type FileValue,
   type Integer,
@@ -163,9 +164,11 @@ export interface FolderResourceClient {
 
 /**
  * The Shortcuts client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link shortcutsContract}.
+ * commands. A client factory creates one from {@link shortcutsContract}. Its type carries the
+ * contract's resource table, {@link ShortcutsResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface ShortcutsClient {
+export interface ShortcutsClient extends ClientBrand<ShortcutsResources> {
   /** A shortcut in the Shortcuts application */
   readonly shortcuts: ShortcutResourceClient
   /** A folder containing shortcuts */

@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
@@ -109,9 +110,11 @@ export type TrackUpdateInput = Record<string, never>
 
 /**
  * The Spotify client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link spotifyContract}.
+ * A client factory creates one from {@link spotifyContract}. Its type carries the contract's
+ * resource table, {@link SpotifyResources}, so references can be bound to it by resource; the brand
+ * has no runtime member.
  */
-export interface SpotifyClient {
+export interface SpotifyClient extends ClientBrand<SpotifyResources> {
   /** Skip to the next track. */
   nextTrack(options?: CallOptions): Promise<void>
   /** Skip to the previous track. */

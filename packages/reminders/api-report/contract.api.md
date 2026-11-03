@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
@@ -101,7 +102,7 @@ export interface ReminderResourceClient {
 }
 
 // @public
-export interface RemindersClient {
+export interface RemindersClient extends ClientBrand<RemindersResources> {
     readonly accounts: AccountResourceClient;
     readonly lists: ListResourceClient;
     readonly reminders: ReminderResourceClient;

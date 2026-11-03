@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
   type Page,
@@ -105,9 +106,11 @@ export interface DocumentResourceClient {
 
 /**
  * The Script Editor client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link scriptEditorContract}.
+ * commands. A client factory creates one from {@link scriptEditorContract}. Its type carries the
+ * contract's resource table, {@link ScriptEditorResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface ScriptEditorClient {
+export interface ScriptEditorClient extends ClientBrand<ScriptEditorResources> {
   /** A Script Editor document */
   readonly documents: DocumentResourceClient
 }

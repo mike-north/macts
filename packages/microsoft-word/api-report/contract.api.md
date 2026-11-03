@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { ResourceDescriptor } from '@macts/contracts';
@@ -187,7 +188,7 @@ export interface FontUpdateInput {
 }
 
 // @public
-export interface MicrosoftWordClient {
+export interface MicrosoftWordClient extends ClientBrand<MicrosoftWordResources> {
     copyObject(options?: CallOptions): Promise<void>;
     createNewDocument(attachedTemplate?: string, options?: CallOptions): Promise<void>;
     cutObject(options?: CallOptions): Promise<void>;

@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type FileSource,
   type Integer,
@@ -740,9 +741,11 @@ export interface SessionUpdateInput {
 
 /**
  * The iTerm client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link iTermContract}.
+ * client factory creates one from {@link iTermContract}. Its type carries the contract's resource
+ * table, {@link iTermResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
-export interface iTermClient {
+export interface iTermClient extends ClientBrand<iTermResources> {
   /**
    * Return the number of elements of a particular class within an object.
    *

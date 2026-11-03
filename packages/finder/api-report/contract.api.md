@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 
@@ -169,7 +170,7 @@ export interface FileUpdateInput {
 }
 
 // @public
-export interface FinderClient {
+export interface FinderClient extends ClientBrand<FinderResources> {
     activate(options?: CallOptions): Promise<void>;
     cleanUp(by?: string, options?: CallOptions): Promise<void>;
     close(options?: CallOptions): Promise<void>;

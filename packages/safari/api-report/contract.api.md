@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 
 // @public
 export interface Document {
@@ -25,7 +26,7 @@ export interface DocumentUpdateInput {
 }
 
 // @public
-export interface SafariClient {
+export interface SafariClient extends ClientBrand<SafariResources> {
     addReadingListItem(andPreviewText?: string, withTitle?: string, options?: CallOptions): Promise<void>;
     dispatchMessageToExtension(options?: CallOptions): Promise<void>;
     doJavaScript(_in?: string, options?: CallOptions): Promise<void>;

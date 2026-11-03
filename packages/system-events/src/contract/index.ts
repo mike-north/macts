@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type ObjectReferenceVariant,
@@ -2337,9 +2338,11 @@ export interface UIElementResourceClient {
 
 /**
  * The System Events client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link systemEventsContract}.
+ * commands. A client factory creates one from {@link systemEventsContract}. Its type carries the
+ * contract's resource table, {@link SystemEventsResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface SystemEventsClient {
+export interface SystemEventsClient extends ClientBrand<SystemEventsResources> {
   /** An item stored in the file system */
   readonly diskItems: DiskItemResourceClient
   /** An action that can be performed on the UI element */

@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 
 // @public
@@ -47,7 +48,7 @@ export type ConnectionStatus = 'disconnecting' | 'connected' | 'connecting' | 'd
 export type Direction = 'incoming' | 'outgoing';
 
 // @public
-export interface MessagesClient {
+export interface MessagesClient extends ClientBrand<MessagesResources> {
     login(options?: CallOptions): Promise<void>;
     logout(options?: CallOptions): Promise<void>;
     send(to: string, options?: CallOptions): Promise<void>;

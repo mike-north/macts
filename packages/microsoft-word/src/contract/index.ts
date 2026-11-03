@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
@@ -1100,9 +1101,11 @@ export interface DocumentResourceClient {
 
 /**
  * The Microsoft Word client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link microsoftWordContract}.
+ * commands. A client factory creates one from {@link microsoftWordContract}. Its type carries the
+ * contract's resource table, {@link MicrosoftWordResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface MicrosoftWordClient {
+export interface MicrosoftWordClient extends ClientBrand<MicrosoftWordResources> {
   /** A Microsoft Word document */
   readonly documents: DocumentResourceClient
   /** Undo the last action */

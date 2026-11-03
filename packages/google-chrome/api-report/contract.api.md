@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
@@ -49,7 +50,7 @@ export interface BookmarkItemUpdateInput {
 }
 
 // @public
-export interface GoogleChromeClient {
+export interface GoogleChromeClient extends ClientBrand<GoogleChromeResources> {
     close(options?: CallOptions): Promise<void>;
     copySelection(options?: CallOptions): Promise<void>;
     count(each?: string, options?: CallOptions): Promise<void>;

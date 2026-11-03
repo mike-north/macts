@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
 } from '@macts/contracts'
@@ -108,9 +109,11 @@ export interface TabUpdateInput {
 
 /**
  * The Safari client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link safariContract}.
+ * client factory creates one from {@link safariContract}. Its type carries the contract's resource
+ * table, {@link SafariResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
-export interface SafariClient {
+export interface SafariClient extends ClientBrand<SafariResources> {
   /**
    * Add a new Reading List item with the given URL. Allows a custom title and preview text to be
    * specified.

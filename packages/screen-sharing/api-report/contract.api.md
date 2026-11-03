@@ -6,9 +6,10 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 
 // @public
-export interface ScreenSharingClient {
+export interface ScreenSharingClient extends ClientBrand<ScreenSharingResources> {
     getURL(url: string, options?: CallOptions): Promise<void>;
 }
 

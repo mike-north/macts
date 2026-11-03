@@ -6,9 +6,10 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 
 // @public
-export interface ConsoleClient {
+export interface ConsoleClient extends ClientBrand<ConsoleResources> {
     selectDevice(options?: CallOptions): Promise<void>;
 }
 

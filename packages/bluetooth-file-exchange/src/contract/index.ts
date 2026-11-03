@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type FileSource,
   type OperationDescriptor,
@@ -46,9 +47,11 @@ export type ApplicationUpdateInput = Record<string, never>
 
 /**
  * The Bluetooth File Exchange client: one namespace per resource that has operations, plus the
- * app's own commands. A client factory creates one from {@link bluetoothFileExchangeContract}.
+ * app's own commands. A client factory creates one from {@link bluetoothFileExchangeContract}. Its
+ * type carries the contract's resource table, {@link BluetoothFileExchangeResources}, so references
+ * can be bound to it by resource; the brand has no runtime member.
  */
-export interface BluetoothFileExchangeClient {
+export interface BluetoothFileExchangeClient extends ClientBrand<BluetoothFileExchangeResources> {
   /**
    * Browse a device
    *

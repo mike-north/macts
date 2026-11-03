@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
 } from '@macts/contracts'
@@ -45,9 +46,11 @@ export type ApplicationUpdateInput = Record<string, never>
 
 /**
  * The Alfred client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link alfredContract}.
+ * client factory creates one from {@link alfredContract}. Its type carries the contract's resource
+ * table, {@link AlfredResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
-export interface AlfredClient {
+export interface AlfredClient extends ClientBrand<AlfredResources> {
   /**
    * Show Alfred with the given text
    *

@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { ObjectReferenceData } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
@@ -75,7 +76,7 @@ export interface AIMHandleUpdateInput {
 }
 
 // @public
-export interface ContactsClient {
+export interface ContactsClient extends ClientBrand<ContactsResources> {
     actionProperty(options?: CallOptions): Promise<void>;
     actionTitle(_with: unknown, _for: ObjectReferenceData<string, 'Person'>, options?: CallOptions): Promise<void>;
     add(to: string, options?: CallOptions): Promise<void>;

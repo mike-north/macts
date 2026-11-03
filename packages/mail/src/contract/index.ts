@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type FileSource,
   type FileValue,
@@ -1619,9 +1620,11 @@ export interface MessageResourceClient {
 
 /**
  * The Mail client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link mailContract}.
+ * client factory creates one from {@link mailContract}. Its type carries the contract's resource
+ * table, {@link MailResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
-export interface MailClient {
+export interface MailClient extends ClientBrand<MailResources> {
   /** A new email message */
   readonly outgoingMessages: OutgoingMessageResourceClient
   /** An email message */

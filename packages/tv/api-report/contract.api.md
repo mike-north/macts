@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
@@ -305,7 +306,7 @@ export interface TrackUpdateInput {
 }
 
 // @public
-export interface TVClient {
+export interface TVClient extends ClientBrand<TVResources> {
     add(to?: string, options?: CallOptions): Promise<void>;
     backTrack(options?: CallOptions): Promise<void>;
     close(options?: CallOptions): Promise<void>;

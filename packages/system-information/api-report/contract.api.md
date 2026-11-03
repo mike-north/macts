@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
@@ -38,7 +39,7 @@ export interface DocumentUpdateInput {
 }
 
 // @public
-export interface SystemInformationClient {
+export interface SystemInformationClient extends ClientBrand<SystemInformationResources> {
     readonly documents: DocumentResourceClient;
     send(options?: CallOptions): Promise<void>;
 }

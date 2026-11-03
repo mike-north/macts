@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
@@ -552,9 +553,11 @@ export interface EventResourceClient {
 
 /**
  * The Calendar client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link calendarContract}.
+ * A client factory creates one from {@link calendarContract}. Its type carries the contract's
+ * resource table, {@link CalendarResources}, so references can be bound to it by resource; the
+ * brand has no runtime member.
  */
-export interface CalendarClient {
+export interface CalendarClient extends ClientBrand<CalendarResources> {
   /** A calendar containing events */
   readonly calendars: CalendarResourceClient
   /** A calendar event */

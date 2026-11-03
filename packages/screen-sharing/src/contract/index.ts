@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
 } from '@macts/contracts'
@@ -30,9 +31,11 @@ const t = ValueTypes
 
 /**
  * The Screen Sharing client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link screenSharingContract}.
+ * commands. A client factory creates one from {@link screenSharingContract}. Its type carries the
+ * contract's resource table, {@link ScreenSharingResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface ScreenSharingClient {
+export interface ScreenSharingClient extends ClientBrand<ScreenSharingResources> {
   /**
    * Open a vnc URL
    *

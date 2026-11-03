@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
   type Page,
@@ -256,9 +257,11 @@ export interface AttachmentResourceClient {
 
 /**
  * The Notes client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link notesContract}.
+ * client factory creates one from {@link notesContract}. Its type carries the contract's resource
+ * table, {@link NotesResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
-export interface NotesClient {
+export interface NotesClient extends ClientBrand<NotesResources> {
   /** A Notes account */
   readonly accounts: AccountResourceClient
   /** A Notes folder */

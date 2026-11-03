@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
@@ -14,7 +15,7 @@ import { Rectangle } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
 
 // @public
-export interface iTermClient {
+export interface iTermClient extends ClientBrand<iTermResources> {
     close(options?: CallOptions): Promise<void>;
     count(each?: string, options?: CallOptions): Promise<void>;
     createHotkeyWindowWithProfile(options?: CallOptions): Promise<void>;

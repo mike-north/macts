@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { ResourceDescriptor } from '@macts/contracts';
@@ -85,7 +86,7 @@ export interface InboxTaskUpdateInput {
 export type IntervalUnit = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
 
 // @public
-export interface OmniFocusClient {
+export interface OmniFocusClient extends ClientBrand<OmniFocusResources> {
     archive(_in: string, compression?: boolean, options?: CallOptions): Promise<void>;
     compact(options?: CallOptions): Promise<void>;
     complete(text: string, options?: CallOptions): Promise<void>;

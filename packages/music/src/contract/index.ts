@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type FileSource,
   type FileValue,
@@ -1720,9 +1721,11 @@ export interface TrackResourceClient {
 
 /**
  * The Music client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link musicContract}.
+ * client factory creates one from {@link musicContract}. Its type carries the contract's resource
+ * table, {@link MusicResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
-export interface MusicClient {
+export interface MusicClient extends ClientBrand<MusicResources> {
   /** a track representing an audio file (MP3, AIFF, etc.) */
   readonly fileTracks: FileTrackResourceClient
   /** a list of tracks/streams */
