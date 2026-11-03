@@ -551,7 +551,7 @@ describe('generateContract: list pages (D2)', () => {
 
   it('describes the page size bounds in the input JSON Schema', () => {
     expect(contract).toContain(
-      '"pageSize":{"type":"object","properties":{"integer":{"type":"string","pattern":"^(0|-?[1-9][0-9]*)$"}},"required":["integer"],"additionalProperties":false,"description":"The most items to return, from 1 to 100. Defaults to 25."}'
+      '"pageSize":{"type":"object","properties":{"integer":{"type":"string","pattern":"^(100|[1-9][0-9]?)$"}},"required":["integer"],"additionalProperties":false,"description":"The most items to return, from 1 to 100. Defaults to 25."}'
     )
   })
 

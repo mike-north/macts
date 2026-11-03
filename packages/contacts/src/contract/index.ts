@@ -1368,7 +1368,7 @@ const personListPeopleOperation: OperationDescriptor<PageRequest, Page<Person>> 
     properties: {
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',
@@ -1416,7 +1416,7 @@ const groupListGroupsOperation: OperationDescriptor<PageRequest, Page<Group>> = 
     properties: {
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',
@@ -1469,7 +1469,7 @@ const emailListEmailsOperation: OperationDescriptor<
       personId: { type: 'string', description: 'Identifier of the person' },
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',
@@ -1530,7 +1530,7 @@ const phoneListPhonesOperation: OperationDescriptor<
       personId: { type: 'string', description: 'Identifier of the person' },
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',
@@ -1591,7 +1591,7 @@ const addressListAddressesOperation: OperationDescriptor<
       personId: { type: 'string', description: 'Identifier of the person' },
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',

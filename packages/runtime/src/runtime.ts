@@ -546,7 +546,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     const permission = operation.descriptor.permission
     const risk = operation.risk
     const apiKeyId = authority.subject
-    const argsSummary = redactArgs(auditableArguments(operation, input))
+    const argsSummary = redactArgs(auditableArguments(input))
     // Minted before enforcement so a held call's 'pending' record and its
     // resolving record share a correlation key.
     const approvalId = randomUUID()
@@ -856,7 +856,8 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
    * them.
    *
    * @throws `UnexpectedValueError` when the executor's result is not a window
-   *   result, or claims more items remain after a page with none.
+   *   result, holds more items than the window's size, or claims more items
+   *   remain after a page with none.
    */
   function assemblePage(
     operation: RegisteredOperation,
@@ -880,6 +881,23 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     // The schema admits only JSON content, which is what a wire value is.
     const items = parsed.data.items as WireValue[]
     const { length, last } = parsed.data
+    if (items.length > window.size) {
+      log().warn(
+        { operation: id, provider: executor.provider, size: window.size, count: items.length },
+        'Executor page window result holds more items than the page size'
+      )
+      throw new UnexpectedValueError(
+        `The "${id}" operation ran in the app, but its page of results is malformed.`,
+        {
+          issues: [
+            {
+              path: ['items'],
+              message: `The page holds more items than the page size of ${String(window.size)}`,
+            },
+          ],
+        }
+      )
+    }
     if (window.offset + window.size >= length) return { items }
     if (items.length === 0 || last === undefined) {
       log().warn(
@@ -1258,18 +1276,20 @@ function pageSizeOf(value: WireValue | undefined): number {
 }
 
 /**
- * A call's arguments as audit and approval records summarize them: a list's
- * cursor is recorded only as present (`true`), never its contents, which can
+ * A call's arguments as audit and approval records summarize them: a
+ * `cursor` is recorded only as present (`true`), never its contents, which can
  * include an item's identifier and therefore user content.
+ *
+ * Arguments are summarized before the input is validated, so this holds for
+ * every operation, whether or not it pages and whether or not it takes a
+ * cursor: a cursor sent where it is refused, or copied from another list, is
+ * still never recorded. `cursor` is reserved on every list; an argument of
+ * that name on another operation is recorded only as present too, which gives
+ * up that detail so that no cursor is ever recorded.
  */
-function auditableArguments(
-  operation: RegisteredOperation,
-  input: unknown
-): Readonly<Record<string, unknown>> {
+function auditableArguments(input: unknown): Readonly<Record<string, unknown>> {
   if (!isRecord(input)) return {}
-  if (!Object.hasOwn(input, CURSOR_INPUT) || resultShapeOf(operation).kind !== 'paged') {
-    return input
-  }
+  if (!Object.hasOwn(input, CURSOR_INPUT)) return input
   return { ...input, [CURSOR_INPUT]: true }
 }
 

@@ -423,7 +423,7 @@ const listListOperation: OperationDescriptor<PageRequest, Page<List>> = {
     properties: {
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',
@@ -496,7 +496,7 @@ const reminderListRemindersOperation: OperationDescriptor<
       listId: { type: 'string', description: 'List identifier' },
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',
@@ -661,7 +661,7 @@ const accountListAccountsOperation: OperationDescriptor<PageRequest, Page<Accoun
     properties: {
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',

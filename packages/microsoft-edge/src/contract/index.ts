@@ -601,7 +601,7 @@ const windowListWindowsOperation: OperationDescriptor<PageRequest, Page<Window>>
     properties: {
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',
@@ -749,7 +749,7 @@ const tabListTabsOperation: OperationDescriptor<
       windowId: { type: 'string', description: 'Window identifier' },
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',
@@ -820,7 +820,7 @@ const bookmarkFolderListBookmarkFoldersOperation: OperationDescriptor<
     properties: {
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',
@@ -876,7 +876,7 @@ const bookmarkItemListBookmarkItemsOperation: OperationDescriptor<
       folderId: { type: 'string', description: 'Bookmark folder identifier' },
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',

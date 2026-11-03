@@ -2369,7 +2369,7 @@ const playlistListPlaylistsOperation: OperationDescriptor<PageRequest, Page<Play
     properties: {
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',
@@ -2426,7 +2426,7 @@ const trackListTracksOperation: OperationDescriptor<
       playlistId: { type: 'string', description: 'Persistent ID of the playlist' },
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',

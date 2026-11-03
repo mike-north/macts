@@ -549,7 +549,7 @@ const mediaItemListMediaItemsOperation: OperationDescriptor<PageRequest, Page<Me
     properties: {
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',
@@ -597,7 +597,7 @@ const albumListAlbumsOperation: OperationDescriptor<PageRequest, Page<Album>> = 
     properties: {
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',
@@ -645,7 +645,7 @@ const folderListFoldersOperation: OperationDescriptor<PageRequest, Page<Folder>>
     properties: {
       pageSize: {
         type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
         required: ['integer'],
         additionalProperties: false,
         description: 'The most items to return, from 1 to 100. Defaults to 25.',

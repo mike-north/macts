@@ -62,7 +62,7 @@ import type { FieldPlan, ValuePlan } from './plan.js'
 import { referenceType } from './reference-type.js'
 import type { ValueType } from './value-type.js'
 import { dateSdkSchema, integerSdkSchema } from './sdk-schemas.js'
-import { INTEGER_TEXT_PATTERN, checkIntegerText, wireIntegerSchema } from './wire-checks.js'
+import { checkIntegerText, wireIntegerSchema } from './wire-checks.js'
 import {
   DynamicWireValueSchema,
   WireDateSchema,
@@ -822,6 +822,15 @@ function pageType<Sdk>(item: ValueType<Sdk>, options?: ValueTypeOptions): PageVa
 }
 
 /**
+ * The decimal text of a page size as the wire JSON Schema states it: 1 to 100,
+ * with no sign and no leading zero. Schema-driven callers can then refuse a
+ * size of zero, a negative size or one above the maximum before calling. It
+ * accepts exactly the integers `1..PAGE_SIZE_LIMITS.maximum`; a test checks it
+ * against that bound, and the wire schema's own check still enforces it.
+ */
+const PAGE_SIZE_TEXT_PATTERN = /^(100|[1-9][0-9]?)$/
+
+/**
  * The page size input: an integer in `1..PAGE_SIZE_LIMITS.maximum`.
  *
  * @remarks
@@ -835,7 +844,7 @@ function pageSizeType(): ValueType<Integer> {
     .strictObject({
       integer: z
         .string({ error: 'An integer payload must be decimal text, for example "25".' })
-        .meta({ pattern: INTEGER_TEXT_PATTERN.source }),
+        .meta({ pattern: PAGE_SIZE_TEXT_PATTERN.source }),
     })
     .superRefine((value, ctx) => {
       if (!checkIntegerText(value.integer, 1, maximum).ok) {

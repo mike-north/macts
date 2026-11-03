@@ -17,6 +17,7 @@
  */
 
 import { describe, expect, it } from 'vitest'
+import { z } from 'zod'
 import { referenceResultType } from '../references/index.js'
 import { PASSTHROUGH_PLAN } from './plan.js'
 import { PAGE_SIZE_LIMITS, PAGING_INPUT_NAMES } from './page.js'
@@ -126,6 +127,39 @@ describe('t.pageInputs', () => {
     expect(parsed.error?.issues.map((issue) => issue.message)).toEqual([
       'The page size must be an integer from 1 to 100.',
     ])
+  })
+
+  describe('wire JSON Schema', () => {
+    /** The JSON Schema of the pageSize field's integer text, as MCP and HTTP callers see it. */
+    function pageSizeTextSchema(): { readonly type?: unknown; readonly pattern?: string } {
+      const schema = z.toJSONSchema(input.wire, { target: 'draft-7' }) as {
+        readonly properties: Record<
+          string,
+          { readonly properties?: Record<string, { type?: unknown; pattern?: string }> }
+        >
+      }
+      const text = schema.properties['pageSize']?.properties?.['integer']
+      if (text === undefined) throw new Error('expected the pageSize integer text schema')
+      return text
+    }
+
+    it('states the page size as decimal text of a positive integer up to 100', () => {
+      expect(pageSizeTextSchema()).toEqual({ type: 'string', pattern: '^(100|[1-9][0-9]?)$' })
+    })
+
+    it('admits through its pattern exactly the integers from 1 to the maximum', () => {
+      const pattern = new RegExp(pageSizeTextSchema().pattern ?? '')
+      for (let n = -150; n <= 1500; n += 1) {
+        expect(pattern.test(String(n)), String(n)).toBe(n >= 1 && n <= PAGE_SIZE_LIMITS.maximum)
+      }
+    })
+
+    it.each(['0', '-1', '-0', '007', '01', '+5', '2.5', '', '1000'])(
+      'refuses %j through its pattern',
+      (text) => {
+        expect(new RegExp(pageSizeTextSchema().pattern ?? '').test(text)).toBe(false)
+      }
+    )
   })
 
   it('rejects a page size outside the bounds on the SDK side too, never clamping', () => {

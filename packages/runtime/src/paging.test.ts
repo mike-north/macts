@@ -23,7 +23,8 @@
  *   operation or for other inputs is a `ValidationError` at `["cursor"]`,
  *   never `COLLECTION_CHANGED`.
  * - The cursor's contents never reach an audit record, a log entry or an
- *   error; audit records say only `cursor: true`.
+ *   error; audit records say only `cursor: true`, for every operation, even
+ *   one that refuses the cursor.
  *
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md (D2, D6, D9, D10)
  */
@@ -62,7 +63,12 @@ const LIBRARIAN_SECRET = 'macts_sk_librarian-secret-never-logged'
 /** May list books, shelves and pages. */
 const LIBRARIAN: Authority = {
   subject: 'key_librarian',
-  permissions: ['library:books:list', 'library:shelves:list', 'library:pages:list'],
+  permissions: [
+    'library:books:list',
+    'library:shelves:list',
+    'library:pages:list',
+    'library:shelves:get',
+  ],
 }
 
 /** A book in wire form, numbered `n`; its identifier (`isbn`) is `isbn-n`. */
@@ -645,6 +651,51 @@ describe('page window results the runtime does not trust', () => {
     expect(error).toBeInstanceOf(UnexpectedValueError)
   })
 
+  it('rejects a window result holding more items than the requested page size with UnexpectedValueError', async () => {
+    // An executor that ignores the window's size: four items for a page of three.
+    const { runtime } = harness(
+      createRecordingExecutor(() =>
+        Promise.resolve({ items: books(4), length: 10, last: 'isbn-4' })
+      )
+    )
+
+    const error = await rejection(
+      runtime.invoke('library.books.list', { pageSize: { integer: '3' } }, asLibrarian())
+    )
+
+    expect(error).toBeInstanceOf(UnexpectedValueError)
+    expect(error).toMatchObject({
+      message:
+        'The "library.books.list" operation ran in the app, but its page of results is malformed.',
+      details: { issues: [expect.objectContaining({ path: ['items'] })] },
+    })
+  })
+
+  it('rejects a window result holding more items than the default page size of 25', async () => {
+    const { runtime } = harness(
+      createRecordingExecutor(() =>
+        Promise.resolve({ items: books(26), length: 40, last: 'isbn-26' })
+      )
+    )
+
+    const error = await rejection(runtime.invoke('library.books.list', {}, asLibrarian()))
+
+    expect(error).toBeInstanceOf(UnexpectedValueError)
+  })
+
+  it('accepts a window result holding exactly the page size', async () => {
+    const { runtime } = harness(
+      createRecordingExecutor(() => Promise.resolve({ items: books(3), length: 3, last: 'isbn-3' }))
+    )
+
+    const page = asPage(
+      await runtime.invoke('library.books.list', { pageSize: { integer: '3' } }, asLibrarian())
+    )
+
+    expect(page.items).toHaveLength(3)
+    expect(page.nextCursor).toBeUndefined()
+  })
+
   it('validates the page items against the item contract', async () => {
     const { runtime } = harness(
       createRecordingExecutor(() =>
@@ -706,6 +757,39 @@ describe('cursor privacy', () => {
     const recorded = everythingRecorded(h, error)
     expect(recorded).not.toContain(MARKER)
     expect(recorded).not.toContain(cursor)
+  })
+
+  it.each([
+    ['a list that does not page', 'library.pages.list'],
+    ['an operation that is not a list', 'library.shelves.get'],
+  ] as const)(
+    'audits a cursor sent to %s only as `cursor: true`, though validation refuses it',
+    async (_kind, id) => {
+      const h = harness(windowExecutor(() => books(6)))
+      // A cursor anchored on the marker, as another list might have issued it.
+      const cursor = `1.${encode({ op: 'library.books.list', in: 'x', fl: '', at: 3, an: MARKER })}`
+
+      const error = await rejection(h.runtime.invoke(id, { cursor }, asLibrarian()))
+
+      expect(error).toBeInstanceOf(ValidationError)
+      expect(h.executor.requests).toHaveLength(0)
+      expect(h.audit.records.map((record) => record.argsSummary).at(-1)).toContain('cursor: true')
+      const recorded = everythingRecorded(h, error)
+      expect(recorded).not.toContain(MARKER)
+      expect(recorded).not.toContain(cursor)
+    }
+  )
+
+  it('audits a raw marker sent as the cursor of a list that does not page only as `cursor: true`', async () => {
+    const h = harness(windowExecutor(() => books(6)))
+
+    const error = await rejection(
+      h.runtime.invoke('library.pages.list', { cursor: MARKER }, asLibrarian())
+    )
+
+    expect(error).toBeInstanceOf(ValidationError)
+    expect(h.audit.records.length).toBeGreaterThan(0)
+    expect(everythingRecorded(h, error)).not.toContain(MARKER)
   })
 
   it('keeps a marker anchor out of the audit, the logs and the error for COLLECTION_CHANGED', async () => {
