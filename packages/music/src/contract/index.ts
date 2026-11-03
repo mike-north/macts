@@ -1710,14 +1710,11 @@ export interface PlaylistResourceClient {
 /** playable audio source */
 export interface TrackResourceClient {
   /**
-   * List tracks, one page at a time.
+   * List tracks, as one page holding all of them.
    *
    * @param playlistId - Persistent ID of the playlist. Does not accept null.
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
    */
-  list(playlistId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Track>>
+  list(playlistId: string, options?: CallOptions): Promise<Page<Track>>
   /**
    * Read the track identified by `persistentID` within `playlistId`.
    *
@@ -2406,7 +2403,7 @@ const playlistGetPlaylistOperation: OperationDescriptor<
 }
 
 const trackListTracksOperation: OperationDescriptor<
-  { readonly playlistId: string } & PageRequest,
+  { readonly playlistId: string },
   Page<Track>
 > = {
   id: 'music.tracks.list',
@@ -2416,27 +2413,12 @@ const trackListTracksOperation: OperationDescriptor<
     'List the tracks of a playlist; the library playlist holds every track in the library',
   input: t.record({
     playlistId: t.string({ description: 'Persistent ID of the playlist' }),
-    ...t.pageInputs(),
   }),
   output: t.page(trackRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      playlistId: { type: 'string', description: 'Persistent ID of the playlist' },
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: { playlistId: { type: 'string', description: 'Persistent ID of the playlist' } },
     required: ['playlistId'],
     additionalProperties: false,
   },
@@ -3179,8 +3161,8 @@ function bind(runtime: ClientRuntime): MusicClient {
         runtime.invoke(playlistSearchOperation, { for: _for, only }, options),
     },
     tracks: {
-      list: (playlistId, page, options) =>
-        runtime.invoke(trackListTracksOperation, { ...page, playlistId }, options),
+      list: (playlistId, options) =>
+        runtime.invoke(trackListTracksOperation, { playlistId }, options),
       get: (playlistId, persistentID, options) =>
         runtime.invoke(trackGetTrackOperation, { playlistId, persistentID }, options),
     },

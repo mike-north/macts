@@ -21,21 +21,10 @@ export class TrackResourceClient {
   }
 
   /**
-   * List the tracks of one playlist, one page at a time. When the result has a `nextCursor`,
-   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
+   * List the tracks of one playlist, as one page.
    */
-  async list(
-    playlistId: string,
-    page: { pageSize?: number; cursor?: string } = {}
-  ): Promise<{ items: Track[]; nextCursor?: string }> {
-    return this.#http.rpc<{ items: Track[]; nextCursor?: string }>(
-      `${this.#app}.${this.#resource}.list`,
-      {
-        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-        playlistId,
-      }
-    )
+  async list(playlistId: string): Promise<{ items: Track[] }> {
+    return this.#http.rpc<{ items: Track[] }>(`${this.#app}.${this.#resource}.list`, { playlistId })
   }
 
   /**

@@ -552,7 +552,7 @@ export interface TrackCreateInput {
 // @public
 export interface TrackResourceClient {
     get(playlistId: string, persistentID: string, options?: CallOptions): Promise<Track>;
-    list(playlistId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Track>>;
+    list(playlistId: string, options?: CallOptions): Promise<Page<Track>>;
 }
 
 // @public

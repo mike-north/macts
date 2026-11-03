@@ -1287,11 +1287,11 @@ export const manifest: unknown = {
           property: 'persistentID',
           primary: true,
           targeting: 'byProperty',
-          unique: true,
+          unique: false,
           evidence: {
             unique: {
-              source: 'sdef',
-              note: 'The app\'s scripting dictionary describes the property as "the id of the item as a hexadecimal string. This id does not change over time."',
+              source: 'curated',
+              note: "A playlist can hold the same song more than once, and a track's persistent ID was observed to be the same in every playlist that holds it, so two entries of one song in a playlist are expected to share one: the tracks of a playlist are not known to have unique persistent IDs. The dictionary describes the property only as an id that does not change over time.",
             },
           },
         },

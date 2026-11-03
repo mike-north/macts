@@ -683,12 +683,8 @@ export interface TrackCreateInput {
 export class TrackResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(playlistId: string, persistentID: string): Promise<Track>;
-    list(playlistId: string, page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(playlistId: string): Promise<{
         items: Track[];
-        nextCursor?: string;
     }>;
 }
 

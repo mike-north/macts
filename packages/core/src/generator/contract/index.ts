@@ -1727,7 +1727,6 @@ function upperFirst(name: string): string {
   return name.charAt(0).toUpperCase() + name.slice(1)
 }
 
-/** `base`, or `base2`, `base3`, … : the first not in `used`, which it joins. */
 /**
  * The local names of the paging types in an app's contract module: `Page` and
  * `PageRequest`, unless the manifest declares a type of that name (an enum, a
@@ -1746,6 +1745,7 @@ function pagingTypeNames(manifest: AppManifest): { page: string; pageRequest: st
   return { page: local('Page'), pageRequest: local('PageRequest') }
 }
 
+/** `base`, or `base2`, `base3`, … : the first not in `used`, which it joins. */
 function uniqueName(base: string, used: Set<string>): string {
   let name = base
   for (let n = 2; used.has(name); n++) name = `${base}${String(n)}`
