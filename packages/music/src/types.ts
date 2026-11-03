@@ -195,10 +195,7 @@ export interface BrowserWindow {
 }
 
 /** Input for creating a BrowserWindow */
-export interface BrowserWindowCreateInput {
-  /** the playlist currently displayed in the window */
-  view?: Playlist
-}
+export type BrowserWindowCreateInput = Record<string, never>
 
 /** Input for updating a BrowserWindow */
 export type BrowserWindowUpdateInput = Partial<BrowserWindowCreateInput>

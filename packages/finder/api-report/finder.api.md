@@ -376,7 +376,6 @@ export interface ListViewOptionsCreateInput {
     calculatesFolderSizes?: boolean;
     iconSize?: string;
     showsIconPreview?: boolean;
-    sortColumn?: Column;
     textSize?: number;
     usesRelativeDates?: boolean;
 }

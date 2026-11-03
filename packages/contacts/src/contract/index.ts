@@ -936,51 +936,6 @@ export interface ContactsClient {
    * address.)
    */
   actionProperty(options?: CallOptions): Promise<void>
-  /**
-   * RollOver - Returns the title that will be placed in the menu for this roll over
-   *
-   * Not available: `for` takes a reference to a person, which the app has no operation to get, so
-   * the operation cannot be called.
-   *
-   * @param _with - property that that was returned from the "action property" handler. Does not
-   * accept null.
-   * @param _for - Currently selected person. Does not accept null.
-   */
-  actionTitle(
-    _with: unknown,
-    _for: ObjectReferenceData<never, 'Person'>,
-    options?: CallOptions
-  ): Promise<void>
-  /**
-   * RollOver - Performs the action on the given person and value
-   *
-   * Not available: `for` takes a reference to a person, which the app has no operation to get, so
-   * the operation cannot be called.
-   *
-   * @param _with - property that that was returned from the "action property" handler. Does not
-   * accept null.
-   * @param _for - Currently selected person. Does not accept null.
-   */
-  performAction(
-    _with: unknown,
-    _for: ObjectReferenceData<never, 'Person'>,
-    options?: CallOptions
-  ): Promise<void>
-  /**
-   * RollOver - Determines if the rollover action should be enabled for the given person and value
-   *
-   * Not available: `for` takes a reference to a person, which the app has no operation to get, so
-   * the operation cannot be called.
-   *
-   * @param _with - property that that was returned from the "action property" handler. Does not
-   * accept null.
-   * @param _for - Currently selected person. Does not accept null.
-   */
-  shouldEnableAction(
-    _with: unknown,
-    _for: ObjectReferenceData<never, 'Person'>,
-    options?: CallOptions
-  ): Promise<void>
 }
 
 const addressRecordType: ValueType<Address> = t.record(
@@ -1776,12 +1731,6 @@ function bind(runtime: ClientRuntime): ContactsClient {
     remove: (from, options) => runtime.invoke(appRemoveOperation, { from }, options),
     save: (options) => runtime.invoke(appSaveOperation, {}, options),
     actionProperty: (options) => runtime.invoke(appActionPropertyOperation, {}, options),
-    actionTitle: (_with, _for, options) =>
-      runtime.invoke(appActionTitleOperation, { with: _with, for: _for }, options),
-    performAction: (_with, _for, options) =>
-      runtime.invoke(appPerformActionOperation, { with: _with, for: _for }, options),
-    shouldEnableAction: (_with, _for, options) =>
-      runtime.invoke(appShouldEnableActionOperation, { with: _with, for: _for }, options),
   }
 }
 

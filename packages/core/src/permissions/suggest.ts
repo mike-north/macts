@@ -15,6 +15,7 @@
 
 import type { AppManifest } from '../manifest/schemas/index.js'
 import { resolveManifestRoutes } from '../manifest/route.js'
+import { isOperationAvailable } from '../generator/input-satisfiability.js'
 import { PERMISSION_FORMAT_DESCRIPTION } from './parser.js'
 
 /** The most suggestions returned; more than a few stops being a suggestion. */
@@ -50,14 +51,24 @@ function editDistance(a: string, b: string): number {
 
 /**
  * The permissions an app's manifest defines, which are the ones worth granting
- * or suggesting: every route's permission, each resource wildcard
- * (`app:resource:*`) that covers them, and the app wildcard (`app:*:*`).
+ * or suggesting: the permission of every route whose operation can be called,
+ * each resource wildcard (`app:resource:*`) that covers them, and the app
+ * wildcard (`app:*:*`).
+ *
+ * @remarks
+ * An operation with a required input that admits no value can never be called
+ * (phases/13 D7, "Resolvable targets"), and every surface leaves it out, so
+ * its permission is not offered for granting or suggested as a correction.
+ * The judgment is the one the generators and capability discovery share
+ * (`isOperationAvailable`).
  *
  * @param manifest - The app manifest.
  * @returns Distinct permissions in route-declaration order, wildcards last.
  */
 export function listKnownPermissions(manifest: AppManifest): string[] {
-  const fine = resolveManifestRoutes(manifest).map((route) => route.permission)
+  const fine = resolveManifestRoutes(manifest)
+    .filter((route) => isOperationAvailable(manifest, route.command, route.resourceType))
+    .map((route) => route.permission)
   const resourceWildcards = new Set<string>()
   const appWildcards = new Set<string>()
   for (const permission of fine) {

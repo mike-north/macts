@@ -68,10 +68,6 @@ export interface WindowCreateInput {
   zoomed?: boolean
   /** Whether the window is currently the frontmost window. */
   frontmost?: boolean
-  /** The currently selected tab */
-  currentTab?: Tab
-  /** The current session in a window */
-  currentSession?: Session
   /** Whether the window is a hotkey window. */
   isHotkeyWindow?: boolean
   /** If the window is a hotkey window, this gives the name of the profile that created the window. */
@@ -101,8 +97,6 @@ export interface Tab {
 
 /** Input for creating a Tab */
 export interface TabCreateInput {
-  /** The current session in a tab */
-  currentSession?: Session
   /** Index of tab in parent tab view control */
   index?: number
   /** The title property */

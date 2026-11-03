@@ -11,15 +11,15 @@
  * Every expected value is written by hand from the fixture and the rule:
  * optional positions that admit no value are left out of every input; an
  * operation with a required one is marked unavailable in its descriptor,
- * reported by generation, and left out of the CLI, the HTTP client and
- * capability discovery.
+ * reported by generation, and left out of both generated clients, the CLI
+ * and capability discovery.
  *
  * @see phases/13-sdk-value-and-execution-contracts.md §D7 ("Resolvable targets")
  */
 
 import { describe, expect, it } from 'vitest'
 import { deriveCapabilities } from '../capabilities/registry.js'
-import { resolveManifestRoutes } from '../manifest/index.js'
+import { resolveManifestRoutes, type AppManifest } from '../manifest/index.js'
 import { generateCliPlugin } from './cli/index.js'
 import { generateHttpClientSdk } from './sdk/http-client.js'
 import {
@@ -125,13 +125,15 @@ describe('the generated contract', () => {
 }`)
   })
 
-  it('says so on the client method', () => {
-    expect(contract).toContain(`  /**
-   * Tag a note
-   *
-   * Not available: \`tag\` takes a reference to a tag, which the app has no operation to get, so the
-   * operation cannot be called.
-   *`)
+  it('offers no client method for it, and keeps its descriptor in the operation table', () => {
+    const noteClient =
+      /export interface NoteResourceClient \{[\s\S]*?\n\}/.exec(contract)?.[0] ?? ''
+    const methods = noteClient.split('\n').flatMap((line) => /^ {2}(\w+)\(/.exec(line)?.[1] ?? [])
+    // Every note operation except tagNote.
+    expect(methods).toEqual(['list', 'get', 'create', 'update', 'delete', 'archive', 'move'])
+    expect(contract).not.toContain('tagNote:')
+    expect(contract).not.toContain('runtime.invoke(noteTagNoteOperation')
+    expect(contract).toContain("  'jotter.notes.tagNote': noteTagNoteOperation,")
   })
 
   it('marks no operation that can be called unavailable', () => {
@@ -194,7 +196,7 @@ describe('the generated contract', () => {
         operation: 'jotter.notes.tagNote',
         resource: 'Tag',
         message:
-          'jotter: commands.tagNote.parameters.tag: jotter.notes.tagNote cannot be called and is left out of MCP tools, HTTP routes, the HTTP client, CLI commands and capability discovery: the required input "tag" takes a reference to "Tag", which the app has no operation to get.',
+          'jotter: commands.tagNote.parameters.tag: jotter.notes.tagNote cannot be called and is left out of MCP tools, HTTP routes, the generated clients, CLI commands and capability discovery: the required input "tag" takes a reference to "Tag", which the app has no operation to get.',
       },
     ])
   })
@@ -281,6 +283,14 @@ describe('capability discovery', () => {
   })
 })
 
+/** The legacy HTTP client's `src/types.ts` for a manifest. */
+function typesOf(source: AppManifest): string {
+  const generated = generateHttpClientSdk(source, { packageName: '@macts/jotter' })
+  const found = generated.files.find((f) => f.path === 'src/types.ts')
+  if (found === undefined) throw new Error('no generated src/types.ts')
+  return found.content
+}
+
 describe('the generated HTTP client', () => {
   const sdk = generateHttpClientSdk(manifest, { packageName: '@macts/jotter' })
   const fileText = (path: string): string => {
@@ -313,5 +323,72 @@ describe('the generated HTTP client', () => {
     const create = /export interface NoteCreateInput \{[\s\S]*?\n\}/.exec(types)?.[0] ?? ''
     expect(create).not.toContain('primaryTag')
     expect(create).toContain('  relatedTags?: Tag[];')
+  })
+  it('leaves an omitted property out of both input types of a resource with no create command', () => {
+    // Folder has no create or update command. Its `owner`, a tag, is made
+    // writable, so it is an optional input field that admits no value.
+    const base = jotterUnsatisfiableInputsManifest()
+    const folder = base.resources['Folder']
+    const owner = folder?.properties['owner']
+    if (folder === undefined || owner === undefined) throw new Error('no Folder owner')
+    const variant: AppManifest = {
+      ...base,
+      resources: {
+        ...base.resources,
+        Folder: {
+          ...folder,
+          properties: { ...folder.properties, owner: { ...owner, access: 'rw' } },
+        },
+      },
+    }
+    const types = typesOf(variant)
+    expect(types).toContain(`export interface FolderCreateInput {
+  /** The folder's title */
+  title?: string;
+}`)
+    expect(types).toContain('export type FolderUpdateInput = Partial<FolderCreateInput>;')
+    // The contract's input types leave it out too.
+    const contract = generateContract(variant).files.find((f) => f.path === CONTRACT_MODULE_PATH)
+    expect(contract?.content).toContain(`export interface FolderCreateInput {
+  /** The folder's title */
+  title?: string
+}`)
+    const update = /export interface FolderUpdateInput \{[\s\S]*?\n\}/.exec(contract?.content ?? '')
+    expect(update?.[0]).not.toContain('owner')
+  })
+
+  it('keeps a required create field that admits no value out of the update input only', () => {
+    // A required tag parameter makes createNote unavailable; the create input
+    // keeps it, and the update input, whose fields are all optional, leaves it
+    // out.
+    const base = jotterUnsatisfiableInputsManifest()
+    const createNote = base.commands['createNote']
+    if (createNote === undefined) throw new Error('no createNote')
+    const variant: AppManifest = {
+      ...base,
+      commands: {
+        ...base.commands,
+        createNote: {
+          ...createNote,
+          parameters: [
+            ...createNote.parameters,
+            {
+              name: 'label',
+              type: { resource: 'Tag' },
+              description: 'The tag to file under',
+              required: true,
+            },
+          ],
+        },
+      },
+    }
+    const types = typesOf(variant)
+    const create = /export interface NoteCreateInput \{[\s\S]*?\n\}/.exec(types)?.[0] ?? ''
+    const update = /export interface NoteUpdateInput \{[\s\S]*?\n\}/.exec(types)?.[0] ?? ''
+    expect(create).toContain('  label: Tag;')
+    expect(update).not.toContain('label')
+    expect(update).not.toContain('primaryTag')
+    expect(update).toContain('  title?: string;')
+    expect(update).toContain('  relatedTags?: Tag[];')
   })
 })

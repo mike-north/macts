@@ -156,10 +156,7 @@ export interface NetworkPreferencesObject {
 }
 
 /** Input for creating a NetworkPreferencesObject */
-export interface NetworkPreferencesObjectCreateInput {
-  /** the current location */
-  currentLocation?: Location
-}
+export type NetworkPreferencesObjectCreateInput = Record<string, never>
 
 /** Input for updating a NetworkPreferencesObject */
 export type NetworkPreferencesObjectUpdateInput = Partial<NetworkPreferencesObjectCreateInput>
@@ -182,8 +179,6 @@ export interface Service {
 
 /** Input for creating a Service */
 export interface ServiceCreateInput {
-  /** the currently selected configuration */
-  currentConfiguration?: Configuration
   /** the name of the service */
   name?: string
 }

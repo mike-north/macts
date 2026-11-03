@@ -34,7 +34,18 @@ import {
   safeIdentifier,
   type CrudOperation,
 } from '../surface.js'
-import { isOperationAvailable, omittedInputs } from '../input-satisfiability.js'
+import {
+  isOperationAvailable,
+  omittedInputs,
+  omittedResourceInputs,
+} from '../input-satisfiability.js'
+
+/** One field line of a generated input type. */
+interface InputFieldLine {
+  readonly tsType: string
+  readonly required: boolean
+  readonly doc: string
+}
 
 /**
  * Options for HTTP client SDK generation.
@@ -251,26 +262,27 @@ function generateTypesFile(manifest: AppManifest): string {
     lines.push('')
 
     // Generate create input type: the resource's writable properties plus the
-    // backing create command's parameters (see `createInputFields`).
+    // backing create command's parameters (see `createInputFields`), less the
+    // fields that admit no value (`omittedResourceInputs`, the judgment the
+    // contract's input types use), whether or not the resource has a create
+    // command.
     //
     // A parameter's `type` is `string | Record<string, string>` from the schema.
     // When it is an object it is structurally compatible with `PropertyType`
     // (e.g. `{ enum: 'EventStatus' }`, `{ array: 'date' }`), so it is cast
     // directly rather than falling back to 'string', which would widen enum and
     // array types unnecessarily.
-    const createFields = new Map<string, { tsType: string; required: boolean; doc: string }>()
-    const createCommand = findCrudCommand(resourceCommandEntries(manifest, resourceName), 'create')
-    const omittedFields =
-      createCommand === undefined
-        ? new Set<string>()
-        : omittedInputs(manifest, createCommand[1], resourceName)
+    const createFields = new Map<string, InputFieldLine>()
+    const updateFields = new Map<string, InputFieldLine>()
+    const omitted = omittedResourceInputs(manifest, resourceName)
     for (const [fieldName, field] of createInputFields(manifest, resourceName)) {
-      if (omittedFields.has(fieldName)) continue
-      createFields.set(fieldName, {
+      const line = {
         tsType: propertyTypeToTs(field.type as PropertyType | undefined),
         required: field.required,
         doc: field.description,
-      })
+      }
+      if (!omitted.create.has(fieldName)) createFields.set(fieldName, line)
+      if (!omitted.update.has(fieldName)) updateFields.set(fieldName, { ...line, required: false })
     }
 
     lines.push(`/** Input for creating a ${resourceName} */`)
@@ -288,9 +300,26 @@ function generateTypesFile(manifest: AppManifest): string {
     }
     lines.push('')
 
-    // Generate update input type
+    // Generate update input type: every update field is optional, so it is
+    // the partial create input unless the two leave out different fields (a
+    // required create field that admits no value, or a resettable one that
+    // admits only null).
     lines.push(`/** Input for updating a ${resourceName} */`)
-    lines.push(`export type ${resourceName}UpdateInput = Partial<${resourceName}CreateInput>;`)
+    const sameFields =
+      updateFields.size === createFields.size &&
+      [...updateFields.keys()].every((name) => createFields.has(name))
+    if (sameFields) {
+      lines.push(`export type ${resourceName}UpdateInput = Partial<${resourceName}CreateInput>;`)
+    } else if (updateFields.size === 0) {
+      lines.push(`export type ${resourceName}UpdateInput = Record<string, never>;`)
+    } else {
+      lines.push(`export interface ${resourceName}UpdateInput {`)
+      for (const [fieldName, field] of updateFields) {
+        lines.push(`  /** ${field.doc} */`)
+        lines.push(`  ${fieldName}?: ${field.tsType};`)
+      }
+      lines.push('}')
+    }
     lines.push('')
   }
 

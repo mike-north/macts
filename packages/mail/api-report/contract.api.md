@@ -9,7 +9,6 @@ import { CallOptions } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
-import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
 
@@ -244,7 +243,6 @@ export interface MailClient {
     move(to: string, options?: CallOptions): Promise<void>;
     readonly outgoingMessages: OutgoingMessageResourceClient;
     performMailActionWithMessages(options?: CallOptions): Promise<void>;
-    synchronize(_with: ObjectReferenceData<string, 'Account'>, options?: CallOptions): Promise<void>;
 }
 
 // @public

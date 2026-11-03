@@ -1331,15 +1331,22 @@ whether the position is optional:
   their JSON Schemas, the HTTP client's parameters, the CLI flags, and the
   capability schema.
 - A required one means the operation can never be called. Generation warns,
-  naming the app, the operation and the position. The descriptor stays,
-  marked `unavailable` with the positions and the reason. The MCP and HTTP
-  adapters leave the operation out of their tools, routes and listings, so a
-  call to it is answered as one to an unknown operation. The generated HTTP
-  client and CLI and capability discovery leave it out too.
+  naming the app, the operation and the position. The descriptor stays in
+  the contract's `operations`, marked `unavailable` with the positions and
+  the reason. The runtime answers `invoke` of it exactly as an unknown
+  operation: the same `ValidationError`, after the credential is verified and
+  the call admitted, and before permission, governance or approval, so no
+  human is asked to approve a call that cannot run. Reference resolution
+  finds its operation the same way, so a resource whose resolving operation
+  is unavailable cannot be resolved. The MCP and HTTP adapters leave the
+  operation out of their tools, routes and listings, so a call to it is
+  answered as one to an unknown operation. Neither generated client has a
+  method for it, and the CLI, capability discovery and the permission listing
+  leave it out too.
 
-The contract, HTTP client and CLI generators and the capability registry take
-this judgment from one manifest-level function. Generation fails if the
-contract disagrees with it.
+The contract, HTTP client and CLI generators, the capability registry and the
+permission listing take this judgment from one manifest-level function.
+Generation fails if the contract disagrees with it.
 
 **Encoding.** Encoding reads only the data fields (`app`, `resource`, `form`,
 `cardinality`, and `id`, `selector`, `entries`, or `container`). It never
