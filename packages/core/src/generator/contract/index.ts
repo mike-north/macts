@@ -415,6 +415,7 @@ const CONTRACT_VALUE_IMPORTS = ['ValueTypes'] as const
 const CONTRACT_BASE_TYPE_IMPORTS = [
   'AppContract',
   'CallOptions',
+  'ClientBrand',
   'ClientRuntime',
   'OperationDescriptor',
   'ValueType',
@@ -1295,7 +1296,7 @@ class ContractBuilder {
       const members = namespace.methods.map((method) => this.#renderMethodSignature(method))
       return `${doc}export interface ${namespace.interfaceName} {\n${members.join('\n')}\n}\n`
     })
-    const { client, contract } = this.#names
+    const { client, contract, resources } = this.#names
     const members = [
       ...namespaces.map(
         (namespace) =>
@@ -1303,14 +1304,19 @@ class ContractBuilder {
       ),
       ...appMethods.map((method) => this.#renderMethodSignature(method)),
     ]
+    // The client carries the contract's resource table in its type (a
+    // type-only brand with no runtime member), so a value annotated with this
+    // interface, not only one a factory returned, can be passed to functions
+    // that read the table, such as `bindReference`.
     const doc = docComment(
-      `The ${this.#manifest.app.name} client: one namespace per resource that has operations, plus the app's own commands. A client factory creates one from {@link ${contract}}.`,
+      `The ${this.#manifest.app.name} client: one namespace per resource that has operations, plus the app's own commands. A client factory creates one from {@link ${contract}}. Its type carries the contract's resource table, {@link ${resources}}, so references can be bound to it by resource; the brand has no runtime member.`,
       ''
     )
+    const brand = `ClientBrand<${resources}>`
     const body =
       members.length === 0
-        ? `export type ${client} = Record<string, never>\n`
-        : `export interface ${client} {\n${members.join('\n')}\n}\n`
+        ? `export type ${client} = Record<string, never> & ${brand}\n`
+        : `export interface ${client} extends ${brand} {\n${members.join('\n')}\n}\n`
     return [...namespaceInterfaces, `${doc}${body}`]
   }
 

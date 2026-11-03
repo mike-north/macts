@@ -75,7 +75,15 @@ describe('generateContract: files', () => {
       'export const jotterContract: AppContract<JotterClient, JotterResources> = {'
     )
     expect(contract).toContain("  app: 'jotter',")
-    expect(contract).toContain('export interface JotterClient {')
+    expect(contract).toContain(
+      'export interface JotterClient extends ClientBrand<JotterResources> {'
+    )
+  })
+
+  it('brands the client interface with the resource table, type-only', () => {
+    // A value annotated with the interface carries the table, so it binds
+    // references; the brand is a type, so the bound client gains no member.
+    expect(contract).toMatch(/^import \{[^}]*\btype ClientBrand\b[^}]*\} from '@macts\/contracts'/m)
   })
 
   it('loads the manifest lazily from the data module, typed unknown', () => {
@@ -470,6 +478,10 @@ describe('generateContract: resource table', () => {
     expect(generated.errors).toEqual([])
     const text = moduleText(generated, CONTRACT_MODULE_PATH)
     expect(text).toContain('export type JotterResources = Readonly<Record<never, never>>\n')
+    // A client with no operations still carries the (empty) table.
+    expect(text).toContain(
+      'export type JotterClient = Record<string, never> & ClientBrand<JotterResources>\n'
+    )
     expect(text).toContain('const resources = {\n\n} satisfies JotterResources\n')
     expect(text).not.toContain('ResourceDescriptor')
   })

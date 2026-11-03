@@ -513,8 +513,10 @@ export function createCodecClient<Client, Resources extends ResourceTable>(
  * not copied with its old client. Whether the target exists is learned only
  * when the result is resolved.
  *
- * The client's type carries its contract's resource table, so `data` type-
- * checks only when the table records the operation every level resolves
+ * The client's type carries its contract's resource table: a factory's
+ * result does, and so does a generated client interface such as
+ * `NotesClient`, so a variable or parameter annotated with it binds the same
+ * data. `data` type-checks only when the table records the operation every level resolves
  * through (`resolvingOperationKey`): `get` for a single-object target, a
  * container, and an identity-collection entry, and `list` for a collection
  * target. The result is the bound variant of `data`'s form and cardinality,

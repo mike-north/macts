@@ -23,7 +23,9 @@
  *
  * A few calls are kept as `@ts-expect-error` to show that `bindReference`
  * itself applies that constraint with the client's own table (an unknown key,
- * a key without `get` bound as one) and accepts only a client from a factory.
+ * a key without `get` bound as one, and the same through a variable or a
+ * parameter annotated with the generated client interface) and accepts only a
+ * client of a contract.
  * Both `tsc --noEmit` and tsd enforce the directive: an invalid call that
  * type-checks fails the build. Each such reference is declared first, so the
  * call, and the error reported at its argument, fits on the one line the
@@ -46,7 +48,12 @@ import {
   type MusicResources,
   type Playlist,
 } from '@macts/music/contract'
-import { notesContract, type Note, type NotesResources } from '@macts/notes/contract'
+import {
+  notesContract,
+  type Note,
+  type NotesClient,
+  type NotesResources,
+} from '@macts/notes/contract'
 import type {
   AppContract,
   ClientBrand,
@@ -94,6 +101,55 @@ expectType<'Branch' | 'Shelf' | 'Book'>(
   null as unknown as ResolvableResourceKey<LibraryResources, 'one'>
 )
 expectType<'Shelf' | 'Book'>(null as unknown as ResolvableResourceKey<LibraryResources, 'many'>)
+
+// --- A client annotated with its generated interface ----------------------
+
+// The generated client interface carries the brand itself, so the ordinary
+// annotations keep the contract's table: a variable typed `NotesClient`, and
+// a parameter typed `NotesClient`, bind references exactly as the factory's
+// result does, accepting and rejecting the same data.
+const annotated: NotesClient = remote.createClient(notesContract, options)
+expectAssignable<ClientBrand<NotesResources>>(annotated)
+expectAssignable<NotesClient>(notes)
+expectType<IdentityReference<Note, string, 'Note'>>(
+  bindReference(annotated, {
+    app: 'notes',
+    resource: 'Note',
+    form: 'identity',
+    cardinality: 'one',
+    id: 'Groceries',
+  })
+)
+const notebook = {
+  app: 'notes',
+  resource: 'Notebook',
+  form: 'selector',
+  cardinality: 'one',
+  selector: { by: 'name', name: 'x' },
+} as const
+// @ts-expect-error -- `Notebook` is not a resource of the notes contract
+bindReference(annotated, notebook)
+
+function everyNoteThrough(client: NotesClient): SelectorCollectionReference<Note, 'Note'> {
+  const noteById = {
+    app: 'notes',
+    resource: 'Note',
+    form: 'identity',
+    cardinality: 'one',
+    id: 7,
+  } as const
+  // @ts-expect-error -- a note's identifier is a string
+  bindReference(client, noteById)
+  return bindReference(client, {
+    app: 'notes',
+    resource: 'Note',
+    form: 'selector',
+    cardinality: 'many',
+    selector: { by: 'every' },
+  })
+}
+expectType<SelectorCollectionReference<Note, 'Note'>>(everyNoteThrough(notes))
+expectType<SelectorCollectionReference<Note, 'Note'>>(everyNoteThrough(annotated))
 
 // --- A resolvable key gives its bound variant, resolving to its record ----
 
@@ -409,7 +465,7 @@ expectType<Promise<unknown>>(
 // A typed contract is still an `AppContract<Client>`.
 expectAssignable<AppContract<LibraryClient>>(libraryContract)
 
-// --- Only clients from the factories -----------------------------------------
+// --- Only clients of a contract ----------------------------------------------
 
 // @ts-expect-error -- a client of no contract carries no resource table
 bindReference({ notes: 1 }, anyReference)

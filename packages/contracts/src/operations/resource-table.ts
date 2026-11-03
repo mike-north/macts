@@ -58,7 +58,9 @@ declare const clientResources: unique symbol
  * the client's type.
  *
  * @remarks
- * Client factories return `Client & ClientBrand<Resources>`. The brand is an
+ * Client factories return `Client & ClientBrand<Resources>`, and a generated
+ * client interface extends `ClientBrand` of its contract's table, so a value
+ * annotated with that interface carries the table too. The brand is an
  * optional member under a symbol that does not exist at runtime, so a client
  * has no such property, and the app's operations stay its only members. It
  * lets functions that take a client, such as `bindReference`, read the
