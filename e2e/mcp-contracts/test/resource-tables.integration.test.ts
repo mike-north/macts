@@ -133,20 +133,24 @@ describe('Xcode references to a device, which Xcode can neither get nor list', (
       ])
   })
 
-  it('reject a reference built directly against the contract, in any form', () => {
+  it('reject a reference built directly against the contract, in any form and either direction', () => {
     const device = t.reference(() => xcodeContract, 'Device', 'one')
+    const reason =
+      'The app has no resource "Device" that references can resolve through ' +
+      '(one with a get or list operation), so a reference to it cannot be'
     for (const reference of [toDevice, { ...toDevice, form: 'identity', id: 'D1' }]) {
-      const result = device.encode(reference)
-      expect(result.ok).toBe(false)
-      if (!result.ok)
-        expect(result.issues).toEqual([
-          {
-            path: [],
-            code: 'unsupported',
-            message:
-              'The app has no resource "Device" that references can resolve through ' +
-              '(one with a get or list operation), so a reference to it cannot be encoded.',
-          },
+      const encoded = device.encode(reference)
+      expect(encoded.ok).toBe(false)
+      if (!encoded.ok)
+        expect(encoded.issues).toEqual([
+          { path: [], code: 'unsupported', message: `${reason} encoded.` },
+        ])
+      const { app: _app, ...wire } = reference
+      const decoded = device.decode({ reference: wire }, NO_BINDING)
+      expect(decoded.ok).toBe(false)
+      if (!decoded.ok)
+        expect(decoded.issues).toEqual([
+          { path: [], code: 'unsupported', message: `${reason} decoded.` },
         ])
     }
   })

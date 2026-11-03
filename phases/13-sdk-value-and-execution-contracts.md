@@ -669,9 +669,11 @@ Manifest types map to value types as follows:
 Generation diagnostics are warnings, not errors. `macts generate` prints each
 one to stderr as `warning: <app>: <position>: …` and still exits 0, and
 `scripts/regenerate.mjs` reports their total across apps. Only generation
-errors fail generation. The shipped manifests produce three: Finder's
-`iconViewOptions` and `columnViewOptions`, and System Events'
-`scriptingResult`.
+errors fail generation. The shipped manifests produce three kinds: unknown
+types (Finder's `iconViewOptions` and `columnViewOptions`, and System Events'
+`scriptingResult`), an unavailable operation (Mail's `synchronize`), and the
+output fields left out under the resolvable-target rule (D7), which
+`packages/core/src/generator/contract/index.test.ts` pins.
 
 The generator owns its output. Each generated package carries a committed
 `.macts-generated.json` that lists the sorted package-relative paths the last
@@ -1455,6 +1457,8 @@ single reference, and an array of them is a list of single references, so
 each needs its target's `get`. An output reference cannot be used when:
 
 - its target has no usable `get`, so no reference to it can be resolved;
+- its target has no primary identifier, so it has no identity form, and
+  native reads emit only identity references (native emission, below);
 - that `get` records a parent (D10, command parents): native reads emit no
   container (container scoping, below), so a reference read from the app to a
   target identified only within its container could not be resolved;
@@ -1475,9 +1479,10 @@ unusable. Leaving it out means:
 - An operation whose result holds one declares no result.
 - Generation warns once per position, naming the app, the resource and field
   (or the command), the target and the reason. A warning for a missing or
-  parent-scoped `get` cites #219; one for a name that is not claimed unique
-  cites this decision. The field returns once its target gains a `get` that
-  records no parent, or a unique claim with evidence.
+  parent-scoped `get` cites #219; one for a missing identifier or a name
+  that is not claimed unique cites this decision. The field returns once its
+  target gains a `get` that records no parent, an identifier, or a unique
+  claim with evidence.
 
 Input positions follow the input rule above, so a field left out of output
 may still be settable through create and update. The contract, HTTP client
@@ -1536,9 +1541,10 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   when it is resolved. When several objects share the name, the app defines
   which one that is, so the reference does not pin one object. An output
   position referencing a name-keyed target is left out of output when the
-  name is not claimed unique (resolvable targets, above). Input positions to it are generated. A
-  resource is name-keyed when the property its identity references carry and
-  are resolved by (its targeting property, D10) is `name`. The manifest's
+  name is not claimed unique (resolvable targets, above). Input positions to
+  it are generated. A resource is name-keyed when the property its identity
+  references carry and are resolved by (its targeting property, D10) is
+  `name`. The manifest's
   evidence that a name is the app's identity for a resource is its primary
   identifier's `unique: true` claim, with the evidence for that claim (D9,
   _Bounded list pages_). With the claim, the target is used at output
@@ -1556,7 +1562,10 @@ naming the referenced resource before any command runs. An app object at an
 output position becomes the identity reference above, with no container.
 
 Every other reference keeps the codec's unsupported marker and fails as
-`InternalError` (D4), in either direction:
+`InternalError` (D4), in either direction. Generation leaves out every output
+position whose target has no identifier, no `get`, or a `get` that records a
+parent (resolvable targets, above), so for those targets the failure arises
+only at inputs:
 
 - every selector form, at any position;
 - identity collections;

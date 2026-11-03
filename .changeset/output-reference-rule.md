@@ -11,15 +11,16 @@
 '@macts/xcode': minor
 ---
 
-Generated contracts no longer declare an output field holding a reference that no caller could use (#219). A field is left out when it references:
+Generated contracts do not declare an output field holding a reference that no caller could use (#219). A field is left out when it references:
 
 - a resource the app has no operation to get;
+- a resource with no identifier, which therefore has no identity reference;
 - a resource the app gets only within its container. A reference read from the app carries no container, so it could not be resolved;
 - or a resource identified by its name, when the manifest does not claim that name unique. Such a reference resolves to whichever object has that name, which may not be the one the app returned. A primary identifier claimed `unique: true`, with its evidence, counts as identity.
 
-A field left out is gone from the contract's record type and its value type, the HTTP client's read type and schema, and what the CLI prints. Native reads no longer read it. A field of the first two kinds used to make reading any record where it was not null fail. Input types are unchanged, so a writable field may still be set. Generation warns once per field left out. The warning names the app, the field, the referenced resource and the reason. The same rule applies to a command result, but no manifest records one yet.
+A field left out is not declared by the contract's record type or value type, and native reads do not read it. It is also gone from the HTTP client's read type and schema and from what the CLI prints. Input types are unchanged, so a writable field may still be set. Generation warns once per field left out. The warning names the app, the field, the referenced resource and the reason. The same rule applies to a command result, but no manifest records one yet.
 
-Breaking change: these record fields are gone from the read types:
+Breaking change: these record fields are gone from the HTTP client's read types and schemas, and from what the CLI prints:
 
 - Arc: Window `activeTab` and `activeSpace`.
 - Finder: FinderWindow `listViewOptions`, and ListViewOptions `sortColumn`.

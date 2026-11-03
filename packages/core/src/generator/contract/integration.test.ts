@@ -566,7 +566,8 @@ describe('resources', () => {
 
   it('reject every reference to a resource with neither a get nor a list operation, which the table leaves out', () => {
     // A reference value type built against the contract rejects a sticker in
-    // any form and cardinality, since none could be resolved.
+    // any form and cardinality, encoding and decoding, since none could be
+    // resolved.
     for (const [cardinality, sticker] of [
       ['one', t.reference(() => contract, 'Sticker', 'one')],
       ['many', t.reference(() => contract, 'Sticker', 'many')],
@@ -576,16 +577,17 @@ describe('resources', () => {
         { by: 'index', index: 0 },
         { by: 'every' },
       ]) {
-        const result = sticker.encode({
-          app: 'jotter',
-          resource: 'Sticker',
-          form: 'selector',
-          cardinality,
-          selector,
-        })
-        expect(result.ok).toBe(false)
-        if (!result.ok)
-          expect(result.issues.map(({ path, code }) => ({ path, code }))).toEqual([
+        const wire = { resource: 'Sticker', form: 'selector', cardinality, selector }
+        const encoded = sticker.encode({ app: 'jotter', ...wire })
+        expect(encoded.ok).toBe(false)
+        if (!encoded.ok)
+          expect(encoded.issues.map(({ path, code }) => ({ path, code }))).toEqual([
+            { path: [], code: 'unsupported' },
+          ])
+        const decoded = sticker.decode({ reference: wire }, TEST_CONTEXT)
+        expect(decoded.ok).toBe(false)
+        if (!decoded.ok)
+          expect(decoded.issues.map(({ path, code }) => ({ path, code }))).toEqual([
             { path: [], code: 'unsupported' },
           ])
       }
