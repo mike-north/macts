@@ -248,10 +248,11 @@ describe('a Contacts action given a person reference', () => {
 const NOT_INSTALLED_BUNDLE_ID = 'com.example.macts.not-installed'
 
 // Replaces the check that a reference input failed with InternalError in the
-// real automation process for an app that is not installed. The application
-// object is now created before the input is decoded, so a missing app is
-// reported as missing whatever the input holds; nothing is sent to any app.
-describe('a Contacts action for an app that is not installed, in the real automation host (replaces the InternalError check for references)', () => {
+// real automation process for an app that is not installed. It pins existing
+// behaviour: the application object is created before the input is decoded,
+// so a missing app is reported as missing whatever the input holds, and
+// nothing is sent to any app.
+describe('a Contacts action for an app that is not installed, in the real automation host (pins the existing AppUnavailableError; replaces the InternalError check for references)', () => {
   it.skipIf(process.platform !== 'darwin').each([
     ['a person reference it can convert', PERSON],
     [

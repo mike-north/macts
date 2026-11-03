@@ -1511,6 +1511,8 @@ Every other reference keeps the codec's unsupported marker and fails as
 - identity collections;
 - a reference with a container, so a parent-scoped target cannot be passed;
 - a resource with no identifier, or with no `get`;
+- a resource with no entry in the request's `resourcePlans`, so none in the
+  script's reference table;
 - a resource whose `get` records a parent (Music tracks, Contacts emails,
   phones and addresses, Calendar events).
 

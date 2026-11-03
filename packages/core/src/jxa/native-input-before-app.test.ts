@@ -9,6 +9,12 @@
  * wherever it sits in the input. Only then are the input's references found
  * in the app, and only then does the body send its command.
  *
+ * A reference to a resource the request's resource plans have no entry for
+ * (a resource with neither a get nor a list, which the generated resource
+ * table leaves out) gets no entry in the script's reference table either, so
+ * it is one the provider cannot convert: an internal error, before the app is
+ * used for an input, and once the command has answered for a result.
+ *
  * Each case runs the real native executor on the real composed script,
  * evaluated in an isolated context against a stand-in Contacts application
  * that records every member read, call, or inspection made of it or of the
@@ -34,7 +40,7 @@ import type { ExecutionRequest } from '../execution/executor.js'
 import { loadManifest } from '../manifest/loader.js'
 import type { AppManifest } from '../manifest/schemas/app.js'
 import { composeNativeScript } from './executor.js'
-import { NATIVE_CODEC } from './native-codec.js'
+import { NATIVE_CODEC, type NativeScript } from './native-codec.js'
 import { createNativeExecutor, type NativeTransport } from './native-executor.js'
 import { parseNativeOutcome } from './test-support/native-harness.js'
 
@@ -125,9 +131,10 @@ function standInContacts() {
 }
 
 /** A transport that evaluates the composed script against `app` in an isolated context. */
-function standInTransport(app: object): NativeTransport {
+function standInTransport(app: object, scripts: NativeScript[] = []): NativeTransport {
   return {
     run(script) {
+      scripts.push(script)
       const context = createContext({ ObjC: { import: () => undefined }, Application: () => app })
       const stdout: unknown = runInContext(composeNativeScript(script, NATIVE_CODEC), context)
       return Promise.resolve(parseNativeOutcome(String(stdout)))
@@ -136,16 +143,27 @@ function standInTransport(app: object): NativeTransport {
 }
 
 /** Runs Contacts' `actionTitle` with `input` under `inputPlan` against `app`. */
-function actionTitle(app: object, input: WireRecord, fields: Record<string, FieldPlan>) {
+function actionTitle(
+  app: object,
+  input: WireRecord,
+  fields: Record<string, FieldPlan>,
+  options: {
+    resourcePlans?: ResourcePlanTable
+    scripts?: NativeScript[]
+    outputPlan?: ValuePlan
+  } = {}
+) {
   const request: ExecutionRequest = {
     manifest: contacts,
     target: { command: 'actionTitle' },
     input,
     inputPlan: { kind: 'record', fields },
-    outputPlan: { kind: 'none' },
-    resourcePlans: RESOURCE_PLANS,
+    outputPlan: options.outputPlan ?? { kind: 'none' },
+    resourcePlans: options.resourcePlans ?? RESOURCE_PLANS,
   }
-  return createNativeExecutor({ transport: standInTransport(app) }).execute(request)
+  return createNativeExecutor({ transport: standInTransport(app, options.scripts) }).execute(
+    request
+  )
 }
 
 /** What a call rejected with; fails if it resolved. */
@@ -275,6 +293,77 @@ describe('a native script uses the app only after the whole input converted (D4)
 
       expect(error).toBeInstanceOf(ValidationError)
       expect(uses).toEqual([])
+    }
+  )
+})
+
+describe('a reference to a resource the resource plans have no entry for', () => {
+  it.each([
+    // Person is a manifest resource; the table leaves it out.
+    ['a manifest resource', 'Person', { Group: { id: { kind: 'string' } } }],
+    // Account is not a Contacts resource at all.
+    ['a resource the manifest lacks', 'Account', RESOURCE_PLANS],
+  ] as const)(
+    'gives %s no reference-table entry and fails with InternalError, using the app not at all',
+    async (_label, resource, resourcePlans) => {
+      const { app, uses } = standInContacts()
+      const scripts: NativeScript[] = []
+      const reference = { reference: { resource, form: 'identity', cardinality: 'one', id: 'x-1' } }
+
+      const error = await rejectionOf(
+        actionTitle(
+          app,
+          { with: 'email', for: reference },
+          {
+            with: required({ kind: 'unknown' }),
+            for: required({ kind: 'reference', resource, cardinality: 'one' }),
+          },
+          { resourcePlans, scripts }
+        )
+      )
+
+      expect(scripts).toHaveLength(1)
+      expect(Object.hasOwn(scripts[0]?.references ?? {}, resource)).toBe(false)
+      expect(scripts[0]?.references).toEqual({})
+      expect(error).toBeInstanceOf(InternalError)
+      if (!(error instanceof InternalError)) return
+      expect(error.message).toBe(
+        'The Contacts operation "actionTitle" takes a reference at `for` that the macOS provider cannot convert yet.'
+      )
+      expect(uses).toEqual([])
+    }
+  )
+
+  it.each([
+    ['a manifest resource', 'Person', { Group: { id: { kind: 'string' } } }],
+    ['a resource the manifest lacks', 'Account', RESOURCE_PLANS],
+  ] as const)(
+    'fails a result that is a reference to %s with InternalError',
+    async (_label, resource, resourcePlans) => {
+      const { app, uses } = standInContacts()
+      const scripts: NativeScript[] = []
+
+      const error = await rejectionOf(
+        actionTitle(
+          app,
+          { with: 'email', for: 'p-1' },
+          { with: required({ kind: 'unknown' }), for: required({ kind: 'unknown' }) },
+          {
+            resourcePlans,
+            scripts,
+            outputPlan: { kind: 'reference', resource, cardinality: 'one' },
+          }
+        )
+      )
+
+      expect(scripts[0]?.references).toEqual({})
+      expect(error).toBeInstanceOf(InternalError)
+      if (!(error instanceof InternalError)) return
+      expect(error.message).toBe(
+        'The Contacts operation "actionTitle" returns a reference that the macOS provider cannot convert yet.'
+      )
+      // The command ran; only converting its result failed.
+      expect(uses).toContain('call app.actionTitle')
     }
   )
 })

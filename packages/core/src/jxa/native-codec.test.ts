@@ -1554,6 +1554,60 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
         'Person p-2.exists()',
       ])
     })
+
+    // A resource with neither a get nor a list has no entry in the contract's
+    // resource table, so the executor's reference table has none either. A
+    // reference to it is one the codec cannot convert: the marker, never a
+    // failed lookup, and in decoding without any use of the app. Resource
+    // names that are also inherited object members must not be found as
+    // entries.
+    describe('a reference to a resource the table has no entry for', () => {
+      const ABSENT = ['Account', 'constructor', 'toString', '__proto__'] as const
+      const absentRef = (resource: string): ValuePlan => ({
+        kind: 'reference',
+        resource,
+        cardinality: 'one',
+      })
+
+      it.each(ABSENT)(
+        'decodes a reference to %s as unsupported, before using the app',
+        (resource) => {
+          expectCodecError(
+            () => decode(identity(resource, 'x-1'), absentRef(resource), untouchable()),
+            {
+              direction: 'decode',
+              path: [],
+              unsupportedKind: 'reference',
+            }
+          )
+        }
+      )
+
+      it.each(ABSENT)(
+        'decodes a reference to %s after a convertible one as unsupported, before using the app',
+        (resource) => {
+          const plan = recordOf({ for: required(PERSON_REF), other: required(absentRef(resource)) })
+          expectCodecError(
+            () =>
+              decode(
+                { for: identity('Person', 'p-1'), other: identity(resource, 'x-1') },
+                plan,
+                untouchable()
+              ),
+            { direction: 'decode', path: ['other'], unsupportedKind: 'reference' }
+          )
+        }
+      )
+
+      it.each(ABSENT)('encodes an object at a reference to %s as unsupported', (resource) => {
+        const app = standInApp()
+        expectCodecError(
+          () => encode(app.people.objects[0], absentRef(resource), environment(app)),
+          { direction: 'encode', path: [], unsupportedKind: 'reference' }
+        )
+        expect(app.calls).toEqual([])
+      })
+    })
   })
 
   describe('reference encode', () => {
