@@ -145,6 +145,15 @@ resources:
           unique:
             source: sdef
             note: 'The app''s scripting dictionary describes the property as "unique identifier for this address."'
+    rangeRead:
+      supported: true
+      evidence:
+        source: probe
+        observedAt: '2026-11-03T18:05:41.000Z'
+        bundleId: com.apple.AddressBook
+        appVersion: '14.0'
+        osVersion: '27.2'
+        note: 'Read-only first pages of the addresses of a person, at page sizes 25, 2 and 1, each read as a range of the collection. No person among the first 100 had more than one address, so no page continued past the first.'
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook
@@ -288,6 +297,15 @@ resources:
           unique:
             source: sdef
             note: 'The app''s scripting dictionary describes the property as "unique identifier for this entry, this is persistent, and stays with the record."'
+    rangeRead:
+      supported: true
+      evidence:
+        source: probe
+        observedAt: '2026-11-03T18:05:41.000Z'
+        bundleId: com.apple.AddressBook
+        appVersion: '14.0'
+        osVersion: '27.2'
+        note: 'Read-only pages of the email addresses of a person: a first page of 25, and pages of 1 continued by cursor across a page boundary, each read as a range of the collection.'
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook
@@ -318,6 +336,15 @@ resources:
           unique:
             source: sdef
             note: 'The app''s scripting dictionary describes the property as "unique and persistent identifier for this record."'
+    rangeRead:
+      supported: true
+      evidence:
+        source: probe
+        observedAt: '2026-11-03T18:05:41.000Z'
+        bundleId: com.apple.AddressBook
+        appVersion: '14.0'
+        osVersion: '27.2'
+        note: 'Read-only pages of the groups at the application, at page sizes 25, 2 and 1. The collection held one group, so no page continued past the first.'
     properties:
       id:
         access: r
@@ -525,6 +552,15 @@ resources:
           unique:
             source: sdef
             note: 'The app''s scripting dictionary describes the property as "unique and persistent identifier for this record."'
+    rangeRead:
+      supported: true
+      evidence:
+        source: probe
+        observedAt: '2026-11-03T18:05:41.000Z'
+        bundleId: com.apple.AddressBook
+        appVersion: '14.0'
+        osVersion: '27.2'
+        note: 'Read-only pages of the people at the application: a first page of 25 continued by cursor, and pages of 2 continued by cursor, each read as a range of the collection.'
     properties:
       id:
         access: r
@@ -878,6 +914,15 @@ resources:
           unique:
             source: sdef
             note: 'The app''s scripting dictionary describes the property as "unique identifier for this entry, this is persistent, and stays with the record."'
+    rangeRead:
+      supported: true
+      evidence:
+        source: probe
+        observedAt: '2026-11-03T18:05:41.000Z'
+        bundleId: com.apple.AddressBook
+        appVersion: '14.0'
+        osVersion: '27.2'
+        note: 'Read-only pages of the phone numbers of a person: a first page of 25, and pages of 2 continued by cursor across a page boundary, each read as a range of the collection.'
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook

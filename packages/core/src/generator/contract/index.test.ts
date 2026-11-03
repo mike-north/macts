@@ -20,7 +20,12 @@
 import { readdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { AppManifestSchema, type AppManifest, type Identifier } from '../../manifest/index.js'
+import {
+  AppManifestSchema,
+  type AppManifest,
+  type Identifier,
+  type Resource,
+} from '../../manifest/index.js'
 import { loadManifest } from '../../manifest/loader.js'
 import {
   CONTRACT_MANIFEST_MODULE_PATH,
@@ -30,6 +35,7 @@ import {
   generateContract,
   type GeneratedContract,
 } from './index.js'
+import { RANGE_READ_SUPPORTED } from '../../manifest/test-support/unique-claim.js'
 import { jotterManifest } from './test-fixtures.js'
 
 const MANIFESTS_DIR = resolve(process.cwd(), '../../manifests')
@@ -483,12 +489,22 @@ describe('generateContract: list pages (D2)', () => {
   output: t.page(folderRecordType),`)
   })
 
-  /** The listFolders descriptor of a Jotter whose folder identifier is changed by `change`. */
-  function listFoldersWith(change: (identifier: Identifier) => void): string {
+  /**
+   * The listFolders descriptor of a Jotter whose folder identifier is changed
+   * by `change`, and whose folders carry `rangeRead` when it is given.
+   */
+  function listFoldersWith(
+    change: (identifier: Identifier) => void,
+    rangeRead?: Resource['rangeRead']
+  ): string {
     const manifest = jotterManifest()
-    const identifier = manifest.resources['Folder']?.identifiers?.[0]
-    if (identifier === undefined) throw new Error('fixture has no Folder identifier')
+    const folder = manifest.resources['Folder']
+    const identifier = folder?.identifiers?.[0]
+    if (folder === undefined || identifier === undefined) {
+      throw new Error('fixture has no Folder identifier')
+    }
     change(identifier)
+    if (rangeRead !== undefined) folder.rangeRead = rangeRead
     const generated = generateContract(manifest)
     expect(generated.errors).toEqual([])
     const text = moduleText(generated, CONTRACT_MODULE_PATH)
@@ -501,16 +517,16 @@ describe('generateContract: list pages (D2)', () => {
       identifier.targeting = 'byProperty'
       identifier.unique = true
       identifier.evidence = { unique: { source: 'curated', note: 'Folder ids never repeat' } }
-    })
+    }, RANGE_READ_SUPPORTED.rangeRead)
 
     expect(descriptor).toContain('    ...t.pageInputs(),')
   })
 
-  it('does not page a list whose identifier is claimed not unique', () => {
+  it('does not page a list whose identifier is claimed not unique, even with a supported range read', () => {
     const descriptor = listFoldersWith((identifier) => {
       identifier.unique = false
       identifier.evidence = { unique: { source: 'curated', note: 'Folder ids can repeat' } }
-    })
+    }, RANGE_READ_SUPPORTED.rangeRead)
 
     expect(descriptor).toContain('  input: t.record({}),')
   })
@@ -518,6 +534,15 @@ describe('generateContract: list pages (D2)', () => {
   it('does not page a list whose identifier is targeted by property with no claim', () => {
     const descriptor = listFoldersWith((identifier) => {
       identifier.targeting = 'byProperty'
+    }, RANGE_READ_SUPPORTED.rangeRead)
+
+    expect(descriptor).toContain('  input: t.record({}),')
+  })
+
+  it('does not page a list whose identifier is claimed unique when no range read is recorded', () => {
+    const descriptor = listFoldersWith((identifier) => {
+      identifier.unique = true
+      identifier.evidence = { unique: { source: 'curated', note: 'Folder ids never repeat' } }
     })
 
     expect(descriptor).toContain('  input: t.record({}),')
@@ -635,10 +660,22 @@ describe('generateContract: paging on real manifests', () => {
     }
   )
 
-  it('pages reminders.reminders.list: its id is claimed unique', async () => {
+  it('pages reminders.reminders.list: its id is claimed unique and its range reads passed', async () => {
     expect(await descriptorOf('reminders', 'reminders.reminders.list')).toContain(
       '    ...t.pageInputs(),'
     )
+  })
+
+  it('does not page music.playlists.list: the app rejects range reads of its playlists', async () => {
+    // Regression: Music answers every range read of its playlists with -1708,
+    // so a paged playlists list failed on every page.
+    const descriptor = await descriptorOf('music', 'music.playlists.list')
+
+    expect(descriptor).not.toContain('t.pageInputs()')
+    expect(descriptor).not.toContain('pageSize')
+    expect(descriptor).not.toContain('cursor')
+    expect(descriptor).toContain('  input: t.record({}),')
+    expect(descriptor).toContain('output: t.page(playlistRecordType)')
   })
 })
 

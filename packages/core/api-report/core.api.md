@@ -309,6 +309,18 @@ export const AppManifestSchema: z.ZodObject<{
                 errorNumber: z.ZodNumber;
             }, z.core.$strict>], "source">;
         }, z.core.$strict>>;
+        rangeRead: z.ZodOptional<z.ZodObject<{
+            supported: z.ZodBoolean;
+            evidence: z.ZodObject<{
+                source: z.ZodLiteral<"probe">;
+                observedAt: z.ZodISODateTime;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
+                note: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>;
+        }, z.core.$strict>>;
     }, z.core.$strip>>;
     enums: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodObject<{
         name: z.ZodString;
@@ -2773,6 +2785,20 @@ export type PureCoarseOperation = (typeof PURE_COARSE_OPERATIONS)[number];
 // @public
 export function quitApp(bundleId: string): Promise<undefined>;
 
+// @public (undocumented)
+export type RangeReadEvidence = z.infer<typeof RangeReadEvidenceSchema>;
+
+// @public
+export const RangeReadEvidenceSchema: z.ZodObject<{
+    source: z.ZodLiteral<"probe">;
+    observedAt: z.ZodISODateTime;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
+    note: z.ZodOptional<z.ZodString>;
+}, z.core.$strict>;
+
 // @public
 export interface RawClass {
     code: string;
@@ -3063,6 +3089,23 @@ export interface ResourceProbeResult {
     runtimeIdentifier: string | undefined;
 }
 
+// @public (undocumented)
+export type ResourceRangeRead = z.infer<typeof ResourceRangeReadSchema>;
+
+// @public
+export const ResourceRangeReadSchema: z.ZodObject<{
+    supported: z.ZodBoolean;
+    evidence: z.ZodObject<{
+        source: z.ZodLiteral<"probe">;
+        observedAt: z.ZodISODateTime;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
+        note: z.ZodOptional<z.ZodString>;
+    }, z.core.$strict>;
+}, z.core.$strict>;
+
 // @public
 export const ResourceSchema: z.ZodObject<{
     name: z.ZodString;
@@ -3249,6 +3292,18 @@ export const ResourceSchema: z.ZodObject<{
             expression: z.ZodString;
             errorNumber: z.ZodNumber;
         }, z.core.$strict>], "source">;
+    }, z.core.$strict>>;
+    rangeRead: z.ZodOptional<z.ZodObject<{
+        supported: z.ZodBoolean;
+        evidence: z.ZodObject<{
+            source: z.ZodLiteral<"probe">;
+            observedAt: z.ZodISODateTime;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
+            note: z.ZodOptional<z.ZodString>;
+        }, z.core.$strict>;
     }, z.core.$strict>>;
 }, z.core.$strip>;
 

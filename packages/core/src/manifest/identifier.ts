@@ -200,16 +200,25 @@ export function resolveListOutputProperties(resource: Resource | undefined): str
  * body, and the runtime's contract registration check all ask it, so they
  * agree by construction.
  *
- * A list pages exactly when its command is the resource-scoped `list` and the
- * resource's primary identifier is claimed unique, with evidence
- * (`unique: true`). Each page is anchored on the identifier of the item just
- * before it, and the anchor check can detect a shift of the collection only if
- * no two items share that value; with adjacent duplicates a shift by one
- * leaves the same value in place, and a page would silently skip or repeat an
- * item. So uniqueness is opt-in: an identifier with no claim, or one claimed
- * not unique, gives a list that reads its whole collection, and so does a
- * resource with no identifier. The claim is independent of how the identifier
- * is targeted.
+ * A list pages exactly when its command is the resource-scoped `list` and
+ * both of these hold, each from curated manifest evidence:
+ *
+ * - The resource's primary identifier is claimed unique (`unique: true`).
+ *   Each page is anchored on the identifier of the item just before it, and
+ *   the anchor check can detect a shift of the collection only if no two
+ *   items share that value; with adjacent duplicates a shift by one leaves
+ *   the same value in place, and a page would silently skip or repeat an
+ *   item. The claim is independent of how the identifier is targeted.
+ * - The resource records that the running app reads a range of its
+ *   collection (`rangeRead.supported: true`), as a live read-only
+ *   observation showed. Every page is read as such a range, and an app that
+ *   rejects it fails every page, so a list never pages on an untested
+ *   collection.
+ *
+ * Anything less gives a list that reads its whole collection as one page: an
+ * identifier with no claim or one claimed not unique, a resource with no
+ * identifier, and a resource whose range read is unobserved or observed to
+ * fail.
  *
  * @param command - The manifest command, by its scope and name.
  * @param resource - The resource the command lists, if any.
@@ -222,5 +231,7 @@ export function listOperationPages(
   resource: Resource | undefined
 ): boolean {
   if (command.scope !== 'resource' || command.name !== 'list') return false
-  return resolvePrimaryIdentifier(resource)?.unique === true
+  return (
+    resolvePrimaryIdentifier(resource)?.unique === true && resource?.rangeRead?.supported === true
+  )
 }

@@ -4,6 +4,7 @@ import {
   DictionarySpellingEvidenceSchema,
   IdentifierUniquenessEvidenceSchema,
   ObservedAtSchema,
+  RangeReadEvidenceSchema,
   ResourceAbsenceEvidenceSchema,
 } from './evidence.js'
 import { resolvePrimaryIdentifierProperty } from '../identifier.js'
@@ -54,7 +55,8 @@ export const IdentifierSchema = z.object({
    * Whether no two items the collection holds at the same time share this
    * identifier's value, as `evidence.unique` shows. Absent means unknown,
    * which is treated as not unique: a list pages only when its resource's
-   * primary identifier is claimed unique (see `listOperationPages`). The
+   * primary identifier is claimed unique, and its resource records a
+   * supported range read (see `listOperationPages`). The
    * claim is curated and independent of `targeting`: a property matched with
    * `byProperty` can be unique, and an id the app names "unique" can repeat.
    * The claim covers the value the runtime reads for this identifier: for
@@ -227,6 +229,48 @@ export const ResourceUnsupportedSchema = z
 export type ResourceUnsupported = z.infer<typeof ResourceUnsupportedSchema>
 
 /**
+ * The marker recording whether the running app reads a range of a resource's
+ * collection, by position, in one request, with the live evidence.
+ *
+ * A list pages only when its resource carries `supported: true` (see
+ * `listOperationPages`): each page is read as such a range, so an app that
+ * rejects the read would fail every page. `supported: false` records a range
+ * read observed to fail, with the error numbers it raised; absent means no
+ * observation, and the resource's lists do not page. The marker is curated
+ * from a read-only observation of the app: no probe writes or changes it.
+ * It covers the collection wherever the resource's lists read it, at the
+ * application or under a parent item.
+ */
+export const ResourceRangeReadSchema = z
+  .object({
+    /** Whether the observed range reads succeeded. */
+    supported: z.boolean(),
+    /** The observation that shows it. */
+    evidence: RangeReadEvidenceSchema,
+  })
+  .strict()
+  .superRefine((marker, ctx) => {
+    const failed = marker.evidence.errorNumbers !== undefined
+    if (!marker.supported && !failed) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'A range read observed to fail records the error numbers it raised: set evidence.errorNumbers.',
+        path: ['evidence', 'errorNumbers'],
+      })
+    }
+    if (marker.supported && failed) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'evidence.errorNumbers records failed range reads, so it cannot support supported: true.',
+        path: ['evidence', 'errorNumbers'],
+      })
+    }
+  })
+export type ResourceRangeRead = z.infer<typeof ResourceRangeReadSchema>
+
+/**
  * Schema for a resource type definition.
  */
 export const ResourceSchema = z
@@ -280,9 +324,23 @@ export const ResourceSchema = z
      * Generated surfaces omit a resource marked unsupported.
      */
     unsupported: ResourceUnsupportedSchema.optional(),
+    /**
+     * Whether the running app reads a range of the resource's collection, with
+     * the live evidence. Absent means unobserved; the resource's lists page
+     * only when it is `supported: true` (see `listOperationPages`).
+     */
+    rangeRead: ResourceRangeReadSchema.optional(),
   })
   .superRefine((resource, ctx) => {
     checkNativeSpellings(resource, ctx)
+    if (resource.rangeRead !== undefined && resource.unsupported !== undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'A resource marked unsupported is never read, so it cannot record whether its collection reads a range.',
+        path: ['rangeRead'],
+      })
+    }
     checkUniquenessClaims(resource.identifiers ?? [], ctx)
     // A resource is addressed by its primary identifier, so the identifier
     // must be readable: it cannot be marked unsupported.

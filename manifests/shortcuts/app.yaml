@@ -27,6 +27,10 @@ resources:
     plural: Shortcuts
     description: A shortcut in the Shortcuts application
     code: srct
+    # No rangeRead: on Shortcuts 10.0 (macOS 27.2), 2026-11-03, read-only pages
+    # of 2 continued by cursor were read as ranges of the collection, but the list
+    # itself fails, paged or not, because a shortcut's color does not decode, so the
+    # list has not passed live and does not page.
     identifiers:
       - property: id
         primary: true
@@ -90,6 +94,15 @@ resources:
           unique:
             source: sdef
             note: 'The app''s scripting dictionary describes the property as "the unique identifier of the folder"'
+    rangeRead:
+      supported: true
+      evidence:
+        source: probe
+        observedAt: '2026-11-03T17:59:44.000Z'
+        bundleId: com.apple.shortcuts
+        appVersion: '10.0'
+        osVersion: '27.2'
+        note: 'Read-only pages of the folders at the application, at page sizes 25, 2 and 1. The collection held one folder, so no page continued past the first.'
     properties:
       name:
         access: rw

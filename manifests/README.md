@@ -261,6 +261,7 @@ resources:
 | `schema`      | string | No       | Reference to JSON Schema file for full data shape                                                                                                                                         |
 | `native`      | object | No       | The app's own spelling of the collection, where it differs from the plural's lower camel case, with dictionary evidence (see [Native spellings](#native-spellings))                       |
 | `unsupported` | object | No       | Marks a resource the app cannot provide (no collection in its dictionary, or every read fails), with evidence (see [Unsupported resources](#unsupported-resources))                       |
+| `rangeRead`   | object | No       | Whether the running app reads a range of the resource's collection, with live evidence; a list pages only when it is `supported: true` (see [Range reads](#range-reads))                  |
 
 #### Properties
 
@@ -546,6 +547,58 @@ resource is rejected, since it would refer to nothing: change the type, or mark
 the property or command unsupported too.
 
 **Schemas:** [`ResourceUnsupportedSchema`](../packages/core/src/manifest/schemas/resource.ts), [`DictionaryAbsenceEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts), [`LiveAbsenceEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts)
+
+##### Range reads
+
+A list returns bounded pages only when the running app was observed to read a
+range of the resource's collection, by position, in one request: each page is
+read that way, and an app that rejects the read fails every page. The
+dictionary does not say whether ranges work, so the marker comes from a live,
+read-only observation of the app, never from the dictionary:
+
+```yaml
+Reminder:
+  name: Reminder
+  plural: Reminders
+  description: A reminder
+  identifiers:
+    - property: id
+      primary: true
+      unique: true
+      evidence: { unique: { source: sdef, note: '...' } }
+  rangeRead:
+    supported: true
+    evidence:
+      source: probe
+      observedAt: '2026-11-03T17:59:10.000Z' # ISO 8601 UTC
+      bundleId: com.apple.reminders
+      appVersion: '7.0'
+      osVersion: '27.2'
+      note: Pages of 25 and of 2, continued by cursor # what was read, never a value
+```
+
+A range read observed to fail is recorded as `supported: false`, with the
+distinct error numbers it raised:
+
+```yaml
+rangeRead:
+  supported: false
+  evidence:
+    source: probe
+    observedAt: '2026-11-03T17:58:53.000Z'
+    bundleId: com.apple.Music
+    appVersion: '1.7.2'
+    osVersion: '27.2'
+    errorNumbers: [-1708] # the request was not understood
+```
+
+A list pages exactly when its resource's primary identifier is claimed unique
+and its resource carries `rangeRead.supported: true`. With no marker, or
+`supported: false`, the list takes no `pageSize` or `cursor` input and returns
+its whole collection as one page. A resource marked `unsupported` records no
+range read.
+
+**Schemas:** [`ResourceRangeReadSchema`](../packages/core/src/manifest/schemas/resource.ts), [`RangeReadEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts)
 
 #### Identifiers
 

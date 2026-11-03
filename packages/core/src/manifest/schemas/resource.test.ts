@@ -236,6 +236,142 @@ describe('ResourceSchema identifier uniqueness claims', () => {
   })
 })
 
+describe('ResourceSchema range read marker', () => {
+  /** Evidence of a passing range read, as a live observation records it. */
+  const PASSED = {
+    source: 'probe',
+    observedAt: '2026-11-03T17:58:53.000Z',
+    bundleId: 'com.example.app',
+    appVersion: '1.0',
+    osVersion: '27.2',
+  }
+  /** Evidence of a range read the app did not understand. */
+  const FAILED = { ...PASSED, errorNumbers: [-1708] }
+
+  /** A resource carrying `rangeRead`, and anything else in `extra`. */
+  function withRangeRead(rangeRead: unknown, extra: Record<string, unknown> = {}) {
+    return ResourceSchema.safeParse({
+      name: 'Item',
+      plural: 'Items',
+      description: 'An item',
+      properties: {},
+      rangeRead,
+      ...extra,
+    })
+  }
+
+  /** The paths of the issues a failed parse reports. */
+  function issuePaths(parsed: ReturnType<typeof withRangeRead>): PropertyKey[][] {
+    return parsed.error?.issues.map((issue) => issue.path) ?? []
+  }
+
+  it('accepts a supported range read with its evidence', () => {
+    const parsed = withRangeRead({ supported: true, evidence: { ...PASSED, note: 'Pages of 2' } })
+
+    expect(parsed.success).toBe(true)
+    expect(parsed.data?.rangeRead).toEqual({
+      supported: true,
+      evidence: { ...PASSED, note: 'Pages of 2' },
+    })
+  })
+
+  it('accepts a failed range read with the error numbers it raised', () => {
+    const parsed = withRangeRead({ supported: false, evidence: FAILED })
+
+    expect(parsed.success).toBe(true)
+    expect(parsed.data?.rangeRead?.evidence.errorNumbers).toEqual([-1708])
+  })
+
+  it('accepts a resource that records no range read', () => {
+    const parsed = ResourceSchema.safeParse({
+      name: 'Item',
+      plural: 'Items',
+      description: 'An item',
+      properties: {},
+    })
+
+    expect(parsed.success).toBe(true)
+    expect(parsed.data?.rangeRead).toBeUndefined()
+  })
+
+  it('rejects a failed range read with no error numbers, at the missing numbers', () => {
+    const parsed = withRangeRead({ supported: false, evidence: PASSED })
+
+    expect(parsed.success).toBe(false)
+    expect(issuePaths(parsed)).toEqual([['rangeRead', 'evidence', 'errorNumbers']])
+  })
+
+  it('rejects a supported range read whose evidence records failures, at the numbers', () => {
+    const parsed = withRangeRead({ supported: true, evidence: FAILED })
+
+    expect(parsed.success).toBe(false)
+    expect(issuePaths(parsed)).toEqual([['rangeRead', 'evidence', 'errorNumbers']])
+  })
+
+  it('rejects a range read marked on a resource marked unsupported, at the marker', () => {
+    const unsupported = {
+      evidence: {
+        source: 'live',
+        observedAt: '2026-11-03T17:58:53.000Z',
+        bundleId: 'com.example.app',
+        appVersion: '1.0',
+        osVersion: '27.2',
+        expression: 'the items collection at the application',
+        errorNumber: -1728,
+      },
+    }
+    const parsed = withRangeRead({ supported: false, evidence: FAILED }, { unsupported })
+
+    expect(parsed.success).toBe(false)
+    expect(issuePaths(parsed)).toEqual([['rangeRead']])
+  })
+
+  it.each([
+    { label: 'no evidence', marker: { supported: true } },
+    { label: 'no supported flag', marker: { evidence: PASSED } },
+    { label: 'an unknown marker field', marker: { supported: true, evidence: PASSED, extra: 1 } },
+    {
+      label: 'a source other than a probe',
+      marker: { supported: true, evidence: { ...PASSED, source: 'sdef' } },
+    },
+    {
+      label: 'a timestamp that is not ISO 8601 UTC',
+      marker: { supported: true, evidence: { ...PASSED, observedAt: '3 Nov 2026' } },
+    },
+    {
+      label: 'no app version',
+      marker: { supported: true, evidence: { ...PASSED, appVersion: undefined } },
+    },
+    {
+      label: 'an empty bundle identifier',
+      marker: { supported: true, evidence: { ...PASSED, bundleId: '' } },
+    },
+    {
+      label: 'no macOS version',
+      marker: { supported: true, evidence: { ...PASSED, osVersion: undefined } },
+    },
+    {
+      label: 'an empty list of error numbers',
+      marker: { supported: false, evidence: { ...PASSED, errorNumbers: [] } },
+    },
+    {
+      label: 'a repeated error number',
+      marker: { supported: false, evidence: { ...PASSED, errorNumbers: [-1708, -1708] } },
+    },
+    {
+      label: 'an error number that is not an integer',
+      marker: { supported: false, evidence: { ...PASSED, errorNumbers: [-17.08] } },
+    },
+    { label: 'an empty note', marker: { supported: true, evidence: { ...PASSED, note: '' } } },
+    {
+      label: 'an unknown evidence field',
+      marker: { supported: true, evidence: { ...PASSED, sampleSize: 3 } },
+    },
+  ])('rejects a marker with $label', ({ marker }) => {
+    expect(withRangeRead(marker).success).toBe(false)
+  })
+})
+
 describe('ResourceSchema plural', () => {
   // A plural is Pascal case letters only, so its lower camel case is always a
   // valid route and permission segment (design record D2; issue #154).

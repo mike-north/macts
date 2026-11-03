@@ -304,7 +304,7 @@ export function operationsFromContract(
       throw new OperationRegistrationError(
         expected.pages
           ? `Contract operation "${descriptor.id}" does not take the paging inputs, but the manifest says its list pages. Regenerate the contract.`
-          : `Contract operation "${descriptor.id}" takes the paging inputs, but the manifest says it does not page: its resource's primary identifier is not claimed unique. Regenerate the contract.`
+          : `Contract operation "${descriptor.id}" takes the paging inputs, but the manifest says it does not page: its resource's primary identifier is not claimed unique, or its range reads are not known to work. Regenerate the contract.`
       )
     }
     return toRegisteredOperation(descriptor, manifest, expected.command)

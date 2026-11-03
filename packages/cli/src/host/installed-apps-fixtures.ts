@@ -101,7 +101,8 @@ function validManifestSource(app: string): string {
         plural: 'Widgets',
         description: 'A widget',
         properties: {},
-        // Claimed unique, so the widget list pages, as its contract declares.
+        // Claimed unique, with range reads that work, so the widget list
+        // pages, as its contract declares.
         identifiers: [
           {
             property: 'id',
@@ -112,6 +113,16 @@ function validManifestSource(app: string): string {
             },
           },
         ],
+        rangeRead: {
+          supported: true,
+          evidence: {
+            source: 'probe',
+            observedAt: '2026-01-15T10:30:00.000Z',
+            bundleId: 'com.example.widgets',
+            appVersion: '1.0',
+            osVersion: '27.2',
+          },
+        },
       },
     },
     enums: {},

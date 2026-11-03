@@ -960,8 +960,8 @@ function listAttempts(): string {
  * `PageWindowResult`): the window's records, the collection's length when it
  * was read, and the identifier of the last record, which anchors the next
  * window (see {@link pagedAttemptReader}). Only a list that pages (see
- * `listOperationPages`: its primary identifier is claimed unique) can read
- * a window. Any other list reads the whole collection and returns
+ * `listOperationPages`: its primary identifier is claimed unique and its
+ * collection is known to read ranges) can read a window. Any other list reads the whole collection and returns
  * its records as an array. Every read goes through the one specifier the body
  * binds ({@link COLLECTION_LOCAL}), so all reads cover the same items.
  *
@@ -1023,7 +1023,8 @@ function listAttempts(): string {
  * app's name for it; every item is keyed by the public names.
  *
  * @throws `InternalError` when `paged` is set for a list that does not page
- *   (see `listOperationPages`): its items cannot be anchored reliably.
+ *   (see `listOperationPages`): its items cannot be anchored reliably, or the
+ *   app is not known to read a range of its collection.
  */
 function buildListBody(
   command: Command,
@@ -1039,7 +1040,7 @@ function buildListBody(
   const declaredIdProperty = resolvePrimaryIdentifierProperty(resource)
   if (paged && (runtimeIdProperty === undefined || !listOperationPages(command, resource))) {
     throw new InternalError(
-      'A list whose primary identifier is not claimed unique cannot be paged.',
+      'A list cannot be paged unless its primary identifier is claimed unique and its collection is known to read ranges.',
       {}
     )
   }

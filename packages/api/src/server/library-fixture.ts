@@ -28,11 +28,29 @@ import {
 
 /**
  * A uniqueness claim, with its evidence, for the fixture's identifiers: a list
- * pages only when its resource's primary identifier is claimed unique.
+ * pages only when its resource's primary identifier is claimed unique, and its
+ * resource records a supported range read ({@link RANGE_READ_SUPPORTED}).
  */
 const UNIQUE_CLAIM = {
   unique: true,
   evidence: { unique: { source: 'curated', note: 'Test fixture: no two items share an id' } },
+} as const
+
+/**
+ * A range read marker for a fixture resource: a list pages only when its
+ * resource also records that the app reads ranges of its collection.
+ */
+const RANGE_READ_SUPPORTED = {
+  rangeRead: {
+    supported: true,
+    evidence: {
+      source: 'probe',
+      observedAt: '2026-01-15T10:30:00.000Z',
+      bundleId: 'com.example.library',
+      appVersion: '1.0',
+      osVersion: '27.2',
+    },
+  },
 } as const
 
 /** The library app's manifest; shelf and book lists page. */
@@ -46,6 +64,7 @@ export const LIBRARY_MANIFEST: AppManifest = {
       description: 'A shelf',
       properties: {},
       identifiers: [{ property: 'code', primary: true, ...UNIQUE_CLAIM }],
+      ...RANGE_READ_SUPPORTED,
     },
     Book: {
       name: 'Book',
@@ -53,6 +72,7 @@ export const LIBRARY_MANIFEST: AppManifest = {
       description: 'A book',
       properties: {},
       identifiers: [{ property: 'isbn', primary: true, ...UNIQUE_CLAIM }],
+      ...RANGE_READ_SUPPORTED,
     },
   },
   enums: {},
