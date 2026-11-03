@@ -23,14 +23,14 @@
 
 import { execFile } from 'node:child_process'
 import { createContext, runInContext } from 'node:vm'
-import type { IssuePath, ValuePlan, WireRecord, WireValue } from '@macts/contracts'
+import type { ValuePlan, WireRecord } from '@macts/contracts'
+import { parseNativeOutcome as parseExecutorOutcome } from '../executor.js'
 import {
   NATIVE_CODEC_ERROR_NAME,
   NATIVE_DECODE_FUNCTION,
   NATIVE_ENCODE_FUNCTION,
   type NativeCodec,
   type NativeCodecEnvironment,
-  type NativeFailure,
   type NativeOutcome,
   type NativeReferenceTable,
 } from '../native-codec.js'
@@ -150,76 +150,19 @@ JSON.stringify(__mactsOutcome);
 `
 }
 
-/** Whether a value is a non-array object. */
-function isObject(value: unknown): value is Readonly<Record<string, unknown>> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
-
-/** Whether a value is an issue path: strings and numbers only. */
-function isIssuePath(value: unknown): value is IssuePath {
-  return (
-    Array.isArray(value) &&
-    value.every((step) => typeof step === 'string' || typeof step === 'number')
-  )
-}
-
-/** Validates the failure half of a parsed outcome. */
-function parseFailure(value: unknown): NativeFailure {
-  if (!isObject(value) || typeof value['message'] !== 'string') {
-    throw new Error(`Malformed native failure: ${JSON.stringify(value)}`)
-  }
-  const message = value['message']
-  if (value['source'] === 'codec') {
-    const direction = value['direction']
-    const path = value['path']
-    if ((direction !== 'decode' && direction !== 'encode') || !isIssuePath(path)) {
-      throw new Error(`Malformed codec failure: ${JSON.stringify(value)}`)
-    }
-    const unsupportedKind = value['unsupportedKind']
-    const missingResource = value['missingResource']
-    if (
-      (unsupportedKind !== undefined && typeof unsupportedKind !== 'string') ||
-      (missingResource !== undefined && typeof missingResource !== 'string')
-    ) {
-      throw new Error(`Malformed codec failure: ${JSON.stringify(value)}`)
-    }
-    return {
-      source: 'codec',
-      direction,
-      path,
-      message,
-      ...(unsupportedKind === undefined ? {} : { unsupportedKind }),
-      ...(missingResource === undefined ? {} : { missingResource }),
-    }
-  }
-  if (value['source'] === 'collection') return { source: 'collection', message }
-  if (value['source'] === 'app') {
-    const errorNumber = value['errorNumber']
-    return typeof errorNumber === 'number'
-      ? { source: 'app', message, errorNumber }
-      : { source: 'app', message }
-  }
-  throw new Error(`Malformed native failure source: ${JSON.stringify(value)}`)
-}
-
 /**
- * Parses the automation process's stdout into a {@link NativeOutcome}.
- * The `value` of a success is returned as parsed JSON.
+ * Parses the automation process's stdout into a {@link NativeOutcome}, by the
+ * same rules the native executor reads it with (`parseNativeOutcome` in
+ * `../executor.ts`): an outcome real execution would refuse as malformed is
+ * refused here too, so a test cannot pass on it. A malformed outcome throws,
+ * naming what is wrong with it.
  */
 export function parseNativeOutcome(stdout: string): NativeOutcome {
-  const parsed: unknown = JSON.parse(stdout.trim())
-  if (!isObject(parsed)) {
-    throw new Error(`Malformed native outcome: ${stdout}`)
+  const outcome = parseExecutorOutcome(stdout)
+  if (typeof outcome === 'string') {
+    throw new Error(`Malformed native outcome: ${outcome}`)
   }
-  if (parsed['ok'] === true) {
-    // The outcome was produced by `JSON.stringify`, so its value is JSON.
-    const value = parsed['value'] as WireValue
-    return { ok: true, value }
-  }
-  if (parsed['ok'] === false) {
-    return { ok: false, failure: parseFailure(parsed['failure']) }
-  }
-  throw new Error(`Malformed native outcome: ${stdout}`)
+  return outcome
 }
 
 /** Options for {@link runNativeScript}. */
