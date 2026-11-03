@@ -8,6 +8,8 @@
  * statuses follow the phases/13 D6 table.
  *
  * @see phases/13-sdk-value-and-execution-contracts.md (D5, D6)
+ * @see https://www.rfc-editor.org/rfc/rfc7235#section-4.1
+ * @see https://www.rfc-editor.org/rfc/rfc6750#section-3
  * @packageDocumentation
  */
 
@@ -354,6 +356,41 @@ describe('E2E: API Server', () => {
       expect(body.error.code).toBe('UNAUTHENTICATED')
       expect(body.error.details).toEqual({ reason: 'revoked' })
       expect(executor.requests).toHaveLength(0)
+    })
+
+    it('should answer 401 with a Bearer challenge for a deleted key, from the next request on', async () => {
+      const { token, metadata } = await runtime.createApiKey({
+        name: 'e2e-delete-key',
+        permissions: ['testapp:items:list'],
+      })
+      const app = appWith()
+      const request = (): Promise<Response> =>
+        Promise.resolve(
+          app.request('/api/v1/rpc/testapp.items.list', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({}),
+          })
+        )
+
+      // The key works, so its status is cached in this process.
+      expect((await request()).status).toBe(200)
+
+      expect(runtime.deleteKeyMetadata(metadata.id)).toBe(true)
+
+      const res = await request()
+      expect(res.status).toBe(401)
+      // RFC 7235 §4.1: a 401 carries a challenge; RFC 6750 §3 names the scheme.
+      expect(res.headers.get('WWW-Authenticate')).toBe('Bearer')
+      const body = (await res.json()) as ErrorResponse
+      expect(body.error.code).toBe('UNAUTHENTICATED')
+      // Answered like a key that cannot be verified, revealing nothing more.
+      expect(body.error.details).toEqual({ reason: 'invalid' })
+      expect(JSON.stringify(body)).not.toContain(token)
+      expect(executor.requests).toHaveLength(1)
     })
 
     it('should allow requests with a non-revoked key', async () => {

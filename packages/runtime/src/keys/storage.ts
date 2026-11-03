@@ -30,6 +30,7 @@ import { getLogger } from '../logger.js'
 import { getMactsHome } from '../paths.js'
 import { deriveEncryptionKey, encrypt, decrypt } from './encryption.js'
 import { loadSqlite, runInTransaction } from './sqlite.js'
+import { clearKeyStatusCache, invalidateKeyStatus } from './key-status-cache.js'
 
 /**
  * Default directory for macts configuration.
@@ -382,13 +383,15 @@ function rowToMetadata(row: KeyRow): ApiKeyMetadata {
  * process; it is also closed automatically on exit and on `SIGINT`/`SIGTERM`.
  * Call this from a long-lived host that wants to release the database file
  * deterministically (graceful shutdown, or before switching `MACTS_HOME`).
- * The next store operation reopens it.
+ * The next store operation reopens it, possibly on a different database, so
+ * cached key statuses are dropped with the connection.
  */
 export function closeKeyStore(): void {
   if (db) {
     db.close()
     db = null
   }
+  clearKeyStatusCache()
 }
 
 // =============================================================================
@@ -542,6 +545,8 @@ export function saveKeyMetadata(keys: ApiKeyMetadata[]): void {
     // later key issued with the same id.
     dropOrphanedPolicies.run()
   })
+  // Any key may have been removed or had its revocation changed.
+  clearKeyStatusCache()
 }
 
 /**
@@ -647,6 +652,7 @@ export function updateKeyMetadata(
       encrypted.keyPrefix,
       keyId
     )
+  invalidateKeyStatus(keyId)
 
   // Return metadata from plaintext values (avoid extra decrypt)
   return {
@@ -690,6 +696,7 @@ export function getKeyMetadata(keyId: string): ApiKeyMetadata | undefined {
 export function revokeKey(keyId: string): boolean {
   const database = getDb()
   const result = database.prepare('UPDATE api_keys SET revoked = 1 WHERE id = ?').run(keyId)
+  invalidateKeyStatus(keyId)
   return result.changes > 0
 }
 
@@ -707,24 +714,64 @@ export function deleteKeyMetadata(keyId: string): boolean {
     database.prepare('DELETE FROM api_key_policies WHERE key_id = ?').run(keyId)
     return database.prepare('DELETE FROM api_keys WHERE id = ?').run(keyId)
   })
+  invalidateKeyStatus(keyId)
   return result.changes > 0
 }
 
 /**
- * Check if a key ID has been revoked.
+ * What the key store holds for a key id.
  *
- * This is an optimized query that only checks revocation status.
- *
- * @param keyId - Key ID to check
- * @returns True if the key exists and is revoked
+ * - `active`: a stored record exists and is not revoked.
+ * - `revoked`: a stored record exists and is marked revoked.
+ * - `missing`: no record is stored, because the key was deleted or was never
+ *   stored. A key's record is what keeps it usable, so a correctly signed key
+ *   in this state is refused like a revoked one.
  */
-export function isKeyRevoked(keyId: string): boolean {
+export type KeyRecordStatus = 'active' | 'revoked' | 'missing'
+
+/**
+ * Look up the stored status of a key id.
+ *
+ * Reads only the revocation column, so it is cheap enough to run on every
+ * validation. It always reads the database; validation's per-process cache sits
+ * in front of it.
+ *
+ * This reports a stored record's status; it is not an authorization check. A
+ * key may be used only when its token also verifies, which `validateApiKey`
+ * decides.
+ *
+ * @param keyId - Key ID to look up (the token's `sub` claim)
+ * @returns The key's {@link KeyRecordStatus}
+ */
+export function getKeyRecordStatus(keyId: string): KeyRecordStatus {
   const database = getDb()
   const row = database.prepare('SELECT revoked FROM api_keys WHERE id = ?').get(keyId) as
     | { revoked: number }
     | undefined
 
-  return row?.revoked === 1
+  if (row === undefined) {
+    return 'missing'
+  }
+  return row.revoked === 1 ? 'revoked' : 'active'
+}
+
+/**
+ * Check whether a key id has a stored record that is marked revoked.
+ *
+ * @remarks
+ * Never use this to decide whether a key may be used. It returns `false` for a
+ * key with no stored record, which validation refuses. It answers only "is
+ * there a stored record marked revoked". Use `validateApiKey` to authorize a
+ * key, and {@link getKeyRecordStatus} to tell active, revoked and missing keys
+ * apart.
+ *
+ * @deprecated Use {@link getKeyRecordStatus}; `isKeyRevoked(id)` equals
+ *   `getKeyRecordStatus(id) === 'revoked'`.
+ * @param keyId - Key ID to check
+ * @returns True if the key has a stored record and it is revoked
+ */
+export function isKeyRevoked(keyId: string): boolean {
+  return getKeyRecordStatus(keyId) === 'revoked'
 }
 
 // =============================================================================

@@ -104,12 +104,24 @@ export interface ApiKeyMetadata {
 
 /**
  * Error codes for API key validation failures.
+ *
+ * @remarks
+ * - `INVALID_FORMAT`: not a macts API key, or not a parseable token.
+ * - `INVALID_SIGNATURE`: not signed with this host's signing secret.
+ * - `EXPIRED`: past the expiry the key was issued with.
+ * - `REVOKED`: the key's stored record marks it revoked.
+ * - `UNKNOWN_KEY`: correctly signed, but the key store holds no record for it,
+ *   because the key was deleted or never stored. A key is only valid while its
+ *   record exists.
+ * - `MALFORMED_PAYLOAD`: correctly signed, but the claims are not a valid key
+ *   payload.
  */
 export type ApiKeyValidationErrorCode =
   | 'INVALID_FORMAT'
   | 'INVALID_SIGNATURE'
   | 'EXPIRED'
   | 'REVOKED'
+  | 'UNKNOWN_KEY'
   | 'MALFORMED_PAYLOAD'
 
 /**

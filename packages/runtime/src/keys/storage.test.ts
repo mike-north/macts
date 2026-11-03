@@ -319,25 +319,45 @@ describe('storage integration', () => {
       expect(result).toBe(false)
     })
 
-    describe('isKeyRevoked', () => {
-      it('should return true for revoked key', () => {
+    describe('getKeyRecordStatus', () => {
+      it('should report a revoked key as revoked', () => {
         storage.addKeyMetadata(createTestMetadata('key_revoked'))
         storage.revokeKey('key_revoked')
 
-        const isRevoked = storage.isKeyRevoked('key_revoked')
-        expect(isRevoked).toBe(true)
+        expect(storage.getKeyRecordStatus('key_revoked')).toBe('revoked')
       })
 
-      it('should return false for active key', () => {
+      it('should report an unrevoked stored key as active', () => {
         storage.addKeyMetadata(createTestMetadata('key_active'))
 
-        const isRevoked = storage.isKeyRevoked('key_active')
-        expect(isRevoked).toBe(false)
+        expect(storage.getKeyRecordStatus('key_active')).toBe('active')
       })
 
-      it('should return false for non-existent key', () => {
-        const isRevoked = storage.isKeyRevoked('key_nonexistent')
-        expect(isRevoked).toBe(false)
+      it('should report a key that was never stored as missing, not as active', () => {
+        expect(storage.getKeyRecordStatus('key_nonexistent')).toBe('missing')
+      })
+
+      it('should report a deleted key as missing', () => {
+        storage.addKeyMetadata(createTestMetadata('key_deleted'))
+        storage.deleteKeyMetadata('key_deleted')
+
+        expect(storage.getKeyRecordStatus('key_deleted')).toBe('missing')
+      })
+    })
+
+    describe('isKeyRevoked (deprecated)', () => {
+      it('is true only for a stored record marked revoked', () => {
+        storage.addKeyMetadata(createTestMetadata('key_revoked'))
+        storage.revokeKey('key_revoked')
+        storage.addKeyMetadata(createTestMetadata('key_active'))
+
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        expect(storage.isKeyRevoked('key_revoked')).toBe(true)
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        expect(storage.isKeyRevoked('key_active')).toBe(false)
+        // No record is not "revoked"; validation refuses such keys separately.
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        expect(storage.isKeyRevoked('key_nonexistent')).toBe(false)
       })
     })
   })

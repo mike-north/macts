@@ -38,6 +38,9 @@ vi.mock('./storage.js', async () => {
     getSigningSecret: vi.fn().mockResolvedValue('test-secret-key-for-coherence'),
     addKeyMetadata: vi.fn().mockResolvedValue(undefined),
     generateKeyId: vi.fn().mockReturnValue('key_coherence'),
+    // Keys are not written to a store here, so report every key as stored and
+    // unrevoked; validation refuses a key with no stored record.
+    getKeyRecordStatus: vi.fn().mockReturnValue('active'),
   }
 })
 

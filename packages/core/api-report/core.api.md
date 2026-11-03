@@ -42,7 +42,7 @@ export interface ApiKeyPayload {
 }
 
 // @public
-export type ApiKeyValidationErrorCode = 'INVALID_FORMAT' | 'INVALID_SIGNATURE' | 'EXPIRED' | 'REVOKED' | 'MALFORMED_PAYLOAD';
+export type ApiKeyValidationErrorCode = 'INVALID_FORMAT' | 'INVALID_SIGNATURE' | 'EXPIRED' | 'REVOKED' | 'UNKNOWN_KEY' | 'MALFORMED_PAYLOAD';
 
 // @public
 export interface ApiKeyValidationFailure {
