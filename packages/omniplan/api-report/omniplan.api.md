@@ -132,12 +132,8 @@ export class MilestoneResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: MilestoneCreateInput): Promise<Milestone>;
     get(id: string): Promise<Milestone>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(): Promise<{
         items: Milestone[];
-        nextCursor?: string;
     }>;
 }
 
@@ -211,12 +207,8 @@ export interface ProjectCreateInput {
 export class ProjectResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Project>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(): Promise<{
         items: Project[];
-        nextCursor?: string;
     }>;
 }
 
@@ -269,12 +261,8 @@ export class ResourceResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: ResourceCreateInput): Promise<Resource>;
     get(id: string): Promise<Resource>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(): Promise<{
         items: Resource[];
-        nextCursor?: string;
     }>;
 }
 
@@ -417,12 +405,8 @@ export class TaskResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: TaskCreateInput): Promise<Task>;
     get(id: string): Promise<Task>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(): Promise<{
         items: Task[];
-        nextCursor?: string;
     }>;
 }
 

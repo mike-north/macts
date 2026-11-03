@@ -21,21 +21,10 @@ export class GraphicResourceClient {
   }
 
   /**
-   * List graphics, one page at a time. When the result has a `nextCursor`,
-   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
+   * List all graphics, as one page.
    */
-  async list(
-    canvasId: string,
-    page: { pageSize?: number; cursor?: string } = {}
-  ): Promise<{ items: Graphic[]; nextCursor?: string }> {
-    return this.#http.rpc<{ items: Graphic[]; nextCursor?: string }>(
-      `${this.#app}.${this.#resource}.list`,
-      {
-        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-        canvasId,
-      }
-    )
+  async list(canvasId: string): Promise<{ items: Graphic[] }> {
+    return this.#http.rpc<{ items: Graphic[] }>(`${this.#app}.${this.#resource}.list`, { canvasId })
   }
 
   /**

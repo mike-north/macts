@@ -22,7 +22,7 @@ export type AccountCreateInput = Record<string, never>;
 // @public
 export interface AccountResourceClient {
     get(name: string, options?: CallOptions): Promise<Account>;
-    list(page?: PageRequest, options?: CallOptions): Promise<Page<Account>>;
+    list(options?: CallOptions): Promise<Page<Account>>;
 }
 
 // @public
@@ -64,7 +64,7 @@ export interface FolderCreateInput {
 // @public
 export interface FolderResourceClient {
     get(name: string, options?: CallOptions): Promise<Folder>;
-    list(page?: PageRequest, options?: CallOptions): Promise<Page<Folder>>;
+    list(options?: CallOptions): Promise<Page<Folder>>;
 }
 
 // @public
@@ -94,7 +94,7 @@ export interface NoteCreateInput {
 export interface NoteResourceClient {
     create(input: NoteCreateInput, options?: CallOptions): Promise<Note>;
     get(name: string, options?: CallOptions): Promise<Note>;
-    list(page?: PageRequest, options?: CallOptions): Promise<Page<Note>>;
+    list(options?: CallOptions): Promise<Page<Note>>;
     show(name: string, options?: CallOptions): Promise<void>;
 }
 

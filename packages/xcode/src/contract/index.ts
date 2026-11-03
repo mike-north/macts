@@ -951,14 +951,8 @@ export interface TestFailureUpdateInput {
  * all objects and commands in Xcode
  */
 export interface WorkspaceDocumentResourceClient {
-  /**
-   * List workspace documents, one page at a time.
-   *
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
-   */
-  list(page?: PageRequest, options?: CallOptions): Promise<Page<WorkspaceDocument>>
+  /** List workspace documents, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<WorkspaceDocument>>
   /**
    * Read the workspace document identified by `name`.
    *
@@ -1100,18 +1094,11 @@ export interface SchemeResourceClient {
  */
 export interface RunDestinationResourceClient {
   /**
-   * List run destinations, one page at a time.
+   * List run destinations, as one page holding all of them.
    *
    * @param workspaceName - Workspace document name. Does not accept null.
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
    */
-  list(
-    workspaceName: string,
-    page?: PageRequest,
-    options?: CallOptions
-  ): Promise<Page<RunDestination>>
+  list(workspaceName: string, options?: CallOptions): Promise<Page<RunDestination>>
   /**
    * Read the run destination identified by `name`.
    *
@@ -1551,34 +1538,19 @@ const resources: AppContract<XcodeClient>['resources'] = {
 }
 
 const workspaceDocumentListWorkspaceDocumentsOperation: OperationDescriptor<
-  PageRequest,
+  Record<string, never>,
   Page<WorkspaceDocument>
 > = {
   id: 'xcode.workspaceDocuments.list',
   permission: 'xcode:workspaceDocuments:list',
   target: { command: 'listWorkspaceDocuments', resource: 'WorkspaceDocument' },
   description: 'List all workspace documents',
-  input: t.record({
-    ...t.pageInputs(),
-  }),
+  input: t.record({}),
   output: t.page(workspaceDocumentRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
@@ -1713,7 +1685,7 @@ const schemeGetSchemeOperation: OperationDescriptor<{ readonly id: string }, Sch
 }
 
 const runDestinationListRunDestinationsOperation: OperationDescriptor<
-  { readonly workspaceName: string } & PageRequest,
+  { readonly workspaceName: string },
   Page<RunDestination>
 > = {
   id: 'xcode.runDestinations.list',
@@ -1722,27 +1694,12 @@ const runDestinationListRunDestinationsOperation: OperationDescriptor<
   description: 'List all run destinations in a workspace',
   input: t.record({
     workspaceName: t.string({ description: 'Workspace document name' }),
-    ...t.pageInputs(),
   }),
   output: t.page(runDestinationRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      workspaceName: { type: 'string', description: 'Workspace document name' },
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: { workspaceName: { type: 'string', description: 'Workspace document name' } },
     required: ['workspaceName'],
     additionalProperties: false,
   },
@@ -2273,8 +2230,8 @@ const operations: AppContract<XcodeClient>['operations'] = {
 function bind(runtime: ClientRuntime): XcodeClient {
   return {
     workspaceDocuments: {
-      list: (page, options) =>
-        runtime.invoke(workspaceDocumentListWorkspaceDocumentsOperation, { ...page }, options),
+      list: (options) =>
+        runtime.invoke(workspaceDocumentListWorkspaceDocumentsOperation, {}, options),
       get: (name, options) =>
         runtime.invoke(workspaceDocumentGetWorkspaceDocumentOperation, { name }, options),
       build: (workspaceName, options) =>
@@ -2334,12 +2291,8 @@ function bind(runtime: ClientRuntime): XcodeClient {
       get: (id, options) => runtime.invoke(schemeGetSchemeOperation, { id }, options),
     },
     runDestinations: {
-      list: (workspaceName, page, options) =>
-        runtime.invoke(
-          runDestinationListRunDestinationsOperation,
-          { ...page, workspaceName },
-          options
-        ),
+      list: (workspaceName, options) =>
+        runtime.invoke(runDestinationListRunDestinationsOperation, { workspaceName }, options),
       get: (name, options) =>
         runtime.invoke(runDestinationGetRunDestinationOperation, { name }, options),
     },

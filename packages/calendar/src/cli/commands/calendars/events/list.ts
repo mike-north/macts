@@ -17,24 +17,15 @@ export class ListEventsCommand extends Command {
     required: true,
     description: 'Calendar identifier',
   })
-  pageSize = Option.String('--page-size', {
-    description: 'The most items to show, from 1 to 100 (default 25)',
-  })
-  cursor = Option.String('--cursor', {
-    description: 'Continue from the previous page, as its output says',
-  })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      const page = await client.events.list(this.calendarId, {
-        ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }),
-        ...(this.cursor === undefined ? {} : { cursor: this.cursor }),
-      })
+      const page = await client.events.list(this.calendarId)
 
-      const output = formatter.formatPage(
+      const output = formatter.formatList(
         page.items.map((item) => ({
           summary: item.summary,
           description: item.description,
@@ -49,8 +40,7 @@ export class ListEventsCommand extends Command {
           excludedDates: item.excludedDates,
           uid: item.uid,
           url: item.url,
-        })),
-        page.nextCursor
+        }))
       )
 
       this.context.stdout.write(output + '\n')

@@ -183,6 +183,13 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "The unique identifier of the window."',
+            },
+          },
         },
       ],
     },
@@ -225,6 +232,13 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "Unique ID of the tab."',
+            },
+          },
         },
       ],
     },
@@ -260,6 +274,13 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "Unique ID of the bookmark folder."',
+            },
+          },
         },
       ],
     },
@@ -302,6 +323,13 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "Unique ID of the bookmark item."',
+            },
+          },
         },
       ],
     },

@@ -212,7 +212,7 @@ export type RunDestinationCreateInput = Record<string, never>;
 // @public
 export interface RunDestinationResourceClient {
     get(name: string, options?: CallOptions): Promise<RunDestination>;
-    list(workspaceName: string, page?: PageRequest, options?: CallOptions): Promise<Page<RunDestination>>;
+    list(workspaceName: string, options?: CallOptions): Promise<Page<RunDestination>>;
 }
 
 // @public
@@ -390,7 +390,7 @@ export interface WorkspaceDocumentResourceClient {
     clean(workspaceName: string, options?: CallOptions): Promise<void>;
     debug(workspaceName: string, scheme?: string, runDestinationSpecifier?: string, skipBuilding?: boolean, commandLineArguments?: unknown, environmentVariables?: unknown, options?: CallOptions): Promise<void>;
     get(name: string, options?: CallOptions): Promise<WorkspaceDocument>;
-    list(page?: PageRequest, options?: CallOptions): Promise<Page<WorkspaceDocument>>;
+    list(options?: CallOptions): Promise<Page<WorkspaceDocument>>;
     run(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown, options?: CallOptions): Promise<void>;
     stop(workspaceName: string, options?: CallOptions): Promise<void>;
     test(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown, options?: CallOptions): Promise<void>;

@@ -25,7 +25,6 @@ import {
   type ClientRuntime,
   type OperationDescriptor,
   type Page,
-  type PageRequest,
   type ValueType,
 } from '@macts/contracts'
 
@@ -75,14 +74,8 @@ export interface DocumentUpdateInput {
 
 /** A system profile document */
 export interface DocumentResourceClient {
-  /**
-   * List documents, one page at a time.
-   *
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
-   */
-  list(page?: PageRequest, options?: CallOptions): Promise<Page<Document>>
+  /** List documents, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Document>>
   /**
    * Read the document identified by `name`.
    *
@@ -136,32 +129,17 @@ const resources: AppContract<SystemInformationClient>['resources'] = {
   },
 }
 
-const documentListOperation: OperationDescriptor<PageRequest, Page<Document>> = {
+const documentListOperation: OperationDescriptor<Record<string, never>, Page<Document>> = {
   id: 'system-information.documents.list',
   permission: 'system-information:documents:list',
   target: { command: 'list', resource: 'Document' },
   description: 'List all system profile documents',
-  input: t.record({
-    ...t.pageInputs(),
-  }),
+  input: t.record({}),
   output: t.page(documentRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
@@ -210,7 +188,7 @@ const operations: AppContract<SystemInformationClient>['operations'] = {
 function bind(runtime: ClientRuntime): SystemInformationClient {
   return {
     documents: {
-      list: (page, options) => runtime.invoke(documentListOperation, { ...page }, options),
+      list: (options) => runtime.invoke(documentListOperation, {}, options),
       get: (name, options) => runtime.invoke(documentGetOperation, { name }, options),
     },
     send: (options) => runtime.invoke(appSendOperation, {}, options),

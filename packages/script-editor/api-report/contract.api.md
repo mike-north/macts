@@ -7,7 +7,6 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Page } from '@macts/contracts';
-import { PageRequest } from '@macts/contracts';
 
 // @public
 export interface Document {
@@ -29,7 +28,7 @@ export interface DocumentCreateInput {
 export interface DocumentResourceClient {
     create(input: DocumentCreateInput, options?: CallOptions): Promise<Document>;
     get(name: string, options?: CallOptions): Promise<Document>;
-    list(page?: PageRequest, options?: CallOptions): Promise<Page<Document>>;
+    list(options?: CallOptions): Promise<Page<Document>>;
 }
 
 // @public

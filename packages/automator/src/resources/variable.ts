@@ -21,21 +21,12 @@ export class VariableResourceClient {
   }
 
   /**
-   * List variables, one page at a time. When the result has a `nextCursor`,
-   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
+   * List all variables, as one page.
    */
-  async list(
-    workflowName: string,
-    page: { pageSize?: number; cursor?: string } = {}
-  ): Promise<{ items: Variable[]; nextCursor?: string }> {
-    return this.#http.rpc<{ items: Variable[]; nextCursor?: string }>(
-      `${this.#app}.${this.#resource}.list`,
-      {
-        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-        workflowName,
-      }
-    )
+  async list(workflowName: string): Promise<{ items: Variable[] }> {
+    return this.#http.rpc<{ items: Variable[] }>(`${this.#app}.${this.#resource}.list`, {
+      workflowName,
+    })
   }
 
   /**

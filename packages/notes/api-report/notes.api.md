@@ -20,12 +20,8 @@ export type AccountCreateInput = Record<string, never>;
 export class AccountResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<Account>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(): Promise<{
         items: Account[];
-        nextCursor?: string;
     }>;
 }
 
@@ -111,12 +107,8 @@ export interface FolderCreateInput {
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<Folder>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(): Promise<{
         items: Folder[];
-        nextCursor?: string;
     }>;
 }
 
@@ -159,12 +151,8 @@ export class NoteResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: NoteCreateInput): Promise<Note>;
     get(name: string): Promise<Note>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(): Promise<{
         items: Note[];
-        nextCursor?: string;
     }>;
     show(name: string): Promise<void>;
 }

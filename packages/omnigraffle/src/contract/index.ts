@@ -26,7 +26,6 @@ import {
   type Integer,
   type OperationDescriptor,
   type Page,
-  type PageRequest,
   type Point,
   type Rgb,
   type ValueType,
@@ -1349,14 +1348,8 @@ export interface ExportSettingsUpdateInput {
 
 /** A drawing page/canvas in OmniGraffle */
 export interface CanvasResourceClient {
-  /**
-   * List canvases, one page at a time.
-   *
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
-   */
-  list(page?: PageRequest, options?: CallOptions): Promise<Page<Canvas>>
+  /** List canvases, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Canvas>>
   /**
    * Read the canvas identified by `id`.
    *
@@ -1370,14 +1363,11 @@ export interface CanvasResourceClient {
 /** Base class for visual elements in OmniGraffle */
 export interface GraphicResourceClient {
   /**
-   * List graphics, one page at a time.
+   * List graphics, as one page holding all of them.
    *
    * @param canvasId - Canvas identifier. Does not accept null.
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
    */
-  list(canvasId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Graphic>>
+  list(canvasId: string, options?: CallOptions): Promise<Page<Graphic>>
   /**
    * Read the graphic identified by `id`.
    *
@@ -1389,14 +1379,11 @@ export interface GraphicResourceClient {
 /** A shape graphic in OmniGraffle */
 export interface ShapeResourceClient {
   /**
-   * List shapes, one page at a time.
+   * List shapes, as one page holding all of them.
    *
    * @param canvasId - Canvas identifier. Does not accept null.
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
    */
-  list(canvasId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Shape>>
+  list(canvasId: string, options?: CallOptions): Promise<Page<Shape>>
   /**
    * Read the shape identified by `id`.
    *
@@ -1410,14 +1397,11 @@ export interface ShapeResourceClient {
 /** A line/connector in OmniGraffle */
 export interface LineResourceClient {
   /**
-   * List lines, one page at a time.
+   * List lines, as one page holding all of them.
    *
    * @param canvasId - Canvas identifier. Does not accept null.
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
    */
-  list(canvasId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Line>>
+  list(canvasId: string, options?: CallOptions): Promise<Page<Line>>
   /**
    * Read the line identified by `id`.
    *
@@ -1429,14 +1413,11 @@ export interface LineResourceClient {
 /** A drawing layer in OmniGraffle */
 export interface LayerResourceClient {
   /**
-   * List layers, one page at a time.
+   * List layers, as one page holding all of them.
    *
    * @param canvasId - Canvas identifier. Does not accept null.
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
    */
-  list(canvasId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Layer>>
+  list(canvasId: string, options?: CallOptions): Promise<Page<Layer>>
   /**
    * Read the layer identified by `name`.
    *
@@ -1937,32 +1918,17 @@ const resources: AppContract<OmniGraffleClient>['resources'] = {
   },
 }
 
-const canvasListCanvasesOperation: OperationDescriptor<PageRequest, Page<Canvas>> = {
+const canvasListCanvasesOperation: OperationDescriptor<Record<string, never>, Page<Canvas>> = {
   id: 'omnigraffle.canvases.list',
   permission: 'omnigraffle:canvases:list',
   target: { command: 'listCanvases', resource: 'Canvas' },
   description: 'List all canvases',
-  input: t.record({
-    ...t.pageInputs(),
-  }),
+  input: t.record({}),
   output: t.page(canvasRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
@@ -2099,7 +2065,7 @@ const canvasCreateCanvasOperation: OperationDescriptor<CanvasCreateInput, Canvas
 }
 
 const graphicListGraphicsOperation: OperationDescriptor<
-  { readonly canvasId: string } & PageRequest,
+  { readonly canvasId: string },
   Page<Graphic>
 > = {
   id: 'omnigraffle.graphics.list',
@@ -2108,27 +2074,12 @@ const graphicListGraphicsOperation: OperationDescriptor<
   description: 'List all graphics on a canvas',
   input: t.record({
     canvasId: t.string({ description: 'Canvas identifier' }),
-    ...t.pageInputs(),
   }),
   output: t.page(graphicRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      canvasId: { type: 'string', description: 'Canvas identifier' },
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: { canvasId: { type: 'string', description: 'Canvas identifier' } },
     required: ['canvasId'],
     additionalProperties: false,
   },
@@ -2152,37 +2103,19 @@ const graphicGetGraphicOperation: OperationDescriptor<{ readonly id: string }, G
   },
 }
 
-const shapeListShapesOperation: OperationDescriptor<
-  { readonly canvasId: string } & PageRequest,
-  Page<Shape>
-> = {
+const shapeListShapesOperation: OperationDescriptor<{ readonly canvasId: string }, Page<Shape>> = {
   id: 'omnigraffle.shapes.list',
   permission: 'omnigraffle:shapes:list',
   target: { command: 'listShapes', resource: 'Shape' },
   description: 'List all shapes on a canvas',
   input: t.record({
     canvasId: t.string({ description: 'Canvas identifier' }),
-    ...t.pageInputs(),
   }),
   output: t.page(shapeRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      canvasId: { type: 'string', description: 'Canvas identifier' },
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: { canvasId: { type: 'string', description: 'Canvas identifier' } },
     required: ['canvasId'],
     additionalProperties: false,
   },
@@ -2409,37 +2342,19 @@ const shapeCreateShapeOperation: OperationDescriptor<ShapeCreateInput, Shape> = 
   },
 }
 
-const lineListLinesOperation: OperationDescriptor<
-  { readonly canvasId: string } & PageRequest,
-  Page<Line>
-> = {
+const lineListLinesOperation: OperationDescriptor<{ readonly canvasId: string }, Page<Line>> = {
   id: 'omnigraffle.lines.list',
   permission: 'omnigraffle:lines:list',
   target: { command: 'listLines', resource: 'Line' },
   description: 'List all lines on a canvas',
   input: t.record({
     canvasId: t.string({ description: 'Canvas identifier' }),
-    ...t.pageInputs(),
   }),
   output: t.page(lineRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      canvasId: { type: 'string', description: 'Canvas identifier' },
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: { canvasId: { type: 'string', description: 'Canvas identifier' } },
     required: ['canvasId'],
     additionalProperties: false,
   },
@@ -2463,37 +2378,19 @@ const lineGetLineOperation: OperationDescriptor<{ readonly id: string }, Line> =
   },
 }
 
-const layerListLayersOperation: OperationDescriptor<
-  { readonly canvasId: string } & PageRequest,
-  Page<Layer>
-> = {
+const layerListLayersOperation: OperationDescriptor<{ readonly canvasId: string }, Page<Layer>> = {
   id: 'omnigraffle.layers.list',
   permission: 'omnigraffle:layers:list',
   target: { command: 'listLayers', resource: 'Layer' },
   description: 'List all layers on a canvas',
   input: t.record({
     canvasId: t.string({ description: 'Canvas identifier' }),
-    ...t.pageInputs(),
   }),
   output: t.page(layerRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      canvasId: { type: 'string', description: 'Canvas identifier' },
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: { canvasId: { type: 'string', description: 'Canvas identifier' } },
     required: ['canvasId'],
     additionalProperties: false,
   },
@@ -2770,29 +2667,26 @@ const operations: AppContract<OmniGraffleClient>['operations'] = {
 function bind(runtime: ClientRuntime): OmniGraffleClient {
   return {
     canvases: {
-      list: (page, options) => runtime.invoke(canvasListCanvasesOperation, { ...page }, options),
+      list: (options) => runtime.invoke(canvasListCanvasesOperation, {}, options),
       get: (id, options) => runtime.invoke(canvasGetCanvasOperation, { id }, options),
       create: (input, options) => runtime.invoke(canvasCreateCanvasOperation, input, options),
     },
     graphics: {
-      list: (canvasId, page, options) =>
-        runtime.invoke(graphicListGraphicsOperation, { ...page, canvasId }, options),
+      list: (canvasId, options) =>
+        runtime.invoke(graphicListGraphicsOperation, { canvasId }, options),
       get: (id, options) => runtime.invoke(graphicGetGraphicOperation, { id }, options),
     },
     shapes: {
-      list: (canvasId, page, options) =>
-        runtime.invoke(shapeListShapesOperation, { ...page, canvasId }, options),
+      list: (canvasId, options) => runtime.invoke(shapeListShapesOperation, { canvasId }, options),
       get: (id, options) => runtime.invoke(shapeGetShapeOperation, { id }, options),
       create: (input, options) => runtime.invoke(shapeCreateShapeOperation, input, options),
     },
     lines: {
-      list: (canvasId, page, options) =>
-        runtime.invoke(lineListLinesOperation, { ...page, canvasId }, options),
+      list: (canvasId, options) => runtime.invoke(lineListLinesOperation, { canvasId }, options),
       get: (id, options) => runtime.invoke(lineGetLineOperation, { id }, options),
     },
     layers: {
-      list: (canvasId, page, options) =>
-        runtime.invoke(layerListLayersOperation, { ...page, canvasId }, options),
+      list: (canvasId, options) => runtime.invoke(layerListLayersOperation, { canvasId }, options),
       get: (name, options) => runtime.invoke(layerGetLayerOperation, { name }, options),
       create: (input, options) => runtime.invoke(layerCreateLayerOperation, input, options),
     },

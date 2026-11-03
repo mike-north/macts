@@ -51,12 +51,8 @@ export class CanvasResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: CanvasCreateInput): Promise<Canvas>;
     get(id: string): Promise<Canvas>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(): Promise<{
         items: Canvas[];
-        nextCursor?: string;
     }>;
 }
 
@@ -248,12 +244,8 @@ export interface GraphicCreateInput {
 export class GraphicResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Graphic>;
-    list(canvasId: string, page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(canvasId: string): Promise<{
         items: Graphic[];
-        nextCursor?: string;
     }>;
 }
 
@@ -464,12 +456,8 @@ export class LayerResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: LayerCreateInput): Promise<Layer>;
     get(name: string): Promise<Layer>;
-    list(canvasId: string, page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(canvasId: string): Promise<{
         items: Layer[];
-        nextCursor?: string;
     }>;
 }
 
@@ -520,12 +508,8 @@ export interface LineCreateInput {
 export class LineResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Line>;
-    list(canvasId: string, page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(canvasId: string): Promise<{
         items: Line[];
-        nextCursor?: string;
     }>;
 }
 
@@ -668,12 +652,8 @@ export class ShapeResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: ShapeCreateInput): Promise<Shape>;
     get(id: string): Promise<Shape>;
-    list(canvasId: string, page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(canvasId: string): Promise<{
         items: Shape[];
-        nextCursor?: string;
     }>;
 }
 

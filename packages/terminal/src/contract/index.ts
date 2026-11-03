@@ -25,7 +25,6 @@ import {
   type ClientRuntime,
   type OperationDescriptor,
   type Page,
-  type PageRequest,
   type ValueType,
 } from '@macts/contracts'
 
@@ -246,14 +245,8 @@ export interface SettingsSetUpdateInput {
 
 /** A Terminal window */
 export interface WindowResourceClient {
-  /**
-   * List windows, one page at a time.
-   *
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
-   */
-  list(page?: PageRequest, options?: CallOptions): Promise<Page<Window>>
+  /** List windows, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Window>>
   /**
    * Read the window identified by `name`.
    *
@@ -264,14 +257,8 @@ export interface WindowResourceClient {
 
 /** A Terminal tab */
 export interface TabResourceClient {
-  /**
-   * List tabs, one page at a time.
-   *
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
-   */
-  list(page?: PageRequest, options?: CallOptions): Promise<Page<Tab>>
+  /** List tabs, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Tab>>
   /**
    * Read the tab identified by `name`.
    *
@@ -282,14 +269,8 @@ export interface TabResourceClient {
 
 /** A Terminal settings set (profile) */
 export interface SettingsSetResourceClient {
-  /**
-   * List settings sets, one page at a time.
-   *
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
-   */
-  list(page?: PageRequest, options?: CallOptions): Promise<Page<SettingsSet>>
+  /** List settings sets, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<SettingsSet>>
   /**
    * Read the settings set identified by `name`.
    *
@@ -393,92 +374,47 @@ const resources: AppContract<TerminalClient>['resources'] = {
   },
 }
 
-const windowListOperation: OperationDescriptor<PageRequest, Page<Window>> = {
+const windowListOperation: OperationDescriptor<Record<string, never>, Page<Window>> = {
   id: 'terminal.windows.list',
   permission: 'terminal:windows:list',
   target: { command: 'list', resource: 'Window' },
   description: 'List items',
-  input: t.record({
-    ...t.pageInputs(),
-  }),
+  input: t.record({}),
   output: t.page(windowRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
 
-const tabListOperation: OperationDescriptor<PageRequest, Page<Tab>> = {
+const tabListOperation: OperationDescriptor<Record<string, never>, Page<Tab>> = {
   id: 'terminal.tabs.list',
   permission: 'terminal:tabs:list',
   target: { command: 'list', resource: 'Tab' },
   description: 'List items',
-  input: t.record({
-    ...t.pageInputs(),
-  }),
+  input: t.record({}),
   output: t.page(tabRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
 
-const settingsSetListOperation: OperationDescriptor<PageRequest, Page<SettingsSet>> = {
+const settingsSetListOperation: OperationDescriptor<Record<string, never>, Page<SettingsSet>> = {
   id: 'terminal.settingsSets.list',
   permission: 'terminal:settingsSets:list',
   target: { command: 'list', resource: 'SettingsSet' },
   description: 'List items',
-  input: t.record({
-    ...t.pageInputs(),
-  }),
+  input: t.record({}),
   output: t.page(settingsSetRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
@@ -577,15 +513,15 @@ const operations: AppContract<TerminalClient>['operations'] = {
 function bind(runtime: ClientRuntime): TerminalClient {
   return {
     windows: {
-      list: (page, options) => runtime.invoke(windowListOperation, { ...page }, options),
+      list: (options) => runtime.invoke(windowListOperation, {}, options),
       get: (name, options) => runtime.invoke(windowGetOperation, { name }, options),
     },
     tabs: {
-      list: (page, options) => runtime.invoke(tabListOperation, { ...page }, options),
+      list: (options) => runtime.invoke(tabListOperation, {}, options),
       get: (name, options) => runtime.invoke(tabGetOperation, { name }, options),
     },
     settingsSets: {
-      list: (page, options) => runtime.invoke(settingsSetListOperation, { ...page }, options),
+      list: (options) => runtime.invoke(settingsSetListOperation, {}, options),
       get: (name, options) => runtime.invoke(settingsSetGetOperation, { name }, options),
     },
     doScript: (command, _in, options) =>

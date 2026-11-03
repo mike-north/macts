@@ -352,6 +352,13 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "the unique identifier of the attachment"',
+            },
+          },
         },
       ],
       nullabilityProbe: {

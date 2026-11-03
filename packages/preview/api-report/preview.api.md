@@ -42,12 +42,8 @@ export interface DocumentCreateInput {
 export class DocumentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<Document>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(): Promise<{
         items: Document[];
-        nextCursor?: string;
     }>;
 }
 

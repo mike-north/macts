@@ -298,12 +298,8 @@ export type RunDestinationCreateInput = Record<string, never>;
 export class RunDestinationResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<RunDestination>;
-    list(workspaceName: string, page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(workspaceName: string): Promise<{
         items: RunDestination[];
-        nextCursor?: string;
     }>;
 }
 
@@ -540,12 +536,8 @@ export class WorkspaceDocumentResourceClient {
     clean(workspaceName: string): Promise<void>;
     debug(workspaceName: string, scheme?: string, runDestinationSpecifier?: string, skipBuilding?: boolean, commandLineArguments?: unknown, environmentVariables?: unknown): Promise<void>;
     get(name: string): Promise<WorkspaceDocument>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(): Promise<{
         items: WorkspaceDocument[];
-        nextCursor?: string;
     }>;
     run(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void>;
     stop(workspaceName: string): Promise<void>;

@@ -21,19 +21,10 @@ export class TagResourceClient {
   }
 
   /**
-   * List tags, one page at a time. When the result has a `nextCursor`,
-   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
+   * List all tags, as one page.
    */
-  async list(
-    page: { pageSize?: number; cursor?: string } = {}
-  ): Promise<{ items: Tag[]; nextCursor?: string }> {
-    return this.#http.rpc<{ items: Tag[]; nextCursor?: string }>(
-      `${this.#app}.${this.#resource}.list`,
-      {
-        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-      }
-    )
+  async list(): Promise<{ items: Tag[] }> {
+    return this.#http.rpc<{ items: Tag[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

@@ -735,14 +735,8 @@ export type CurrencyUpdateInput = Record<string, never>
 
 /** An OmniPlan project */
 export interface ProjectResourceClient {
-  /**
-   * List projects, one page at a time.
-   *
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
-   */
-  list(page?: PageRequest, options?: CallOptions): Promise<Page<Project>>
+  /** List projects, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Project>>
   /**
    * Read the project identified by `id`.
    *
@@ -753,14 +747,8 @@ export interface ProjectResourceClient {
 
 /** A task within an OmniPlan project */
 export interface TaskResourceClient {
-  /**
-   * List tasks, one page at a time.
-   *
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
-   */
-  list(page?: PageRequest, options?: CallOptions): Promise<Page<Task>>
+  /** List tasks, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Task>>
   /**
    * Read the task identified by `id`.
    *
@@ -773,14 +761,8 @@ export interface TaskResourceClient {
 
 /** A milestone (zero-duration marker task) */
 export interface MilestoneResourceClient {
-  /**
-   * List milestones, one page at a time.
-   *
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
-   */
-  list(page?: PageRequest, options?: CallOptions): Promise<Page<Milestone>>
+  /** List milestones, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Milestone>>
   /**
    * Read the milestone identified by `id`.
    *
@@ -793,14 +775,8 @@ export interface MilestoneResourceClient {
 
 /** A resource (person, equipment, or material) */
 export interface ResourceResourceClient {
-  /**
-   * List resources, one page at a time.
-   *
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
-   */
-  list(page?: PageRequest, options?: CallOptions): Promise<Page<Resource>>
+  /** List resources, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Resource>>
   /**
    * Read the resource identified by `id`.
    *
@@ -1232,32 +1208,17 @@ const resources: AppContract<OmniPlanClient>['resources'] = {
   },
 }
 
-const projectListProjectsOperation: OperationDescriptor<PageRequest, Page<Project>> = {
+const projectListProjectsOperation: OperationDescriptor<Record<string, never>, Page<Project>> = {
   id: 'omniplan.projects.list',
   permission: 'omniplan:projects:list',
   target: { command: 'listProjects', resource: 'Project' },
   description: 'List all projects',
-  input: t.record({
-    ...t.pageInputs(),
-  }),
+  input: t.record({}),
   output: t.page(projectRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
@@ -1280,32 +1241,17 @@ const projectGetProjectOperation: OperationDescriptor<{ readonly id: string }, P
   },
 }
 
-const taskListTasksOperation: OperationDescriptor<PageRequest, Page<Task>> = {
+const taskListTasksOperation: OperationDescriptor<Record<string, never>, Page<Task>> = {
   id: 'omniplan.tasks.list',
   permission: 'omniplan:tasks:list',
   target: { command: 'listTasks', resource: 'Task' },
   description: 'List all tasks',
-  input: t.record({
-    ...t.pageInputs(),
-  }),
+  input: t.record({}),
   output: t.page(taskRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
@@ -1490,32 +1436,20 @@ const taskCreateTaskOperation: OperationDescriptor<TaskCreateInput, Task> = {
   },
 }
 
-const milestoneListMilestonesOperation: OperationDescriptor<PageRequest, Page<Milestone>> = {
+const milestoneListMilestonesOperation: OperationDescriptor<
+  Record<string, never>,
+  Page<Milestone>
+> = {
   id: 'omniplan.milestones.list',
   permission: 'omniplan:milestones:list',
   target: { command: 'listMilestones', resource: 'Milestone' },
   description: 'List all milestones',
-  input: t.record({
-    ...t.pageInputs(),
-  }),
+  input: t.record({}),
   output: t.page(milestoneRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
@@ -1577,32 +1511,17 @@ const milestoneCreateMilestoneOperation: OperationDescriptor<MilestoneCreateInpu
   },
 }
 
-const resourceListResourcesOperation: OperationDescriptor<PageRequest, Page<Resource>> = {
+const resourceListResourcesOperation: OperationDescriptor<Record<string, never>, Page<Resource>> = {
   id: 'omniplan.resources.list',
   permission: 'omniplan:resources:list',
   target: { command: 'listResources', resource: 'Resource' },
   description: 'List all resources',
-  input: t.record({
-    ...t.pageInputs(),
-  }),
+  input: t.record({}),
   output: t.page(resourceRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
@@ -2065,22 +1984,21 @@ const operations: AppContract<OmniPlanClient>['operations'] = {
 function bind(runtime: ClientRuntime): OmniPlanClient {
   return {
     projects: {
-      list: (page, options) => runtime.invoke(projectListProjectsOperation, { ...page }, options),
+      list: (options) => runtime.invoke(projectListProjectsOperation, {}, options),
       get: (id, options) => runtime.invoke(projectGetProjectOperation, { id }, options),
     },
     tasks: {
-      list: (page, options) => runtime.invoke(taskListTasksOperation, { ...page }, options),
+      list: (options) => runtime.invoke(taskListTasksOperation, {}, options),
       get: (id, options) => runtime.invoke(taskGetTaskOperation, { id }, options),
       create: (input, options) => runtime.invoke(taskCreateTaskOperation, input, options),
     },
     milestones: {
-      list: (page, options) =>
-        runtime.invoke(milestoneListMilestonesOperation, { ...page }, options),
+      list: (options) => runtime.invoke(milestoneListMilestonesOperation, {}, options),
       get: (id, options) => runtime.invoke(milestoneGetMilestoneOperation, { id }, options),
       create: (input, options) => runtime.invoke(milestoneCreateMilestoneOperation, input, options),
     },
     resources: {
-      list: (page, options) => runtime.invoke(resourceListResourcesOperation, { ...page }, options),
+      list: (options) => runtime.invoke(resourceListResourcesOperation, {}, options),
       get: (id, options) => runtime.invoke(resourceGetResourceOperation, { id }, options),
       create: (input, options) => runtime.invoke(resourceCreateResourceOperation, input, options),
     },

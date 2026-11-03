@@ -118,6 +118,13 @@ export const manifest: unknown = {
           property: 'name',
           primary: true,
           targeting: 'byProperty',
+          unique: false,
+          evidence: {
+            unique: {
+              source: 'curated',
+              note: 'A calendar name is a title the user chooses; two calendars can share one.',
+            },
+          },
         },
       ],
       nullabilityProbe: {
@@ -395,6 +402,13 @@ export const manifest: unknown = {
         {
           property: 'uid',
           primary: true,
+          unique: false,
+          evidence: {
+            unique: {
+              source: 'curated',
+              note: 'Every occurrence of a recurring event shares its uid: twelve events sharing one uid were observed on one calendar.',
+            },
+          },
         },
       ],
       nullabilityProbe: {

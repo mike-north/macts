@@ -91,7 +91,7 @@ export interface MilestoneCreateInput {
 export interface MilestoneResourceClient {
     create(input: MilestoneCreateInput, options?: CallOptions): Promise<Milestone>;
     get(id: Integer, options?: CallOptions): Promise<Milestone>;
-    list(page?: PageRequest, options?: CallOptions): Promise<Page<Milestone>>;
+    list(options?: CallOptions): Promise<Page<Milestone>>;
 }
 
 // @public
@@ -147,7 +147,7 @@ export interface ProjectCreateInput {
 // @public
 export interface ProjectResourceClient {
     get(id: string, options?: CallOptions): Promise<Project>;
-    list(page?: PageRequest, options?: CallOptions): Promise<Page<Project>>;
+    list(options?: CallOptions): Promise<Page<Project>>;
 }
 
 // @public
@@ -188,7 +188,7 @@ export interface ResourceCreateInput {
 export interface ResourceResourceClient {
     create(input: ResourceCreateInput, options?: CallOptions): Promise<Resource>;
     get(id: Integer, options?: CallOptions): Promise<Resource>;
-    list(page?: PageRequest, options?: CallOptions): Promise<Page<Resource>>;
+    list(options?: CallOptions): Promise<Page<Resource>>;
 }
 
 // @public
@@ -301,7 +301,7 @@ export interface TaskCreateInput {
 export interface TaskResourceClient {
     create(input: TaskCreateInput, options?: CallOptions): Promise<Task>;
     get(id: Integer, options?: CallOptions): Promise<Task>;
-    list(page?: PageRequest, options?: CallOptions): Promise<Page<Task>>;
+    list(options?: CallOptions): Promise<Page<Task>>;
 }
 
 // @public

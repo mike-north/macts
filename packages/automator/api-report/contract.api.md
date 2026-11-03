@@ -88,7 +88,7 @@ export type RequiredResourceCreateInput = Record<string, never>;
 
 // @public
 export interface RequiredResourceResourceClient {
-    list(actionId: string, page?: PageRequest, options?: CallOptions): Promise<Page<RequiredResource>>;
+    list(actionId: string, options?: CallOptions): Promise<Page<RequiredResource>>;
 }
 
 // @public
@@ -108,7 +108,7 @@ export interface SettingCreateInput {
 
 // @public
 export interface SettingResourceClient {
-    list(actionId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Setting>>;
+    list(actionId: string, options?: CallOptions): Promise<Page<Setting>>;
 }
 
 // @public
@@ -133,7 +133,7 @@ export interface VariableCreateInput {
 // @public
 export interface VariableResourceClient {
     get(id: string, options?: CallOptions): Promise<Variable>;
-    list(workflowName: string, page?: PageRequest, options?: CallOptions): Promise<Page<Variable>>;
+    list(workflowName: string, options?: CallOptions): Promise<Page<Variable>>;
 }
 
 // @public
@@ -162,7 +162,7 @@ export type WorkflowCreateInput = Record<string, never>;
 export interface WorkflowResourceClient {
     execute(workflow: unknown, options?: CallOptions): Promise<void>;
     get(name: string, options?: CallOptions): Promise<Workflow>;
-    list(page?: PageRequest, options?: CallOptions): Promise<Page<Workflow>>;
+    list(options?: CallOptions): Promise<Page<Workflow>>;
 }
 
 // @public

@@ -26,7 +26,6 @@ import {
   type Integer,
   type OperationDescriptor,
   type Page,
-  type PageRequest,
   type Rgb,
   type ValueType,
 } from '@macts/contracts'
@@ -495,14 +494,8 @@ export interface OpenFileAlarmUpdateInput {
 
 /** A calendar containing events */
 export interface CalendarResourceClient {
-  /**
-   * List calendars, one page at a time.
-   *
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
-   */
-  list(page?: PageRequest, options?: CallOptions): Promise<Page<Calendar>>
+  /** List calendars, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Calendar>>
   /**
    * Read the calendar identified by `id`.
    *
@@ -516,14 +509,11 @@ export interface CalendarResourceClient {
 /** A calendar event */
 export interface EventResourceClient {
   /**
-   * List events, one page at a time.
+   * List events, as one page holding all of them.
    *
    * @param calendarId - Calendar identifier. Does not accept null.
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
    */
-  list(calendarId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Event>>
+  list(calendarId: string, options?: CallOptions): Promise<Page<Event>>
   /**
    * Read the event identified by `id` within `calendarId`.
    *
@@ -753,32 +743,17 @@ const resources: AppContract<CalendarClient>['resources'] = {
   },
 }
 
-const calendarListOperation: OperationDescriptor<PageRequest, Page<Calendar>> = {
+const calendarListOperation: OperationDescriptor<Record<string, never>, Page<Calendar>> = {
   id: 'calendar.calendars.list',
   permission: 'calendar:calendars:list',
   target: { command: 'list', resource: 'Calendar' },
   description: 'List all calendars',
-  input: t.record({
-    ...t.pageInputs(),
-  }),
+  input: t.record({}),
   output: t.page(calendarRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
@@ -848,7 +823,7 @@ const calendarCreateOperation: OperationDescriptor<CalendarCreateInput, Calendar
 }
 
 const eventListEventsOperation: OperationDescriptor<
-  { readonly calendarId: string } & PageRequest,
+  { readonly calendarId: string },
   Page<Event>
 > = {
   id: 'calendar.events.list',
@@ -857,27 +832,12 @@ const eventListEventsOperation: OperationDescriptor<
   description: 'List all events in a calendar',
   input: t.record({
     calendarId: t.string({ description: 'Calendar identifier' }),
-    ...t.pageInputs(),
   }),
   output: t.page(eventRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      calendarId: { type: 'string', description: 'Calendar identifier' },
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: { calendarId: { type: 'string', description: 'Calendar identifier' } },
     required: ['calendarId'],
     additionalProperties: false,
   },
@@ -1247,13 +1207,13 @@ const operations: AppContract<CalendarClient>['operations'] = {
 function bind(runtime: ClientRuntime): CalendarClient {
   return {
     calendars: {
-      list: (page, options) => runtime.invoke(calendarListOperation, { ...page }, options),
+      list: (options) => runtime.invoke(calendarListOperation, {}, options),
       get: (id, options) => runtime.invoke(calendarGetOperation, { id }, options),
       create: (input, options) => runtime.invoke(calendarCreateOperation, input, options),
     },
     events: {
-      list: (calendarId, page, options) =>
-        runtime.invoke(eventListEventsOperation, { ...page, calendarId }, options),
+      list: (calendarId, options) =>
+        runtime.invoke(eventListEventsOperation, { calendarId }, options),
       get: (calendarId, id, options) =>
         runtime.invoke(eventGetEventOperation, { calendarId, id }, options),
       create: (input, options) => runtime.invoke(eventCreateEventOperation, input, options),

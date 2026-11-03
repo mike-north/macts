@@ -84,12 +84,8 @@ export class CalendarResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: CalendarCreateInput): Promise<Calendar>;
     get(id: string): Promise<Calendar>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(): Promise<{
         items: Calendar[];
-        nextCursor?: string;
     }>;
 }
 
@@ -191,12 +187,8 @@ export class EventResourceClient {
     create(input: EventCreateInput): Promise<Event_2>;
     delete(calendarId: string, id: string): Promise<void>;
     get(calendarId: string, id: string): Promise<Event_2>;
-    list(calendarId: string, page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(calendarId: string): Promise<{
         items: Event_2[];
-        nextCursor?: string;
     }>;
     show(): Promise<void>;
     update(calendarId: string, id: string, input: EventUpdateInput): Promise<Event_2>;

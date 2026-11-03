@@ -151,12 +151,8 @@ export type RequiredResourceCreateInput = Record<string, never>;
 // @public
 export class RequiredResourceResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    list(actionId: string, page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(actionId: string): Promise<{
         items: RequiredResource[];
-        nextCursor?: string;
     }>;
 }
 
@@ -188,12 +184,8 @@ export interface SettingCreateInput {
 // @public
 export class SettingResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    list(actionId: string, page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(actionId: string): Promise<{
         items: Setting[];
-        nextCursor?: string;
     }>;
 }
 
@@ -226,12 +218,8 @@ export interface VariableCreateInput {
 export class VariableResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Variable>;
-    list(workflowName: string, page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(workflowName: string): Promise<{
         items: Variable[];
-        nextCursor?: string;
     }>;
 }
 
@@ -268,12 +256,8 @@ export class WorkflowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     execute(workflow: unknown): Promise<void>;
     get(name: string): Promise<Workflow>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(): Promise<{
         items: Workflow[];
-        nextCursor?: string;
     }>;
 }
 

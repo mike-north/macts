@@ -13,24 +13,15 @@ export class ListDocumentsCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  pageSize = Option.String('--page-size', {
-    description: 'The most items to show, from 1 to 100 (default 25)',
-  })
-  cursor = Option.String('--cursor', {
-    description: 'Continue from the previous page, as its output says',
-  })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      const page = await client.documents.list({
-        ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }),
-        ...(this.cursor === undefined ? {} : { cursor: this.cursor }),
-      })
+      const page = await client.documents.list()
 
-      const output = formatter.formatPage(
+      const output = formatter.formatList(
         page.items.map((item) => ({
           name: item.name,
           fullName: item.fullName,
@@ -43,8 +34,7 @@ export class ListDocumentsCommand extends Command {
           trackRevisions: item.trackRevisions,
           showRevisions: item.showRevisions,
           defaultTabStop: item.defaultTabStop,
-        })),
-        page.nextCursor
+        }))
       )
 
       this.context.stdout.write(output + '\n')
