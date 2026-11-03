@@ -257,6 +257,7 @@ expectAssignable<ApiKeyValidationErrorCode>('INVALID_FORMAT')
 expectAssignable<ApiKeyValidationErrorCode>('INVALID_SIGNATURE')
 expectAssignable<ApiKeyValidationErrorCode>('EXPIRED')
 expectAssignable<ApiKeyValidationErrorCode>('REVOKED')
+expectAssignable<ApiKeyValidationErrorCode>('UNKNOWN_KEY')
 expectAssignable<ApiKeyValidationErrorCode>('MALFORMED_PAYLOAD')
 expectNotAssignable<ApiKeyValidationErrorCode>(undefined)
 

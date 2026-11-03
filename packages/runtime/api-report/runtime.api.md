@@ -221,6 +221,9 @@ export function getKeyMetadata(keyId: string): ApiKeyMetadata | undefined;
 export function getKeyPolicy(keyId: string): GovernancePolicy | undefined;
 
 // @public
+export function getKeyRecordStatus(keyId: string): KeyRecordStatus;
+
+// @public
 export function getLogger(): pino.Logger;
 
 // @public
@@ -252,7 +255,7 @@ export interface GovernanceContextWithoutApprovals extends GovernanceContextBase
 
 export { hasPermission }
 
-// @public
+// @public @deprecated
 export function isKeyRevoked(keyId: string): boolean;
 
 // @public
@@ -270,6 +273,9 @@ export interface KeyPolicyResolver {
     invalidate(apiKeyId?: string): void;
     resolve(apiKeyId: string): Promise<GovernancePolicy | undefined>;
 }
+
+// @public
+export type KeyRecordStatus = 'active' | 'revoked' | 'missing';
 
 // @public
 export interface ListApiKeysOptions {

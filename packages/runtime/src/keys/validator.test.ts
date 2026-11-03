@@ -15,7 +15,7 @@ import { assertValidationSuccess, assertValidationFailure } from './validation-t
 // Mock storage module
 vi.mock('./storage.js', () => ({
   getSigningSecret: vi.fn().mockResolvedValue('test-secret-key-for-testing-purposes'),
-  isKeyRevoked: vi.fn().mockReturnValue(false),
+  getKeyRecordStatus: vi.fn().mockReturnValue('active'),
 }))
 
 const TEST_SECRET = 'test-secret-key-for-testing-purposes'
@@ -197,6 +197,18 @@ describe('validateApiKey', () => {
       assertValidationFailure(result)
       expect(result.errorCode).toBe('INVALID_SIGNATURE')
     })
+
+    it('should never look up the key store for a token whose signature does not verify', async () => {
+      const token = await createTestToken(
+        { permissions: ['calendar:events:list'] },
+        { secret: 'different-secret-key' }
+      )
+
+      const result = await validateApiKey(token)
+
+      assertValidationFailure(result)
+      expect(storage.getKeyRecordStatus).not.toHaveBeenCalled()
+    })
   })
 
   describe('negative cases - expiration', () => {
@@ -213,7 +225,7 @@ describe('validateApiKey', () => {
 
   describe('negative cases - revocation', () => {
     it('should reject revoked token', async () => {
-      vi.mocked(storage.isKeyRevoked).mockReturnValueOnce(true)
+      vi.mocked(storage.getKeyRecordStatus).mockReturnValueOnce('revoked')
 
       const token = await createTestToken({
         permissions: ['calendar:events:list'],
@@ -224,7 +236,44 @@ describe('validateApiKey', () => {
 
       assertValidationFailure(result)
       expect(result.errorCode).toBe('REVOKED')
-      expect(storage.isKeyRevoked).toHaveBeenCalledWith('key_revoked123')
+      expect(storage.getKeyRecordStatus).toHaveBeenCalledWith('key_revoked123')
+    })
+  })
+
+  describe('negative cases - no stored record', () => {
+    it('should refuse a correctly signed token whose key has no stored record', async () => {
+      vi.mocked(storage.getKeyRecordStatus).mockReturnValueOnce('missing')
+
+      const token = await createTestToken({
+        permissions: ['calendar:events:list'],
+        sub: 'key_unstored123',
+      })
+
+      const result = await validateApiKey(token)
+
+      assertValidationFailure(result)
+      expect(result.errorCode).toBe('UNKNOWN_KEY')
+      expect(storage.getKeyRecordStatus).toHaveBeenCalledWith('key_unstored123')
+      // The message names neither the key id nor the token.
+      expect(result.error).not.toContain('key_unstored123')
+      expect(result.error).not.toContain(token)
+    })
+
+    it('should look a key with no stored record up again on every call, never caching it', async () => {
+      vi.mocked(storage.getKeyRecordStatus).mockReturnValueOnce('missing')
+      const token = await createTestToken({
+        permissions: ['calendar:events:list'],
+        sub: 'key_storedlater',
+      })
+
+      const first = await validateApiKey(token)
+      assertValidationFailure(first)
+      expect(first.errorCode).toBe('UNKNOWN_KEY')
+
+      // The record appears; the next call must see it rather than a cached refusal.
+      const second = await validateApiKey(token)
+      assertValidationSuccess(second)
+      expect(storage.getKeyRecordStatus).toHaveBeenCalledTimes(2)
     })
   })
 
