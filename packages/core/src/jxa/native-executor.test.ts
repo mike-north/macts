@@ -639,8 +639,10 @@ describe('createNativeExecutor', () => {
     })
   })
 
+  // Resolution within the native conversion scope is covered in
+  // native-resolution.test.ts.
   describe('reference resolution', () => {
-    it('fails every resolution with InternalError and runs no automation', async () => {
+    it('fails a selector reference with InternalError and runs no automation', async () => {
       const run = mockRun()
       const error = await rejectionOf(
         createNativeExecutor({ transport: { run } }).resolve({
@@ -657,7 +659,9 @@ describe('createNativeExecutor', () => {
       )
       expect(error).toBeInstanceOf(InternalError)
       if (!(error instanceof InternalError)) return
-      expect(error.message).toBe('The macOS provider does not resolve references.')
+      expect(error.message).toBe(
+        'The macOS provider cannot resolve a selector reference to the Notes resource "Note" yet.'
+      )
       expect(error.details).toEqual({})
       expect(run).not.toHaveBeenCalled()
     })

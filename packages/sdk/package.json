@@ -59,6 +59,7 @@
     "@macts/contacts": "workspace:*",
     "@macts/music": "workspace:*",
     "@macts/notes": "workspace:*",
+    "@macts/reminders": "workspace:*",
     "tsd": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",
