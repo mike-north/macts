@@ -7,7 +7,6 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
-import { ObjectReferenceVariant } from '@macts/contracts';
 
 // @public
 export interface AliasFile {
@@ -205,7 +204,6 @@ export interface FinderWindow {
     readonly columnViewOptions: unknown;
     currentView: string | null;
     readonly iconViewOptions: unknown;
-    readonly listViewOptions: ObjectReferenceVariant<ListViewOptions, never, 'ListViewOptions'> | null;
     pathbarVisible: boolean | null;
     sidebarWidth: Integer | null;
     statusbarVisible: boolean | null;
@@ -266,7 +264,6 @@ export interface ListViewOptions {
     calculatesFolderSizes: boolean | null;
     iconSize: string | null;
     showsIconPreview: boolean | null;
-    sortColumn: ObjectReferenceVariant<Column, never, 'Column'> | null;
     textSize: Integer | null;
     usesRelativeDates: boolean | null;
 }

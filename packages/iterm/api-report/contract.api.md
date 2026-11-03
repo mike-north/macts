@@ -8,7 +8,6 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
-import { ObjectReferenceVariant } from '@macts/contracts';
 import { Point } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
@@ -175,7 +174,6 @@ export interface SessionUpdateInput {
 
 // @public
 export interface Tab {
-    currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null;
     index: Integer | null;
     title: string | null;
 }
@@ -197,8 +195,6 @@ export interface Window {
     readonly alternateIdentifier: string | null;
     bounds: Rectangle | null;
     readonly closeable: boolean | null;
-    currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null;
-    currentTab: ObjectReferenceVariant<Tab, never, 'Tab'> | null;
     frame: Rectangle | null;
     frontmost: boolean | null;
     hotkeyWindowProfile: string | null;

@@ -7,7 +7,6 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
-import { ObjectReferenceVariant } from '@macts/contracts';
 
 // @public
 export interface ArcClient {
@@ -61,8 +60,6 @@ export interface TabUpdateInput {
 
 // @public
 export interface Window {
-    readonly activeSpace: ObjectReferenceVariant<Space, string, 'Space'> | null;
-    readonly activeTab: ObjectReferenceVariant<Tab, string, 'Tab'> | null;
     readonly closeable: boolean | null;
     readonly id: string;
     incognito: boolean | null;

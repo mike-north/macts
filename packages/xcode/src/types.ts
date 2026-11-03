@@ -30,10 +30,6 @@ export interface WorkspaceDocument {
   loaded: boolean
   /** The workspace's scheme that will be used for scheme actions */
   activeScheme: Scheme
-  /** The workspace's run destination that will be used for scheme actions */
-  activeRunDestination: RunDestination
-  /** The scheme action result for the last scheme action command issued to the workspace document */
-  lastSchemeActionResult: SchemeActionResult
 }
 
 /** Input for creating a WorkspaceDocument */
@@ -254,10 +250,6 @@ export interface RunDestination {
   architecture: string
   /** The identifier of the platform which this run destination targets */
   platform: string
-  /** The physical or virtual device which this run destination targets */
-  device: Device
-  /** If the run destination's device has a companion, this is that device */
-  companionDevice: Device
 }
 
 /** Input for creating a RunDestination */
@@ -473,8 +465,6 @@ export const WorkspaceDocumentSchema = z.object({
   path: z.string(),
   loaded: z.boolean(),
   activeScheme: z.string(),
-  activeRunDestination: z.string(),
-  lastSchemeActionResult: z.string(),
 })
 
 export const FileDocumentSchema = z.object({
@@ -547,8 +537,6 @@ export const RunDestinationSchema = z.object({
   name: z.string(),
   architecture: z.string(),
   platform: z.string(),
-  device: z.string(),
-  companionDevice: z.string(),
 })
 
 export const DeviceSchema = z.object({

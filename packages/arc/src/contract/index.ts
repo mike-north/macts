@@ -24,7 +24,6 @@ import {
   type CallOptions,
   type ClientRuntime,
   type Integer,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
   type ValueType,
 } from '@macts/contracts'
@@ -83,16 +82,6 @@ export interface Window {
    * Nullable. No evidence that the app always sets it.
    */
   zoomed: boolean | null
-  /**
-   * Returns the currently selected tab.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly activeTab: ObjectReferenceVariant<Tab, string, 'Tab'> | null
-  /**
-   * Returns the currently active space.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly activeSpace: ObjectReferenceVariant<Space, string, 'Space'> | null
   /**
    * Whether the window is an incognito window.
    * Nullable. No evidence that the app always sets it.
@@ -289,14 +278,6 @@ const windowRecordType: ValueType<Window> = t.record(
     visible: t.nullable(t.boolean(), { description: 'Whether the window is currently visible.' }),
     zoomable: t.nullable(t.boolean(), { description: 'Whether the window can be zoomed.' }),
     zoomed: t.nullable(t.boolean(), { description: 'Whether the window is currently zoomed.' }),
-    activeTab: t.nullable(
-      t.reference<Tab, string, 'Tab'>(() => arcContract, 'Tab', 'one'),
-      { description: 'Returns the currently selected tab' }
-    ),
-    activeSpace: t.nullable(
-      t.reference<Space, string, 'Space'>(() => arcContract, 'Space', 'one'),
-      { description: 'Returns the currently active space' }
-    ),
     incognito: t.nullable(t.boolean(), {
       description: 'Whether the window is an incognito window.',
     }),

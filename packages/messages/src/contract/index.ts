@@ -23,7 +23,6 @@ import {
   type AppContract,
   type CallOptions,
   type ClientRuntime,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
   type ValueType,
 } from '@macts/contracts'
@@ -56,11 +55,6 @@ export interface Participant {
    * Never null: the primary identifier.
    */
   readonly id: string
-  /**
-   * The account for this participant.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly account: ObjectReferenceVariant<Account, string, 'Account'> | null
   /**
    * The participant's name as it appears in the participant list.
    * Nullable. No evidence that the app always sets it.
@@ -129,11 +123,6 @@ export interface Chat {
    * Nullable. No evidence that the app always sets it.
    */
   readonly name: string | null
-  /**
-   * The account which is participating in this chat.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly account: ObjectReferenceVariant<Account, string, 'Account'> | null
 }
 
 /** Input for creating a Participant. */
@@ -186,10 +175,6 @@ const participantRecordType: ValueType<Participant> = t.record(
       description:
         "The participant's unique identifier. For example: 01234567-89AB-CDEF-0123-456789ABCDEF:+11234567890",
     }),
-    account: t.nullable(
-      t.reference<Account, string, 'Account'>(() => messagesContract, 'Account', 'one'),
-      { description: 'The account for this participant.' }
-    ),
     name: t.nullable(t.string(), {
       description: "The participant's name as it appears in the participant list.",
     }),
@@ -228,10 +213,6 @@ const chatRecordType: ValueType<Chat> = t.record(
     name: t.nullable(t.string(), {
       description: "The chat's name as it appears in the chat list.",
     }),
-    account: t.nullable(
-      t.reference<Account, string, 'Account'>(() => messagesContract, 'Account', 'one'),
-      { description: 'The account which is participating in this chat.' }
-    ),
   },
   { description: 'An SMS or iMessage chat.' }
 )

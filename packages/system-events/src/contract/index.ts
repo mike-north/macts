@@ -24,7 +24,6 @@ import {
   type CallOptions,
   type ClientRuntime,
   type Integer,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
   type Rectangle,
   type ValueType,
@@ -186,13 +185,7 @@ export interface Location {
 }
 
 /** the preferences for the current user's network */
-export interface NetworkPreferencesObject {
-  /**
-   * the current location.
-   * Nullable. No evidence that the app always sets it.
-   */
-  currentLocation: ObjectReferenceVariant<Location, string, 'Location'> | null
-}
+export type NetworkPreferencesObject = Record<string, never>
 
 /** A collection of settings for a network service */
 export interface Service {
@@ -202,20 +195,10 @@ export interface Service {
    */
   readonly active: boolean | null
   /**
-   * the currently selected configuration.
-   * Nullable. No evidence that the app always sets it.
-   */
-  currentConfiguration: ObjectReferenceVariant<Configuration, string, 'Configuration'> | null
-  /**
    * the unique identifier for the service.
    * Never null: the primary identifier.
    */
   readonly id: string
-  /**
-   * the interface the service is built on.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly interface: ObjectReferenceVariant<Interface, string, 'Interface'> | null
   /**
    * the type of service.
    * Nullable. No evidence that the app always sets it.
@@ -279,63 +262,7 @@ export interface Alias {
 }
 
 /** The Classic domain in the file system */
-export interface ClassicDomainObject {
-  /**
-   * The Apple Menu Items folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly appleMenuFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Control Panels folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly controlPanelsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Control Strip Modules folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly controlStripModulesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Classic Desktop folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly desktopFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Extensions folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly extensionsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Fonts folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly fontsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Launcher Items folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly launcherItemsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Classic Preferences folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly preferencesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Shutdown Items folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly shutdownFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The StartupItems folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly startupItemsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The System folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly systemFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-}
+export type ClassicDomainObject = Record<string, never>
 
 /** A disk in the file system */
 export interface Disk {
@@ -393,11 +320,6 @@ export interface DiskItem {
    * Nullable. No evidence that the app always sets it.
    */
   readonly busyStatus: boolean | null
-  /**
-   * the folder or disk which has this disk item as an element.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly container: ObjectReferenceVariant<DiskItem, string, 'DiskItem'> | null
   /**
    * the date on which the disk item was created.
    * Nullable. No evidence that the app always sets it.
@@ -473,80 +395,15 @@ export interface DiskItem {
 /** A domain in the file system */
 export interface Domain {
   /**
-   * The Application Support folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly applicationSupportFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Applications folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly applicationsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Desktop Pictures folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly desktopPicturesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Folder Action Scripts folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly folderActionScriptsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Fonts folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly fontsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
    * the unique identifier of the domain.
    * Never null: the primary identifier.
    */
   readonly id: string
   /**
-   * The Library folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly libraryFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
    * the name of the domain.
    * Nullable. No evidence that the app always sets it.
    */
   readonly name: string | null
-  /**
-   * The Preferences folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly preferencesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Scripting Additions folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly scriptingAdditionsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Scripts folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly scriptsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Shared Documents folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly sharedDocumentsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Speakable Items folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly speakableItemsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Utilities folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly utilitiesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Automator Workflows folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly workflowsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
 }
 
 /** A file in the file system */
@@ -644,63 +501,7 @@ export interface SystemDomainObject {
 }
 
 /** The user domain in the file system */
-export interface UserDomainObject {
-  /**
-   * The user's Desktop folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly desktopFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Documents folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly documentsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Downloads folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly downloadsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Favorites folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly favoritesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Home folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly homeFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Movies folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly moviesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Music folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly musicFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Pictures folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly picturesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Public folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly publicFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Sites folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly sitesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Temporary Items folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly temporaryItemsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-}
+export type UserDomainObject = Record<string, never>
 
 /** An action that can be performed on the UI element */
 export interface Action {
@@ -1395,11 +1196,6 @@ export interface ScriptingClass {
    * Nullable. No evidence that the app always sets it.
    */
   readonly suiteName: string | null
-  /**
-   * The class from which this class inherits.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly superclass: ObjectReferenceVariant<ScriptingClass, string, 'ScriptingClass'> | null
 }
 
 /** A command within a suite within a scripting definition */
@@ -1419,15 +1215,6 @@ export interface ScriptingCommand {
    * Nullable. No evidence that the app always sets it.
    */
   readonly description: string | null
-  /**
-   * The direct parameter of the command.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly directParameter: ObjectReferenceVariant<
-    ScriptingParameter,
-    string,
-    'ScriptingParameter'
-  > | null
   /**
    * Is the command hidden?
    * Nullable. No evidence that the app always sets it.
@@ -2497,31 +2284,14 @@ const locationRecordType: ValueType<Location> = t.record(
 )
 
 const networkPreferencesObjectRecordType: ValueType<NetworkPreferencesObject> = t.record(
-  {
-    currentLocation: t.nullable(
-      t.reference<Location, string, 'Location'>(() => systemEventsContract, 'Location', 'one'),
-      { description: 'the current location' }
-    ),
-  },
+  {},
   { description: "the preferences for the current user's network" }
 )
 
 const serviceRecordType: ValueType<Service> = t.record(
   {
     active: t.nullable(t.boolean(), { description: 'Is the service active?' }),
-    currentConfiguration: t.nullable(
-      t.reference<Configuration, string, 'Configuration'>(
-        () => systemEventsContract,
-        'Configuration',
-        'one'
-      ),
-      { description: 'the currently selected configuration' }
-    ),
     id: t.string({ description: 'the unique identifier for the service' }),
-    interface: t.nullable(
-      t.reference<Interface, string, 'Interface'>(() => systemEventsContract, 'Interface', 'one'),
-      { description: 'the interface the service is built on' }
-    ),
     kind: t.nullable(t.integer(), { description: 'the type of service' }),
     name: t.nullable(t.string(), { description: 'the name of the service' }),
   },
@@ -2557,52 +2327,7 @@ const aliasRecordType: ValueType<Alias> = t.record(
 )
 
 const classicDomainObjectRecordType: ValueType<ClassicDomainObject> = t.record(
-  {
-    appleMenuFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Apple Menu Items folder' }
-    ),
-    controlPanelsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Control Panels folder' }
-    ),
-    controlStripModulesFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Control Strip Modules folder' }
-    ),
-    desktopFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Classic Desktop folder' }
-    ),
-    extensionsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Extensions folder' }
-    ),
-    fontsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Fonts folder' }
-    ),
-    launcherItemsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Launcher Items folder' }
-    ),
-    preferencesFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Classic Preferences folder' }
-    ),
-    shutdownFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Shutdown Items folder' }
-    ),
-    startupItemsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The StartupItems folder' }
-    ),
-    systemFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The System folder' }
-    ),
-  },
+  {},
   { description: 'The Classic domain in the file system' }
 )
 
@@ -2634,10 +2359,6 @@ const diskRecordType: ValueType<Disk> = t.record(
 const diskItemRecordType: ValueType<DiskItem> = t.record(
   {
     busyStatus: t.nullable(t.boolean(), { description: 'Is the disk item busy?' }),
-    container: t.nullable(
-      t.reference<DiskItem, string, 'DiskItem'>(() => systemEventsContract, 'DiskItem', 'one'),
-      { description: 'the folder or disk which has this disk item as an element' }
-    ),
     creationDate: t.nullable(t.date(), {
       description: 'the date on which the disk item was created',
     }),
@@ -2668,60 +2389,8 @@ const diskItemRecordType: ValueType<DiskItem> = t.record(
 
 const domainRecordType: ValueType<Domain> = t.record(
   {
-    applicationSupportFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Application Support folder' }
-    ),
-    applicationsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Applications folder' }
-    ),
-    desktopPicturesFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Desktop Pictures folder' }
-    ),
-    folderActionScriptsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Folder Action Scripts folder' }
-    ),
-    fontsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Fonts folder' }
-    ),
     id: t.string({ description: 'the unique identifier of the domain' }),
-    libraryFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Library folder' }
-    ),
     name: t.nullable(t.string(), { description: 'the name of the domain' }),
-    preferencesFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Preferences folder' }
-    ),
-    scriptingAdditionsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Scripting Additions folder' }
-    ),
-    scriptsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Scripts folder' }
-    ),
-    sharedDocumentsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Shared Documents folder' }
-    ),
-    speakableItemsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Speakable Items folder' }
-    ),
-    utilitiesFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Utilities folder' }
-    ),
-    workflowsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Automator Workflows folder' }
-    ),
   },
   { description: 'A domain in the file system' }
 )
@@ -2787,52 +2456,7 @@ const systemDomainObjectRecordType: ValueType<SystemDomainObject> = t.record(
 )
 
 const userDomainObjectRecordType: ValueType<UserDomainObject> = t.record(
-  {
-    desktopFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: "The user's Desktop folder" }
-    ),
-    documentsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: "The user's Documents folder" }
-    ),
-    downloadsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: "The user's Downloads folder" }
-    ),
-    favoritesFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: "The user's Favorites folder" }
-    ),
-    homeFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: "The user's Home folder" }
-    ),
-    moviesFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: "The user's Movies folder" }
-    ),
-    musicFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: "The user's Music folder" }
-    ),
-    picturesFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: "The user's Pictures folder" }
-    ),
-    publicFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: "The user's Public folder" }
-    ),
-    sitesFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: "The user's Sites folder" }
-    ),
-    temporaryItemsFolder: t.nullable(
-      t.reference<Folder, never, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
-      { description: 'The Temporary Items folder' }
-    ),
-  },
+  {},
   { description: 'The user domain in the file system' }
 )
 
@@ -3283,14 +2907,6 @@ const scriptingClassRecordType: ValueType<ScriptingClass> = t.record(
     suiteName: t.nullable(t.string(), {
       description: 'The name of the suite to which this class belongs',
     }),
-    superclass: t.nullable(
-      t.reference<ScriptingClass, string, 'ScriptingClass'>(
-        () => systemEventsContract,
-        'ScriptingClass',
-        'one'
-      ),
-      { description: 'The class from which this class inherits' }
-    ),
   },
   { description: 'A class within a suite within a scripting definition' }
 )
@@ -3300,14 +2916,6 @@ const scriptingCommandRecordType: ValueType<ScriptingCommand> = t.record(
     name: t.nullable(t.string(), { description: 'The name of the command' }),
     id: t.string({ description: 'The unique identifier of the command' }),
     description: t.nullable(t.string(), { description: 'The description of the command' }),
-    directParameter: t.nullable(
-      t.reference<ScriptingParameter, string, 'ScriptingParameter'>(
-        () => systemEventsContract,
-        'ScriptingParameter',
-        'one'
-      ),
-      { description: 'The direct parameter of the command' }
-    ),
     hidden: t.nullable(t.boolean(), { description: 'Is the command hidden?' }),
     scriptingResult: t.unknown({ description: 'The object or data returned by this command' }),
     suiteName: t.nullable(t.string(), {

@@ -280,8 +280,6 @@ export type ResolvedBuildSettingUpdateInput = Partial<ResolvedBuildSettingCreate
 // @public
 export interface RunDestination {
     architecture: string;
-    companionDevice: Device;
-    device: Device;
     id?: string;
     name: string;
     platform: string;
@@ -305,8 +303,6 @@ export const RunDestinationSchema: z.ZodObject<{
     name: z.ZodString;
     architecture: z.ZodString;
     platform: z.ZodString;
-    device: z.ZodString;
-    companionDevice: z.ZodString;
 }, z.core.$strip>;
 
 // @public
@@ -503,11 +499,9 @@ export type TextDocumentUpdateInput = Partial<TextDocumentCreateInput>;
 
 // @public
 export interface WorkspaceDocument {
-    activeRunDestination: RunDestination;
     activeScheme: Scheme;
     file: string;
     id?: string;
-    lastSchemeActionResult: SchemeActionResult;
     loaded: boolean;
     modified: boolean;
     name: string;
@@ -545,8 +539,6 @@ export const WorkspaceDocumentSchema: z.ZodObject<{
     path: z.ZodString;
     loaded: z.ZodBoolean;
     activeScheme: z.ZodString;
-    activeRunDestination: z.ZodString;
-    lastSchemeActionResult: z.ZodString;
 }, z.core.$strip>;
 
 // @public

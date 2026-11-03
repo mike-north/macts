@@ -27,7 +27,6 @@ import {
   type FileValue,
   type Integer,
   type ObjectReferenceData,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
   type Rgb,
   type ValueType,
@@ -278,36 +277,6 @@ export interface OutgoingMessage {
 /** Represents the object responsible for managing a viewer window */
 export interface MessageViewer {
   /**
-   * The top level Drafts mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly draftsMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
-   * The top level In mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly inbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
-   * The top level Junk mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly junkMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
-   * The top level Out mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly outbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
-   * The top level Sent mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly sentMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
-   * The top level Trash mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly trashMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
    * The column that is currently sorted in the viewer.
    * Nullable. No evidence that the app always sets it.
    */
@@ -372,16 +341,6 @@ export interface Message {
    * Nullable. No evidence that the app always sets it.
    */
   backgroundColor: string | null
-  /**
-   * The mailbox in which this message is filed.
-   * Nullable. No evidence that the app always sets it.
-   */
-  mailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
-   * Contents of an email message.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly content: ObjectReferenceVariant<RichText, never, 'RichText'> | null
   /**
    * The date a message was received.
    * Nullable. No evidence that the app always sets it.
@@ -596,16 +555,6 @@ export interface Mailbox {
    * Nullable. No evidence that the app always sets it.
    */
   readonly unreadCount: Integer | null
-  /**
-   * The account property.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly account: ObjectReferenceVariant<Account, string, 'Account'> | null
-  /**
-   * The container property.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly container: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
 }
 
 /** Class for message rules */
@@ -675,16 +624,6 @@ export interface Rule {
    * Nullable. No evidence that the app always sets it.
    */
   allConditionsMustBeMet: boolean | null
-  /**
-   * If rule matches, copy to this mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  copyMessage: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
-   * If rule matches, move to this mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  moveMessage: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * Indicates whether the color will be used to highlight the text or background of a message in
    * the message list.
@@ -1745,30 +1684,6 @@ const outgoingMessageRecordType: ValueType<OutgoingMessage> = t.record(
 
 const messageViewerRecordType: ValueType<MessageViewer> = t.record(
   {
-    draftsMailbox: t.nullable(
-      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
-      { description: 'The top level Drafts mailbox' }
-    ),
-    inbox: t.nullable(
-      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
-      { description: 'The top level In mailbox' }
-    ),
-    junkMailbox: t.nullable(
-      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
-      { description: 'The top level Junk mailbox' }
-    ),
-    outbox: t.nullable(
-      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
-      { description: 'The top level Out mailbox' }
-    ),
-    sentMailbox: t.nullable(
-      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
-      { description: 'The top level Sent mailbox' }
-    ),
-    trashMailbox: t.nullable(
-      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
-      { description: 'The top level Trash mailbox' }
-    ),
     sortColumn: t.nullable(t.string(), {
       description: 'The column that is currently sorted in the viewer',
     }),
@@ -1805,14 +1720,6 @@ const messageRecordType: ValueType<Message> = t.record(
     id: t.integer({ description: 'The unique identifier of the message.' }),
     allHeaders: t.nullable(t.string(), { description: 'All the headers of the message' }),
     backgroundColor: t.nullable(t.string(), { description: 'The background color of the message' }),
-    mailbox: t.nullable(
-      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
-      { description: 'The mailbox in which this message is filed' }
-    ),
-    content: t.nullable(
-      t.reference<RichText, never, 'RichText'>(() => mailContract, 'RichText', 'one'),
-      { description: 'Contents of an email message' }
-    ),
     dateReceived: t.nullable(t.date(), { description: 'The date a message was received' }),
     dateSent: t.nullable(t.date(), { description: 'The date a message was sent' }),
     deletedStatus: t.nullable(t.boolean(), {
@@ -1927,14 +1834,6 @@ const mailboxRecordType: ValueType<Mailbox> = t.record(
     unreadCount: t.nullable(t.integer(), {
       description: 'The number of unread messages in the mailbox',
     }),
-    account: t.nullable(
-      t.reference<Account, string, 'Account'>(() => mailContract, 'Account', 'one'),
-      { description: 'The account property' }
-    ),
-    container: t.nullable(
-      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
-      { description: 'The container property' }
-    ),
   },
   { description: 'A mailbox that holds messages' }
 )
@@ -1977,14 +1876,6 @@ const ruleRecordType: ValueType<Rule> = t.record(
     allConditionsMustBeMet: t.nullable(t.boolean(), {
       description: 'Indicates whether all conditions must be met for rule to execute',
     }),
-    copyMessage: t.nullable(
-      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
-      { description: 'If rule matches, copy to this mailbox' }
-    ),
-    moveMessage: t.nullable(
-      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
-      { description: 'If rule matches, move to this mailbox' }
-    ),
     highlightTextUsingColor: t.nullable(t.boolean(), {
       description:
         'Indicates whether the color will be used to highlight the text or background of a message in the message list',

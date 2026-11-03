@@ -8,7 +8,6 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
-import { ObjectReferenceVariant } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
 
 // @public
@@ -98,7 +97,6 @@ export interface TabUpdateInput {
 
 // @public
 export interface Window {
-    readonly activeTab: ObjectReferenceVariant<Tab, string, 'Tab'> | null;
     activeTabIndex: Integer | null;
     bounds: Rectangle | null;
     readonly closeable: boolean | null;

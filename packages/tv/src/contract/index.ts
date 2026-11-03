@@ -26,7 +26,6 @@ import {
   type FileSource,
   type FileValue,
   type Integer,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
   type ValueType,
 } from '@macts/contracts'
@@ -102,11 +101,6 @@ export interface BrowserWindow {
    * Nullable. No evidence that the app always sets it.
    */
   readonly selection: string | null
-  /**
-   * the playlist currently displayed in the window.
-   * Nullable. No evidence that the app always sets it.
-   */
-  view: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null
 }
 
 /** a track representing a video file */
@@ -155,11 +149,6 @@ export interface Playlist {
    */
   name: string | null
   /**
-   * folder which contains this playlist (if any).
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly parent: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null
-  /**
    * the total size of all tracks (in bytes).
    * Nullable. No evidence that the app always sets it.
    */
@@ -193,11 +182,6 @@ export interface PlaylistWindow {
    * Nullable. No evidence that the app always sets it.
    */
   readonly selection: string | null
-  /**
-   * the playlist displayed in the window.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly view: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null
 }
 
 /** a track residing in a shared library */
@@ -1068,10 +1052,6 @@ const browserWindowRecordType: ValueType<BrowserWindow> = t.record(
   {
     id: t.nullable(t.integer(), { description: 'Unique identifier for this window' }),
     selection: t.nullable(t.string(), { description: 'the selected tracks' }),
-    view: t.nullable(
-      t.reference<Playlist, never, 'Playlist'>(() => tvContract, 'Playlist', 'one'),
-      { description: 'the playlist currently displayed in the window' }
-    ),
   },
   { description: 'the main window' }
 )
@@ -1101,10 +1081,6 @@ const playlistRecordType: ValueType<Playlist> = t.record(
       description: 'the total length of all tracks (in seconds)',
     }),
     name: t.nullable(t.string(), { description: 'the name of the playlist' }),
-    parent: t.nullable(
-      t.reference<Playlist, never, 'Playlist'>(() => tvContract, 'Playlist', 'one'),
-      { description: 'folder which contains this playlist (if any)' }
-    ),
     size: t.nullable(t.integer(), { description: 'the total size of all tracks (in bytes)' }),
     specialKind: t.nullable(t.string(), { description: 'special playlist kind' }),
     time: t.nullable(t.string(), { description: 'the length of all tracks in MM:SS format' }),
@@ -1119,10 +1095,6 @@ const playlistWindowRecordType: ValueType<PlaylistWindow> = t.record(
   {
     id: t.nullable(t.integer(), { description: 'Unique identifier for this window' }),
     selection: t.nullable(t.string(), { description: 'the selected tracks' }),
-    view: t.nullable(
-      t.reference<Playlist, never, 'Playlist'>(() => tvContract, 'Playlist', 'one'),
-      { description: 'the playlist displayed in the window' }
-    ),
   },
   { description: 'a sub-window showing a single playlist' }
 )

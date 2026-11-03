@@ -25,7 +25,6 @@ import {
   type ClientRuntime,
   type FileSource,
   type Integer,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
   type Point,
   type Rectangle,
@@ -106,16 +105,6 @@ export interface Window {
    */
   frontmost: boolean | null
   /**
-   * The currently selected tab.
-   * Nullable. No evidence that the app always sets it.
-   */
-  currentTab: ObjectReferenceVariant<Tab, never, 'Tab'> | null
-  /**
-   * The current session in a window.
-   * Nullable. No evidence that the app always sets it.
-   */
-  currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null
-  /**
    * Whether the window is a hotkey window.
    * Nullable. No evidence that the app always sets it.
    */
@@ -149,11 +138,6 @@ export interface Window {
 
 /** A terminal tab */
 export interface Tab {
-  /**
-   * The current session in a tab.
-   * Nullable. No evidence that the app always sets it.
-   */
-  currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null
   /**
    * Index of tab in parent tab view control.
    * Nullable. No evidence that the app always sets it.
@@ -930,14 +914,6 @@ const windowRecordType: ValueType<Window> = t.record(
     frontmost: t.nullable(t.boolean(), {
       description: 'Whether the window is currently the frontmost window.',
     }),
-    currentTab: t.nullable(
-      t.reference<Tab, never, 'Tab'>(() => iTermContract, 'Tab', 'one'),
-      { description: 'The currently selected tab' }
-    ),
-    currentSession: t.nullable(
-      t.reference<Session, string, 'Session'>(() => iTermContract, 'Session', 'one'),
-      { description: 'The current session in a window' }
-    ),
     isHotkeyWindow: t.nullable(t.boolean(), {
       description: 'Whether the window is a hotkey window.',
     }),
@@ -961,10 +937,6 @@ const windowRecordType: ValueType<Window> = t.record(
 
 const tabRecordType: ValueType<Tab> = t.record(
   {
-    currentSession: t.nullable(
-      t.reference<Session, string, 'Session'>(() => iTermContract, 'Session', 'one'),
-      { description: 'The current session in a tab' }
-    ),
     index: t.nullable(t.integer(), { description: 'Index of tab in parent tab view control' }),
     title: t.nullable(t.string(), { description: 'The title property' }),
   },

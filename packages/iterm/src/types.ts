@@ -36,10 +36,6 @@ export interface Window {
   zoomed: boolean
   /** Whether the window is currently the frontmost window. */
   frontmost: boolean
-  /** The currently selected tab */
-  currentTab: Tab
-  /** The current session in a window */
-  currentSession: Session
   /** Whether the window is a hotkey window. */
   isHotkeyWindow: boolean
   /** If the window is a hotkey window, this gives the name of the profile that created the window. */
@@ -87,8 +83,6 @@ export type WindowUpdateInput = Partial<WindowCreateInput>
 
 /** A terminal tab */
 export interface Tab {
-  /** The current session in a tab */
-  currentSession: Session
   /** Index of tab in parent tab view control */
   index: number
   /** The title property */
@@ -283,8 +277,6 @@ export const WindowSchema = z.object({
   zoomable: z.boolean(),
   zoomed: z.boolean(),
   frontmost: z.boolean(),
-  currentTab: z.string(),
-  currentSession: z.string(),
   isHotkeyWindow: z.boolean(),
   hotkeyWindowProfile: z.string(),
   position: z.object({ x: z.number(), y: z.number() }),
@@ -294,7 +286,6 @@ export const WindowSchema = z.object({
 })
 
 export const TabSchema = z.object({
-  currentSession: z.string(),
   index: z.number(),
   title: z.string(),
 })

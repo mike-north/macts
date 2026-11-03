@@ -24,7 +24,6 @@ import {
   type CallOptions,
   type ClientRuntime,
   type Integer,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
   type ValueType,
 } from '@macts/contracts'
@@ -303,11 +302,6 @@ export interface FinderWindow {
    */
   readonly iconViewOptions: unknown
   /**
-   * the list view options for the container window.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly listViewOptions: ObjectReferenceVariant<ListViewOptions, never, 'ListViewOptions'> | null
-  /**
    * the column view options for the container window.
    * Nullable. No evidence that the app always sets it.
    */
@@ -365,11 +359,6 @@ export interface ListViewOptions {
    * Nullable. No evidence that the app always sets it.
    */
   textSize: Integer | null
-  /**
-   * the column that the list view is sorted on.
-   * Nullable. No evidence that the app always sets it.
-   */
-  sortColumn: ObjectReferenceVariant<Column, never, 'Column'> | null
   /**
    * Are relative dates (e.g., today, yesterday) shown in the list view?
    * Nullable. No evidence that the app always sets it.
@@ -922,14 +911,6 @@ const finderWindowRecordType: ValueType<FinderWindow> = t.record(
       description: 'the current view for the container window',
     }),
     iconViewOptions: t.unknown({ description: 'the icon view options for the container window' }),
-    listViewOptions: t.nullable(
-      t.reference<ListViewOptions, never, 'ListViewOptions'>(
-        () => finderContract,
-        'ListViewOptions',
-        'one'
-      ),
-      { description: 'the list view options for the container window' }
-    ),
     columnViewOptions: t.unknown({
       description: 'the column view options for the container window',
     }),
@@ -966,10 +947,6 @@ const listViewOptionsRecordType: ValueType<ListViewOptions> = t.record(
     textSize: t.nullable(t.integer(), {
       description: 'the size of the text displayed in the list view',
     }),
-    sortColumn: t.nullable(
-      t.reference<Column, never, 'Column'>(() => finderContract, 'Column', 'one'),
-      { description: 'the column that the list view is sorted on' }
-    ),
     usesRelativeDates: t.nullable(t.boolean(), {
       description: 'Are relative dates (e.g., today, yesterday) shown in the list view?',
     }),
