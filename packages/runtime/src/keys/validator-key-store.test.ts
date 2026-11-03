@@ -26,7 +26,6 @@ import {
   generateKeyId,
   getSigningSecret,
   revokeKey,
-  saveKeyMetadata,
   updateKeyMetadata,
 } from './storage.js'
 import { validateApiKey } from './validator.js'
@@ -154,19 +153,13 @@ describe('validateApiKey against the key store: changes in this process are seen
     await expectRefused(token, 'UNKNOWN_KEY')
   })
 
-  it('refuses a key on the very next call after an update marks it revoked', async () => {
-    const { token, keyId } = await createValidatedKey('Updated to revoked')
+  it('keeps accepting a renamed key, with the grant its token carries', async () => {
+    const { token, keyId } = await createValidatedKey('Renamed after use')
 
-    expect(updateKeyMetadata(keyId, { revoked: true })?.revoked).toBe(true)
+    expect(updateKeyMetadata(keyId, { name: 'Renamed' })?.name).toBe('Renamed')
 
-    await expectRefused(token, 'REVOKED')
-  })
-
-  it('refuses a key on the very next call after the key set is replaced without it', async () => {
-    const { token } = await createValidatedKey('Dropped by replacement')
-
-    saveKeyMetadata([])
-
-    await expectRefused(token, 'UNKNOWN_KEY')
+    const result = await validateApiKey(token)
+    assertValidationSuccess(result)
+    expect(result.payload.permissions).toEqual(['calendar:events:list'])
   })
 })

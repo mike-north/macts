@@ -259,6 +259,11 @@ export { hasPermission }
 export function isKeyRevoked(keyId: string): boolean;
 
 // @public
+export interface KeyMetadataUpdate {
+    readonly name?: string;
+}
+
+// @public
 export class KeyPolicyError extends Error {
     constructor(
     keyId: string, message: string);
@@ -408,9 +413,6 @@ export function revokeKey(keyId: string): boolean;
 export type RuntimeLogger = Pick<Logger, 'error' | 'warn' | 'info'>;
 
 // @public
-export function saveKeyMetadata(keys: ApiKeyMetadata[]): void;
-
-// @public
 export function setKeyPolicy(keyId: string, policy: GovernancePolicy, updatedAt?: Date): void;
 
 // @public
@@ -438,7 +440,7 @@ export class UnexpandableCoarsePermissionError extends Error {
 }
 
 // @public
-export function updateKeyMetadata(keyId: string, updates: Partial<ApiKeyMetadata>): ApiKeyMetadata | undefined;
+export function updateKeyMetadata(keyId: string, updates: KeyMetadataUpdate): ApiKeyMetadata | undefined;
 
 // @public
 export function validateAndCheckPermission(token: string, requiredPermission: string, permissionHistory?: PermissionHistoryEntry[]): Promise<PermissionCheckResult & {
