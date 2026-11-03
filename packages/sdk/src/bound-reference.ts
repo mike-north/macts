@@ -13,7 +13,11 @@
  * declared data field makes encoding fail, so a bound reference's own
  * enumerable properties are exactly its data fields. The client it resolves
  * through is a `#private` field, and `resolve` is a prototype member, so
- * neither is ever encoded, serialized, or compared as data.
+ * neither is ever encoded, serialized, or compared as data. A bound reference
+ * is a class instance, so a strict deep-equality check that compares
+ * prototypes (`node:assert`'s `deepStrictEqual`, vitest's `toStrictEqual`)
+ * does not match identical hand-built data, while JSON serialization,
+ * spreading, and `toEqual` do.
  *
  * This module depends only on `@macts/contracts`, because the remote entry
  * point uses it and must never load the Mac-side runtime.

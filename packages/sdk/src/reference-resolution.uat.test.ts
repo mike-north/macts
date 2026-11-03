@@ -31,6 +31,10 @@
  *   through that client exactly as `ClientRuntime.resolve` does; binding
  *   sends nothing; another app at any level is `ValidationError` at that
  *   level's `app`; a reference decoded by one client rebinds to another.
+ * - D5: a resolution presents the client's token and is verified like any
+ *   call, so a token that is not a macts key, or a revoked key, is
+ *   `AuthenticationError` (code `UNAUTHENTICATED`) with that reason, and
+ *   nothing is resolved; over HTTP the 401 carries `WWW-Authenticate: Bearer`.
  * - D11: a result violating the output contract is `UnexpectedValueError`.
  * - D6: an abort is `OperationCancelledError`.
  *
@@ -44,6 +48,7 @@ import { afterAll, afterEach, describe, expect, it, vi } from 'vitest'
 import { createApp } from '@macts/api/server'
 import type { ResolutionRequest } from '@macts/core'
 import {
+  AuthenticationError,
   OperationCancelledError,
   PermissionDeniedError,
   TargetNotFoundError,
@@ -57,6 +62,7 @@ import {
   closeKeyStore,
   createApiKey,
   createLogger,
+  revokeKey,
   setLogger,
   type GovernanceContext,
 } from '@macts/runtime'
@@ -143,6 +149,29 @@ async function keyWith(permissions: readonly string[]): Promise<string> {
   return key.token
 }
 
+/** A real key holding every library permission, revoked before it is used. */
+async function revokedKey(): Promise<string> {
+  const key = await createApiKey({
+    name: 'Revoked reference resolution test',
+    permissions: [...ALL_PERMISSIONS],
+  })
+  revokeKey(key.keyId)
+  return key.token
+}
+
+/**
+ * Tokens the key store does not accept, with the reason verification gives
+ * for each (phases/13 D5).
+ */
+const REJECTED_TOKENS = [
+  {
+    name: 'a token that is not a macts key',
+    token: () => Promise.resolve('macts_sk_not-a-real-key'),
+    reason: 'malformed',
+  },
+  { name: 'a revoked key', token: revokedKey, reason: 'revoked' },
+] as const
+
 /** The books the library holds, in wire form, by ISBN. */
 const BOOKS: Readonly<Record<string, WireValue>> = {
   [DUNE_ISBN]: DUNE_WIRE,
@@ -205,19 +234,35 @@ interface Factory {
   readonly name: string
   /** `bindReference` as the factory's own entry point exports it. */
   readonly bindReference: typeof bindLocalReference
+  /**
+   * Build a client whose key holds `permissions`, or that presents `token`
+   * instead when it is given.
+   */
   build(
     permissions: readonly string[],
-    respond: (request: ResolutionRequest) => Promise<WireValue>
+    respond: (request: ResolutionRequest) => Promise<WireValue>,
+    token?: string
   ): Promise<Harness>
+}
+
+/** One HTTP response the remote client received, as far as the tests read it. */
+interface ObservedResponse {
+  readonly status: number
+  readonly challenge: string | null
+}
+
+/** A remote client under test, which also records every response it received. */
+interface RemoteHarness extends Harness {
+  readonly responses: readonly ObservedResponse[]
 }
 
 const local: Factory = {
   name: 'local client (@macts/sdk/local)',
   bindReference: bindLocalReference,
-  async build(permissions, respond) {
+  async build(permissions, respond, token) {
     const executor = createRecordingExecutor(() => Promise.resolve(DUNE_WIRE), respond)
     const client = createLocalClient(libraryContract, {
-      token: await keyWith(permissions),
+      token: token ?? (await keyWith(permissions)),
       executor,
       governance: ALLOW_ALL,
     })
@@ -229,10 +274,10 @@ const local: Factory = {
   },
 }
 
-const remote: Factory = {
+const remote = {
   name: 'remote client (@macts/sdk) over a real listener',
   bindReference: bindRemoteReference,
-  async build(permissions, respond) {
+  async build(permissions, respond, token?): Promise<RemoteHarness> {
     const executor = createRecordingExecutor(() => Promise.resolve(DUNE_WIRE), respond)
     const app = createApp([], {
       cors: false,
@@ -252,18 +297,24 @@ const remote: Factory = {
     openServers.push(server)
     const { port } = server.address() as AddressInfo
     let requests = 0
-    const fetch: typeof globalThis.fetch = (input, init) => {
+    const responses: ObservedResponse[] = []
+    const fetch: typeof globalThis.fetch = async (input, init) => {
       requests++
-      return globalThis.fetch(input, init)
+      const response = await globalThis.fetch(input, init)
+      responses.push({
+        status: response.status,
+        challenge: response.headers.get('WWW-Authenticate'),
+      })
+      return response
     }
     const client = createRemoteClient(libraryContract, {
-      token: await keyWith(permissions),
+      token: token ?? (await keyWith(permissions)),
       url: `http://127.0.0.1:${String(port)}`,
       fetch,
     })
-    return { client, executor, sent: () => requests }
+    return { client, executor, sent: () => requests, responses }
   },
-}
+} satisfies Factory
 
 /** A reference to Dune by its ISBN, built by hand as a caller would. */
 const DUNE: ReferenceData = {
@@ -572,6 +623,22 @@ describe.each([local, remote])('reference resolution: $name', (factory) => {
     expect(error).toMatchObject({ details: { resource: 'Book', entryIndex: 1 } })
   })
 
+  describe('raises AuthenticationError, resolving nothing, for', () => {
+    it.each(REJECTED_TOKENS)('$name', async ({ token, reason }) => {
+      const { client, executor } = await factory.build(
+        ALL_PERMISSIONS,
+        libraryResolution,
+        await token()
+      )
+
+      const error = await rejection(client.resolve(DUNE))
+
+      expect(error).toBeInstanceOf(AuthenticationError)
+      expect(error).toMatchObject({ code: 'UNAUTHENTICATED', details: { reason } })
+      expect(executor.resolutions).toHaveLength(0)
+    })
+  })
+
   it('raises PermissionDeniedError for a key without the get permission, running nothing', async () => {
     // The key may list books but not read one, so a single reference is denied.
     const { client, executor } = await factory.build(['library:books:list'], libraryResolution)
@@ -705,5 +772,16 @@ describe('rebinding a reference across localities', () => {
     // The local client ran only the operation that decoded the book.
     expect(localHarness.executor.requests).toHaveLength(1)
     expect(localHarness.executor.resolutions).toHaveLength(0)
+  })
+})
+
+describe('resolution over HTTP with a credential the service refuses', () => {
+  it.each(REJECTED_TOKENS)('answers 401 with a Bearer challenge for $name', async ({ token }) => {
+    const harness = await remote.build(ALL_PERMISSIONS, libraryResolution, await token())
+
+    await rejection(harness.client.resolve(DUNE))
+
+    expect(harness.responses).toEqual([{ status: 401, challenge: 'Bearer' }])
+    expect(harness.executor.resolutions).toHaveLength(0)
   })
 })

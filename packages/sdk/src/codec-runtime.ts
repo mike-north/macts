@@ -12,7 +12,9 @@
  *
  * - an input, or a reference to resolve, that fails its contract raises
  *   `ValidationError` before anything is sent;
- * - a result that fails its contract raises `UnexpectedValueError`.
+ * - a result that fails its contract raises `UnexpectedValueError`, as does
+ *   the resolution of an identity collection that does not hold exactly one
+ *   record per entry.
  *
  * There are two kinds of call. `invoke` runs an operation. `resolve` resolves
  * a reference (phases/13 D7): it re-encodes the reference's data through the
@@ -290,6 +292,41 @@ function encodeReference(
 }
 
 /**
+ * Check that the resolution of an identity collection holds exactly one
+ * record per entry.
+ *
+ * @remarks
+ * The runtime that resolved the reference enforces this already (phases/13
+ * D7, Resolution step 8), so an entry is never silently dropped. The client
+ * checks it again because what it received is untrusted: a service or
+ * runtime that skipped the check must not hand the caller a collection that
+ * lost entries without saying which.
+ *
+ * @param subject - What produced the result, for the error message.
+ * @throws `UnexpectedValueError` when the number of records is not the
+ *   number of entries.
+ */
+function checkEntryCount(reference: ReferenceData, resolved: unknown, subject: string): void {
+  if (reference.form !== 'identity' || reference.cardinality !== 'many') return
+  // Anything but an array already failed the list operation's output contract.
+  if (!Array.isArray(resolved)) return
+  const expected = reference.entries.length
+  if (resolved.length === expected) return
+  const received = String(resolved.length)
+  throw new UnexpectedValueError(
+    `${subject} must hold one record per entry: expected ${String(expected)} records, received ${received}.`,
+    {
+      issues: [
+        {
+          path: [],
+          message: `Expected ${String(expected)} records, one per entry, but received ${received}`,
+        },
+      ],
+    }
+  )
+}
+
+/**
  * The operation a reference to `target` resolves as: the one the contract's
  * resource table records for the reference's cardinality
  * (`resolvingOperationKey`). Its output contract decodes the result.
@@ -342,12 +379,10 @@ function buildCodecClientRuntime(app: ClientApp, transport: ClientTransport): Co
       const wire = encodeReference(app, 'resolve', target, reference)
       const operation = resolvingOperation(app, target)
       const result = await transport.resolve(wire, options)
-      return decodeOutput(
-        operation,
-        result,
-        decodeContext,
-        `The result of resolving a reference as "${operation.id}"`
-      )
+      const subject = `The result of resolving a reference as "${operation.id}"`
+      const resolved = decodeOutput(operation, result, decodeContext, subject)
+      checkEntryCount(reference, resolved, subject)
+      return resolved
     },
   }
   // References in any result resolve through this same runtime.

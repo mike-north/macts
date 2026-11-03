@@ -18,6 +18,9 @@
  * - D11: the client decodes a resolution result with the output contract of
  *   the resource's `get` or `list` operation; a mismatch is
  *   `UnexpectedValueError`.
+ * - D7 Resolution step 8: an identity collection resolves to exactly one
+ *   record per entry; the client checks it again, and a mismatch is
+ *   `UnexpectedValueError`.
  * - D7 Caller-built references: `bindReference(client, data)` encodes the
  *   data through the app's reference value type and decodes it with the
  *   client's own decode context, so the result is a reference the client
@@ -207,6 +210,23 @@ describe('binding decoded references', () => {
     })
   })
 
+  it('compares equal to its data except under prototype-strict equality', async () => {
+    const { book } = await decodedBook()
+    const data = {
+      app: 'library',
+      resource: 'Branch',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'DT',
+    }
+
+    expect(book.shelf.container).toEqual(data)
+    expect({ ...book.shelf.container }).toStrictEqual(data)
+    expect(JSON.parse(JSON.stringify(book.shelf.container))).toStrictEqual(data)
+    // A bound reference is a class instance, not a plain object.
+    expect(book.shelf.container).not.toStrictEqual(data)
+  })
+
   it('re-encodes a bound reference to exactly the canonical wire form', async () => {
     const { book } = await decodedBook()
 
@@ -301,6 +321,59 @@ describe('resolving bound references', () => {
         'The result of resolving a reference as "library.books.get" does not match its contract.',
     })
     expect(sent).toHaveLength(1)
+  })
+
+  it('raises UnexpectedValueError when an identity collection resolves to fewer records than entries', async () => {
+    // Two entries, one record: an entry was dropped instead of reported.
+    const { book, sent } = await decodedBook(() => [DUNE_WIRE])
+
+    const error = await rejection(book.sequels.resolve())
+
+    expect(error).toBeInstanceOf(UnexpectedValueError)
+    expect(error).toMatchObject({
+      message:
+        'The result of resolving a reference as "library.books.list" must hold one record per ' +
+        'entry: expected 2 records, received 1.',
+      details: {
+        issues: [{ path: [], message: 'Expected 2 records, one per entry, but received 1' }],
+      },
+    })
+    expect(sent.map((request) => request.kind)).toEqual(['invoke', 'resolve'])
+  })
+
+  it('raises UnexpectedValueError when an identity collection resolves to more records than entries', async () => {
+    const { client } = recordingClient(() => [DUNE_WIRE, DUNE_MESSIAH_WIRE])
+
+    const error = await rejection(
+      client.resolve({
+        app: 'library',
+        resource: 'Book',
+        form: 'identity',
+        cardinality: 'many',
+        entries: [],
+      })
+    )
+
+    expect(error).toBeInstanceOf(UnexpectedValueError)
+    expect(error).toMatchObject({
+      details: {
+        issues: [{ path: [], message: 'Expected 0 records, one per entry, but received 2' }],
+      },
+    })
+  })
+
+  it('does not count records for a selector collection', async () => {
+    const { client } = recordingClient(() => [DUNE_WIRE, DUNE_MESSIAH_WIRE])
+
+    const resolved = await client.resolve({
+      app: 'library',
+      resource: 'Book',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'every' },
+    })
+
+    expect(resolved).toHaveLength(2)
   })
 
   it("raises ValidationError at a nested container's app, sending nothing", async () => {
