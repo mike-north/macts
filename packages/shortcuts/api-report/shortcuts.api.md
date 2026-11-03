@@ -89,12 +89,8 @@ export interface ShortcutCreateInput {
 export class ShortcutResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Shortcut>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(): Promise<{
         items: Shortcut[];
-        nextCursor?: string;
     }>;
     run(id: string, withInput?: unknown): Promise<void>;
 }

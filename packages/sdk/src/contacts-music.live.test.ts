@@ -57,7 +57,6 @@ import {
   type AnyOperationDescriptor,
   type AppContract,
   type OperationId,
-  type Page,
   type WireRecord,
 } from '@macts/contracts'
 import { AppManifestSchema, createNativeExecutor, type AppManifest } from '@macts/core'
@@ -154,20 +153,6 @@ function permissionsOf<Client>(
     if (operation === undefined) throw new Error(`the contract declares no ${id}`)
     return operation.permission
   })
-}
-
-/** Every item of a list, read page by page until no `nextCursor` remains. */
-async function everyItem<Item>(
-  read: (page: { readonly cursor?: string }) => Promise<Page<Item>>
-): Promise<Item[]> {
-  const items: Item[] = []
-  let cursor: string | undefined
-  do {
-    const page = await read(cursor === undefined ? {} : { cursor })
-    items.push(...page.items)
-    cursor = page.nextCursor
-  } while (cursor !== undefined)
-  return items
 }
 
 /** A wire record's field, read without assuming the record's shape. */
@@ -303,7 +288,8 @@ describe.skipIf(!liveAppsEnabled)('Music reads against Music.app (local only)', 
   it(
     'lists the library playlist tracks and gets the first by its persistent ID',
     async () => {
-      const playlists = await everyItem((page) => music.playlists.list(page))
+      // Playlists do not page: the one page holds every playlist.
+      const playlists = (await music.playlists.list()).items
       const library = playlists.find((playlist) => playlist.specialKind === LIBRARY_PLAYLIST_KIND)
       if (library === undefined) return
       const tracks = await music.tracks.list(library.persistentID)
@@ -327,7 +313,8 @@ describe.skipIf(!liveAppsEnabled)('Music reads against Music.app (local only)', 
     async () => {
       // A track's numeric id belongs to its entry in one playlist; its
       // persistent ID is the same in every playlist that holds it.
-      const playlists = await everyItem((page) => music.playlists.list(page))
+      // Playlists do not page: the one page holds every playlist.
+      const playlists = (await music.playlists.list()).items
       const library = playlists.find((playlist) => playlist.specialKind === LIBRARY_PLAYLIST_KIND)
       const other = playlists.find(
         (playlist) => playlist.persistentID !== library?.persistentID && (playlist.size ?? 0) > 0

@@ -200,6 +200,17 @@ export const manifest: unknown = {
         skipped: [],
         note: 'the parent scan stopped at the time limit after 104 parents',
       },
+      rangeRead: {
+        supported: true,
+        evidence: {
+          source: 'probe',
+          observedAt: '2026-11-03T18:05:41.000Z',
+          bundleId: 'com.apple.AddressBook',
+          appVersion: '14.0',
+          osVersion: '27.2',
+          note: 'Read-only first pages of the addresses of a person, at page sizes 25, 2 and 1, each read as a range of the collection. No person among the first 100 had more than one address, so no page continued past the first.',
+        },
+      },
     },
     AIMHandle: {
       name: 'AIMHandle',
@@ -364,6 +375,17 @@ export const manifest: unknown = {
         skipped: [],
         note: 'the parent scan stopped at the time limit after 105 parents',
       },
+      rangeRead: {
+        supported: true,
+        evidence: {
+          source: 'probe',
+          observedAt: '2026-11-03T18:05:41.000Z',
+          bundleId: 'com.apple.AddressBook',
+          appVersion: '14.0',
+          osVersion: '27.2',
+          note: 'Read-only pages of the email addresses of a person: a first page of 25, and pages of 1 continued by cursor across a page boundary, each read as a range of the collection.',
+        },
+      },
     },
     Group: {
       name: 'Group',
@@ -424,6 +446,17 @@ export const manifest: unknown = {
         parentsScanned: 1,
         status: 'probed',
         skipped: [],
+      },
+      rangeRead: {
+        supported: true,
+        evidence: {
+          source: 'probe',
+          observedAt: '2026-11-03T18:05:41.000Z',
+          bundleId: 'com.apple.AddressBook',
+          appVersion: '14.0',
+          osVersion: '27.2',
+          note: 'Read-only pages of the groups at the application, at page sizes 25, 2 and 1. The collection held one group, so no page continued past the first.',
+        },
       },
     },
     ICQHandle: {
@@ -993,6 +1026,17 @@ export const manifest: unknown = {
         skipped: ['image'],
         note: 'stopped at the time limit after 23 items',
       },
+      rangeRead: {
+        supported: true,
+        evidence: {
+          source: 'probe',
+          observedAt: '2026-11-03T18:05:41.000Z',
+          bundleId: 'com.apple.AddressBook',
+          appVersion: '14.0',
+          osVersion: '27.2',
+          note: 'Read-only pages of the people at the application: a first page of 25 continued by cursor, and pages of 2 continued by cursor, each read as a range of the collection.',
+        },
+      },
     },
     Phone: {
       name: 'Phone',
@@ -1073,6 +1117,17 @@ export const manifest: unknown = {
         status: 'probed',
         skipped: [],
         note: 'the parent scan stopped at the time limit after 77 parents; the sample stopped at the time limit after 48 items',
+      },
+      rangeRead: {
+        supported: true,
+        evidence: {
+          source: 'probe',
+          observedAt: '2026-11-03T18:05:41.000Z',
+          bundleId: 'com.apple.AddressBook',
+          appVersion: '14.0',
+          osVersion: '27.2',
+          note: 'Read-only pages of the phone numbers of a person: a first page of 25, and pages of 2 continued by cursor across a page boundary, each read as a range of the collection.',
+        },
       },
     },
     RelatedName: {

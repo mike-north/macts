@@ -124,14 +124,8 @@ export interface FolderUpdateInput {
 
 /** A shortcut in the Shortcuts application */
 export interface ShortcutResourceClient {
-  /**
-   * List shortcuts, one page at a time.
-   *
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
-   */
-  list(page?: PageRequest, options?: CallOptions): Promise<Page<Shortcut>>
+  /** List shortcuts, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Shortcut>>
   /**
    * Read the shortcut identified by `id`.
    *
@@ -225,32 +219,17 @@ const resources: AppContract<ShortcutsClient>['resources'] = {
   },
 }
 
-const shortcutListOperation: OperationDescriptor<PageRequest, Page<Shortcut>> = {
+const shortcutListOperation: OperationDescriptor<Record<string, never>, Page<Shortcut>> = {
   id: 'shortcuts.shortcuts.list',
   permission: 'shortcuts:shortcuts:list',
   target: { command: 'list', resource: 'Shortcut' },
   description: 'List all shortcuts',
-  input: t.record({
-    ...t.pageInputs(),
-  }),
+  input: t.record({}),
   output: t.page(shortcutRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
@@ -435,7 +414,7 @@ const operations: AppContract<ShortcutsClient>['operations'] = {
 function bind(runtime: ClientRuntime): ShortcutsClient {
   return {
     shortcuts: {
-      list: (page, options) => runtime.invoke(shortcutListOperation, { ...page }, options),
+      list: (options) => runtime.invoke(shortcutListOperation, {}, options),
       get: (id, options) => runtime.invoke(shortcutGetOperation, { id }, options),
       run: (id, withInput, options) =>
         runtime.invoke(shortcutRunOperation, { id, withInput }, options),

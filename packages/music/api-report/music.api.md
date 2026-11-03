@@ -427,12 +427,8 @@ export interface PlaylistCreateInput {
 export class PlaylistResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(persistentID: string): Promise<Playlist>;
-    list(page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(): Promise<{
         items: Playlist[];
-        nextCursor?: string;
     }>;
     move(to: string): Promise<void>;
     search(_for: string, only?: string): Promise<void>;

@@ -21,19 +21,10 @@ export class ScenarioResourceClient {
   }
 
   /**
-   * List scenarios, one page at a time. When the result has a `nextCursor`,
-   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
+   * List all scenarios, as one page.
    */
-  async list(
-    page: { pageSize?: number; cursor?: string } = {}
-  ): Promise<{ items: Scenario[]; nextCursor?: string }> {
-    return this.#http.rpc<{ items: Scenario[]; nextCursor?: string }>(
-      `${this.#app}.${this.#resource}.list`,
-      {
-        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-      }
-    )
+  async list(): Promise<{ items: Scenario[] }> {
+    return this.#http.rpc<{ items: Scenario[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

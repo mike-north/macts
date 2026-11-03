@@ -29,7 +29,6 @@ import {
   type ObjectReferenceVariant,
   type OperationDescriptor,
   type Page,
-  type PageRequest,
   type ValueType,
 } from '@macts/contracts'
 
@@ -1056,14 +1055,11 @@ export interface WorkspaceDocumentResourceClient {
  */
 export interface ProjectResourceClient {
   /**
-   * List projects, one page at a time.
+   * List projects, as one page holding all of them.
    *
    * @param workspaceName - Workspace document name. Does not accept null.
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
    */
-  list(workspaceName: string, page?: PageRequest, options?: CallOptions): Promise<Page<Project>>
+  list(workspaceName: string, options?: CallOptions): Promise<Page<Project>>
   /**
    * Read the project identified by `id`.
    *
@@ -1077,14 +1073,11 @@ export interface ProjectResourceClient {
  */
 export interface SchemeResourceClient {
   /**
-   * List schemes, one page at a time.
+   * List schemes, as one page holding all of them.
    *
    * @param workspaceName - Workspace document name. Does not accept null.
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
    */
-  list(workspaceName: string, page?: PageRequest, options?: CallOptions): Promise<Page<Scheme>>
+  list(workspaceName: string, options?: CallOptions): Promise<Page<Scheme>>
   /**
    * Read the scheme identified by `id`.
    *
@@ -1590,7 +1583,7 @@ const workspaceDocumentGetWorkspaceDocumentOperation: OperationDescriptor<
 }
 
 const projectListProjectsOperation: OperationDescriptor<
-  { readonly workspaceName: string } & PageRequest,
+  { readonly workspaceName: string },
   Page<Project>
 > = {
   id: 'xcode.projects.list',
@@ -1599,27 +1592,12 @@ const projectListProjectsOperation: OperationDescriptor<
   description: 'List all projects in a workspace',
   input: t.record({
     workspaceName: t.string({ description: 'Workspace document name' }),
-    ...t.pageInputs(),
   }),
   output: t.page(projectRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      workspaceName: { type: 'string', description: 'Workspace document name' },
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: { workspaceName: { type: 'string', description: 'Workspace document name' } },
     required: ['workspaceName'],
     additionalProperties: false,
   },
@@ -1644,7 +1622,7 @@ const projectGetProjectOperation: OperationDescriptor<{ readonly id: string }, P
 }
 
 const schemeListSchemesOperation: OperationDescriptor<
-  { readonly workspaceName: string } & PageRequest,
+  { readonly workspaceName: string },
   Page<Scheme>
 > = {
   id: 'xcode.schemes.list',
@@ -1653,27 +1631,12 @@ const schemeListSchemesOperation: OperationDescriptor<
   description: 'List all schemes in a workspace',
   input: t.record({
     workspaceName: t.string({ description: 'Workspace document name' }),
-    ...t.pageInputs(),
   }),
   output: t.page(schemeRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      workspaceName: { type: 'string', description: 'Workspace document name' },
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: { workspaceName: { type: 'string', description: 'Workspace document name' } },
     required: ['workspaceName'],
     additionalProperties: false,
   },
@@ -2294,13 +2257,13 @@ function bind(runtime: ClientRuntime): XcodeClient {
         ),
     },
     projects: {
-      list: (workspaceName, page, options) =>
-        runtime.invoke(projectListProjectsOperation, { ...page, workspaceName }, options),
+      list: (workspaceName, options) =>
+        runtime.invoke(projectListProjectsOperation, { workspaceName }, options),
       get: (id, options) => runtime.invoke(projectGetProjectOperation, { id }, options),
     },
     schemes: {
-      list: (workspaceName, page, options) =>
-        runtime.invoke(schemeListSchemesOperation, { ...page, workspaceName }, options),
+      list: (workspaceName, options) =>
+        runtime.invoke(schemeListSchemesOperation, { workspaceName }, options),
       get: (id, options) => runtime.invoke(schemeGetSchemeOperation, { id }, options),
     },
     runDestinations: {

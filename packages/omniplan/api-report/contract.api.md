@@ -8,7 +8,6 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
-import { PageRequest } from '@macts/contracts';
 
 // @public
 export interface Assignment {
@@ -230,7 +229,7 @@ export interface ScenarioCreateInput {
 // @public
 export interface ScenarioResourceClient {
     get(id: string, options?: CallOptions): Promise<Scenario>;
-    list(page?: PageRequest, options?: CallOptions): Promise<Page<Scenario>>;
+    list(options?: CallOptions): Promise<Page<Scenario>>;
 }
 
 // @public
