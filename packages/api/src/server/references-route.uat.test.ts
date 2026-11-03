@@ -14,9 +14,9 @@
  *   the resource's `get` operation and a collection as its `list` operation,
  *   possibly empty; an identity collection holds one record per entry, and a
  *   short result is `UNEXPECTED_VALUE`; a missing identity-collection entry is
- *   `TARGET_NOT_FOUND` with `entryIndex`; a resource without the operation is
- *   `INVALID_SELECTION`; an unknown app or malformed reference is
- *   `VALIDATION_FAILED`; a body with any field but `app` and `reference` is
+ *   `TARGET_NOT_FOUND` with `entryIndex`; an index past the end is
+ *   `INVALID_SELECTION`; an unknown app, a malformed reference, or one whose
+ *   resource has no resolving operation is `VALIDATION_FAILED`; a body with any field but `app` and `reference` is
  *   `VALIDATION_FAILED`, one issue per unknown field.
  * - D5: the per-client-address limit applies before the credential is
  *   examined, and the runtime's pipeline governs every resolution.
@@ -294,7 +294,7 @@ describe('POST /references/v1/resolve: resolution failures', () => {
     })
   })
 
-  it('answers a reference to a resource without a get operation with 400 INVALID_SELECTION', async () => {
+  it('answers a reference to a resource without a get operation with 400 VALIDATION_FAILED at its resource', async () => {
     const server = await listenServer()
 
     const res = await resolve(server, libraryBody(SCIENCE_FICTION_SHELF), LIBRARIAN_TOKEN)
@@ -302,10 +302,16 @@ describe('POST /references/v1/resolve: resolution failures', () => {
     expect(res.status).toBe(400)
     expect(await res.json()).toEqual({
       error: {
-        code: 'INVALID_SELECTION',
-        message:
-          'References to "Shelf" cannot be resolved: the library app has no get operation for it.',
-        details: { resource: 'Shelf' },
+        code: 'VALIDATION_FAILED',
+        message: 'The library app cannot resolve a single reference to "Shelf".',
+        details: {
+          issues: [
+            {
+              path: ['reference', 'resource'],
+              message: 'The library app has no get operation for "Shelf"',
+            },
+          ],
+        },
       },
     })
     expect(server.executor.resolutions).toHaveLength(0)

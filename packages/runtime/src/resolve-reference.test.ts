@@ -5,8 +5,10 @@
  *
  * - D7: a single reference resolves as its resource's `get` operation and a
  *   collection reference as its `list` operation, needing that operation's
- *   permission (and no container's); a resource without the operation fails
- *   with `InvalidSelectionError`; the wire rules `t.reference` enforces.
+ *   permission (and no container's); a reference whose resource has no such
+ *   operation is invalid against the contract and fails with `ValidationError`
+ *   at its resource (`InvalidSelectionError` is only for an index or range the
+ *   collection cannot satisfy); the wire rules `t.reference` enforces.
  * - D5: the pipeline order (verify → admission → permission → governance and
  *   approval → validation → executor), failing closed.
  * - D6: which canonical class and details each failure carries.
@@ -955,7 +957,7 @@ describe('resolveReference: reference validation (D7)', () => {
 })
 
 describe('resolveReference: resources without a resolving operation (D7)', () => {
-  it('fails a single reference to a resource with no get operation with InvalidSelectionError', async () => {
+  it('fails a single reference to a resource with no get operation with ValidationError at its resource', async () => {
     const writer = createMemoryAuditWriter()
     const { runtime, executor } = harness({ governance: { policy: ALLOW_ALL_POLICY, writer } })
 
@@ -972,14 +974,21 @@ describe('resolveReference: resources without a resolving operation (D7)', () =>
       )
     )
 
-    expect(error).toBeInstanceOf(InvalidSelectionError)
-    if (!(error instanceof InvalidSelectionError)) return
-    expect(error.details).toEqual({ resource: 'Page' })
+    expect(error).toBeInstanceOf(ValidationError)
+    if (!(error instanceof ValidationError)) return
+    expect(error.message).toBe('The library app cannot resolve a single reference to "Page".')
+    expect(error.details.issues).toEqual([
+      {
+        path: ['reference', 'resource'],
+        message: 'The library app has no get operation for "Page"',
+      },
+    ])
     expect(executor.resolutions).toHaveLength(0)
+    // It is routing, read before governance, so nothing is audited.
     expect(writer.records).toHaveLength(0)
   })
 
-  it('fails a collection reference to a resource with no list operation with InvalidSelectionError', async () => {
+  it('fails a collection reference to a resource with no list operation with ValidationError at its resource', async () => {
     const { runtime, executor } = harness()
 
     const error = await rejection(
@@ -995,9 +1004,15 @@ describe('resolveReference: resources without a resolving operation (D7)', () =>
       )
     )
 
-    expect(error).toBeInstanceOf(InvalidSelectionError)
-    if (!(error instanceof InvalidSelectionError)) return
-    expect(error.details).toEqual({ resource: 'Stamp' })
+    expect(error).toBeInstanceOf(ValidationError)
+    if (!(error instanceof ValidationError)) return
+    expect(error.message).toBe('The library app cannot resolve a collection reference to "Stamp".')
+    expect(error.details.issues).toEqual([
+      {
+        path: ['reference', 'resource'],
+        message: 'The library app has no list operation for "Stamp"',
+      },
+    ])
     expect(executor.resolutions).toHaveLength(0)
   })
 

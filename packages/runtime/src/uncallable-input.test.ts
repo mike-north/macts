@@ -28,7 +28,6 @@
 import { describe, expect, it } from 'vitest'
 import type { AppManifest, GovernancePolicy } from '@macts/core'
 import {
-  InvalidSelectionError,
   ValidationError,
   ValueTypes as t,
   type AnyOperationDescriptor,
@@ -313,12 +312,15 @@ describe('resolveReference: a resolving operation marked unavailable (D7)', () =
       runtime.resolveReference('library', { reference: stamp }, librarian())
     )
 
-    expect(error).toBeInstanceOf(InvalidSelectionError)
-    if (!(error instanceof InvalidSelectionError)) return
-    expect(error.message).toBe(
-      'References to "Stamp" cannot be resolved: the library app has no get operation for it.'
-    )
-    expect(error.details).toEqual({ resource: 'Stamp' })
+    expect(error).toBeInstanceOf(ValidationError)
+    if (!(error instanceof ValidationError)) return
+    expect(error.message).toBe('The library app cannot resolve a single reference to "Stamp".')
+    expect(error.details.issues).toEqual([
+      {
+        path: ['reference', 'resource'],
+        message: 'The library app has no get operation for "Stamp"',
+      },
+    ])
     expect(provider.requests).toHaveLength(0)
     expect(executor.resolutions).toHaveLength(0)
   })
