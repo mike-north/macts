@@ -161,8 +161,10 @@ describe('a resource with a get but no identifier', () => {
   })
 
   it('warns about each, with the no-identifier reason', () => {
-    const omitted = generated.diagnostics.filter(({ kind }) => kind === 'omitted-output')
-    expect(omitted.filter(({ target }) => target === 'Book')).toEqual([
+    const book = generated.diagnostics.filter(
+      (diagnostic) => diagnostic.kind === 'omitted-output' && diagnostic.target === 'Book'
+    )
+    expect(book).toEqual([
       {
         kind: 'omitted-output',
         app: 'shelf',
