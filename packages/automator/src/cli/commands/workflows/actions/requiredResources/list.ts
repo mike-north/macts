@@ -20,10 +20,10 @@ export class ListRequiredResourcesCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.requiredResources.list(this.actionId)
+      const page = await client.requiredResources.list(this.actionId)
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           kind: item.kind,
           name: item.name,
           resource: item.resource,

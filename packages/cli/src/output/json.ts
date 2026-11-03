@@ -21,6 +21,15 @@ export class JsonFormatter implements OutputFormatter {
     return this.stringify({ data })
   }
 
+  /** `{ data, nextCursor? }`: `nextCursor` is present exactly when more items remain. */
+  formatPage(
+    data: readonly unknown[],
+    nextCursor: string | undefined,
+    _options?: TableOptions
+  ): string {
+    return this.stringify(nextCursor === undefined ? { data } : { data, nextCursor })
+  }
+
   formatError(error: Error | string): string {
     const message = error instanceof Error ? error.message : error
 

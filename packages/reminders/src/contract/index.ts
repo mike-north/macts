@@ -25,6 +25,8 @@ import {
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
+  type Page,
+  type PageRequest,
   type ValueType,
 } from '@macts/contracts'
 
@@ -244,14 +246,26 @@ export interface ReminderUpdateInput {
 
 /** An account in the Reminders application */
 export interface AccountResourceClient {
-  /** List accounts. */
-  list(options?: CallOptions): Promise<readonly Account[]>
+  /**
+   * List accounts, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Account>>
 }
 
 /** A list of reminders */
 export interface ListResourceClient {
-  /** List lists. */
-  list(options?: CallOptions): Promise<readonly List[]>
+  /**
+   * List lists, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<List>>
   /**
    * Read the list identified by `id`.
    *
@@ -265,11 +279,14 @@ export interface ListResourceClient {
 /** A reminder item */
 export interface ReminderResourceClient {
   /**
-   * List reminders.
+   * List reminders, one page at a time.
    *
    * @param listId - List identifier. Does not accept null.
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
    */
-  list(listId: string, options?: CallOptions): Promise<readonly Reminder[]>
+  list(listId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Reminder>>
   /**
    * Read the reminder identified by `id`.
    *
@@ -391,17 +408,32 @@ const resources: AppContract<RemindersClient>['resources'] = {
   },
 }
 
-const listListOperation: OperationDescriptor<Record<string, never>, readonly List[]> = {
+const listListOperation: OperationDescriptor<PageRequest, Page<List>> = {
   id: 'reminders.lists.list',
   permission: 'reminders:lists:list',
   target: { command: 'list', resource: 'List' },
   description: 'List all reminder lists',
-  input: t.record({}),
-  output: t.array(listRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(listRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -445,8 +477,8 @@ const listCreateOperation: OperationDescriptor<ListCreateInput, List> = {
 }
 
 const reminderListRemindersOperation: OperationDescriptor<
-  { readonly listId: string },
-  readonly Reminder[]
+  { readonly listId: string } & PageRequest,
+  Page<Reminder>
 > = {
   id: 'reminders.reminders.list',
   permission: 'reminders:reminders:list',
@@ -454,12 +486,27 @@ const reminderListRemindersOperation: OperationDescriptor<
   description: 'List all reminders in a list',
   input: t.record({
     listId: t.string({ description: 'List identifier' }),
+    ...t.pageInputs(),
   }),
-  output: t.array(reminderRecordType),
+  output: t.page(reminderRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { listId: { type: 'string', description: 'List identifier' } },
+    properties: {
+      listId: { type: 'string', description: 'List identifier' },
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     required: ['listId'],
     additionalProperties: false,
   },
@@ -599,20 +646,32 @@ const reminderShowOperation: OperationDescriptor<Record<string, never>, undefine
   },
 }
 
-const accountListAccountsOperation: OperationDescriptor<
-  Record<string, never>,
-  readonly Account[]
-> = {
+const accountListAccountsOperation: OperationDescriptor<PageRequest, Page<Account>> = {
   id: 'reminders.accounts.list',
   permission: 'reminders:accounts:list',
   target: { command: 'listAccounts', resource: 'Account' },
   description: 'List all accounts',
-  input: t.record({}),
-  output: t.array(accountRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(accountRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -635,16 +694,16 @@ const operations: AppContract<RemindersClient>['operations'] = {
 function bind(runtime: ClientRuntime): RemindersClient {
   return {
     accounts: {
-      list: (options) => runtime.invoke(accountListAccountsOperation, {}, options),
+      list: (page, options) => runtime.invoke(accountListAccountsOperation, { ...page }, options),
     },
     lists: {
-      list: (options) => runtime.invoke(listListOperation, {}, options),
+      list: (page, options) => runtime.invoke(listListOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(listGetOperation, { id }, options),
       create: (input, options) => runtime.invoke(listCreateOperation, input, options),
     },
     reminders: {
-      list: (listId, options) =>
-        runtime.invoke(reminderListRemindersOperation, { listId }, options),
+      list: (listId, page, options) =>
+        runtime.invoke(reminderListRemindersOperation, { ...page, listId }, options),
       get: (id, options) => runtime.invoke(reminderGetReminderOperation, { id }, options),
       create: (input, options) => runtime.invoke(reminderCreateReminderOperation, input, options),
       delete: (id, options) => runtime.invoke(reminderDeleteReminderOperation, { id }, options),

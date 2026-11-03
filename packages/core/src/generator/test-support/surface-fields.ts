@@ -19,6 +19,7 @@
  */
 
 import * as ts from 'typescript'
+import { PAGING_INPUT_NAMES } from '@macts/contracts'
 import type { AppManifest } from '../../manifest/index.js'
 import { CANONICAL_IDENTIFIER_KEY, resolvePrimaryIdentifierProperty } from '../../manifest/index.js'
 import { deriveCapabilities } from '../../capabilities/registry.js'
@@ -214,7 +215,14 @@ function cliFieldLists(manifest: AppManifest): FieldList[] {
   const options = { packageName: 'cli-fields', sdkPackageName: 'sdk-fields' }
   const cli = generateCliPlugin(manifest, options)
   const context = createCliGeneratorContext(manifest, options)
-  const otherSources = new Set<string>([CANONICAL_IDENTIFIER_KEY, 'json', 'message'])
+  // A paged list command's `--page-size` and `--cursor` options are the
+  // paging inputs, which no resource property supplies.
+  const otherSources = new Set<string>([
+    CANONICAL_IDENTIFIER_KEY,
+    'json',
+    'message',
+    ...PAGING_INPUT_NAMES,
+  ])
   for (const path of context.getHierarchyPaths()) {
     for (const parent of path.parentParams) otherSources.add(parent.name)
   }

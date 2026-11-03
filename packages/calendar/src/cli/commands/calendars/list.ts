@@ -19,10 +19,10 @@ export class ListCalendarsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.calendars.list()
+      const page = await client.calendars.list()
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           name: item.name,
           title: item.title,
           color: item.color,

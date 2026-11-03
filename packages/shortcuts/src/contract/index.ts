@@ -26,6 +26,8 @@ import {
   type FileValue,
   type Integer,
   type OperationDescriptor,
+  type Page,
+  type PageRequest,
   type Rgb,
   type ValueType,
 } from '@macts/contracts'
@@ -122,8 +124,14 @@ export interface FolderUpdateInput {
 
 /** A shortcut in the Shortcuts application */
 export interface ShortcutResourceClient {
-  /** List shortcuts. */
-  list(options?: CallOptions): Promise<readonly Shortcut[]>
+  /**
+   * List shortcuts, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Shortcut>>
   /**
    * Read the shortcut identified by `id`.
    *
@@ -142,8 +150,14 @@ export interface ShortcutResourceClient {
 
 /** A folder containing shortcuts */
 export interface FolderResourceClient {
-  /** List folders. */
-  list(options?: CallOptions): Promise<readonly Folder[]>
+  /**
+   * List folders, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Folder>>
   /**
    * Read the folder identified by `id`.
    *
@@ -211,17 +225,32 @@ const resources: AppContract<ShortcutsClient>['resources'] = {
   },
 }
 
-const shortcutListOperation: OperationDescriptor<Record<string, never>, readonly Shortcut[]> = {
+const shortcutListOperation: OperationDescriptor<PageRequest, Page<Shortcut>> = {
   id: 'shortcuts.shortcuts.list',
   permission: 'shortcuts:shortcuts:list',
   target: { command: 'list', resource: 'Shortcut' },
   description: 'List all shortcuts',
-  input: t.record({}),
-  output: t.array(shortcutRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(shortcutRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -345,17 +374,32 @@ const shortcutRunOperation: OperationDescriptor<
   },
 }
 
-const folderListFoldersOperation: OperationDescriptor<Record<string, never>, readonly Folder[]> = {
+const folderListFoldersOperation: OperationDescriptor<PageRequest, Page<Folder>> = {
   id: 'shortcuts.folders.list',
   permission: 'shortcuts:folders:list',
   target: { command: 'listFolders', resource: 'Folder' },
   description: 'List all folders',
-  input: t.record({}),
-  output: t.array(folderRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(folderRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -391,13 +435,13 @@ const operations: AppContract<ShortcutsClient>['operations'] = {
 function bind(runtime: ClientRuntime): ShortcutsClient {
   return {
     shortcuts: {
-      list: (options) => runtime.invoke(shortcutListOperation, {}, options),
+      list: (page, options) => runtime.invoke(shortcutListOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(shortcutGetOperation, { id }, options),
       run: (id, withInput, options) =>
         runtime.invoke(shortcutRunOperation, { id, withInput }, options),
     },
     folders: {
-      list: (options) => runtime.invoke(folderListFoldersOperation, {}, options),
+      list: (page, options) => runtime.invoke(folderListFoldersOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(folderGetFolderOperation, { id }, options),
     },
   }

@@ -79,7 +79,14 @@ describe('registerInstalledApps', () => {
     // Registered from the contract, not the manifest: the descriptor is the
     // contract's own, so its input carries a record plan, never passthrough.
     expect(operation?.descriptor.permission).toBe('widgets:widgets:list')
-    expect(operation?.descriptor.input.plan).toEqual({ kind: 'record', fields: {} })
+    // The fixture's list takes the paging inputs (`t.pageInputs()`).
+    expect(operation?.descriptor.input.plan).toEqual({
+      kind: 'record',
+      fields: {
+        pageSize: { value: { kind: 'integer' }, presence: 'optional' },
+        cursor: { value: { kind: 'string' }, presence: 'optional' },
+      },
+    })
   })
 
   it('registers an app whose package is nested inside its host package', async () => {

@@ -19,10 +19,10 @@ export class ListFoldersCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.folders.list()
+      const page = await client.folders.list()
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           name: item.name,
           id: item.id,
           shared: item.shared,

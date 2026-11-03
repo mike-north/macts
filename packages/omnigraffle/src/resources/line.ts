@@ -21,10 +21,10 @@ export class LineResourceClient {
   }
 
   /**
-   * List the lines of one canvas.
+   * List the lines of one canvas, as one page.
    */
-  async list(canvasId: string): Promise<Line[]> {
-    return this.#http.rpc<Line[]>(`${this.#app}.${this.#resource}.list`, { canvasId })
+  async list(canvasId: string): Promise<{ items: Line[] }> {
+    return this.#http.rpc<{ items: Line[] }>(`${this.#app}.${this.#resource}.list`, { canvasId })
   }
 
   /**

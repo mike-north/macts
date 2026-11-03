@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import type { AppManifest } from '../../manifest/index.js'
 import { generateHttpClientSdk } from './http-client.js'
+import { UNIQUE_CLAIM } from '../../manifest/test-support/unique-claim.js'
 
 function findFile(
   files: { path: string; content: string }[],
@@ -31,7 +32,7 @@ const testManifest: AppManifest = {
         name: { access: 'rw', type: 'string', description: 'Name', optional: false },
         count: { access: 'rw', type: 'integer', description: 'Count', optional: true },
       },
-      identifiers: [{ property: 'id', primary: true }],
+      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
     },
   },
   enums: {
@@ -207,7 +208,10 @@ describe('generateHttpClientSdk', () => {
     expect(content).toContain('export class ItemResourceClient')
 
     // Check CRUD methods (named by operation, routed by command KEY)
-    expect(content).toContain('async list(): Promise<Item[]>')
+    // Item has a primary identifier, so its list pages and returns one page.
+    expect(content).toContain(
+      'async list(page: { pageSize?: number; cursor?: string } = {}): Promise<{ items: Item[]; nextCursor?: string }>'
+    )
     expect(content).toContain('async get(id: string): Promise<Item>')
     expect(content).toContain('async create(input: ItemCreateInput): Promise<Item>')
     expect(content).toContain('async update(id: string, input: ItemUpdateInput): Promise<Item>')
@@ -223,6 +227,30 @@ describe('generateHttpClientSdk', () => {
     // Check custom command method, routed by its key (`show`).
     expect(content).toContain('async show(id: string)')
     expect(content).toContain('${this.#app}.${this.#resource}.show`')
+  })
+
+  it('sends the page size in its integer wire form and the cursor as given, before the scope', () => {
+    const result = generateHttpClientSdk(testManifest, { packageName: '@macts/sdk-testapp' })
+    const content = findFile(result.files, 'src/resources/item.ts').content
+    expect(content).toContain(
+      '...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } })'
+    )
+    expect(content).toContain('...(page.cursor === undefined ? {} : { cursor: page.cursor })')
+  })
+
+  it('gives the list of a resource with no identifier no page argument, and one page', () => {
+    const item = testManifest.resources['Item']
+    if (item === undefined) throw new Error('fixture has no Item')
+    const { identifiers: _identifiers, ...unidentified } = item
+    const manifest: AppManifest = {
+      ...testManifest,
+      resources: { ...testManifest.resources, Item: unidentified },
+    }
+    const content = findFile(
+      generateHttpClientSdk(manifest, { packageName: '@macts/sdk-testapp' }).files,
+      'src/resources/item.ts'
+    ).content
+    expect(content).toContain('async list(): Promise<{ items: Item[] }>')
   })
 
   it('omits CRUD methods with no backing manifest command', () => {
@@ -243,7 +271,10 @@ describe('generateHttpClientSdk', () => {
     }
     const result = generateHttpClientSdk(manifestNoCreate, { packageName: '@macts/sdk-testapp' })
     const content = findFile(result.files, 'src/resources/item.ts').content
-    expect(content).toContain('async list(): Promise<Item[]>')
+    // Item has a primary identifier, so its list pages and returns one page.
+    expect(content).toContain(
+      'async list(page: { pageSize?: number; cursor?: string } = {}): Promise<{ items: Item[]; nextCursor?: string }>'
+    )
     expect(content).not.toContain('async create(')
     expect(content).not.toContain('async get(')
     expect(content).not.toContain('async delete(')
@@ -334,12 +365,14 @@ describe('generateHttpClientSdk', () => {
     }
     const result = generateHttpClientSdk(manifestWithParent, { packageName: '@macts/sdk-testapp' })
     const items = findFile(result.files, 'src/resources/item.ts').content
-    expect(items).toContain('async list(boxId: string): Promise<Item[]>')
-    expect(items).toContain('List the items of one box.')
+    expect(items).toContain(
+      'async list(boxId: string, page: { pageSize?: number; cursor?: string } = {}): Promise<{ items: Item[]; nextCursor?: string }>'
+    )
+    expect(items).toContain('List the items of one box, one page at a time.')
     expect(items).not.toContain('List all items.')
     // A list with no parent still lists everything.
     const boxes = findFile(result.files, 'src/resources/box.ts').content
-    expect(boxes).toContain('List all boxes.')
+    expect(boxes).toContain('List all boxes, as one page.')
   })
 
   // Regression: a resource command parameter typed as an enum (e.g. `Status`) makes the

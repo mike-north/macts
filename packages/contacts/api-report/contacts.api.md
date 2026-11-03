@@ -35,7 +35,13 @@ export interface AddressCreateInput {
 export class AddressResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(personId: string, id: string): Promise<Address>;
-    list(personId: string): Promise<Address[]>;
+    list(personId: string, page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Address[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -168,7 +174,13 @@ export interface EmailCreateInput {
 export class EmailResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(personId: string, id: string): Promise<Email>;
-    list(personId: string): Promise<Email[]>;
+    list(personId: string, page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Email[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -198,7 +210,13 @@ export interface GroupCreateInput {
 export class GroupResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Group>;
-    list(): Promise<Group[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Group[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -340,7 +358,13 @@ export interface PersonCreateInput {
 export class PersonResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Person>;
-    list(): Promise<Person[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Person[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -388,7 +412,13 @@ export interface PhoneCreateInput {
 export class PhoneResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(personId: string, id: string): Promise<Phone>;
-    list(personId: string): Promise<Phone[]>;
+    list(personId: string, page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Phone[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)

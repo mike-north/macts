@@ -21,10 +21,10 @@ export class EventResourceClient {
   }
 
   /**
-   * List the events of one calendar.
+   * List the events of one calendar, as one page.
    */
-  async list(calendarId: string): Promise<Event[]> {
-    return this.#http.rpc<Event[]>(`${this.#app}.${this.#resource}.list`, { calendarId })
+  async list(calendarId: string): Promise<{ items: Event[] }> {
+    return this.#http.rpc<{ items: Event[] }>(`${this.#app}.${this.#resource}.list`, { calendarId })
   }
 
   /**

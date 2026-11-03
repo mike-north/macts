@@ -444,8 +444,9 @@ describe('resolving bound references', () => {
     expect(sent).toHaveLength(0)
   })
 
-  it('raises InternalError when a collection resolves to something other than an array', async () => {
-    // Inconsistent: the list operation's output contract is a single record.
+  it('raises InternalError when the list a collection resolves through does not return a page', async () => {
+    // Inconsistent: the list operation's output contract is a single record,
+    // not a page, so no item type is known to decode the resolved records with.
     const listOperation = libraryContract.operations['library.books.list']
     const getOperation = libraryContract.operations['library.books.get']
     if (listOperation === undefined || getOperation === undefined) throw new Error('fixture')

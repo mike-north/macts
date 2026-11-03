@@ -8,6 +8,8 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
+import { Page } from '@macts/contracts';
+import { PageRequest } from '@macts/contracts';
 
 // @public
 export interface Album {
@@ -24,7 +26,7 @@ export interface AlbumCreateInput {
 // @public
 export interface AlbumResourceClient {
     get(id: string, options?: CallOptions): Promise<Album>;
-    list(options?: CallOptions): Promise<readonly Album[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Album>>;
 }
 
 // @public
@@ -64,7 +66,7 @@ export interface FolderCreateInput {
 // @public
 export interface FolderResourceClient {
     get(id: string, options?: CallOptions): Promise<Folder>;
-    list(options?: CallOptions): Promise<readonly Folder[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Folder>>;
 }
 
 // @public
@@ -103,7 +105,7 @@ export interface MediaItemCreateInput {
 export interface MediaItemResourceClient {
     duplicate(id: string, options?: CallOptions): Promise<void>;
     get(id: string, options?: CallOptions): Promise<MediaItem>;
-    list(options?: CallOptions): Promise<readonly MediaItem[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<MediaItem>>;
 }
 
 // @public

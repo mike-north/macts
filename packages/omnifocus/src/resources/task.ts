@@ -21,10 +21,10 @@ export class TaskResourceClient {
   }
 
   /**
-   * List all tasks.
+   * List all tasks, as one page.
    */
-  async list(): Promise<Task[]> {
-    return this.#http.rpc<Task[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Task[] }> {
+    return this.#http.rpc<{ items: Task[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

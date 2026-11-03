@@ -21,9 +21,9 @@ export class DependencyResourceClient {
   }
 
   /**
-   * List all dependencies.
+   * List all dependencies, as one page.
    */
-  async list(): Promise<Dependency[]> {
-    return this.#http.rpc<Dependency[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Dependency[] }> {
+    return this.#http.rpc<{ items: Dependency[] }>(`${this.#app}.${this.#resource}.list`)
   }
 }

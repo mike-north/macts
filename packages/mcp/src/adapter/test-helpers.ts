@@ -11,6 +11,7 @@ import type { AppManifest } from '@macts/core'
 import {
   EMPTY_RESOURCE_PLAN_TABLE,
   PASSTHROUGH_PLAN,
+  ValueTypes as t,
   type InvocationContext,
   type OperationId,
   type ValueType,
@@ -67,6 +68,29 @@ export function fakeOperation(
       description,
       input: wireOnlyType(wire),
       output: wireOnlyType(z.null()),
+    },
+    manifest: UNUSED_MANIFEST,
+    risk: 'read',
+    resources: EMPTY_RESOURCE_PLAN_TABLE,
+  }
+}
+
+/**
+ * A registered list operation as a generated contract declares one: the
+ * paging inputs, and a page of note records as its output.
+ *
+ * @param id - The operation id.
+ */
+export function fakeListOperation(id: OperationId): RegisteredOperation {
+  const [app = '', resource = '', command = ''] = id.split('.')
+  return {
+    descriptor: {
+      id,
+      permission: `${app}:${resource}:${command}`,
+      target: { command, resource: 'Note' },
+      description: `Lists with ${id}`,
+      input: t.record({ ...t.pageInputs() }),
+      output: t.page(t.record({ name: t.string() })),
     },
     manifest: UNUSED_MANIFEST,
     risk: 'read',

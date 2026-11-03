@@ -21,10 +21,21 @@ export class ReminderResourceClient {
   }
 
   /**
-   * List the reminders of one list.
+   * List the reminders of one list, one page at a time. When the result has a `nextCursor`,
+   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(listId: string): Promise<Reminder[]> {
-    return this.#http.rpc<Reminder[]>(`${this.#app}.${this.#resource}.list`, { listId })
+  async list(
+    listId: string,
+    page: { pageSize?: number; cursor?: string } = {}
+  ): Promise<{ items: Reminder[]; nextCursor?: string }> {
+    return this.#http.rpc<{ items: Reminder[]; nextCursor?: string }>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+        listId,
+      }
+    )
   }
 
   /**

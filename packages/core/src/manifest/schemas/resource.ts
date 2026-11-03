@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { PropertySchema } from './property.js'
 import {
   DictionarySpellingEvidenceSchema,
+  IdentifierUniquenessEvidenceSchema,
   ObservedAtSchema,
   ResourceAbsenceEvidenceSchema,
 } from './evidence.js'
@@ -49,6 +50,19 @@ export const IdentifierSchema = z.object({
    * `whose({ ... })` clause must match (it is the same in the common case).
    */
   runtimeProperty: z.string().optional(),
+  /**
+   * Whether no two items the collection holds at the same time share this
+   * identifier's value, as `evidence.unique` shows. Absent means unknown,
+   * which is treated as not unique: a list pages only when its resource's
+   * primary identifier is claimed unique (see `listOperationPages`). The
+   * claim is curated and independent of `targeting`: a property matched with
+   * `byProperty` can be unique, and an id the app names "unique" can repeat.
+   * The claim covers the value the runtime reads for this identifier: for
+   * `byProperty`, the `runtimeProperty` when one is set.
+   */
+  unique: z.boolean().optional(),
+  /** The evidence behind the claims above; `unique` needs it, and it needs `unique`. */
+  evidence: z.object({ unique: IdentifierUniquenessEvidenceSchema.optional() }).strict().optional(),
 })
 export type Identifier = z.infer<typeof IdentifierSchema>
 
@@ -269,6 +283,7 @@ export const ResourceSchema = z
   })
   .superRefine((resource, ctx) => {
     checkNativeSpellings(resource, ctx)
+    checkUniquenessClaims(resource.identifiers ?? [], ctx)
     // A resource is addressed by its primary identifier, so the identifier
     // must be readable: it cannot be marked unsupported.
     const identifier = resolvePrimaryIdentifierProperty(resource)
@@ -285,6 +300,38 @@ export const ResourceSchema = z
     }
   })
 export type Resource = z.infer<typeof ResourceSchema>
+
+/**
+ * An identifier's uniqueness claim and its evidence come together: a claim
+ * with no evidence would page a list on a guess, and evidence with no claim
+ * says nothing.
+ */
+function checkUniquenessClaims(
+  identifiers: readonly {
+    readonly unique?: boolean | undefined
+    readonly evidence?: { readonly unique?: unknown } | undefined
+  }[],
+  ctx: z.RefinementCtx
+): void {
+  identifiers.forEach((identifier, index) => {
+    const claimed = identifier.unique !== undefined
+    const evidenced = identifier.evidence?.unique !== undefined
+    if (claimed && !evidenced) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          "An identifier's unique claim needs evidence.unique saying where it comes from (the dictionary, or a curated observation).",
+        path: ['identifiers', index, 'evidence', 'unique'],
+      })
+    } else if (evidenced && !claimed) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'evidence.unique supports a claim, so the identifier must also set unique.',
+        path: ['identifiers', index, 'unique'],
+      })
+    }
+  })
+}
 
 /**
  * A recorded native spelling must differ from the spelling it replaces: a

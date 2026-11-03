@@ -19,10 +19,10 @@ export class ListWorkspaceDocumentsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.workspaceDocuments.list()
+      const page = await client.workspaceDocuments.list()
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           name: item.name,
           modified: item.modified,
           file: item.file,

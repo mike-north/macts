@@ -21,10 +21,19 @@ export class AttachmentResourceClient {
   }
 
   /**
-   * List all attachments.
+   * List attachments, one page at a time. When the result has a `nextCursor`,
+   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(): Promise<Attachment[]> {
-    return this.#http.rpc<Attachment[]>(`${this.#app}.${this.#resource}.list`)
+  async list(
+    page: { pageSize?: number; cursor?: string } = {}
+  ): Promise<{ items: Attachment[]; nextCursor?: string }> {
+    return this.#http.rpc<{ items: Attachment[]; nextCursor?: string }>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+      }
+    )
   }
 
   /**

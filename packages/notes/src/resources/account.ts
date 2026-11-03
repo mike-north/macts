@@ -21,10 +21,10 @@ export class AccountResourceClient {
   }
 
   /**
-   * List all accounts.
+   * List all accounts, as one page.
    */
-  async list(): Promise<Account[]> {
-    return this.#http.rpc<Account[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Account[] }> {
+    return this.#http.rpc<{ items: Account[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

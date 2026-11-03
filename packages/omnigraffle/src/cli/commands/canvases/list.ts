@@ -19,10 +19,10 @@ export class ListCanvasesCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.canvases.list()
+      const page = await client.canvases.list()
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           id: item.id,
           name: item.name,
           adjustsPages: item.adjustsPages,

@@ -21,10 +21,10 @@ export class SettingsSetResourceClient {
   }
 
   /**
-   * List all settings sets.
+   * List all settings sets, as one page.
    */
-  async list(): Promise<SettingsSet[]> {
-    return this.#http.rpc<SettingsSet[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: SettingsSet[] }> {
+    return this.#http.rpc<{ items: SettingsSet[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

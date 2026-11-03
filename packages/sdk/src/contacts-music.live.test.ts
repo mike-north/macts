@@ -50,7 +50,17 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { contactsContract, type ContactsClient } from '@macts/contacts/contract'
 import { musicContract, type MusicClient } from '@macts/music/contract'
-import type { AnyOperationDescriptor, AppContract, OperationId, WireRecord } from '@macts/contracts'
+import {
+  EMPTY_RESOURCE_PLAN_TABLE,
+  Integer,
+  ValueTypes,
+  isPageValueType,
+  type AnyOperationDescriptor,
+  type AppContract,
+  type OperationId,
+  type Page,
+  type WireRecord,
+} from '@macts/contracts'
 import { AppManifestSchema, createNativeExecutor, type AppManifest } from '@macts/core'
 import {
   ALLOW_ALL_POLICY,
@@ -69,7 +79,10 @@ const liveAppsEnabled = process.env['MACTS_LIVE_APPS'] === '1'
  */
 const LIVE_TEST_TIMEOUT_MS = 180_000
 
-/** How many people to look through for one that has an email, phone or address. */
+/**
+ * How many people to look through for one that has an email, phone or
+ * address: the size of the one page of people read, at most the largest page.
+ */
 const PERSON_SCAN_LIMIT = 60
 
 /** The special kind Music reports for its library playlist, which holds every track. */
@@ -99,6 +112,10 @@ afterAll(async () => {
 /**
  * Runs operations of one contract through the native executor directly and
  * checks each wire result against the operation's `output.wire`.
+ *
+ * A list's output is a page. The runtime asks the executor for the items and
+ * makes the page itself, so a list here reads the whole collection as the
+ * items of one page, as the runtime does for a list that does not page.
  */
 interface WireReader {
   /** The wire result of `id` on `input`, after it passed `output.wire`. */
@@ -112,13 +129,16 @@ async function wireReader<Client>(contract: AppContract<Client>): Promise<WireRe
     async read(id, input) {
       const operation: AnyOperationDescriptor | undefined = contract.operations[id]
       if (operation === undefined) throw new Error(`the contract declares no ${id}`)
-      const wire = await executor.execute({
+      const page = isPageValueType(operation.output) ? operation.output : undefined
+      const result = await executor.execute({
         manifest,
         target: operation.target,
         input,
         inputPlan: operation.input.plan,
-        outputPlan: operation.output.plan,
+        outputPlan: page === undefined ? operation.output.plan : ValueTypes.array(page.item).plan,
+        resources: EMPTY_RESOURCE_PLAN_TABLE,
       })
+      const wire = page === undefined ? result : { items: result }
       const parsed = operation.output.wire.safeParse(wire)
       expect(parsed.success, `${id}: ${JSON.stringify(parsed.error?.issues)}`).toBe(true)
       return wire
@@ -136,6 +156,20 @@ function permissionsOf<Client>(
     if (operation === undefined) throw new Error(`the contract declares no ${id}`)
     return operation.permission
   })
+}
+
+/** Every item of a list, read page by page until no `nextCursor` remains. */
+async function everyItem<Item>(
+  read: (page: { readonly cursor?: string }) => Promise<Page<Item>>
+): Promise<Item[]> {
+  const items: Item[] = []
+  let cursor: string | undefined
+  do {
+    const page = await read(cursor === undefined ? {} : { cursor })
+    items.push(...page.items)
+    cursor = page.nextCursor
+  } while (cursor !== undefined)
+  return items
 }
 
 /** A wire record's field, read without assuming the record's shape. */
@@ -177,16 +211,16 @@ describe.skipIf(!liveAppsEnabled)('Contacts reads against Contacts.app (local on
   it(
     'lists people and gets the first by its id',
     async () => {
-      const people = await contacts.people.list()
-      personIds = people.map((person) => person.id)
-      const first = people[0]
+      const people = await contacts.people.list({ pageSize: Integer.validate(PERSON_SCAN_LIMIT) })
+      personIds = people.items.map((person) => person.id)
+      const first = people.items[0]
       if (first === undefined) return
       const person = await contacts.people.get(first.id)
       expect(person.id).toBe(first.id)
       expect(person.creationDate).toBeInstanceOf(Date)
 
       const listed = await wire.read('contacts.people.list', {})
-      expect(Array.isArray(listed)).toBe(true)
+      expect(Array.isArray(field(listed, 'items'))).toBe(true)
       expect(field(await wire.read('contacts.people.get', { id: first.id }), 'id')).toBe(first.id)
     },
     LIVE_TEST_TIMEOUT_MS
@@ -196,7 +230,7 @@ describe.skipIf(!liveAppsEnabled)('Contacts reads against Contacts.app (local on
     'lists groups and gets the first by its id',
     async () => {
       const groups = await contacts.groups.list()
-      const first = groups[0]
+      const first = groups.items[0]
       if (first === undefined) return
       const group = await contacts.groups.get(first.id)
       expect(group.id).toBe(first.id)
@@ -216,7 +250,7 @@ describe.skipIf(!liveAppsEnabled)('Contacts reads against Contacts.app (local on
     async (resource, listId, getId) => {
       for (const personId of personIds.slice(0, PERSON_SCAN_LIMIT)) {
         const items = await contacts[resource].list(personId)
-        const first = items[0]
+        const first = items.items[0]
         if (first === undefined) continue
         const item = await contacts[resource].get(personId, first.id)
         expect(item.id).toBe(first.id)
@@ -256,7 +290,7 @@ describe.skipIf(!liveAppsEnabled)('Music reads against Music.app (local only)', 
     'lists playlists and gets the first by its persistent ID',
     async () => {
       const playlists = await music.playlists.list()
-      const first = playlists[0]
+      const first = playlists.items[0]
       if (first === undefined) return
       const playlist = await music.playlists.get(first.persistentID)
       expect(playlist.persistentID).toBe(first.persistentID)
@@ -271,11 +305,11 @@ describe.skipIf(!liveAppsEnabled)('Music reads against Music.app (local only)', 
   it(
     'lists the library playlist tracks and gets the first by its persistent ID',
     async () => {
-      const playlists = await music.playlists.list()
+      const playlists = await everyItem((page) => music.playlists.list(page))
       const library = playlists.find((playlist) => playlist.specialKind === LIBRARY_PLAYLIST_KIND)
       if (library === undefined) return
       const tracks = await music.tracks.list(library.persistentID)
-      const first = tracks[0]
+      const first = tracks.items[0]
       if (first === undefined) return
       const track = await music.tracks.get(library.persistentID, first.persistentID)
       expect(track.persistentID).toBe(first.persistentID)
@@ -295,13 +329,13 @@ describe.skipIf(!liveAppsEnabled)('Music reads against Music.app (local only)', 
     async () => {
       // A track's numeric id belongs to its entry in one playlist; its
       // persistent ID is the same in every playlist that holds it.
-      const playlists = await music.playlists.list()
+      const playlists = await everyItem((page) => music.playlists.list(page))
       const library = playlists.find((playlist) => playlist.specialKind === LIBRARY_PLAYLIST_KIND)
       const other = playlists.find(
         (playlist) => playlist.persistentID !== library?.persistentID && (playlist.size ?? 0) > 0
       )
       if (library === undefined || other === undefined) return
-      const first = (await music.tracks.list(other.persistentID))[0]
+      const first = (await music.tracks.list(other.persistentID)).items[0]
       if (first === undefined) return
       const track = await music.tracks.get(library.persistentID, first.persistentID)
       expect(track.persistentID).toBe(first.persistentID)

@@ -21,10 +21,10 @@ export class WindowResourceClient {
   }
 
   /**
-   * List all windows.
+   * List all windows, as one page.
    */
-  async list(): Promise<Window[]> {
-    return this.#http.rpc<Window[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Window[] }> {
+    return this.#http.rpc<{ items: Window[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

@@ -7,6 +7,7 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { Page } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
 
 // @public
@@ -58,7 +59,7 @@ export type CalendarPriority = '0' | '9' | '5' | '1';
 export interface CalendarResourceClient {
     create(input: CalendarCreateInput, options?: CallOptions): Promise<Calendar>;
     get(id: string, options?: CallOptions): Promise<Calendar>;
-    list(options?: CallOptions): Promise<readonly Calendar[]>;
+    list(options?: CallOptions): Promise<Page<Calendar>>;
 }
 
 // @public
@@ -126,7 +127,7 @@ export interface EventResourceClient {
     create(input: EventCreateInput, options?: CallOptions): Promise<Event_2>;
     delete(calendarId: string, id: string, options?: CallOptions): Promise<void>;
     get(calendarId: string, id: string, options?: CallOptions): Promise<Event_2>;
-    list(calendarId: string, options?: CallOptions): Promise<readonly Event_2[]>;
+    list(calendarId: string, options?: CallOptions): Promise<Page<Event_2>>;
     show(options?: CallOptions): Promise<void>;
     update(calendarId: string, id: string, input: EventUpdateInput, options?: CallOptions): Promise<Event_2>;
 }

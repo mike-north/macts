@@ -26,6 +26,7 @@
 
 import { z } from 'zod'
 import {
+  PAGING_INPUT_NAMES,
   ValueTypes as t,
   resourcePlanTable,
   type RecordField,
@@ -46,6 +47,7 @@ import type {
 } from '../../manifest/index.js'
 import {
   ignoredIdentifierNullability,
+  listOperationPages,
   normalizeAppRouteSegment,
   resolveManifestRoutes,
   resolveParameterNullability,
@@ -329,13 +331,19 @@ type InputModel =
       /** The input is a request record spelled out field by field. */
       readonly kind: 'fields'
       readonly fields: readonly FieldModel[]
+      /**
+       * The record also takes the paging inputs (`t.pageInputs()`): the input
+       * of a list operation of a resource that has an identifier.
+       */
+      readonly paged: boolean
     }
 
 /** What an operation returns. */
 type OutputModel =
   | { readonly kind: 'none' }
   | { readonly kind: 'record'; readonly resourceKey: string }
-  | { readonly kind: 'records'; readonly resourceKey: string }
+  /** One page of a resource's records: the output of every list operation. */
+  | { readonly kind: 'page'; readonly resourceKey: string }
   | { readonly kind: 'value'; readonly shape: ValueShape }
 
 /** One operation descriptor to emit. */
@@ -440,10 +448,18 @@ class ContractBuilder {
   readonly #operations: OperationModel[] = []
   readonly #operationsByRoute = new Map<string, OperationModel>()
   readonly #privateBindings = new Set<string>(['t', 'resources', 'operations', 'bind'])
+  /**
+   * The local names the module gives the paging types of `@macts/contracts`:
+   * `Page` and `PageRequest`, or an alias when the manifest declares a type of
+   * that name (an app with a `Page` resource), so paging never takes a name
+   * an app needs.
+   */
+  readonly #pagingNames: { readonly page: string; readonly pageRequest: string }
 
   constructor(manifest: AppManifest) {
     this.#manifest = manifest
     this.#names = contractNames(manifest)
+    this.#pagingNames = pagingTypeNames(manifest)
     this.#resolver = createNameResolver(manifest)
     for (const [resourceKey, resource] of usableResources(manifest)) {
       const identifier = this.#identifierProperty(resource)
@@ -707,6 +723,7 @@ class ContractBuilder {
   #inputModel(route: ManifestRoute): InputModel {
     const shape = this.#crudShape(route)
     const resourceKey = route.resourceType
+    if (shape === 'list') this.#checkPagingNames(route)
     if (shape === 'create' && resourceKey !== undefined && this.#isChosenCrud(route, shape)) {
       return { kind: 'create', resourceKey }
     }
@@ -726,7 +743,36 @@ class ContractBuilder {
       if (fields.has(param.name)) continue
       fields.set(param.name, this.#parameterField(param))
     }
-    return { kind: 'fields', fields: [...fields.values()].filter((field) => this.#keeps(field)) }
+    return {
+      kind: 'fields',
+      fields: [...fields.values()].filter((field) => this.#keeps(field)),
+      paged: this.#pages(route),
+    }
+  }
+
+  /**
+   * Whether the route is a list that pages (see `listOperationPages`): a list
+   * whose resource's primary identifier is claimed unique. Any other list
+   * takes no paging inputs and returns its whole collection as one page.
+   */
+  #pages(route: ManifestRoute): boolean {
+    return listOperationPages(route.command, route.resource)
+  }
+
+  /**
+   * A list operation reserves the paging input names, so no app parameter of
+   * one may use them: the generated input would otherwise declare one field
+   * twice, with two meanings.
+   */
+  #checkPagingNames(route: ManifestRoute): void {
+    const reserved: readonly string[] = PAGING_INPUT_NAMES
+    for (const param of route.command.parameters) {
+      if (reserved.includes(param.name)) {
+        this.errors.push(
+          `${route.route}: the parameter ${JSON.stringify(param.name)} uses a name list operations reserve for paging (${PAGING_INPUT_NAMES.join(', ')}); rename the parameter in the manifest.`
+        )
+      }
+    }
   }
 
   /**
@@ -853,7 +899,7 @@ class ContractBuilder {
       }
       switch (shape) {
         case 'list':
-          return { kind: 'records', resourceKey }
+          return { kind: 'page', resourceKey }
         case 'get':
         case 'create':
         case 'update':
@@ -865,7 +911,7 @@ class ContractBuilder {
     // A command's result is an output, so it is nullable by default, like a
     // read field: a manifest has no evidence that a command always returns a
     // value. (CRUD results above are never nullable: a missing target fails
-    // the operation, and a list is an array, possibly empty.)
+    // the operation, and a list is a page, possibly empty.)
     const returns = route.command.returns
     return returns === undefined
       ? { kind: 'none' }
@@ -937,13 +983,37 @@ class ContractBuilder {
       ...this.#parameterField(param),
       optional: false,
     }))
+    const params = this.#positional(fields)
+    const returnType = `${this.#pagingNames.page}<${resource.name}>`
+    const paged = operation.input.kind === 'fields' && operation.input.paged
+    if (!paged) {
+      return {
+        name: 'list',
+        doc: `List ${identifierWords(resource.plural)}, as one page holding all of them.`,
+        params,
+        returnType,
+        operation,
+        body: { kind: 'fields', fields: this.#bodyFields(fields) },
+      }
+    }
+    const page = uniqueName('page', new Set(params.map((param) => param.binding)))
     return {
       name: 'list',
-      doc: `List ${identifierWords(resource.plural)}.`,
-      params: this.#positional(fields),
-      returnType: `readonly ${resource.name}[]`,
+      doc: `List ${identifierWords(resource.plural)}, one page at a time.`,
+      params: [
+        ...params,
+        {
+          binding: page,
+          type: this.#pagingNames.pageRequest,
+          optional: true,
+          doc: 'The page size, and the cursor that continues from the previous page.',
+        },
+      ],
+      returnsDoc:
+        'One page of results. When `nextCursor` is present, more remain: call again with the same arguments and that cursor.',
+      returnType,
       operation,
-      body: { kind: 'fields', fields: this.#bodyFields(fields) },
+      body: { kind: 'input-with-fields', binding: page, fields: this.#bodyFields(fields) },
     }
   }
 
@@ -1081,11 +1151,33 @@ class ContractBuilder {
     )
     const used: readonly ContractTypeName[] = [...this.#renderer.usedTypes]
     types.push(...used)
+    const named = types.map((name) => ({ imported: name, local: name }))
+    named.push(...this.#pageTypeImportSpecifiers())
     const specifiers = [
       ...CONTRACT_VALUE_IMPORTS,
-      ...types.sort((a, b) => a.localeCompare(b)).map((name) => `type ${name}`),
+      ...named
+        .sort((a, b) => a.imported.localeCompare(b.imported))
+        .map(({ imported, local }) =>
+          imported === local ? `type ${imported}` : `type ${imported} as ${local}`
+        ),
     ]
     return `import {\n${specifiers.map((s) => `  ${s},`).join('\n')}\n} from '@macts/contracts'\n`
+  }
+
+  /**
+   * The paging types the module imports, under their local names: `Page` when
+   * an operation returns a page, `PageRequest` when an operation takes the
+   * paging inputs.
+   */
+  #pageTypeImportSpecifiers(): { imported: string; local: string }[] {
+    const imports: { imported: string; local: string }[] = []
+    if (this.#operations.some((operation) => operation.output.kind === 'page')) {
+      imports.push({ imported: 'Page', local: this.#pagingNames.page })
+    }
+    if (this.#operations.some((op) => op.input.kind === 'fields' && op.input.paged)) {
+      imports.push({ imported: 'PageRequest', local: this.#pagingNames.pageRequest })
+    }
+    return imports
   }
 
   #renderEnumTypes(): string[] {
@@ -1213,6 +1305,20 @@ class ContractBuilder {
     return `{\n${lines.join('\n')}\n${indent}}`
   }
 
+  /**
+   * The fields object of an operation's request record: its fields, then the
+   * paging inputs when the operation pages, so the paging inputs are built by
+   * the one constructor every list shares.
+   */
+  #renderRequestFields(fields: readonly FieldModel[], paged: boolean): string {
+    if (!paged) return this.#renderRecordFields(fields, '  ')
+    const lines = fields.map((field) => {
+      const expression = this.#renderer.expression(field.shape, field.description)
+      return `    ${propertyKey(field.name)}: ${field.optional ? `t.optional(${expression})` : expression},`
+    })
+    return `{\n${[...lines, '    ...t.pageInputs(),'].join('\n')}\n  }`
+  }
+
   #renderRecordValueTypes(): string[] {
     return usableResources(this.#manifest).map(([resourceKey, resource]) => {
       const binding = this.#recordBinding(resourceKey)
@@ -1266,6 +1372,11 @@ ${entries.join('\n')}
 
   #inputType(input: InputModel): string {
     if (input.kind === 'create') return `${input.resourceKey}CreateInput`
+    if (input.paged) {
+      const base = this.#inputType({ ...input, paged: false })
+      const { pageRequest } = this.#pagingNames
+      return input.fields.length === 0 ? pageRequest : `${base} & ${pageRequest}`
+    }
     if (input.fields.length === 0) return 'Record<string, never>'
     const members = input.fields.map((field) => {
       const type = this.#renderer.sdkType(field.shape, 'input')
@@ -1285,8 +1396,8 @@ ${entries.join('\n')}
         return 'undefined'
       case 'record':
         return output.resourceKey
-      case 'records':
-        return `readonly ${output.resourceKey}[]`
+      case 'page':
+        return `${this.#pagingNames.page}<${output.resourceKey}>`
       case 'value':
         return this.#renderer.sdkType(output.shape, 'output')
     }
@@ -1298,8 +1409,8 @@ ${entries.join('\n')}
         return 't.none()'
       case 'record':
         return this.#recordBinding(output.resourceKey)
-      case 'records':
-        return `t.array(${this.#recordBinding(output.resourceKey)})`
+      case 'page':
+        return `t.page(${this.#recordBinding(output.resourceKey)})`
       case 'value':
         return this.#renderer.expression(output.shape)
     }
@@ -1319,7 +1430,9 @@ ${entries.join('\n')}
       const type = this.#builder.build(field.shape, field.description)
       built[field.name] = field.optional ? t.optional(type) : type
     }
-    return t.record(built)
+    return t.record(
+      input.kind === 'fields' && input.paged ? { ...built, ...t.pageInputs() } : built
+    )
   }
 
   /**
@@ -1336,7 +1449,7 @@ ${entries.join('\n')}
     const input =
       operation.input.kind === 'create'
         ? this.#createInputBinding(operation.input.resourceKey)
-        : `t.record(${this.#renderRecordFields(operation.input.fields, '  ')})`
+        : `t.record(${this.#renderRequestFields(operation.input.fields, operation.input.paged)})`
     const target =
       route.resourceType === undefined
         ? `{ command: ${stringLiteral(route.commandKey)} }`
@@ -1448,6 +1561,7 @@ export const ${contract}: AppContract<${client}> = {
     const imported = [
       ...CONTRACT_VALUE_IMPORTS,
       ...CONTRACT_BASE_TYPE_IMPORTS,
+      ...this.#pageTypeImportSpecifiers().map((specifier) => specifier.local),
       ...this.#renderer.usedTypes,
     ]
     reportDuplicates(
@@ -1605,7 +1719,9 @@ function renderBody(body: MethodModel['body']): string {
     case 'input-with-fields':
       // Positional identifiers come last so they win over any same-named key
       // an untyped caller slips into the input.
-      return `{ ...${body.binding}, ${fields(body.fields)} }`
+      return body.fields.length === 0
+        ? `{ ...${body.binding} }`
+        : `{ ...${body.binding}, ${fields(body.fields)} }`
   }
 }
 
@@ -1648,6 +1764,24 @@ function wrap(line: string, width: number): string[] {
 
 function upperFirst(name: string): string {
   return name.charAt(0).toUpperCase() + name.slice(1)
+}
+
+/**
+ * The local names of the paging types in an app's contract module: `Page` and
+ * `PageRequest`, unless the manifest declares a type of that name (an enum, a
+ * resource, or a resource's create or update input), in which case the import
+ * is aliased `MactsPage` / `MactsPageRequest` (numbered if those are taken too).
+ */
+function pagingTypeNames(manifest: AppManifest): { page: string; pageRequest: string } {
+  const declared = new Set<string>(Object.keys(manifest.enums))
+  for (const [key] of usableResources(manifest)) {
+    declared.add(key)
+    declared.add(`${key}CreateInput`)
+    declared.add(`${key}UpdateInput`)
+  }
+  const local = (name: string): string =>
+    declared.has(name) ? uniqueName(`Macts${name}`, declared) : name
+  return { page: local('Page'), pageRequest: local('PageRequest') }
 }
 
 /** `base`, or `base2`, `base3`, … : the first not in `used`, which it joins. */

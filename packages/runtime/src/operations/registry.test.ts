@@ -20,6 +20,7 @@ import { z } from 'zod'
 import { loadManifest, resolveManifestRoutes, type AppManifest } from '@macts/core'
 import {
   PASSTHROUGH_PLAN,
+  ValueTypes as t,
   type AnyOperationDescriptor,
   type AppContract,
   type ValueType,
@@ -303,6 +304,59 @@ describe('operationsFromContract', () => {
   it('refuses a contract for a different app', () => {
     expect(() => operationsFromContract(contractWith([descriptor()], 'notes'), CALENDAR)).toThrow(
       OperationRegistrationError
+    )
+  })
+})
+
+describe('operationsFromContract: paging agrees with the manifest', () => {
+  /** CALENDAR with the calendar identifier entry replaced by `identifier`. */
+  function calendarWith(
+    identifier: NonNullable<AppManifest['resources'][string]['identifiers']>[number]
+  ): AppManifest {
+    const calendar = CALENDAR.resources['Calendar']
+    if (calendar === undefined) throw new Error('fixture lost its Calendar')
+    return {
+      ...CALENDAR,
+      resources: { ...CALENDAR.resources, Calendar: { ...calendar, identifiers: [identifier] } },
+    }
+  }
+
+  const UNIQUE = {
+    unique: true,
+    evidence: { unique: { source: 'curated', note: 'Calendar ids never repeat' } },
+  } as const
+  const pagedList = descriptor({
+    input: t.record({ ...t.pageInputs() }),
+    output: t.page(t.record({})),
+  })
+  const wholeList = descriptor({ input: t.record({}), output: t.page(t.record({})) })
+
+  it('registers a paged list whose identifier is claimed unique, even targeted by property', () => {
+    const manifest = calendarWith({
+      property: 'name',
+      primary: true,
+      targeting: 'byProperty',
+      ...UNIQUE,
+    })
+
+    expect(operationsFromContract(contractWith([pagedList]), manifest)).toHaveLength(1)
+  })
+
+  it('registers an unpaged list whose identifier makes no uniqueness claim', () => {
+    expect(operationsFromContract(contractWith([wholeList]), CALENDAR)).toHaveLength(1)
+  })
+
+  it('refuses a list that takes the paging inputs when its identifier is not claimed unique', () => {
+    expect(() => operationsFromContract(contractWith([pagedList]), CALENDAR)).toThrow(
+      'Contract operation "calendar.calendars.list" takes the paging inputs, but the manifest says it does not page: its resource\'s primary identifier is not claimed unique. Regenerate the contract.'
+    )
+  })
+
+  it('refuses a list without the paging inputs when the manifest says it pages', () => {
+    const manifest = calendarWith({ property: 'calendarIdentifier', primary: true, ...UNIQUE })
+
+    expect(() => operationsFromContract(contractWith([wholeList]), manifest)).toThrow(
+      'Contract operation "calendar.calendars.list" does not take the paging inputs, but the manifest says its list pages. Regenerate the contract.'
     )
   })
 })

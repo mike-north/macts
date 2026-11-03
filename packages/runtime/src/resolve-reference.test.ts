@@ -34,6 +34,7 @@ import {
   TargetNotFoundError,
   UnexpectedValueError,
   ValidationError,
+  ValueTypes as t,
   type Authority,
   type AppContract,
   type InvocationContext,
@@ -49,6 +50,7 @@ import { createRuntime, type MactsRuntime, type RuntimeLogger } from './runtime.
 import {
   CALENDAR_MANIFEST,
   FIXED_NOW,
+  BOOK_RECORD,
   LIBRARY_MANIFEST,
   createFakeVerifier,
   createMemoryAuditWriter,
@@ -327,7 +329,19 @@ describe('resolveReference: allowed resolutions', () => {
     expect(Object.hasOwn(executor.resolutions[0] ?? {}, 'signal')).toBe(false)
   })
 
-  it('hands a collection reference the list output plan: an array of the record', async () => {
+  it('resolves a collection reference to the full array of records, never a page', async () => {
+    const three = [DUNE_WIRE, { ...DUNE_WIRE, isbn: 'b' }, { ...DUNE_WIRE, isbn: 'c' }]
+    const { runtime, executor } = harness({ executor: resolvingTo(three) })
+
+    const result = await runtime.resolveReference('library', wire(EVERY_BOOK), as(LIBRARIAN_SECRET))
+
+    // Resolution is not paged (D7 step 8): no page window, no `items` wrapper.
+    expect(result).toEqual(three)
+    expect(executor.requests).toHaveLength(0)
+    expect(Object.hasOwn(executor.resolutions[0] ?? {}, 'page')).toBe(false)
+  })
+
+  it('hands a collection reference an array of the list item plan, not the page plan', async () => {
     const { runtime, executor } = harness({ executor: resolvingTo([DUNE_WIRE]) })
 
     await runtime.resolveReference('library', wire(EVERY_BOOK), as(LIBRARIAN_SECRET))
@@ -1266,6 +1280,27 @@ describe('registerContract: recorded resolving operations', () => {
       runtime.resolveReference('library', wire(DUNE_BY_NAME), as(LIBRARIAN_SECRET))
     )
     expect(error).toBeInstanceOf(ValidationError)
+  })
+
+  it('refuses a contract whose recorded list does not return a page, registering nothing', () => {
+    const base = libraryContract()
+    const list = base.operations['library.books.list']
+    if (list === undefined) throw new Error('fixture lost its book list')
+    const contract: AppContract<unknown> = {
+      ...base,
+      operations: {
+        ...base.operations,
+        'library.books.list': { ...list, output: t.array(BOOK_RECORD) },
+      },
+    }
+    const runtime = bareRuntime()
+
+    expect(() => {
+      runtime.registerContract(contract, LIBRARY_MANIFEST)
+    }).toThrow(
+      'The library contract is inconsistent: resource "Book" records "library.books.list" as its list operation, whose output is not a page. Regenerate the contract.'
+    )
+    expect(runtime.operations()).toEqual([])
   })
 
   it('refuses a contract whose recorded list targets a different resource', () => {

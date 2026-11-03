@@ -5,7 +5,12 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { PASSTHROUGH_PLAN, TargetNotFoundError, type ValuePlan } from '@macts/contracts'
+import {
+  EMPTY_RESOURCE_PLAN_TABLE,
+  PASSTHROUGH_PLAN,
+  TargetNotFoundError,
+  type ValuePlan,
+} from '@macts/contracts'
 import type { AppManifest, ExecutionRequest } from '@macts/core'
 import {
   TEST_EXECUTOR_NAMES,
@@ -102,7 +107,14 @@ function executionRequest(
   outputPlan: ValuePlan,
   input: ExecutionRequest['input'] = {}
 ): ExecutionRequest {
-  return { manifest: MANIFEST, target, input, inputPlan: PASSTHROUGH_PLAN, outputPlan }
+  return {
+    manifest: MANIFEST,
+    target,
+    input,
+    inputPlan: PASSTHROUGH_PLAN,
+    outputPlan,
+    resources: EMPTY_RESOURCE_PLAN_TABLE,
+  }
 }
 
 /** The rejection of `promise`, failing the test if it resolves. */
@@ -125,6 +137,17 @@ describe('createTestStubExecutor: execute', () => {
 
     expect(executor.provider).toBe(TEST_STUB_PROVIDER)
     expect(result).toEqual([])
+  })
+
+  it('answers a paged list window with an empty collection', async () => {
+    const executor = createTestStubExecutor()
+
+    const result = await executor.execute({
+      ...executionRequest({ command: 'list', resource: 'Widget' }, LIST_PLAN),
+      page: { offset: 0, size: 25 },
+    })
+
+    expect(result).toEqual({ items: [], length: 0 })
   })
 
   it.each([
@@ -178,6 +201,7 @@ describe('createTestStubExecutor: resolve', () => {
   it('resolves a selector collection to an empty array', async () => {
     const result = await createTestStubExecutor().resolve({
       manifest: MANIFEST,
+      resources: EMPTY_RESOURCE_PLAN_TABLE,
       reference: {
         resource: 'Widget',
         form: 'selector',
@@ -193,6 +217,7 @@ describe('createTestStubExecutor: resolve', () => {
   it('resolves an identity collection with no entries to an empty array', async () => {
     const result = await createTestStubExecutor().resolve({
       manifest: MANIFEST,
+      resources: EMPTY_RESOURCE_PLAN_TABLE,
       reference: { resource: 'Widget', form: 'identity', cardinality: 'many', entries: [] },
       outputPlan: LIST_PLAN,
     })
@@ -204,6 +229,7 @@ describe('createTestStubExecutor: resolve', () => {
     const error = await rejectionOf(
       createTestStubExecutor().resolve({
         manifest: MANIFEST,
+        resources: EMPTY_RESOURCE_PLAN_TABLE,
         reference: {
           resource: 'Widget',
           form: 'identity',
@@ -225,6 +251,7 @@ describe('createTestStubExecutor: resolve', () => {
     const error = await rejectionOf(
       createTestStubExecutor().resolve({
         manifest: MANIFEST,
+        resources: EMPTY_RESOURCE_PLAN_TABLE,
         reference: { ...identity, cardinality: 'one' },
         outputPlan: RECORD_PLAN,
       })
@@ -239,6 +266,7 @@ describe('createTestStubExecutor: resolve', () => {
 
     const result = await createTestStubExecutor().resolve({
       manifest: MANIFEST,
+      resources: EMPTY_RESOURCE_PLAN_TABLE,
       reference,
       outputPlan: PASSTHROUGH_PLAN,
     })

@@ -161,16 +161,10 @@ const LIBRARY_OPERATIONS: readonly AnyOperationDescriptor[] = [
     'library:shelves:list',
     'list',
     'Shelf',
-    t.array(SHELF_RECORD)
+    t.page(SHELF_RECORD)
   ),
   BOOKS_GET,
-  libraryOperation(
-    'library.books.list',
-    'library:books:list',
-    'list',
-    'Book',
-    t.array(BOOK_RECORD)
-  ),
+  libraryOperation('library.books.list', 'library:books:list', 'list', 'Book', t.page(BOOK_RECORD)),
 ]
 
 /**

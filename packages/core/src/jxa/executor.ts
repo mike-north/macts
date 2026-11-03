@@ -41,6 +41,7 @@ import { execFile } from 'node:child_process'
 import type { IssuePath, WireValue } from '@macts/contracts'
 import {
   NATIVE_CODEC_ERROR_NAME,
+  NATIVE_COLLECTION_CHANGED_ERROR_NAME,
   NATIVE_DECODE_FUNCTION,
   NATIVE_ENCODE_FUNCTION,
   type NativeCodec,
@@ -239,7 +240,7 @@ export interface RunNativeScriptOptions {
  *
  * @remarks
  * The script decodes `script.input` against `script.inputPlan`, invokes
- * `script.body` as `(app, args)` with the target application, encodes the
+ * `script.body` as `(app, args, page)` with the target application, encodes the
  * result against `script.outputPlan`, and reports a {@link NativeOutcome}.
  * Everything the app or the codec raises inside the process resolves as a
  * failed outcome; it is not a rejection. A success whose value was dropped by
@@ -298,7 +299,8 @@ function embedJson(value: unknown): string {
  * The catch clause of a native script: describes what was thrown as a
  * {@link NativeFailure}. A codec error, recognized by its marker name, keeps its
  * direction, path, message, and its unsupported kind or missing resource if it
- * has one; anything else
+ * has one; a changed collection, recognized by its marker name, keeps its
+ * message; anything else
  * is an app or bridge failure that keeps its message and, when it carries one,
  * its numeric error code.
  */
@@ -312,6 +314,9 @@ const DESCRIBE_THROWN = [
   '        codecFailure.missingResource = e.missingResource;',
   '      }',
   '      return { ok: false, failure: codecFailure };',
+  '    }',
+  `    if (e !== null && typeof e === 'object' && e.name === ${JSON.stringify(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}) {`,
+  "      return { ok: false, failure: { source: 'collection', message: String(e.message) } };",
   '    }',
   "    var failure = { source: 'app', message: String(e && e.message || e) };",
   "    if (e !== null && e !== undefined && typeof e.errorNumber === 'number') {",
@@ -328,7 +333,8 @@ const DESCRIBE_THROWN = [
  * its final expression is that outcome serialized as JSON, which the host
  * prints. The input, both plans, and the reference table are embedded with
  * {@link embedJson}, the bundle identifier as a JSON string literal, and the
- * body inside its own `(function (app, args) { ... })`.
+ * body inside its own `(function (app, args, page) { ... })`, called with the
+ * page window (or `null`) embedded the same way.
  *
  * The application object comes first, because decoding a reference addresses
  * the app: the codec functions receive `{ app, references }`. Creating it
@@ -345,9 +351,9 @@ export function composeNativeScript(script: NativeScript, codec: NativeCodec): s
     '    app.includeStandardAdditions = true;',
     `    var env = { app: app, references: ${embedJson(script.references)} };`,
     `    var args = ${NATIVE_DECODE_FUNCTION}(${embedJson(script.input)}, ${embedJson(script.inputPlan)}, env);`,
-    '    var value = (function (app, args) {',
+    '    var value = (function (app, args, page) {',
     script.body,
-    '    })(app, args);',
+    `    })(app, args, ${embedJson(script.page ?? null)});`,
     `    return { ok: true, value: ${NATIVE_ENCODE_FUNCTION}(value, ${embedJson(script.outputPlan)}, env) };`,
     '  } catch (e) {',
     DESCRIBE_THROWN,
@@ -409,6 +415,8 @@ function parseNativeFailure(value: unknown): NativeFailure | string {
       if (typeof errorNumber !== 'number') return 'the app failure has a non-numeric error number'
       return { source: 'app', message, errorNumber }
     }
+    case 'collection':
+      return { source: 'collection', message }
     case 'codec': {
       const direction = value['direction']
       const path = value['path']

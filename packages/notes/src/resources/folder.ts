@@ -21,10 +21,10 @@ export class FolderResourceClient {
   }
 
   /**
-   * List all folders.
+   * List all folders, as one page.
    */
-  async list(): Promise<Folder[]> {
-    return this.#http.rpc<Folder[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Folder[] }> {
+    return this.#http.rpc<{ items: Folder[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

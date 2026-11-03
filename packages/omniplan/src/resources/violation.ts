@@ -21,10 +21,10 @@ export class ViolationResourceClient {
   }
 
   /**
-   * List all violations.
+   * List all violations, as one page.
    */
-  async list(): Promise<Violation[]> {
-    return this.#http.rpc<Violation[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Violation[] }> {
+    return this.#http.rpc<{ items: Violation[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

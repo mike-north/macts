@@ -51,7 +51,9 @@ export class CanvasResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: CanvasCreateInput): Promise<Canvas>;
     get(id: string): Promise<Canvas>;
-    list(): Promise<Canvas[]>;
+    list(): Promise<{
+        items: Canvas[];
+    }>;
 }
 
 // @public (undocumented)
@@ -242,7 +244,9 @@ export interface GraphicCreateInput {
 export class GraphicResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Graphic>;
-    list(canvasId: string): Promise<Graphic[]>;
+    list(canvasId: string): Promise<{
+        items: Graphic[];
+    }>;
 }
 
 // @public (undocumented)
@@ -452,7 +456,9 @@ export class LayerResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: LayerCreateInput): Promise<Layer>;
     get(name: string): Promise<Layer>;
-    list(canvasId: string): Promise<Layer[]>;
+    list(canvasId: string): Promise<{
+        items: Layer[];
+    }>;
 }
 
 // @public (undocumented)
@@ -502,7 +508,9 @@ export interface LineCreateInput {
 export class LineResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Line>;
-    list(canvasId: string): Promise<Line[]>;
+    list(canvasId: string): Promise<{
+        items: Line[];
+    }>;
 }
 
 // @public (undocumented)
@@ -644,7 +652,9 @@ export class ShapeResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: ShapeCreateInput): Promise<Shape>;
     get(id: string): Promise<Shape>;
-    list(canvasId: string): Promise<Shape[]>;
+    list(canvasId: string): Promise<{
+        items: Shape[];
+    }>;
 }
 
 // @public (undocumented)

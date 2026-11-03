@@ -20,10 +20,10 @@ export class ListLayersCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.layers.list(this.canvasId)
+      const page = await client.layers.list(this.canvasId)
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           name: item.name,
           locked: item.locked,
           visible: item.visible,

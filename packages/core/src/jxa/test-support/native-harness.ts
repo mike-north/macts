@@ -188,6 +188,7 @@ function parseFailure(value: unknown): NativeFailure {
       ...(missingResource === undefined ? {} : { missingResource }),
     }
   }
+  if (value['source'] === 'collection') return { source: 'collection', message }
   if (value['source'] === 'app') {
     const errorNumber = value['errorNumber']
     return typeof errorNumber === 'number'

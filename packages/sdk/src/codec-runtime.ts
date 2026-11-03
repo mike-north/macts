@@ -43,6 +43,7 @@ import {
   UnexpectedValueError,
   ValidationError,
   ValueTypes as t,
+  referenceResultType,
   resolvingOperationKey,
   type AnyOperationDescriptor,
   type AppContract,
@@ -187,8 +188,25 @@ function decodeOutput<Output>(
   context: DecodeContext,
   subject = `The result of "${operation.id}"`
 ): Output {
+  return decodeResult(operation, operation.output, wire, context, subject)
+}
+
+/**
+ * Decode a wire result with `type`, a value type derived from `operation`'s
+ * output contract (the output itself, or what a resolution returns).
+ *
+ * @throws `UnexpectedValueError` listing every issue when the result violates
+ *   `type`.
+ */
+function decodeResult<Output>(
+  operation: AnyOperationDescriptor,
+  type: ValueType<Output>,
+  wire: unknown,
+  context: DecodeContext,
+  subject: string
+): Output {
   const decoded = runCodec(`The output contract of "${operation.id}"`, () =>
-    operation.output.decode(wire, context)
+    type.decode(wire, context)
   )
   if (!decoded.ok) {
     throw new UnexpectedValueError(`${subject} does not match its contract.`, {
@@ -329,7 +347,8 @@ function checkEntryCount(reference: ReferenceData, resolved: unknown, subject: s
 /**
  * The operation a reference to `target` resolves as: the one the contract's
  * resource table records for the reference's cardinality
- * (`resolvingOperationKey`). Its output contract decodes the result.
+ * (`resolvingOperationKey`). The result is decoded with the value type
+ * derived from its output contract ({@link resolutionResultType}).
  *
  * @throws `InternalError` when the contract records no such operation, or
  *   records one it does not contain. A reference that encoded is always
@@ -351,6 +370,33 @@ function resolvingOperation(app: ClientApp, target: ReferenceTarget): AnyOperati
     )
   }
   return operation
+}
+
+/**
+ * The value type a resolution through `operation` is decoded with
+ * (`referenceResultType`, the runtime's own rule): the `get` output for a
+ * single reference, and for a collection an array of the items of the
+ * `list` operation's page, never the page. A collection reference resolves to
+ * all of its members, not to one page of them.
+ *
+ * @throws `InternalError` when the contract's list operation does not return
+ *   a page, so the contract is inconsistent.
+ */
+function resolutionResultType(
+  app: ClientApp,
+  target: ReferenceTarget,
+  operation: AnyOperationDescriptor
+): ValueType<unknown> {
+  try {
+    return referenceResultType(target.cardinality, operation.output)
+  } catch (cause) {
+    if (!(cause instanceof TypeError)) throw cause
+    throw new InternalError(
+      `The ${app.app} contract records "${operation.id}" as how references to "${target.resource}" resolve, but its output is not a page, so its references cannot be resolved.`,
+      {},
+      { cause }
+    )
+  }
 }
 
 /** A client runtime and the decode context it binds every decoded value with. */
@@ -378,9 +424,10 @@ function buildCodecClientRuntime(app: ClientApp, transport: ClientTransport): Co
       const target = readReferenceTarget(app, 'resolve', reference)
       const wire = encodeReference(app, 'resolve', target, reference)
       const operation = resolvingOperation(app, target)
+      const resultType = resolutionResultType(app, target, operation)
       const result = await transport.resolve(wire, options)
       const subject = `The result of resolving a reference as "${operation.id}"`
-      const resolved = decodeOutput(operation, result, decodeContext, subject)
+      const resolved = decodeResult(operation, resultType, result, decodeContext, subject)
       checkEntryCount(reference, resolved, subject)
       return resolved
     },

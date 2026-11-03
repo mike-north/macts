@@ -7,6 +7,7 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { Page } from '@macts/contracts';
 
 // @public
 export interface Folder {
@@ -30,7 +31,7 @@ export interface FolderCreateInput {
 export interface FolderResourceClient {
     create(input: FolderCreateInput, options?: CallOptions): Promise<Folder>;
     get(id: string, options?: CallOptions): Promise<Folder>;
-    list(options?: CallOptions): Promise<readonly Folder[]>;
+    list(options?: CallOptions): Promise<Page<Folder>>;
 }
 
 // @public
@@ -65,7 +66,7 @@ export interface InboxTaskCreateInput {
 export interface InboxTaskResourceClient {
     create(input: InboxTaskCreateInput, options?: CallOptions): Promise<InboxTask>;
     get(id: string, options?: CallOptions): Promise<InboxTask>;
-    list(options?: CallOptions): Promise<readonly InboxTask[]>;
+    list(options?: CallOptions): Promise<Page<InboxTask>>;
 }
 
 // @public
@@ -117,7 +118,7 @@ export type PerspectiveCreateInput = Record<string, never>;
 // @public
 export interface PerspectiveResourceClient {
     get(id: string, options?: CallOptions): Promise<Perspective>;
-    list(options?: CallOptions): Promise<readonly Perspective[]>;
+    list(options?: CallOptions): Promise<Page<Perspective>>;
 }
 
 // @public
@@ -183,7 +184,7 @@ export interface ProjectCreateInput {
 export interface ProjectResourceClient {
     create(input: ProjectCreateInput, options?: CallOptions): Promise<Project>;
     get(id: string, options?: CallOptions): Promise<Project>;
-    list(options?: CallOptions): Promise<readonly Project[]>;
+    list(options?: CallOptions): Promise<Page<Project>>;
 }
 
 // @public
@@ -243,7 +244,7 @@ export interface TagCreateInput {
 export interface TagResourceClient {
     create(input: TagCreateInput, options?: CallOptions): Promise<Tag>;
     get(id: string, options?: CallOptions): Promise<Tag>;
-    list(options?: CallOptions): Promise<readonly Tag[]>;
+    list(options?: CallOptions): Promise<Page<Tag>>;
 }
 
 // @public
@@ -305,7 +306,7 @@ export interface TaskCreateInput {
 export interface TaskResourceClient {
     create(input: TaskCreateInput, options?: CallOptions): Promise<Task>;
     get(id: string, options?: CallOptions): Promise<Task>;
-    list(options?: CallOptions): Promise<readonly Task[]>;
+    list(options?: CallOptions): Promise<Page<Task>>;
 }
 
 // @public

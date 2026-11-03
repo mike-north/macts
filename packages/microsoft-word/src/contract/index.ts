@@ -25,6 +25,7 @@ import {
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
+  type Page,
   type Rgb,
   type ValueType,
 } from '@macts/contracts'
@@ -1060,8 +1061,8 @@ export interface FieldUpdateInput {
 
 /** A Microsoft Word document */
 export interface DocumentResourceClient {
-  /** List documents. */
-  list(options?: CallOptions): Promise<readonly Document[]>
+  /** List documents, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Document>>
   /**
    * Read the document identified by `id`.
    *
@@ -1450,13 +1451,13 @@ const resources: AppContract<MicrosoftWordClient>['resources'] = {
   },
 }
 
-const documentListOperation: OperationDescriptor<Record<string, never>, readonly Document[]> = {
+const documentListOperation: OperationDescriptor<Record<string, never>, Page<Document>> = {
   id: 'microsoft-word.documents.list',
   permission: 'microsoft-word:documents:list',
   target: { command: 'list', resource: 'Document' },
   description: 'List all documents',
   input: t.record({}),
-  output: t.array(documentRecordType),
+  output: t.page(documentRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',

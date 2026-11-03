@@ -6,6 +6,8 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { Page } from '@macts/contracts';
+import { PageRequest } from '@macts/contracts';
 
 // @public
 export interface Account {
@@ -20,7 +22,7 @@ export type AccountCreateInput = Record<string, never>;
 // @public
 export interface AccountResourceClient {
     get(name: string, options?: CallOptions): Promise<Account>;
-    list(options?: CallOptions): Promise<readonly Account[]>;
+    list(options?: CallOptions): Promise<Page<Account>>;
 }
 
 // @public
@@ -41,7 +43,7 @@ export type AttachmentCreateInput = Record<string, never>;
 // @public
 export interface AttachmentResourceClient {
     get(id: string, options?: CallOptions): Promise<Attachment>;
-    list(options?: CallOptions): Promise<readonly Attachment[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Attachment>>;
 }
 
 // @public
@@ -62,7 +64,7 @@ export interface FolderCreateInput {
 // @public
 export interface FolderResourceClient {
     get(name: string, options?: CallOptions): Promise<Folder>;
-    list(options?: CallOptions): Promise<readonly Folder[]>;
+    list(options?: CallOptions): Promise<Page<Folder>>;
 }
 
 // @public
@@ -92,7 +94,7 @@ export interface NoteCreateInput {
 export interface NoteResourceClient {
     create(input: NoteCreateInput, options?: CallOptions): Promise<Note>;
     get(name: string, options?: CallOptions): Promise<Note>;
-    list(options?: CallOptions): Promise<readonly Note[]>;
+    list(options?: CallOptions): Promise<Page<Note>>;
     show(name: string, options?: CallOptions): Promise<void>;
 }
 

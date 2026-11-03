@@ -636,6 +636,13 @@ export const manifest: unknown = {
           property: 'persistentID',
           primary: true,
           targeting: 'byProperty',
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'curated',
+              note: "The application's playlists collection lists each playlist object once; a repeated entry arises only for a track inside a playlist, which is why Track is not unique. A read-only list of every playlist on Music 1.7.2 (macOS 27.2), 2026-11-03, found 3 playlists with 3 distinct persistent IDs, as did each source's playlists. The dictionary describes the property as an id that does not change over time, which is about persistence, not uniqueness.",
+            },
+          },
         },
       ],
     },
@@ -1280,6 +1287,13 @@ export const manifest: unknown = {
           property: 'persistentID',
           primary: true,
           targeting: 'byProperty',
+          unique: false,
+          evidence: {
+            unique: {
+              source: 'curated',
+              note: "A playlist can hold the same song more than once, and a track's persistent ID was observed to be the same in every playlist that holds it, so two entries of one song in a playlist are expected to share one: the tracks of a playlist are not known to have unique persistent IDs. The dictionary describes the property only as an id that does not change over time.",
+            },
+          },
         },
       ],
     },

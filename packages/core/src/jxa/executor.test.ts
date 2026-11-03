@@ -242,7 +242,9 @@ describe('composeNativeScript', () => {
     expect(source).toContain(
       'return { ok: true, value: __mactsEncode(value, JSON.parse("{\\"kind\\":\\"passthrough\\"}"), env) };'
     )
-    expect(source).toContain('(function (app, args) {\nreturn args;\n')
+    expect(source).toContain('(function (app, args, page) {\nreturn args;\n')
+    // With no page window, the body's `page` argument is embedded null.
+    expect(source).toContain(`})(app, args, JSON.parse(${JSON.stringify('null')}));`)
     expect(source.trimEnd().endsWith('JSON.stringify(__mactsOutcome);')).toBe(true)
   })
 
@@ -261,6 +263,21 @@ describe('composeNativeScript', () => {
     expect(env).toBeLessThan(decode)
     expect(decode).toBeLessThan(body)
     expect(body).toBeLessThan(encode)
+  })
+
+  it('embeds a page window as a JSON string literal, never as code', () => {
+    const page = { offset: 25, size: 25, anchor: 'SENTINEL_ANCHOR_77f1' }
+    const source = composeNativeScript(
+      { ...nativeScript({ body: 'return page;' }), page },
+      NATIVE_CODEC
+    )
+    const callLine = source
+      .split('\n')
+      .find((line) => line.trimStart().startsWith('})(app, args, '))
+    expect(callLine?.trim()).toBe(
+      `})(app, args, JSON.parse(${JSON.stringify(JSON.stringify(page))}));`
+    )
+    expect(source.split('\n').filter((line) => line.includes(page.anchor))).toEqual([callLine])
   })
 })
 

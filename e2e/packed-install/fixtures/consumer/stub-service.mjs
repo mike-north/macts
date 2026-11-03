@@ -1,7 +1,7 @@
 /**
  * A stub macts service on an ephemeral local port, answering the widgets
  * app's operations the way the real HTTP adapter does: `list` succeeds with
- * one widget in wire form, and `get` fails with a `TARGET_NOT_FOUND` error
+ * a page of one widget in wire form, and `get` fails with a `TARGET_NOT_FOUND` error
  * envelope. The Notes app's `notes.attachments.get` also fails with a
  * `TARGET_NOT_FOUND` envelope. It records the Authorization header of every request.
  */
@@ -17,7 +17,9 @@ export async function startStubService() {
       response.setHeader('Content-Type', 'application/json')
       if (request.method === 'POST' && request.url === '/api/v1/rpc/widgets.widgets.list') {
         response.statusCode = 200
-        response.end(JSON.stringify({ result: [{ name: 'Sprocket', count: { integer: '7' } }] }))
+        response.end(
+          JSON.stringify({ result: { items: [{ name: 'Sprocket', count: { integer: '7' } }] } })
+        )
         return
       }
       if (request.method === 'POST' && request.url === '/api/v1/rpc/widgets.widgets.get') {

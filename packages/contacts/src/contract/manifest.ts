@@ -178,6 +178,13 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "unique identifier for this address."',
+            },
+          },
         },
       ],
       nullabilityProbe: {
@@ -335,6 +342,13 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "unique identifier for this entry, this is persistent, and stays with the record."',
+            },
+          },
         },
       ],
       nullabilityProbe: {
@@ -390,6 +404,13 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "unique and persistent identifier for this record."',
+            },
+          },
         },
       ],
       nullabilityProbe: {
@@ -950,6 +971,13 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "unique and persistent identifier for this record."',
+            },
+          },
         },
       ],
       nullabilityProbe: {
@@ -1024,6 +1052,13 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "unique identifier for this entry, this is persistent, and stays with the record."',
+            },
+          },
         },
       ],
       nullabilityProbe: {

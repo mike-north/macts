@@ -53,7 +53,9 @@ export const TEST_STUB_PROVIDER = 'test-stub'
  * applies to this executor as to any other. The stub therefore answers as an
  * app with no objects would, keyed by the output plan it is handed:
  *
- * - An `array` plan (a list) yields `[]`, which every list contract admits.
+ * - An `array` plan (a list) yields `[]`, which every list contract admits;
+ *   for a paged list, whose request carries a page window, it yields the
+ *   window result of an empty collection, `{ items: [], length: 0 }`.
  * - A `passthrough` plan yields `{ executor: 'test-stub', target, input }`:
  *   the operation's manifest target and the validated wire input. A value
  *   under that plan has no wire encoding and is not validated, so a test can
@@ -90,7 +92,9 @@ export function createTestStubExecutor(): Executor {
         })
       }
       if (outputPlan.kind === 'array') {
-        return Promise.resolve([])
+        // A list reads an array of its items: none, since there is no app. A
+        // paged list answers its window with an empty collection.
+        return Promise.resolve(request.page === undefined ? [] : { items: [], length: 0 })
       }
       return Promise.reject(noTarget(target.resource))
     },

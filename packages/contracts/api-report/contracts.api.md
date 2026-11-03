@@ -117,6 +117,14 @@ export type CodecResult<T> = {
 };
 
 // @public
+export class CollectionChangedError extends MactsError<'COLLECTION_CHANGED'> {
+    // (undocumented)
+    readonly code = "COLLECTION_CHANGED";
+    // (undocumented)
+    readonly name = "CollectionChangedError";
+}
+
+// @public
 export interface CollectionReference<T, R extends string = string> extends Resolvable<readonly T[]> {
     readonly app: string;
     readonly cardinality: 'many';
@@ -166,6 +174,9 @@ export type DynamicWireValue = string | boolean | null | WireInteger | WireDoubl
 export const DynamicWireValueSchema: z.ZodType<DynamicWireValue>;
 
 // @public
+export const EMPTY_RESOURCE_PLAN_TABLE: ResourcePlanTable;
+
+// @public
 export const ERROR_CLASSES: {
     readonly [C in WireErrorCode]: MactsErrorConstructor<C>;
 };
@@ -196,6 +207,7 @@ export interface ErrorDetailsByCode {
         readonly state: ApprovalRejectionState;
     };
     readonly CANCELLED: NoDetails;
+    readonly COLLECTION_CHANGED: NoDetails;
     readonly FILE_NOT_FOUND: {
         readonly path?: string;
     };
@@ -408,6 +420,9 @@ export interface InvocationContext {
 }
 
 // @public
+export function isPageValueType(type: ValueType<unknown>): type is PageValueType<unknown>;
+
+// @public
 export type IssuePath = readonly (string | number)[];
 
 // @public
@@ -436,6 +451,8 @@ export interface MactsErrorByCode {
     readonly APPROVAL_REJECTED: ApprovalRejectedError;
     // (undocumented)
     readonly CANCELLED: OperationCancelledError;
+    // (undocumented)
+    readonly COLLECTION_CHANGED: CollectionChangedError;
     // (undocumented)
     readonly FILE_NOT_FOUND: FileNotFoundError;
     // (undocumented)
@@ -557,6 +574,38 @@ export type OptionalFieldNames<Fields extends RecordFields> = {
 }[keyof Fields];
 
 // @public
+export interface Page<T> {
+    readonly items: readonly T[];
+    readonly nextCursor?: string;
+}
+
+// @public
+export const PAGE_SIZE_LIMITS: {
+    readonly default: number;
+    readonly maximum: number;
+};
+
+// @public
+export interface PageInputFields {
+    readonly cursor: OptionalField<string>;
+    readonly pageSize: OptionalField<Integer>;
+}
+
+// @public
+export interface PageRequest {
+    readonly cursor?: string;
+    readonly pageSize?: Integer;
+}
+
+// @public
+export interface PageValueType<T> extends ValueType<Page<T>> {
+    readonly item: ValueType<T>;
+}
+
+// @public
+export const PAGING_INPUT_NAMES: readonly ['pageSize', 'cursor'];
+
+// @public
 export const PASSTHROUGH_PLAN: Extract<ValuePlan, {
     readonly kind: 'passthrough';
 }>;
@@ -657,6 +706,9 @@ export type ReferenceRegistry = Readonly<Record<string, {
 }>>;
 
 // @public
+export function referenceResultType(cardinality: ReferenceCardinality, output: ValueType<unknown>): ValueType<unknown>;
+
+// @public
 export interface ReferenceScope {
     readonly app: string;
     readonly resources: ReferenceRegistry;
@@ -704,6 +756,17 @@ export interface ResourceDescriptor<RecordType, Id = unknown> {
     readonly name: string;
     readonly record: ValueType<RecordType>;
 }
+
+// @public
+export interface ResourcePlans {
+    readonly id?: ValuePlan;
+}
+
+// @public
+export type ResourcePlanTable = Readonly<Record<string, ResourcePlans>>;
+
+// @public
+export function resourcePlanTable(resources: ReferenceRegistry): ResourcePlanTable;
 
 // @public
 export interface Rgb {
@@ -945,6 +1008,8 @@ export interface ValueTypeConstructors {
     none(options?: ValueTypeOptions): ValueType<undefined>;
     nullable<Sdk>(inner: ValueType<Sdk>, options?: ValueTypeOptions): ValueType<Sdk | null>;
     optional<Sdk>(inner: ValueType<Sdk>): OptionalField<Sdk>;
+    page<Sdk>(item: ValueType<Sdk>, options?: ValueTypeOptions): PageValueType<Sdk>;
+    pageInputs(): PageInputFields;
     point(options?: ValueTypeOptions): ValueType<Point>;
     record<const Fields extends RecordFields>(fields: Fields, options?: ValueTypeOptions): ValueType<RecordSdk<Fields>>;
     rectangle(options?: ValueTypeOptions): ValueType<Rectangle>;

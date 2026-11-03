@@ -3,7 +3,8 @@ import type {
   Command as ManifestCommand,
   CommandParameter,
 } from '../../manifest/index.js'
-import { resolvePrimaryIdentifierProperty } from '../../manifest/index.js'
+import { PAGE_SIZE_LIMITS } from '@macts/contracts'
+import { listOperationPages, resolvePrimaryIdentifierProperty } from '../../manifest/index.js'
 import { usableProperties } from '../../manifest/unsupported.js'
 import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.js'
 import {
@@ -111,6 +112,12 @@ function buildResourceAccess(resource: Resource): string {
   return resourceNamespace(resource)
 }
 
+/** The help text of a paged list command's `--page-size` flag. */
+const PAGE_SIZE_FLAG_DESCRIPTION = `The most items to show, from 1 to ${String(PAGE_SIZE_LIMITS.maximum)} (default ${String(PAGE_SIZE_LIMITS.default)})`
+
+/** The help text of a paged list command's `--cursor` flag. */
+const CURSOR_FLAG_DESCRIPTION = 'Continue from the previous page, as its output says'
+
 /**
  * Generate a list command for a hierarchy path.
  */
@@ -150,10 +157,24 @@ export function generateListCommand(
   // match the SDK signature.
   const parentOptions = generateListParamOptions(listRequiredParams)
 
-  const listArgs =
-    listRequiredParams.length > 0
-      ? listRequiredParams.map((p) => `this.${safeParamProperty(p.name, 'list')}`).join(', ')
-      : ''
+  // A list that pages (see `listOperationPages`) takes `--page-size` and
+  // `--cursor`, forwards them as the SDK's trailing page argument, and says
+  // how to read the next page when more remain. Any other list's single page
+  // holds every item.
+  const paged = listCommand !== undefined && listOperationPages(listCommand, resource)
+  const pageArgument =
+    '{ ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }), ...(this.cursor === undefined ? {} : { cursor: this.cursor }) }'
+  const listArgs = [
+    ...listRequiredParams.map((p) => `this.${safeParamProperty(p.name, 'list')}`),
+    ...(paged ? [pageArgument] : []),
+  ].join(', ')
+  const pageOptions = paged
+    ? `  pageSize = Option.String('--page-size', { description: ${JSON.stringify(PAGE_SIZE_FLAG_DESCRIPTION)} });
+  cursor = Option.String('--cursor', { description: ${JSON.stringify(CURSOR_FLAG_DESCRIPTION)} });
+`
+    : ''
+  const format = paged ? 'formatPage' : 'formatList'
+  const formatTail = paged ? ', page.nextCursor' : ''
 
   const content = `import { Command, Option } from 'clipanion';
 import { getClient } from '${sdkImportPath}';
@@ -170,17 +191,17 @@ export class List${resource.plural}Command extends Command {
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
-${parentOptions}
+${parentOptions}${pageOptions}
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false);
 
     try {
       const client = getClient();
-      const items = await client.${resourceAccess}.list(${listArgs});
+      const page = await client.${resourceAccess}.list(${listArgs});
 
-      const output = formatter.formatList(items.map(item => ({
+      const output = formatter.${format}(page.items.map(item => ({
 ${generateListFieldMapping(resource)}
-      })));
+      }))${formatTail});
 
       this.context.stdout.write(output + '\\n');
       return 0;

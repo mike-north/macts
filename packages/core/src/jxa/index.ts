@@ -17,6 +17,7 @@ export {
   NATIVE_DECODE_FUNCTION,
   NATIVE_ENCODE_FUNCTION,
   NATIVE_CODEC_ERROR_NAME,
+  NATIVE_COLLECTION_CHANGED_ERROR_NAME,
   type NativeAddressing,
   type NativeCodec,
   type NativeCodecEnvironment,

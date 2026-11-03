@@ -19,10 +19,10 @@ export class ListDocumentsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.documents.list()
+      const page = await client.documents.list()
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           name: item.name,
           path: item.path,
           contents: item.contents,

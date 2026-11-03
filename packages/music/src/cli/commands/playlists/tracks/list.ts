@@ -23,10 +23,10 @@ export class ListTracksCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.tracks.list(this.playlistId)
+      const page = await client.tracks.list(this.playlistId)
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           id: item.id,
           index: item.index,
           name: item.name,

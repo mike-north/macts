@@ -92,6 +92,13 @@ export interface ErrorDetailsByCode {
   readonly FILE_NOT_FOUND: { readonly path?: string }
   /** A range or index selection is invalid for the collection it addresses. */
   readonly INVALID_SELECTION: { readonly resource?: string }
+  /**
+   * The collection changed while it was being read, so no consistent result
+   * exists; the same request is correct and can be retried, from the first
+   * page if it was paged. No details: what identified the change (an item's
+   * identifier) may be user content.
+   */
+  readonly COLLECTION_CHANGED: NoDetails
   /** The app is not installed or is not responding. */
   readonly APP_UNAVAILABLE: {
     readonly app: string

@@ -21,10 +21,10 @@ export class DocumentResourceClient {
   }
 
   /**
-   * List all documents.
+   * List all documents, as one page.
    */
-  async list(): Promise<Document[]> {
-    return this.#http.rpc<Document[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Document[] }> {
+    return this.#http.rpc<{ items: Document[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

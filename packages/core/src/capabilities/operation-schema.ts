@@ -16,6 +16,7 @@
  * @packageDocumentation
  */
 
+import { PAGE_SIZE_LIMITS } from '@macts/contracts'
 import type {
   AppManifest,
   Command,
@@ -24,6 +25,7 @@ import type {
   PropertyType,
   Resource,
 } from '../manifest/index.js'
+import { listOperationPages } from '../manifest/identifier.js'
 import { splitIdentifierWords } from '../manifest/lower-camel.js'
 import {
   isUnsupportedResourceKey,
@@ -201,7 +203,8 @@ function parametersToJsonSchema(parameters: CommandParameter[]): {
  * Generate input schema for a resource operation.
  *
  * For CRUD operations, we derive the schema from resource properties:
- * - list: No parameters (or optional filters)
+ * - list: its parameters, plus the optional `pageSize` and `cursor` inputs
+ *   when the list pages (see `listOperationPages`)
  * - get: Requires identifier property
  * - create: Requires writable properties (excluding read-only)
  * - update: Requires identifier + writable properties
@@ -267,6 +270,10 @@ export function generateResourceOperationSchema(command: Command, resource: Reso
     }
   }
 
+  if (listOperationPages(command, resource)) {
+    Object.assign(properties, pagingInputSchemas())
+  }
+
   const schema: Record<string, unknown> = {
     type: 'object',
     properties,
@@ -278,6 +285,32 @@ export function generateResourceOperationSchema(command: Command, resource: Reso
   }
 
   return schema as JsonSchema
+}
+
+/**
+ * The optional paging inputs of a list that pages, described as values the
+ * way this registry describes every input (an integer as a JSON number, not
+ * in its wire form): `pageSize`, a whole number of items within the page size
+ * bounds, and `cursor`, the previous page's `nextCursor`.
+ *
+ * @see phases/13-sdk-value-and-execution-contracts.md §D9 (Bounded list pages)
+ */
+function pagingInputSchemas(): Record<string, JsonSchema> {
+  const { default: size, maximum } = PAGE_SIZE_LIMITS
+  return {
+    pageSize: {
+      type: 'integer',
+      minimum: 1,
+      maximum,
+      default: size,
+      description: `The most items to return, from 1 to ${String(maximum)} (default ${String(size)}).`,
+    },
+    cursor: {
+      type: 'string',
+      description:
+        "The previous page's nextCursor, to read the page after it. Omit it to read the first page.",
+    },
+  }
 }
 
 /**

@@ -20,10 +20,10 @@ export class ListVariablesCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.variables.list(this.workflowName)
+      const page = await client.variables.list(this.workflowName)
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           name: item.name,
           value: item.value,
           settable: item.settable,

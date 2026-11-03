@@ -80,8 +80,9 @@ describe('macts mcp serve (UAT): each request’s bearer governs its own calls',
     const result = await callTool(granted, LIST_TOOL, {})
 
     expect(result.isError).toBeUndefined()
-    // The stub executor answers a list with `[]`, as an app with no notes would.
-    expect(toolDocument(result)).toEqual({ result: [] })
+    // The stub executor answers a list with an empty page, as an app with no
+    // notes would; nothing remains, so no continuation line follows.
+    expect(toolDocument(result)).toEqual({ result: { items: [] } })
   })
 
   it('denies the other key on the same tool of the same daemon', async () => {

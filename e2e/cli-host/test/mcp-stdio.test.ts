@@ -8,15 +8,16 @@
  * plugins directory holds the real built `@macts/notes-server` and
  * `@macts/notes`. `MACTS_TEST_EXECUTOR=stub` selects the built-in test
  * executor, so no app is automated and every dispatched call answers as an
- * app with no objects would: a list yields `[]`, which the list's output
- * contract admits (phases/13 D11). Keys are minted by the CLI into the same
+ * app with no objects would: a list yields an empty page, `{ items: [] }`,
+ * which the list's output contract admits (phases/13 D11). Keys are minted by the CLI into the same
  * macts home.
  *
  * Expected values are hand-derived:
  *
  * - From the Notes contract (`packages/notes/src/contract/index.ts`): operation
  *   `notes.notes.list` requires `notes:notes:list`, targets command `list` on
- *   resource `Note`, and takes an empty strict record; its tool name is
+ *   resource `Note`, and takes a strict record of the optional paging inputs;
+ *   its tool name is
  *   `macts__notes__notes_list`. `getAttachment` (route name `get`) is
  *   `notes.attachments.get`, whose tool is `macts__notes__attachments_get`.
  * - From phases/13 D6: a tool result is `{ "result": … }`; a failure is
@@ -58,8 +59,8 @@ const SETUP_TIMEOUT_MS = 90_000
 const LIST_TOOL = 'macts__notes__notes_list'
 const DISCOVERY_TOOL = 'macts__capabilities__discover'
 
-/** The result the stub executor gives for `notes.notes.list`: an empty list. */
-const STUB_LIST_RESULT: readonly unknown[] = []
+/** The result the stub executor gives for `notes.notes.list`: an empty page. */
+const STUB_LIST_RESULT = { items: [] }
 
 let home: MactsHome
 let granted: McpSession

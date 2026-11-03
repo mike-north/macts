@@ -20,6 +20,13 @@
  *    unless its output plan is `passthrough` (a value with no wire encoding),
  *    before any adapter emits it.
  *
+ * A list operation returns one page (`Page` in `@macts/contracts`). The runtime
+ * owns paging: it reads the paging inputs (`pageSize`, `cursor`) of a list
+ * that pages, checks the cursor against the operation and the call's other
+ * inputs, hands the executor a page window instead, and assembles the page
+ * and its next cursor from what the executor read. The cursor's contents are
+ * never logged or audited; an audit record says only that one was presented.
+ *
  * No step can be skipped: there is no trusted-caller mode, and a local caller
  * presents a credential exactly as a remote one does. Every failure is raised
  * as a canonical structured error, and any failure the runtime did not
@@ -42,6 +49,7 @@ import type {
   ApprovalRequest,
   ExecutionRequest,
   Executor,
+  PageWindow,
   ResolutionRequest,
 } from '@macts/core'
 import {
@@ -65,24 +73,31 @@ import {
   RateLimitedError,
   UnexpectedValueError,
   ValidationError,
+  PAGE_SIZE_LIMITS,
   ValueTypes,
+  isPageValueType,
+  referenceResultType,
   resolvingOperationKey,
   type AppContract,
   type Authority,
   type Credential,
   type InvocationContext,
   type OperationId,
+  type PageValueType,
   type ReferenceCardinality,
   type ReferenceWire,
+  type ValueType,
   type WireRecord,
   type WireValue,
 } from '@macts/contracts'
+import { z } from 'zod'
 import { resolveGovernanceForRequest, type GovernanceContext } from './governance/context.js'
 import type { RateLimiter } from './invocation/rate-limiter.js'
 import { createKeyStoreVerifier, type CredentialVerifier } from './invocation/verifier.js'
 import { hasPermission } from './keys/validator.js'
 import { getLogger } from './logger.js'
 import { toValidationIssues } from './operations/passthrough.js'
+import { decodePageCursor, encodePageCursor } from './operations/page-cursor.js'
 import { toValueFreeIssues } from './operations/value-free-issues.js'
 import {
   OperationRegistrationError,
@@ -275,7 +290,73 @@ export interface MactsRuntime {
  * reference, the `list` operation for a collection. Absent when the contract
  * records none.
  */
-type ResolvingOperations = Readonly<Partial<Record<ReferenceCardinality, OperationId>>>
+type ResolvingOperations = Readonly<Partial<Record<ReferenceCardinality, ResolvingEntry>>>
+
+/**
+ * What a contract records for one cardinality of a resource's references: the
+ * id of the operation they resolve as, looked up when a reference is resolved
+ * (so an operation marked `unavailable` is not resolvable), and the value type
+ * of what the resolution returns ({@link referenceResultType}).
+ */
+interface ResolvingEntry {
+  readonly id: OperationId
+  readonly result: ValueType<unknown>
+}
+
+/**
+ * The operation a reference resolves as, and the value type of what the
+ * resolution returns ({@link referenceResultType}): the `get` output for a
+ * single reference, an array of the `list` page's items for a collection.
+ */
+interface ResolvingOperation {
+  readonly operation: RegisteredOperation
+  readonly result: ValueType<unknown>
+}
+
+/**
+ * How an operation's result is produced, by its output contract:
+ *
+ * - `direct`: the executor's result is the operation's result.
+ * - `whole`: a list that does not page; the executor reads the whole
+ *   collection as an array of items, which becomes the single page.
+ * - `paged`: a list that pages; the runtime turns the paging inputs into a
+ *   page window, and the page and its cursor from the executor's window
+ *   result.
+ */
+type ResultShape =
+  | { readonly kind: 'direct' }
+  | { readonly kind: 'whole'; readonly page: PageValueType<unknown> }
+  | { readonly kind: 'paged'; readonly page: PageValueType<unknown> }
+
+/**
+ * The window result a paging executor returns (`PageWindowResult` in
+ * `@macts/core`): checked before it is trusted, like any executor result.
+ */
+const PageWindowResultSchema = z.strictObject({
+  items: z.array(z.unknown()),
+  length: z.number().int().nonnegative(),
+  last: z.exactOptional(z.union([z.string(), z.number().refine(Number.isFinite)])),
+})
+
+/** The input key of the page size, one of the reserved paging input names. */
+const PAGE_SIZE_INPUT = 'pageSize'
+
+/** The input key of the cursor, one of the reserved paging input names. */
+const CURSOR_INPUT = 'cursor'
+
+/**
+ * The result shape of an operation. A list pages when its output is a page
+ * and its input record takes both paging inputs; a list whose output is a page
+ * but which takes no paging inputs (a resource with no identifier) reads its
+ * whole collection into one page.
+ */
+function resultShapeOf(operation: RegisteredOperation): ResultShape {
+  const { input, output } = operation.descriptor
+  if (!isPageValueType(output)) return { kind: 'direct' }
+  const fields = input.plan.kind === 'record' ? input.plan.fields : {}
+  const pages = Object.hasOwn(fields, PAGE_SIZE_INPUT) && Object.hasOwn(fields, CURSOR_INPUT)
+  return pages ? { kind: 'paged', page: output } : { kind: 'whole', page: output }
+}
 
 /**
  * An app registered from its generated contract: what reference resolution
@@ -469,7 +550,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     const permission = operation.descriptor.permission
     const risk = operation.risk
     const apiKeyId = authority.subject
-    const argsSummary = redactArgs(isRecord(input) ? input : {})
+    const argsSummary = redactArgs(auditableArguments(input))
     // Minted before enforcement so a held call's 'pending' record and its
     // resolving record share a correlation key.
     const approvalId = randomUUID()
@@ -715,19 +796,129 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     context: InvocationContext
   ): Promise<WireValue> {
     const { descriptor, manifest } = operation
-    const request: ExecutionRequest = {
+    const shape = resultShapeOf(operation)
+    const base = {
       manifest,
       target: descriptor.target,
-      input,
       inputPlan: descriptor.input.plan,
-      outputPlan: descriptor.output.plan,
       resources: operation.resources,
       ...(context.signal === undefined ? {} : { signal: context.signal }),
     }
-    const result = await dispatch(operation, context, { operation: descriptor.id }, () =>
-      executor.execute(request)
+    const run = (request: ExecutionRequest): Promise<WireValue> =>
+      dispatch(operation, context, { operation: descriptor.id }, () => executor.execute(request))
+
+    switch (shape.kind) {
+      case 'direct':
+        return validateOutput(
+          operation,
+          descriptor.output,
+          await run({ ...base, input, outputPlan: descriptor.output.plan })
+        )
+      case 'whole': {
+        const items = await run({ ...base, input, outputPlan: itemsPlan(shape.page) })
+        return validateOutput(operation, descriptor.output, { items })
+      }
+      case 'paged': {
+        const { window, inputs } = pageWindowOf(descriptor.id, input)
+        const result = await run({
+          ...base,
+          input: inputs,
+          outputPlan: itemsPlan(shape.page),
+          page: window,
+        })
+        const page = assemblePage(operation, window, inputs, result)
+        return validateOutput(operation, descriptor.output, page)
+      }
+    }
+  }
+
+  /**
+   * The page window a paged call reads, from its paging inputs, and the call's
+   * other inputs, which the executor receives without the paging inputs.
+   *
+   * @throws `ValidationError` at `["cursor"]` for a cursor that cannot
+   *   continue this call (see `decodePageCursor`).
+   */
+  function pageWindowOf(
+    operation: OperationId,
+    input: WireRecord
+  ): { window: PageWindow; inputs: WireRecord } {
+    const inputs: Record<string, WireValue> = {}
+    for (const [key, value] of Object.entries(input)) {
+      if (key !== PAGE_SIZE_INPUT && key !== CURSOR_INPUT) inputs[key] = value
+    }
+    const size = pageSizeOf(input[PAGE_SIZE_INPUT])
+    const cursor = input[CURSOR_INPUT]
+    if (typeof cursor !== 'string') return { window: { offset: 0, size }, inputs }
+    const position = decodePageCursor(cursor, { operation, inputs })
+    return { window: { offset: position.offset, size, anchor: position.anchor }, inputs }
+  }
+
+  /**
+   * The page an executor's window result makes, with the cursor of the next
+   * page when more items remain: exactly when `offset + size < length`. The
+   * next page starts after the items returned and is anchored on the last of
+   * them.
+   *
+   * @throws `UnexpectedValueError` when the executor's result is not a window
+   *   result, holds more items than the window's size, or claims more items
+   *   remain after a page with none.
+   */
+  function assemblePage(
+    operation: RegisteredOperation,
+    window: PageWindow,
+    inputs: WireRecord,
+    result: WireValue
+  ): WireValue {
+    const id = operation.descriptor.id
+    const parsed = PageWindowResultSchema.safeParse(result)
+    if (!parsed.success) {
+      const issues = toValueFreeIssues(parsed.error.issues, result)
+      log().warn(
+        { operation: id, provider: executor.provider, issues },
+        'Executor page window result is malformed'
+      )
+      throw new UnexpectedValueError(
+        `The "${id}" operation ran in the app, but its page of results is malformed.`,
+        { issues }
+      )
+    }
+    // The schema admits only JSON content, which is what a wire value is.
+    const items = parsed.data.items as WireValue[]
+    const { length, last } = parsed.data
+    if (items.length > window.size) {
+      log().warn(
+        { operation: id, provider: executor.provider, size: window.size, count: items.length },
+        'Executor page window result holds more items than the page size'
+      )
+      throw new UnexpectedValueError(
+        `The "${id}" operation ran in the app, but its page of results is malformed.`,
+        {
+          issues: [
+            {
+              path: ['items'],
+              message: `The page holds more items than the page size of ${String(window.size)}`,
+            },
+          ],
+        }
+      )
+    }
+    if (window.offset + window.size >= length) return { items }
+    if (items.length === 0 || last === undefined) {
+      log().warn(
+        { operation: id, provider: executor.provider },
+        'Executor page window claims more items after an empty page'
+      )
+      throw new UnexpectedValueError(
+        `The "${id}" operation ran in the app, but its page of results is malformed.`,
+        { issues: [{ path: [], message: 'More items remain, but the page holds none' }] }
+      )
+    }
+    const nextCursor = encodePageCursor(
+      { operation: id, inputs },
+      { offset: window.offset + items.length, anchor: last }
     )
-    return validateOutput(operation, result)
+    return { items, nextCursor }
   }
 
   /**
@@ -766,8 +957,10 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   }
 
   /**
-   * The registered operation a reference resolves as: the resource's `get`
-   * operation for a single reference, its `list` operation for a collection.
+   * The registered operation a reference resolves as, with the value type of
+   * what it returns: the resource's `get` operation for a single reference,
+   * its `list` operation for a collection (whose result is an array of the
+   * page's items, see {@link referenceResultType}).
    *
    * @remarks
    * The contract records which operation that is (`ResourceDescriptor.get` and
@@ -778,18 +971,18 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
    * `invoke`'s ({@link callableOperation}), so a resource that records no such
    * operation, or one marked `unavailable`, is not resolvable.
    */
-  function resolvingOperation(app: RegisteredApp, target: ReferenceTarget): RegisteredOperation {
+  function resolvingOperation(app: RegisteredApp, target: ReferenceTarget): ResolvingOperation {
     const { resource, cardinality } = target
-    const id = app.resolving.get(resource)?.[cardinality]
-    const operation = id === undefined ? undefined : callableOperation(id)
-    if (operation === undefined) {
+    const entry = app.resolving.get(resource)?.[cardinality]
+    const operation = entry === undefined ? undefined : callableOperation(entry.id)
+    if (entry === undefined || operation === undefined) {
       const shape = resolvingOperationKey(cardinality)
       throw new InvalidSelectionError(
         `References to "${resource}" cannot be resolved: the ${app.contract.app} app has no ${shape} operation for it.`,
         { resource }
       )
     }
-    return operation
+    return { operation, result: entry.result }
   }
 
   /**
@@ -836,16 +1029,18 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
    * records each mismatch at warn level, with the operation, the executor's
    * provider, and the same value-free issues.
    *
+   * @param output - The contract the result must meet: the operation's
+   *   output, or for a resolution the value type of what it resolves to.
    * @param purpose - Why the operation ran, when it ran on the caller's
    *   behalf for something other than a direct call (`'to resolve a
    *   reference'`); named in the error message.
    */
   function validateOutput(
     operation: RegisteredOperation,
+    output: ValueType<unknown>,
     result: WireValue,
     purpose?: string
   ): WireValue {
-    const output = operation.descriptor.output
     if (output.plan.kind === 'passthrough') {
       return result
     }
@@ -869,8 +1064,10 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   }
 
   /**
-   * Validate a resolution result against the output contract of the operation
-   * it resolved as ({@link validateOutput}), and, for an identity collection,
+   * Validate a resolution result against what the reference resolves to
+   * ({@link referenceResultType}: the `get` output, or an array of the `list`
+   * page's items, since resolution is not paged) with {@link validateOutput},
+   * and, for an identity collection,
    * that it holds exactly one record per entry. A mismatch is an app result
    * that violated the contract.
    *
@@ -881,12 +1078,13 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
    * the output plan, because it is about the reference, not the record shape.
    */
   function validateResolution(
-    operation: RegisteredOperation,
+    resolving: ResolvingOperation,
     reference: ReferenceWire,
     result: WireValue
   ): WireValue {
+    const { operation } = resolving
     const id = operation.descriptor.id
-    validateOutput(operation, result, 'to resolve a reference')
+    validateOutput(operation, resolving.result, result, 'to resolve a reference')
     if (reference.form === 'identity' && reference.cardinality === 'many') {
       const expected = reference.entries.length
       const received = Array.isArray(result) ? result.length : undefined
@@ -911,12 +1109,13 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   /**
    * Check that every operation the contract's resource table records as how
    * a resource's references resolve is one of the contract's operations and
-   * targets that resource, and index them by resource and cardinality.
+   * targets that resource, and index them by resource and cardinality with
+   * the value type of what a resolution returns.
    *
    * @throws {@link OperationRegistrationError} naming the resource, the field,
-   *   and the id, when a recorded id is not one of the contract's operations or
-   *   targets a different resource: the contract is inconsistent and must be
-   *   regenerated.
+   *   and the id, when a recorded id is not one of the contract's operations,
+   *   targets a different resource, or (for `list`) does not return a page: the
+   *   contract is inconsistent and must be regenerated.
    */
   function resolvingOperationsOf(
     contract: AppContract<unknown>,
@@ -925,7 +1124,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     const byId = new Map(operations.map((operation) => [operation.descriptor.id, operation]))
     const resolving = new Map<string, ResolvingOperations>()
     for (const [resource, descriptor] of Object.entries(contract.resources)) {
-      const entry: Partial<Record<ReferenceCardinality, OperationId>> = {}
+      const entry: Partial<Record<ReferenceCardinality, ResolvingEntry>> = {}
       for (const cardinality of REFERENCE_CARDINALITIES) {
         const field = resolvingOperationKey(cardinality)
         const id = descriptor[field]
@@ -943,7 +1142,16 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
             `The ${contract.app} contract is inconsistent: resource "${resource}" records "${id}" as its ${field} operation, ${problem}. Regenerate the contract.`
           )
         }
-        entry[cardinality] = id
+        let result: ValueType<unknown>
+        try {
+          result = referenceResultType(cardinality, operation.descriptor.output)
+        } catch (error) {
+          throw new OperationRegistrationError(
+            `The ${contract.app} contract is inconsistent: resource "${resource}" records "${id}" as its ${field} operation, whose output is not a page. Regenerate the contract.`,
+            { cause: error }
+          )
+        }
+        entry[cardinality] = { id, result }
       }
       resolving.set(resource, entry)
     }
@@ -1029,7 +1237,8 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       // malformed reference from an authorized caller is still governed and
       // audited like any other call of that operation.
       const target = readReferenceTarget(app, reference)
-      const operation = resolvingOperation(app, target)
+      const resolving = resolvingOperation(app, target)
+      const { operation } = resolving
 
       // Only the target resource's permission is checked. A container chain
       // only locates the target natively and contributes no data to the
@@ -1039,17 +1248,55 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       const validated = validateReference(app, target, reference)
 
       throwIfCancelled(context)
+      // Resolution is not paged: a collection resolves to its whole selection,
+      // shaped by an array of the list's item plan, never by its page plan.
       const request: ResolutionRequest = {
         manifest: operation.manifest,
         reference: validated,
-        outputPlan: operation.descriptor.output.plan,
+        outputPlan: resolving.result.plan,
         resources: operation.resources,
         ...(context.signal === undefined ? {} : { signal: context.signal }),
       }
       const result = await dispatch(operation, context, call, () => executor.resolve(request))
-      return validateResolution(operation, validated, result)
+      return validateResolution(resolving, validated, result)
     },
   }
+}
+
+/** The plan of a page's items as an array: what an executor reads for a list. */
+function itemsPlan(page: PageValueType<unknown>) {
+  return ValueTypes.array(page.item).plan
+}
+
+/**
+ * The page size of a paged call: its validated `pageSize` input, or the
+ * default when it has none. The input contract has already checked the value
+ * is an integer from 1 to the maximum.
+ */
+function pageSizeOf(value: WireValue | undefined): number {
+  if (value !== undefined && isWireRecord(value)) {
+    const text = value['integer']
+    if (typeof text === 'string') return Number(text)
+  }
+  return PAGE_SIZE_LIMITS.default
+}
+
+/**
+ * A call's arguments as audit and approval records summarize them: a
+ * `cursor` is recorded only as present (`true`), never its contents, which can
+ * include an item's identifier and therefore user content.
+ *
+ * Arguments are summarized before the input is validated, so this holds for
+ * every operation, whether or not it pages and whether or not it takes a
+ * cursor: a cursor sent where it is refused, or copied from another list, is
+ * still never recorded. `cursor` is reserved on every list; an argument of
+ * that name on another operation is recorded only as present too, which gives
+ * up that detail so that no cursor is ever recorded.
+ */
+function auditableArguments(input: unknown): Readonly<Record<string, unknown>> {
+  if (!isRecord(input)) return {}
+  if (!Object.hasOwn(input, CURSOR_INPUT)) return input
+  return { ...input, [CURSOR_INPUT]: true }
 }
 
 /** The smallest secret worth scrubbing; shorter text would match unrelated words. */

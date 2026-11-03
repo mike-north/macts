@@ -48,7 +48,9 @@ export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: FolderCreateInput): Promise<Folder>;
     get(id: string): Promise<Folder>;
-    list(): Promise<Folder[]>;
+    list(): Promise<{
+        items: Folder[];
+    }>;
 }
 
 // @public (undocumented)
@@ -97,7 +99,9 @@ export class InboxTaskResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: InboxTaskCreateInput): Promise<InboxTask>;
     get(id: string): Promise<InboxTask>;
-    list(): Promise<InboxTask[]>;
+    list(): Promise<{
+        items: InboxTask[];
+    }>;
 }
 
 // @public (undocumented)
@@ -166,7 +170,9 @@ export type PerspectiveCreateInput = Record<string, never>;
 export class PerspectiveResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Perspective>;
-    list(): Promise<Perspective[]>;
+    list(): Promise<{
+        items: Perspective[];
+    }>;
 }
 
 // @public (undocumented)
@@ -239,7 +245,9 @@ export class ProjectResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: ProjectCreateInput): Promise<Project>;
     get(id: string): Promise<Project>;
-    list(): Promise<Project[]>;
+    list(): Promise<{
+        items: Project[];
+    }>;
 }
 
 // @public (undocumented)
@@ -317,7 +325,9 @@ export class TagResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: TagCreateInput): Promise<Tag>;
     get(id: string): Promise<Tag>;
-    list(): Promise<Tag[]>;
+    list(): Promise<{
+        items: Tag[];
+    }>;
 }
 
 // @public (undocumented)
@@ -387,7 +397,9 @@ export class TaskResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: TaskCreateInput): Promise<Task>;
     get(id: string): Promise<Task>;
-    list(): Promise<Task[]>;
+    list(): Promise<{
+        items: Task[];
+    }>;
 }
 
 // @public (undocumented)

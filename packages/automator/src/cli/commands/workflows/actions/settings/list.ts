@@ -20,10 +20,10 @@ export class ListSettingsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.settings.list(this.actionId)
+      const page = await client.settings.list(this.actionId)
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           name: item.name,
           value: item.value,
           defaultValue: item.defaultValue,

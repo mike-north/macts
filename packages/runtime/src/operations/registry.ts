@@ -21,11 +21,13 @@ import type { AppManifest, Command, PermissionHistoryEntry, RiskClass } from '@m
 import {
   classifyCommandRisk,
   contractResourcePlans,
+  listOperationPages,
   normalizeAppRouteSegment,
   resolveCommandRoutes,
 } from '@macts/core'
 import {
   EMPTY_RESOURCE_PLAN_TABLE,
+  PAGING_INPUT_NAMES,
   resourcePlanTable,
   type AnyOperationDescriptor,
   type AppContract,
@@ -130,6 +132,8 @@ interface ManifestOperation {
   readonly permission: PermissionString
   readonly target: OperationTarget
   readonly command: Command
+  /** Whether the manifest says this operation pages (see `listOperationPages`). */
+  readonly pages: boolean
 }
 
 /** Whether `value` has the `app.resource.command` shape of an operation id. */
@@ -171,7 +175,13 @@ function deriveManifestOperations(manifest: AppManifest): ManifestOperation[] {
         route.resourceType === undefined
           ? { command: commandKey }
           : { command: commandKey, resource: route.resourceType }
-      operations.push({ id, permission, target, command })
+      operations.push({
+        id,
+        permission,
+        target,
+        command,
+        pages: listOperationPages(command, route.resource),
+      })
     }
   }
   return operations
@@ -252,7 +262,10 @@ function sameTarget(a: OperationTarget, b: OperationTarget): boolean {
  * it is filed by, with exactly the manifest-derived permission and target.
  * Checking the target as well as the permission matters: a descriptor that
  * kept a read permission but pointed at a destructive command would otherwise
- * run that command under the read grant.
+ * run that command under the read grant. A descriptor also takes the paging
+ * inputs exactly when the manifest says its list pages (`listOperationPages`),
+ * so a contract generated before an identifier's uniqueness claim changed is
+ * refused rather than paging a list that cannot be anchored reliably.
  *
  * A contract may cover a subset of the manifest's operations. Its resource
  * table must agree with the manifest too: every resource it lists is one the
@@ -306,8 +319,23 @@ export function operationsFromContract(
         `Contract operation "${descriptor.id}" targets a different manifest command than the manifest route does`
       )
     }
+    if (takesPagingInputs(descriptor) !== expected.pages) {
+      throw new OperationRegistrationError(
+        expected.pages
+          ? `Contract operation "${descriptor.id}" does not take the paging inputs, but the manifest says its list pages. Regenerate the contract.`
+          : `Contract operation "${descriptor.id}" takes the paging inputs, but the manifest says it does not page: its resource's primary identifier is not claimed unique. Regenerate the contract.`
+      )
+    }
     return toRegisteredOperation(descriptor, manifest, expected.command, resources)
   })
+}
+
+/** Whether a descriptor's input record declares every paging input. */
+function takesPagingInputs(descriptor: AnyOperationDescriptor): boolean {
+  const { plan } = descriptor.input
+  return (
+    plan.kind === 'record' && PAGING_INPUT_NAMES.every((name) => Object.hasOwn(plan.fields, name))
+  )
 }
 
 /**

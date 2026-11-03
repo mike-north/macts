@@ -21,10 +21,10 @@ export class NoteResourceClient {
   }
 
   /**
-   * List all notes.
+   * List all notes, as one page.
    */
-  async list(): Promise<Note[]> {
-    return this.#http.rpc<Note[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Note[] }> {
+    return this.#http.rpc<{ items: Note[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

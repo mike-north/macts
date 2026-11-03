@@ -11,6 +11,7 @@ import type { AppManifest, Resource, Command } from '../../manifest/index.js'
 import type { PropertyType } from '../../manifest/schemas/property.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
+  listOperationPages,
   normalizeResourceRouteSegment,
   resolveCanonicalIdentifierSource,
   commandRouteSegment,
@@ -705,7 +706,13 @@ function generateResourceClient(
 
   const crudMethods = [
     listCmd
-      ? generateListMethod(commandRouteSegment(...listCmd), listCmd[1], resourceName, pluralWords)
+      ? generateListMethod(
+          commandRouteSegment(...listCmd),
+          listCmd[1],
+          resourceName,
+          pluralWords,
+          listOperationPages(listCmd[1], resource)
+        )
       : '',
     getCmd
       ? generateGetMethod(commandRouteSegment(...getCmd), getCmd[1], resourceName, nameWords)
@@ -815,55 +822,69 @@ ${methodBody}
  * `listMethodParameters`), so SDK and server always agree on parameter names.
  * The doc comment of a list under a command parent says it lists the items of
  * one parent.
+ *
+ * Every list returns one page, `{ items, nextCursor? }`. A list that pages
+ * (see `listOperationPages`) takes a trailing `page` argument whose
+ * `pageSize` is sent in its integer wire form and whose `cursor` is sent as
+ * given. Any other list takes no paging argument and its page holds every
+ * item.
  */
 function generateListMethod(
   routeSegment: string,
   command: Command,
   resourceName: string,
-  pluralWords: string
+  pluralWords: string,
+  paged: boolean
 ): string {
   const requiredParams = listMethodParameters(command)
+  const page = uniquePageBinding(requiredParams.map((p) => safeIdentifier(p.name)))
 
-  if (requiredParams.length === 0) {
-    return `
-  /**
-   * List all ${pluralWords}.
-   */
-  async list(): Promise<${resourceName}[]> {
-    return this.#http.rpc<${resourceName}[]>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`);
+  const params = requiredParams.map((p) => {
+    const tsType = propertyTypeToTs(p.type as PropertyType)
+    return `${safeIdentifier(p.name)}: ${tsType}`
+  })
+  if (paged) params.push(`${page}: { pageSize?: number; cursor?: string } = {}`)
+
+  const bodyProps = requiredParams.map((p) => {
+    const safeName = safeIdentifier(p.name)
+    return safeName === p.name ? safeName : `'${p.name}': ${safeName}`
+  })
+  if (paged) {
+    bodyProps.unshift(
+      `...(${page}.pageSize === undefined ? {} : { pageSize: { integer: String(${page}.pageSize) } })`,
+      `...(${page}.cursor === undefined ? {} : { cursor: ${page}.cursor })`
+    )
   }
-`
-  }
-
-  // Build the parameter signature and body for required params only.
-  const signature = requiredParams
-    .map((p) => {
-      const tsType = propertyTypeToTs(p.type as PropertyType)
-      return `${safeIdentifier(p.name)}: ${tsType}`
-    })
-    .join(', ')
-
-  const bodyProps = requiredParams
-    .map((p) => {
-      const safeName = safeIdentifier(p.name)
-      return safeName === p.name ? safeName : `'${p.name}': ${safeName}`
-    })
-    .join(', ')
-  const bodyArg = `{ ${bodyProps} }`
+  const bodyArg = bodyProps.length === 0 ? '' : `, { ${bodyProps.join(', ')} }`
+  const returnType = paged
+    ? `{ items: ${resourceName}[]; nextCursor?: string }`
+    : `{ items: ${resourceName}[] }`
   // A list under a command parent returns that parent's items, not all of them.
-  const listed =
+  const scope =
     command.parent === undefined
-      ? `all ${pluralWords}`
+      ? undefined
       : `the ${pluralWords} of one ${identifierWords(command.parent.resource)}`
+  const listed = scope ?? `all ${pluralWords}`
+  const doc = paged
+    ? `   * List ${scope ?? pluralWords}, one page at a time. When the result has a \`nextCursor\`,
+   * more remain: call again with the same arguments and \`{ cursor: nextCursor }\`.`
+    : `   * List ${listed}, as one page.`
 
   return `
   /**
-   * List ${listed}.
+${doc}
    */
-  async list(${signature}): Promise<${resourceName}[]> {
-    return this.#http.rpc<${resourceName}[]>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, ${bodyArg});
+  async list(${params.join(', ')}): Promise<${returnType}> {
+    return this.#http.rpc<${returnType}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`${bodyArg});
   }
 `
+}
+
+/** The name of a list method's paging argument: `page`, unless a parameter already uses it. */
+function uniquePageBinding(taken: readonly string[]): string {
+  let name = 'page'
+  while (taken.includes(name)) name = `_${name}`
+  return name
 }
 
 /**

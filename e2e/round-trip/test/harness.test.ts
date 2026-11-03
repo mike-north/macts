@@ -28,12 +28,12 @@ function makeClient(options: {
   return {
     calendars: {
       list() {
-        return Promise.resolve(options.calendars)
+        return Promise.resolve({ items: options.calendars })
       },
     },
     events: {
       list(_calendarId: string) {
-        return Promise.resolve(events)
+        return Promise.resolve({ items: events })
       },
       create(_input) {
         if (createThrows) return Promise.reject(createThrows)
@@ -97,6 +97,56 @@ describe('runCalendarRoundTrip', () => {
 // ---------------------------------------------------------------------------
 // Failure paths (regression guards — these are the exact invariants #30/#81 broke)
 // ---------------------------------------------------------------------------
+
+describe('runCalendarRoundTrip over paged lists', () => {
+  it('finds the created event on a later page by following nextCursor', async () => {
+    const SUMMARY = '[macts-e2e] round-trip gate test event'
+    const cursors: (string | undefined)[] = []
+    const client: CalendarClientFacade = {
+      calendars: {
+        list: () => Promise.resolve({ items: [{ id: 'cal-1', name: 'Work', writable: true }] }),
+      },
+      events: {
+        list(_calendarId, page) {
+          cursors.push(page?.cursor)
+          return Promise.resolve(
+            page?.cursor === undefined
+              ? { items: [{ id: 'evt-0', summary: 'Older event' }], nextCursor: 'next-1' }
+              : { items: [{ id: 'evt-1', summary: SUMMARY }] }
+          )
+        },
+        create: (input) => Promise.resolve({ id: 'evt-1', summary: input.summary }),
+      },
+    }
+
+    const result = await runCalendarRoundTrip(client)
+
+    expect(result.appearedInList).toBe(true)
+    expect(cursors).toEqual([undefined, 'next-1'])
+  })
+
+  it('finds a writable calendar on a later page', async () => {
+    const client: CalendarClientFacade = {
+      calendars: {
+        list: (page) =>
+          Promise.resolve(
+            page?.cursor === undefined
+              ? { items: [{ id: 'cal-ro', name: 'Holidays', writable: false }], nextCursor: 'c2' }
+              : { items: [{ id: 'cal-rw', name: 'Work', writable: true }] }
+          ),
+      },
+      events: {
+        list: () =>
+          Promise.resolve({ items: [{ summary: '[macts-e2e] round-trip gate test event' }] }),
+        create: (input) => Promise.resolve({ summary: input.summary }),
+      },
+    }
+
+    const result = await runCalendarRoundTrip(client)
+
+    expect(result.calendarId).toBe('cal-rw')
+  })
+})
 
 describe('runCalendarRoundTrip failure cases', () => {
   it('throws when calendars.list() returns no calendars', async () => {

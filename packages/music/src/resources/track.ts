@@ -21,10 +21,10 @@ export class TrackResourceClient {
   }
 
   /**
-   * List the tracks of one playlist.
+   * List the tracks of one playlist, as one page.
    */
-  async list(playlistId: string): Promise<Track[]> {
-    return this.#http.rpc<Track[]>(`${this.#app}.${this.#resource}.list`, { playlistId })
+  async list(playlistId: string): Promise<{ items: Track[] }> {
+    return this.#http.rpc<{ items: Track[] }>(`${this.#app}.${this.#resource}.list`, { playlistId })
   }
 
   /**

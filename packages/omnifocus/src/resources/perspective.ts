@@ -21,10 +21,10 @@ export class PerspectiveResourceClient {
   }
 
   /**
-   * List all perspectives.
+   * List all perspectives, as one page.
    */
-  async list(): Promise<Perspective[]> {
-    return this.#http.rpc<Perspective[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Perspective[] }> {
+    return this.#http.rpc<{ items: Perspective[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

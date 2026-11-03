@@ -24,6 +24,7 @@ import {
   type CallOptions,
   type ClientRuntime,
   type OperationDescriptor,
+  type Page,
   type ValueType,
 } from '@macts/contracts'
 
@@ -244,8 +245,8 @@ export interface SettingsSetUpdateInput {
 
 /** A Terminal window */
 export interface WindowResourceClient {
-  /** List windows. */
-  list(options?: CallOptions): Promise<readonly Window[]>
+  /** List windows, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Window>>
   /**
    * Read the window identified by `name`.
    *
@@ -256,8 +257,8 @@ export interface WindowResourceClient {
 
 /** A Terminal tab */
 export interface TabResourceClient {
-  /** List tabs. */
-  list(options?: CallOptions): Promise<readonly Tab[]>
+  /** List tabs, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Tab>>
   /**
    * Read the tab identified by `name`.
    *
@@ -268,8 +269,8 @@ export interface TabResourceClient {
 
 /** A Terminal settings set (profile) */
 export interface SettingsSetResourceClient {
-  /** List settings sets. */
-  list(options?: CallOptions): Promise<readonly SettingsSet[]>
+  /** List settings sets, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<SettingsSet>>
   /**
    * Read the settings set identified by `name`.
    *
@@ -373,13 +374,13 @@ const resources: AppContract<TerminalClient>['resources'] = {
   },
 }
 
-const windowListOperation: OperationDescriptor<Record<string, never>, readonly Window[]> = {
+const windowListOperation: OperationDescriptor<Record<string, never>, Page<Window>> = {
   id: 'terminal.windows.list',
   permission: 'terminal:windows:list',
   target: { command: 'list', resource: 'Window' },
   description: 'List items',
   input: t.record({}),
-  output: t.array(windowRecordType),
+  output: t.page(windowRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -388,13 +389,13 @@ const windowListOperation: OperationDescriptor<Record<string, never>, readonly W
   },
 }
 
-const tabListOperation: OperationDescriptor<Record<string, never>, readonly Tab[]> = {
+const tabListOperation: OperationDescriptor<Record<string, never>, Page<Tab>> = {
   id: 'terminal.tabs.list',
   permission: 'terminal:tabs:list',
   target: { command: 'list', resource: 'Tab' },
   description: 'List items',
   input: t.record({}),
-  output: t.array(tabRecordType),
+  output: t.page(tabRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -403,16 +404,13 @@ const tabListOperation: OperationDescriptor<Record<string, never>, readonly Tab[
   },
 }
 
-const settingsSetListOperation: OperationDescriptor<
-  Record<string, never>,
-  readonly SettingsSet[]
-> = {
+const settingsSetListOperation: OperationDescriptor<Record<string, never>, Page<SettingsSet>> = {
   id: 'terminal.settingsSets.list',
   permission: 'terminal:settingsSets:list',
   target: { command: 'list', resource: 'SettingsSet' },
   description: 'List items',
   input: t.record({}),
-  output: t.array(settingsSetRecordType),
+  output: t.page(settingsSetRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
