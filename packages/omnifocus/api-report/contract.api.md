@@ -8,6 +8,7 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
 
 // @public
@@ -107,10 +108,39 @@ export interface OmniFocusClient {
 // @public
 export const omniFocusContract: AppContract<OmniFocusClient, OmniFocusResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type OmniFocusResources = typeof resources;
+export type OmniFocusResources = Readonly<{
+    Task: ResourceDescriptor<Task, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.tasks.get';
+        readonly list: 'omnifocus.tasks.list';
+    };
+    Project: ResourceDescriptor<Project, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.projects.get';
+        readonly list: 'omnifocus.projects.list';
+    };
+    Folder: ResourceDescriptor<Folder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.folders.get';
+        readonly list: 'omnifocus.folders.list';
+    };
+    Tag: ResourceDescriptor<Tag, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.tags.get';
+        readonly list: 'omnifocus.tags.list';
+    };
+    InboxTask: ResourceDescriptor<InboxTask, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.inboxTasks.get';
+        readonly list: 'omnifocus.inboxTasks.list';
+    };
+    Perspective: ResourceDescriptor<Perspective, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.perspectives.get';
+        readonly list: 'omnifocus.perspectives.list';
+    };
+}>;
 
 // @public
 export interface Perspective {

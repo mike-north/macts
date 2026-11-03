@@ -10,7 +10,6 @@ import { FileSource } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
-import { ValueType } from '@macts/contracts';
 
 // @public
 export interface BookmarkFolder {
@@ -79,10 +78,8 @@ export interface GoogleChromeClient {
 // @public
 export const googleChromeContract: AppContract<GoogleChromeClient, GoogleChromeResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type GoogleChromeResources = typeof resources;
+export type GoogleChromeResources = Readonly<Record<never, never>>;
 
 // @public
 export interface Tab {

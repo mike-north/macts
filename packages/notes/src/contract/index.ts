@@ -26,6 +26,7 @@ import {
   type OperationDescriptor,
   type Page,
   type PageRequest,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -321,9 +322,42 @@ const noteCreateInputType: ValueType<NoteCreateInput> = t.record({
 })
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link notesContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type NotesResources = Readonly<{
+  Account: ResourceDescriptor<Account, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'notes.accounts.get'
+    readonly list: 'notes.accounts.list'
+  }
+  Folder: ResourceDescriptor<Folder, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'notes.folders.get'
+    readonly list: 'notes.folders.list'
+  }
+  Note: ResourceDescriptor<Note, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'notes.notes.get'
+    readonly list: 'notes.notes.list'
+  }
+  Attachment: ResourceDescriptor<Attachment, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'notes.attachments.get'
+    readonly list: 'notes.attachments.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link NotesResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
 const resources = {
   Account: {
@@ -354,15 +388,7 @@ const resources = {
     get: 'notes.attachments.get',
     list: 'notes.attachments.list',
   },
-} as const satisfies AppContract<NotesClient>['resources']
-
-/**
- * The type of the resource table of {@link notesContract}: each resource key,
- * the operations that resolve references to it, and its record and identifier
- * types. A client created from the contract carries it, so `bindReference`
- * admits only references the contract can resolve.
- */
-export type NotesResources = typeof resources
+} satisfies NotesResources
 
 const accountListOperation: OperationDescriptor<Record<string, never>, Page<Account>> = {
   id: 'notes.accounts.list',

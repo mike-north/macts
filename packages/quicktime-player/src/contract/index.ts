@@ -26,7 +26,6 @@ import {
   type FileSource,
   type Integer,
   type OperationDescriptor,
-  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -143,38 +142,24 @@ export interface QuickTimePlayerClient {
   showRemoteHud(options?: CallOptions): Promise<void>
 }
 
-const documentRecordType: ValueType<Document> = t.record(
-  {
-    name: t.nullable(t.string(), { description: 'The document name' }),
-    id: t.string({ description: 'The unique identifier of the document' }),
-    path: t.nullable(t.string(), { description: 'The file path of the document' }),
-    playing: t.nullable(t.boolean(), { description: 'Whether the document is currently playing' }),
-    duration: t.nullable(t.double(), { description: 'The duration of the document in seconds' }),
-    currentTime: t.nullable(t.double(), { description: 'The current playback time in seconds' }),
-  },
-  { description: 'A QuickTime Player document' }
-)
+/**
+ * The type of the resource table of {@link quickTimePlayerContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type QuickTimePlayerResources = Readonly<Record<never, never>>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link QuickTimePlayerResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
-const resources = {
-  Document: {
-    name: 'Document',
-    record: documentRecordType,
-    id: t.string({ description: 'The unique identifier of the document' }),
-  },
-} as const satisfies AppContract<QuickTimePlayerClient>['resources']
-
-/**
- * The type of the resource table of {@link quickTimePlayerContract}: each resource key,
- * the operations that resolve references to it, and its record and identifier
- * types. A client created from the contract carries it, so `bindReference`
- * admits only references the contract can resolve.
- */
-export type QuickTimePlayerResources = typeof resources
+const resources = {} satisfies QuickTimePlayerResources
 
 const appOpenURLOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'quicktime-player.app.openURL',

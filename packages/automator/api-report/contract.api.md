@@ -9,6 +9,7 @@ import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
 
 // @public
@@ -76,10 +77,32 @@ export interface AutomatorClient {
 // @public
 export const automatorContract: AppContract<AutomatorClient, AutomatorResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AutomatorResources = typeof resources;
+export type AutomatorResources = Readonly<{
+    Workflow: ResourceDescriptor<Workflow, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'automator.workflows.get';
+        readonly list: 'automator.workflows.list';
+    };
+    AutomatorAction: ResourceDescriptor<AutomatorAction, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'automator.automatorActions.get';
+        readonly list: 'automator.automatorActions.list';
+    };
+    Variable: ResourceDescriptor<Variable, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'automator.variables.get';
+        readonly list: 'automator.variables.list';
+    };
+    Setting: ResourceDescriptor<Setting, string> & {
+        readonly id: ValueType<string>;
+        readonly list: 'automator.settings.list';
+    };
+    RequiredResource: ResourceDescriptor<RequiredResource, string> & {
+        readonly id: ValueType<string>;
+        readonly list: 'automator.requiredResources.list';
+    };
+}>;
 
 // @public
 export interface RequiredResource {

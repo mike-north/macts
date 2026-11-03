@@ -9,6 +9,7 @@ import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
 
 // @public
@@ -109,10 +110,23 @@ export interface RemindersClient {
 // @public
 export const remindersContract: AppContract<RemindersClient, RemindersResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RemindersResources = typeof resources;
+export type RemindersResources = Readonly<{
+    Account: ResourceDescriptor<Account, string> & {
+        readonly id: ValueType<string>;
+        readonly list: 'reminders.accounts.list';
+    };
+    List: ResourceDescriptor<List, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'reminders.lists.get';
+        readonly list: 'reminders.lists.list';
+    };
+    Reminder: ResourceDescriptor<Reminder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'reminders.reminders.get';
+        readonly list: 'reminders.reminders.list';
+    };
+}>;
 
 // @public
 export interface ReminderUpdateInput {

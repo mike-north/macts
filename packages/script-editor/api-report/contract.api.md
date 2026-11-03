@@ -7,6 +7,7 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
 
 // @public
@@ -47,10 +48,14 @@ export interface ScriptEditorClient {
 // @public
 export const scriptEditorContract: AppContract<ScriptEditorClient, ScriptEditorResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptEditorResources = typeof resources;
+export type ScriptEditorResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'script-editor.documents.get';
+        readonly list: 'script-editor.documents.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

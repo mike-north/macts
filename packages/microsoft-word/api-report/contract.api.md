@@ -8,6 +8,7 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
 
@@ -203,10 +204,14 @@ export interface MicrosoftWordClient {
 // @public
 export const microsoftWordContract: AppContract<MicrosoftWordClient, MicrosoftWordResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MicrosoftWordResources = typeof resources;
+export type MicrosoftWordResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'microsoft-word.documents.get';
+        readonly list: 'microsoft-word.documents.list';
+    };
+}>;
 
 // @public
 export interface PageSetup {

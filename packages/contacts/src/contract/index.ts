@@ -27,6 +27,7 @@ import {
   type OperationDescriptor,
   type Page,
   type PageRequest,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -1118,24 +1119,6 @@ const addressRecordType: ValueType<Address> = t.record(
   { description: 'Address for the given record.' }
 )
 
-const aimHandleRecordType: ValueType<AIMHandle> = t.record(
-  {
-    id: t.nullable(t.string(), { description: 'Unique identifier for this handle' }),
-    label: t.nullable(t.string(), { description: 'Label for this handle' }),
-    value: t.nullable(t.string(), { description: 'The AIM handle value' }),
-  },
-  { description: 'User name for America Online (AOL) instant messaging.' }
-)
-
-const customDateRecordType: ValueType<CustomDate> = t.record(
-  {
-    id: t.nullable(t.string(), { description: 'Unique identifier for this date' }),
-    label: t.nullable(t.string(), { description: 'Label for this date' }),
-    value: t.nullable(t.date(), { description: 'The date value' }),
-  },
-  { description: 'Arbitrary date associated with this person.' }
-)
-
 const emailRecordType: ValueType<Email> = t.record(
   {
     id: t.string({ description: 'Unique identifier for this email' }),
@@ -1153,33 +1136,6 @@ const groupRecordType: ValueType<Group> = t.record(
     modificationDate: t.nullable(t.date(), { description: 'When the contact was last modified.' }),
   },
   { description: 'A Group Record in the address book database' }
-)
-
-const icqHandleRecordType: ValueType<ICQHandle> = t.record(
-  {
-    id: t.nullable(t.string(), { description: 'Unique identifier for this handle' }),
-    label: t.nullable(t.string(), { description: 'Label for this handle' }),
-    value: t.nullable(t.string(), { description: 'The ICQ handle value' }),
-  },
-  { description: 'User name for ICQ instant messaging.' }
-)
-
-const jabberHandleRecordType: ValueType<JabberHandle> = t.record(
-  {
-    id: t.nullable(t.string(), { description: 'Unique identifier for this handle' }),
-    label: t.nullable(t.string(), { description: 'Label for this handle' }),
-    value: t.nullable(t.string(), { description: 'The Jabber handle value' }),
-  },
-  { description: 'User name for Jabber instant messaging.' }
-)
-
-const msnHandleRecordType: ValueType<MSNHandle> = t.record(
-  {
-    id: t.nullable(t.string(), { description: 'Unique identifier for this handle' }),
-    label: t.nullable(t.string(), { description: 'Label for this handle' }),
-    value: t.nullable(t.string(), { description: 'The MSN handle value' }),
-  },
-  { description: 'User name for Microsoft Network (MSN) instant messaging.' }
 )
 
 const personRecordType: ValueType<Person> = t.record(
@@ -1229,54 +1185,48 @@ const phoneRecordType: ValueType<Phone> = t.record(
   { description: 'Phone number for a person.' }
 )
 
-const relatedNameRecordType: ValueType<RelatedName> = t.record(
-  {
-    id: t.nullable(t.string(), { description: 'Unique identifier for this name' }),
-    label: t.nullable(t.string(), { description: 'Label for this name' }),
-    value: t.nullable(t.string(), { description: 'The related name value' }),
-  },
-  { description: 'Other names related to this person.' }
-)
-
-const socialProfileRecordType: ValueType<SocialProfile> = t.record(
-  {
-    id: t.string({ description: 'The persistent unique identifier for this profile.' }),
-    serviceName: t.nullable(t.string(), {
-      description: 'The service name of this social profile.',
-    }),
-    userName: t.nullable(t.string(), {
-      description: 'The username used with this social profile.',
-    }),
-    userIdentifier: t.nullable(t.string(), {
-      description: 'A service-specific identifier used with this social profile.',
-    }),
-    url: t.nullable(t.string(), { description: 'The URL of this social profile.' }),
-  },
-  { description: 'Profile for social networks.' }
-)
-
-const urlRecordType: ValueType<Url> = t.record(
-  {
-    id: t.nullable(t.string(), { description: 'Unique identifier for this URL' }),
-    label: t.nullable(t.string(), { description: 'Label for this URL' }),
-    value: t.nullable(t.string(), { description: 'The URL value' }),
-  },
-  { description: 'URLs for this person.' }
-)
-
-const yahooHandleRecordType: ValueType<YahooHandle> = t.record(
-  {
-    id: t.nullable(t.string(), { description: 'Unique identifier for this handle' }),
-    label: t.nullable(t.string(), { description: 'Label for this handle' }),
-    value: t.nullable(t.string(), { description: 'The Yahoo handle value' }),
-  },
-  { description: 'User name for Yahoo instant messaging.' }
-)
+/**
+ * The type of the resource table of {@link contactsContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type ContactsResources = Readonly<{
+  Address: ResourceDescriptor<Address, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'contacts.addresses.get'
+    readonly list: 'contacts.addresses.list'
+  }
+  Email: ResourceDescriptor<Email, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'contacts.emails.get'
+    readonly list: 'contacts.emails.list'
+  }
+  Group: ResourceDescriptor<Group, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'contacts.groups.get'
+    readonly list: 'contacts.groups.list'
+  }
+  Person: ResourceDescriptor<Person, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'contacts.people.get'
+    readonly list: 'contacts.people.list'
+  }
+  Phone: ResourceDescriptor<Phone, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'contacts.phones.get'
+    readonly list: 'contacts.phones.list'
+  }
+}>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link ContactsResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
 const resources = {
   Address: {
@@ -1285,14 +1235,6 @@ const resources = {
     id: t.string({ description: 'unique identifier for this address.' }),
     get: 'contacts.addresses.get',
     list: 'contacts.addresses.list',
-  },
-  AIMHandle: {
-    name: 'AIMHandle',
-    record: aimHandleRecordType,
-  },
-  CustomDate: {
-    name: 'CustomDate',
-    record: customDateRecordType,
   },
   Email: {
     name: 'Email',
@@ -1308,18 +1250,6 @@ const resources = {
     get: 'contacts.groups.get',
     list: 'contacts.groups.list',
   },
-  ICQHandle: {
-    name: 'ICQHandle',
-    record: icqHandleRecordType,
-  },
-  JabberHandle: {
-    name: 'JabberHandle',
-    record: jabberHandleRecordType,
-  },
-  MSNHandle: {
-    name: 'MSNHandle',
-    record: msnHandleRecordType,
-  },
   Person: {
     name: 'Person',
     record: personRecordType,
@@ -1334,32 +1264,7 @@ const resources = {
     get: 'contacts.phones.get',
     list: 'contacts.phones.list',
   },
-  RelatedName: {
-    name: 'RelatedName',
-    record: relatedNameRecordType,
-  },
-  SocialProfile: {
-    name: 'SocialProfile',
-    record: socialProfileRecordType,
-    id: t.string({ description: 'The persistent unique identifier for this profile.' }),
-  },
-  Url: {
-    name: 'Url',
-    record: urlRecordType,
-  },
-  YahooHandle: {
-    name: 'YahooHandle',
-    record: yahooHandleRecordType,
-  },
-} as const satisfies AppContract<ContactsClient>['resources']
-
-/**
- * The type of the resource table of {@link contactsContract}: each resource key,
- * the operations that resolve references to it, and its record and identifier
- * types. A client created from the contract carries it, so `bindReference`
- * admits only references the contract can resolve.
- */
-export type ContactsResources = typeof resources
+} satisfies ContactsResources
 
 const personListPeopleOperation: OperationDescriptor<PageRequest, Page<Person>> = {
   id: 'contacts.people.list',

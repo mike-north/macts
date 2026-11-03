@@ -7,6 +7,7 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
 
 // @public
@@ -44,10 +45,14 @@ export interface TextEditClient {
 // @public
 export const textEditContract: AppContract<TextEditClient, TextEditResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TextEditResources = typeof resources;
+export type TextEditResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'textedit.documents.get';
+        readonly list: 'textedit.documents.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

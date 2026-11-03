@@ -15,10 +15,8 @@ export interface ScreenSharingClient {
 // @public
 export const screenSharingContract: AppContract<ScreenSharingClient, ScreenSharingResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScreenSharingResources = typeof resources;
+export type ScreenSharingResources = Readonly<Record<never, never>>;
 
 // (No @packageDocumentation comment for this package)
 

@@ -8,7 +8,6 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
-import { ValueType } from '@macts/contracts';
 
 // @public
 export interface AliasFile {
@@ -201,10 +200,8 @@ export interface FinderClient {
 // @public
 export const finderContract: AppContract<FinderClient, FinderResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FinderResources = typeof resources;
+export type FinderResources = Readonly<Record<never, never>>;
 
 // @public
 export interface FinderWindow {

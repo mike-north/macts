@@ -27,6 +27,7 @@ import {
   type OperationDescriptor,
   type Page,
   type PageRequest,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -1079,20 +1080,6 @@ const scenarioRecordType: ValueType<Scenario> = t.record(
   { description: 'An alternative project plan' }
 )
 
-const scheduleRecordType: ValueType<Schedule> = t.record(
-  {},
-  { description: 'A schedule of working time' }
-)
-
-const currencyRecordType: ValueType<Currency> = t.record(
-  {
-    code: t.nullable(t.string(), { description: 'Locale code for this currency' }),
-    name: t.nullable(t.string(), { description: 'Name for this currency' }),
-    symbol: t.nullable(t.string(), { description: 'Symbol for this currency' }),
-  },
-  { description: 'A locale based currency object' }
-)
-
 const taskCreateInputType: ValueType<TaskCreateInput> = t.record({
   name: t.string({ description: 'Task name' }),
   startingDate: t.optional(t.date({ description: 'Start date' })),
@@ -1143,9 +1130,50 @@ const resourceCreateInputType: ValueType<ResourceCreateInput> = t.record({
 })
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link omniPlanContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type OmniPlanResources = Readonly<{
+  Project: ResourceDescriptor<Project, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omniplan.projects.get'
+    readonly list: 'omniplan.projects.list'
+  }
+  Task: ResourceDescriptor<Task, Integer> & {
+    readonly id: ValueType<Integer>
+    readonly get: 'omniplan.tasks.get'
+    readonly list: 'omniplan.tasks.list'
+  }
+  Milestone: ResourceDescriptor<Milestone, Integer> & {
+    readonly id: ValueType<Integer>
+    readonly get: 'omniplan.milestones.get'
+    readonly list: 'omniplan.milestones.list'
+  }
+  Resource: ResourceDescriptor<Resource, Integer> & {
+    readonly id: ValueType<Integer>
+    readonly get: 'omniplan.resources.get'
+    readonly list: 'omniplan.resources.list'
+  }
+  Assignment: ResourceDescriptor<Assignment> & { readonly list: 'omniplan.assignments.list' }
+  Dependency: ResourceDescriptor<Dependency> & { readonly list: 'omniplan.dependencies.list' }
+  Violation: ResourceDescriptor<Violation> & { readonly list: 'omniplan.violations.list' }
+  Scenario: ResourceDescriptor<Scenario, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omniplan.scenarios.get'
+    readonly list: 'omniplan.scenarios.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link OmniPlanResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
 const resources = {
   Project: {
@@ -1198,23 +1226,7 @@ const resources = {
     get: 'omniplan.scenarios.get',
     list: 'omniplan.scenarios.list',
   },
-  Schedule: {
-    name: 'Schedule',
-    record: scheduleRecordType,
-  },
-  Currency: {
-    name: 'Currency',
-    record: currencyRecordType,
-  },
-} as const satisfies AppContract<OmniPlanClient>['resources']
-
-/**
- * The type of the resource table of {@link omniPlanContract}: each resource key,
- * the operations that resolve references to it, and its record and identifier
- * types. A client created from the contract carries it, so `bindReference`
- * admits only references the contract can resolve.
- */
-export type OmniPlanResources = typeof resources
+} satisfies OmniPlanResources
 
 const projectListProjectsOperation: OperationDescriptor<Record<string, never>, Page<Project>> = {
   id: 'omniplan.projects.list',

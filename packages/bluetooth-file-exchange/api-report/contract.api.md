@@ -7,7 +7,6 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
-import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Application {
@@ -29,10 +28,8 @@ export interface BluetoothFileExchangeClient {
 // @public
 export const bluetoothFileExchangeContract: AppContract<BluetoothFileExchangeClient, BluetoothFileExchangeResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type BluetoothFileExchangeResources = typeof resources;
+export type BluetoothFileExchangeResources = Readonly<Record<never, never>>;
 
 // (No @packageDocumentation comment for this package)
 

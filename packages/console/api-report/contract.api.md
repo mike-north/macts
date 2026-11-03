@@ -15,10 +15,8 @@ export interface ConsoleClient {
 // @public
 export const consoleContract: AppContract<ConsoleClient, ConsoleResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ConsoleResources = typeof resources;
+export type ConsoleResources = Readonly<Record<never, never>>;
 
 // (No @packageDocumentation comment for this package)
 

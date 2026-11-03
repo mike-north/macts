@@ -31,6 +31,7 @@ import {
   type OperationDescriptor,
   type Page,
   type PageRequest,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -1839,163 +1840,6 @@ export interface MusicClient {
   openLocation(options?: CallOptions): Promise<void>
 }
 
-const airPlayDeviceRecordType: ValueType<AirPlayDevice> = t.record(
-  {
-    active: t.nullable(t.boolean(), { description: 'is the device currently being played to?' }),
-    available: t.nullable(t.boolean(), { description: 'is the device currently available?' }),
-    kind: t.nullable(t.string(), { description: 'the kind of the device' }),
-    networkAddress: t.nullable(t.string(), {
-      description: 'the network (MAC) address of the device',
-    }),
-    protected: t.nullable(t.boolean(), {
-      description: 'is the device password- or passcode-protected?',
-    }),
-    selected: t.nullable(t.boolean(), { description: 'is the device currently selected?' }),
-    supportsAudio: t.nullable(t.boolean(), {
-      description: 'does the device support audio playback?',
-    }),
-    supportsVideo: t.nullable(t.boolean(), {
-      description: 'does the device support video playback?',
-    }),
-    soundVolume: t.nullable(t.integer(), {
-      description: 'the output volume for the device (0 = minimum, 100 = maximum)',
-    }),
-  },
-  { description: 'an AirPlay device' }
-)
-
-const artworkRecordType: ValueType<Artwork> = t.record(
-  {
-    data: t.nullable(t.string(), {
-      description: 'data for this artwork, in the form of a picture',
-    }),
-    description: t.nullable(t.string(), { description: 'description of artwork as a string' }),
-    downloaded: t.nullable(t.boolean(), { description: 'was this artwork downloaded by Music?' }),
-    format: t.nullable(t.string(), { description: 'the data format for this piece of artwork' }),
-    kind: t.nullable(t.integer(), { description: 'kind or purpose of this piece of artwork' }),
-    rawData: t.unknown({ description: 'data for this artwork, in original format' }),
-  },
-  { description: 'a piece of art within a track or playlist' }
-)
-
-const audioCDPlaylistRecordType: ValueType<AudioCDPlaylist> = t.record(
-  {
-    artist: t.nullable(t.string(), { description: 'the artist of the CD' }),
-    compilation: t.nullable(t.boolean(), { description: 'is this CD a compilation album?' }),
-    composer: t.nullable(t.string(), { description: 'the composer of the CD' }),
-    discCount: t.nullable(t.integer(), {
-      description: 'the total number of discs in this CD’s album',
-    }),
-    discNumber: t.nullable(t.integer(), {
-      description: 'the index of this CD disc in the source album',
-    }),
-    genre: t.nullable(t.string(), { description: 'the genre of the CD' }),
-    year: t.nullable(t.integer(), { description: 'the year the album was recorded/released' }),
-  },
-  { description: 'a playlist representing an audio CD' }
-)
-
-const audioCDTrackRecordType: ValueType<AudioCDTrack> = t.record(
-  {
-    location: t.nullable(t.file(), {
-      description: 'the location of the file represented by this track',
-    }),
-  },
-  { description: 'a track on an audio CD' }
-)
-
-const browserWindowRecordType: ValueType<BrowserWindow> = t.record(
-  {
-    selection: t.nullable(t.string(), { description: 'the selected tracks' }),
-    view: t.nullable(
-      t.reference<Playlist, string, 'Playlist'>(() => musicContract, 'Playlist', 'one'),
-      { description: 'the playlist currently displayed in the window' }
-    ),
-  },
-  { description: 'the main window' }
-)
-
-const encoderRecordType: ValueType<Encoder> = t.record(
-  {
-    format: t.nullable(t.string(), { description: 'the data format created by the encoder' }),
-  },
-  { description: 'converts a track to a specific file format' }
-)
-
-const eqPresetRecordType: ValueType<EQPreset> = t.record(
-  {
-    band1: t.nullable(t.double(), {
-      description: 'the equalizer 32 Hz band level (-12.0 dB to +12.0 dB)',
-    }),
-    band2: t.nullable(t.double(), {
-      description: 'the equalizer 64 Hz band level (-12.0 dB to +12.0 dB)',
-    }),
-    band3: t.nullable(t.double(), {
-      description: 'the equalizer 125 Hz band level (-12.0 dB to +12.0 dB)',
-    }),
-    band4: t.nullable(t.double(), {
-      description: 'the equalizer 250 Hz band level (-12.0 dB to +12.0 dB)',
-    }),
-    band5: t.nullable(t.double(), {
-      description: 'the equalizer 500 Hz band level (-12.0 dB to +12.0 dB)',
-    }),
-    band6: t.nullable(t.double(), {
-      description: 'the equalizer 1 kHz band level (-12.0 dB to +12.0 dB)',
-    }),
-    band7: t.nullable(t.double(), {
-      description: 'the equalizer 2 kHz band level (-12.0 dB to +12.0 dB)',
-    }),
-    band8: t.nullable(t.double(), {
-      description: 'the equalizer 4 kHz band level (-12.0 dB to +12.0 dB)',
-    }),
-    band9: t.nullable(t.double(), {
-      description: 'the equalizer 8 kHz band level (-12.0 dB to +12.0 dB)',
-    }),
-    band10: t.nullable(t.double(), {
-      description: 'the equalizer 16 kHz band level (-12.0 dB to +12.0 dB)',
-    }),
-    modifiable: t.nullable(t.boolean(), { description: 'can this preset be modified?' }),
-    preamp: t.nullable(t.double(), {
-      description: 'the equalizer preamp level (-12.0 dB to +12.0 dB)',
-    }),
-    updateTracks: t.nullable(t.boolean(), {
-      description:
-        'should tracks which refer to this preset be updated when the preset is renamed or deleted?',
-    }),
-  },
-  { description: 'equalizer preset configuration' }
-)
-
-const eqWindowRecordType: ValueType<EQWindow> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this window' }),
-  },
-  { description: 'the equalizer window' }
-)
-
-const fileTrackRecordType: ValueType<FileTrack> = t.record(
-  {
-    location: t.nullable(t.file(), {
-      description: 'the location of the file represented by this track',
-    }),
-  },
-  { description: 'a track representing an audio file (MP3, AIFF, etc.)' }
-)
-
-const libraryPlaylistRecordType: ValueType<LibraryPlaylist> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this playlist' }),
-  },
-  { description: 'the main library playlist' }
-)
-
-const miniplayerWindowRecordType: ValueType<MiniplayerWindow> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this window' }),
-  },
-  { description: 'the miniplayer window' }
-)
-
 const playlistRecordType: ValueType<Playlist> = t.record(
   {
     id: t.nullable(t.integer(), { description: 'the id of the item' }),
@@ -2020,51 +1864,6 @@ const playlistRecordType: ValueType<Playlist> = t.record(
     }),
   },
   { description: 'a list of tracks/streams' }
-)
-
-const playlistWindowRecordType: ValueType<PlaylistWindow> = t.record(
-  {
-    selection: t.nullable(t.string(), { description: 'the selected tracks' }),
-    view: t.nullable(
-      t.reference<Playlist, string, 'Playlist'>(() => musicContract, 'Playlist', 'one'),
-      { description: 'the playlist displayed in the window' }
-    ),
-  },
-  { description: 'a sub-window showing a single playlist' }
-)
-
-const radioTunerPlaylistRecordType: ValueType<RadioTunerPlaylist> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this playlist' }),
-  },
-  { description: 'the radio tuner playlist' }
-)
-
-const sharedTrackRecordType: ValueType<SharedTrack> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this track' }),
-  },
-  { description: 'a track residing in a shared library' }
-)
-
-const sourceRecordType: ValueType<Source> = t.record(
-  {
-    capacity: t.nullable(t.double(), {
-      description: 'the total size of the source if it has a fixed size',
-    }),
-    freeSpace: t.nullable(t.double(), {
-      description: 'the free space on the source if it has a fixed size',
-    }),
-    kind: t.nullable(t.string(), { description: 'The kind property' }),
-  },
-  { description: 'a media source (library, CD, device, etc.)' }
-)
-
-const subscriptionPlaylistRecordType: ValueType<SubscriptionPlaylist> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this playlist' }),
-  },
-  { description: 'a subscription playlist from Apple Music' }
 )
 
 const trackRecordType: ValueType<Track> = t.record(
@@ -2215,86 +2014,35 @@ const trackRecordType: ValueType<Track> = t.record(
   { description: 'playable audio source' }
 )
 
-const urlTrackRecordType: ValueType<URLTrack> = t.record(
-  {
-    address: t.nullable(t.string(), { description: 'the URL for this track' }),
-  },
-  { description: 'a track representing a network stream' }
-)
-
-const userPlaylistRecordType: ValueType<UserPlaylist> = t.record(
-  {
-    shared: t.nullable(t.boolean(), { description: 'is this playlist shared?' }),
-    smart: t.nullable(t.boolean(), { description: 'is this a Smart Playlist?' }),
-    genius: t.nullable(t.boolean(), { description: 'is this a Genius Playlist?' }),
-  },
-  { description: 'custom playlists created by the user' }
-)
-
-const videoWindowRecordType: ValueType<VideoWindow> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this window' }),
-  },
-  { description: 'the video window' }
-)
-
-const visualRecordType: ValueType<Visual> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this visual' }),
-  },
-  { description: 'a visual plug-in' }
-)
+/**
+ * The type of the resource table of {@link musicContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type MusicResources = Readonly<{
+  Playlist: ResourceDescriptor<Playlist, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'music.playlists.get'
+    readonly list: 'music.playlists.list'
+  }
+  Track: ResourceDescriptor<Track, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'music.tracks.get'
+    readonly list: 'music.tracks.list'
+  }
+}>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link MusicResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
 const resources = {
-  AirPlayDevice: {
-    name: 'AirPlayDevice',
-    record: airPlayDeviceRecordType,
-  },
-  Artwork: {
-    name: 'Artwork',
-    record: artworkRecordType,
-  },
-  AudioCDPlaylist: {
-    name: 'AudioCDPlaylist',
-    record: audioCDPlaylistRecordType,
-  },
-  AudioCDTrack: {
-    name: 'AudioCDTrack',
-    record: audioCDTrackRecordType,
-  },
-  BrowserWindow: {
-    name: 'BrowserWindow',
-    record: browserWindowRecordType,
-  },
-  Encoder: {
-    name: 'Encoder',
-    record: encoderRecordType,
-  },
-  EQPreset: {
-    name: 'EQPreset',
-    record: eqPresetRecordType,
-  },
-  EQWindow: {
-    name: 'EQWindow',
-    record: eqWindowRecordType,
-  },
-  FileTrack: {
-    name: 'FileTrack',
-    record: fileTrackRecordType,
-  },
-  LibraryPlaylist: {
-    name: 'LibraryPlaylist',
-    record: libraryPlaylistRecordType,
-  },
-  MiniplayerWindow: {
-    name: 'MiniplayerWindow',
-    record: miniplayerWindowRecordType,
-  },
   Playlist: {
     name: 'Playlist',
     record: playlistRecordType,
@@ -2303,26 +2051,6 @@ const resources = {
     }),
     get: 'music.playlists.get',
     list: 'music.playlists.list',
-  },
-  PlaylistWindow: {
-    name: 'PlaylistWindow',
-    record: playlistWindowRecordType,
-  },
-  RadioTunerPlaylist: {
-    name: 'RadioTunerPlaylist',
-    record: radioTunerPlaylistRecordType,
-  },
-  SharedTrack: {
-    name: 'SharedTrack',
-    record: sharedTrackRecordType,
-  },
-  Source: {
-    name: 'Source',
-    record: sourceRecordType,
-  },
-  SubscriptionPlaylist: {
-    name: 'SubscriptionPlaylist',
-    record: subscriptionPlaylistRecordType,
   },
   Track: {
     name: 'Track',
@@ -2333,31 +2061,7 @@ const resources = {
     get: 'music.tracks.get',
     list: 'music.tracks.list',
   },
-  URLTrack: {
-    name: 'URLTrack',
-    record: urlTrackRecordType,
-  },
-  UserPlaylist: {
-    name: 'UserPlaylist',
-    record: userPlaylistRecordType,
-  },
-  VideoWindow: {
-    name: 'VideoWindow',
-    record: videoWindowRecordType,
-  },
-  Visual: {
-    name: 'Visual',
-    record: visualRecordType,
-  },
-} as const satisfies AppContract<MusicClient>['resources']
-
-/**
- * The type of the resource table of {@link musicContract}: each resource key,
- * the operations that resolve references to it, and its record and identifier
- * types. A client created from the contract carries it, so `bindReference`
- * admits only references the contract can resolve.
- */
-export type MusicResources = typeof resources
+} satisfies MusicResources
 
 const playlistListPlaylistsOperation: OperationDescriptor<PageRequest, Page<Playlist>> = {
   id: 'music.playlists.list',

@@ -29,6 +29,7 @@ import {
   type Page,
   type PageRequest,
   type Rectangle,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -551,9 +552,42 @@ const tabCreateInputType: ValueType<TabCreateInput> = t.record({
 })
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link microsoftEdgeContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type MicrosoftEdgeResources = Readonly<{
+  Window: ResourceDescriptor<Window, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'microsoft-edge.windows.get'
+    readonly list: 'microsoft-edge.windows.list'
+  }
+  Tab: ResourceDescriptor<Tab, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'microsoft-edge.tabs.get'
+    readonly list: 'microsoft-edge.tabs.list'
+  }
+  BookmarkFolder: ResourceDescriptor<BookmarkFolder, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'microsoft-edge.bookmarkFolders.get'
+    readonly list: 'microsoft-edge.bookmarkFolders.list'
+  }
+  BookmarkItem: ResourceDescriptor<BookmarkItem, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'microsoft-edge.bookmarkItems.get'
+    readonly list: 'microsoft-edge.bookmarkItems.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link MicrosoftEdgeResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
 const resources = {
   Window: {
@@ -584,15 +618,7 @@ const resources = {
     get: 'microsoft-edge.bookmarkItems.get',
     list: 'microsoft-edge.bookmarkItems.list',
   },
-} as const satisfies AppContract<MicrosoftEdgeClient>['resources']
-
-/**
- * The type of the resource table of {@link microsoftEdgeContract}: each resource key,
- * the operations that resolve references to it, and its record and identifier
- * types. A client created from the contract carries it, so `bindReference`
- * admits only references the contract can resolve.
- */
-export type MicrosoftEdgeResources = typeof resources
+} satisfies MicrosoftEdgeResources
 
 const windowListWindowsOperation: OperationDescriptor<PageRequest, Page<Window>> = {
   id: 'microsoft-edge.windows.list',

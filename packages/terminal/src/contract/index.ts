@@ -25,6 +25,7 @@ import {
   type ClientRuntime,
   type OperationDescriptor,
   type Page,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -346,9 +347,37 @@ const settingsSetRecordType: ValueType<SettingsSet> = t.record(
 )
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link terminalContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type TerminalResources = Readonly<{
+  Window: ResourceDescriptor<Window, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'terminal.windows.get'
+    readonly list: 'terminal.windows.list'
+  }
+  Tab: ResourceDescriptor<Tab, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'terminal.tabs.get'
+    readonly list: 'terminal.tabs.list'
+  }
+  SettingsSet: ResourceDescriptor<SettingsSet, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'terminal.settingsSets.get'
+    readonly list: 'terminal.settingsSets.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link TerminalResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
 const resources = {
   Window: {
@@ -372,15 +401,7 @@ const resources = {
     get: 'terminal.settingsSets.get',
     list: 'terminal.settingsSets.list',
   },
-} as const satisfies AppContract<TerminalClient>['resources']
-
-/**
- * The type of the resource table of {@link terminalContract}: each resource key,
- * the operations that resolve references to it, and its record and identifier
- * types. A client created from the contract carries it, so `bindReference`
- * admits only references the contract can resolve.
- */
-export type TerminalResources = typeof resources
+} satisfies TerminalResources
 
 const windowListOperation: OperationDescriptor<Record<string, never>, Page<Window>> = {
   id: 'terminal.windows.list',

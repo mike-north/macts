@@ -6,7 +6,6 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
-import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Anchor {
@@ -46,10 +45,8 @@ export interface SystemSettingsClient {
 // @public
 export const systemSettingsContract: AppContract<SystemSettingsClient, SystemSettingsResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SystemSettingsResources = typeof resources;
+export type SystemSettingsResources = Readonly<Record<never, never>>;
 
 // (No @packageDocumentation comment for this package)
 

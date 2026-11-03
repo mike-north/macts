@@ -30,6 +30,7 @@ import {
   type OperationDescriptor,
   type Page,
   type PageRequest,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -1139,16 +1140,6 @@ export interface XcodeClient {
   readonly runDestinations: RunDestinationResourceClient
 }
 
-/** The members of {@link SchemeActionResultStatus}, for its value type. */
-const schemeActionResultStatusMembers = [
-  'notYetStarted',
-  'running',
-  'cancelled',
-  'failed',
-  'errorOccurred',
-  'succeeded',
-] as const
-
 const workspaceDocumentRecordType: ValueType<WorkspaceDocument> = t.record(
   {
     name: t.string({ description: 'The name of the workspace' }),
@@ -1188,56 +1179,6 @@ const workspaceDocumentRecordType: ValueType<WorkspaceDocument> = t.record(
   }
 )
 
-const fileDocumentRecordType: ValueType<FileDocument> = t.record(
-  {
-    name: t.string({ description: 'The name of the document' }),
-    modified: t.nullable(t.boolean(), { description: 'Has it been modified since the last save?' }),
-    file: t.nullable(t.file(), { description: 'Its location on disk, if it has one' }),
-    path: t.nullable(t.string(), { description: "The document's path" }),
-  },
-  { description: 'A document that represents a file on disk' }
-)
-
-const textDocumentRecordType: ValueType<TextDocument> = t.record(
-  {
-    name: t.string({ description: 'The name of the document' }),
-    modified: t.nullable(t.boolean(), { description: 'Has it been modified since the last save?' }),
-    file: t.nullable(t.file(), { description: 'Its location on disk, if it has one' }),
-    path: t.nullable(t.string(), { description: "The document's path" }),
-    selectedCharacterRange: t.unknown({
-      description: 'The first and last character positions in the selection',
-    }),
-    selectedParagraphRange: t.unknown({
-      description: 'The first and last paragraph positions that contain the selection',
-    }),
-    text: t.nullable(t.string(), { description: 'The text of the text file referenced' }),
-    notifiesWhenClosing: t.nullable(t.boolean(), {
-      description: 'Should Xcode notify other apps when this document is closed?',
-    }),
-  },
-  { description: 'A document that represents a text file on disk' }
-)
-
-const sourceDocumentRecordType: ValueType<SourceDocument> = t.record(
-  {
-    name: t.string({ description: 'The name of the document' }),
-    modified: t.nullable(t.boolean(), { description: 'Has it been modified since the last save?' }),
-    file: t.nullable(t.file(), { description: 'Its location on disk, if it has one' }),
-    path: t.nullable(t.string(), { description: "The document's path" }),
-    selectedCharacterRange: t.unknown({
-      description: 'The first and last character positions in the selection',
-    }),
-    selectedParagraphRange: t.unknown({
-      description: 'The first and last paragraph positions that contain the selection',
-    }),
-    text: t.nullable(t.string(), { description: 'The text of the text file referenced' }),
-    notifiesWhenClosing: t.nullable(t.boolean(), {
-      description: 'Should Xcode notify other apps when this document is closed?',
-    }),
-  },
-  { description: 'A document that represents a source file on disk' }
-)
-
 const projectRecordType: ValueType<Project> = t.record(
   {
     id: t.string({ description: 'The unique identifier for the project' }),
@@ -1247,48 +1188,6 @@ const projectRecordType: ValueType<Project> = t.record(
     description:
       'An Xcode project. Projects represent project files on disk and are always open in the context of a workspace document',
   }
-)
-
-const targetRecordType: ValueType<Target> = t.record(
-  {
-    id: t.string({ description: 'The unique identifier for the target' }),
-    name: t.nullable(t.string(), { description: 'The name of this target' }),
-    project: t.nullable(
-      t.reference<Project, string, 'Project'>(() => xcodeContract, 'Project', 'one'),
-      { description: 'The project that contains this target' }
-    ),
-  },
-  {
-    description:
-      'A target is a blueprint for building a product. Targets inherit build settings from their project if not overridden in the target',
-  }
-)
-
-const buildConfigurationRecordType: ValueType<BuildConfiguration> = t.record(
-  {
-    id: t.string({ description: 'The unique identifier for the build configuration' }),
-    name: t.nullable(t.string(), { description: 'The name of the build configuration' }),
-  },
-  {
-    description:
-      'A set of build settings for a target or project. Each target in a project has the same named build configurations as the project',
-  }
-)
-
-const buildSettingRecordType: ValueType<BuildSetting> = t.record(
-  {
-    name: t.string({ description: 'The unlocalized build setting name (e.g. DSTROOT)' }),
-    value: t.nullable(t.string(), { description: 'A string value for the build setting' }),
-  },
-  { description: 'A setting that controls how products are built' }
-)
-
-const resolvedBuildSettingRecordType: ValueType<ResolvedBuildSetting> = t.record(
-  {
-    name: t.string({ description: 'The unlocalized build setting name (e.g. DSTROOT)' }),
-    value: t.nullable(t.string(), { description: 'A string value for the build setting' }),
-  },
-  { description: 'An object that represents a resolved value for a build setting' }
 )
 
 const schemeRecordType: ValueType<Scheme> = t.record(
@@ -1328,129 +1227,43 @@ const runDestinationRecordType: ValueType<RunDestination> = t.record(
   }
 )
 
-const deviceRecordType: ValueType<Device> = t.record(
-  {
-    name: t.nullable(t.string(), { description: 'The name of the device' }),
-    deviceIdentifier: t.string({ description: 'A stable identifier for the device' }),
-    operatingSystemVersion: t.nullable(t.string(), {
-      description: 'The version of the operating system installed on the device',
-    }),
-    deviceModel: t.nullable(t.string(), { description: 'The model of device' }),
-    generic: t.nullable(t.boolean(), {
-      description:
-        'Whether this run destination is generic instead of representing a specific device',
-    }),
-  },
-  {
-    description:
-      'A device which can be used as the target for a scheme action, as part of a run destination',
+/**
+ * The type of the resource table of {@link xcodeContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type XcodeResources = Readonly<{
+  WorkspaceDocument: ResourceDescriptor<WorkspaceDocument, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'xcode.workspaceDocuments.get'
+    readonly list: 'xcode.workspaceDocuments.list'
   }
-)
-
-const schemeActionResultRecordType: ValueType<SchemeActionResult> = t.record(
-  {
-    id: t.string({ description: 'The unique identifier for the scheme action result' }),
-    completed: t.nullable(t.boolean(), {
-      description: 'Whether this scheme action has completed (successfully or otherwise) or not',
-    }),
-    status: t.nullable(t.enumeration(schemeActionResultStatusMembers), {
-      description: 'Indicates the status of the scheme action',
-    }),
-    errorMessage: t.nullable(t.string(), {
-      description: 'If the result\'s status is "error occurred", this will be the error message',
-    }),
-    buildLog: t.nullable(t.string(), {
-      description:
-        'If this scheme action performed a build, this will be the text of the build log',
-    }),
-  },
-  { description: 'An object describing the result of performing a scheme action command' }
-)
-
-const buildErrorRecordType: ValueType<BuildError> = t.record(
-  {
-    message: t.string({ description: 'The text of the issue' }),
-    filePath: t.nullable(t.string(), { description: 'The file path where the issue occurred' }),
-    startingLineNumber: t.nullable(t.integer(), {
-      description: 'The starting line number in the file where the issue occurred',
-    }),
-    endingLineNumber: t.nullable(t.integer(), {
-      description: 'The ending line number in the file where the issue occurred',
-    }),
-    startingColumnNumber: t.nullable(t.integer(), {
-      description: 'The starting column number in the file where the issue occurred',
-    }),
-    endingColumnNumber: t.nullable(t.integer(), {
-      description: 'The ending column number in the file where the issue occurred',
-    }),
-  },
-  { description: 'An error generated by a build' }
-)
-
-const buildWarningRecordType: ValueType<BuildWarning> = t.record(
-  {
-    message: t.string({ description: 'The text of the issue' }),
-    filePath: t.nullable(t.string(), { description: 'The file path where the issue occurred' }),
-    startingLineNumber: t.nullable(t.integer(), {
-      description: 'The starting line number in the file where the issue occurred',
-    }),
-    endingLineNumber: t.nullable(t.integer(), {
-      description: 'The ending line number in the file where the issue occurred',
-    }),
-    startingColumnNumber: t.nullable(t.integer(), {
-      description: 'The starting column number in the file where the issue occurred',
-    }),
-    endingColumnNumber: t.nullable(t.integer(), {
-      description: 'The ending column number in the file where the issue occurred',
-    }),
-  },
-  { description: 'A warning generated by a build' }
-)
-
-const analyzerIssueRecordType: ValueType<AnalyzerIssue> = t.record(
-  {
-    message: t.string({ description: 'The text of the issue' }),
-    filePath: t.nullable(t.string(), { description: 'The file path where the issue occurred' }),
-    startingLineNumber: t.nullable(t.integer(), {
-      description: 'The starting line number in the file where the issue occurred',
-    }),
-    endingLineNumber: t.nullable(t.integer(), {
-      description: 'The ending line number in the file where the issue occurred',
-    }),
-    startingColumnNumber: t.nullable(t.integer(), {
-      description: 'The starting column number in the file where the issue occurred',
-    }),
-    endingColumnNumber: t.nullable(t.integer(), {
-      description: 'The ending column number in the file where the issue occurred',
-    }),
-  },
-  { description: 'A warning generated by the static analyzer' }
-)
-
-const testFailureRecordType: ValueType<TestFailure> = t.record(
-  {
-    message: t.string({ description: 'The text of the issue' }),
-    filePath: t.nullable(t.string(), { description: 'The file path where the issue occurred' }),
-    startingLineNumber: t.nullable(t.integer(), {
-      description: 'The starting line number in the file where the issue occurred',
-    }),
-    endingLineNumber: t.nullable(t.integer(), {
-      description: 'The ending line number in the file where the issue occurred',
-    }),
-    startingColumnNumber: t.nullable(t.integer(), {
-      description: 'The starting column number in the file where the issue occurred',
-    }),
-    endingColumnNumber: t.nullable(t.integer(), {
-      description: 'The ending column number in the file where the issue occurred',
-    }),
-  },
-  { description: 'A failure from a test' }
-)
+  Project: ResourceDescriptor<Project, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'xcode.projects.get'
+    readonly list: 'xcode.projects.list'
+  }
+  Scheme: ResourceDescriptor<Scheme, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'xcode.schemes.get'
+    readonly list: 'xcode.schemes.list'
+  }
+  RunDestination: ResourceDescriptor<RunDestination, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'xcode.runDestinations.get'
+    readonly list: 'xcode.runDestinations.list'
+  }
+}>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link XcodeResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
 const resources = {
   WorkspaceDocument: {
@@ -1460,47 +1273,12 @@ const resources = {
     get: 'xcode.workspaceDocuments.get',
     list: 'xcode.workspaceDocuments.list',
   },
-  FileDocument: {
-    name: 'FileDocument',
-    record: fileDocumentRecordType,
-    id: t.string({ description: 'The name of the document' }),
-  },
-  TextDocument: {
-    name: 'TextDocument',
-    record: textDocumentRecordType,
-    id: t.string({ description: 'The name of the document' }),
-  },
-  SourceDocument: {
-    name: 'SourceDocument',
-    record: sourceDocumentRecordType,
-    id: t.string({ description: 'The name of the document' }),
-  },
   Project: {
     name: 'Project',
     record: projectRecordType,
     id: t.string({ description: 'The unique identifier for the project' }),
     get: 'xcode.projects.get',
     list: 'xcode.projects.list',
-  },
-  Target: {
-    name: 'Target',
-    record: targetRecordType,
-    id: t.string({ description: 'The unique identifier for the target' }),
-  },
-  BuildConfiguration: {
-    name: 'BuildConfiguration',
-    record: buildConfigurationRecordType,
-    id: t.string({ description: 'The unique identifier for the build configuration' }),
-  },
-  BuildSetting: {
-    name: 'BuildSetting',
-    record: buildSettingRecordType,
-    id: t.string({ description: 'The unlocalized build setting name (e.g. DSTROOT)' }),
-  },
-  ResolvedBuildSetting: {
-    name: 'ResolvedBuildSetting',
-    record: resolvedBuildSettingRecordType,
-    id: t.string({ description: 'The unlocalized build setting name (e.g. DSTROOT)' }),
   },
   Scheme: {
     name: 'Scheme',
@@ -1518,45 +1296,7 @@ const resources = {
     get: 'xcode.runDestinations.get',
     list: 'xcode.runDestinations.list',
   },
-  Device: {
-    name: 'Device',
-    record: deviceRecordType,
-    id: t.string({ description: 'A stable identifier for the device' }),
-  },
-  SchemeActionResult: {
-    name: 'SchemeActionResult',
-    record: schemeActionResultRecordType,
-    id: t.string({ description: 'The unique identifier for the scheme action result' }),
-  },
-  BuildError: {
-    name: 'BuildError',
-    record: buildErrorRecordType,
-    id: t.string({ description: 'The text of the issue' }),
-  },
-  BuildWarning: {
-    name: 'BuildWarning',
-    record: buildWarningRecordType,
-    id: t.string({ description: 'The text of the issue' }),
-  },
-  AnalyzerIssue: {
-    name: 'AnalyzerIssue',
-    record: analyzerIssueRecordType,
-    id: t.string({ description: 'The text of the issue' }),
-  },
-  TestFailure: {
-    name: 'TestFailure',
-    record: testFailureRecordType,
-    id: t.string({ description: 'The text of the issue' }),
-  },
-} as const satisfies AppContract<XcodeClient>['resources']
-
-/**
- * The type of the resource table of {@link xcodeContract}: each resource key,
- * the operations that resolve references to it, and its record and identifier
- * types. A client created from the contract carries it, so `bindReference`
- * admits only references the contract can resolve.
- */
-export type XcodeResources = typeof resources
+} satisfies XcodeResources
 
 const workspaceDocumentListWorkspaceDocumentsOperation: OperationDescriptor<
   Record<string, never>,

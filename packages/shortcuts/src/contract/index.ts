@@ -28,6 +28,7 @@ import {
   type OperationDescriptor,
   type Page,
   type PageRequest,
+  type ResourceDescriptor,
   type Rgb,
   type ValueType,
 } from '@macts/contracts'
@@ -204,9 +205,32 @@ const folderRecordType: ValueType<Folder> = t.record(
 )
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link shortcutsContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type ShortcutsResources = Readonly<{
+  Shortcut: ResourceDescriptor<Shortcut, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'shortcuts.shortcuts.get'
+    readonly list: 'shortcuts.shortcuts.list'
+  }
+  Folder: ResourceDescriptor<Folder, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'shortcuts.folders.get'
+    readonly list: 'shortcuts.folders.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link ShortcutsResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
 const resources = {
   Shortcut: {
@@ -223,15 +247,7 @@ const resources = {
     get: 'shortcuts.folders.get',
     list: 'shortcuts.folders.list',
   },
-} as const satisfies AppContract<ShortcutsClient>['resources']
-
-/**
- * The type of the resource table of {@link shortcutsContract}: each resource key,
- * the operations that resolve references to it, and its record and identifier
- * types. A client created from the contract carries it, so `bindReference`
- * admits only references the contract can resolve.
- */
-export type ShortcutsResources = typeof resources
+} satisfies ShortcutsResources
 
 const shortcutListOperation: OperationDescriptor<PageRequest, Page<Shortcut>> = {
   id: 'shortcuts.shortcuts.list',

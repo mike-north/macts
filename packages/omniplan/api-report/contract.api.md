@@ -9,6 +9,7 @@ import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
 
 // @public
@@ -128,10 +129,43 @@ export interface OmniPlanClient {
 // @public
 export const omniPlanContract: AppContract<OmniPlanClient, OmniPlanResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type OmniPlanResources = typeof resources;
+export type OmniPlanResources = Readonly<{
+    Project: ResourceDescriptor<Project, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omniplan.projects.get';
+        readonly list: 'omniplan.projects.list';
+    };
+    Task: ResourceDescriptor<Task, Integer> & {
+        readonly id: ValueType<Integer>;
+        readonly get: 'omniplan.tasks.get';
+        readonly list: 'omniplan.tasks.list';
+    };
+    Milestone: ResourceDescriptor<Milestone, Integer> & {
+        readonly id: ValueType<Integer>;
+        readonly get: 'omniplan.milestones.get';
+        readonly list: 'omniplan.milestones.list';
+    };
+    Resource: ResourceDescriptor<Resource, Integer> & {
+        readonly id: ValueType<Integer>;
+        readonly get: 'omniplan.resources.get';
+        readonly list: 'omniplan.resources.list';
+    };
+    Assignment: ResourceDescriptor<Assignment> & {
+        readonly list: 'omniplan.assignments.list';
+    };
+    Dependency: ResourceDescriptor<Dependency> & {
+        readonly list: 'omniplan.dependencies.list';
+    };
+    Violation: ResourceDescriptor<Violation> & {
+        readonly list: 'omniplan.violations.list';
+    };
+    Scenario: ResourceDescriptor<Scenario, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omniplan.scenarios.get';
+        readonly list: 'omniplan.scenarios.list';
+    };
+}>;
 
 // @public
 export interface Project {

@@ -28,7 +28,6 @@ import {
   type ObjectReferenceVariant,
   type OperationDescriptor,
   type Rectangle,
-  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -390,105 +389,24 @@ export interface GoogleChromeClient {
   execute(javascript: string, options?: CallOptions): Promise<void>
 }
 
-const windowRecordType: ValueType<Window> = t.record(
-  {
-    givenName: t.nullable(t.string(), { description: 'The given name of the window.' }),
-    name: t.nullable(t.string(), { description: 'The full title of the window.' }),
-    id: t.string({ description: 'The unique identifier of the window.' }),
-    index: t.nullable(t.integer(), {
-      description: 'The index of the window, ordered front to back.',
-    }),
-    bounds: t.nullable(t.rectangle(), { description: 'The bounding rectangle of the window.' }),
-    closeable: t.nullable(t.boolean(), { description: 'Whether the window has a close box.' }),
-    minimizable: t.nullable(t.boolean(), { description: 'Whether the window can be minimized.' }),
-    minimized: t.nullable(t.boolean(), {
-      description: 'Whether the window is currently minimized.',
-    }),
-    resizable: t.nullable(t.boolean(), { description: 'Whether the window can be resized.' }),
-    visible: t.nullable(t.boolean(), { description: 'Whether the window is currently visible.' }),
-    zoomable: t.nullable(t.boolean(), { description: 'Whether the window can be zoomed.' }),
-    zoomed: t.nullable(t.boolean(), { description: 'Whether the window is currently zoomed.' }),
-    activeTab: t.nullable(
-      t.reference<Tab, string, 'Tab'>(() => googleChromeContract, 'Tab', 'one'),
-      { description: 'Returns the currently selected tab' }
-    ),
-    mode: t.nullable(t.string(), {
-      description:
-        "Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window.",
-    }),
-    activeTabIndex: t.nullable(t.integer(), { description: 'The index of the active tab.' }),
-  },
-  { description: 'A window.' }
-)
-
-const tabRecordType: ValueType<Tab> = t.record(
-  {
-    id: t.string({ description: 'Unique ID of the tab.' }),
-    title: t.nullable(t.string(), { description: 'The title of the tab.' }),
-    uRL: t.nullable(t.string(), { description: 'The url visible to the user.' }),
-    loading: t.nullable(t.boolean(), { description: 'Is loading?' }),
-  },
-  { description: 'A tab.' }
-)
-
-const bookmarkFolderRecordType: ValueType<BookmarkFolder> = t.record(
-  {
-    id: t.string({ description: 'Unique ID of the bookmark folder.' }),
-    title: t.nullable(t.string(), { description: 'The title of the folder.' }),
-    index: t.nullable(t.double(), {
-      description: 'Returns the index with respect to its parent bookmark folder.',
-    }),
-  },
-  { description: 'A bookmarks folder that contains other bookmarks folder and bookmark items.' }
-)
-
-const bookmarkItemRecordType: ValueType<BookmarkItem> = t.record(
-  {
-    id: t.string({ description: 'Unique ID of the bookmark item.' }),
-    title: t.nullable(t.string(), { description: 'The title of the bookmark item.' }),
-    uRL: t.nullable(t.string(), { description: 'The URL of the bookmark.' }),
-    index: t.nullable(t.double(), {
-      description: 'Returns the index with respect to its parent bookmark folder.',
-    }),
-  },
-  { description: 'An item consists of an URL and the title of a bookmark' }
-)
+/**
+ * The type of the resource table of {@link googleChromeContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type GoogleChromeResources = Readonly<Record<never, never>>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link GoogleChromeResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
-const resources = {
-  Window: {
-    name: 'Window',
-    record: windowRecordType,
-    id: t.string({ description: 'The unique identifier of the window.' }),
-  },
-  Tab: {
-    name: 'Tab',
-    record: tabRecordType,
-    id: t.string({ description: 'Unique ID of the tab.' }),
-  },
-  BookmarkFolder: {
-    name: 'BookmarkFolder',
-    record: bookmarkFolderRecordType,
-    id: t.string({ description: 'Unique ID of the bookmark folder.' }),
-  },
-  BookmarkItem: {
-    name: 'BookmarkItem',
-    record: bookmarkItemRecordType,
-    id: t.string({ description: 'Unique ID of the bookmark item.' }),
-  },
-} as const satisfies AppContract<GoogleChromeClient>['resources']
-
-/**
- * The type of the resource table of {@link googleChromeContract}: each resource key,
- * the operations that resolve references to it, and its record and identifier
- * types. A client created from the contract carries it, so `bindReference`
- * admits only references the contract can resolve.
- */
-export type GoogleChromeResources = typeof resources
+const resources = {} satisfies GoogleChromeResources
 
 const appSaveOperation: OperationDescriptor<
   { readonly in?: FileSource | undefined; readonly as?: string | undefined },

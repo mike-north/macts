@@ -30,7 +30,6 @@ import {
   type Point,
   type Rectangle,
   type Rgb,
-  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -905,159 +904,24 @@ export interface iTermClient {
   toggleHotkeyWindow(options?: CallOptions): Promise<void>
 }
 
-const windowRecordType: ValueType<Window> = t.record(
-  {
-    id: t.integer({ description: 'The unique identifier of the session.' }),
-    alternateIdentifier: t.nullable(t.string(), {
-      description: 'The alternate unique identifier of the session.',
-    }),
-    name: t.nullable(t.string(), { description: 'The full title of the window.' }),
-    index: t.nullable(t.integer(), {
-      description: 'The index of the window, ordered front to back.',
-    }),
-    bounds: t.nullable(t.rectangle(), { description: 'The bounding rectangle of the window.' }),
-    closeable: t.nullable(t.boolean(), { description: 'Whether the window has a close box.' }),
-    miniaturizable: t.nullable(t.boolean(), {
-      description: 'Whether the window can be minimized.',
-    }),
-    miniaturized: t.nullable(t.boolean(), {
-      description: 'Whether the window is currently minimized.',
-    }),
-    resizable: t.nullable(t.boolean(), { description: 'Whether the window can be resized.' }),
-    visible: t.nullable(t.boolean(), { description: 'Whether the window is currently visible.' }),
-    zoomable: t.nullable(t.boolean(), { description: 'Whether the window can be zoomed.' }),
-    zoomed: t.nullable(t.boolean(), { description: 'Whether the window is currently zoomed.' }),
-    frontmost: t.nullable(t.boolean(), {
-      description: 'Whether the window is currently the frontmost window.',
-    }),
-    currentTab: t.nullable(
-      t.reference<Tab, never, 'Tab'>(() => iTermContract, 'Tab', 'one'),
-      { description: 'The currently selected tab' }
-    ),
-    currentSession: t.nullable(
-      t.reference<Session, string, 'Session'>(() => iTermContract, 'Session', 'one'),
-      { description: 'The current session in a window' }
-    ),
-    isHotkeyWindow: t.nullable(t.boolean(), {
-      description: 'Whether the window is a hotkey window.',
-    }),
-    hotkeyWindowProfile: t.nullable(t.string(), {
-      description:
-        'If the window is a hotkey window, this gives the name of the profile that created the window.',
-    }),
-    position: t.nullable(t.point(), {
-      description: 'The position of the window, relative to the upper left corner of the screen.',
-    }),
-    origin: t.nullable(t.point(), {
-      description: 'The position of the window, relative to the lower left corner of the screen.',
-    }),
-    size: t.nullable(t.point(), { description: 'The width and height of the window' }),
-    frame: t.nullable(t.rectangle(), {
-      description: 'The bounding rectangle, relative to the lower left corner of the screen.',
-    }),
-  },
-  { description: 'A window.' }
-)
-
-const tabRecordType: ValueType<Tab> = t.record(
-  {
-    currentSession: t.nullable(
-      t.reference<Session, string, 'Session'>(() => iTermContract, 'Session', 'one'),
-      { description: 'The current session in a tab' }
-    ),
-    index: t.nullable(t.integer(), { description: 'Index of tab in parent tab view control' }),
-    title: t.nullable(t.string(), { description: 'The title property' }),
-  },
-  { description: 'A terminal tab' }
-)
-
-const sessionRecordType: ValueType<Session> = t.record(
-  {
-    id: t.string({ description: 'The unique identifier of the session.' }),
-    isProcessing: t.nullable(t.boolean(), {
-      description: 'The session has received output recently.',
-    }),
-    isAtShellPrompt: t.nullable(t.boolean(), {
-      description: 'The terminal is at the shell prompt. Requires shell integration.',
-    }),
-    columns: t.nullable(t.integer(), { description: 'The columns property' }),
-    rows: t.nullable(t.integer(), { description: 'The rows property' }),
-    tty: t.nullable(t.string(), { description: 'The tty property' }),
-    contents: t.nullable(t.string(), {
-      description: 'The currently visible contents of the session.',
-    }),
-    text: t.nullable(t.string(), { description: 'The currently visible contents of the session.' }),
-    colorPreset: t.nullable(t.string(), { description: 'The colorPreset property' }),
-    backgroundColor: t.nullable(t.rgb(), { description: 'The backgroundColor property' }),
-    boldColor: t.nullable(t.rgb(), { description: 'The boldColor property' }),
-    cursorColor: t.nullable(t.rgb(), { description: 'The cursorColor property' }),
-    cursorTextColor: t.nullable(t.rgb(), { description: 'The cursorTextColor property' }),
-    foregroundColor: t.nullable(t.rgb(), { description: 'The foregroundColor property' }),
-    selectedTextColor: t.nullable(t.rgb(), { description: 'The selectedTextColor property' }),
-    selectionColor: t.nullable(t.rgb(), { description: 'The selectionColor property' }),
-    aNSIBlackColor: t.nullable(t.rgb(), { description: 'The aNSIBlackColor property' }),
-    aNSIRedColor: t.nullable(t.rgb(), { description: 'The aNSIRedColor property' }),
-    aNSIGreenColor: t.nullable(t.rgb(), { description: 'The aNSIGreenColor property' }),
-    aNSIYellowColor: t.nullable(t.rgb(), { description: 'The aNSIYellowColor property' }),
-    aNSIBlueColor: t.nullable(t.rgb(), { description: 'The aNSIBlueColor property' }),
-    aNSIMagentaColor: t.nullable(t.rgb(), { description: 'The aNSIMagentaColor property' }),
-    aNSICyanColor: t.nullable(t.rgb(), { description: 'The aNSICyanColor property' }),
-    aNSIWhiteColor: t.nullable(t.rgb(), { description: 'The aNSIWhiteColor property' }),
-    aNSIBrightBlackColor: t.nullable(t.rgb(), { description: 'The aNSIBrightBlackColor property' }),
-    aNSIBrightRedColor: t.nullable(t.rgb(), { description: 'The aNSIBrightRedColor property' }),
-    aNSIBrightGreenColor: t.nullable(t.rgb(), { description: 'The aNSIBrightGreenColor property' }),
-    aNSIBrightYellowColor: t.nullable(t.rgb(), {
-      description: 'The aNSIBrightYellowColor property',
-    }),
-    aNSIBrightBlueColor: t.nullable(t.rgb(), { description: 'The aNSIBrightBlueColor property' }),
-    aNSIBrightMagentaColor: t.nullable(t.rgb(), {
-      description: 'The aNSIBrightMagentaColor property',
-    }),
-    aNSIBrightCyanColor: t.nullable(t.rgb(), { description: 'The aNSIBrightCyanColor property' }),
-    aNSIBrightWhiteColor: t.nullable(t.rgb(), { description: 'The aNSIBrightWhiteColor property' }),
-    underlineColor: t.nullable(t.rgb(), { description: 'The underlineColor property' }),
-    useUnderlineColor: t.nullable(t.boolean(), {
-      description: 'Whether the use a dedicated color for underlining.',
-    }),
-    backgroundImage: t.nullable(t.string(), { description: 'The backgroundImage property' }),
-    name: t.nullable(t.string(), { description: 'The name property' }),
-    transparency: t.nullable(t.double(), { description: 'The transparency property' }),
-    uniqueID: t.nullable(t.string(), { description: 'The uniqueID property' }),
-    profileName: t.nullable(t.string(), { description: "The session's profile name" }),
-    answerbackString: t.nullable(t.string(), { description: 'ENQ Answerback string' }),
-  },
-  { description: 'A terminal session' }
-)
+/**
+ * The type of the resource table of {@link iTermContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type iTermResources = Readonly<Record<never, never>>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link iTermResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
-const resources = {
-  Window: {
-    name: 'Window',
-    record: windowRecordType,
-    id: t.integer({ description: 'The unique identifier of the session.' }),
-  },
-  Tab: {
-    name: 'Tab',
-    record: tabRecordType,
-  },
-  Session: {
-    name: 'Session',
-    record: sessionRecordType,
-    id: t.string({ description: 'The unique identifier of the session.' }),
-  },
-} as const satisfies AppContract<iTermClient>['resources']
-
-/**
- * The type of the resource table of {@link iTermContract}: each resource key,
- * the operations that resolve references to it, and its record and identifier
- * types. A client created from the contract carries it, so `bindReference`
- * admits only references the contract can resolve.
- */
-export type iTermResources = typeof resources
+const resources = {} satisfies iTermResources
 
 const appCountOperation: OperationDescriptor<{ readonly each?: string | undefined }, undefined> = {
   id: 'iterm.app.count',

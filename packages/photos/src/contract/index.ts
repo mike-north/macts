@@ -28,6 +28,7 @@ import {
   type OperationDescriptor,
   type Page,
   type PageRequest,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -449,20 +450,6 @@ const mediaItemRecordType: ValueType<MediaItem> = t.record(
   { description: 'A media item, such as a photo or video' }
 )
 
-const containerRecordType: ValueType<Container> = t.record(
-  {
-    id: t.string({ description: 'The unique ID of this container' }),
-    name: t.nullable(t.string(), { description: 'The name of this container' }),
-    parent: t.nullable(
-      t.reference<Folder, string, 'Folder'>(() => photosContract, 'Folder', 'one'),
-      { description: "This container's parent folder, if any" }
-    ),
-  },
-  {
-    description: 'Base class for collections that contains other items, such as albums and folders',
-  }
-)
-
 const albumRecordType: ValueType<Album> = t.record(
   {
     id: t.string({ description: 'The unique ID of this album' }),
@@ -487,18 +474,38 @@ const folderRecordType: ValueType<Folder> = t.record(
   { description: 'A folder. A container that holds albums and other folders, but not media items' }
 )
 
-const momentRecordType: ValueType<Moment> = t.record(
-  {
-    id: t.string({ description: 'The unique ID of the Moment' }),
-    name: t.nullable(t.string(), { description: 'The name of the Moment' }),
-  },
-  { description: 'A set of media items that represents a Moment' }
-)
+/**
+ * The type of the resource table of {@link photosContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type PhotosResources = Readonly<{
+  MediaItem: ResourceDescriptor<MediaItem, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'photos.mediaItems.get'
+    readonly list: 'photos.mediaItems.list'
+  }
+  Album: ResourceDescriptor<Album, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'photos.albums.get'
+    readonly list: 'photos.albums.list'
+  }
+  Folder: ResourceDescriptor<Folder, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'photos.folders.get'
+    readonly list: 'photos.folders.list'
+  }
+}>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link PhotosResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
 const resources = {
   MediaItem: {
@@ -507,11 +514,6 @@ const resources = {
     id: t.string({ description: 'The unique ID of the media item' }),
     get: 'photos.mediaItems.get',
     list: 'photos.mediaItems.list',
-  },
-  Container: {
-    name: 'Container',
-    record: containerRecordType,
-    id: t.string({ description: 'The unique ID of this container' }),
   },
   Album: {
     name: 'Album',
@@ -527,20 +529,7 @@ const resources = {
     get: 'photos.folders.get',
     list: 'photos.folders.list',
   },
-  Moment: {
-    name: 'Moment',
-    record: momentRecordType,
-    id: t.string({ description: 'The unique ID of the Moment' }),
-  },
-} as const satisfies AppContract<PhotosClient>['resources']
-
-/**
- * The type of the resource table of {@link photosContract}: each resource key,
- * the operations that resolve references to it, and its record and identifier
- * types. A client created from the contract carries it, so `bindReference`
- * admits only references the contract can resolve.
- */
-export type PhotosResources = typeof resources
+} satisfies PhotosResources
 
 const mediaItemListMediaItemsOperation: OperationDescriptor<PageRequest, Page<MediaItem>> = {
   id: 'photos.mediaItems.list',

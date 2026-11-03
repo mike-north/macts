@@ -12,7 +12,6 @@ import { ObjectReferenceVariant } from '@macts/contracts';
 import { Point } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
-import { ValueType } from '@macts/contracts';
 
 // @public
 export interface iTermClient {
@@ -49,10 +48,8 @@ export interface iTermClient {
 // @public
 export const iTermContract: AppContract<iTermClient, iTermResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type iTermResources = typeof resources;
+export type iTermResources = Readonly<Record<never, never>>;
 
 // @public
 export type SaveOptions = 'yes' | 'no' | 'ask';

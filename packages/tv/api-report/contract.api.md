@@ -10,7 +10,6 @@ import { FileSource } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
-import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Artwork {
@@ -340,10 +339,8 @@ export interface TVClient {
 // @public
 export const tvContract: AppContract<TVClient, TVResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TVResources = typeof resources;
+export type TVResources = Readonly<Record<never, never>>;
 
 // @public
 export interface URLTrack {

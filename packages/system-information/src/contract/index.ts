@@ -25,6 +25,7 @@ import {
   type ClientRuntime,
   type OperationDescriptor,
   type Page,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -115,9 +116,27 @@ const documentRecordType: ValueType<Document> = t.record(
 )
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link systemInformationContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type SystemInformationResources = Readonly<{
+  Document: ResourceDescriptor<Document, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'system-information.documents.get'
+    readonly list: 'system-information.documents.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link SystemInformationResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
 const resources = {
   Document: {
@@ -127,15 +146,7 @@ const resources = {
     get: 'system-information.documents.get',
     list: 'system-information.documents.list',
   },
-} as const satisfies AppContract<SystemInformationClient>['resources']
-
-/**
- * The type of the resource table of {@link systemInformationContract}: each resource key,
- * the operations that resolve references to it, and its record and identifier
- * types. A client created from the contract carries it, so `bindReference`
- * admits only references the contract can resolve.
- */
-export type SystemInformationResources = typeof resources
+} satisfies SystemInformationResources
 
 const documentListOperation: OperationDescriptor<Record<string, never>, Page<Document>> = {
   id: 'system-information.documents.list',

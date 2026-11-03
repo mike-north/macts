@@ -7,6 +7,7 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
 
 // @public
@@ -89,10 +90,24 @@ export interface TerminalClient {
 // @public
 export const terminalContract: AppContract<TerminalClient, TerminalResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TerminalResources = typeof resources;
+export type TerminalResources = Readonly<{
+    Window: ResourceDescriptor<Window, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'terminal.windows.get';
+        readonly list: 'terminal.windows.list';
+    };
+    Tab: ResourceDescriptor<Tab, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'terminal.tabs.get';
+        readonly list: 'terminal.tabs.list';
+    };
+    SettingsSet: ResourceDescriptor<SettingsSet, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'terminal.settingsSets.get';
+        readonly list: 'terminal.settingsSets.list';
+    };
+}>;
 
 // @public
 export interface Window {

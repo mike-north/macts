@@ -13,6 +13,7 @@ import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
 
 // @public
@@ -316,10 +317,19 @@ export interface MusicClient {
 // @public
 export const musicContract: AppContract<MusicClient, MusicResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MusicResources = typeof resources;
+export type MusicResources = Readonly<{
+    Playlist: ResourceDescriptor<Playlist, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'music.playlists.get';
+        readonly list: 'music.playlists.list';
+    };
+    Track: ResourceDescriptor<Track, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'music.tracks.get';
+        readonly list: 'music.tracks.list';
+    };
+}>;
 
 // @public
 export interface Playlist {

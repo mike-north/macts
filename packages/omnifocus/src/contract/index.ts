@@ -26,6 +26,7 @@ import {
   type Integer,
   type OperationDescriptor,
   type Page,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -1274,9 +1275,52 @@ const inboxTaskCreateInputType: ValueType<InboxTaskCreateInput> = t.record({
 })
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link omniFocusContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type OmniFocusResources = Readonly<{
+  Task: ResourceDescriptor<Task, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnifocus.tasks.get'
+    readonly list: 'omnifocus.tasks.list'
+  }
+  Project: ResourceDescriptor<Project, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnifocus.projects.get'
+    readonly list: 'omnifocus.projects.list'
+  }
+  Folder: ResourceDescriptor<Folder, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnifocus.folders.get'
+    readonly list: 'omnifocus.folders.list'
+  }
+  Tag: ResourceDescriptor<Tag, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnifocus.tags.get'
+    readonly list: 'omnifocus.tags.list'
+  }
+  InboxTask: ResourceDescriptor<InboxTask, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnifocus.inboxTasks.get'
+    readonly list: 'omnifocus.inboxTasks.list'
+  }
+  Perspective: ResourceDescriptor<Perspective, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnifocus.perspectives.get'
+    readonly list: 'omnifocus.perspectives.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link OmniFocusResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
 const resources = {
   Task: {
@@ -1321,15 +1365,7 @@ const resources = {
     get: 'omnifocus.perspectives.get',
     list: 'omnifocus.perspectives.list',
   },
-} as const satisfies AppContract<OmniFocusClient>['resources']
-
-/**
- * The type of the resource table of {@link omniFocusContract}: each resource key,
- * the operations that resolve references to it, and its record and identifier
- * types. A client created from the contract carries it, so `bindReference`
- * admits only references the contract can resolve.
- */
-export type OmniFocusResources = typeof resources
+} satisfies OmniFocusResources
 
 const folderListFoldersOperation: OperationDescriptor<Record<string, never>, Page<Folder>> = {
   id: 'omnifocus.folders.list',

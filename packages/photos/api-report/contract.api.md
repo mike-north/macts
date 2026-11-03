@@ -10,6 +10,7 @@ import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
 
 // @public
@@ -155,10 +156,24 @@ export interface PhotosClient {
 // @public
 export const photosContract: AppContract<PhotosClient, PhotosResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PhotosResources = typeof resources;
+export type PhotosResources = Readonly<{
+    MediaItem: ResourceDescriptor<MediaItem, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'photos.mediaItems.get';
+        readonly list: 'photos.mediaItems.list';
+    };
+    Album: ResourceDescriptor<Album, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'photos.albums.get';
+        readonly list: 'photos.albums.list';
+    };
+    Folder: ResourceDescriptor<Folder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'photos.folders.get';
+        readonly list: 'photos.folders.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

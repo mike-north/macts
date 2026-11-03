@@ -7,6 +7,7 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
 
 // @public
@@ -40,10 +41,14 @@ export interface PreviewClient {
 // @public
 export const previewContract: AppContract<PreviewClient, PreviewResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PreviewResources = typeof resources;
+export type PreviewResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'preview.documents.get';
+        readonly list: 'preview.documents.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

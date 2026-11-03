@@ -42,19 +42,23 @@ export interface ScreenSharingClient {
 }
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link screenSharingContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
  */
-const resources = {} as const satisfies AppContract<ScreenSharingClient>['resources']
+export type ScreenSharingResources = Readonly<Record<never, never>>
 
 /**
- * The type of the resource table of {@link screenSharingContract}: each resource key,
- * the operations that resolve references to it, and its record and identifier
- * types. A client created from the contract carries it, so `bindReference`
- * admits only references the contract can resolve.
+ * The resource table: the implementation of {@link ScreenSharingResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
-export type ScreenSharingResources = typeof resources
+const resources = {} satisfies ScreenSharingResources
 
 const appGetURLOperation: OperationDescriptor<{ readonly url: string }, undefined> = {
   id: 'screen-sharing.app.getURL',

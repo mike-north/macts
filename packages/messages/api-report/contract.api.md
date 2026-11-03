@@ -7,7 +7,6 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
-import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Account {
@@ -57,10 +56,8 @@ export interface MessagesClient {
 // @public
 export const messagesContract: AppContract<MessagesClient, MessagesResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MessagesResources = typeof resources;
+export type MessagesResources = Readonly<Record<never, never>>;
 
 // @public
 export interface Participant {

@@ -9,6 +9,7 @@ import { CallOptions } from '@macts/contracts';
 import { ObjectReferenceData } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
 
 // @public
@@ -93,10 +94,34 @@ export interface ContactsClient {
 // @public
 export const contactsContract: AppContract<ContactsClient, ContactsResources>;
 
-// Warning: (ae-forgotten-export) The symbol "resources" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ContactsResources = typeof resources;
+export type ContactsResources = Readonly<{
+    Address: ResourceDescriptor<Address, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'contacts.addresses.get';
+        readonly list: 'contacts.addresses.list';
+    };
+    Email: ResourceDescriptor<Email, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'contacts.emails.get';
+        readonly list: 'contacts.emails.list';
+    };
+    Group: ResourceDescriptor<Group, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'contacts.groups.get';
+        readonly list: 'contacts.groups.list';
+    };
+    Person: ResourceDescriptor<Person, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'contacts.people.get';
+        readonly list: 'contacts.people.list';
+    };
+    Phone: ResourceDescriptor<Phone, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'contacts.phones.get';
+        readonly list: 'contacts.phones.list';
+    };
+}>;
 
 // @public
 export interface CustomDate {
