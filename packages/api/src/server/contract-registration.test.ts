@@ -74,6 +74,42 @@ function registerCalendar(registrar: AppRegistrar): void {
   registrar.registerContract(calendarContract(), CALENDAR_MANIFEST)
 }
 
+describe('an operation marked unavailable', () => {
+  // A required input of this create admits no value (phases/13 D7,
+  // "Resolvable targets"), so the descriptor marks the operation unavailable.
+  const unavailableCreate: AnyOperationDescriptor = {
+    ...createEvent,
+    unavailable: {
+      positions: ['summary'],
+      reason: 'Not available: `summary` admits no value, so the operation cannot be called.',
+    },
+  }
+  const register = (registrar: AppRegistrar): void => {
+    registrar.registerContract(calendarContract(unavailableCreate), CALENDAR_MANIFEST)
+  }
+
+  it('is not routed: a call gets the same 404 as an unknown operation, never reaching the runtime', async () => {
+    const { app, verifier, executor } = createTestServer({ manifests: [], register })
+
+    const res = await post(app, 'calendar.events.create', { summary: 'Standup' }, WRITER_TOKEN)
+    const unknown = await post(app, 'calendar.events.nope', {}, WRITER_TOKEN)
+
+    expect(res.status).toBe(404)
+    expect(await errorBody(res)).toEqual(await errorBody(unknown))
+    expect(verifier.calls()).toBe(0)
+    expect(executor.requests).toHaveLength(0)
+  })
+
+  it('is not listed by introspection', async () => {
+    const { app } = createTestServer({ manifests: [], register })
+
+    const res = await app.request('/api/v1/introspect/all')
+
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ apps: [] })
+  })
+})
+
 describe('a server with contract-registered apps', () => {
   it('validates input against the contract wire schema, not the manifest request schema', async () => {
     const contractServer = createTestServer({ manifests: [], register: registerCalendar })

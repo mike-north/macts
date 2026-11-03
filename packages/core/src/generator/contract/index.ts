@@ -116,7 +116,8 @@ interface ContractDiagnosticBase {
  * - `unavailable-operation`: a required input position of an operation takes
  *   a reference to a resource the app cannot resolve, so the operation can
  *   never be called. Its descriptor is marked `unavailable`, and MCP tools,
- *   generated CLI commands and capability discovery leave it out. The fix is
+ *   HTTP routes, the generated HTTP client and CLI commands, and capability
+ *   discovery leave it out. The fix is
  *   to give the resource a `get`, with evidence, or to mark the command
  *   unsupported.
  */
@@ -232,7 +233,7 @@ export function collectContractDiagnostics(manifest: AppManifest): ContractDiagn
         position,
         operation: operationId(route.route),
         resource: input.resource,
-        message: `${app}: ${position}: ${route.route} cannot be called and is left out of MCP tools, CLI commands and capability discovery: the required input "${input.name}" takes a reference to "${input.resource}", which the app has no operation to get.`,
+        message: `${app}: ${position}: ${route.route} cannot be called and is left out of MCP tools, HTTP routes, the HTTP client, CLI commands and capability discovery: the required input "${input.name}" takes a reference to "${input.resource}", which the app has no operation to get.`,
       })
     }
   }

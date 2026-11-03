@@ -20,7 +20,7 @@ export class PerformMailActionWithMessagesCommand extends Command {
 
     try {
       const client = getClient()
-      await client.performMailActionWithMessages(undefined, undefined)
+      await client.performMailActionWithMessages()
 
       const output = formatter.formatSuccess('performMailActionWithMessages completed successfully')
       this.context.stdout.write(output + '\n')

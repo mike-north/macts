@@ -19,7 +19,7 @@ export class CheckForNewMailCommand extends Command {
 
     try {
       const client = getClient()
-      await client.checkForNewMail(undefined)
+      await client.checkForNewMail()
 
       const output = formatter.formatSuccess('checkForNewMail completed successfully')
       this.context.stdout.write(output + '\n')

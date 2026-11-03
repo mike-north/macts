@@ -11,7 +11,8 @@
  * Every expected value is written by hand from the fixture and the rule:
  * optional positions that admit no value are left out of every input; an
  * operation with a required one is marked unavailable in its descriptor,
- * reported by generation, and left out of the CLI and capability discovery.
+ * reported by generation, and left out of the CLI, the HTTP client and
+ * capability discovery.
  *
  * @see phases/13-sdk-value-and-execution-contracts.md §D7 ("Resolvable targets")
  */
@@ -20,6 +21,7 @@ import { describe, expect, it } from 'vitest'
 import { deriveCapabilities } from '../capabilities/registry.js'
 import { resolveManifestRoutes } from '../manifest/index.js'
 import { generateCliPlugin } from './cli/index.js'
+import { generateHttpClientSdk } from './sdk/http-client.js'
 import {
   CONTRACT_MODULE_PATH,
   collectContractDiagnostics,
@@ -192,7 +194,7 @@ describe('the generated contract', () => {
         operation: 'jotter.notes.tagNote',
         resource: 'Tag',
         message:
-          'jotter: commands.tagNote.parameters.tag: jotter.notes.tagNote cannot be called and is left out of MCP tools, CLI commands and capability discovery: the required input "tag" takes a reference to "Tag", which the app has no operation to get.',
+          'jotter: commands.tagNote.parameters.tag: jotter.notes.tagNote cannot be called and is left out of MCP tools, HTTP routes, the HTTP client, CLI commands and capability discovery: the required input "tag" takes a reference to "Tag", which the app has no operation to get.',
       },
     ])
   })
@@ -228,14 +230,14 @@ describe('the generated CLI', () => {
     expect(fileText('src/plugin.ts')).not.toContain('TagNoteCommand')
   })
 
-  it('has no flag for an omitted parameter, and passes undefined in its position', () => {
+  it('has no flag or argument for an omitted parameter', () => {
     const exportNotes = fileText('src/commands/export-notes.ts')
     expect(exportNotes).not.toContain("'--tagged'")
     expect(exportNotes).toContain(
       `  untaggedOr = Option.String('--untagged-or', { required: false, description: "Export the notes with this tag, or the untagged ones when null" });`
     )
     expect(exportNotes).toContain(
-      'await client.exportNotes(this.format as unknown as Parameters<typeof client.exportNotes>[0], undefined, this.untaggedOr as unknown as Parameters<typeof client.exportNotes>[2]);'
+      'await client.exportNotes(this.format as unknown as Parameters<typeof client.exportNotes>[0], this.untaggedOr as unknown as Parameters<typeof client.exportNotes>[1]);'
     )
   })
 
@@ -276,5 +278,40 @@ describe('capability discovery', () => {
     expect(named('jotter.notes.create')?.inputSchema.properties).not.toHaveProperty('primaryTag')
     expect(named('jotter.notes.update')?.inputSchema.properties).not.toHaveProperty('primaryTag')
     expect(named('jotter.notes.create')?.inputSchema.properties).toHaveProperty('relatedTags')
+  })
+})
+
+describe('the generated HTTP client', () => {
+  const sdk = generateHttpClientSdk(manifest, { packageName: '@macts/jotter' })
+  const fileText = (path: string): string => {
+    const found = sdk.files.find((f) => f.path === path)
+    if (found === undefined) throw new Error(`no generated ${path}`)
+    return found.content
+  }
+
+  it('has no method for the unavailable operation', () => {
+    const methods = fileText('src/resources/note.ts')
+      .split('\n')
+      .flatMap((line) => /^ {2}async (\w+)\(/.exec(line)?.[1] ?? [])
+    // Every note operation except tag.
+    expect(methods).toEqual(['list', 'get', 'create', 'update', 'delete', 'archive', 'move'])
+  })
+
+  it('has no parameter for an omitted parameter, and does not send it', () => {
+    const client = fileText('src/client.ts')
+    expect(client).toContain(
+      '  async exportNotes(format: string, untaggedOr?: Tag): Promise<void> {'
+    )
+    expect(client).toContain(
+      "    await this.#httpClient.rpc<undefined>('jotter.app.exportNotes', { format, untaggedOr });"
+    )
+    expect(client).not.toContain('tagged?')
+  })
+
+  it('leaves an omitted property out of the create input, and keeps a list', () => {
+    const types = fileText('src/types.ts')
+    const create = /export interface NoteCreateInput \{[\s\S]*?\n\}/.exec(types)?.[0] ?? ''
+    expect(create).not.toContain('primaryTag')
+    expect(create).toContain('  relatedTags?: Tag[];')
   })
 })

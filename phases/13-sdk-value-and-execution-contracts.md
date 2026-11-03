@@ -1314,10 +1314,12 @@ derived JSON Schema is `{"not": {}}`. Otherwise the derived JSON Schema lists
 exactly the admitted container keys, so tool and HTTP schemas advertise them.
 The runtime check of raw HTTP and MCP requests against `input.wire` (D11)
 therefore enforces the rule, and the codecs and the SDK schema apply the same
-predicate. A position's own reference fails at its path. A container or an
-entry fails at its `resource`, for example `[...path, 'container',
-'resource']` or `[...path, 'entries', 0, 'resource']`, at every depth. An
-empty identity collection has no entry to resolve, so it is admitted.
+predicate. When encoding or decoding, a position's own reference fails at its
+path, and a container or an entry fails at its `resource`, for example
+`[...path, 'container', 'resource']` or `[...path, 'entries', 0, 'resource']`,
+at every depth. The raw `input.wire` check names no such path: a reference that
+matches none of the wire forms is one issue at the reference itself. An empty
+identity collection has no entry to resolve, so it is admitted.
 
 Generated surfaces never publish an operation an agent cannot call. Some input
 positions admit no value at all: those that take a single reference to a
@@ -1326,13 +1328,16 @@ array (which may be empty), is not one of them. What happens depends on
 whether the position is optional:
 
 - An optional one is left out of the input: the SDK types, the value types and
-  their JSON Schemas, the CLI flags, and the capability schema.
+  their JSON Schemas, the HTTP client's parameters, the CLI flags, and the
+  capability schema.
 - A required one means the operation can never be called. Generation warns,
   naming the app, the operation and the position. The descriptor stays,
-  marked `unavailable` with the positions and the reason. The MCP adapter, the
-  generated CLI and capability discovery leave the operation out.
+  marked `unavailable` with the positions and the reason. The MCP and HTTP
+  adapters leave the operation out of their tools, routes and listings, so a
+  call to it is answered as one to an unknown operation. The generated HTTP
+  client and CLI and capability discovery leave it out too.
 
-The contract generator, the CLI generator and the capability registry take
+The contract, HTTP client and CLI generators and the capability registry take
 this judgment from one manifest-level function. Generation fails if the
 contract disagrees with it.
 
@@ -1465,8 +1470,9 @@ is rejected wherever it appears, so no bound reference to it ever exists:
 - **Sent in a raw HTTP or MCP request.** The runtime's check against
   `input.wire` rejects it with `ValidationError` (D11).
 - **Returned by an operation.** This is a defect on our side, never the
-  caller's. The generator emits a reference position only when its target has
-  its resolving operation, so such a reference means the contract is wrong.
+  caller's. A contract may declare an output reference position only when its
+  target has its resolving operation, so such a reference means the contract
+  is wrong.
   The runtime's check of the result against `output.wire` rejects it with
   `UnexpectedValueError` (step 8 above), and so does the client's decoding.
 - **Sent to the resolve route.** A target resource that records no resolving

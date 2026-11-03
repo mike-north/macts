@@ -5,8 +5,6 @@
  * @packageDocumentation
  */
 
-import type { Person } from './types.js'
-
 /**
  * Client configuration options.
  */
@@ -139,29 +137,5 @@ export class ContactsClient {
    */
   async actionProperty(): Promise<void> {
     await this.#httpClient.rpc<undefined>('contacts.app.actionProperty', {})
-  }
-
-  /**
-   * RollOver - Returns the title that will be placed in the menu for this roll over
-   */
-  async actionTitle(_with: unknown, _for: Person): Promise<void> {
-    await this.#httpClient.rpc<undefined>('contacts.app.actionTitle', { with: _with, for: _for })
-  }
-
-  /**
-   * RollOver - Performs the action on the given person and value
-   */
-  async performAction(_with: unknown, _for: Person): Promise<void> {
-    await this.#httpClient.rpc<undefined>('contacts.app.performAction', { with: _with, for: _for })
-  }
-
-  /**
-   * RollOver - Determines if the rollover action should be enabled for the given person and value
-   */
-  async shouldEnableAction(_with: unknown, _for: Person): Promise<void> {
-    await this.#httpClient.rpc<undefined>('contacts.app.shouldEnableAction', {
-      with: _with,
-      for: _for,
-    })
   }
 }

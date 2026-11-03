@@ -16,12 +16,7 @@ import {
   resolvePrimaryIdentifierProperty,
   commandRouteSegment,
 } from '../../manifest/index.js'
-import {
-  hasUsableProperty,
-  usableCommands,
-  usableProperties,
-  usableResources,
-} from '../../manifest/unsupported.js'
+import { hasUsableProperty, usableProperties, usableResources } from '../../manifest/unsupported.js'
 import { propertyTypeToTs } from '../types.js'
 import { SDK_GENERATED_NOTICE } from '../generated-header.js'
 import {
@@ -37,7 +32,9 @@ import {
   resourceHasOperations,
   resourceNamespace,
   safeIdentifier,
+  type CrudOperation,
 } from '../surface.js'
+import { isOperationAvailable, omittedInputs } from '../input-satisfiability.js'
 
 /**
  * Options for HTTP client SDK generation.
@@ -262,7 +259,13 @@ function generateTypesFile(manifest: AppManifest): string {
     // directly rather than falling back to 'string', which would widen enum and
     // array types unnecessarily.
     const createFields = new Map<string, { tsType: string; required: boolean; doc: string }>()
+    const createCommand = findCrudCommand(resourceCommandEntries(manifest, resourceName), 'create')
+    const omittedFields =
+      createCommand === undefined
+        ? new Set<string>()
+        : omittedInputs(manifest, createCommand[1], resourceName)
     for (const [fieldName, field] of createInputFields(manifest, resourceName)) {
+      if (omittedFields.has(fieldName)) continue
       createFields.set(fieldName, {
         tsType: propertyTypeToTs(field.type as PropertyType | undefined),
         required: field.required,
@@ -401,23 +404,21 @@ function generateClientFile(
   // Find enum and resource types used in app-level commands that must be
   // imported from './types.js' in the generated client file.
   const typesUsedInAppCommands = new Set<string>()
-  for (const [, cmd] of usableCommands(manifest)) {
-    if (cmd.scope === 'application') {
-      for (const param of cmd.parameters) {
-        const paramType = param.type as PropertyType | undefined
-        if (typeof paramType === 'object') {
-          if ('enum' in paramType) {
-            // Enum reference: the type name is the enum's name directly
-            typesUsedInAppCommands.add(paramType.enum)
-          } else if ('resource' in paramType) {
-            // Resource reference: capitalise to match the generated interface name
-            const name = paramType.resource.charAt(0).toUpperCase() + paramType.resource.slice(1)
-            typesUsedInAppCommands.add(name)
-          }
-        } else if (typeof paramType === 'string') {
-          if (manifest.enums[paramType]) {
-            typesUsedInAppCommands.add(paramType)
-          }
+  for (const [, cmd] of availableAppCommands(manifest)) {
+    for (const param of cmd.parameters) {
+      const paramType = param.type as PropertyType | undefined
+      if (typeof paramType === 'object') {
+        if ('enum' in paramType) {
+          // Enum reference: the type name is the enum's name directly
+          typesUsedInAppCommands.add(paramType.enum)
+        } else if ('resource' in paramType) {
+          // Resource reference: capitalise to match the generated interface name
+          const name = paramType.resource.charAt(0).toUpperCase() + paramType.resource.slice(1)
+          typesUsedInAppCommands.add(name)
+        }
+      } else if (typeof paramType === 'string') {
+        if (manifest.enums[paramType]) {
+          typesUsedInAppCommands.add(paramType)
         }
       }
     }
@@ -443,7 +444,7 @@ function generateClientFile(
     .join('\n')
 
   // Generate app-level command methods
-  const appCommands = appCommandEntries(manifest)
+  const appCommands = availableAppCommands(manifest)
     .map(([key, cmd]) => generateAppCommandMethod(commandRouteSegment(key, cmd), cmd, appNameLower))
     .join('\n\n')
 
@@ -553,6 +554,32 @@ ${appCommands}
 }
 
 /**
+ * The command as its operation takes it: without the parameters left out
+ * because they admit no value (see `../input-satisfiability.ts`), so the client
+ * never offers a parameter no request can fill.
+ */
+function requestCommand(
+  manifest: AppManifest,
+  command: Command,
+  resourceName: string | undefined
+): Command {
+  const omitted = omittedInputs(manifest, command, resourceName)
+  if (omitted.size === 0) return command
+  return { ...command, parameters: command.parameters.filter((p) => !omitted.has(p.name)) }
+}
+
+/**
+ * The application commands whose operations can be called, each as its
+ * operation takes it. An operation whose required input admits no value gets
+ * no method.
+ */
+function availableAppCommands(manifest: AppManifest): [string, Command][] {
+  return appCommandEntries(manifest)
+    .filter(([, cmd]) => isOperationAvailable(manifest, cmd, undefined))
+    .map(([key, cmd]) => [key, requestCommand(manifest, cmd, undefined)])
+}
+
+/**
  * Generate method for app-level command.
  *
  * The route is keyed by the command's route segment (`commandRouteSegment`: its
@@ -594,16 +621,27 @@ function generateResourceClient(
   const nameWords = identifierWords(resource.name)
   const pluralWords = identifierWords(resource.plural)
 
-  const resourceCommands = resourceCommandEntries(manifest, resourceName)
+  const allCommands = resourceCommandEntries(manifest, resourceName)
+  // An operation whose required input admits no value gets no method, and
+  // every other one takes only the parameters its operation takes.
+  const available = (cmd: Command): boolean => isOperationAvailable(manifest, cmd, resourceName)
+  const resourceCommands = allCommands
+    .filter(([, cmd]) => available(cmd))
+    .map(([key, cmd]): [string, Command] => [key, requestCommand(manifest, cmd, resourceName)])
 
   // Resolve the backing command for each CRUD shape so routes can be keyed by
   // the command's manifest key (the single source of truth shared with the
-  // server router) rather than by the operation name.
-  const listCmd = findCrudCommand(resourceCommands, 'list')
-  const getCmd = findCrudCommand(resourceCommands, 'get')
-  const createCmd = findCrudCommand(resourceCommands, 'create')
-  const updateCmd = findCrudCommand(resourceCommands, 'update')
-  const deleteCmd = findCrudCommand(resourceCommands, 'delete')
+  // server router) rather than by the operation name. The choice is made among
+  // all of the resource's commands, as the contract makes it.
+  const crud = (shape: CrudOperation): [string, Command] | undefined => {
+    const found = findCrudCommand(allCommands, shape)
+    return found !== undefined && available(found[1]) ? found : undefined
+  }
+  const listCmd = crud('list')
+  const getCmd = crud('get')
+  const createCmd = crud('create')
+  const updateCmd = crud('update')
+  const deleteCmd = crud('delete')
 
   const commandMethods = resourceCommands
     .map(([key, cmd]) => generateResourceCommandMethod(commandRouteSegment(key, cmd), cmd))

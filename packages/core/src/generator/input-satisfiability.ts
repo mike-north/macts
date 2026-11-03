@@ -12,16 +12,18 @@
  * Generated surfaces never offer what cannot be called:
  *
  * - An optional unsatisfiable position is left out of the operation's input:
- *   its SDK types, value types and JSON Schemas, CLI flags and capability
- *   schema. The operation stays callable without it.
+ *   its SDK types, value types and JSON Schemas, HTTP client parameters, CLI
+ *   flags and capability schema. The operation stays callable without it.
  * - An operation with a required unsatisfiable position can never be called.
  *   Its contract descriptor stays, marked `unavailable`, and generation
- *   reports it; the surfaces that offer operations to agents (MCP tools,
- *   generated CLI commands, and capability discovery) leave it out.
+ *   reports it; the surfaces that offer operations (MCP tools, HTTP routes,
+ *   the generated HTTP client and CLI commands, and capability discovery)
+ *   leave it out.
  *
- * The judgment is made from the manifest alone, so the contract generator,
- * the CLI generator and the capability registry (which runtime discovery
- * builds from manifests) share it.
+ * The judgment is made from the manifest alone, so the contract, HTTP client
+ * and CLI generators and the capability registry (which runtime discovery
+ * builds from manifests) share it. The MCP and HTTP adapters read its outcome
+ * from the descriptor's `unavailable` member.
  *
  * @packageDocumentation
  */

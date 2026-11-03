@@ -756,8 +756,8 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
 
   /**
    * Validate the whole reference with the app contract's reference value type,
-   * `t.reference(resources, resource, cardinality)`, and return its payload in
-   * wire form.
+   * `t.reference(() => contract, resource, cardinality)`, whose scope is the
+   * contract (its app and resource table), and return its payload in wire form.
    */
   function validateReference(
     app: RegisteredApp,
@@ -766,8 +766,8 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   ): ReferenceWire {
     const type =
       target.cardinality === 'one'
-        ? ValueTypes.reference(() => app.contract.resources, target.resource, 'one')
-        : ValueTypes.reference(() => app.contract.resources, target.resource, 'many')
+        ? ValueTypes.reference(() => app.contract, target.resource, 'one')
+        : ValueTypes.reference(() => app.contract, target.resource, 'many')
     const parsed = type.wire.safeParse(reference)
     if (!parsed.success) {
       throw new ValidationError('The reference failed validation.', {

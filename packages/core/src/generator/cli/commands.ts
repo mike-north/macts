@@ -346,7 +346,7 @@ export function generateAppCommand(
   })
 
   // Build parameter flags. An input left out because it admits no value has
-  // no flag, and its positional argument is passed as undefined.
+  // no flag and no positional argument.
   const omitted = ctx.omittedInputs(cmd, undefined)
   const paramFlags = sortedParams
     .filter((p) => !omitted.has(p.name))
@@ -534,16 +534,19 @@ function generateResourceCommandArgs(
 }
 
 /**
- * The positional arguments of an SDK method call, one per parameter in
- * signature order. A parameter left out of the operation's input has no flag,
- * so its position is passed as `undefined`.
+ * The positional arguments of an SDK method call, in signature order. A
+ * parameter left out of the operation's input has no flag and no position:
+ * the SDK method does not take it either.
  */
 function positionalArgs(
   params: readonly CommandParameter[],
   omitted: ReadonlySet<string>,
   render: (param: CommandParameter, index: number) => string
 ): string {
-  return params.map((p, i) => (omitted.has(p.name) ? 'undefined' : render(p, i))).join(', ')
+  return params
+    .filter((p) => !omitted.has(p.name))
+    .map((p, i) => render(p, i))
+    .join(', ')
 }
 
 function generateParentOptions(parentParams: ParentParam[]): string {

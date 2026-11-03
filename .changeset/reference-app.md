@@ -1,4 +1,5 @@
 ---
+'@macts/api': minor
 '@macts/contracts': minor
 '@macts/core': minor
 '@macts/arc': minor
@@ -48,19 +49,22 @@ Generated surfaces never offer an operation that cannot be called. An input posi
 - generation warns, naming the app, the operation and the position;
 - the descriptor stays, with a new `unavailable` member (`OperationUnavailability`: the positions and the reason), and the SDK method's documentation says so;
 - the MCP adapter lists no tool for it, and calling its tool name is an unknown-tool call;
-- the generated CLI has no command for it, and capability discovery lists no capability for it.
+- the HTTP API neither routes nor lists it: `POST /rpc/<id>` gets the same 404 as an unknown operation, and introspection leaves it out;
+- the generated HTTP client has no method for it, the generated CLI has no command for it, and capability discovery lists no capability for it.
 
-None of the affected positions ever worked through the native runtime, because it cannot yet encode references. What changes is how a request that uses them is treated. A request that sends a left-out field used to reach the server, and is now rejected as an unknown field. An unavailable operation is no longer offered as a tool, a command or a capability, and a raw request to it is still rejected by its input schema.
+A left-out position has no parameter in either generated client, no CLI flag, and no field in the capability schema.
+
+None of the affected positions ever worked through the native runtime, because it cannot yet encode references. What changes is how a request that uses them is treated. A request that sends a left-out field used to reach the server, and is now rejected as an unknown field. An unavailable operation is no longer offered as a tool, a route, a client method, a command or a capability.
 
 Operations that become unavailable:
 
-- Contacts `contacts.app.actionTitle`, `contacts.app.performAction` and `contacts.app.shouldEnableAction`: their required `for` takes a person, and Contacts has no operation that gets one. The CLI commands `macts contacts action-title`, `perform-action` and `should-enable-action` are removed.
-- Mail `mail.app.synchronize`: its required `with` takes an account, and Mail has no operation that gets one. The CLI command `macts mail synchronize` is removed.
+- Contacts `contacts.app.actionTitle`, `contacts.app.performAction` and `contacts.app.shouldEnableAction`: their required `for` takes a person, and Contacts has no operation that gets one. The `ContactsClient` HTTP client methods `actionTitle`, `performAction` and `shouldEnableAction` and the CLI commands `macts contacts action-title`, `perform-action` and `should-enable-action` are removed.
+- Mail `mail.app.synchronize`: its required `with` takes an account, and Mail has no operation that gets one. The `MailClient` HTTP client method `synchronize` and the CLI command `macts mail synchronize` are removed.
 
 Operations that lose an optional position:
 
-- Mail `mail.app.checkForNewMail` loses `for` (an account). The SDK method is now `checkForNewMail(options?)`, and the CLI flag `--for` is removed.
-- Mail `mail.app.performMailActionWithMessages` loses `inMailboxes` (a mailbox) and `forRule` (a rule). The SDK method is now `performMailActionWithMessages(options?)`, and the CLI flags `--in-mailboxes` and `--for-rule` are removed.
+- Mail `mail.app.checkForNewMail` loses `for` (an account). The contract client method is now `checkForNewMail(options?)`, the HTTP client method `checkForNewMail()`, and the CLI flag `--for` is removed.
+- Mail `mail.app.performMailActionWithMessages` loses `inMailboxes` (a mailbox) and `forRule` (a rule). The contract client method is now `performMailActionWithMessages(options?)`, the HTTP client method `performMailActionWithMessages()`, and the CLI flags `--in-mailboxes` and `--for-rule` are removed.
 
 Create and update input types that no operation takes lose the same kind of field. The types change, but no request does:
 
