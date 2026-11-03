@@ -33,9 +33,8 @@ const KEY_PREFIX = 'macts_sk_'
  *    (deleted, or never stored) fails with `UNKNOWN_KEY`, and a revoked one
  *    with `REVOKED`.
  *
- * The stored status is cached per process for at most five seconds. Revoking,
- * updating, or deleting a key through this process's key store drops its
- * cached status, so the next validation here sees the change at once. A change
+ * The stored status is cached per process for at most five seconds. Revoking
+ * or deleting a key through this process's key store drops its cached status, so the next validation here sees the change at once. A change
  * made by another process (for example the CLI, while a server runs) is seen
  * here once the cached status expires, within five seconds. A missing record
  * is never cached.

@@ -150,7 +150,13 @@ export async function createApiKey(
   options: CreateApiKeyOptions,
   permissionsSection?: PermissionsSection
 ): Promise<CreateApiKeyResult> {
-  assertGrantablePermissions(options.permissions, options.knownPermissions ?? [])
+  // Snapshot what the caller asked for before any await, so the record stored
+  // below describes the same request that was validated, expanded and signed
+  // even if the caller changes its options object meanwhile.
+  const name = options.name
+  const requestedPermissions = [...options.permissions]
+
+  assertGrantablePermissions(requestedPermissions, options.knownPermissions ?? [])
 
   const keyId = generateKeyId()
   const now = Math.floor(Date.now() / 1000)
@@ -160,16 +166,16 @@ export async function createApiKey(
   // we reject them precisely rather than store a scope that authorizes nothing.
   let expandedPermissions: string[]
   if (permissionsSection) {
-    expandedPermissions = expandPermissions(options.permissions, permissionsSection, {
+    expandedPermissions = expandPermissions(requestedPermissions, permissionsSection, {
       unmapped: 'keep',
     })
   } else {
-    const coarse = findUnexpandableCoarsePermissions(options.permissions)
+    const coarse = findUnexpandableCoarsePermissions(requestedPermissions)
     if (coarse.length > 0 && coarse[0] !== undefined) {
       throw new UnexpandableCoarsePermissionError(coarse[0])
     }
     // Remaining permissions are fine-grained or wildcards; store as-is.
-    expandedPermissions = [...options.permissions]
+    expandedPermissions = [...requestedPermissions]
   }
 
   // Calculate expiration if provided
@@ -186,7 +192,7 @@ export async function createApiKey(
     sub: keyId,
     iat: now,
     permissions: expandedPermissions,
-    name: options.name,
+    name,
   }
 
   if (exp !== undefined) {
@@ -207,9 +213,9 @@ export async function createApiKey(
   // Create metadata for storage
   const metadata: ApiKeyMetadata = {
     id: keyId,
-    name: options.name,
+    name,
     permissions: expandedPermissions,
-    originalPermissions: options.permissions,
+    originalPermissions: requestedPermissions,
     createdAt: new Date(now * 1000),
     expiresAt,
     revoked: false,
