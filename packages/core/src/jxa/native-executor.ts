@@ -165,10 +165,12 @@ export type NativeRunFailure =
  * codec, and read as the resource's get reads its item, in one automation
  * process per request. A missing object fails with `TargetNotFoundError`
  * naming the referenced resource, with `entryIndex` for an identity
- * collection's entry, and an empty identity collection resolves to `[]`
- * without running anything. Every other reference (a selector, a reference
- * located through a container, or one to a resource outside that scope) fails
- * with `InternalError` naming the form, before any automation runs.
+ * collection's entry. An empty identity collection resolves to `[]` without
+ * starting an automation process; the runtime has already run permission,
+ * governance, approval and audit for it, as for any resolution. Every other
+ * reference (a selector, a reference located through a container, or one to
+ * a resource outside that scope) fails with `InternalError` naming the form,
+ * before any automation runs.
  *
  * @param options - Time limit and, for tests, the transport.
  * @returns An `Executor` whose provider is `'macos'`.
@@ -223,10 +225,13 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       // authorized, governed and audited the call before it reached here.
       if (resolution.entryCount === 0) return []
 
-      const get = resolvingCommand(manifest, reference.resource, 'get')
+      // Failures are described as the operation the runtime ran the call as:
+      // the resource's get for a single reference, its list for a collection.
+      const shape = reference.cardinality === 'one' ? 'get' : 'list'
+      const resolving = resolvingCommand(manifest, reference.resource, shape)
       const context: NativeFailureContext = {
         app: manifest.app.name,
-        operation: { command: get?.[0] ?? 'get', resource: reference.resource },
+        operation: { command: resolving?.[0] ?? shape, resource: reference.resource },
         timeoutMs,
       }
       const script: NativeScript = {
