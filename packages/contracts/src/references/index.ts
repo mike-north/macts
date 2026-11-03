@@ -49,6 +49,7 @@
 import type { CallOptions } from '../call-options.js'
 import type { OperationId } from '../operations/index.js'
 import type { Integer } from '../values/integer.js'
+import type { ResourcePlanTable, ResourcePlans } from '../values/plan.js'
 import type { ValueType } from '../values/value-type.js'
 import type { WireInteger, WireValue } from '../values/wire.js'
 
@@ -495,6 +496,34 @@ export interface ReferenceScope {
   readonly app: string
   /** The app's resource table. */
   readonly resources: ReferenceRegistry
+}
+
+/**
+ * The value plans of an app's resources, derived from its resource table: each
+ * resource's identifier plan, taken from the identifier value type the table
+ * records for it.
+ *
+ * @remarks
+ * Every resource of the table has an entry, including those with no
+ * identifier, whose entry is empty: a reference's containers usually belong to
+ * other resources, so an executor needs the whole table, not only the
+ * resources a position declares. Hosts derive it once, when an app's contract
+ * is registered, and pass it with every request.
+ *
+ * @param resources - The app contract's resource table.
+ * @returns A frozen table with one entry per resource, in table order.
+ */
+export function resourcePlanTable(resources: ReferenceRegistry): ResourcePlanTable {
+  // `Object.fromEntries` defines own properties, so no resource key (not even
+  // `__proto__`) can reach the table's prototype.
+  return Object.freeze(
+    Object.fromEntries(
+      Object.entries(resources).map(([resource, descriptor]): [string, ResourcePlans] => [
+        resource,
+        Object.freeze(descriptor.id === undefined ? {} : { id: descriptor.id.plan }),
+      ])
+    )
+  )
 }
 
 /**

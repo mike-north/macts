@@ -50,4 +50,5 @@ expectAssignable<NativeScript>({
   input: {},
   inputPlan: PASSTHROUGH_PLAN,
   outputPlan: PASSTHROUGH_PLAN,
+  references: {},
 })

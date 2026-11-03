@@ -124,11 +124,59 @@ describe('built NATIVE_CODEC prelude', () => {
     })
   })
 
-  it('marks a reference decode with the kind it cannot convert, not as a bad value', () => {
+  it('addresses the object an identity reference names, through the environment it is given', () => {
+    const person = { exists: () => true }
+    const requests: unknown[] = []
+    const app = {
+      people: {
+        byId: (id: unknown) => {
+          requests.push(id)
+          return person
+        },
+      },
+    }
+    const decoded = evaluated.decode(
+      { for: { reference: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' } } },
+      {
+        kind: 'record',
+        fields: {
+          for: {
+            presence: 'required',
+            value: { kind: 'reference', resource: 'Person', cardinality: 'one' },
+          },
+        },
+      },
+      {
+        app,
+        references: {
+          Person: {
+            id: { kind: 'string' },
+            addressing: { collection: 'people', lookup: 'byId', property: 'id' },
+          },
+        },
+      }
+    )
+    // The decoded value is the app's own object, not a copy of it.
+    expect(typeof decoded === 'object' && decoded !== null && Reflect.get(decoded, 'for')).toBe(
+      person
+    )
+    expect(requests).toEqual(['p-1'])
+  })
+
+  it('marks a reference it cannot convert with its kind, not as a bad value', () => {
     let thrown: unknown
     try {
       evaluated.decode(
-        { for: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' } },
+        {
+          for: {
+            reference: {
+              resource: 'Person',
+              form: 'selector',
+              cardinality: 'one',
+              selector: { by: 'name', name: 'Ada' },
+            },
+          },
+        },
         {
           kind: 'record',
           fields: {
@@ -137,7 +185,8 @@ describe('built NATIVE_CODEC prelude', () => {
               value: { kind: 'reference', resource: 'Person', cardinality: 'one' },
             },
           },
-        }
+        },
+        { app: {}, references: {} }
       )
     } catch (error) {
       thrown = error
@@ -148,7 +197,7 @@ describe('built NATIVE_CODEC prelude', () => {
       name: 'MactsCodecError',
       direction: 'decode',
       path: ['for'],
-      message: 'Reference values have no conversion in this codec',
+      message: 'Selector references have no conversion in this codec',
       unsupportedKind: 'reference',
     })
   })
@@ -173,6 +222,7 @@ describe('built NATIVE_CODEC prelude', () => {
         },
         inputPlan: plan,
         outputPlan: plan,
+        references: {},
       })
       expect(outcome).toEqual({
         ok: true,
@@ -230,6 +280,7 @@ describe.skipIf(process.platform !== 'darwin')(
         input: { count: { integer: '41' }, at: { date: '2026-10-31T17:04:05.120+02:30' } },
         inputPlan: plan,
         outputPlan: plan,
+        references: {},
       })
       // D3: integers travel as canonical decimal strings; dates as UTC ISO text
       // with milliseconds. 14:34:05.120Z plus one second.
@@ -239,12 +290,14 @@ describe.skipIf(process.platform !== 'darwin')(
       })
     }, 30000)
 
-    it('reports a reference input as a marked codec decode failure, before the app is addressed', () => {
+    it('reports a reference it cannot convert as a marked codec decode failure, before the body runs', () => {
       const outcome = runWithDist({
-        // No app has this bundle identifier: addressing it would be an app failure.
-        bundleId: 'com.example.macts.not-installed',
-        body: 'return null;',
-        input: { for: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' } },
+        bundleId: FINDER,
+        // Reached only if decoding succeeded.
+        body: "throw new Error('the body ran');",
+        input: {
+          for: { reference: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' } },
+        },
         inputPlan: {
           kind: 'record',
           fields: {
@@ -255,6 +308,8 @@ describe.skipIf(process.platform !== 'darwin')(
           },
         },
         outputPlan: { kind: 'none' },
+        // The script lists no Person, so the person cannot be addressed.
+        references: {},
       })
       expect(outcome).toEqual({
         ok: false,
@@ -262,7 +317,8 @@ describe.skipIf(process.platform !== 'darwin')(
           source: 'codec',
           direction: 'decode',
           path: ['for'],
-          message: 'Reference values have no conversion in this codec',
+          message:
+            'References to "Person" have no conversion in this codec: the app does not find its objects at the application by their identifier',
           unsupportedKind: 'reference',
         },
       })
@@ -275,6 +331,7 @@ describe.skipIf(process.platform !== 'darwin')(
         input: { count: { integer: '1' }, at: { date: '2026-10-31T14:34:05.120Z' } },
         inputPlan: plan,
         outputPlan: plan,
+        references: {},
       })
       // D4: the codec's own error object becomes a `codec` failure with its path.
       expect(outcome).toEqual({

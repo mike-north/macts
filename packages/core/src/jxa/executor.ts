@@ -297,7 +297,8 @@ function embedJson(value: unknown): string {
 /**
  * The catch clause of a native script: describes what was thrown as a
  * {@link NativeFailure}. A codec error, recognized by its marker name, keeps its
- * direction, path, message, and unsupported kind if it has one; anything else
+ * direction, path, message, and its unsupported kind or missing resource if it
+ * has one; anything else
  * is an app or bridge failure that keeps its message and, when it carries one,
  * its numeric error code.
  */
@@ -306,6 +307,9 @@ const DESCRIBE_THROWN = [
   "      var codecFailure = { source: 'codec', direction: e.direction, path: e.path, message: e.message };",
   "      if (typeof e.unsupportedKind === 'string') {",
   '        codecFailure.unsupportedKind = e.unsupportedKind;',
+  '      }',
+  "      if (typeof e.missingResource === 'string') {",
+  '        codecFailure.missingResource = e.missingResource;',
   '      }',
   '      return { ok: false, failure: codecFailure };',
   '    }',
@@ -322,9 +326,14 @@ const DESCRIBE_THROWN = [
  * The script imports the C standard library bridge, declares the codec's
  * functions, and evaluates one try/catch that yields a {@link NativeOutcome};
  * its final expression is that outcome serialized as JSON, which the host
- * prints. The input and both plans are embedded with {@link embedJson}, the
- * bundle identifier as a JSON string literal, and the body inside its own
- * `(function (app, args) { ... })`.
+ * prints. The input, both plans, and the reference table are embedded with
+ * {@link embedJson}, the bundle identifier as a JSON string literal, and the
+ * body inside its own `(function (app, args) { ... })`.
+ *
+ * The application object comes first, because decoding a reference addresses
+ * the app: the codec functions receive `{ app, references }`. Creating it
+ * sends the app nothing, and the body runs only after the whole input
+ * decoded, so a decode failure still means no command was sent.
  */
 export function composeNativeScript(script: NativeScript, codec: NativeCodec): string {
   return [
@@ -332,13 +341,14 @@ export function composeNativeScript(script: NativeScript, codec: NativeCodec): s
     codec.prelude,
     'var __mactsOutcome = (function () {',
     '  try {',
-    `    var args = ${NATIVE_DECODE_FUNCTION}(${embedJson(script.input)}, ${embedJson(script.inputPlan)});`,
     `    var app = Application(${JSON.stringify(script.bundleId)});`,
     '    app.includeStandardAdditions = true;',
+    `    var env = { app: app, references: ${embedJson(script.references)} };`,
+    `    var args = ${NATIVE_DECODE_FUNCTION}(${embedJson(script.input)}, ${embedJson(script.inputPlan)}, env);`,
     '    var value = (function (app, args) {',
     script.body,
     '    })(app, args);',
-    `    return { ok: true, value: ${NATIVE_ENCODE_FUNCTION}(value, ${embedJson(script.outputPlan)}) };`,
+    `    return { ok: true, value: ${NATIVE_ENCODE_FUNCTION}(value, ${embedJson(script.outputPlan)}, env) };`,
     '  } catch (e) {',
     DESCRIBE_THROWN,
     '  }',
@@ -407,11 +417,24 @@ function parseNativeFailure(value: unknown): NativeFailure | string {
       }
       if (!isIssuePath(path)) return 'the codec failure has no path'
       const unsupportedKind = value['unsupportedKind']
-      if (unsupportedKind === undefined) return { source: 'codec', direction, path, message }
-      if (typeof unsupportedKind !== 'string') {
+      const missingResource = value['missingResource']
+      if (unsupportedKind !== undefined && typeof unsupportedKind !== 'string') {
         return 'the codec failure has a non-text unsupported kind'
       }
-      return { source: 'codec', direction, path, message, unsupportedKind }
+      if (missingResource !== undefined && typeof missingResource !== 'string') {
+        return 'the codec failure has a non-text missing resource'
+      }
+      if (unsupportedKind !== undefined && missingResource !== undefined) {
+        return 'the codec failure is both unsupported and missing'
+      }
+      return {
+        source: 'codec',
+        direction,
+        path,
+        message,
+        ...(unsupportedKind === undefined ? {} : { unsupportedKind }),
+        ...(missingResource === undefined ? {} : { missingResource }),
+      }
     }
     default:
       return 'the failure has an unknown source'

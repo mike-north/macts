@@ -31,6 +31,7 @@
 import { createContext, runInContext } from 'node:vm'
 import { describe, expect, it } from 'vitest'
 import {
+  EMPTY_RESOURCE_PLAN_TABLE,
   PASSTHROUGH_PLAN,
   TargetNotFoundError,
   UnexpectedValueError,
@@ -381,6 +382,7 @@ async function listBoth(
     input: options.input ?? {},
     inputPlan: PASSTHROUGH_PLAN,
     outputPlan,
+    resources: EMPTY_RESOURCE_PLAN_TABLE,
   }
   const batchedApp = fakePlanner(rows, options.faults)
   const batched = await settle(
@@ -795,6 +797,7 @@ describe('list bodies: the identifier read is never guarded', () => {
         input: SHELF_INPUT,
         inputPlan: PASSTHROUGH_PLAN,
         outputPlan: PASSTHROUGH_PLAN,
+        resources: EMPTY_RESOURCE_PLAN_TABLE,
       })
     )
     expect(errorOf(result)).toBeInstanceOf(AppOperationError)

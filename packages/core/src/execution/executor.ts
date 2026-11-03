@@ -15,6 +15,7 @@
 import type {
   OperationTarget,
   ReferenceWire,
+  ResourcePlanTable,
   ValuePlan,
   WireRecord,
   WireValue,
@@ -45,6 +46,13 @@ export interface ExecutionRequest {
   readonly inputPlan: ValuePlan
   /** Shape the result must take; `PASSTHROUGH_PLAN` under the same condition. */
   readonly outputPlan: ValuePlan
+  /**
+   * The value plans of the app's resources, from its registered contract:
+   * what converting a reference in `input` or in the result needs. Always
+   * present: an app registered without a contract passes
+   * `EMPTY_RESOURCE_PLAN_TABLE`, and then no reference converts.
+   */
+  readonly resources: ResourcePlanTable
   /** Abort the execution. */
   readonly signal?: AbortSignal
 }
@@ -73,6 +81,12 @@ export interface ResolutionRequest {
    * cardinality `'one'`, its list operation output plan for `'many'`.
    */
   readonly outputPlan: ValuePlan
+  /**
+   * The value plans of the app's resources, from its registered contract, as
+   * on {@link ExecutionRequest.resources}: what converting the reference, its
+   * containers, and any reference in the result needs. Always present.
+   */
+  readonly resources: ResourcePlanTable
   /** Abort the resolution. */
   readonly signal?: AbortSignal
 }

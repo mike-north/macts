@@ -9,6 +9,7 @@
 import { z } from 'zod'
 import type { AppManifest } from '@macts/core'
 import {
+  EMPTY_RESOURCE_PLAN_TABLE,
   PASSTHROUGH_PLAN,
   type InvocationContext,
   type OperationId,
@@ -69,6 +70,7 @@ export function fakeOperation(
     },
     manifest: UNUSED_MANIFEST,
     risk: 'read',
+    resources: EMPTY_RESOURCE_PLAN_TABLE,
   }
 }
 

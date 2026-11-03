@@ -11,8 +11,9 @@
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md — A2 (numbers),
  *   A3 (dates, geometry, colors), A4 (presence and nullability), D3 (numeric wire
- *   encoding and unambiguous decoding), D4 (native codec interface), D9
- *   (passthrough), D10 (precision, signed zero, classification, dates)
+ *   encoding and unambiguous decoding), D4 (native codec interface), D7
+ *   (reference wire forms, native emission), D9 (passthrough), D10 (precision,
+ *   signed zero, classification, dates, identifier targeting)
  */
 
 import { runInNewContext } from 'node:vm'
@@ -32,6 +33,8 @@ import {
   NATIVE_CODEC_ERROR_NAME,
   NATIVE_DECODE_FUNCTION,
   NATIVE_ENCODE_FUNCTION,
+  type NativeCodecEnvironment,
+  type NativeReferenceTable,
 } from './native-codec.js'
 import { evaluatePrelude, type CodecFunction } from './test-support/native-harness.js'
 
@@ -56,6 +59,129 @@ const nullable = (value: ValuePlan): ValuePlan => ({ kind: 'nullable', value })
 const recordOf = (fields: Record<string, FieldPlan>): ValuePlan => ({ kind: 'record', fields })
 const required = (value: ValuePlan): FieldPlan => ({ value, presence: 'required' })
 const optional = (value: ValuePlan): FieldPlan => ({ value, presence: 'optional' })
+
+// ---------------------------------------------------------------------------
+// References
+// ---------------------------------------------------------------------------
+
+const PERSON_REF: ValuePlan = { kind: 'reference', resource: 'Person', cardinality: 'one' }
+const PEOPLE_REF: ValuePlan = { kind: 'reference', resource: 'Person', cardinality: 'many' }
+const WINDOW_REF: ValuePlan = { kind: 'reference', resource: 'Window', cardinality: 'one' }
+const TRACK_REF: ValuePlan = { kind: 'reference', resource: 'Track', cardinality: 'one' }
+const EMAIL_REF: ValuePlan = { kind: 'reference', resource: 'Email', cardinality: 'one' }
+const NOTE_REF: ValuePlan = { kind: 'reference', resource: 'Note', cardinality: 'one' }
+const ALBUM_REF: ValuePlan = { kind: 'reference', resource: 'Album', cardinality: 'one' }
+
+/**
+ * The reference table of the stand-in app, one resource per case the codec
+ * tells apart:
+ *
+ * - `Person`: text identifier, found by id at the application;
+ * - `Window`: integer identifier, found by id;
+ * - `Track`: text identifier, found by matching its `persistentID` property;
+ * - `Email`: has an identifier, but is found only within its person, so it has
+ *   no addressing;
+ * - `Note`: no identifier and no addressing;
+ * - `Album` is not listed at all.
+ */
+const REFERENCES: NativeReferenceTable = {
+  Person: { id: STRING, addressing: { collection: 'people', lookup: 'byId', property: 'id' } },
+  Window: { id: INTEGER, addressing: { collection: 'windows', lookup: 'byId', property: 'id' } },
+  Track: {
+    id: STRING,
+    addressing: { collection: 'tracks', lookup: 'byProperty', property: 'persistentID' },
+  },
+  Email: { id: STRING },
+  Note: {},
+}
+
+/** A single identity reference in wire form. */
+function identity(resource: string, id: unknown): Record<string, Record<string, unknown>> {
+  return { reference: { resource, form: 'identity', cardinality: 'one', id } }
+}
+
+/** A single selector reference in wire form. */
+function selector(resource: string, select: unknown): Record<string, Record<string, unknown>> {
+  return { reference: { resource, form: 'selector', cardinality: 'one', selector: select } }
+}
+
+/** One object of the stand-in app: its identifier read, and its existence. */
+type StandInObject = Readonly<Record<string, () => unknown>>
+
+/** One collection of the stand-in app and the objects it holds. */
+interface StandInCollection {
+  readonly objects: readonly StandInObject[]
+  byId(id: unknown): StandInObject
+  whose(match: Readonly<Record<string, unknown>>): readonly StandInObject[]
+}
+
+/** A stand-in application and the requests the codec made of it, in order. */
+interface StandInApp {
+  readonly calls: string[]
+  readonly people: StandInCollection
+  readonly windows: StandInCollection
+  readonly tracks: StandInCollection
+}
+
+/**
+ * A stand-in for the automation bridge's application object, behaving as the
+ * live bridge does for what the codec uses: `byId(id)` and `whose(match)[0]`
+ * give an object whether or not one matches, and only `exists()` tells. An
+ * object's property is read by calling it. Every request is recorded.
+ */
+function standInApp(): StandInApp {
+  const calls: string[] = []
+  const object = (resource: string, property: string, value: unknown): StandInObject => ({
+    exists: () => {
+      calls.push(`${resource} ${String(value)}.exists()`)
+      return true
+    },
+    [property]: () => {
+      calls.push(`${resource} ${String(value)}.${property}()`)
+      return value
+    },
+  })
+  const missing = (resource: string): StandInObject => ({
+    exists: () => {
+      calls.push(`${resource} missing.exists()`)
+      return false
+    },
+  })
+  const collection = (
+    name: string,
+    resource: string,
+    property: string,
+    ids: readonly unknown[]
+  ): StandInCollection => {
+    const objects = ids.map((id) => object(resource, property, id))
+    const find = (id: unknown): StandInObject => {
+      const index = ids.indexOf(id)
+      return index === -1 ? missing(resource) : (objects[index] ?? missing(resource))
+    }
+    return {
+      objects,
+      byId: (id) => {
+        calls.push(`${name}.byId(${JSON.stringify(id)})`)
+        return find(id)
+      },
+      whose: (match) => {
+        calls.push(`${name}.whose(${JSON.stringify(match)})`)
+        return [find(match[property])]
+      },
+    }
+  }
+  return {
+    calls,
+    people: collection('people', 'Person', 'id', ['p-1', 'p-2']),
+    windows: collection('windows', 'Window', 'id', [7, 8]),
+    tracks: collection('tracks', 'Track', 'persistentID', ['A1', 'B2']),
+  }
+}
+
+/** The codec environment for a stand-in app and {@link REFERENCES}. */
+function environment(app: StandInApp): NativeCodecEnvironment {
+  return { app, references: REFERENCES }
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -85,24 +211,35 @@ interface ExpectedCodecError {
    * must not carry the marker: the value itself violated its plan.
    */
   readonly unsupportedKind?: string
+  /**
+   * The resource of a referenced object the app does not have. When omitted,
+   * the error must not carry it.
+   */
+  readonly missingResource?: string
 }
 
 /**
  * Asserts that `fn` throws a codec error object with exactly the contracted
  * shape (D4): `name`, `direction`, `path`, `message`, plus `unsupportedKind`
- * only when the plan's kind has no conversion, and nothing else.
+ * only when the plan's kind has no conversion, `missingResource` only when a
+ * referenced object is missing, and nothing else.
  */
 function expectCodecError(fn: () => unknown, expected: ExpectedCodecError): void {
   const error = thrownBy(fn)
   const keys = ['direction', 'message', 'name', 'path']
   if (expected.unsupportedKind !== undefined) keys.push('unsupportedKind')
+  if (expected.missingResource !== undefined) keys.push('missingResource')
   expect(Object.keys(error as object).sort()).toEqual(keys.sort())
-  const { name, direction, path, message, unsupportedKind } = error as Record<string, unknown>
-  expect({ name, direction, path, unsupportedKind }).toEqual({
+  const { name, direction, path, message, unsupportedKind, missingResource } = error as Record<
+    string,
+    unknown
+  >
+  expect({ name, direction, path, unsupportedKind, missingResource }).toEqual({
     name: NATIVE_CODEC_ERROR_NAME,
     direction: expected.direction,
     path: expected.path,
     unsupportedKind: expected.unsupportedKind,
+    missingResource: expected.missingResource,
   })
   expect(typeof message).toBe('string')
   const text = typeof message === 'string' ? message : ''
@@ -1084,15 +1221,317 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
   })
 
   // -------------------------------------------------------------------------
+  // references (D4, D7)
+  // -------------------------------------------------------------------------
+
+  describe('reference decode', () => {
+    it('addresses the object a string identifier names, by id', () => {
+      const app = standInApp()
+      const decoded = decode(identity('Person', 'p-2'), PERSON_REF, environment(app))
+      // The decoded value is the app's own object, not a copy or a description.
+      expect(decoded).toBe(app.people.objects[1])
+      expect(app.calls).toEqual(['people.byId("p-2")', 'Person p-2.exists()'])
+    })
+
+    it('decodes an integer identifier to a number before addressing by it', () => {
+      const app = standInApp()
+      const decoded = decode(identity('Window', { integer: '7' }), WINDOW_REF, environment(app))
+      expect(decoded).toBe(app.windows.objects[0])
+      // The app receives the number 7, never the wire text "7".
+      expect(app.calls).toEqual(['windows.byId(7)', 'Window 7.exists()'])
+    })
+
+    it('matches the identifier property when the resource is targeted by property', () => {
+      const app = standInApp()
+      const decoded = decode(identity('Track', 'B2'), TRACK_REF, environment(app))
+      expect(decoded).toBe(app.tracks.objects[1])
+      expect(app.calls).toEqual(['tracks.whose({"persistentID":"B2"})', 'Track B2.exists()'])
+    })
+
+    it('addresses a reference nested in a record, at its field', () => {
+      const app = standInApp()
+      const plan = recordOf({ for: required(PERSON_REF), with: required(STRING) })
+      const decoded = decode(
+        { for: identity('Person', 'p-1'), with: 'phone' },
+        plan,
+        environment(app)
+      )
+      expect(ownValue(decoded, 'for')).toBe(app.people.objects[0])
+      expect(ownValue(decoded, 'with')).toBe('phone')
+    })
+
+    it('reports an object the app does not have as missing, naming its resource', () => {
+      const app = standInApp()
+      expectCodecError(() => decode(identity('Person', 'p-9'), PERSON_REF, environment(app)), {
+        direction: 'decode',
+        path: [],
+        includes: ['"Person"'],
+        missingResource: 'Person',
+      })
+      expectCodecError(() => decode(identity('Track', 'Z9'), TRACK_REF, environment(app)), {
+        direction: 'decode',
+        path: [],
+        missingResource: 'Track',
+      })
+      expectCodecError(
+        () =>
+          decode({ for: identity('Person', 'p-9') }, recordOf({ for: required(PERSON_REF) }), {
+            app,
+            references: REFERENCES,
+          }),
+        { direction: 'decode', path: ['for'], missingResource: 'Person' }
+      )
+    })
+
+    it.each([
+      [
+        'a name selector',
+        selector('Person', { by: 'name', name: 'Ada' }),
+        PERSON_REF,
+        'Selector references',
+      ],
+      [
+        'an index selector',
+        selector('Person', { by: 'index', index: { integer: '0' } }),
+        PERSON_REF,
+        'Selector references',
+      ],
+      [
+        'an identity collection',
+        { reference: { resource: 'Person', form: 'identity', cardinality: 'many', entries: [] } },
+        PEOPLE_REF,
+        'Collection references',
+      ],
+      [
+        'an every selector',
+        {
+          reference: {
+            resource: 'Person',
+            form: 'selector',
+            cardinality: 'many',
+            selector: { by: 'every' },
+          },
+        },
+        PEOPLE_REF,
+        'Collection references',
+      ],
+      [
+        'a range selector',
+        {
+          reference: {
+            resource: 'Person',
+            form: 'selector',
+            cardinality: 'many',
+            selector: { by: 'range', start: { integer: '0' }, end: { integer: '2' } },
+          },
+        },
+        PEOPLE_REF,
+        'Collection references',
+      ],
+      [
+        'a reference located through a container',
+        {
+          reference: {
+            resource: 'Person',
+            form: 'identity',
+            cardinality: 'one',
+            id: 'p-1',
+            container: identity('Group', 'g-1')['reference'],
+          },
+        },
+        PERSON_REF,
+        'located through a container',
+      ],
+      [
+        'a resource found only within its container',
+        identity('Email', 'e-1'),
+        EMAIL_REF,
+        'does not find its objects at the application',
+      ],
+      [
+        'a resource with no identifier',
+        identity('Note', 'n-1'),
+        NOTE_REF,
+        'does not find its objects at the application',
+      ],
+      [
+        'a resource the table does not list',
+        identity('Album', 'a-1'),
+        ALBUM_REF,
+        'does not find its objects at the application',
+      ],
+    ] as const)(
+      'marks %s as a reference it cannot convert, and addresses nothing',
+      (_name, wire, plan, fragment) => {
+        const app = standInApp()
+        expectCodecError(() => decode(wire, plan, environment(app)), {
+          direction: 'decode',
+          path: [],
+          includes: [fragment],
+          unsupportedKind: 'reference',
+        })
+        expect(app.calls).toEqual([])
+      }
+    )
+
+    it('marks a reference it is given no environment for, whatever the value is', () => {
+      expectCodecError(() => decode(identity('Person', 'p-1'), PERSON_REF), {
+        direction: 'decode',
+        path: [],
+        unsupportedKind: 'reference',
+      })
+    })
+
+    it('marks a reference when there is no application to address', () => {
+      expectCodecError(
+        () => decode(identity('Person', 'p-1'), PERSON_REF, { app: null, references: REFERENCES }),
+        { direction: 'decode', path: [], unsupportedKind: 'reference' }
+      )
+    })
+
+    it.each([
+      ['a value that is not a reference', 'p-1', []],
+      ['a reference to another resource', identity('Window', { integer: '7' }), ['resource']],
+      [
+        'a reference of the other cardinality',
+        { reference: { resource: 'Person', form: 'identity', cardinality: 'many', entries: [] } },
+        ['cardinality'],
+      ],
+      [
+        'an unknown form',
+        { reference: { resource: 'Person', form: 'guess', cardinality: 'one', id: 'p-1' } },
+        ['form'],
+      ],
+      [
+        'an undeclared field',
+        {
+          reference: {
+            resource: 'Person',
+            form: 'identity',
+            cardinality: 'one',
+            id: 'p-1',
+            label: 'x',
+          },
+        },
+        ['label'],
+      ],
+      [
+        'an identity reference without an id',
+        { reference: { resource: 'Person', form: 'identity', cardinality: 'one' } },
+        [],
+      ],
+      [
+        'an identifier that violates its plan',
+        identity('Window', { integer: '1.5' }),
+        ['id'],
+      ],
+    ] as const)('rejects %s as invalid input, unmarked', (_name, wire, path) => {
+      const app = standInApp()
+      const plan = path[0] === 'id' ? WINDOW_REF : PERSON_REF
+      expectCodecError(() => decode(wire, plan, environment(app)), {
+        direction: 'decode',
+        path,
+      })
+      expect(app.calls).toEqual([])
+    })
+  })
+
+  describe('reference encode', () => {
+    it('encodes an object as the identity reference that finds it again', () => {
+      const app = standInApp()
+      expect(encode(app.people.objects[1], PERSON_REF, environment(app))).toEqual(
+        identity('Person', 'p-2')
+      )
+      expect(app.calls).toEqual(['Person p-2.id()'])
+    })
+
+    it('encodes an integer identifier as integer text', () => {
+      const app = standInApp()
+      expect(encode(app.windows.objects[0], WINDOW_REF, environment(app))).toEqual(
+        identity('Window', { integer: '7' })
+      )
+    })
+
+    it('reads the identifier property of a resource targeted by property', () => {
+      const app = standInApp()
+      expect(encode(app.tracks.objects[0], TRACK_REF, environment(app))).toEqual(
+        identity('Track', 'A1')
+      )
+      expect(app.calls).toEqual(['Track A1.persistentID()'])
+    })
+
+    it('encodes references inside records and lists, and a missing one as null', () => {
+      const app = standInApp()
+      const plan = recordOf({
+        owner: required(nullable(PERSON_REF)),
+        windows: required(arrayOf(WINDOW_REF)),
+      })
+      expect(
+        encode(
+          { owner: null, windows: [app.windows.objects[0], app.windows.objects[1]] },
+          plan,
+          environment(app)
+        )
+      ).toEqual({
+        owner: null,
+        windows: [identity('Window', { integer: '7' }), identity('Window', { integer: '8' })],
+      })
+    })
+
+    it.each([
+      ['a collection', PEOPLE_REF],
+      ['a resource found only within its container', EMAIL_REF],
+      ['a resource with no identifier', NOTE_REF],
+      ['a resource the table does not list', ALBUM_REF],
+    ] as const)('marks %s as a reference it cannot convert', (_name, plan) => {
+      const app = standInApp()
+      expectCodecError(() => encode(app.people.objects[0], plan, environment(app)), {
+        direction: 'encode',
+        path: [],
+        unsupportedKind: 'reference',
+      })
+      expect(app.calls).toEqual([])
+    })
+
+    it('marks a reference it is given no environment for', () => {
+      const app = standInApp()
+      expectCodecError(() => encode(app.people.objects[0], PERSON_REF), {
+        direction: 'encode',
+        path: [],
+        unsupportedKind: 'reference',
+      })
+    })
+
+    it('rejects a value that is not an app object, unmarked', () => {
+      const app = standInApp()
+      expectCodecError(() => encode('p-1', PERSON_REF, environment(app)), {
+        direction: 'encode',
+        path: [],
+        includes: ['an object of "Person"'],
+      })
+      // A plain record has no identifier member to call.
+      expectCodecError(() => encode({ name: 'Ada' }, PERSON_REF, environment(app)), {
+        direction: 'encode',
+        path: [],
+      })
+    })
+
+    it('rejects an identifier that violates its plan, at the id', () => {
+      const app = standInApp()
+      const fractional = { id: () => 1.5 }
+      expectCodecError(() => encode(fractional, WINDOW_REF, environment(app)), {
+        direction: 'encode',
+        path: ['id'],
+      })
+    })
+  })
+
+  // -------------------------------------------------------------------------
   // kinds that land later
   // -------------------------------------------------------------------------
 
-  describe('reference, file, and file-source', () => {
-    const LATER: readonly ValuePlan[] = [
-      { kind: 'reference', resource: 'calendar', cardinality: 'one' },
-      { kind: 'file' },
-      { kind: 'file-source' },
-    ]
+  describe('file and file-source', () => {
+    const LATER: readonly ValuePlan[] = [{ kind: 'file' }, { kind: 'file-source' }]
 
     it.each(LATER)(
       'rejects $kind in both directions, marked as a kind it cannot convert',
@@ -1123,15 +1562,6 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
         direction: 'decode',
         path: ['attachment'],
         unsupportedKind: 'file',
-      })
-    })
-
-    it('marks the kind whatever the value is, even one that is not a reference at all', () => {
-      const plan: ValuePlan = { kind: 'reference', resource: 'calendar', cardinality: 'one' }
-      expectCodecError(() => decode('not a reference', plan), {
-        direction: 'decode',
-        path: [],
-        unsupportedKind: 'reference',
       })
     })
   })
@@ -1193,6 +1623,7 @@ describe('codec literals', () => {
       double: WIRE_KEYS.double,
       date: WIRE_KEYS.date,
       record: WIRE_KEYS.record,
+      reference: WIRE_KEYS.reference,
     })
   })
 })

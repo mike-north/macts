@@ -18,14 +18,23 @@
  */
 
 import type { AppManifest, Command, PermissionHistoryEntry, RiskClass } from '@macts/core'
-import { classifyCommandRisk, normalizeAppRouteSegment, resolveCommandRoutes } from '@macts/core'
-import type {
-  AnyOperationDescriptor,
-  AppContract,
-  OperationId,
-  OperationTarget,
-  PermissionString,
-  ValueType,
+import {
+  classifyCommandRisk,
+  contractResourcePlans,
+  normalizeAppRouteSegment,
+  resolveCommandRoutes,
+} from '@macts/core'
+import {
+  EMPTY_RESOURCE_PLAN_TABLE,
+  resourcePlanTable,
+  type AnyOperationDescriptor,
+  type AppContract,
+  type OperationId,
+  type OperationTarget,
+  type PermissionString,
+  type ResourcePlanTable,
+  type ValuePlan,
+  type ValueType,
 } from '@macts/contracts'
 import { PASSTHROUGH_OUTPUT_TYPE, passthroughInputType } from './passthrough.js'
 import { buildCommandSchema } from './request-schema.js'
@@ -47,6 +56,13 @@ export interface RegisteredOperation {
   readonly risk: RiskClass
   /** The command's permission renames, newest first, when it has any. */
   readonly permissionHistory?: PermissionHistoryEntry[]
+  /**
+   * The value plans of the app's resources, which the executor needs to
+   * convert references: derived from the app's contract when the operation
+   * was registered from one, and empty when it was registered from the
+   * manifest alone, so no reference converts.
+   */
+  readonly resources: ResourcePlanTable
 }
 
 /**
@@ -165,11 +181,13 @@ function deriveManifestOperations(manifest: AppManifest): ManifestOperation[] {
 function toRegisteredOperation(
   descriptor: AnyOperationDescriptor,
   manifest: AppManifest,
-  command: Command
+  command: Command,
+  resources: ResourcePlanTable
 ): RegisteredOperation {
   return {
     descriptor,
     manifest,
+    resources,
     risk: classifyCommandRisk(command),
     ...(command.permissionHistory === undefined
       ? {}
@@ -216,7 +234,7 @@ export function operationsFromManifest(manifest: AppManifest): RegisteredOperati
       input,
       output: PASSTHROUGH_OUTPUT_TYPE,
     }
-    return toRegisteredOperation(descriptor, manifest, command)
+    return toRegisteredOperation(descriptor, manifest, command, EMPTY_RESOURCE_PLAN_TABLE)
   })
 }
 
@@ -236,7 +254,11 @@ function sameTarget(a: OperationTarget, b: OperationTarget): boolean {
  * kept a read permission but pointed at a destructive command would otherwise
  * run that command under the read grant.
  *
- * A contract may cover a subset of the manifest's operations.
+ * A contract may cover a subset of the manifest's operations. Its resource
+ * table must agree with the manifest too: every resource it lists is one the
+ * manifest declares, with the identifier type of the manifest's primary
+ * identifier property. Each registered operation carries the table's value
+ * plans (`resourcePlanTable`).
  *
  * Exported so a contract can be checked against its manifest without
  * constructing a runtime, for example when verifying generated packages.
@@ -260,6 +282,7 @@ export function operationsFromContract(
     )
   }
 
+  const resources = checkedResourcePlans(contract, manifest)
   const derived = new Map(deriveManifestOperations(manifest).map((op) => [op.id, op]))
   return Object.entries(contract.operations).map(([key, descriptor]) => {
     if (key !== descriptor.id) {
@@ -283,8 +306,81 @@ export function operationsFromContract(
         `Contract operation "${descriptor.id}" targets a different manifest command than the manifest route does`
       )
     }
-    return toRegisteredOperation(descriptor, manifest, expected.command)
+    return toRegisteredOperation(descriptor, manifest, expected.command, resources)
   })
+}
+
+/**
+ * The value plans of the contract's resources, after checking each against
+ * the plans a contract generated from the manifest carries.
+ *
+ * @remarks
+ * A reference's identifier is converted by its resource's identifier plan, so
+ * a contract whose identifier type disagrees with the manifest's primary
+ * identifier property (an integer where the manifest declares text, or an
+ * identifier the manifest does not declare) would convert identifiers wrongly
+ * and address the wrong object, or none. Such a contract is refused, as is one
+ * that lists a resource the manifest does not have.
+ *
+ * @throws {@link OperationRegistrationError} naming the resource and both
+ *   identifier types.
+ */
+function checkedResourcePlans(
+  contract: AppContract<unknown>,
+  manifest: AppManifest
+): ResourcePlanTable {
+  const resources = resourcePlanTable(contract.resources)
+  const expected = contractResourcePlans(manifest)
+  for (const [resource, plans] of Object.entries(resources)) {
+    const manifestPlans = Object.hasOwn(expected, resource) ? expected[resource] : undefined
+    if (manifestPlans === undefined) {
+      throw new OperationRegistrationError(
+        `The ${contract.app} contract lists resource "${resource}", which the manifest does not declare. Regenerate the contract.`
+      )
+    }
+    if (!samePlan(plans.id, manifestPlans.id)) {
+      throw new OperationRegistrationError(
+        `The ${contract.app} contract gives resource "${resource}" ${describeIdentifierPlan(plans.id)}, but its manifest gives it ${describeIdentifierPlan(manifestPlans.id)}. Regenerate the contract.`
+      )
+    }
+  }
+  return resources
+}
+
+/** An identifier plan for a registration message: the plan as JSON, or that there is none. */
+function describeIdentifierPlan(plan: ValuePlan | undefined): string {
+  return plan === undefined ? 'no identifier' : `the identifier plan ${JSON.stringify(plan)}`
+}
+
+/**
+ * Whether two identifier plans describe the same value. Plans are JSON data,
+ * so they are compared structurally, with record keys in any order.
+ */
+function samePlan(a: ValuePlan | undefined, b: ValuePlan | undefined): boolean {
+  return sameJson(a, b)
+}
+
+/** Whether a JSON value is a record: an object that is not a list. */
+function isJsonRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+/** Structural equality of two JSON values. */
+function sameJson(a: unknown, b: unknown): boolean {
+  if (a === b) return true
+  if (Array.isArray(a)) {
+    return (
+      Array.isArray(b) &&
+      a.length === b.length &&
+      a.every((item: unknown, index) => sameJson(item, b[index]))
+    )
+  }
+  if (!isJsonRecord(a) || !isJsonRecord(b)) return false
+  const keys = Object.keys(a)
+  return (
+    keys.length === Object.keys(b).length &&
+    keys.every((key) => Object.hasOwn(b, key) && sameJson(a[key], b[key]))
+  )
 }
 
 /**
