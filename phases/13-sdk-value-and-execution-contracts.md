@@ -965,9 +965,12 @@ guessed one. The body binds the parent item, addressed in the parent
 resource's collection by that resource's identifier targeting with the
 identifier read from the recorded parameter, fails as "no such object" when it
 does not exist, and then addresses the command's resource collection under
-it. A command that records no parent addresses its resource's collection at
-the application. The rule, the guard, and its exceptions are in D10 (command
-parents).
+it. A get, update or delete finds its item in that collection by the item
+resource's own identifier targeting, as a top-level lookup does: a Music track
+is matched by its persistent ID under its playlist, since its numeric id
+belongs to its entry in that one playlist. A command that records no parent
+addresses its resource's collection at the application. The rule, the guard,
+and its exceptions are in D10 (command parents).
 
 **Worker compatibility.** A later executor may run a long-lived automation
 worker (one process per target app, pooled and restartable) instead of one
@@ -1706,9 +1709,15 @@ The probes (`macts probe`, identifiers and `--nullability`) address the app the 
 
 **A command's parent is recorded, never guessed.** A command on a nested resource records `parent: { resource, parameter }`: `resource` is the key of the resource whose items hold the command's resource as elements, and `parameter` is the command's own required parameter that carries the parent item's identifier. Calendar's `getEvent` records `{ resource: Calendar, parameter: calendarId }`. The parent is a fact the curator records from the app's dictionary (the parent's class has the child as an element); nothing derives it from a parameter's name or position, or from the hierarchy. The manifest schema rejects a parent resource the manifest does not declare, one marked unsupported on a usable command, and a parameter that is not one of the command's required parameters, naming the command, the field and the value.
 
-Every surface takes the parent from the record. Native bodies address the parent resource's collection (`resolveCollectionAccessor`), the parent item in it by that resource's identifier targeting, and the command's resource collection under that item (D4, command parents); a command with no parent addresses its resource at the application. The generated SDKs, the contract and the CLI take a get, update or delete's parent scope from `parent.parameter`, and the child identifier is the first other required parameter (`resolveIdParams` in `generator/surface.ts`).
+Every surface takes the parent from the record. Native bodies address the parent resource's collection (`resolveCollectionAccessor`), the parent item in it by that resource's identifier targeting, the command's resource collection under that item, and a get, update or delete's item in it by the command resource's identifier targeting (D4, command parents); a command with no parent addresses its resource at the application. The generated SDKs, the contract and the CLI take a get, update or delete's parent scope from `parent.parameter`, and the child identifier is the first other required parameter (`resolveIdParams` in `generator/surface.ts`).
 
 **A guard holds every shipped manifest to the rule** (`manifest/command-parents.test.ts`). Every usable list, get, create, update or delete command on a resource the hierarchy nests under another resource, and does not also place at the application (`usableHierarchyChildren` of the top-level entries), records a parent; only those shapes address a collection. A recorded parent must hold the command's resource in the hierarchy. A resource the hierarchy does not place has no parent to record and is not checked. The only exceptions are the nested commands whose parent awaits a design decision, [#173](https://github.com/mike-north/macts/issues/173): Microsoft Edge's `getTab` and `getBookmarkItem`; OmniGraffle's `getGraphic`, `getShape`, `getLine` and `getLayer`; OmniPlan's task, milestone, resource, assignment, dependency, violation and scenario commands; Xcode's `getProject`, `getScheme` and `getRunDestination`; and OmniFocus's `listTasks`, `getTask` and `createTask`. The list is exact: an entry that records a parent, or whose resource becomes a top-level child, fails the guard until it is removed.
+
+### Identifier targeting
+
+**Targeting applies at every level of a nested lookup.** A resource's identifier targeting (the app's `id` specifier by default, or `byProperty`, a match on a property) is how every lookup of one of its items is built, wherever the item is: in the application's collection, as the parent of a command, or as the target of a get, update or delete under that parent (`buildTargetExpression` and `buildNestedTargetExpression` in `jxa/native-scripts.ts` share one lookup). Music playlists and tracks are matched on their persistent ID, the dictionary's "id of the item as a hexadecimal string. This id does not change over time", because a track's numeric `id` belongs to its entry in one playlist: on Music 1.7.2, one track was id 2218 in the library playlist and id 2344 in another, while its persistent ID was the same in both, and ids and persistent IDs of 3 playlists and 1220 playlist tracks were unchanged across a relaunch. A get by persistent ID under the 608-track library playlist took a median of 250 ms through the native executor, most of it starting the automation process; the lookup itself took 17 ms, against 18 ms by numeric id.
+
+**A list's canonical `id` alias never replaces a field.** Results without a typed contract mirror the runtime identifier under `id`, except for a resource with a usable property named `id`, whose own value stays (`resolveCanonicalIdentifierSource` in `manifest/identifier.ts`, which the HTTP client generator also uses for its read types).
 
 ### Unsupported resources
 

@@ -1,6 +1,10 @@
 import type { CliPlugin } from '@macts/cli'
+import { ListPlaylistsCommand } from './commands/playlists/list.js'
+import { GetPlaylistCommand } from './commands/playlists/get.js'
 import { MovePlaylistCommand } from './commands/playlists/move.js'
 import { SearchPlaylistCommand } from './commands/playlists/search.js'
+import { ListTracksCommand } from './commands/playlists/tracks/list.js'
+import { GetTrackCommand } from './commands/playlists/tracks/get.js'
 import { RefreshFileTrackCommand } from './commands/sources/libraryPlaylists/fileTracks/refresh.js'
 import { PrintCommand } from './commands/print.js'
 import { CloseCommand } from './commands/close.js'
@@ -38,8 +42,12 @@ export const plugin: CliPlugin = {
   name: 'music',
   description: 'Commands for Music',
   commands: [
+    ListPlaylistsCommand,
+    GetPlaylistCommand,
     MovePlaylistCommand,
     SearchPlaylistCommand,
+    ListTracksCommand,
+    GetTrackCommand,
     RefreshFileTrackCommand,
     PrintCommand,
     CloseCommand,

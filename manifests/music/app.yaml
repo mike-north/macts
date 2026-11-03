@@ -390,7 +390,37 @@ resources:
     plural: Playlists
     description: a list of tracks/streams
     code: cPly
+    # Looked up by `persistentID` (pPIS, from the dictionary's `item` class),
+    # matched on that property, not by the numeric `id`. The dictionary
+    # describes the persistent ID as "the id of the item as a hexadecimal
+    # string. This id does not change over time" and makes no such claim for
+    # `id`. Observed on Music 1.7.2 (macOS 27.2), 2026-11-03: across a
+    # relaunch, the persistent IDs and numeric ids of 3 playlists and 1220
+    # playlist tracks were unchanged, but a track's numeric id belongs to its
+    # entry in one playlist (one persistent ID was id 2218 in the library
+    # playlist and id 2344 in the playlist whose special kind is Music, and the
+    # library playlist has no track with id 2344),
+    # while its persistent ID is the same in every playlist.
+    identifiers:
+      - property: persistentID
+        primary: true
+        targeting: byProperty
     properties:
+      id:
+        access: r
+        type: integer
+        description: the id of the item
+        code: 'ID  '
+      index:
+        access: r
+        type: integer
+        description: the index of the item in internal application order
+        code: pidx
+      persistentID:
+        access: r
+        type: string
+        description: the id of the item as a hexadecimal string. This id does not change over time.
+        code: pPIS
       description:
         access: rw
         type: string
@@ -422,6 +452,22 @@ resources:
           resource: playlist
         description: folder which contains this playlist (if any)
         code: pPlP
+        # No playlist read was in a folder. For a playlist with no folder the
+        # app fails the read (-1728, both across the collection and for each
+        # playlist) instead of reporting a missing value, and the record then
+        # lacks the field, so every playlist read would fail its contract.
+        unsupported:
+          reason: The app fails the read for a playlist that is in no folder instead of reporting a missing value.
+          evidence:
+            source: probe
+            observedAt: '2026-11-03T03:16:26.771Z'
+            bundleId: com.apple.Music
+            appVersion: 1.7.2
+            osVersion: '27.2'
+            sampleSize: 3
+            failedReads: 3
+            errorNumbers:
+              - -1728
       size:
         access: r
         type: integer
@@ -524,7 +570,42 @@ resources:
     plural: Tracks
     description: playable audio source
     code: cTrk
+    # Looked up by `persistentID` (pPIS, from the dictionary's `item` class),
+    # matched on that property, not by the numeric `id`. The dictionary
+    # describes the persistent ID as "the id of the item as a hexadecimal
+    # string. This id does not change over time" and makes no such claim for
+    # `id`. Observed on Music 1.7.2 (macOS 27.2), 2026-11-03: across a
+    # relaunch, the persistent IDs and numeric ids of 3 playlists and 1220
+    # playlist tracks were unchanged, but a track's numeric id belongs to its
+    # entry in one playlist (one persistent ID was id 2218 in the library
+    # playlist and id 2344 in the playlist whose special kind is Music, and the
+    # library playlist has no track with id 2344),
+    # while its persistent ID is the same in every playlist.
+    identifiers:
+      - property: persistentID
+        primary: true
+        targeting: byProperty
     properties:
+      id:
+        access: r
+        type: integer
+        description: the id of the item
+        code: 'ID  '
+      index:
+        access: r
+        type: integer
+        description: the index of the item in internal application order
+        code: pidx
+      name:
+        access: rw
+        type: string
+        description: the name of the item
+        code: pnam
+      persistentID:
+        access: r
+        type: string
+        description: the id of the item as a hexadecimal string. This id does not change over time.
+        code: pPIS
       album:
         access: rw
         type: string
@@ -1366,6 +1447,59 @@ hierarchy:
       access: rw
       description: a visual plug-in
 commands:
+  # Reads. Playlists are elements of the application; tracks are read under
+  # a playlist, and the library playlist holds every track in the library.
+  listPlaylists:
+    name: list
+    routeName: list
+    description: List every playlist
+    scope: resource
+    resourceType: Playlist
+    parameters: []
+  getPlaylist:
+    name: get
+    routeName: get
+    description: Get a playlist by its persistent ID
+    scope: resource
+    resourceType: Playlist
+    parameters:
+      - name: persistentID
+        type: string
+        description: Persistent ID of the playlist
+        required: true
+  listTracks:
+    name: list
+    routeName: list
+    description: List the tracks of a playlist; the library playlist holds every track in the library
+    scope: resource
+    resourceType: Track
+    # The dictionary's `playlist` class has `track` as an element.
+    parent:
+      resource: Playlist
+      parameter: playlistId
+    parameters:
+      - name: playlistId
+        type: string
+        description: Persistent ID of the playlist
+        required: true
+  getTrack:
+    name: get
+    routeName: get
+    description: Get a track of a playlist by its persistent ID
+    scope: resource
+    resourceType: Track
+    parent:
+      resource: Playlist
+      parameter: playlistId
+    parameters:
+      - name: playlistId
+        type: string
+        description: Persistent ID of the playlist
+        required: true
+      - name: persistentID
+        type: string
+        description: Persistent ID of the track
+        required: true
   print:
     name: print
     description: Print the specified object(s)

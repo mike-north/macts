@@ -170,7 +170,8 @@ resources:
         type: string
         description: The AIM handle value
         optional: false
-        code: valL
+        # sdef `contact info` (az16), inherited here: <property name="value" code="az17" description="Value.">
+        code: az17
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook
@@ -206,7 +207,7 @@ resources:
         type: date
         description: The date value
         optional: false
-        code: valL
+        code: az17
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook
@@ -232,17 +233,6 @@ resources:
         description: Unique identifier for this email
         optional: false
         code: 'ID  '
-        nullable: false
-        evidence:
-          nullable:
-            source: probe
-            observedAt: '2026-11-01T16:38:08.485Z'
-            bundleId: com.apple.AddressBook
-            appVersion: '14.0'
-            osVersion: '27.2'
-            sampleSize: 32
-            nullCount: 0
-            failedReads: 0
       label:
         access: rw
         type: string
@@ -265,7 +255,7 @@ resources:
         type: string
         description: The email address
         optional: false
-        code: valL
+        code: az17
         nullable: false
         evidence:
           nullable:
@@ -277,6 +267,12 @@ resources:
             sampleSize: 32
             nullCount: 0
             failedReads: 0
+    # The dictionary's `contact info` class (az16), which an email inherits,
+    # declares `id` ('ID  '): "unique identifier for this entry, this is
+    # persistent, and stays with the record". It is looked up under its person.
+    identifiers:
+      - property: id
+        primary: true
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook
@@ -295,12 +291,34 @@ resources:
     plural: Groups
     description: A Group Record in the address book database
     code: azf5
+    # A group inherits the dictionary's `entry` class (azf6), whose `id`
+    # ('ID  ') is "unique and persistent identifier for this record", so a
+    # group is looked up by that id. The entry's `selected` (selE) is not
+    # declared here: it is window selection state, and see Person for its cost.
+    identifiers:
+      - property: id
+        primary: true
     properties:
+      id:
+        access: r
+        type: string
+        description: Unique and persistent identifier for this record.
+        code: 'ID  '
       name:
         access: rw
         type: string
         description: The name of this group.
         code: pnam
+      creationDate:
+        access: r
+        type: date
+        description: When the contact was created.
+        code: az35
+      modificationDate:
+        access: r
+        type: date
+        description: When the contact was last modified.
+        code: az34
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook
@@ -335,7 +353,7 @@ resources:
         type: string
         description: The ICQ handle value
         optional: false
-        code: valL
+        code: az17
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook
@@ -413,7 +431,7 @@ resources:
         type: string
         description: The Jabber handle value
         optional: false
-        code: valL
+        code: az17
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook
@@ -450,7 +468,7 @@ resources:
         type: string
         description: The MSN handle value
         optional: false
-        code: valL
+        code: az17
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook
@@ -468,7 +486,30 @@ resources:
     plural: People
     description: A person in the address book database.
     code: azf4
+    # A person inherits the dictionary's `entry` class (azf6), whose `id`
+    # ('ID  ') is "unique and persistent identifier for this record", so a
+    # person is looked up by that id. The entry's `selected` (selE) is not
+    # declared: it is window selection state, and reading it across 295 people
+    # took 5.4 s on Contacts 14.0 (macOS 27.2), a fifth of a list's time limit.
+    identifiers:
+      - property: id
+        primary: true
     properties:
+      id:
+        access: r
+        type: string
+        description: Unique and persistent identifier for this record.
+        code: 'ID  '
+      creationDate:
+        access: r
+        type: date
+        description: When the contact was created.
+        code: az35
+      modificationDate:
+        access: r
+        type: date
+        description: When the contact was last modified.
+        code: az34
       nickname:
         access: rw
         type: string
@@ -556,7 +597,7 @@ resources:
             failedReads: 0
       birthDate:
         access: rw
-        type: string
+        type: date
         description: The birth date of this person.
         code: az11
         nullable: true
@@ -770,17 +811,6 @@ resources:
         description: Unique identifier for this phone
         optional: false
         code: 'ID  '
-        nullable: false
-        evidence:
-          nullable:
-            source: probe
-            observedAt: '2026-11-01T16:38:08.485Z'
-            bundleId: com.apple.AddressBook
-            appVersion: '14.0'
-            osVersion: '27.2'
-            sampleSize: 48
-            nullCount: 0
-            failedReads: 0
       label:
         access: rw
         type: string
@@ -803,7 +833,7 @@ resources:
         type: string
         description: The phone number
         optional: false
-        code: valL
+        code: az17
         nullable: false
         evidence:
           nullable:
@@ -815,6 +845,12 @@ resources:
             sampleSize: 48
             nullCount: 0
             failedReads: 0
+    # The dictionary's `contact info` class (az16), which an phone inherits,
+    # declares `id` ('ID  '): "unique identifier for this entry, this is
+    # persistent, and stays with the record". It is looked up under its person.
+    identifiers:
+      - property: id
+        primary: true
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook
@@ -851,7 +887,7 @@ resources:
         type: string
         description: The related name value
         optional: false
-        code: valL
+        code: az17
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook
@@ -934,7 +970,7 @@ resources:
         type: string
         description: The URL value
         optional: false
-        code: valL
+        code: az17
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook
@@ -971,7 +1007,7 @@ resources:
         type: string
         description: The Yahoo handle value
         optional: false
-        code: valL
+        code: az17
     nullabilityProbe:
       observedAt: '2026-11-01T16:38:08.485Z'
       bundleId: com.apple.AddressBook
@@ -1154,6 +1190,143 @@ hierarchy:
           access: rw
           description: Email address for a person.
 commands:
+  # Reads. People and groups are elements of the application; emails, phones
+  # and addresses are elements of a person, so they are read under one.
+  listPeople:
+    name: list
+    routeName: list
+    description: List every person
+    scope: resource
+    resourceType: Person
+    parameters: []
+  getPerson:
+    name: get
+    routeName: get
+    description: Get a person by identifier
+    scope: resource
+    resourceType: Person
+    parameters:
+      - name: id
+        type: string
+        description: Identifier of the person
+        required: true
+  listGroups:
+    name: list
+    routeName: list
+    description: List every group
+    scope: resource
+    resourceType: Group
+    parameters: []
+  getGroup:
+    name: get
+    routeName: get
+    description: Get a group by identifier
+    scope: resource
+    resourceType: Group
+    parameters:
+      - name: id
+        type: string
+        description: Identifier of the group
+        required: true
+  listEmails:
+    name: list
+    routeName: list
+    description: List the email addresses of a person
+    scope: resource
+    resourceType: Email
+    # The dictionary's `person` class has `email` as an element.
+    parent:
+      resource: Person
+      parameter: personId
+    parameters:
+      - name: personId
+        type: string
+        description: Identifier of the person
+        required: true
+  getEmail:
+    name: get
+    routeName: get
+    description: Get one email address of a person by its identifier
+    scope: resource
+    resourceType: Email
+    parent:
+      resource: Person
+      parameter: personId
+    parameters:
+      - name: personId
+        type: string
+        description: Identifier of the person
+        required: true
+      - name: id
+        type: string
+        description: Identifier of the email address
+        required: true
+  listPhones:
+    name: list
+    routeName: list
+    description: List the phone numbers of a person
+    scope: resource
+    resourceType: Phone
+    # The dictionary's `person` class has `phone` as an element.
+    parent:
+      resource: Person
+      parameter: personId
+    parameters:
+      - name: personId
+        type: string
+        description: Identifier of the person
+        required: true
+  getPhone:
+    name: get
+    routeName: get
+    description: Get one phone number of a person by its identifier
+    scope: resource
+    resourceType: Phone
+    parent:
+      resource: Person
+      parameter: personId
+    parameters:
+      - name: personId
+        type: string
+        description: Identifier of the person
+        required: true
+      - name: id
+        type: string
+        description: Identifier of the phone number
+        required: true
+  listAddresses:
+    name: list
+    routeName: list
+    description: List the addresses of a person
+    scope: resource
+    resourceType: Address
+    # The dictionary's `person` class has `address` as an element.
+    parent:
+      resource: Person
+      parameter: personId
+    parameters:
+      - name: personId
+        type: string
+        description: Identifier of the person
+        required: true
+  getAddress:
+    name: get
+    routeName: get
+    description: Get one address of a person by its identifier
+    scope: resource
+    resourceType: Address
+    parent:
+      resource: Person
+      parameter: personId
+    parameters:
+      - name: personId
+        type: string
+        description: Identifier of the person
+        required: true
+      - name: id
+        type: string
+        description: Identifier of the address
+        required: true
   make:
     name: make
     description: Create a new object.

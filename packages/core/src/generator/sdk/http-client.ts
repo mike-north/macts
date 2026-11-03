@@ -12,16 +12,10 @@ import type { PropertyType } from '../../manifest/schemas/property.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
   normalizeResourceRouteSegment,
-  resolveIdentifierTargeting,
-  resolvePrimaryIdentifierProperty,
+  resolveCanonicalIdentifierSource,
   commandRouteSegment,
 } from '../../manifest/index.js'
-import {
-  hasUsableProperty,
-  usableCommands,
-  usableProperties,
-  usableResources,
-} from '../../manifest/unsupported.js'
+import { usableCommands, usableProperties, usableResources } from '../../manifest/unsupported.js'
 import { propertyTypeToTs } from '../types.js'
 import { SDK_GENERATED_NOTICE } from '../generated-header.js'
 import {
@@ -223,10 +217,8 @@ function generateTypesFile(manifest: AppManifest): string {
     // declared identifier: a `byProperty` resource (e.g. Calendar, whose declared
     // `calendarIdentifier` throws via JXA) surfaces its working property (`name`),
     // since that is the value get/delete/create accept as the lookup.
-    const targeting = resolveIdentifierTargeting(resource)
-    const idProperty = targeting?.property ?? resolvePrimaryIdentifierProperty(resource)
-    const emitCanonicalId =
-      idProperty !== undefined && !hasUsableProperty(resource, CANONICAL_IDENTIFIER_KEY)
+    const idProperty = resolveCanonicalIdentifierSource(resource)
+    const emitCanonicalId = idProperty !== undefined
 
     lines.push(`/** ${resource.description} */`)
     if (props.length === 0 && !emitCanonicalId) {
@@ -300,10 +292,7 @@ function generateTypesFile(manifest: AppManifest): string {
     // Mirror the canonical `id` field added to the read type, so runtime
     // validation accepts the identifier the list output surfaces. Uses the same
     // runtime-targeting-aware resolution as the read type above.
-    const targeting = resolveIdentifierTargeting(resource)
-    const idProperty = targeting?.property ?? resolvePrimaryIdentifierProperty(resource)
-    const emitCanonicalId =
-      idProperty !== undefined && !hasUsableProperty(resource, CANONICAL_IDENTIFIER_KEY)
+    const emitCanonicalId = resolveCanonicalIdentifierSource(resource) !== undefined
 
     lines.push(`export const ${resourceName}Schema = z.object({`)
     if (emitCanonicalId) {

@@ -131,8 +131,14 @@ export type EmailUpdateInput = Partial<EmailCreateInput>
 
 /** A Group Record in the address book database */
 export interface Group {
+  /** Unique and persistent identifier for this record. */
+  id: string
   /** The name of this group. */
   name: string
+  /** When the contact was created. */
+  creationDate: Date
+  /** When the contact was last modified. */
+  modificationDate: Date
 }
 
 /** Input for creating a Group */
@@ -209,6 +215,12 @@ export type MSNHandleUpdateInput = Partial<MSNHandleCreateInput>
 
 /** A person in the address book database. */
 export interface Person {
+  /** Unique and persistent identifier for this record. */
+  id: string
+  /** When the contact was created. */
+  creationDate: Date
+  /** When the contact was last modified. */
+  modificationDate: Date
   /** The Nickname of this person. */
   nickname: string
   /** Organization that employs this person. */
@@ -222,7 +234,7 @@ export interface Person {
   /** The home page of this person. */
   homePage: string
   /** The birth date of this person. */
-  birthDate: string
+  birthDate: Date
   /** The phonetic version of the Last name of this person. */
   phoneticLastName: string
   /** The title of this person. */
@@ -264,7 +276,7 @@ export interface PersonCreateInput {
   /** The home page of this person. */
   homePage?: string
   /** The birth date of this person. */
-  birthDate?: string
+  birthDate?: Date
   /** The phonetic version of the Last name of this person. */
   phoneticLastName?: string
   /** The title of this person. */
@@ -440,7 +452,10 @@ export const EmailSchema = z.object({
 })
 
 export const GroupSchema = z.object({
+  id: z.string(),
   name: z.string(),
+  creationDate: z.string(),
+  modificationDate: z.string(),
 })
 
 export const ICQHandleSchema = z.object({
@@ -462,6 +477,9 @@ export const MSNHandleSchema = z.object({
 })
 
 export const PersonSchema = z.object({
+  id: z.string(),
+  creationDate: z.string(),
+  modificationDate: z.string(),
   nickname: z.string(),
   organization: z.string(),
   maidenName: z.string(),

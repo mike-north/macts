@@ -329,6 +329,12 @@ export type MiniplayerWindowUpdateInput = Partial<MiniplayerWindowCreateInput>
 
 /** a list of tracks/streams */
 export interface Playlist {
+  /** the id of the item */
+  id: number
+  /** the index of the item in internal application order */
+  index: number
+  /** the id of the item as a hexadecimal string. This id does not change over time. */
+  persistentID: string
   /** the description of the playlist */
   description: string
   /** is this playlist disliked? */
@@ -339,8 +345,6 @@ export interface Playlist {
   name: string
   /** is this playlist favorited? */
   favorited: boolean
-  /** folder which contains this playlist (if any) */
-  parent: Playlist
   /** the total size of all tracks (in bytes) */
   size: number
   /** special playlist kind */
@@ -434,6 +438,14 @@ export type SubscriptionPlaylistUpdateInput = Partial<SubscriptionPlaylistCreate
 
 /** playable audio source */
 export interface Track {
+  /** the id of the item */
+  id: number
+  /** the index of the item in internal application order */
+  index: number
+  /** the name of the item */
+  name: string
+  /** the id of the item as a hexadecimal string. This id does not change over time. */
+  persistentID: string
   /** the album name of the track */
   album: string
   /** the album artist of the track */
@@ -578,6 +590,8 @@ export interface Track {
 
 /** Input for creating a Track */
 export interface TrackCreateInput {
+  /** the name of the item */
+  name?: string
   /** the album name of the track */
   album?: string
   /** the album artist of the track */
@@ -826,12 +840,14 @@ export const MiniplayerWindowSchema = z.object({
 })
 
 export const PlaylistSchema = z.object({
+  id: z.number(),
+  index: z.number(),
+  persistentID: z.string(),
   description: z.string(),
   disliked: z.boolean(),
   duration: z.number(),
   name: z.string(),
   favorited: z.boolean(),
-  parent: z.string(),
   size: z.number(),
   specialKind: z.string(),
   time: z.string(),
@@ -862,6 +878,10 @@ export const SubscriptionPlaylistSchema = z.object({
 })
 
 export const TrackSchema = z.object({
+  id: z.number(),
+  index: z.number(),
+  name: z.string(),
+  persistentID: z.string(),
   album: z.string(),
   albumArtist: z.string(),
   albumDisliked: z.boolean(),

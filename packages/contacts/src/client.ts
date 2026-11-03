@@ -5,6 +5,11 @@
  * @packageDocumentation
  */
 
+import { AddressResourceClient } from './resources/address.js'
+import { EmailResourceClient } from './resources/email.js'
+import { GroupResourceClient } from './resources/group.js'
+import { PersonResourceClient } from './resources/person.js'
+import { PhoneResourceClient } from './resources/phone.js'
 import type { Person } from './types.js'
 
 /**
@@ -84,9 +89,29 @@ export class ContactsError extends Error {
 export class ContactsClient {
   readonly #httpClient: HttpClient
 
+  /** Address for the given record. */
+  readonly addresses: AddressResourceClient
+
+  /** Email address for a person. */
+  readonly emails: EmailResourceClient
+
+  /** A Group Record in the address book database */
+  readonly groups: GroupResourceClient
+
+  /** A person in the address book database. */
+  readonly people: PersonResourceClient
+
+  /** Phone number for a person. */
+  readonly phones: PhoneResourceClient
+
   constructor(options: ContactsClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
+    this.addresses = new AddressResourceClient(this.#httpClient, 'contacts', 'addresses')
+    this.emails = new EmailResourceClient(this.#httpClient, 'contacts', 'emails')
+    this.groups = new GroupResourceClient(this.#httpClient, 'contacts', 'groups')
+    this.people = new PersonResourceClient(this.#httpClient, 'contacts', 'people')
+    this.phones = new PhoneResourceClient(this.#httpClient, 'contacts', 'phones')
   }
 
   /**

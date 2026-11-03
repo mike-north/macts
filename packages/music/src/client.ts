@@ -7,6 +7,7 @@
 
 import { FileTrackResourceClient } from './resources/filetrack.js'
 import { PlaylistResourceClient } from './resources/playlist.js'
+import { TrackResourceClient } from './resources/track.js'
 
 /**
  * Client configuration options.
@@ -91,11 +92,15 @@ export class MusicClient {
   /** a list of tracks/streams */
   readonly playlists: PlaylistResourceClient
 
+  /** playable audio source */
+  readonly tracks: TrackResourceClient
+
   constructor(options: MusicClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
     this.fileTracks = new FileTrackResourceClient(this.#httpClient, 'music', 'fileTracks')
     this.playlists = new PlaylistResourceClient(this.#httpClient, 'music', 'playlists')
+    this.tracks = new TrackResourceClient(this.#httpClient, 'music', 'tracks')
   }
 
   /**
