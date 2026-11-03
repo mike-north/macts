@@ -13,6 +13,7 @@
 '@macts/microsoft-edge': minor
 '@macts/music': minor
 '@macts/photos': minor
+'@macts/runtime': minor
 '@macts/system-events': minor
 '@macts/tv': minor
 '@macts/xcode': minor
@@ -40,17 +41,19 @@ A reference must now name objects that can be resolved, at every level:
 - A single reference, every container, and every identity-collection entry need a resource with a `get` operation.
 - A collection needs a resource with `list`.
 
-`ReferenceRegistry` entries record `get` and `list` for this, and an app contract's `resources` table already has them. The rule is part of the reference wire schema, so it applies everywhere: to encoding, decoding, the runtime's check of raw HTTP and MCP requests, and the JSON Schema of every reference position. That JSON Schema now lists only the resources that can contain a reference, and a position whose resource lacks its operation admits no value (`{"not": {}}`). A violation is reported at the reference itself, or at the `resource` of the offending container or entry.
+`ReferenceRegistry` entries record `get` and `list` for this, and an app contract's `resources` table already has them. The runtime's reference resolution applies the rule too: a resolve request whose container or entry names a resource with no `get` is rejected as a validation failure. A resource whose resolving operation is unavailable cannot be resolved. The rule is part of the reference wire schema, so it applies everywhere: to encoding, decoding, the runtime's check of raw HTTP and MCP requests, and the JSON Schema of every reference position. That JSON Schema now lists only the resources that can contain a reference, and a position whose resource lacks its operation admits no value (`{"not": {}}`). A violation is reported at the reference itself, or at the `resource` of the offending container or entry.
 
 `ResourceDescriptor.id` now documents the meaning of an identity reference to a resource keyed by name. It resolves to whichever object has that name when it is resolved. When several objects share the name, the app decides which one that is.
 
 Generated surfaces never offer an operation that cannot be called. An input position that takes a single reference to a resource with no `get` admits no value, so the rule above rejects every request that fills it. An optional position like that is left out of the input. A required one makes the operation unavailable:
 
 - generation warns, naming the app, the operation and the position;
-- the descriptor stays, with a new `unavailable` member (`OperationUnavailability`: the positions and the reason), and the SDK method's documentation says so;
+- the descriptor stays in the contract's `operations`, with a new `unavailable` member (`OperationUnavailability`: the positions and the reason);
+- the runtime answers `invoke` of it exactly as an unknown operation, with the same validation error, before permission, governance or approval, so no one is asked to approve a call that cannot run;
 - the MCP adapter lists no tool for it, and calling its tool name is an unknown-tool call;
 - the HTTP API neither routes nor lists it: `POST /rpc/<id>` gets the same 404 as an unknown operation, and introspection leaves it out;
-- the generated HTTP client has no method for it, the generated CLI has no command for it, and capability discovery lists no capability for it.
+- neither generated client has a method for it, the generated CLI has no command for it, and capability discovery lists no capability for it;
+- its permission is no longer a known permission: `macts api-key create` rejects a grant naming it (for example `contacts:app:actionTitle`) as an unknown permission, and `macts permissions expand` no longer lists or suggests it. These permissions never authorized anything that could be called.
 
 A left-out position has no parameter in either generated client, no CLI flag, and no field in the capability schema.
 
@@ -58,15 +61,15 @@ None of the affected positions ever worked through the native runtime, because i
 
 Operations that become unavailable:
 
-- Contacts `contacts.app.actionTitle`, `contacts.app.performAction` and `contacts.app.shouldEnableAction`: their required `for` takes a person, and Contacts has no operation that gets one. The `ContactsClient` HTTP client methods `actionTitle`, `performAction` and `shouldEnableAction` and the CLI commands `macts contacts action-title`, `perform-action` and `should-enable-action` are removed.
-- Mail `mail.app.synchronize`: its required `with` takes an account, and Mail has no operation that gets one. The `MailClient` HTTP client method `synchronize` and the CLI command `macts mail synchronize` are removed.
+- Contacts `contacts.app.actionTitle`, `contacts.app.performAction` and `contacts.app.shouldEnableAction`: their required `for` takes a person, and Contacts has no operation that gets one. The `actionTitle`, `performAction` and `shouldEnableAction` methods of both the contract client and the `ContactsClient` HTTP client, and the CLI commands `macts contacts action-title`, `perform-action` and `should-enable-action`, are removed.
+- Mail `mail.app.synchronize`: its required `with` takes an account, and Mail has no operation that gets one. The `synchronize` method of both the contract client and the `MailClient` HTTP client, and the CLI command `macts mail synchronize`, are removed.
 
 Operations that lose an optional position:
 
 - Mail `mail.app.checkForNewMail` loses `for` (an account). The contract client method is now `checkForNewMail(options?)`, the HTTP client method `checkForNewMail()`, and the CLI flag `--for` is removed.
 - Mail `mail.app.performMailActionWithMessages` loses `inMailboxes` (a mailbox) and `forRule` (a rule). The contract client method is now `performMailActionWithMessages(options?)`, the HTTP client method `performMailActionWithMessages()`, and the CLI flags `--in-mailboxes` and `--for-rule` are removed.
 
-Create and update input types that no operation takes lose the same kind of field. The types change, but no request does:
+Create and update input types that no operation takes lose the same kind of field, in both the contract and the HTTP client types (`src/types.ts`), so the two clients' input types agree for every resource. The types change, but no request does:
 
 - Finder `ListViewOptionsCreateInput` and `ListViewOptionsUpdateInput` lose `sortColumn`.
 - iTerm `WindowCreateInput` and `WindowUpdateInput` lose `currentTab` and `currentSession`, and `TabCreateInput` and `TabUpdateInput` lose `currentSession`.

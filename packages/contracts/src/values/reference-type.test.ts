@@ -342,7 +342,7 @@ describe('the app', () => {
     expectEncodeIssues(note, { ...sdkNote, app: 7 }, [{ path: ['app'], code: 'invalid-type' }])
   })
 
-  it('rejects a reference of another app before anything else is read, at every level', () => {
+  it('rejects a reference of another app at every level', () => {
     const message = messagesOf(note.encode({ ...sdkNote, app: 'calendar' }))
     expect(message).toBe(
       'Expected a reference to an object of "notes"; received a reference to an object of ' +

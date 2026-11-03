@@ -17,13 +17,14 @@
  * - An operation with a required unsatisfiable position can never be called.
  *   Its contract descriptor stays, marked `unavailable`, and generation
  *   reports it; the surfaces that offer operations (MCP tools, HTTP routes,
- *   the generated HTTP client and CLI commands, and capability discovery)
- *   leave it out.
+ *   the methods of both generated clients, CLI commands, capability
+ *   discovery, and the permissions offered for granting) leave it out.
  *
  * The judgment is made from the manifest alone, so the contract, HTTP client
- * and CLI generators and the capability registry (which runtime discovery
- * builds from manifests) share it. The MCP and HTTP adapters read its outcome
- * from the descriptor's `unavailable` member.
+ * and CLI generators, the capability registry (which runtime discovery builds
+ * from manifests) and the permission listing share it. The runtime and the MCP
+ * and HTTP adapters read its outcome from the descriptor's `unavailable`
+ * member.
  *
  * @packageDocumentation
  */
@@ -77,6 +78,22 @@ export function unsatisfiableTarget(manifest: AppManifest, shape: ValueShape): s
 }
 
 /**
+ * The resource an input field of declared type `type` references when the
+ * field admits no value, or `undefined` when it admits one: a nullable field
+ * admits `null`, and any other admits a value unless its composition is
+ * unsatisfiable ({@link unsatisfiableTarget}).
+ */
+function fieldTarget(
+  manifest: AppManifest,
+  names: ReturnType<typeof createNameResolver>,
+  type: DeclaredType,
+  nullable: boolean
+): string | undefined {
+  if (nullable) return undefined
+  return unsatisfiableTarget(manifest, mapDeclaredType(type, 'input', names).shape)
+}
+
+/**
  * The unsatisfiable input positions of one operation: `command` applied to
  * the resource `resourceKey` (`undefined` for an app command).
  *
@@ -102,8 +119,7 @@ export function unsatisfiableInputs(
     position: Pick<UnsatisfiableInput, 'required' | 'source'> & { readonly nullable: boolean }
   ): void => {
     seen.add(name)
-    if (position.nullable) return
-    const resource = unsatisfiableTarget(manifest, mapDeclaredType(type, 'input', names).shape)
+    const resource = fieldTarget(manifest, names, type, position.nullable)
     if (resource === undefined) return
     found.push({ name, resource, required: position.required, source: position.source })
   }
@@ -184,4 +200,46 @@ export function isOperationAvailable(
   resourceKey: string | undefined
 ): boolean {
   return !unsatisfiableInputs(manifest, command, resourceKey).some((input) => input.required)
+}
+
+/** The fields a resource's create and update input types leave out. */
+export interface OmittedResourceInputs {
+  /** Optional create input fields that admit no value. */
+  readonly create: ReadonlySet<string>
+  /**
+   * Update input fields that admit no value. Every update field is optional,
+   * and one accepts `null` (and so admits a value) only when its property is
+   * verified resettable.
+   */
+  readonly update: ReadonlySet<string>
+}
+
+/**
+ * The fields left out of a resource's create and update input types, which
+ * every resource has whether or not it has a create or update command.
+ *
+ * @remarks
+ * The same judgment as {@link unsatisfiableInputs} applies to the input
+ * types themselves: a create field is left out when it is optional and admits
+ * no value, and an update field (always optional) when it admits no value.
+ * A required create field that admits no value stays: the create operation
+ * that takes it is unavailable instead.
+ */
+export function omittedResourceInputs(
+  manifest: AppManifest,
+  resourceKey: string
+): OmittedResourceInputs {
+  const names = createNameResolver(manifest)
+  const properties = manifest.resources[resourceKey]?.properties ?? {}
+  const create = new Set<string>()
+  const update = new Set<string>()
+  for (const [name, field] of createInputFields(manifest, resourceKey)) {
+    if (!field.required && fieldTarget(manifest, names, field.type, false) !== undefined) {
+      create.add(name)
+    }
+    const property = Object.hasOwn(properties, name) ? properties[name] : undefined
+    const resettable = property !== undefined && resolveResettability(property) !== undefined
+    if (fieldTarget(manifest, names, field.type, resettable) !== undefined) update.add(name)
+  }
+  return { create, update }
 }

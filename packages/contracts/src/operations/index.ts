@@ -80,9 +80,10 @@ export interface OperationDescriptor<Input, Output> {
    * @remarks
    * The descriptor stays in the contract, so the operation keeps its identity
    * and its input still rejects every request. The surfaces that offer
-   * operations (MCP tools, HTTP routes, the generated HTTP client and CLI
-   * commands, capability discovery) leave an unavailable operation out, so
-   * they never offer a call that must fail.
+   * operations (MCP tools, HTTP routes, the methods of the generated clients,
+   * CLI commands, capability discovery) leave an unavailable operation out, so
+   * they never offer a call that must fail, and the runtime answers a call to
+   * it exactly as one to an unknown operation.
    */
   readonly unavailable?: OperationUnavailability
 }

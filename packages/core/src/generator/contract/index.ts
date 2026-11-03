@@ -17,7 +17,9 @@
  *
  * The client surface (namespaces, method names, positional parameters) follows
  * the shared derivation in `../surface.ts`, the same one the HTTP client SDK
- * uses, so the two clients have the same shape.
+ * uses, so the two clients have the same shape. Neither has a method for an
+ * operation marked `unavailable` (`../input-satisfiability.ts`), whose
+ * descriptor the contract still declares.
  *
  * @packageDocumentation
  */
@@ -116,10 +118,9 @@ interface ContractDiagnosticBase {
  * - `unavailable-operation`: a required input position of an operation takes
  *   a reference to a resource the app cannot resolve, so the operation can
  *   never be called. Its descriptor is marked `unavailable`, and MCP tools,
- *   HTTP routes, the generated HTTP client and CLI commands, and capability
- *   discovery leave it out. The fix is
- *   to give the resource a `get`, with evidence, or to mark the command
- *   unsupported.
+ *   HTTP routes, both generated clients, CLI commands, and capability
+ *   discovery leave it out. The fix is to give the resource a `get`, with
+ *   evidence, or to mark the command unsupported.
  */
 export type ContractDiagnostic =
   | (ContractDiagnosticBase & {
@@ -233,7 +234,7 @@ export function collectContractDiagnostics(manifest: AppManifest): ContractDiagn
         position,
         operation: operationId(route.route),
         resource: input.resource,
-        message: `${app}: ${position}: ${route.route} cannot be called and is left out of MCP tools, HTTP routes, the HTTP client, CLI commands and capability discovery: the required input "${input.name}" takes a reference to "${input.resource}", which the app has no operation to get.`,
+        message: `${app}: ${position}: ${route.route} cannot be called and is left out of MCP tools, HTTP routes, the generated clients, CLI commands and capability discovery: the required input "${input.name}" takes a reference to "${input.resource}", which the app has no operation to get.`,
       })
     }
   }
@@ -469,6 +470,10 @@ class ContractBuilder {
    * in-process scope both take them from here, so the schemas built in
    * process (such as `inputJsonSchema`) admit the same references as the
    * generated value types.
+   *
+   * Invariant: a recorded `get` or `list` is not itself `unavailable`, since
+   * the runtime refuses to resolve through one that is while the wire schema
+   * would still admit references to the resource.
    */
   #resolvingRoutes(resourceKey: string): { get?: OperationId; list?: OperationId } {
     const routes: { get?: OperationId; list?: OperationId } = {}
@@ -487,7 +492,7 @@ class ContractBuilder {
     this.#deriveOperations()
     const namespaces = this.#deriveNamespaces()
     const appMethods = appCommandEntries(this.#manifest).flatMap(([commandKey, command]) => {
-      const operation = this.#operationsByRoute.get(this.#routeOf(commandKey, undefined))
+      const operation = this.#callableOperation(this.#routeOf(commandKey, undefined))
       return operation === undefined ? [] : [this.#commandMethod(command, operation)]
     })
 
@@ -827,6 +832,16 @@ class ContractBuilder {
       : { kind: 'value', shape: nullableShape(this.#map(returns, 'output')) }
   }
 
+  /**
+   * The operation of a route that the client offers a method for: one that
+   * can be called. An operation marked `unavailable` keeps its descriptor in
+   * `operations`, but no client method, since every call to it must fail.
+   */
+  #callableOperation(routeKey: string): OperationModel | undefined {
+    const operation = this.#operationsByRoute.get(routeKey)
+    return operation === undefined || operation.unavailable.length > 0 ? undefined : operation
+  }
+
   #deriveNamespaces(): NamespaceModel[] {
     const namespaces: NamespaceModel[] = []
     for (const [resourceKey, resource] of usableResources(this.#manifest)) {
@@ -836,7 +851,7 @@ class ContractBuilder {
       const crud = (shape: CrudOperation): [Command, OperationModel] | undefined => {
         const found = findCrudCommand(commands, shape)
         if (found === undefined) return undefined
-        const operation = this.#operationsByRoute.get(this.#routeOf(found[0], resourceKey))
+        const operation = this.#callableOperation(this.#routeOf(found[0], resourceKey))
         return operation === undefined ? undefined : [found[1], operation]
       }
       const list = crud('list')
@@ -851,7 +866,7 @@ class ContractBuilder {
       if (remove) methods.push(this.#deleteMethod(resource, ...remove))
       for (const [commandKey, command] of commands) {
         if (isCrudName(command.name)) continue
-        const operation = this.#operationsByRoute.get(this.#routeOf(commandKey, resourceKey))
+        const operation = this.#callableOperation(this.#routeOf(commandKey, resourceKey))
         if (operation !== undefined) methods.push(this.#commandMethod(command, operation))
       }
       namespaces.push({
@@ -1134,9 +1149,7 @@ class ContractBuilder {
       ),
       ...(method.returnsDoc === undefined ? [] : [`@returns ${method.returnsDoc}`]),
     ]
-    const unavailable = unavailableReason(method.operation)
-    const text = unavailable === undefined ? method.doc : `${method.doc}\n\n${unavailable}`
-    const doc = tags.length === 0 ? text : `${text}\n\n${tags.join('\n')}`
+    const doc = tags.length === 0 ? method.doc : `${method.doc}\n\n${tags.join('\n')}`
     return `${docComment(doc, '  ')}  ${method.name}(${params}): Promise<${method.returnType}>`
   }
 

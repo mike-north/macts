@@ -381,7 +381,6 @@ export interface MessageCreateInput {
     flaggedStatus?: boolean;
     flagIndex?: number;
     junkMailStatus?: boolean;
-    mailbox?: Mailbox;
     readStatus?: boolean;
 }
 
@@ -667,7 +666,6 @@ export type RuleConditionUpdateInput = Partial<RuleConditionCreateInput>;
 export interface RuleCreateInput {
     allConditionsMustBeMet?: boolean;
     colorMessage?: string;
-    copyMessage?: Mailbox;
     deleteMessage?: boolean;
     enabled?: boolean;
     forwardMessage?: string;
@@ -676,7 +674,6 @@ export interface RuleCreateInput {
     markFlagged?: boolean;
     markFlagIndex?: number;
     markRead?: boolean;
-    moveMessage?: Mailbox;
     name?: string;
     playSound?: string;
     redirectMessage?: string;

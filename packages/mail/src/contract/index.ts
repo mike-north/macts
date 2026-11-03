@@ -1670,15 +1670,6 @@ export interface MailClient {
    * this handler is a list of messages being acted upon.
    */
   performMailActionWithMessages(options?: CallOptions): Promise<void>
-  /**
-   * Command to trigger synchronizing of an IMAP account with the server.
-   *
-   * Not available: `with` takes a reference to an account, which the app has no operation to get,
-   * so the operation cannot be called.
-   *
-   * @param _with - The account to synchronize. Does not accept null.
-   */
-  synchronize(_with: ObjectReferenceData<string, 'Account'>, options?: CallOptions): Promise<void>
 }
 
 const richTextRecordType: ValueType<RichText> = t.record(
@@ -2662,8 +2653,6 @@ function bind(runtime: ClientRuntime): MailClient {
     mailto: (options) => runtime.invoke(appMailtoOperation, {}, options),
     performMailActionWithMessages: (options) =>
       runtime.invoke(appPerformMailActionWithMessagesOperation, {}, options),
-    synchronize: (_with, options) =>
-      runtime.invoke(appSynchronizeOperation, { with: _with }, options),
   }
 }
 
