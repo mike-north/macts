@@ -705,7 +705,9 @@ describe('generateContract: identifier nullability', () => {
    */
   readonly uid: string
 `)
-    expect(generated.diagnostics).toEqual([
+    expect(
+      generated.diagnostics.filter(({ kind }) => kind === 'identifier-nullability-ignored')
+    ).toEqual([
       {
         kind: 'identifier-nullability-ignored',
         app: 'jotter',
@@ -717,8 +719,20 @@ describe('generateContract: identifier nullability', () => {
     ])
   })
 
-  it('reports nothing for the unmodified fixture', () => {
-    expect(jotter.diagnostics).toEqual([])
+  it('reports only the output field the unmodified fixture leaves out', () => {
+    // Folder.owner holds a reference to a tag, and Jotter has no operation to
+    // get a tag, so the field is left out of output (phases/13 D7, #219).
+    expect(jotter.diagnostics).toEqual([
+      {
+        kind: 'omitted-output',
+        app: 'jotter',
+        position: 'resources.Folder.properties.owner',
+        target: 'Tag',
+        reason: 'no-get',
+        message:
+          'jotter: resources.Folder.properties.owner: the Folder field "owner" is left out of output: it holds a reference to "Tag", which the app has no operation to get (#219).',
+      },
+    ])
   })
 })
 
@@ -823,7 +837,10 @@ describe('real app manifests', () => {
     // uses an unresolvable bare type name.
     const found = apps
       .flatMap(({ manifest }) => collectContractDiagnostics(manifest))
-      .filter((diagnostic) => diagnostic.kind !== 'unavailable-operation')
+      .filter(
+        (diagnostic) =>
+          diagnostic.kind !== 'unavailable-operation' && diagnostic.kind !== 'omitted-output'
+      )
       .map((diagnostic) => ({
         kind: diagnostic.kind,
         app: diagnostic.app,
@@ -881,6 +898,107 @@ describe('real app manifests', () => {
         resource: 'Account',
       },
     ])
+  })
+
+  it('leave out exactly the hand-audited output positions, each for its reason', () => {
+    // Audited by hand against the manifests (phases/13 D7, resolvable
+    // targets; #219). Every entry is a record field holding a single
+    // reference, or an array of them: `no-get` when the target has no command
+    // named get, `not-unique` when the target is identified by a name its
+    // primary identifier does not claim unique. No shipped output references
+    // a resource whose get records a parent, and no shipped command records a
+    // result, so no result is left out. A new omission, or a field returning
+    // to output, must change this list.
+    const found = apps
+      .flatMap(({ manifest }) => collectContractDiagnostics(manifest))
+      .flatMap((diagnostic) => {
+        if (diagnostic.kind !== 'omitted-output') return []
+        const field = /^resources\.([^.]+)\.properties\.([^.]+)$/.exec(diagnostic.position)
+        const [resource, property] =
+          field === null ? [diagnostic.position, 'result'] : [field[1], field[2]]
+        return [[diagnostic.app, resource, property, diagnostic.target, diagnostic.reason]]
+      })
+    const expected: [
+      app: string,
+      resource: string,
+      field: string,
+      target: string,
+      reason: string,
+    ][] = [
+      ['arc', 'Window', 'activeTab', 'Tab', 'no-get'],
+      ['arc', 'Window', 'activeSpace', 'Space', 'no-get'],
+      ['finder', 'FinderWindow', 'listViewOptions', 'ListViewOptions', 'no-get'],
+      ['finder', 'ListViewOptions', 'sortColumn', 'Column', 'no-get'],
+      ['google-chrome', 'Window', 'activeTab', 'Tab', 'no-get'],
+      ['iterm', 'Window', 'currentTab', 'Tab', 'no-get'],
+      ['iterm', 'Window', 'currentSession', 'Session', 'no-get'],
+      ['iterm', 'Tab', 'currentSession', 'Session', 'no-get'],
+      ['mail', 'MessageViewer', 'draftsMailbox', 'Mailbox', 'no-get'],
+      ['mail', 'MessageViewer', 'inbox', 'Mailbox', 'no-get'],
+      ['mail', 'MessageViewer', 'junkMailbox', 'Mailbox', 'no-get'],
+      ['mail', 'MessageViewer', 'outbox', 'Mailbox', 'no-get'],
+      ['mail', 'MessageViewer', 'sentMailbox', 'Mailbox', 'no-get'],
+      ['mail', 'MessageViewer', 'trashMailbox', 'Mailbox', 'no-get'],
+      ['mail', 'Message', 'mailbox', 'Mailbox', 'no-get'],
+      ['mail', 'Message', 'content', 'RichText', 'no-get'],
+      ['mail', 'Mailbox', 'account', 'Account', 'no-get'],
+      ['mail', 'Mailbox', 'container', 'Mailbox', 'no-get'],
+      ['mail', 'Rule', 'copyMessage', 'Mailbox', 'no-get'],
+      ['mail', 'Rule', 'moveMessage', 'Mailbox', 'no-get'],
+      ['messages', 'Participant', 'account', 'Account', 'no-get'],
+      ['messages', 'Chat', 'account', 'Account', 'no-get'],
+      ['system-events', 'NetworkPreferencesObject', 'currentLocation', 'Location', 'no-get'],
+      ['system-events', 'Service', 'currentConfiguration', 'Configuration', 'no-get'],
+      ['system-events', 'Service', 'interface', 'Interface', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'appleMenuFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'controlPanelsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'controlStripModulesFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'desktopFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'extensionsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'fontsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'launcherItemsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'preferencesFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'shutdownFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'startupItemsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'systemFolder', 'Folder', 'no-get'],
+      ['system-events', 'DiskItem', 'container', 'DiskItem', 'no-get'],
+      ['system-events', 'Domain', 'applicationSupportFolder', 'Folder', 'no-get'],
+      ['system-events', 'Domain', 'applicationsFolder', 'Folder', 'no-get'],
+      ['system-events', 'Domain', 'desktopPicturesFolder', 'Folder', 'no-get'],
+      ['system-events', 'Domain', 'folderActionScriptsFolder', 'Folder', 'no-get'],
+      ['system-events', 'Domain', 'fontsFolder', 'Folder', 'no-get'],
+      ['system-events', 'Domain', 'libraryFolder', 'Folder', 'no-get'],
+      ['system-events', 'Domain', 'preferencesFolder', 'Folder', 'no-get'],
+      ['system-events', 'Domain', 'scriptingAdditionsFolder', 'Folder', 'no-get'],
+      ['system-events', 'Domain', 'scriptsFolder', 'Folder', 'no-get'],
+      ['system-events', 'Domain', 'sharedDocumentsFolder', 'Folder', 'no-get'],
+      ['system-events', 'Domain', 'speakableItemsFolder', 'Folder', 'no-get'],
+      ['system-events', 'Domain', 'utilitiesFolder', 'Folder', 'no-get'],
+      ['system-events', 'Domain', 'workflowsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'desktopFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'documentsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'downloadsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'favoritesFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'homeFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'moviesFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'musicFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'picturesFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'publicFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'sitesFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'temporaryItemsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ScriptingClass', 'superclass', 'ScriptingClass', 'no-get'],
+      ['system-events', 'ScriptingCommand', 'directParameter', 'ScriptingParameter', 'no-get'],
+      ['tv', 'BrowserWindow', 'view', 'Playlist', 'no-get'],
+      ['tv', 'Playlist', 'parent', 'Playlist', 'no-get'],
+      ['tv', 'PlaylistWindow', 'view', 'Playlist', 'no-get'],
+      ['xcode', 'WorkspaceDocument', 'lastSchemeActionResult', 'SchemeActionResult', 'no-get'],
+      // A run destination is identified by its name, which is not claimed unique.
+      ['xcode', 'WorkspaceDocument', 'activeRunDestination', 'RunDestination', 'not-unique'],
+      ['xcode', 'RunDestination', 'device', 'Device', 'no-get'],
+      ['xcode', 'RunDestination', 'companionDevice', 'Device', 'no-get'],
+    ]
+    expect(expected).toHaveLength(70)
+    expect(found.sort()).toEqual(expected.sort())
   })
 
   it('generate without errors', () => {

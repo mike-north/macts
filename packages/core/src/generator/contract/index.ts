@@ -61,6 +61,13 @@ import { manifestGeneratedNotice } from '../generated-header.js'
 import { usableCommands, usableProperties, usableResources } from '../../manifest/unsupported.js'
 import { resolvingCommand } from '../../manifest/resource-commands.js'
 import {
+  omittedOutput,
+  omittedOutputPositions,
+  omittedOutputProperties,
+  omittedOutputResult,
+  type OmittedOutputReason,
+} from '../../manifest/output-references.js'
+import {
   appCommandEntries,
   commandMethodParameters,
   createInputFields,
@@ -126,6 +133,12 @@ interface ContractDiagnosticBase {
  *   HTTP routes, both generated clients, CLI commands, and capability
  *   discovery leave it out. The fix is to give the resource a `get`, with
  *   evidence, or to mark the command unsupported.
+ * - `omitted-output`: an output position (a record field, or a command's
+ *   result) holds a reference no caller could use: its resource has no `get`,
+ *   or a `get` that records a parent, or is identified by a name not claimed
+ *   unique. The contract, the HTTP client, the CLI and the native reads leave
+ *   it out. The fix is a `get` that records no parent, or a `unique` claim on
+ *   the identifier, with evidence.
  */
 export type ContractDiagnostic =
   | (ContractDiagnosticBase & {
@@ -144,6 +157,13 @@ export type ContractDiagnostic =
       readonly operation: OperationId
       /** The manifest key of the resource the position references. */
       readonly resource: string
+    })
+  | (ContractDiagnosticBase & {
+      readonly kind: 'omitted-output'
+      /** The manifest key of the resource the position references. */
+      readonly target: string
+      /** Why a reference to it cannot be used. */
+      readonly reason: OmittedOutputReason
     })
 
 /** The generated contract modules and what generation found. */
@@ -183,12 +203,22 @@ export function contractNames(manifest: AppManifest): ContractNames {
   }
 }
 
+/** Why an omitted output position is left out, as its warning says it. */
+const OMITTED_OUTPUT_REASONS: Readonly<Record<OmittedOutputReason, string>> = {
+  'no-get': 'which the app has no operation to get (#219)',
+  'parent-scoped':
+    'which the app gets only within its container, and references read from the app carry no container (#219)',
+  'not-unique':
+    'which is identified by its name, and no unique claim shows the name identifies one object (phases/13 D7, name-keyed resources)',
+}
+
 /**
  * Report every manifest type that does not resolve, once per declaration
  * site (resource properties, command parameters, and command results), and
  * every nullability claim on a primary identifier property, which the
- * contract ignores, and every required input position that makes its
- * operation unavailable.
+ * contract ignores, every required input position that makes its
+ * operation unavailable, and every output position left out because it holds
+ * a reference no caller could use.
  */
 export function collectContractDiagnostics(manifest: AppManifest): ContractDiagnostic[] {
   const app = normalizeAppRouteSegment(manifest.app.name)
@@ -242,6 +272,20 @@ export function collectContractDiagnostics(manifest: AppManifest): ContractDiagn
         message: `${app}: ${position}: ${route.route} cannot be called and is left out of MCP tools, HTTP routes, the generated clients, CLI commands and capability discovery: the required input "${input.name}" takes a reference to "${input.resource}", which the app has no operation to get.`,
       })
     }
+  }
+  for (const omitted of omittedOutputPositions(manifest)) {
+    const what =
+      omitted.resource !== undefined && omitted.property !== undefined
+        ? `the ${omitted.resource} field "${omitted.property}"`
+        : `the result of "${omitted.command ?? ''}"`
+    diagnostics.push({
+      kind: 'omitted-output',
+      app,
+      position: omitted.position,
+      target: omitted.target,
+      reason: omitted.reason,
+      message: `${app}: ${omitted.position}: ${what} is left out of output: it holds a reference to "${omitted.target}", ${OMITTED_OUTPUT_REASONS[omitted.reason]}.`,
+    })
   }
   return diagnostics
 }
@@ -546,6 +590,7 @@ class ContractBuilder {
 
   build(): string {
     this.#deriveOperations()
+    this.#checkOutputs()
     const namespaces = this.#deriveNamespaces()
     const appMethods = appCommandEntries(this.#manifest).flatMap(([commandKey, command]) => {
       const operation = this.#callableOperation(this.#routeOf(commandKey, undefined))
@@ -798,6 +843,15 @@ class ContractBuilder {
    * `resolveReadNullability`), and optional when the manifest says so.
    */
   #recordFields(resource: Resource): (FieldModel & { readonly readOnly: boolean })[] {
+    return this.#allRecordFields(resource).filter((field) => this.#resolvesOutput(field.shape))
+  }
+
+  /**
+   * Every usable property of a resource as a record field, including those
+   * the record leaves out because they hold a reference no caller could
+   * resolve ({@link ContractBuilder.#resolvesOutput}).
+   */
+  #allRecordFields(resource: Resource): (FieldModel & { readonly readOnly: boolean })[] {
     return usableProperties(resource).map(([name, prop]) => {
       const resolution = resolveReadNullability(resource, name, prop)
       const shape = this.#map(prop.type, 'output')
@@ -810,6 +864,48 @@ class ContractBuilder {
         readOnly: prop.access === 'r',
       }
     })
+  }
+
+  /**
+   * Whether an output composition can be declared: every reference it holds
+   * can be used (see `../../manifest/output-references.ts`).
+   */
+  #resolvesOutput(shape: ValueShape): boolean {
+    return omittedOutput(this.#manifest, shape) === undefined
+  }
+
+  /**
+   * Check the outputs the contract declares against the manifest-level
+   * judgment the HTTP client and CLI generators and the native reads use, so
+   * that every surface leaves out the same record fields and results. A
+   * disagreement is a generator defect, reported as an error so the contract
+   * is not published.
+   */
+  #checkOutputs(): void {
+    for (const [resourceKey, resource] of usableResources(this.#manifest)) {
+      const judged = [...omittedOutputProperties(this.#manifest, resource).keys()]
+      const kept = new Set(this.#recordFields(resource).map(({ name }) => name))
+      const omitted = this.#allRecordFields(resource)
+        .map(({ name }) => name)
+        .filter((name) => !kept.has(name))
+      if (
+        judged.length !== omitted.length ||
+        judged.some((name, index) => omitted[index] !== name)
+      ) {
+        this.errors.push(
+          `${resourceKey}: the output fields left out disagree with the shared judgment (judged ${JSON.stringify(judged)}, contract ${JSON.stringify(omitted)}).`
+        )
+      }
+    }
+    for (const operation of this.#operations) {
+      const judged = omittedOutputResult(this.#manifest, operation.route.command) !== undefined
+      const declared = operation.output.kind !== 'none'
+      if (operation.route.command.returns !== undefined && judged === declared) {
+        this.errors.push(
+          `${operation.route.route}: whether the result is left out disagrees with the shared judgment (judged ${String(judged)}).`
+        )
+      }
+    }
   }
 
   /**
@@ -913,10 +1009,12 @@ class ContractBuilder {
     // read field: a manifest has no evidence that a command always returns a
     // value. (CRUD results above are never nullable: a missing target fails
     // the operation, and a list is a page, possibly empty.)
+    // A result holding a reference no caller could use is left out, as a
+    // record field holding one is (see `../../manifest/output-references.ts`).
     const returns = route.command.returns
-    return returns === undefined
-      ? { kind: 'none' }
-      : { kind: 'value', shape: nullableShape(this.#map(returns, 'output')) }
+    if (returns === undefined) return { kind: 'none' }
+    const result = nullableShape(this.#map(returns, 'output'))
+    return this.#resolvesOutput(result) ? { kind: 'value', shape: result } : { kind: 'none' }
   }
 
   /**

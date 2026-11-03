@@ -499,31 +499,32 @@ describe('resources', () => {
   })
 
   it('reject references to a resource the contract cannot resolve them through', () => {
-    const folder = resourceRecord('Folder')
-    // `color` is required and nullable: it must be present, and null is data (A4).
-    const base = { folderId: Integer.validate(7), title: 'Inbox', notes: [], color: null }
+    // The Folder record leaves `owner` out, since it would hold such a
+    // reference (#219); a reference position to a tag still rejects one.
+    expect(recordFields(resourceRecord('Folder').plan)).not.toContain('owner')
+    const tag = t.reference(() => contract, 'Tag', 'one')
     const byIdentity = {
-      ...base,
-      owner: { app: 'jotter', resource: 'Tag', form: 'identity', cardinality: 'one', id: 'x' },
+      app: 'jotter',
+      resource: 'Tag',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'x',
     }
     const byName = {
-      ...base,
-      owner: {
-        app: 'jotter',
-        resource: 'Tag',
-        form: 'selector',
-        cardinality: 'one',
-        selector: { by: 'name', name: 'x' },
-      },
+      app: 'jotter',
+      resource: 'Tag',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'name', name: 'x' },
     }
     const issues = (value: unknown) => {
-      const result = folder.encode(value)
+      const result = tag.encode(value)
       return result.ok ? [] : result.issues.map(({ path, code }) => ({ path, code }))
     }
     // Tag has no identifier, so it has no identity form; and it has no get
     // operation, so even a selector to one could never be resolved.
-    expect(issues(byIdentity)).toEqual([{ path: ['owner'], code: 'unsupported' }])
-    expect(issues(byName)).toEqual([{ path: ['owner'], code: 'unsupported' }])
+    expect(issues(byIdentity)).toEqual([{ path: [], code: 'unsupported' }])
+    expect(issues(byName)).toEqual([{ path: [], code: 'unsupported' }])
     // A collection of tags can be listed, so a selector collection encodes.
     const tags = t.reference(() => contract, 'Tag', 'many')
     expect(

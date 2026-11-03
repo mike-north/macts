@@ -58,7 +58,7 @@ import {
   resolvePrimaryIdentifierProperty,
 } from '../manifest/identifier.js'
 import { resolveCollectionAccessor, resolvePropertyAccessor } from '../manifest/native-accessor.js'
-import { usableProperties } from '../manifest/unsupported.js'
+import { omittedOutputProperties, outputProperties } from '../manifest/output-references.js'
 import { resolvingCommand } from '../manifest/resource-commands.js'
 import {
   NATIVE_CODEC_ERROR_NAME,
@@ -267,10 +267,11 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
 }
 
 /**
- * Statements that build the local record `obj` from one item's usable
- * properties (those declared and not marked unsupported), keyed by their
+ * Statements that build the local record `obj` from the properties one item's
+ * output record declares (its usable properties, less those holding a
+ * reference no caller could resolve, see `outputProperties`), keyed by their
  * public names. get, create and update all return a record built here, so
- * the three cannot drift.
+ * the three cannot drift, and none reads a field the contract leaves out.
  *
  * The read is batched across the item's properties: one `properties()` call,
  * from whose record each usable property is taken under the app's name for it, and
@@ -284,8 +285,13 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * is omitted rather than failing the operation. A body with no resource reads
  * `name`.
  */
-function readUsableProperties(resource: Resource | undefined, itemLocal: string): string {
-  const keys = resource === undefined ? ['name'] : usableProperties(resource).map(([key]) => key)
+function readOutputProperties(
+  manifest: AppManifest,
+  resource: Resource | undefined,
+  itemLocal: string
+): string {
+  const keys =
+    resource === undefined ? ['name'] : outputProperties(manifest, resource).map(([key]) => key)
   const native = (key: string): string => nativePropertyName(resource, key)
   const readOnItsOwn = (key: string): string =>
     `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {}`
@@ -1089,7 +1095,11 @@ function buildListBody(
   identifierAliases: boolean,
   paged: boolean
 ): ResourceBody {
-  const allPropNames = resolveListOutputProperties(resource)
+  // The identifier is always read; every other property is read only when the
+  // output record declares it (see `outputProperties`).
+  const omitted: ReadonlyMap<string, unknown> =
+    resource === undefined ? new Map() : omittedOutputProperties(manifest, resource)
+  const allPropNames = resolveListOutputProperties(resource).filter((p) => !omitted.has(p))
   const targeting = resolveIdentifierTargeting(resource)
   const runtimeIdProperty = targeting?.property
   const declaredIdProperty = resolvePrimaryIdentifierProperty(resource)
@@ -1196,7 +1206,7 @@ function buildListBody(
 
 /**
  * Read one item's usable properties into a record keyed by their public names
- * (see {@link readUsableProperties}). A command that records a parent
+ * (see {@link readOutputProperties}). A command that records a parent
  * addresses the item under the parent item; any other addresses it at the
  * application. The item must exist (see
  * {@link failIfMissing}) before any property is read.
@@ -1210,7 +1220,7 @@ function buildGetBody(
   const parentScope = recordedParentScope(command, manifest)
   const identifierParam = resolveIdentifierParam(command, parentScope)
   const bindItem = bindTarget(command, resource, resourcePlural, parentScope, identifierParam)
-  const body = lines(bindItem, readUsableProperties(resource, 'item'), 'return obj;')
+  const body = lines(bindItem, readOutputProperties(manifest, resource, 'item'), 'return obj;')
   return { body, identifierArguments: identifierArgumentsOf(parentScope, identifierParam) }
 }
 
@@ -1269,7 +1279,7 @@ function buildCreateBody(
       ),
       `var item = ${itemClass}(props);`,
       `${member(PARENT_LOCAL, resourcePlural)}.push(item);`,
-      readUsableProperties(resource, 'item'),
+      readOutputProperties(manifest, resource, 'item'),
       'return obj;'
     )
     return { body, identifierArguments: [parentScope.parentIdParam] }
@@ -1283,7 +1293,7 @@ function buildCreateBody(
     collectSuppliedParameters('props', command.parameters, native),
     `var item = ${itemClass}(props);`,
     'item.make();',
-    readUsableProperties(resource, 'item'),
+    readOutputProperties(manifest, resource, 'item'),
     'return obj;'
   )
   return { body, identifierArguments: [] }
@@ -1315,7 +1325,7 @@ function buildUpdateBody(
       (p) =>
         `if (${supplied(p.name)}) { try { ${member('item', nativePropertyName(resource, p.name))} = ${argumentValue(p.name, p)}; } catch (e) {} }`
     ),
-    readUsableProperties(resource, 'item'),
+    readOutputProperties(manifest, resource, 'item'),
     'return obj;'
   )
   return { body, identifierArguments: identifierArgumentsOf(parentScope, identifierParam) }
