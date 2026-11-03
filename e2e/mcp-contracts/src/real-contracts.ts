@@ -13,7 +13,12 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { loadManifest, type AppManifest } from '@macts/core'
-import type { AnyOperationDescriptor, ClientRuntime, OperationId } from '@macts/contracts'
+import type {
+  AnyOperationDescriptor,
+  ClientRuntime,
+  OperationId,
+  ResourceTable,
+} from '@macts/contracts'
 
 /** The repository's `manifests/` directory. */
 const MANIFESTS_DIR = fileURLToPath(new URL('../../../manifests/', import.meta.url))
@@ -29,6 +34,8 @@ export interface RealContract {
   /** The app's route segment, as the contract names it. */
   readonly app: string
   readonly operations: Readonly<Record<OperationId, AnyOperationDescriptor>>
+  /** The resources references can name, keyed by manifest resource key. */
+  readonly resources: ResourceTable
   /** Build the app's client on top of a client runtime. */
   readonly bind: (runtime: ClientRuntime) => unknown
 }
@@ -51,7 +58,7 @@ export const APP_NAMES: readonly string[] = readdirSync(MANIFESTS_DIR, { withFil
 
 /**
  * Whether a value is a contract: an object with an `app` name, an `operations`
- * table and a `bind` function.
+ * table, a `resources` table and a `bind` function.
  */
 function isContract(value: unknown): value is RealContract {
   return (
@@ -62,6 +69,9 @@ function isContract(value: unknown): value is RealContract {
     'operations' in value &&
     typeof value.operations === 'object' &&
     value.operations !== null &&
+    'resources' in value &&
+    typeof value.resources === 'object' &&
+    value.resources !== null &&
     'bind' in value &&
     typeof value.bind === 'function'
   )

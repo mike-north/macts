@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Layer, LayerCreateInput } from '../types.js'
 
@@ -23,8 +24,8 @@ export class LayerResourceClient {
   /**
    * List the layers of one canvas, as one page.
    */
-  async list(canvasId: string): Promise<{ items: Layer[] }> {
-    return this.#http.rpc<{ items: Layer[] }>(`${this.#app}.${this.#resource}.list`, { canvasId })
+  async list(canvasId: string): Promise<Page<Layer>> {
+    return this.#http.rpc<Page<Layer>>(`${this.#app}.${this.#resource}.list`, { canvasId })
   }
 
   /**

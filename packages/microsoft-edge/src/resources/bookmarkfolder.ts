@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { BookmarkFolder } from '../types.js'
 
@@ -23,8 +24,8 @@ export class BookmarkFolderResourceClient {
   /**
    * List all bookmark folders, as one page.
    */
-  async list(): Promise<{ items: BookmarkFolder[] }> {
-    return this.#http.rpc<{ items: BookmarkFolder[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<BookmarkFolder>> {
+    return this.#http.rpc<Page<BookmarkFolder>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

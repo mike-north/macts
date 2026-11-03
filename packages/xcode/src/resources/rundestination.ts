@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { RunDestination } from '../types.js'
 
@@ -23,8 +24,8 @@ export class RunDestinationResourceClient {
   /**
    * List the run destinations of one workspace document, as one page.
    */
-  async list(workspaceName: string): Promise<{ items: RunDestination[] }> {
-    return this.#http.rpc<{ items: RunDestination[] }>(`${this.#app}.${this.#resource}.list`, {
+  async list(workspaceName: string): Promise<Page<RunDestination>> {
+    return this.#http.rpc<Page<RunDestination>>(`${this.#app}.${this.#resource}.list`, {
       workspaceName,
     })
   }

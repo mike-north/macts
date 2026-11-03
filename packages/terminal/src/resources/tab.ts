@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Tab } from '../types.js'
 
@@ -23,8 +24,8 @@ export class TabResourceClient {
   /**
    * List all tabs, as one page.
    */
-  async list(): Promise<{ items: Tab[] }> {
-    return this.#http.rpc<{ items: Tab[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Tab>> {
+    return this.#http.rpc<Page<Tab>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

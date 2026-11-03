@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { AutomatorAction } from '../types.js'
 
@@ -23,8 +24,8 @@ export class AutomatorActionResourceClient {
   /**
    * List the automator actions of one workflow, as one page.
    */
-  async list(workflowName: string): Promise<{ items: AutomatorAction[] }> {
-    return this.#http.rpc<{ items: AutomatorAction[] }>(`${this.#app}.${this.#resource}.list`, {
+  async list(workflowName: string): Promise<Page<AutomatorAction>> {
+    return this.#http.rpc<Page<AutomatorAction>>(`${this.#app}.${this.#resource}.list`, {
       workflowName,
     })
   }

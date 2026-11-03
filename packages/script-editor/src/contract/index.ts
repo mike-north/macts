@@ -22,9 +22,11 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
   type Page,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -104,9 +106,11 @@ export interface DocumentResourceClient {
 
 /**
  * The Script Editor client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link scriptEditorContract}.
+ * commands. A client factory creates one from {@link scriptEditorContract}. Its type carries the
+ * contract's resource table, {@link ScriptEditorResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface ScriptEditorClient {
+export interface ScriptEditorClient extends ClientBrand<ScriptEditorResources> {
   /** A Script Editor document */
   readonly documents: DocumentResourceClient
 }
@@ -135,11 +139,29 @@ const documentCreateInputType: ValueType<DocumentCreateInput> = t.record({
 })
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link scriptEditorContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
  */
-const resources: AppContract<ScriptEditorClient>['resources'] = {
+export type ScriptEditorResources = Readonly<{
+  Document: ResourceDescriptor<Document, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'script-editor.documents.get'
+    readonly list: 'script-editor.documents.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link ScriptEditorResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
+ */
+const resources = {
   Document: {
     name: 'Document',
     record: documentRecordType,
@@ -147,7 +169,7 @@ const resources: AppContract<ScriptEditorClient>['resources'] = {
     get: 'script-editor.documents.get',
     list: 'script-editor.documents.list',
   },
-}
+} satisfies ScriptEditorResources
 
 const documentListOperation: OperationDescriptor<Record<string, never>, Page<Document>> = {
   id: 'script-editor.documents.list',
@@ -226,7 +248,7 @@ function bind(runtime: ClientRuntime): ScriptEditorClient {
  * The Script Editor contract. Pass it to a client factory to obtain a
  * {@link ScriptEditorClient}.
  */
-export const scriptEditorContract: AppContract<ScriptEditorClient> = {
+export const scriptEditorContract: AppContract<ScriptEditorClient, ScriptEditorResources> = {
   app: 'script-editor',
   operations,
   resources,

@@ -18,6 +18,20 @@
 import type { CallOptions } from '../call-options.js'
 import type { ReferenceData } from '../references/index.js'
 import type { ValueType } from '../values/value-type.js'
+import type { ClientBrand, ResourceTable } from './resource-table.js'
+
+export type {
+  BoundReferenceOf,
+  ClientBrand,
+  ResolvableCollectionReferenceData,
+  ResolvableContainment,
+  ResolvableObjectReferenceData,
+  ResolvableReferenceData,
+  ResolvableResourceKey,
+  ResourceIdOf,
+  ResourceRecordOf,
+  ResourceTable,
+} from './resource-table.js'
 
 /**
  * Stable identity of an operation: `app.resource.command` (or `app.app.command`
@@ -194,8 +208,13 @@ export interface ClientRuntime {
  * One app's generated contract.
  *
  * @typeParam Client - The app's generated client interface.
+ * @typeParam Resources - The type of the contract's resource table. A
+ *   generated contract declares its table's literal type, so that a client
+ *   created from it can check references statically (see
+ *   {@link ResolvableReferenceData}). It defaults to the widest table, whose
+ *   keys are not known.
  */
-export interface AppContract<Client> {
+export interface AppContract<Client, Resources extends ResourceTable = ResourceTable> {
   /** The app's route segment, for example `'calendar'`. */
   readonly app: string
   /** Every operation, keyed by identity. */
@@ -211,18 +230,29 @@ export interface AppContract<Client> {
    * identifier types from it through a lazy thunk, so generated code builds
    * no parallel table.
    */
-  readonly resources: Readonly<Record<string, ResourceDescriptor<unknown>>>
+  readonly resources: Resources
   /**
    * Load the app manifest. Called only by the Mac-side runtime, which validates
    * the result before use.
    */
   loadManifest(): Promise<unknown>
-  /** Build the app client on top of a factory-supplied runtime. */
-  bind(runtime: ClientRuntime): Client
+  /**
+   * Build the app client on top of a factory-supplied runtime.
+   *
+   * @remarks
+   * The result's type carries the contract's resource table in a
+   * {@link ClientBrand}, which has no runtime presence: `bind` returns the
+   * client alone.
+   */
+  bind(runtime: ClientRuntime): Client & ClientBrand<Resources>
 }
 
 /**
  * The shape shared by the local and remote client factories: an app contract
- * plus locality-specific options yields that app's client.
+ * plus locality-specific options yields that app's client, whose type carries
+ * the contract's resource table.
  */
-export type ClientFactory<Options> = <Client>(app: AppContract<Client>, options: Options) => Client
+export type ClientFactory<Options> = <Client, Resources extends ResourceTable>(
+  app: AppContract<Client, Resources>,
+  options: Options
+) => Client & ClientBrand<Resources>

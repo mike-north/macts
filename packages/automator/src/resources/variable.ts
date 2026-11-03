@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Variable } from '../types.js'
 
@@ -23,10 +24,8 @@ export class VariableResourceClient {
   /**
    * List the variables of one workflow, as one page.
    */
-  async list(workflowName: string): Promise<{ items: Variable[] }> {
-    return this.#http.rpc<{ items: Variable[] }>(`${this.#app}.${this.#resource}.list`, {
-      workflowName,
-    })
+  async list(workflowName: string): Promise<Page<Variable>> {
+    return this.#http.rpc<Page<Variable>>(`${this.#app}.${this.#resource}.list`, { workflowName })
   }
 
   /**

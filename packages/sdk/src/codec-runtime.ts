@@ -47,16 +47,18 @@ import {
   resolvingOperationKey,
   type AnyOperationDescriptor,
   type AppContract,
+  type BoundReferenceOf,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type CodecResult,
-  type CollectionReferenceVariant,
   type DecodeContext,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
   type OperationId,
   type ReferenceCardinality,
   type ReferenceData,
+  type ResolvableReferenceData,
+  type ResourceTable,
   type ValidationIssue,
   type ValueType,
   type WireValue,
@@ -476,10 +478,10 @@ function isObject(value: unknown): value is object {
  *   references bound to the earlier client resolve under this one's
  *   credential.
  */
-export function createCodecClient<Client>(
-  app: AppContract<Client>,
+export function createCodecClient<Client, Resources extends ResourceTable>(
+  app: AppContract<Client, Resources>,
   transport: ClientTransport
-): Client {
+): Client & ClientBrand<Resources> {
   const { runtime, decodeContext } = buildCodecClientRuntime(app, transport)
   const client = app.bind(runtime)
   if (isObject(client)) {
@@ -511,6 +513,18 @@ export function createCodecClient<Client>(
  * not copied with its old client. Whether the target exists is learned only
  * when the result is resolved.
  *
+ * The client's type carries its contract's resource table: a factory's
+ * result does, and so does a generated client interface such as
+ * `NotesClient`, so a variable or parameter annotated with it binds the same
+ * data. `data` type-checks only when the table records the operation every level resolves
+ * through (`resolvingOperationKey`): `get` for a single-object target, a
+ * container, and an identity-collection entry, and `list` for a collection
+ * target. The result is the bound variant of `data`'s form and cardinality,
+ * with the resource's record and identifier types, so its `resolve()` yields
+ * the record, or an array of records. A container that is itself a bound
+ * reference is admitted as it is, because a client already decoded it. For a
+ * contract that declares no table type, any reference data type-checks.
+ *
  * @example
  * ```typescript
  * import { bindReference, createClient, resolveClientOptions } from '@macts/sdk'
@@ -530,7 +544,8 @@ export function createCodecClient<Client>(
  * @param client - A client created by `createClient` from `@macts/sdk` or
  *   `@macts/sdk/local`.
  * @param data - The reference to bind.
- * @returns The reference bound to `client`.
+ * @returns The reference bound to `client`: the bound variant of `data`
+ *   (`BoundReferenceOf`).
  * @throws `TypeError` when `client` is not a client created by either
  *   factory.
  * @throws `ValidationError` listing every issue the encoding raises: an `app`
@@ -538,10 +553,10 @@ export function createCodecClient<Client>(
  *   other form, and a target, container, or entry whose resource has no
  *   resolving operation.
  */
-export function bindReference(
-  client: object,
-  data: ReferenceData
-): ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown> {
+export function bindReference<
+  Resources extends ResourceTable,
+  const Data extends ResolvableReferenceData<Resources>,
+>(client: ClientBrand<Resources>, data: Data): BoundReferenceOf<Resources, Data> {
   const binding = clientBindings.get(client)
   if (binding === undefined) {
     throw new TypeError(
@@ -562,5 +577,8 @@ export function bindReference(
       {}
     )
   }
-  return decoded.value
+  // The variant is the one `data` names: decoding keeps the resource, form,
+  // and cardinality that encoding read, and the record and identifier types
+  // are those of the contract the reference was checked against.
+  return decoded.value as BoundReferenceOf<Resources, Data>
 }

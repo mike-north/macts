@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Tag, TagCreateInput } from '../types.js'
 
@@ -23,8 +24,8 @@ export class TagResourceClient {
   /**
    * List all tags, as one page.
    */
-  async list(): Promise<{ items: Tag[] }> {
-    return this.#http.rpc<{ items: Tag[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Tag>> {
+    return this.#http.rpc<Page<Tag>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

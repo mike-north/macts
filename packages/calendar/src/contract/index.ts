@@ -22,10 +22,12 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
   type Page,
+  type ResourceDescriptor,
   type Rgb,
   type ValueType,
 } from '@macts/contracts'
@@ -551,9 +553,11 @@ export interface EventResourceClient {
 
 /**
  * The Calendar client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link calendarContract}.
+ * A client factory creates one from {@link calendarContract}. Its type carries the contract's
+ * resource table, {@link CalendarResources}, so references can be bound to it by resource; the
+ * brand has no runtime member.
  */
-export interface CalendarClient {
+export interface CalendarClient extends ClientBrand<CalendarResources> {
   /** A calendar containing events */
   readonly calendars: CalendarResourceClient
   /** A calendar event */
@@ -573,9 +577,6 @@ export interface CalendarClient {
    */
   viewCalendar(at: Date, options?: CallOptions): Promise<void>
 }
-
-/** The members of {@link ParticipationStatus}, for its value type. */
-const participationStatusMembers = ['unknown', 'accepted', 'declined', 'tentative'] as const
 
 /** The members of {@link EventStatus}, for its value type. */
 const eventStatusMembers = ['cancelled', 'confirmed', 'none', 'tentative'] as const
@@ -615,68 +616,6 @@ const eventRecordType: ValueType<Event> = t.record(
   { description: 'A calendar event' }
 )
 
-const attendeeRecordType: ValueType<Attendee> = t.record(
-  {
-    displayName: t.nullable(t.string(), { description: 'The first and last name of the attendee' }),
-    email: t.string({ description: 'Email address of the attendee' }),
-    participationStatus: t.enumeration(participationStatusMembers, {
-      description: 'The invitation status for the attendee',
-    }),
-  },
-  { description: 'An event attendee' }
-)
-
-const displayAlarmRecordType: ValueType<DisplayAlarm> = t.record(
-  {
-    triggerInterval: t.nullable(t.integer(), {
-      description:
-        'The interval in minutes between the event and the alarm (positive for after, negative for before)',
-    }),
-    triggerDate: t.nullable(t.date(), { description: 'An absolute alarm date' }),
-  },
-  { description: 'A message/display alarm' }
-)
-
-const mailAlarmRecordType: ValueType<MailAlarm> = t.record(
-  {
-    triggerInterval: t.nullable(t.integer(), {
-      description:
-        'The interval in minutes between the event and the alarm (positive for after, negative for before)',
-    }),
-    triggerDate: t.nullable(t.date(), { description: 'An absolute alarm date' }),
-  },
-  { description: 'A mail/email alarm' }
-)
-
-const soundAlarmRecordType: ValueType<SoundAlarm> = t.record(
-  {
-    triggerInterval: t.nullable(t.integer(), {
-      description:
-        'The interval in minutes between the event and the alarm (positive for after, negative for before)',
-    }),
-    triggerDate: t.nullable(t.date(), { description: 'An absolute alarm date' }),
-    soundName: t.nullable(t.string(), {
-      description: 'The system sound name to be used for the alarm',
-    }),
-    soundFile: t.nullable(t.string(), {
-      description: 'The (POSIX) path to the sound file to be used for the alarm',
-    }),
-  },
-  { description: 'A sound alarm' }
-)
-
-const openFileAlarmRecordType: ValueType<OpenFileAlarm> = t.record(
-  {
-    triggerInterval: t.nullable(t.integer(), {
-      description:
-        'The interval in minutes between the event and the alarm (positive for after, negative for before)',
-    }),
-    triggerDate: t.nullable(t.date(), { description: 'An absolute alarm date' }),
-    filepath: t.nullable(t.string(), { description: 'The (POSIX) path to be opened by the alarm' }),
-  },
-  { description: "An 'open file' alarm" }
-)
-
 const calendarCreateInputType: ValueType<CalendarCreateInput> = t.record({
   name: t.string({ description: 'Calendar name' }),
   title: t.optional(t.string({ description: 'The calendar title (synonym for name)' })),
@@ -702,11 +641,34 @@ const eventCreateInputType: ValueType<EventCreateInput> = t.record({
 })
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link calendarContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
  */
-const resources: AppContract<CalendarClient>['resources'] = {
+export type CalendarResources = Readonly<{
+  Calendar: ResourceDescriptor<Calendar, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'calendar.calendars.get'
+    readonly list: 'calendar.calendars.list'
+  }
+  Event: ResourceDescriptor<Event, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'calendar.events.get'
+    readonly list: 'calendar.events.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link CalendarResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
+ */
+const resources = {
   Calendar: {
     name: 'Calendar',
     record: calendarRecordType,
@@ -721,27 +683,7 @@ const resources: AppContract<CalendarClient>['resources'] = {
     get: 'calendar.events.get',
     list: 'calendar.events.list',
   },
-  Attendee: {
-    name: 'Attendee',
-    record: attendeeRecordType,
-  },
-  DisplayAlarm: {
-    name: 'DisplayAlarm',
-    record: displayAlarmRecordType,
-  },
-  MailAlarm: {
-    name: 'MailAlarm',
-    record: mailAlarmRecordType,
-  },
-  SoundAlarm: {
-    name: 'SoundAlarm',
-    record: soundAlarmRecordType,
-  },
-  OpenFileAlarm: {
-    name: 'OpenFileAlarm',
-    record: openFileAlarmRecordType,
-  },
-}
+} satisfies CalendarResources
 
 const calendarListOperation: OperationDescriptor<Record<string, never>, Page<Calendar>> = {
   id: 'calendar.calendars.list',
@@ -1233,7 +1175,7 @@ function bind(runtime: ClientRuntime): CalendarClient {
  * The Calendar contract. Pass it to a client factory to obtain a
  * {@link CalendarClient}.
  */
-export const calendarContract: AppContract<CalendarClient> = {
+export const calendarContract: AppContract<CalendarClient, CalendarResources> = {
   app: 'calendar',
   operations,
   resources,

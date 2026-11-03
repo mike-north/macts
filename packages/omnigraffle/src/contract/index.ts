@@ -22,11 +22,13 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
   type Page,
   type Point,
+  type ResourceDescriptor,
   type Rgb,
   type ValueType,
 } from '@macts/contracts'
@@ -1430,9 +1432,11 @@ export interface LayerResourceClient {
 
 /**
  * The OmniGraffle client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link omniGraffleContract}.
+ * commands. A client factory creates one from {@link omniGraffleContract}. Its type carries the
+ * contract's resource table, {@link OmniGraffleResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface OmniGraffleClient {
+export interface OmniGraffleClient extends ClientBrand<OmniGraffleResources> {
   /** A drawing page/canvas in OmniGraffle */
   readonly canvases: CanvasResourceClient
   /** Base class for visual elements in OmniGraffle */
@@ -1516,15 +1520,6 @@ const hopTypeMembers = [
   'ignoreHop',
   'gapHop',
   'bridgeHop',
-] as const
-
-/** The members of {@link LabelOrientation}, for its value type. */
-const labelOrientationMembers = [
-  'horizontal',
-  'vertical',
-  'parallel',
-  'perpendicular',
-  'custom',
 ] as const
 
 /** The members of {@link TextAutosizing}, for its value type. */
@@ -1688,15 +1683,6 @@ const lineRecordType: ValueType<Line> = t.record(
   { description: 'A line/connector in OmniGraffle' }
 )
 
-const groupRecordType: ValueType<Group> = t.record(
-  {
-    id: t.string({ description: 'Unique identifier' }),
-    rotation: t.nullable(t.double(), { description: 'Rotation of the group in degrees' }),
-    connectToGroupOnly: t.nullable(t.boolean(), { description: 'Only connect to the group?' }),
-  },
-  { description: 'A group of graphics in OmniGraffle' }
-)
-
 const layerRecordType: ValueType<Layer> = t.record(
   {
     name: t.string({ description: 'Name of the layer' }),
@@ -1705,81 +1691,6 @@ const layerRecordType: ValueType<Layer> = t.record(
     prints: t.nullable(t.boolean(), { description: "Do the layer's graphics print?" }),
   },
   { description: 'A drawing layer in OmniGraffle' }
-)
-
-const subgraphRecordType: ValueType<Subgraph> = t.record(
-  {
-    id: t.string({ description: 'Unique identifier' }),
-    collapsed: t.nullable(t.boolean(), { description: 'Is the subgraph collapsed?' }),
-    topMargin: t.nullable(t.double(), { description: 'Top margin' }),
-    bottomMargin: t.nullable(t.double(), { description: 'Bottom margin' }),
-    leftMargin: t.nullable(t.double(), { description: 'Left margin' }),
-    rightMargin: t.nullable(t.double(), { description: 'Right margin' }),
-  },
-  { description: 'A subgraph container in OmniGraffle' }
-)
-
-const labelRecordType: ValueType<Label> = t.record(
-  {
-    id: t.string({ description: 'Unique identifier' }),
-    text: t.nullable(t.string(), { description: 'The text inside the label' }),
-    labelPosition: t.nullable(t.double(), { description: 'The position along the line' }),
-    labelOffset: t.nullable(t.double(), { description: 'The offset from the line' }),
-    labelRotation: t.nullable(t.enumeration(labelOrientationMembers), {
-      description: 'The type of rotation around the line',
-    }),
-  },
-  { description: 'A text label on a line' }
-)
-
-const gridRecordType: ValueType<Grid> = t.record(
-  {
-    visible: t.nullable(t.boolean(), { description: 'Is the grid visible?' }),
-    snaps: t.nullable(t.boolean(), { description: 'Do points snap to the grid?' }),
-    spacing: t.nullable(t.double(), { description: 'Number of pixels between minor grid lines' }),
-    major: t.nullable(t.boolean(), { description: "Does the grid have 'major' lines?" }),
-    majorSpacing: t.nullable(t.integer(), {
-      description: 'The number of minor grid lines for each major line',
-    }),
-    drawsInFront: t.nullable(t.boolean(), {
-      description: 'Does the grid draw in front of all shapes?',
-    }),
-    scriptGridColor: t.nullable(t.rgb(), { description: 'Color of the grid' }),
-    scriptMajorGridColor: t.nullable(t.rgb(), { description: 'Color of major lines' }),
-  },
-  { description: 'Grid settings for a canvas' }
-)
-
-const masterRecordType: ValueType<Master> = t.record(
-  {
-    id: t.string({ description: 'Unique identifier' }),
-    name: t.nullable(t.string(), { description: 'Name of this master' }),
-  },
-  { description: 'A reusable template/master in OmniGraffle' }
-)
-
-const exportSettingsRecordType: ValueType<ExportSettings> = t.record(
-  {
-    areaType: t.nullable(t.enumeration(exportAreaTypeMembers), {
-      description: 'The type of area to be exported',
-    }),
-    exportScale: t.nullable(t.double(), { description: 'The scale to use during export' }),
-    resolution: t.nullable(t.double(), {
-      description: 'The number of pixels per point in the resulting exported image',
-    }),
-    drawsBackground: t.nullable(t.boolean(), { description: 'Draw the background canvas color' }),
-    includeBorder: t.nullable(t.boolean(), {
-      description: 'Whether or not to include a border area',
-    }),
-    borderAmount: t.nullable(t.double(), {
-      description: 'The number of pixels of border area to include',
-    }),
-    includeNonprintingLayers: t.nullable(t.boolean(), {
-      description: 'Whether to export with non printing layers',
-    }),
-    useArtboards: t.nullable(t.boolean(), { description: 'Whether to export with artboards' }),
-  },
-  { description: 'Export configuration settings' }
 )
 
 const canvasCreateInputType: ValueType<CanvasCreateInput> = t.record({
@@ -1848,11 +1759,49 @@ const layerCreateInputType: ValueType<LayerCreateInput> = t.record({
 })
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link omniGraffleContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
  */
-const resources: AppContract<OmniGraffleClient>['resources'] = {
+export type OmniGraffleResources = Readonly<{
+  Canvas: ResourceDescriptor<Canvas, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnigraffle.canvases.get'
+    readonly list: 'omnigraffle.canvases.list'
+  }
+  Graphic: ResourceDescriptor<Graphic, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnigraffle.graphics.get'
+    readonly list: 'omnigraffle.graphics.list'
+  }
+  Shape: ResourceDescriptor<Shape, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnigraffle.shapes.get'
+    readonly list: 'omnigraffle.shapes.list'
+  }
+  Line: ResourceDescriptor<Line, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnigraffle.lines.get'
+    readonly list: 'omnigraffle.lines.list'
+  }
+  Layer: ResourceDescriptor<Layer, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnigraffle.layers.get'
+    readonly list: 'omnigraffle.layers.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link OmniGraffleResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
+ */
+const resources = {
   Canvas: {
     name: 'Canvas',
     record: canvasRecordType,
@@ -1881,11 +1830,6 @@ const resources: AppContract<OmniGraffleClient>['resources'] = {
     get: 'omnigraffle.lines.get',
     list: 'omnigraffle.lines.list',
   },
-  Group: {
-    name: 'Group',
-    record: groupRecordType,
-    id: t.string({ description: 'Unique identifier' }),
-  },
   Layer: {
     name: 'Layer',
     record: layerRecordType,
@@ -1893,30 +1837,7 @@ const resources: AppContract<OmniGraffleClient>['resources'] = {
     get: 'omnigraffle.layers.get',
     list: 'omnigraffle.layers.list',
   },
-  Subgraph: {
-    name: 'Subgraph',
-    record: subgraphRecordType,
-    id: t.string({ description: 'Unique identifier' }),
-  },
-  Label: {
-    name: 'Label',
-    record: labelRecordType,
-    id: t.string({ description: 'Unique identifier' }),
-  },
-  Grid: {
-    name: 'Grid',
-    record: gridRecordType,
-  },
-  Master: {
-    name: 'Master',
-    record: masterRecordType,
-    id: t.string({ description: 'Unique identifier' }),
-  },
-  ExportSettings: {
-    name: 'ExportSettings',
-    record: exportSettingsRecordType,
-  },
-}
+} satisfies OmniGraffleResources
 
 const canvasListCanvasesOperation: OperationDescriptor<Record<string, never>, Page<Canvas>> = {
   id: 'omnigraffle.canvases.list',
@@ -2707,7 +2628,7 @@ function bind(runtime: ClientRuntime): OmniGraffleClient {
  * The OmniGraffle contract. Pass it to a client factory to obtain a
  * {@link OmniGraffleClient}.
  */
-export const omniGraffleContract: AppContract<OmniGraffleClient> = {
+export const omniGraffleContract: AppContract<OmniGraffleClient, OmniGraffleResources> = {
   app: 'omnigraffle',
   operations,
   resources,

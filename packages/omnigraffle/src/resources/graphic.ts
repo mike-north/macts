@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Graphic } from '../types.js'
 
@@ -23,8 +24,8 @@ export class GraphicResourceClient {
   /**
    * List the graphics of one canvas, as one page.
    */
-  async list(canvasId: string): Promise<{ items: Graphic[] }> {
-    return this.#http.rpc<{ items: Graphic[] }>(`${this.#app}.${this.#resource}.list`, { canvasId })
+  async list(canvasId: string): Promise<Page<Graphic>> {
+    return this.#http.rpc<Page<Graphic>>(`${this.#app}.${this.#resource}.list`, { canvasId })
   }
 
   /**

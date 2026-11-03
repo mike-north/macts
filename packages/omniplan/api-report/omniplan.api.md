@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -19,9 +20,7 @@ export interface AssignmentCreateInput {
 // @public
 export class AssignmentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    list(): Promise<{
-        items: Assignment[];
-    }>;
+    list(): Promise<Page<Assignment>>;
 }
 
 // @public (undocumented)
@@ -88,9 +87,7 @@ export interface DependencyCreateInput {
 // @public
 export class DependencyResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    list(): Promise<{
-        items: Dependency[];
-    }>;
+    list(): Promise<Page<Dependency>>;
 }
 
 // @public (undocumented)
@@ -132,9 +129,7 @@ export class MilestoneResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: MilestoneCreateInput): Promise<Milestone>;
     get(id: string): Promise<Milestone>;
-    list(): Promise<{
-        items: Milestone[];
-    }>;
+    list(): Promise<Page<Milestone>>;
 }
 
 // @public (undocumented)
@@ -207,9 +202,7 @@ export interface ProjectCreateInput {
 export class ProjectResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Project>;
-    list(): Promise<{
-        items: Project[];
-    }>;
+    list(): Promise<Page<Project>>;
 }
 
 // @public (undocumented)
@@ -261,9 +254,7 @@ export class ResourceResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: ResourceCreateInput): Promise<Resource>;
     get(id: string): Promise<Resource>;
-    list(): Promise<{
-        items: Resource[];
-    }>;
+    list(): Promise<Page<Resource>>;
 }
 
 // @public (undocumented)
@@ -314,9 +305,7 @@ export interface ScenarioCreateInput {
 export class ScenarioResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Scenario>;
-    list(): Promise<{
-        items: Scenario[];
-    }>;
+    list(): Promise<Page<Scenario>>;
 }
 
 // @public (undocumented)
@@ -401,9 +390,7 @@ export class TaskResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: TaskCreateInput): Promise<Task>;
     get(id: string): Promise<Task>;
-    list(): Promise<{
-        items: Task[];
-    }>;
+    list(): Promise<Page<Task>>;
 }
 
 // @public (undocumented)
@@ -455,9 +442,7 @@ export type ViolationCreateInput = Record<string, never>;
 export class ViolationResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     fix(): Promise<void>;
-    list(): Promise<{
-        items: Violation[];
-    }>;
+    list(): Promise<Page<Violation>>;
 }
 
 // @public (undocumented)

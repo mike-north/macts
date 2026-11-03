@@ -6,10 +6,13 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface BookmarkFolder {
@@ -61,7 +64,7 @@ export interface BookmarkItemUpdateInput {
 }
 
 // @public
-export interface MicrosoftEdgeClient {
+export interface MicrosoftEdgeClient extends ClientBrand<MicrosoftEdgeResources> {
     readonly bookmarkFolders: BookmarkFolderResourceClient;
     readonly bookmarkItems: BookmarkItemResourceClient;
     readonly tabs: TabResourceClient;
@@ -69,7 +72,31 @@ export interface MicrosoftEdgeClient {
 }
 
 // @public
-export const microsoftEdgeContract: AppContract<MicrosoftEdgeClient>;
+export const microsoftEdgeContract: AppContract<MicrosoftEdgeClient, MicrosoftEdgeResources>;
+
+// @public
+export type MicrosoftEdgeResources = Readonly<{
+    Window: ResourceDescriptor<Window, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'microsoft-edge.windows.get';
+        readonly list: 'microsoft-edge.windows.list';
+    };
+    Tab: ResourceDescriptor<Tab, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'microsoft-edge.tabs.get';
+        readonly list: 'microsoft-edge.tabs.list';
+    };
+    BookmarkFolder: ResourceDescriptor<BookmarkFolder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'microsoft-edge.bookmarkFolders.get';
+        readonly list: 'microsoft-edge.bookmarkFolders.list';
+    };
+    BookmarkItem: ResourceDescriptor<BookmarkItem, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'microsoft-edge.bookmarkItems.get';
+        readonly list: 'microsoft-edge.bookmarkItems.list';
+    };
+}>;
 
 // @public
 export interface Tab {

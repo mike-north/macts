@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Track } from '../types.js'
 
@@ -23,8 +24,8 @@ export class TrackResourceClient {
   /**
    * List the tracks of one playlist, as one page.
    */
-  async list(playlistId: string): Promise<{ items: Track[] }> {
-    return this.#http.rpc<{ items: Track[] }>(`${this.#app}.${this.#resource}.list`, { playlistId })
+  async list(playlistId: string): Promise<Page<Track>> {
+    return this.#http.rpc<Page<Track>>(`${this.#app}.${this.#resource}.list`, { playlistId })
   }
 
   /**

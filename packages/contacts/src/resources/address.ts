@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Address } from '../types.js'
 
@@ -27,15 +28,12 @@ export class AddressResourceClient {
   async list(
     personId: string,
     page: { pageSize?: number; cursor?: string } = {}
-  ): Promise<{ items: Address[]; nextCursor?: string }> {
-    return this.#http.rpc<{ items: Address[]; nextCursor?: string }>(
-      `${this.#app}.${this.#resource}.list`,
-      {
-        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-        personId,
-      }
-    )
+  ): Promise<Page<Address>> {
+    return this.#http.rpc<Page<Address>>(`${this.#app}.${this.#resource}.list`, {
+      ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+      ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+      personId,
+    })
   }
 
   /**

@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 
 // @public
 export interface Anchor {
@@ -37,13 +38,16 @@ export interface PaneResourceClient {
 export type PaneUpdateInput = Record<string, never>;
 
 // @public
-export interface SystemSettingsClient {
+export interface SystemSettingsClient extends ClientBrand<SystemSettingsResources> {
     readonly panes: PaneResourceClient;
     reveal(options?: CallOptions): Promise<void>;
 }
 
 // @public
-export const systemSettingsContract: AppContract<SystemSettingsClient>;
+export const systemSettingsContract: AppContract<SystemSettingsClient, SystemSettingsResources>;
+
+// @public
+export type SystemSettingsResources = Readonly<Record<never, never>>;
 
 // (No @packageDocumentation comment for this package)
 

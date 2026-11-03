@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -20,9 +21,7 @@ export type AccountCreateInput = Record<string, never>;
 export class AccountResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<Account>;
-    list(): Promise<{
-        items: Account[];
-    }>;
+    list(): Promise<Page<Account>>;
 }
 
 // @public (undocumented)
@@ -54,10 +53,7 @@ export class AttachmentResourceClient {
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Attachment[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Attachment>>;
 }
 
 // @public (undocumented)
@@ -107,9 +103,7 @@ export interface FolderCreateInput {
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<Folder>;
-    list(): Promise<{
-        items: Folder[];
-    }>;
+    list(): Promise<Page<Folder>>;
 }
 
 // @public (undocumented)
@@ -151,9 +145,7 @@ export class NoteResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: NoteCreateInput): Promise<Note>;
     get(name: string): Promise<Note>;
-    list(): Promise<{
-        items: Note[];
-    }>;
+    list(): Promise<Page<Note>>;
     show(name: string): Promise<void>;
 }
 

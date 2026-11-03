@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { RequiredResource } from '../types.js'
 
@@ -23,8 +24,8 @@ export class RequiredResourceResourceClient {
   /**
    * List the required resources of one automator action, as one page.
    */
-  async list(actionId: string): Promise<{ items: RequiredResource[] }> {
-    return this.#http.rpc<{ items: RequiredResource[] }>(`${this.#app}.${this.#resource}.list`, {
+  async list(actionId: string): Promise<Page<RequiredResource>> {
+    return this.#http.rpc<Page<RequiredResource>>(`${this.#app}.${this.#resource}.list`, {
       actionId,
     })
   }

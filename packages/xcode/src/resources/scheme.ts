@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Scheme } from '../types.js'
 
@@ -23,10 +24,8 @@ export class SchemeResourceClient {
   /**
    * List the schemes of one workspace document, as one page.
    */
-  async list(workspaceName: string): Promise<{ items: Scheme[] }> {
-    return this.#http.rpc<{ items: Scheme[] }>(`${this.#app}.${this.#resource}.list`, {
-      workspaceName,
-    })
+  async list(workspaceName: string): Promise<Page<Scheme>> {
+    return this.#http.rpc<Page<Scheme>>(`${this.#app}.${this.#resource}.list`, { workspaceName })
   }
 
   /**

@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Dependency } from '../types.js'
 
@@ -23,7 +24,7 @@ export class DependencyResourceClient {
   /**
    * List all dependencies, as one page.
    */
-  async list(): Promise<{ items: Dependency[] }> {
-    return this.#http.rpc<{ items: Dependency[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Dependency>> {
+    return this.#http.rpc<Page<Dependency>>(`${this.#app}.${this.#resource}.list`)
   }
 }

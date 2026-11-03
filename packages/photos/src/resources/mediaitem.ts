@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { MediaItem } from '../types.js'
 
@@ -23,8 +24,8 @@ export class MediaItemResourceClient {
   /**
    * List all media items, as one page.
    */
-  async list(): Promise<{ items: MediaItem[] }> {
-    return this.#http.rpc<{ items: MediaItem[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<MediaItem>> {
+    return this.#http.rpc<Page<MediaItem>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

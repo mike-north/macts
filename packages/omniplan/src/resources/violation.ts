@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Violation } from '../types.js'
 
@@ -23,8 +24,8 @@ export class ViolationResourceClient {
   /**
    * List all violations, as one page.
    */
-  async list(): Promise<{ items: Violation[] }> {
-    return this.#http.rpc<{ items: Violation[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Violation>> {
+    return this.#http.rpc<Page<Violation>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
