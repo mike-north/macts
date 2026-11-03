@@ -1,17 +1,20 @@
 /**
- * Whether a resource's two resolution results have the same record shape.
+ * Whether a resource's two resolution results have the same record shape, and
+ * the macOS provider's get and list bodies read the same properties.
  *
  * A single reference resolves as the resource's `get` and is validated against
  * the get output. An identity collection resolves as its `list`, validated
  * against an array of the list's page items (phases/13 D7,
  * `referenceResultType`). The macOS provider reads every resolved object,
  * single or in a collection, with the get body's record read. That is correct
- * only while a get record and a list item have the same plan, so this module
- * compares the two for a resource and describes every difference.
+ * only while a get record and a list item have the same plan, and the get
+ * body reads the same keys a list body reads, so this module compares both
+ * for a resource and describes every difference.
  *
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md (D7, D9)
  */
 
+import type { NativeReadKeys } from '@macts/core/testing'
 import {
   referenceResultType,
   type AnyOperationDescriptor,
@@ -48,12 +51,7 @@ export function compareResolutionPlans(
   operations: Readonly<Record<OperationId, AnyOperationDescriptor>>
 ): ResolutionPlanComparison {
   const { get, list } = resource
-  if (get === undefined || list === undefined) {
-    return {
-      compared: false,
-      reason: `${resource.name} has ${get === undefined ? 'no get' : 'a get'} and ${list === undefined ? 'no list' : 'a list'}`,
-    }
-  }
+  if (get === undefined || list === undefined) return notCompared(resource)
   const getRecord = referenceResultType('one', operationOf(operations, get).output).plan
   const listResult = referenceResultType('many', operationOf(operations, list).output).plan
   // A passthrough list resolves to itself, not to an array of items.
@@ -63,6 +61,47 @@ export function compareResolutionPlans(
     differences: planDifferences(getRecord, listItem, []).map(
       (difference) => `${resource.name} (get ${get}, list ${list}): ${difference}`
     ),
+  }
+}
+
+/**
+ * Compare the record keys the native get body reads for `resource` with those
+ * the native list body reads, when the resource records both a get and a
+ * list.
+ *
+ * @param resource - The resource's descriptor in its contract.
+ * @param reads - The keys each body reads, from the app's manifest.
+ * @returns Not compared when the resource records no get or no list;
+ *   otherwise each key one body reads and the other does not, naming the
+ *   resource.
+ */
+export function compareNativeReads(
+  resource: ResolvableResource,
+  reads: NativeReadKeys
+): ResolutionPlanComparison {
+  if (resource.get === undefined || resource.list === undefined) return notCompared(resource)
+  const onlyIn = (keys: readonly string[], others: readonly string[]): string[] =>
+    keys.filter((key) => !others.includes(key)).sort()
+  return {
+    compared: true,
+    differences: [
+      ...onlyIn(reads.get, reads.list).map(
+        (key) => `${resource.name}: the get body reads "${key}" but the list body does not`
+      ),
+      ...onlyIn(reads.list, reads.get).map(
+        (key) => `${resource.name}: the list body reads "${key}" but the get body does not`
+      ),
+    ],
+  }
+}
+
+/** The comparison of a resource that lacks a get or a list: nothing to compare. */
+function notCompared(resource: ResolvableResource): ResolutionPlanComparison {
+  const has = (operation: OperationId | undefined, name: string): string =>
+    operation === undefined ? `no ${name}` : `a ${name}`
+  return {
+    compared: false,
+    reason: `${resource.name} has ${has(resource.get, 'get')} and ${has(resource.list, 'list')}`,
   }
 }
 

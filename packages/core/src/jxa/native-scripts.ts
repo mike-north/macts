@@ -286,7 +286,7 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * `name`.
  */
 function readUsableProperties(resource: Resource | undefined, itemLocal: string): string {
-  const keys = resource === undefined ? ['name'] : usableProperties(resource).map(([key]) => key)
+  const keys = itemReadKeys(resource)
   const native = (key: string): string => nativePropertyName(resource, key)
   const readOnItsOwn = (key: string): string =>
     `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {}`
@@ -302,6 +302,42 @@ function readUsableProperties(resource: Resource | undefined, itemLocal: string)
     ...keys.map(readOnItsOwn),
     '}'
   )
+}
+
+/**
+ * The public keys of the properties one item's record read takes
+ * ({@link readUsableProperties}): the resource's usable properties, or `name`
+ * for a body with no resource.
+ */
+function itemReadKeys(resource: Resource | undefined): string[] {
+  return resource === undefined ? ['name'] : usableProperties(resource).map(([key]) => key)
+}
+
+/** The record keys the native bodies read for one resource, by body. */
+export interface NativeReadKeys {
+  /** What a get (and a resolved reference) reads from one item. */
+  readonly get: readonly string[]
+  /** What a list reads across the collection, for each item. */
+  readonly list: readonly string[]
+}
+
+/**
+ * The record keys a get body and a list body read for `resource`.
+ *
+ * @remarks
+ * A resolved identity collection is read with the get body's record read but
+ * validated against the list's item plan, so the two must read the same keys.
+ * They do while the resource's primary identifier is one of its usable
+ * properties: a list also reads the identifier when it is not
+ * ({@link resolveListOutputProperties}). A list never reads a declared
+ * identifier its targeting matches by another property, and a get's guarded
+ * read of it yields nothing, so that key is in both sets yet in neither
+ * record.
+ *
+ * @param resource - The resource definition from the manifest.
+ */
+export function nativeReadKeys(resource: Resource | undefined): NativeReadKeys {
+  return { get: itemReadKeys(resource), list: resolveListOutputProperties(resource) }
 }
 
 /**

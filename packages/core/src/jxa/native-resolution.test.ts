@@ -43,7 +43,7 @@ import type { AppManifest } from '../manifest/schemas/app.js'
 import { runNativeScript } from './executor.js'
 import { NATIVE_CODEC, type NativeOutcome, type NativeScript } from './native-codec.js'
 import { createNativeExecutor, type NativeTransport } from './native-executor.js'
-import { buildNativeBody, buildResolutionBody } from './native-scripts.js'
+import { buildNativeBody, buildResolutionBody, nativeReadKeys } from './native-scripts.js'
 import { recorded, standInTransport } from './test-support/stand-in-app.js'
 
 const CONTACTS_MANIFEST = fileURLToPath(
@@ -167,6 +167,35 @@ describe('buildResolutionBody', () => {
 
   it('fails with InternalError for a resource the manifest does not declare', () => {
     expect(() => buildResolutionBody(contacts, 'Account', 'one')).toThrow(InternalError)
+  })
+})
+
+describe('nativeReadKeys', () => {
+  it('reads the same person properties in a get and in a list', () => {
+    const person = contacts.resources['Person']
+    const keys = nativeReadKeys(person)
+
+    expect([...keys.get].sort()).toEqual([...keys.list].sort())
+    expect(keys.get).toContain('id')
+    expect(keys.get).toContain('firstName')
+  })
+
+  it('has a list read an identifier that is not a usable property, and a get not', () => {
+    const keys = nativeReadKeys({
+      name: 'Book',
+      plural: 'Books',
+      description: 'A book',
+      properties: {
+        title: { access: 'r', type: 'string', optional: false, description: 'The title' },
+      },
+      identifiers: [{ property: 'isbn', primary: true }],
+    })
+
+    expect(keys).toEqual({ get: ['title'], list: ['title', 'isbn'] })
+  })
+
+  it('reads name for a body with no resource', () => {
+    expect(nativeReadKeys(undefined)).toEqual({ get: ['name'], list: ['name'] })
   })
 })
 

@@ -1,13 +1,15 @@
 /**
  * Integration: in every real contract, a resource's get record and list item
- * have the same plan.
+ * have the same plan, and the native get and list bodies read the same
+ * properties.
  *
  * A single reference resolves to the resource's get output, and an identity
  * collection to an array of its list's page items (phases/13 D7). The macOS
  * provider reads both with the get body's record read (D7, native conversion
- * scope), which is correct only while the two plans are equal. This test
- * holds every shipped contract to that, for every resource with both a get
- * and a list; a resource with only one of them has nothing to compare.
+ * scope), which is correct only while the two plans are equal and the get
+ * body reads the keys the list body reads (`nativeReadKeys`). This test holds
+ * every shipped contract and manifest to both, for every resource with both a
+ * get and a list; a resource with only one of them has nothing to compare.
  *
  * The comparison itself is checked first on hand-built descriptors, so the
  * test over the real contracts cannot pass by comparing nothing.
@@ -23,7 +25,12 @@ import {
   type ValueType,
 } from '@macts/contracts'
 import { loadRealApps, type RealApp } from '../src/real-contracts.js'
-import { compareResolutionPlans, type ResolvableResource } from '../src/resolution-plans.js'
+import { nativeReadKeys } from '@macts/core/testing'
+import {
+  compareNativeReads,
+  compareResolutionPlans,
+  type ResolvableResource,
+} from '../src/resolution-plans.js'
 
 /** One hand-built book operation, `library.books.<command>`, with output `output`. */
 function operation(command: string, output: ValueType<unknown>): AnyOperationDescriptor {
@@ -94,6 +101,42 @@ describe('compareResolutionPlans', () => {
   })
 })
 
+describe('compareNativeReads', () => {
+  const BOTH: ResolvableResource = {
+    name: 'Book',
+    get: 'library.books.get',
+    list: 'library.books.list',
+  }
+
+  it('finds no difference when both bodies read the same keys, in any order', () => {
+    expect(compareNativeReads(BOTH, { get: ['isbn', 'title'], list: ['title', 'isbn'] })).toEqual({
+      compared: true,
+      differences: [],
+    })
+  })
+
+  it('names the resource and each key only one body reads', () => {
+    // A list also reads the identifier when it is not a usable property.
+    expect(compareNativeReads(BOTH, { get: ['title', 'cover'], list: ['title', 'isbn'] })).toEqual({
+      compared: true,
+      differences: [
+        'Book: the get body reads "cover" but the list body does not',
+        'Book: the list body reads "isbn" but the get body does not',
+      ],
+    })
+  })
+
+  it.each<[ResolvableResource, string]>([
+    [{ name: 'Book', get: 'library.books.get' }, 'Book has a get and no list'],
+    [{ name: 'Book', list: 'library.books.list' }, 'Book has no get and a list'],
+  ])('does not compare a resource without both: %o', (resource, reason) => {
+    expect(compareNativeReads(resource, { get: ['title'], list: ['isbn'] })).toEqual({
+      compared: false,
+      reason,
+    })
+  })
+})
+
 let apps: RealApp[] = []
 
 beforeAll(async () => {
@@ -101,20 +144,30 @@ beforeAll(async () => {
 })
 
 describe('every real contract', () => {
-  it('gives each resource with a get and a list the same get record and list item plan', () => {
+  it('gives each resource with a get and a list the same get record and list item plan, read by the same native properties', () => {
     const differences: string[] = []
     let compared = 0
     let notCompared = 0
     for (const app of apps) {
       for (const resource of Object.values(app.contract.resources)) {
-        const comparison = compareResolutionPlans(resource, app.contract.operations)
-        if (!comparison.compared) {
+        const plans = compareResolutionPlans(resource, app.contract.operations)
+        const manifestResource = Object.hasOwn(app.manifest.resources, resource.name)
+          ? app.manifest.resources[resource.name]
+          : undefined
+        if (manifestResource === undefined) {
+          differences.push(`${app.name}: ${resource.name} is not a resource of the manifest`)
+          continue
+        }
+        const reads = compareNativeReads(resource, nativeReadKeys(manifestResource))
+        if (!plans.compared || !reads.compared) {
           notCompared++
           continue
         }
         compared++
         differences.push(
-          ...comparison.differences.map((difference) => `${app.name}: ${difference}`)
+          ...[...plans.differences, ...reads.differences].map(
+            (difference) => `${app.name}: ${difference}`
+          )
         )
       }
     }
