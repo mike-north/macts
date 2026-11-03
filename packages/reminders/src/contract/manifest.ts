@@ -86,7 +86,7 @@ export const manifest: unknown = {
       },
       rangeRead: {
         supported: true,
-        read: 'column',
+        read: 'range',
         evidence: {
           source: 'probe',
           observedAt: '2026-11-03T17:59:10.000Z',

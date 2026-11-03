@@ -204,7 +204,7 @@ resources:
             note: 'The app''s scripting dictionary describes the property as "The unique ID of this container."'
     rangeRead:
       supported: true
-      read: column
+      read: range
       evidence:
         source: probe
         observedAt: '2026-11-03T18:00:00.000Z'

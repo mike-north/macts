@@ -427,7 +427,7 @@ export type IdentifierUniquenessEvidence = z.infer<typeof IdentifierUniquenessEv
  * `columnMs` by column (each property read over the whole collection, then
  * cut to the page). `items` is the size of the collection the page was read
  * from. The resource's marker chooses its page read from these two times
- * (see `ResourceRangeReadSchema`). A column page costs what the whole
+ * (see `pageReadFor`). A column page costs what the whole
  * collection costs, so its time holds only near the recorded size.
  */
 export const RangeReadEvidenceSchema = z

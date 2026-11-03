@@ -47,19 +47,19 @@ const PAGED_LISTS = [
 
 /**
  * How each list that pages reads a page, as chosen from the live cost sweep:
- * `column` where a page read over the whole collection was the faster,
- * `range` where a page read over its own items was.
+ * `column` where a page read over the whole collection took at most three
+ * quarters of a page read over its own items, `range` everywhere else.
  */
 const PAGE_READ_BY_LIST: Readonly<Record<string, PageRead>> = {
-  'contacts.addresses.list': 'column',
-  'contacts.emails.list': 'column',
-  'contacts.groups.list': 'column',
+  'contacts.addresses.list': 'range',
+  'contacts.emails.list': 'range',
+  'contacts.groups.list': 'range',
   'contacts.people.list': 'column',
   'contacts.phones.list': 'range',
   'notes.attachments.list': 'column',
   'photos.albums.list': 'column',
-  'photos.folders.list': 'column',
-  'reminders.accounts.list': 'column',
+  'photos.folders.list': 'range',
+  'reminders.accounts.list': 'range',
   'reminders.lists.list': 'column',
   'reminders.reminders.list': 'range',
   'shortcuts.folders.list': 'range',
@@ -132,7 +132,7 @@ describe('paging on shipped manifests rests on live range-read evidence', () => 
     expect(reads).toEqual(PAGE_READ_BY_LIST)
   })
 
-  it('reads Contacts people by column and Reminders reminders by range, each the faster for its app', () => {
+  it('reads Contacts people by column and Reminders reminders by range, each the read its measured costs choose', () => {
     // Regression: Contacts answers a range read item by item, so a page of
     // 25 people read by range took about 1 s per person and hit the 30 s
     // limit, while a read over all its people takes about as long as one

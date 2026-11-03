@@ -5,6 +5,7 @@ import {
   ResourceSchema,
   RuntimeProbeSchema,
   ProbeStatusSchema,
+  pageReadFor,
 } from './resource.js'
 import { ZodError } from 'zod'
 
@@ -279,7 +280,7 @@ describe('ResourceSchema range read marker', () => {
     expect(parsed.data?.rangeRead).toEqual(marker)
   })
 
-  it('accepts read: range when the range page was the faster', () => {
+  it('accepts read: range when the range page was faster', () => {
     const parsed = withRangeRead({
       supported: true,
       read: 'range',
@@ -290,7 +291,7 @@ describe('ResourceSchema range read marker', () => {
   })
 
   it('accepts read: range when both page reads took the same time', () => {
-    // Column is chosen only when it was strictly faster.
+    // Range is the default; a tie never chooses column.
     const parsed = withRangeRead({
       supported: true,
       read: 'range',
@@ -298,6 +299,67 @@ describe('ResourceSchema range read marker', () => {
     })
 
     expect(parsed.success).toBe(true)
+  })
+
+  describe('the column margin: column only when columnMs <= 0.75 x pageMs', () => {
+    it('accepts read: column when the column page took exactly 0.75 of the range page', () => {
+      const parsed = withRangeRead({
+        supported: true,
+        read: 'column',
+        evidence: { ...PASSED, pageMs: 400, columnMs: 300 },
+      })
+
+      expect(parsed.success).toBe(true)
+    })
+
+    it('rejects read: column when the column page took just over 0.75 of the range page, at read', () => {
+      const parsed = withRangeRead({
+        supported: true,
+        read: 'column',
+        evidence: { ...PASSED, pageMs: 400, columnMs: 301 },
+      })
+
+      expect(parsed.success).toBe(false)
+      expect(issuePaths(parsed)).toEqual([['rangeRead', 'read']])
+    })
+
+    it('accepts read: range when the column page was faster, but by less than the margin', () => {
+      // A difference within live-measurement noise (Contacts emails measured
+      // 272 ms by range and 263 ms by column) keeps the latency bound.
+      const parsed = withRangeRead({
+        supported: true,
+        read: 'range',
+        evidence: { ...PASSED, pageMs: 272, columnMs: 263, items: 3 },
+      })
+
+      expect(parsed.success).toBe(true)
+    })
+
+    it('rejects read: range when the column page took exactly 0.75 of the range page, at read', () => {
+      const parsed = withRangeRead({
+        supported: true,
+        read: 'range',
+        evidence: { ...PASSED, pageMs: 400, columnMs: 300 },
+      })
+
+      expect(parsed.success).toBe(false)
+      expect(issuePaths(parsed)).toEqual([['rangeRead', 'read']])
+    })
+  })
+
+  describe('pageReadFor', () => {
+    it.each([
+      [400, 300, 'column'],
+      [400, 301, 'range'],
+      [600, 90, 'column'],
+      [300, 300, 'range'],
+      [450, 4900, 'range'],
+      [0, 0, 'range'],
+      [1, 0, 'column'],
+      [0, 1, 'range'],
+    ] as const)('chooses for pageMs %d and columnMs %d: %s', (pageMs, columnMs, read) => {
+      expect(pageReadFor(pageMs, columnMs)).toBe(read)
+    })
   })
 
   it('accepts a failed range read with the error numbers it raised', () => {
@@ -337,7 +399,7 @@ describe('ResourceSchema range read marker', () => {
     }
   )
 
-  it('rejects read: column when the column page was not the faster, at read', () => {
+  it('rejects read: column when the column page was slower, at read', () => {
     const parsed = withRangeRead({
       supported: true,
       read: 'column',
@@ -348,7 +410,7 @@ describe('ResourceSchema range read marker', () => {
     expect(issuePaths(parsed)).toEqual([['rangeRead', 'read']])
   })
 
-  it('rejects read: range when the column page was the faster, at read', () => {
+  it('rejects read: range when the column page was faster by more than the margin, at read', () => {
     const parsed = withRangeRead({ supported: true, read: 'range', evidence: PASSED })
 
     expect(parsed.success).toBe(false)

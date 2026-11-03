@@ -2331,6 +2331,9 @@ export type PageAnchor = string | number;
 export type PageRead = (typeof PAGE_READS)[number];
 
 // @public
+export function pageReadFor(pageMs: number, columnMs: number): PageRead;
+
+// @public
 export interface PageWindow {
     readonly anchor?: PageAnchor;
     readonly offset: number;

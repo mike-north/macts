@@ -147,7 +147,7 @@ resources:
             note: 'The app''s scripting dictionary describes the property as "unique identifier for this address."'
     rangeRead:
       supported: true
-      read: column
+      read: range
       evidence:
         source: probe
         observedAt: '2026-11-03T18:05:41.000Z'
@@ -303,7 +303,7 @@ resources:
             note: 'The app''s scripting dictionary describes the property as "unique identifier for this entry, this is persistent, and stays with the record."'
     rangeRead:
       supported: true
-      read: column
+      read: range
       evidence:
         source: probe
         observedAt: '2026-11-03T18:05:41.000Z'
@@ -346,7 +346,7 @@ resources:
             note: 'The app''s scripting dictionary describes the property as "unique and persistent identifier for this record."'
     rangeRead:
       supported: true
-      read: column
+      read: range
       evidence:
         source: probe
         observedAt: '2026-11-03T18:05:41.000Z'

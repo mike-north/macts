@@ -41,7 +41,7 @@ resources:
             note: 'The app''s scripting dictionary describes the property as "The unique identifier of the account"'
     rangeRead:
       supported: true
-      read: column
+      read: range
       evidence:
         source: probe
         observedAt: '2026-11-03T17:59:10.000Z'

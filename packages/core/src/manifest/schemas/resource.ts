@@ -252,6 +252,23 @@ export type PageRead = (typeof PAGE_READS)[number]
 const PAGE_COST_FIELDS = ['pageMs', 'columnMs', 'items'] as const
 
 /**
+ * The page read measured page costs choose: `column` only when the column page
+ * took at most three quarters of the range page's time (`columnMs <= 0.75 *
+ * pageMs`), and `range` otherwise, ties included.
+ *
+ * Range is the default because a range page costs what the page holds, so it
+ * keeps paging's latency bound whatever the collection's size; a column page
+ * costs what the whole collection costs. Column gives up that bound, so it is
+ * chosen only for a clear measured gain, never for a difference within the
+ * noise of a live measurement (collections that fit in one page time the same
+ * either way). The comparison is made in whole numbers, so the boundary is
+ * exact, and a tie is range even when both reads measured 0 ms.
+ */
+export function pageReadFor(pageMs: number, columnMs: number): PageRead {
+  return columnMs < pageMs && columnMs * 4 <= pageMs * 3 ? 'column' : 'range'
+}
+
+/**
  * The marker recording whether the running app reads a range of a resource's
  * collection, by position, in one request, with the live evidence, and how a
  * page of it is read.
@@ -267,10 +284,10 @@ const PAGE_COST_FIELDS = ['pageMs', 'columnMs', 'items'] as const
  * under a parent item.
  *
  * A passing marker records `read` (see {@link PAGE_READS}) and the evidence's
- * page costs (`pageMs`, `columnMs`, `items`), and `read` must be the faster
- * of the two measured reads: `column` only when the column page took less
- * time than the range page, `range` otherwise. The choice holds at the
- * recorded collection size; a column page costs more as the collection grows.
+ * page costs (`pageMs`, `columnMs`, `items`), and `read` must be the read
+ * those costs choose (see {@link pageReadFor}): `range` unless the column page
+ * was clearly faster. The choice holds at the recorded collection size; a
+ * column page costs more as the collection grows.
  */
 export const ResourceRangeReadSchema = z
   .discriminatedUnion('supported', [
@@ -334,11 +351,11 @@ export const ResourceRangeReadSchema = z
     }
     const { pageMs, columnMs } = evidence
     if (pageMs === undefined || columnMs === undefined) return
-    const faster: PageRead = columnMs < pageMs ? 'column' : 'range'
-    if (marker.read !== faster) {
+    const chosen = pageReadFor(pageMs, columnMs)
+    if (marker.read !== chosen) {
       ctx.addIssue({
         code: 'custom',
-        message: `read must be the faster measured page read: ${faster} (pageMs ${String(pageMs)}, columnMs ${String(columnMs)}).`,
+        message: `read must be the page read the measured costs choose, column only when columnMs is at most 0.75 x pageMs: ${chosen} (pageMs ${String(pageMs)}, columnMs ${String(columnMs)}).`,
         path: ['read'],
       })
     }

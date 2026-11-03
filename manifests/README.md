@@ -592,9 +592,12 @@ Reminder:
   faster there.
 
 Both give the same page, cursor, anchor check and `COLLECTION_CHANGED`. `read`
-is required with `supported: true`, as are `pageMs`, `columnMs` and `items`,
-and it must be the faster measured read: `column` only when `columnMs` is less
-than `pageMs`. A column page costs what the whole collection costs, so it gets
+is required with `supported: true`, as are `pageMs`, `columnMs` and `items`.
+`range` is the default, because a range page costs what the page holds and so
+keeps paging's latency bound. `read` is `column` only when the column page took
+at most three quarters of the range page's time (`columnMs <= 0.75 × pageMs`),
+and `range` otherwise, ties included; the schema rejects any other `read`. A
+difference within measurement noise never chooses column. A column page costs what the whole collection costs, so it gets
 slower as the collection grows: the choice holds at the recorded `items`, and
 should be measured again when the collection grows well past it.
 
