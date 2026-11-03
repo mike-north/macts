@@ -116,7 +116,11 @@ ${script.body}
     return { ok: true, value: ${NATIVE_ENCODE_FUNCTION}(value, ${JSON.stringify(script.outputPlan)}) };
   } catch (e) {
     if (e !== null && typeof e === 'object' && e.name === ${JSON.stringify(NATIVE_CODEC_ERROR_NAME)}) {
-      return { ok: false, failure: { source: 'codec', direction: e.direction, path: e.path, message: e.message } };
+      var codecFailure = { source: 'codec', direction: e.direction, path: e.path, message: e.message };
+      if (typeof e.unsupportedKind === 'string') {
+        codecFailure.unsupportedKind = e.unsupportedKind;
+      }
+      return { ok: false, failure: codecFailure };
     }
     var failure = { source: 'app', message: String(e !== null && typeof e === 'object' && 'message' in e ? e.message : e) };
     if (e !== null && typeof e === 'object' && typeof e.errorNumber === 'number') {
@@ -154,7 +158,12 @@ function parseFailure(value: unknown): NativeFailure {
     if ((direction !== 'decode' && direction !== 'encode') || !isIssuePath(path)) {
       throw new Error(`Malformed codec failure: ${JSON.stringify(value)}`)
     }
-    return { source: 'codec', direction, path, message }
+    const unsupportedKind = value['unsupportedKind']
+    if (unsupportedKind === undefined) return { source: 'codec', direction, path, message }
+    if (typeof unsupportedKind !== 'string') {
+      throw new Error(`Malformed codec failure: ${JSON.stringify(value)}`)
+    }
+    return { source: 'codec', direction, path, message, unsupportedKind }
   }
   if (value['source'] === 'collection') return { source: 'collection', message }
   if (value['source'] === 'app') {

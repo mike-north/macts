@@ -429,6 +429,40 @@ describe('createNativeExecutor', () => {
       expect(error.details).toEqual({ issues: [{ path: ['limit'], message: 'Bad integer' }] })
     })
 
+    // Regression: a value kind the codec cannot convert (a reference input) was
+    // reported as ValidationError, blaming a caller whose input was valid.
+    it.each([
+      ['decode', 'takes'],
+      ['encode', 'returns'],
+    ] as const)(
+      'reports a codec %s failure for an unsupported kind as InternalError',
+      async (direction, verb) => {
+        const run = mockRun().mockResolvedValue(
+          failed({
+            source: 'codec',
+            direction,
+            path: ['for'],
+            message: 'Reference values have no conversion in this codec',
+            unsupportedKind: 'reference',
+          })
+        )
+        const error = await rejectionOf(
+          createNativeExecutor({ transport: { run } }).execute(request())
+        )
+        expect(error).toBeInstanceOf(InternalError)
+        if (!(error instanceof InternalError)) return
+        expect(error.message).toBe(
+          `The Notes operation "Note get" ${verb} reference values at \`for\`, which the macOS provider does not support yet.`
+        )
+        expect(error.details).toEqual({})
+        expect(error.cause).toBeInstanceOf(Error)
+        expect(error.cause).toMatchObject({
+          message: 'Reference values have no conversion in this codec',
+          path: ['for'],
+        })
+      }
+    )
+
     it('classifies a process failure and keeps the raw failure only as cause', async () => {
       const failure = processFailure("execution error: Error: Error: Can't get object. (-1728)")
       const run = mockRun().mockRejectedValue(failure)
@@ -627,6 +661,32 @@ describe('describeNativeFailure', () => {
       }),
       type: ValidationError,
       details: { issues: [{ path: ['count'], message: 'Bad integer' }] },
+    },
+    {
+      // The input's plan has a kind the codec cannot convert: macts's fault.
+      name: 'codec decode of an unsupported kind',
+      failure: reported({
+        source: 'codec',
+        direction: 'decode',
+        path: ['attachments', 0],
+        message: 'File values have no conversion in this codec',
+        unsupportedKind: 'file',
+      }),
+      type: InternalError,
+      details: {},
+    },
+    {
+      // The result's plan has a kind the codec cannot convert: not the app's fault.
+      name: 'codec encode of an unsupported kind',
+      failure: reported({
+        source: 'codec',
+        direction: 'encode',
+        path: [],
+        message: 'File source values have no conversion in this codec',
+        unsupportedKind: 'file-source',
+      }),
+      type: InternalError,
+      details: {},
     },
   ]
 

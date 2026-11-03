@@ -80,20 +80,29 @@ interface ExpectedCodecError {
   /** Exact message, or substrings that must all appear. */
   readonly message?: string
   readonly includes?: readonly string[]
+  /**
+   * The plan kind the codec reports it cannot convert. When omitted, the error
+   * must not carry the marker: the value itself violated its plan.
+   */
+  readonly unsupportedKind?: string
 }
 
 /**
  * Asserts that `fn` throws a codec error object with exactly the contracted
- * shape (D4): `name`, `direction`, `path`, `message`, and nothing else.
+ * shape (D4): `name`, `direction`, `path`, `message`, plus `unsupportedKind`
+ * only when the plan's kind has no conversion, and nothing else.
  */
 function expectCodecError(fn: () => unknown, expected: ExpectedCodecError): void {
   const error = thrownBy(fn)
-  expect(Object.keys(error as object).sort()).toEqual(['direction', 'message', 'name', 'path'])
-  const { name, direction, path, message } = error as Record<string, unknown>
-  expect({ name, direction, path }).toEqual({
+  const keys = ['direction', 'message', 'name', 'path']
+  if (expected.unsupportedKind !== undefined) keys.push('unsupportedKind')
+  expect(Object.keys(error as object).sort()).toEqual(keys.sort())
+  const { name, direction, path, message, unsupportedKind } = error as Record<string, unknown>
+  expect({ name, direction, path, unsupportedKind }).toEqual({
     name: NATIVE_CODEC_ERROR_NAME,
     direction: expected.direction,
     path: expected.path,
+    unsupportedKind: expected.unsupportedKind,
   })
   expect(typeof message).toBe('string')
   const text = typeof message === 'string' ? message : ''
@@ -1085,33 +1094,72 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
       { kind: 'file-source' },
     ]
 
-    it.each(LATER)('rejects $kind in both directions as having no conversion', (plan) => {
-      expectCodecError(() => encode({}, plan), {
-        direction: 'encode',
-        path: [],
-        includes: ['have no conversion in this codec'],
-      })
-      expectCodecError(() => decode({}, plan), {
-        direction: 'decode',
-        path: [],
-        includes: ['have no conversion in this codec'],
-      })
-    })
+    it.each(LATER)(
+      'rejects $kind in both directions, marked as a kind it cannot convert',
+      (plan) => {
+        expectCodecError(() => encode({}, plan), {
+          direction: 'encode',
+          path: [],
+          includes: ['have no conversion in this codec'],
+          unsupportedKind: plan.kind,
+        })
+        expectCodecError(() => decode({}, plan), {
+          direction: 'decode',
+          path: [],
+          includes: ['have no conversion in this codec'],
+          unsupportedKind: plan.kind,
+        })
+      }
+    )
 
     it('reports the path of an unsupported kind nested in a record', () => {
       const plan = recordOf({ attachment: required({ kind: 'file' }) })
       expectCodecError(() => encode({ attachment: {} }, plan), {
         direction: 'encode',
         path: ['attachment'],
+        unsupportedKind: 'file',
+      })
+      expectCodecError(() => decode({ attachment: {} }, plan), {
+        direction: 'decode',
+        path: ['attachment'],
+        unsupportedKind: 'file',
+      })
+    })
+
+    it('marks the kind whatever the value is, even one that is not a reference at all', () => {
+      const plan: ValuePlan = { kind: 'reference', resource: 'calendar', cardinality: 'one' }
+      expectCodecError(() => decode('not a reference', plan), {
+        direction: 'decode',
+        path: [],
+        unsupportedKind: 'reference',
       })
     })
   })
 
-  it('rejects an unrecognized plan kind', () => {
-    // Plans arrive as embedded JSON; a malformed one must fail loudly.
+  it('does not mark a value that violates a plan the codec can convert', () => {
+    // Ordinary failures blame the value, so they carry no unsupported kind.
+    expectCodecError(() => decode({ integer: '1.5' }, INTEGER), { direction: 'decode', path: [] })
+    expectCodecError(() => encode(1.5, INTEGER), { direction: 'encode', path: [] })
+    expectCodecError(() => decode({ at: 'soon' }, recordOf({ at: required(DATE) })), {
+      direction: 'decode',
+      path: ['at'],
+    })
+  })
+
+  it('rejects an unrecognized plan kind, marked as a kind it cannot convert', () => {
+    // Plans arrive as embedded JSON; a malformed one must fail loudly, and the
+    // fault is the plan's, not the value's.
     const bogus = { kind: 'bogus' } as unknown as ValuePlan
-    expectCodecError(() => encode(1, bogus), { direction: 'encode', path: [] })
-    expectCodecError(() => decode(1, bogus), { direction: 'decode', path: [] })
+    expectCodecError(() => encode(1, bogus), {
+      direction: 'encode',
+      path: [],
+      unsupportedKind: 'bogus',
+    })
+    expectCodecError(() => decode(1, bogus), {
+      direction: 'decode',
+      path: [],
+      unsupportedKind: 'bogus',
+    })
   })
 })
 

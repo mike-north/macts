@@ -124,6 +124,35 @@ describe('built NATIVE_CODEC prelude', () => {
     })
   })
 
+  it('marks a reference decode with the kind it cannot convert, not as a bad value', () => {
+    let thrown: unknown
+    try {
+      evaluated.decode(
+        { for: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' } },
+        {
+          kind: 'record',
+          fields: {
+            for: {
+              presence: 'required',
+              value: { kind: 'reference', resource: 'Person', cardinality: 'one' },
+            },
+          },
+        }
+      )
+    } catch (error) {
+      thrown = error
+    }
+    // D4: the contracted error object, marked so the executor reports an
+    // internal limitation rather than invalid input.
+    expect(thrown).toEqual({
+      name: 'MactsCodecError',
+      direction: 'decode',
+      path: ['for'],
+      message: 'Reference values have no conversion in this codec',
+      unsupportedKind: 'reference',
+    })
+  })
+
   it.skipIf(process.platform !== 'darwin')(
     'round-trips values through the real automation process',
     async () => {
@@ -207,6 +236,35 @@ describe.skipIf(process.platform !== 'darwin')(
       expect(outcome).toEqual({
         ok: true,
         value: { count: { integer: '42' }, at: { date: '2026-10-31T14:34:06.120Z' } },
+      })
+    }, 30000)
+
+    it('reports a reference input as a marked codec decode failure, before the app is addressed', () => {
+      const outcome = runWithDist({
+        // No app has this bundle identifier: addressing it would be an app failure.
+        bundleId: 'com.example.macts.not-installed',
+        body: 'return null;',
+        input: { for: { resource: 'Person', form: 'identity', cardinality: 'one', id: 'p-1' } },
+        inputPlan: {
+          kind: 'record',
+          fields: {
+            for: {
+              presence: 'required',
+              value: { kind: 'reference', resource: 'Person', cardinality: 'one' },
+            },
+          },
+        },
+        outputPlan: { kind: 'none' },
+      })
+      expect(outcome).toEqual({
+        ok: false,
+        failure: {
+          source: 'codec',
+          direction: 'decode',
+          path: ['for'],
+          message: 'Reference values have no conversion in this codec',
+          unsupportedKind: 'reference',
+        },
       })
     }, 30000)
 

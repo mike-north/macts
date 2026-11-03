@@ -820,7 +820,9 @@ native values for arguments, and native results to wire values, before
   - Under a `none` plan, `__mactsEncode` returns `null` whatever the native
     result was, and `__mactsDecode` returns `undefined` (D3).
   - Both throw an object with `name: 'MactsCodecError'`, plus `direction`,
-    `path`, and `message`, when a value violates the plan.
+    `path`, and `message`, when a value violates the plan. When the plan has a
+    kind the codec cannot convert (`reference`, `file`, `file-source`, or an
+    unrecognized kind), the object also carries `unsupportedKind`, that kind.
 - **`NativeScript`** — `{ bundleId, body, input, inputPlan, outputPlan }`.
   - `input` is a `WireRecord`, because operation input is always
     record-shaped (D2).
@@ -832,7 +834,7 @@ native values for arguments, and native results to wire values, before
 - **`NativeOutcome`** — `{ ok: true, value: WireValue } | { ok: false, failure: NativeFailure }`.
   A `NativeFailure` takes one of two forms:
   - `{ source: 'app', message, errorNumber? }`: raised by the app or the bridge.
-  - `{ source: 'codec', direction, path, message }`: raised by the codec.
+  - `{ source: 'codec', direction, path, message, unsupportedKind? }`: raised by the codec.
 
 **How `executor.ts` consumes it.** The executor gains a function,
 `runNativeScript(script, codec, { timeout, signal, maxOutputBytes })`, that runs
@@ -866,7 +868,8 @@ the body runs, as the bridge has always set it. The script is passed to `osascri
 shell.
 
 In the catch block, a thrown object whose `name` is the codec marker becomes a
-`codec` failure with its `direction`, `path`, and `message`. Anything else
+`codec` failure with its `direction`, `path`, `message`, and `unsupportedKind`
+when it has one. Anything else
 becomes an `app` failure whose `message` is `String(e && e.message || e)`, with
 `errorNumber` only when `e.errorNumber` is a number. An app error caught in
 the process carries its native number (a missing object gives -1728), and
@@ -884,6 +887,10 @@ The native `Executor` maps a `NativeOutcome` failure to canonical errors:
 - A codec `decode` failure maps to `ValidationError` with
   `issues: [{ path, message }]`. Input was already validated against `wire`,
   so this indicates a bridge-form defect.
+- A codec failure with `unsupportedKind`, in either direction, maps to
+  `InternalError`, never `ValidationError` or `UnexpectedValueError`: no input
+  or result at that position can be converted, so neither the caller nor the
+  app is at fault. Its message names the operation, the kind and the position.
 
 Native error numbers map to D6 classes as follows:
 
