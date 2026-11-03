@@ -21,6 +21,7 @@ import { describe, expect, it } from 'vitest'
 import { buildNativeBody } from '../jxa/native-scripts.js'
 import {
   shelfManifest,
+  shelfManifestWithoutBookIdentifier,
   shelfManifestWithUniqueSeries,
 } from '../manifest/test-support/shelf-output-references.js'
 import { generateCliPlugin } from './cli/index.js'
@@ -139,6 +140,48 @@ describe('a name-keyed resource whose name is claimed unique', () => {
     expect(omitted.some((message) => message.includes('"Series"'))).toBe(false)
     expect(omitted).toContain(notUniqueWarning('genre', 'Genre'))
     expect(omitted).toHaveLength(5)
+  })
+})
+
+describe('a resource with a get but no identifier', () => {
+  // A book can still be got, but without an identifier it has no identity
+  // form, and native reads emit only identity references, so a reference to
+  // one read from the app could not be expressed (phases/13 D7).
+  const generated = generateContract(shelfManifestWithoutBookIdentifier())
+  const text = fileOf(generated.files, CONTRACT_MODULE_PATH)
+
+  it('leaves out the field and the result that reference it, without failing', () => {
+    expect(generated.errors).toEqual([])
+    expect(declaration(text, /export interface Library \{[\s\S]*?\n\}/)).not.toContain(
+      'favoriteBook'
+    )
+    expect(declaration(text, / {2}id: 'shelf\.app\.featuredBook',[\s\S]*?\n\}/)).toContain(
+      '  output: t.none(),'
+    )
+  })
+
+  it('warns about each, with the no-identifier reason', () => {
+    const omitted = generated.diagnostics.filter(({ kind }) => kind === 'omitted-output')
+    expect(omitted.filter(({ target }) => target === 'Book')).toEqual([
+      {
+        kind: 'omitted-output',
+        app: 'shelf',
+        position: 'resources.Library.properties.favoriteBook',
+        target: 'Book',
+        reason: 'no-identifier',
+        message:
+          'shelf: resources.Library.properties.favoriteBook: the Library field "favoriteBook" is left out of output: it holds a reference to "Book", which has no identifier, so no reference read from the app can name one (phases/13 D7, resolvable targets).',
+      },
+      {
+        kind: 'omitted-output',
+        app: 'shelf',
+        position: 'commands.featuredBook.returns',
+        target: 'Book',
+        reason: 'no-identifier',
+        message:
+          'shelf: commands.featuredBook.returns: the result of "featuredBook" is left out of output: it holds a reference to "Book", which has no identifier, so no reference read from the app can name one (phases/13 D7, resolvable targets).',
+      },
+    ])
   })
 })
 

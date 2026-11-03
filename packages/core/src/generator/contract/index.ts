@@ -213,6 +213,8 @@ export function contractNames(manifest: AppManifest): ContractNames {
 /** Why an omitted output position is left out, as its warning says it. */
 const OMITTED_OUTPUT_REASONS: Readonly<Record<OmittedOutputReason, string>> = {
   'no-get': 'which the app has no operation to get (#219)',
+  'no-identifier':
+    'which has no identifier, so no reference read from the app can name one (phases/13 D7, resolvable targets)',
   'parent-scoped':
     'which the app gets only within its container, and references read from the app carry no container (#219)',
   'not-unique':

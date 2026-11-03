@@ -310,3 +310,16 @@ export function shelfManifestWithUniqueSeries(): AppManifest {
   }
   return manifest
 }
+
+/**
+ * The Shelf manifest with the book's identifier removed, so a book can still
+ * be got but has no identity form: `Library.favoriteBook` and the
+ * `featuredBook` result are left out of output (`no-identifier`).
+ */
+export function shelfManifestWithoutBookIdentifier(): AppManifest {
+  const manifest = shelfManifest()
+  const book = manifest.resources['Book']
+  if (book === undefined) throw new Error('the Shelf fixture has no Book')
+  delete book.identifiers
+  return manifest
+}

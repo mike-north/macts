@@ -1000,8 +1000,9 @@ describe('real app manifests', () => {
     // reference, or an array of them: `no-get` when the target has no command
     // named get, `not-unique` when the target is identified by a name its
     // primary identifier does not claim unique. No shipped output references
-    // a resource whose get records a parent, and no shipped command records a
-    // result, so no result is left out. A new omission, or a field returning
+    // a resource whose get records a parent, or one with a get and no
+    // identifier, and no shipped command records a result, so no result is
+    // left out. A new omission, or a field returning
     // to output, must change this list.
     const found = apps
       .flatMap(({ manifest }) => collectContractDiagnostics(manifest))

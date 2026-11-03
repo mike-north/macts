@@ -9,6 +9,9 @@
  * ({@link resolvingCommand}). An output reference cannot be used when:
  *
  * - its target has no usable `get`, so no reference to it passes validation;
+ * - its target has no primary identifier, so it has no identity form: an
+ *   object of it can be addressed only by a selector, and native reads emit
+ *   only identity references;
  * - its target's `get` records a parent, so the target is identified only
  *   within its container. Native reads emit no container, so a reference read
  *   from the app could not be resolved either (container chains are a later
@@ -44,7 +47,7 @@ import type { AppManifest } from './schemas/app.js'
 import type { Command } from './schemas/command.js'
 import type { Property } from './schemas/property.js'
 import type { Resource } from './schemas/resource.js'
-import { resolveIdentifierTargeting } from './identifier.js'
+import { resolveIdentifierTargeting, resolvePrimaryIdentifierProperty } from './identifier.js'
 import { resolvePrimaryIdentifier } from './primary-identifier.js'
 import { resolvingCommand } from './resource-commands.js'
 import { usableCommands, usableProperties, usableResources } from './unsupported.js'
@@ -60,12 +63,14 @@ import {
  * Why an output reference cannot be used:
  *
  * - `no-get`: its target has no usable `get` command.
+ * - `no-identifier`: its target has no primary identifier, so no identity
+ *   reference to one exists.
  * - `parent-scoped`: its target's `get` records a parent, and native reads
  *   emit no container.
  * - `not-unique`: its target is identified by its name, and its primary
  *   identifier is not claimed unique, so the name does not pin one object.
  */
-export type OmittedOutputReason = 'no-get' | 'parent-scoped' | 'not-unique'
+export type OmittedOutputReason = 'no-get' | 'no-identifier' | 'parent-scoped' | 'not-unique'
 
 /** An output reference that cannot be used, and why. */
 export interface OmittedOutput {
@@ -98,7 +103,9 @@ export function isNameKeyed(manifest: AppManifest, resourceKey: string): boolean
 /**
  * Why a reference read from the app to `resourceKey` cannot be used, or
  * `undefined` when it can: the resource has a usable `get` that records no
- * parent, and is not name-keyed ({@link isNameKeyed}).
+ * parent and a primary identifier, and is not name-keyed
+ * ({@link isNameKeyed}). The reasons are checked in that order, so the first
+ * that applies is reported.
  *
  * @param manifest - The app manifest.
  * @param resourceKey - The manifest key of the referenced resource.
@@ -109,6 +116,9 @@ export function omittedOutputReason(
 ): OmittedOutputReason | undefined {
   const get = resolvingCommand(manifest, resourceKey, 'get')
   if (get === undefined) return 'no-get'
+  if (resolvePrimaryIdentifierProperty(manifest.resources[resourceKey]) === undefined) {
+    return 'no-identifier'
+  }
   if (get[1].parent !== undefined) return 'parent-scoped'
   return isNameKeyed(manifest, resourceKey) ? 'not-unique' : undefined
 }

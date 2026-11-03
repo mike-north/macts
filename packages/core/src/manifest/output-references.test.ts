@@ -2,8 +2,9 @@
  * Tests for the output reference judgment, over the Shelf fixture (see
  * `shelfManifest` for its cases). Expected values are written by hand from
  * phases/13 D7: an output reference is usable only through its target's
- * `get`, only when that `get` records no parent, and only when the target is
- * not identified by a name its identifier does not claim unique.
+ * `get`, only when the target has a primary identifier, only when that `get`
+ * records no parent, and only when the target is not identified by a name its
+ * identifier does not claim unique.
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md §D7
  * @see https://github.com/mike-north/macts/issues/219
@@ -22,6 +23,7 @@ import {
 import type { AppManifest } from './schemas/index.js'
 import {
   shelfManifest,
+  shelfManifestWithoutBookIdentifier,
   shelfManifestWithUniqueSeries,
 } from './test-support/shelf-output-references.js'
 import type { ValueShape } from './value-shapes.js'
@@ -64,6 +66,10 @@ describe('omittedOutputReason', () => {
   it('rejects a resource identified by a name that is not claimed unique', () => {
     expect(omittedOutputReason(manifest, 'Series')).toBe('not-unique')
     expect(omittedOutputReason(manifest, 'Genre')).toBe('not-unique')
+  })
+
+  it('rejects a resource with a get but no primary identifier', () => {
+    expect(omittedOutputReason(shelfManifestWithoutBookIdentifier(), 'Book')).toBe('no-identifier')
   })
 
   it('accepts a name claimed unique, with evidence', () => {
