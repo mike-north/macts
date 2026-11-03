@@ -21,10 +21,21 @@ export class TabResourceClient {
   }
 
   /**
-   * List all tabs.
+   * List tabs, one page at a time. When the result has a `nextCursor`,
+   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(windowId: string): Promise<Tab[]> {
-    return this.#http.rpc<Tab[]>(`${this.#app}.${this.#resource}.list`, { windowId })
+  async list(
+    windowId: string,
+    page: { pageSize?: number; cursor?: string } = {}
+  ): Promise<{ items: Tab[]; nextCursor?: string }> {
+    return this.#http.rpc<{ items: Tab[]; nextCursor?: string }>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+        windowId,
+      }
+    )
   }
 
   /**

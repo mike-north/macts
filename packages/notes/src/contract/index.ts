@@ -24,6 +24,8 @@ import {
   type CallOptions,
   type ClientRuntime,
   type OperationDescriptor,
+  type Page,
+  type PageRequest,
   type ValueType,
 } from '@macts/contracts'
 
@@ -191,8 +193,14 @@ export type AttachmentUpdateInput = Record<string, never>
 
 /** A Notes account */
 export interface AccountResourceClient {
-  /** List accounts. */
-  list(options?: CallOptions): Promise<readonly Account[]>
+  /**
+   * List accounts, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Account>>
   /**
    * Read the account identified by `name`.
    *
@@ -203,8 +211,14 @@ export interface AccountResourceClient {
 
 /** A Notes folder */
 export interface FolderResourceClient {
-  /** List folders. */
-  list(options?: CallOptions): Promise<readonly Folder[]>
+  /**
+   * List folders, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Folder>>
   /**
    * Read the folder identified by `name`.
    *
@@ -215,8 +229,14 @@ export interface FolderResourceClient {
 
 /** A note */
 export interface NoteResourceClient {
-  /** List notes. */
-  list(options?: CallOptions): Promise<readonly Note[]>
+  /**
+   * List notes, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Note>>
   /**
    * Read the note identified by `name`.
    *
@@ -235,8 +255,14 @@ export interface NoteResourceClient {
 
 /** A note attachment */
 export interface AttachmentResourceClient {
-  /** List attachments. */
-  list(options?: CallOptions): Promise<readonly Attachment[]>
+  /**
+   * List attachments, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Attachment>>
   /**
    * Read the attachment identified by `id`.
    *
@@ -348,62 +374,122 @@ const resources: AppContract<NotesClient>['resources'] = {
   },
 }
 
-const accountListOperation: OperationDescriptor<Record<string, never>, readonly Account[]> = {
+const accountListOperation: OperationDescriptor<PageRequest, Page<Account>> = {
   id: 'notes.accounts.list',
   permission: 'notes:accounts:list',
   target: { command: 'list', resource: 'Account' },
   description: 'List items',
-  input: t.record({}),
-  output: t.array(accountRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(accountRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
 
-const folderListOperation: OperationDescriptor<Record<string, never>, readonly Folder[]> = {
+const folderListOperation: OperationDescriptor<PageRequest, Page<Folder>> = {
   id: 'notes.folders.list',
   permission: 'notes:folders:list',
   target: { command: 'list', resource: 'Folder' },
   description: 'List items',
-  input: t.record({}),
-  output: t.array(folderRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(folderRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
 
-const noteListOperation: OperationDescriptor<Record<string, never>, readonly Note[]> = {
+const noteListOperation: OperationDescriptor<PageRequest, Page<Note>> = {
   id: 'notes.notes.list',
   permission: 'notes:notes:list',
   target: { command: 'list', resource: 'Note' },
   description: 'List items',
-  input: t.record({}),
-  output: t.array(noteRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(noteRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
 
-const attachmentListOperation: OperationDescriptor<Record<string, never>, readonly Attachment[]> = {
+const attachmentListOperation: OperationDescriptor<PageRequest, Page<Attachment>> = {
   id: 'notes.attachments.list',
   permission: 'notes:attachments:list',
   target: { command: 'list', resource: 'Attachment' },
   description: 'List items',
-  input: t.record({}),
-  output: t.array(attachmentRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(attachmentRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -534,21 +620,21 @@ const operations: AppContract<NotesClient>['operations'] = {
 function bind(runtime: ClientRuntime): NotesClient {
   return {
     accounts: {
-      list: (options) => runtime.invoke(accountListOperation, {}, options),
+      list: (page, options) => runtime.invoke(accountListOperation, { ...page }, options),
       get: (name, options) => runtime.invoke(accountGetOperation, { name }, options),
     },
     folders: {
-      list: (options) => runtime.invoke(folderListOperation, {}, options),
+      list: (page, options) => runtime.invoke(folderListOperation, { ...page }, options),
       get: (name, options) => runtime.invoke(folderGetOperation, { name }, options),
     },
     notes: {
-      list: (options) => runtime.invoke(noteListOperation, {}, options),
+      list: (page, options) => runtime.invoke(noteListOperation, { ...page }, options),
       get: (name, options) => runtime.invoke(noteGetOperation, { name }, options),
       create: (input, options) => runtime.invoke(noteCreateOperation, input, options),
       show: (name, options) => runtime.invoke(noteShowOperation, { name }, options),
     },
     attachments: {
-      list: (options) => runtime.invoke(attachmentListOperation, {}, options),
+      list: (page, options) => runtime.invoke(attachmentListOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(attachmentGetAttachmentOperation, { id }, options),
     },
   }

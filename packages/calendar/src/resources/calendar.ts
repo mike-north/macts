@@ -21,10 +21,19 @@ export class CalendarResourceClient {
   }
 
   /**
-   * List all calendars.
+   * List calendars, one page at a time. When the result has a `nextCursor`,
+   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(): Promise<Calendar[]> {
-    return this.#http.rpc<Calendar[]>(`${this.#app}.${this.#resource}.list`)
+  async list(
+    page: { pageSize?: number; cursor?: string } = {}
+  ): Promise<{ items: Calendar[]; nextCursor?: string }> {
+    return this.#http.rpc<{ items: Calendar[]; nextCursor?: string }>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+      }
+    )
   }
 
   /**

@@ -22,7 +22,13 @@ export interface AlbumCreateInput {
 export class AlbumResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Album>;
-    list(): Promise<Album[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Album[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -92,7 +98,13 @@ export interface FolderCreateInput {
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Folder>;
-    list(): Promise<Folder[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Folder[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -143,7 +155,13 @@ export class MediaItemResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     duplicate(id: string): Promise<void>;
     get(id: string): Promise<MediaItem>;
-    list(): Promise<MediaItem[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: MediaItem[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)

@@ -21,9 +21,9 @@ export class AssignmentResourceClient {
   }
 
   /**
-   * List all assignments.
+   * List all assignments, as one page.
    */
-  async list(): Promise<Assignment[]> {
-    return this.#http.rpc<Assignment[]>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<{ items: Assignment[] }> {
+    return this.#http.rpc<{ items: Assignment[] }>(`${this.#app}.${this.#resource}.list`)
   }
 }

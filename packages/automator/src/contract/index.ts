@@ -25,6 +25,8 @@ import {
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
+  type Page,
+  type PageRequest,
   type ValueType,
 } from '@macts/contracts'
 
@@ -347,8 +349,14 @@ export type RequiredResourceUpdateInput = Record<string, never>
 
 /** A series of actions stored in a file */
 export interface WorkflowResourceClient {
-  /** List workflows. */
-  list(options?: CallOptions): Promise<readonly Workflow[]>
+  /**
+   * List workflows, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Workflow>>
   /**
    * Read the workflow identified by `name`.
    *
@@ -366,11 +374,18 @@ export interface WorkflowResourceClient {
 /** A single step in a workflow */
 export interface AutomatorActionResourceClient {
   /**
-   * List automator actions.
+   * List automator actions, one page at a time.
    *
    * @param workflowName - Workflow name. Does not accept null.
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
    */
-  list(workflowName: string, options?: CallOptions): Promise<readonly AutomatorAction[]>
+  list(
+    workflowName: string,
+    page?: PageRequest,
+    options?: CallOptions
+  ): Promise<Page<AutomatorAction>>
   /**
    * Read the automator action identified by `id`.
    *
@@ -382,11 +397,14 @@ export interface AutomatorActionResourceClient {
 /** A variable used by the workflow */
 export interface VariableResourceClient {
   /**
-   * List variables.
+   * List variables, one page at a time.
    *
    * @param workflowName - Workflow name. Does not accept null.
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
    */
-  list(workflowName: string, options?: CallOptions): Promise<readonly Variable[]>
+  list(workflowName: string, page?: PageRequest, options?: CallOptions): Promise<Page<Variable>>
   /**
    * Read the variable identified by `id`.
    *
@@ -398,21 +416,27 @@ export interface VariableResourceClient {
 /** A named value in an action */
 export interface SettingResourceClient {
   /**
-   * List settings.
+   * List settings, one page at a time.
    *
    * @param actionId - Action identifier. Does not accept null.
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
    */
-  list(actionId: string, options?: CallOptions): Promise<readonly Setting[]>
+  list(actionId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Setting>>
 }
 
 /** A resource required for proper operation of the action */
 export interface RequiredResourceResourceClient {
   /**
-   * List required resources.
+   * List required resources, one page at a time.
    *
    * @param actionId - Action identifier. Does not accept null.
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
    */
-  list(actionId: string, options?: CallOptions): Promise<readonly RequiredResource[]>
+  list(actionId: string, page?: PageRequest, options?: CallOptions): Promise<Page<RequiredResource>>
 }
 
 /**
@@ -600,17 +624,32 @@ const resources: AppContract<AutomatorClient>['resources'] = {
   },
 }
 
-const workflowListOperation: OperationDescriptor<Record<string, never>, readonly Workflow[]> = {
+const workflowListOperation: OperationDescriptor<PageRequest, Page<Workflow>> = {
   id: 'automator.workflows.list',
   permission: 'automator:workflows:list',
   target: { command: 'list', resource: 'Workflow' },
   description: 'List all workflows',
-  input: t.record({}),
-  output: t.array(workflowRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(workflowRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -725,8 +764,8 @@ const workflowExecuteOperation: OperationDescriptor<{ readonly workflow: unknown
 }
 
 const automatorActionListActionsOperation: OperationDescriptor<
-  { readonly workflowName: string },
-  readonly AutomatorAction[]
+  { readonly workflowName: string } & PageRequest,
+  Page<AutomatorAction>
 > = {
   id: 'automator.automatorActions.list',
   permission: 'automator:actions:list',
@@ -734,12 +773,27 @@ const automatorActionListActionsOperation: OperationDescriptor<
   description: 'List all actions in a workflow',
   input: t.record({
     workflowName: t.string({ description: 'Workflow name' }),
+    ...t.pageInputs(),
   }),
-  output: t.array(automatorActionRecordType),
+  output: t.page(automatorActionRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { workflowName: { type: 'string', description: 'Workflow name' } },
+    properties: {
+      workflowName: { type: 'string', description: 'Workflow name' },
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     required: ['workflowName'],
     additionalProperties: false,
   },
@@ -973,8 +1027,8 @@ const appRemoveOperation: OperationDescriptor<{ readonly object: unknown }, unde
 }
 
 const variableListVariablesOperation: OperationDescriptor<
-  { readonly workflowName: string },
-  readonly Variable[]
+  { readonly workflowName: string } & PageRequest,
+  Page<Variable>
 > = {
   id: 'automator.variables.list',
   permission: 'automator:variables:list',
@@ -982,12 +1036,27 @@ const variableListVariablesOperation: OperationDescriptor<
   description: 'List all variables in a workflow',
   input: t.record({
     workflowName: t.string({ description: 'Workflow name' }),
+    ...t.pageInputs(),
   }),
-  output: t.array(variableRecordType),
+  output: t.page(variableRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { workflowName: { type: 'string', description: 'Workflow name' } },
+    properties: {
+      workflowName: { type: 'string', description: 'Workflow name' },
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     required: ['workflowName'],
     additionalProperties: false,
   },
@@ -1012,8 +1081,8 @@ const variableGetVariableOperation: OperationDescriptor<{ readonly id: string },
 }
 
 const settingListSettingsOperation: OperationDescriptor<
-  { readonly actionId: string },
-  readonly Setting[]
+  { readonly actionId: string } & PageRequest,
+  Page<Setting>
 > = {
   id: 'automator.settings.list',
   permission: 'automator:settings:list',
@@ -1021,20 +1090,35 @@ const settingListSettingsOperation: OperationDescriptor<
   description: 'List all settings for an action',
   input: t.record({
     actionId: t.string({ description: 'Action identifier' }),
+    ...t.pageInputs(),
   }),
-  output: t.array(settingRecordType),
+  output: t.page(settingRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { actionId: { type: 'string', description: 'Action identifier' } },
+    properties: {
+      actionId: { type: 'string', description: 'Action identifier' },
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     required: ['actionId'],
     additionalProperties: false,
   },
 }
 
 const requiredResourceListRequiredResourcesOperation: OperationDescriptor<
-  { readonly actionId: string },
-  readonly RequiredResource[]
+  { readonly actionId: string } & PageRequest,
+  Page<RequiredResource>
 > = {
   id: 'automator.requiredResources.list',
   permission: 'automator:requiredResources:list',
@@ -1042,12 +1126,27 @@ const requiredResourceListRequiredResourcesOperation: OperationDescriptor<
   description: 'List all required resources for an action',
   input: t.record({
     actionId: t.string({ description: 'Action identifier' }),
+    ...t.pageInputs(),
   }),
-  output: t.array(requiredResourceRecordType),
+  output: t.page(requiredResourceRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { actionId: { type: 'string', description: 'Action identifier' } },
+    properties: {
+      actionId: { type: 'string', description: 'Action identifier' },
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     required: ['actionId'],
     additionalProperties: false,
   },
@@ -1072,28 +1171,32 @@ const operations: AppContract<AutomatorClient>['operations'] = {
 function bind(runtime: ClientRuntime): AutomatorClient {
   return {
     workflows: {
-      list: (options) => runtime.invoke(workflowListOperation, {}, options),
+      list: (page, options) => runtime.invoke(workflowListOperation, { ...page }, options),
       get: (name, options) => runtime.invoke(workflowGetOperation, { name }, options),
       execute: (workflow, options) =>
         runtime.invoke(workflowExecuteOperation, { workflow }, options),
     },
     automatorActions: {
-      list: (workflowName, options) =>
-        runtime.invoke(automatorActionListActionsOperation, { workflowName }, options),
+      list: (workflowName, page, options) =>
+        runtime.invoke(automatorActionListActionsOperation, { ...page, workflowName }, options),
       get: (id, options) => runtime.invoke(automatorActionGetActionOperation, { id }, options),
     },
     variables: {
-      list: (workflowName, options) =>
-        runtime.invoke(variableListVariablesOperation, { workflowName }, options),
+      list: (workflowName, page, options) =>
+        runtime.invoke(variableListVariablesOperation, { ...page, workflowName }, options),
       get: (id, options) => runtime.invoke(variableGetVariableOperation, { id }, options),
     },
     settings: {
-      list: (actionId, options) =>
-        runtime.invoke(settingListSettingsOperation, { actionId }, options),
+      list: (actionId, page, options) =>
+        runtime.invoke(settingListSettingsOperation, { ...page, actionId }, options),
     },
     requiredResources: {
-      list: (actionId, options) =>
-        runtime.invoke(requiredResourceListRequiredResourcesOperation, { actionId }, options),
+      list: (actionId, page, options) =>
+        runtime.invoke(
+          requiredResourceListRequiredResourcesOperation,
+          { ...page, actionId },
+          options
+        ),
     },
     add: (object, to, atIndex, options) =>
       runtime.invoke(appAddOperation, { object, to, atIndex }, options),

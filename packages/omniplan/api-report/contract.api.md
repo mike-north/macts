@@ -7,6 +7,8 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { Page } from '@macts/contracts';
+import { PageRequest } from '@macts/contracts';
 
 // @public
 export interface Assignment {
@@ -20,7 +22,7 @@ export interface AssignmentCreateInput {
 
 // @public
 export interface AssignmentResourceClient {
-    list(options?: CallOptions): Promise<readonly Assignment[]>;
+    list(options?: CallOptions): Promise<Page<Assignment>>;
 }
 
 // @public
@@ -57,7 +59,7 @@ export interface DependencyCreateInput {
 
 // @public
 export interface DependencyResourceClient {
-    list(options?: CallOptions): Promise<readonly Dependency[]>;
+    list(options?: CallOptions): Promise<Page<Dependency>>;
 }
 
 // @public
@@ -89,7 +91,7 @@ export interface MilestoneCreateInput {
 export interface MilestoneResourceClient {
     create(input: MilestoneCreateInput, options?: CallOptions): Promise<Milestone>;
     get(id: Integer, options?: CallOptions): Promise<Milestone>;
-    list(options?: CallOptions): Promise<readonly Milestone[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Milestone>>;
 }
 
 // @public
@@ -145,7 +147,7 @@ export interface ProjectCreateInput {
 // @public
 export interface ProjectResourceClient {
     get(id: string, options?: CallOptions): Promise<Project>;
-    list(options?: CallOptions): Promise<readonly Project[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Project>>;
 }
 
 // @public
@@ -186,7 +188,7 @@ export interface ResourceCreateInput {
 export interface ResourceResourceClient {
     create(input: ResourceCreateInput, options?: CallOptions): Promise<Resource>;
     get(id: Integer, options?: CallOptions): Promise<Resource>;
-    list(options?: CallOptions): Promise<readonly Resource[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Resource>>;
 }
 
 // @public
@@ -228,7 +230,7 @@ export interface ScenarioCreateInput {
 // @public
 export interface ScenarioResourceClient {
     get(id: string, options?: CallOptions): Promise<Scenario>;
-    list(options?: CallOptions): Promise<readonly Scenario[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Scenario>>;
 }
 
 // @public
@@ -299,7 +301,7 @@ export interface TaskCreateInput {
 export interface TaskResourceClient {
     create(input: TaskCreateInput, options?: CallOptions): Promise<Task>;
     get(id: Integer, options?: CallOptions): Promise<Task>;
-    list(options?: CallOptions): Promise<readonly Task[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Task>>;
 }
 
 // @public
@@ -340,7 +342,7 @@ export type ViolationCreateInput = Record<string, never>;
 // @public
 export interface ViolationResourceClient {
     fix(options?: CallOptions): Promise<void>;
-    list(options?: CallOptions): Promise<readonly Violation[]>;
+    list(options?: CallOptions): Promise<Page<Violation>>;
 }
 
 // @public

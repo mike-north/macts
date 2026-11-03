@@ -27,6 +27,8 @@ import {
   type Integer,
   type ObjectReferenceVariant,
   type OperationDescriptor,
+  type Page,
+  type PageRequest,
   type ValueType,
 } from '@macts/contracts'
 
@@ -949,8 +951,14 @@ export interface TestFailureUpdateInput {
  * all objects and commands in Xcode
  */
 export interface WorkspaceDocumentResourceClient {
-  /** List workspace documents. */
-  list(options?: CallOptions): Promise<readonly WorkspaceDocument[]>
+  /**
+   * List workspace documents, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<WorkspaceDocument>>
   /**
    * Read the workspace document identified by `name`.
    *
@@ -1049,11 +1057,14 @@ export interface WorkspaceDocumentResourceClient {
  */
 export interface ProjectResourceClient {
   /**
-   * List projects.
+   * List projects, one page at a time.
    *
    * @param workspaceName - Workspace document name. Does not accept null.
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
    */
-  list(workspaceName: string, options?: CallOptions): Promise<readonly Project[]>
+  list(workspaceName: string, page?: PageRequest, options?: CallOptions): Promise<Page<Project>>
   /**
    * Read the project identified by `id`.
    *
@@ -1067,11 +1078,14 @@ export interface ProjectResourceClient {
  */
 export interface SchemeResourceClient {
   /**
-   * List schemes.
+   * List schemes, one page at a time.
    *
    * @param workspaceName - Workspace document name. Does not accept null.
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
    */
-  list(workspaceName: string, options?: CallOptions): Promise<readonly Scheme[]>
+  list(workspaceName: string, page?: PageRequest, options?: CallOptions): Promise<Page<Scheme>>
   /**
    * Read the scheme identified by `id`.
    *
@@ -1086,11 +1100,18 @@ export interface SchemeResourceClient {
  */
 export interface RunDestinationResourceClient {
   /**
-   * List run destinations.
+   * List run destinations, one page at a time.
    *
    * @param workspaceName - Workspace document name. Does not accept null.
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
    */
-  list(workspaceName: string, options?: CallOptions): Promise<readonly RunDestination[]>
+  list(
+    workspaceName: string,
+    page?: PageRequest,
+    options?: CallOptions
+  ): Promise<Page<RunDestination>>
   /**
    * Read the run destination identified by `name`.
    *
@@ -1530,19 +1551,34 @@ const resources: AppContract<XcodeClient>['resources'] = {
 }
 
 const workspaceDocumentListWorkspaceDocumentsOperation: OperationDescriptor<
-  Record<string, never>,
-  readonly WorkspaceDocument[]
+  PageRequest,
+  Page<WorkspaceDocument>
 > = {
   id: 'xcode.workspaceDocuments.list',
   permission: 'xcode:workspaceDocuments:list',
   target: { command: 'listWorkspaceDocuments', resource: 'WorkspaceDocument' },
   description: 'List all workspace documents',
-  input: t.record({}),
-  output: t.array(workspaceDocumentRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(workspaceDocumentRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -1569,8 +1605,8 @@ const workspaceDocumentGetWorkspaceDocumentOperation: OperationDescriptor<
 }
 
 const projectListProjectsOperation: OperationDescriptor<
-  { readonly workspaceName: string },
-  readonly Project[]
+  { readonly workspaceName: string } & PageRequest,
+  Page<Project>
 > = {
   id: 'xcode.projects.list',
   permission: 'xcode:projects:list',
@@ -1578,12 +1614,27 @@ const projectListProjectsOperation: OperationDescriptor<
   description: 'List all projects in a workspace',
   input: t.record({
     workspaceName: t.string({ description: 'Workspace document name' }),
+    ...t.pageInputs(),
   }),
-  output: t.array(projectRecordType),
+  output: t.page(projectRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { workspaceName: { type: 'string', description: 'Workspace document name' } },
+    properties: {
+      workspaceName: { type: 'string', description: 'Workspace document name' },
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     required: ['workspaceName'],
     additionalProperties: false,
   },
@@ -1608,8 +1659,8 @@ const projectGetProjectOperation: OperationDescriptor<{ readonly id: string }, P
 }
 
 const schemeListSchemesOperation: OperationDescriptor<
-  { readonly workspaceName: string },
-  readonly Scheme[]
+  { readonly workspaceName: string } & PageRequest,
+  Page<Scheme>
 > = {
   id: 'xcode.schemes.list',
   permission: 'xcode:schemes:list',
@@ -1617,12 +1668,27 @@ const schemeListSchemesOperation: OperationDescriptor<
   description: 'List all schemes in a workspace',
   input: t.record({
     workspaceName: t.string({ description: 'Workspace document name' }),
+    ...t.pageInputs(),
   }),
-  output: t.array(schemeRecordType),
+  output: t.page(schemeRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { workspaceName: { type: 'string', description: 'Workspace document name' } },
+    properties: {
+      workspaceName: { type: 'string', description: 'Workspace document name' },
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     required: ['workspaceName'],
     additionalProperties: false,
   },
@@ -1647,8 +1713,8 @@ const schemeGetSchemeOperation: OperationDescriptor<{ readonly id: string }, Sch
 }
 
 const runDestinationListRunDestinationsOperation: OperationDescriptor<
-  { readonly workspaceName: string },
-  readonly RunDestination[]
+  { readonly workspaceName: string } & PageRequest,
+  Page<RunDestination>
 > = {
   id: 'xcode.runDestinations.list',
   permission: 'xcode:runDestinations:list',
@@ -1656,12 +1722,27 @@ const runDestinationListRunDestinationsOperation: OperationDescriptor<
   description: 'List all run destinations in a workspace',
   input: t.record({
     workspaceName: t.string({ description: 'Workspace document name' }),
+    ...t.pageInputs(),
   }),
-  output: t.array(runDestinationRecordType),
+  output: t.page(runDestinationRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { workspaceName: { type: 'string', description: 'Workspace document name' } },
+    properties: {
+      workspaceName: { type: 'string', description: 'Workspace document name' },
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     required: ['workspaceName'],
     additionalProperties: false,
   },
@@ -2192,8 +2273,8 @@ const operations: AppContract<XcodeClient>['operations'] = {
 function bind(runtime: ClientRuntime): XcodeClient {
   return {
     workspaceDocuments: {
-      list: (options) =>
-        runtime.invoke(workspaceDocumentListWorkspaceDocumentsOperation, {}, options),
+      list: (page, options) =>
+        runtime.invoke(workspaceDocumentListWorkspaceDocumentsOperation, { ...page }, options),
       get: (name, options) =>
         runtime.invoke(workspaceDocumentGetWorkspaceDocumentOperation, { name }, options),
       build: (workspaceName, options) =>
@@ -2243,18 +2324,22 @@ function bind(runtime: ClientRuntime): XcodeClient {
         ),
     },
     projects: {
-      list: (workspaceName, options) =>
-        runtime.invoke(projectListProjectsOperation, { workspaceName }, options),
+      list: (workspaceName, page, options) =>
+        runtime.invoke(projectListProjectsOperation, { ...page, workspaceName }, options),
       get: (id, options) => runtime.invoke(projectGetProjectOperation, { id }, options),
     },
     schemes: {
-      list: (workspaceName, options) =>
-        runtime.invoke(schemeListSchemesOperation, { workspaceName }, options),
+      list: (workspaceName, page, options) =>
+        runtime.invoke(schemeListSchemesOperation, { ...page, workspaceName }, options),
       get: (id, options) => runtime.invoke(schemeGetSchemeOperation, { id }, options),
     },
     runDestinations: {
-      list: (workspaceName, options) =>
-        runtime.invoke(runDestinationListRunDestinationsOperation, { workspaceName }, options),
+      list: (workspaceName, page, options) =>
+        runtime.invoke(
+          runDestinationListRunDestinationsOperation,
+          { ...page, workspaceName },
+          options
+        ),
       get: (name, options) =>
         runtime.invoke(runDestinationGetRunDestinationOperation, { name }, options),
     },

@@ -21,10 +21,19 @@ export class MilestoneResourceClient {
   }
 
   /**
-   * List all milestones.
+   * List milestones, one page at a time. When the result has a `nextCursor`,
+   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(): Promise<Milestone[]> {
-    return this.#http.rpc<Milestone[]>(`${this.#app}.${this.#resource}.list`)
+  async list(
+    page: { pageSize?: number; cursor?: string } = {}
+  ): Promise<{ items: Milestone[]; nextCursor?: string }> {
+    return this.#http.rpc<{ items: Milestone[]; nextCursor?: string }>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+      }
+    )
   }
 
   /**

@@ -26,6 +26,8 @@ import {
   type Integer,
   type ObjectReferenceVariant,
   type OperationDescriptor,
+  type Page,
+  type PageRequest,
   type Rectangle,
   type ValueType,
 } from '@macts/contracts'
@@ -304,8 +306,14 @@ export interface BookmarkItemUpdateInput {
 
 /** A window. */
 export interface WindowResourceClient {
-  /** List windows. */
-  list(options?: CallOptions): Promise<readonly Window[]>
+  /**
+   * List windows, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Window>>
   /**
    * Read the window identified by `id`.
    *
@@ -319,11 +327,14 @@ export interface WindowResourceClient {
 /** A tab. */
 export interface TabResourceClient {
   /**
-   * List tabs.
+   * List tabs, one page at a time.
    *
    * @param windowId - Window identifier. Does not accept null.
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
    */
-  list(windowId: string, options?: CallOptions): Promise<readonly Tab[]>
+  list(windowId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Tab>>
   /**
    * Read the tab identified by `id`.
    *
@@ -409,8 +420,14 @@ export interface TabResourceClient {
 
 /** A bookmarks folder that contains other bookmarks folder and bookmark items. */
 export interface BookmarkFolderResourceClient {
-  /** List bookmark folders. */
-  list(options?: CallOptions): Promise<readonly BookmarkFolder[]>
+  /**
+   * List bookmark folders, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<BookmarkFolder>>
   /**
    * Read the bookmark folder identified by `id`.
    *
@@ -422,11 +439,14 @@ export interface BookmarkFolderResourceClient {
 /** An item consists of an URL and the title of a bookmark */
 export interface BookmarkItemResourceClient {
   /**
-   * List bookmark items.
+   * List bookmark items, one page at a time.
    *
    * @param folderId - Bookmark folder identifier. Does not accept null.
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
    */
-  list(folderId: string, options?: CallOptions): Promise<readonly BookmarkItem[]>
+  list(folderId: string, page?: PageRequest, options?: CallOptions): Promise<Page<BookmarkItem>>
   /**
    * Read the bookmark item identified by `id`.
    *
@@ -566,17 +586,32 @@ const resources: AppContract<MicrosoftEdgeClient>['resources'] = {
   },
 }
 
-const windowListWindowsOperation: OperationDescriptor<Record<string, never>, readonly Window[]> = {
+const windowListWindowsOperation: OperationDescriptor<PageRequest, Page<Window>> = {
   id: 'microsoft-edge.windows.list',
   permission: 'microsoft-edge:windows:list',
   target: { command: 'listWindows', resource: 'Window' },
   description: 'List all windows',
-  input: t.record({}),
-  output: t.array(windowRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(windowRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -694,19 +729,37 @@ const windowCreateWindowOperation: OperationDescriptor<WindowCreateInput, Window
   },
 }
 
-const tabListTabsOperation: OperationDescriptor<{ readonly windowId: string }, readonly Tab[]> = {
+const tabListTabsOperation: OperationDescriptor<
+  { readonly windowId: string } & PageRequest,
+  Page<Tab>
+> = {
   id: 'microsoft-edge.tabs.list',
   permission: 'microsoft-edge:tabs:list',
   target: { command: 'listTabs', resource: 'Tab' },
   description: 'List all tabs in a window',
   input: t.record({
     windowId: t.string({ description: 'Window identifier' }),
+    ...t.pageInputs(),
   }),
-  output: t.array(tabRecordType),
+  output: t.page(tabRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { windowId: { type: 'string', description: 'Window identifier' } },
+    properties: {
+      windowId: { type: 'string', description: 'Window identifier' },
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     required: ['windowId'],
     additionalProperties: false,
   },
@@ -750,19 +803,34 @@ const tabCreateTabOperation: OperationDescriptor<TabCreateInput, Tab> = {
 }
 
 const bookmarkFolderListBookmarkFoldersOperation: OperationDescriptor<
-  Record<string, never>,
-  readonly BookmarkFolder[]
+  PageRequest,
+  Page<BookmarkFolder>
 > = {
   id: 'microsoft-edge.bookmarkFolders.list',
   permission: 'microsoft-edge:bookmarkFolders:list',
   target: { command: 'listBookmarkFolders', resource: 'BookmarkFolder' },
   description: 'List all bookmark folders',
-  input: t.record({}),
-  output: t.array(bookmarkFolderRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(bookmarkFolderRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -789,8 +857,8 @@ const bookmarkFolderGetBookmarkFolderOperation: OperationDescriptor<
 }
 
 const bookmarkItemListBookmarkItemsOperation: OperationDescriptor<
-  { readonly folderId: string },
-  readonly BookmarkItem[]
+  { readonly folderId: string } & PageRequest,
+  Page<BookmarkItem>
 > = {
   id: 'microsoft-edge.bookmarkItems.list',
   permission: 'microsoft-edge:bookmarkItems:list',
@@ -798,12 +866,27 @@ const bookmarkItemListBookmarkItemsOperation: OperationDescriptor<
   description: 'List all bookmark items in a folder',
   input: t.record({
     folderId: t.string({ description: 'Bookmark folder identifier' }),
+    ...t.pageInputs(),
   }),
-  output: t.array(bookmarkItemRecordType),
+  output: t.page(bookmarkItemRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { folderId: { type: 'string', description: 'Bookmark folder identifier' } },
+    properties: {
+      folderId: { type: 'string', description: 'Bookmark folder identifier' },
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     required: ['folderId'],
     additionalProperties: false,
   },
@@ -1083,12 +1166,13 @@ const operations: AppContract<MicrosoftEdgeClient>['operations'] = {
 function bind(runtime: ClientRuntime): MicrosoftEdgeClient {
   return {
     windows: {
-      list: (options) => runtime.invoke(windowListWindowsOperation, {}, options),
+      list: (page, options) => runtime.invoke(windowListWindowsOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(windowGetWindowOperation, { id }, options),
       create: (input, options) => runtime.invoke(windowCreateWindowOperation, input, options),
     },
     tabs: {
-      list: (windowId, options) => runtime.invoke(tabListTabsOperation, { windowId }, options),
+      list: (windowId, page, options) =>
+        runtime.invoke(tabListTabsOperation, { ...page, windowId }, options),
       get: (id, options) => runtime.invoke(tabGetTabOperation, { id }, options),
       create: (input, options) => runtime.invoke(tabCreateTabOperation, input, options),
       reload: (tabId, options) => runtime.invoke(tabReloadOperation, { tabId }, options),
@@ -1109,13 +1193,14 @@ function bind(runtime: ClientRuntime): MicrosoftEdgeClient {
         runtime.invoke(tabExecuteOperation, { tabId, javascript }, options),
     },
     bookmarkFolders: {
-      list: (options) => runtime.invoke(bookmarkFolderListBookmarkFoldersOperation, {}, options),
+      list: (page, options) =>
+        runtime.invoke(bookmarkFolderListBookmarkFoldersOperation, { ...page }, options),
       get: (id, options) =>
         runtime.invoke(bookmarkFolderGetBookmarkFolderOperation, { id }, options),
     },
     bookmarkItems: {
-      list: (folderId, options) =>
-        runtime.invoke(bookmarkItemListBookmarkItemsOperation, { folderId }, options),
+      list: (folderId, page, options) =>
+        runtime.invoke(bookmarkItemListBookmarkItemsOperation, { ...page, folderId }, options),
       get: (id, options) => runtime.invoke(bookmarkItemGetBookmarkItemOperation, { id }, options),
     },
   }

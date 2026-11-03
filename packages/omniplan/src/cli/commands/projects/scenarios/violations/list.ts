@@ -19,10 +19,10 @@ export class ListViolationsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.violations.list()
+      const page = await client.violations.list()
 
       const output = formatter.formatList(
-        items.map((item) => ({
+        page.items.map((item) => ({
           violationType: item.violationType,
           shortDescription: item.shortDescription,
           html: item.html,

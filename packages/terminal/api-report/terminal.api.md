@@ -54,7 +54,13 @@ export interface SettingsSetCreateInput {
 export class SettingsSetResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<SettingsSet>;
-    list(): Promise<SettingsSet[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: SettingsSet[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -96,7 +102,13 @@ export interface TabCreateInput {
 export class TabResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<Tab>;
-    list(): Promise<Tab[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Tab[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -158,7 +170,13 @@ export interface WindowCreateInput {
 export class WindowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<Window>;
-    list(): Promise<Window[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Window[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)

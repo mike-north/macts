@@ -21,10 +21,19 @@ export class DocumentResourceClient {
   }
 
   /**
-   * List all documents.
+   * List documents, one page at a time. When the result has a `nextCursor`,
+   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(): Promise<Document[]> {
-    return this.#http.rpc<Document[]>(`${this.#app}.${this.#resource}.list`)
+  async list(
+    page: { pageSize?: number; cursor?: string } = {}
+  ): Promise<{ items: Document[]; nextCursor?: string }> {
+    return this.#http.rpc<{ items: Document[]; nextCursor?: string }>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+      }
+    )
   }
 
   /**

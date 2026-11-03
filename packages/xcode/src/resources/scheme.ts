@@ -21,10 +21,21 @@ export class SchemeResourceClient {
   }
 
   /**
-   * List all schemes.
+   * List schemes, one page at a time. When the result has a `nextCursor`,
+   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(workspaceName: string): Promise<Scheme[]> {
-    return this.#http.rpc<Scheme[]>(`${this.#app}.${this.#resource}.list`, { workspaceName })
+  async list(
+    workspaceName: string,
+    page: { pageSize?: number; cursor?: string } = {}
+  ): Promise<{ items: Scheme[]; nextCursor?: string }> {
+    return this.#http.rpc<{ items: Scheme[]; nextCursor?: string }>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+        workspaceName,
+      }
+    )
   }
 
   /**

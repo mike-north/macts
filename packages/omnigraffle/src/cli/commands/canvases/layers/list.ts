@@ -14,21 +14,31 @@ export class ListLayersCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   canvasId = Option.String('--canvas-id', { required: true, description: 'Canvas identifier' })
+  pageSize = Option.String('--page-size', {
+    description: 'The most items to show, from 1 to 100 (default 25)',
+  })
+  cursor = Option.String('--cursor', {
+    description: 'Continue from the previous page, as its output says',
+  })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      const items = await client.layers.list(this.canvasId)
+      const page = await client.layers.list(this.canvasId, {
+        ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }),
+        ...(this.cursor === undefined ? {} : { cursor: this.cursor }),
+      })
 
-      const output = formatter.formatList(
-        items.map((item) => ({
+      const output = formatter.formatPage(
+        page.items.map((item) => ({
           name: item.name,
           locked: item.locked,
           visible: item.visible,
           prints: item.prints,
-        }))
+        })),
+        page.nextCursor
       )
 
       this.context.stdout.write(output + '\n')

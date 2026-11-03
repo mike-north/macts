@@ -19,7 +19,9 @@ export interface AssignmentCreateInput {
 // @public
 export class AssignmentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    list(): Promise<Assignment[]>;
+    list(): Promise<{
+        items: Assignment[];
+    }>;
 }
 
 // @public (undocumented)
@@ -86,7 +88,9 @@ export interface DependencyCreateInput {
 // @public
 export class DependencyResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    list(): Promise<Dependency[]>;
+    list(): Promise<{
+        items: Dependency[];
+    }>;
 }
 
 // @public (undocumented)
@@ -128,7 +132,13 @@ export class MilestoneResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: MilestoneCreateInput): Promise<Milestone>;
     get(id: string): Promise<Milestone>;
-    list(): Promise<Milestone[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Milestone[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -201,7 +211,13 @@ export interface ProjectCreateInput {
 export class ProjectResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Project>;
-    list(): Promise<Project[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Project[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -253,7 +269,13 @@ export class ResourceResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: ResourceCreateInput): Promise<Resource>;
     get(id: string): Promise<Resource>;
-    list(): Promise<Resource[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Resource[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -304,7 +326,13 @@ export interface ScenarioCreateInput {
 export class ScenarioResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Scenario>;
-    list(): Promise<Scenario[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Scenario[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -389,7 +417,13 @@ export class TaskResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: TaskCreateInput): Promise<Task>;
     get(id: string): Promise<Task>;
-    list(): Promise<Task[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Task[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -441,7 +475,9 @@ export type ViolationCreateInput = Record<string, never>;
 export class ViolationResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     fix(): Promise<void>;
-    list(): Promise<Violation[]>;
+    list(): Promise<{
+        items: Violation[];
+    }>;
 }
 
 // @public (undocumented)

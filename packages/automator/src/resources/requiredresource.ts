@@ -21,9 +21,20 @@ export class RequiredResourceResourceClient {
   }
 
   /**
-   * List all required resources.
+   * List required resources, one page at a time. When the result has a `nextCursor`,
+   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(actionId: string): Promise<RequiredResource[]> {
-    return this.#http.rpc<RequiredResource[]>(`${this.#app}.${this.#resource}.list`, { actionId })
+  async list(
+    actionId: string,
+    page: { pageSize?: number; cursor?: string } = {}
+  ): Promise<{ items: RequiredResource[]; nextCursor?: string }> {
+    return this.#http.rpc<{ items: RequiredResource[]; nextCursor?: string }>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+        actionId,
+      }
+    )
   }
 }

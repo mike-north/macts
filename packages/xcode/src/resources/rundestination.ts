@@ -21,12 +21,21 @@ export class RunDestinationResourceClient {
   }
 
   /**
-   * List all run destinations.
+   * List run destinations, one page at a time. When the result has a `nextCursor`,
+   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(workspaceName: string): Promise<RunDestination[]> {
-    return this.#http.rpc<RunDestination[]>(`${this.#app}.${this.#resource}.list`, {
-      workspaceName,
-    })
+  async list(
+    workspaceName: string,
+    page: { pageSize?: number; cursor?: string } = {}
+  ): Promise<{ items: RunDestination[]; nextCursor?: string }> {
+    return this.#http.rpc<{ items: RunDestination[]; nextCursor?: string }>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+        workspaceName,
+      }
+    )
   }
 
   /**

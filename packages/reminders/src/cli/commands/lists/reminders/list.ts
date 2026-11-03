@@ -14,16 +14,25 @@ export class ListRemindersCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   listId = Option.String('--list-id', { required: true, description: 'List identifier' })
+  pageSize = Option.String('--page-size', {
+    description: 'The most items to show, from 1 to 100 (default 25)',
+  })
+  cursor = Option.String('--cursor', {
+    description: 'Continue from the previous page, as its output says',
+  })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      const items = await client.reminders.list(this.listId)
+      const page = await client.reminders.list(this.listId, {
+        ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }),
+        ...(this.cursor === undefined ? {} : { cursor: this.cursor }),
+      })
 
-      const output = formatter.formatList(
-        items.map((item) => ({
+      const output = formatter.formatPage(
+        page.items.map((item) => ({
           name: item.name,
           id: item.id,
           body: item.body,
@@ -36,7 +45,8 @@ export class ListRemindersCommand extends Command {
           creationDate: item.creationDate,
           modificationDate: item.modificationDate,
           alldayDueDate: item.alldayDueDate,
-        }))
+        })),
+        page.nextCursor
       )
 
       this.context.stdout.write(output + '\n')

@@ -130,7 +130,13 @@ export class DocumentResourceClient {
     close(saving?: boolean): Promise<void>;
     createRange(start?: number, end?: number): Promise<void>;
     get(id: string): Promise<Document>;
-    list(): Promise<Document[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Document[];
+        nextCursor?: string;
+    }>;
     print(): Promise<void>;
     save(): Promise<void>;
     saveAs(fileName: string, fileFormat?: SaveFormat): Promise<void>;

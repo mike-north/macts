@@ -45,7 +45,13 @@ export class DocumentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: DocumentCreateInput): Promise<Document>;
     get(name: string): Promise<Document>;
-    list(): Promise<Document[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Document[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)

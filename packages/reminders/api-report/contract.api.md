@@ -7,6 +7,8 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { Page } from '@macts/contracts';
+import { PageRequest } from '@macts/contracts';
 
 // @public
 export interface Account {
@@ -19,7 +21,7 @@ export type AccountCreateInput = Record<string, never>;
 
 // @public
 export interface AccountResourceClient {
-    list(options?: CallOptions): Promise<readonly Account[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Account>>;
 }
 
 // @public
@@ -44,7 +46,7 @@ export interface ListCreateInput {
 export interface ListResourceClient {
     create(input: ListCreateInput, options?: CallOptions): Promise<List>;
     get(id: string, options?: CallOptions): Promise<List>;
-    list(options?: CallOptions): Promise<readonly List[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<List>>;
 }
 
 // @public
@@ -92,7 +94,7 @@ export interface ReminderResourceClient {
     create(input: ReminderCreateInput, options?: CallOptions): Promise<Reminder>;
     delete(id: string, options?: CallOptions): Promise<void>;
     get(id: string, options?: CallOptions): Promise<Reminder>;
-    list(listId: string, options?: CallOptions): Promise<readonly Reminder[]>;
+    list(listId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Reminder>>;
     show(options?: CallOptions): Promise<void>;
 }
 

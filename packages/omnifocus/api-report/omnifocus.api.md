@@ -48,7 +48,13 @@ export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: FolderCreateInput): Promise<Folder>;
     get(id: string): Promise<Folder>;
-    list(): Promise<Folder[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Folder[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -97,7 +103,13 @@ export class InboxTaskResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: InboxTaskCreateInput): Promise<InboxTask>;
     get(id: string): Promise<InboxTask>;
-    list(): Promise<InboxTask[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: InboxTask[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -166,7 +178,13 @@ export type PerspectiveCreateInput = Record<string, never>;
 export class PerspectiveResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Perspective>;
-    list(): Promise<Perspective[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Perspective[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -239,7 +257,13 @@ export class ProjectResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: ProjectCreateInput): Promise<Project>;
     get(id: string): Promise<Project>;
-    list(): Promise<Project[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Project[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -317,7 +341,13 @@ export class TagResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: TagCreateInput): Promise<Tag>;
     get(id: string): Promise<Tag>;
-    list(): Promise<Tag[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Tag[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -387,7 +417,13 @@ export class TaskResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: TaskCreateInput): Promise<Task>;
     get(id: string): Promise<Task>;
-    list(): Promise<Task[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Task[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)

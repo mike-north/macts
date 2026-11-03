@@ -24,6 +24,8 @@ import {
   type CallOptions,
   type ClientRuntime,
   type OperationDescriptor,
+  type Page,
+  type PageRequest,
   type ValueType,
 } from '@macts/contracts'
 
@@ -77,8 +79,14 @@ export interface DocumentUpdateInput {
 
 /** A TextEdit document */
 export interface DocumentResourceClient {
-  /** List documents. */
-  list(options?: CallOptions): Promise<readonly Document[]>
+  /**
+   * List documents, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Document>>
   /**
    * Read the document identified by `name`.
    *
@@ -130,17 +138,32 @@ const resources: AppContract<TextEditClient>['resources'] = {
   },
 }
 
-const documentListOperation: OperationDescriptor<Record<string, never>, readonly Document[]> = {
+const documentListOperation: OperationDescriptor<PageRequest, Page<Document>> = {
   id: 'textedit.documents.list',
   permission: 'textedit:documents:list',
   target: { command: 'list', resource: 'Document' },
   description: 'List all open documents',
-  input: t.record({}),
-  output: t.array(documentRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(documentRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -192,7 +215,7 @@ const operations: AppContract<TextEditClient>['operations'] = {
 function bind(runtime: ClientRuntime): TextEditClient {
   return {
     documents: {
-      list: (options) => runtime.invoke(documentListOperation, {}, options),
+      list: (page, options) => runtime.invoke(documentListOperation, { ...page }, options),
       get: (name, options) => runtime.invoke(documentGetOperation, { name }, options),
       create: (input, options) => runtime.invoke(documentCreateOperation, input, options),
     },

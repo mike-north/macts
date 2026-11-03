@@ -26,6 +26,8 @@ import {
   type Integer,
   type ObjectReferenceVariant,
   type OperationDescriptor,
+  type Page,
+  type PageRequest,
   type ValueType,
 } from '@macts/contracts'
 
@@ -276,8 +278,14 @@ export type MomentUpdateInput = Record<string, never>
 
 /** A media item, such as a photo or video */
 export interface MediaItemResourceClient {
-  /** List media items. */
-  list(options?: CallOptions): Promise<readonly MediaItem[]>
+  /**
+   * List media items, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<MediaItem>>
   /**
    * Read the media item identified by `id`.
    *
@@ -294,8 +302,14 @@ export interface MediaItemResourceClient {
 
 /** An album. A container that holds media items */
 export interface AlbumResourceClient {
-  /** List albums. */
-  list(options?: CallOptions): Promise<readonly Album[]>
+  /**
+   * List albums, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Album>>
   /**
    * Read the album identified by `id`.
    *
@@ -306,8 +320,14 @@ export interface AlbumResourceClient {
 
 /** A folder. A container that holds albums and other folders, but not media items */
 export interface FolderResourceClient {
-  /** List folders. */
-  list(options?: CallOptions): Promise<readonly Folder[]>
+  /**
+   * List folders, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Folder>>
   /**
    * Read the folder identified by `id`.
    *
@@ -514,20 +534,32 @@ const resources: AppContract<PhotosClient>['resources'] = {
   },
 }
 
-const mediaItemListMediaItemsOperation: OperationDescriptor<
-  Record<string, never>,
-  readonly MediaItem[]
-> = {
+const mediaItemListMediaItemsOperation: OperationDescriptor<PageRequest, Page<MediaItem>> = {
   id: 'photos.mediaItems.list',
   permission: 'photos:mediaItems:list',
   target: { command: 'listMediaItems', resource: 'MediaItem' },
   description: 'List all media items',
-  input: t.record({}),
-  output: t.array(mediaItemRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(mediaItemRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -550,17 +582,32 @@ const mediaItemGetMediaItemOperation: OperationDescriptor<{ readonly id: string 
   },
 }
 
-const albumListAlbumsOperation: OperationDescriptor<Record<string, never>, readonly Album[]> = {
+const albumListAlbumsOperation: OperationDescriptor<PageRequest, Page<Album>> = {
   id: 'photos.albums.list',
   permission: 'photos:albums:list',
   target: { command: 'listAlbums', resource: 'Album' },
   description: 'List all albums',
-  input: t.record({}),
-  output: t.array(albumRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(albumRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -583,17 +630,32 @@ const albumGetAlbumOperation: OperationDescriptor<{ readonly id: string }, Album
   },
 }
 
-const folderListFoldersOperation: OperationDescriptor<Record<string, never>, readonly Folder[]> = {
+const folderListFoldersOperation: OperationDescriptor<PageRequest, Page<Folder>> = {
   id: 'photos.folders.list',
   permission: 'photos:folders:list',
   target: { command: 'listFolders', resource: 'Folder' },
   description: 'List all folders',
-  input: t.record({}),
-  output: t.array(folderRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(folderRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -950,16 +1012,17 @@ const operations: AppContract<PhotosClient>['operations'] = {
 function bind(runtime: ClientRuntime): PhotosClient {
   return {
     mediaItems: {
-      list: (options) => runtime.invoke(mediaItemListMediaItemsOperation, {}, options),
+      list: (page, options) =>
+        runtime.invoke(mediaItemListMediaItemsOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(mediaItemGetMediaItemOperation, { id }, options),
       duplicate: (id, options) => runtime.invoke(mediaItemDuplicateOperation, { id }, options),
     },
     albums: {
-      list: (options) => runtime.invoke(albumListAlbumsOperation, {}, options),
+      list: (page, options) => runtime.invoke(albumListAlbumsOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(albumGetAlbumOperation, { id }, options),
     },
     folders: {
-      list: (options) => runtime.invoke(folderListFoldersOperation, {}, options),
+      list: (page, options) => runtime.invoke(folderListFoldersOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(folderGetFolderOperation, { id }, options),
     },
     _import: (files, into, skipCheckDuplicates, options) =>

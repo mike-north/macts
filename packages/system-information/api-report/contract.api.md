@@ -6,6 +6,8 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { Page } from '@macts/contracts';
+import { PageRequest } from '@macts/contracts';
 
 // @public
 export type DetailLevel = 'mini' | 'basic' | 'full';
@@ -26,7 +28,7 @@ export interface DocumentCreateInput {
 // @public
 export interface DocumentResourceClient {
     get(name: string, options?: CallOptions): Promise<Document>;
-    list(options?: CallOptions): Promise<readonly Document[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Document>>;
 }
 
 // @public

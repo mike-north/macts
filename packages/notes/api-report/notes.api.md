@@ -20,7 +20,13 @@ export type AccountCreateInput = Record<string, never>;
 export class AccountResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<Account>;
-    list(): Promise<Account[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Account[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -49,7 +55,13 @@ export type AttachmentCreateInput = Record<string, never>;
 export class AttachmentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Attachment>;
-    list(): Promise<Attachment[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Attachment[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -99,7 +111,13 @@ export interface FolderCreateInput {
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<Folder>;
-    list(): Promise<Folder[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Folder[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -141,7 +159,13 @@ export class NoteResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: NoteCreateInput): Promise<Note>;
     get(name: string): Promise<Note>;
-    list(): Promise<Note[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Note[];
+        nextCursor?: string;
+    }>;
     show(name: string): Promise<void>;
 }
 

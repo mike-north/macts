@@ -7,6 +7,8 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { Page } from '@macts/contracts';
+import { PageRequest } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
 
 // @public
@@ -99,7 +101,7 @@ export interface DocumentResourceClient {
     close(saving?: boolean, options?: CallOptions): Promise<void>;
     createRange(start?: Integer, end?: Integer, options?: CallOptions): Promise<void>;
     get(id: string, options?: CallOptions): Promise<Document>;
-    list(options?: CallOptions): Promise<readonly Document[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Document>>;
     print(options?: CallOptions): Promise<void>;
     save(options?: CallOptions): Promise<void>;
     saveAs(fileName: string, fileFormat?: SaveFormat, options?: CallOptions): Promise<void>;

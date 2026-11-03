@@ -13,23 +13,33 @@ export class ListWorkflowsCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
+  pageSize = Option.String('--page-size', {
+    description: 'The most items to show, from 1 to 100 (default 25)',
+  })
+  cursor = Option.String('--cursor', {
+    description: 'Continue from the previous page, as its output says',
+  })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      const items = await client.workflows.list()
+      const page = await client.workflows.list({
+        ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }),
+        ...(this.cursor === undefined ? {} : { cursor: this.cursor }),
+      })
 
-      const output = formatter.formatList(
-        items.map((item) => ({
+      const output = formatter.formatPage(
+        page.items.map((item) => ({
           name: item.name,
           currentAction: item.currentAction,
           executionResult: item.executionResult,
           executionErrorMessage: item.executionErrorMessage,
           executionErrorNumber: item.executionErrorNumber,
           executionId: item.executionId,
-        }))
+        })),
+        page.nextCursor
       )
 
       this.context.stdout.write(output + '\n')

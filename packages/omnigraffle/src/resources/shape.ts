@@ -21,10 +21,21 @@ export class ShapeResourceClient {
   }
 
   /**
-   * List all shapes.
+   * List shapes, one page at a time. When the result has a `nextCursor`,
+   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(canvasId: string): Promise<Shape[]> {
-    return this.#http.rpc<Shape[]>(`${this.#app}.${this.#resource}.list`, { canvasId })
+  async list(
+    canvasId: string,
+    page: { pageSize?: number; cursor?: string } = {}
+  ): Promise<{ items: Shape[]; nextCursor?: string }> {
+    return this.#http.rpc<{ items: Shape[]; nextCursor?: string }>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+        canvasId,
+      }
+    )
   }
 
   /**

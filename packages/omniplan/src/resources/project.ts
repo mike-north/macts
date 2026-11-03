@@ -21,10 +21,19 @@ export class ProjectResourceClient {
   }
 
   /**
-   * List all projects.
+   * List projects, one page at a time. When the result has a `nextCursor`,
+   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(): Promise<Project[]> {
-    return this.#http.rpc<Project[]>(`${this.#app}.${this.#resource}.list`)
+  async list(
+    page: { pageSize?: number; cursor?: string } = {}
+  ): Promise<{ items: Project[]; nextCursor?: string }> {
+    return this.#http.rpc<{ items: Project[]; nextCursor?: string }>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+      }
+    )
   }
 
   /**

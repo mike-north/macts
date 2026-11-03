@@ -25,6 +25,8 @@ import {
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
+  type Page,
+  type PageRequest,
   type ValueType,
 } from '@macts/contracts'
 
@@ -826,8 +828,14 @@ export type PerspectiveUpdateInput = Record<string, never>
 
 /** A task within OmniFocus */
 export interface TaskResourceClient {
-  /** List tasks. */
-  list(options?: CallOptions): Promise<readonly Task[]>
+  /**
+   * List tasks, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Task>>
   /**
    * Read the task identified by `id`.
    *
@@ -840,8 +848,14 @@ export interface TaskResourceClient {
 
 /** A project in OmniFocus */
 export interface ProjectResourceClient {
-  /** List projects. */
-  list(options?: CallOptions): Promise<readonly Project[]>
+  /**
+   * List projects, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Project>>
   /**
    * Read the project identified by `id`.
    *
@@ -854,8 +868,14 @@ export interface ProjectResourceClient {
 
 /** A group of projects and sub-folders representing an area of responsibility */
 export interface FolderResourceClient {
-  /** List folders. */
-  list(options?: CallOptions): Promise<readonly Folder[]>
+  /**
+   * List folders, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Folder>>
   /**
    * Read the folder identified by `id`.
    *
@@ -868,8 +888,14 @@ export interface FolderResourceClient {
 
 /** A tag for organizing and filtering tasks */
 export interface TagResourceClient {
-  /** List tags. */
-  list(options?: CallOptions): Promise<readonly Tag[]>
+  /**
+   * List tags, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Tag>>
   /**
    * Read the tag identified by `id`.
    *
@@ -882,8 +908,14 @@ export interface TagResourceClient {
 
 /** A task that is in the document's inbox */
 export interface InboxTaskResourceClient {
-  /** List inbox tasks. */
-  list(options?: CallOptions): Promise<readonly InboxTask[]>
+  /**
+   * List inbox tasks, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<InboxTask>>
   /**
    * Read the inbox task identified by `id`.
    *
@@ -896,8 +928,14 @@ export interface InboxTaskResourceClient {
 
 /** A saved view or filter configuration */
 export interface PerspectiveResourceClient {
-  /** List perspectives. */
-  list(options?: CallOptions): Promise<readonly Perspective[]>
+  /**
+   * List perspectives, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Perspective>>
   /**
    * Read the perspective identified by `id`.
    *
@@ -1322,17 +1360,32 @@ const resources: AppContract<OmniFocusClient>['resources'] = {
   },
 }
 
-const folderListFoldersOperation: OperationDescriptor<Record<string, never>, readonly Folder[]> = {
+const folderListFoldersOperation: OperationDescriptor<PageRequest, Page<Folder>> = {
   id: 'omnifocus.folders.list',
   permission: 'omnifocus:folders:list',
   target: { command: 'listFolders', resource: 'Folder' },
   description: 'List all folders',
-  input: t.record({}),
-  output: t.array(folderRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(folderRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -1375,20 +1428,32 @@ const folderCreateFolderOperation: OperationDescriptor<FolderCreateInput, Folder
   },
 }
 
-const projectListProjectsOperation: OperationDescriptor<
-  Record<string, never>,
-  readonly Project[]
-> = {
+const projectListProjectsOperation: OperationDescriptor<PageRequest, Page<Project>> = {
   id: 'omnifocus.projects.list',
   permission: 'omnifocus:projects:list',
   target: { command: 'listProjects', resource: 'Project' },
   description: 'List all projects',
-  input: t.record({}),
-  output: t.array(projectRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(projectRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -1555,17 +1620,32 @@ const projectCreateProjectOperation: OperationDescriptor<ProjectCreateInput, Pro
   },
 }
 
-const taskListTasksOperation: OperationDescriptor<Record<string, never>, readonly Task[]> = {
+const taskListTasksOperation: OperationDescriptor<PageRequest, Page<Task>> = {
   id: 'omnifocus.tasks.list',
   permission: 'omnifocus:tasks:list',
   target: { command: 'listTasks', resource: 'Task' },
   description: 'List all tasks',
-  input: t.record({}),
-  output: t.array(taskRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(taskRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -1695,17 +1775,32 @@ const taskCreateTaskOperation: OperationDescriptor<TaskCreateInput, Task> = {
   },
 }
 
-const tagListTagsOperation: OperationDescriptor<Record<string, never>, readonly Tag[]> = {
+const tagListTagsOperation: OperationDescriptor<PageRequest, Page<Tag>> = {
   id: 'omnifocus.tags.list',
   permission: 'omnifocus:tags:list',
   target: { command: 'listTags', resource: 'Tag' },
   description: 'List all tags',
-  input: t.record({}),
-  output: t.array(tagRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(tagRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -1753,20 +1848,32 @@ const tagCreateTagOperation: OperationDescriptor<TagCreateInput, Tag> = {
   },
 }
 
-const inboxTaskListInboxTasksOperation: OperationDescriptor<
-  Record<string, never>,
-  readonly InboxTask[]
-> = {
+const inboxTaskListInboxTasksOperation: OperationDescriptor<PageRequest, Page<InboxTask>> = {
   id: 'omnifocus.inboxTasks.list',
   permission: 'omnifocus:inboxTasks:list',
   target: { command: 'listInboxTasks', resource: 'InboxTask' },
   description: 'List all inbox tasks',
-  input: t.record({}),
-  output: t.array(inboxTaskRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(inboxTaskRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -1845,20 +1952,32 @@ const inboxTaskCreateInboxTaskOperation: OperationDescriptor<InboxTaskCreateInpu
   },
 }
 
-const perspectiveListPerspectivesOperation: OperationDescriptor<
-  Record<string, never>,
-  readonly Perspective[]
-> = {
+const perspectiveListPerspectivesOperation: OperationDescriptor<PageRequest, Page<Perspective>> = {
   id: 'omnifocus.perspectives.list',
   permission: 'omnifocus:perspectives:list',
   target: { command: 'listPerspectives', resource: 'Perspective' },
   description: 'List all perspectives',
-  input: t.record({}),
-  output: t.array(perspectiveRecordType),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
+  output: t.page(perspectiveRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -2125,32 +2244,34 @@ const operations: AppContract<OmniFocusClient>['operations'] = {
 function bind(runtime: ClientRuntime): OmniFocusClient {
   return {
     tasks: {
-      list: (options) => runtime.invoke(taskListTasksOperation, {}, options),
+      list: (page, options) => runtime.invoke(taskListTasksOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(taskGetTaskOperation, { id }, options),
       create: (input, options) => runtime.invoke(taskCreateTaskOperation, input, options),
     },
     projects: {
-      list: (options) => runtime.invoke(projectListProjectsOperation, {}, options),
+      list: (page, options) => runtime.invoke(projectListProjectsOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(projectGetProjectOperation, { id }, options),
       create: (input, options) => runtime.invoke(projectCreateProjectOperation, input, options),
     },
     folders: {
-      list: (options) => runtime.invoke(folderListFoldersOperation, {}, options),
+      list: (page, options) => runtime.invoke(folderListFoldersOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(folderGetFolderOperation, { id }, options),
       create: (input, options) => runtime.invoke(folderCreateFolderOperation, input, options),
     },
     tags: {
-      list: (options) => runtime.invoke(tagListTagsOperation, {}, options),
+      list: (page, options) => runtime.invoke(tagListTagsOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(tagGetTagOperation, { id }, options),
       create: (input, options) => runtime.invoke(tagCreateTagOperation, input, options),
     },
     inboxTasks: {
-      list: (options) => runtime.invoke(inboxTaskListInboxTasksOperation, {}, options),
+      list: (page, options) =>
+        runtime.invoke(inboxTaskListInboxTasksOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(inboxTaskGetInboxTaskOperation, { id }, options),
       create: (input, options) => runtime.invoke(inboxTaskCreateInboxTaskOperation, input, options),
     },
     perspectives: {
-      list: (options) => runtime.invoke(perspectiveListPerspectivesOperation, {}, options),
+      list: (page, options) =>
+        runtime.invoke(perspectiveListPerspectivesOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(perspectiveGetPerspectiveOperation, { id }, options),
     },
     complete: (text, options) => runtime.invoke(appCompleteOperation, { text }, options),

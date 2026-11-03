@@ -21,10 +21,21 @@ export class BookmarkItemResourceClient {
   }
 
   /**
-   * List all bookmark items.
+   * List bookmark items, one page at a time. When the result has a `nextCursor`,
+   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(folderId: string): Promise<BookmarkItem[]> {
-    return this.#http.rpc<BookmarkItem[]>(`${this.#app}.${this.#resource}.list`, { folderId })
+  async list(
+    folderId: string,
+    page: { pageSize?: number; cursor?: string } = {}
+  ): Promise<{ items: BookmarkItem[]; nextCursor?: string }> {
+    return this.#http.rpc<{ items: BookmarkItem[]; nextCursor?: string }>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+        folderId,
+      }
+    )
   }
 
   /**

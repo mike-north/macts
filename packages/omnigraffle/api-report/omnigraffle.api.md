@@ -51,7 +51,13 @@ export class CanvasResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: CanvasCreateInput): Promise<Canvas>;
     get(id: string): Promise<Canvas>;
-    list(): Promise<Canvas[]>;
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Canvas[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -242,7 +248,13 @@ export interface GraphicCreateInput {
 export class GraphicResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Graphic>;
-    list(canvasId: string): Promise<Graphic[]>;
+    list(canvasId: string, page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Graphic[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -452,7 +464,13 @@ export class LayerResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: LayerCreateInput): Promise<Layer>;
     get(name: string): Promise<Layer>;
-    list(canvasId: string): Promise<Layer[]>;
+    list(canvasId: string, page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Layer[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -502,7 +520,13 @@ export interface LineCreateInput {
 export class LineResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Line>;
-    list(canvasId: string): Promise<Line[]>;
+    list(canvasId: string, page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Line[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)
@@ -644,7 +668,13 @@ export class ShapeResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: ShapeCreateInput): Promise<Shape>;
     get(id: string): Promise<Shape>;
-    list(canvasId: string): Promise<Shape[]>;
+    list(canvasId: string, page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
+        items: Shape[];
+        nextCursor?: string;
+    }>;
 }
 
 // @public (undocumented)

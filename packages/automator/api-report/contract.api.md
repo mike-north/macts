@@ -7,6 +7,8 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { Page } from '@macts/contracts';
+import { PageRequest } from '@macts/contracts';
 
 // @public
 export interface AutomatorAction {
@@ -47,7 +49,7 @@ export interface AutomatorActionCreateInput {
 // @public
 export interface AutomatorActionResourceClient {
     get(id: string, options?: CallOptions): Promise<AutomatorAction>;
-    list(workflowName: string, options?: CallOptions): Promise<readonly AutomatorAction[]>;
+    list(workflowName: string, page?: PageRequest, options?: CallOptions): Promise<Page<AutomatorAction>>;
 }
 
 // @public
@@ -86,7 +88,7 @@ export type RequiredResourceCreateInput = Record<string, never>;
 
 // @public
 export interface RequiredResourceResourceClient {
-    list(actionId: string, options?: CallOptions): Promise<readonly RequiredResource[]>;
+    list(actionId: string, page?: PageRequest, options?: CallOptions): Promise<Page<RequiredResource>>;
 }
 
 // @public
@@ -106,7 +108,7 @@ export interface SettingCreateInput {
 
 // @public
 export interface SettingResourceClient {
-    list(actionId: string, options?: CallOptions): Promise<readonly Setting[]>;
+    list(actionId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Setting>>;
 }
 
 // @public
@@ -131,7 +133,7 @@ export interface VariableCreateInput {
 // @public
 export interface VariableResourceClient {
     get(id: string, options?: CallOptions): Promise<Variable>;
-    list(workflowName: string, options?: CallOptions): Promise<readonly Variable[]>;
+    list(workflowName: string, page?: PageRequest, options?: CallOptions): Promise<Page<Variable>>;
 }
 
 // @public
@@ -160,7 +162,7 @@ export type WorkflowCreateInput = Record<string, never>;
 export interface WorkflowResourceClient {
     execute(workflow: unknown, options?: CallOptions): Promise<void>;
     get(name: string, options?: CallOptions): Promise<Workflow>;
-    list(options?: CallOptions): Promise<readonly Workflow[]>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Workflow>>;
 }
 
 // @public
