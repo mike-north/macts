@@ -151,3 +151,42 @@ describe('generateCliPlugin command casts', () => {
     expect(folderIdDeclarations).toHaveLength(1)
   })
 })
+
+describe('generateCliPlugin list commands: paging', () => {
+  const options = {
+    packageName: '@macts/testapp',
+    sdkPackageName: '@macts/sdk-testapp',
+  }
+
+  it('gives the list of an identified resource --page-size and --cursor, forwarded as the page', () => {
+    const list = fileContent(generateCliPlugin(buildManifest(), options), 'calendars/list.ts')
+
+    expect(list).toContain(
+      'pageSize = Option.String(\'--page-size\', { description: "The most items to show, from 1 to 100 (default 25)" });'
+    )
+    expect(list).toContain(
+      'cursor = Option.String(\'--cursor\', { description: "Continue from the previous page, as its output says" });'
+    )
+    expect(list).toContain(
+      'client.calendars.list({ ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }), ...(this.cursor === undefined ? {} : { cursor: this.cursor }) })'
+    )
+    // The output says how to read the next page when more remain.
+    expect(list).toContain('formatter.formatPage(page.items.map(')
+    expect(list).toContain('page.nextCursor);')
+  })
+
+  it('gives the list of a resource with no identifier no paging flags, and prints its one page', () => {
+    const manifest = buildManifest()
+    const calendar = manifest.resources['Calendar']
+    if (calendar === undefined) throw new Error('fixture has no Calendar')
+    const { identifiers: _identifiers, ...unidentified } = calendar
+    manifest.resources['Calendar'] = unidentified
+
+    const list = fileContent(generateCliPlugin(manifest, options), 'calendars/list.ts')
+
+    expect(list).not.toContain('--page-size')
+    expect(list).not.toContain('--cursor')
+    expect(list).toContain('client.calendars.list();')
+    expect(list).toContain('formatter.formatList(page.items.map(')
+  })
+})

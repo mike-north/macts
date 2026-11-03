@@ -127,6 +127,17 @@ describe('createTestStubExecutor: execute', () => {
     expect(result).toEqual([])
   })
 
+  it('answers a paged list window with an empty collection', async () => {
+    const executor = createTestStubExecutor()
+
+    const result = await executor.execute({
+      ...executionRequest({ command: 'list', resource: 'Widget' }, LIST_PLAN),
+      page: { offset: 0, size: 25 },
+    })
+
+    expect(result).toEqual({ items: [], length: 0 })
+  })
+
   it.each([
     ['a get', { command: 'get', resource: 'Widget' }, RECORD_PLAN],
     ['a create', { command: 'make', resource: 'Widget' }, RECORD_PLAN],

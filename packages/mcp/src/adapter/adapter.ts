@@ -16,6 +16,11 @@
  *   `{ "result": … }`, or a canonical structured error as the
  *   `{ "error": { code, message, details } }` envelope with `isError` set,
  *   exactly as the HTTP adapter sends it (phases/13 D6);
+ * - telling an agent how to continue a list: when a list operation's page
+ *   says more items remain, one plain-language line follows the result
+ *   saying how many items the page holds and that calling again with the same
+ *   arguments plus `cursor` reads more. Every list tool gets it from its
+ *   operation's page output, never from a per-tool hook;
  * - answering a call to a tool it does not serve with an MCP protocol error.
  *
  * It never verifies a credential, checks a permission, evaluates policy, or
@@ -32,6 +37,7 @@ import { McpError, ErrorCode, type CallToolResult } from '@modelcontextprotocol/
 import { z } from 'zod'
 import {
   MactsError,
+  isPageValueType,
   toWireErrorEnvelope,
   type AnyMactsError,
   type InvocationContext,
@@ -115,7 +121,8 @@ export interface McpAdapter {
    *   locating the credential until a call needs it. If it throws, the call
    *   fails exactly as if the runtime had thrown that error.
    * @returns `{ content: [{ type: 'text', text: '{"result":…}' }] }` on
-   *   success; for any failure, `isError: true` with the text
+   *   success, the text followed by one continuation line when a list's page
+   *   says more items remain; for any failure, `isError: true` with the text
    *   `{"error":{"code","message","details"}}`. Failures never reject.
    * @throws `McpError` with `ErrorCode.InvalidParams` when `name` is not a tool
    *   this adapter serves. The message is fixed and never echoes the name.
@@ -140,6 +147,37 @@ const INPUT_SCHEMA_TARGET = 'draft-7'
 interface ServedTool {
   readonly listing: McpToolListing
   readonly operation: OperationId
+  /** Whether the operation returns a page (`t.page(…)`): every list operation does. */
+  readonly pages: boolean
+}
+
+/**
+ * The line that follows a page's result when more items remain: how many
+ * items the page holds, and how to read more. It names the `cursor` argument
+ * but repeats no data; the cursor itself is the result's `nextCursor`.
+ */
+function moreItemsNote(itemCount: number): string {
+  const items = itemCount === 1 ? '1 item' : `${String(itemCount)} items`
+  return `This page holds ${items}; more remain. Call this tool again with the same arguments plus "cursor" set to the result's nextCursor to read the next page.`
+}
+
+/**
+ * The tool result of a successful call: the result document, followed by the
+ * continuation line when the tool returns a page and the page says more
+ * items remain.
+ */
+function successResult(result: unknown, pages: boolean): CallToolResult {
+  const success = textResult({ result }, false)
+  if (!pages || typeof result !== 'object' || result === null) return success
+  const { items, nextCursor } = result as { items?: unknown; nextCursor?: unknown }
+  if (typeof nextCursor !== 'string' || !Array.isArray(items)) return success
+  return {
+    content: success.content.map((block) =>
+      block.type === 'text'
+        ? { ...block, text: `${block.text}\n${moreItemsNote(items.length)}` }
+        : block
+    ),
+  }
 }
 
 /**
@@ -190,6 +228,7 @@ function deriveTools(operations: readonly RegisteredOperation[]): Map<string, Se
     tools.set(name, {
       listing: { name, description, inputSchema: deriveInputSchema(operation) },
       operation: id,
+      pages: isPageValueType(operation.descriptor.output),
     })
   }
   return tools
@@ -298,13 +337,13 @@ export function createMcpAdapter(
         // the runtime, and the requested name is not reflected back.
         throw new McpError(ErrorCode.InvalidParams, UNKNOWN_TOOL_MESSAGE)
       }
-      const { operation } = tool
+      const { operation, pages } = tool
       let invocation: InvocationContext | undefined
       try {
         invocation = typeof context === 'function' ? context() : context
         const input = args === undefined ? {} : args
         const result = await runtime.invoke(operation, input, invocation)
-        return textResult({ result }, false)
+        return successResult(result, pages)
       } catch (error) {
         return failureResult(error, {
           logger: logger(),

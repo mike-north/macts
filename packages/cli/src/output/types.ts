@@ -56,6 +56,23 @@ export interface OutputFormatter {
   formatList(data: readonly unknown[], options?: TableOptions): string
 
   /**
+   * Format one page of a list: its items, and how to read the next page when
+   * more remain.
+   *
+   * @param data - The page's items, as objects to format
+   * @param nextCursor - The page's continuation, present exactly when more
+   *   items remain; the command reads the next page when given it as
+   *   `--cursor`
+   * @param options - Table formatting options
+   * @returns Formatted string
+   */
+  formatPage(
+    data: readonly unknown[],
+    nextCursor: string | undefined,
+    options?: TableOptions
+  ): string
+
+  /**
    * Format an error message.
    *
    * @param error - Error or message to format

@@ -6,7 +6,8 @@
  * `@macts/notes`, and `@macts/reminders-server` with `@macts/reminders`.
  * `MACTS_TEST_EXECUTOR=stub` selects the built-in test
  * executor, so no app is automated and every dispatched call answers as an
- * app with no objects would: a list yields `[]`. Keys are minted by the CLI
+ * app with no objects would: a list yields an empty page, `{ items: [] }`,
+ * with no `nextCursor` because nothing remains. Keys are minted by the CLI
  * itself, into the same macts home the server verifies against. Everything is
  * asserted over real HTTP.
  *
@@ -14,13 +15,14 @@
  *
  * - From the Notes contract (`packages/notes/src/contract/index.ts`): operation
  *   `notes.notes.list` requires `notes:notes:list`, targets command `list` on
- *   resource `Note`, and takes `t.record({})`, a record with no fields, whose
- *   wire schema is a strict object (phases/13 D2), so an extra key is an
- *   `unrecognized_keys` issue at the root. The manifest's passthrough request
+ *   resource `Note`, and takes only the optional paging inputs
+ *   (`t.pageInputs()`), in a record whose wire schema is a strict object
+ *   (phases/13 D2), so an extra key is an `unrecognized_keys` issue at the
+ *   root. The manifest's passthrough request
  *   schema accepts extra keys, so that issue can only come from the contract.
  * - From the Reminders contract (`packages/reminders/src/contract/index.ts`):
  *   operation `reminders.lists.list` requires `reminders:lists:list`, targets
- *   command `list` on resource `List`, and takes `t.record({})`.
+ *   command `list` on resource `List`, and takes only the paging inputs.
  * - From phases/13 D6: failures use the `{ "error": { code, message,
  *   details } }` envelope; a missing permission is 403 `PERMISSION_DENIED`
  *   whose details name the required permission and a hint; invalid input is
@@ -31,7 +33,8 @@
  *   naming the resource, which phases/13 D6 maps to 404 `TARGET_NOT_FOUND`.
  * - From phases/13 D11: the runtime validates every result against the
  *   operation's output contract before the HTTP adapter emits it, so a list
- *   result reaches the caller only when it conforms; `[]` always does.
+ *   result reaches the caller only when it conforms; an empty page always
+ *   does.
  * - From phases/13 D9: the test executor is selected by name, announced on
  *   stderr, named as the executor provider in the startup report, and an
  *   unknown name fails startup. It appears in contributor docs, never in user
@@ -117,7 +120,7 @@ describe('macts --serve (UAT): operations', () => {
     const { status, json } = await call('notes.notes.list', {}, grantedToken)
 
     expect(status).toBe(200)
-    expect(json).toEqual({ result: [] })
+    expect(json).toEqual({ result: { items: [] } })
   })
 
   it('dispatches a granted call to a second installed app', async () => {
@@ -126,7 +129,7 @@ describe('macts --serve (UAT): operations', () => {
     const { status, json } = await call('reminders.lists.list', {}, remindersToken)
 
     expect(status).toBe(200)
-    expect(json).toEqual({ result: [] })
+    expect(json).toEqual({ result: { items: [] } })
   })
 
   it('answers a get with 404 TARGET_NOT_FOUND, since the test executor automates no app', async () => {

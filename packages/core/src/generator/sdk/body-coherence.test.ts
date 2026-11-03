@@ -376,13 +376,14 @@ describe('cross-surface body-coherence: SDK vs. server required params', () => {
     it('SDK list() method signature includes required parent param calendarId', () => {
       // The generated list() must accept calendarId so the server's scoping
       // JXA (app.calendars.byId(calendarId).events()) has the value to use.
-      expect(eventClient).toMatch(/async list\(calendarId:\s*string\)/)
+      // Event has a primary identifier, so the page follows the parent scope.
+      expect(eventClient).toMatch(/async list\(calendarId:\s*string, page:/)
     })
 
     it('SDK list() method body forwards calendarId in the request body', () => {
       // The server's buildListCommandCode reads calendarId from the request body;
       // if the SDK omits it the server gets undefined and emits byId(undefined).
-      expect(eventClient).toContain('{ calendarId }')
+      expect(eventClient).toContain(', calendarId })')
     })
 
     it('server required param matches SDK sent param (calendarId)', () => {
@@ -410,11 +411,11 @@ describe('cross-surface body-coherence: SDK vs. server required params', () => {
     const reminderClient = findFile(result.files, 'src/resources/reminder.ts').content
 
     it('SDK list() method signature includes required parent param listId', () => {
-      expect(reminderClient).toMatch(/async list\(listId:\s*string\)/)
+      expect(reminderClient).toMatch(/async list\(listId:\s*string, page:/)
     })
 
     it('SDK list() method body forwards listId in the request body', () => {
-      expect(reminderClient).toContain('{ listId }')
+      expect(reminderClient).toContain(', listId })')
     })
 
     it('server required param matches SDK sent param (listId)', () => {
@@ -587,7 +588,7 @@ describe('cross-surface body-coherence: SDK vs. server required params', () => {
       expect(listEvents).toBeDefined()
       if (listEvents !== undefined) {
         expect(requiredParams(listEvents)).toEqual(['calendarId'])
-        expect(eventClient).toContain('{ calendarId }')
+        expect(eventClient).toContain(', calendarId })')
       }
 
       // create (Event): manifest requires calendarId + summary + startDate + endDate;

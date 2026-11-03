@@ -62,6 +62,25 @@ describe('HumanFormatter', () => {
     })
   })
 
+  describe('formatPage', () => {
+    it('follows the table with how to read the next page when more remain', () => {
+      const result = formatter.formatPage([{ id: '1' }], 'next-1')
+      expect(result).toBe(
+        'id\n1 \n\nMore items remain. To see them, run the same command again with --cursor next-1'
+      )
+    })
+
+    it('is just the table on the last page', () => {
+      expect(formatter.formatPage([{ id: '1' }], undefined)).toBe(
+        formatter.formatList([{ id: '1' }])
+      )
+    })
+
+    it('says no items were found for an empty last page', () => {
+      expect(formatter.formatPage([], undefined)).toBe('No items found.')
+    })
+  })
+
   describe('formatError', () => {
     it('should prefix with Error:', () => {
       const result = formatter.formatError('Something went wrong')

@@ -50,20 +50,52 @@ export interface CreateEventInput {
   readonly endDate: Date
 }
 
+/** The paging arguments of a list call: the cursor of the page to read. */
+export interface PageArguments {
+  readonly cursor?: string
+}
+
+/**
+ * One page of a list call: its items, and the cursor of the next page when
+ * more remain.
+ */
+export interface ListPage<T> {
+  readonly items: readonly T[]
+  readonly nextCursor?: string
+}
+
 /**
  * A stripped-down view of the Calendar SDK surface the harness uses.
  *
  * Both the real `CalendarClient` and the fake client in unit tests satisfy
- * this interface.
+ * this interface. Every list returns one page.
  */
 export interface CalendarClientFacade {
   readonly calendars: {
-    list(): Promise<CalendarSummary[]>
+    list(page?: PageArguments): Promise<ListPage<CalendarSummary>>
   }
   readonly events: {
-    list(calendarId: string): Promise<EventSummary[]>
+    list(calendarId: string, page?: PageArguments): Promise<ListPage<EventSummary>>
     create(input: CreateEventInput): Promise<EventSummary>
   }
+}
+
+/**
+ * The first item of a paged listing that satisfies `test`, reading pages
+ * only until it is found; `undefined` when no item in the whole listing does.
+ */
+async function findInPages<T>(
+  read: (page: PageArguments) => Promise<ListPage<T>>,
+  test: (item: T) => boolean
+): Promise<T | undefined> {
+  let cursor: string | undefined
+  do {
+    const page = await read(cursor === undefined ? {} : { cursor })
+    const found = page.items.find(test)
+    if (found !== undefined) return found
+    cursor = page.nextCursor
+  } while (cursor !== undefined)
+  return undefined
 }
 
 /**
@@ -92,7 +124,8 @@ export interface RoundTripResult {
  * 1. Lists calendars and selects a writable one; falls back to the first
  *    calendar if none are marked writable.
  * 2. Creates a test event in that calendar.
- * 3. Lists events in the calendar and asserts the created event appears.
+ * 3. Lists events in the calendar, following each page's cursor, and asserts
+ *    the created event appears.
  * 4. Records cleanup status (delete not yet in the SDK — tracked in #84).
  *
  * Throws if:
@@ -109,9 +142,12 @@ export async function runCalendarRoundTrip(
   client: CalendarClientFacade,
   eventSummary = '[macts-e2e] round-trip gate test event'
 ): Promise<RoundTripResult> {
-  // 1. Pick a writable calendar.
-  const calendars = await client.calendars.list()
-  const target = calendars.find((c) => c.writable) ?? calendars[0]
+  // 1. Pick a writable calendar, from any page; otherwise the first calendar.
+  const target =
+    (await findInPages(
+      (page) => client.calendars.list(page),
+      (c) => c.writable
+    )) ?? (await client.calendars.list()).items[0]
 
   if (!target) {
     throw new Error('FAIL: calendars.list() returned no calendars — is Calendar.app signed in?')
@@ -143,9 +179,12 @@ export async function runCalendarRoundTrip(
     endDate,
   })
 
-  // 3. List events and verify the created event appears.
-  const events = await client.events.list(calendarId)
-  const appearedInList = events.some((e) => e.summary === eventSummary)
+  // 3. List events, page by page, and verify the created event appears.
+  const appearedInList =
+    (await findInPages(
+      (page) => client.events.list(calendarId, page),
+      (e) => e.summary === eventSummary
+    )) !== undefined
 
   if (!appearedInList) {
     throw new Error(

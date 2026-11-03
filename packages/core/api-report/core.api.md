@@ -1225,6 +1225,7 @@ export interface ExecutionRequest {
     readonly inputPlan: ValuePlan;
     readonly manifest: AppManifest;
     readonly outputPlan: ValuePlan;
+    readonly page?: PageWindow;
     readonly signal?: AbortSignal;
     readonly target: OperationTarget;
 }
@@ -1965,6 +1966,9 @@ export const NATIVE_CODEC: NativeCodec;
 export const NATIVE_CODEC_ERROR_NAME = "MactsCodecError";
 
 // @public
+export const NATIVE_COLLECTION_CHANGED_ERROR_NAME = "MactsCollectionChanged";
+
+// @public
 export const NATIVE_DECODE_FUNCTION = "__mactsDecode";
 
 // @public
@@ -1973,6 +1977,7 @@ export const NATIVE_ENCODE_FUNCTION = "__mactsEncode";
 // @public
 export interface NativeBodyOptions {
     readonly identifierAliases?: boolean;
+    readonly paged?: boolean;
 }
 
 // @public
@@ -1991,6 +1996,9 @@ export type NativeFailure = {
     readonly source: 'app';
     readonly message: string;
     readonly errorNumber?: number;
+} | {
+    readonly source: 'collection';
+    readonly message: string;
 } | {
     readonly source: 'codec';
     readonly direction: 'decode' | 'encode';
@@ -2020,6 +2028,7 @@ export interface NativeScript {
     readonly input: WireRecord;
     readonly inputPlan: ValuePlan;
     readonly outputPlan: ValuePlan;
+    readonly page?: PageWindow | undefined;
 }
 
 // @public
@@ -2202,6 +2211,23 @@ export const OWNED_OUTPUT_RECORD_FILE = ".macts-generated.json";
 
 // @public
 export type OwnedOutputSource = 'record' | 'headers' | 'none';
+
+// @public
+export type PageAnchor = string | number;
+
+// @public
+export interface PageWindow {
+    readonly anchor?: PageAnchor;
+    readonly offset: number;
+    readonly size: number;
+}
+
+// @public
+export interface PageWindowResult {
+    readonly items: readonly WireValue[];
+    readonly last?: PageAnchor;
+    readonly length: number;
+}
 
 // @public
 export function parseApprovalConfig(input: unknown): ParseApprovalConfigResult;

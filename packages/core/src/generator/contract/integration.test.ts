@@ -34,6 +34,7 @@ import { z } from 'zod'
 import {
   Integer,
   ValueTypes as t,
+  isPageValueType,
   type AnyOperationDescriptor,
   type AppContract,
   type CallOptions,
@@ -97,13 +98,14 @@ function runTsc(dir: string): { status: number | null; output: string } {
  * usage the client's types must reject; the build fails if any compiles.
  */
 const CONSUMER_SOURCE = `
-import { Integer, type ClientRuntime } from '@macts/contracts'
+import { Integer, type ClientRuntime, type Page } from '@macts/contracts'
 import {
   jotterContract,
   type Folder,
   type JotterClient,
   type Note,
   type NoteUpdateInput,
+  type Tag,
 } from './contract/index.js'
 
 declare const runtime: ClientRuntime
@@ -114,8 +116,20 @@ export async function usage(): Promise<void> {
   const folderId: Integer | undefined =
     note.folder !== null && note.folder.form === 'identity' ? note.folder.id : undefined
   void folderId
-  const notes: readonly Note[] = await client.notes.list({ signal: new AbortController().signal })
-  void notes
+  const notes: Page<Note> = await client.notes.list(
+    { pageSize: Integer.validate(10) },
+    { signal: new AbortController().signal }
+  )
+  const more: Page<Note> = await client.notes.list({ cursor: notes.nextCursor ?? '' })
+  void [notes.items, more]
+  // @ts-expect-error -- the page size is an Integer, not a plain number
+  await client.notes.list({ pageSize: 10 })
+  // @ts-expect-error -- paging inputs are not call options
+  await client.notes.list(undefined, { pageSize: Integer.validate(10) })
+  // @ts-expect-error -- Tag has no identifier, so its list takes no paging inputs
+  await client.tags.list({ pageSize: Integer.validate(10) })
+  const tags: Page<Tag> = await client.tags.list()
+  void tags
   await client.notes.update(Integer.validate(7), 'N1', { title: 'Renamed' })
   await client.notes.create({ folderId: Integer.validate(7), title: 'New' })
   await client.notes.archive('N1')
@@ -160,8 +174,11 @@ export async function usage(): Promise<void> {
   // @ts-expect-error -- the command result may be null
   const sureTotal: Integer = await client.wordTotal()
   void sureTotal
-  const listed: readonly Note[] = await client.notes.list()
+  const listed: Page<Note> = await client.notes.list()
   void listed
+  // @ts-expect-error -- a list returns a page, not an array
+  const asArray: readonly Note[] = await client.notes.list()
+  void asArray
   // @ts-expect-error -- the parent identifier is an Integer, not a plain number
   await client.notes.update(7, 'N1', {})
   // @ts-expect-error -- the identifier parameter is a string
@@ -345,7 +362,9 @@ describe('operations', () => {
   })
 
   it('describe results by CRUD shape, and commands without results as none', () => {
-    expect(operationAt('jotter.notes.listNotes').output.plan.kind).toBe('array')
+    const list = operationAt('jotter.notes.listNotes').output
+    expect(isPageValueType(list)).toBe(true)
+    expect(isPageValueType(list) ? list.item : undefined).toBe(contract.resources['Note']?.record)
     expect(operationAt('jotter.notes.getNote').output).toBe(contract.resources['Note']?.record)
     expect(operationAt('jotter.notes.createNote').output).toBe(contract.resources['Note']?.record)
     expect(operationAt('jotter.notes.updateNote').output).toBe(contract.resources['Note']?.record)
@@ -455,7 +474,7 @@ describe('bind', () => {
     const input = { folderId: Integer.validate(7), title: 'New' }
     await call(client, ['notes', 'create'], input)
     await call(client, ['notes', 'delete'], 'N1')
-    await call(client, ['notes', 'list'])
+    await call(client, ['notes', 'list'], { pageSize: Integer.validate(5), cursor: 'c' })
     await call(client, ['notes', 'archive'], 'N1')
     expect(calls.map((c) => c.operation.id)).toEqual([
       'jotter.notes.createNote',
@@ -465,7 +484,7 @@ describe('bind', () => {
     ])
     expect(calls[0]?.input).toBe(input)
     expect(calls[1]?.input).toEqual({ noteId: 'N1' })
-    expect(calls[2]?.input).toEqual({})
+    expect(calls[2]?.input).toEqual({ pageSize: 5, cursor: 'c' })
     expect(calls[3]?.input).toEqual({ noteId: 'N1', until: undefined })
   })
 
@@ -479,7 +498,7 @@ describe('bind', () => {
   it('passes trailing call options through to the runtime', async () => {
     const { client, calls } = boundClient()
     const options = { signal: new AbortController().signal }
-    await call(client, ['notes', 'list'], options)
+    await call(client, ['notes', 'list'], undefined, options)
     await call(client, ['notes', 'get'], 'N1', options)
     await call(client, ['quit'], undefined, options)
     expect(calls.map((c) => c.options)).toEqual([options, options, options])
@@ -641,11 +660,17 @@ describe('encoding', () => {
 })
 
 describe('the native boundary: a list with a missing value (the motivating case)', () => {
-  // A list read runs the operation's output plan through the native codec in
-  // the automation process (encode), then the client decodes the wire value
-  // against the same output type. A native "missing value" arrives as null.
+  // A list read runs an array of the page's item plan through the native codec
+  // in the automation process (encode); the runtime makes the page, and the
+  // client decodes it against the operation's page output. A native "missing
+  // value" arrives as null.
   const native = evaluatePrelude(NATIVE_CODEC.prelude)
   const list = (): AnyOperationDescriptor => operationAt('jotter.tags.listTags')
+  const itemsPlan = (): ValuePlan => {
+    const output = list().output
+    if (!isPageValueType(output)) throw new Error('a list output must be a page')
+    return t.array(output.item).plan
+  }
 
   it('keeps a null at a default (nullable) field for that item, and every other item intact', () => {
     const items = [
@@ -654,9 +679,9 @@ describe('the native boundary: a list with a missing value (the motivating case)
       { label: 'Later', name: 'later' },
     ]
     // The wire value leaves the automation process as JSON text.
-    const wire: unknown = JSON.parse(JSON.stringify(native.encode(items, list().output.plan)))
+    const wire: unknown = JSON.parse(JSON.stringify(native.encode(items, itemsPlan())))
     expect(wire).toEqual(items)
-    expect(valueOf(list().output.decode(wire, TEST_CONTEXT))).toEqual(items)
+    expect(valueOf(list().output.decode({ items: wire }, TEST_CONTEXT))).toEqual({ items })
   })
 
   it('fails at a curated non-null field, naming the item and field', () => {
@@ -666,7 +691,7 @@ describe('the native boundary: a list with a missing value (the motivating case)
     ]
     let thrown: unknown
     try {
-      native.encode(items, list().output.plan)
+      native.encode(items, itemsPlan())
     } catch (error) {
       thrown = error
     }
@@ -676,8 +701,10 @@ describe('the native boundary: a list with a missing value (the motivating case)
       path: [1, 'name'],
     })
     // The client rejects the same value at the same path, whichever side sees it first.
-    const decoded = list().output.decode(items, TEST_CONTEXT)
-    expect(decoded.ok ? [] : decoded.issues.map((entry) => entry.path)).toEqual([[1, 'name']])
+    const decoded = list().output.decode({ items }, TEST_CONTEXT)
+    expect(decoded.ok ? [] : decoded.issues.map((entry) => entry.path)).toEqual([
+      ['items', 1, 'name'],
+    ])
   })
 })
 
@@ -797,15 +824,9 @@ function boundClient(): { client: unknown; calls: RecordedCall[] } {
 }
 
 /** A valid wire result for each kind of operation output. */
-function cannedWire(operation: { readonly output: { readonly plan: ValuePlan } }): unknown {
-  switch (operation.output.plan.kind) {
-    case 'none':
-      return null
-    case 'array':
-      return []
-    default:
-      return NOTE_WIRE
-  }
+function cannedWire(operation: AnyOperationDescriptor): unknown {
+  if (isPageValueType(operation.output)) return { items: [] }
+  return operation.output.plan.kind === 'none' ? null : NOTE_WIRE
 }
 
 function objectAt(root: unknown, path: readonly string[]): Record<string, unknown> {

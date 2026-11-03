@@ -33,7 +33,7 @@ try {
 
   const report = {
     listed,
-    integerAcceptedByLocal: acceptsLocalInteger(listed[0]?.count),
+    integerAcceptedByLocal: acceptsLocalInteger(listed.items[0]?.count),
     error: {
       name: thrown?.name,
       code: thrown?.code,

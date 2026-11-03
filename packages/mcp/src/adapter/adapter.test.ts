@@ -59,6 +59,7 @@ import { McpToolDerivationError } from './errors.js'
 import {
   createRecordingLogger,
   createStubRuntime,
+  fakeListOperation,
   fakeOperation,
   type InvokeCall,
 } from './test-helpers.js'
@@ -292,6 +293,74 @@ describe('callTool success', () => {
 
     expect(produced).toBe(1)
     expect(runtime.calls[0]?.context).toBe(CONTEXT)
+  })
+})
+
+describe('callTool on a list: the continuation line', () => {
+  const PAGED = fakeListOperation('notes.notes.listNotes')
+
+  /** The text of a tool result's only content block. */
+  function textOf(result: CallToolResult): string {
+    expect(result.content).toHaveLength(1)
+    const [content] = result.content
+    if (content?.type !== 'text') throw new Error('expected one text content item')
+    return content.text
+  }
+
+  /** An adapter serving the paged list, answering every call with `page`. */
+  function pagedAdapter(page: WireValue) {
+    const runtime = createStubRuntime([PAGED], () => Promise.resolve(page))
+    return createMcpAdapter(runtime, { logger: createRecordingLogger().logger })
+  }
+
+  it('follows the result with one line saying how many items and how to read more', async () => {
+    const page = { items: [{ name: 'a' }, { name: 'b' }], nextCursor: 'cursor-opaque' }
+
+    const result = await pagedAdapter(page).callTool('macts__notes__notes_list_notes', {}, CONTEXT)
+
+    expect(result.isError).toBeUndefined()
+    const [document, note, ...rest] = textOf(result).split('\n')
+    expect(JSON.parse(document ?? '')).toEqual({ result: page })
+    expect(note).toBe(
+      'This page holds 2 items; more remain. Call this tool again with the same arguments plus "cursor" set to the result\'s nextCursor to read the next page.'
+    )
+    expect(rest).toEqual([])
+  })
+
+  it('says "1 item" for a page of one', async () => {
+    const result = await pagedAdapter({ items: [{ name: 'a' }], nextCursor: 'c' }).callTool(
+      'macts__notes__notes_list_notes',
+      {},
+      CONTEXT
+    )
+
+    expect(textOf(result)).toContain('\nThis page holds 1 item; more remain.')
+  })
+
+  it('adds nothing to the last page, which has no nextCursor', async () => {
+    const page = { items: [{ name: 'a' }] }
+
+    const result = await pagedAdapter(page).callTool('macts__notes__notes_list_notes', {}, CONTEXT)
+
+    expect(textOf(result)).toBe(JSON.stringify({ result: page }))
+  })
+
+  it('adds nothing to an operation that does not return a page, even if its result looks like one', async () => {
+    const lookalike = { items: [], nextCursor: 'not-a-page' }
+    const { adapter } = adapterAnswering(() => Promise.resolve(lookalike))
+
+    const result = await adapter.callTool('macts__notes__notes_get', { name: 'x' }, CONTEXT)
+
+    expect(textOf(result)).toBe(JSON.stringify({ result: lookalike }))
+  })
+
+  it('never repeats the cursor or any item in the line', async () => {
+    const page = { items: [{ name: 'secret-item-1d2e' }], nextCursor: 'secret-cursor-1d2e' }
+
+    const result = await pagedAdapter(page).callTool('macts__notes__notes_list_notes', {}, CONTEXT)
+
+    const note = textOf(result).split('\n')[1] ?? ''
+    expect(note).not.toContain('secret')
   })
 })
 
