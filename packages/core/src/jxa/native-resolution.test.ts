@@ -43,6 +43,7 @@ import type { AppManifest } from '../manifest/schemas/app.js'
 import { runNativeScript } from './executor.js'
 import { NATIVE_CODEC, type NativeOutcome, type NativeScript } from './native-codec.js'
 import { createNativeExecutor, type NativeTransport } from './native-executor.js'
+import { shelfManifest } from '../manifest/test-support/shelf-output-references.js'
 import { buildNativeBody, buildResolutionBody, nativeReadKeys } from './native-scripts.js'
 import { recorded, standInTransport } from './test-support/stand-in-app.js'
 
@@ -192,6 +193,18 @@ describe('nativeReadKeys', () => {
     })
 
     expect(keys).toEqual({ get: ['title'], list: ['title', 'isbn'] })
+  })
+
+  it('leaves the fields the output record leaves out unread in a get and in a list (#219)', () => {
+    // In the Shelf fixture, Library's currentChapter (parent-scoped get),
+    // topAuthor and authors (no get), and series and genre (names not claimed
+    // unique) are left out of output, and retiredSeries is unsupported; id and
+    // favoriteBook remain.
+    const shelf = shelfManifest()
+    expect(nativeReadKeys(shelf, shelf.resources['Library'])).toEqual({
+      get: ['id', 'favoriteBook'],
+      list: ['id', 'favoriteBook'],
+    })
   })
 
   it('reads name for a body with no resource', () => {

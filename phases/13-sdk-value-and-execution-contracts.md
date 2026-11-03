@@ -1565,7 +1565,7 @@ Every other reference keeps the codec's unsupported marker and fails as
 `InternalError` (D4), in either direction. Generation leaves out every output
 position whose target has no identifier, no `get`, or a `get` that records a
 parent (resolvable targets, above), so for those targets the failure arises
-only at inputs:
+only for a reference a caller supplies:
 
 - every selector form, at any position;
 - identity collections;
