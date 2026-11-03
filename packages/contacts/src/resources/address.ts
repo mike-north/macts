@@ -21,10 +21,21 @@ export class AddressResourceClient {
   }
 
   /**
-   * List the addresses of one person, as one page.
+   * List the addresses of one person, one page at a time. When the result has a `nextCursor`,
+   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(personId: string): Promise<{ items: Address[] }> {
-    return this.#http.rpc<{ items: Address[] }>(`${this.#app}.${this.#resource}.list`, { personId })
+  async list(
+    personId: string,
+    page: { pageSize?: number; cursor?: string } = {}
+  ): Promise<{ items: Address[]; nextCursor?: string }> {
+    return this.#http.rpc<{ items: Address[]; nextCursor?: string }>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+        personId,
+      }
+    )
   }
 
   /**

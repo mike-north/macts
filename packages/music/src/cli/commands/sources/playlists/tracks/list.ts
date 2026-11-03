@@ -17,15 +17,24 @@ export class ListTracksCommand extends Command {
     required: true,
     description: 'Persistent ID of the playlist',
   })
+  pageSize = Option.String('--page-size', {
+    description: 'The most items to show, from 1 to 100 (default 25)',
+  })
+  cursor = Option.String('--cursor', {
+    description: 'Continue from the previous page, as its output says',
+  })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      const page = await client.tracks.list(this.playlistId)
+      const page = await client.tracks.list(this.playlistId, {
+        ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }),
+        ...(this.cursor === undefined ? {} : { cursor: this.cursor }),
+      })
 
-      const output = formatter.formatList(
+      const output = formatter.formatPage(
         page.items.map((item) => ({
           id: item.id,
           index: item.index,
@@ -101,7 +110,8 @@ export class ListTracksCommand extends Command {
           volumeAdjustment: item.volumeAdjustment,
           work: item.work,
           year: item.year,
-        }))
+        })),
+        page.nextCursor
       )
 
       this.context.stdout.write(output + '\n')

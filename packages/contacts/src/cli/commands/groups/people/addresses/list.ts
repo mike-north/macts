@@ -17,15 +17,24 @@ export class ListAddressesCommand extends Command {
     required: true,
     description: 'Identifier of the person',
   })
+  pageSize = Option.String('--page-size', {
+    description: 'The most items to show, from 1 to 100 (default 25)',
+  })
+  cursor = Option.String('--cursor', {
+    description: 'Continue from the previous page, as its output says',
+  })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      const page = await client.addresses.list(this.personId)
+      const page = await client.addresses.list(this.personId, {
+        ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }),
+        ...(this.cursor === undefined ? {} : { cursor: this.cursor }),
+      })
 
-      const output = formatter.formatList(
+      const output = formatter.formatPage(
         page.items.map((item) => ({
           city: item.city,
           formattedAddress: item.formattedAddress,
@@ -36,7 +45,8 @@ export class ListAddressesCommand extends Command {
           label: item.label,
           countryCode: item.countryCode,
           state: item.state,
-        }))
+        })),
+        page.nextCursor
       )
 
       this.context.stdout.write(output + '\n')

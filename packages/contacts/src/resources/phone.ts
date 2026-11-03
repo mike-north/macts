@@ -21,10 +21,21 @@ export class PhoneResourceClient {
   }
 
   /**
-   * List the phones of one person, as one page.
+   * List the phones of one person, one page at a time. When the result has a `nextCursor`,
+   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(personId: string): Promise<{ items: Phone[] }> {
-    return this.#http.rpc<{ items: Phone[] }>(`${this.#app}.${this.#resource}.list`, { personId })
+  async list(
+    personId: string,
+    page: { pageSize?: number; cursor?: string } = {}
+  ): Promise<{ items: Phone[]; nextCursor?: string }> {
+    return this.#http.rpc<{ items: Phone[]; nextCursor?: string }>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+        personId,
+      }
+    )
   }
 
   /**

@@ -12,6 +12,7 @@ import { Integer } from '@macts/contracts';
 import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { PageRequest } from '@macts/contracts';
 
 // @public
 export interface AirPlayDevice {
@@ -341,7 +342,7 @@ export interface PlaylistCreateInput {
 // @public
 export interface PlaylistResourceClient {
     get(persistentID: string, options?: CallOptions): Promise<Playlist>;
-    list(options?: CallOptions): Promise<Page<Playlist>>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Playlist>>;
     move(to: string, options?: CallOptions): Promise<void>;
     search(_for: string, only?: string, options?: CallOptions): Promise<void>;
 }
@@ -551,7 +552,7 @@ export interface TrackCreateInput {
 // @public
 export interface TrackResourceClient {
     get(playlistId: string, persistentID: string, options?: CallOptions): Promise<Track>;
-    list(playlistId: string, options?: CallOptions): Promise<Page<Track>>;
+    list(playlistId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Track>>;
 }
 
 // @public

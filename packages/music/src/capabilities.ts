@@ -571,7 +571,20 @@ export const capabilities: readonly CapabilityMetadata[] = [
     risk: 'read',
     inputSchema: {
       type: 'object',
-      properties: {},
+      properties: {
+        pageSize: {
+          type: 'integer',
+          minimum: 1,
+          maximum: 100,
+          default: 25,
+          description: 'The most items to return, from 1 to 100 (default 25).',
+        },
+        cursor: {
+          type: 'string',
+          description:
+            "The previous page's nextCursor, to read the page after it. Omit it to read the first page.",
+        },
+      },
       additionalProperties: false,
     },
   },
@@ -663,6 +676,18 @@ export const capabilities: readonly CapabilityMetadata[] = [
         playlistId: {
           description: 'Persistent ID of the playlist',
           type: 'string',
+        },
+        pageSize: {
+          type: 'integer',
+          minimum: 1,
+          maximum: 100,
+          default: 25,
+          description: 'The most items to return, from 1 to 100 (default 25).',
+        },
+        cursor: {
+          type: 'string',
+          description:
+            "The previous page's nextCursor, to read the page after it. Omit it to read the first page.",
         },
       },
       additionalProperties: false,

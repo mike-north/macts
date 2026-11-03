@@ -636,6 +636,13 @@ export const manifest: unknown = {
           property: 'persistentID',
           primary: true,
           targeting: 'byProperty',
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "the id of the item as a hexadecimal string. This id does not change over time."',
+            },
+          },
         },
       ],
     },
@@ -1280,6 +1287,13 @@ export const manifest: unknown = {
           property: 'persistentID',
           primary: true,
           targeting: 'byProperty',
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "the id of the item as a hexadecimal string. This id does not change over time."',
+            },
+          },
         },
       ],
     },

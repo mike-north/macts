@@ -8,6 +8,7 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { ObjectReferenceData } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { PageRequest } from '@macts/contracts';
 
 // @public
 export interface Address {
@@ -37,7 +38,7 @@ export interface AddressCreateInput {
 // @public
 export interface AddressResourceClient {
     get(personId: string, id: string, options?: CallOptions): Promise<Address>;
-    list(personId: string, options?: CallOptions): Promise<Page<Address>>;
+    list(personId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Address>>;
 }
 
 // @public
@@ -126,7 +127,7 @@ export interface EmailCreateInput {
 // @public
 export interface EmailResourceClient {
     get(personId: string, id: string, options?: CallOptions): Promise<Email>;
-    list(personId: string, options?: CallOptions): Promise<Page<Email>>;
+    list(personId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Email>>;
 }
 
 // @public
@@ -151,7 +152,7 @@ export interface GroupCreateInput {
 // @public
 export interface GroupResourceClient {
     get(id: string, options?: CallOptions): Promise<Group>;
-    list(options?: CallOptions): Promise<Page<Group>>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Group>>;
 }
 
 // @public
@@ -268,7 +269,7 @@ export interface PersonCreateInput {
 // @public
 export interface PersonResourceClient {
     get(id: string, options?: CallOptions): Promise<Person>;
-    list(options?: CallOptions): Promise<Page<Person>>;
+    list(page?: PageRequest, options?: CallOptions): Promise<Page<Person>>;
 }
 
 // @public
@@ -308,7 +309,7 @@ export interface PhoneCreateInput {
 // @public
 export interface PhoneResourceClient {
     get(personId: string, id: string, options?: CallOptions): Promise<Phone>;
-    list(personId: string, options?: CallOptions): Promise<Page<Phone>>;
+    list(personId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Phone>>;
 }
 
 // @public

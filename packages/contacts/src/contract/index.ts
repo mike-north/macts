@@ -26,6 +26,7 @@ import {
   type ObjectReferenceData,
   type OperationDescriptor,
   type Page,
+  type PageRequest,
   type ValueType,
 } from '@macts/contracts'
 
@@ -913,11 +914,14 @@ export interface YahooHandleUpdateInput {
 /** Address for the given record. */
 export interface AddressResourceClient {
   /**
-   * List addresses, as one page holding all of them.
+   * List addresses, one page at a time.
    *
    * @param personId - Identifier of the person. Does not accept null.
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
    */
-  list(personId: string, options?: CallOptions): Promise<Page<Address>>
+  list(personId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Address>>
   /**
    * Read the address identified by `id` within `personId`.
    *
@@ -930,11 +934,14 @@ export interface AddressResourceClient {
 /** Email address for a person. */
 export interface EmailResourceClient {
   /**
-   * List emails, as one page holding all of them.
+   * List emails, one page at a time.
    *
    * @param personId - Identifier of the person. Does not accept null.
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
    */
-  list(personId: string, options?: CallOptions): Promise<Page<Email>>
+  list(personId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Email>>
   /**
    * Read the email identified by `id` within `personId`.
    *
@@ -946,8 +953,14 @@ export interface EmailResourceClient {
 
 /** A Group Record in the address book database */
 export interface GroupResourceClient {
-  /** List groups, as one page holding all of them. */
-  list(options?: CallOptions): Promise<Page<Group>>
+  /**
+   * List groups, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Group>>
   /**
    * Read the group identified by `id`.
    *
@@ -958,8 +971,14 @@ export interface GroupResourceClient {
 
 /** A person in the address book database. */
 export interface PersonResourceClient {
-  /** List people, as one page holding all of them. */
-  list(options?: CallOptions): Promise<Page<Person>>
+  /**
+   * List people, one page at a time.
+   *
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
+   */
+  list(page?: PageRequest, options?: CallOptions): Promise<Page<Person>>
   /**
    * Read the person identified by `id`.
    *
@@ -971,11 +990,14 @@ export interface PersonResourceClient {
 /** Phone number for a person. */
 export interface PhoneResourceClient {
   /**
-   * List phones, as one page holding all of them.
+   * List phones, one page at a time.
    *
    * @param personId - Identifier of the person. Does not accept null.
+   * @param page - The page size, and the cursor that continues from the previous page.
+   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
+   * same arguments and that cursor.
    */
-  list(personId: string, options?: CallOptions): Promise<Page<Phone>>
+  list(personId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Phone>>
   /**
    * Read the phone identified by `id` within `personId`.
    *
@@ -1331,17 +1353,32 @@ const resources: AppContract<ContactsClient>['resources'] = {
   },
 }
 
-const personListPeopleOperation: OperationDescriptor<Record<string, never>, Page<Person>> = {
+const personListPeopleOperation: OperationDescriptor<PageRequest, Page<Person>> = {
   id: 'contacts.people.list',
   permission: 'contacts:people:list',
   target: { command: 'listPeople', resource: 'Person' },
   description: 'List every person',
-  input: t.record({}),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
   output: t.page(personRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -1364,17 +1401,32 @@ const personGetPersonOperation: OperationDescriptor<{ readonly id: string }, Per
   },
 }
 
-const groupListGroupsOperation: OperationDescriptor<Record<string, never>, Page<Group>> = {
+const groupListGroupsOperation: OperationDescriptor<PageRequest, Page<Group>> = {
   id: 'contacts.groups.list',
   permission: 'contacts:groups:list',
   target: { command: 'listGroups', resource: 'Group' },
   description: 'List every group',
-  input: t.record({}),
+  input: t.record({
+    ...t.pageInputs(),
+  }),
   output: t.page(groupRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     additionalProperties: false,
   },
 }
@@ -1397,19 +1449,37 @@ const groupGetGroupOperation: OperationDescriptor<{ readonly id: string }, Group
   },
 }
 
-const emailListEmailsOperation: OperationDescriptor<{ readonly personId: string }, Page<Email>> = {
+const emailListEmailsOperation: OperationDescriptor<
+  { readonly personId: string } & PageRequest,
+  Page<Email>
+> = {
   id: 'contacts.emails.list',
   permission: 'contacts:emails:list',
   target: { command: 'listEmails', resource: 'Email' },
   description: 'List the email addresses of a person',
   input: t.record({
     personId: t.string({ description: 'Identifier of the person' }),
+    ...t.pageInputs(),
   }),
   output: t.page(emailRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { personId: { type: 'string', description: 'Identifier of the person' } },
+    properties: {
+      personId: { type: 'string', description: 'Identifier of the person' },
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     required: ['personId'],
     additionalProperties: false,
   },
@@ -1440,19 +1510,37 @@ const emailGetEmailOperation: OperationDescriptor<
   },
 }
 
-const phoneListPhonesOperation: OperationDescriptor<{ readonly personId: string }, Page<Phone>> = {
+const phoneListPhonesOperation: OperationDescriptor<
+  { readonly personId: string } & PageRequest,
+  Page<Phone>
+> = {
   id: 'contacts.phones.list',
   permission: 'contacts:phones:list',
   target: { command: 'listPhones', resource: 'Phone' },
   description: 'List the phone numbers of a person',
   input: t.record({
     personId: t.string({ description: 'Identifier of the person' }),
+    ...t.pageInputs(),
   }),
   output: t.page(phoneRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { personId: { type: 'string', description: 'Identifier of the person' } },
+    properties: {
+      personId: { type: 'string', description: 'Identifier of the person' },
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     required: ['personId'],
     additionalProperties: false,
   },
@@ -1484,7 +1572,7 @@ const phoneGetPhoneOperation: OperationDescriptor<
 }
 
 const addressListAddressesOperation: OperationDescriptor<
-  { readonly personId: string },
+  { readonly personId: string } & PageRequest,
   Page<Address>
 > = {
   id: 'contacts.addresses.list',
@@ -1493,12 +1581,27 @@ const addressListAddressesOperation: OperationDescriptor<
   description: 'List the addresses of a person',
   input: t.record({
     personId: t.string({ description: 'Identifier of the person' }),
+    ...t.pageInputs(),
   }),
   output: t.page(addressRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { personId: { type: 'string', description: 'Identifier of the person' } },
+    properties: {
+      personId: { type: 'string', description: 'Identifier of the person' },
+      pageSize: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The most items to return, from 1 to 100. Defaults to 25.',
+      },
+      cursor: {
+        type: 'string',
+        description:
+          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
+      },
+    },
     required: ['personId'],
     additionalProperties: false,
   },
@@ -2879,26 +2982,28 @@ const operations: AppContract<ContactsClient>['operations'] = {
 function bind(runtime: ClientRuntime): ContactsClient {
   return {
     addresses: {
-      list: (personId, options) =>
-        runtime.invoke(addressListAddressesOperation, { personId }, options),
+      list: (personId, page, options) =>
+        runtime.invoke(addressListAddressesOperation, { ...page, personId }, options),
       get: (personId, id, options) =>
         runtime.invoke(addressGetAddressOperation, { personId, id }, options),
     },
     emails: {
-      list: (personId, options) => runtime.invoke(emailListEmailsOperation, { personId }, options),
+      list: (personId, page, options) =>
+        runtime.invoke(emailListEmailsOperation, { ...page, personId }, options),
       get: (personId, id, options) =>
         runtime.invoke(emailGetEmailOperation, { personId, id }, options),
     },
     groups: {
-      list: (options) => runtime.invoke(groupListGroupsOperation, {}, options),
+      list: (page, options) => runtime.invoke(groupListGroupsOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(groupGetGroupOperation, { id }, options),
     },
     people: {
-      list: (options) => runtime.invoke(personListPeopleOperation, {}, options),
+      list: (page, options) => runtime.invoke(personListPeopleOperation, { ...page }, options),
       get: (id, options) => runtime.invoke(personGetPersonOperation, { id }, options),
     },
     phones: {
-      list: (personId, options) => runtime.invoke(phoneListPhonesOperation, { personId }, options),
+      list: (personId, page, options) =>
+        runtime.invoke(phoneListPhonesOperation, { ...page, personId }, options),
       get: (personId, id, options) =>
         runtime.invoke(phoneGetPhoneOperation, { personId, id }, options),
     },

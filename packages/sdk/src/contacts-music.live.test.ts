@@ -51,11 +51,13 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { contactsContract, type ContactsClient } from '@macts/contacts/contract'
 import { musicContract, type MusicClient } from '@macts/music/contract'
 import {
+  Integer,
   ValueTypes,
   isPageValueType,
   type AnyOperationDescriptor,
   type AppContract,
   type OperationId,
+  type Page,
   type WireRecord,
 } from '@macts/contracts'
 import { AppManifestSchema, createNativeExecutor, type AppManifest } from '@macts/core'
@@ -76,7 +78,10 @@ const liveAppsEnabled = process.env['MACTS_LIVE_APPS'] === '1'
  */
 const LIVE_TEST_TIMEOUT_MS = 180_000
 
-/** How many people to look through for one that has an email, phone or address. */
+/**
+ * How many people to look through for one that has an email, phone or
+ * address: the size of the one page of people read, at most the largest page.
+ */
 const PERSON_SCAN_LIMIT = 60
 
 /** The special kind Music reports for its library playlist, which holds every track. */
@@ -151,6 +156,20 @@ function permissionsOf<Client>(
   })
 }
 
+/** Every item of a list, read page by page until no `nextCursor` remains. */
+async function everyItem<Item>(
+  read: (page: { readonly cursor?: string }) => Promise<Page<Item>>
+): Promise<Item[]> {
+  const items: Item[] = []
+  let cursor: string | undefined
+  do {
+    const page = await read(cursor === undefined ? {} : { cursor })
+    items.push(...page.items)
+    cursor = page.nextCursor
+  } while (cursor !== undefined)
+  return items
+}
+
 /** A wire record's field, read without assuming the record's shape. */
 function field(record: unknown, key: string): unknown {
   return typeof record === 'object' && record !== null && !Array.isArray(record)
@@ -190,7 +209,7 @@ describe.skipIf(!liveAppsEnabled)('Contacts reads against Contacts.app (local on
   it(
     'lists people and gets the first by its id',
     async () => {
-      const people = await contacts.people.list()
+      const people = await contacts.people.list({ pageSize: Integer.validate(PERSON_SCAN_LIMIT) })
       personIds = people.items.map((person) => person.id)
       const first = people.items[0]
       if (first === undefined) return
@@ -284,7 +303,7 @@ describe.skipIf(!liveAppsEnabled)('Music reads against Music.app (local only)', 
   it(
     'lists the library playlist tracks and gets the first by its persistent ID',
     async () => {
-      const playlists = (await music.playlists.list()).items
+      const playlists = await everyItem((page) => music.playlists.list(page))
       const library = playlists.find((playlist) => playlist.specialKind === LIBRARY_PLAYLIST_KIND)
       if (library === undefined) return
       const tracks = await music.tracks.list(library.persistentID)
@@ -308,7 +327,7 @@ describe.skipIf(!liveAppsEnabled)('Music reads against Music.app (local only)', 
     async () => {
       // A track's numeric id belongs to its entry in one playlist; its
       // persistent ID is the same in every playlist that holds it.
-      const playlists = (await music.playlists.list()).items
+      const playlists = await everyItem((page) => music.playlists.list(page))
       const library = playlists.find((playlist) => playlist.specialKind === LIBRARY_PLAYLIST_KIND)
       const other = playlists.find(
         (playlist) => playlist.persistentID !== library?.persistentID && (playlist.size ?? 0) > 0

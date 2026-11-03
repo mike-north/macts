@@ -35,8 +35,12 @@ export interface AddressCreateInput {
 export class AddressResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(personId: string, id: string): Promise<Address>;
-    list(personId: string): Promise<{
+    list(personId: string, page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
         items: Address[];
+        nextCursor?: string;
     }>;
 }
 
@@ -170,8 +174,12 @@ export interface EmailCreateInput {
 export class EmailResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(personId: string, id: string): Promise<Email>;
-    list(personId: string): Promise<{
+    list(personId: string, page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
         items: Email[];
+        nextCursor?: string;
     }>;
 }
 
@@ -202,8 +210,12 @@ export interface GroupCreateInput {
 export class GroupResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Group>;
-    list(): Promise<{
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
         items: Group[];
+        nextCursor?: string;
     }>;
 }
 
@@ -346,8 +358,12 @@ export interface PersonCreateInput {
 export class PersonResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Person>;
-    list(): Promise<{
+    list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
         items: Person[];
+        nextCursor?: string;
     }>;
 }
 
@@ -396,8 +412,12 @@ export interface PhoneCreateInput {
 export class PhoneResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(personId: string, id: string): Promise<Phone>;
-    list(personId: string): Promise<{
+    list(personId: string, page?: {
+        pageSize?: number;
+        cursor?: string;
+    }): Promise<{
         items: Phone[];
+        nextCursor?: string;
     }>;
 }
 
