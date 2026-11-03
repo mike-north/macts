@@ -202,9 +202,10 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       }
 
       const context: NativeFailureContext = { app: manifest.app.name, operation: target, timeoutMs }
-      return runToWireValue(transport, script, context, signal, (failure) =>
-        describeNativeFailure({ kind: 'reported', failure }, context)
-      )
+      return runToWireValue(transport, script, context, signal, {
+        subject: 'The operation',
+        describeFailure: (failure) => describeNativeFailure({ kind: 'reported', failure }, context),
+      })
     },
     async resolve(request: ResolutionRequest): Promise<WireValue> {
       const { manifest, reference, outputPlan, resourcePlans, signal } = request
@@ -236,24 +237,37 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
         outputPlan,
         references,
       }
-      return runToWireValue(transport, script, context, signal, (failure) =>
-        describeResolutionFailure(failure, reference, context)
-      )
+      return runToWireValue(transport, script, context, signal, {
+        subject: 'Resolving the reference',
+        describeFailure: (failure) => describeResolutionFailure(failure, reference, context),
+      })
     },
   }
 }
 
+/** How {@link runToWireValue} reports what went wrong, for the call it runs. */
+interface WireValueReporting {
+  /**
+   * What produced the result, starting a sentence: `The operation` for an
+   * operation, `Resolving the reference` for a resolution.
+   */
+  readonly subject: string
+  /** Classifies a failure the automation process reported. */
+  readonly describeFailure: (failure: NativeFailure) => AnyMactsError
+}
+
 /**
  * Run `script` and return its result as a wire value, classifying a reported
- * failure with `describeFailure` and a process failure as
- * {@link describeNativeFailure} does.
+ * failure with `reporting.describeFailure` and a process failure as
+ * {@link describeNativeFailure} does. A result that is not a wire value is an
+ * `InternalError` naming `reporting.subject`.
  */
 async function runToWireValue(
   transport: NativeTransport,
   script: NativeScript,
   context: NativeFailureContext,
   signal: AbortSignal | undefined,
-  describeFailure: (failure: NativeFailure) => AnyMactsError
+  reporting: WireValueReporting
 ): Promise<WireValue> {
   const { timeoutMs } = context
   const outcome = await runCancellable(
@@ -261,13 +275,13 @@ async function runToWireValue(
     context,
     signal
   )
-  if (!outcome.ok) throw describeFailure(outcome.failure)
+  if (!outcome.ok) throw reporting.describeFailure(outcome.failure)
   // The codec already produced a wire value; this guards a replaced
   // transport that does not honor the outcome contract.
   const value: unknown = outcome.value
   if (value === undefined) return null
   if (!isWireValue(value)) {
-    throw new InternalError('The operation produced a result that is not valid JSON.', {})
+    throw new InternalError(`${reporting.subject} produced a result that is not valid JSON.`, {})
   }
   return value
 }

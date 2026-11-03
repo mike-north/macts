@@ -251,6 +251,27 @@ describe('resolving a single identity reference', () => {
   })
 })
 
+describe('a resolution result that is not JSON', () => {
+  // Regression: the message was shared with operations and named "the
+  // operation" for a resolution too.
+  it.each<[string, unknown, ReferenceWire]>([
+    ['NaN', Number.NaN, person('p-ada')],
+    ['a function', () => undefined, person('p-ada')],
+    ['NaN, for an identity collection', Number.NaN, people('p-ada')],
+  ])('refuses %s with InternalError naming the resolution', async (_label, value, reference) => {
+    // The transport breaks its contract on purpose, so its mock is untyped.
+    const run = vi.fn().mockResolvedValue({ ok: true, value })
+
+    const error = await rejectionOf(
+      createNativeExecutor({ transport: { run } }).resolve(resolution(reference))
+    )
+
+    expect(error).toBeInstanceOf(InternalError)
+    if (!(error instanceof InternalError)) return
+    expect(error.message).toBe('Resolving the reference produced a result that is not valid JSON.')
+  })
+})
+
 describe('resolving an identity collection', () => {
   it('reads each entry in entry order, in one automation process', async () => {
     const { app } = standInContacts([ADA, GRACE, ALAN])
