@@ -1793,6 +1793,9 @@ importers:
       '@macts/notes':
         specifier: workspace:*
         version: link:../notes
+      '@macts/reminders':
+        specifier: workspace:*
+        version: link:../reminders
       tsd:
         specifier: 'catalog:'
         version: 0.31.2

@@ -2,7 +2,7 @@
   "name": "@macts-e2e/mcp-contracts",
   "version": "0.0.0",
   "private": true,
-  "description": "MCP contract-tools integration: serves the real Notes and Calendar contracts through the @macts/mcp adapter, a real runtime, and a real MCP client and server, and checks tool derivation, dispatch, and the structured error shape; also checks every shipped contract's embedded input JSON Schema and that discovery and the adapter agree on every tool name, that no contract client has a method for an unavailable operation, and that every contract's resource table lists only resolvable resources and is declared by an exported type",
+  "description": "MCP contract-tools integration: serves the real Notes and Calendar contracts through the @macts/mcp adapter, a real runtime, and a real MCP client and server, and checks tool derivation, dispatch, and the structured error shape; also checks every shipped contract's embedded input JSON Schema and that discovery and the adapter agree on every tool name, that no contract client has a method for an unavailable operation, that every contract's resource table lists only resolvable resources and is declared by an exported type, and that every resource's get record and list item have the same plan and the same native property reads",
   "license": "MIT",
   "type": "module",
   "scripts": {
