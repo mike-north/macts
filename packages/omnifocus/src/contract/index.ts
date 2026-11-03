@@ -22,10 +22,12 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
   type Page,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -909,9 +911,11 @@ export interface PerspectiveResourceClient {
 
 /**
  * The OmniFocus client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link omniFocusContract}.
+ * commands. A client factory creates one from {@link omniFocusContract}. Its type carries the
+ * contract's resource table, {@link OmniFocusResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface OmniFocusClient {
+export interface OmniFocusClient extends ClientBrand<OmniFocusResources> {
   /** A task within OmniFocus */
   readonly tasks: TaskResourceClient
   /** A project in OmniFocus */
@@ -1274,11 +1278,54 @@ const inboxTaskCreateInputType: ValueType<InboxTaskCreateInput> = t.record({
 })
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link omniFocusContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
  */
-const resources: AppContract<OmniFocusClient>['resources'] = {
+export type OmniFocusResources = Readonly<{
+  Task: ResourceDescriptor<Task, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnifocus.tasks.get'
+    readonly list: 'omnifocus.tasks.list'
+  }
+  Project: ResourceDescriptor<Project, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnifocus.projects.get'
+    readonly list: 'omnifocus.projects.list'
+  }
+  Folder: ResourceDescriptor<Folder, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnifocus.folders.get'
+    readonly list: 'omnifocus.folders.list'
+  }
+  Tag: ResourceDescriptor<Tag, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnifocus.tags.get'
+    readonly list: 'omnifocus.tags.list'
+  }
+  InboxTask: ResourceDescriptor<InboxTask, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnifocus.inboxTasks.get'
+    readonly list: 'omnifocus.inboxTasks.list'
+  }
+  Perspective: ResourceDescriptor<Perspective, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'omnifocus.perspectives.get'
+    readonly list: 'omnifocus.perspectives.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link OmniFocusResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
+ */
+const resources = {
   Task: {
     name: 'Task',
     record: taskRecordType,
@@ -1321,7 +1368,7 @@ const resources: AppContract<OmniFocusClient>['resources'] = {
     get: 'omnifocus.perspectives.get',
     list: 'omnifocus.perspectives.list',
   },
-}
+} satisfies OmniFocusResources
 
 const folderListFoldersOperation: OperationDescriptor<Record<string, never>, Page<Folder>> = {
   id: 'omnifocus.folders.list',
@@ -2174,7 +2221,7 @@ function bind(runtime: ClientRuntime): OmniFocusClient {
  * The OmniFocus contract. Pass it to a client factory to obtain a
  * {@link OmniFocusClient}.
  */
-export const omniFocusContract: AppContract<OmniFocusClient> = {
+export const omniFocusContract: AppContract<OmniFocusClient, OmniFocusResources> = {
   app: 'omnifocus',
   operations,
   resources,

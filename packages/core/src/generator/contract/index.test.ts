@@ -32,6 +32,7 @@ import {
   CONTRACT_MODULE_PATH,
   collectContractDiagnostics,
   contractNames,
+  contractResourcePlans,
   generateContract,
   type GeneratedContract,
 } from './index.js'
@@ -69,10 +70,20 @@ describe('generateContract: files', () => {
     expect(jotter.errors).toEqual([])
   })
 
-  it('exports the contract as <camelApp>Contract typed AppContract<<PascalApp>Client>', () => {
-    expect(contract).toContain('export const jotterContract: AppContract<JotterClient> = {')
+  it('exports the contract as <camelApp>Contract typed AppContract<<PascalApp>Client, <PascalApp>Resources>', () => {
+    expect(contract).toContain(
+      'export const jotterContract: AppContract<JotterClient, JotterResources> = {'
+    )
     expect(contract).toContain("  app: 'jotter',")
-    expect(contract).toContain('export interface JotterClient {')
+    expect(contract).toContain(
+      'export interface JotterClient extends ClientBrand<JotterResources> {'
+    )
+  })
+
+  it('brands the client interface with the resource table, type-only', () => {
+    // A value annotated with the interface carries the table, so it binds
+    // references; the brand is a type, so the bound client gains no member.
+    expect(contract).toMatch(/^import \{[^}]*\btype ClientBrand\b[^}]*\} from '@macts\/contracts'/m)
   })
 
   it('loads the manifest lazily from the data module, typed unknown', () => {
@@ -422,6 +433,58 @@ describe('generateContract: resource table', () => {
     list: 'jotter.tags.listTags',
   },`)
   })
+
+  it('declares the table as an exported type, one entry per resource, which the table satisfies', () => {
+    // Each entry builds on ResourceDescriptor<Record, Id> and narrows to
+    // required, literal members exactly the identifier and resolving
+    // operations the resource has, so the type says which are present.
+    expect(contract).toContain(`export type JotterResources = Readonly<{
+  Note: ResourceDescriptor<Note, string> & { readonly id: ValueType<string>; readonly get: 'jotter.notes.getNote'; readonly list: 'jotter.notes.listNotes' }
+  Folder: ResourceDescriptor<Folder, Integer> & { readonly id: ValueType<Integer>; readonly get: 'jotter.folders.getFolder'; readonly list: 'jotter.folders.listFolders' }
+  Tag: ResourceDescriptor<Tag> & { readonly list: 'jotter.tags.listTags' }
+}>
+`)
+    expect(contract).toMatch(
+      /^import \{[^}]*\btype ResourceDescriptor\b[^}]*\} from '@macts\/contracts'/m
+    )
+    // The value is checked against the declared type rather than declaring
+    // one of its own, so there is one table.
+    expect(contract).toContain('const resources = {\n')
+    expect(contract).toContain('\n} satisfies JotterResources\n')
+    expect(contract).not.toContain('typeof resources')
+    expect(contract.match(/^const resources\b/gm)).toHaveLength(1)
+    expect(contract.match(/^export type JotterResources\b/gm)).toHaveLength(1)
+    expect(contract).toContain('  resources,\n')
+  })
+
+  it('leaves out a resource with neither a get nor a list operation, in the type and the value (D7)', () => {
+    // Sticker records no resolving operation, so no reference to one can be
+    // resolved at any position.
+    expect(contract).not.toMatch(/^ {2}Sticker:/m)
+    // Nothing reads a sticker record, so it has no record value type…
+    expect(contract).not.toContain('stickerRecordType')
+    // …but the record interface stays, since the reference field's type names it.
+    expect(contract).toContain('export interface Sticker {\n')
+    expect(contract).toContain("(() => jotterContract, 'Sticker', 'one')")
+  })
+
+  it('declares an empty table for an app whose resources are all unresolvable', () => {
+    const manifest = jotterManifest()
+    const sticker = manifest.resources['Sticker']
+    if (sticker === undefined) throw new Error('fixture has no Sticker resource')
+    manifest.resources = { Sticker: sticker }
+    manifest.commands = {}
+    const generated = generateContract(manifest)
+    expect(generated.errors).toEqual([])
+    const text = moduleText(generated, CONTRACT_MODULE_PATH)
+    expect(text).toContain('export type JotterResources = Readonly<Record<never, never>>\n')
+    // A client with no operations still carries the (empty) table.
+    expect(text).toContain(
+      'export type JotterClient = Record<string, never> & ClientBrand<JotterResources>\n'
+    )
+    expect(text).toContain('const resources = {\n\n} satisfies JotterResources\n')
+    expect(text).not.toContain('ResourceDescriptor')
+  })
 })
 
 describe('generateContract: client', () => {
@@ -755,6 +818,18 @@ describe('generateContract: errors', () => {
     ])
   })
 
+  it('reports a manifest name that collides with the resource table type', () => {
+    const result = withChanges((manifest) => {
+      manifest.enums['JotterResources'] = {
+        name: 'JotterResources',
+        values: [{ name: 'a', value: 'a' }],
+      }
+    })
+    expect(result.errors).toEqual([
+      'jotter: the name JotterResources is declared twice in module scope.',
+    ])
+  })
+
   it('reports two methods with the same name in one namespace', () => {
     const result = withChanges((manifest) => {
       manifest.commands['archiveAgain'] = {
@@ -802,12 +877,19 @@ describe('contractNames', () => {
       app: 'google-chrome',
       client: 'GoogleChromeClient',
       contract: 'googleChromeContract',
+      resources: 'GoogleChromeResources',
     })
-    expect(named('TV')).toEqual({ app: 'tv', client: 'TVClient', contract: 'tvContract' })
+    expect(named('TV')).toEqual({
+      app: 'tv',
+      client: 'TVClient',
+      contract: 'tvContract',
+      resources: 'TVResources',
+    })
     expect(named('iTerm')).toEqual({
       app: 'iterm',
       client: 'iTermClient',
       contract: 'iTermContract',
+      resources: 'iTermResources',
     })
   })
 })
@@ -1012,5 +1094,21 @@ describe('real app manifests', () => {
       const json = text.slice(text.indexOf('export const manifest: unknown = ') + 33)
       expect(AppManifestSchema.parse(JSON.parse(json))).toEqual(manifest)
     }
+  })
+})
+
+describe('contractResourcePlans', () => {
+  // Registration checks a contract's resource plans against these. Computed
+  // before the builder derived its operations, the table found no resolving
+  // operation for any resource and came out empty, so registration refused
+  // every generated contract as listing undeclared resources.
+  it('gives the plans of exactly the resources the generated table lists', () => {
+    const plans = contractResourcePlans(jotterManifest())
+    // Note and Folder are got and listed, Tag only listed; Sticker has neither.
+    expect(Object.keys(plans).sort()).toEqual(['Folder', 'Note', 'Tag'])
+    // Note is identified by `uid` and Folder by `folderId`; Tag has no identifier.
+    expect(plans['Note']?.id).toBeDefined()
+    expect(plans['Folder']?.id).toBeDefined()
+    expect(plans['Tag']).toEqual({})
   })
 })

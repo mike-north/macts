@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
 
@@ -924,7 +925,7 @@ export type SystemDomainObjectCreateInput = Record<string, never>;
 export type SystemDomainObjectUpdateInput = Record<string, never>;
 
 // @public
-export interface SystemEventsClient {
+export interface SystemEventsClient extends ClientBrand<SystemEventsResources> {
     abortTransaction(options?: CallOptions): Promise<void>;
     readonly actions: ActionResourceClient;
     attachActionTo(using: string, options?: CallOptions): Promise<void>;
@@ -958,7 +959,10 @@ export interface SystemEventsClient {
 }
 
 // @public
-export const systemEventsContract: AppContract<SystemEventsClient>;
+export const systemEventsContract: AppContract<SystemEventsClient, SystemEventsResources>;
+
+// @public
+export type SystemEventsResources = Readonly<Record<never, never>>;
 
 // @public
 export interface TabGroup {

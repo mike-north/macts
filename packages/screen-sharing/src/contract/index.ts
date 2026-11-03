@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
 } from '@macts/contracts'
@@ -30,9 +31,11 @@ const t = ValueTypes
 
 /**
  * The Screen Sharing client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link screenSharingContract}.
+ * commands. A client factory creates one from {@link screenSharingContract}. Its type carries the
+ * contract's resource table, {@link ScreenSharingResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface ScreenSharingClient {
+export interface ScreenSharingClient extends ClientBrand<ScreenSharingResources> {
   /**
    * Open a vnc URL
    *
@@ -42,11 +45,23 @@ export interface ScreenSharingClient {
 }
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link screenSharingContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
  */
-const resources: AppContract<ScreenSharingClient>['resources'] = {}
+export type ScreenSharingResources = Readonly<Record<never, never>>
+
+/**
+ * The resource table: the implementation of {@link ScreenSharingResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
+ */
+const resources = {} satisfies ScreenSharingResources
 
 const appGetURLOperation: OperationDescriptor<{ readonly url: string }, undefined> = {
   id: 'screen-sharing.app.getURL',
@@ -82,7 +97,7 @@ function bind(runtime: ClientRuntime): ScreenSharingClient {
  * The Screen Sharing contract. Pass it to a client factory to obtain a
  * {@link ScreenSharingClient}.
  */
-export const screenSharingContract: AppContract<ScreenSharingClient> = {
+export const screenSharingContract: AppContract<ScreenSharingClient, ScreenSharingResources> = {
   app: 'screen-sharing',
   operations,
   resources,

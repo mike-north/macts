@@ -6,10 +6,13 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { Point } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Canvas {
@@ -399,7 +402,7 @@ export interface MasterUpdateInput {
 }
 
 // @public
-export interface OmniGraffleClient {
+export interface OmniGraffleClient extends ClientBrand<OmniGraffleResources> {
     assemble(subgraph?: boolean, options?: CallOptions): Promise<void>;
     readonly canvases: CanvasResourceClient;
     connect(from: string, to: string, options?: CallOptions): Promise<void>;
@@ -416,7 +419,36 @@ export interface OmniGraffleClient {
 }
 
 // @public
-export const omniGraffleContract: AppContract<OmniGraffleClient>;
+export const omniGraffleContract: AppContract<OmniGraffleClient, OmniGraffleResources>;
+
+// @public
+export type OmniGraffleResources = Readonly<{
+    Canvas: ResourceDescriptor<Canvas, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnigraffle.canvases.get';
+        readonly list: 'omnigraffle.canvases.list';
+    };
+    Graphic: ResourceDescriptor<Graphic, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnigraffle.graphics.get';
+        readonly list: 'omnigraffle.graphics.list';
+    };
+    Shape: ResourceDescriptor<Shape, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnigraffle.shapes.get';
+        readonly list: 'omnigraffle.shapes.list';
+    };
+    Line: ResourceDescriptor<Line, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnigraffle.lines.get';
+        readonly list: 'omnigraffle.lines.list';
+    };
+    Layer: ResourceDescriptor<Layer, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnigraffle.layers.get';
+        readonly list: 'omnigraffle.layers.list';
+    };
+}>;
 
 // @public
 export type Orientation = 'horizontally' | 'vertically';

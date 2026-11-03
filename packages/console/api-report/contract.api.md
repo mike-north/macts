@@ -6,14 +6,18 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 
 // @public
-export interface ConsoleClient {
+export interface ConsoleClient extends ClientBrand<ConsoleResources> {
     selectDevice(options?: CallOptions): Promise<void>;
 }
 
 // @public
-export const consoleContract: AppContract<ConsoleClient>;
+export const consoleContract: AppContract<ConsoleClient, ConsoleResources>;
+
+// @public
+export type ConsoleResources = Readonly<Record<never, never>>;
 
 // (No @packageDocumentation comment for this package)
 

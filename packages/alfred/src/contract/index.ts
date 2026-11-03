@@ -22,9 +22,9 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
-  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -46,9 +46,11 @@ export type ApplicationUpdateInput = Record<string, never>
 
 /**
  * The Alfred client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link alfredContract}.
+ * client factory creates one from {@link alfredContract}. Its type carries the contract's resource
+ * table, {@link AlfredResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
-export interface AlfredClient {
+export interface AlfredClient extends ClientBrand<AlfredResources> {
   /**
    * Show Alfred with the given text
    *
@@ -135,25 +137,24 @@ export interface AlfredClient {
   setTheme(theme: string, options?: CallOptions): Promise<void>
 }
 
-const applicationRecordType: ValueType<Application> = t.record(
-  {
-    name: t.string({ description: 'The name of the application' }),
-  },
-  { description: 'The Alfred application' }
-)
+/**
+ * The type of the resource table of {@link alfredContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type AlfredResources = Readonly<Record<never, never>>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link AlfredResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
-const resources: AppContract<AlfredClient>['resources'] = {
-  Application: {
-    name: 'Application',
-    record: applicationRecordType,
-    id: t.string({ description: 'The name of the application' }),
-  },
-}
+const resources = {} satisfies AlfredResources
 
 const appSearchOperation: OperationDescriptor<{ readonly query?: string | undefined }, undefined> =
   {
@@ -451,7 +452,7 @@ function bind(runtime: ClientRuntime): AlfredClient {
  * The Alfred contract. Pass it to a client factory to obtain a
  * {@link AlfredClient}.
  */
-export const alfredContract: AppContract<AlfredClient> = {
+export const alfredContract: AppContract<AlfredClient, AlfredResources> = {
   app: 'alfred',
   operations,
   resources,

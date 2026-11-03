@@ -456,7 +456,8 @@ export type CollectionReferenceVariant<T, Id = unknown, R extends string = strin
  * to that resource. A resource without an identifier (`id` absent) can be
  * referenced only by selector forms: name, index, every, or range. A reference's
  * containers usually belong to other resources, so the table covers every
- * resource of the app, not only the one a position declares.
+ * resource of the app that a reference can name, not only the one a position
+ * declares. A reference to a resource absent from the table is rejected.
  *
  * Each entry also names the operations that resolve references to the
  * resource, where it has them: `get` resolves a single-object reference and

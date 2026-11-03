@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Shortcut } from '../types.js'
 
@@ -23,8 +24,8 @@ export class ShortcutResourceClient {
   /**
    * List all shortcuts, as one page.
    */
-  async list(): Promise<{ items: Shortcut[] }> {
-    return this.#http.rpc<{ items: Shortcut[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Shortcut>> {
+    return this.#http.rpc<Page<Shortcut>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

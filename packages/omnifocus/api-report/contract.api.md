@@ -6,8 +6,11 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Folder {
@@ -83,7 +86,7 @@ export interface InboxTaskUpdateInput {
 export type IntervalUnit = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
 
 // @public
-export interface OmniFocusClient {
+export interface OmniFocusClient extends ClientBrand<OmniFocusResources> {
     archive(_in: string, compression?: boolean, options?: CallOptions): Promise<void>;
     compact(options?: CallOptions): Promise<void>;
     complete(text: string, options?: CallOptions): Promise<void>;
@@ -104,7 +107,41 @@ export interface OmniFocusClient {
 }
 
 // @public
-export const omniFocusContract: AppContract<OmniFocusClient>;
+export const omniFocusContract: AppContract<OmniFocusClient, OmniFocusResources>;
+
+// @public
+export type OmniFocusResources = Readonly<{
+    Task: ResourceDescriptor<Task, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.tasks.get';
+        readonly list: 'omnifocus.tasks.list';
+    };
+    Project: ResourceDescriptor<Project, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.projects.get';
+        readonly list: 'omnifocus.projects.list';
+    };
+    Folder: ResourceDescriptor<Folder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.folders.get';
+        readonly list: 'omnifocus.folders.list';
+    };
+    Tag: ResourceDescriptor<Tag, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.tags.get';
+        readonly list: 'omnifocus.tags.list';
+    };
+    InboxTask: ResourceDescriptor<InboxTask, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.inboxTasks.get';
+        readonly list: 'omnifocus.inboxTasks.list';
+    };
+    Perspective: ResourceDescriptor<Perspective, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.perspectives.get';
+        readonly list: 'omnifocus.perspectives.list';
+    };
+}>;
 
 // @public
 export interface Perspective {

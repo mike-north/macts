@@ -187,6 +187,12 @@ export interface ContractNames {
   readonly client: string
   /** The exported contract binding, e.g. `googleChromeContract`. */
   readonly contract: string
+  /**
+   * The exported type of the contract's resource table, e.g.
+   * `GoogleChromeResources`: the literal type of the table, which client
+   * factories carry into the client's type.
+   */
+  readonly resources: string
 }
 
 /**
@@ -200,6 +206,7 @@ export function contractNames(manifest: AppManifest): ContractNames {
     app: normalizeAppRouteSegment(manifest.app.name),
     client: `${appName}Client`,
     contract: `${lowerCamel(appName)}Contract`,
+    resources: `${appName}Resources`,
   }
 }
 
@@ -452,6 +459,7 @@ const CONTRACT_VALUE_IMPORTS = ['ValueTypes'] as const
 const CONTRACT_BASE_TYPE_IMPORTS = [
   'AppContract',
   'CallOptions',
+  'ClientBrand',
   'ClientRuntime',
   'OperationDescriptor',
   'ValueType',
@@ -491,6 +499,7 @@ class ContractBuilder {
   readonly #identifiers = new Map<string, ValueShape>()
   readonly #operations: OperationModel[] = []
   readonly #operationsByRoute = new Map<string, OperationModel>()
+  #operationsDerived = false
   readonly #privateBindings = new Set<string>(['t', 'resources', 'operations', 'bind'])
   /**
    * The local names the module gives the paging types of `@macts/contracts`:
@@ -532,12 +541,37 @@ class ContractBuilder {
    */
   #buildRegistry(): ReferenceRegistry {
     const registry: Record<string, ReferenceRegistry[string]> = {}
-    for (const [resourceKey, resource] of usableResources(this.#manifest)) {
+    for (const { resourceKey, resource, routes } of this.#tableResources()) {
       const id = this.#identifierValueType(resourceKey, resource)
-      const routes = this.#resolvingRoutes(resourceKey)
       registry[resourceKey] = id !== undefined ? { id, ...routes } : routes
     }
     return registry
+  }
+
+  /**
+   * The resources the resource table lists, in manifest order, each with the
+   * operations that resolve references to it: every usable resource that
+   * records a `get` or a `list`.
+   *
+   * @remarks
+   * A resource with neither is left out. No reference to it is a valid value
+   * at any position or in any form (phases/13 D7, "Resolvable targets"): a
+   * single reference resolves through `get`, a collection through `list`, and
+   * a container and an identity-collection entry through `get`. A reference
+   * value type pointing at such a resource rejects every reference to it, as
+   * one naming no resource of the app.
+   */
+  #tableResources(): {
+    resourceKey: string
+    resource: Resource
+    routes: { get?: OperationId; list?: OperationId }
+  }[] {
+    return usableResources(this.#manifest).flatMap(([resourceKey, resource]) => {
+      const routes = this.#resolvingRoutes(resourceKey)
+      return routes.get === undefined && routes.list === undefined
+        ? []
+        : [{ resourceKey, resource, routes }]
+    })
   }
 
   /**
@@ -547,8 +581,9 @@ class ContractBuilder {
    * contract generated from this manifest has exactly these plans.
    */
   resourcePlans(): ResourcePlanTable {
+    this.#deriveOperations()
     const registry: Record<string, ReferenceRegistry[string]> = {}
-    for (const [resourceKey, resource] of usableResources(this.#manifest)) {
+    for (const { resourceKey, resource } of this.#tableResources()) {
       const id = this.#identifierValueType(resourceKey, resource)
       registry[resourceKey] = id !== undefined ? { id } : {}
     }
@@ -658,6 +693,11 @@ class ContractBuilder {
   }
 
   #deriveOperations(): void {
+    // The resource table reads which operations resolve each resource from
+    // the derived operations, so derivation runs once, before the first
+    // reader, whether that is `build` or `resourcePlans`.
+    if (this.#operationsDerived) return
+    this.#operationsDerived = true
     const used = new Set<string>()
     for (const route of resolveManifestRoutes(this.#manifest)) {
       const binding = uniqueName(
@@ -1249,7 +1289,7 @@ class ContractBuilder {
       (name) => usesValueType || name !== 'ValueType'
     )
     const used: readonly ContractTypeName[] = [...this.#renderer.usedTypes]
-    types.push(...used)
+    types.push(...used, ...this.#tableTypeImports())
     const named = types.map((name) => ({ imported: name, local: name }))
     named.push(...this.#pageTypeImportSpecifiers())
     const specifiers = [
@@ -1261,6 +1301,11 @@ class ContractBuilder {
         ),
     ]
     return `import {\n${specifiers.map((s) => `  ${s},`).join('\n')}\n} from '@macts/contracts'\n`
+  }
+
+  /** The types the resource table's type uses beyond the base imports. */
+  #tableTypeImports(): string[] {
+    return this.#tableResources().length > 0 ? ['ResourceDescriptor'] : []
   }
 
   /**
@@ -1349,7 +1394,7 @@ class ContractBuilder {
       const members = namespace.methods.map((method) => this.#renderMethodSignature(method))
       return `${doc}export interface ${namespace.interfaceName} {\n${members.join('\n')}\n}\n`
     })
-    const { client, contract } = this.#names
+    const { client, contract, resources } = this.#names
     const members = [
       ...namespaces.map(
         (namespace) =>
@@ -1357,14 +1402,19 @@ class ContractBuilder {
       ),
       ...appMethods.map((method) => this.#renderMethodSignature(method)),
     ]
+    // The client carries the contract's resource table in its type (a
+    // type-only brand with no runtime member), so a value annotated with this
+    // interface, not only one a factory returned, can be passed to functions
+    // that read the table, such as `bindReference`.
     const doc = docComment(
-      `The ${this.#manifest.app.name} client: one namespace per resource that has operations, plus the app's own commands. A client factory creates one from {@link ${contract}}.`,
+      `The ${this.#manifest.app.name} client: one namespace per resource that has operations, plus the app's own commands. A client factory creates one from {@link ${contract}}. Its type carries the contract's resource table, {@link ${resources}}, so references can be bound to it by resource; the brand has no runtime member.`,
       ''
     )
+    const brand = `ClientBrand<${resources}>`
     const body =
       members.length === 0
-        ? `export type ${client} = Record<string, never>\n`
-        : `export interface ${client} {\n${members.join('\n')}\n}\n`
+        ? `export type ${client} = Record<string, never> & ${brand}\n`
+        : `export interface ${client} extends ${brand} {\n${members.join('\n')}\n}\n`
     return [...namespaceInterfaces, `${doc}${body}`]
   }
 
@@ -1418,12 +1468,27 @@ class ContractBuilder {
     return `{\n${[...lines, '    ...t.pageInputs(),'].join('\n')}\n  }`
   }
 
+  /**
+   * The record value types, one for each usable resource whose records the
+   * contract reads: those the resource table lists and those an operation
+   * returns. A resource the table leaves out and no operation returns has no
+   * record value type, since nothing would decode a record of it.
+   */
   #renderRecordValueTypes(): string[] {
-    return usableResources(this.#manifest).map(([resourceKey, resource]) => {
+    const read = new Set([
+      ...this.#tableResources().map(({ resourceKey }) => resourceKey),
+      ...this.#operations.flatMap(({ output }) =>
+        output.kind === 'record' || output.kind === 'page' ? [output.resourceKey] : []
+      ),
+    ])
+    return usableResources(this.#manifest).flatMap(([resourceKey, resource]) => {
+      if (!read.has(resourceKey)) return []
       const binding = this.#recordBinding(resourceKey)
       this.#privateBindings.add(binding)
       const fields = this.#recordFields(resource)
-      return `const ${binding}: ValueType<${resourceKey}> = t.record(${this.#renderRecordFields(fields)}, { description: ${stringLiteral(resource.description)} })\n`
+      return [
+        `const ${binding}: ValueType<${resourceKey}> = t.record(${this.#renderRecordFields(fields)}, { description: ${stringLiteral(resource.description)} })\n`,
+      ]
     })
   }
 
@@ -1442,7 +1507,25 @@ class ContractBuilder {
   }
 
   #renderResourceTable(): string {
-    const entries = usableResources(this.#manifest).map(([resourceKey, resource]) => {
+    const resources = this.#tableResources()
+    const typeEntries = resources.map(({ resourceKey, resource, routes }) => {
+      const identifierShape = this.#identifiers.get(resourceKey)
+      const identified =
+        this.#identifierProperty(resource) !== undefined && identifierShape !== undefined
+      const id = identified ? this.#renderer.sdkType(identifierShape, 'output') : undefined
+      const descriptor = `ResourceDescriptor<${id === undefined ? resourceKey : `${resourceKey}, ${id}`}>`
+      // The descriptor declares `id`, `get` and `list` optional; an entry
+      // narrows each it has to required, so the type says which are present.
+      const present = [
+        ...(id === undefined ? [] : [`readonly id: ValueType<${id}>`]),
+        ...Object.entries(routes).map(
+          ([field, route]) => `readonly ${field}: ${stringLiteral(route)}`
+        ),
+      ]
+      const type = present.length === 0 ? descriptor : `${descriptor} & { ${present.join('; ')} }`
+      return `  ${propertyKey(resourceKey)}: ${type}`
+    })
+    const valueEntries = resources.map(({ resourceKey, resource, routes }) => {
       const members = [
         `name: ${stringLiteral(resourceKey)}`,
         `record: ${this.#recordBinding(resourceKey)}`,
@@ -1452,20 +1535,36 @@ class ContractBuilder {
       if (identifier !== undefined && identifierShape !== undefined) {
         members.push(`id: ${this.#renderer.expression(identifierShape, identifier.description)}`)
       }
-      for (const [shape, route] of Object.entries(this.#resolvingRoutes(resourceKey))) {
-        members.push(`${shape}: ${stringLiteral(route)}`)
+      for (const [field, route] of Object.entries(routes)) {
+        members.push(`${field}: ${stringLiteral(route)}`)
       }
       return `  ${propertyKey(resourceKey)}: {\n${members.map((m) => `    ${m},`).join('\n')}\n  },`
     })
-    const { client } = this.#names
+    const { contract, resources: typeName } = this.#names
+    const type =
+      typeEntries.length === 0
+        ? 'Readonly<Record<never, never>>'
+        : `Readonly<{\n${typeEntries.join('\n')}\n}>`
     return `/**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link ${contract}}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * \`bindReference\` admits only references the contract can resolve.
  */
-const resources: AppContract<${client}>['resources'] = {
-${entries.join('\n')}
-}
+export type ${typeName} = ${type}
+
+/**
+ * The resource table: the implementation of {@link ${typeName}}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a \`get\` or a \`list\`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
+ */
+const resources = {
+${valueEntries.join('\n')}
+} satisfies ${typeName}
 `
   }
 
@@ -1623,12 +1722,12 @@ ${members.join('\n')}
   }
 
   #renderContract(): string {
-    const { app, client, contract } = this.#names
+    const { app, client, contract, resources } = this.#names
     return `/**
  * The ${this.#manifest.app.name} contract. Pass it to a client factory to obtain a
  * {@link ${client}}.
  */
-export const ${contract}: AppContract<${client}> = {
+export const ${contract}: AppContract<${client}, ${resources}> = {
   app: ${stringLiteral(app)},
   operations,
   resources,
@@ -1656,11 +1755,13 @@ export const ${contract}: AppContract<${client}> = {
       ...namespaces.map((namespace) => namespace.interfaceName),
       this.#names.client,
       this.#names.contract,
+      this.#names.resources,
     ]
     const imported = [
       ...CONTRACT_VALUE_IMPORTS,
       ...CONTRACT_BASE_TYPE_IMPORTS,
       ...this.#pageTypeImportSpecifiers().map((specifier) => specifier.local),
+      ...this.#tableTypeImports(),
       ...this.#renderer.usedTypes,
     ]
     reportDuplicates(
@@ -1866,12 +1967,13 @@ function upperFirst(name: string): string {
 }
 
 /**
- * The local names of the paging types in an app's contract module: `Page` and
+ * The local names of the paging types of `@macts/contracts` in an app's
+ * generated modules (its contract and its HTTP client): `Page` and
  * `PageRequest`, unless the manifest declares a type of that name (an enum, a
  * resource, or a resource's create or update input), in which case the import
  * is aliased `MactsPage` / `MactsPageRequest` (numbered if those are taken too).
  */
-function pagingTypeNames(manifest: AppManifest): { page: string; pageRequest: string } {
+export function pagingTypeNames(manifest: AppManifest): { page: string; pageRequest: string } {
   const declared = new Set<string>(Object.keys(manifest.enums))
   for (const [key] of usableResources(manifest)) {
     declared.add(key)

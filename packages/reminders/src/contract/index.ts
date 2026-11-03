@@ -22,11 +22,13 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
   type Page,
   type PageRequest,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -313,9 +315,11 @@ export interface ReminderResourceClient {
 
 /**
  * The Reminders client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link remindersContract}.
+ * commands. A client factory creates one from {@link remindersContract}. Its type carries the
+ * contract's resource table, {@link RemindersResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface RemindersClient {
+export interface RemindersClient extends ClientBrand<RemindersResources> {
   /** An account in the Reminders application */
   readonly accounts: AccountResourceClient
   /** A list of reminders */
@@ -381,11 +385,38 @@ const reminderCreateInputType: ValueType<ReminderCreateInput> = t.record({
 })
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link remindersContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
  */
-const resources: AppContract<RemindersClient>['resources'] = {
+export type RemindersResources = Readonly<{
+  Account: ResourceDescriptor<Account, string> & {
+    readonly id: ValueType<string>
+    readonly list: 'reminders.accounts.list'
+  }
+  List: ResourceDescriptor<List, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'reminders.lists.get'
+    readonly list: 'reminders.lists.list'
+  }
+  Reminder: ResourceDescriptor<Reminder, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'reminders.reminders.get'
+    readonly list: 'reminders.reminders.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link RemindersResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
+ */
+const resources = {
   Account: {
     name: 'Account',
     record: accountRecordType,
@@ -406,7 +437,7 @@ const resources: AppContract<RemindersClient>['resources'] = {
     get: 'reminders.reminders.get',
     list: 'reminders.reminders.list',
   },
-}
+} satisfies RemindersResources
 
 const listListOperation: OperationDescriptor<PageRequest, Page<List>> = {
   id: 'reminders.lists.list',
@@ -717,7 +748,7 @@ function bind(runtime: ClientRuntime): RemindersClient {
  * The Reminders contract. Pass it to a client factory to obtain a
  * {@link RemindersClient}.
  */
-export const remindersContract: AppContract<RemindersClient> = {
+export const remindersContract: AppContract<RemindersClient, RemindersResources> = {
   app: 'reminders',
   operations,
   resources,

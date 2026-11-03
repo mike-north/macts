@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Calendar, CalendarCreateInput } from '../types.js'
 
@@ -23,8 +24,8 @@ export class CalendarResourceClient {
   /**
    * List all calendars, as one page.
    */
-  async list(): Promise<{ items: Calendar[] }> {
-    return this.#http.rpc<{ items: Calendar[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Calendar>> {
+    return this.#http.rpc<Page<Calendar>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

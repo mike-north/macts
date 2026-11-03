@@ -10,9 +10,10 @@
  *
  * `bindReference(client, data)` binds a caller-built reference, or one bound
  * to another client, to a client. Both entry points export the same function.
- * It takes the data form of any reference and returns a bound reference of
- * either cardinality, whose `resolve()` yields a record or an array of
- * records.
+ * For a client of a contract that declares no resource table type, it takes
+ * the data form of any reference and returns a bound reference of either
+ * cardinality, whose `resolve()` yields a record or an array of records.
+ * `bind-reference.test-d.ts` covers clients whose table type is known.
  *
  * Invalid usage is expressed with `expectNotAssignable` rather than
  * `expectError`, because `src/**` is also compiled by `tsc --noEmit`.
@@ -22,17 +23,21 @@
 
 import { expectNotAssignable, expectType } from 'tsd'
 import type {
+  AppContract,
   ClientRuntime,
   CollectionReferenceVariant,
   IdentityReference,
   ObjectReferenceVariant,
   ReferenceData,
+  SelectorReference,
 } from '@macts/contracts'
 import type { Book, LibraryClient, Shelf } from './library-fixture.js'
 import * as remote from './index.js'
 import * as local from './local.js'
 
 declare const client: LibraryClient
+declare const untyped: AppContract<LibraryClient>
+const untypedClient = remote.createClient(untyped, { token: 't', url: 'http://localhost:8372' })
 declare const runtime: ClientRuntime
 declare const reference: ReferenceData
 declare const book: Book
@@ -70,12 +75,12 @@ expectType<typeof remote.bindReference>(local.bindReference)
 
 // Binding takes any reference's data, bound or built by hand, and returns a bound reference.
 expectType<ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown>>(
-  remote.bindReference(client, reference)
+  remote.bindReference(untypedClient, reference)
 )
-expectType<ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown>>(
-  local.bindReference(client, book.shelf)
+expectType<IdentityReference<unknown, unknown, 'Shelf'> | SelectorReference<unknown, 'Shelf'>>(
+  local.bindReference(untypedClient, book.shelf)
 )
-expectType<Promise<unknown>>(remote.bindReference(client, reference).resolve())
+expectType<Promise<unknown>>(remote.bindReference(untypedClient, reference).resolve())
 
 // A client is an object; a primitive is not, and is not reference data either.
 expectNotAssignable<Parameters<typeof remote.bindReference>[0]>('library')

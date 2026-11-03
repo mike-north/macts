@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -25,10 +26,7 @@ export class AlbumResourceClient {
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Album[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Album>>;
 }
 
 // @public (undocumented)
@@ -101,10 +99,7 @@ export class FolderResourceClient {
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<{
-        items: Folder[];
-        nextCursor?: string;
-    }>;
+    }): Promise<Page<Folder>>;
 }
 
 // @public (undocumented)
@@ -155,9 +150,7 @@ export class MediaItemResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     duplicate(id: string): Promise<void>;
     get(id: string): Promise<MediaItem>;
-    list(): Promise<{
-        items: MediaItem[];
-    }>;
+    list(): Promise<Page<MediaItem>>;
 }
 
 // @public (undocumented)

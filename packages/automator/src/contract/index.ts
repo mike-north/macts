@@ -22,10 +22,12 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
   type Page,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -418,9 +420,11 @@ export interface RequiredResourceResourceClient {
 
 /**
  * The Automator client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link automatorContract}.
+ * commands. A client factory creates one from {@link automatorContract}. Its type carries the
+ * contract's resource table, {@link AutomatorResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface AutomatorClient {
+export interface AutomatorClient extends ClientBrand<AutomatorResources> {
   /** A series of actions stored in a file */
   readonly workflows: WorkflowResourceClient
   /** A single step in a workflow */
@@ -561,11 +565,47 @@ const requiredResourceRecordType: ValueType<RequiredResource> = t.record(
 )
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link automatorContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
  */
-const resources: AppContract<AutomatorClient>['resources'] = {
+export type AutomatorResources = Readonly<{
+  Workflow: ResourceDescriptor<Workflow, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'automator.workflows.get'
+    readonly list: 'automator.workflows.list'
+  }
+  AutomatorAction: ResourceDescriptor<AutomatorAction, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'automator.automatorActions.get'
+    readonly list: 'automator.automatorActions.list'
+  }
+  Variable: ResourceDescriptor<Variable, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'automator.variables.get'
+    readonly list: 'automator.variables.list'
+  }
+  Setting: ResourceDescriptor<Setting, string> & {
+    readonly id: ValueType<string>
+    readonly list: 'automator.settings.list'
+  }
+  RequiredResource: ResourceDescriptor<RequiredResource, string> & {
+    readonly id: ValueType<string>
+    readonly list: 'automator.requiredResources.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link AutomatorResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
+ */
+const resources = {
   Workflow: {
     name: 'Workflow',
     record: workflowRecordType,
@@ -599,7 +639,7 @@ const resources: AppContract<AutomatorClient>['resources'] = {
     id: t.string({ description: 'The name of the required resource' }),
     list: 'automator.requiredResources.list',
   },
-}
+} satisfies AutomatorResources
 
 const workflowListOperation: OperationDescriptor<Record<string, never>, Page<Workflow>> = {
   id: 'automator.workflows.list',
@@ -1106,7 +1146,7 @@ function bind(runtime: ClientRuntime): AutomatorClient {
  * The Automator contract. Pass it to a client factory to obtain a
  * {@link AutomatorClient}.
  */
-export const automatorContract: AppContract<AutomatorClient> = {
+export const automatorContract: AppContract<AutomatorClient, AutomatorResources> = {
   app: 'automator',
   operations,
   resources,

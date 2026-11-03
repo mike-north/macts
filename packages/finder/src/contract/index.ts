@@ -22,10 +22,10 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
-  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -643,9 +643,11 @@ export interface ColumnUpdateInput {
 
 /**
  * The Finder client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link finderContract}.
+ * client factory creates one from {@link finderContract}. Its type carries the contract's resource
+ * table, {@link FinderResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
-export interface FinderClient {
+export interface FinderClient extends ClientBrand<FinderResources> {
   /**
    * Open the specified object(s)
    *
@@ -791,258 +793,24 @@ export interface FinderClient {
   sleep(options?: CallOptions): Promise<void>
 }
 
-const containerRecordType: ValueType<Container> = t.record(
-  {
-    entireContents: t.nullable(t.string(), {
-      description: 'the entire contents of the container, including the contents of its children',
-    }),
-  },
-  { description: 'An item that contains other items' }
-)
-
-const diskRecordType: ValueType<Disk> = t.record(
-  {
-    id: t.integer({
-      description:
-        'the unique id for this disk (unchanged while disk remains connected and Finder remains running)',
-    }),
-    capacity: t.nullable(t.double(), {
-      description: 'the total number of bytes (free or used) on the disk',
-    }),
-    freeSpace: t.nullable(t.double(), { description: 'the number of free bytes left on the disk' }),
-    ejectable: t.nullable(t.boolean(), {
-      description: 'Can the media be ejected (floppies, CDs, and so on)?',
-    }),
-    localVolume: t.nullable(t.boolean(), {
-      description: 'Is the media a local volume (as opposed to a file server)?',
-    }),
-    startup: t.nullable(t.boolean(), { description: 'Is this disk the boot disk?' }),
-    format: t.nullable(t.string(), { description: 'the filesystem format of this disk' }),
-    journalingEnabled: t.nullable(t.boolean(), {
-      description: 'Does this disk do file system journaling?',
-    }),
-    ignorePrivileges: t.nullable(t.boolean(), { description: 'Ignore permissions on this disk?' }),
-  },
-  { description: 'A disk' }
-)
-
-const folderRecordType: ValueType<Folder> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this folder' }),
-  },
-  { description: 'A folder' }
-)
-
-const fileRecordType: ValueType<File> = t.record(
-  {
-    fileType: t.nullable(t.string(), {
-      description: 'the OSType identifying the type of data contained in the item',
-    }),
-    creatorType: t.nullable(t.string(), {
-      description: 'the OSType identifying the application that created the item',
-    }),
-    stationery: t.boolean({ description: 'Is the file a stationery pad?' }),
-    productVersion: t.string({
-      description: 'the version of the product (visible at the top of the “Get Info” window)',
-    }),
-    version: t.string({
-      description: 'the version of the file (visible at the bottom of the “Get Info” window)',
-    }),
-  },
-  { description: 'A file' }
-)
-
-const aliasFileRecordType: ValueType<AliasFile> = t.record(
-  {
-    originalItem: t.nullable(t.string(), {
-      description: 'the original item pointed to by the alias',
-    }),
-  },
-  { description: 'An alias file (created with “Make Alias”)' }
-)
-
-const applicationFileRecordType: ValueType<ApplicationFile> = t.record(
-  {
-    id: t.string({ description: 'the bundle identifier or creator type of the application' }),
-    acceptsHighLevelEvents: t.nullable(t.boolean(), {
-      description: 'Is the application high-level event aware? (OBSOLETE: always returns true)',
-    }),
-    hasScriptingTerminology: t.nullable(t.boolean(), {
-      description: 'Does the process have a scripting terminology, i.e., can it be scripted?',
-    }),
-  },
-  { description: "An application's file on disk" }
-)
-
-const documentFileRecordType: ValueType<DocumentFile> = t.record(
-  {},
-  { description: 'A document file' }
-)
-
-const internetLocationFileRecordType: ValueType<InternetLocationFile> = t.record(
-  {
-    location: t.nullable(t.string(), { description: 'the internet location' }),
-  },
-  { description: 'A file containing an internet location' }
-)
-
-const clippingRecordType: ValueType<Clipping> = t.record(
-  {
-    clippingWindow: t.nullable(t.string(), {
-      description: '(NOT AVAILABLE YET) the clipping window for this clipping',
-    }),
-  },
-  { description: 'A clipping' }
-)
-
-const packageRecordType: ValueType<Package> = t.record(
-  {
-    id: t.nullable(t.string(), { description: 'Unique identifier for this package' }),
-  },
-  { description: 'A package' }
-)
-
-const finderWindowRecordType: ValueType<FinderWindow> = t.record(
-  {
-    target: t.nullable(t.string(), {
-      description: 'the container at which this file viewer is targeted',
-    }),
-    currentView: t.nullable(t.string(), {
-      description: 'the current view for the container window',
-    }),
-    iconViewOptions: t.unknown({ description: 'the icon view options for the container window' }),
-    columnViewOptions: t.unknown({
-      description: 'the column view options for the container window',
-    }),
-    toolbarVisible: t.nullable(t.boolean(), { description: "Is the window's toolbar visible?" }),
-    statusbarVisible: t.nullable(t.boolean(), {
-      description: "Is the window's status bar visible?",
-    }),
-    pathbarVisible: t.nullable(t.boolean(), { description: "Is the window's path bar visible?" }),
-    sidebarWidth: t.nullable(t.integer(), {
-      description: 'the width of the sidebar for the container window',
-    }),
-  },
-  { description: 'A file viewer window' }
-)
-
-const clippingWindowRecordType: ValueType<ClippingWindow> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this window' }),
-  },
-  { description: 'The window containing a clipping' }
-)
-
-const listViewOptionsRecordType: ValueType<ListViewOptions> = t.record(
-  {
-    calculatesFolderSizes: t.nullable(t.boolean(), {
-      description: 'Are folder sizes calculated and displayed in the window?',
-    }),
-    showsIconPreview: t.nullable(t.boolean(), {
-      description: 'displays a preview of the item in list view',
-    }),
-    iconSize: t.nullable(t.string(), {
-      description: 'the size of icons displayed in the list view',
-    }),
-    textSize: t.nullable(t.integer(), {
-      description: 'the size of the text displayed in the list view',
-    }),
-    usesRelativeDates: t.nullable(t.boolean(), {
-      description: 'Are relative dates (e.g., today, yesterday) shown in the list view?',
-    }),
-  },
-  { description: 'the list view options' }
-)
-
-const columnRecordType: ValueType<Column> = t.record(
-  {
-    index: t.nullable(t.integer(), {
-      description: 'the index in the front-to-back ordering within its container',
-    }),
-    name: t.nullable(t.string(), { description: 'the column name' }),
-    sortDirection: t.nullable(t.string(), {
-      description: 'The direction in which the window is sorted',
-    }),
-    width: t.nullable(t.integer(), { description: 'the width of this column' }),
-    minimumWidth: t.nullable(t.integer(), {
-      description: 'the minimum allowed width of this column',
-    }),
-    maximumWidth: t.nullable(t.integer(), {
-      description: 'the maximum allowed width of this column',
-    }),
-    visible: t.nullable(t.boolean(), { description: 'is this column visible' }),
-  },
-  { description: 'a column of a list view' }
-)
+/**
+ * The type of the resource table of {@link finderContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type FinderResources = Readonly<Record<never, never>>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link FinderResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
-const resources: AppContract<FinderClient>['resources'] = {
-  Container: {
-    name: 'Container',
-    record: containerRecordType,
-  },
-  Disk: {
-    name: 'Disk',
-    record: diskRecordType,
-    id: t.integer({
-      description:
-        'the unique id for this disk (unchanged while disk remains connected and Finder remains running)',
-    }),
-  },
-  Folder: {
-    name: 'Folder',
-    record: folderRecordType,
-  },
-  File: {
-    name: 'File',
-    record: fileRecordType,
-  },
-  AliasFile: {
-    name: 'AliasFile',
-    record: aliasFileRecordType,
-  },
-  ApplicationFile: {
-    name: 'ApplicationFile',
-    record: applicationFileRecordType,
-    id: t.string({ description: 'the bundle identifier or creator type of the application' }),
-  },
-  DocumentFile: {
-    name: 'DocumentFile',
-    record: documentFileRecordType,
-  },
-  InternetLocationFile: {
-    name: 'InternetLocationFile',
-    record: internetLocationFileRecordType,
-  },
-  Clipping: {
-    name: 'Clipping',
-    record: clippingRecordType,
-  },
-  Package: {
-    name: 'Package',
-    record: packageRecordType,
-  },
-  FinderWindow: {
-    name: 'FinderWindow',
-    record: finderWindowRecordType,
-  },
-  ClippingWindow: {
-    name: 'ClippingWindow',
-    record: clippingWindowRecordType,
-  },
-  ListViewOptions: {
-    name: 'ListViewOptions',
-    record: listViewOptionsRecordType,
-  },
-  Column: {
-    name: 'Column',
-    record: columnRecordType,
-  },
-}
+const resources = {} satisfies FinderResources
 
 const appOpenOperation: OperationDescriptor<
   { readonly using?: string | undefined; readonly withProperties?: unknown },
@@ -1929,7 +1697,7 @@ function bind(runtime: ClientRuntime): FinderClient {
  * The Finder contract. Pass it to a client factory to obtain a
  * {@link FinderClient}.
  */
-export const finderContract: AppContract<FinderClient> = {
+export const finderContract: AppContract<FinderClient, FinderResources> = {
   app: 'finder',
   operations,
   resources,

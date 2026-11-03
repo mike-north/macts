@@ -6,11 +6,14 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface AnalyzerIssue {
@@ -399,7 +402,7 @@ export interface WorkspaceDocumentUpdateInput {
 }
 
 // @public
-export interface XcodeClient {
+export interface XcodeClient extends ClientBrand<XcodeResources> {
     readonly projects: ProjectResourceClient;
     readonly runDestinations: RunDestinationResourceClient;
     readonly schemes: SchemeResourceClient;
@@ -407,7 +410,31 @@ export interface XcodeClient {
 }
 
 // @public
-export const xcodeContract: AppContract<XcodeClient>;
+export const xcodeContract: AppContract<XcodeClient, XcodeResources>;
+
+// @public
+export type XcodeResources = Readonly<{
+    WorkspaceDocument: ResourceDescriptor<WorkspaceDocument, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'xcode.workspaceDocuments.get';
+        readonly list: 'xcode.workspaceDocuments.list';
+    };
+    Project: ResourceDescriptor<Project, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'xcode.projects.get';
+        readonly list: 'xcode.projects.list';
+    };
+    Scheme: ResourceDescriptor<Scheme, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'xcode.schemes.get';
+        readonly list: 'xcode.schemes.list';
+    };
+    RunDestination: ResourceDescriptor<RunDestination, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'xcode.runDestinations.get';
+        readonly list: 'xcode.runDestinations.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

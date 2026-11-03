@@ -6,10 +6,11 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 
 // @public
-export interface ArcClient {
+export interface ArcClient extends ClientBrand<ArcResources> {
     close(options?: CallOptions): Promise<void>;
     count(each?: string, options?: CallOptions): Promise<void>;
     execute(javascript: string, options?: CallOptions): Promise<void>;
@@ -23,7 +24,10 @@ export interface ArcClient {
 }
 
 // @public
-export const arcContract: AppContract<ArcClient>;
+export const arcContract: AppContract<ArcClient, ArcResources>;
+
+// @public
+export type ArcResources = Readonly<Record<never, never>>;
 
 // @public
 export interface Space {

@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 
 // @public
@@ -168,7 +169,7 @@ export interface FileUpdateInput {
 }
 
 // @public
-export interface FinderClient {
+export interface FinderClient extends ClientBrand<FinderResources> {
     activate(options?: CallOptions): Promise<void>;
     cleanUp(by?: string, options?: CallOptions): Promise<void>;
     close(options?: CallOptions): Promise<void>;
@@ -197,7 +198,10 @@ export interface FinderClient {
 }
 
 // @public
-export const finderContract: AppContract<FinderClient>;
+export const finderContract: AppContract<FinderClient, FinderResources>;
+
+// @public
+export type FinderResources = Readonly<Record<never, never>>;
 
 // @public
 export interface FinderWindow {

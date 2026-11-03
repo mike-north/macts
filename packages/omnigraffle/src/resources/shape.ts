@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Shape, ShapeCreateInput } from '../types.js'
 
@@ -23,8 +24,8 @@ export class ShapeResourceClient {
   /**
    * List the shapes of one canvas, as one page.
    */
-  async list(canvasId: string): Promise<{ items: Shape[] }> {
-    return this.#http.rpc<{ items: Shape[] }>(`${this.#app}.${this.#resource}.list`, { canvasId })
+  async list(canvasId: string): Promise<Page<Shape>> {
+    return this.#http.rpc<Page<Shape>>(`${this.#app}.${this.#resource}.list`, { canvasId })
   }
 
   /**

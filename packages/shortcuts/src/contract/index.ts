@@ -22,12 +22,14 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type FileValue,
   type Integer,
   type OperationDescriptor,
   type Page,
   type PageRequest,
+  type ResourceDescriptor,
   type Rgb,
   type ValueType,
 } from '@macts/contracts'
@@ -162,9 +164,11 @@ export interface FolderResourceClient {
 
 /**
  * The Shortcuts client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link shortcutsContract}.
+ * commands. A client factory creates one from {@link shortcutsContract}. Its type carries the
+ * contract's resource table, {@link ShortcutsResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface ShortcutsClient {
+export interface ShortcutsClient extends ClientBrand<ShortcutsResources> {
   /** A shortcut in the Shortcuts application */
   readonly shortcuts: ShortcutResourceClient
   /** A folder containing shortcuts */
@@ -198,11 +202,34 @@ const folderRecordType: ValueType<Folder> = t.record(
 )
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link shortcutsContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
  */
-const resources: AppContract<ShortcutsClient>['resources'] = {
+export type ShortcutsResources = Readonly<{
+  Shortcut: ResourceDescriptor<Shortcut, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'shortcuts.shortcuts.get'
+    readonly list: 'shortcuts.shortcuts.list'
+  }
+  Folder: ResourceDescriptor<Folder, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'shortcuts.folders.get'
+    readonly list: 'shortcuts.folders.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link ShortcutsResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
+ */
+const resources = {
   Shortcut: {
     name: 'Shortcut',
     record: shortcutRecordType,
@@ -217,7 +244,7 @@ const resources: AppContract<ShortcutsClient>['resources'] = {
     get: 'shortcuts.folders.get',
     list: 'shortcuts.folders.list',
   },
-}
+} satisfies ShortcutsResources
 
 const shortcutListOperation: OperationDescriptor<Record<string, never>, Page<Shortcut>> = {
   id: 'shortcuts.shortcuts.list',
@@ -430,7 +457,7 @@ function bind(runtime: ClientRuntime): ShortcutsClient {
  * The Shortcuts contract. Pass it to a client factory to obtain a
  * {@link ShortcutsClient}.
  */
-export const shortcutsContract: AppContract<ShortcutsClient> = {
+export const shortcutsContract: AppContract<ShortcutsClient, ShortcutsResources> = {
   app: 'shortcuts',
   operations,
   resources,

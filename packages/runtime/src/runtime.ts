@@ -65,7 +65,6 @@ import {
   ApprovalPendingError,
   ApprovalRejectedError,
   InternalError,
-  InvalidSelectionError,
   MactsError,
   OperationCancelledError,
   PermissionDeniedError,
@@ -272,9 +271,9 @@ export interface MactsRuntime {
    * @returns A single record for a single reference; an array of records,
    *   possibly empty, for a collection reference.
    * @throws A canonical structured error from `@macts/contracts` for every
-   *   failure: `ValidationError` for an unknown app or a malformed reference,
-   *   `InvalidSelectionError` when the resource has no operation to resolve
-   *   the reference as, the same errors as `invoke` for authentication,
+   *   failure: `ValidationError` for an unknown app, a malformed reference,
+   *   or one whose resource the contract's table lacks or records no
+   *   operation to resolve it as, the same errors as `invoke` for authentication,
    *   permission, and governance, `TargetNotFoundError` and
    *   `InvalidSelectionError` from the executor unchanged, and
    *   `UnexpectedValueError` when the result violates the operation's output
@@ -970,6 +969,13 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
    * contract's operations. The operation is found through the same lookup as
    * `invoke`'s ({@link callableOperation}), so a resource that records no such
    * operation, or one marked `unavailable`, is not resolvable.
+   *
+   * @throws `ValidationError` at the reference's resource when the resource
+   *   has no such operation: the reference is invalid against the contract,
+   *   exactly as one naming a resource absent from the table is
+   *   ({@link readReferenceTarget}). `InvalidSelectionError` is reserved for
+   *   an index or range that the collection cannot satisfy, which only the
+   *   app can tell.
    */
   function resolvingOperation(app: RegisteredApp, target: ReferenceTarget): ResolvingOperation {
     const { resource, cardinality } = target
@@ -977,9 +983,17 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     const operation = entry === undefined ? undefined : callableOperation(entry.id)
     if (entry === undefined || operation === undefined) {
       const shape = resolvingOperationKey(cardinality)
-      throw new InvalidSelectionError(
-        `References to "${resource}" cannot be resolved: the ${app.contract.app} app has no ${shape} operation for it.`,
-        { resource }
+      const kind = cardinality === 'one' ? 'a single' : 'a collection'
+      throw new ValidationError(
+        `The ${app.contract.app} app cannot resolve ${kind} reference to "${resource}".`,
+        {
+          issues: [
+            {
+              path: ['reference', 'resource'],
+              message: `The ${app.contract.app} app has no ${shape} operation for "${resource}"`,
+            },
+          ],
+        }
       )
     }
     return { operation, result: entry.result }

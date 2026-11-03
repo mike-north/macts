@@ -22,12 +22,12 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type FileSource,
   type FileValue,
   type Integer,
   type OperationDescriptor,
-  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -944,9 +944,11 @@ export interface PlaylistResourceClient {
 
 /**
  * The TV client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link tvContract}.
+ * client factory creates one from {@link tvContract}. Its type carries the contract's resource
+ * table, {@link TVResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
-export interface TVClient {
+export interface TVClient extends ClientBrand<TVResources> {
   /** a track representing a video file */
   readonly fileTracks: FileTrackResourceClient
   /** a list of tracks/streams */
@@ -1033,280 +1035,24 @@ export interface TVClient {
   openLocation(options?: CallOptions): Promise<void>
 }
 
-const artworkRecordType: ValueType<Artwork> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this artwork' }),
-    data: t.nullable(t.string(), {
-      description: 'data for this artwork, in the form of a picture',
-    }),
-    description: t.nullable(t.string(), { description: 'description of artwork as a string' }),
-    downloaded: t.nullable(t.boolean(), { description: 'was this artwork downloaded by iTunes?' }),
-    format: t.nullable(t.string(), { description: 'the data format for this piece of artwork' }),
-    kind: t.nullable(t.integer(), { description: 'kind or purpose of this piece of artwork' }),
-    rawData: t.unknown({ description: 'data for this artwork, in original format' }),
-  },
-  { description: 'a piece of art within a track or playlist' }
-)
-
-const browserWindowRecordType: ValueType<BrowserWindow> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this window' }),
-    selection: t.nullable(t.string(), { description: 'the selected tracks' }),
-  },
-  { description: 'the main window' }
-)
-
-const fileTrackRecordType: ValueType<FileTrack> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this track' }),
-    location: t.nullable(t.file(), {
-      description: 'the location of the file represented by this track',
-    }),
-  },
-  { description: 'a track representing a video file' }
-)
-
-const libraryPlaylistRecordType: ValueType<LibraryPlaylist> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this playlist' }),
-  },
-  { description: 'the main library playlist' }
-)
-
-const playlistRecordType: ValueType<Playlist> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this playlist' }),
-    description: t.nullable(t.string(), { description: 'the description of the playlist' }),
-    duration: t.nullable(t.integer(), {
-      description: 'the total length of all tracks (in seconds)',
-    }),
-    name: t.nullable(t.string(), { description: 'the name of the playlist' }),
-    size: t.nullable(t.integer(), { description: 'the total size of all tracks (in bytes)' }),
-    specialKind: t.nullable(t.string(), { description: 'special playlist kind' }),
-    time: t.nullable(t.string(), { description: 'the length of all tracks in MM:SS format' }),
-    visible: t.nullable(t.boolean(), {
-      description: 'is this playlist visible in the Source list?',
-    }),
-  },
-  { description: 'a list of tracks/streams' }
-)
-
-const playlistWindowRecordType: ValueType<PlaylistWindow> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this window' }),
-    selection: t.nullable(t.string(), { description: 'the selected tracks' }),
-  },
-  { description: 'a sub-window showing a single playlist' }
-)
-
-const sharedTrackRecordType: ValueType<SharedTrack> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this track' }),
-  },
-  { description: 'a track residing in a shared library' }
-)
-
-const sourceRecordType: ValueType<Source> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this source' }),
-    capacity: t.nullable(t.double(), {
-      description: 'the total size of the source if it has a fixed size',
-    }),
-    freeSpace: t.nullable(t.double(), {
-      description: 'the free space on the source if it has a fixed size',
-    }),
-    kind: t.nullable(t.string(), { description: 'The kind property' }),
-  },
-  { description: 'a media source (library, CD, device, etc.)' }
-)
-
-const trackRecordType: ValueType<Track> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this track' }),
-    album: t.nullable(t.string(), { description: 'the album name of the track' }),
-    albumRating: t.nullable(t.integer(), {
-      description: 'the rating of the album for this track (0 to 100)',
-    }),
-    albumRatingKind: t.nullable(t.string(), {
-      description: 'the rating kind of the album rating for this track',
-    }),
-    bitRate: t.nullable(t.integer(), { description: 'the bit rate of the track (in kbps)' }),
-    bookmark: t.nullable(t.double(), { description: 'the bookmark time of the track in seconds' }),
-    bookmarkable: t.nullable(t.boolean(), {
-      description: 'is the playback position for this track remembered?',
-    }),
-    category: t.nullable(t.string(), { description: 'the category of the track' }),
-    comment: t.nullable(t.string(), { description: 'freeform notes about the track' }),
-    databaseID: t.nullable(t.integer(), {
-      description:
-        'the common, unique ID for this track. If two tracks in different playlists have the same database ID, they are sharing the same data.',
-    }),
-    dateAdded: t.nullable(t.date(), {
-      description: 'the date the track was added to the playlist',
-    }),
-    description: t.nullable(t.string(), { description: 'the description of the track' }),
-    director: t.nullable(t.string(), { description: 'the artist/source of the track' }),
-    discCount: t.nullable(t.integer(), {
-      description: 'the total number of discs in the source album',
-    }),
-    discNumber: t.nullable(t.integer(), {
-      description: 'the index of the disc containing this track on the source album',
-    }),
-    downloaderAccount: t.nullable(t.string(), {
-      description: 'the account of the person who downloaded this track',
-    }),
-    downloaderName: t.nullable(t.string(), {
-      description: 'the name of the person who downloaded this track',
-    }),
-    duration: t.nullable(t.double(), { description: 'the length of the track in seconds' }),
-    enabled: t.nullable(t.boolean(), { description: 'is this track checked for playback?' }),
-    episodeID: t.nullable(t.string(), { description: 'the episode ID of the track' }),
-    episodeNumber: t.nullable(t.integer(), { description: 'the episode number of the track' }),
-    finish: t.nullable(t.double(), { description: 'the stop time of the track in seconds' }),
-    genre: t.nullable(t.string(), { description: 'the genre (category) of the track' }),
-    grouping: t.nullable(t.string(), {
-      description:
-        'the grouping (piece) of the track. Generally used to denote movements within a classical work.',
-    }),
-    kind: t.nullable(t.string(), { description: 'a text description of the track' }),
-    longDescription: t.nullable(t.string(), { description: 'the long description of the track' }),
-    mediaKind: t.nullable(t.string(), { description: 'the media kind of the track' }),
-    modificationDate: t.nullable(t.date(), {
-      description: 'the modification date of the content of this track',
-    }),
-    playedCount: t.nullable(t.integer(), {
-      description: 'number of times this track has been played',
-    }),
-    playedDate: t.nullable(t.date(), {
-      description: 'the date and time this track was last played',
-    }),
-    purchaserAccount: t.nullable(t.string(), {
-      description: 'the account of the person who purchased this track',
-    }),
-    purchaserName: t.nullable(t.string(), {
-      description: 'the name of the person who purchased this track',
-    }),
-    rating: t.nullable(t.integer(), { description: 'the rating of this track (0 to 100)' }),
-    ratingKind: t.nullable(t.string(), { description: 'the rating kind of this track' }),
-    releaseDate: t.nullable(t.date(), { description: 'the release date of this track' }),
-    sampleRate: t.nullable(t.integer(), { description: 'the sample rate of the track (in Hz)' }),
-    seasonNumber: t.nullable(t.integer(), { description: 'the season number of the track' }),
-    skippedCount: t.nullable(t.integer(), {
-      description: 'number of times this track has been skipped',
-    }),
-    skippedDate: t.nullable(t.date(), {
-      description: 'the date and time this track was last skipped',
-    }),
-    show: t.nullable(t.string(), { description: 'the show name of the track' }),
-    sortAlbum: t.nullable(t.string(), {
-      description: 'override string to use for the track when sorting by album',
-    }),
-    sortDirector: t.nullable(t.string(), {
-      description: 'override string to use for the track when sorting by artist',
-    }),
-    sortName: t.nullable(t.string(), {
-      description: 'override string to use for the track when sorting by name',
-    }),
-    sortShow: t.nullable(t.string(), {
-      description: 'override string to use for the track when sorting by show name',
-    }),
-    size: t.nullable(t.double(), { description: 'the size of the track (in bytes)' }),
-    start: t.nullable(t.double(), { description: 'the start time of the track in seconds' }),
-    time: t.nullable(t.string(), { description: 'the length of the track in MM:SS format' }),
-    trackCount: t.nullable(t.integer(), {
-      description: 'the total number of tracks on the source album',
-    }),
-    trackNumber: t.nullable(t.integer(), {
-      description: 'the index of the track on the source album',
-    }),
-    unplayed: t.nullable(t.boolean(), { description: 'is this track unplayed?' }),
-    volumeAdjustment: t.nullable(t.integer(), {
-      description: 'relative volume adjustment of the track (-100% to 100%)',
-    }),
-    year: t.nullable(t.integer(), { description: 'the year the track was recorded/released' }),
-  },
-  { description: 'playable video source' }
-)
-
-const urlTrackRecordType: ValueType<URLTrack> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this track' }),
-    address: t.nullable(t.string(), { description: 'the URL for this track' }),
-  },
-  { description: 'a track representing a network stream' }
-)
-
-const userPlaylistRecordType: ValueType<UserPlaylist> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this playlist' }),
-    shared: t.nullable(t.boolean(), { description: 'is this playlist shared?' }),
-    smart: t.nullable(t.boolean(), { description: 'is this a Smart Playlist?' }),
-  },
-  { description: 'custom playlists created by the user' }
-)
-
-const videoWindowRecordType: ValueType<VideoWindow> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this window' }),
-  },
-  { description: 'the video window' }
-)
+/**
+ * The type of the resource table of {@link tvContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type TVResources = Readonly<Record<never, never>>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link TVResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
-const resources: AppContract<TVClient>['resources'] = {
-  Artwork: {
-    name: 'Artwork',
-    record: artworkRecordType,
-  },
-  BrowserWindow: {
-    name: 'BrowserWindow',
-    record: browserWindowRecordType,
-  },
-  FileTrack: {
-    name: 'FileTrack',
-    record: fileTrackRecordType,
-  },
-  LibraryPlaylist: {
-    name: 'LibraryPlaylist',
-    record: libraryPlaylistRecordType,
-  },
-  Playlist: {
-    name: 'Playlist',
-    record: playlistRecordType,
-  },
-  PlaylistWindow: {
-    name: 'PlaylistWindow',
-    record: playlistWindowRecordType,
-  },
-  SharedTrack: {
-    name: 'SharedTrack',
-    record: sharedTrackRecordType,
-  },
-  Source: {
-    name: 'Source',
-    record: sourceRecordType,
-  },
-  Track: {
-    name: 'Track',
-    record: trackRecordType,
-  },
-  URLTrack: {
-    name: 'URLTrack',
-    record: urlTrackRecordType,
-  },
-  UserPlaylist: {
-    name: 'UserPlaylist',
-    record: userPlaylistRecordType,
-  },
-  VideoWindow: {
-    name: 'VideoWindow',
-    record: videoWindowRecordType,
-  },
-}
+const resources = {} satisfies TVResources
 
 const appCloseOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'tv.app.close',
@@ -1954,7 +1700,7 @@ function bind(runtime: ClientRuntime): TVClient {
  * The TV contract. Pass it to a client factory to obtain a
  * {@link TVClient}.
  */
-export const tvContract: AppContract<TVClient> = {
+export const tvContract: AppContract<TVClient, TVResources> = {
   app: 'tv',
   operations,
   resources,

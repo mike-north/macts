@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
 } from '@macts/contracts'
@@ -30,19 +31,33 @@ const t = ValueTypes
 
 /**
  * The Console client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link consoleContract}.
+ * A client factory creates one from {@link consoleContract}. Its type carries the contract's
+ * resource table, {@link ConsoleResources}, so references can be bound to it by resource; the brand
+ * has no runtime member.
  */
-export interface ConsoleClient {
+export interface ConsoleClient extends ClientBrand<ConsoleResources> {
   /** Select a device. */
   selectDevice(options?: CallOptions): Promise<void>
 }
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link consoleContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
  */
-const resources: AppContract<ConsoleClient>['resources'] = {}
+export type ConsoleResources = Readonly<Record<never, never>>
+
+/**
+ * The resource table: the implementation of {@link ConsoleResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
+ */
+const resources = {} satisfies ConsoleResources
 
 const appSelectDeviceOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'console.app.selectDevice',
@@ -75,7 +90,7 @@ function bind(runtime: ClientRuntime): ConsoleClient {
  * The Console contract. Pass it to a client factory to obtain a
  * {@link ConsoleClient}.
  */
-export const consoleContract: AppContract<ConsoleClient> = {
+export const consoleContract: AppContract<ConsoleClient, ConsoleResources> = {
   app: 'console',
   operations,
   resources,

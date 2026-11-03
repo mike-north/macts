@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 
 // @public
@@ -20,13 +21,16 @@ export type ApplicationCreateInput = Record<string, never>;
 export type ApplicationUpdateInput = Record<string, never>;
 
 // @public
-export interface BluetoothFileExchangeClient {
+export interface BluetoothFileExchangeClient extends ClientBrand<BluetoothFileExchangeResources> {
     browse(device?: string, options?: CallOptions): Promise<void>;
     send(file?: readonly FileSource[], toDevice?: string, options?: CallOptions): Promise<void>;
 }
 
 // @public
-export const bluetoothFileExchangeContract: AppContract<BluetoothFileExchangeClient>;
+export const bluetoothFileExchangeContract: AppContract<BluetoothFileExchangeClient, BluetoothFileExchangeResources>;
+
+// @public
+export type BluetoothFileExchangeResources = Readonly<Record<never, never>>;
 
 // (No @packageDocumentation comment for this package)
 

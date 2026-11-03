@@ -98,11 +98,18 @@ function runTsc(dir: string): { status: number | null; output: string } {
  * usage the client's types must reject; the build fails if any compiles.
  */
 const CONSUMER_SOURCE = `
-import { Integer, type ClientRuntime, type Page } from '@macts/contracts'
+import {
+  Integer,
+  type ClientRuntime,
+  type Page,
+  type ResolvableReferenceData,
+  type ResolvableResourceKey,
+} from '@macts/contracts'
 import {
   jotterContract,
   type Folder,
   type JotterClient,
+  type JotterResources,
   type Note,
   type NoteUpdateInput,
   type Tag,
@@ -214,6 +221,23 @@ export async function usage(): Promise<void> {
   void appless
   const inJotter: NonNullable<Note['folder']> = { app: 'jotter', resource: 'Folder', form: 'identity', cardinality: 'one', id: Integer.validate(7), resolve: () => Promise.reject(new Error('unused')) }
   void inJotter
+
+  // The exported table type says which resources resolve references of each
+  // cardinality (D7): its entries record get and list as required literals.
+  const resolvableOne: ResolvableResourceKey<JotterResources, 'one'>[] = ['Note', 'Folder']
+  const resolvableMany: ResolvableResourceKey<JotterResources, 'many'>[] = ['Note', 'Folder', 'Tag']
+  void [resolvableOne, resolvableMany]
+  // @ts-expect-error -- Tag's entry has no get, only the descriptor's optional one, so it does not resolve as one
+  const tagAsOne: ResolvableResourceKey<JotterResources, 'one'> = 'Tag'
+  // @ts-expect-error -- Sticker records neither get nor list, so the table leaves it out
+  const stickerAsMany: ResolvableResourceKey<JotterResources, 'many'> = 'Sticker'
+  void [tagAsOne, stickerAsMany]
+  const tagCollection: ResolvableReferenceData<JotterResources> = { app: 'jotter', resource: 'Tag', form: 'selector', cardinality: 'many', selector: { by: 'every' } }
+  // @ts-expect-error -- a single tag cannot be bound: Tag has no get
+  const oneTag: ResolvableReferenceData<JotterResources> = { app: 'jotter', resource: 'Tag', form: 'selector', cardinality: 'one', selector: { by: 'name', name: 'x' } }
+  // @ts-expect-error -- no reference to a sticker can be bound
+  const oneSticker: ResolvableReferenceData<JotterResources> = { app: 'jotter', resource: 'Sticker', form: 'selector', cardinality: 'one', selector: { by: 'name', name: 'x' } }
+  void [tagCollection, oneTag, oneSticker]
 }
 `
 
@@ -425,7 +449,7 @@ describe('operations', () => {
 })
 
 describe('resources', () => {
-  it('list every resource with its record, identifier, and resolving operations', () => {
+  it('list every resource a reference can resolve through, with its record, identifier, and resolving operations', () => {
     const { Note, Folder, Tag } = contract.resources
     expect(Note?.name).toBe('Note')
     expect(Note?.get).toBe('jotter.notes.getNote')
@@ -434,6 +458,8 @@ describe('resources', () => {
     expect(Folder?.list).toBe('jotter.folders.listFolders')
     expect(Tag?.get).toBeUndefined()
     expect(Tag?.list).toBe('jotter.tags.listTags')
+    // Sticker records neither, so no reference to one resolves (D7).
+    expect(Object.keys(contract.resources)).toEqual(['Note', 'Folder', 'Tag'])
     expect(Note?.id?.encode('N1')).toEqual({ ok: true, value: 'N1' })
     expect(Folder?.id?.encode(Integer.validate(7))).toEqual({ ok: true, value: { integer: '7' } })
   })
@@ -536,6 +562,44 @@ describe('resources', () => {
         selector: { by: 'every' },
       }).ok
     ).toBe(true)
+  })
+
+  it('reject every reference to a resource with neither a get nor a list operation, which the table leaves out', () => {
+    const folder = resourceRecord('Folder')
+    const base = { folderId: Integer.validate(7), title: 'Inbox', notes: [], color: null }
+    const stickers = [
+      { form: 'selector', cardinality: 'one', selector: { by: 'name', name: 'x' } },
+      { form: 'selector', cardinality: 'one', selector: { by: 'index', index: 0 } },
+    ].map((form) => ({ ...base, sticker: { app: 'jotter', resource: 'Sticker', ...form } }))
+    for (const value of stickers) {
+      const result = folder.encode(value)
+      expect(result.ok).toBe(false)
+      if (!result.ok) {
+        expect(result.issues.map(({ path, code }) => ({ path, code }))).toEqual([
+          { path: ['sticker'], code: 'unsupported' },
+        ])
+      }
+    }
+    // Without the field, or with null, the folder encodes.
+    expect(folder.encode(base).ok).toBe(true)
+    expect(folder.encode({ ...base, sticker: null }).ok).toBe(true)
+    // Nor does a sticker reference decode from the wire.
+    const decoded = folder.decode(
+      {
+        folderId: { integer: '7' },
+        title: 'Inbox',
+        notes: [],
+        color: null,
+        sticker: {
+          resource: 'Sticker',
+          form: 'selector',
+          cardinality: 'one',
+          selector: { by: 'name', name: 'x' },
+        },
+      },
+      TEST_CONTEXT
+    )
+    expect(decoded.ok).toBe(false)
   })
 
   it('admit as containers only resources the contract can get', () => {

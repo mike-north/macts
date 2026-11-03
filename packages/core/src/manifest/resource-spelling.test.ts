@@ -137,17 +137,13 @@ function contractSpellings(manifest: AppManifest): Spelling[] {
   if (content === undefined) throw new Error('the contract has no contract module')
   const source = parse(CONTRACT_MODULE_PATH, content)
   const found = accessorMembers(source, 'contract accessor')
-  // `const resources = { <Key>: { …, get: '<id>', list: '<id>' } }`
+  // `const resources = { <Key>: { …, get: '<id>', list: '<id>' } } satisfies <App>Resources`
   walk(source, (node) => {
-    if (
-      !ts.isVariableDeclaration(node) ||
-      !ts.isIdentifier(node.name) ||
-      node.name.text !== 'resources' ||
-      node.initializer === undefined ||
-      !ts.isObjectLiteralExpression(node.initializer)
-    )
-      return
-    for (const entry of node.initializer.properties) {
+    if (!ts.isVariableDeclaration(node) || !ts.isIdentifier(node.name)) return
+    if (node.name.text !== 'resources' || node.initializer === undefined) return
+    const table = withoutTypeAssertions(node.initializer)
+    if (!ts.isObjectLiteralExpression(table)) return
+    for (const entry of table.properties) {
       if (!ts.isPropertyAssignment(entry) || !ts.isObjectLiteralExpression(entry.initializer))
         continue
       const resourceKey = ts.isIdentifier(entry.name) ? entry.name.text : undefined
@@ -169,6 +165,15 @@ function contractSpellings(manifest: AppManifest): Spelling[] {
     }
   })
   return found
+}
+
+/** `expression` without the `as` and `satisfies` operators around it, which change no value. */
+function withoutTypeAssertions(expression: ts.Expression): ts.Expression {
+  let current = expression
+  while (ts.isAsExpression(current) || ts.isSatisfiesExpression(current)) {
+    current = current.expression
+  }
+  return current
 }
 
 /**

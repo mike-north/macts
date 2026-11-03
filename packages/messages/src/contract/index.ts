@@ -22,9 +22,9 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
-  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -154,9 +154,11 @@ export type ChatUpdateInput = Record<string, never>
 
 /**
  * The Messages client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link messagesContract}.
+ * A client factory creates one from {@link messagesContract}. Its type carries the contract's
+ * resource table, {@link MessagesResources}, so references can be bound to it by resource; the
+ * brand has no runtime member.
  */
-export interface MessagesClient {
+export interface MessagesClient extends ClientBrand<MessagesResources> {
   /**
    * Sends a message to a participant or to a chat.
    *
@@ -169,79 +171,24 @@ export interface MessagesClient {
   logout(options?: CallOptions): Promise<void>
 }
 
-const participantRecordType: ValueType<Participant> = t.record(
-  {
-    id: t.string({
-      description:
-        "The participant's unique identifier. For example: 01234567-89AB-CDEF-0123-456789ABCDEF:+11234567890",
-    }),
-    name: t.nullable(t.string(), {
-      description: "The participant's name as it appears in the participant list.",
-    }),
-    handle: t.nullable(t.string(), { description: "The participant's handle." }),
-    firstName: t.nullable(t.string(), {
-      description: "The first name from this participan's Contacts card, if available",
-    }),
-    lastName: t.nullable(t.string(), {
-      description: "The last name from this participant's Contacts card, if available",
-    }),
-    fullName: t.nullable(t.string(), {
-      description: "The full name from this participant's Contacts card, if available",
-    }),
-  },
-  { description: 'A participant for an account.' }
-)
-
-const accountRecordType: ValueType<Account> = t.record(
-  {
-    id: t.string({ description: 'A unique identifier for this account.' }),
-    description: t.nullable(t.string(), {
-      description: 'The name of this account as defined in Account preferences description field',
-    }),
-    enabled: t.nullable(t.boolean(), { description: 'Is the account enabled?' }),
-    connectionStatus: t.nullable(t.string(), {
-      description: 'The connection status for this account.',
-    }),
-    serviceType: t.nullable(t.string(), { description: 'The type of service for this account' }),
-  },
-  { description: 'An account that can be logged in to from this system' }
-)
-
-const chatRecordType: ValueType<Chat> = t.record(
-  {
-    id: t.string({ description: 'A guid identifier for this chat.' }),
-    name: t.nullable(t.string(), {
-      description: "The chat's name as it appears in the chat list.",
-    }),
-  },
-  { description: 'An SMS or iMessage chat.' }
-)
+/**
+ * The type of the resource table of {@link messagesContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type MessagesResources = Readonly<Record<never, never>>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link MessagesResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
-const resources: AppContract<MessagesClient>['resources'] = {
-  Participant: {
-    name: 'Participant',
-    record: participantRecordType,
-    id: t.string({
-      description:
-        "The participant's unique identifier. For example: 01234567-89AB-CDEF-0123-456789ABCDEF:+11234567890",
-    }),
-  },
-  Account: {
-    name: 'Account',
-    record: accountRecordType,
-    id: t.string({ description: 'A unique identifier for this account.' }),
-  },
-  Chat: {
-    name: 'Chat',
-    record: chatRecordType,
-    id: t.string({ description: 'A guid identifier for this chat.' }),
-  },
-}
+const resources = {} satisfies MessagesResources
 
 const appSendOperation: OperationDescriptor<{ readonly to: string }, undefined> = {
   id: 'messages.app.send',
@@ -311,7 +258,7 @@ function bind(runtime: ClientRuntime): MessagesClient {
  * The Messages contract. Pass it to a client factory to obtain a
  * {@link MessagesClient}.
  */
-export const messagesContract: AppContract<MessagesClient> = {
+export const messagesContract: AppContract<MessagesClient, MessagesResources> = {
   app: 'messages',
   operations,
   resources,

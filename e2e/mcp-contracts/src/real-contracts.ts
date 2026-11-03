@@ -17,7 +17,7 @@ import type {
   AnyOperationDescriptor,
   ClientRuntime,
   OperationId,
-  ResourceDescriptor,
+  ResourceTable,
 } from '@macts/contracts'
 
 /** The repository's `manifests/` directory. */
@@ -34,8 +34,8 @@ export interface RealContract {
   /** The app's route segment, as the contract names it. */
   readonly app: string
   readonly operations: Readonly<Record<OperationId, AnyOperationDescriptor>>
-  /** The resource table, keyed by manifest resource key. */
-  readonly resources: Readonly<Record<string, ResourceDescriptor<unknown>>>
+  /** The resources references can name, keyed by manifest resource key. */
+  readonly resources: ResourceTable
   /** Build the app's client on top of a client runtime. */
   readonly bind: (runtime: ClientRuntime) => unknown
 }

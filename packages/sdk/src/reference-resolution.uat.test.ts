@@ -54,7 +54,9 @@ import {
   TargetNotFoundError,
   UnexpectedValueError,
   ValidationError,
+  type ClientBrand,
   type ReferenceData,
+  type ResourceTable,
   type WireValue,
 } from '@macts/contracts'
 import {
@@ -238,7 +240,11 @@ function libraryResolution(request: ResolutionRequest): Promise<WireValue> {
 
 /** A client under test, with what can be observed about it. */
 interface Harness {
-  readonly client: LibraryClient
+  /**
+   * The client. Its type carries the widest resource table, so the references
+   * these tests bind are checked at runtime, not statically.
+   */
+  readonly client: LibraryClient & ClientBrand<ResourceTable>
   readonly executor: RecordingExecutor
   /** How many requests left the client: HTTP requests for remote, executor calls for local. */
   sent(): number

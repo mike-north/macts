@@ -22,6 +22,7 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type FileSource,
   type FileValue,
@@ -29,7 +30,6 @@ import {
   type ObjectReferenceData,
   type OperationDescriptor,
   type Rgb,
-  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -1559,9 +1559,11 @@ export interface MessageResourceClient {
 
 /**
  * The Mail client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link mailContract}.
+ * client factory creates one from {@link mailContract}. Its type carries the contract's resource
+ * table, {@link MailResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
-export interface MailClient {
+export interface MailClient extends ClientBrand<MailResources> {
   /** A new email message */
   readonly outgoingMessages: OutgoingMessageResourceClient
   /** An email message */
@@ -1611,440 +1613,24 @@ export interface MailClient {
   performMailActionWithMessages(options?: CallOptions): Promise<void>
 }
 
-const richTextRecordType: ValueType<RichText> = t.record(
-  {
-    color: t.nullable(t.rgb(), { description: 'The color of the first character.' }),
-    font: t.nullable(t.string(), { description: 'The name of the font of the first character.' }),
-    size: t.nullable(t.double(), { description: 'The size in points of the first character.' }),
-  },
-  { description: 'Rich (styled) text' }
-)
-
-const attachmentRecordType: ValueType<Attachment> = t.record(
-  {
-    fileName: t.nullable(t.file(), { description: 'The file for the attachment' }),
-  },
-  {
-    description:
-      'Represents an inline text attachment. This class is used mainly for make commands.',
-  }
-)
-
-const paragraphRecordType: ValueType<Paragraph> = t.record(
-  {
-    color: t.nullable(t.rgb(), { description: 'The color of the first character.' }),
-    font: t.nullable(t.string(), { description: 'The name of the font of the first character.' }),
-    size: t.nullable(t.double(), { description: 'The size in points of the first character.' }),
-  },
-  { description: 'This subdivides the text into paragraphs.' }
-)
-
-const wordRecordType: ValueType<Word> = t.record(
-  {
-    color: t.nullable(t.rgb(), { description: 'The color of the first character.' }),
-    font: t.nullable(t.string(), { description: 'The name of the font of the first character.' }),
-    size: t.nullable(t.double(), { description: 'The size in points of the first character.' }),
-  },
-  { description: 'This subdivides the text into words.' }
-)
-
-const characterRecordType: ValueType<Character> = t.record(
-  {
-    color: t.nullable(t.rgb(), { description: 'The color of the character.' }),
-    font: t.nullable(t.string(), { description: 'The name of the font of the character.' }),
-    size: t.nullable(t.double(), { description: 'The size in points of the character.' }),
-  },
-  { description: 'This subdivides the text into characters.' }
-)
-
-const attributeRunRecordType: ValueType<AttributeRun> = t.record(
-  {
-    color: t.nullable(t.rgb(), { description: 'The color of the first character.' }),
-    font: t.nullable(t.string(), { description: 'The name of the font of the first character.' }),
-    size: t.nullable(t.double(), { description: 'The size in points of the first character.' }),
-  },
-  { description: 'This subdivides the text into chunks that all have the same attributes.' }
-)
-
-const outgoingMessageRecordType: ValueType<OutgoingMessage> = t.record(
-  {
-    sender: t.nullable(t.string(), { description: 'The sender of the message' }),
-    subject: t.nullable(t.string(), { description: 'The subject of the message' }),
-    visible: t.nullable(t.boolean(), {
-      description:
-        'Controls whether the message window is shown on the screen. The default is false',
-    }),
-    messageSignature: t.nullable(t.string(), { description: 'The signature of the message' }),
-    id: t.integer({ description: 'The unique identifier of the message' }),
-    htmlContent: t.nullable(t.string(), { description: 'Does nothing at all (deprecated)' }),
-    vcardPath: t.nullable(t.file(), { description: 'Does nothing at all (deprecated)' }),
-  },
-  { description: 'A new email message' }
-)
-
-const messageViewerRecordType: ValueType<MessageViewer> = t.record(
-  {
-    sortColumn: t.nullable(t.string(), {
-      description: 'The column that is currently sorted in the viewer',
-    }),
-    sortedAscending: t.nullable(t.boolean(), {
-      description: 'Whether the viewer is sorted ascending or not',
-    }),
-    mailboxListVisible: t.nullable(t.boolean(), {
-      description: 'Controls whether the list of mailboxes is visible or not',
-    }),
-    previewPaneIsVisible: t.nullable(t.boolean(), {
-      description:
-        'Controls whether the preview pane of the message viewer window is visible or not',
-    }),
-    visibleColumns: t.nullable(t.string(), {
-      description:
-        'List of columns that are visible. The subject column and the message status column will always be visible',
-    }),
-    id: t.integer({ description: 'The unique identifier of the message viewer' }),
-    visibleMessages: t.nullable(t.string(), {
-      description: 'List of messages currently being displayed in the viewer',
-    }),
-    selectedMessages: t.nullable(t.string(), {
-      description: 'List of messages currently selected',
-    }),
-    selectedMailboxes: t.nullable(t.string(), {
-      description: 'List of mailboxes currently selected in the list of mailboxes',
-    }),
-  },
-  { description: 'Represents the object responsible for managing a viewer window' }
-)
-
-const messageRecordType: ValueType<Message> = t.record(
-  {
-    id: t.integer({ description: 'The unique identifier of the message.' }),
-    allHeaders: t.nullable(t.string(), { description: 'All the headers of the message' }),
-    backgroundColor: t.nullable(t.string(), { description: 'The background color of the message' }),
-    dateReceived: t.nullable(t.date(), { description: 'The date a message was received' }),
-    dateSent: t.nullable(t.date(), { description: 'The date a message was sent' }),
-    deletedStatus: t.nullable(t.boolean(), {
-      description: 'Indicates whether the message is deleted or not',
-    }),
-    flaggedStatus: t.nullable(t.boolean(), {
-      description: 'Indicates whether the message is flagged or not',
-    }),
-    flagIndex: t.nullable(t.integer(), {
-      description: 'The flag on the message, or -1 if the message is not flagged',
-    }),
-    junkMailStatus: t.nullable(t.boolean(), {
-      description:
-        'Indicates whether the message has been marked junk or evaluated to be junk by the junk mail filter.',
-    }),
-    readStatus: t.nullable(t.boolean(), {
-      description: 'Indicates whether the message is read or not',
-    }),
-    messageId: t.nullable(t.string(), { description: 'The unique message ID string' }),
-    source: t.nullable(t.string(), { description: 'Raw source of the message' }),
-    replyTo: t.nullable(t.string(), { description: 'The address that replies should be sent to' }),
-    messageSize: t.nullable(t.integer(), { description: 'The size (in bytes) of a message' }),
-    sender: t.nullable(t.string(), { description: 'The sender of the message' }),
-    subject: t.nullable(t.string(), { description: 'The subject of the message' }),
-    wasForwarded: t.nullable(t.boolean(), {
-      description: 'Indicates whether the message was forwarded or not',
-    }),
-    wasRedirected: t.nullable(t.boolean(), {
-      description: 'Indicates whether the message was redirected or not',
-    }),
-    wasRepliedTo: t.nullable(t.boolean(), {
-      description: 'Indicates whether the message was replied to or not',
-    }),
-  },
-  { description: 'An email message' }
-)
-
-const accountRecordType: ValueType<Account> = t.record(
-  {
-    deliveryAccount: t.nullable(t.string(), {
-      description: 'The delivery account used when sending mail from this account',
-    }),
-    name: t.nullable(t.string(), { description: 'The name of an account' }),
-    id: t.string({ description: 'The unique identifier of the account' }),
-    password: t.nullable(t.string(), {
-      description: 'Password for this account. Can be set, but not read via scripting',
-    }),
-    authentication: t.nullable(t.string(), {
-      description: 'Preferred authentication scheme for account',
-    }),
-    accountType: t.nullable(t.string(), { description: 'The type of an account' }),
-    emailAddresses: t.nullable(t.string(), {
-      description: 'The list of email addresses configured for an account',
-    }),
-    fullName: t.nullable(t.string(), {
-      description: 'The users full name configured for an account',
-    }),
-    emptyJunkMessagesFrequency: t.nullable(t.integer(), {
-      description:
-        'Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete)',
-    }),
-    emptySentMessagesFrequency: t.nullable(t.integer(), {
-      description: 'Does nothing at all (deprecated)',
-    }),
-    emptyTrashFrequency: t.nullable(t.integer(), {
-      description:
-        'Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete)',
-    }),
-    emptyJunkMessagesOnQuit: t.nullable(t.boolean(), {
-      description:
-        'Indicates whether the messages in the junk messages mailboxes will be deleted on quit',
-    }),
-    emptySentMessagesOnQuit: t.nullable(t.boolean(), {
-      description: 'Does nothing at all (deprecated)',
-    }),
-    emptyTrashOnQuit: t.nullable(t.boolean(), {
-      description:
-        'Indicates whether the messages in deleted messages mailboxes will be permanently deleted on quit',
-    }),
-    enabled: t.nullable(t.boolean(), {
-      description: 'Indicates whether the account is enabled or not',
-    }),
-    userName: t.nullable(t.string(), {
-      description: 'The user name used to connect to an account',
-    }),
-    accountDirectory: t.nullable(t.file(), {
-      description: 'The directory where the account stores things on disk',
-    }),
-    port: t.nullable(t.integer(), { description: 'The port used to connect to an account' }),
-    serverName: t.nullable(t.string(), {
-      description: 'The host name used to connect to an account',
-    }),
-    includeWhenGettingNewMail: t.nullable(t.boolean(), {
-      description: 'Does nothing at all (deprecated)',
-    }),
-    moveDeletedMessagesToTrash: t.nullable(t.boolean(), {
-      description: 'Indicates whether messages that are deleted will be moved to the trash mailbox',
-    }),
-    usesSsl: t.nullable(t.boolean(), {
-      description: 'Indicates whether SSL is enabled for this receiving account',
-    }),
-  },
-  {
-    description:
-      "A Mail account for receiving messages (POP/IMAP). To create a new receiving account, use the 'pop account', 'imap account', and 'iCloud account' objects",
-  }
-)
-
-const mailboxRecordType: ValueType<Mailbox> = t.record(
-  {
-    name: t.nullable(t.string(), { description: 'The name of a mailbox' }),
-    unreadCount: t.nullable(t.integer(), {
-      description: 'The number of unread messages in the mailbox',
-    }),
-  },
-  { description: 'A mailbox that holds messages' }
-)
-
-const ruleRecordType: ValueType<Rule> = t.record(
-  {
-    colorMessage: t.nullable(t.string(), { description: 'If rule matches, apply this color' }),
-    deleteMessage: t.nullable(t.boolean(), { description: 'If rule matches, delete message' }),
-    forwardText: t.nullable(t.string(), {
-      description:
-        'If rule matches, prepend this text to the forwarded message. Set to empty string to include no prepended text',
-    }),
-    forwardMessage: t.nullable(t.string(), {
-      description:
-        'If rule matches, forward message to this address, or multiple addresses, separated by commas. Set to empty string to disable this action',
-    }),
-    markFlagged: t.nullable(t.boolean(), {
-      description: 'If rule matches, mark message as flagged',
-    }),
-    markFlagIndex: t.nullable(t.integer(), {
-      description:
-        'If rule matches, mark message with the specified flag. Set to -1 to disable this action',
-    }),
-    markRead: t.nullable(t.boolean(), { description: 'If rule matches, mark message as read' }),
-    playSound: t.nullable(t.string(), {
-      description: 'If rule matches, play this sound (specify name of sound or path to sound)',
-    }),
-    redirectMessage: t.nullable(t.string(), {
-      description:
-        'If rule matches, redirect message to this address or multiple addresses, separate by commas. Set to empty string to disable this action',
-    }),
-    replyText: t.nullable(t.string(), {
-      description:
-        'If rule matches, reply to message and prepend with this text. Set to empty string to disable this action',
-    }),
-    runScript: t.nullable(t.string(), {
-      description:
-        'If rule matches, run this compiled AppleScript file. Set to empty string to disable this action',
-    }),
-    allConditionsMustBeMet: t.nullable(t.boolean(), {
-      description: 'Indicates whether all conditions must be met for rule to execute',
-    }),
-    highlightTextUsingColor: t.nullable(t.boolean(), {
-      description:
-        'Indicates whether the color will be used to highlight the text or background of a message in the message list',
-    }),
-    enabled: t.nullable(t.boolean(), { description: 'Indicates whether the rule is enabled' }),
-    name: t.nullable(t.string(), { description: 'Name of rule' }),
-    shouldCopyMessage: t.nullable(t.boolean(), {
-      description: 'Indicates whether the rule has a copy action',
-    }),
-    shouldMoveMessage: t.nullable(t.boolean(), {
-      description: 'Indicates whether the rule has a move action',
-    }),
-    stopEvaluatingRules: t.nullable(t.boolean(), {
-      description: 'If rule matches, stop rule evaluation for this message',
-    }),
-  },
-  { description: 'Class for message rules' }
-)
-
-const ruleConditionRecordType: ValueType<RuleCondition> = t.record(
-  {
-    expression: t.nullable(t.string(), { description: 'Rule expression field' }),
-    header: t.nullable(t.string(), { description: 'Rule header key' }),
-    qualifier: t.nullable(t.string(), { description: 'Rule qualifier' }),
-    ruleType: t.nullable(t.string(), { description: 'Rule type' }),
-  },
-  { description: 'Class for conditions that can be attached to a single rule' }
-)
-
-const recipientRecordType: ValueType<Recipient> = t.record(
-  {
-    address: t.nullable(t.string(), { description: 'The recipients email address' }),
-    name: t.nullable(t.string(), { description: 'The name used for display' }),
-  },
-  { description: 'An email recipient' }
-)
-
-const bccRecipientRecordType: ValueType<BccRecipient> = t.record(
-  {
-    id: t.nullable(t.string(), { description: 'Unique identifier for this recipient' }),
-  },
-  { description: 'An email recipient in the Bcc: field' }
-)
-
-const ccRecipientRecordType: ValueType<CcRecipient> = t.record(
-  {
-    id: t.nullable(t.string(), { description: 'Unique identifier for this recipient' }),
-  },
-  { description: 'An email recipient in the Cc: field' }
-)
-
-const toRecipientRecordType: ValueType<ToRecipient> = t.record(
-  {
-    id: t.nullable(t.string(), { description: 'Unique identifier for this recipient' }),
-  },
-  { description: 'An email recipient in the To: field' }
-)
-
-const headerRecordType: ValueType<Header> = t.record(
-  {
-    content: t.nullable(t.string(), { description: 'Contents of the header' }),
-    name: t.nullable(t.string(), { description: 'Name of the header value' }),
-  },
-  { description: 'A header value for a message. E.g. To, Subject, From.' }
-)
-
-const mailAttachmentRecordType: ValueType<MailAttachment> = t.record(
-  {
-    name: t.nullable(t.string(), { description: 'Name of the attachment' }),
-    mIMEType: t.nullable(t.string(), {
-      description: 'MIME type of the attachment E.g. text/plain.',
-    }),
-    fileSize: t.nullable(t.integer(), { description: 'Approximate size in bytes.' }),
-    downloaded: t.nullable(t.boolean(), {
-      description: 'Indicates whether the attachment has been downloaded.',
-    }),
-    id: t.string({ description: 'The unique identifier of the attachment.' }),
-  },
-  { description: 'A file attached to a received message.' }
-)
+/**
+ * The type of the resource table of {@link mailContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type MailResources = Readonly<Record<never, never>>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link MailResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
-const resources: AppContract<MailClient>['resources'] = {
-  RichText: {
-    name: 'RichText',
-    record: richTextRecordType,
-  },
-  Attachment: {
-    name: 'Attachment',
-    record: attachmentRecordType,
-  },
-  Paragraph: {
-    name: 'Paragraph',
-    record: paragraphRecordType,
-  },
-  Word: {
-    name: 'Word',
-    record: wordRecordType,
-  },
-  Character: {
-    name: 'Character',
-    record: characterRecordType,
-  },
-  AttributeRun: {
-    name: 'AttributeRun',
-    record: attributeRunRecordType,
-  },
-  OutgoingMessage: {
-    name: 'OutgoingMessage',
-    record: outgoingMessageRecordType,
-    id: t.integer({ description: 'The unique identifier of the message' }),
-  },
-  MessageViewer: {
-    name: 'MessageViewer',
-    record: messageViewerRecordType,
-    id: t.integer({ description: 'The unique identifier of the message viewer' }),
-  },
-  Message: {
-    name: 'Message',
-    record: messageRecordType,
-    id: t.integer({ description: 'The unique identifier of the message.' }),
-  },
-  Account: {
-    name: 'Account',
-    record: accountRecordType,
-    id: t.string({ description: 'The unique identifier of the account' }),
-  },
-  Mailbox: {
-    name: 'Mailbox',
-    record: mailboxRecordType,
-  },
-  Rule: {
-    name: 'Rule',
-    record: ruleRecordType,
-  },
-  RuleCondition: {
-    name: 'RuleCondition',
-    record: ruleConditionRecordType,
-  },
-  Recipient: {
-    name: 'Recipient',
-    record: recipientRecordType,
-  },
-  BccRecipient: {
-    name: 'BccRecipient',
-    record: bccRecipientRecordType,
-  },
-  CcRecipient: {
-    name: 'CcRecipient',
-    record: ccRecipientRecordType,
-  },
-  ToRecipient: {
-    name: 'ToRecipient',
-    record: toRecipientRecordType,
-  },
-  Header: {
-    name: 'Header',
-    record: headerRecordType,
-  },
-  MailAttachment: {
-    name: 'MailAttachment',
-    record: mailAttachmentRecordType,
-    id: t.string({ description: 'The unique identifier of the attachment.' }),
-  },
-}
+const resources = {} satisfies MailResources
 
 const appDeleteOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'mail.app.delete',
@@ -2551,7 +2137,7 @@ function bind(runtime: ClientRuntime): MailClient {
  * The Mail contract. Pass it to a client factory to obtain a
  * {@link MailClient}.
  */
-export const mailContract: AppContract<MailClient> = {
+export const mailContract: AppContract<MailClient, MailResources> = {
   app: 'mail',
   operations,
   resources,
