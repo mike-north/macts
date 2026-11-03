@@ -1400,8 +1400,8 @@ without a second constructor.
 `get` for a single object, a container, and an identity-collection entry (a
 bound entry is itself a resolvable single reference), and `list` for a
 collection. There is no exception. The contract's `resources` table already
-records both operations, so a reference value type reads them from its scope,
-and no further field is needed. A generated table lists only the resources
+records both operations, so a reference value type reads them from its scope.
+A parent-scoped resource also records its parent (below). A generated table lists only the resources
 that record `get` or `list`: no reference to any other resource is valid at
 any position or in any form, so a reference naming one is rejected as naming
 no resource the app can resolve references through.
@@ -1421,6 +1421,40 @@ path, and a container or an entry fails at its `resource`, for example
 at every depth. The raw `input.wire` check names no such path: a reference that
 matches none of the wire forms is one issue at the reference itself. An empty
 identity collection has no entry to resolve, so it is admitted.
+
+**Parent-scoped targets.** Some resources are found only within an object of
+another resource: their resolving `get` records a parent (D10, command
+parents) and takes that parent's identifier. Music tracks are got within a
+playlist; Contacts addresses, emails and phones within a person; Calendar
+events within a calendar. A reference to such a resource can be resolved only
+when it carries the parent's identifier, so wherever it resolves through its
+resource's `get` or `list`, its `container` is required and must be an
+identity reference to the parent. That covers a position's own reference in
+either form, a container, an identity-collection entry, and a selector
+collection. A missing container, one naming another resource, and a selector
+container (which supplies no identifier) are encode and decode issues at
+`[...path, 'container']`, and the wire and SDK schemas reject them, so the
+derived JSON Schema of such a position lists `container` as required and
+admits only the parent's identity form there. The container is read by the
+same rules, so a chain of parents is checked level by level. A resource found
+at the application keeps an optional container of any resolvable resource.
+The parent-scoped rule narrows what bound and data reference types admit, so
+`bindReference` and every typed input position reject the same references at
+compile time.
+
+The resource table records the fact once, as `ResourceDescriptor.parent`: the
+key of the parent resource, present exactly when the resource's recorded `get`
+records a parent, and taken from that command's `parent.resource` when the
+contract is generated, as `get` and `list` are chosen. A resource whose `get`
+records no parent is not parent-scoped, even when its `list` records one: a
+single reference to it resolves through a `get` at the application. Encoding, decoding, the wire and SDK
+schemas, the reference data types and resolution all read this field; none
+re-derives it from the manifest. A parent that references cannot name by its
+identifier and resolve through a `get` fails generation, naming the resource
+and its parent, because no reference to the resource could then be resolved.
+A guard over the shipped contracts
+(`e2e/mcp-contracts/test/parent-scoped-resources.integration.test.ts`) holds
+every table's `parent` to the manifest command behind its `get`.
 
 Generated surfaces never publish an operation an agent cannot call. Some input
 positions admit no value at all: those that take a single reference to a
@@ -1521,7 +1555,15 @@ Every other reference keeps the codec's unsupported marker and fails as
 
 Selectors and collections address the app through mechanisms other than an
 identifier lookup, and container chains need the parent's own addressing, so
-each is a separate extension of this scope.
+each is a separate extension of this scope. In particular, the contract now
+requires the parent's container on every reference to a parent-scoped target
+(resolvable targets, above), but the macOS provider does not yet convert a
+container: such a reference passes encoding and the runtime's checks and then
+fails as `InternalError` at an operation position, and output positions to
+parent-scoped targets are still left out of generation
+([#219](https://github.com/mike-north/macts/issues/219),
+[#242](https://github.com/mike-north/macts/issues/242)). Native container
+conversion is still to come.
 
 **Binding.** References are live objects bound to the client that decoded
 them, via `DecodeContext.bindReference`. The binder receives decoded
@@ -1614,6 +1656,18 @@ bypass policy:
    result is validated as an array of the `list` operation's item type, never
    as its page (`referenceResultType` in `@macts/contracts` states what a
    reference resolves to, and the runtime uses it).
+
+**Parent-scoped resolution.** A reference to a parent-scoped target resolves
+as its resource's `get` (or `list`) within the parent its container names:
+the container's `id` is the value of the command's `parent.parameter`, the
+same input a direct `get` call takes for the parent scope, and the
+reference's own `id` is the child identifier (D10, command parents). Step 6
+rejects a reference without that container, or with one naming another
+resource, before the executor runs, so a provider always receives it. The
+runtime hands the validated reference to the executor's `resolve` unchanged
+(D9); mapping the container to the parent input is the provider's, which
+reads the parent from the request's manifest. Container traversal still
+needs no container permission (step 4).
 
 Unpaged collection resolution can still be slow on a very large selection:
 it reads the whole selection in one executor call, under the same time limit
@@ -1824,7 +1878,9 @@ execute(request), resolve(request) }`.
   cardinality `'one'`; for `'many'`, an array of the item plan of its `list`
   output, because resolution is never paged), the required `resourcePlans`,
   and an optional `signal`. Like `ExecutionRequest`, it carries no authority. Container chains
-  are evaluated natively and contribute no data to the result. It follows the
+  are evaluated natively and contribute no data to the result. A reference to a parent-scoped
+  target always carries its parent's identity container (D7, parent-scoped targets), whose `id`
+  the provider passes as the `get`'s `parent.parameter`. It follows the
   D7 error rules: `TargetNotFoundError` for a missing identity or name match,
   `InvalidSelectionError` for an index or range past the end,
   `TargetNotFoundError` with `entryIndex` for a missing identity-collection
