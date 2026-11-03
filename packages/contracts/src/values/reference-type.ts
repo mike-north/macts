@@ -709,8 +709,8 @@ function convertCollection<Id, Pos, Tag>(
  */
 function withinClause(resource: string, parent: ParentScope): string {
   return parent.operation === 'get'
-    ? `finds a ${quote(resource)} only within its ${quote(parent.resource)}`
-    : `lists ${quote(resource)} objects only within a ${quote(parent.resource)}`
+    ? `finds each ${quote(resource)} only within its ${quote(parent.resource)}`
+    : `lists ${quote(resource)} objects only within their ${quote(parent.resource)}`
 }
 
 /**
@@ -759,7 +759,7 @@ function readContainer<Id, Pos, Tag>(
         at,
         'invalid-type',
         `The app ${withinClause(resource, parent)}, by that ${quote(parent.resource)}'s ` +
-          'identifier, so the container must be an identity reference to a ' +
+          'identifier, so the container must be an identity reference to the resource ' +
           `${quote(parent.resource)}; received ${received}.`
       )
     )

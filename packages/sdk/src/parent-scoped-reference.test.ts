@@ -170,7 +170,7 @@ describe('bindReference with a collection the app lists only within a parent', (
         message:
           'The required field "container" is missing; expected an identity reference to the ' +
           '"List" whose "Reminder" objects are selected, because the app lists "Reminder" ' +
-          'objects only within a "List".',
+          'objects only within their "List".',
       },
     ])
     expect(sent).toEqual([])
@@ -185,7 +185,7 @@ describe('bindReference with a collection the app lists only within a parent', (
         message:
           'The required field "container" is missing; expected an identity reference to the ' +
           '"Window" whose "Tab" objects are selected, because the app lists "Tab" objects only ' +
-          'within a "Window".',
+          'within their "Window".',
       },
     ])
   })

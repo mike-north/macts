@@ -109,12 +109,12 @@ function failures(
 
 const MISSING_PLAYLIST =
   'The required field "container" is missing; expected an identity reference to the ' +
-  '"Playlist" the "Track" is in, because the app finds a "Track" only within its "Playlist".'
+  '"Playlist" the "Track" is in, because the app finds each "Track" only within its "Playlist".'
 
 function wrongContainer(received: string): string {
   return (
-    'The app finds a "Track" only within its "Playlist", by that "Playlist"\'s identifier, so ' +
-    `the container must be an identity reference to a "Playlist"; received ${received}.`
+    'The app finds each "Track" only within its "Playlist", by that "Playlist"\'s identifier, so ' +
+    `the container must be an identity reference to the resource "Playlist"; received ${received}.`
   )
 }
 
@@ -200,7 +200,7 @@ describe('encoding a reference to a parent-scoped resource', () => {
         message:
           'The required field "container" is missing; expected an identity reference to the ' +
           '"Playlist" whose "Track" objects are selected, because the app lists "Track" objects ' +
-          'only within a "Playlist".',
+          'only within their "Playlist".',
       },
     ])
     expect(tracks.encode({ ...every, container: identity('Playlist', 'P1') }).ok).toBe(true)
@@ -213,7 +213,7 @@ describe('encoding a reference to a parent-scoped resource', () => {
         code: 'missing-field',
         message:
           'The required field "container" is missing; expected an identity reference to the ' +
-          '"Library" the "Shelf" is in, because the app finds a "Shelf" only within its "Library".',
+          '"Library" the "Shelf" is in, because the app finds each "Shelf" only within its "Library".',
       },
     ])
     const chain = identity('Book', 'B1', identity('Shelf', 'S1', identity('Library', 'L1')))
@@ -249,7 +249,7 @@ describe('decoding a reference to a parent-scoped resource', () => {
 const MISSING_LIST =
   'The required field "container" is missing; expected an identity reference to the ' +
   '"List" whose "Reminder" objects are selected, because the app lists "Reminder" objects ' +
-  'only within a "List".'
+  'only within their "List".'
 
 describe('a reference to a resource listed, but not got, within a parent', () => {
   const every = {
@@ -276,8 +276,9 @@ describe('a reference to a resource listed, but not got, within a parent', () =>
         path: ['container'],
         code: 'invalid-type',
         message:
-          'The app lists "Reminder" objects only within a "List", by that "List"\'s ' +
-          'identifier, so the container must be an identity reference to a "List"; received a ' +
+          'The app lists "Reminder" objects only within their "List", by that "List"\'s ' +
+          'identifier, so the container must be an identity reference to the resource "List"; ' +
+          'received a ' +
           'reference to "Person".',
       },
     ])
@@ -360,8 +361,9 @@ describe('a resource whose get and list parents differ', () => {
         path: ['container'],
         code: 'invalid-type',
         message:
-          'The app finds a "Message" only within its "Mailbox", by that "Mailbox"\'s ' +
-          'identifier, so the container must be an identity reference to a "Mailbox"; ' +
+          'The app finds each "Message" only within its "Mailbox", by that "Mailbox"\'s ' +
+          'identifier, so the container must be an identity reference to the resource ' +
+          '"Mailbox"; ' +
           'received a reference to "Account".',
       },
     ])
@@ -392,8 +394,9 @@ describe('a resource whose get and list parents differ', () => {
         ({ message: text }) => text
       )
     ).toEqual([
-      'The app lists "Message" objects only within a "Account", by that "Account"\'s ' +
-        'identifier, so the container must be an identity reference to a "Account"; received a ' +
+      'The app lists "Message" objects only within their "Account", by that "Account"\'s ' +
+        'identifier, so the container must be an identity reference to the resource "Account"; ' +
+        'received a ' +
         'reference to "Mailbox".',
     ])
   })

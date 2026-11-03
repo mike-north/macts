@@ -572,16 +572,13 @@ class ContractBuilder {
         if (found?.routes.get !== undefined && identified) continue
         const [within, unresolved] =
           route === 'get'
-            ? [
-                `gets a ${resourceKey} only within its ${parent}`,
-                `no reference to a ${resourceKey}`,
-              ]
+            ? [`gets each ${resourceKey} only within its ${parent}`, `no ${resourceKey} reference`]
             : [
-                `lists ${resourceKey} objects only within a ${parent}`,
+                `lists ${resourceKey} objects only within their ${parent}`,
                 `no collection of ${resourceKey} objects`,
               ]
         this.errors.push(
-          `${this.#names.app}: resources.${resourceKey}: the app ${within}, but references cannot name a ${parent} by its identifier and resolve it through a get, so ${unresolved} could be resolved (phases/13 D7, resolvable targets).`
+          `${this.#names.app}: resources.${resourceKey}: the app ${within}, but references cannot name the ${parent} by its identifier and resolve it through a get, so ${unresolved} could be resolved (phases/13 D7, resolvable targets).`
         )
       }
     }
