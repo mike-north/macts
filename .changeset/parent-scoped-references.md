@@ -3,15 +3,42 @@
 '@macts/core': minor
 '@macts/runtime': minor
 '@macts/sdk': minor
+'@macts/automator': minor
 '@macts/calendar': minor
 '@macts/contacts': minor
+'@macts/microsoft-edge': minor
 '@macts/music': minor
+'@macts/omnigraffle': minor
+'@macts/reminders': minor
+'@macts/xcode': minor
 ---
 
-A reference to a resource the app finds only within another resource now has to name that parent. Music tracks are found within a playlist; Contacts addresses, emails and phones within a person; Calendar events within a calendar. The generated resource table records this as `parent: '<ParentKey>'` on the resource, and `ResourceDescriptor.parent` in `@macts/contracts` describes it.
+Some reference inputs now require a container. When the operation that resolves a reference finds objects only within an object of another resource, the reference has to name that parent as its container.
 
-Wherever such a reference is resolved, its `container` must be an identity reference to the parent: as a position's own reference in either form, as a container, as an identity-collection entry, and as a selector collection. Encoding, decoding, `bindReference`, the runtime's reference check and the published input JSON Schemas reject a reference with no container, a container naming another resource, or a selector container, each with a `ValidationError` at `container` that names the parent. The reference data types reject the same references at compile time. A chain of parents is checked level by level. References to resources found at the application are unchanged.
+- Music gets and lists tracks within a playlist.
+- Contacts gets and lists addresses, emails and phones within a person.
+- Calendar gets and lists events within a calendar.
+- Some apps list resources only within a parent, though each gets a single one without a parent:
+  - Reminders lists reminders within a list.
+  - Microsoft Edge lists tabs within a window, and bookmark items within a bookmark folder.
+  - OmniGraffle lists graphics, shapes, lines and layers within a canvas.
+  - Xcode lists projects, schemes and run destinations within a workspace document.
+  - Automator lists actions and variables within a workflow, and an action's settings and required resources within that action.
 
-Behavior change: code that built a reference to a track, address, email, phone or event without its parent container now fails to compile and is rejected at runtime. Add the parent's identity reference as `container`. Contacts' input JSON Schemas grow, because each container branch for an address, email or phone now spells out the person container it requires.
+The generated resource table records this for each resolving operation, as `parents: { get?, list? }` on the resource. `ResourceDescriptor.parents` (of type `ResourceParents`) in `@macts/contracts` describes it. A reference takes the parent of the operation that resolves it:
 
-The macOS provider still does not convert a reference with a container, so passing one to an operation still fails with `InternalError`, and operations still return no references to these resources.
+- A single-object reference, a container and an identity-collection entry take the `get` parent.
+- A selector collection (every or range) takes the `list` parent.
+
+Where a parent applies, the reference's `container` must be an identity reference to it. The following reject a reference with no container, with a container naming another resource, or with a selector container:
+
+- encoding and decoding;
+- `bindReference`;
+- the runtime's reference check;
+- the published input JSON Schemas.
+
+Encoding and `bindReference` raise a `ValidationError` at `container` that names the parent. The reference data types reject the same references at compile time. A chain of parents is checked level by level. References resolved through an operation that works at the application are unchanged.
+
+Behavior change: code that built such a reference without its container now fails to compile and is rejected at runtime. That covers references to a track, address, email, phone or event, and collections of reminders, tabs, graphics and the other listed resources. Add the parent's identity reference as `container`. Contacts' input JSON Schemas grow, because each container branch for an address, email or phone now spells out the person container it requires.
+
+The macOS provider still does not convert a reference with a container. Passing one to an operation still fails with `InternalError`, and operations still return no references to these resources.
