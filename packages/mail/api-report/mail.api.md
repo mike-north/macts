@@ -293,8 +293,6 @@ export type MailAttachmentUpdateInput = Partial<MailAttachmentCreateInput>;
 
 // @public
 export interface Mailbox {
-    account: Account;
-    container: Mailbox;
     name: string;
     unreadCount: number;
 }
@@ -308,8 +306,6 @@ export interface MailboxCreateInput {
 export const MailboxSchema: z.ZodObject<{
     name: z.ZodString;
     unreadCount: z.ZodNumber;
-    account: z.ZodString;
-    container: z.ZodString;
 }, z.core.$strip>;
 
 // @public
@@ -350,7 +346,6 @@ export class MailError extends Error {
 export interface Message {
     allHeaders: string;
     backgroundColor: string;
-    content: unknown;
     dateReceived: Date;
     dateSent: Date;
     deletedStatus: boolean;
@@ -358,7 +353,6 @@ export interface Message {
     flagIndex: number;
     id: number;
     junkMailStatus: boolean;
-    mailbox: Mailbox;
     messageId: string;
     messageSize: number;
     readStatus: boolean;
@@ -398,8 +392,6 @@ export const MessageSchema: z.ZodObject<{
     id: z.ZodNumber;
     allHeaders: z.ZodString;
     backgroundColor: z.ZodString;
-    mailbox: z.ZodString;
-    content: z.ZodString;
     dateReceived: z.ZodString;
     dateSent: z.ZodString;
     deletedStatus: z.ZodBoolean;
@@ -423,19 +415,13 @@ export type MessageUpdateInput = Partial<MessageCreateInput>;
 
 // @public
 export interface MessageViewer {
-    draftsMailbox: Mailbox;
     id: number;
-    inbox: Mailbox;
-    junkMailbox: Mailbox;
     mailboxListVisible: boolean;
-    outbox: Mailbox;
     previewPaneIsVisible: boolean;
     selectedMailboxes: string;
     selectedMessages: string;
-    sentMailbox: Mailbox;
     sortColumn: string;
     sortedAscending: boolean;
-    trashMailbox: Mailbox;
     visibleColumns: string;
     visibleMessages: string;
 }
@@ -454,12 +440,6 @@ export interface MessageViewerCreateInput {
 
 // @public (undocumented)
 export const MessageViewerSchema: z.ZodObject<{
-    draftsMailbox: z.ZodString;
-    inbox: z.ZodString;
-    junkMailbox: z.ZodString;
-    outbox: z.ZodString;
-    sentMailbox: z.ZodString;
-    trashMailbox: z.ZodString;
     sortColumn: z.ZodString;
     sortedAscending: z.ZodBoolean;
     mailboxListVisible: z.ZodBoolean;
@@ -615,7 +595,6 @@ export type RichTextUpdateInput = Partial<RichTextCreateInput>;
 export interface Rule {
     allConditionsMustBeMet: boolean;
     colorMessage: string;
-    copyMessage: Mailbox;
     deleteMessage: boolean;
     enabled: boolean;
     forwardMessage: string;
@@ -624,7 +603,6 @@ export interface Rule {
     markFlagged: boolean;
     markFlagIndex: number;
     markRead: boolean;
-    moveMessage: Mailbox;
     name: string;
     playSound: string;
     redirectMessage: string;
@@ -701,8 +679,6 @@ export const RuleSchema: z.ZodObject<{
     replyText: z.ZodString;
     runScript: z.ZodString;
     allConditionsMustBeMet: z.ZodBoolean;
-    copyMessage: z.ZodString;
-    moveMessage: z.ZodString;
     highlightTextUsingColor: z.ZodBoolean;
     enabled: z.ZodBoolean;
     name: z.ZodString;

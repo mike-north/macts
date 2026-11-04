@@ -30,8 +30,6 @@ export class ListRunDestinationsCommand extends Command {
           name: item.name,
           architecture: item.architecture,
           platform: item.platform,
-          device: item.device,
-          companionDevice: item.companionDevice,
         }))
       )
 

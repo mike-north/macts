@@ -525,31 +525,32 @@ describe('resources', () => {
   })
 
   it('reject references to a resource the contract cannot resolve them through', () => {
-    const folder = resourceRecord('Folder')
-    // `color` is required and nullable: it must be present, and null is data (A4).
-    const base = { folderId: Integer.validate(7), title: 'Inbox', notes: [], color: null }
+    // The Folder record leaves `owner` out, since it would hold such a
+    // reference (#219); a reference position to a tag still rejects one.
+    expect(recordFields(resourceRecord('Folder').plan)).not.toContain('owner')
+    const tag = t.reference(() => contract, 'Tag', 'one')
     const byIdentity = {
-      ...base,
-      owner: { app: 'jotter', resource: 'Tag', form: 'identity', cardinality: 'one', id: 'x' },
+      app: 'jotter',
+      resource: 'Tag',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'x',
     }
     const byName = {
-      ...base,
-      owner: {
-        app: 'jotter',
-        resource: 'Tag',
-        form: 'selector',
-        cardinality: 'one',
-        selector: { by: 'name', name: 'x' },
-      },
+      app: 'jotter',
+      resource: 'Tag',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'name', name: 'x' },
     }
     const issues = (value: unknown) => {
-      const result = folder.encode(value)
+      const result = tag.encode(value)
       return result.ok ? [] : result.issues.map(({ path, code }) => ({ path, code }))
     }
     // Tag has no identifier, so it has no identity form; and it has no get
     // operation, so even a selector to one could never be resolved.
-    expect(issues(byIdentity)).toEqual([{ path: ['owner'], code: 'unsupported' }])
-    expect(issues(byName)).toEqual([{ path: ['owner'], code: 'unsupported' }])
+    expect(issues(byIdentity)).toEqual([{ path: [], code: 'unsupported' }])
+    expect(issues(byName)).toEqual([{ path: [], code: 'unsupported' }])
     // A collection of tags can be listed, so a selector collection encodes.
     const tags = t.reference(() => contract, 'Tag', 'many')
     expect(
@@ -564,41 +565,66 @@ describe('resources', () => {
   })
 
   it('reject every reference to a resource with neither a get nor a list operation, which the table leaves out', () => {
-    const folder = resourceRecord('Folder')
-    const base = { folderId: Integer.validate(7), title: 'Inbox', notes: [], color: null }
-    const stickers = [
-      { form: 'selector', cardinality: 'one', selector: { by: 'name', name: 'x' } },
-      { form: 'selector', cardinality: 'one', selector: { by: 'index', index: 0 } },
-    ].map((form) => ({ ...base, sticker: { app: 'jotter', resource: 'Sticker', ...form } }))
-    for (const value of stickers) {
-      const result = folder.encode(value)
-      expect(result.ok).toBe(false)
-      if (!result.ok) {
-        expect(result.issues.map(({ path, code }) => ({ path, code }))).toEqual([
-          { path: ['sticker'], code: 'unsupported' },
-        ])
+    // A reference value type built against the contract rejects a sticker in
+    // any form and cardinality, encoding and decoding, since none could be
+    // resolved.
+    for (const [cardinality, sticker] of [
+      ['one', t.reference(() => contract, 'Sticker', 'one')],
+      ['many', t.reference(() => contract, 'Sticker', 'many')],
+    ] as const) {
+      for (const selector of [
+        { by: 'name', name: 'x' },
+        { by: 'index', index: 0 },
+        { by: 'every' },
+      ]) {
+        const wire = { resource: 'Sticker', form: 'selector', cardinality, selector }
+        const encoded = sticker.encode({ app: 'jotter', ...wire })
+        expect(encoded.ok).toBe(false)
+        if (!encoded.ok)
+          expect(encoded.issues.map(({ path, code }) => ({ path, code }))).toEqual([
+            { path: [], code: 'unsupported' },
+          ])
+        const decoded = sticker.decode({ reference: wire }, TEST_CONTEXT)
+        expect(decoded.ok).toBe(false)
+        if (!decoded.ok)
+          expect(decoded.issues.map(({ path, code }) => ({ path, code }))).toEqual([
+            { path: [], code: 'unsupported' },
+          ])
       }
     }
-    // Without the field, or with null, the folder encodes.
+  })
+
+  it('leave out of the output record a field that references such a resource (#219)', () => {
+    // Folder.sticker names a Sticker, which nothing can resolve, so the folder
+    // record does not declare it, in either direction.
+    const folder = resourceRecord('Folder')
+    const base = { folderId: Integer.validate(7), title: 'Inbox', notes: [], color: null }
     expect(folder.encode(base).ok).toBe(true)
-    expect(folder.encode({ ...base, sticker: null }).ok).toBe(true)
-    // Nor does a sticker reference decode from the wire.
+    const sticker = {
+      app: 'jotter',
+      resource: 'Sticker',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'name', name: 'x' },
+    }
+    for (const value of [sticker, null]) {
+      const result = folder.encode({ ...base, sticker: value })
+      expect(result.ok).toBe(false)
+      if (!result.ok)
+        expect(result.issues.map(({ path, code }) => ({ path, code }))).toEqual([
+          { path: ['sticker'], code: 'unknown-field' },
+        ])
+    }
+    const { app: _app, ...wire } = sticker
     const decoded = folder.decode(
-      {
-        folderId: { integer: '7' },
-        title: 'Inbox',
-        notes: [],
-        color: null,
-        sticker: {
-          resource: 'Sticker',
-          form: 'selector',
-          cardinality: 'one',
-          selector: { by: 'name', name: 'x' },
-        },
-      },
+      { folderId: { integer: '7' }, title: 'Inbox', notes: [], color: null, sticker: wire },
       TEST_CONTEXT
     )
     expect(decoded.ok).toBe(false)
+    if (!decoded.ok)
+      expect(decoded.issues.map(({ path, code }) => ({ path, code }))).toEqual([
+        { path: ['sticker'], code: 'unknown-field' },
+      ])
   })
 
   it('admit as containers only resources the contract can get', () => {

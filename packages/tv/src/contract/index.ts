@@ -27,7 +27,6 @@ import {
   type FileSource,
   type FileValue,
   type Integer,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
 } from '@macts/contracts'
 
@@ -102,11 +101,6 @@ export interface BrowserWindow {
    * Nullable. No evidence that the app always sets it.
    */
   readonly selection: string | null
-  /**
-   * the playlist currently displayed in the window.
-   * Nullable. No evidence that the app always sets it.
-   */
-  view: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null
 }
 
 /** a track representing a video file */
@@ -155,11 +149,6 @@ export interface Playlist {
    */
   name: string | null
   /**
-   * folder which contains this playlist (if any).
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly parent: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null
-  /**
    * the total size of all tracks (in bytes).
    * Nullable. No evidence that the app always sets it.
    */
@@ -193,11 +182,6 @@ export interface PlaylistWindow {
    * Nullable. No evidence that the app always sets it.
    */
   readonly selection: string | null
-  /**
-   * the playlist displayed in the window.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly view: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null
 }
 
 /** a track residing in a shared library */

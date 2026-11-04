@@ -501,7 +501,6 @@ export type SessionUpdateInput = Partial<SessionCreateInput>;
 
 // @public
 export interface Tab {
-    currentSession: Session;
     index: number;
     title: string;
 }
@@ -514,7 +513,6 @@ export interface TabCreateInput {
 
 // @public (undocumented)
 export const TabSchema: z.ZodObject<{
-    currentSession: z.ZodString;
     index: z.ZodNumber;
     title: z.ZodString;
 }, z.core.$strip>;
@@ -532,8 +530,6 @@ export interface Window {
         height: number;
     };
     closeable: boolean;
-    currentSession: Session;
-    currentTab: Tab;
     frame: {
         x: number;
         y: number;
@@ -621,8 +617,6 @@ export const WindowSchema: z.ZodObject<{
     zoomable: z.ZodBoolean;
     zoomed: z.ZodBoolean;
     frontmost: z.ZodBoolean;
-    currentTab: z.ZodString;
-    currentSession: z.ZodString;
     isHotkeyWindow: z.ZodBoolean;
     hotkeyWindowProfile: z.ZodString;
     position: z.ZodObject<{

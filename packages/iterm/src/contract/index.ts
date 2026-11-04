@@ -26,7 +26,6 @@ import {
   type ClientRuntime,
   type FileSource,
   type Integer,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
   type Point,
   type Rectangle,
@@ -106,16 +105,6 @@ export interface Window {
    */
   frontmost: boolean | null
   /**
-   * The currently selected tab.
-   * Nullable. No evidence that the app always sets it.
-   */
-  currentTab: ObjectReferenceVariant<Tab, never, 'Tab'> | null
-  /**
-   * The current session in a window.
-   * Nullable. No evidence that the app always sets it.
-   */
-  currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null
-  /**
    * Whether the window is a hotkey window.
    * Nullable. No evidence that the app always sets it.
    */
@@ -149,11 +138,6 @@ export interface Window {
 
 /** A terminal tab */
 export interface Tab {
-  /**
-   * The current session in a tab.
-   * Nullable. No evidence that the app always sets it.
-   */
-  currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null
   /**
    * Index of tab in parent tab view control.
    * Nullable. No evidence that the app always sets it.

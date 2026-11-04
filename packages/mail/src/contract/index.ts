@@ -28,7 +28,6 @@ import {
   type FileValue,
   type Integer,
   type ObjectReferenceData,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
   type Rgb,
 } from '@macts/contracts'
@@ -278,36 +277,6 @@ export interface OutgoingMessage {
 /** Represents the object responsible for managing a viewer window */
 export interface MessageViewer {
   /**
-   * The top level Drafts mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly draftsMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
-   * The top level In mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly inbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
-   * The top level Junk mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly junkMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
-   * The top level Out mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly outbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
-   * The top level Sent mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly sentMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
-   * The top level Trash mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly trashMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
    * The column that is currently sorted in the viewer.
    * Nullable. No evidence that the app always sets it.
    */
@@ -372,16 +341,6 @@ export interface Message {
    * Nullable. No evidence that the app always sets it.
    */
   backgroundColor: string | null
-  /**
-   * The mailbox in which this message is filed.
-   * Nullable. No evidence that the app always sets it.
-   */
-  mailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
-   * Contents of an email message.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly content: ObjectReferenceVariant<RichText, never, 'RichText'> | null
   /**
    * The date a message was received.
    * Nullable. No evidence that the app always sets it.
@@ -596,16 +555,6 @@ export interface Mailbox {
    * Nullable. No evidence that the app always sets it.
    */
   readonly unreadCount: Integer | null
-  /**
-   * The account property.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly account: ObjectReferenceVariant<Account, string, 'Account'> | null
-  /**
-   * The container property.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly container: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
 }
 
 /** Class for message rules */
@@ -675,16 +624,6 @@ export interface Rule {
    * Nullable. No evidence that the app always sets it.
    */
   allConditionsMustBeMet: boolean | null
-  /**
-   * If rule matches, copy to this mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  copyMessage: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
-  /**
-   * If rule matches, move to this mailbox.
-   * Nullable. No evidence that the app always sets it.
-   */
-  moveMessage: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * Indicates whether the color will be used to highlight the text or background of a message in
    * the message list.

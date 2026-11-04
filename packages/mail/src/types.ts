@@ -271,18 +271,6 @@ export type OutgoingMessageUpdateInput = Partial<OutgoingMessageCreateInput>
 
 /** Represents the object responsible for managing a viewer window */
 export interface MessageViewer {
-  /** The top level Drafts mailbox */
-  draftsMailbox: Mailbox
-  /** The top level In mailbox */
-  inbox: Mailbox
-  /** The top level Junk mailbox */
-  junkMailbox: Mailbox
-  /** The top level Out mailbox */
-  outbox: Mailbox
-  /** The top level Sent mailbox */
-  sentMailbox: Mailbox
-  /** The top level Trash mailbox */
-  trashMailbox: Mailbox
   /** The column that is currently sorted in the viewer */
   sortColumn: string
   /** Whether the viewer is sorted ascending or not */
@@ -334,10 +322,6 @@ export interface Message {
   allHeaders: string
   /** The background color of the message */
   backgroundColor: string
-  /** The mailbox in which this message is filed */
-  mailbox: Mailbox
-  /** Contents of an email message */
-  content: unknown
   /** The date a message was received */
   dateReceived: Date
   /** The date a message was sent */
@@ -490,10 +474,6 @@ export interface Mailbox {
   name: string
   /** The number of unread messages in the mailbox */
   unreadCount: number
-  /** The account property */
-  account: Account
-  /** The container property */
-  container: Mailbox
 }
 
 /** Input for creating a Mailbox */
@@ -531,10 +511,6 @@ export interface Rule {
   runScript: string
   /** Indicates whether all conditions must be met for rule to execute */
   allConditionsMustBeMet: boolean
-  /** If rule matches, copy to this mailbox */
-  copyMessage: Mailbox
-  /** If rule matches, move to this mailbox */
-  moveMessage: Mailbox
   /** Indicates whether the color will be used to highlight the text or background of a message in the message list */
   highlightTextUsingColor: boolean
   /** Indicates whether the rule is enabled */
@@ -760,12 +736,6 @@ export const OutgoingMessageSchema = z.object({
 })
 
 export const MessageViewerSchema = z.object({
-  draftsMailbox: z.string(),
-  inbox: z.string(),
-  junkMailbox: z.string(),
-  outbox: z.string(),
-  sentMailbox: z.string(),
-  trashMailbox: z.string(),
   sortColumn: z.string(),
   sortedAscending: z.boolean(),
   mailboxListVisible: z.boolean(),
@@ -781,8 +751,6 @@ export const MessageSchema = z.object({
   id: z.number(),
   allHeaders: z.string(),
   backgroundColor: z.string(),
-  mailbox: z.string(),
-  content: z.string(),
   dateReceived: z.string(),
   dateSent: z.string(),
   deletedStatus: z.boolean(),
@@ -829,8 +797,6 @@ export const AccountSchema = z.object({
 export const MailboxSchema = z.object({
   name: z.string(),
   unreadCount: z.number(),
-  account: z.string(),
-  container: z.string(),
 })
 
 export const RuleSchema = z.object({
@@ -846,8 +812,6 @@ export const RuleSchema = z.object({
   replyText: z.string(),
   runScript: z.string(),
   allConditionsMustBeMet: z.boolean(),
-  copyMessage: z.string(),
-  moveMessage: z.string(),
   highlightTextUsingColor: z.boolean(),
   enabled: z.boolean(),
   name: z.string(),

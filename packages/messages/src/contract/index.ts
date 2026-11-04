@@ -24,7 +24,6 @@ import {
   type CallOptions,
   type ClientBrand,
   type ClientRuntime,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
 } from '@macts/contracts'
 
@@ -56,11 +55,6 @@ export interface Participant {
    * Never null: the primary identifier.
    */
   readonly id: string
-  /**
-   * The account for this participant.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly account: ObjectReferenceVariant<Account, string, 'Account'> | null
   /**
    * The participant's name as it appears in the participant list.
    * Nullable. No evidence that the app always sets it.
@@ -129,11 +123,6 @@ export interface Chat {
    * Nullable. No evidence that the app always sets it.
    */
   readonly name: string | null
-  /**
-   * The account which is participating in this chat.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly account: ObjectReferenceVariant<Account, string, 'Account'> | null
 }
 
 /** Input for creating a Participant. */
