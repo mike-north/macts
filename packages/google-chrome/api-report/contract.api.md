@@ -94,6 +94,10 @@ export type GoogleChromeResources = Readonly<{
         readonly id: ValueType<string>;
         readonly get: 'google-chrome.tabs.get';
         readonly list: 'google-chrome.tabs.list';
+        readonly parents: {
+            readonly get: 'Window';
+            readonly list: 'Window';
+        };
     };
 }>;
 

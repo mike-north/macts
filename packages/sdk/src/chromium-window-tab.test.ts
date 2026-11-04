@@ -117,6 +117,9 @@ describe('the generated Google Chrome contract', () => {
   })
 
   it('records Window as the parent of both tab reads, carried by windowId', async () => {
+    const { Window, Tab } = googleChromeContract.resources
+    expect(Tab.parents).toEqual({ get: 'Window', list: 'Window' })
+    expect('parents' in Window).toBe(false)
     const manifest = await manifestOf(googleChromeContract)
     const parent = { resource: 'Window', parameter: 'windowId' }
     expect(manifest.commands['getTab']?.parent).toEqual(parent)
@@ -144,6 +147,7 @@ describe('the generated Microsoft Edge contract', () => {
     expect(get?.target).toEqual({ command: 'getTab', resource: 'Tab' })
     expect(get?.inputJsonSchema?.['required']).toEqual(['windowId', 'id'])
     expect(get?.input.encode({ id: 'T1' }).ok).toBe(false)
+    expect(microsoftEdgeContract.resources.Tab.parents).toEqual({ get: 'Window', list: 'Window' })
     const manifest = await manifestOf(microsoftEdgeContract)
     const parent = { resource: 'Window', parameter: 'windowId' }
     expect(manifest.commands['getTab']?.parent).toEqual(parent)

@@ -84,6 +84,10 @@ export type MicrosoftEdgeResources = Readonly<{
         readonly id: ValueType<string>;
         readonly get: 'microsoft-edge.tabs.get';
         readonly list: 'microsoft-edge.tabs.list';
+        readonly parents: {
+            readonly get: 'Window';
+            readonly list: 'Window';
+        };
     };
     BookmarkFolder: ResourceDescriptor<BookmarkFolder, string> & {
         readonly id: ValueType<string>;
@@ -94,6 +98,9 @@ export type MicrosoftEdgeResources = Readonly<{
         readonly id: ValueType<string>;
         readonly get: 'microsoft-edge.bookmarkItems.get';
         readonly list: 'microsoft-edge.bookmarkItems.list';
+        readonly parents: {
+            readonly list: 'BookmarkFolder';
+        };
     };
 }>;
 

@@ -1409,7 +1409,7 @@ without a second constructor.
 bound entry is itself a resolvable single reference), and `list` for a
 collection. There is no exception. The contract's `resources` table already
 records both operations, so a reference value type reads them from its scope,
-and no further field is needed. A generated table lists only the resources
+along with the parent each operation records (below). A generated table lists only the resources
 that record `get` or `list`: no reference to any other resource is valid at
 any position or in any form, so a reference naming one is rejected as naming
 no resource the app can resolve references through.
@@ -1429,6 +1429,52 @@ path, and a container or an entry fails at its `resource`, for example
 at every depth. The raw `input.wire` check names no such path: a reference that
 matches none of the wire forms is one issue at the reference itself. An empty
 identity collection has no entry to resolve, so it is admitted.
+
+**Parent-scoped targets.** Some resolving operations find objects only within
+an object of another resource: their command records a parent (D10, command
+parents) and takes that parent's identifier. Music gets and lists tracks
+within a playlist; Contacts addresses, emails and phones within a person;
+Calendar events within a calendar; Google Chrome and Microsoft Edge tabs
+within a window. Reminders lists reminders only within a list but gets one at
+the application, and Automator, Microsoft Edge (bookmark items), OmniGraffle
+and Xcode list some resources only within a parent in the same way. A reference resolved through such an operation can be resolved only when
+it carries the parent's identifier, so its `container` is required and must
+be an identity reference to that operation's parent. A reference takes the
+parent of the operation that resolves it: a single-object reference in
+either form (a name or index selector included), a container and an
+identity-collection entry take the `get` parent, and a selector collection
+(every or range) takes the `list` parent. A missing container, one naming
+another resource, and a selector container (which supplies no identifier)
+are encode and decode issues at `[...path, 'container']`, and the wire and
+SDK schemas reject them, so the derived JSON Schema of such a position lists
+`container` as required and admits only the parent's identity form there.
+The container is read by the same rules, so a chain of parents is checked
+level by level. A reference resolved through an operation at the application
+keeps an optional container of any resolvable resource. The rule narrows
+what bound and data reference types admit, so `bindReference` and every
+typed input position reject the same references at compile time.
+
+The resource table records the parents once, as `ResourceDescriptor.parents`,
+`{ get?, list? }`, keyed like the routes: each field is the key of the parent
+resource, present exactly when the command behind the route of the same name
+records a parent, and taken from that command's `parent.resource` when the
+contract is generated, as `get` and `list` are chosen. `parents` is absent
+when neither route records one, and the two fields may name different
+resources. Encoding, decoding, the wire and SDK schemas, the reference data
+types and resolution all read this field; none re-derives it from the
+manifest. A route's parent that references cannot name by its identifier and
+resolve through a `get` fails generation, naming the resource, the route and
+the parent, because no reference resolved through that route could then be
+resolved. A guard over the shipped contracts
+(`e2e/mcp-contracts/test/parent-scoped-resources.integration.test.ts`) holds
+every table's `parents` to the manifest commands behind its routes and pins
+them by hand.
+
+A container whose parent is name-keyed and not claimed unique (Calendar
+calendars, Automator workflows, Xcode workspace documents) names the parent by
+name, and a name others share resolves to the first match the app returns. How
+name-keyed resources are looked up is
+[#208](https://github.com/mike-north/macts/issues/208).
 
 Generated surfaces never publish an operation an agent cannot call. Some input
 positions admit no value at all: those that take a single reference to a
@@ -1614,7 +1660,16 @@ only for a reference a caller supplies:
 
 Selectors and collections address the app through mechanisms other than an
 identifier lookup, and container chains need the parent's own addressing, so
-each is a separate extension of this scope.
+each is a separate extension of this scope. In particular, the contract now
+requires the parent's container on every reference resolved through an
+operation that records a parent (parent-scoped targets, above), but the macOS
+provider does not yet convert a
+container: such a reference passes encoding and the runtime's checks and then
+fails as `InternalError` at an operation position, and output positions to
+parent-scoped targets are still left out of generation
+([#219](https://github.com/mike-north/macts/issues/219),
+[#242](https://github.com/mike-north/macts/issues/242)). Native container
+conversion is still to come.
 
 The provider resolves references (resolution, below) within the same scope,
 plus identity collections whose entries are in it:
@@ -1743,6 +1798,19 @@ bypass policy:
    result is validated as an array of the `list` operation's item type, never
    as its page (`referenceResultType` in `@macts/contracts` states what a
    reference resolves to, and the runtime uses it).
+
+**Parent-scoped resolution.** A reference resolved through an operation that
+records a parent resolves as that operation (`get` for a single object, `list`
+for a selector collection) within the parent its container names: the
+container's `id` is the value of the command's `parent.parameter`, the same
+input a direct call takes for the parent scope, and a single reference's own
+`id` is the child identifier (D10, command parents). Step 6
+rejects a reference without that container, or with one naming another
+resource, before the executor runs, so a provider always receives it. The
+runtime hands the validated reference to the executor's `resolve` unchanged
+(D9); mapping the container to the parent input is the provider's, which
+reads the parent from the request's manifest. Container traversal still
+needs no container permission (step 4).
 
 Unpaged collection resolution can still be slow on a very large selection:
 it reads the whole selection in one executor call, under the same time limit
@@ -1953,7 +2021,9 @@ execute(request), resolve(request) }`.
   cardinality `'one'`; for `'many'`, an array of the item plan of its `list`
   output, because resolution is never paged), the required `resourcePlans`,
   and an optional `signal`. Like `ExecutionRequest`, it carries no authority. Container chains
-  are evaluated natively and contribute no data to the result. It follows the
+  are evaluated natively and contribute no data to the result. A reference resolved through an
+  operation that records a parent always carries that parent's identity container (D7,
+  parent-scoped targets), whose `id` the provider passes as the operation's `parent.parameter`. It follows the
   D7 error rules: `TargetNotFoundError` for a missing identity or name match,
   `InvalidSelectionError` for an index or range past the end,
   `TargetNotFoundError` with `entryIndex` for a missing identity-collection
@@ -2268,7 +2338,7 @@ The probes (`macts probe`, identifiers and `--nullability`) address the app the 
 
 Every surface takes the parent from the record. Native bodies address the parent resource's collection (`resolveCollectionAccessor`), the parent item in it by that resource's identifier targeting, the command's resource collection under that item, and a get, update or delete's item in it by the command resource's identifier targeting (D4, command parents); a command with no parent addresses its resource at the application. The generated SDKs, the contract and the CLI take a get, update or delete's parent scope from `parent.parameter`, and the child identifier is the first other required parameter (`resolveIdParams` in `generator/surface.ts`).
 
-**A guard holds every shipped manifest to the rule** (`manifest/command-parents.test.ts`). Every usable list, get, create, update or delete command on a resource the hierarchy nests under another resource, and does not also place at the application (`usableHierarchyChildren` of the top-level entries), records a parent; only those shapes address a collection. A recorded parent must hold the command's resource in the hierarchy. A resource the hierarchy does not place has no parent to record and is not checked. The only exceptions are the nested commands whose parent awaits a design decision, [#173](https://github.com/mike-north/macts/issues/173): Microsoft Edge's `getTab` and `getBookmarkItem`; OmniGraffle's `getGraphic`, `getShape`, `getLine` and `getLayer`; OmniPlan's task, milestone, resource, assignment, dependency, violation and scenario commands; Xcode's `getProject`, `getScheme` and `getRunDestination`; and OmniFocus's `listTasks`, `getTask` and `createTask`. The list is exact: an entry that records a parent, or whose resource becomes a top-level child, fails the guard until it is removed.
+**A guard holds every shipped manifest to the rule** (`manifest/command-parents.test.ts`). Every usable list, get, create, update or delete command on a resource the hierarchy nests under another resource, and does not also place at the application (`usableHierarchyChildren` of the top-level entries), records a parent; only those shapes address a collection. A recorded parent must hold the command's resource in the hierarchy. A resource the hierarchy does not place has no parent to record and is not checked. The only exceptions are the nested commands whose parent awaits a design decision, [#173](https://github.com/mike-north/macts/issues/173): Microsoft Edge's `getBookmarkItem`; OmniGraffle's `getGraphic`, `getShape`, `getLine` and `getLayer`; OmniPlan's task, milestone, resource, assignment, dependency, violation and scenario commands; Xcode's `getProject`, `getScheme` and `getRunDestination`; and OmniFocus's `listTasks`, `getTask` and `createTask`. The list is exact: an entry that records a parent, or whose resource becomes a top-level child, fails the guard until it is removed.
 
 ### Identifier targeting
 

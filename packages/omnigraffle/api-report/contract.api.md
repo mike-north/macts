@@ -432,21 +432,33 @@ export type OmniGraffleResources = Readonly<{
         readonly id: ValueType<string>;
         readonly get: 'omnigraffle.graphics.get';
         readonly list: 'omnigraffle.graphics.list';
+        readonly parents: {
+            readonly list: 'Canvas';
+        };
     };
     Shape: ResourceDescriptor<Shape, string> & {
         readonly id: ValueType<string>;
         readonly get: 'omnigraffle.shapes.get';
         readonly list: 'omnigraffle.shapes.list';
+        readonly parents: {
+            readonly list: 'Canvas';
+        };
     };
     Line: ResourceDescriptor<Line, string> & {
         readonly id: ValueType<string>;
         readonly get: 'omnigraffle.lines.get';
         readonly list: 'omnigraffle.lines.list';
+        readonly parents: {
+            readonly list: 'Canvas';
+        };
     };
     Layer: ResourceDescriptor<Layer, string> & {
         readonly id: ValueType<string>;
         readonly get: 'omnigraffle.layers.get';
         readonly list: 'omnigraffle.layers.list';
+        readonly parents: {
+            readonly list: 'Canvas';
+        };
     };
 }>;
 

@@ -123,9 +123,11 @@ const documentCreateInputType: ValueType<DocumentCreateInput> = t.record({
 /**
  * The type of the resource table of {@link textEditContract}: every resource a
  * reference can name, keyed by manifest resource key, with its record type,
- * its identifier type (when it has one), and the operations that resolve
- * references to it. A client created from the contract carries it, so
- * `bindReference` admits only references the contract can resolve.
+ * its identifier type (when it has one), the operations that resolve
+ * references to it, and, for each of those operations that finds the
+ * resource only within another resource, that parent. A client created from
+ * the contract carries it, so `bindReference` admits only references the
+ * contract can resolve.
  */
 export type TextEditResources = Readonly<{
   Document: ResourceDescriptor<Document, string> & {

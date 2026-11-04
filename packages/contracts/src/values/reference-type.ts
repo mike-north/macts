@@ -42,14 +42,23 @@
  *   collection's resource;
  * - selector positions are non-negative integers, and a range has
  *   `start <= end` (`start === end` is a valid empty range);
- * - a container is a single-object reference.
+ * - a container is a single-object reference;
+ * - a reference resolved through an operation that records a parent (the
+ *   table entry's `parents` names one for that operation: `get` for a
+ *   single-object reference, a container and an identity-collection entry;
+ *   `list` for a selector collection) carries a container, and that container
+ *   is an identity reference to the parent resource; the container is itself
+ *   read by the same rules, so a chain of parents is checked level by level.
  *
  * Every resolvable object has its resolving operation: a single-object
  * reference, every container, and every identity-collection entry name a
- * resource with `get`, and a collection names a resource with `list`. Both
- * directions check it, and the wire and SDK schemas admit only the resources
- * that satisfy it, so the JSON Schema of a position lists exactly the keys it
- * accepts. A caller-built reference that could never be resolved is rejected
+ * resource with `get`, and a collection names a resource with `list`. An
+ * operation that finds objects only within a parent can resolve a reference
+ * only within that parent, so such references also need the parent's
+ * identity container. Both directions check
+ * it, and the wire and SDK schemas admit only the references that satisfy it,
+ * so the JSON Schema of a position lists exactly the keys it accepts and
+ * requires the container where one is needed. A caller-built reference that could never be resolved is rejected
  * before any call, a raw request carrying one is rejected by the wire schema,
  * and a returned one can only come from a defect of the contract.
  *
@@ -286,11 +295,24 @@ interface Walk<Id, Pos, Tag> {
  * an identity reference to a resource without one is rejected while reading
  * the header.
  */
+/**
+ * The parent the operation resolving a reference finds its object or objects
+ * within, which the reference's container must be an identity reference to.
+ */
+interface ParentScope {
+  /** The parent resource key. */
+  readonly resource: string
+  /** The resolving operation that records it. */
+  readonly operation: 'get' | 'list'
+}
+
 type Header<Tag> =
   | {
       readonly source: Source
       readonly tag: Tag
       readonly resource: string
+      /** The parent of the operation resolving this reference, when it records one. */
+      readonly parent: ParentScope | undefined
       readonly form: 'identity'
       /** The identifier value type of `resource`. */
       readonly idType: ValueType<unknown>
@@ -299,6 +321,8 @@ type Header<Tag> =
       readonly source: Source
       readonly tag: Tag
       readonly resource: string
+      /** The parent of the operation resolving this reference, when it records one. */
+      readonly parent: ParentScope | undefined
       readonly form: 'selector'
     }
 
@@ -469,7 +493,8 @@ function readHeader<Id, Pos, Tag>(
     return INVALID
   }
   if (tag === INVALID) return INVALID
-  if (form === 'selector') return { source, tag, resource, form }
+  const parent = parentScope(entry, want.role, want.cardinality)
+  if (form === 'selector') return { source, tag, resource, parent, form }
   if (entry.id === undefined) {
     issues.push(
       issue(
@@ -481,7 +506,7 @@ function readHeader<Id, Pos, Tag>(
     )
     return INVALID
   }
-  return { source, tag, resource, form, idType: entry.id }
+  return { source, tag, resource, parent, form, idType: entry.id }
 }
 
 /**
@@ -506,6 +531,20 @@ function resolvable(
   cardinality: ReferenceCardinality
 ): boolean {
   return entry?.[resolvingOperation(role, cardinality)] !== undefined
+}
+
+/**
+ * The parent the operation resolving a reference at `role` with `cardinality`
+ * finds objects within, when the entry records one for it.
+ */
+function parentScope(
+  entry: ReferenceRegistry[string] | undefined,
+  role: Want['role'],
+  cardinality: ReferenceCardinality
+): ParentScope | undefined {
+  const operation = resolvingOperation(role, cardinality)
+  const resource = entry?.parents?.[operation]
+  return resource === undefined ? undefined : { resource, operation }
 }
 
 /** The resources of `registry` that can be resolved at `role`, as a table of the same shape. */
@@ -599,7 +638,7 @@ function identityBody<Id, Pos, Tag>(
     raw === undefined
       ? fieldMismatch(raw, [...path, 'id'], issues, 'the object identifier')
       : walk.direction.id(header.idType, raw, [...path, 'id'], issues)
-  const container = readContainer(source, path, walk, issues)
+  const container = readContainer(header, path, walk, issues)
   const unknown = source.rejectUnknown(walk.direction.fields(IDENTITY_FIELDS), path, issues)
   if (id === INVALID || container === INVALID || unknown) return INVALID
   const base = { ...tag, resource, form: 'identity', cardinality: 'one', id } as const
@@ -614,7 +653,7 @@ function selectorBody<Id, Pos, Tag>(
 ): SelectorShape<Id, Pos, Tag> | Invalid {
   const { source, tag, resource } = header
   const selector = objectSelector(source.read('selector'), [...path, 'selector'], walk, issues)
-  const container = readContainer(source, path, walk, issues)
+  const container = readContainer(header, path, walk, issues)
   const unknown = source.rejectUnknown(walk.direction.fields(SELECTOR_FIELDS), path, issues)
   if (selector === INVALID || container === INVALID || unknown) return INVALID
   const base = { ...tag, resource, form: 'selector', cardinality: 'one', selector } as const
@@ -651,7 +690,7 @@ function convertCollection<Id, Pos, Tag>(
   }
 
   const selector = collectionSelector(source.read('selector'), [...path, 'selector'], walk, issues)
-  const container = readContainer(source, path, walk, issues)
+  const container = readContainer(header, path, walk, issues)
   const unknown = source.rejectUnknown(
     walk.direction.fields(SELECTOR_COLLECTION_FIELDS),
     path,
@@ -662,22 +701,71 @@ function convertCollection<Id, Pos, Tag>(
   return container === undefined ? base : { ...base, container }
 }
 
-/** Read the optional container of a reference: absent, or a single-object reference. */
+/**
+ * Why a reference to `resource` needs an identity container of `parent`, as
+ * the predicate of "the app …" the container messages share: the resolving
+ * operation finds the object (`get`) or selects the objects (`list`) only
+ * within one.
+ */
+function withinClause(resource: string, parent: ParentScope): string {
+  return parent.operation === 'get'
+    ? `finds each ${quote(resource)} only within its ${quote(parent.resource)}`
+    : `lists ${quote(resource)} objects only within their ${quote(parent.resource)}`
+}
+
+/**
+ * Read the container of the reference `header` heads: optional, and a
+ * single-object reference, when the operation resolving it works at the
+ * application; required, and an identity reference to the parent, when that
+ * operation records one.
+ */
 function readContainer<Id, Pos, Tag>(
-  source: Source,
+  header: Header<Tag>,
   path: IssuePath,
   walk: Walk<Id, Pos, Tag>,
   issues: Issues
 ): ObjectShape<Id, Pos, Tag> | undefined | Invalid {
-  const raw = source.read('container')
-  if (raw === undefined) return undefined
-  return convertObject(
+  const { resource, parent } = header
+  const at = [...path, 'container']
+  const raw = header.source.read('container')
+  if (raw === undefined) {
+    if (parent === undefined) return undefined
+    const what =
+      parent.operation === 'get'
+        ? `the ${quote(parent.resource)} the ${quote(resource)} is in`
+        : `the ${quote(parent.resource)} whose ${quote(resource)} objects are selected`
+    return fieldMismatch(
+      raw,
+      at,
+      issues,
+      `an identity reference to ${what}, because the app ${withinClause(resource, parent)}`
+    )
+  }
+  const container = convertObject(
     raw,
-    [...path, 'container'],
+    at,
     { resource: undefined, cardinality: 'one', form: undefined, role: 'container' },
     walk,
     issues
   )
+  if (container === INVALID || parent === undefined) return container
+  if (container.resource !== parent.resource || container.form !== 'identity') {
+    const received =
+      container.form === 'identity'
+        ? `a reference to ${quote(container.resource)}`
+        : `a selector reference to ${quote(container.resource)}`
+    issues.push(
+      issue(
+        at,
+        'invalid-type',
+        `The app ${withinClause(resource, parent)}, by that ${quote(parent.resource)}'s ` +
+          'identifier, so the container must be an identity reference to the resource ' +
+          `${quote(parent.resource)}; received ${received}.`
+      )
+    )
+    return INVALID
+  }
+  return container
 }
 
 function readEntries<Id, Pos, Tag>(
@@ -858,60 +946,153 @@ const WIRE_COLLECTION_SELECTOR_SCHEMA = z.discriminatedUnion('by', [
     }),
 ])
 
-function wireIdentity(
-  resource: string,
-  id: ZodType<WireValue>,
-  container: ZodType<ReferenceWire>
-): ZodType<ReferenceWire> {
-  return z.strictObject({
-    resource: z.literal(resource),
-    form: z.literal('identity'),
-    cardinality: z.literal('one'),
-    id,
-    container: container.exactOptional(),
-  })
+/**
+ * How a reference to one resource carries its container in a schema: when the
+ * operation resolving it works at the application, any resolvable container,
+ * optionally; when that operation records a parent, an identity reference to
+ * the parent, required.
+ */
+interface ContainerSlot {
+  readonly schema: ZodType
+  readonly required: boolean
 }
 
-function wireSelector(
-  resource: ZodType<string>,
-  container: ZodType<ReferenceWire>
-): ZodType<ReferenceWire> {
-  return z.strictObject({
-    resource,
-    form: z.literal('selector'),
-    cardinality: z.literal('one'),
-    selector: WIRE_OBJECT_SELECTOR_SCHEMA,
-    container: container.exactOptional(),
-  })
+/** A union of `members`, which is `never` when there are none. */
+function unionOf(members: readonly ZodType[], error: string): ZodType {
+  const [first, second, ...rest] = members
+  if (first === undefined) return z.never({ error })
+  if (second === undefined) return first
+  return z.union([first, second, ...rest])
 }
 
 /**
- * Wire schema of a container: a single-object reference to a resource in the
- * table that can be resolved as a container (one with `get`; see
- * {@link resolvingOperation}). Identity branches exist only for those that
- * also have an identifier; the selector branch admits every one of them, so
- * the union is empty only when no resource can contain.
+ * The schemas of the single-object references of one app, in one form (wire
+ * or SDK), built lazily from its resource table so that containers, which
+ * nest, and parents, which chain, are built once and never recurse while
+ * being built.
  */
-function wireContainer(registry: ReferenceRegistry): ZodType<ReferenceWire> {
-  const schema: ZodType<ReferenceWire> = z.lazy(() => {
-    const containers = resolvableResources(registry, 'container', 'one')
-    const [first, ...rest] = Object.keys(containers)
-    if (first === undefined) {
-      return z.never({ error: 'The app has no resource that can contain a reference.' })
-    }
-    return z.union([
-      ...identified(containers).map(([key, id]) => wireIdentity(key, id.wire, schema)),
-      wireSelector(z.enum([first, ...rest]), schema),
-    ])
+interface ObjectSchemas {
+  /** How a reference to `resource` resolved through `operation` carries its container. */
+  slot(resource: string, operation: 'get' | 'list'): ContainerSlot
+  /** An identity reference to `resource`, which must have identifier type `id`. */
+  identity(resource: string, id: ValueType<unknown>): ZodType
+  /** A selector reference to `resource`. */
+  selector(resource: string): ZodType
+}
+
+/** How one form spells the three object shapes; the rest of the construction is shared. */
+interface SchemaForm {
+  /** The schema of an identifier value in this form. */
+  id(type: ValueType<unknown>): ZodType
+  /** A reference object with the given fields; `app` is added in the SDK form. */
+  object(fields: Readonly<Record<string, ZodType>>): ZodType
+  /** The selector of a single-object reference. */
+  readonly objectSelector: ZodType
+  /** A field that may be absent. */
+  optional(schema: ZodType): ZodType
+}
+
+/** The container field of a reference, as `slot` says it is carried. */
+function containerField(form: SchemaForm, slot: ContainerSlot): ZodType {
+  return slot.required ? slot.schema : form.optional(slot.schema)
+}
+
+function objectSchemas(registry: ReferenceRegistry, form: SchemaForm): ObjectSchemas {
+  const containers = resolvableResources(registry, 'container', 'one')
+  /**
+   * Any container: a single-object reference to a resource that can be
+   * resolved as a container (see {@link resolvingOperation}). Identity
+   * branches exist only for those that also have an identifier. Resources
+   * whose `get` works at the application share one selector branch; each whose
+   * `get` records a parent has its own, which requires that parent.
+   */
+  const anyContainer: ZodType = z.lazy(() => {
+    const keys = Object.keys(containers)
+    const topLevel = keys.filter((key) => containers[key]?.parents?.get === undefined)
+    const [first, ...rest] = topLevel
+    const shared =
+      first === undefined
+        ? []
+        : [
+            form.object({
+              resource: z.enum([first, ...rest]),
+              form: z.literal('selector'),
+              cardinality: z.literal('one'),
+              selector: form.objectSelector,
+              container: form.optional(anyContainer),
+            }),
+          ]
+    return unionOf(
+      [
+        ...identified(containers).map(([key, id]) => self.identity(key, id)),
+        ...shared,
+        ...keys.filter((key) => !topLevel.includes(key)).map((key) => self.selector(key)),
+      ],
+      'The app has no resource that can contain a reference.'
+    )
   })
-  return schema
+
+  const self: ObjectSchemas = {
+    slot(resource, operation) {
+      const parent = Object.hasOwn(registry, resource)
+        ? registry[resource]?.parents?.[operation]
+        : undefined
+      return parent === undefined
+        ? { schema: anyContainer, required: false }
+        : { schema: parentContainer(parent), required: true }
+    },
+    identity(resource, id) {
+      return form.object({
+        resource: z.literal(resource),
+        form: z.literal('identity'),
+        cardinality: z.literal('one'),
+        id: form.id(id),
+        container: containerField(form, self.slot(resource, 'get')),
+      })
+    },
+    selector(resource) {
+      return form.object({
+        resource: z.literal(resource),
+        form: z.literal('selector'),
+        cardinality: z.literal('one'),
+        selector: form.objectSelector,
+        container: containerField(form, self.slot(resource, 'get')),
+      })
+    },
+  }
+
+  /**
+   * The container of a reference whose resolving operation finds objects
+   * within `parent`: an identity reference to `parent`, which therefore needs
+   * `get` and an identifier.
+   */
+  function parentContainer(parent: string): ZodType {
+    return z.lazy(() => {
+      const id = Object.hasOwn(containers, parent) ? containers[parent]?.id : undefined
+      return id === undefined
+        ? z.never({ error: `The app cannot resolve an identity reference to ${quote(parent)}.` })
+        : self.identity(parent, id)
+    })
+  }
+
+  return self
+}
+
+/** The wire form of reference objects: strict, with no `app`. */
+const WIRE_FORM: SchemaForm = {
+  id: (type) => type.wire,
+  object: (fields) => z.strictObject(fields),
+  objectSelector: WIRE_OBJECT_SELECTOR_SCHEMA,
+  optional: (schema) => schema.exactOptional(),
 }
 
 /**
  * Wire schema of the payload of a reference to `resource` with `cardinality`.
  * It admits only what can be resolved (see {@link resolvingOperation}): a
- * position whose resource lacks its resolving operation admits nothing, and
- * an identity collection admits entries only when its resource can be got.
+ * position whose resource lacks its resolving operation admits nothing, an
+ * identity collection admits entries only when its resource can be got, and
+ * a reference whose resolving operation records a parent needs that parent's
+ * identity container.
  */
 function wirePayload(
   registry: ReferenceRegistry,
@@ -931,31 +1112,49 @@ function wirePayload(
       error: unresolvableMessage(resource, unresolvableWant(resource, cardinality)),
     })
   }
-  const container = wireContainer(registry)
+  // The schemas of `ObjectSchemas` admit exactly the wire forms of references,
+  // as the walker reads them.
+  return referencePayload(registry, resource, cardinality, WIRE_FORM, {
+    collectionSelector: WIRE_COLLECTION_SELECTOR_SCHEMA,
+    entryError: unresolvableMessage(resource, entryWant(resource)),
+  }) as ZodType<ReferenceWire>
+}
+
+/**
+ * The payload schema of a reference to `resource` with `cardinality`, in
+ * `form`, for a resource that can be resolved at that cardinality.
+ */
+function referencePayload(
+  registry: ReferenceRegistry,
+  resource: string,
+  cardinality: ReferenceCardinality,
+  form: SchemaForm,
+  extra: { readonly collectionSelector: ZodType; readonly entryError: string }
+): ZodType {
+  const schemas = objectSchemas(registry, form)
+  const entry = registry[resource]
   // A resource without an identifier has no identity forms; the selector
   // branch alone remains, so the union is never empty.
   const id = entry?.id
   if (cardinality === 'one') {
-    const selector = wireSelector(z.literal(resource), container)
-    return id === undefined
-      ? selector
-      : z.union([wireIdentity(resource, id.wire, container), selector])
+    const selector = schemas.selector(resource)
+    return id === undefined ? selector : z.union([schemas.identity(resource, id), selector])
   }
-  const selector = z.strictObject({
+  const selector = form.object({
     resource: z.literal(resource),
     form: z.literal('selector'),
     cardinality: z.literal('many'),
-    selector: WIRE_COLLECTION_SELECTOR_SCHEMA,
-    container: container.exactOptional(),
+    selector: extra.collectionSelector,
+    container: containerField(form, schemas.slot(resource, 'list')),
   })
   if (id === undefined) return selector
   // Entries are single references, so they need `get`; without it only an
   // empty identity collection is admitted, as the walker admits it.
   const member = resolvable(entry, 'entry', 'one')
-    ? wireIdentity(resource, id.wire, container)
-    : z.never({ error: unresolvableMessage(resource, entryWant(resource)) })
+    ? schemas.identity(resource, id)
+    : z.never({ error: extra.entryError })
   return z.union([
-    z.strictObject({
+    form.object({
       resource: z.literal(resource),
       form: z.literal('identity'),
       cardinality: z.literal('many'),
@@ -1003,45 +1202,14 @@ const SDK_COLLECTION_SELECTOR_SCHEMA = z.discriminatedUnion('by', [
   }),
 ])
 
-function sdkIdentity(app: string, resource: string, id: ZodType, container: ZodType): ZodType {
-  return sdkObject({
-    app: z.literal(app),
-    resource: z.literal(resource),
-    form: z.literal('identity'),
-    cardinality: z.literal('one'),
-    id,
-    container: container.optional(),
-  })
-}
-
-function sdkSelector(app: string, resource: ZodType<string>, container: ZodType): ZodType {
-  return sdkObject({
-    app: z.literal(app),
-    resource,
-    form: z.literal('selector'),
-    cardinality: z.literal('one'),
-    selector: SDK_OBJECT_SELECTOR_SCHEMA,
-    container: container.optional(),
-  })
-}
-
-/**
- * SDK schema of a container: a single-object reference to a resource that
- * can be resolved as a container (see {@link resolvingOperation}). Identity
- * branches exist only for those resources that also have an identifier.
- */
-function sdkContainer(scope: ReferenceScope): ZodType {
-  const { app, resources } = scope
-  const schema: ZodType = z.lazy(() => {
-    const containers = resolvableResources(resources, 'container', 'one')
-    const [first, ...rest] = Object.keys(containers)
-    if (first === undefined) return z.never()
-    return z.union([
-      ...identified(containers).map(([key, id]) => sdkIdentity(app, key, id.sdk, schema)),
-      sdkSelector(app, z.enum([first, ...rest]), schema),
-    ])
-  })
-  return schema
+/** The SDK form of reference objects for `app`: every level carries the app. */
+function sdkForm(app: string): SchemaForm {
+  return {
+    id: (type) => type.sdk,
+    object: (fields) => sdkObject({ app: z.literal(app), ...fields }),
+    objectSelector: SDK_OBJECT_SELECTOR_SCHEMA,
+    optional: (schema) => schema.optional(),
+  }
 }
 
 function sdkReference(
@@ -1051,34 +1219,11 @@ function sdkReference(
 ): ZodType {
   const { app, resources } = scope
   if (!Object.hasOwn(resources, resource)) return z.never()
-  const entry = resources[resource]
-  if (!resolvable(entry, 'reference', cardinality)) return z.never()
-  const container = sdkContainer(scope)
-  const id = entry?.id
-  const identity = id === undefined ? undefined : sdkIdentity(app, resource, id.sdk, container)
-  if (cardinality === 'one') {
-    const selector = sdkSelector(app, z.literal(resource), container)
-    return identity === undefined ? selector : z.union([identity, selector])
-  }
-  const selector = sdkObject({
-    app: z.literal(app),
-    resource: z.literal(resource),
-    form: z.literal('selector'),
-    cardinality: z.literal('many'),
-    selector: SDK_COLLECTION_SELECTOR_SCHEMA,
-    container: container.optional(),
+  if (!resolvable(resources[resource], 'reference', cardinality)) return z.never()
+  return referencePayload(resources, resource, cardinality, sdkForm(app), {
+    collectionSelector: SDK_COLLECTION_SELECTOR_SCHEMA,
+    entryError: unresolvableMessage(resource, entryWant(resource)),
   })
-  if (identity === undefined) return selector
-  return z.union([
-    sdkObject({
-      app: z.literal(app),
-      resource: z.literal(resource),
-      form: z.literal('identity'),
-      cardinality: z.literal('many'),
-      entries: z.array(resolvable(entry, 'entry', 'one') ? identity : z.never()),
-    }),
-    selector,
-  ])
 }
 
 /** Every resource in the table that has an identifier, with its identifier value type. */

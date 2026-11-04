@@ -1781,6 +1781,9 @@ importers:
       '@macts/api':
         specifier: workspace:*
         version: link:../api
+      '@macts/automator':
+        specifier: workspace:*
+        version: link:../automator
       '@macts/calendar':
         specifier: workspace:*
         version: link:../calendar
@@ -1799,9 +1802,15 @@ importers:
       '@macts/notes':
         specifier: workspace:*
         version: link:../notes
+      '@macts/omnigraffle':
+        specifier: workspace:*
+        version: link:../omnigraffle
       '@macts/reminders':
         specifier: workspace:*
         version: link:../reminders
+      '@macts/xcode':
+        specifier: workspace:*
+        version: link:../xcode
       tsd:
         specifier: 'catalog:'
         version: 0.31.2

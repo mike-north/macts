@@ -462,9 +462,11 @@ const tabRecordType: ValueType<Tab> = t.record(
 /**
  * The type of the resource table of {@link googleChromeContract}: every resource a
  * reference can name, keyed by manifest resource key, with its record type,
- * its identifier type (when it has one), and the operations that resolve
- * references to it. A client created from the contract carries it, so
- * `bindReference` admits only references the contract can resolve.
+ * its identifier type (when it has one), the operations that resolve
+ * references to it, and, for each of those operations that finds the
+ * resource only within another resource, that parent. A client created from
+ * the contract carries it, so `bindReference` admits only references the
+ * contract can resolve.
  */
 export type GoogleChromeResources = Readonly<{
   Window: ResourceDescriptor<Window, string> & {
@@ -476,6 +478,7 @@ export type GoogleChromeResources = Readonly<{
     readonly id: ValueType<string>
     readonly get: 'google-chrome.tabs.get'
     readonly list: 'google-chrome.tabs.list'
+    readonly parents: { readonly get: 'Window'; readonly list: 'Window' }
   }
 }>
 
@@ -501,6 +504,7 @@ const resources = {
     id: t.string({ description: 'Unique ID of the tab.' }),
     get: 'google-chrome.tabs.get',
     list: 'google-chrome.tabs.list',
+    parents: { get: 'Window', list: 'Window' },
   },
 } satisfies GoogleChromeResources
 
