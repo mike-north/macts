@@ -43,12 +43,13 @@ verify the credential, admit the call against the optional per-subject rate
 limit, check the operation's permission, validate the input, enforce
 governance policy (auditing the decision and, for a held call, asking a
 human), hand the request to the executor the runtime was built with, then
-validate the result against the operation's output contract. A call whose
-key lacks the operation's permission is recorded as a `permission-denied`
-audit entry, which says nothing about its input. A call whose input fails
-validation is recorded as an `invalid-input` audit entry and is never put to
-policy or an approver. Failures are the structured errors from
-`@macts/contracts`.
+validate the result against the operation's output contract. When the
+governance context has an audit writer, a call whose key lacks the operation's
+permission is recorded as a `permission-denied` audit entry, which says
+nothing about its input, and a call whose input fails validation is recorded
+as an `invalid-input` audit entry. With no audit writer, neither is recorded.
+A call whose input fails validation is never put to policy or an approver.
+Failures are the structured errors from `@macts/contracts`.
 
 A result that does not match the operation's output contract fails with
 `UnexpectedValueError`, whichever executor produced it. The operation has

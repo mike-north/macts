@@ -1157,13 +1157,15 @@ Permission comes before validation, so there is no schema oracle: a caller
 without the permission learns nothing about the operation's input contract,
 and is answered `PermissionDeniedError` whatever its input, never
 `ValidationError`. A caller that has the permission and sends invalid input is
-answered `ValidationError`. A permission denial writes exactly one
-`permission-denied` audit record (D6) after admission, so where the runtime
-has a rate limiter (step 1b; the HTTP server configures one by default) that
-limit also bounds how many are written, and before validation, so the record
-carries the operation's permission, the key, and the time and nothing else:
-valid and invalid input from a caller without the permission leave records
-that differ only in their timestamps. A call turned away before the permission
+answered `ValidationError`. Where the governance context has an audit writer
+(the host governance always does), a permission denial writes exactly one
+`permission-denied` audit record (D6); with no audit writer it writes none.
+The record is written after admission, so where the runtime has a rate limiter
+(step 1b; the HTTP server configures one by default) that limit also bounds
+how many are written, and before validation, so the record carries the
+operation's permission, the key, and the time and nothing else: valid and
+invalid input from a caller without the permission leave records that differ
+only in their timestamps. A call turned away before the permission
 check (an unverified credential, a rate-limited call, an unknown operation or
 app) writes no record. Validation comes before governance, so only well-formed
 calls reach policy, audit summaries, and approvers: an argument summary
@@ -1174,9 +1176,9 @@ input record and a manifest command's declared input (its parameters and
 nothing else) both reject it. The summary still counts any such key that
 reaches it in `unknownKeys`, never naming it, as a backstop for an input
 schema that admits or strips one anyway. A call rejected by validation after
-the permission check writes exactly one `invalid-input` audit record (D6) with
-the number of validation issues and nothing from the input, and is never put
-to an approver.
+the permission check writes exactly one `invalid-input` audit record (D6),
+where there is an audit writer, with the number of validation issues and
+nothing from the input, and is never put to an approver.
 
 Fail-closed rules carry over unchanged: a resolver failure, an `enforceCall`
 failure, or an audit-write failure denies the call. That includes the
