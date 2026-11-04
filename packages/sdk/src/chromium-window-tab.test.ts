@@ -128,6 +128,16 @@ describe('the generated Google Chrome contract', () => {
     expect(manifest.commands['listWindows']?.parent).toBeUndefined()
   })
 
+  it('claims window and tab ids unique only within the running session, with a live sample', async () => {
+    const manifest = await manifestOf(googleChromeContract)
+    for (const resource of ['Window', 'Tab']) {
+      const [identifier] = manifest.resources[resource]?.identifiers ?? []
+      expect(identifier).toMatchObject({ property: 'id', primary: true, unique: true })
+      expect(identifier?.evidence?.unique?.source).toBe('curated')
+      expect(identifier?.evidence?.unique?.note).toContain('within the running Chrome session')
+    }
+  })
+
   it('rejects a tab get without its window before anything runs', () => {
     const get = googleChromeContract.operations['google-chrome.tabs.get']
     const encoded = get?.input.encode({ id: 'T1' })

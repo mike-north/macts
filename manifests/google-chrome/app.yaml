@@ -130,6 +130,13 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: curated
+            note: 'The dictionary describes the property as "The unique identifier of the window.", typed text. A read-only list of the windows on Google Chrome 156.0.8078.80 (macOS 27.2), 2026-11-04, found 1 window with 1 distinct id, read as text, and getting that window by its id read the same id back. The sample shows distinctness only trivially. A window''s id identifies it within the running Chrome session; nothing here shows it survives a relaunch.'
+            observedAt: '2026-11-04T03:31:45.000Z'
+            appVersion: 156.0.8078.80
   Tab:
     name: Tab
     plural: Tabs
@@ -167,6 +174,13 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: curated
+            note: 'The claim is for the tabs of one window, the collection a tab is listed in. The dictionary describes the property as "Unique ID of the tab.", typed text. A read-only list on Google Chrome 156.0.8078.80 (macOS 27.2), 2026-11-04, found 1 window holding 1 tab, whose id was read as text, and getting that tab by its window and its id read the same id back. The sample shows distinctness only trivially, and nothing about uniqueness across windows. A tab''s id identifies it within the running Chrome session; nothing here shows it survives a relaunch.'
+            observedAt: '2026-11-04T03:31:45.000Z'
+            appVersion: 156.0.8078.80
   BookmarkFolder:
     name: BookmarkFolder
     plural: BookmarkFolders
