@@ -2,10 +2,9 @@
  * Reference hydration through the runtime for the Archive stand-in app, over
  * the contract the generator emits for it.
  *
- * The Archive manifest exercises three addressing mechanisms: an entry found
- * by the app's key (`targeting: byKey`), a desk that is a singleton root
- * identified by its kind, and a read the app reports as a failure to find a
- * value (-1728) that counts as an empty value. Other tests check the native
+ * The Archive manifest exercises two addressing mechanisms: an entry found by
+ * the app's key (`targeting: byKey`), and a desk that is a singleton root
+ * identified by its kind. Other tests check the native
  * bodies and the generated text separately; this one registers the contract
  * as the generator emits it (its resource table is what `resolveReference`
  * builds the kinds and keys from), with the shipped native executor over a
@@ -110,11 +109,6 @@ async function rejectionOf(promise: Promise<unknown>): Promise<unknown> {
   throw new Error('Expected the call to reject')
 }
 
-/** A failure the app raises, carrying its native error number. */
-function appError(errorNumber: number): Error {
-  return Object.assign(new Error('The app failed.'), { errorNumber })
-}
-
 /** An archive object that exists and reports `record` as its property record. */
 function object(record: Record<string, unknown>, members: Record<string, unknown> = {}) {
   return { exists: () => true, properties: () => ({ ...record }), ...members }
@@ -124,13 +118,10 @@ function object(record: Record<string, unknown>, members: Record<string, unknown
 function standInArchive(backDesk: unknown = undefined) {
   const absent = { exists: () => false }
   const root = object(
-    { location: '/root', title: 'Root', holder: null, shelfMark: 'R1', summary: 'Top' },
+    { location: '/root', title: 'Root', holder: null },
     { location: () => '/root' }
   )
-  const entry = object(
-    { location: '/a', title: 'A', holder: root, shelfMark: 'S1', summary: 'Kept' },
-    { location: () => '/a' }
-  )
+  const entry = object({ location: '/a', title: 'A', holder: root }, { location: () => '/a' })
   const entries = new Map<unknown, unknown>([
     ['/a', entry],
     ['/root', root],
@@ -138,15 +129,8 @@ function standInArchive(backDesk: unknown = undefined) {
   return {
     includeStandardAdditions: false,
     entries: { byName: (key: unknown) => entries.get(key) ?? absent },
-    frontDesk: object(
-      { clerk: 'Kim', featured: entry },
-      {
-        bell: () => {
-          throw appError(-1728)
-        },
-      }
-    ),
-    backDesk: backDesk ?? object({ clerk: 'Lee', featured: null, bell: 'Brass' }),
+    frontDesk: object({ clerk: 'Kim', featured: entry }),
+    backDesk: backDesk ?? object({ clerk: 'Lee', featured: null }),
   }
 }
 
@@ -178,11 +162,8 @@ const FRONT_DESK = {
   kind: 'front',
   clerk: 'Kim',
   featured: wireRef('Entry', '/a'),
-  // The front desk's bell read fails with -1728, and `bell` carries probe
-  // evidence of exactly that, so it is the empty value (D10).
-  bell: null,
 }
-const BACK_DESK = { kind: 'back', clerk: 'Lee', featured: null, bell: 'Brass' }
+const BACK_DESK = { kind: 'back', clerk: 'Lee', featured: null }
 
 describe('reference resolution over the generated Archive contract', () => {
   it('resolves a reference to a root by its kind', async () => {
@@ -233,8 +214,6 @@ describe('reference resolution over the generated Archive contract', () => {
       location: '/a',
       title: 'A',
       holder: wireRef('Entry', '/root'),
-      shelfMark: 'S1',
-      summary: 'Kept',
     })
   })
 
@@ -261,8 +240,6 @@ describe('reference resolution over the generated Archive contract', () => {
       location: '/root',
       title: 'Root',
       holder: null,
-      shelfMark: 'R1',
-      summary: 'Top',
     })
   })
 })

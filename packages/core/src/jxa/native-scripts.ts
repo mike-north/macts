@@ -62,7 +62,6 @@ import { resolveCollectionAccessor, resolvePropertyAccessor } from '../manifest/
 import { omittedOutputProperties, outputProperties } from '../manifest/output-references.js'
 import { resolvingCommand } from '../manifest/resource-commands.js'
 import { ROOT_KIND_PROPERTY, rootProperties } from '../manifest/roots.js'
-import { readsAbsentAsNull } from '../manifest/schemas/evidence.js'
 import {
   NATIVE_CODEC_ERROR_NAME,
   NATIVE_COLLECTION_CHANGED_ERROR_NAME,
@@ -288,11 +287,8 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * `calendarIdentifier`), each property is read on its own. Every read on its
  * own is by the app's name and guarded, so a property the item cannot report
  * is omitted rather than failing the operation, and its record then fails
- * the contract unless the field may be absent. A property whose evidence
- * shows the app reporting an absent value by failing the read with "no such
- * object" ({@link absentAsNull}) takes `null` from that failure instead; the
- * item's own existence is checked before this read, so a missing item still
- * fails as missing. A body with no resource reads `name`.
+ * the contract unless the field may be absent. A body with no resource reads
+ * `name`.
  *
  * A singleton root's object holds nothing that says which kind it is, so its
  * `kind` is not read from the app: it is set from `kindExpression`, the kind
@@ -316,9 +312,7 @@ function readOutputProperties(
   )
   const native = (key: string): string => nativePropertyName(resource, key)
   const readOnItsOwn = (key: string): string =>
-    absentAsNull(resource, key)
-      ? `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) { if (e && e.errorNumber === ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}) { ${member('obj', key)} = null; } }`
-      : `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {}`
+    `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {}`
   return lines(
     'var obj = {};',
     'try {',
@@ -334,20 +328,6 @@ function readOutputProperties(
       ? `${member('obj', ROOT_KIND_PROPERTY)} = ${kindExpression};`
       : ''
   )
-}
-
-/**
- * Whether a failed read of `key` with "no such object" is the property's
- * empty value: its nullability evidence shows the app failing that way when
- * an item has no value (`readsAbsentAsNull`). Every other failure, and this
- * one for any other property, is still a failure.
- */
-function absentAsNull(resource: Resource | undefined, key: string): boolean {
-  const property =
-    resource !== undefined && Object.hasOwn(resource.properties, key)
-      ? resource.properties[key]
-      : undefined
-  return property !== undefined && readsAbsentAsNull(property)
 }
 
 /**
@@ -850,17 +830,13 @@ const COLLECTION_CHANGED_MESSAGE =
  * - `communicationFailed(e)` tells whether a thrown error is one of
  *   {@link COMMUNICATION_FAILURE_ERROR_NUMBERS}: the request failed, so no
  *   guard or fallback may absorb it.
- * - `readEach(list, name, guarded, absentAsNull)` reads one property of
- *   every item of `list`, one request per item. A guarded read the item
- *   cannot answer leaves `undefined` at its position, so the record omits
- *   that property, unless `absentAsNull` is `true` and the read failed with
- *   "no such object": that is the property's empty value (see
- *   {@link absentAsNull}), so `null` is left there. An unguarded failure, or
- *   a communication failure, fails the list. `absentAsNull` may be left out.
- * - `readColumn(what, name, absentAsNull)` reads one property across the
- *   items in one request. When that request fails other than by a
- *   communication failure, it falls back to `readEach` with every read
- *   guarded, passing `absentAsNull` on.
+ * - `readEach(list, name, guarded)` reads one property of every item of
+ *   `list`, one request per item. A guarded read the item cannot answer
+ *   leaves `undefined` at its position, so the record omits that property; an
+ *   unguarded failure, or a communication failure, fails the list.
+ * - `readColumn(what, name)` reads one property across the items in one
+ *   request. When that request fails other than by a communication failure,
+ *   it falls back to `readEach` with every read guarded.
  */
 function listReadHelpers(): string {
   return lines(
@@ -891,13 +867,13 @@ function listReadHelpers(): string {
     `  if (items === null) { items = aligned("the items", ${COLLECTION_LOCAL}()); }`,
     '  return items;',
     '}',
-    'function readEach(list, name, guarded, absentAsNull) {',
+    'function readEach(list, name, guarded) {',
     '  var values = [];',
     '  for (var i = 0; i < list.length; i++) {',
     '    if (guarded) {',
     '      try { values.push(list[i][name]()); } catch (e) {',
     '        if (communicationFailed(e)) { throw e; }',
-    `        values.push(absentAsNull === true && e && e.errorNumber === ${String(NO_SUCH_OBJECT_ERROR_NUMBER)} ? null : undefined);`,
+    '        values.push(undefined);',
     '      }',
     '    } else {',
     '      values.push(list[i][name]());',
@@ -905,11 +881,11 @@ function listReadHelpers(): string {
     '  }',
     '  return values;',
     '}',
-    'function readColumn(what, name, absentAsNull) {',
+    'function readColumn(what, name) {',
     '  var values;',
     `  try { values = ${COLLECTION_LOCAL}[name](); } catch (e) {`,
     '    if (communicationFailed(e)) { throw e; }',
-    '    return readEach(itemList(), name, true, absentAsNull);',
+    '    return readEach(itemList(), name, true);',
     '  }',
     '  return aligned(what, values);',
     '}'
@@ -1356,7 +1332,7 @@ function buildListBody(
   const columnLocal = (index: number): string => `column${String(index)}`
   const columnReads = bestEffortProps.map(
     (p, index) =>
-      `${columnLocal(index)} = readColumn(${literal(`the property "${p}"`)}, ${literal(native(p))}${absentAsNull(resource, p) ? ', true' : ''});`
+      `${columnLocal(index)} = readColumn(${literal(`the property "${p}"`)}, ${literal(native(p))});`
   )
   const recordFields = bestEffortProps.map((p, index) => {
     const value = `${columnLocal(index)}[i]`
