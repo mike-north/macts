@@ -184,6 +184,10 @@ resources:
     # Observed on TV 1.7.2 (macOS 27.2), 2026-11-03: the application's 3
     # playlists had distinct persistent IDs and integer ids, and the 2 sources
     # held 4 playlists, one of which the application's playlists do not list.
+    # Observed again on 2026-11-04: 3 playlists in one source and 1 in the
+    # other, with persistent IDs distinct within each source and across all 4;
+    # each of the application's 3 playlists is under exactly one source with
+    # the same persistent ID, and the fourth is found only within its source.
     # A playlist's `container` read returns a property specifier, not its
     # source, so the caller supplies the source rather than reading it back.
     identifiers:
