@@ -723,6 +723,19 @@ describe('describeNativeFailure', () => {
       details: { resource: 'Note' },
     },
     {
+      // A scoped operation's parent check names the parent it found missing,
+      // so the error names the parent, not the operation's resource.
+      name: 'app -1728 naming the missing parent',
+      failure: reported({
+        source: 'app',
+        message: APP_TEXT,
+        errorNumber: -1728,
+        missingResource: 'Account',
+      }),
+      type: TargetNotFoundError,
+      details: { resource: 'Account' },
+    },
+    {
       name: 'app -1728 for an app-level command (no resource)',
       failure: app(-1728),
       context: appContext,
@@ -1043,6 +1056,19 @@ describe('describeNativeFailure', () => {
     const described = describeNativeFailure(app(-1728), context)
     expect(described.message).toContain('Notes')
     expect(described.message).toContain('Note')
+  })
+
+  it('names the missing parent, not the operation resource, in its not-found message', () => {
+    const described = describeNativeFailure(
+      reported({
+        source: 'app',
+        message: APP_TEXT,
+        errorNumber: -1728,
+        missingResource: 'Account',
+      }),
+      context
+    )
+    expect(described.message).toBe('Notes has no Account matching the request.')
   })
 
   it('suggests a pending permission prompt for a timeout', () => {

@@ -55,7 +55,6 @@ const MANIFESTS_DIR = resolve(process.cwd(), '../../manifests')
  * @see https://github.com/mike-north/macts/issues/173
  */
 const AWAITING_PARENT_DESIGN: ReadonlySet<string> = new Set([
-  'microsoft-edge: getTab',
   'microsoft-edge: getBookmarkItem',
   'omnigraffle: getGraphic',
   'omnigraffle: getShape',

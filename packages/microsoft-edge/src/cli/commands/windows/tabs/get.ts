@@ -13,6 +13,7 @@ export class GetTabCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
+  windowId = Option.String('--window-id', { required: true, description: 'Window identifier' })
 
   tabId = Option.String({ name: 'id', required: true })
 
@@ -21,7 +22,7 @@ export class GetTabCommand extends Command {
 
     try {
       const client = getClient()
-      const item = await client.tabs.get(this.tabId)
+      const item = await client.tabs.get(this.windowId, this.tabId)
 
       const output = formatter.format({
         id: item.id,

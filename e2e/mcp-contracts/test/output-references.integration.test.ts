@@ -118,7 +118,6 @@ describe('output references in every real contract', () => {
     // nor a list, so the table carries no record for them.
     expect(positions.sort()).toEqual(
       [
-        'microsoft-edge Window.activeTab → Tab',
         'photos Album.parent → Folder',
         'photos Folder.parent → Folder',
         'xcode WorkspaceDocument.activeScheme → Scheme',
@@ -143,9 +142,6 @@ describe('output references in every real contract', () => {
     // that some operation returns.
     expect([...checked].sort()).toEqual(
       [
-        'microsoft-edge.windows.create → Tab',
-        'microsoft-edge.windows.get → Tab',
-        'microsoft-edge.windows.list → Tab',
         'photos.albums.get → Folder',
         'photos.albums.list → Folder',
         'photos.folders.get → Folder',

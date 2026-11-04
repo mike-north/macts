@@ -1076,12 +1076,13 @@ describe('real app manifests', () => {
     // holding a single reference, or an array of them: `no-get` when macts
     // has no get for the target yet, `not-unique` when macts identifies the
     // target by a name the manifest has no uniqueness evidence for yet, and
-    // `parent-scoped` when the target's get records a parent (a TV playlist,
-    // got within its source). No shipped output references a resource with a
-    // get and no identifier, and no shipped command records a result, so no
-    // result is left out. A new omission fails until it is
-    // reviewed and added here. Removing a row records restored coverage: the
-    // field is back in output.
+    // `parent-scoped` when the target's get records a parent and native reads
+    // do not return the container yet (a Chrome or Edge tab, got within its
+    // window; a TV playlist, got within its source). No shipped output
+    // references a resource with a get and no identifier, and no shipped
+    // command records a result, so no result is left out. A new omission
+    // fails until it is reviewed and added here. Removing a row records
+    // restored coverage: the field is back in output.
     const found = apps
       .flatMap(({ manifest }) => collectContractDiagnostics(manifest))
       .flatMap((diagnostic) => {
@@ -1102,7 +1103,8 @@ describe('real app manifests', () => {
       ['arc', 'Window', 'activeSpace', 'Space', 'no-get'],
       ['finder', 'FinderWindow', 'listViewOptions', 'ListViewOptions', 'no-get'],
       ['finder', 'ListViewOptions', 'sortColumn', 'Column', 'no-get'],
-      ['google-chrome', 'Window', 'activeTab', 'Tab', 'no-get'],
+      // A tab is got only within its window.
+      ['google-chrome', 'Window', 'activeTab', 'Tab', 'parent-scoped'],
       ['iterm', 'Window', 'currentTab', 'Tab', 'no-get'],
       ['iterm', 'Window', 'currentSession', 'Session', 'no-get'],
       ['iterm', 'Tab', 'currentSession', 'Session', 'no-get'],
@@ -1120,6 +1122,8 @@ describe('real app manifests', () => {
       ['mail', 'Rule', 'moveMessage', 'Mailbox', 'no-get'],
       ['messages', 'Participant', 'account', 'Account', 'no-get'],
       ['messages', 'Chat', 'account', 'Account', 'no-get'],
+      // A tab is got only within its window.
+      ['microsoft-edge', 'Window', 'activeTab', 'Tab', 'parent-scoped'],
       ['system-events', 'NetworkPreferencesObject', 'currentLocation', 'Location', 'no-get'],
       ['system-events', 'Service', 'currentConfiguration', 'Configuration', 'no-get'],
       ['system-events', 'Service', 'interface', 'Interface', 'no-get'],
@@ -1170,7 +1174,7 @@ describe('real app manifests', () => {
       ['xcode', 'RunDestination', 'device', 'Device', 'no-get'],
       ['xcode', 'RunDestination', 'companionDevice', 'Device', 'no-get'],
     ]
-    expect(expected).toHaveLength(70)
+    expect(expected).toHaveLength(71)
     expect(found.sort()).toEqual(expected.sort())
   })
 
