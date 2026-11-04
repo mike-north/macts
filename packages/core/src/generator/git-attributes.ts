@@ -14,7 +14,12 @@
  *
  * - **`src/**`** is marked whenever the package emits a source file. A
  *   generated package's `src/` tree is wholly the generator's: every file under
- *   it is in the package's owned-output record.
+ *   it is in the package's owned-output record. A hand-written file there would
+ *   be marked too, and collapsed in review, so the committed tree is checked:
+ *   the test "<package> tracks no file under src/ that its record does not
+ *   list" in `packages/cli/src/commands/generate-check.test.ts` fails, naming
+ *   the file, when a tracked file under a generated package's `src/` is
+ *   missing from its record.
  * - **Every other emitted file** is marked by its exact path, anchored at the
  *   package root with a leading `/` so a file of the same name deeper in the
  *   package is not swept in. This includes this file itself and the

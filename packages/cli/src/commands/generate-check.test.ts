@@ -9,7 +9,9 @@
  *
  * The last suite checks the committed tree itself: every generated package
  * carries the `.gitattributes` the generator emits, listed in its record and
- * holding the marking rule of `packages/core/src/generator/git-attributes.ts`.
+ * holding the marking rule of `packages/core/src/generator/git-attributes.ts`,
+ * and tracks no file under `src/` that its record does not list, which is what
+ * keeps that rule's `src/**` from marking a hand-written file as generated.
  *
  * @see https://github.com/mike-north/macts/issues/179
  * @see https://git-scm.com/docs/git-status#_porcelain_format_version_1
@@ -193,6 +195,23 @@ describe('check-clean-tree', () => {
 /** The attribute every marking line sets. */
 const GENERATED = 'linguist-generated=true'
 
+/**
+ * The files git tracks under a path of a package, relative to the package,
+ * sorted. Staged files count, as `git ls-files` reads the index.
+ */
+function trackedFiles(packageDir: string, path: string): string[] {
+  const run = spawnSync('git', ['ls-files', '-z', '--', path], {
+    cwd: packageDir,
+    encoding: 'utf-8',
+    maxBuffer: 64 * 1024 * 1024,
+  })
+  if (run.status !== 0) throw new Error(`git ls-files failed in ${packageDir}: ${run.stderr}`)
+  return run.stdout
+    .split('\0')
+    .filter((file) => file.length > 0)
+    .sort()
+}
+
 /** Every committed package directory that holds a generator record. */
 function generatedPackageDirs(): string[] {
   const packagesDir = join(REPO_ROOT, 'packages')
@@ -236,6 +255,25 @@ describe('committed generated packages', () => {
       expect(new Set(rules)).toEqual(expected)
       expect(rules).toHaveLength(expected.size)
       expect(rules).toContain(`src/** ${GENERATED}`)
+    }
+  )
+
+  // `src/** linguist-generated=true` is only honest while the generator owns
+  // the whole `src/` tree. A hand-written file committed there would be
+  // collapsed in review as generated code, so every tracked file under `src/`
+  // must be one the package's record lists.
+  it.each(dirs.map((dir) => [dir.slice(REPO_ROOT.length + 1), dir]))(
+    '%s tracks no file under src/ that its record does not list',
+    async (name, dir) => {
+      const record = JSON.parse(await readFile(join(dir, '.macts-generated.json'), 'utf-8')) as {
+        files: string[]
+      }
+      const owned = new Set(record.files)
+      const stray = trackedFiles(dir, 'src').filter((path) => !owned.has(path))
+      expect(
+        stray,
+        `${name}: these tracked files under src/ are not in .macts-generated.json, yet its .gitattributes marks them linguist-generated: ${stray.join(', ')}`
+      ).toEqual([])
     }
   )
 })
