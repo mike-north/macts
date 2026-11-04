@@ -16,6 +16,10 @@
  * - only an operation registered from a contract pages (D2, D9): its input
  *   record declares `pageSize` and `cursor`. A manifest-registered list reads
  *   its whole result, so the paging inputs are not part of its contract.
+ * - a resource-scoped get, update or delete selects its item by its
+ *   identifier parameter, the first required parameter other than its
+ *   parent's; a manifest whose get, update or delete declares none is refused at registration with
+ *   `OperationRegistrationError`, and nothing from it is registered.
  *
  * Operation ids and permissions are derived by hand from the manifest route
  * rules (`app.<resource plural>.<command key>`,
@@ -35,6 +39,7 @@ import {
 } from '@macts/contracts'
 import { ALLOW_ALL_POLICY } from './governance/active-policy.js'
 import { createBearerCredential } from './invocation/credential.js'
+import { OperationRegistrationError } from './operations/registry.js'
 import { createRuntime, type MactsRuntime } from './runtime.js'
 import {
   CALENDAR_MANIFEST,
@@ -53,12 +58,8 @@ import {
 } from './runtime-test-helpers.js'
 
 /**
- * A gadget app whose `get` declares no required parameter, only an optional
- * `verbose` flag.
- *
- * Its native body addresses the gadget by the `id` key, the fallback a get or
- * update with no required parameter uses (`resolveIdentifierParam` in
- * `@macts/core`), although `id` is not a declared parameter.
+ * A gadget app whose `get` addresses a gadget by its required `serial`
+ * parameter and takes an optional `verbose` flag.
  *
  * Operation ids and permissions: `workshop.gadgets.get`
  * (`workshop:gadgets:get`) and `workshop.app.reset` (`workshop:app:reset`,
@@ -87,6 +88,7 @@ const WORKSHOP_MANIFEST: AppManifest = {
       scope: 'resource',
       resourceType: 'Gadget',
       parameters: [
+        { name: 'serial', type: 'string', description: 'The gadget', required: true },
         { name: 'verbose', type: 'boolean', description: 'Read every property', required: false },
       ],
     },
@@ -227,11 +229,13 @@ describe('undeclared keys in a manifest-registered operation', () => {
   })
 })
 
-describe('the id fallback of a get with no required parameter', () => {
-  it('rejects an undeclared id before execution, so nothing is looked up', async () => {
+describe('an undeclared id', () => {
+  it('is rejected beside the declared identifier before execution, so nothing is looked up', async () => {
     const h = harness()
 
-    const error = await rejection(h.runtime.invoke(GET_GADGET, { id: 'gadget-7' }, asOperator()))
+    const error = await rejection(
+      h.runtime.invoke(GET_GADGET, { serial: 'g-1', id: 'gadget-7' }, asOperator())
+    )
 
     expectUndeclaredKeyRejection(error)
     expect(h.executor.requests).toHaveLength(0)
@@ -239,15 +243,58 @@ describe('the id fallback of a get with no required parameter', () => {
     expect(h.writer.records).toEqual([invalidInputRecord('workshop:gadgets:get', 'workshop')])
   })
 
-  it('rejects an undeclared id sent beside the declared parameter', async () => {
+  it('cannot stand in for the declared identifier', async () => {
     const h = harness()
 
-    const error = await rejection(
-      h.runtime.invoke(GET_GADGET, { verbose: true, id: 'gadget-7' }, asOperator())
-    )
+    const error = await rejection(h.runtime.invoke(GET_GADGET, { id: 'gadget-7' }, asOperator()))
 
-    expectUndeclaredKeyRejection(error)
+    expect(error).toBeInstanceOf(ValidationError)
+    if (!(error instanceof ValidationError)) return
+    expect(error.details.issues.map((issue) => issue.path)).toEqual(
+      expect.arrayContaining([['serial'], []])
+    )
     expect(h.executor.requests).toHaveLength(0)
+  })
+})
+
+describe('a get with no identifier parameter', () => {
+  /** The workshop app with a `get` that declares only the optional `verbose` flag. */
+  const UNADDRESSABLE: AppManifest = {
+    ...WORKSHOP_MANIFEST,
+    commands: {
+      ...WORKSHOP_MANIFEST.commands,
+      get: {
+        name: 'get',
+        description: 'Get one gadget',
+        scope: 'resource',
+        resourceType: 'Gadget',
+        parameters: [
+          { name: 'verbose', type: 'boolean', description: 'Read every property', required: false },
+        ],
+      },
+    },
+  }
+
+  it('is refused at registration, which registers nothing from the app', async () => {
+    const executor = createRecordingExecutor()
+    const runtime = createRuntime({
+      executor,
+      verifier: createFakeVerifier({ [SECRET]: OPERATOR }),
+      clock: fixedClock,
+      governance: { policy: ALLOW_ALL_POLICY },
+    })
+
+    const register = (): void => {
+      runtime.registerManifest(UNADDRESSABLE)
+    }
+    expect(register).toThrow(OperationRegistrationError)
+    expect(register).toThrow(/App "Workshop".*"get".*identifier parameter/s)
+    expect(runtime.operation(GET_GADGET)).toBeUndefined()
+    expect(runtime.operation(RESET)).toBeUndefined()
+
+    const error = await rejection(runtime.invoke(GET_GADGET, { id: 'gadget-7' }, asOperator()))
+    expect(error).toBeInstanceOf(ValidationError)
+    expect(executor.requests).toHaveLength(0)
   })
 })
 
@@ -266,9 +313,9 @@ describe('declared keys of a manifest-registered operation', () => {
   it('accepts a declared optional parameter left out', async () => {
     const h = harness()
 
-    await h.runtime.invoke(GET_GADGET, {}, asOperator())
+    await h.runtime.invoke(GET_GADGET, { serial: 'g-1' }, asOperator())
 
-    expect(h.executor.requests[0]?.input).toEqual({})
+    expect(h.executor.requests[0]?.input).toEqual({ serial: 'g-1' })
   })
 
   it('reads a manifest-registered list whole, with no page window', async () => {

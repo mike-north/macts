@@ -87,7 +87,6 @@ suites:
     enums:
       - Edfm
     commands:
-      - delete
       - move
       - open
   - name: Power Suite
@@ -2441,13 +2440,10 @@ commands:
     scope: application
     code: 'stop'
     parameters: []
-  delete:
-    name: delete
-    description: Delete disk item(s).
-    scope: resource
-    resourceType: DiskItem
-    code: delo
-    parameters: []
+  # Deleting a disk item is not offered yet. The app's `delete` verb needs the
+  # disk item as its direct object, and a DiskItem cannot yet be selected by
+  # an identifier parameter. A delete that targets one disk item returns once
+  # DiskItem is identified by its POSIX path.
   move:
     name: move
     description: Move disk item(s) to a new location.

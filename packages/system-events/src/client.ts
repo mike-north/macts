@@ -5,7 +5,6 @@
  * @packageDocumentation
  */
 
-import { DiskItemResourceClient } from './resources/diskitem.js'
 import { ActionResourceClient } from './resources/action.js'
 import { UIElementResourceClient } from './resources/uielement.js'
 
@@ -86,9 +85,6 @@ export class SystemEventsError extends Error {
 export class SystemEventsClient {
   readonly #httpClient: HttpClient
 
-  /** An item stored in the file system */
-  readonly diskItems: DiskItemResourceClient
-
   /** An action that can be performed on the UI element */
   readonly actions: ActionResourceClient
 
@@ -98,7 +94,6 @@ export class SystemEventsClient {
   constructor(options: SystemEventsClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.diskItems = new DiskItemResourceClient(this.#httpClient, 'system-events', 'diskItems')
     this.actions = new ActionResourceClient(this.#httpClient, 'system-events', 'actions')
     this.uiElements = new UIElementResourceClient(this.#httpClient, 'system-events', 'uiElements')
   }
