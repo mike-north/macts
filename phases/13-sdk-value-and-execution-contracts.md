@@ -1809,7 +1809,8 @@ only for a reference a caller supplies:
 - every selector form, at any position;
 - identity collections;
 - a container on a top-level resource, a container of another resource than
-  the one its `get` records, or a selector container;
+  the one its `get` records, or a selector container: each breaks the
+  container rule, so it is a caller error, not a form awaiting support;
 - a resource with no identifier, or with no `get`, or whose parent has no
   addressing;
 - a resource with no entry in the request's `resourcePlans`, so none in the
