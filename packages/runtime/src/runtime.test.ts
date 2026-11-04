@@ -67,7 +67,7 @@ const READER: Authority = { subject: 'key_reader', permissions: ['calendar:event
 /** Holds only the permission `delete` had before it was renamed. */
 const LEGACY: Authority = { subject: 'key_legacy', permissions: ['calendar:events:remove'] }
 
-const VALID_CREATE_INPUT = { summary: 'Standup', password: 'hunter2' }
+const VALID_CREATE_INPUT = { summary: 'Standup', allDay: true }
 
 /** A logger whose calls can be inspected. */
 function createSpyLogger(): RuntimeLogger & {
@@ -609,8 +609,7 @@ describe('step 4: governance', () => {
       permission: 'calendar:events:create',
       risk: 'write',
       identity: { apiKeyId: 'key_writer', apiKeyName: 'Calendar assistant' },
-      // `password` is not a parameter of `create`, so only its count is recorded.
-      argsSummary: 'summary: Standup; unknownKeys: 1',
+      argsSummary: 'summary: Standup; allDay: true',
       requestedAt: FIXED_NOW,
       layer: 'host',
     })
@@ -758,9 +757,8 @@ describe('step 4: governance', () => {
     await runtime.invoke(CREATE, VALID_CREATE_INPUT, as(WRITER_SECRET))
 
     expect(writer.records).toHaveLength(1)
-    expect(writer.records[0]).toMatchObject({ argsSummary: 'summary: Standup; unknownKeys: 1' })
+    expect(writer.records[0]).toMatchObject({ argsSummary: 'summary: Standup; allDay: true' })
     expect(JSON.stringify(writer.records)).not.toContain(WRITER_SECRET)
-    expect(JSON.stringify(writer.records)).not.toContain('hunter2')
   })
 
   it('records a non-record input as invalid input, without a summary', async () => {

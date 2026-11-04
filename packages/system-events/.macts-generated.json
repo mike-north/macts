@@ -44,7 +44,6 @@
     "src/contract/manifest.ts",
     "src/index.ts",
     "src/resources/action.ts",
-    "src/resources/diskitem.ts",
     "src/resources/uielement.ts",
     "src/types.ts",
     "tsconfig.json",

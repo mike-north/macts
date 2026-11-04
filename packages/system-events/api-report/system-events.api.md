@@ -318,12 +318,6 @@ export interface DiskItemCreateInput {
     visible?: boolean;
 }
 
-// @public
-export class DiskItemResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    delete(id: string): Promise<void>;
-}
-
 // @public (undocumented)
 export const DiskItemSchema: z.ZodObject<{
     busyStatus: z.ZodBoolean;
@@ -1376,7 +1370,6 @@ export class SystemEventsClient {
     connect(): Promise<void>;
     decrement(): Promise<void>;
     disconnect(): Promise<void>;
-    readonly diskItems: DiskItemResourceClient;
     doFolderAction(folderActionCode: string, withItemList?: unknown, withWindowSize?: {
         x: number;
         y: number;

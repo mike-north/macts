@@ -189,8 +189,10 @@ export interface MactsRuntime {
    *
    * @throws `OperationRegistrationError` when the app's route segment is
    *   reserved (`RESERVED_APP_ROUTE_SEGMENTS`), an operation id is already
-   *   registered, or the manifest yields a malformed id or permission. A
-   *   refused registration adds nothing.
+   *   registered, the manifest yields a malformed id or permission, or a
+   *   resource-scoped get, update or delete command declares no identifier
+   *   parameter (the error names the app and the command). A refused
+   *   registration adds nothing.
    */
   registerManifest(manifest: AppManifest): void
   /**
@@ -237,10 +239,12 @@ export interface MactsRuntime {
    *
    * Input is validated after the permission check and before governance. A
    * call rejected by validation is audited as `invalid-input`, with its issue
-   * count and none of its arguments, and nobody is asked to approve it. Audit
-   * and approval records of a governed call summarize only the operation's
-   * declared parameters, from the validated input; other keys are counted as
-   * `unknownKeys`, never named.
+   * count and none of its arguments, and nobody is asked to approve it. An
+   * input key that is not a declared parameter is invalid input, whether the
+   * operation was registered from a manifest or a contract. Audit and approval
+   * records of a governed call summarize only the operation's declared
+   * parameters, from the validated input; any other key that reaches them
+   * anyway is counted as `unknownKeys`, never named.
    *
    * @param id - The operation to run.
    * @param input - The input record in wire form, as received.
@@ -1505,10 +1509,12 @@ function declaredInputNames(operation: RegisteredOperation): readonly string[] {
  * only as present (`true`), never its contents, which can include an item's
  * identifier and therefore user content.
  *
- * Keys of the input as received that are not declared parameters (an input
- * schema may let them through, or strip them) are recorded only as their
- * count, `unknownKeys: N`, never by name or value: nothing but the operation's
- * own contract decides what an audit record or an approver is shown.
+ * Keys of the input as received that are not declared parameters are
+ * recorded only as their count, `unknownKeys: N`, never by name or value:
+ * nothing but the operation's own contract decides what an audit record or an
+ * approver is shown. Both registrations reject such keys during validation,
+ * so the count is normally absent; it is a backstop for an input schema that
+ * admits or strips one anyway.
  *
  * @param declared - The declared parameter names ({@link declaredInputNames}).
  * @param validated - The input as validation returned it; the only source of

@@ -41,7 +41,7 @@ import type { CredentialVerifier } from './invocation/verifier.js'
  * - `calendar.events.list`   — `calendar:events:list`, read
  * - `calendar.events.create` — `calendar:events:create`, write; requires `summary`
  * - `calendar.events.delete` — `calendar:events:delete` (declared), delete;
- *   formerly `calendar:events:remove`
+ *   requires `id`, the event it deletes; formerly `calendar:events:remove`
  */
 export const CALENDAR_MANIFEST: AppManifest = {
   version: '1.0',
@@ -82,7 +82,7 @@ export const CALENDAR_MANIFEST: AppManifest = {
       description: 'Delete an event',
       scope: 'resource',
       resourceType: 'Event',
-      parameters: [],
+      parameters: [{ name: 'id', type: 'string', description: 'Identifier', required: true }],
       permission: 'calendar:events:delete',
       permissionHistory: [
         {
