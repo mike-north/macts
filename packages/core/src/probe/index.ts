@@ -54,5 +54,6 @@ export {
 export {
   writeNullabilityResults,
   writeProbeResults,
+  type NotWrittenClaim,
   type NullabilityWriteResult,
 } from './writer.js'

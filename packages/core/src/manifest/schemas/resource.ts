@@ -1,7 +1,7 @@
 import { z } from 'zod'
-import { PropertySchema } from './property.js'
+import { PropertyClaimsSchema, PropertySchema } from './property.js'
 import {
-  DictionarySpellingEvidenceSchema,
+  DictionaryTermEvidenceSchema,
   IdentifierUniquenessEvidenceSchema,
   ObservedAtSchema,
   RangeReadEvidenceSchema,
@@ -203,10 +203,31 @@ export const ResourceNativeSpellingSchema = z
     /** The accessor the automation bridge resolves for the collection, e.g. `airplayDevices`. */
     collection: z.string().min(1),
     /** The dictionary term the accessor is the bridge's spelling of. */
-    evidence: DictionarySpellingEvidenceSchema,
+    evidence: DictionaryTermEvidenceSchema,
   })
   .strict()
 export type ResourceNativeSpelling = z.infer<typeof ResourceNativeSpellingSchema>
+
+/**
+ * The class a resource's dictionary class inherits, recorded from the
+ * dictionary's `inherits` attribute, never guessed.
+ *
+ * The manifest is read flattened (`../superclasses.ts`, phases/13 D10,
+ * "Superclasses"): the resource gains each ancestor property it does not
+ * declare, and the nearest ancestor's identifiers when it declares none, so
+ * every surface sees a subclass's record and identity as its superclass's
+ * unless the resource says otherwise. The superclass must be a resource of
+ * the same manifest, and the chain must not loop.
+ */
+export const ResourceInheritsSchema = z
+  .object({
+    /** The manifest key of the superclass resource, e.g. `DiskItem`. */
+    resource: z.string().min(1),
+    /** The superclass's name exactly as the dictionary's `inherits` writes it, e.g. `disk item`. */
+    evidence: DictionaryTermEvidenceSchema,
+  })
+  .strict()
+export type ResourceInherits = z.infer<typeof ResourceInheritsSchema>
 
 /**
  * The marker on a resource the app cannot provide: its dictionary has no
@@ -408,6 +429,21 @@ export const ResourceSchema = z
      * spelling is the app's.
      */
     native: ResourceNativeSpellingSchema.optional(),
+    /**
+     * The superclass of the resource's dictionary class, from the
+     * dictionary. Absent means the class inherits nothing the manifest
+     * models. The manifest is read flattened, so a parsed resource already
+     * holds what it inherits.
+     */
+    inherits: ResourceInheritsSchema.optional(),
+    /**
+     * Claims about properties the resource inherits, by property key, stated
+     * without redeclaring the property (`PropertyClaimsSchema`). Only a
+     * resource that records `inherits` has them, each for a property an
+     * ancestor declares and the resource does not. The manifest is read
+     * flattened, so a parsed resource holds them merged into its properties.
+     */
+    inheritedClaims: z.record(z.string(), PropertyClaimsSchema).optional(),
     /**
      * Set when the app cannot provide the resource (its dictionary has no
      * collection for it, or every read of it fails), with the evidence.

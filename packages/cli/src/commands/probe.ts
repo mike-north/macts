@@ -89,6 +89,7 @@ import type {
   ValueKindCounts,
 } from '@macts/core'
 import { resolveManifestsDir } from './capabilities/registry.js'
+import { nullabilityWriteNotes } from './nullability-write-notes.js'
 
 /**
  * `macts probe <app>`
@@ -342,11 +343,8 @@ export class ProbeCommand extends Command {
     }
     try {
       const written = await writeNullabilityResults(manifestPath, merged)
-      this.context.stderr.write(`Wrote nullability evidence to ${manifestPath}\n`)
-      if (written.keptEarlierBlocks.length > 0) {
-        this.context.stderr.write(
-          `Kept the earlier nullability probe record for ${written.keptEarlierBlocks.join(', ')}: this probe read no items there.\n`
-        )
+      for (const line of nullabilityWriteNotes(manifestPath, written)) {
+        this.context.stderr.write(line)
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)

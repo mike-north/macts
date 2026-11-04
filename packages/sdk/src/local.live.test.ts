@@ -6,7 +6,7 @@
  *
  * `@macts/sdk/local`'s `createClient(notesContract, ...)` with the default
  * native executor and a real API key, end to end through the invocation
- * pipeline (verify, permission, governance, validate, execute) and the native
+ * pipeline (verify, permission, validate, governance, execute) and the native
  * JXA codec. All checks are read-only; nothing is created, updated, or deleted:
  *
  *   1. `accounts.list()` resolves to an array whose entries have a string

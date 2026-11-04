@@ -16,7 +16,7 @@
  *   (`MACTS_HOME`), and the process-wide structured logger.
  * - **Invocation** — the single pipeline every operation runs through
  *   (verify the credential, admit it against an optional rate limit, check
- *   permission, enforce governance, validate input, execute), the operation
+ *   permission, validate input, enforce governance, execute), the operation
  *   registry it dispatches from, and the self-redacting credential holder.
  *
  * The runtime depends on `@macts/core` and `@macts/contracts`. It never

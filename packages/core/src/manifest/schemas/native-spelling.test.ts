@@ -31,10 +31,10 @@ import { describe, expect, it } from 'vitest'
 import { parseManifestYaml } from '../loader.js'
 import {
   DictionaryAbsenceEvidenceSchema,
-  DictionarySpellingEvidenceSchema,
+  DictionaryTermEvidenceSchema,
   LiveAbsenceEvidenceSchema,
   type DictionaryAbsenceEvidence,
-  type DictionarySpellingEvidence,
+  type DictionaryTermEvidence,
   type LiveAbsenceEvidence,
 } from './evidence.js'
 import { PropertySchema } from './property.js'
@@ -43,7 +43,7 @@ import { ResourceSchema } from './resource.js'
 const BASE = { access: 'r', type: 'string', description: 'A field' } as const
 
 /** Music 1.7.2's dictionary on macOS 27.2, which writes "AirPlay devices". */
-function spelling(term: string): DictionarySpellingEvidence {
+function spelling(term: string): DictionaryTermEvidence {
   return {
     source: 'dictionary',
     bundleId: 'com.apple.Music',
@@ -108,7 +108,7 @@ function issueMessages(result: {
 
 describe('dictionary spelling evidence', () => {
   it('accepts the app build and the term as the dictionary writes it', () => {
-    expect(DictionarySpellingEvidenceSchema.parse(spelling('AirPlay devices'))).toEqual(
+    expect(DictionaryTermEvidenceSchema.parse(spelling('AirPlay devices'))).toEqual(
       spelling('AirPlay devices')
     )
   })
@@ -116,7 +116,7 @@ describe('dictionary spelling evidence', () => {
   it.each(['bundleId', 'appVersion', 'osVersion', 'term'] as const)(
     'rejects an empty %s',
     (field) => {
-      const result = DictionarySpellingEvidenceSchema.safeParse({
+      const result = DictionaryTermEvidenceSchema.safeParse({
         ...spelling('URL'),
         [field]: '',
       })
@@ -128,18 +128,18 @@ describe('dictionary spelling evidence', () => {
     'rejects a missing %s',
     (field) => {
       const { [field]: _omitted, ...rest } = spelling('URL')
-      expect(DictionarySpellingEvidenceSchema.safeParse(rest).success).toBe(false)
+      expect(DictionaryTermEvidenceSchema.safeParse(rest).success).toBe(false)
     }
   )
 
   it('rejects any source but the dictionary', () => {
     expect(
-      DictionarySpellingEvidenceSchema.safeParse({ ...spelling('URL'), source: 'probe' }).success
+      DictionaryTermEvidenceSchema.safeParse({ ...spelling('URL'), source: 'probe' }).success
     ).toBe(false)
   })
 
   it('rejects an unknown field', () => {
-    const result = DictionarySpellingEvidenceSchema.safeParse({
+    const result = DictionaryTermEvidenceSchema.safeParse({
       ...spelling('URL'),
       observedAt: '2026-11-01T00:00:00.000Z',
     })

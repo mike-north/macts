@@ -64,8 +64,8 @@ The MCP server:
   client's `env` config
 - Runs every tool call under that key, through the same pipeline as the HTTP
   API: the key is verified on every call (a key revoked during the session is
-  refused on its next call), its permissions are checked, this Mac's
-  governance policy is enforced and audited, and the input is validated
+  refused on its next call), its permissions are checked, the input is
+  validated, and this Mac's governance policy is enforced and audited
 
 A successful call returns one text content item holding
 `{ "result": <wire value> }`. A failed call has `isError: true` and one text
