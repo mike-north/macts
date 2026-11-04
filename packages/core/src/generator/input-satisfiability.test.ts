@@ -179,9 +179,13 @@ describe('the generated contract', () => {
     const update = /export interface NoteUpdateInput \{[\s\S]*?\n\}/.exec(contract)?.[0] ?? ''
     expect(update).toContain("  relatedTags?: readonly ObjectReferenceData<never, 'Tag'>[]")
     expect(update).not.toContain('primaryTag')
-    // The record still reads the property (optional, and nullable by
-    // default): only inputs leave it out.
-    expect(contract).toContain("  primaryTag?: ObjectReferenceVariant<Tag, never, 'Tag'> | null")
+    // The record leaves both out: a tag read from the app could not be
+    // resolved, whether alone or in a list (phases/13 D7, #219). Inputs keep
+    // the list, which may be empty.
+    const record = /export interface Note \{[\s\S]*?\n\}/.exec(contract)?.[0] ?? ''
+    expect(record).toContain('  readonly uid: string')
+    expect(record).not.toContain('primaryTag')
+    expect(record).not.toContain('relatedTags')
   })
 
   it('is reported by a generation warning naming the app, operation and position', () => {

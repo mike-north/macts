@@ -283,7 +283,6 @@ export interface FinderWindow {
     columnViewOptions: unknown;
     currentView: string;
     iconViewOptions: unknown;
-    listViewOptions: unknown;
     pathbarVisible: boolean;
     sidebarWidth: number;
     statusbarVisible: boolean;
@@ -306,7 +305,6 @@ export const FinderWindowSchema: z.ZodObject<{
     target: z.ZodString;
     currentView: z.ZodString;
     iconViewOptions: z.ZodString;
-    listViewOptions: z.ZodString;
     columnViewOptions: z.ZodString;
     toolbarVisible: z.ZodBoolean;
     statusbarVisible: z.ZodBoolean;
@@ -366,7 +364,6 @@ export interface ListViewOptions {
     calculatesFolderSizes: boolean;
     iconSize: string;
     showsIconPreview: boolean;
-    sortColumn: Column;
     textSize: number;
     usesRelativeDates: boolean;
 }
@@ -386,7 +383,6 @@ export const ListViewOptionsSchema: z.ZodObject<{
     showsIconPreview: z.ZodBoolean;
     iconSize: z.ZodString;
     textSize: z.ZodNumber;
-    sortColumn: z.ZodString;
     usesRelativeDates: z.ZodBoolean;
 }, z.core.$strip>;
 

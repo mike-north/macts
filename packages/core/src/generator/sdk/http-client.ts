@@ -16,7 +16,8 @@ import {
   resolveCanonicalIdentifierSource,
   commandRouteSegment,
 } from '../../manifest/index.js'
-import { usableProperties, usableResources } from '../../manifest/unsupported.js'
+import { usableResources } from '../../manifest/unsupported.js'
+import { outputProperties } from '../../manifest/output-references.js'
 import { propertyTypeToTs } from '../types.js'
 import { SDK_GENERATED_NOTICE } from '../generated-header.js'
 import { pagingTypeNames } from '../contract/index.js'
@@ -218,7 +219,11 @@ function generateTypesFile(manifest: AppManifest): string {
 
   // Generate resource types
   for (const [resourceName, resource] of resources) {
-    const props = usableProperties(resource)
+    // The read type declares the fields the contract's record declares: a
+    // field holding a reference macts cannot yet return in a resolvable form
+    // is left out
+    // (`outputProperties`, the judgment the contract and native reads use).
+    const props = outputProperties(manifest, resource)
 
     // List output surfaces the resource's primary identifier under the canonical
     // `id` key (see the server list executor) so a consumer can always read
@@ -337,7 +342,7 @@ function generateTypesFile(manifest: AppManifest): string {
     if (emitCanonicalId) {
       lines.push(`  ${CANONICAL_IDENTIFIER_KEY}: z.string().optional(),`)
     }
-    for (const [propName, prop] of usableProperties(resource)) {
+    for (const [propName, prop] of outputProperties(manifest, resource)) {
       const zodType = propertyTypeToZod(prop.type, prop.optional)
       lines.push(`  ${propName}: ${zodType},`)
     }

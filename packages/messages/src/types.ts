@@ -27,8 +27,6 @@ export type ConnectionStatus = 'disconnecting' | 'connected' | 'connecting' | 'd
 export interface Participant {
   /** The participant's unique identifier. For example: 01234567-89AB-CDEF-0123-456789ABCDEF:+11234567890 */
   id: string
-  /** The account for this participant. */
-  account: Account
   /** The participant's name as it appears in the participant list. */
   name: string
   /** The participant's handle. */
@@ -76,8 +74,6 @@ export interface Chat {
   id: string
   /** The chat's name as it appears in the chat list. */
   name: string
-  /** The account which is participating in this chat. */
-  account: Account
 }
 
 /** Input for creating a Chat */
@@ -90,7 +86,6 @@ export type ChatUpdateInput = Partial<ChatCreateInput>
 
 export const ParticipantSchema = z.object({
   id: z.string(),
-  account: z.string(),
   name: z.string(),
   handle: z.string(),
   firstName: z.string(),
@@ -109,5 +104,4 @@ export const AccountSchema = z.object({
 export const ChatSchema = z.object({
   id: z.string(),
   name: z.string(),
-  account: z.string(),
 })

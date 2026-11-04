@@ -270,8 +270,6 @@ export interface FinderWindow {
   currentView: string
   /** the icon view options for the container window */
   iconViewOptions: unknown
-  /** the list view options for the container window */
-  listViewOptions: unknown
   /** the column view options for the container window */
   columnViewOptions: unknown
   /** Is the window's toolbar visible? */
@@ -325,8 +323,6 @@ export interface ListViewOptions {
   iconSize: string
   /** the size of the text displayed in the list view */
   textSize: number
-  /** the column that the list view is sorted on */
-  sortColumn: Column
   /** Are relative dates (e.g., today, yesterday) shown in the list view? */
   usesRelativeDates: boolean
 }
@@ -439,7 +435,6 @@ export const FinderWindowSchema = z.object({
   target: z.string(),
   currentView: z.string(),
   iconViewOptions: z.string(),
-  listViewOptions: z.string(),
   columnViewOptions: z.string(),
   toolbarVisible: z.boolean(),
   statusbarVisible: z.boolean(),
@@ -456,7 +451,6 @@ export const ListViewOptionsSchema = z.object({
   showsIconPreview: z.boolean(),
   iconSize: z.string(),
   textSize: z.number(),
-  sortColumn: z.string(),
   usesRelativeDates: z.boolean(),
 })
 

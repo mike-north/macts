@@ -27,8 +27,6 @@ export class GetRunDestinationCommand extends Command {
         name: item.name,
         architecture: item.architecture,
         platform: item.platform,
-        device: item.device,
-        companionDevice: item.companionDevice,
       })
 
       this.context.stdout.write(output + '\n')

@@ -158,7 +158,7 @@ describe('every real contract', () => {
           differences.push(`${app.name}: ${resource.name} is not a resource of the manifest`)
           continue
         }
-        const reads = compareNativeReads(resource, nativeReadKeys(manifestResource))
+        const reads = compareNativeReads(resource, nativeReadKeys(app.manifest, manifestResource))
         if (!plans.compared || !reads.compared) {
           notCompared++
           continue

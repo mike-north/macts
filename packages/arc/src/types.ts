@@ -27,10 +27,6 @@ export interface Window {
   zoomable: boolean
   /** Whether the window is currently zoomed. */
   zoomed: boolean
-  /** Returns the currently selected tab */
-  activeTab: Tab
-  /** Returns the currently active space */
-  activeSpace: Space
   /** Whether the window is an incognito window. */
   incognito: boolean
   /** Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window. */
@@ -108,8 +104,6 @@ export const WindowSchema = z.object({
   visible: z.boolean(),
   zoomable: z.boolean(),
   zoomed: z.boolean(),
-  activeTab: z.string(),
-  activeSpace: z.string(),
   incognito: z.boolean(),
   mode: z.string(),
 })

@@ -43,7 +43,6 @@ export type ArtworkUpdateInput = Partial<ArtworkCreateInput>;
 export interface BrowserWindow {
     id: number;
     selection: string;
-    view: Playlist;
 }
 
 // @public
@@ -53,7 +52,6 @@ export type BrowserWindowCreateInput = Record<string, never>;
 export const BrowserWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
     selection: z.ZodString;
-    view: z.ZodString;
 }, z.core.$strip>;
 
 // @public
@@ -150,7 +148,6 @@ export interface Playlist {
     duration: number;
     id: number;
     name: string;
-    parent: Playlist;
     size: number;
     specialKind: string;
     time: string;
@@ -176,7 +173,6 @@ export const PlaylistSchema: z.ZodObject<{
     description: z.ZodString;
     duration: z.ZodNumber;
     name: z.ZodString;
-    parent: z.ZodString;
     size: z.ZodNumber;
     specialKind: z.ZodString;
     time: z.ZodString;
@@ -190,7 +186,6 @@ export type PlaylistUpdateInput = Partial<PlaylistCreateInput>;
 export interface PlaylistWindow {
     id: number;
     selection: string;
-    view: Playlist;
 }
 
 // @public
@@ -200,7 +195,6 @@ export type PlaylistWindowCreateInput = Record<string, never>;
 export const PlaylistWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
     selection: z.ZodString;
-    view: z.ZodString;
 }, z.core.$strip>;
 
 // @public

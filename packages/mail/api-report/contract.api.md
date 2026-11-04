@@ -10,7 +10,6 @@ import { ClientBrand } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
-import { ObjectReferenceVariant } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
 
 // @public
@@ -214,8 +213,6 @@ export type MailAttachmentUpdateInput = Record<string, never>;
 
 // @public
 export interface Mailbox {
-    readonly account: ObjectReferenceVariant<Account, string, 'Account'> | null;
-    readonly container: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     name: string | null;
     readonly unreadCount: Integer | null;
 }
@@ -256,7 +253,6 @@ export type MailResources = Readonly<Record<never, never>>;
 export interface Message {
     readonly allHeaders: string | null;
     backgroundColor: string | null;
-    readonly content: ObjectReferenceVariant<RichText, never, 'RichText'> | null;
     readonly dateReceived: Date | null;
     readonly dateSent: Date | null;
     deletedStatus: boolean | null;
@@ -264,7 +260,6 @@ export interface Message {
     flagIndex: Integer | null;
     readonly id: Integer;
     junkMailStatus: boolean | null;
-    mailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     readonly messageId: string | null;
     readonly messageSize: Integer | null;
     readStatus: boolean | null;
@@ -310,19 +305,13 @@ export interface MessageUpdateInput {
 
 // @public
 export interface MessageViewer {
-    readonly draftsMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     readonly id: Integer;
-    readonly inbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
-    readonly junkMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     mailboxListVisible: boolean | null;
-    readonly outbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     previewPaneIsVisible: boolean | null;
     selectedMailboxes: string | null;
     selectedMessages: string | null;
-    readonly sentMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     sortColumn: string | null;
     sortedAscending: boolean | null;
-    readonly trashMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     visibleColumns: string | null;
     visibleMessages: string | null;
 }
@@ -454,7 +443,6 @@ export interface RichTextUpdateInput {
 export interface Rule {
     allConditionsMustBeMet: boolean | null;
     colorMessage: string | null;
-    copyMessage: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     deleteMessage: boolean | null;
     enabled: boolean | null;
     forwardMessage: string | null;
@@ -463,7 +451,6 @@ export interface Rule {
     markFlagged: boolean | null;
     markFlagIndex: Integer | null;
     markRead: boolean | null;
-    moveMessage: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null;
     name: string | null;
     playSound: string | null;
     redirectMessage: string | null;

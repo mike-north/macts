@@ -3,24 +3,19 @@
  *
  * Every field, parameter, and result in a generated contract is described by a
  * value type composed from the `ValueTypes` constructors of `@macts/contracts`
- * (conventionally aliased `t`). This module decides which composition a
- * manifest type maps to, and renders it twice: as the constructor expression
- * (`t.array(t.date())`) and as the SDK type callers see (`readonly Date[]`).
+ * (conventionally aliased `t`). Which composition a manifest type maps to is
+ * decided from the manifest (`../../manifest/value-shapes.ts`); this module
+ * renders it twice: as the constructor expression (`t.array(t.date())`) and
+ * as the SDK type callers see (`readonly Date[]`).
  * It also builds the same composition in process, with the same constructors
  * ({@link ValueBuilder}), so the generator can derive data from the value type
  * the emitted expression will construct, such as its wire JSON Schema. All
  * three come from one {@link ValueShape}, so the expression, the declared
  * type, and the built value type cannot disagree.
  *
- * The mapping depends on position. File-like types (`file`, `data`) are
- * {@link FileValue}s where an operation returns them and file sources where an
- * operation consumes them; every other type maps the same way in both
- * positions.
- *
- * Type names that refer to resources or enums are resolved against the
- * manifest by normalized name (case-insensitive, ignoring spaces, dashes, and
- * underscores). A name that resolves to nothing maps to `t.unknown()`, and the
- * caller reports it as a diagnostic.
+ * A file-like type is a {@link FileValue} where an operation returns it and a
+ * file source where an operation consumes it, and a name that resolves to
+ * nothing renders as `t.unknown()`.
  *
  * @packageDocumentation
  */
@@ -31,186 +26,21 @@ import {
   type ValueType,
   type ValueTypeOptions,
 } from '@macts/contracts'
-import type { AppManifest } from '../../manifest/index.js'
-import { normalizeTypeName } from '../../manifest/type-names.js'
-import { usableResources } from '../../manifest/unsupported.js'
-import type { DeclaredType } from '../surface.js'
+import type { ValuePosition, ValueShape } from '../../manifest/value-shapes.js'
 
-/**
- * Where a value appears: in what an operation returns (records, results), or
- * in what it consumes (inputs, parameters).
- */
-export type ValuePosition = 'output' | 'input'
-
-/** The leaf value kinds, each one `ValueTypes` constructor. */
-export type LeafKind =
-  | 'string'
-  | 'boolean'
-  | 'integer'
-  | 'double'
-  | 'date'
-  | 'point'
-  | 'rectangle'
-  | 'rgb'
-  | 'file'
-  | 'fileSource'
-  | 'unknown'
-
-/**
- * The composition a manifest type maps to, before rendering.
- *
- * @remarks
- * `enum` names the manifest enum key and `reference` the manifest resource
- * key, so rendering can refer to the generated enum type and record interface.
- */
-export type ValueShape =
-  | { readonly kind: LeafKind }
-  | { readonly kind: 'enum'; readonly enumKey: string }
-  | { readonly kind: 'array'; readonly item: ValueShape }
-  | { readonly kind: 'reference'; readonly resourceKey: string }
-  | { readonly kind: 'nullable'; readonly inner: ValueShape }
-
-/**
- * `shape`, or `null`. Nullability is decided by the caller from manifest
- * evidence, never by the declared type, so it wraps an already mapped shape.
- *
- * @remarks
- * An `unknown` value already admits `null`, so it is returned unchanged
- * rather than wrapped; a shape that is already nullable is not wrapped twice.
- */
-export function nullableShape(shape: ValueShape): ValueShape {
-  if (shape.kind === 'unknown' || shape.kind === 'nullable') return shape
-  return { kind: 'nullable', inner: shape }
-}
-
-/** The outcome of mapping one declared type. */
-export interface MappedType {
-  /** The composition the type maps to. */
-  readonly shape: ValueShape
-  /**
-   * Whether every name in the type resolved. When `false`, the unresolved
-   * part is `unknown` in {@link MappedType.shape}.
-   */
-  readonly resolved: boolean
-}
-
-/**
- * Resolves resource and enum names that manifest types refer to, to manifest
- * keys.
- */
-export interface NameResolver {
-  /**
-   * The resource key a name refers to: matched against each usable resource's
-   * key, `name`, and `plural`. A resource marked unsupported is on no
-   * generated surface, so a name that refers to it resolves to none.
-   */
-  resource(name: string): string | undefined
-  /** The enum key a name refers to: matched against each enum's key. */
-  enumeration(name: string): string | undefined
-}
-
-/** Build the name resolver for a manifest. */
-export function createNameResolver(manifest: AppManifest): NameResolver {
-  const resources = new Map<string, string>()
-  for (const [key, resource] of usableResources(manifest)) {
-    for (const alias of [key, resource.name, resource.plural]) {
-      const normalized = normalizeTypeName(alias)
-      // The first declared resource wins an alias two resources share.
-      if (!resources.has(normalized)) resources.set(normalized, key)
-    }
-  }
-  const enums = new Map<string, string>()
-  for (const key of Object.keys(manifest.enums)) {
-    const normalized = normalizeTypeName(key)
-    if (!enums.has(normalized)) enums.set(normalized, key)
-  }
-  return {
-    resource: (name) => resources.get(normalizeTypeName(name)),
-    enumeration: (name) => enums.get(normalizeTypeName(name)),
-  }
-}
-
-/** The leaf kind of each primitive manifest type, by position. */
-const PRIMITIVE_KINDS: Readonly<Record<string, Readonly<Record<ValuePosition, LeafKind>>>> = {
-  string: { output: 'string', input: 'string' },
-  boolean: { output: 'boolean', input: 'boolean' },
-  integer: { output: 'integer', input: 'integer' },
-  number: { output: 'double', input: 'double' },
-  date: { output: 'date', input: 'date' },
-  point: { output: 'point', input: 'point' },
-  rect: { output: 'rectangle', input: 'rectangle' },
-  rgb: { output: 'rgb', input: 'rgb' },
-  file: { output: 'file', input: 'fileSource' },
-  data: { output: 'file', input: 'fileSource' },
-  any: { output: 'unknown', input: 'unknown' },
-}
-
-const UNRESOLVED: MappedType = { shape: { kind: 'unknown' }, resolved: false }
-
-/**
- * Map a declared manifest type to its value composition at `position`.
- *
- * @remarks
- * - An absent type is a string, the manifest's default property type.
- * - `{ resource: R }` tries resources first, then enums; `{ enum: E }` tries
- *   enums first, then resources; a bare name tries enums, then resources.
- * - `{ array: X }` maps `X` at the same position.
- * - Anything else, including a record with no recognized key, is unresolved.
- */
-export function mapDeclaredType(
-  type: DeclaredType,
-  position: ValuePosition,
-  names: NameResolver
-): MappedType {
-  if (type === undefined) return { shape: { kind: 'string' }, resolved: true }
-  return mapTypeValue(type, position, names)
-}
-
-/**
- * Map a type as it appears in manifest data. Parameter types are loosely
- * typed records (`Record<string, string>`), so the walk narrows the actual
- * value rather than trusting the declared shape.
- */
-function mapTypeValue(type: unknown, position: ValuePosition, names: NameResolver): MappedType {
-  if (typeof type === 'string') {
-    const primitive = PRIMITIVE_KINDS[type]
-    if (primitive !== undefined) return { shape: { kind: primitive[position] }, resolved: true }
-    return byName(type, ['enum', 'resource'], names)
-  }
-  if (typeof type !== 'object' || type === null || Array.isArray(type)) return UNRESOLVED
-  const keys = Object.keys(type)
-  if (keys.length !== 1) return UNRESOLVED
-  if ('array' in type) {
-    const mapped = mapTypeValue(type.array, position, names)
-    return { shape: { kind: 'array', item: mapped.shape }, resolved: mapped.resolved }
-  }
-  if ('resource' in type && typeof type.resource === 'string') {
-    return byName(type.resource, ['resource', 'enum'], names)
-  }
-  if ('enum' in type && typeof type.enum === 'string') {
-    return byName(type.enum, ['enum', 'resource'], names)
-  }
-  return UNRESOLVED
-}
-
-function byName(
-  name: string,
-  order: readonly ['enum' | 'resource', 'enum' | 'resource'],
-  names: NameResolver
-): MappedType {
-  for (const kind of order) {
-    if (kind === 'enum') {
-      const enumKey = names.enumeration(name)
-      if (enumKey !== undefined) return { shape: { kind: 'enum', enumKey }, resolved: true }
-    } else {
-      const resourceKey = names.resource(name)
-      if (resourceKey !== undefined) {
-        return { shape: { kind: 'reference', resourceKey }, resolved: true }
-      }
-    }
-  }
-  return UNRESOLVED
-}
+// Which composition a declared type maps to is manifest knowledge
+// (../../manifest/value-shapes.ts); this module renders and builds it. The
+// mapping is re-exported here for the generators that render it.
+export {
+  createNameResolver,
+  mapDeclaredType,
+  nullableShape,
+  type LeafKind,
+  type MappedType,
+  type NameResolver,
+  type ValuePosition,
+  type ValueShape,
+} from '../../manifest/value-shapes.js'
 
 /**
  * The `@macts/contracts` type names that rendered SDK types can refer to. A
