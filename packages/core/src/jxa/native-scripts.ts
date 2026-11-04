@@ -1537,9 +1537,11 @@ function buildRootListBody(
 }
 
 /**
- * Delete one item, addressed like a get. A delete command with no required
- * parameter at all (System Events' disk item delete) has no item to address and
- * is called on the app with its parameters instead.
+ * Delete one item, addressed like a get: Calendar's `deleteEvent` binds the
+ * event its `id` parameter names, under the calendar its `calendarId` names,
+ * and deletes it. A delete command with no required parameter other than its
+ * parent's has no item to address and is called on the app with its
+ * parameters instead.
  */
 function buildDeleteBody(
   command: Command,

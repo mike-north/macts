@@ -275,8 +275,9 @@ function toRegisteredOperation(
  * registered from a contract; the output is any JSON value. A
  * manifest-registered list does not page, so its input declares no paging
  * inputs. A resource-scoped get, update or delete must declare the identifier
- * parameter it selects its item by, or the manifest is refused. They stand in for generated descriptors until generated contracts
- * carry value types, and the generator never produces them.
+ * parameter it selects its item by, or the manifest is refused. They stand in
+ * for generated descriptors until generated contracts carry value types, and
+ * the generator never produces them.
  *
  * @param manifest - A validated app manifest.
  * @returns One registered operation per route, in command-declaration order.

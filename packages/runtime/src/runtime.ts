@@ -189,8 +189,10 @@ export interface MactsRuntime {
    *
    * @throws `OperationRegistrationError` when the app's route segment is
    *   reserved (`RESERVED_APP_ROUTE_SEGMENTS`), an operation id is already
-   *   registered, or the manifest yields a malformed id or permission. A
-   *   refused registration adds nothing.
+   *   registered, the manifest yields a malformed id or permission, or a
+   *   resource-scoped get, update or delete command declares no identifier
+   *   parameter (the error names the app and the command). A refused
+   *   registration adds nothing.
    */
   registerManifest(manifest: AppManifest): void
   /**
