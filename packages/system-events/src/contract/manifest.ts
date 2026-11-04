@@ -966,7 +966,7 @@ export const manifest: unknown = {
           access: 'r',
           type: 'string',
           description: 'the URL of the disk item',
-          code: 'url',
+          code: 'url ',
           optional: false,
           native: {
             name: 'url',
@@ -1345,7 +1345,7 @@ export const manifest: unknown = {
           access: 'r',
           type: 'string',
           description: 'the URL of the disk item',
-          code: 'url',
+          code: 'url ',
           optional: false,
           native: {
             name: 'url',

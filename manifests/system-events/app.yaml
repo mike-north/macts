@@ -631,7 +631,7 @@ resources:
         access: r
         type: string
         description: the URL of the disk item
-        code: url
+        code: 'url '
         native:
           name: url
           evidence:
