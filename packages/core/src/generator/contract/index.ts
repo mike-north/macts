@@ -229,7 +229,7 @@ const OMITTED_OUTPUT_REASONS: Readonly<Record<OmittedOutputReason, (target: stri
   'no-get': (target) => `and macts has no get for "${target}" yet (#219)`,
   'no-identifier': (target) => `and macts has no identifier for "${target}" yet (#219)`,
   'parent-scoped': (target) =>
-    `which the app finds only within its container, and macts does not yet return a "${target}" reference with its container (#219, #242)`,
+    `which the app finds only within its container, and this field is not read through a valid container for "${target}" (#219, #242)`,
   'unrecorded-parent': (target) =>
     `which the app holds only within a container, and macts's get for "${target}" does not name that container yet (#219)`,
   'not-unique': (target) =>
