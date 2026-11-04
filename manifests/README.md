@@ -617,6 +617,19 @@ difference within measurement noise never chooses column. A column page costs wh
 slower as the collection grows: the choice holds at the recorded `items`, and
 should be measured again when the collection grows well past it.
 
+The cost is measured with a read-only harness that times every list that pages
+both ways through the real list body and prints the `cost` block and `read` to
+record. It never writes to an app and prints only timings and counts:
+
+```sh
+pnpm --filter @macts/core build
+MACTS_LIVE_APPS=1 MACTS_PAGE_COST=1 pnpm --filter @macts/core exec vitest run src/jxa/page-read-cost.live.test.ts
+```
+
+`MACTS_PAGE_COST_RUNS` sets the runs (5 by default), and
+`MACTS_PAGE_COST_LISTS` limits it to some lists, e.g. `reminders.lists.list`.
+See [`page-read-cost.live.test.ts`](../packages/core/src/jxa/page-read-cost.live.test.ts).
+
 A range read observed to fail is recorded as `supported: false`, with the
 distinct error numbers it raised:
 
