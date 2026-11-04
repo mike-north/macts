@@ -160,6 +160,80 @@ describe('singleton roots: the identity validation derives', () => {
     ])
   })
 
+  describe('re-validating what normalisation derived', () => {
+    /** The validated Archive manifest as plain data, as an embedded copy is re-read. */
+    function revalidated(): ArchiveSource {
+      return JSON.parse(JSON.stringify(AppManifestSchema.parse(archiveSource()))) as ArchiveSource
+    }
+    const IDENTIFIERS_ISSUE =
+      'resources.Desk.identifiers: "Desk" is identified by its kind, which its roots define; remove identifiers, or leave exactly the one validation derives (kind, primary, unique, byRoot, with its curated uniqueness evidence).'
+
+    /** Re-validate with the derived Desk identifiers changed by `change`. */
+    function withDeskIdentifiers(
+      change: (identifiers: Record<string, unknown>[]) => void
+    ): string[] {
+      const source = revalidated()
+      const identifiers = resourceOf(source, 'Desk')['identifiers'] as Record<string, unknown>[]
+      change(identifiers)
+      return issuesOf(source)
+    }
+
+    it('accepts the normalised form again, unchanged', () => {
+      expect(issuesOf(revalidated())).toEqual([])
+    })
+
+    it.each([
+      [
+        'drops primary',
+        (identifiers: Record<string, unknown>[]) => delete identifiers[0]?.['primary'],
+      ],
+      [
+        'sets unique to false',
+        (identifiers: Record<string, unknown>[]) => {
+          if (identifiers[0] !== undefined) identifiers[0]['unique'] = false
+        },
+      ],
+      [
+        'drops the uniqueness evidence',
+        (identifiers: Record<string, unknown>[]) => delete identifiers[0]?.['evidence'],
+      ],
+      [
+        'changes the uniqueness evidence',
+        (identifiers: Record<string, unknown>[]) => {
+          if (identifiers[0] !== undefined) {
+            identifiers[0]['evidence'] = {
+              unique: { source: 'curated', note: 'Some other reason.' },
+            }
+          }
+        },
+      ],
+      [
+        'adds a second identifier',
+        (identifiers: Record<string, unknown>[]) => {
+          identifiers.push({ property: 'clerk' })
+        },
+      ],
+    ])('rejects a derived identifier list that %s', (_what, change) => {
+      // Some changes also break the identifier schema's own rules; the root's
+      // rule rejects each regardless.
+      expect(withDeskIdentifiers(change)).toContain(IDENTIFIERS_ISSUE)
+    })
+
+    it('rejects a changed derived kind property', () => {
+      const source = revalidated()
+      const properties = resourceOf(source, 'Desk')['properties'] as Record<
+        string,
+        Record<string, unknown>
+      >
+      const kind = properties['kind']
+      if (kind === undefined) throw new Error('the normalised Desk has no kind')
+      kind['access'] = 'rw'
+      expect(issuesOf(source)).toContain(
+        'resources.Desk.properties.kind: "Desk" holds its kind in "kind", of the enum DeskKind its roots define; remove the property, or leave exactly the one validation derives.'
+      )
+    })
+  })
+
   it('validates a validated manifest to the same manifest', () => {
     const once = AppManifestSchema.parse(archiveSource())
     expect(AppManifestSchema.parse(once)).toEqual(once)
@@ -219,7 +293,7 @@ describe('singleton roots: the identity validation derives', () => {
     const source = archiveSource()
     resourceOf(source, 'Desk')['identifiers'] = [{ property: 'clerk', primary: true }]
     expect(issuesOf(source)).toEqual([
-      'resources.Desk.identifiers: "Desk" is identified by its kind, which its roots define; remove identifiers.',
+      'resources.Desk.identifiers: "Desk" is identified by its kind, which its roots define; remove identifiers, or leave exactly the one validation derives (kind, primary, unique, byRoot, with its curated uniqueness evidence).',
     ])
   })
 
@@ -228,7 +302,7 @@ describe('singleton roots: the identity validation derives', () => {
     const properties = resourceOf(property, 'Desk')['properties'] as Record<string, unknown>
     properties['kind'] = { access: 'r', type: 'string', description: 'The kind' }
     expect(issuesOf(property)).toEqual([
-      'resources.Desk.properties.kind: "Desk" holds its kind in "kind", of the enum DeskKind its roots define; remove the property.',
+      'resources.Desk.properties.kind: "Desk" holds its kind in "kind", of the enum DeskKind its roots define; remove the property, or leave exactly the one validation derives.',
     ])
     const enumValues = archiveSource()
     enumValues.enums['DeskKind'] = {

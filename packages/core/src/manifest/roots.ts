@@ -14,7 +14,7 @@
  *
  * Normalisation is idempotent, because a validated manifest (the one a
  * generated package embeds) is validated again before use: the pieces it adds
- * are accepted when present in exactly the form it gives them.
+ * are accepted only when present in exactly the form it gives them.
  *
  * Internal to this package: nothing here is part of the public entry.
  */
@@ -129,6 +129,33 @@ function isEnumType(type: unknown, enumKey: string): boolean {
 }
 
 /**
+ * Whether two manifest values are the same data: equal primitives, or arrays
+ * and plain objects of the same shape holding the same data, whatever the
+ * order of an object's keys. A value that normalisation derives is accepted
+ * on re-validation only when it is the same data as the derived one, so a
+ * piece of a root's identity cannot be dropped or changed.
+ */
+function isSameData(a: unknown, b: unknown): boolean {
+  if (a === b) return true
+  if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) return false
+  if (Array.isArray(a) || Array.isArray(b)) {
+    return (
+      Array.isArray(a) &&
+      Array.isArray(b) &&
+      a.length === b.length &&
+      a.every((item, index) => isSameData(item, b[index]))
+    )
+  }
+  const keys = Object.keys(a)
+  return (
+    keys.length === Object.keys(b).length &&
+    keys.every(
+      (key) => Object.hasOwn(b, key) && isSameData(Reflect.get(a, key), Reflect.get(b, key))
+    )
+  )
+}
+
+/**
  * The issues of the manifest's singleton roots, checked before
  * normalisation:
  *
@@ -171,23 +198,19 @@ export function findRootIssues(
     const identifiers = resource.identifiers
     if (
       identifiers !== undefined &&
-      !(
-        identifiers.length === 1 &&
-        identifiers[0]?.property === ROOT_KIND_PROPERTY &&
-        identifiers[0].targeting === 'byRoot'
-      )
+      !(identifiers.length === 1 && isSameData(identifiers[0], KIND_IDENTIFIER))
     ) {
       issues.push({
-        message: `"${key}" is identified by its kind, which its roots define; remove identifiers.`,
+        message: `"${key}" is identified by its kind, which its roots define; remove identifiers, or leave exactly the one validation derives (${ROOT_KIND_PROPERTY}, primary, unique, byRoot, with its curated uniqueness evidence).`,
         path: ['resources', key, 'identifiers'],
       })
     }
     const declared = Object.hasOwn(resource.properties, ROOT_KIND_PROPERTY)
       ? resource.properties[ROOT_KIND_PROPERTY]
       : undefined
-    if (declared !== undefined && !isEnumType(declared.type, enumKey)) {
+    if (declared !== undefined && !isSameData(declared, kindProperty(key, resource))) {
       issues.push({
-        message: `"${key}" holds its kind in "${ROOT_KIND_PROPERTY}", of the enum ${enumKey} its roots define; remove the property.`,
+        message: `"${key}" holds its kind in "${ROOT_KIND_PROPERTY}", of the enum ${enumKey} its roots define; remove the property, or leave exactly the one validation derives.`,
         path: ['resources', key, 'properties', ROOT_KIND_PROPERTY],
       })
     }
