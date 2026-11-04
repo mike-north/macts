@@ -140,17 +140,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[\_delete()](./music.musicclient._delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete an element from an object
-
-</td></tr>
-<tr><td>
-
 [\_export(as, to)](./music.musicclient._export.md)
 
 </td><td>

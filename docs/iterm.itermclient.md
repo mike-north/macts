@@ -106,17 +106,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[\_delete()](./iterm.itermclient._delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete an object.
-
-</td></tr>
-<tr><td>
-
 [close()](./iterm.itermclient.close.md)
 
 </td><td>

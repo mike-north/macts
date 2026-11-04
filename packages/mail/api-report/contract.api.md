@@ -230,7 +230,6 @@ export interface MailboxUpdateInput {
 // @public
 export interface MailClient extends ClientBrand<MailResources> {
     checkForNewMail(options?: CallOptions): Promise<void>;
-    _delete(options?: CallOptions): Promise<void>;
     duplicate(to?: string, withProperties?: unknown, options?: CallOptions): Promise<void>;
     extractAddressFrom(options?: CallOptions): Promise<void>;
     extractNameFrom(options?: CallOptions): Promise<void>;

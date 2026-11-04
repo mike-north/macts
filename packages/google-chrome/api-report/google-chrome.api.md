@@ -80,7 +80,6 @@ export class GoogleChromeClient {
     copySelection(): Promise<void>;
     count(each?: string): Promise<void>;
     cutSelection(): Promise<void>;
-    _delete(): Promise<void>;
     duplicate(to?: string, withProperties?: unknown): Promise<void>;
     execute(javascript: string): Promise<void>;
     exists(): Promise<void>;

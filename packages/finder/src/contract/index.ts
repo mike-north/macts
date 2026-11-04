@@ -681,8 +681,6 @@ export interface FinderClient extends ClientBrand<FinderResources> {
    * @param as - the data type for which the size is calculated. Does not accept null.
    */
   dataSize(as?: string, options?: CallOptions): Promise<void>
-  /** Move an item from its container to the trash */
-  _delete(options?: CallOptions): Promise<void>
   /**
    * Duplicate one or more object(s)
    *
@@ -1105,21 +1103,6 @@ const appDataSizeOperation: OperationDescriptor<{ readonly as?: string | undefin
     properties: {
       as: { type: 'string', description: 'the data type for which the size is calculated' },
     },
-    additionalProperties: false,
-  },
-}
-
-const appDeleteOperation: OperationDescriptor<Record<string, never>, undefined> = {
-  id: 'finder.app.delete',
-  permission: 'finder:app:delete',
-  target: { command: 'delete' },
-  description: 'Move an item from its container to the trash',
-  input: t.record({}),
-  output: t.none(),
-  inputJsonSchema: {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: {},
     additionalProperties: false,
   },
 }
@@ -1634,7 +1617,6 @@ const operations: AppContract<FinderClient>['operations'] = {
   'finder.app.close': appCloseOperation,
   'finder.app.count': appCountOperation,
   'finder.app.dataSize': appDataSizeOperation,
-  'finder.app.delete': appDeleteOperation,
   'finder.app.duplicate': appDuplicateOperation,
   'finder.app.exists': appExistsOperation,
   'finder.app.make': appMakeOperation,
@@ -1666,7 +1648,6 @@ function bind(runtime: ClientRuntime): FinderClient {
     close: (options) => runtime.invoke(appCloseOperation, {}, options),
     count: (each, options) => runtime.invoke(appCountOperation, { each }, options),
     dataSize: (as, options) => runtime.invoke(appDataSizeOperation, { as }, options),
-    _delete: (options) => runtime.invoke(appDeleteOperation, {}, options),
     duplicate: (to, replacing, routingSuppressed, exactCopy, options) =>
       runtime.invoke(
         appDuplicateOperation,

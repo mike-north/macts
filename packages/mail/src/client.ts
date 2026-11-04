@@ -110,13 +110,6 @@ export class MailClient {
   }
 
   /**
-   * Delete an object.
-   */
-  async _delete(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('mail.app.delete', {})
-  }
-
-  /**
    * Copy an object.
    */
   async duplicate(to?: string, withProperties?: unknown): Promise<void> {

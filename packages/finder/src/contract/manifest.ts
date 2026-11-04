@@ -34,7 +34,6 @@ export const manifest: unknown = {
         'close',
         'count',
         'dataSize',
-        'delete',
         'duplicate',
         'exists',
         'make',
@@ -1653,13 +1652,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'dsiz',
-    },
-    delete: {
-      name: 'delete',
-      description: 'Move an item from its container to the trash',
-      scope: 'application',
-      parameters: [],
-      code: 'delo',
     },
     duplicate: {
       name: 'duplicate',

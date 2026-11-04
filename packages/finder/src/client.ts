@@ -144,13 +144,6 @@ export class FinderClient {
   }
 
   /**
-   * Move an item from its container to the trash
-   */
-  async _delete(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('finder.app.delete', {})
-  }
-
-  /**
    * Duplicate one or more object(s)
    */
   async duplicate(

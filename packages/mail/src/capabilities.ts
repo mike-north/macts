@@ -57,21 +57,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'mail.app.delete',
-    app: 'mail',
-    appBundleId: 'com.apple.mail',
-    resource: 'app',
-    operation: 'delete',
-    description: 'Delete an object.',
-    permission: 'mail:app:delete',
-    risk: 'delete',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-      additionalProperties: false,
-    },
-  },
-  {
     name: 'mail.app.duplicate',
     app: 'mail',
     appBundleId: 'com.apple.mail',

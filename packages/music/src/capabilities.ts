@@ -130,21 +130,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'music.app.delete',
-    app: 'music',
-    appBundleId: 'com.apple.Music',
-    resource: 'app',
-    operation: 'delete',
-    description: 'Delete an element from an object',
-    permission: 'music:app:delete',
-    risk: 'delete',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-      additionalProperties: false,
-    },
-  },
-  {
     name: 'music.app.download',
     app: 'music',
     appBundleId: 'com.apple.Music',

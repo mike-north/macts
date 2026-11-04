@@ -8,7 +8,6 @@ import { OpenCommand } from './commands/open.js'
 import { CloseCommand } from './commands/close.js'
 import { QuitCommand } from './commands/quit.js'
 import { CountCommand } from './commands/count.js'
-import { DeleteCommand } from './commands/delete.js'
 import { DuplicateCommand } from './commands/duplicate.js'
 import { ExistsCommand } from './commands/exists.js'
 import { MakeCommand } from './commands/make.js'
@@ -43,7 +42,6 @@ export const plugin: CliPlugin = {
     CloseCommand,
     QuitCommand,
     CountCommand,
-    DeleteCommand,
     DuplicateCommand,
     ExistsCommand,
     MakeCommand,

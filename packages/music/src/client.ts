@@ -142,13 +142,6 @@ export class MusicClient {
   }
 
   /**
-   * Delete an element from an object
-   */
-  async _delete(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('music.app.delete', {})
-  }
-
-  /**
    * Duplicate one or more object(s)
    */
   async duplicate(to?: string): Promise<void> {

@@ -1,6 +1,5 @@
 import type { CliPlugin } from '@macts/cli'
 import { CountCommand } from './commands/count.js'
-import { DeleteCommand } from './commands/delete.js'
 import { DuplicateCommand } from './commands/duplicate.js'
 import { ExistsCommand } from './commands/exists.js'
 import { MakeCommand } from './commands/make.js'
@@ -36,7 +35,6 @@ export const plugin: CliPlugin = {
   description: 'Commands for iTerm',
   commands: [
     CountCommand,
-    DeleteCommand,
     DuplicateCommand,
     ExistsCommand,
     MakeCommand,

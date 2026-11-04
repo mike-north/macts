@@ -22,7 +22,6 @@ export interface iTermClient extends ClientBrand<iTermResources> {
     createTabWithDefaultProfile(command?: string, options?: CallOptions): Promise<void>;
     createWindowWithDefaultProfile(command?: string, options?: CallOptions): Promise<void>;
     createWindowWithProfile(command?: string, options?: CallOptions): Promise<void>;
-    _delete(options?: CallOptions): Promise<void>;
     duplicate(to: string, withProperties?: unknown, options?: CallOptions): Promise<void>;
     exists(options?: CallOptions): Promise<void>;
     hideHotkeyWindow(options?: CallOptions): Promise<void>;

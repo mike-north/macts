@@ -150,21 +150,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'finder.app.delete',
-    app: 'finder',
-    appBundleId: 'com.apple.finder',
-    resource: 'app',
-    operation: 'delete',
-    description: 'Move an item from its container to the trash',
-    permission: 'finder:app:delete',
-    risk: 'delete',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-      additionalProperties: false,
-    },
-  },
-  {
     name: 'finder.app.duplicate',
     app: 'finder',
     appBundleId: 'com.apple.finder',

@@ -176,7 +176,6 @@ export interface FinderClient extends ClientBrand<FinderResources> {
     copy(options?: CallOptions): Promise<void>;
     count(each: string, options?: CallOptions): Promise<void>;
     dataSize(as?: string, options?: CallOptions): Promise<void>;
-    _delete(options?: CallOptions): Promise<void>;
     duplicate(to?: string, replacing?: boolean, routingSuppressed?: boolean, exactCopy?: boolean, options?: CallOptions): Promise<void>;
     eject(options?: CallOptions): Promise<void>;
     empty(security?: boolean, options?: CallOptions): Promise<void>;

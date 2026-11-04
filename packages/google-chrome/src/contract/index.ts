@@ -371,8 +371,6 @@ export interface GoogleChromeClient extends ClientBrand<GoogleChromeResources> {
    * @param each - The class of objects to be counted. Does not accept null.
    */
   count(each?: string, options?: CallOptions): Promise<void>
-  /** Delete an object. */
-  _delete(options?: CallOptions): Promise<void>
   /**
    * Copy object(s) and put the copies at a new location.
    *
@@ -737,21 +735,6 @@ const appCountOperation: OperationDescriptor<{ readonly each?: string | undefine
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: { each: { type: 'string', description: 'The class of objects to be counted.' } },
-    additionalProperties: false,
-  },
-}
-
-const appDeleteOperation: OperationDescriptor<Record<string, never>, undefined> = {
-  id: 'google-chrome.app.delete',
-  permission: 'google-chrome:app:delete',
-  target: { command: 'delete' },
-  description: 'Delete an object.',
-  input: t.record({}),
-  output: t.none(),
-  inputJsonSchema: {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: {},
     additionalProperties: false,
   },
 }
@@ -1220,7 +1203,6 @@ const operations: AppContract<GoogleChromeClient>['operations'] = {
   'google-chrome.app.close': appCloseOperation,
   'google-chrome.app.quit': appQuitOperation,
   'google-chrome.app.count': appCountOperation,
-  'google-chrome.app.delete': appDeleteOperation,
   'google-chrome.app.duplicate': appDuplicateOperation,
   'google-chrome.app.exists': appExistsOperation,
   'google-chrome.app.make': appMakeOperation,
@@ -1256,7 +1238,6 @@ function bind(runtime: ClientRuntime): GoogleChromeClient {
     close: (options) => runtime.invoke(appCloseOperation, {}, options),
     quit: (options) => runtime.invoke(appQuitOperation, {}, options),
     count: (each, options) => runtime.invoke(appCountOperation, { each }, options),
-    _delete: (options) => runtime.invoke(appDeleteOperation, {}, options),
     duplicate: (to, withProperties, options) =>
       runtime.invoke(appDuplicateOperation, { to, withProperties }, options),
     exists: (options) => runtime.invoke(appExistsOperation, {}, options),

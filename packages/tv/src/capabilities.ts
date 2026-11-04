@@ -130,21 +130,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'tv.app.delete',
-    app: 'tv',
-    appBundleId: 'com.apple.TV',
-    resource: 'app',
-    operation: 'delete',
-    description: 'Delete an element from an object',
-    permission: 'tv:app:delete',
-    risk: 'delete',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-      additionalProperties: false,
-    },
-  },
-  {
     name: 'tv.app.download',
     app: 'tv',
     appBundleId: 'com.apple.TV',

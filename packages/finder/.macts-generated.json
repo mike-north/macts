@@ -15,7 +15,6 @@
     "src/cli/commands/copy.ts",
     "src/cli/commands/count.ts",
     "src/cli/commands/data-size.ts",
-    "src/cli/commands/delete.ts",
     "src/cli/commands/duplicate.ts",
     "src/cli/commands/eject.ts",
     "src/cli/commands/empty.ts",

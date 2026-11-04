@@ -1756,8 +1756,6 @@ export interface MusicClient extends ClientBrand<MusicResources> {
    * AppleScript. Does not accept null.
    */
   count(each: string, options?: CallOptions): Promise<void>
-  /** Delete an element from an object */
-  _delete(options?: CallOptions): Promise<void>
   /**
    * Duplicate one or more object(s)
    *
@@ -2221,21 +2219,6 @@ const appCountOperation: OperationDescriptor<{ readonly each: string }, undefine
       },
     },
     required: ['each'],
-    additionalProperties: false,
-  },
-}
-
-const appDeleteOperation: OperationDescriptor<Record<string, never>, undefined> = {
-  id: 'music.app.delete',
-  permission: 'music:app:delete',
-  target: { command: 'delete' },
-  description: 'Delete an element from an object',
-  input: t.record({}),
-  output: t.none(),
-  inputJsonSchema: {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: {},
     additionalProperties: false,
   },
 }
@@ -2813,7 +2796,6 @@ const operations: AppContract<MusicClient>['operations'] = {
   'music.app.print': appPrintOperation,
   'music.app.close': appCloseOperation,
   'music.app.count': appCountOperation,
-  'music.app.delete': appDeleteOperation,
   'music.app.duplicate': appDuplicateOperation,
   'music.app.exists': appExistsOperation,
   'music.app.make': appMakeOperation,
@@ -2867,7 +2849,6 @@ function bind(runtime: ClientRuntime): MusicClient {
       runtime.invoke(appPrintOperation, { printDialog, withProperties, kind, theme }, options),
     close: (options) => runtime.invoke(appCloseOperation, {}, options),
     count: (each, options) => runtime.invoke(appCountOperation, { each }, options),
-    _delete: (options) => runtime.invoke(appDeleteOperation, {}, options),
     duplicate: (to, options) => runtime.invoke(appDuplicateOperation, { to }, options),
     exists: (options) => runtime.invoke(appExistsOperation, {}, options),
     make: (_new, at, withProperties, options) =>

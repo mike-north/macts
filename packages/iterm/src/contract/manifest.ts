@@ -26,7 +26,7 @@ export const manifest: unknown = {
       description: 'Common classes and commands for all applications.',
       code: '????',
       resources: ['Window'],
-      commands: ['count', 'delete', 'duplicate', 'exists', 'make', 'move'],
+      commands: ['count', 'duplicate', 'exists', 'make', 'move'],
       enums: ['SaveOptions'],
     },
     {
@@ -781,13 +781,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'cnte',
-    },
-    delete: {
-      name: 'delete',
-      description: 'Delete an object.',
-      scope: 'application',
-      parameters: [],
-      code: 'delo',
     },
     duplicate: {
       name: 'duplicate',

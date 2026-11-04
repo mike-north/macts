@@ -14,7 +14,6 @@
     "src/cli/commands/accounts/mailboxes/messages/redirect.ts",
     "src/cli/commands/accounts/mailboxes/messages/reply.ts",
     "src/cli/commands/check-for-new-mail.ts",
-    "src/cli/commands/delete.ts",
     "src/cli/commands/duplicate.ts",
     "src/cli/commands/extract-address-from.ts",
     "src/cli/commands/extract-name-from.ts",

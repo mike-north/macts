@@ -9,7 +9,6 @@ import { RefreshFileTrackCommand } from './commands/sources/libraryPlaylists/fil
 import { PrintCommand } from './commands/print.js'
 import { CloseCommand } from './commands/close.js'
 import { CountCommand } from './commands/count.js'
-import { DeleteCommand } from './commands/delete.js'
 import { DuplicateCommand } from './commands/duplicate.js'
 import { ExistsCommand } from './commands/exists.js'
 import { MakeCommand } from './commands/make.js'
@@ -52,7 +51,6 @@ export const plugin: CliPlugin = {
     PrintCommand,
     CloseCommand,
     CountCommand,
-    DeleteCommand,
     DuplicateCommand,
     ExistsCommand,
     MakeCommand,

@@ -177,21 +177,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'iterm.app.delete',
-    app: 'iterm',
-    appBundleId: 'com.googlecode.iterm2',
-    resource: 'app',
-    operation: 'delete',
-    description: 'Delete an object.',
-    permission: 'iterm:app:delete',
-    risk: 'delete',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-      additionalProperties: false,
-    },
-  },
-  {
     name: 'iterm.app.duplicate',
     app: 'iterm',
     appBundleId: 'com.googlecode.iterm2',

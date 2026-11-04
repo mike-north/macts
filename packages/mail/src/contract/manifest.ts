@@ -26,7 +26,7 @@ export const manifest: unknown = {
       description: 'Common classes and commands for all applications.',
       code: '????',
       resources: [],
-      commands: ['delete', 'duplicate', 'move'],
+      commands: ['duplicate', 'move'],
       enums: [],
     },
     {
@@ -1937,13 +1937,6 @@ export const manifest: unknown = {
   },
   relationships: [],
   commands: {
-    delete: {
-      name: 'delete',
-      description: 'Delete an object.',
-      scope: 'application',
-      parameters: [],
-      code: 'delo',
-    },
     duplicate: {
       name: 'duplicate',
       description: 'Copy an object.',

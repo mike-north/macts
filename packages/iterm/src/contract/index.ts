@@ -736,8 +736,6 @@ export interface iTermClient extends ClientBrand<iTermResources> {
    * @param each - The class of objects to be counted. Does not accept null.
    */
   count(each?: string, options?: CallOptions): Promise<void>
-  /** Delete an object. */
-  _delete(options?: CallOptions): Promise<void>
   /**
    * Copy object(s) and put the copies at a new location.
    *
@@ -925,21 +923,6 @@ const appCountOperation: OperationDescriptor<{ readonly each?: string | undefine
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: { each: { type: 'string', description: 'The class of objects to be counted.' } },
-    additionalProperties: false,
-  },
-}
-
-const appDeleteOperation: OperationDescriptor<Record<string, never>, undefined> = {
-  id: 'iterm.app.delete',
-  permission: 'iterm:app:delete',
-  target: { command: 'delete' },
-  description: 'Delete an object.',
-  input: t.record({}),
-  output: t.none(),
-  inputJsonSchema: {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: {},
     additionalProperties: false,
   },
 }
@@ -1683,7 +1666,6 @@ const appToggleHotkeyWindowOperation: OperationDescriptor<Record<string, never>,
 /** Every operation, keyed by its identity. */
 const operations: AppContract<iTermClient>['operations'] = {
   'iterm.app.count': appCountOperation,
-  'iterm.app.delete': appDeleteOperation,
   'iterm.app.duplicate': appDuplicateOperation,
   'iterm.app.exists': appExistsOperation,
   'iterm.app.make': appMakeOperation,
@@ -1716,7 +1698,6 @@ const operations: AppContract<iTermClient>['operations'] = {
 function bind(runtime: ClientRuntime): iTermClient {
   return {
     count: (each, options) => runtime.invoke(appCountOperation, { each }, options),
-    _delete: (options) => runtime.invoke(appDeleteOperation, {}, options),
     duplicate: (to, withProperties, options) =>
       runtime.invoke(appDuplicateOperation, { to, withProperties }, options),
     exists: (options) => runtime.invoke(appExistsOperation, {}, options),

@@ -32,7 +32,6 @@ export const manifest: unknown = {
         'close',
         'quit',
         'count',
-        'delete',
         'duplicate',
         'exists',
         'make',
@@ -503,13 +502,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'cnte',
-    },
-    delete: {
-      name: 'delete',
-      description: 'Delete an object.',
-      scope: 'application',
-      parameters: [],
-      code: 'delo',
     },
     duplicate: {
       name: 'duplicate',

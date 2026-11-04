@@ -14,7 +14,6 @@
     "src/cli/commands/close.ts",
     "src/cli/commands/convert.ts",
     "src/cli/commands/count.ts",
-    "src/cli/commands/delete.ts",
     "src/cli/commands/download.ts",
     "src/cli/commands/duplicate.ts",
     "src/cli/commands/exists.ts",

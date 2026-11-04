@@ -286,7 +286,6 @@ export interface MusicClient extends ClientBrand<MusicResources> {
     close(options?: CallOptions): Promise<void>;
     convert(options?: CallOptions): Promise<void>;
     count(each: string, options?: CallOptions): Promise<void>;
-    _delete(options?: CallOptions): Promise<void>;
     download(options?: CallOptions): Promise<void>;
     duplicate(to?: string, options?: CallOptions): Promise<void>;
     exists(options?: CallOptions): Promise<void>;

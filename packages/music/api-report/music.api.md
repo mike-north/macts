@@ -358,7 +358,6 @@ export class MusicClient {
     close(): Promise<void>;
     convert(): Promise<void>;
     count(each: string): Promise<void>;
-    _delete(): Promise<void>;
     download(): Promise<void>;
     duplicate(to?: string): Promise<void>;
     exists(): Promise<void>;

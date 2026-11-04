@@ -11,7 +11,6 @@ suites:
     code: ????
     description: Common classes and commands for all applications.
     commands:
-      - delete
       - duplicate
       - move
   - name: Text Suite
@@ -1355,12 +1354,8 @@ hierarchy:
           access: rw
           description: Class for conditions that can be attached to a single rule
 commands:
-  delete:
-    name: delete
-    description: Delete an object.
-    scope: application
-    code: delo
-    parameters: []
+  # Delete is not offered yet: as declared at application scope, it names no
+  # item. A delete returns once it can name the item it acts on.
   duplicate:
     name: duplicate
     description: Copy an object.
