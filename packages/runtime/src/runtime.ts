@@ -24,8 +24,9 @@
  *
  * A list operation returns one page (`Page` in `@macts/contracts`). The runtime
  * owns paging: it reads the paging inputs (`pageSize`, `cursor`) of a list
- * that pages, checks the cursor against the operation and the call's other
- * inputs, hands the executor a page window instead, and assembles the page
+ * that pages and, as part of validating the input, checks the cursor against
+ * the operation and the call's other inputs; it hands the executor a page
+ * window instead of the paging inputs, and assembles the page
  * and its next cursor from what the executor read. The cursor's contents are
  * never logged or audited; an audit record says only that one was presented.
  *
@@ -346,6 +347,25 @@ type ResultShape =
   | { readonly kind: 'paged'; readonly page: PageValueType<unknown> }
 
 /**
+ * A call whose input passed validation, ready to run: the validated input and
+ * how the operation's result is produced ({@link ResultShape}). For a list
+ * that pages, validation has already turned the paging inputs into the page
+ * window, checking any presented cursor against the operation and the call's
+ * other inputs, so execution only reads the window. `inputs` are the call's
+ * inputs without the paging inputs, as the executor receives them.
+ */
+type ValidatedCall =
+  | { readonly kind: 'direct'; readonly input: WireRecord }
+  | { readonly kind: 'whole'; readonly input: WireRecord; readonly page: PageValueType<unknown> }
+  | {
+      readonly kind: 'paged'
+      readonly input: WireRecord
+      readonly page: PageValueType<unknown>
+      readonly window: PageWindow
+      readonly inputs: WireRecord
+    }
+
+/**
  * The window result a paging executor returns (`PageWindowResult` in
  * `@macts/core`): checked before it is trusted, like any executor result.
  */
@@ -625,7 +645,13 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     const apiKeyId = authority.subject
     const { writer } = await governanceFor(operation, apiKeyId, context)
     log().info(
-      { operation: operation.descriptor.id, permission, apiKeyId, issueCount },
+      {
+        operation: operation.descriptor.id,
+        permission,
+        apiKeyId,
+        issueCount,
+        ...internalDetails(context),
+      },
       'Call rejected by input validation'
     )
     if (writer === undefined) {
@@ -829,7 +855,42 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     throw new ApprovalRejectedError(outcome.reason, { permission, layer, state: outcome.state })
   }
 
-  /** Step 3: the input must be a record that satisfies the operation's wire contract. */
+  /**
+   * Step 3 of `invoke`: validate the input ({@link validateInput}) and, for a
+   * list that pages, read its page window from the paging inputs
+   * ({@link pageWindowOf}). Checking a cursor (its format, version, operation,
+   * and the inputs it was issued for) is a judgement about the caller's input
+   * alone, so it happens here, before governance: a cursor that cannot
+   * continue the call is rejected like any other invalid input. Only whether
+   * the cursor's anchor still sits where it did is left to execution, since
+   * only the app can tell.
+   *
+   * @throws `ValidationError` for invalid input, including a cursor that cannot
+   *   continue the call (at `["cursor"]`).
+   */
+  function validateCall(
+    operation: RegisteredOperation,
+    input: unknown,
+    context: InvocationContext
+  ): ValidatedCall {
+    const validated = validateInput(operation, input, context)
+    const shape = resultShapeOf(operation)
+    switch (shape.kind) {
+      case 'direct':
+        return { kind: 'direct', input: validated }
+      case 'whole':
+        return { kind: 'whole', input: validated, page: shape.page }
+      case 'paged':
+        return {
+          kind: 'paged',
+          input: validated,
+          page: shape.page,
+          ...pageWindowOf(operation.descriptor.id, validated),
+        }
+    }
+  }
+
+  /** The input must be a record that satisfies the operation's wire contract. */
   function validateInput(
     operation: RegisteredOperation,
     input: unknown,
@@ -892,16 +953,19 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   }
 
   /**
-   * Step 5 of `invoke`: execute the operation, then validate its result
-   * against the operation's output contract ({@link validateOutput}).
+   * Step 5 of `invoke`: execute the validated call ({@link validateCall}),
+   * then validate its result against the operation's output contract
+   * ({@link validateOutput}). A paged call reads the window validation
+   * produced; the executor reports an anchor that has moved as
+   * `CollectionChangedError`.
    */
   async function execute(
     operation: RegisteredOperation,
-    input: WireRecord,
+    call: ValidatedCall,
     context: InvocationContext
   ): Promise<WireValue> {
     const { descriptor, manifest } = operation
-    const shape = resultShapeOf(operation)
+    const { input } = call
     const base = {
       manifest,
       target: descriptor.target,
@@ -912,7 +976,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     const run = (request: ExecutionRequest): Promise<WireValue> =>
       dispatch(operation, context, { operation: descriptor.id }, () => executor.execute(request))
 
-    switch (shape.kind) {
+    switch (call.kind) {
       case 'direct':
         return validateOutput(
           operation,
@@ -920,15 +984,15 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
           await run({ ...base, input, outputPlan: descriptor.output.plan })
         )
       case 'whole': {
-        const items = await run({ ...base, input, outputPlan: itemsPlan(shape.page) })
+        const items = await run({ ...base, input, outputPlan: itemsPlan(call.page) })
         return validateOutput(operation, descriptor.output, { items })
       }
       case 'paged': {
-        const { window, inputs } = pageWindowOf(descriptor.id, input)
+        const { window, inputs } = call
         const result = await run({
           ...base,
           input: inputs,
-          outputPlan: itemsPlan(shape.page),
+          outputPlan: itemsPlan(call.page),
           page: window,
         })
         const page = assemblePage(operation, window, inputs, result)
@@ -1325,14 +1389,14 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       }
 
       checkPermission(operation, authority)
-      const validated = await validateAudited(operation, authority, context, () =>
-        validateInput(operation, input, context)
+      const call = await validateAudited(operation, authority, context, () =>
+        validateCall(operation, input, context)
       )
-      const argsSummary = argumentSummary(declaredInputNames(operation), validated, input)
+      const argsSummary = argumentSummary(declaredInputNames(operation), call.input, input)
       await enforceGovernance(operation, authority, argsSummary, context)
 
       throwIfCancelled(context)
-      return execute(operation, validated, context)
+      return execute(operation, call, context)
     },
 
     async resolveReference(appName, reference, context) {

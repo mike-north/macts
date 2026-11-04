@@ -22,6 +22,10 @@
  * - D6: a cursor that is malformed, of an unknown format version, from another
  *   operation or for other inputs is a `ValidationError` at `["cursor"]`,
  *   never `COLLECTION_CHANGED`.
+ * - D5, D9: those cursor checks are input validation, so they run before
+ *   governance: such a call writes one `invalid-input` audit record and is
+ *   never put to an approver. Only an anchor that has moved is found during
+ *   execution, as `COLLECTION_CHANGED`.
  * - The cursor's contents never reach an audit record, a log entry or an
  *   error; audit records say only `cursor: true`, and an operation that
  *   refuses the cursor audits the call as `invalid-input`, with no values.
@@ -30,7 +34,7 @@
  */
 
 import { describe, expect, it, vi } from 'vitest'
-import type { ExecutionRequest } from '@macts/core'
+import type { ExecutionRequest, GovernancePolicy } from '@macts/core'
 import {
   CollectionChangedError,
   UnexpectedValueError,
@@ -50,11 +54,14 @@ import {
   LIBRARY_MANIFEST,
   PAGED_LIST_INPUT,
   createFakeVerifier,
+  FIXED_NOW,
   createMemoryAuditWriter,
+  createRecordingApprovalProvider,
   createRecordingExecutor,
   fixedClock,
   libraryContract,
   type MemoryAuditWriter,
+  type RecordingApprovalProvider,
   type RecordingExecutor,
 } from './runtime-test-helpers.js'
 
@@ -145,21 +152,47 @@ interface Harness {
   readonly executor: RecordingExecutor
   readonly logger: SpyLogger
   readonly audit: MemoryAuditWriter
+  /** The approval provider, which approves every request it is asked. */
+  readonly approver: RecordingApprovalProvider
 }
 
-/** A runtime with `contract` registered over `executor`, auditing every call. */
-function harness(executor: RecordingExecutor, contract = libraryContract()): Harness {
+/** Every library operation is held for confirmation. */
+const CONFIRM_FIRST_LIBRARY: GovernancePolicy = {
+  version: '1',
+  defaultDisposition: 'forbidden',
+  apps: [
+    {
+      app: 'library',
+      disposition: 'confirm-first',
+      operations: [],
+      restrictions: { pathsAllow: [], pathsDeny: [], urlsAllow: [], urlsDeny: [] },
+      tags: [],
+    },
+  ],
+  tags: [],
+}
+
+/**
+ * A runtime with `contract` registered over `executor`, auditing every call,
+ * under `policy` (allow-all unless given) with an approval gate that approves.
+ */
+function harness(
+  executor: RecordingExecutor,
+  contract = libraryContract(),
+  policy: GovernancePolicy = ALLOW_ALL_POLICY
+): Harness {
   const logger: SpyLogger = { error: vi.fn(), warn: vi.fn(), info: vi.fn() }
   const audit = createMemoryAuditWriter()
+  const approver = createRecordingApprovalProvider(() => Promise.resolve({ state: 'approved' }))
   const runtime = createRuntime({
     executor,
     verifier: createFakeVerifier({ [LIBRARIAN_SECRET]: LIBRARIAN }),
     clock: fixedClock,
     logger,
-    governance: { policy: ALLOW_ALL_POLICY, writer: audit },
+    governance: { policy, writer: audit, approvals: { provider: approver } },
   })
   runtime.registerContract(contract, LIBRARY_MANIFEST)
-  return { runtime, executor, logger, audit }
+  return { runtime, executor, logger, audit, approver }
 }
 
 /** The librarian's invocation context. */
@@ -359,7 +392,7 @@ describe('paging through a list (D2, D9)', () => {
 
   it('reports COLLECTION_CHANGED from the executor when the anchor moved, unchanged', async () => {
     let rows = books(6)
-    const { runtime } = harness(windowExecutor(() => rows))
+    const { runtime, audit } = harness(windowExecutor(() => rows))
 
     const cursor = await issuedCursor(runtime)
     rows = rows.filter((row) => isbnOf(row) !== 'isbn-3')
@@ -369,6 +402,9 @@ describe('paging through a list (D2, D9)', () => {
 
     expect(error).toBeInstanceOf(CollectionChangedError)
     expect(error).toMatchObject({ code: 'COLLECTION_CHANGED', details: {} })
+    // Only the app can tell that the anchor moved, so this call passed
+    // validation and governance and failed in execution.
+    expect(audit.records.map((record) => record.decision)).toEqual(['allowed', 'allowed'])
   })
 
   it('binds the cursor to the other inputs and passes them to the executor', async () => {
@@ -537,6 +573,94 @@ describe('cursor validation (D6)', () => {
     )
 
     expect(rest.items.map(isbnOf)).toEqual(['isbn-4', 'isbn-5', 'isbn-6'])
+  })
+})
+
+describe('cursor checks before governance (D5)', () => {
+  /** A cursor the book list issued after its first page of three, from an allow-all runtime. */
+  async function cursorFromAnotherRuntime(input: WireRecord = {}): Promise<string> {
+    return issuedCursor(
+      harness(
+        windowExecutor(() => books(6)),
+        contractWithShelfInput()
+      ).runtime,
+      input
+    )
+  }
+
+  /** A cursor the shelf list issued after its first page of three. */
+  async function shelfCursor(): Promise<string> {
+    const { runtime } = harness(windowExecutor(() => books(6)))
+    const page = asPage(
+      await runtime.invoke('library.shelves.list', { pageSize: { integer: '3' } }, asLibrarian())
+    )
+    if (page.nextCursor === undefined) throw new Error('expected a shelf cursor')
+    return page.nextCursor
+  }
+
+  it.each<[string, () => Promise<string>, WireRecord]>([
+    ['a malformed cursor', () => Promise.resolve('not-a-cursor'), {}],
+    [
+      'a cursor of an unknown format version',
+      async () => `2${(await cursorFromAnotherRuntime()).slice(1)}`,
+      {},
+    ],
+    ['a cursor issued by another operation', shelfCursor, {}],
+    [
+      'a cursor issued for other inputs',
+      () => cursorFromAnotherRuntime({ shelf: 'SF-1' }),
+      { shelf: 'SF-2' },
+    ],
+  ])(
+    'rejects %s on a confirm-first list without asking the approver, as one invalid-input record',
+    async (_label, makeCursor, input) => {
+      const cursor = await makeCursor()
+      const h = harness(
+        windowExecutor(() => books(6)),
+        contractWithShelfInput(),
+        CONFIRM_FIRST_LIBRARY
+      )
+
+      const error = await validationFailure(
+        h.runtime.invoke(
+          'library.books.list',
+          { ...input, pageSize: { integer: '3' }, cursor },
+          asLibrarian()
+        )
+      )
+
+      expect(error.details.issues.map((issue) => issue.path)).toEqual([['cursor']])
+      expect(h.approver.requests).toHaveLength(0)
+      expect(h.executor.requests).toHaveLength(0)
+      expect(h.audit.records).toEqual([
+        {
+          capability: 'library:books:list',
+          app: 'library',
+          apiKeyId: 'key_librarian',
+          decision: 'invalid-input',
+          timestamp: FIXED_NOW,
+          issueCount: 1,
+        },
+      ])
+    }
+  )
+
+  it('puts a confirm-first list with a cursor that can continue it to the approver', async () => {
+    const cursor = await cursorFromAnotherRuntime()
+    const h = harness(
+      windowExecutor(() => books(6)),
+      contractWithShelfInput(),
+      CONFIRM_FIRST_LIBRARY
+    )
+
+    await h.runtime.invoke(
+      'library.books.list',
+      { pageSize: { integer: '3' }, cursor },
+      asLibrarian()
+    )
+
+    expect(h.approver.requests).toHaveLength(1)
+    expect(h.audit.records.map((record) => record.decision)).toEqual(['pending', 'approved'])
   })
 })
 
@@ -748,14 +872,20 @@ describe('cursor privacy', () => {
   })
 
   it('keeps a marker anchor out of the audit, the logs and the error for a bad cursor', async () => {
-    const h = harness(windowExecutor(() => books(6)))
+    const h = harness(
+      windowExecutor(() => books(6)),
+      libraryContract(),
+      CONFIRM_FIRST_LIBRARY
+    )
     // A cursor anchored on the marker, but issued for another operation.
     const cursor = `1.${encode({ op: 'library.shelves.list', in: 'x', fl: '', at: 3, an: MARKER })}`
 
     const error = await rejection(h.runtime.invoke('library.books.list', { cursor }, asLibrarian()))
 
     expect(error).toBeInstanceOf(ValidationError)
-    expect(h.audit.records.length).toBeGreaterThan(0)
+    // Rejected by validation: audited as invalid input, never put to an approver.
+    expect(h.audit.records.map((record) => record.decision)).toEqual(['invalid-input'])
+    expect(h.approver.requests).toHaveLength(0)
     const recorded = everythingRecorded(h, error)
     expect(recorded).not.toContain(MARKER)
     expect(recorded).not.toContain(cursor)

@@ -173,7 +173,7 @@ const CONFIRM_FIRST_VAULT: GovernancePolicy = {
 }
 
 /** A key name that is not one of the operation's parameters, and its value. */
-const UNDECLARED_KEY = 'smuggledField'
+const UNDECLARED_KEY = 'undeclaredField'
 const UNDECLARED_VALUE = 'undeclared-value-7f3a'
 
 /** How the fixture app is registered: from its manifest alone, or from its contract. */
@@ -467,6 +467,33 @@ describe('permission before validation (no schema oracle)', () => {
 
       expect(error).toBeInstanceOf(PermissionDeniedError)
       // A permission denial writes no audit record, so neither does this one.
+      expect(h.writer.records).toEqual([])
+      expect(provider.requests).toHaveLength(0)
+      expect(h.executor.requests).toHaveLength(0)
+    }
+  )
+
+  it.each<Registration>(['manifest', 'contract'])(
+    'answers a caller without the permission (%s registration) identically for valid and invalid input',
+    async (registration) => {
+      const { provider, governance } = gated(() => Promise.resolve({ state: 'approved' }))
+      const h = harness({ registration, governance })
+
+      const forValid = await rejection(
+        h.runtime.invoke(CREATE, { title: 'Groceries' }, as(READER_SECRET))
+      )
+      const forInvalid = await rejection(h.runtime.invoke(CREATE, { title: 42 }, as(READER_SECRET)))
+
+      expect(forValid).toBeInstanceOf(PermissionDeniedError)
+      expect(forInvalid).toBeInstanceOf(PermissionDeniedError)
+      if (!(forValid instanceof PermissionDeniedError)) return
+      if (!(forInvalid instanceof PermissionDeniedError)) return
+      expect({
+        message: forInvalid.message,
+        code: forInvalid.code,
+        details: forInvalid.details,
+      }).toEqual({ message: forValid.message, code: forValid.code, details: forValid.details })
+      // Neither call has any audit, approval, or execution side effect.
       expect(h.writer.records).toEqual([])
       expect(provider.requests).toHaveLength(0)
       expect(h.executor.requests).toHaveLength(0)
