@@ -13,6 +13,10 @@ export class GetRunDestinationCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
+  workspaceName = Option.String('--workspace-name', {
+    required: true,
+    description: 'Workspace document name',
+  })
 
   runDestinationId = Option.String({ name: 'name', required: true })
 
@@ -21,7 +25,7 @@ export class GetRunDestinationCommand extends Command {
 
     try {
       const client = getClient()
-      const item = await client.runDestinations.get(this.runDestinationId)
+      const item = await client.runDestinations.get(this.workspaceName, this.runDestinationId)
 
       const output = formatter.format({
         name: item.name,

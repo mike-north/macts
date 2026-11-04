@@ -29,7 +29,6 @@ export class GetWorkspaceDocumentCommand extends Command {
         file: item.file,
         path: item.path,
         loaded: item.loaded,
-        activeScheme: item.activeScheme,
       })
 
       this.context.stdout.write(output + '\n')

@@ -13,6 +13,10 @@ export class GetSchemeCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
+  workspaceName = Option.String('--workspace-name', {
+    required: true,
+    description: 'Workspace document name',
+  })
 
   schemeId = Option.String({ name: 'id', required: true })
 
@@ -21,7 +25,7 @@ export class GetSchemeCommand extends Command {
 
     try {
       const client = getClient()
-      const item = await client.schemes.get(this.schemeId)
+      const item = await client.schemes.get(this.workspaceName, this.schemeId)
 
       const output = formatter.format({
         id: item.id,

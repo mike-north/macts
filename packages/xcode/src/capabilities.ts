@@ -47,19 +47,23 @@ export const capabilities: readonly CapabilityMetadata[] = [
     appBundleId: 'com.apple.dt.Xcode',
     resource: 'projects',
     operation: 'get',
-    description: 'Get a project by ID',
+    description: 'Get a project of a workspace by ID',
     permission: 'xcode:projects:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
       properties: {
+        workspaceName: {
+          description: 'Workspace document name',
+          type: 'string',
+        },
         id: {
           description: 'Project identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['id'],
+      required: ['workspaceName', 'id'],
     },
   },
   {
@@ -89,19 +93,23 @@ export const capabilities: readonly CapabilityMetadata[] = [
     appBundleId: 'com.apple.dt.Xcode',
     resource: 'runDestinations',
     operation: 'get',
-    description: 'Get a run destination by name',
+    description: 'Get a run destination of a workspace by name',
     permission: 'xcode:runDestinations:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
       properties: {
+        workspaceName: {
+          description: 'Workspace document name',
+          type: 'string',
+        },
         name: {
           description: 'Run destination name',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['name'],
+      required: ['workspaceName', 'name'],
     },
   },
   {
@@ -131,19 +139,23 @@ export const capabilities: readonly CapabilityMetadata[] = [
     appBundleId: 'com.apple.dt.Xcode',
     resource: 'schemes',
     operation: 'get',
-    description: 'Get a scheme by ID',
+    description: 'Get a scheme of a workspace by ID',
     permission: 'xcode:schemes:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
       properties: {
+        workspaceName: {
+          description: 'Workspace document name',
+          type: 'string',
+        },
         id: {
           description: 'Scheme identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['id'],
+      required: ['workspaceName', 'id'],
     },
   },
   {

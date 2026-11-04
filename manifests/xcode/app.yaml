@@ -785,11 +785,21 @@ commands:
   getProject:
     name: get
     routeName: get
-    description: Get a project by ID
+    description: Get a project of a workspace by ID
     scope: resource
     resourceType: Project
+    # The dictionary has `project` only as an element of `workspace document`,
+    # and the application has no `project` element, so a project is got within
+    # its workspace document, as it is listed.
+    parent:
+      resource: WorkspaceDocument
+      parameter: workspaceName
     code: getd
     parameters:
+      - name: workspaceName
+        type: string
+        description: Workspace document name
+        required: true
       - name: id
         type: string
         description: Project identifier
@@ -814,11 +824,21 @@ commands:
   getScheme:
     name: get
     routeName: get
-    description: Get a scheme by ID
+    description: Get a scheme of a workspace by ID
     scope: resource
     resourceType: Scheme
+    # The dictionary has `scheme` only as an element of `workspace document`,
+    # and the application has no `scheme` element, so a scheme is got within
+    # its workspace document, as it is listed.
+    parent:
+      resource: WorkspaceDocument
+      parameter: workspaceName
     code: getd
     parameters:
+      - name: workspaceName
+        type: string
+        description: Workspace document name
+        required: true
       - name: id
         type: string
         description: Scheme identifier
@@ -843,11 +863,22 @@ commands:
   getRunDestination:
     name: get
     routeName: get
-    description: Get a run destination by name
+    description: Get a run destination of a workspace by name
     scope: resource
     resourceType: RunDestination
+    # The dictionary has `run destination` only as an element of
+    # `workspace document`, and the application has no `run destination`
+    # element, so a run destination is got within its workspace document, as
+    # it is listed.
+    parent:
+      resource: WorkspaceDocument
+      parameter: workspaceName
     code: getd
     parameters:
+      - name: workspaceName
+        type: string
+        description: Workspace document name
+        required: true
       - name: name
         type: string
         description: Run destination name
