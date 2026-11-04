@@ -1717,7 +1717,6 @@ describe('Contacts read bodies (shipped manifest, #213)', () => {
   it.each([
     ['getEmail', 'Email', 'emails'],
     ['getPhone', 'Phone', 'phones'],
-    ['getAddress', 'Address', 'addresses'],
   ])('%s looks the %s up by id under its person', (command, resource, collection) => {
     const text = body(command, resource)
     expect(text).toContain('var parentId = args["personId"];')
@@ -1726,6 +1725,20 @@ describe('Contacts read bodies (shipped manifest, #213)', () => {
     expect(text).toContain(`var item = parent["${collection}"].byId(itemId);`)
     // Addressed at the application, these fail with -1728 on Contacts 14.0.
     expect(text).not.toContain(`app["${collection}"]`)
+  })
+
+  it('getAddress matches the Address on its id under its person, never by id specifier', () => {
+    // Under a person holding no address, Contacts' address id specifier
+    // claims to exist for another person's address id; a match on `id` finds
+    // nothing there (manifest identifier targeting `byProperty`).
+    const text = body('getAddress', 'Address')
+    expect(text).toContain('var parentId = args["personId"];')
+    expect(text).toContain('var itemId = args["id"];')
+    expect(text).toContain('var parent = app["people"].byId(parentId);')
+    expect(text).toContain('var item = parent["addresses"].whose({ "id": itemId })[0];')
+    expect(text).toContain('if (!item.exists()) {')
+    expect(text).not.toContain('parent["addresses"].byId(')
+    expect(text).not.toContain('app["addresses"]')
   })
 
   it('a person list mirrors no canonical alias over the id the person already has', () => {

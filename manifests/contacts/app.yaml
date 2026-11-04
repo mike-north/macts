@@ -136,15 +136,28 @@ resources:
     # "unique identifier for this address." Unlike the entry and contact-info
     # ids, it is not documented as persistent, and its stability across
     # relaunches of Contacts has not been observed. It is looked up under its
-    # person.
+    # person, matched on its `id` property, not by id specifier: under a
+    # person who holds no address, the specifier claims to exist for an id
+    # that belongs to another person's address. Observed read-only on
+    # Contacts 14.0 (macOS 27.2), 2026-11-04T18:24:54Z, over 60 people, 5 of
+    # whom hold an address: for an address id held by one person,
+    # `addresses.byId(id).exists()` was true under 55 of the 55 people
+    # holding no address, and false under the 4 other people holding one;
+    # `addresses.whose({ id })` held 0 items under all 59 other people and 1
+    # under the holder; the address id lists of the 55 people holding none
+    # excluded it. The email and phone id specifiers were answered correctly
+    # under every other person in the same sample, so those keep `byId`.
     identifiers:
       - property: id
         primary: true
+        targeting: byProperty
         unique: true
         evidence:
           unique:
-            source: sdef
-            note: 'The app''s scripting dictionary describes the property as "unique identifier for this address."'
+            source: curated
+            note: 'The app''s scripting dictionary describes the property as "unique identifier for this address." A read-only list of the addresses of 60 people on Contacts 14.0 (macOS 27.2), 2026-11-04, found 5 people holding 1 address each, with 5 distinct ids: unique within each person and across all 5. The claim covers the id the `whose` match is made on.'
+            observedAt: '2026-11-04T18:24:54.000Z'
+            appVersion: '14.0'
     rangeRead:
       supported: true
       read: range

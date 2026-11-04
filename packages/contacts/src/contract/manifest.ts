@@ -178,11 +178,14 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          targeting: 'byProperty',
           unique: true,
           evidence: {
             unique: {
-              source: 'sdef',
-              note: 'The app\'s scripting dictionary describes the property as "unique identifier for this address."',
+              source: 'curated',
+              note: 'The app\'s scripting dictionary describes the property as "unique identifier for this address." A read-only list of the addresses of 60 people on Contacts 14.0 (macOS 27.2), 2026-11-04, found 5 people holding 1 address each, with 5 distinct ids: unique within each person and across all 5. The claim covers the id the `whose` match is made on.',
+              observedAt: '2026-11-04T18:24:54.000Z',
+              appVersion: '14.0',
             },
           },
         },
