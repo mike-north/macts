@@ -18,8 +18,10 @@
  *   its whole result, so the paging inputs are not part of its contract.
  * - a resource-scoped get, update or delete selects its item by its
  *   identifier parameter, the first required parameter other than its
- *   parent's; a manifest whose get, update or delete declares none is refused at registration with
- *   `OperationRegistrationError`, and nothing from it is registered.
+ *   parent's; a manifest whose get, update or delete declares none is refused
+ *   at registration with `OperationRegistrationError`, and nothing from it is
+ *   registered, so a call naming one of its operations is an unknown
+ *   operation.
  *
  * Operation ids and permissions are derived by hand from the manifest route
  * rules (`app.<resource plural>.<command key>`,
@@ -258,7 +260,12 @@ describe('an undeclared id', () => {
 })
 
 describe('a get with no identifier parameter', () => {
-  /** The workshop app with a `get` that declares only the optional `verbose` flag. */
+  /**
+   * The workshop app with a `get` that declares only the optional `verbose`
+   * flag: no required parameter, so its native body would have no declared
+   * identifier to select a gadget by and would fall back to reading an `id`
+   * argument the input contract does not declare.
+   */
   const UNADDRESSABLE: AppManifest = {
     ...WORKSHOP_MANIFEST,
     commands: {
@@ -275,7 +282,8 @@ describe('a get with no identifier parameter', () => {
     },
   }
 
-  it('is refused at registration, which registers nothing from the app', async () => {
+  /** A runtime over a recording executor, with nothing registered yet. */
+  function unregisteredHarness(): { runtime: MactsRuntime; executor: RecordingExecutor } {
     const executor = createRecordingExecutor()
     const runtime = createRuntime({
       executor,
@@ -283,6 +291,11 @@ describe('a get with no identifier parameter', () => {
       clock: fixedClock,
       governance: { policy: ALLOW_ALL_POLICY },
     })
+    return { runtime, executor }
+  }
+
+  it('is refused at registration, which registers nothing from the app', () => {
+    const { runtime } = unregisteredHarness()
 
     const register = (): void => {
       runtime.registerManifest(UNADDRESSABLE)
@@ -291,10 +304,20 @@ describe('a get with no identifier parameter', () => {
     expect(register).toThrow(/App "Workshop".*"get".*identifier parameter/s)
     expect(runtime.operation(GET_GADGET)).toBeUndefined()
     expect(runtime.operation(RESET)).toBeUndefined()
+  })
+
+  it('answers a call carrying an id as an unknown operation, so nothing is looked up', async () => {
+    const { runtime, executor } = unregisteredHarness()
+    expect(() => {
+      runtime.registerManifest(UNADDRESSABLE)
+    }).toThrow(OperationRegistrationError)
 
     const error = await rejection(runtime.invoke(GET_GADGET, { id: 'gadget-7' }, asOperator()))
+
     expect(error).toBeInstanceOf(ValidationError)
+    expect(error).toMatchObject({ message: `Unknown operation "${GET_GADGET}".` })
     expect(executor.requests).toHaveLength(0)
+    expect(executor.resolutions).toHaveLength(0)
   })
 })
 
