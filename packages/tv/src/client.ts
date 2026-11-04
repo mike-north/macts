@@ -5,8 +5,11 @@
  * @packageDocumentation
  */
 
+import { BrowserWindowResourceClient } from './resources/browserwindow.js'
 import { FileTrackResourceClient } from './resources/filetrack.js'
 import { PlaylistResourceClient } from './resources/playlist.js'
+import { PlaylistWindowResourceClient } from './resources/playlistwindow.js'
+import { SourceResourceClient } from './resources/source.js'
 
 /**
  * Client configuration options.
@@ -85,17 +88,33 @@ export class TVError extends Error {
 export class TVClient {
   readonly #httpClient: HttpClient
 
+  /** the main window */
+  readonly browserWindows: BrowserWindowResourceClient
+
   /** a track representing a video file */
   readonly fileTracks: FileTrackResourceClient
 
   /** a list of tracks/streams */
   readonly playlists: PlaylistResourceClient
 
+  /** a sub-window showing a single playlist */
+  readonly playlistWindows: PlaylistWindowResourceClient
+
+  /** a media source (library, CD, device, etc.) */
+  readonly sources: SourceResourceClient
+
   constructor(options: TVClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
+    this.browserWindows = new BrowserWindowResourceClient(this.#httpClient, 'tv', 'browserWindows')
     this.fileTracks = new FileTrackResourceClient(this.#httpClient, 'tv', 'fileTracks')
     this.playlists = new PlaylistResourceClient(this.#httpClient, 'tv', 'playlists')
+    this.playlistWindows = new PlaylistWindowResourceClient(
+      this.#httpClient,
+      'tv',
+      'playlistWindows'
+    )
+    this.sources = new SourceResourceClient(this.#httpClient, 'tv', 'sources')
   }
 
   /**

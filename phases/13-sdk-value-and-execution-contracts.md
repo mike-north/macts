@@ -1434,26 +1434,26 @@ identity collection has no entry to resolve, so it is admitted.
 an object of another resource: their command records a parent (D10, command
 parents) and takes that parent's identifier. Music gets and lists tracks
 within a playlist; Contacts addresses, emails and phones within a person;
-Calendar events within a calendar; Google Chrome and Microsoft Edge tabs
-within a window. Reminders lists reminders only within a list but gets one at
-the application, and Automator, Microsoft Edge (bookmark items), OmniGraffle
-and Xcode list some resources only within a parent in the same way. A
-reference resolved through such an operation can be resolved only when
-it carries the parent's identifier, so its `container` is required and must
-be an identity reference to that operation's parent. A reference takes the
-parent of the operation that resolves it: a single-object reference in
-either form (a name or index selector included), a container and an
+Calendar events within a calendar; Google Chrome and Microsoft Edge tabs within
+a window; TV playlists within a source. Reminders lists reminders only within a
+list but gets one at the application, and Automator, Microsoft Edge (bookmark
+items), OmniGraffle and Xcode list some resources only within a parent in the
+same way. A reference resolved through such an operation can be resolved only
+when it carries the parent's identifier, so its `container` is required and
+must be an identity reference to that operation's parent. A reference takes the
+parent of the operation that resolves it: a single-object reference in either
+form (a name or index selector included), a container and an
 identity-collection entry take the `get` parent, and a selector collection
 (every or range) takes the `list` parent. A missing container, one naming
-another resource, and a selector container (which supplies no identifier)
-are encode and decode issues at `[...path, 'container']`, and the wire and
-SDK schemas reject them, so the derived JSON Schema of such a position lists
-`container` as required and admits only the parent's identity form there.
-The container is read by the same rules, so a chain of parents is checked
-level by level. A reference resolved through an operation at the application
-keeps an optional container of any resolvable resource. The rule narrows
-what bound and data reference types admit, so `bindReference` and every
-typed input position reject the same references at compile time.
+another resource, and a selector container (which supplies no identifier) are
+encode and decode issues at `[...path, 'container']`, and the wire and SDK
+schemas reject them, so the derived JSON Schema of such a position lists
+`container` as required and admits only the parent's identity form there. The
+container is read by the same rules, so a chain of parents is checked level by
+level. A reference resolved through an operation at the application keeps an
+optional container of any resolvable resource. The rule narrows what bound and
+data reference types admit, so `bindReference` and every typed input position
+reject the same references at compile time.
 
 The resource table records the parents once, as `ResourceDescriptor.parents`,
 `{ get?, list? }`, keyed like the routes: each field is the key of the parent
