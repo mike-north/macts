@@ -3,8 +3,10 @@
  * `shelfManifest` for its cases). Expected values are written by hand from
  * phases/13 D7: an output reference is usable only through its target's
  * `get`, only when the target has a primary identifier, only when that `get`
- * records no parent, and only when the target is not identified by a name its
- * identifier does not claim unique.
+ * records no parent, only when the hierarchy does not hold the target solely
+ * within another resource while that `get` names no container, and only when
+ * the target is not identified by a name its identifier does not claim
+ * unique.
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md §D7
  * @see https://github.com/mike-north/macts/issues/219
@@ -23,6 +25,8 @@ import {
 import type { AppManifest } from './schemas/index.js'
 import {
   shelfManifest,
+  shelfManifestWithBooksAlsoAtTheApplication,
+  shelfManifestWithBooksInLibraries,
   shelfManifestWithoutBookIdentifier,
   shelfManifestWithUniqueSeries,
 } from './test-support/shelf-output-references.js'
@@ -74,6 +78,77 @@ describe('omittedOutputReason', () => {
 
   it('accepts a name claimed unique, with evidence', () => {
     expect(omittedOutputReason(shelfManifestWithUniqueSeries(), 'Series')).toBeUndefined()
+  })
+})
+
+describe('omittedOutputReason for a target held only within a container', () => {
+  // Books are held only within a library, yet getBook records no parent: a
+  // reference to a book could not be resolved, because the app has no
+  // collection of books to look it up in.
+  const nested = shelfManifestWithBooksInLibraries()
+
+  it('rejects a target the hierarchy holds only within another resource when its get records no parent', () => {
+    expect(omittedOutputReason(nested, 'Book')).toBe('unrecorded-parent')
+  })
+
+  it('accepts the same target when the application holds it too', () => {
+    expect(
+      omittedOutputReason(shelfManifestWithBooksAlsoAtTheApplication(), 'Book')
+    ).toBeUndefined()
+  })
+
+  it('reports parent-scoped, not unrecorded-parent, when the target’s get records its parent', () => {
+    expect(omittedOutputReason(nested, 'Chapter')).toBe('parent-scoped')
+  })
+
+  it('does not fire for a target the hierarchy places nowhere', () => {
+    // The base fixture's hierarchy holds only libraries, so it says nothing
+    // about where books live.
+    expect(omittedOutputReason(manifest, 'Book')).toBeUndefined()
+  })
+
+  it('checks a missing identifier first, and a name with no unique claim last', () => {
+    const withoutIdentifier = shelfManifestWithBooksInLibraries()
+    const book = withoutIdentifier.resources['Book']
+    if (book === undefined) throw new Error('the fixture has no Book')
+    delete book.identifiers
+    delete withoutIdentifier.commands['getChapter']
+    expect(omittedOutputReason(withoutIdentifier, 'Book')).toBe('no-identifier')
+    // Series are name-keyed and held only within a library.
+    expect(omittedOutputReason(nested, 'Series')).toBe('unrecorded-parent')
+  })
+
+  it('leaves the field and the result out of output positions', () => {
+    expect(
+      omittedOutputPositions(nested).filter((found) => found.reason === 'unrecorded-parent')
+    ).toEqual([
+      {
+        position: 'resources.Library.properties.favoriteBook',
+        resource: 'Library',
+        property: 'favoriteBook',
+        target: 'Book',
+        reason: 'unrecorded-parent',
+      },
+      {
+        position: 'resources.Library.properties.series',
+        resource: 'Library',
+        property: 'series',
+        target: 'Series',
+        reason: 'unrecorded-parent',
+      },
+      {
+        position: 'commands.featuredSeries.returns',
+        command: 'featuredSeries',
+        target: 'Series',
+        reason: 'unrecorded-parent',
+      },
+      {
+        position: 'commands.featuredBook.returns',
+        command: 'featuredBook',
+        target: 'Book',
+        reason: 'unrecorded-parent',
+      },
+    ])
   })
 })
 
