@@ -1179,8 +1179,12 @@ way, so if the record cannot be written (or the governance context holding the
 writer cannot be loaded) the caller is still answered `PermissionDeniedError`,
 and the failure is logged to the operator log with the operation, the key, and
 the correlation id, and no values. The caller cannot tell whether its denial
-was recorded. Steps 1–4 also govern reference resolution and file fetch,
-which are read-risk calls (D7, D8). Execution owns the pipeline.
+was recorded. A denied call loads the governance context because the audit
+writer lives there; this is intended and must stay, since the load does not
+depend on the input, and a cached loader failure gives later authorized calls
+the same `InternalError` an authorized first call would get. Steps 1–4 also
+govern reference resolution and file fetch, which are read-risk calls (D7,
+D8). Execution owns the pipeline.
 
 Step 1b is admission, not authority. It runs only when the runtime is
 constructed with a `rateLimiter`, keyed by the verified subject, so it never

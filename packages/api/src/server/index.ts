@@ -178,11 +178,14 @@ export interface ServerOptions {
    *
    * When omitted, the server enforces this Mac's governance: `loadHostGovernance`
    * from `@macts/runtime`, loaded on the first call that reaches the governance
-   * step. That is the policy file under `MACTS_HOME` (or the default policy when
-   * there is none), the registered approval provider if any, every key's own
-   * policy, and an audit log under `MACTS_HOME`. If that configuration is
-   * malformed or unreadable, every call is denied with `INTERNAL`; it never
-   * falls back to allowing everything.
+   * step or needs its audit log. That is the policy file under `MACTS_HOME` (or
+   * the default policy when there is none), the registered approval provider if
+   * any, every key's own policy, and an audit log under `MACTS_HOME`. If that
+   * configuration is malformed or unreadable, every call that passes the
+   * permission check is denied with `INTERNAL`; it never falls back to allowing
+   * everything. A caller without the operation's permission is still denied
+   * with `PERMISSION_DENIED`; its `permission-denied` record cannot be written
+   * without the audit log, so the failure is logged instead.
    *
    * Supply a context to enforce something else instead, for example in tests
    * or a custom deployment. Build one from `loadActivePolicy`,

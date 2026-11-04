@@ -164,8 +164,11 @@ loaded from `MACTS_HOME` on the first call: the policy file at
 `governance/policy.json` (or the default policy when there is none), the
 approval provider registered in `governance/approval.json`, every key's own
 policy, and an audit log at `governance/audit.jsonl`. A malformed or unreadable
-policy or approval file denies every call with `500 INTERNAL`; it never falls
-back to allowing everything. Pass a `GovernanceContext` to enforce something
+policy or approval file denies every call that passes the permission check with
+`500 INTERNAL`; it never falls back to allowing everything. A caller without the
+operation's permission is still answered `403 PERMISSION_DENIED`; its
+`permission-denied` record cannot be written without the audit log, so the
+failure is logged instead. Pass a `GovernanceContext` to enforce something
 else.
 
 **Example:**
