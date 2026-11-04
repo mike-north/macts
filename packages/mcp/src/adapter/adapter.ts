@@ -10,7 +10,8 @@
  *   whose input admits no value, so that it is never offered as a tool;
  * - deriving each tool from its operation descriptor: the name from the
  *   operation id ({@link toolNameFor}), the description from the descriptor,
- *   and the input schema from the descriptor's wire contract (phases/13 D9);
+ *   and the input schema from the input side of the descriptor's wire
+ *   contract, which is what a call may send (phases/13 D9);
  * - refusing, when it is built, any operation it cannot serve faithfully: an
  *   input contract JSON Schema cannot represent or that does not describe an
  *   object, or two operations that derive the same tool name;
@@ -60,9 +61,10 @@ import { toolNameFor } from './tool-name.js'
  * The JSON Schema of a tool's input, as MCP requires it: an object schema.
  *
  * @remarks
- * Derived from the operation's wire contract with
- * `z.toJSONSchema(input.wire, { target: 'draft-7' })`, so it describes wire
- * values and carries every keyword that derivation produces.
+ * Derived from the input side of the operation's wire contract with
+ * `z.toJSONSchema(input.wire, { target: 'draft-7', io: 'input' })`, so it
+ * describes the wire values a call may send and carries every keyword that
+ * derivation produces.
  */
 export interface McpToolInputSchema {
   /** MCP requires every tool's input to be a JSON object. */
@@ -185,6 +187,16 @@ function successResult(result: unknown, pages: boolean): CallToolResult {
  * The input schema of an operation's tool, derived once from its wire
  * contract.
  *
+ * @remarks
+ * The schema renders the input side of `input.wire`: the values its
+ * validation accepts, which is what a call may send. The wire schema of a
+ * generated contract is a pure validator, so its input and output sides are
+ * the same document. The input of an operation registered from a manifest
+ * alone is a pipe instead, from the command's declared input into a record of
+ * JSON values. Its input side lists the command's parameters, which of them
+ * are required, and that no other key is accepted; its output side is only
+ * the bare JSON record, which tells a client nothing about the call.
+ *
  * @throws {@link McpToolDerivationError} naming the operation when JSON Schema
  *   cannot represent the contract or the result is not an object schema. There
  *   is no fallback schema: a tool that advertises less than its contract would
@@ -194,7 +206,7 @@ function deriveInputSchema(operation: RegisteredOperation): McpToolInputSchema {
   const { id, input } = operation.descriptor
   let schema: Record<string, unknown>
   try {
-    schema = z.toJSONSchema(input.wire, { target: INPUT_SCHEMA_TARGET })
+    schema = z.toJSONSchema(input.wire, { target: INPUT_SCHEMA_TARGET, io: 'input' })
   } catch (cause) {
     throw new McpToolDerivationError(
       `The input contract of operation "${id}" cannot be represented as JSON Schema`,
