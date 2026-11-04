@@ -250,18 +250,19 @@ resources:
 
 #### Resource Fields
 
-| Field         | Type   | Required | Description                                                                                                                                                                                                      |
-| ------------- | ------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`        | string | Yes      | Resource name (singular, PascalCase)                                                                                                                                                                             |
-| `plural`      | string | Yes      | Plural form for collections, PascalCase letters only (`MediaItems`, `URLs`); its lower camel case (`mediaItems`) spells the resource in routes, SDK accessors, tool names and permissions                        |
-| `description` | string | Yes      | Human-readable description                                                                                                                                                                                       |
-| `code`        | string | No       | AppleScript four-character code                                                                                                                                                                                  |
-| `properties`  | object | No       | Property definitions (see [Properties](#properties))                                                                                                                                                             |
-| `identifiers` | array  | No       | Identifier configuration (see [Identifiers](#identifiers))                                                                                                                                                       |
-| `schema`      | string | No       | Reference to JSON Schema file for full data shape                                                                                                                                                                |
-| `native`      | object | No       | The app's own spelling of the collection, where it differs from the plural's lower camel case, with dictionary evidence (see [Native spellings](#native-spellings))                                              |
-| `unsupported` | object | No       | Marks a resource the app cannot provide (no collection in its dictionary, or every read fails), with evidence (see [Unsupported resources](#unsupported-resources))                                              |
-| `rangeRead`   | object | No       | Whether the running app reads a range of the resource's collection, with live evidence; a list pages only when it is `supported: true`, and reads its pages as its `read` says (see [Range reads](#range-reads)) |
+| Field         | Type   | Required | Description                                                                                                                                                                                                                                                                     |
+| ------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`        | string | Yes      | Resource name (singular, PascalCase)                                                                                                                                                                                                                                            |
+| `plural`      | string | Yes      | Plural form for collections, PascalCase letters only (`MediaItems`, `URLs`); its lower camel case (`mediaItems`) spells the resource in routes, SDK accessors, tool names and permissions                                                                                       |
+| `description` | string | Yes      | Human-readable description                                                                                                                                                                                                                                                      |
+| `code`        | string | No       | AppleScript four-character code                                                                                                                                                                                                                                                 |
+| `properties`  | object | No       | Property definitions (see [Properties](#properties))                                                                                                                                                                                                                            |
+| `identifiers` | array  | No       | Identifier configuration (see [Identifiers](#identifiers))                                                                                                                                                                                                                      |
+| `schema`      | string | No       | Reference to JSON Schema file for full data shape                                                                                                                                                                                                                               |
+| `native`      | object | No       | The app's own spelling of the collection, where it differs from the plural's lower camel case, with dictionary evidence (see [Native spellings](#native-spellings))                                                                                                             |
+| `unsupported` | object | No       | Marks a resource the app cannot provide (no collection in its dictionary, or every read fails), with evidence (see [Unsupported resources](#unsupported-resources))                                                                                                             |
+| `rangeRead`   | object | No       | Whether the running app reads a range of the resource's collection, with live evidence; a list pages only when it is `supported: true`, and reads its pages as its `read` says (see [Range reads](#range-reads))                                                                |
+| `roots`       | object | No       | Marks a singleton root: the app holds the resource's objects as its own properties, one per kind (`<kind>: { property, evidence }`, with dictionary evidence per kind). Validation derives the kind enum, a `kind` property and the identifier; see [Identifiers](#identifiers) |
 
 #### Properties
 
@@ -671,10 +672,11 @@ identifiers:
     primary: false
 ```
 
-| Field      | Type    | Required | Description                                                  |
-| ---------- | ------- | -------- | ------------------------------------------------------------ |
-| `property` | string  | Yes      | Name of the property used as identifier                      |
-| `primary`  | boolean | No       | Whether this is the primary identifier (defaults to `false`) |
+| Field       | Type    | Required | Description                                                                                                                                                                                                                                                                    |
+| ----------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `property`  | string  | Yes      | Name of the property used as identifier                                                                                                                                                                                                                                        |
+| `primary`   | boolean | No       | Whether this is the primary identifier (defaults to `false`)                                                                                                                                                                                                                   |
+| `targeting` | enum    | No       | How the app finds an item from the identifier: `byId` (default, the app's id form), `byProperty` (a match on a working property), `byKey` (the collection's key form, which the app interprets, such as a path), or `byRoot` (a singleton root's kind; derived, never written) |
 
 The primary identifier is used for lookups and references. A resource should have exactly one primary identifier.
 

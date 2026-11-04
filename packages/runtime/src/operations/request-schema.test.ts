@@ -269,7 +269,7 @@ describe('buildDeclaredInputSchema', () => {
     ],
   })
 
-  it('accepts every declared parameter, typed as the permissive schema types it', () => {
+  it('accepts every declared parameter, with the same types as the permissive schema', () => {
     const result = buildDeclaredInputSchema(CREATE).safeParse({
       title: 'Hello',
       count: 3,
