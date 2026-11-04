@@ -418,6 +418,16 @@ resources:
     plural: ClassicDomainObjects
     description: The Classic domain in the file system
     code: domc
+    # The dictionary's class inherits `domain`: it has the domain's folders,
+    # `id` and `name` besides its own, and is identified by the domain's `id`.
+    inherits:
+      resource: Domain
+      evidence:
+        source: dictionary
+        bundleId: com.apple.systemevents
+        appVersion: 1.3.6
+        osVersion: '27.2'
+        term: domain
     properties:
       appleMenuFolder:
         access: r
@@ -620,7 +630,7 @@ resources:
         access: r
         type: string
         description: the URL of the disk item
-        code: url
+        code: 'url '
         native:
           name: url
           evidence:
@@ -808,13 +818,16 @@ resources:
     plural: Folders
     description: A folder in the file system
     code: cfol
-    properties:
-      id:
-        access: r
-        type: string
-        description: Unique identifier for this folder
-        optional: false
-        code: 'ID  '
+    # The dictionary's `folder` declares no property of its own: it has every
+    # property of `disk item`, its `id` among them, and is identified by it.
+    inherits:
+      resource: DiskItem
+      evidence:
+        source: dictionary
+        bundleId: com.apple.systemevents
+        appVersion: 1.3.6
+        osVersion: '27.2'
+        term: disk item
 
   LocalDomainObject:
     name: LocalDomainObject
@@ -860,6 +873,16 @@ resources:
     plural: UserDomainObjects
     description: The user domain in the file system
     code: domu
+    # The dictionary's class inherits `domain`: it has the domain's folders,
+    # `id` and `name` besides its own, and is identified by the domain's `id`.
+    inherits:
+      resource: Domain
+      evidence:
+        source: dictionary
+        bundleId: com.apple.systemevents
+        appVersion: 1.3.6
+        osVersion: '27.2'
+        term: domain
     properties:
       desktopFolder:
         access: r

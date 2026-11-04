@@ -268,17 +268,22 @@ export const UnsupportedSchema = z.object({
 export type Unsupported = z.infer<typeof UnsupportedSchema>
 
 /**
- * Evidence that an app spells a collection or a property differently from the
- * spelling macts derives: the term as the app's scripting dictionary writes
- * it, for one app build on one macOS version.
+ * Evidence from an app's scripting dictionary: a term exactly as the
+ * dictionary writes it, for one app build on one macOS version.
  *
- * The bridge's spelling of a term follows from the term itself (its first word
- * lowercased whole, each later word capitalized), so the term is the evidence:
- * "AirPlay devices" is `airplayDevices`, "ANSI black color" is
- * `ansiBlackColor`. The provenance fields say which build the dictionary was
- * read from, because a later release can rename a term.
+ * The term is what the dictionary shows; the provenance fields say which
+ * build the dictionary was read from, because a later release can rename a
+ * term or change a class. A manifest records it where it states something the
+ * dictionary declares and macts cannot derive: an app's own spelling of a
+ * collection or a property (`native` in `./resource.ts` and `./property.ts`),
+ * or the class a class inherits (`inherits` in `./resource.ts`).
+ *
+ * For a native spelling the term is the evidence because the bridge's
+ * spelling follows from the term itself (its first word lowercased whole,
+ * each later word capitalized): "AirPlay devices" is `airplayDevices`, "ANSI
+ * black color" is `ansiBlackColor`.
  */
-export const DictionarySpellingEvidenceSchema = z
+export const DictionaryTermEvidenceSchema = z
   .object({
     source: z.literal('dictionary'),
     /** The bundle identifier of the app whose dictionary was read. */
@@ -290,12 +295,13 @@ export const DictionarySpellingEvidenceSchema = z
     /**
      * The dictionary term exactly as the dictionary writes it, e.g.
      * `AirPlay devices` or `URL`: a class's plural for a collection, a
-     * property's name for a property.
+     * property's name for a property, the superclass's name for a class's
+     * `inherits`.
      */
     term: z.string().min(1),
   })
   .strict()
-export type DictionarySpellingEvidence = z.infer<typeof DictionarySpellingEvidenceSchema>
+export type DictionaryTermEvidence = z.infer<typeof DictionaryTermEvidenceSchema>
 
 /**
  * How an app's dictionary lacks a collection the manifest declares.

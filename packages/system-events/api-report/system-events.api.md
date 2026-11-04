@@ -182,13 +182,19 @@ export const CheckboxSchema: z.ZodObject<{
 export type CheckboxUpdateInput = Partial<CheckboxCreateInput>;
 
 // @public
-export type ClassicDomainObject = Record<string, never>;
+export interface ClassicDomainObject {
+    id: string;
+    name: string;
+}
 
 // @public
 export type ClassicDomainObjectCreateInput = Record<string, never>;
 
 // @public (undocumented)
-export const ClassicDomainObjectSchema: z.ZodObject<{}, z.core.$strip>;
+export const ClassicDomainObjectSchema: z.ZodObject<{
+    id: z.ZodString;
+    name: z.ZodString;
+}, z.core.$strip>;
 
 // @public
 export type ClassicDomainObjectUpdateInput = Partial<ClassicDomainObjectCreateInput>;
@@ -464,15 +470,47 @@ export type FileUpdateInput = Partial<FileCreateInput>;
 
 // @public
 export interface Folder {
+    busyStatus: boolean;
+    creationDate: Date;
+    displayedName: string;
     id: string;
+    modificationDate: Date;
+    name: string;
+    nameExtension: string;
+    packageFolder: boolean;
+    path: string;
+    physicalSize: number;
+    pOSIXPath: string;
+    size: number;
+    uRL: string;
+    visible: boolean;
+    volume: string;
 }
 
 // @public
-export type FolderCreateInput = Record<string, never>;
+export interface FolderCreateInput {
+    modificationDate?: Date;
+    name?: string;
+    visible?: boolean;
+}
 
 // @public (undocumented)
 export const FolderSchema: z.ZodObject<{
+    busyStatus: z.ZodBoolean;
+    creationDate: z.ZodString;
+    displayedName: z.ZodString;
     id: z.ZodString;
+    modificationDate: z.ZodString;
+    name: z.ZodString;
+    nameExtension: z.ZodString;
+    packageFolder: z.ZodBoolean;
+    path: z.ZodString;
+    physicalSize: z.ZodNumber;
+    pOSIXPath: z.ZodString;
+    size: z.ZodNumber;
+    uRL: z.ZodString;
+    visible: z.ZodBoolean;
+    volume: z.ZodString;
 }, z.core.$strip>;
 
 // @public
@@ -1518,13 +1556,19 @@ export const UIElementSchema: z.ZodObject<{
 export type UIElementUpdateInput = Partial<UIElementCreateInput>;
 
 // @public
-export type UserDomainObject = Record<string, never>;
+export interface UserDomainObject {
+    id: string;
+    name: string;
+}
 
 // @public
 export type UserDomainObjectCreateInput = Record<string, never>;
 
 // @public (undocumented)
-export const UserDomainObjectSchema: z.ZodObject<{}, z.core.$strip>;
+export const UserDomainObjectSchema: z.ZodObject<{
+    id: z.ZodString;
+    name: z.ZodString;
+}, z.core.$strip>;
 
 // @public
 export type UserDomainObjectUpdateInput = Partial<UserDomainObjectCreateInput>;

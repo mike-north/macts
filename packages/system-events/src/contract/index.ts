@@ -262,7 +262,18 @@ export interface Alias {
 }
 
 /** The Classic domain in the file system */
-export type ClassicDomainObject = Record<string, never>
+export interface ClassicDomainObject {
+  /**
+   * the unique identifier of the domain.
+   * Never null: the primary identifier.
+   */
+  readonly id: string
+  /**
+   * the name of the domain.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+}
 
 /** A disk in the file system */
 export interface Disk {
@@ -467,10 +478,80 @@ export interface FilePackage {
 /** A folder in the file system */
 export interface Folder {
   /**
-   * Unique identifier for this folder.
+   * Is the disk item busy?
    * Nullable. No evidence that the app always sets it.
    */
-  readonly id: string | null
+  readonly busyStatus: boolean | null
+  /**
+   * the date on which the disk item was created.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly creationDate: Date | null
+  /**
+   * the name of the disk item as displayed in the User Interface.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly displayedName: string | null
+  /**
+   * the unique ID of the disk item.
+   * Never null: the primary identifier.
+   */
+  readonly id: string
+  /**
+   * the date on which the disk item was last modified.
+   * Nullable. No evidence that the app always sets it.
+   */
+  modificationDate: Date | null
+  /**
+   * the name of the disk item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * the extension portion of the name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly nameExtension: string | null
+  /**
+   * Is the disk item a package?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly packageFolder: boolean | null
+  /**
+   * the file system path of the disk item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly path: string | null
+  /**
+   * the actual space used by the disk item on disk.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly physicalSize: Integer | null
+  /**
+   * the POSIX file system path of the disk item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly pOSIXPath: string | null
+  /**
+   * the logical size of the disk item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly size: Integer | null
+  /**
+   * the URL of the disk item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly uRL: string | null
+  /**
+   * Is the disk item visible?
+   * Nullable. No evidence that the app always sets it.
+   */
+  visible: boolean | null
+  /**
+   * the volume on which the disk item resides.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly volume: string | null
 }
 
 /** The local domain in the file system */
@@ -501,7 +582,18 @@ export interface SystemDomainObject {
 }
 
 /** The user domain in the file system */
-export type UserDomainObject = Record<string, never>
+export interface UserDomainObject {
+  /**
+   * the unique identifier of the domain.
+   * Never null: the primary identifier.
+   */
+  readonly id: string
+  /**
+   * the name of the domain.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+}
 
 /** An action that can be performed on the UI element */
 export interface Action {
@@ -1617,10 +1709,33 @@ export type FilePackageCreateInput = Record<string, never>
 export type FilePackageUpdateInput = Record<string, never>
 
 /** Input for creating a Folder. */
-export type FolderCreateInput = Record<string, never>
+export interface FolderCreateInput {
+  /** the date on which the disk item was last modified */
+  modificationDate?: Date
+  /** the name of the disk item */
+  name?: string
+  /** Is the disk item visible? */
+  visible?: boolean
+}
 
 /** Input for updating a Folder. Omitted fields are left unchanged. */
-export type FolderUpdateInput = Record<string, never>
+export interface FolderUpdateInput {
+  /**
+   * the date on which the disk item was last modified.
+   * Cannot be reset: null is rejected.
+   */
+  modificationDate?: Date
+  /**
+   * the name of the disk item.
+   * Cannot be reset: null is rejected.
+   */
+  name?: string
+  /**
+   * Is the disk item visible?
+   * Cannot be reset: null is rejected.
+   */
+  visible?: boolean
+}
 
 /** Input for creating a LocalDomainObject. */
 export type LocalDomainObjectCreateInput = Record<string, never>
