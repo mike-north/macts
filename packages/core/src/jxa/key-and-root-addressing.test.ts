@@ -1,6 +1,6 @@
 /**
  * Native addressing by the app's key specifier (`targeting: byKey`), of
- * singleton roots (`roots`), over the Archive fixture
+ * singleton roots (`roots`), and of absent values, over the Archive fixture
  * (see `archiveManifest`).
  *
  * Expected outcomes are written by hand from phases/13 D4, D7 and D10:
@@ -18,6 +18,10 @@
  *   A reference by kind resolves to that object, in a resolution and as an
  *   operation's input; an object read from the app cannot be encoded as a
  *   reference to a root, since nothing on it says which kind it is.
+ * - A read that fails with -1728 is an empty value (`null`) only for a
+ *   property claimed nullable on probe evidence whose failed reads all
+ *   raised -1728, and only after the item itself was found. The same failure
+ *   of any other property, and any other failure of that one, still fails.
  *
  * The executor cases run the real native executor on the real composed
  * script, in an isolated context, against a stand-in Archive application
@@ -31,6 +35,7 @@ import {
   AppOperationError,
   InternalError,
   TargetNotFoundError,
+  UnexpectedValueError,
   type ResourcePlanTable,
   type ValuePlan,
   type WireRecord,
@@ -74,6 +79,8 @@ const ENTRY_PLAN: ValuePlan = {
     location: { presence: 'required', value: text() },
     title: { presence: 'required', value: nullable(text()) },
     holder: { presence: 'required', value: nullable(ENTRY_REF) },
+    shelfMark: { presence: 'required', value: nullable(text()) },
+    summary: { presence: 'required', value: nullable(text()) },
   },
 }
 
@@ -84,6 +91,7 @@ const DESK_PLAN: ValuePlan = {
     kind: { presence: 'required', value: DESK_KIND },
     clerk: { presence: 'required', value: nullable(text()) },
     featured: { presence: 'required', value: nullable(ENTRY_REF) },
+    bell: { presence: 'required', value: nullable(text()) },
   },
 }
 
@@ -127,21 +135,25 @@ interface DeskOptions {
 /**
  * A stand-in Archive application: one volume (`v1`) holding a mark at `/m`,
  * two entries (`/a`, held by `/root`) the entries collection finds by key, a
- * label `l1` on `/a`, a front desk featuring `/a`, and a back desk. Each desk
- * can be replaced (`desks`) by one the app reports missing or failing.
+ * label `l1` on `/a`, a front desk featuring `/a`, and a back desk with a
+ * bell. Each desk can be replaced (`desks`) by one the app reports missing or
+ * failing. `entryMembers` adds members to entry `/a`, such as a failing read.
  */
-function standInArchive(options: { desks?: DeskOptions } = {}) {
+function standInArchive(
+  options: { desks?: DeskOptions; entryMembers?: Record<string, unknown> } = {}
+) {
   const uses: string[] = []
   const rootEntry = object(
-    { location: '/root', title: 'Root', holder: null },
+    { location: '/root', title: 'Root', holder: null, shelfMark: 'R1', summary: 'Top' },
     { location: () => '/root' }
   )
   const label = object({ id: 'l1', text: 'Fragile' })
   const entry = object(
-    { location: '/a', title: 'A', holder: rootEntry },
+    { location: '/a', title: 'A', holder: rootEntry, shelfMark: 'S1', summary: 'Kept' },
     {
       location: () => '/a',
       labels: { byId: (id: unknown) => (id === 'l1' ? label : ABSENT) },
+      ...options.entryMembers,
     }
   )
   const entries = new Map<unknown, unknown>([
@@ -159,8 +171,9 @@ function standInArchive(options: { desks?: DeskOptions } = {}) {
     volumes: { byId: (id: unknown) => (id === 'v1' ? volume : ABSENT) },
     entries: { byName: (key: unknown) => entries.get(key) ?? ABSENT },
     frontDesk:
-      options.desks?.front ?? object({ clerk: 'Kim', featured: entry }, { name: () => 'Front' }),
-    backDesk: options.desks?.back ?? object({ clerk: 'Lee', featured: null }),
+      options.desks?.front ??
+      object({ clerk: 'Kim', featured: entry }, { bell: failing(-1728), name: () => 'Front' }),
+    backDesk: options.desks?.back ?? object({ clerk: 'Lee', featured: null, bell: 'Brass' }),
     // Ringing answers with the desk rung, so a test can see what encoding it does.
     ring: (params: { desk?: unknown }) => {
       rang.push(params.desk)
@@ -292,6 +305,8 @@ describe('key targeting against a stand-in Archive', () => {
       location: '/a',
       title: 'A',
       holder: ref('Entry', '/root'),
+      shelfMark: 'S1',
+      summary: 'Kept',
     })
     expect(uses.slice(0, 3)).toEqual([
       'read app.entries',
@@ -383,6 +398,7 @@ describe('singleton roots against a stand-in Archive', () => {
       kind: 'back',
       clerk: 'Lee',
       featured: null,
+      bell: 'Brass',
     })
     expect(uses.slice(0, 3)).toEqual([
       'read app.backDesk',
@@ -420,8 +436,8 @@ describe('singleton roots against a stand-in Archive', () => {
     const { app } = standInArchive()
 
     await expect(listDesks(app)).resolves.toEqual([
-      { kind: 'front', clerk: 'Kim', featured: ref('Entry', '/a') },
-      { kind: 'back', clerk: 'Lee', featured: null },
+      { kind: 'front', clerk: 'Kim', featured: ref('Entry', '/a'), bell: null },
+      { kind: 'back', clerk: 'Lee', featured: null, bell: 'Brass' },
     ])
   })
 
@@ -432,7 +448,7 @@ describe('singleton roots against a stand-in Archive', () => {
     const { app } = standInArchive({ desks: { back } })
 
     await expect(listDesks(app)).resolves.toEqual([
-      { kind: 'front', clerk: 'Kim', featured: ref('Entry', '/a') },
+      { kind: 'front', clerk: 'Kim', featured: ref('Entry', '/a'), bell: null },
     ])
   })
 
@@ -461,6 +477,7 @@ describe('singleton roots against a stand-in Archive', () => {
         kind: { presence: 'required', value: frontOnly },
         clerk: { presence: 'required', value: nullable(text()) },
         featured: { presence: 'required', value: nullable(ENTRY_REF) },
+        bell: { presence: 'required', value: nullable(text()) },
       },
     }
     const { app } = standInArchive()
@@ -477,10 +494,10 @@ describe('singleton roots against a stand-in Archive', () => {
 
     await expect(
       run('getDesk', { kind: 'front' }, inputOf(frontOnly, 'kind'), deskPlan)
-    ).resolves.toEqual({ kind: 'front', clerk: 'Kim', featured: ref('Entry', '/a') })
+    ).resolves.toEqual({ kind: 'front', clerk: 'Kim', featured: ref('Entry', '/a'), bell: null })
     await expect(
       run('listDesks', {}, { kind: 'record', fields: {} }, { kind: 'array', items: deskPlan })
-    ).resolves.toEqual([{ kind: 'front', clerk: 'Kim', featured: ref('Entry', '/a') }])
+    ).resolves.toEqual([{ kind: 'front', clerk: 'Kim', featured: ref('Entry', '/a'), bell: null }])
   })
 
   it('resolves a reference by kind to the record its get returns', async () => {
@@ -490,6 +507,7 @@ describe('singleton roots against a stand-in Archive', () => {
       kind: 'back',
       clerk: 'Lee',
       featured: null,
+      bell: 'Brass',
     })
   })
 
@@ -508,8 +526,8 @@ describe('singleton roots against a stand-in Archive', () => {
         { kind: 'array', items: DESK_PLAN }
       )
     ).resolves.toEqual([
-      { kind: 'back', clerk: 'Lee', featured: null },
-      { kind: 'front', clerk: 'Kim', featured: ref('Entry', '/a') },
+      { kind: 'back', clerk: 'Lee', featured: null, bell: 'Brass' },
+      { kind: 'front', clerk: 'Kim', featured: ref('Entry', '/a'), bell: null },
     ])
   })
 
@@ -551,5 +569,154 @@ describe('singleton roots against a stand-in Archive', () => {
     )
 
     expect(error).toBeInstanceOf(InternalError)
+  })
+})
+
+describe('absent values against a stand-in Archive', () => {
+  const getEntry = (app: object) =>
+    execute(
+      app,
+      'getEntry',
+      'Entry',
+      { location: '/a' },
+      { input: inputOf(text(), 'location'), output: ENTRY_PLAN }
+    )
+
+  it('reads -1728 on a property with evidence of it as null', async () => {
+    const { app } = standInArchive({
+      entryMembers: {
+        properties: () => ({ location: '/a', title: 'A', holder: null, summary: 'Kept' }),
+        shelfMark: failing(-1728),
+      },
+    })
+
+    await expect(getEntry(app)).resolves.toMatchObject({ location: '/a', shelfMark: null })
+  })
+
+  it('fails -1728 on a property with no such evidence', async () => {
+    const { app } = standInArchive({
+      entryMembers: {
+        properties: () => ({ location: '/a', title: 'A', holder: null, shelfMark: 'S1' }),
+        summary: failing(-1728),
+      },
+    })
+
+    const error = await rejectionOf(getEntry(app))
+
+    expect(error).toBeInstanceOf(UnexpectedValueError)
+  })
+
+  it('fails any other error on a property with evidence of -1728', async () => {
+    const { app } = standInArchive({
+      entryMembers: {
+        properties: () => ({ location: '/a', title: 'A', holder: null, summary: 'Kept' }),
+        shelfMark: failing(-1700),
+      },
+    })
+
+    const error = await rejectionOf(getEntry(app))
+
+    expect(error).toBeInstanceOf(UnexpectedValueError)
+  })
+
+  it('reads -1728 on a property with evidence of it as null when resolving a reference', async () => {
+    const { app } = standInArchive({
+      entryMembers: {
+        properties: () => ({ location: '/a', title: 'A', holder: null, summary: 'Kept' }),
+        shelfMark: failing(-1728),
+      },
+    })
+
+    await expect(resolve(app, ref('Entry', '/a').reference, ENTRY_PLAN)).resolves.toMatchObject({
+      location: '/a',
+      shelfMark: null,
+    })
+  })
+
+  it('fails -1728 on a property with no such evidence when resolving a reference', async () => {
+    const { app } = standInArchive({
+      entryMembers: {
+        properties: () => ({ location: '/a', title: 'A', holder: null, shelfMark: 'S1' }),
+        summary: failing(-1728),
+      },
+    })
+
+    const error = await rejectionOf(resolve(app, ref('Entry', '/a').reference, ENTRY_PLAN))
+
+    expect(error).toBeInstanceOf(UnexpectedValueError)
+  })
+
+  it('fails a missing item as missing, before any property is read', async () => {
+    const { app, uses } = standInArchive()
+
+    const error = await rejectionOf(
+      execute(
+        app,
+        'getEntry',
+        'Entry',
+        { location: '/missing' },
+        { input: inputOf(text(), 'location'), output: ENTRY_PLAN }
+      )
+    )
+
+    expect(error).toBeInstanceOf(TargetNotFoundError)
+    expect(uses.some((use) => use.includes('shelfMark'))).toBe(false)
+  })
+
+  describe('in a list, item by item', () => {
+    /**
+     * A stand-in entries collection whose `shelfMark` and `summary` reads
+     * fail across the collection, so each is read item by item, where `/a`
+     * answers and `/root` fails with `rootFailure` on the property `failing`.
+     */
+    function listingArchive(failingProperty: 'shelfMark' | 'summary', rootFailure: number) {
+      const uses: string[] = []
+      const item = (location: string, values: Record<string, unknown>) => ({
+        location: () => location,
+        ...Object.fromEntries(Object.entries(values).map(([key, value]) => [key, () => value])),
+      })
+      const a = item('/a', { shelfMark: 'S1', summary: 'Kept' })
+      const root = {
+        ...item('/root', { shelfMark: 'R1', summary: 'Top' }),
+        [failingProperty]: failing(rootFailure),
+      }
+      const entries = Object.assign(() => [a, root], {
+        location: () => ['/a', '/root'],
+        title: () => ['A', 'Root'],
+        holder: () => [null, null],
+        shelfMark: failing(-1728),
+        summary: failing(-1728),
+      })
+      return { app: recorded({ includeStandardAdditions: false, entries }, 'app', uses) }
+    }
+    const listEntries = (app: object) =>
+      execute(
+        app,
+        'listEntries',
+        'Entry',
+        {},
+        { input: { kind: 'record', fields: {} }, output: { kind: 'array', items: ENTRY_PLAN } }
+      )
+
+    it('reads -1728 on an evidenced property as null for that item', async () => {
+      const { app } = listingArchive('shelfMark', -1728)
+
+      await expect(listEntries(app)).resolves.toEqual([
+        { location: '/a', title: 'A', holder: null, shelfMark: 'S1', summary: 'Kept' },
+        { location: '/root', title: 'Root', holder: null, shelfMark: null, summary: 'Top' },
+      ])
+    })
+
+    it('fails -1728 on a property with no such evidence', async () => {
+      const { app } = listingArchive('summary', -1728)
+
+      expect(await rejectionOf(listEntries(app))).toBeInstanceOf(UnexpectedValueError)
+    })
+
+    it('fails any other error on an evidenced property', async () => {
+      const { app } = listingArchive('shelfMark', -1700)
+
+      expect(await rejectionOf(listEntries(app))).toBeInstanceOf(UnexpectedValueError)
+    })
   })
 })
