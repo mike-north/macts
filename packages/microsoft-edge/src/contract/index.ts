@@ -25,7 +25,6 @@ import {
   type ClientBrand,
   type ClientRuntime,
   type Integer,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
   type Page,
   type Rectangle,
@@ -97,11 +96,6 @@ export interface Window {
    * Nullable. No evidence that the app always sets it.
    */
   zoomed: boolean | null
-  /**
-   * Returns the currently selected tab.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly activeTab: ObjectReferenceVariant<Tab, string, 'Tab'> | null
   /**
    * Represents the mode of the window which can be 'normal' or 'incognito', can be set only once
    * during creation of the window.
@@ -328,11 +322,12 @@ export interface TabResourceClient {
    */
   list(windowId: string, options?: CallOptions): Promise<Page<Tab>>
   /**
-   * Read the tab identified by `id`.
+   * Read the tab identified by `id` within `windowId`.
    *
+   * @param windowId - Window identifier. Does not accept null.
    * @param id - Tab identifier. Does not accept null.
    */
-  get(id: string, options?: CallOptions): Promise<Tab>
+  get(windowId: string, id: string, options?: CallOptions): Promise<Tab>
   /** Create a tab. */
   create(input: TabCreateInput, options?: CallOptions): Promise<Tab>
   /**
@@ -473,10 +468,6 @@ const windowRecordType: ValueType<Window> = t.record(
     visible: t.nullable(t.boolean(), { description: 'Whether the window is currently visible.' }),
     zoomable: t.nullable(t.boolean(), { description: 'Whether the window can be zoomed.' }),
     zoomed: t.nullable(t.boolean(), { description: 'Whether the window is currently zoomed.' }),
-    activeTab: t.nullable(
-      t.reference<Tab, string, 'Tab'>(() => microsoftEdgeContract, 'Tab', 'one'),
-      { description: 'Returns the currently selected tab' }
-    ),
     mode: t.nullable(t.string(), {
       description:
         "Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window.",
@@ -554,7 +545,7 @@ export type MicrosoftEdgeResources = Readonly<{
     readonly id: ValueType<string>
     readonly get: 'microsoft-edge.tabs.get'
     readonly list: 'microsoft-edge.tabs.list'
-    readonly parents: { readonly list: 'Window' }
+    readonly parents: { readonly get: 'Window'; readonly list: 'Window' }
   }
   BookmarkFolder: ResourceDescriptor<BookmarkFolder, string> & {
     readonly id: ValueType<string>
@@ -591,7 +582,7 @@ const resources = {
     id: t.string({ description: 'Unique ID of the tab.' }),
     get: 'microsoft-edge.tabs.get',
     list: 'microsoft-edge.tabs.list',
-    parents: { list: 'Window' },
+    parents: { get: 'Window', list: 'Window' },
   },
   BookmarkFolder: {
     name: 'BookmarkFolder',
@@ -756,20 +747,27 @@ const tabListTabsOperation: OperationDescriptor<{ readonly windowId: string }, P
   },
 }
 
-const tabGetTabOperation: OperationDescriptor<{ readonly id: string }, Tab> = {
+const tabGetTabOperation: OperationDescriptor<
+  { readonly windowId: string; readonly id: string },
+  Tab
+> = {
   id: 'microsoft-edge.tabs.get',
   permission: 'microsoft-edge:tabs:get',
   target: { command: 'getTab', resource: 'Tab' },
-  description: 'Get a tab by ID',
+  description: 'Get a tab of a window by ID',
   input: t.record({
+    windowId: t.string({ description: 'Window identifier' }),
     id: t.string({ description: 'Tab identifier' }),
   }),
   output: tabRecordType,
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { id: { type: 'string', description: 'Tab identifier' } },
-    required: ['id'],
+    properties: {
+      windowId: { type: 'string', description: 'Window identifier' },
+      id: { type: 'string', description: 'Tab identifier' },
+    },
+    required: ['windowId', 'id'],
     additionalProperties: false,
   },
 }
@@ -1133,7 +1131,7 @@ function bind(runtime: ClientRuntime): MicrosoftEdgeClient {
     },
     tabs: {
       list: (windowId, options) => runtime.invoke(tabListTabsOperation, { windowId }, options),
-      get: (id, options) => runtime.invoke(tabGetTabOperation, { id }, options),
+      get: (windowId, id, options) => runtime.invoke(tabGetTabOperation, { windowId, id }, options),
       create: (input, options) => runtime.invoke(tabCreateTabOperation, input, options),
       reload: (tabId, options) => runtime.invoke(tabReloadOperation, { tabId }, options),
       goBack: (tabId, options) => runtime.invoke(tabGoBackOperation, { tabId }, options),

@@ -635,6 +635,7 @@ const COMPILE_ERROR_PATTERN = /^\s*(?:\d+:\d+:\s*)?syntax error:/m
  * | codec, `decode`                                          | `ValidationError` with `issues`          |
  * | codec, `encode`                                          | `UnexpectedValueError` with `issues`     |
  * | collection changed while a list read it                  | `CollectionChangedError`                 |
+ * | app, -1728 (no such object), with a missing resource     | `TargetNotFoundError` for that resource  |
  * | app, -1728 (no such object)                              | `TargetNotFoundError`                    |
  * | app, -1719 (invalid index)                               | `InvalidSelectionError`                  |
  * | app, -1743 (not authorized)                              | `AppAuthorizationRequiredError`          |
@@ -730,6 +731,19 @@ function describeReportedFailure(
   const options = { cause: new Error(failure.message) }
   if (failure.errorNumber === undefined) {
     return new AppOperationError(`${app} could not complete the operation.`, { app }, options)
+  }
+  if (
+    failure.errorNumber === NativeErrorNumber.noSuchObject &&
+    failure.missingResource !== undefined
+  ) {
+    // The body found the parent of a scoped operation missing, so the error
+    // names the parent: a tab cannot be found in a window that does not exist.
+    const resource = failure.missingResource
+    return new TargetNotFoundError(
+      `${app} has no ${resource} matching the request.`,
+      { resource },
+      options
+    )
   }
   return classifyErrorNumber(failure.errorNumber, failure.message, context, options)
 }

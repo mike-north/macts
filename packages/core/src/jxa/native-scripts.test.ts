@@ -1956,7 +1956,11 @@ describe('missing targets and parents fail as no such object', () => {
                 endDate: '2024-01-15T11:00:00.000Z',
               }
             : eventArgs
-        expectNoSuchObject(runBody(body, calendarApp(parent), args))
+        const thrown = runBody(body, calendarApp(parent), args)
+        expectNoSuchObject(thrown)
+        // The miss names the parent's resource, so the failure says which
+        // object is missing: the calendar, not an event in it.
+        expect(thrown).toMatchObject({ missingResource: 'Calendar' })
         expect(parent.used).toEqual([])
       }
     )
@@ -1967,7 +1971,11 @@ describe('missing targets and parents fail as no such object', () => {
         const item = fakeSpecifier(false)
         const parent = fakeSpecifier(true, { events: { byId: () => item.specifier } })
         const body = buildNativeBody(calendar, { command, resource: 'Event' })
-        expectNoSuchObject(runBody(body, calendarApp(parent), eventArgs))
+        const thrown = runBody(body, calendarApp(parent), eventArgs)
+        expectNoSuchObject(thrown)
+        // A missing target names no resource of its own: the operation's
+        // resource is the one missing.
+        expect(thrown).not.toHaveProperty('missingResource')
         expect(item.used).toEqual([])
       }
     )

@@ -433,10 +433,16 @@ export const manifest: unknown = {
     },
     getTab: {
       name: 'get',
-      description: 'Get a tab by ID',
+      description: 'Get a tab of a window by ID',
       scope: 'resource',
       resourceType: 'Tab',
       parameters: [
+        {
+          name: 'windowId',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
         {
           name: 'id',
           type: 'string',
@@ -444,6 +450,10 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
       code: 'getd',
       routeName: 'get',
     },

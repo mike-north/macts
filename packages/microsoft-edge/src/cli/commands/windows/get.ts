@@ -36,7 +36,6 @@ export class GetWindowCommand extends Command {
         visible: item.visible,
         zoomable: item.zoomable,
         zoomed: item.zoomed,
-        activeTab: item.activeTab,
         mode: item.mode,
         activeTabIndex: item.activeTabIndex,
       })
