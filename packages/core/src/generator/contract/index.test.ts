@@ -1123,9 +1123,12 @@ describe('real app manifests', () => {
     // target by a name the manifest has no uniqueness evidence for yet, and
     // `parent-scoped` when the target's get records a parent and native reads
     // do not return the container yet (a Chrome or Edge tab, got within its
-    // window; a TV playlist, got within its source). No shipped output
-    // references a resource with a get and no identifier, and no shipped
-    // command records a result, so no result is left out. A new omission
+    // window; a TV playlist, got within its source; an Xcode scheme, run
+    // destination or project, got within its workspace document). No shipped
+    // output references a resource with a get and no identifier, no shipped
+    // output references a resource the hierarchy holds only within another
+    // resource while its get records no parent (`unrecorded-parent`), and no
+    // shipped command records a result, so no result is left out. A new omission
     // fails until it is reviewed and added here. Removing a row records
     // restored coverage: the field is back in output. The 25 System Events
     // rows marked as inherited (a folder's `container`, and the domain
@@ -1245,13 +1248,23 @@ describe('real app manifests', () => {
       ['tv', 'BrowserWindow', 'view', 'Playlist', 'parent-scoped'],
       ['tv', 'Playlist', 'parent', 'Playlist', 'parent-scoped'],
       ['tv', 'PlaylistWindow', 'view', 'Playlist', 'parent-scoped'],
+      // A scheme, a run destination and a project are got only within their
+      // workspace document. They return only once a workspace document has an
+      // evidenced identity, its path rather than its name, and references
+      // carry their container.
+      ['xcode', 'WorkspaceDocument', 'activeScheme', 'Scheme', 'parent-scoped'],
+      // Also name-keyed with no unique claim, which is hidden by decision:
+      // once containers are emitted its reason becomes `not-unique`, and it
+      // stays out until run destination names are shown to be unique. They
+      // likely repeat within one workspace (the same simulator name on two
+      // runtimes), so that needs a live check across two or more runtimes.
+      ['xcode', 'WorkspaceDocument', 'activeRunDestination', 'RunDestination', 'parent-scoped'],
       ['xcode', 'WorkspaceDocument', 'lastSchemeActionResult', 'SchemeActionResult', 'no-get'],
-      // A run destination is identified by its name, which is not claimed unique.
-      ['xcode', 'WorkspaceDocument', 'activeRunDestination', 'RunDestination', 'not-unique'],
+      ['xcode', 'Target', 'project', 'Project', 'parent-scoped'],
       ['xcode', 'RunDestination', 'device', 'Device', 'no-get'],
       ['xcode', 'RunDestination', 'companionDevice', 'Device', 'no-get'],
     ]
-    expect(expected).toHaveLength(96)
+    expect(expected).toHaveLength(98)
     expect(found.sort()).toEqual(expected.sort())
   })
 

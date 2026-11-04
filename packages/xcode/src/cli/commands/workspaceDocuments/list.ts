@@ -28,7 +28,6 @@ export class ListWorkspaceDocumentsCommand extends Command {
           file: item.file,
           path: item.path,
           loaded: item.loaded,
-          activeScheme: item.activeScheme,
         }))
       )
 

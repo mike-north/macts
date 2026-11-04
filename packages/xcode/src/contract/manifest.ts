@@ -585,6 +585,7 @@ export const manifest: unknown = {
         {
           property: 'name',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
     },
@@ -1096,10 +1097,16 @@ export const manifest: unknown = {
     },
     getProject: {
       name: 'get',
-      description: 'Get a project by ID',
+      description: 'Get a project of a workspace by ID',
       scope: 'resource',
       resourceType: 'Project',
       parameters: [
+        {
+          name: 'workspaceName',
+          type: 'string',
+          description: 'Workspace document name',
+          required: true,
+        },
         {
           name: 'id',
           type: 'string',
@@ -1107,6 +1114,10 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      parent: {
+        resource: 'WorkspaceDocument',
+        parameter: 'workspaceName',
+      },
       code: 'getd',
       routeName: 'get',
     },
@@ -1132,10 +1143,16 @@ export const manifest: unknown = {
     },
     getScheme: {
       name: 'get',
-      description: 'Get a scheme by ID',
+      description: 'Get a scheme of a workspace by ID',
       scope: 'resource',
       resourceType: 'Scheme',
       parameters: [
+        {
+          name: 'workspaceName',
+          type: 'string',
+          description: 'Workspace document name',
+          required: true,
+        },
         {
           name: 'id',
           type: 'string',
@@ -1143,6 +1160,10 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      parent: {
+        resource: 'WorkspaceDocument',
+        parameter: 'workspaceName',
+      },
       code: 'getd',
       routeName: 'get',
     },
@@ -1168,10 +1189,16 @@ export const manifest: unknown = {
     },
     getRunDestination: {
       name: 'get',
-      description: 'Get a run destination by name',
+      description: 'Get a run destination of a workspace by name',
       scope: 'resource',
       resourceType: 'RunDestination',
       parameters: [
+        {
+          name: 'workspaceName',
+          type: 'string',
+          description: 'Workspace document name',
+          required: true,
+        },
         {
           name: 'name',
           type: 'string',
@@ -1179,6 +1206,10 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      parent: {
+        resource: 'WorkspaceDocument',
+        parameter: 'workspaceName',
+      },
       code: 'getd',
       routeName: 'get',
     },

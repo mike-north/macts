@@ -780,7 +780,7 @@ Application
 
 | Field         | Type   | Required | Description                                              |
 | ------------- | ------ | -------- | -------------------------------------------------------- |
-| `resource`    | string | Yes      | Reference to a resource type                             |
+| `resource`    | string | Yes      | Key of a declared resource (validated, at any depth)     |
 | `access`      | enum   | Yes      | Access mode: `r` (read-only) or `rw` (can create/delete) |
 | `description` | string | No       | Human-readable description of this relationship          |
 | `children`    | object | No       | Nested children (recursive)                              |

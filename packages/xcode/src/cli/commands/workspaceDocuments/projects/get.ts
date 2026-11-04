@@ -13,6 +13,10 @@ export class GetProjectCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
+  workspaceName = Option.String('--workspace-name', {
+    required: true,
+    description: 'Workspace document name',
+  })
 
   projectId = Option.String({ name: 'id', required: true })
 
@@ -21,7 +25,7 @@ export class GetProjectCommand extends Command {
 
     try {
       const client = getClient()
-      const item = await client.projects.get(this.projectId)
+      const item = await client.projects.get(this.workspaceName, this.projectId)
 
       const output = formatter.format({
         id: item.id,
