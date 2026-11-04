@@ -838,10 +838,9 @@ native values for arguments, and native results to wire values, before
   to a resource the app finds by its identifier. The reference carries a
   container exactly when the resource is found within its parent, and the
   codec converts that identity container the same way (D7, native conversion
-  scope). The
-  environment's `references` table, `NativeReferenceTable`, holds one entry
-  per resource, `NativeReferencePlans { id?, addressing? }`: `id` is the
-  resource's identifier plan from the request's `resourcePlans` (D9), and
+  scope). The environment's `references` table, `NativeReferenceTable`, holds
+  one entry per resource, `NativeReferencePlans { id?, addressing? }`: `id` is
+  the resource's identifier plan from the request's `resourcePlans` (D9), and
   `addressing` is how the app finds one of its objects from its identifier.
   For a resource held in a collection it is
   `NativeAddressing { collection, lookup, property, within? }`. The native
@@ -1747,18 +1746,17 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   was read through, known statically from the read path, never a container
   asked of the object: Chrome tabs have no `container` property, and a
   top-level Mail mailbox's `container` fails with the app's no-such-object
-  error, -1728. Asking an object for
-  its container is allowed only through a manifest-curated container
-  accessor with evidence. So a field holding such a reference is kept only
-  on its target's parent's own record, when that parent is a valid container
-  (resolvable targets, above); no membership check runs at emission, because
-  the container holds by construction, and at resolution the child is
-  looked up within the container, so a wrong container fails as
-  `TargetNotFoundError` with no extra request. The container is looked up
-  by its parent's own targeting, and the child within it by the child's: a
-  parent found by its key is looked up by its key (key-targeted resources,
-  below). An object that is identified
-  globally but reached only through a container emits no container.
+  error, -1728. Asking an object for its container is allowed only through a
+  manifest-curated container accessor with evidence. So a field holding such
+  a reference is kept only on its target's parent's own record, when that
+  parent is a valid container (resolvable targets, above); no membership
+  check runs at emission, because the container holds by construction, and
+  at resolution the child is looked up within the container, so a wrong
+  container fails as `TargetNotFoundError` with no extra request. The
+  container is looked up by its parent's own targeting, and the child within
+  it by the child's: a parent found by its key is looked up by its key
+  (key-targeted resources, below). An object that is identified globally
+  but reached only through a container emits no container.
   Examples are Arc spaces, iTerm sessions, and nested Photos folders. Google
   Chrome and Microsoft Edge tabs are reached only through their window, and
   each tab get records the window, so a tab reference carries its window as
