@@ -974,6 +974,12 @@ The native `Executor` maps a `NativeOutcome` failure to canonical errors:
   and a message naming the position: Contacts has no Person matching the
   reference at `for`. It is not read from an app error number; the codec
   checks existence before any command runs.
+- An app failure with -1728 and `missingResource` maps to
+  `TargetNotFoundError` with `details: { resource }`, that resource: a scoped
+  operation's body checks its parent exists before it addresses anything
+  under it, and a missing parent names the parent's resource, not the
+  operation's. Google Chrome has no Window matching the request, for a tab
+  got within a window that does not exist.
 
 Native error numbers map to D6 classes as follows:
 
