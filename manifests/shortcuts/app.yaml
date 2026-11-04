@@ -96,12 +96,20 @@ resources:
             note: 'The app''s scripting dictionary describes the property as "the unique identifier of the folder"'
     rangeRead:
       supported: true
+      read: range
       evidence:
         source: probe
         observedAt: '2026-11-03T17:59:44.000Z'
         bundleId: com.apple.shortcuts
         appVersion: '10.0'
         osVersion: '27.2'
+        cost:
+          observedAt: '2026-11-03T21:20:00.000Z'
+          pageMs: 192
+          columnMs: 217
+          items: 1
+          runs: 3
+          pageSize: 25
         note: 'Read-only pages of the folders at the application, at page sizes 25, 2 and 1. The collection held one folder, so no page continued past the first.'
     properties:
       name:

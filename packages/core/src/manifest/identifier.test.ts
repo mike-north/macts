@@ -12,7 +12,11 @@
 
 import { describe, it, expect } from 'vitest'
 import type { Resource } from './schemas/resource.js'
-import { RANGE_READ_SUPPORTED, UNIQUE_CLAIM } from './test-support/unique-claim.js'
+import {
+  RANGE_READ_FAILED,
+  RANGE_READ_SUPPORTED,
+  UNIQUE_CLAIM,
+} from './test-support/unique-claim.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
   listOperationPages,
@@ -220,13 +224,6 @@ describe('listOperationPages', () => {
     unique: false,
     evidence: { unique: { source: 'curated' as const, note: 'Values repeat' } },
   }
-  const RANGE_READ_FAILED = {
-    rangeRead: {
-      supported: false,
-      evidence: { ...RANGE_READ_SUPPORTED.rangeRead.evidence, errorNumbers: [-1708] },
-    },
-  }
-
   it('pages a list whose primary identifier is claimed unique and whose range read passed', () => {
     const resource = makeResource({
       identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],

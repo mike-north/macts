@@ -374,12 +374,21 @@ export const manifest: unknown = {
       },
       rangeRead: {
         supported: true,
+        read: 'column',
         evidence: {
           source: 'probe',
           observedAt: '2026-11-03T17:58:55.000Z',
           bundleId: 'com.apple.Notes',
           appVersion: '4.13',
           osVersion: '27.2',
+          cost: {
+            observedAt: '2026-11-03T21:20:00.000Z',
+            pageMs: 1136,
+            columnMs: 224,
+            items: 25,
+            runs: 3,
+            pageSize: 25,
+          },
           note: 'Read-only pages of the attachments at the application: a first page of 25, and pages of 2 continued by cursor across a page boundary, each read as a range of the collection.',
         },
       },

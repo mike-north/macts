@@ -245,12 +245,21 @@ export const manifest: unknown = {
       ],
       rangeRead: {
         supported: true,
+        read: 'column',
         evidence: {
           source: 'probe',
           observedAt: '2026-11-03T18:00:00.000Z',
           bundleId: 'com.apple.Photos',
           appVersion: '12.0',
           osVersion: '27.2',
+          cost: {
+            observedAt: '2026-11-03T21:20:00.000Z',
+            pageMs: 426,
+            columnMs: 243,
+            items: 48,
+            runs: 3,
+            pageSize: 25,
+          },
           note: 'Read-only pages of the albums at the application: a first page of 25 continued by cursor, and pages of 2 continued by cursor, each read as a range of the collection.',
         },
       },
@@ -300,12 +309,21 @@ export const manifest: unknown = {
       ],
       rangeRead: {
         supported: true,
+        read: 'range',
         evidence: {
           source: 'probe',
           observedAt: '2026-11-03T18:00:00.000Z',
           bundleId: 'com.apple.Photos',
           appVersion: '12.0',
           osVersion: '27.2',
+          cost: {
+            observedAt: '2026-11-03T21:20:00.000Z',
+            pageMs: 235,
+            columnMs: 215,
+            items: 1,
+            runs: 3,
+            pageSize: 25,
+          },
           note: 'Read-only pages of the folders at the application, at page sizes 25, 2 and 1. The collection held one folder, so no page continued past the first.',
         },
       },

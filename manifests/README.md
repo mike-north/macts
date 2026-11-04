@@ -250,18 +250,18 @@ resources:
 
 #### Resource Fields
 
-| Field         | Type   | Required | Description                                                                                                                                                                               |
-| ------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`        | string | Yes      | Resource name (singular, PascalCase)                                                                                                                                                      |
-| `plural`      | string | Yes      | Plural form for collections, PascalCase letters only (`MediaItems`, `URLs`); its lower camel case (`mediaItems`) spells the resource in routes, SDK accessors, tool names and permissions |
-| `description` | string | Yes      | Human-readable description                                                                                                                                                                |
-| `code`        | string | No       | AppleScript four-character code                                                                                                                                                           |
-| `properties`  | object | No       | Property definitions (see [Properties](#properties))                                                                                                                                      |
-| `identifiers` | array  | No       | Identifier configuration (see [Identifiers](#identifiers))                                                                                                                                |
-| `schema`      | string | No       | Reference to JSON Schema file for full data shape                                                                                                                                         |
-| `native`      | object | No       | The app's own spelling of the collection, where it differs from the plural's lower camel case, with dictionary evidence (see [Native spellings](#native-spellings))                       |
-| `unsupported` | object | No       | Marks a resource the app cannot provide (no collection in its dictionary, or every read fails), with evidence (see [Unsupported resources](#unsupported-resources))                       |
-| `rangeRead`   | object | No       | Whether the running app reads a range of the resource's collection, with live evidence; a list pages only when it is `supported: true` (see [Range reads](#range-reads))                  |
+| Field         | Type   | Required | Description                                                                                                                                                                                                      |
+| ------------- | ------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`        | string | Yes      | Resource name (singular, PascalCase)                                                                                                                                                                             |
+| `plural`      | string | Yes      | Plural form for collections, PascalCase letters only (`MediaItems`, `URLs`); its lower camel case (`mediaItems`) spells the resource in routes, SDK accessors, tool names and permissions                        |
+| `description` | string | Yes      | Human-readable description                                                                                                                                                                                       |
+| `code`        | string | No       | AppleScript four-character code                                                                                                                                                                                  |
+| `properties`  | object | No       | Property definitions (see [Properties](#properties))                                                                                                                                                             |
+| `identifiers` | array  | No       | Identifier configuration (see [Identifiers](#identifiers))                                                                                                                                                       |
+| `schema`      | string | No       | Reference to JSON Schema file for full data shape                                                                                                                                                                |
+| `native`      | object | No       | The app's own spelling of the collection, where it differs from the plural's lower camel case, with dictionary evidence (see [Native spellings](#native-spellings))                                              |
+| `unsupported` | object | No       | Marks a resource the app cannot provide (no collection in its dictionary, or every read fails), with evidence (see [Unsupported resources](#unsupported-resources))                                              |
+| `rangeRead`   | object | No       | Whether the running app reads a range of the resource's collection, with live evidence; a list pages only when it is `supported: true`, and reads its pages as its `read` says (see [Range reads](#range-reads)) |
 
 #### Properties
 
@@ -551,10 +551,11 @@ the property or command unsupported too.
 ##### Range reads
 
 A list returns bounded pages only when the running app was observed to read a
-range of the resource's collection, by position, in one request: each page is
-read that way, and an app that rejects the read fails every page. The
-dictionary does not say whether ranges work, so the marker comes from a live,
-read-only observation of the app, never from the dictionary:
+range of the resource's collection, by position, in one request: an app that
+rejects the read failed every page. The dictionary does not say whether ranges
+work, so the marker comes from a live, read-only observation of the app, never
+from the dictionary. A passing marker also records how a page is read, and the
+measured cost it was chosen from, as its own observation:
 
 ```yaml
 Reminder:
@@ -568,14 +569,68 @@ Reminder:
       evidence: { unique: { source: sdef, note: '...' } }
   rangeRead:
     supported: true
+    read: range # how a page is read: range or column
     evidence:
       source: probe
-      observedAt: '2026-11-03T17:59:10.000Z' # ISO 8601 UTC
+      observedAt: '2026-11-03T17:59:10.000Z' # when range reads were checked, ISO 8601 UTC
       bundleId: com.apple.reminders
       appVersion: '7.0'
       osVersion: '27.2'
+      cost:
+        observedAt: '2026-11-03T21:20:00.000Z' # when the page was timed
+        pageMs: 7082 # the page read by range, in milliseconds
+        columnMs: 46179 # the same page read by column
+        items: 332 # the collection size the page was read from
+        runs: 3 # each time is the median of this many reads
+        pageSize: 25 # the size of the timed page
       note: Pages of 25 and of 2, continued by cursor # what was read, never a value
 ```
+
+`read` says how the list reads a page's items:
+
+- `range`: each property is read once over the page's items, as a range of the
+  collection. A page costs what it holds.
+- `column`: each property is read once over the whole collection, and the
+  values are cut to the page. Some apps answer a range read item by item but a
+  whole-collection read at once (Contacts people), so a column page is far
+  faster there.
+
+Both give the same page, cursor, anchor check and `COLLECTION_CHANGED`. `read`
+and `evidence.cost` are required with `supported: true`. `cost` is its own
+observation, dated by its own `observedAt`, since the page is timed apart from
+the check that range reads work. It records:
+
+- `pageMs`: the first page of `pageSize` items read by range, in milliseconds;
+- `columnMs`: the same page read by column;
+- `items`: how many items the collection held;
+- `runs`: how many times the page was read each way, the two reads
+  interleaved; `pageMs` and `columnMs` are the medians of these runs;
+- `pageSize`: the size of the timed page, the default page size of 25.
+
+All six are required, the times are whole milliseconds, and `items`, `runs` and
+`pageSize` are at least 1.
+`range` is the default, because a range page costs what the page holds and so
+keeps paging's latency bound. `read` is `column` only when the column page took
+at most three quarters of the range page's time (`columnMs <= 0.75 × pageMs`),
+and `range` otherwise, ties included; the schema rejects any other `read`. The
+margin absorbs typical measurement noise, so a small difference keeps `range`.
+A result near the margin can fall either side when measured again; the
+recorded medians decide. A column page costs what the whole collection costs, so it gets
+slower as the collection grows: the choice holds at the recorded `items`, and
+should be measured again when the collection grows well past it.
+
+The cost is measured with a read-only harness that times every list that pages
+both ways through the real list body and prints the `cost` block and `read` to
+record. It never writes to an app and prints only timings and counts:
+
+```sh
+pnpm --filter @macts/core build
+MACTS_LIVE_APPS=1 MACTS_PAGE_COST=1 pnpm --filter @macts/core exec vitest run src/jxa/page-read-cost.live.test.ts
+```
+
+`MACTS_PAGE_COST_RUNS` sets the runs (5 by default), and
+`MACTS_PAGE_COST_LISTS` limits it to some lists, e.g. `reminders.lists.list`.
+See [`page-read-cost.live.test.ts`](../packages/core/src/jxa/page-read-cost.live.test.ts).
 
 A range read observed to fail is recorded as `supported: false`, with the
 distinct error numbers it raised:
@@ -591,6 +646,8 @@ rangeRead:
     osVersion: '27.2'
     errorNumbers: [-1708] # the request was not understood
 ```
+
+A failed observation records no `read` and no `cost`.
 
 A list pages exactly when its resource's primary identifier is claimed unique
 and its resource carries `rangeRead.supported: true`. With no marker, or

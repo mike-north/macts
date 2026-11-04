@@ -229,42 +229,132 @@ export const ResourceUnsupportedSchema = z
 export type ResourceUnsupported = z.infer<typeof ResourceUnsupportedSchema>
 
 /**
+ * How a list that pages reads the items of one page, chosen per resource from
+ * live measurement.
+ *
+ * - `range`: each property is read once over the page's items, as a range of
+ *   the collection. A page costs what it holds, whatever the collection's
+ *   size.
+ * - `column`: each property is read once over the whole collection, and the
+ *   values are cut to the page inside the automation process. Some apps
+ *   answer a range read item by item but a whole-collection read at once
+ *   (Contacts people), so this is the faster page there. A page costs what
+ *   the whole collection costs, so it grows with the collection.
+ *
+ * Both give the same page, cursor, anchor check and changed-collection
+ * failure; only how the values are fetched differs.
+ */
+export const PAGE_READS = ['range', 'column'] as const
+/** One way a list that pages reads a page (see {@link PAGE_READS}). */
+export type PageRead = (typeof PAGE_READS)[number]
+
+/**
+ * The page read measured page costs choose: `column` only when the column page
+ * took at most three quarters of the range page's time
+ * (`columnMs <= 0.75 * pageMs`), and `range` otherwise, ties included.
+ *
+ * Range is the default because a range page costs what the page holds, so it
+ * keeps paging's latency bound whatever the collection's size; a column page
+ * costs what the whole collection costs. Column gives up that bound, so it is
+ * chosen only for a clear measured gain. The margin absorbs typical
+ * measurement noise, so a small difference keeps range; a result near the
+ * margin can fall either side when measured again, and the recorded median
+ * decides. The comparison is made in whole numbers, so the boundary is exact,
+ * and a tie is range even when both reads measured 0 ms.
+ */
+export function pageReadFor(pageMs: number, columnMs: number): PageRead {
+  return columnMs < pageMs && columnMs * 4 <= pageMs * 3 ? 'column' : 'range'
+}
+
+/**
  * The marker recording whether the running app reads a range of a resource's
- * collection, by position, in one request, with the live evidence.
+ * collection, by position, in one request, with the live evidence, and how a
+ * page of it is read.
  *
  * A list pages only when its resource carries `supported: true` (see
- * `listOperationPages`): each page is read as such a range, so an app that
- * rejects the read would fail every page. `supported: false` records a range
- * read observed to fail, with the error numbers it raised; absent means no
- * observation, and the resource's lists do not page. The marker is curated
- * from a read-only observation of the app: no probe writes or changes it.
- * It covers the collection wherever the resource's lists read it, at the
- * application or under a parent item.
+ * `listOperationPages`): paging is enabled only on a live observation of the
+ * collection read page by page, since an app that rejects range reads failed
+ * every page (Music playlists). `supported: false` records a range read
+ * observed to fail, with the error numbers it raised; absent means no
+ * observation, and the resource's lists do not page. The marker is curated from a read-only
+ * observation of the app: no probe writes or changes it. It covers the
+ * collection wherever the resource's lists read it, at the application or
+ * under a parent item.
+ *
+ * A passing marker records `read` (see {@link PAGE_READS}) and the measured
+ * page cost (`evidence.cost`, see `PageCostSchema`), and `read` must be the
+ * read that cost chooses (see {@link pageReadFor}): `range` unless the column
+ * page was clearly faster. The choice holds at the recorded collection size; a
+ * column page costs more as the collection grows. A failed marker records no
+ * `read` and no cost.
  */
 export const ResourceRangeReadSchema = z
-  .object({
-    /** Whether the observed range reads succeeded. */
-    supported: z.boolean(),
-    /** The observation that shows it. */
-    evidence: RangeReadEvidenceSchema,
-  })
-  .strict()
-  .superRefine((marker, ctx) => {
-    const failed = marker.evidence.errorNumbers !== undefined
-    if (!marker.supported && !failed) {
-      ctx.addIssue({
-        code: 'custom',
-        message:
-          'A range read observed to fail records the error numbers it raised: set evidence.errorNumbers.',
-        path: ['evidence', 'errorNumbers'],
+  .discriminatedUnion('supported', [
+    z
+      .object({
+        /** The observed range reads succeeded. */
+        supported: z.literal(true),
+        /** How a page of the collection is read (see {@link PAGE_READS}). */
+        read: z.enum(PAGE_READS),
+        /** The observation that shows it, with the measured page costs. */
+        evidence: RangeReadEvidenceSchema,
       })
+      .strict(),
+    z
+      .object({
+        /** The observed range reads failed. */
+        supported: z.literal(false),
+        /** The observation that shows it. */
+        evidence: RangeReadEvidenceSchema,
+      })
+      .strict(),
+  ])
+  .superRefine((marker, ctx) => {
+    const evidence = marker.evidence
+    const failed = evidence.errorNumbers !== undefined
+    if (!marker.supported) {
+      if (!failed) {
+        ctx.addIssue({
+          code: 'custom',
+          message:
+            'A range read observed to fail records the error numbers it raised: set evidence.errorNumbers.',
+          path: ['evidence', 'errorNumbers'],
+        })
+      }
+      if (evidence.cost !== undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'evidence.cost records what a page cost, which a failed range read cannot have.',
+          path: ['evidence', 'cost'],
+        })
+      }
+      return
     }
-    if (marker.supported && failed) {
+    if (failed) {
       ctx.addIssue({
         code: 'custom',
         message:
           'evidence.errorNumbers records failed range reads, so it cannot support supported: true.',
         path: ['evidence', 'errorNumbers'],
+      })
+    }
+    const cost = evidence.cost
+    if (cost === undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'A list that pages records what a page cost, both ways it can be read, and how it was measured: set evidence.cost.',
+        path: ['evidence', 'cost'],
+      })
+      return
+    }
+    const { pageMs, columnMs } = cost
+    const chosen = pageReadFor(pageMs, columnMs)
+    if (marker.read !== chosen) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `read must be the page read the measured costs choose, column only when columnMs is at most 0.75 x pageMs: ${chosen} (pageMs ${String(pageMs)}, columnMs ${String(columnMs)}).`,
+        path: ['read'],
       })
     }
   })

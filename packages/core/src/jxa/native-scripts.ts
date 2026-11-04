@@ -49,7 +49,7 @@
 import { InternalError, ValidationError, type OperationTarget } from '@macts/contracts'
 import type { AppManifest } from '../manifest/schemas/app.js'
 import type { Command, CommandParameter } from '../manifest/schemas/command.js'
-import type { Resource } from '../manifest/schemas/resource.js'
+import type { PageRead, Resource } from '../manifest/schemas/resource.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
   listOperationPages,
@@ -741,9 +741,9 @@ const PAGE_PARAMETER = 'page'
 
 /**
  * The native error number for an index or range a collection does not reach.
- * A paged list reads by range, so inside its read this number means the
- * collection shrank while it was read, never that the caller's request was
- * wrong.
+ * A page read by range reads through ranges, so inside its read this number
+ * means the collection shrank while it was read, never that the caller's
+ * request was wrong.
  */
 const INVALID_RANGE_ERROR_NUMBER = -1719
 
@@ -971,28 +971,32 @@ function attemptReader(nativeIdName: string | undefined, columnReads: readonly s
  * leave it in place and are harmless; a pair of compensating moves across the
  * anchor goes undetected.
  *
- * The window is then read as a range of the collection, so every read costs
- * what the page holds, not what the collection holds: the page's identifiers,
- * each property, and the identifiers again, exactly as an unpaged attempt
- * reads the whole collection. The anchor is checked again after the reads,
- * so a move during them is detected too. The whole identifier column is
- * never read.
- *
- * `window(start, end)` is the one place the body's half-open, zero-based
- * positions become the app's range form, which is zero-based and includes its
- * end, fails rather than clamps past the last item, and gives odd ranges for
- * negative positions. Every caller passes `0 <= start < end <= length`.
- * Inside a paged read a range the collection no longer reaches means it shrank
- * meanwhile, so it is a changed `Inconsistent`, never an app failure.
+ * The window is then read, as the resource's page read (`read`) says: the
+ * identifiers, each property, and the identifiers again, one request each.
+ * The anchor is checked again after the reads, so a move during them is
+ * detected too. Either page read makes the same requests and gives the same
+ * page, length, anchor and changed-collection failure; only what each read
+ * covers differs (see {@link rangeWindowReader} and
+ * {@link columnWindowReader}). Every caller passes
+ * `0 <= offset < end <= length`.
  */
-function pagedAttemptReader(nativeIdName: string, columnReads: readonly string[]): string {
+function pagedAttemptReader(
+  nativeIdName: string,
+  columnLocals: readonly string[],
+  columnReads: readonly string[],
+  read: PageRead
+): string {
   const offset = `${PAGE_PARAMETER}.offset`
+  const anchorRead =
+    read === 'range'
+      ? `${member(`window(${offset} - 1, ${offset})`, nativeIdName)}()`
+      : `within(${member(WHOLE_LOCAL, nativeIdName)}(), ${offset} - 1, ${offset})`
   return lines(
     identifierReader(nativeIdName),
     sameIdentifiersHelper(),
-    'function window(start, end) {',
-    `  return ${WHOLE_LOCAL}.slice(start, end - 1);`,
-    '}',
+    read === 'range'
+      ? rangeWindowReader(columnReads)
+      : columnWindowReader(columnLocals, columnReads),
     'function outOfRange(e) {',
     `  return e !== null && e !== undefined && e.errorNumber === ${String(INVALID_RANGE_ERROR_NUMBER)};`,
     '}',
@@ -1000,7 +1004,7 @@ function pagedAttemptReader(nativeIdName: string, columnReads: readonly string[]
     `  if (${offset} === 0) { return true; }`,
     `  if (${offset} > ${LENGTH_LOCAL}) { return false; }`,
     '  var at;',
-    `  try { at = ${member(`window(${offset} - 1, ${offset})`, nativeIdName)}(); } catch (e) {`,
+    `  try { at = ${anchorRead}; } catch (e) {`,
     '    if (outOfRange(e)) { return false; }',
     '    throw e;',
     '  }',
@@ -1013,9 +1017,33 @@ function pagedAttemptReader(nativeIdName: string, columnReads: readonly string[]
     `  if (!anchorHolds()) { collectionChanged(${literal(COLLECTION_CHANGED_MESSAGE)}); }`,
     `  var end = Math.min(${offset} + ${PAGE_PARAMETER}.size, ${LENGTH_LOCAL});`,
     `  if (end <= ${offset}) { ${COUNT_LOCAL} = 0; ${IDS_LOCAL} = []; return; }`,
-    `  ${COUNT_LOCAL} = end - ${offset};`,
+    `  readWindow(${offset}, end);`,
+    `  if (!anchorHolds()) { collectionChanged(${literal(COLLECTION_CHANGED_MESSAGE)}); }`,
+    '}'
+  )
+}
+
+/**
+ * Statements declaring `readWindow(start, end)` for a page read by range:
+ * every read covers only the window, so a read costs what the page holds, not
+ * what the collection holds, and the whole identifier column is never read.
+ *
+ * `window(start, end)` is the one place the body's half-open, zero-based
+ * positions become the app's range form, which is zero-based and includes its
+ * end, fails rather than clamps past the last item, and gives odd ranges for
+ * negative positions. A range read is evaluated when it is made, so inside a
+ * paged read a range the collection no longer reaches means it shrank
+ * meanwhile: a changed `Inconsistent`, never an app failure.
+ */
+function rangeWindowReader(columnReads: readonly string[]): string {
+  return lines(
+    'function window(start, end) {',
+    `  return ${WHOLE_LOCAL}.slice(start, end - 1);`,
+    '}',
+    'function readWindow(start, end) {',
+    `  ${COUNT_LOCAL} = end - start;`,
     '  try {',
-    `    ${COLLECTION_LOCAL} = window(${offset}, end);`,
+    `    ${COLLECTION_LOCAL} = window(start, end);`,
     `    ${IDS_LOCAL} = readIdentifiers();`,
     `    if (${IDS_LOCAL}.length !== ${COUNT_LOCAL}) { throw new Inconsistent(${literal(COLLECTION_CHANGED_MESSAGE)}, true); }`,
     readColumnsThenCheck(columnReads, 'sameIdentifiers(readIdentifiers())'),
@@ -1023,7 +1051,54 @@ function pagedAttemptReader(nativeIdName: string, columnReads: readonly string[]
     `    if (outOfRange(e)) { throw new Inconsistent(${literal(COLLECTION_CHANGED_MESSAGE)}, true); }`,
     '    throw e;',
     '  }',
-    `  if (!anchorHolds()) { collectionChanged(${literal(COLLECTION_CHANGED_MESSAGE)}); }`,
+    '}'
+  )
+}
+
+/**
+ * Statements declaring `readWindow(start, end)` for a page read by column:
+ * every read covers the whole collection, exactly as an unpaged attempt reads
+ * it (see {@link attemptReader}), and only then are the identifiers and every
+ * property cut to the window. A read costs what the collection holds, which
+ * some apps answer far faster than a range read of the page; a page's cost
+ * therefore grows with the collection.
+ *
+ * Because every read covers the whole collection, the attempt's consistency
+ * check covers it too: each read must give one value per item the identifier
+ * read found, and the identifiers read again must equal them throughout, or
+ * the attempt is read again (see {@link listAttempts}). A collection that no
+ * longer reaches the window's end shrank meanwhile, a changed `Inconsistent`,
+ * as by range.
+ *
+ * A property the app cannot read across the items falls back to one request
+ * per item (see `readColumn` in {@link listReadHelpers}) over what the failed
+ * read covered: the whole collection, not the page. Such a page costs one
+ * request per item of the collection, where by range it costs one per item of
+ * the page. A measured column cost reflects that only when the fallback fired
+ * while it was timed.
+ *
+ * `within(values, start, end)` is the one place a whole-collection read is
+ * cut to positions: the values at the half-open, zero-based `[start, end)`,
+ * or `null` when the read is not a list or does not reach `end`, which the
+ * anchor check takes as an anchor that is gone.
+ */
+function columnWindowReader(
+  columnLocals: readonly string[],
+  columnReads: readonly string[]
+): string {
+  return lines(
+    'function within(values, start, end) {',
+    '  if (!Array.isArray(values) || values.length < end) { return null; }',
+    '  return values.slice(start, end);',
+    '}',
+    'function readWindow(start, end) {',
+    `  ${IDS_LOCAL} = readIdentifiers();`,
+    `  ${COUNT_LOCAL} = ${IDS_LOCAL}.length;`,
+    `  if (${COUNT_LOCAL} < end) { throw new Inconsistent(${literal(COLLECTION_CHANGED_MESSAGE)}, true); }`,
+    readColumnsThenCheck(columnReads, 'sameIdentifiers(readIdentifiers())'),
+    `  ${IDS_LOCAL} = within(${IDS_LOCAL}, start, end);`,
+    ...columnLocals.map((local) => `  ${local} = within(${local}, start, end);`),
+    `  ${COUNT_LOCAL} = end - start;`,
     '}'
   )
 }
@@ -1068,6 +1143,24 @@ function listAttempts(): string {
 }
 
 /**
+ * How a page of `resource` is read: the page read its range-read marker
+ * records (see `PAGE_READS` in the manifest schema).
+ *
+ * @throws `InternalError` when the resource records no supported range read,
+ *   which `listOperationPages` already requires of every list that pages.
+ */
+function pageReadOf(resource: Resource | undefined): PageRead {
+  const marker = resource?.rangeRead
+  if (marker?.supported !== true) {
+    throw new InternalError(
+      'A list cannot be paged unless its collection is known to read ranges.',
+      {}
+    )
+  }
+  return marker.read
+}
+
+/**
  * List the items of the resource's collection at the application, or, for a
  * command that records a parent, of the collection under the parent item.
  *
@@ -1093,12 +1186,17 @@ function listAttempts(): string {
  * by index. A list therefore costs one request per property, plus one to read
  * the identifiers again (or count the items again), however many items it
  * has, and a paged list two more: the length, and the anchor (checked before
- * and after the reads). Reading every item's record one item at a time cost
+ * and after the reads). A paged list reads its window by range or by column,
+ * as its resource's range-read marker records, with the same requests and the
+ * same meaning either way (see {@link pagedAttemptReader}). Reading every
+ * item's record one item at a time cost
  * one request per item, at seconds each in some apps (a Reminders list of 80
  * items took over four minutes), and reading the whole property record across
  * the collection in one request fails in Reminders (-1728), so each property
- * is its own request. The cost of a read across a range follows the range's
- * size, not the collection's, so a page costs what it holds.
+ * is its own request. Apps differ in what a read costs: some answer a read
+ * across a range item by item, so its cost follows the range's size, while a
+ * read across the whole collection costs what the collection holds. The page
+ * read is chosen per resource from live measurement of both.
  *
  * Index assembly is only correct while every read describes the same items in
  * the same order. Every read is checked against the item count, and the
@@ -1217,13 +1315,14 @@ function buildListBody(
 
   const nativeIdName = runtimeIdProperty === undefined ? undefined : native(runtimeIdProperty)
   const pagedIdName = paged ? nativeIdName : undefined
+  const pageRead = pagedIdName === undefined ? undefined : pageReadOf(resource)
   const body = lines(
     parentBinding,
-    pagedIdName === undefined
+    pageRead === undefined
       ? `var ${COLLECTION_LOCAL} = ${collectionExpression};`
       : lines(
           `var ${WHOLE_LOCAL} = ${collectionExpression};`,
-          `var ${COLLECTION_LOCAL} = null;`,
+          `var ${COLLECTION_LOCAL} = ${pageRead === 'range' ? 'null' : WHOLE_LOCAL};`,
           `var ${LENGTH_LOCAL} = 0;`
         ),
     `var ${COUNT_LOCAL} = 0;`,
@@ -1232,9 +1331,14 @@ function buildListBody(
       ? ''
       : `var ${bestEffortProps.map((_p, index) => columnLocal(index)).join(', ')};`,
     listReadHelpers(),
-    pagedIdName === undefined
+    pagedIdName === undefined || pageRead === undefined
       ? attemptReader(nativeIdName, columnReads)
-      : pagedAttemptReader(pagedIdName, columnReads),
+      : pagedAttemptReader(
+          pagedIdName,
+          bestEffortProps.map((_p, index) => columnLocal(index)),
+          columnReads,
+          pageRead
+        ),
     listAttempts(),
     'var result = [];',
     `for (var i = 0; i < ${COUNT_LOCAL}; i++) {`,
