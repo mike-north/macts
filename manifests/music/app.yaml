@@ -597,6 +597,21 @@ resources:
     # playlist and id 2344 in the playlist whose special kind is Music, and the
     # library playlist has no track with id 2344),
     # while its persistent ID is the same in every playlist.
+    #
+    # A track is found within its playlist by a `whose` match on
+    # `persistentID`, and a playlist that does not hold the track does not
+    # find it. Observed read-only on Music 1.7.2 (macOS 27.2),
+    # 2026-11-04T19:30:12Z, over 3 playlists holding 608, 608 and 4 tracks
+    # (1220 entries, every persistent ID a 16-digit hexadecimal string): for
+    # 2 tracks held by another playlist and not by the 4-track playlist, the
+    # match under the 4-track playlist held 0 items and its first item did not
+    # exist, and `tracks.get` and reference resolution within it both failed
+    # as `TargetNotFoundError` naming Track; the 4-track playlist's first
+    # track was got and resolved within it with the same persistent ID, and
+    # every persistent ID it lists is also listed under the library playlist.
+    # No persistent ID was repeated within any of the 3 playlists, so the
+    # first match of a repeated one was not observed, and no playlist was
+    # empty.
     identifiers:
       - property: persistentID
         primary: true
