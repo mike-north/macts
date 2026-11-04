@@ -58,6 +58,7 @@ import {
   type ManifestRoute,
 } from '../../manifest/index.js'
 import { lowerCamel } from '../../manifest/lower-camel.js'
+import { reportsAbsence } from '../../manifest/schemas/evidence.js'
 import { manifestGeneratedNotice } from '../generated-header.js'
 import { usableCommands, usableProperties, usableResources } from '../../manifest/unsupported.js'
 import { resolvingCommand } from '../../manifest/resource-commands.js'
@@ -1957,9 +1958,18 @@ export function readNullabilityNote(resolution: NullabilityResolution, appName: 
   switch (basis.source) {
     case 'probe': {
       const provenance = observationProvenance(appName, basis)
-      return nullable
-        ? `Nullable. Observed missing in ${String(basis.nullCount)} of ${String(basis.sampleSize)} items (${provenance}).`
-        : `Never null: observed in all ${String(basis.sampleSize)} items (${provenance}).`
+      if (!nullable) {
+        return `Never null: observed in all ${String(basis.sampleSize)} items (${provenance}).`
+      }
+      if (reportsAbsence(basis)) {
+        // The app says a value is absent by failing the read (phases/13 D10),
+        // so the reads that failed, not items that read empty, are the reason.
+        const reported = `reported no value in ${String(basis.failedReads)} of ${String(basis.sampleSize + basis.failedReads)} reads`
+        return basis.nullCount > 0
+          ? `Nullable. Observed missing in ${String(basis.nullCount)} of ${String(basis.sampleSize)} items, and the app ${reported} (${provenance}).`
+          : `Nullable. The app ${reported} (${provenance}).`
+      }
+      return `Nullable. Observed missing in ${String(basis.nullCount)} of ${String(basis.sampleSize)} items (${provenance}).`
     }
     case 'curated':
       return `${nullable ? 'Nullable' : 'Never null'}: ${curatedBasis(appName, basis)}`

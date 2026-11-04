@@ -27,6 +27,7 @@ import {
   type Resource,
 } from '../../manifest/index.js'
 import { loadManifest } from '../../manifest/loader.js'
+import type { ProbeNullabilityEvidence } from '../../manifest/schemas/evidence.js'
 import {
   CONTRACT_MANIFEST_MODULE_PATH,
   CONTRACT_MODULE_PATH,
@@ -34,9 +35,11 @@ import {
   contractNames,
   contractResourcePlans,
   generateContract,
+  readNullabilityNote,
   type GeneratedContract,
 } from './index.js'
 import { RANGE_READ_SUPPORTED } from '../../manifest/test-support/unique-claim.js'
+import { archiveManifest } from '../../manifest/test-support/archive-key-and-root.js'
 import {
   isNameKeyed,
   isValidContainer,
@@ -1336,5 +1339,41 @@ describe('contractResourcePlans', () => {
     expect(plans['Note']?.id).toBeDefined()
     expect(plans['Folder']?.id).toBeDefined()
     expect(plans['Tag']).toEqual({})
+  })
+})
+
+/**
+ * The doc line of a property that is nullable because the app fails the read
+ * (phases/13 D10): it names the failed reads, not items observed empty. The
+ * expected lines are written from the evidence of the Archive fixture's
+ * `Entry.shelfMark` (3 reads succeeded, 2 failed with no such object; Archive
+ * 1.0, macOS 27.2, probed 2026-11-01).
+ */
+describe('generateContract: nullability notes for reported absences', () => {
+  it('says the app reported no value in 2 of the 5 reads, not that items were observed missing', () => {
+    const contract = generateContract(archiveManifest()).files.find(
+      (file) => file.path === CONTRACT_MODULE_PATH
+    )
+    expect(contract?.content).toContain(
+      '   * Nullable. The app reported no value in 2 of 5 reads (Archive 1.0, macOS 27.2, 2026-11-01).\n'
+    )
+    expect(contract?.content).not.toContain('Observed missing in 0 of 3 items')
+  })
+
+  it('names both causes when the probe also saw empty values', () => {
+    const evidence = {
+      source: 'probe',
+      observedAt: '2026-11-01T12:00:00.000Z',
+      bundleId: 'com.example.archive',
+      appVersion: '1.0',
+      osVersion: '27.2',
+      sampleSize: 3,
+      nullCount: 1,
+      failedReads: 2,
+      errorNumbers: [-1728],
+    } satisfies ProbeNullabilityEvidence
+    expect(readNullabilityNote({ nullable: true, basis: evidence }, 'Archive')).toBe(
+      'Nullable. Observed missing in 1 of 3 items, and the app reported no value in 2 of 5 reads (Archive 1.0, macOS 27.2, 2026-11-01).'
+    )
   })
 })
