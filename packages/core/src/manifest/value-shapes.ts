@@ -70,8 +70,9 @@ export type ValueShape =
   | { readonly kind: 'nullable'; readonly inner: ValueShape }
 
 /**
- * `shape`, or `null`. Nullability is decided by the caller from manifest
- * evidence, never by the declared type, so it wraps an already mapped shape.
+ * The shape that accepts what `shape` accepts and also `null`. Nullability is
+ * decided by the caller from manifest evidence, never by the declared type,
+ * so it wraps an already mapped shape.
  *
  * @remarks
  * An `unknown` value already admits `null`, so it is returned unchanged
