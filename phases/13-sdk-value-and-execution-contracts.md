@@ -1584,18 +1584,24 @@ curated `get` cannot serve:
 
 Xcode's workspace document `activeScheme` and `activeRunDestination`, and a
 target's `project`, are left out as container-scoped: Xcode gets a scheme, a
-run destination and a project only within its workspace document. References
-now carry their container, but a workspace document is no valid container
-yet: it is identified by its name, with no unique claim. Its identity is its
-document path, a location identity, since two checkouts with the same name
-can be open at once (a reason from how documents are opened; no live check
-has observed it yet), so no name claim is to be added. The fields return with
-path curation of the workspace document, with evidence: `byKey` if the app
-looks documents up by path, otherwise `byProperty` on `path`.
-`activeRunDestination` also needs evidence, from a live check with two or more
-runtimes, that a run destination's name identifies one object, and a target's
-`project` also needs nested chains, since it is read through a target, not
-through its workspace document.
+run destination and a project only within its workspace document.
+References now carry their container, but that is not enough to bring them
+back, because the container itself needs an evidenced identity, and a
+workspace document is no valid container yet: it is targeted by its name,
+with no unique claim, and its name likely cannot be shown unique, since two
+checkouts of the same project can be open at once under one name (a reason
+from how documents are opened; no live check has observed it yet). So no
+name claim is to be added. Its container identity is its `path` instead, a
+location identity: in the scripting dictionary a path is unique among open
+documents and is how the app itself addresses a document. The fields come
+back with path curation of the workspace document, with evidence: `byKey` if
+the app looks documents up by path, otherwise `byProperty` on `path`.
+`activeRunDestination` also needs evidence that a run destination's name
+identifies one object within its workspace. Run destination names likely
+repeat within one workspace (the same simulator name on two runtimes), so a
+live check across two or more runtimes must come before any uniqueness
+claim. A target's `project` also needs nested chains, since it is read
+through a target, not through its workspace document.
 
 A position that holds such a reference anywhere, bare, in an array, or as the
 non-null case of a nullable value, is left out of output for now; generation
@@ -1693,7 +1699,11 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   would act on that other tab. The window and tab `id` and the window
   `activeTab` field docs say so. Xcode schemes, run destinations and
   projects are container-scoped: each is got within its workspace document,
-  which is no valid container yet (resolvable targets, above).
+  because there is no evidence that scheme or project ids are unique across
+  workspaces. That is the same bar as iTerm's sessions: an object reached
+  through a path of containers is identified globally only with evidence
+  that its id is unique across the app. A workspace document is no valid
+  container yet (resolvable targets, above).
 - **What the positional rule leaves out.** Because a field is kept only on
   its target's parent's own record, of the fields left out as
   container-scoped this restores only Chrome and Edge `Window.activeTab`.

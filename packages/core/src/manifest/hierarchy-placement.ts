@@ -51,21 +51,38 @@ export function placedEntries(manifest: AppManifest): PlacedEntry[] {
 }
 
 /**
+ * Each manifest's nested-only resources, computed once per manifest object.
+ * The output reference rule asks for them once per reference it judges, and
+ * each answer would otherwise walk the whole hierarchy. Keying on the object
+ * relies on a manifest not changing once it is loaded: nothing in macts edits
+ * a manifest's hierarchy, resources or their unsupported markers after
+ * parsing, so the answer for one object never goes stale. A manifest built by
+ * editing another is a new object, with its own entry; one edited in place
+ * after its first query would keep the answer it had.
+ */
+const nestedOnlyCache = new WeakMap<AppManifest, ReadonlySet<string>>()
+
+/**
  * The resources the hierarchy nests under another resource and does not also
  * place at the application: their items exist only inside a container. A
  * resource the hierarchy places nowhere is not among them, since the
- * hierarchy says nothing about where its items live.
+ * hierarchy says nothing about where its items live. The set is computed
+ * once per manifest object (see {@link nestedOnlyCache}).
  *
  * @param manifest - The app manifest.
  */
-export function nestedOnlyResources(manifest: AppManifest): Set<string> {
+export function nestedOnlyResources(manifest: AppManifest): ReadonlySet<string> {
+  const cached = nestedOnlyCache.get(manifest)
+  if (cached !== undefined) return cached
   const entries = placedEntries(manifest)
   const topLevel = new Set(
     entries.filter((entry) => entry.holder === undefined).map((entry) => entry.child.resource)
   )
-  return new Set(
+  const nested: ReadonlySet<string> = new Set(
     entries
       .filter((entry) => entry.holder !== undefined && !topLevel.has(entry.child.resource))
       .map((entry) => entry.child.resource)
   )
+  nestedOnlyCache.set(manifest, nested)
+  return nested
 }

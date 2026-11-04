@@ -40,4 +40,4 @@ Breaking change: these record fields are gone from the HTTP client's read types 
   - ScriptingClass `superclass`;
   - ScriptingCommand `directParameter`.
 - TV: BrowserWindow and PlaylistWindow `view`, and Playlist `parent`.
-- Xcode, on records a call returns: RunDestination `device` and `companionDevice` (macts has no get for Device yet), and WorkspaceDocument `lastSchemeActionResult` (no get for SchemeActionResult yet) and `activeRunDestination`. A run destination is identified by its name, and the manifest has no evidence yet that the name is unique.
+- Xcode, on records a call returns: RunDestination `device` and `companionDevice` (macts has no get for Device yet), and WorkspaceDocument `lastSchemeActionResult` (no get for SchemeActionResult yet) and `activeRunDestination`. A run destination is identified by its name, and the manifest has no evidence yet that the name is unique. It is also found only within its workspace document, so the field needs its workspace container as well as that evidence.

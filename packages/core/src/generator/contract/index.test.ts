@@ -1180,13 +1180,17 @@ describe('real app manifests', () => {
       ['tv', 'PlaylistWindow', 'view', 'Playlist', 'parent-scoped'],
       // A scheme, a run destination and a project are got only within their
       // workspace document. A workspace document is identified by its name,
-      // with no claim, so it is no valid container yet; its identity is its
-      // document path, and the scheme and run destination fields return with
-      // path curation of it (and, for the run destination, evidence that
-      // run destination names are unique). A target's project is read
-      // through a target, not through its workspace document, so it also needs
-      // nested chains.
+      // with no claim, so it is no valid container yet; its evidenced identity
+      // is its document path, and these fields return with path curation of
+      // it. A target's project is read through a target, not through its
+      // workspace document, so it also needs nested chains.
       ['xcode', 'WorkspaceDocument', 'activeScheme', 'Scheme', 'parent-scoped'],
+      // Also name-keyed with no unique claim, which is hidden by decision:
+      // once its workspace document is a valid container its reason becomes
+      // `not-unique`, and it stays out until run destination names are shown
+      // to be unique. They likely repeat within one workspace (the same
+      // simulator name on two runtimes), so that needs a live check across two
+      // or more runtimes.
       ['xcode', 'WorkspaceDocument', 'activeRunDestination', 'RunDestination', 'parent-scoped'],
       ['xcode', 'WorkspaceDocument', 'lastSchemeActionResult', 'SchemeActionResult', 'no-get'],
       ['xcode', 'Target', 'project', 'Project', 'parent-scoped'],

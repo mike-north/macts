@@ -21,15 +21,21 @@
  *
  * Run destination names are observed, not claimed: the run destination case
  * prints how many the first workspace lists and how many distinct names they
- * have. Nothing here asserts that run destination names are unique.
+ * have. Nothing here asserts that run destination names are unique: they
+ * likely repeat within one workspace (the same simulator name on two
+ * runtimes), so a uniqueness claim needs a live check across two or more
+ * runtimes first.
  *
- * Read-only: nothing is opened, closed, built, run or changed, and Xcode is
- * never quit. The test prints only counts, never a name, id or path. When no
- * workspace document is open, every case after the list skips, and says so.
+ * Reading Xcode launches it if it is not running. Apart from that the suite
+ * is read-only: no document is opened, closed or changed, nothing is built or
+ * run, and Xcode is never quit. The test prints only counts, never a name, id
+ * or path. Each child case finds the first workspace document itself, so a
+ * case can run alone (`-t`). A case skips, and says why, when no workspace
+ * document is open or the workspace lists none of its children.
  *
  * ## Why this cannot run in CI
  *
- * - Requires a logged-in macOS desktop with Xcode running and, for anything
+ * - Requires a logged-in macOS desktop with Xcode installed and, for anything
  *   beyond the workspace list, a workspace or project open.
  * - Requires automation permission (TCC) for the process running the tests to
  *   control Xcode. The first run raises a one-time prompt that only a person
@@ -86,10 +92,13 @@ afterAll(async () => {
   await rm(mactsHome, { recursive: true, force: true })
 })
 
+/** A case's test context, as far as skipping goes. */
+interface SkipContext {
+  skip(note?: string): never
+}
+
 describe.skipIf(!liveAppsEnabled)('Xcode workspace reads (local only)', () => {
   let xcode: XcodeClient
-  /** The first open workspace document's name, once listed. */
-  let workspaceName: string | undefined
 
   beforeAll(async () => {
     const key = await createApiKey({
@@ -110,13 +119,34 @@ describe.skipIf(!liveAppsEnabled)('Xcode workspace reads (local only)', () => {
     })
   }, LIVE_TEST_TIMEOUT_MS)
 
+  /**
+   * The name of the first open workspace document. Each case looks it up
+   * itself, so it does not depend on another case having run; with none open,
+   * the case skips, saying so.
+   */
+  async function firstWorkspace(context: SkipContext): Promise<string> {
+    const workspaces = await xcode.workspaceDocuments.list()
+    const name = workspaces.items[0]?.name
+    if (name === undefined) {
+      console.warn('SKIPPING: no workspace document is open in Xcode.')
+      return context.skip('no workspace document is open')
+    }
+    return name
+  }
+
+  /** Skips the case, saying why, when the first workspace lists no `what`. */
+  function skipIfEmpty(context: SkipContext, count: number, what: string): void {
+    if (count > 0) return
+    console.warn(`SKIPPING: the first workspace document lists no ${what}.`)
+    context.skip(`the first workspace document lists no ${what}`)
+  }
+
   it(
     'lists workspace documents',
     async () => {
       const workspaces = await xcode.workspaceDocuments.list()
       console.info(`Xcode workspace documents listed: ${String(workspaces.items.length)}`)
-      workspaceName = workspaces.items[0]?.name
-      if (workspaceName === undefined) {
+      if (workspaces.items.length === 0) {
         console.warn(
           'SKIPPING the scheme, run destination and project reads: no workspace document is open in Xcode.'
         )
@@ -128,12 +158,13 @@ describe.skipIf(!liveAppsEnabled)('Xcode workspace reads (local only)', () => {
   it(
     'lists the schemes of the first workspace and gets the first by the workspace and its id',
     async (context) => {
-      if (workspaceName === undefined) return context.skip('no workspace document is open')
+      const workspaceName = await firstWorkspace(context)
       const schemes = await xcode.schemes.list(workspaceName)
       const ids = schemes.items.map((scheme) => scheme.id)
       console.info(`Xcode schemes listed in the first workspace: ${String(ids.length)}`)
+      skipIfEmpty(context, ids.length, 'schemes')
       const [first] = ids
-      if (first === undefined) return
+      if (first === undefined) throw new Error('no scheme was listed')
       const got = await xcode.schemes.get(workspaceName, first)
       expect(got.id === first).toBe(true)
     },
@@ -143,15 +174,16 @@ describe.skipIf(!liveAppsEnabled)('Xcode workspace reads (local only)', () => {
   it(
     'lists the run destinations of the first workspace and gets the first by the workspace and its name',
     async (context) => {
-      if (workspaceName === undefined) return context.skip('no workspace document is open')
+      const workspaceName = await firstWorkspace(context)
       const destinations = await xcode.runDestinations.list(workspaceName)
       const names = destinations.items.map((destination) => destination.name)
       // Observation only: no claim is made that run destination names are unique.
       console.info(
         `Xcode run destinations listed in the first workspace: ${String(names.length)}, distinct names: ${String(new Set(names).size)}`
       )
+      skipIfEmpty(context, names.length, 'run destinations')
       const [first] = names
-      if (first === undefined) return
+      if (first === undefined) throw new Error('no run destination was listed')
       const got = await xcode.runDestinations.get(workspaceName, first)
       expect(got.name === first).toBe(true)
     },
@@ -161,12 +193,13 @@ describe.skipIf(!liveAppsEnabled)('Xcode workspace reads (local only)', () => {
   it(
     'lists the projects of the first workspace and gets the first by the workspace and its id',
     async (context) => {
-      if (workspaceName === undefined) return context.skip('no workspace document is open')
+      const workspaceName = await firstWorkspace(context)
       const projects = await xcode.projects.list(workspaceName)
       const ids = projects.items.map((project) => project.id)
       console.info(`Xcode projects listed in the first workspace: ${String(ids.length)}`)
+      skipIfEmpty(context, ids.length, 'projects')
       const [first] = ids
-      if (first === undefined) return
+      if (first === undefined) throw new Error('no project was listed')
       const got = await xcode.projects.get(workspaceName, first)
       expect(got.id === first).toBe(true)
     },
