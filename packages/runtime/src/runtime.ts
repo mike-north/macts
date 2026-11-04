@@ -142,10 +142,10 @@ export interface CreateRuntimeOptions {
    * permission denial or invalid input), and its result is reused for every
    * later call. If it fails, that call and every later one is denied with
    * `InternalError` and the cause is logged; a call refused by the permission
-   * check is still answered with `PermissionDeniedError`. The failure is kept rather than
-   * retried, because the usual causes (a malformed or unreadable policy or
-   * approval file) do not fix themselves while the process runs, and a call
-   * must never run under governance that could not be established.
+   * check is still answered with `PermissionDeniedError`. The failure is kept
+   * rather than retried, because the usual causes (a malformed or unreadable
+   * policy or approval file) do not fix themselves while the process runs, and
+   * a call must never run under governance that could not be established.
    *
    * There is no default: a runtime never runs calls under governance it was
    * not given. Hosts that act for this Mac pass `loadHostGovernance`; a test
@@ -578,9 +578,10 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
    * audited ({@link auditPermissionDenied}) and then raised as
    * `PermissionDeniedError`.
    *
-   * Runs after admission, so the rate limit bounds how many denials can be
-   * recorded, and before the input is looked at, so neither the error nor the
-   * record depends on it.
+   * Runs after admission, so where the runtime has a rate limiter (as the
+   * HTTP server configures by default) that limit also bounds how many
+   * denials can be recorded, and before the input is looked at, so neither
+   * the error nor the record depends on it.
    */
   async function checkPermission(
     operation: RegisteredOperation,
@@ -612,7 +613,9 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
    * that holds the writer cannot be loaded) leaves the caller's answer as the
    * `PermissionDeniedError` it would otherwise be: the caller cannot tell
    * whether its denial was recorded. The failure goes to the operator log
-   * instead, with the operation, the key, and the correlation id.
+   * instead, with the operation, the key, and the correlation id; if the
+   * operator logger itself fails, that failure is dropped and the answer is
+   * still the same.
    */
   async function auditPermissionDenied(
     operation: RegisteredOperation,
@@ -628,16 +631,21 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       }
       await recordPermissionDenied({ permission, apiKeyId, timestamp: clock(), writer })
     } catch (error) {
-      log().error(
-        {
-          err: loggableError(error, context.credential),
-          operation: operation.descriptor.id,
-          permission,
-          apiKeyId,
-          ...internalDetails(context),
-        },
-        'Permission denial could not be audited'
-      )
+      try {
+        log().error(
+          {
+            err: loggableError(error, context.credential),
+            operation: operation.descriptor.id,
+            permission,
+            apiKeyId,
+            ...internalDetails(context),
+          },
+          'Permission denial could not be audited'
+        )
+      } catch {
+        // A logger that fails cannot change the answer either: the caller is
+        // still denied with the same PermissionDeniedError.
+      }
     }
   }
 

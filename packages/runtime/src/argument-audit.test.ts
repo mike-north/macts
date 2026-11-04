@@ -25,7 +25,8 @@
  *   permission sees the same error and leaves the same record whatever its
  *   input; a call turned away before the permission check writes nothing; if
  *   the record cannot be written, the caller is still answered with
- *   `PermissionDeniedError` and the failure goes to the operator log.
+ *   `PermissionDeniedError` and the failure goes to the operator log, and a
+ *   failing operator logger does not change that answer either.
  *
  * Two registrations of one fixture app are exercised: from its manifest alone
  * and from a contract. Both input contracts reject keys that are not declared
@@ -688,14 +689,35 @@ describe('permission-denied audit records', () => {
     expect(logged).not.toContain(READER_SECRET)
   })
 
+  it('still answers PermissionDeniedError, unchanged, when the record cannot be written and the operator logger throws', async () => {
+    const reference = harness()
+    const expected = deniedAnswer(
+      await rejection(reference.runtime.invoke(CREATE, { title: 'Groceries' }, as(READER_SECRET)))
+    )
+    const h = harness({ writer: createMemoryAuditWriter([1]) })
+    h.logger.error.mockImplementation(() => {
+      throw new Error('log sink closed')
+    })
+
+    const error = await rejection(
+      h.runtime.invoke(CREATE, { title: 'Groceries' }, as(READER_SECRET))
+    )
+
+    expect(deniedAnswer(error)).toEqual(expected)
+    expect(h.logger.error).toHaveBeenCalledTimes(1)
+    expect(h.writer.records).toEqual([])
+    expect(h.executor.requests).toHaveLength(0)
+  })
+
   it('still answers PermissionDeniedError when governance cannot be loaded to record the denial', async () => {
+    const policyPath = '/var/macts/governance/policy.json'
     const logger = { error: vi.fn(), warn: vi.fn(), info: vi.fn() }
     const runtime = createRuntime({
       executor: createRecordingExecutor(() => Promise.resolve<WireValue>({})),
       verifier: createFakeVerifier({ [READER_SECRET]: READER }),
       clock: fixedClock,
       logger,
-      governance: () => Promise.reject(new Error('policy unreadable at /secret/policy.json')),
+      governance: () => Promise.reject(new Error(`policy unreadable at ${policyPath}`)),
     })
     runtime.registerManifest(VAULT_MANIFEST)
 
@@ -704,8 +726,16 @@ describe('permission-denied audit records', () => {
     )
 
     expect(error).toBeInstanceOf(PermissionDeniedError)
+    if (!(error instanceof PermissionDeniedError)) return
+    // The loader's message names the policy file. It belongs in the operator
+    // log, where a broken policy is diagnosed, and never in the caller's
+    // answer, as for a permitted call whose governance cannot be loaded.
+    expect(JSON.stringify({ message: error.message, details: error.details })).not.toContain(
+      policyPath
+    )
     expect(logger.error).toHaveBeenCalledTimes(1)
     expect(logger.error.mock.calls[0]?.[0]).toMatchObject({
+      err: { message: `policy unreadable at ${policyPath}` },
       operation: CREATE,
       apiKeyId: 'key_vault_reader',
       correlationId: 'req-12',
