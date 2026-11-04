@@ -174,9 +174,9 @@ describe('singleton roots: the identity validation derives', () => {
       ...manifest,
       resources: { ...manifest.resources, Desk: { ...desk, identifiers: entryIdentifiers } },
     }
-    const normalized = normalizeRoots(inherited).resources['Desk']
-    expect(normalized?.identifiers).toHaveLength(1)
-    expect(normalized?.identifiers?.[0]).toMatchObject({
+    const normalized = normalizeRoots(inherited).resources.Desk
+    expect(normalized.identifiers).toHaveLength(1)
+    expect(normalized.identifiers[0]).toMatchObject({
       property: 'kind',
       primary: true,
       targeting: 'byRoot',

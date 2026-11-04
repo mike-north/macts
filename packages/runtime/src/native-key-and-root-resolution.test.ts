@@ -115,7 +115,7 @@ function object(record: Record<string, unknown>, members: Record<string, unknown
 }
 
 /** An entry `/root`, and `/a` held by it; a front desk featuring `/a`, and a back desk. */
-function standInArchive(backDesk: unknown = undefined) {
+function standInArchive(backDesk?: unknown) {
   const absent = { exists: () => false }
   const root = object(
     { location: '/root', title: 'Root', holder: null },

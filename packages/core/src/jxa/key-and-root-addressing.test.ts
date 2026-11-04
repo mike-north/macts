@@ -31,7 +31,6 @@ import {
   AppOperationError,
   InternalError,
   TargetNotFoundError,
-  UnexpectedValueError,
   type ResourcePlanTable,
   type ValuePlan,
   type WireRecord,
