@@ -916,3 +916,93 @@ describe('a singleton root as a container', () => {
     )
   })
 })
+
+/**
+ * Reported absences inside a container: an entry's record holds a reference to
+ * a label, which is found within the entry (a reference carries its
+ * container, phases/13 D7), next to `shelfMark`, whose evidence shows the app
+ * failing its read with -1728 when an entry has none (D10).
+ *
+ * Expected outcomes are written by hand from those rules: the failed
+ * `shelfMark` read is `null` and the label reference still names the entry it
+ * was read through as its container; an entry the key does not find fails as
+ * missing before any of its properties is read.
+ */
+describe('reported absences next to a contained reference', () => {
+  /** The Archive manifest with an entry property holding a reference to its label. */
+  const withLabel = parseManifestYaml(
+    ARCHIVE_MANIFEST_YAML.replace(
+      '      shelfMark:\n',
+      `      label:
+        access: r
+        type: { resource: Label }
+        description: The entry's first label
+      shelfMark:
+`
+    )
+  )
+  const LABEL_REF: ValuePlan = { kind: 'reference', resource: 'Label', cardinality: 'one' }
+  const ENTRY_WITH_LABEL: ValuePlan = {
+    kind: 'record',
+    fields: {
+      location: { presence: 'required', value: text() },
+      label: { presence: 'required', value: nullable(LABEL_REF) },
+      shelfMark: { presence: 'required', value: nullable(text()) },
+    },
+  }
+
+  /** A stand-in app whose entry `/a` holds label `l1` and fails its `shelfMark` read with -1728. */
+  function archiveWithLabel(uses: string[]) {
+    const label = object({ id: 'l1', text: 'Fragile' }, { id: () => 'l1' })
+    const entry = object(
+      { location: '/a', label },
+      { location: () => '/a', shelfMark: failing(-1728) }
+    )
+    return recorded(
+      {
+        includeStandardAdditions: false,
+        entries: { byName: (key: unknown) => (key === '/a' ? entry : ABSENT) },
+      },
+      'app',
+      uses
+    )
+  }
+
+  const getEntry = (app: object, location: string) =>
+    createNativeExecutor({ transport: standInTransport(app) }).execute({
+      manifest: withLabel,
+      target: { command: 'getEntry', resource: 'Entry' },
+      input: { location },
+      inputPlan: inputOf(text(), 'location'),
+      outputPlan: ENTRY_WITH_LABEL,
+      resourcePlans: RESOURCE_PLANS,
+    })
+
+  it('reads the failed shelfMark as null and keeps the entry as the label’s container', async () => {
+    const app = archiveWithLabel([])
+
+    await expect(getEntry(app, '/a')).resolves.toEqual({
+      location: '/a',
+      label: {
+        reference: {
+          resource: 'Label',
+          form: 'identity',
+          cardinality: 'one',
+          id: 'l1',
+          container: { resource: 'Entry', form: 'identity', cardinality: 'one', id: '/a' },
+        },
+      },
+      shelfMark: null,
+    })
+  })
+
+  it('fails an entry the key does not find as missing, before any property is read', async () => {
+    const uses: string[] = []
+    const app = archiveWithLabel(uses)
+
+    const error = await rejectionOf(getEntry(app, '/missing'))
+
+    expect(error).toBeInstanceOf(TargetNotFoundError)
+    expect(uses.some((use) => use.includes('shelfMark') || use.includes('label'))).toBe(false)
+  })
+})
