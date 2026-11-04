@@ -114,7 +114,7 @@ const calendarManifest: AppManifest = {
           optional: false,
         },
       },
-      identifiers: [{ property: 'calendarIdentifier', primary: true }],
+      identifiers: [{ property: 'calendarIdentifier', primary: true, targeting: 'byId' }],
     },
     Event: {
       name: 'Event',
@@ -127,7 +127,7 @@ const calendarManifest: AppManifest = {
         location: { access: 'rw', type: 'string', description: 'Location', optional: true },
         uid: { access: 'r', type: 'string', description: 'Unique event key', optional: false },
       },
-      identifiers: [{ property: 'uid', primary: true }],
+      identifiers: [{ property: 'uid', primary: true, targeting: 'byId' }],
     },
   },
   enums: {},
@@ -222,7 +222,7 @@ const remindersManifest: AppManifest = {
         id: { access: 'r', type: 'string', description: 'List id', optional: false },
         name: { access: 'rw', type: 'string', description: 'Name', optional: false },
       },
-      identifiers: [{ property: 'id', primary: true }],
+      identifiers: [{ property: 'id', primary: true, targeting: 'byId' }],
     },
     Reminder: {
       name: 'Reminder',
@@ -236,6 +236,7 @@ const remindersManifest: AppManifest = {
         {
           property: 'id',
           primary: true,
+          targeting: 'byId',
           unique: true,
           evidence: { unique: { source: 'sdef', note: 'The unique identifier of the reminder' } },
         },
@@ -333,7 +334,7 @@ const updateManifest: AppManifest = {
         name: { access: 'rw', type: 'string', description: 'Title', optional: false },
         body: { access: 'rw', type: 'string', description: 'Body', optional: true },
       },
-      identifiers: [{ property: 'id', primary: true }],
+      identifiers: [{ property: 'id', primary: true, targeting: 'byId' }],
     },
   },
   enums: {},

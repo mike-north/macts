@@ -51,7 +51,9 @@ function buildManifest(): AppManifest {
           // A writable boolean — surfaces as `boolean | undefined` from the flag.
           shared: { access: 'rw', type: 'boolean', description: 'Is shared', optional: true },
         },
-        identifiers: [{ property: 'calendarIdentifier', primary: true, ...UNIQUE_CLAIM }],
+        identifiers: [
+          { property: 'calendarIdentifier', primary: true, targeting: 'byId', ...UNIQUE_CLAIM },
+        ],
         ...RANGE_READ_SUPPORTED,
       },
       Folder: {
@@ -61,7 +63,7 @@ function buildManifest(): AppManifest {
         properties: {
           name: { access: 'r', type: 'string', description: 'Folder name', optional: false },
         },
-        identifiers: [{ property: 'name', primary: true }],
+        identifiers: [{ property: 'name', primary: true, targeting: 'byProperty' }],
       },
     },
     enums: {},
@@ -186,7 +188,7 @@ describe('generateCliPlugin list commands: paging', () => {
     const manifest = buildManifest()
     const calendar = manifest.resources['Calendar']
     if (calendar === undefined) throw new Error('fixture has no Calendar')
-    calendar.identifiers = [{ property: 'calendarIdentifier', primary: true }]
+    calendar.identifiers = [{ property: 'calendarIdentifier', primary: true, targeting: 'byId' }]
 
     const list = fileContent(generateCliPlugin(manifest, options), 'calendars/list.ts')
 

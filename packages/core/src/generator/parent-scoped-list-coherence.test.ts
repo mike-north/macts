@@ -81,7 +81,7 @@ const manifest: AppManifest = {
         id: { access: 'r', type: 'string', description: 'Window id', optional: false },
         name: { access: 'rw', type: 'string', description: 'Window name', optional: false },
       },
-      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
+      identifiers: [{ property: 'id', primary: true, targeting: 'byId', ...UNIQUE_CLAIM }],
       ...RANGE_READ_SUPPORTED,
     },
     Tab: {
@@ -92,7 +92,7 @@ const manifest: AppManifest = {
         id: { access: 'r', type: 'string', description: 'Tab id', optional: false },
         url: { access: 'rw', type: 'string', description: 'Tab URL', optional: false },
       },
-      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
+      identifiers: [{ property: 'id', primary: true, targeting: 'byId', ...UNIQUE_CLAIM }],
       ...RANGE_READ_SUPPORTED,
     },
     // Regression fixture for issue #94: a resource NESTED in the hierarchy (so
@@ -107,7 +107,7 @@ const manifest: AppManifest = {
         id: { access: 'r', type: 'string', description: 'Bookmark id', optional: false },
         title: { access: 'rw', type: 'string', description: 'Bookmark title', optional: false },
       },
-      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
+      identifiers: [{ property: 'id', primary: true, targeting: 'byId', ...UNIQUE_CLAIM }],
       ...RANGE_READ_SUPPORTED,
     },
   },

@@ -17,6 +17,7 @@
 
 import type { AppManifest, Command, CommandParameter, Resource } from '../manifest/index.js'
 import { itemIdentifierParameter, unselectableItemCommands } from '../manifest/item-selection.js'
+import { untargetedIdentifiers } from '../manifest/identifier-targeting.js'
 import { normalizeResourceRouteSegment } from '../manifest/route.js'
 import { splitIdentifierWords } from '../manifest/lower-camel.js'
 import {
@@ -180,20 +181,28 @@ export function findResourceCreateCommand(
 }
 
 /**
- * The errors that refuse generating anything from a manifest: one per command
- * that must select one item and declares no identifier parameter to select it
- * by (`unselectableItemCommands`), each naming the app and the command key and
- * saying what to declare.
+ * The errors that refuse generating anything from a manifest, each naming the
+ * app and saying what to declare:
+ *
+ * - one per command that must select one item and declares no identifier
+ *   parameter to select it by (`unselectableItemCommands`), naming the
+ *   command key;
+ * - one per resource whose primary identifier declares no targeting and is
+ *   not the class's dictionary id, code `ID  ` (`untargetedIdentifiers`),
+ *   naming the resource and the identifier property.
  *
  * Every package and SDK generator checks this before it builds any file and
  * returns these errors with no files, and `generateCapabilitiesModule` throws
  * them, so no generated interface takes an identifier the manifest does not
- * declare. Registration refuses the same commands by the same rule.
+ * declare, and no surface looks an item up by an id specifier that cannot
+ * find it. Registration refuses the same manifests by the same rules.
  */
 export function generationRefusals(manifest: AppManifest): string[] {
-  return unselectableItemCommands(manifest).map(
-    ({ problem }) => `App "${manifest.app.name}" cannot be generated from its manifest: ${problem}`
-  )
+  const refused = `App "${manifest.app.name}" cannot be generated from its manifest`
+  return [
+    ...unselectableItemCommands(manifest).map(({ problem }) => `${refused}: ${problem}`),
+    ...untargetedIdentifiers(manifest).map(({ problem }) => `${refused}: ${problem}`),
+  ]
 }
 
 /**

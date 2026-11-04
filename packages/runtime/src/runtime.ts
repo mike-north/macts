@@ -197,7 +197,10 @@ export interface MactsRuntime {
    *   registered, the manifest yields a malformed id or permission, or a
    *   resource-scoped get, update or delete command, or an application-scoped
    *   delete, declares no identifier parameter (the error names the app and
-   *   the command). A refused registration adds nothing.
+   *   the command), or a resource's primary identifier declares no targeting
+   *   and is not the class's dictionary id, code `ID  ` (the error names the
+   *   app, the resource and the property). A refused registration adds
+   *   nothing.
    */
   registerManifest(manifest: AppManifest): void
   /**
@@ -220,7 +223,9 @@ export interface MactsRuntime {
    *   resource, or a resource the manifest does not declare, or an identifier
    *   type that differs from the manifest's primary identifier property, or the
    *   manifest has a command that `registerManifest` refuses for declaring no
-   *   identifier parameter. A refused registration adds nothing.
+   *   identifier parameter, or a resource it refuses for an untargeted
+   *   identifier that is not the dictionary id. A refused registration adds
+   *   nothing.
    */
   registerContract(contract: AppContract<unknown>, manifest: AppManifest): void
   /**

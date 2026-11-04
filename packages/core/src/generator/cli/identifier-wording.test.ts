@@ -58,7 +58,7 @@ function buildManifest(): AppManifest {
         plural: 'Items',
         description: 'An item',
         properties: { id: stringProp },
-        identifiers: [{ property: 'id', primary: true }],
+        identifiers: [{ property: 'id', primary: true, targeting: 'byId' }],
       },
       Playlist: {
         name: 'Playlist',
@@ -79,7 +79,7 @@ function buildManifest(): AppManifest {
         plural: 'Documents',
         description: 'A document',
         properties: { name: stringProp },
-        identifiers: [{ property: 'name', primary: true }],
+        identifiers: [{ property: 'name', primary: true, targeting: 'byProperty' }],
       },
       Calendar: {
         name: 'Calendar',

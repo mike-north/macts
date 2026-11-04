@@ -71,7 +71,7 @@ resources:
     properties:
       id: { access: r, type: string, description: The identifier }
       name: { access: rw, type: string, description: The name }
-    identifiers: [{ property: id, primary: true }]
+    identifiers: [{ property: id, primary: true, targeting: byId }]
   Connection:
     name: Connection
     plural: Connections
@@ -79,14 +79,14 @@ resources:
     properties:
       id: { access: r, type: string, description: The identifier }
       label: { access: rw, type: string, description: The label }
-    identifiers: [{ property: id, primary: true }]
+    identifiers: [{ property: id, primary: true, targeting: byId }]
   Session:
     name: Session
     plural: Sessions
     description: A session
     properties:
       id: { access: r, type: string, description: The identifier }
-    identifiers: [{ property: id, primary: true }]
+    identifiers: [{ property: id, primary: true, targeting: byId }]
 hierarchy:
   children:
     speakers: { resource: Speaker, access: r }

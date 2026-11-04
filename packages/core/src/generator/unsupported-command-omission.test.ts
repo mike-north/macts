@@ -63,7 +63,7 @@ resources:
     description: A speaker
     properties:
       id: { access: r, type: string, description: The identifier }
-    identifiers: [{ property: id, primary: true }]
+    identifiers: [{ property: id, primary: true, targeting: byId }]
 hierarchy:
   children:
     speakers: { resource: Speaker, access: r }

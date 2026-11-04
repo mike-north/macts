@@ -50,7 +50,7 @@ export const CALENDAR_MANIFEST: AppManifest = {
       plural: 'Events',
       description: 'An event',
       properties: {},
-      identifiers: [{ property: 'uid', primary: true }],
+      identifiers: [{ property: 'uid', primary: true, targeting: 'byId' }],
     },
   },
   enums: {},

@@ -31,7 +31,7 @@ function createCalendarManifest(): AppManifest {
             optional: false,
           },
         },
-        identifiers: [{ property: 'name', primary: true }],
+        identifiers: [{ property: 'name', primary: true, targeting: 'byProperty' }],
       },
     },
     enums: {},

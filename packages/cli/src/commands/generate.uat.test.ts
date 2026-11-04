@@ -52,6 +52,7 @@ const PAGE_RESOURCE = `  Page:
     identifiers:
       - property: uid
         primary: true
+        targeting: byId
 `
 const LIST_PAGES_COMMAND = `  listPages:
     name: list
@@ -91,6 +92,7 @@ resources:
     identifiers:
       - property: uid
         primary: true
+        targeting: byId
 ${withPages ? PAGE_RESOURCE : ''}enums: {}
 hierarchy:
   children: {}
