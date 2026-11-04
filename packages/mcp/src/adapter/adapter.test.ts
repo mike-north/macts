@@ -11,9 +11,9 @@
  *   `isError: true` with `{ "error": { code, message, details } }`; anything
  *   that cannot be encoded as a canonical wire error is a generic `INTERNAL`
  *   whose original is logged, never echoed.
- * - D9: a tool's input schema is `z.toJSONSchema(input.wire, { target:
- *   'draft-7' })`, and a contract JSON Schema cannot represent is an error,
- *   never an empty schema.
+ * - D9: a tool's input schema is the input side of its wire contract,
+ *   `z.toJSONSchema(input.wire, { target: 'draft-7', io: 'input' })`, and a
+ *   contract JSON Schema cannot represent is an error, never an empty schema.
  * - D8: a file result is grant-bearing metadata in wire form, served exactly
  *   as received; bytes never appear in a tool result.
  * - MCP: tool input schemas are object schemas; failures of the tool itself
