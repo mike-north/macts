@@ -835,9 +835,10 @@ native values for arguments, and native results to wire values, before
     object the app does not have, the object instead carries
     `missingResource`, the referenced resource.
 - **Reference conversion.** The codec converts a single identity reference
-  to a resource the app finds by its identifier, carrying a container exactly
-  when the resource is found within its parent, and then an identity
-  container converted the same way (D7, native conversion scope). The
+  to a resource the app finds by its identifier. The reference carries a
+  container exactly when the resource is found within its parent, and the
+  codec converts that identity container the same way (D7, native conversion
+  scope). The
   environment's `references` table, `NativeReferenceTable`, holds one entry
   per resource, `NativeReferencePlans { id?, addressing? }`: `id` is the
   resource's identifier plan from the request's `resourcePlans` (D9), and
@@ -1745,7 +1746,8 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   by id needs that parent, and the container is always the record the field
   was read through, known statically from the read path, never a container
   asked of the object: Chrome tabs have no `container` property, and a
-  top-level Mail mailbox's `container` fails (-1728). Asking an object for
+  top-level Mail mailbox's `container` fails with the app's no-such-object
+  error, -1728. Asking an object for
   its container is allowed only through a manifest-curated container
   accessor with evidence. So a field holding such a reference is kept only
   on its target's parent's own record, when that parent is a valid container
