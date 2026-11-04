@@ -2001,9 +2001,6 @@ export function isSensitiveKey(key: string, extraSensitiveKeys?: readonly string
 export function isValidPermission(permission: string): boolean;
 
 // @public
-export const ITEM_COMMAND_NAMES: readonly string[];
-
-// @public
 export function itemIdentifierParameter(command: Command): CommandParameter | undefined;
 
 // @public
@@ -4035,9 +4032,6 @@ export function selectProbedProperties(manifest: AppManifest, resource: Resource
     read: string[];
     skipped: SkippedProperty[];
 };
-
-// @public
-export function selectsOneItem(command: Command): boolean;
 
 // @public
 export type SensitivityTag = z.infer<typeof SensitivityTagSchema>;

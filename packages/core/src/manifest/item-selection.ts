@@ -68,7 +68,8 @@ export function itemIdentifierParameter(command: Command): CommandParameter | un
 
 /**
  * Why a command cannot be offered, when it must name one item
- * ({@link selectsOneItem}) and declares no identifier parameter
+ * (a resource-scoped get, update or delete, or a delete at application
+ * scope) and declares no identifier parameter
  * ({@link itemIdentifierParameter}).
  *
  * @remarks
