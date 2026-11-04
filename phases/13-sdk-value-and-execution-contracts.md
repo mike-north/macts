@@ -1142,8 +1142,9 @@ authority, in both modes. Adapters translate protocol context into an
 
 Permission comes before validation, so there is no schema oracle: a caller
 without the permission learns nothing about the operation's input contract,
-and one that sends invalid input is answered `PermissionDeniedError`, never
-`ValidationError`. A permission denial writes no audit record. Validation
+and is answered `PermissionDeniedError` whatever its input, never
+`ValidationError`. A caller that has the permission and sends invalid input
+is answered `ValidationError`. A permission denial writes no audit record. Validation
 comes before governance, so only well-formed calls reach policy, audit
 summaries, and approvers: an argument summary describes input that passed its
 contract, and names only parameters the contract declares. A key that is not
@@ -1798,8 +1799,8 @@ bypass policy:
    record has the same capability, app, key, and decision as a direct call;
    it differs only in `argsSummary`, which holds the redacted validated
    reference. Nested values in that summary are reduced to a key count, so a
-   selector is summarized as an object and the name a name selector looked up
-   is not recorded. Nothing else marks the record as a resolution.
+   selector is summarized as an object, and the name that a name selector
+   looked up is not recorded. Nothing else marks the record as a resolution.
 7. The executor's `resolve` runs (D9).
 8. The result is validated against the operation's `output.wire`, as every
    `invoke` result is, unless its output plan is `passthrough` (D11). For an
