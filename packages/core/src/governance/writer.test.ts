@@ -11,7 +11,8 @@
  *
  * @see Issue #7 — Trust & Governance: every capability call is audit-logged.
  * @see Issue #52 — Governance foundation acceptance criteria.
- * @see phases/13-sdk-value-and-execution-contracts.md (D5: `invalid-input` records)
+ * @see phases/13-sdk-value-and-execution-contracts.md (D5: `invalid-input` and
+ *   `permission-denied` records)
  */
 
 import { describe, it, expect, afterEach } from 'vitest'
@@ -224,6 +225,54 @@ describe('createFileAuditWriter — invalid-input records', () => {
       decision: 'invalid-input',
       timestamp: TIMESTAMP_A,
       issueCount: 1,
+    } as unknown as AuditRecord
+
+    await expect(writer.append(record)).rejects.toThrow(TypeError)
+    await expect(readFile(logPath, 'utf8')).rejects.toMatchObject({ code: 'ENOENT' })
+  })
+})
+
+describe('createFileAuditWriter — permission-denied records', () => {
+  // phases/13 D5: a call refused by the permission check is recorded as
+  // `permission-denied` with its attribution and time only.
+  it('writes and reads back a permission-denied record with nothing about the input', async () => {
+    const dir = await makeTempDir()
+    const logPath = join(dir, 'audit.jsonl')
+    const writer = createFileAuditWriter(logPath)
+
+    await writer.append(
+      createAuditRecord({
+        capability: 'calendar:events:create',
+        app: 'calendar',
+        apiKeyId: 'assistant-calendar-reader',
+        decision: 'permission-denied',
+        timestamp: TIMESTAMP_A,
+      })
+    )
+
+    expect(await readJsonLines(logPath)).toEqual([
+      {
+        capability: 'calendar:events:create',
+        app: 'calendar',
+        apiKeyId: 'assistant-calendar-reader',
+        decision: 'permission-denied',
+        timestamp: '2026-06-14T10:42:12.000Z',
+      },
+    ])
+  })
+
+  it('refuses a permission-denied record carrying a summary, writing nothing', async () => {
+    const dir = await makeTempDir()
+    const logPath = join(dir, 'audit.jsonl')
+    const writer = createFileAuditWriter(logPath)
+    // A cast stands in for a record built outside the type system.
+    const record = {
+      capability: 'calendar:events:create',
+      app: 'calendar',
+      argsSummary: 'title: Groceries',
+      apiKeyId: 'assistant-calendar-reader',
+      decision: 'permission-denied',
+      timestamp: TIMESTAMP_A,
     } as unknown as AuditRecord
 
     await expect(writer.append(record)).rejects.toThrow(TypeError)
