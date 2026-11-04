@@ -62,7 +62,7 @@ import { resolveCollectionAccessor, resolvePropertyAccessor } from '../manifest/
 import { omittedOutputProperties, outputProperties } from '../manifest/output-references.js'
 import { resolvingCommand } from '../manifest/resource-commands.js'
 import { ROOT_KIND_PROPERTY, rootProperties } from '../manifest/roots.js'
-import { readsAbsentAsNull } from '../manifest/schemas/evidence.js'
+import { ABSENT_VALUE_ERROR_NUMBER, readsAbsentAsNull } from '../manifest/schemas/evidence.js'
 import {
   NATIVE_CODEC_ERROR_NAME,
   NATIVE_COLLECTION_CHANGED_ERROR_NAME,
@@ -292,7 +292,9 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * shows the app reporting an absent value by failing the read with "no such
  * object" ({@link absentAsNull}) takes `null` from that failure instead; the
  * item's own existence is checked before this read, so a missing item still
- * fails as missing. A body with no resource reads `name`.
+ * fails as missing. That holds for a get, a resolved reference and an update's
+ * read-back (checked before its writes); a create's read-back needs no check,
+ * because the item was just made. A body with no resource reads `name`.
  *
  * A singleton root's object holds nothing that says which kind it is, so its
  * `kind` is not read from the app: it is set from `kindExpression`, the kind
@@ -594,7 +596,7 @@ interface ParentScope {
  * singular target is missing, and the executor classifies it as a missing
  * target, so a body-detected miss and an app-reported miss are one failure.
  */
-export const NO_SUCH_OBJECT_ERROR_NUMBER = -1728
+export const NO_SUCH_OBJECT_ERROR_NUMBER = ABSENT_VALUE_ERROR_NUMBER
 
 /**
  * Native error numbers that mean a request to the app failed, not that the

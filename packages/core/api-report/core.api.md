@@ -874,8 +874,6 @@ export const CardinalitySchema: z.ZodEnum<{
     "many-to-many": "many-to-many";
 }>;
 
-// Warning: (ae-forgotten-export) The symbol "NullabilityClaim" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function checkNullabilityClaim(claim: NullabilityClaim, ctx: z.RefinementCtx): void;
 
@@ -2321,6 +2319,14 @@ export interface NotWrittenClaim {
 
 // @public
 export type NullabilityBasis = 'identifier' | 'default' | NullabilityEvidence;
+
+// @public
+export interface NullabilityClaim {
+    readonly evidence?: {
+        readonly nullable?: NullabilityEvidence | undefined;
+    } | undefined;
+    readonly nullable?: boolean | undefined;
+}
 
 // @public (undocumented)
 export type NullabilityEvidence = z.infer<typeof NullabilityEvidenceSchema>;

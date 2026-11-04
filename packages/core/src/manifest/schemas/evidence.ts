@@ -32,8 +32,9 @@ export const NON_NULL_SAMPLE_THRESHOLD = 30
  * The native "no such object" error number, as a probe records it: the app
  * reports that an item has no object at a property, which for a property
  * that holds an object (a folder an item may not have) is how the app says
- * the value is absent. Mirrors the native layer's own constant, which this
- * layer cannot import.
+ * the value is absent. The native layer defines its own "no such object"
+ * constant from this one, so a probe's evidence and a body's reads agree on
+ * the number.
  */
 export const ABSENT_VALUE_ERROR_NUMBER = -1728
 
@@ -547,8 +548,10 @@ export const RangeReadEvidenceSchema = z
 export type RangeReadEvidence = z.infer<typeof RangeReadEvidenceSchema>
 
 /** The parts of a field that make or support a nullability claim. */
-interface NullabilityClaim {
+export interface NullabilityClaim {
+  /** Whether the field may be null, when the manifest claims either. */
   readonly nullable?: boolean | undefined
+  /** The evidence behind the claim. */
   readonly evidence?: { readonly nullable?: NullabilityEvidence | undefined } | undefined
 }
 
