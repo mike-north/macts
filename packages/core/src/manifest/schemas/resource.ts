@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { PropertySchema } from './property.js'
 import {
-  DictionarySpellingEvidenceSchema,
   DictionaryTermEvidenceSchema,
   IdentifierUniquenessEvidenceSchema,
   ObservedAtSchema,
@@ -204,7 +203,7 @@ export const ResourceNativeSpellingSchema = z
     /** The accessor the automation bridge resolves for the collection, e.g. `airplayDevices`. */
     collection: z.string().min(1),
     /** The dictionary term the accessor is the bridge's spelling of. */
-    evidence: DictionarySpellingEvidenceSchema,
+    evidence: DictionaryTermEvidenceSchema,
   })
   .strict()
 export type ResourceNativeSpelling = z.infer<typeof ResourceNativeSpellingSchema>

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { possibleValueKinds } from '../value-kinds.js'
 import {
-  DictionarySpellingEvidenceSchema,
+  DictionaryTermEvidenceSchema,
   NullabilityEvidenceSchema,
   ResettabilityEvidenceSchema,
   UnsupportedSchema,
@@ -84,7 +84,7 @@ export const PropertyNativeSpellingSchema = z
     /** The name the automation bridge resolves for the property, e.g. `ansiBlackColor`. */
     name: z.string().min(1),
     /** The dictionary term the name is the bridge's spelling of. */
-    evidence: DictionarySpellingEvidenceSchema,
+    evidence: DictionaryTermEvidenceSchema,
   })
   .strict()
 export type PropertyNativeSpelling = z.infer<typeof PropertyNativeSpellingSchema>

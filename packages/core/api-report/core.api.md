@@ -1187,10 +1187,10 @@ export const DictionaryAbsenceFindingSchema: z.ZodEnum<{
     "not-an-element": "not-an-element";
 }>;
 
-// @public (undocumented)
+// @public @deprecated
 export type DictionarySpellingEvidence = DictionaryTermEvidence;
 
-// @public
+// @public @deprecated
 export const DictionarySpellingEvidenceSchema: z.ZodObject<{
     source: z.ZodLiteral<"dictionary">;
     bundleId: z.ZodString;

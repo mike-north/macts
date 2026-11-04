@@ -274,9 +274,14 @@ export type Unsupported = z.infer<typeof UnsupportedSchema>
  * The term is what the dictionary shows; the provenance fields say which
  * build the dictionary was read from, because a later release can rename a
  * term or change a class. A manifest records it where it states something the
- * dictionary says and macts cannot derive: an app's own spelling of a name
- * ({@link DictionarySpellingEvidenceSchema}), or the class a class inherits
- * (`inherits` in `./resource.ts`).
+ * dictionary declares and macts cannot derive: an app's own spelling of a
+ * collection or a property (`native` in `./resource.ts` and `./property.ts`),
+ * or the class a class inherits (`inherits` in `./resource.ts`).
+ *
+ * For a native spelling the term is the evidence because the bridge's
+ * spelling follows from the term itself (its first word lowercased whole,
+ * each later word capitalized): "AirPlay devices" is `airplayDevices`, "ANSI
+ * black color" is `ansiBlackColor`.
  */
 export const DictionaryTermEvidenceSchema = z
   .object({
@@ -299,16 +304,18 @@ export const DictionaryTermEvidenceSchema = z
 export type DictionaryTermEvidence = z.infer<typeof DictionaryTermEvidenceSchema>
 
 /**
- * Evidence that an app spells a collection or a property differently from the
- * spelling macts derives: the term as the app's scripting dictionary writes
- * it ({@link DictionaryTermEvidenceSchema}).
+ * The former name of {@link DictionaryTermEvidenceSchema}, from when the
+ * evidence was recorded only for native spellings.
  *
- * The bridge's spelling of a term follows from the term itself (its first word
- * lowercased whole, each later word capitalized), so the term is the evidence:
- * "AirPlay devices" is `airplayDevices`, "ANSI black color" is
- * `ansiBlackColor`.
+ * @deprecated Use {@link DictionaryTermEvidenceSchema}: the same schema,
+ * named for every dictionary declaration a manifest records.
  */
 export const DictionarySpellingEvidenceSchema = DictionaryTermEvidenceSchema
+/**
+ * The former name of {@link DictionaryTermEvidence}.
+ *
+ * @deprecated Use {@link DictionaryTermEvidence}.
+ */
 export type DictionarySpellingEvidence = DictionaryTermEvidence
 
 /**

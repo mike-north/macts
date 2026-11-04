@@ -1051,7 +1051,11 @@ describe('real app manifests', () => {
     // one with a get and no identifier, and no shipped command records a
     // result, so no result is left out. A new omission fails until it is
     // reviewed and added here. Removing a row records restored coverage: the
-    // field is back in output.
+    // field is back in output. The 25 System Events rows marked as inherited
+    // (a folder's `container`, and the domain folders the user and Classic
+    // domains inherit) are references macts did not read at all before those
+    // resources were read with their superclass's properties (D10,
+    // "Superclasses"); each stays out until its target has a read.
     const found = apps
       .flatMap(({ manifest }) => collectContractDiagnostics(manifest))
       .flatMap((diagnostic) => {
@@ -1129,8 +1133,8 @@ describe('real app manifests', () => {
       ['system-events', 'UserDomainObject', 'publicFolder', 'Folder', 'no-get'],
       ['system-events', 'UserDomainObject', 'sitesFolder', 'Folder', 'no-get'],
       ['system-events', 'UserDomainObject', 'temporaryItemsFolder', 'Folder', 'no-get'],
-      // Inherited from the dictionary's superclasses: a folder is a disk item,
-      // and the user and Classic domains are domains (D10, "Superclasses").
+      // Inherited: a folder is a disk item, and the user and Classic domains
+      // are domains (D10, "Superclasses"). 1 + 13 + 11 rows.
       ['system-events', 'Folder', 'container', 'DiskItem', 'no-get'],
       ['system-events', 'UserDomainObject', 'applicationSupportFolder', 'Folder', 'no-get'],
       ['system-events', 'UserDomainObject', 'applicationsFolder', 'Folder', 'no-get'],
