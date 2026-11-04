@@ -1474,6 +1474,25 @@ needs its target's `get`. macts cannot yet return a usable reference when:
   reference would resolve to whichever object has that name, not necessarily
   the one the app returned.
 
+Coverage closes most gaps by curating a `get`, a `list` and an identifier
+for the target, and for most shipped rows first a `get` or `list` for the
+record that holds the field. Two shapes are decided for targets that a
+curated `get` cannot serve:
+
+- A target that is never an element of the app, only an object held in a
+  property (Finder's list view options and their sort column, Mail's
+  message content, Xcode's run destination `device` and `companionDevice`),
+  will be returned as an embedded value record: the object's properties
+  inline in the holding record, not a reference. This is a new output kind,
+  with no `get` and no identity.
+- A target with no identifier, only a position within its container (iTerm's
+  window `currentTab`), will be returned as a selector reference by that
+  position within its container, once output references carry containers
+  (#242).
+
+Xcode's workspace document `activeRunDestination` stays left out until
+evidence shows that a run destination's name identifies one object.
+
 A position that holds such a reference anywhere, bare, in an array, or as the
 non-null case of a nullable value, is left out of output for now; generation
 does not fail. `null` and the empty array do not rescue it, as they do an
