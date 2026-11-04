@@ -847,9 +847,13 @@ native values for arguments, and native results to wire values, before
   `lookup: 'byProperty'` addresses the first match of
   `app[collection].whose({ [property]: id })`, and `lookup: 'byKey'`
   addresses `app[collection].byName(id)`, the collection's key specifier
-  (D10, key targeting). Only a resource whose resolving get records no parent
-  (D10, command parents) has `addressing`, and a singleton root (D10) has
-  none.
+  (D10, key targeting). A singleton root (D10) is addressed by its kind:
+  `lookup: 'byRoot'` maps each kind to the application property holding its
+  object, so a decoded reference addresses `app[roots[id]]`, and a kind the
+  map does not hold is a missing target. Encoding an object at a reference
+  position to a root fails as unsupported, since nothing on the object says
+  which kind it is (D7, singleton roots). Only a resource whose resolving get
+  records no parent (D10, command parents) has `addressing`.
   - Decoding runs in two phases. The first converts the whole input with no
     access to the application: the reference's form, its resource's `id` plan
     and `addressing`, and its `id` are checked and converted there, and the
@@ -1638,14 +1642,18 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   is resolved, so the reference does not survive a move or rename. A key that
   finds nothing is `TargetNotFoundError`.
 - **Singleton roots.** A singleton root (D10) is held by the application as
-  one of its own properties and has no identifier, so no reference names it
-  yet. Its get takes no identifier and is not a resolving operation: the
-  resource table leaves the root out, an output position holding one is left
-  out of output with the `singleton-root` reason, and an input position
-  taking one admits nothing, so a required one makes its operation
-  unavailable. A reference to a root would carry the resource alone, with no
-  identity value, and resolve through the application property; it is added
-  when an app's output first needs one.
+  its own properties, one object per kind, and is identified by its kind: an
+  identity reference carries the kind, and resolves through the application
+  property the kind names, as the root's `get` does. The resource table
+  records the root with its kind enum as the identifier type, so an input
+  position taking a reference to a root accepts one by kind. A kind whose
+  property holds no object on this Mac is `TargetNotFoundError`, never an
+  empty record, and a list of the root returns one record per kind whose
+  property holds an object, skipping the others, so it lists the roots this
+  Mac has. An output position holding a reference to a root is left out of
+  output with the `root-kind-unmapped` reason: the app returns the object,
+  and nothing on it says which kind it is, so the reference needs a curated
+  mapping from the field to its kind, which no manifest records yet.
 
 **Native conversion scope.** The macOS provider converts a reference inside
 the automation process (D4, reference conversion) when it is a single
@@ -2053,8 +2061,8 @@ execute(request), resolve(request) }`.
   resource key and declared in `@macts/contracts` next to `ValuePlan`. `id` is
   the plan of the resource's identifier value type, the one a reference's `id`
   is wire-encoded by, and is absent for a resource with no identifier. A
-  singleton root (D10) has no identifier and no entry, since the contract's
-  resource table leaves it out (D7, singleton roots). Entries
+  singleton root's (D10) `id` is the plan of its kind enum (D7, singleton
+  roots). Entries
   are objects, so a later per-resource field does not change the table's
   shape. The table holds plans only: which native property carries an
   identifier, and how an object is found from it, stays manifest knowledge
@@ -2304,6 +2312,8 @@ Why the default is nullable: evidence of non-null narrows an output from `T | nu
 
 **Observations outrank claims.** A probe that sees a null sets `nullable: true` and replaces an earlier non-null claim from any source except structure. The probe output and the evidence note report the contradiction. A probe that sees no nulls never removes a `nullable: true` claim from any source, including an earlier probe's observation, and never overrides a curated claim. Only curation can narrow a property that has been observed or declared nullable. A property read that throws is not null evidence: it counts toward neither the null count nor the sample size.
 
+**A read the app fails with "no such object" can be the empty value.** Some apps report that an item has no value at a property that holds an object, such as a folder an item may not have, by failing the read with "no such object" (-1728) instead of returning a missing value. Probe evidence may record the distinct error numbers its failed reads raised (`errorNumbers`). When there are failed reads and every one raised -1728, the evidence supports `nullable: true` even though no read returned a missing value, and contradicts `nullable: false`. For a property claimed nullable on that evidence, and no other, a native read that fails with -1728 is the empty value, `null`: in a get, a resolved reference, and a list's item-by-item reads. The item's own existence is checked first, so a missing item still fails as missing, and any other failure of the read still fails. Whether absence of that kind is nullable or unsupported is curated: unsupported when it is structural, with a platform reason and every instance failing (D10, unsupported properties); nullable when it depends on the data.
+
 **Probe evidence records** the app bundle id, app version, macOS version, sample size, null count, failed-read count, and observation time. For each resource, it also records the collection path it read and the properties it skipped. The probe records presence only. Values are never returned, logged, or persisted. It never writes app data. It reads at most 60 items per collection within a per-app time budget, at evenly spaced positions across the collection and with a share for each parent collection, so one list or calendar cannot make up the whole sample. For a nested collection it does not enumerate every parent: it looks in evenly spaced parents, 20 at first and twice as many in each later round, until the leaves it has found hold enough items, it has looked in 1,000 collections, or half the call's time limit is spent. It records how many parents it looked in, so a resource with no items found says how much of the store it covered rather than claiming the store is empty. It skips file and data properties and body-like content properties, which can be large or trigger downloads, and it reports what it skipped.
 
 **Input positions** default to non-null, because widening an input later is non-breaking. Create inputs are never nullable in this decision: a property's nullability claim describes what reads return, not what a create accepts, and no claim kind for create inputs exists yet. Adding one later widens an input, which is non-breaking. A command parameter is nullable only with a claim. An update field accepts `null` (reset) only when the property is resettable. Resettability is curated only, with a note naming the verification, because proving it requires writes. Until a property is curated, `null` at its update field is rejected before execution (D11). A4's "explicit `null` means reset where supported" holds because reset that isn't supported is rejected, not attempted.
@@ -2366,9 +2376,13 @@ Every surface takes the parent from the record. Native bodies address the parent
 
 ### Singleton roots
 
-**A resource whose one object the application holds as a property is a singleton root.** An app may hold an object, such as a front desk, as one of its own properties without having its class as an element. The resource records `root: { property, evidence }`: `property` is the bridge's accessor for the application property, and the evidence is the dictionary term it spells, in the form native spellings use (D10, native spellings). The root's one object needs no identifier and is held in no collection, so the schema rejects a root that declares identifiers, a collection spelling or a range read. Its only standard command is a get, which takes no required parameter and records no parent; the schema rejects a list, create, update or delete that applies to it, a command that records it as parent, and a hierarchy entry that names it, since every entry is a collection.
+**A resource whose objects the application holds as its own properties is a singleton root.** An app may hold objects, such as a front desk and a back desk, as properties of the application without having their class as an element. The resource records `roots: { <kind>: { property, evidence } }`, curated per kind: each kind is a lower camel case name, `property` is the app's spelling of the application property that holds that kind's object, and the evidence is the dictionary term it spells, in the form native spellings use (D10, native spellings). A resource with one kind is a root like any other, with that kind as its only value.
 
-**Every surface reads the property.** The native get addresses `app[property]`, fails as a missing target when it holds nothing, and reads the record as any get does. The contract operation's input is empty, the clients' `get` takes only call options, and the CLI reaches the get at the root property, as a hierarchy key names a collection; there is no list. No reference names a root yet (D7, singleton roots).
+**The kind is the identity.** Validation derives the rest from the kinds (`manifest/roots.ts`): a closed enum of the kinds, `<Resource>Kind`; a read-only `kind` property of that enum; and the resource's one identifier, primary, on `kind`, with `targeting: byRoot`, unique by construction because each kind names one application property. A validated manifest is validated again before use, so the derived pieces are accepted in exactly the form validation gives them, and rejected in any other: a root declares no identifier of its own, no `kind` property of another type, and no kind enum with other values. `byRoot` belongs to roots alone. The objects are held in no collection, so the schema rejects a collection spelling and a range read on a root.
+
+**Commands.** A root's standard commands are a get, which takes exactly one required parameter, of the kind enum, and a list, which takes none. Neither records a parent; the schema rejects a create, update or delete that applies to a root, a command that records a root as its parent, and a hierarchy entry that names one, since every entry is a collection.
+
+**Every surface follows the kind.** The native get looks the kind up in the root's kinds, addresses the application property it names, and fails as a missing target when the kind is not one of them or its property holds no object on this Mac (the app reports it missing, or "no such object"); it never returns an empty record. The native list reads each kind in declaration order, skips a kind whose property holds no object, fails on any other error, and reads each record as the get does. Every record's `kind` is the kind it was found by, since the object does not say. A list of roots reads every kind it has, so it never pages. The contract, the clients and the CLI treat the root as an identified resource whose identifier is its kind: the CLI reaches it at its namespace, as it would a collection. References follow D7 (singleton roots).
 
 ### Unsupported resources
 
