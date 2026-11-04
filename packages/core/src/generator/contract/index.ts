@@ -137,14 +137,16 @@ interface ContractDiagnosticBase {
  * - `omitted-output`: an output position (a record field, or a command's
  *   result) holds a reference macts cannot yet hand back in a form a caller
  *   can resolve: macts has no `get` for its resource yet, or no identifier,
- *   or a `get` that needs the container native reads do not return yet, or a
+ *   or a `get` that needs a container the position does not hold (a native
+ *   read returns, as the container, only the record a field is read through,
+ *   when that record is the target's parent and a valid container), or a
  *   `get` that names no container for a resource the app holds only within
  *   one, or no evidence that the name it is identified by is unique. The
  *   contract, the HTTP client, the CLI and the native reads leave it out for
  *   now. Each one is a coverage gap (#219), closed by giving the resource a
- *   `get` and an identifier, recording the parent its `get` needs, returning
- *   containers (#242), or a `unique` claim on the identifier, each with
- *   evidence.
+ *   `get` and an identifier, recording the parent its `get` needs, making
+ *   the parent a valid container or returning nested containers (#242), or a
+ *   `unique` claim on the identifier, each with evidence.
  */
 export type ContractDiagnostic =
   | (ContractDiagnosticBase & {
@@ -947,10 +949,18 @@ class ContractBuilder {
   /**
    * The fields of a resource's record, the read position: each property is
    * nullable unless there is evidence that the app always sets it (see
-   * `resolveReadNullability`), and optional when the manifest says so.
+   * `resolveReadNullability`), and optional when the manifest says so. The
+   * record is the one its fields are read through, which matters for a field
+   * whose target is got within the resource (see
+   * `../../manifest/output-references.ts`).
    */
-  #recordFields(resource: Resource): (FieldModel & { readonly readOnly: boolean })[] {
-    return this.#allRecordFields(resource).filter((field) => this.#resolvesOutput(field.shape))
+  #recordFields(
+    resourceKey: string,
+    resource: Resource
+  ): (FieldModel & { readonly readOnly: boolean })[] {
+    return this.#allRecordFields(resource).filter((field) =>
+      this.#resolvesOutput(field.shape, resourceKey)
+    )
   }
 
   /**
@@ -975,10 +985,11 @@ class ContractBuilder {
 
   /**
    * Whether an output composition can be declared: every reference it holds
-   * can be used (see `../../manifest/output-references.ts`).
+   * can be used (see `../../manifest/output-references.ts`), at a field of
+   * `sourceKey`'s record, or at a command result when it is `undefined`.
    */
-  #resolvesOutput(shape: ValueShape): boolean {
-    return omittedOutput(this.#manifest, shape) === undefined
+  #resolvesOutput(shape: ValueShape, sourceKey?: string): boolean {
+    return omittedOutput(this.#manifest, shape, sourceKey) === undefined
   }
 
   /**
@@ -990,8 +1001,8 @@ class ContractBuilder {
    */
   #checkOutputs(): void {
     for (const [resourceKey, resource] of usableResources(this.#manifest)) {
-      const judged = [...omittedOutputProperties(this.#manifest, resource).keys()]
-      const kept = new Set(this.#recordFields(resource).map(({ name }) => name))
+      const judged = [...omittedOutputProperties(this.#manifest, resourceKey, resource).keys()]
+      const kept = new Set(this.#recordFields(resourceKey, resource).map(({ name }) => name))
       const omitted = this.#allRecordFields(resource)
         .map(({ name }) => name)
         .filter((name) => !kept.has(name))
@@ -1411,7 +1422,7 @@ class ContractBuilder {
 
   #renderRecordInterfaces(): string[] {
     return usableResources(this.#manifest).map(([resourceKey, resource]) => {
-      const fields = this.#recordFields(resource)
+      const fields = this.#recordFields(resourceKey, resource)
       const doc = docComment(resource.description, '')
       if (fields.length === 0) return `${doc}export type ${resourceKey} = Record<string, never>\n`
       const lines = fields.map((field) => {
@@ -1552,7 +1563,7 @@ class ContractBuilder {
       if (!read.has(resourceKey)) return []
       const binding = this.#recordBinding(resourceKey)
       this.#privateBindings.add(binding)
-      const fields = this.#recordFields(resource)
+      const fields = this.#recordFields(resourceKey, resource)
       return [
         `const ${binding}: ValueType<${resourceKey}> = t.record(${this.#renderRecordFields(fields)}, { description: ${stringLiteral(resource.description)} })\n`,
       ]

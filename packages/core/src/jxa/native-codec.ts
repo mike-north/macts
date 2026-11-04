@@ -56,7 +56,9 @@ export const NATIVE_CODEC_ERROR_NAME = 'MactsCodecError'
  * - `encode(native, plan, env)` returns JSON-safe wire values: no raw `NaN`,
  *   `Infinity`, or `-0`, no `Date` objects, and no own properties holding
  *   `undefined`. Absent optional fields are omitted. An app object at a
- *   reference position becomes an identity reference.
+ *   reference position becomes an identity reference; one whose resource is
+ *   found within a container must come with the record it was read through
+ *   ({@link NATIVE_CONTAINED_REFERENCE_KEY}), which becomes its container.
  * - `env` is `{ app, references }`. Without it, no reference converts.
  * - Under a `passthrough` plan, both functions return their argument
  *   unchanged.
@@ -77,6 +79,26 @@ export interface NativeCodec {
   /** In-process JavaScript defining the decode and encode functions. */
   readonly prelude: string
 }
+
+/**
+ * Sole key of the record a native body hands the codec at a reference
+ * position whose target is got within the record the field was read through
+ * (phases/13 D7, container scoping). Its value is
+ * `{ value, container }` or `{ value, containerId }`:
+ *
+ * - `value` is what the app returned at the position: an object of the
+ *   target, or a specifier the codec reads the target's id from (Chrome's
+ *   `windows.byId(W).activeTab`).
+ * - `container` is the record's item, whose id the codec reads by the
+ *   parent's addressing; `containerId` is the record's identifier, already
+ *   read (a list row's).
+ *
+ * The codec encodes the reference with the container in identity form, in the
+ * same request. A body hands values over this way only under a typed output
+ * plan, and only at positions the output rule keeps with their container
+ * (`containerReferences` in `NativeBodyOptions`).
+ */
+export const NATIVE_CONTAINED_REFERENCE_KEY = '__mactsContainedReference'
 
 /**
  * Marker `name` of the object a list body throws when its collection changed
@@ -115,8 +137,9 @@ function buildPrelude(factorySource: string): string {
  * package's unit tests exercise in Node. It implements every value plan kind
  * except `file` and `file-source`, which fail with a codec error marked with
  * the unsupported kind. References convert in identity form only, one object
- * at a time, to a resource the app finds at the application by its
- * identifier; any other reference is marked unsupported as well.
+ * at a time, to a resource the app finds by its identifier, at the
+ * application or within a container that is itself in identity form; any
+ * other reference is marked unsupported as well.
  *
  * Conversions follow the value contracts: integers are canonical decimal
  * text within the safe-integer domain, numbers in dynamic content are always
@@ -139,14 +162,27 @@ export const NATIVE_CODEC: NativeCodec = Object.freeze({
  * and `byProperty` matches `property` against the identifier. Either way the
  * identifier a reference carries is the value of `property`, so reading it
  * back from an object gives the identifier that finds the object again.
+ *
+ * When the resource's get records a parent, `within` names that parent: the
+ * resource is identified only within its container (phases/13 D7, container
+ * scoping), so `collection` is the container's, a reference to it carries the
+ * container, and the container is found by the parent's own addressing first.
  */
 export interface NativeAddressing {
-  /** The app's spelling of the resource's collection at the application. */
+  /**
+   * The app's spelling of the resource's collection: at the application, or
+   * at the container when `within` is set.
+   */
   readonly collection: string
   /** How the collection finds an item from its identifier. */
   readonly lookup: 'byId' | 'byProperty'
   /** The app's spelling of the property that holds the identifier. */
   readonly property: string
+  /**
+   * The manifest key of the parent the resource is found within; absent for
+   * a resource found at the application.
+   */
+  readonly within?: string
 }
 
 /**
@@ -156,9 +192,9 @@ export interface NativeAddressing {
  *
  * @remarks
  * `id` is absent for a resource with no identifier. `addressing` is absent
- * when the app cannot find an object of the resource at the application by its
- * identifier: it has no identifier, or it is found only within a container (its
- * get records a parent). A reference to such a resource does not convert.
+ * when the app cannot find an object of the resource by its identifier: it
+ * has no identifier or no get, or it is found within a parent that has no
+ * addressing. A reference to such a resource does not convert.
  */
 export interface NativeReferencePlans {
   /** The plan of the resource's identifier. */
@@ -169,7 +205,8 @@ export interface NativeReferencePlans {
 
 /**
  * The resources whose references a native script may convert, keyed by
- * manifest resource key.
+ * manifest resource key. A resource found within a parent comes with the
+ * parent's entry too.
  */
 export type NativeReferenceTable = Readonly<Record<string, NativeReferencePlans>>
 

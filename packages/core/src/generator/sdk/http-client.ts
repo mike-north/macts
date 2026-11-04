@@ -223,7 +223,7 @@ function generateTypesFile(manifest: AppManifest): string {
     // field holding a reference macts cannot yet return in a resolvable form
     // is left out
     // (`outputProperties`, the judgment the contract and native reads use).
-    const props = outputProperties(manifest, resource)
+    const props = outputProperties(manifest, resourceName, resource)
 
     // List output surfaces the resource's primary identifier under the canonical
     // `id` key (see the server list executor) so a consumer can always read
@@ -342,7 +342,7 @@ function generateTypesFile(manifest: AppManifest): string {
     if (emitCanonicalId) {
       lines.push(`  ${CANONICAL_IDENTIFIER_KEY}: z.string().optional(),`)
     }
-    for (const [propName, prop] of outputProperties(manifest, resource)) {
+    for (const [propName, prop] of outputProperties(manifest, resourceName, resource)) {
       const zodType = propertyTypeToZod(prop.type, prop.optional)
       lines.push(`  ${propName}: ${zodType},`)
     }

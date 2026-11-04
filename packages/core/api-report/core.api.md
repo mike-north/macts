@@ -2073,10 +2073,12 @@ export interface NativeAddressing {
     readonly collection: string;
     readonly lookup: 'byId' | 'byProperty';
     readonly property: string;
+    readonly within?: string;
 }
 
 // @public
 export interface NativeBodyOptions {
+    readonly containerReferences?: boolean;
     readonly identifierAliases?: boolean;
     readonly paged?: boolean;
 }

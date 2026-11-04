@@ -37,6 +37,11 @@ import {
   type GeneratedContract,
 } from './index.js'
 import { RANGE_READ_SUPPORTED } from '../../manifest/test-support/unique-claim.js'
+import {
+  isNameKeyed,
+  isValidContainer,
+  omittedOutputReason,
+} from '../../manifest/output-references.js'
 import { jotterManifest } from './test-fixtures.js'
 
 const MANIFESTS_DIR = resolve(process.cwd(), '../../manifests')
@@ -1076,10 +1081,16 @@ describe('real app manifests', () => {
     // holding a single reference, or an array of them: `no-get` when macts
     // has no get for the target yet, `not-unique` when macts identifies the
     // target by a name the manifest has no uniqueness evidence for yet, and
-    // `parent-scoped` when the target's get records a parent and native reads
-    // do not return the container yet (a Chrome or Edge tab, got within its
-    // window; a TV playlist, got within its source; an Xcode scheme, run
-    // destination or project, got within its workspace document). No shipped
+    // `parent-scoped` when the target's get records a parent and the field
+    // holds no container for it: a native read returns, as the container,
+    // only the record the field is read through, when that record is the
+    // target's parent and a valid container (a TV playlist, got within its
+    // source, read through a window or another playlist; an Xcode scheme or
+    // run destination, got within a workspace document, which is identified
+    // by its name with no claim; an Xcode project, got within its workspace
+    // document, read through a target). Chrome and Edge windows'
+    // `activeTab` are kept: a tab is got within its window, which is
+    // top-level and claims its id unique. No shipped
     // output references a resource with a get and no identifier, no shipped
     // output references a resource the hierarchy holds only within another
     // resource while its get records no parent (`unrecorded-parent`), and no
@@ -1106,8 +1117,6 @@ describe('real app manifests', () => {
       ['arc', 'Window', 'activeSpace', 'Space', 'no-get'],
       ['finder', 'FinderWindow', 'listViewOptions', 'ListViewOptions', 'no-get'],
       ['finder', 'ListViewOptions', 'sortColumn', 'Column', 'no-get'],
-      // A tab is got only within its window.
-      ['google-chrome', 'Window', 'activeTab', 'Tab', 'parent-scoped'],
       ['iterm', 'Window', 'currentTab', 'Tab', 'no-get'],
       ['iterm', 'Window', 'currentSession', 'Session', 'no-get'],
       ['iterm', 'Tab', 'currentSession', 'Session', 'no-get'],
@@ -1125,8 +1134,6 @@ describe('real app manifests', () => {
       ['mail', 'Rule', 'moveMessage', 'Mailbox', 'no-get'],
       ['messages', 'Participant', 'account', 'Account', 'no-get'],
       ['messages', 'Chat', 'account', 'Account', 'no-get'],
-      // A tab is got only within its window.
-      ['microsoft-edge', 'Window', 'activeTab', 'Tab', 'parent-scoped'],
       ['system-events', 'NetworkPreferencesObject', 'currentLocation', 'Location', 'no-get'],
       ['system-events', 'Service', 'currentConfiguration', 'Configuration', 'no-get'],
       ['system-events', 'Service', 'interface', 'Interface', 'no-get'],
@@ -1172,7 +1179,13 @@ describe('real app manifests', () => {
       ['tv', 'Playlist', 'parent', 'Playlist', 'parent-scoped'],
       ['tv', 'PlaylistWindow', 'view', 'Playlist', 'parent-scoped'],
       // A scheme, a run destination and a project are got only within their
-      // workspace document.
+      // workspace document. A workspace document is identified by its name,
+      // with no claim, so it is no valid container yet; its identity is its
+      // document path, and the scheme and run destination fields return with
+      // path curation of it (and, for the run destination, evidence that
+      // run destination names are unique). A target's project is read
+      // through a target, not through its workspace document, so it also needs
+      // nested chains.
       ['xcode', 'WorkspaceDocument', 'activeScheme', 'Scheme', 'parent-scoped'],
       ['xcode', 'WorkspaceDocument', 'activeRunDestination', 'RunDestination', 'parent-scoped'],
       ['xcode', 'WorkspaceDocument', 'lastSchemeActionResult', 'SchemeActionResult', 'no-get'],
@@ -1180,8 +1193,39 @@ describe('real app manifests', () => {
       ['xcode', 'RunDestination', 'device', 'Device', 'no-get'],
       ['xcode', 'RunDestination', 'companionDevice', 'Device', 'no-get'],
     ]
-    expect(expected).toHaveLength(73)
+    expect(expected).toHaveLength(71)
     expect(found.sort()).toEqual(expected.sort())
+  })
+
+  /** The manifest of the shipped app in `dir`. */
+  function manifestOf(dir: string): AppManifest {
+    const found = apps.find((app) => app.dir === dir)
+    if (found === undefined) throw new Error(`no manifest for ${dir}`)
+    return found.manifest
+  }
+
+  it("keep Chrome and Edge windows' active tab, carrying the window it was read through", () => {
+    // A tab is got within its window; a window is top-level and claims its id
+    // unique on the scripting dictionary, so it is a valid container.
+    for (const dir of ['google-chrome', 'microsoft-edge']) {
+      const manifest = manifestOf(dir)
+      expect(isValidContainer(manifest, 'Window')).toBe(true)
+      expect(omittedOutputReason(manifest, 'Tab', 'Window')).toBeUndefined()
+      // With no record to read it through, a tab still has no container.
+      expect(omittedOutputReason(manifest, 'Tab')).toBe('parent-scoped')
+    }
+  })
+
+  it("leave out an Xcode workspace document's active scheme and run destination: the document is no valid container yet", () => {
+    // A workspace document is identified by its name, with no unique claim.
+    // Its identity is its document path, since two checkouts with the same
+    // name can be open at once, so no name claim is to be added; the fields
+    // return with path curation of the document.
+    const xcode = manifestOf('xcode')
+    expect(isNameKeyed(xcode, 'WorkspaceDocument')).toBe(true)
+    expect(isValidContainer(xcode, 'WorkspaceDocument')).toBe(false)
+    expect(omittedOutputReason(xcode, 'Scheme', 'WorkspaceDocument')).toBe('parent-scoped')
+    expect(omittedOutputReason(xcode, 'RunDestination', 'WorkspaceDocument')).toBe('parent-scoped')
   })
 
   it('generate without errors', () => {

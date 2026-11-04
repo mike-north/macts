@@ -18,8 +18,12 @@
  *   identity form: an object of it can be addressed only by a selector, and
  *   native reads emit only identity references;
  * - the target's `get` records a parent, so the target is identified only
- *   within its container, and native reads do not return the container yet
- *   (#242);
+ *   within its container, and the position is not one where a native read
+ *   holds that container: a native read hands over, as the container, the
+ *   record the field is read through, so it can return one only at a field
+ *   of the target's parent itself, and only when that parent is a valid
+ *   container ({@link isValidContainer}). A command result is read through no
+ *   record, so it has no container to return;
  * - the target's `get` records no parent, but the manifest hierarchy holds the
  *   target only within another resource, never at the application, so the
  *   `get` looks for it in a collection the app does not have, and macts does
@@ -45,7 +49,9 @@
  * and CLI generators read record fields through it, the contract generator
  * checks its own records and results against it, and the native get, list,
  * create and update bodies read only the properties it keeps, so none of those
- * surfaces declares or reads a field another leaves out. The older
+ * surfaces declares or reads a field another leaves out. The native bodies
+ * also take from here which fields they hand to the codec together with the
+ * record they were read through, as the references' container. The older
  * `generateSdk` path does not use it yet (#253).
  *
  * Internal to this package: nothing here is part of the public entry.
@@ -78,8 +84,10 @@ import {
  * - `no-get`: macts has no usable `get` command for the target yet.
  * - `no-identifier`: macts has no primary identifier for the target yet, so
  *   no identity reference to one exists.
- * - `parent-scoped`: the target's `get` records a parent, and native reads do
- *   not return containers yet (#242).
+ * - `parent-scoped`: the target's `get` records a parent, and the position
+ *   holds no container for it: it is not a field of the target's parent, or
+ *   that parent is not a valid container ({@link isValidContainer}), or it is
+ *   a command result, which is read through no record.
  * - `unrecorded-parent`: the target's `get` records no parent, but the app
  *   holds the target only within a container: the manifest hierarchy, which
  *   records the app's element containment, places it under another resource
@@ -126,30 +134,77 @@ export function isNameKeyed(manifest: AppManifest, resourceKey: string): boolean
 }
 
 /**
+ * Whether `containerKey` can be the container a native read returns with a
+ * reference to one of its children: a reference to it read from the app
+ * would itself be usable with no container ({@link omittedOutputReason} with
+ * no source). That is, it has a usable `get` and a primary identifier, that
+ * `get` records no parent (it is top-level), the hierarchy does not hold it
+ * only within another resource, and it is not name-keyed, or it claims its
+ * name unique with evidence.
+ *
+ * A container whose own `get` records a parent would need its own container
+ * in turn (a nested chain), which a native read does not return.
+ *
+ * @param manifest - The app manifest.
+ * @param containerKey - The manifest key of the would-be container.
+ */
+export function isValidContainer(manifest: AppManifest, containerKey: string): boolean {
+  return omittedOutputReason(manifest, containerKey) === undefined
+}
+
+/**
  * What macts does not provide yet for a reference read from the app to
  * `resourceKey` to be usable, or `undefined` when it can be used: the
- * resource has a usable `get` and a primary identifier, that `get` records no
- * parent, the hierarchy does not hold the resource only within another
- * resource ({@link nestedOnlyResources}), and the resource is not name-keyed
+ * resource has a usable `get` and a primary identifier; that `get` records no
+ * parent, or it records `sourceKey` and that is a valid container
+ * ({@link isValidContainer}); the hierarchy does not hold the resource only
+ * within another resource while its `get` records no parent
+ * ({@link nestedOnlyResources}); and the resource is not name-keyed
  * ({@link isNameKeyed}). The reasons are checked in that order (`no-get`,
  * `no-identifier`, `parent-scoped`, `unrecorded-parent`, `not-unique`), so
  * the first that applies is reported.
  *
+ * The judgment is positional for a target whose `get` records a parent: a
+ * native read hands the codec, as the reference's container, the record the
+ * field was read through, never a container it asks the object for. So such a
+ * target is usable only at a field of its parent's own record.
+ *
  * @param manifest - The app manifest.
  * @param resourceKey - The manifest key of the referenced resource.
+ * @param sourceKey - The manifest key of the resource whose record holds the
+ *   position; `undefined` for a command result, which is read through no
+ *   record.
  */
 export function omittedOutputReason(
   manifest: AppManifest,
-  resourceKey: string
+  resourceKey: string,
+  sourceKey?: string
 ): OmittedOutputReason | undefined {
   const get = resolvingCommand(manifest, resourceKey, 'get')
   if (get === undefined) return 'no-get'
   if (resolvePrimaryIdentifierProperty(manifest.resources[resourceKey]) === undefined) {
     return 'no-identifier'
   }
-  if (get[1].parent !== undefined) return 'parent-scoped'
-  if (nestedOnlyResources(manifest).has(resourceKey)) return 'unrecorded-parent'
+  const parent = get[1].parent?.resource
+  if (parent !== undefined) {
+    if (parent !== sourceKey || !isValidContainer(manifest, parent)) return 'parent-scoped'
+  } else if (nestedOnlyResources(manifest).has(resourceKey)) {
+    return 'unrecorded-parent'
+  }
   return isNameKeyed(manifest, resourceKey) ? 'not-unique' : undefined
+}
+
+/**
+ * The manifest key of the container a native read returns with a reference
+ * to `resourceKey`, or `undefined` when such a reference carries none: the
+ * parent its `get` records. Meaningful only for a position the output rule
+ * keeps, where that parent is the resource whose record holds the field.
+ *
+ * @param manifest - The app manifest.
+ * @param resourceKey - The manifest key of the referenced resource.
+ */
+export function outputContainer(manifest: AppManifest, resourceKey: string): string | undefined {
+  return resolvingCommand(manifest, resourceKey, 'get')?.[1].parent?.resource
 }
 
 /** The resource keys a value composition references. */
@@ -174,10 +229,16 @@ function referencedResources(shape: ValueShape): string[] {
  *
  * @param manifest - The app manifest.
  * @param shape - The composition of the output position.
+ * @param sourceKey - The resource whose record holds the position;
+ *   `undefined` for a command result (see {@link omittedOutputReason}).
  */
-export function omittedOutput(manifest: AppManifest, shape: ValueShape): OmittedOutput | undefined {
+export function omittedOutput(
+  manifest: AppManifest,
+  shape: ValueShape,
+  sourceKey?: string
+): OmittedOutput | undefined {
   for (const target of referencedResources(shape)) {
-    const reason = omittedOutputReason(manifest, target)
+    const reason = omittedOutputReason(manifest, target, sourceKey)
     if (reason !== undefined) return { target, reason }
   }
   return undefined
@@ -194,16 +255,20 @@ function outputShape(type: DeclaredType, names: NameResolver): ValueShape {
  * usable form yet.
  *
  * @param manifest - The app manifest.
- * @param resource - One of the manifest's resources.
+ * @param resourceKey - The manifest key of `resource`: the record each field
+ *   is read through, which a reference to a target got within it carries as
+ *   its container.
+ * @param resource - The resource's definition.
  */
 export function omittedOutputProperties(
   manifest: AppManifest,
+  resourceKey: string,
   resource: Pick<Resource, 'properties'>
 ): ReadonlyMap<string, OmittedOutput> {
   const omitted = new Map<string, OmittedOutput>()
   const names = createNameResolver(manifest)
   for (const [name, property] of usableProperties(resource)) {
-    const found = omittedOutput(manifest, outputShape(property.type, names))
+    const found = omittedOutput(manifest, outputShape(property.type, names), resourceKey)
     if (found !== undefined) omitted.set(name, found)
   }
   return omitted
@@ -217,15 +282,45 @@ export function omittedOutputProperties(
  * (#253).
  *
  * @param manifest - The app manifest.
- * @param resource - One of the manifest's resources.
+ * @param resourceKey - The manifest key of `resource`.
+ * @param resource - The resource's definition.
  * @returns The `[name, property]` pairs.
  */
 export function outputProperties(
   manifest: AppManifest,
+  resourceKey: string,
   resource: Pick<Resource, 'properties'>
 ): [string, Property][] {
-  const omitted = omittedOutputProperties(manifest, resource)
+  const omitted = omittedOutputProperties(manifest, resourceKey, resource)
   return usableProperties(resource).filter(([name]) => !omitted.has(name))
+}
+
+/**
+ * The properties of a resource's output record ({@link outputProperties})
+ * whose references a native read returns with the record as their container:
+ * those holding a reference to a target whose `get` records the resource as
+ * its parent ({@link outputContainer}). The output rule keeps such a field
+ * only when the resource is a valid container, so every one of them carries
+ * the record it was read through.
+ *
+ * @param manifest - The app manifest.
+ * @param resourceKey - The manifest key of `resource`.
+ * @param resource - The resource's definition.
+ * @returns The property names, in declaration order.
+ */
+export function containedOutputProperties(
+  manifest: AppManifest,
+  resourceKey: string,
+  resource: Pick<Resource, 'properties'>
+): string[] {
+  const names = createNameResolver(manifest)
+  return outputProperties(manifest, resourceKey, resource)
+    .filter(([, property]) =>
+      referencedResources(outputShape(property.type, names)).some(
+        (target) => outputContainer(manifest, target) === resourceKey
+      )
+    )
+    .map(([name]) => name)
 }
 
 /**
@@ -268,7 +363,7 @@ export interface OmittedOutputPosition extends OmittedOutput {
 export function omittedOutputPositions(manifest: AppManifest): OmittedOutputPosition[] {
   const found: OmittedOutputPosition[] = []
   for (const [resourceKey, resource] of usableResources(manifest)) {
-    for (const [property, omitted] of omittedOutputProperties(manifest, resource)) {
+    for (const [property, omitted] of omittedOutputProperties(manifest, resourceKey, resource)) {
       found.push({
         position: `resources.${resourceKey}.properties.${property}`,
         resource: resourceKey,

@@ -322,7 +322,7 @@ describe.skipIf(process.platform !== 'darwin')(
           direction: 'decode',
           path: ['for'],
           message:
-            'References to "Person" have no conversion in this codec: the app does not find its objects at the application by their identifier',
+            'References to "Person" have no conversion in this codec: the app does not find its objects by their identifier',
           unsupportedKind: 'reference',
         },
       })

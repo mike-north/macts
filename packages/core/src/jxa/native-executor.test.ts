@@ -198,7 +198,7 @@ describe('createNativeExecutor', () => {
 
       it('merges the identifier plan with how the app finds the object, for each referenced resource only', async () => {
         // Contacts: a person is found by id in the app's people (manifest
-        // identifier `id`, default targeting); an email is found only under
+        // identifier `id`, default targeting); an email is found by id within
         // its person (its get records the person as parent).
         const contacts = await loadManifest(CONTACTS_MANIFEST)
         const references = await scriptReferences({
@@ -214,11 +214,31 @@ describe('createNativeExecutor', () => {
             id: { kind: 'string' },
             addressing: { collection: 'people', lookup: 'byId', property: 'id' },
           },
-          Email: { id: { kind: 'string' } },
+          Email: {
+            id: { kind: 'string' },
+            addressing: { collection: 'emails', lookup: 'byId', property: 'id', within: 'Person' },
+          },
         })
       })
 
-      it('matches by property for a resource targeted by property, and drops a parent-scoped one', async () => {
+      it('carries the parent a resource is found within, though no plan names it', async () => {
+        const contacts = await loadManifest(CONTACTS_MANIFEST)
+        const references = await scriptReferences({
+          manifest: contacts,
+          target: { command: 'actionTitle' },
+          input: { with: 'phone', for: 'p-1' },
+          inputPlan: PASSTHROUGH_PLAN,
+          outputPlan: reference('Email'),
+          resourcePlans: { Person: STRING_ID, Email: STRING_ID },
+        })
+        expect(Object.keys(references).sort()).toEqual(['Email', 'Person'])
+        expect(references['Person']).toEqual({
+          id: { kind: 'string' },
+          addressing: { collection: 'people', lookup: 'byId', property: 'id' },
+        })
+      })
+
+      it('matches by property for a resource targeted by property, within its parent too', async () => {
         // Music: playlists and tracks are both matched on `persistentID`
         // (`targeting: byProperty`); a track's get records its playlist.
         const music = await loadManifest(MUSIC_MANIFEST)
@@ -241,7 +261,15 @@ describe('createNativeExecutor', () => {
             id: { kind: 'string' },
             addressing: { collection: 'playlists', lookup: 'byProperty', property: 'persistentID' },
           },
-          Track: { id: { kind: 'string' } },
+          Track: {
+            id: { kind: 'string' },
+            addressing: {
+              collection: 'tracks',
+              lookup: 'byProperty',
+              property: 'persistentID',
+              within: 'Playlist',
+            },
+          },
         })
       })
 

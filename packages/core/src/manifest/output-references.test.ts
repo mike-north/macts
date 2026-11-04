@@ -3,10 +3,11 @@
  * `shelfManifest` for its cases). Expected values are written by hand from
  * phases/13 D7: an output reference is usable only through its target's
  * `get`, only when the target has a primary identifier, only when that `get`
- * records no parent, only when the hierarchy does not hold the target solely
- * within another resource while that `get` names no container, and only when
- * the target is not identified by a name its identifier does not claim
- * unique.
+ * records no parent or the field is read through a record of that parent and
+ * the parent is a valid container (top-level, with an identifier, not
+ * name-keyed), only when the hierarchy does not hold the target solely within
+ * another resource while that `get` names no container, and only when the
+ * target is not identified by a name its identifier does not claim unique.
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md §D7
  * @see https://github.com/mike-north/macts/issues/219
@@ -27,6 +28,7 @@ import {
   shelfManifest,
   shelfManifestWithBooksAlsoAtTheApplication,
   shelfManifestWithBooksInLibraries,
+  shelfManifestWithContainedFields,
   shelfManifestWithoutBookIdentifier,
   shelfManifestWithUniqueSeries,
 } from './test-support/shelf-output-references.js'
@@ -152,6 +154,70 @@ describe('omittedOutputReason for a target held only within a container', () => 
   })
 })
 
+describe('omittedOutputReason for a target got within its container, by the record holding the field', () => {
+  // phases/13 D7, container scoping: a native read hands the codec the record
+  // a field was read through as the reference's container, so a target whose
+  // get records a parent is usable exactly at a field of that parent, when
+  // the parent is itself a valid container.
+  const contained = shelfManifestWithContainedFields()
+
+  it('keeps a target read through a record of its parent, a top-level resource with an id', () => {
+    expect(omittedOutputReason(contained, 'Chapter', 'Book')).toBeUndefined()
+  })
+
+  it('leaves out a target read through a record of another resource', () => {
+    expect(omittedOutputReason(contained, 'Chapter', 'Library')).toBe('parent-scoped')
+  })
+
+  it('leaves out a target whose parent is itself got within a container, a nested chain', () => {
+    expect(omittedOutputReason(contained, 'Paragraph', 'Chapter')).toBe('parent-scoped')
+  })
+
+  it('leaves out a target whose parent is identified by a name not claimed unique', () => {
+    expect(omittedOutputReason(contained, 'Volume', 'Series')).toBe('parent-scoped')
+  })
+
+  it('keeps a target whose name-keyed parent claims its name unique, with evidence', () => {
+    const unique = shelfManifestWithContainedFields({ uniqueSeries: true })
+    expect(omittedOutputReason(unique, 'Volume', 'Series')).toBeUndefined()
+  })
+
+  it('leaves out a target with no record it is read through, as a command result has none', () => {
+    expect(omittedOutputReason(contained, 'Chapter')).toBe('parent-scoped')
+    const featuredChapter = contained.commands['featuredChapter']
+    if (featuredChapter === undefined) throw new Error('the fixture has no featuredChapter')
+    expect(omittedOutputResult(contained, featuredChapter)).toEqual({
+      target: 'Chapter',
+      reason: 'parent-scoped',
+    })
+  })
+
+  it('judges a top-level target the same whatever record holds the field', () => {
+    expect(omittedOutputReason(contained, 'Book', 'Library')).toBeUndefined()
+    expect(omittedOutputReason(contained, 'Series', 'Library')).toBe('not-unique')
+  })
+
+  it('keeps and leaves out exactly those record fields, and the result', () => {
+    expect(
+      omittedOutputPositions(contained)
+        .filter((found) => found.reason === 'parent-scoped')
+        .map(({ position }) => position)
+    ).toEqual([
+      'resources.Chapter.properties.firstParagraph',
+      'resources.Series.properties.latestVolume',
+      'resources.Library.properties.currentChapter',
+      'commands.featuredChapter.returns',
+    ])
+    const book = contained.resources['Book']
+    if (book === undefined) throw new Error('the fixture has no Book')
+    expect(outputProperties(contained, 'Book', book).map(([name]) => name)).toEqual([
+      'id',
+      'title',
+      'bookmark',
+    ])
+  })
+})
+
 describe('omittedOutput', () => {
   it('finds a reference macts cannot yet resolve bare, in an array, in a nullable, and nested', () => {
     const author = { target: 'Author', reason: 'no-get' }
@@ -195,7 +261,7 @@ describe('isNameKeyed', () => {
 
 describe('omittedOutputProperties and outputProperties', () => {
   it('leave out exactly the fields macts cannot yet resolve, and keep the rest in declaration order', () => {
-    expect([...omittedOutputProperties(manifest, resource('Library'))]).toEqual([
+    expect([...omittedOutputProperties(manifest, 'Library', resource('Library'))]).toEqual([
       ['currentChapter', { target: 'Chapter', reason: 'parent-scoped' }],
       ['topAuthor', { target: 'Author', reason: 'no-get' }],
       ['authors', { target: 'Author', reason: 'no-get' }],
@@ -203,17 +269,16 @@ describe('omittedOutputProperties and outputProperties', () => {
       ['genre', { target: 'Genre', reason: 'not-unique' }],
     ])
     // `retiredSeries` is marked unsupported, so it is on no surface at all.
-    expect(outputProperties(manifest, resource('Library')).map(([name]) => name)).toEqual([
-      'id',
-      'favoriteBook',
-    ])
+    expect(
+      outputProperties(manifest, 'Library', resource('Library')).map(([name]) => name)
+    ).toEqual(['id', 'favoriteBook'])
   })
 
   it('keep a reference to a name claimed unique', () => {
     const unique = shelfManifestWithUniqueSeries()
     const library = unique.resources['Library']
     if (library === undefined) throw new Error('the fixture has no Library')
-    expect(outputProperties(unique, library).map(([name]) => name)).toEqual([
+    expect(outputProperties(unique, 'Library', library).map(([name]) => name)).toEqual([
       'id',
       'favoriteBook',
       'series',
@@ -221,8 +286,8 @@ describe('omittedOutputProperties and outputProperties', () => {
   })
 
   it('leave out nothing of a resource with no reference fields', () => {
-    expect(omittedOutputProperties(manifest, resource('Book')).size).toBe(0)
-    expect(outputProperties(manifest, resource('Book')).map(([name]) => name)).toEqual([
+    expect(omittedOutputProperties(manifest, 'Book', resource('Book')).size).toBe(0)
+    expect(outputProperties(manifest, 'Book', resource('Book')).map(([name]) => name)).toEqual([
       'id',
       'title',
     ])

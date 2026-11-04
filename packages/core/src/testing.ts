@@ -5,8 +5,8 @@
  * somewhere other than the automation host, for example in an isolated
  * JavaScript context against a stand-in application: the composition of the
  * script the built-in transport runs, the reading of the outcome it prints,
- * a transport that runs that script against a stand-in application, and the
- * record keys the native get and list bodies read for a resource.
+ * a transport that runs that script against a stand-in application, a
+ * stand-in Chromium browser application, and the record keys the native get and list bodies read for a resource.
  * Tests in other macts packages use it to drive the real native executor end
  * to end with only the transport replaced.
  *
@@ -20,4 +20,11 @@
 
 export { composeNativeScript, parseNativeOutcome } from './jxa/executor.js'
 export { standInTransport } from './jxa/test-support/stand-in-app.js'
+export {
+  standInChromium,
+  STAND_IN_NEW_TAB_ID,
+  type StandInChromiumOptions,
+  type StandInTab,
+  type StandInWindow,
+} from './jxa/test-support/stand-in-chromium.js'
 export { nativeReadKeys, type NativeReadKeys } from './jxa/native-scripts.js'
