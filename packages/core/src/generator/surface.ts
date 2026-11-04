@@ -185,10 +185,10 @@ export function findResourceCreateCommand(
  * by (`unselectableItemCommands`), each naming the app and the command key and
  * saying what to declare.
  *
- * Every generator entry point checks this before it builds any file and
- * returns these errors with no files, so no generated interface takes an
- * identifier the manifest does not declare. Registration refuses the same
- * commands by the same rule.
+ * Every package and SDK generator checks this before it builds any file and
+ * returns these errors with no files, and `generateCapabilitiesModule` throws
+ * them, so no generated interface takes an identifier the manifest does not
+ * declare. Registration refuses the same commands by the same rule.
  */
 export function generationRefusals(manifest: AppManifest): string[] {
   return unselectableItemCommands(manifest).map(

@@ -14,6 +14,10 @@
  * stdout, keep files the generator never emitted, and leave the package as a
  * fresh generate would.
  *
+ * A manifest with a command that must name one item and declares no
+ * identifier parameter (phases/13 D5) is refused: the CLI prints the refusal,
+ * naming the app and the command, exits 1, and writes and prunes nothing.
+ *
  * @see https://github.com/mike-north/macts/issues/179
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md §D2 (generated contracts)
  */
@@ -56,8 +60,15 @@ const LIST_PAGES_COMMAND = `  listPages:
     resourceType: Page
 `
 
+/** An application-scoped delete with no parameters, which names no item. */
+const APPLICATION_DELETE_COMMAND = `  delete:
+    name: delete
+    description: Delete an object
+    scope: application
+`
+
 /** A manifest whose `Note.layout` names a resource the manifest does not declare. */
-function sketchpadManifest(layoutType: string, withPages = false): string {
+function sketchpadManifest(layoutType: string, withPages = false, extraCommands = ''): string {
   return `version: '1.0'
 app:
   bundleId: com.example.sketchpad
@@ -89,7 +100,7 @@ commands:
     description: List notes
     scope: resource
     resourceType: Note
-${withPages ? LIST_PAGES_COMMAND : ''}`
+${withPages ? LIST_PAGES_COMMAND : ''}${extraCommands}`
 }
 
 interface CliResult {
@@ -225,5 +236,82 @@ describe('macts generate (UAT): owned output', () => {
         (path) => !path.endsWith('CHANGELOG.md') && !path.endsWith('notes.test.ts')
       )
     ).toEqual(await tree(fresh))
+  }, 60_000)
+})
+
+describe('macts generate (UAT): a manifest the item-selection rule refuses', () => {
+  let dir = ''
+
+  beforeAll(() => {
+    if (!existsSync(binPath)) {
+      throw new Error(
+        `Built CLI not found at ${binPath}. Run \`pnpm --filter @macts/cli build\` before this UAT.`
+      )
+    }
+  })
+
+  afterEach(async () => {
+    if (dir !== '') await rm(dir, { recursive: true, force: true })
+    dir = ''
+  })
+
+  /** The refusal for {@link APPLICATION_DELETE_COMMAND}, written by hand from phases/13 D5. */
+  const REFUSAL =
+    'App "Sketchpad" cannot be generated from its manifest: its application-scoped delete command "delete" declares no identifier parameter. A delete acts on one item, selected by a required parameter, so without one no item can be selected. Scope "delete" to the resource whose items it deletes and declare the item\'s identifier as a required parameter.'
+
+  async function generateInto(outDir: string, extraCommands: string): Promise<CliResult> {
+    const manifestPath = join(dir, 'app.yaml')
+    await writeFile(manifestPath, sketchpadManifest('string', false, extraCommands))
+    return runCli(['generate', manifestPath, '--out-dir', outDir, '--target', 'all'])
+  }
+
+  /** Every file under `root` with its content, or an empty list when it does not exist. */
+  async function filesUnder(root: string): Promise<[string, string][]> {
+    if (!existsSync(root)) return []
+    const entries = await readdir(root, { recursive: true, withFileTypes: true })
+    const files = entries
+      .filter((entry) => entry.isFile())
+      .map((entry) => join(entry.parentPath, entry.name))
+      .sort()
+    return Promise.all(
+      files.map(
+        async (path): Promise<[string, string]> => [
+          path.slice(root.length + 1),
+          await readFile(path, 'utf-8'),
+        ]
+      )
+    )
+  }
+
+  // Guards the user-visible refusal: the error names the app and the command
+  // and says what to declare, the exit code is 1, and no file is written.
+  it('exits 1 naming the app and command, and writes no files', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'macts-generate-uat-'))
+    const out = join(dir, 'out')
+
+    const result = await generateInto(out, APPLICATION_DELETE_COMMAND)
+
+    expect(result.code).toBe(1)
+    expect(result.stderr).toContain(`Errors during generation:\n  - ${REFUSAL}\n`)
+    expect(result.stdout).not.toContain('Writing')
+    expect(await filesUnder(out)).toEqual([])
+  }, 60_000)
+
+  // Guards that a refusal never prunes: a package generated earlier from the
+  // same app is left exactly as it was, so a refused run cannot delete the
+  // files a previous run owns.
+  it('leaves a previously generated package untouched', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'macts-generate-uat-'))
+    const out = join(dir, 'out')
+    expect((await generateInto(out, '')).code).toBe(0)
+    const before = await filesUnder(out)
+    expect(before.length).toBeGreaterThan(0)
+
+    const refused = await generateInto(out, APPLICATION_DELETE_COMMAND)
+
+    expect(refused.code).toBe(1)
+    expect(refused.stderr).toContain(REFUSAL)
+    expect(refused.stdout).not.toContain('pruned')
+    expect(await filesUnder(out)).toEqual(before)
   }, 60_000)
 })

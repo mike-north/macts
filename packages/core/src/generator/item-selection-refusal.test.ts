@@ -4,14 +4,15 @@
  *
  * Such a command is a resource-scoped get, update or delete with no required
  * parameter other than its parent's, or a delete at application scope with no
- * parameters (phases/13 D5). Every generator entry point refuses it before it
- * builds a file, so no generated interface takes an identifier the manifest
- * does not declare. The expected messages are written by hand from the
- * stand-in manifests below.
+ * parameters (phases/13 D5). Every package and SDK generator refuses it before
+ * it builds a file, and the capability module generator refuses it too, so no
+ * generated interface takes an identifier the manifest does not declare. The
+ * expected messages are written by hand from the stand-in manifests below.
  */
 
 import { describe, expect, it } from 'vitest'
 import type { AppManifest } from '../manifest/index.js'
+import { generateCapabilitiesModule } from './capabilities/index.js'
 import { generateCliPlugin } from './cli/index.js'
 import { generateClientPackage } from './client/index.js'
 import { generateSdk } from './generate.js'
@@ -105,10 +106,9 @@ const ENTRY_POINTS: [string, (m: AppManifest) => { files: unknown[]; errors: str
 ]
 
 describe('generation refuses a command that cannot select its item', () => {
-  // Guards the removed fallback: before, every surface invented an `id`
-  // parameter for this get, so the generated client took an input the
-  // manifest never declared. Now nothing is generated, and the error names
-  // the app and the command and says what to declare.
+  // Guards that no generated surface takes an identifier the manifest does
+  // not declare: a get with none generates nothing, and the error names the
+  // app and the command and says what to declare.
   it.each(ENTRY_POINTS)('%s refuses a get with no identifier parameter', (_name, generate) => {
     const result = generate(PARAMETERLESS_GET)
     expect(result.errors).toEqual([GET_REFUSAL])
@@ -138,5 +138,30 @@ describe('generation refuses a command that cannot select its item', () => {
     const result = gen(declared)
     expect(result.errors).toEqual([])
     expect(result.files.length).toBeGreaterThan(0)
+  })
+})
+
+describe('generateCapabilitiesModule refuses a command that cannot select its item', () => {
+  // Guards that capability metadata is never emitted for a command the
+  // package generators refuse: the refusal is the same text, thrown.
+  it('refuses a get with no identifier parameter', () => {
+    expect(() => generateCapabilitiesModule(PARAMETERLESS_GET)).toThrow(GET_REFUSAL)
+  })
+
+  it('refuses an application-scoped delete with no parameters', () => {
+    expect(() => generateCapabilitiesModule(APPLICATION_DELETE)).toThrow(DELETE_REFUSAL)
+  })
+
+  it('describes the app once the identifier is declared', () => {
+    const declared = widgets({
+      getWidget: {
+        name: 'get',
+        description: 'Get a widget',
+        scope: 'resource',
+        resourceType: 'Widget',
+        parameters: [{ name: 'name', type: 'string', description: 'Name', required: true }],
+      },
+    })
+    expect(generateCapabilitiesModule(declared)).toContain('"name": "widgets.widgets.get"')
   })
 })
