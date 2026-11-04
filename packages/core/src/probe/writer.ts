@@ -128,8 +128,14 @@ export async function writeProbeResults(
  *
  * For each resource it upserts the `nullabilityProbe` block, and for each
  * property whose claim the merge sets or refreshes it upserts `nullable` and
- * `evidence.nullable`. Nothing else changes: `evidence.resettable`, claims the
- * merge left unchanged, and every other line keep their text.
+ * `evidence.nullable`: on the property's declaration, or, for a property the
+ * resource inherits from a superclass (D10, "Superclasses"), in a
+ * claims-only overlay, `inheritedClaims.<property>`, so the claim is the
+ * resource's own and the declaration stays the superclass's. Nothing else
+ * changes: `evidence.resettable`, claims the merge left unchanged, and every
+ * other line keep their text. A claim with nowhere to go (the resource
+ * neither declares nor inherits the property, or its evidence is not a
+ * mapping) is not written, and is reported in `notWritten`.
  *
  * A resource whose new probe read no item (out of time, unreachable, failed,
  * or empty) keeps an earlier `nullabilityProbe` block that did read items:
@@ -145,22 +151,29 @@ export async function writeNullabilityResults(
   merged: NullabilityMergeResult
 ): Promise<NullabilityWriteResult> {
   const keptEarlierBlocks: string[] = []
+  const notWritten: NotWrittenClaim[] = []
   await editManifest(manifestPath, (doc) => {
     for (const resource of merged.resources) {
       if (!hasResource(doc, resource.resource)) continue
       for (const outcome of resource.properties) {
         if (outcome.claim === undefined || outcome.change === 'unchanged') continue
-        const path = ['resources', resource.resource, 'properties', outcome.property]
-        if (!isMap(doc.getIn(path))) continue
-        doc.setIn([...path, 'nullable'], outcome.claim.nullable)
-        const evidence = doc.getIn([...path, 'evidence'])
+        const { resource: key } = resource
+        const { property } = outcome
+        const path = claimPath(doc, key, property)
+        if (path === undefined) {
+          notWritten.push({ resource: key, property, reason: 'not-declared' })
+          continue
+        }
+        const evidence: unknown = doc.getIn([...path, 'evidence'])
         if (
           evidence !== undefined &&
           !isMap(evidence) &&
           !(isScalar(evidence) && evidence.value === null)
         ) {
+          notWritten.push({ resource: key, property, reason: 'evidence-not-mapping' })
           continue
         }
+        doc.setIn([...path, 'nullable'], outcome.claim.nullable)
         doc.setIn([...path, 'evidence', 'nullable'], createNode(doc, outcome.claim.evidence))
       }
       const blockPath = ['resources', resource.resource, 'nullabilityProbe']
@@ -171,7 +184,47 @@ export async function writeNullabilityResults(
       doc.setIn(blockPath, createNode(doc, resource.block))
     }
   })
-  return { keptEarlierBlocks }
+  return { keptEarlierBlocks, notWritten }
+}
+
+/**
+ * Where a claim about `property` of `resourceKey` is written: the property's
+ * declaration, when the resource declares it; the resource's claims-only
+ * overlay for it, when the resource inherits it from a superclass; or
+ * `undefined`, when it does neither.
+ */
+function claimPath(
+  doc: Document,
+  resourceKey: string,
+  property: string
+): (string | number)[] | undefined {
+  const declared = ['resources', resourceKey, 'properties', property]
+  if (isMap(doc.getIn(declared))) return declared
+  if (doc.getIn(declared) !== undefined) return undefined
+  const seen = new Set([resourceKey])
+  let superclass: unknown = doc.getIn(['resources', resourceKey, 'inherits', 'resource'])
+  while (typeof superclass === 'string' && !seen.has(superclass)) {
+    if (isMap(doc.getIn(['resources', superclass, 'properties', property]))) {
+      return ['resources', resourceKey, 'inheritedClaims', property]
+    }
+    seen.add(superclass)
+    superclass = doc.getIn(['resources', superclass, 'inherits', 'resource'])
+  }
+  return undefined
+}
+
+/** A claim the probe decided on and {@link writeNullabilityResults} did not write. */
+export interface NotWrittenClaim {
+  /** The manifest key of the resource. */
+  readonly resource: string
+  /** The property the claim is about. */
+  readonly property: string
+  /**
+   * Why it has nowhere to go: `not-declared`, the resource neither declares
+   * nor inherits the property; `evidence-not-mapping`, the property's (or its
+   * overlay's) `evidence` is not a mapping, so a claim cannot be added to it.
+   */
+  readonly reason: 'not-declared' | 'evidence-not-mapping'
 }
 
 /** What {@link writeNullabilityResults} wrote. */
@@ -181,6 +234,12 @@ export interface NullabilityWriteResult {
    * `nullabilityProbe` block (which did read items) was kept, in merge order.
    */
   readonly keptEarlierBlocks: readonly string[]
+  /**
+   * Claims the merge set or refreshed that were not written, in merge order:
+   * the resource neither declares nor inherits the property, or the
+   * property's `evidence` is not a mapping.
+   */
+  readonly notWritten: readonly NotWrittenClaim[]
 }
 
 /** The `itemsRead` of an existing `nullabilityProbe` block node, or 0. */

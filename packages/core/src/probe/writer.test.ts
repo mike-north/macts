@@ -1016,3 +1016,112 @@ describe('writeNullabilityResults on committed manifests (regression)', () => {
     expect(written?.nullabilityProbe).toEqual(block)
   })
 })
+
+/**
+ * A manifest whose Book inherits Item (D10, "Superclasses"): Book declares no
+ * property, so its `size` exists only once the manifest is read flattened.
+ */
+const INHERITING_MANIFEST = `version: '1.0'
+app:
+  name: Catalog
+  bundleId: com.example.catalog
+resources:
+  Item:
+    name: Item
+    plural: Items
+    description: An item
+    properties:
+      id:
+        access: r
+        type: string
+        description: The id
+      size:
+        access: r
+        type: integer
+        description: The size
+    identifiers:
+      - property: id
+        primary: true
+  Book:
+    name: Book
+    plural: Books
+    description: A book
+    inherits:
+      resource: Item
+      evidence:
+        source: dictionary
+        bundleId: com.example.catalog
+        appVersion: '2.0'
+        osVersion: '27.2'
+        term: item
+hierarchy:
+  children: {}
+`
+
+describe('writeNullabilityResults: a property a resource inherits', () => {
+  /** The merge decisions of a Book probe that set `outcomes`. */
+  const bookDecisions = (...outcomes: PropertyMergeOutcome[]): NullabilityMergeResult => ({
+    bundleId: 'com.example.catalog',
+    appName: 'Catalog',
+    resources: [
+      {
+        resource: 'Book',
+        block: {
+          observedAt: OBSERVED_AT,
+          bundleId: 'com.example.catalog',
+          appVersion: '2.0',
+          osVersion: '27.2',
+          accessPath: 'books',
+          itemsRead: 40,
+          status: 'probed',
+          skipped: [],
+        },
+        properties: outcomes,
+      },
+    ],
+  })
+
+  it("writes the claim as the resource's claims-only overlay, leaving the superclass's declaration", async () => {
+    const path = join(dir, 'app.yaml')
+    await writeFile(path, INHERITING_MANIFEST)
+    const evidence = probeEvidence('com.example.catalog', '2.0', 40, 0)
+    const written = await writeNullabilityResults(
+      path,
+      bookDecisions(claimOutcome('size', 'set', evidence))
+    )
+
+    expect(written.notWritten).toEqual([])
+    const after = await readFile(path, 'utf-8')
+    const runs = insertedRuns(INHERITING_MANIFEST, after)
+    expect(runs.map((run) => Object.keys(parseBlock(run) as object))).toEqual([
+      ['inheritedClaims', 'nullabilityProbe'],
+    ])
+    expect((parseBlock(runs[0] ?? []) as Record<string, unknown>)['inheritedClaims']).toEqual({
+      size: { nullable: false, evidence: { nullable: evidence } },
+    })
+    const manifest = parseManifestYaml(after)
+    expect(manifest.resources['Book']?.properties['size']).toMatchObject({
+      description: 'The size',
+      nullable: false,
+      evidence: { nullable: evidence },
+    })
+    // The superclass's declaration is untouched.
+    expect(manifest.resources['Item']?.properties['size']?.nullable).toBeUndefined()
+  })
+
+  it('reports a claim about a property the resource neither declares nor inherits as not written', async () => {
+    const path = join(dir, 'app.yaml')
+    await writeFile(path, INHERITING_MANIFEST)
+    const evidence = probeEvidence('com.example.catalog', '2.0', 40, 0)
+    const written = await writeNullabilityResults(
+      path,
+      bookDecisions(claimOutcome('pages', 'set', evidence))
+    )
+
+    expect(written.notWritten).toEqual([
+      { resource: 'Book', property: 'pages', reason: 'not-declared' },
+    ])
+    const after = await readFile(path, 'utf-8')
+    expect(after).not.toContain('pages')
+  })
+})
