@@ -25,7 +25,13 @@
  * list is only checked to be an array, and no window is got. A window is got
  * only when one is listed.
  *
- * Nothing is created, changed, deleted, played or paused.
+ * Nothing is created, changed, deleted, played or paused, and nothing is
+ * written to TV. The suite leaves TV as it found it: it quits TV afterwards
+ * only when TV was not running before the suite started, so a TV the suite
+ * launched is closed again and one already open is left open. No source,
+ * playlist or window name or id is printed: identifiers are compared as
+ * booleans, so a failed comparison shows no value, and an output-contract
+ * failure reports only each issue's path and code.
  *
  * ## Why this cannot run in CI
  *
@@ -50,6 +56,8 @@
  * @see https://github.com/mike-north/macts/issues/219
  */
 
+import { execFileSync } from 'node:child_process'
+import { isDeepStrictEqual } from 'node:util'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { tvContract, type TVClient } from '@macts/tv/contract'
 import {
@@ -131,7 +139,10 @@ async function wireReader<Client>(contract: AppContract<Client>): Promise<WireRe
       })
       const wire = page === undefined ? result : { items: result }
       const parsed = operation.output.wire.safeParse(wire)
-      expect(parsed.success, `${id}: ${JSON.stringify(parsed.error?.issues)}`).toBe(true)
+      // Only each issue's path and code: an issue can carry the received
+      // value, which may be a name or an id from the library.
+      const issues = (parsed.error?.issues ?? []).map(({ path, code }) => ({ path, code }))
+      expect(parsed.success, `${id}: ${JSON.stringify(issues)}`).toBe(true)
       return wire
     },
   }
@@ -162,6 +173,16 @@ function firstWireItem(page: unknown): WireRecord | undefined {
     : undefined
 }
 
+/** Whether TV is running now: `pgrep` exits 0 when a process is named exactly TV. */
+function tvIsRunning(): boolean {
+  try {
+    execFileSync('pgrep', ['-x', 'TV'], { stdio: 'ignore' })
+    return true
+  } catch {
+    return false
+  }
+}
+
 /** A wire record's field, read without assuming the record's shape. */
 function field(record: unknown, key: string): unknown {
   return typeof record === 'object' && record !== null && !Array.isArray(record)
@@ -182,8 +203,11 @@ describe.skipIf(!liveAppsEnabled)('TV reads against TV.app (local only)', () => 
   ]
   let tv: TVClient
   let wire: WireReader
+  /** Whether TV was running before the suite's first call, so the suite did not launch it. */
+  let wasRunning = true
 
   beforeAll(async () => {
+    wasRunning = tvIsRunning()
     const key = await createApiKey({
       name: 'Live TV reads test',
       permissions: permissionsOf(tvContract, OPERATIONS),
@@ -192,6 +216,18 @@ describe.skipIf(!liveAppsEnabled)('TV reads against TV.app (local only)', () => 
     wire = await wireReader(tvContract)
   }, LIVE_TEST_TIMEOUT_MS)
 
+  afterAll(() => {
+    // Leave TV as the suite found it: quit it only when the suite launched it.
+    if (wasRunning) return
+    try {
+      execFileSync('osascript', ['-e', 'tell application id "com.apple.TV" to quit'], {
+        stdio: 'ignore',
+      })
+    } catch {
+      // TV already quit, or refused; nothing to restore.
+    }
+  })
+
   it(
     'lists sources and gets the first by its persistent ID',
     async () => {
@@ -199,11 +235,16 @@ describe.skipIf(!liveAppsEnabled)('TV reads against TV.app (local only)', () => 
       const first = sources.items[0]
       if (first === undefined) return
       const source = await tv.sources.get(first.persistentID)
-      expect(source.persistentID).toBe(first.persistentID)
+      expect(source.persistentID === first.persistentID, 'source persistent ID round-trips').toBe(
+        true
+      )
 
       await wire.read('tv.sources.list', {})
       const got = await wire.read('tv.sources.get', { persistentID: first.persistentID })
-      expect(field(got, 'persistentID')).toBe(first.persistentID)
+      expect(
+        field(got, 'persistentID') === first.persistentID,
+        'source persistent ID round-trips on the wire'
+      ).toBe(true)
     },
     LIVE_TEST_TIMEOUT_MS
   )
@@ -218,13 +259,19 @@ describe.skipIf(!liveAppsEnabled)('TV reads against TV.app (local only)', () => 
         const first = playlists.items[0]
         if (first === undefined) continue
         const playlist = await tv.playlists.get(source.persistentID, first.persistentID)
-        expect(playlist.persistentID).toBe(first.persistentID)
+        expect(
+          playlist.persistentID === first.persistentID,
+          'playlist persistent ID round-trips under its source'
+        ).toBe(true)
 
         const got = await wire.read('tv.playlists.get', {
           sourceId: source.persistentID,
           persistentID: first.persistentID,
         })
-        expect(field(got, 'persistentID')).toBe(first.persistentID)
+        expect(
+          field(got, 'persistentID') === first.persistentID,
+          'playlist persistent ID round-trips on the wire'
+        ).toBe(true)
       }
     },
     LIVE_TEST_TIMEOUT_MS
@@ -245,12 +292,13 @@ describe.skipIf(!liveAppsEnabled)('TV reads against TV.app (local only)', () => 
       const first = windows.items[0]
       if (first === undefined) return
       const window = await tv[resource].get(first.id)
-      expect(window.id).toBe(first.id)
+      expect(window.id === first.id, 'window id round-trips').toBe(true)
 
       // The wire form of the integer id, as the wire list returned it.
       const wireId = firstWireItem(listed)?.['id']
       if (wireId === undefined) throw new Error(`${listId} listed a window the wire list lacks`)
-      expect(field(await wire.read(getId, { id: wireId }), 'id')).toEqual(wireId)
+      const got = field(await wire.read(getId, { id: wireId }), 'id')
+      expect(isDeepStrictEqual(got, wireId), 'window id round-trips on the wire').toBe(true)
     },
     LIVE_TEST_TIMEOUT_MS
   )
