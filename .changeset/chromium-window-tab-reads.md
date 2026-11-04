@@ -11,5 +11,3 @@ Google Chrome windows and tabs can now be read:
 A window or tab id identifies it within one browser session: ids start over when the browser is relaunched, so an id kept across a relaunch may name a different window or tab, not merely fail to find one. Nothing shows an id changing while the browser keeps running.
 
 Breaking change in Microsoft Edge: `tabs.get` now takes the tab's window as well as its id, `tabs.get(windowId, id)`, and the CLI's `windows tabs get` takes `--window-id`. Edge, like Chrome, has no list of every tab, so a tab can be read only within its window; before, the read looked for the tab in a list Edge does not have. This follows Edge's scripting dictionary and has not been verified on an installed Edge.
-
-Breaking change in Microsoft Edge: a window's `activeTab` is removed from Edge window records, so code that reads `window.activeTab` no longer compiles. Before, it was returned, but a caller could not use it to read the tab. It is also left out of Chrome window records. macts cannot yet return a reference to a tab together with its window; `activeTab` is planned to come back once it can.

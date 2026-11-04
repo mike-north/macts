@@ -24,7 +24,6 @@ Breaking change: these record fields are gone from the HTTP client's read types 
 
 - Arc: Window `activeTab` and `activeSpace`.
 - Finder: FinderWindow `listViewOptions`, and ListViewOptions `sortColumn`.
-- Google Chrome: Window `activeTab`.
 - iTerm: Window `currentTab` and `currentSession`, and Tab `currentSession`.
 - Mail:
   - Message `mailbox` and `content`;
