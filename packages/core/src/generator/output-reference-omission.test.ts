@@ -11,7 +11,9 @@
  * contract, the HTTP client, the CLI and the native reads, with a generation
  * warning citing #219; so is one holding a reference to a resource identified
  * by a name its primary identifier does not claim unique, while the same
- * resource with a `unique: true` claim is declared;
+ * resource with a `unique: true` claim is declared; so is one holding a
+ * reference to a resource the hierarchy holds only within another resource,
+ * when that resource's `get` names no container;
  * input positions follow their own rule and are still generated.
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md §D7
@@ -22,6 +24,8 @@ import { describe, expect, it } from 'vitest'
 import { buildNativeBody } from '../jxa/native-scripts.js'
 import {
   shelfManifest,
+  shelfManifestWithBooksAlsoAtTheApplication,
+  shelfManifestWithBooksInLibraries,
   shelfManifestWithoutBookIdentifier,
   shelfManifestWithUniqueSeries,
 } from '../manifest/test-support/shelf-output-references.js'
@@ -185,6 +189,64 @@ describe('a resource with a get but no identifier', () => {
           'shelf: commands.featuredBook.returns: the result of "featuredBook" is left out of output for now: it holds a reference to "Book", and macts has no identifier for "Book" yet (#219).',
       },
     ])
+  })
+})
+
+describe('a resource held only within a container its get does not name', () => {
+  // Books are held only within a library, and getBook records no parent, so
+  // a book reference read from the app could not be resolved.
+  const generated = generateContract(shelfManifestWithBooksInLibraries())
+  const text = fileOf(generated.files, CONTRACT_MODULE_PATH)
+
+  it('leaves out the field and the result that reference it, without failing', () => {
+    expect(generated.errors).toEqual([])
+    expect(declaration(text, /export interface Library \{[\s\S]*?\n\}/)).not.toContain(
+      'favoriteBook'
+    )
+    expect(declaration(text, / {2}id: 'shelf\.app\.featuredBook',[\s\S]*?\n\}/)).toContain(
+      '  output: t.none(),'
+    )
+  })
+
+  it('warns about each, with the unrecorded-parent reason', () => {
+    const book = generated.diagnostics.filter(
+      (diagnostic) => diagnostic.kind === 'omitted-output' && diagnostic.target === 'Book'
+    )
+    expect(book).toEqual([
+      {
+        kind: 'omitted-output',
+        app: 'shelf',
+        position: 'resources.Library.properties.favoriteBook',
+        target: 'Book',
+        reason: 'unrecorded-parent',
+        message:
+          'shelf: resources.Library.properties.favoriteBook: the Library field "favoriteBook" is left out of output for now: it holds a reference to "Book", which the app holds only within a container, and macts\'s get for "Book" does not name that container yet (#219).',
+      },
+      {
+        kind: 'omitted-output',
+        app: 'shelf',
+        position: 'commands.featuredBook.returns',
+        target: 'Book',
+        reason: 'unrecorded-parent',
+        message:
+          'shelf: commands.featuredBook.returns: the result of "featuredBook" is left out of output for now: it holds a reference to "Book", which the app holds only within a container, and macts\'s get for "Book" does not name that container yet (#219).',
+      },
+    ])
+  })
+
+  it('keeps both, and warns about neither, when the application holds books too', () => {
+    const also = generateContract(shelfManifestWithBooksAlsoAtTheApplication())
+    expect(
+      declaration(
+        fileOf(also.files, CONTRACT_MODULE_PATH),
+        /export interface Library \{[\s\S]*?\n\}/
+      )
+    ).toContain("  readonly favoriteBook: ObjectReferenceVariant<Book, string, 'Book'> | null")
+    expect(
+      also.diagnostics.filter(
+        (diagnostic) => diagnostic.kind === 'omitted-output' && diagnostic.target === 'Book'
+      )
+    ).toEqual([])
   })
 })
 

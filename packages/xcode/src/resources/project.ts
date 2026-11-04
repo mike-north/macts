@@ -29,9 +29,9 @@ export class ProjectResourceClient {
   }
 
   /**
-   * Get a project by id.
+   * Get a project by id within a parent scope.
    */
-  async get(id: string): Promise<Project> {
-    return this.#http.rpc<Project>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(workspaceName: string, id: string): Promise<Project> {
+    return this.#http.rpc<Project>(`${this.#app}.${this.#resource}.get`, { workspaceName, id })
   }
 }

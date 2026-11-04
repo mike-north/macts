@@ -27,7 +27,6 @@ import {
   type FileValue,
   type Integer,
   type ObjectReferenceData,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
   type Page,
   type ResourceDescriptor,
@@ -75,11 +74,6 @@ export interface WorkspaceDocument {
    * Nullable. No evidence that the app always sets it.
    */
   readonly loaded: boolean | null
-  /**
-   * The workspace's scheme that will be used for scheme actions.
-   * Nullable. No evidence that the app always sets it.
-   */
-  activeScheme: ObjectReferenceVariant<Scheme, string, 'Scheme'> | null
 }
 
 /** A document that represents a file on disk */
@@ -226,11 +220,6 @@ export interface Target {
    * Nullable. No evidence that the app always sets it.
    */
   name: string | null
-  /**
-   * The project that contains this target.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly project: ObjectReferenceVariant<Project, string, 'Project'> | null
 }
 
 /**
@@ -1039,11 +1028,12 @@ export interface ProjectResourceClient {
    */
   list(workspaceName: string, options?: CallOptions): Promise<Page<Project>>
   /**
-   * Read the project identified by `id`.
+   * Read the project identified by `id` within `workspaceName`.
    *
+   * @param workspaceName - Workspace document name. Does not accept null.
    * @param id - Project identifier. Does not accept null.
    */
-  get(id: string, options?: CallOptions): Promise<Project>
+  get(workspaceName: string, id: string, options?: CallOptions): Promise<Project>
 }
 
 /**
@@ -1057,11 +1047,12 @@ export interface SchemeResourceClient {
    */
   list(workspaceName: string, options?: CallOptions): Promise<Page<Scheme>>
   /**
-   * Read the scheme identified by `id`.
+   * Read the scheme identified by `id` within `workspaceName`.
    *
+   * @param workspaceName - Workspace document name. Does not accept null.
    * @param id - Scheme identifier. Does not accept null.
    */
-  get(id: string, options?: CallOptions): Promise<Scheme>
+  get(workspaceName: string, id: string, options?: CallOptions): Promise<Scheme>
 }
 
 /**
@@ -1076,11 +1067,12 @@ export interface RunDestinationResourceClient {
    */
   list(workspaceName: string, options?: CallOptions): Promise<Page<RunDestination>>
   /**
-   * Read the run destination identified by `name`.
+   * Read the run destination identified by `name` within `workspaceName`.
    *
+   * @param workspaceName - Workspace document name. Does not accept null.
    * @param name - Run destination name. Does not accept null.
    */
-  get(name: string, options?: CallOptions): Promise<RunDestination>
+  get(workspaceName: string, name: string, options?: CallOptions): Promise<RunDestination>
 }
 
 /**
@@ -1121,10 +1113,6 @@ const workspaceDocumentRecordType: ValueType<WorkspaceDocument> = t.record(
     loaded: t.nullable(t.boolean(), {
       description: 'Whether the workspace document has finished loading after being opened',
     }),
-    activeScheme: t.nullable(
-      t.reference<Scheme, string, 'Scheme'>(() => xcodeContract, 'Scheme', 'one'),
-      { description: "The workspace's scheme that will be used for scheme actions" }
-    ),
   },
   {
     description:
@@ -1191,19 +1179,19 @@ export type XcodeResources = Readonly<{
     readonly id: ValueType<string>
     readonly get: 'xcode.projects.get'
     readonly list: 'xcode.projects.list'
-    readonly parents: { readonly list: 'WorkspaceDocument' }
+    readonly parents: { readonly get: 'WorkspaceDocument'; readonly list: 'WorkspaceDocument' }
   }
   Scheme: ResourceDescriptor<Scheme, string> & {
     readonly id: ValueType<string>
     readonly get: 'xcode.schemes.get'
     readonly list: 'xcode.schemes.list'
-    readonly parents: { readonly list: 'WorkspaceDocument' }
+    readonly parents: { readonly get: 'WorkspaceDocument'; readonly list: 'WorkspaceDocument' }
   }
   RunDestination: ResourceDescriptor<RunDestination, string> & {
     readonly id: ValueType<string>
     readonly get: 'xcode.runDestinations.get'
     readonly list: 'xcode.runDestinations.list'
-    readonly parents: { readonly list: 'WorkspaceDocument' }
+    readonly parents: { readonly get: 'WorkspaceDocument'; readonly list: 'WorkspaceDocument' }
   }
 }>
 
@@ -1229,7 +1217,7 @@ const resources = {
     id: t.string({ description: 'The unique identifier for the project' }),
     get: 'xcode.projects.get',
     list: 'xcode.projects.list',
-    parents: { list: 'WorkspaceDocument' },
+    parents: { get: 'WorkspaceDocument', list: 'WorkspaceDocument' },
   },
   Scheme: {
     name: 'Scheme',
@@ -1237,7 +1225,7 @@ const resources = {
     id: t.string({ description: 'The unique identifier for the scheme' }),
     get: 'xcode.schemes.get',
     list: 'xcode.schemes.list',
-    parents: { list: 'WorkspaceDocument' },
+    parents: { get: 'WorkspaceDocument', list: 'WorkspaceDocument' },
   },
   RunDestination: {
     name: 'RunDestination',
@@ -1247,7 +1235,7 @@ const resources = {
     }),
     get: 'xcode.runDestinations.get',
     list: 'xcode.runDestinations.list',
-    parents: { list: 'WorkspaceDocument' },
+    parents: { get: 'WorkspaceDocument', list: 'WorkspaceDocument' },
   },
 } satisfies XcodeResources
 
@@ -1311,20 +1299,27 @@ const projectListProjectsOperation: OperationDescriptor<
   },
 }
 
-const projectGetProjectOperation: OperationDescriptor<{ readonly id: string }, Project> = {
+const projectGetProjectOperation: OperationDescriptor<
+  { readonly workspaceName: string; readonly id: string },
+  Project
+> = {
   id: 'xcode.projects.get',
   permission: 'xcode:projects:get',
   target: { command: 'getProject', resource: 'Project' },
-  description: 'Get a project by ID',
+  description: 'Get a project of a workspace by ID',
   input: t.record({
+    workspaceName: t.string({ description: 'Workspace document name' }),
     id: t.string({ description: 'Project identifier' }),
   }),
   output: projectRecordType,
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { id: { type: 'string', description: 'Project identifier' } },
-    required: ['id'],
+    properties: {
+      workspaceName: { type: 'string', description: 'Workspace document name' },
+      id: { type: 'string', description: 'Project identifier' },
+    },
+    required: ['workspaceName', 'id'],
     additionalProperties: false,
   },
 }
@@ -1350,20 +1345,27 @@ const schemeListSchemesOperation: OperationDescriptor<
   },
 }
 
-const schemeGetSchemeOperation: OperationDescriptor<{ readonly id: string }, Scheme> = {
+const schemeGetSchemeOperation: OperationDescriptor<
+  { readonly workspaceName: string; readonly id: string },
+  Scheme
+> = {
   id: 'xcode.schemes.get',
   permission: 'xcode:schemes:get',
   target: { command: 'getScheme', resource: 'Scheme' },
-  description: 'Get a scheme by ID',
+  description: 'Get a scheme of a workspace by ID',
   input: t.record({
+    workspaceName: t.string({ description: 'Workspace document name' }),
     id: t.string({ description: 'Scheme identifier' }),
   }),
   output: schemeRecordType,
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { id: { type: 'string', description: 'Scheme identifier' } },
-    required: ['id'],
+    properties: {
+      workspaceName: { type: 'string', description: 'Workspace document name' },
+      id: { type: 'string', description: 'Scheme identifier' },
+    },
+    required: ['workspaceName', 'id'],
     additionalProperties: false,
   },
 }
@@ -1390,22 +1392,26 @@ const runDestinationListRunDestinationsOperation: OperationDescriptor<
 }
 
 const runDestinationGetRunDestinationOperation: OperationDescriptor<
-  { readonly name: string },
+  { readonly workspaceName: string; readonly name: string },
   RunDestination
 > = {
   id: 'xcode.runDestinations.get',
   permission: 'xcode:runDestinations:get',
   target: { command: 'getRunDestination', resource: 'RunDestination' },
-  description: 'Get a run destination by name',
+  description: 'Get a run destination of a workspace by name',
   input: t.record({
+    workspaceName: t.string({ description: 'Workspace document name' }),
     name: t.string({ description: 'Run destination name' }),
   }),
   output: runDestinationRecordType,
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { name: { type: 'string', description: 'Run destination name' } },
-    required: ['name'],
+    properties: {
+      workspaceName: { type: 'string', description: 'Workspace document name' },
+      name: { type: 'string', description: 'Run destination name' },
+    },
+    required: ['workspaceName', 'name'],
     additionalProperties: false,
   },
 }
@@ -1967,18 +1973,20 @@ function bind(runtime: ClientRuntime): XcodeClient {
     projects: {
       list: (workspaceName, options) =>
         runtime.invoke(projectListProjectsOperation, { workspaceName }, options),
-      get: (id, options) => runtime.invoke(projectGetProjectOperation, { id }, options),
+      get: (workspaceName, id, options) =>
+        runtime.invoke(projectGetProjectOperation, { workspaceName, id }, options),
     },
     schemes: {
       list: (workspaceName, options) =>
         runtime.invoke(schemeListSchemesOperation, { workspaceName }, options),
-      get: (id, options) => runtime.invoke(schemeGetSchemeOperation, { id }, options),
+      get: (workspaceName, id, options) =>
+        runtime.invoke(schemeGetSchemeOperation, { workspaceName, id }, options),
     },
     runDestinations: {
       list: (workspaceName, options) =>
         runtime.invoke(runDestinationListRunDestinationsOperation, { workspaceName }, options),
-      get: (name, options) =>
-        runtime.invoke(runDestinationGetRunDestinationOperation, { name }, options),
+      get: (workspaceName, name, options) =>
+        runtime.invoke(runDestinationGetRunDestinationOperation, { workspaceName, name }, options),
     },
   }
 }

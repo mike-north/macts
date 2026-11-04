@@ -1463,10 +1463,11 @@ an object of another resource: their command records a parent (D10, command
 parents) and takes that parent's identifier. Music gets and lists tracks
 within a playlist; Contacts addresses, emails and phones within a person;
 Calendar events within a calendar; Google Chrome and Microsoft Edge tabs within
-a window; TV playlists within a source. Reminders lists reminders only within a
-list but gets one at the application, and Automator, Microsoft Edge (bookmark
-items), OmniGraffle and Xcode list some resources only within a parent in the
-same way. A reference resolved through such an operation can be resolved only
+a window; TV playlists within a source; Xcode projects, schemes and run
+destinations within a workspace document. Reminders lists reminders only
+within a list but gets one at the application, and Automator, Microsoft Edge
+(bookmark items) and OmniGraffle list some resources only within a parent in
+the same way. A reference resolved through such an operation can be resolved only
 when it carries the parent's identifier, so its `container` is required and
 must be an identity reference to that operation's parent. A reference takes the
 parent of the operation that resolves it: a single-object reference in either
@@ -1550,6 +1551,14 @@ needs its target's `get`. macts cannot yet return a usable reference when:
   not return containers yet (container scoping, below; #242), so a reference
   read from the app to a target identified only within its container could
   not be resolved;
+- that `get` records no parent, but the manifest hierarchy holds the target
+  only within another resource and never at the application, so the `get`
+  looks for it in a collection the app does not have; what is missing is the
+  parent the `get` does not record (`unrecorded-parent`). The hierarchy is
+  the manifest's record of the app's element containment, and one helper
+  reads it for this rule and for the command-parent guard (D10). When the
+  hierarchy places the target nowhere, it cannot say where the target lives,
+  and this case does not apply;
 - or macts identifies the target by its name, and the manifest has no
   evidence yet that the name is unique (name-keyed resources, below), so the
   reference would resolve to whichever object has that name, not necessarily
@@ -1571,8 +1580,22 @@ curated `get` cannot serve:
   position within its container, once output references carry containers
   (#242).
 
-Xcode's workspace document `activeRunDestination` stays left out until
-evidence shows that a run destination's name identifies one object.
+Xcode's workspace document `activeScheme` and `activeRunDestination`, and a
+target's `project`, are left out as container-scoped: Xcode gets a scheme, a
+run destination and a project only within its workspace document. Returning
+containers is not enough to bring them back, because the container itself
+needs an evidenced identity. A workspace document is targeted by name today,
+and its name likely cannot be shown unique: two checkouts of the same project
+can be open at once under one name. Its container identity is its `path`
+instead, a location identity: in the scripting dictionary a path is unique
+among open documents and is how the app itself addresses a document. These
+fields come back once a workspace document is curated by its path, with
+evidence (looked up by path directly if the app supports it, otherwise matched
+on `path`), and references carry their container. `activeRunDestination` also needs evidence that a run
+destination's name identifies one object within its workspace. Run
+destination names likely repeat within one workspace (the same simulator name
+on two runtimes), so a live check across two or more runtimes must come
+before any uniqueness claim.
 
 A position that holds such a reference anywhere, bare, in an array, or as the
 non-null case of a nullable value, is left out of output for now; generation
@@ -1589,8 +1612,9 @@ resolved yet. Leaving it out means:
   (or the command), the target and what macts does not provide yet, for
   example "macts has no get for "Mailbox" yet". Every warning cites #219.
   The position returns on regeneration once coverage closes the gap: a `get`
-  for the target that records no parent and an identifier, returned
-  containers (#242), or a unique claim with evidence.
+  for the target that records no parent and an identifier, the parent a
+  nested target's `get` needs, returned containers (#242), or a unique claim
+  with evidence.
 
 Input positions follow the input rule above, so a field left out of output
 may still be settable through create and update. The contract, HTTP client
@@ -1642,7 +1666,13 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   parent. A native read emits a container exactly when resolving the object
   by id needs that parent. An object that is identified globally but reached
   only through a container emits no container. Examples are Arc spaces, iTerm
-  sessions, and nested Photos folders. Native reads emit no container yet, so
+  sessions, and nested Photos folders. Xcode schemes, run destinations and
+  projects are container-scoped: each is got within its workspace document,
+  because there is no evidence that scheme or project ids are unique across
+  workspaces. That is the same bar as iTerm's sessions: an object reached
+  through a path of containers is identified globally only with evidence
+  that its id is unique across the app.
+  Native reads emit no container yet, so
   an output position whose target's identity is scoped to its container is
   left out of output (resolvable targets, above) until reads emit containers
   (#242).
@@ -2374,7 +2404,7 @@ The probes (`macts probe`, identifiers and `--nullability`) address the app the 
 
 Every surface takes the parent from the record. Native bodies address the parent resource's collection (`resolveCollectionAccessor`), the parent item in it by that resource's identifier targeting, the command's resource collection under that item, and a get, update or delete's item in it by the command resource's identifier targeting (D4, command parents); a command with no parent addresses its resource at the application. The generated SDKs, the contract and the CLI take a get, update or delete's parent scope from `parent.parameter`, and the child identifier is the first other required parameter (`resolveIdParams` in `generator/surface.ts`).
 
-**A guard holds every shipped manifest to the rule** (`manifest/command-parents.test.ts`). Every usable list, get, create, update or delete command on a resource the hierarchy nests under another resource, and does not also place at the application (`usableHierarchyChildren` of the top-level entries), records a parent; only those shapes address a collection. A recorded parent must hold the command's resource in the hierarchy. A resource the hierarchy does not place has no parent to record and is not checked. The only exceptions are the nested commands whose parent awaits a design decision, [#173](https://github.com/mike-north/macts/issues/173): Microsoft Edge's `getBookmarkItem`; OmniGraffle's `getGraphic`, `getShape`, `getLine` and `getLayer`; OmniPlan's task, milestone, resource, assignment, dependency, violation and scenario commands; Xcode's `getProject`, `getScheme` and `getRunDestination`; and OmniFocus's `listTasks`, `getTask` and `createTask`. The list is exact: an entry that records a parent, or whose resource becomes a top-level child, fails the guard until it is removed.
+**A guard holds every shipped manifest to the rule** (`manifest/command-parents.test.ts`). Every usable list, get, create, update or delete command on a resource the hierarchy nests under another resource, and does not also place at the application (`nestedOnlyResources` in `manifest/hierarchy-placement.ts`, the same helper the output rule's `unrecorded-parent` case reads), records a parent; only those shapes address a collection. A recorded parent must hold the command's resource in the hierarchy. A resource the hierarchy does not place has no parent to record and is not checked. The only exceptions are the nested commands whose parent awaits a design decision, [#173](https://github.com/mike-north/macts/issues/173): Microsoft Edge's `getBookmarkItem`; OmniGraffle's `getGraphic`, `getShape`, `getLine` and `getLayer`; OmniPlan's task, milestone, resource, assignment, dependency, violation and scenario commands; and OmniFocus's `listTasks`, `getTask` and `createTask`. The list is exact: an entry that records a parent, or whose resource becomes a top-level child, fails the guard until it is removed.
 
 ### Identifier targeting
 

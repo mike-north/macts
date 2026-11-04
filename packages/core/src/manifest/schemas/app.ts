@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { ResourceSchema } from './resource.js'
 import { EnumSchema } from './enum.js'
 import { CommandSchema } from './command.js'
-import { HierarchySchema } from './hierarchy.js'
+import { HierarchySchema, type HierarchyChild } from './hierarchy.js'
 import { RelationshipSchema } from './relationship.js'
 import { AppMetadataSchema, SuiteSchema, ExtractionMetadataSchema } from './metadata.js'
 import { findDuplicateRoutes } from '../route.js'
@@ -87,6 +87,34 @@ function findCommandParentIssues(
 }
 
 /**
+ * The issues of every hierarchy entry, at any depth, whose `resource` is not a
+ * key of `resources`. The hierarchy is the manifest's record of the app's
+ * element containment, and the containment checks read it by resource key
+ * (`../hierarchy-placement.ts`), so an entry naming no declared resource
+ * places nothing: a misspelt key would silently exempt the resource it meant
+ * from the command-parent guard and the output reference rule.
+ */
+function findHierarchyResourceIssues(
+  manifest: Pick<AppManifest, 'resources' | 'hierarchy'>
+): ManifestIssue[] {
+  const issues: ManifestIssue[] = []
+  const walk = (children: Record<string, HierarchyChild>, path: string[]): void => {
+    for (const [key, child] of Object.entries(children)) {
+      const entryPath = [...path, key]
+      if (!Object.hasOwn(manifest.resources, child.resource)) {
+        issues.push({
+          message: `${[...entryPath, 'resource'].join('.')}: "${child.resource}" is not a resource the manifest declares; name the key of the resource whose items this collection holds.`,
+          path: [...entryPath, 'resource'],
+        })
+      }
+      if (child.children !== undefined) walk(child.children, [...entryPath, 'children'])
+    }
+  }
+  walk(manifest.hierarchy.children, ['hierarchy', 'children'])
+  return issues
+}
+
+/**
  * Top-level manifest schema for a macOS application.
  * This is the complete representation of an app's scriptable interface.
  */
@@ -142,6 +170,9 @@ export const AppManifestSchema = z
       })
     }
     for (const issue of findCommandParentIssues(data)) {
+      ctx.addIssue({ code: 'custom', ...issue })
+    }
+    for (const issue of findHierarchyResourceIssues(data)) {
       ctx.addIssue({ code: 'custom', ...issue })
     }
   })
