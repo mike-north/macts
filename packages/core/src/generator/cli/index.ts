@@ -65,6 +65,12 @@ export function generateCliPlugin(
         return chosen !== undefined && available(chosen)
       }
 
+      // A singleton root has only its get.
+      if (hierarchyPath.root !== undefined) {
+        if (hasOp('get')) commands.push(generateGetCommand(hierarchyPath, ctx))
+        continue
+      }
+
       // List command
       if (hasOp('list')) {
         commands.push(generateListCommand(hierarchyPath, ctx))

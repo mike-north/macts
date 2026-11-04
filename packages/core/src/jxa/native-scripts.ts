@@ -399,6 +399,9 @@ function buildCommandCallBody(command: Command, resultLocal = false): string {
  *   the declared identifier fails at run time (Calendar's
  *   `calendarIdentifier`), so the item is matched on a working property such as
  *   `name`. The property is named by the app's spelling of it.
+ * - `byKey`: `app["<plural>"].byName(<value>)`, the collection's key
+ *   specifier, which the app interprets (an app that keys files by path finds
+ *   whatever file is at that path).
  *
  * @param resourcePlural - The collection's accessor in the app (see
  *   `resolveCollectionAccessor`).
@@ -419,7 +422,8 @@ export function buildTargetExpression(
  * {@link buildTargetExpression}:
  *
  * - `byId`: `<parentTarget>["<childPlural>"].byId(<childId>)`;
- * - `byProperty`: `<parentTarget>["<childPlural>"].whose({ "<property>": <childId> })[0]`.
+ * - `byProperty`: `<parentTarget>["<childPlural>"].whose({ "<property>": <childId> })[0]`;
+ * - `byKey`: `<parentTarget>["<childPlural>"].byName(<childId>)`.
  *
  * Calendar events are reachable only this way. `app.events.byId(uid)` builds a
  * specifier that fails with "no such object" when used, because events are not
@@ -450,6 +454,9 @@ function lookupInCollection(
   if (lookup?.lookup === 'byProperty') {
     return `${collection}.whose({ ${literal(lookup.property)}: ${valueExpression} })[0]`
   }
+  // The bridge spells the key specifier `byName`, whatever the key means to
+  // the app: here it carries the identifier value, never an item's name.
+  if (lookup?.lookup === 'byKey') return `${collection}.byName(${valueExpression})`
   return `${collection}.byId(${valueExpression})`
 }
 
@@ -1366,7 +1373,8 @@ function buildListBody(
  * Read one item's usable properties into a record keyed by their public names
  * (see {@link readOutputProperties}). A command that records a parent
  * addresses the item under the parent item; any other addresses it at the
- * application. The item must exist (see
+ * application. A singleton root's item is the application property that
+ * holds it, so its get reads no identifier. The item must exist (see
  * {@link failIfMissing}) before any property is read.
  */
 function buildGetBody(
@@ -1375,6 +1383,16 @@ function buildGetBody(
   resourcePlural: string,
   manifest: AppManifest
 ): ResourceBody {
+  const root = resource?.root
+  if (root !== undefined) {
+    const body = lines(
+      `var item = ${member('app', root.property)};`,
+      failIfMissing('item'),
+      readOutputProperties(manifest, resource, 'item'),
+      'return obj;'
+    )
+    return { body, identifierArguments: [] }
+  }
   const parentScope = recordedParentScope(command, manifest)
   const identifierParam = resolveIdentifierParam(command, parentScope)
   const bindItem = bindTarget(command, resource, resourcePlural, parentScope, identifierParam)

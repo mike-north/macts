@@ -1,4 +1,11 @@
-import type { AppManifest, Resource, Command, Enum, HierarchyChild } from '../../manifest/index.js'
+import type {
+  AppManifest,
+  Resource,
+  ResourceRoot,
+  Command,
+  Enum,
+  HierarchyChild,
+} from '../../manifest/index.js'
 import {
   isUnsupportedResourceKey,
   usableCommands,
@@ -44,7 +51,10 @@ export interface CliGeneratorContext {
   /** Get application class name (PascalCase) */
   getAppClassName(): string
 
-  /** Get the hierarchy as a flat list of paths */
+  /**
+   * Get the hierarchy as a flat list of paths, followed by one path per
+   * singleton root, at the application property that holds it.
+   */
   getHierarchyPaths(): HierarchyPath[]
 
   /**
@@ -73,6 +83,13 @@ export interface HierarchyPath {
   canCreate: boolean
   /** Parameter names needed to reach this path (e.g., ['calendarId'] for events) */
   parentParams: ParentParam[]
+  /**
+   * The application property holding the resource's one object, when the
+   * path reaches a singleton root rather than a collection. Its segment is
+   * the property, as a hierarchy key is its collection, and only a get is
+   * generated under it.
+   */
+  root?: ResourceRoot | undefined
 }
 
 export interface ParentParam {
@@ -98,6 +115,19 @@ export function createCliGeneratorContext(
   // Build hierarchy paths
   const hierarchyPaths: HierarchyPath[] = []
   buildHierarchyPaths(manifest, manifest.hierarchy.children, [], [], hierarchyPaths)
+  // A singleton root is in no collection, so no hierarchy entry names it; it
+  // is reached at the application property that holds it.
+  for (const [resourceName, resource] of resourceMap) {
+    const root = resource.root
+    if (root === undefined) continue
+    hierarchyPaths.push({
+      path: [root.property],
+      resourceName,
+      canCreate: false,
+      parentParams: [],
+      root,
+    })
+  }
 
   return {
     manifest,

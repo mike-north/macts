@@ -62,13 +62,15 @@ export function resolvePrimaryIdentifierProperty(
 export interface IdentifierTargetingResolution {
   /**
    * The targeting strategy: `byId` emits a JXA `byId(value)` lookup; `byProperty`
-   * emits a `whose({ <property>: value })[0]` lookup.
+   * emits a `whose({ <property>: value })[0]` lookup; `byKey` emits the
+   * collection's key specifier applied to the value.
    */
   strategy: IdentifierTargeting
   /**
    * The runtime property to read for list output and to match against for a
-   * `byProperty` lookup. For `byId` this is the identifier property; for
-   * `byProperty` it is `runtimeProperty` when set, else the identifier property.
+   * `byProperty` lookup. For `byId` and `byKey` this is the identifier
+   * property; for `byProperty` it is `runtimeProperty` when set, else the
+   * identifier property.
    *
    * This is the value-carrying property — NOT the request parameter name. The
    * request parameter (e.g. `id`, `calendarId`) is a separate schema-contract
@@ -90,6 +92,9 @@ export interface IdentifierTargetingResolution {
  * - `byProperty`: `app.<plural>.whose({ <property>: value })[0]` — the declared
  *   identifier throws at runtime (e.g. Calendar's `calendarIdentifier()`), so the
  *   resource is matched on a property that works (e.g. `name`).
+ * - `byKey`: the collection's key specifier applied to the identifier value,
+ *   which the app interprets (an app that keys files by path finds whatever
+ *   file is at that path).
  *
  * Returns `undefined` when the resource declares no identifiers — such a resource
  * cannot be addressed by identifier at all, and callers handle that explicitly.
@@ -108,7 +113,8 @@ export function resolveIdentifierTargeting(
   // absent means the `byId` default.
   const strategy: IdentifierTargeting = entry.targeting ?? 'byId'
   // For byProperty, the JXA `whose` key may be an explicit runtimeProperty; for
-  // byId, the runtime property IS the identifier property (the value read in list).
+  // byId and byKey, the runtime property IS the identifier property (the value
+  // read in list, and the value the lookup takes).
   const property =
     strategy === 'byProperty' ? (entry.runtimeProperty ?? entry.property) : entry.property
   return { strategy, property }

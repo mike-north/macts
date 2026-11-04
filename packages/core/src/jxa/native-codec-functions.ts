@@ -747,6 +747,9 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       setOwn(match, addressing.property, id)
       const matches = callMember('decode', collection, 'whose', [match], path, expected)
       object = isHostObject(matches) ? matches[0] : undefined
+    } else if (addressing.lookup === 'byKey') {
+      // The bridge's key specifier: the identifier is the key the app interprets.
+      object = callMember('decode', collection, 'byName', [id], path, expected)
     } else {
       object = callMember('decode', collection, 'byId', [id], path, expected)
     }

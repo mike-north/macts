@@ -6,6 +6,7 @@ import { HierarchySchema } from './hierarchy.js'
 import { RelationshipSchema } from './relationship.js'
 import { AppMetadataSchema, SuiteSchema, ExtractionMetadataSchema } from './metadata.js'
 import { findDuplicateRoutes } from '../route.js'
+import { findRootIssues } from '../roots.js'
 import {
   findUnsupportedTypeReferences,
   isCommandUnsupported,
@@ -142,6 +143,9 @@ export const AppManifestSchema = z
       })
     }
     for (const issue of findCommandParentIssues(data)) {
+      ctx.addIssue({ code: 'custom', ...issue })
+    }
+    for (const issue of findRootIssues(data)) {
       ctx.addIssue({ code: 'custom', ...issue })
     }
   })

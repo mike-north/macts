@@ -136,15 +136,16 @@ export const NATIVE_CODEC: NativeCodec = Object.freeze({
  * @remarks
  * It follows the resource's identifier targeting (phases/13 D10), as a
  * generated get does: `byId` asks the collection for the item with that id,
- * and `byProperty` matches `property` against the identifier. Either way the
- * identifier a reference carries is the value of `property`, so reading it
- * back from an object gives the identifier that finds the object again.
+ * `byProperty` matches `property` against the identifier, and `byKey` applies
+ * the collection's key specifier to it. In each case the identifier a
+ * reference carries is the value of `property`, so reading it back from an
+ * object gives the identifier that finds the object again.
  */
 export interface NativeAddressing {
   /** The app's spelling of the resource's collection at the application. */
   readonly collection: string
   /** How the collection finds an item from its identifier. */
-  readonly lookup: 'byId' | 'byProperty'
+  readonly lookup: 'byId' | 'byProperty' | 'byKey'
   /** The app's spelling of the property that holds the identifier. */
   readonly property: string
 }
