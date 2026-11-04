@@ -304,7 +304,7 @@ export interface WindowResourceClient {
   /**
    * Read the window identified by `id`.
    *
-   * @param id - ID of the window. Does not accept null.
+   * @param id - Window identifier. Does not accept null.
    */
   get(id: string, options?: CallOptions): Promise<Window>
 }
@@ -314,14 +314,14 @@ export interface TabResourceClient {
   /**
    * List tabs, as one page holding all of them.
    *
-   * @param windowId - ID of the window. Does not accept null.
+   * @param windowId - Window identifier. Does not accept null.
    */
   list(windowId: string, options?: CallOptions): Promise<Page<Tab>>
   /**
    * Read the tab identified by `id` within `windowId`.
    *
-   * @param windowId - ID of the window. Does not accept null.
-   * @param id - ID of the tab. Does not accept null.
+   * @param windowId - Window identifier. Does not accept null.
+   * @param id - Tab identifier. Does not accept null.
    */
   get(windowId: string, id: string, options?: CallOptions): Promise<Tab>
 }
@@ -529,13 +529,13 @@ const windowGetWindowOperation: OperationDescriptor<{ readonly id: string }, Win
   target: { command: 'getWindow', resource: 'Window' },
   description: 'Get a window by its ID',
   input: t.record({
-    id: t.string({ description: 'ID of the window' }),
+    id: t.string({ description: 'Window identifier' }),
   }),
   output: windowRecordType,
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { id: { type: 'string', description: 'ID of the window' } },
+    properties: { id: { type: 'string', description: 'Window identifier' } },
     required: ['id'],
     additionalProperties: false,
   },
@@ -547,13 +547,13 @@ const tabListTabsOperation: OperationDescriptor<{ readonly windowId: string }, P
   target: { command: 'listTabs', resource: 'Tab' },
   description: 'List the tabs of a window',
   input: t.record({
-    windowId: t.string({ description: 'ID of the window' }),
+    windowId: t.string({ description: 'Window identifier' }),
   }),
   output: t.page(tabRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { windowId: { type: 'string', description: 'ID of the window' } },
+    properties: { windowId: { type: 'string', description: 'Window identifier' } },
     required: ['windowId'],
     additionalProperties: false,
   },
@@ -568,16 +568,16 @@ const tabGetTabOperation: OperationDescriptor<
   target: { command: 'getTab', resource: 'Tab' },
   description: 'Get a tab of a window by its ID',
   input: t.record({
-    windowId: t.string({ description: 'ID of the window' }),
-    id: t.string({ description: 'ID of the tab' }),
+    windowId: t.string({ description: 'Window identifier' }),
+    id: t.string({ description: 'Tab identifier' }),
   }),
   output: tabRecordType,
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: {
-      windowId: { type: 'string', description: 'ID of the window' },
-      id: { type: 'string', description: 'ID of the tab' },
+      windowId: { type: 'string', description: 'Window identifier' },
+      id: { type: 'string', description: 'Tab identifier' },
     },
     required: ['windowId', 'id'],
     additionalProperties: false,

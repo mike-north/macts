@@ -453,11 +453,11 @@ export const capabilities: readonly CapabilityMetadata[] = [
       type: 'object',
       properties: {
         windowId: {
-          description: 'ID of the window',
+          description: 'Window identifier',
           type: 'string',
         },
         id: {
-          description: 'ID of the tab',
+          description: 'Tab identifier',
           type: 'string',
         },
       },
@@ -478,7 +478,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
       type: 'object',
       properties: {
         windowId: {
-          description: 'ID of the window',
+          description: 'Window identifier',
           type: 'string',
         },
       },
@@ -499,7 +499,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
       type: 'object',
       properties: {
         id: {
-          description: 'ID of the window',
+          description: 'Window identifier',
           type: 'string',
         },
       },

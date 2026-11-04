@@ -1437,7 +1437,8 @@ within a playlist; Contacts addresses, emails and phones within a person;
 Calendar events within a calendar; Google Chrome and Microsoft Edge tabs
 within a window. Reminders lists reminders only within a list but gets one at
 the application, and Automator, Microsoft Edge (bookmark items), OmniGraffle
-and Xcode list some resources only within a parent in the same way. A reference resolved through such an operation can be resolved only when
+and Xcode list some resources only within a parent in the same way. A
+reference resolved through such an operation can be resolved only when
 it carries the parent's identifier, so its `container` is required and must
 be an identity reference to that operation's parent. A reference takes the
 parent of the operation that resolves it: a single-object reference in
@@ -1612,11 +1613,11 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   exactly when its `get` is parent-scoped, meaning the command records a
   parent. A native read emits a container exactly when resolving the object
   by id needs that parent. An object that is identified globally but reached
-  only through a container emits no container. Examples are Chrome and Edge
-  tabs, Arc spaces, iTerm sessions, and nested Photos folders. Native reads
-  emit no container yet, so an output position whose target's identity is
-  scoped to its container is left out of output (resolvable targets, above)
-  until reads emit containers (#242).
+  only through a container emits no container. Examples are Arc spaces, iTerm
+  sessions, and nested Photos folders. Native reads emit no container yet, so
+  an output position whose target's identity is scoped to its container is
+  left out of output (resolvable targets, above) until reads emit containers
+  (#242).
 - **Name-keyed resources.** A resource whose primary identifier is its name
   keeps `ResourceDescriptor.id`. Resolving an identity reference to it means
   the same as a name selector: it resolves to whichever object has that name

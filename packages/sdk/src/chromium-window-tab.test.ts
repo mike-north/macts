@@ -17,7 +17,8 @@
  * replaced: it evaluates the composed script against a stand-in app in an
  * isolated context, so the body, input and output plans and the codec are the
  * shipped ones. The stand-in has no app-wide `tabs` member at all, so a body
- * that addressed one would fail, and it records every lookup it serves.
+ * that addressed one would fail, and it records every lookup it serves and
+ * every tab it makes or adds to a window.
  *
  * Edge is not installed on the Mac these were written on; its cases rest on
  * the dictionary and the stand-in, not on a live run.
@@ -128,12 +129,19 @@ describe('the generated Google Chrome contract', () => {
     expect(manifest.commands['listWindows']?.parent).toBeUndefined()
   })
 
-  it('claims window and tab ids unique only within the running session, with a live sample', async () => {
+  it('claims window and tab ids unique on the dictionary, only within the running session', async () => {
     const manifest = await manifestOf(googleChromeContract)
-    for (const resource of ['Window', 'Tab']) {
+    // The dictionary's own description of each id property is the basis; a
+    // live sample of one window and one tab cannot show distinctness.
+    const dictionaryText = {
+      Window: 'The unique identifier of the window.',
+      Tab: 'Unique ID of the tab.',
+    }
+    for (const [resource, text] of Object.entries(dictionaryText)) {
       const [identifier] = manifest.resources[resource]?.identifiers ?? []
       expect(identifier).toMatchObject({ property: 'id', primary: true, unique: true })
-      expect(identifier?.evidence?.unique?.source).toBe('curated')
+      expect(identifier?.evidence?.unique?.source).toBe('sdef')
+      expect(identifier?.evidence?.unique?.note).toContain(`"${text}"`)
       expect(identifier?.evidence?.unique?.note).toContain('within the running Chrome session')
     }
   })
@@ -248,11 +256,22 @@ function collection(
   })
 }
 
+/** The id the stand-in gives a tab it makes. */
+const NEW_TAB_ID = 'T-new'
+
 /**
  * A stand-in Chromium app holding `windows`, front to back. It has a
- * `windows` collection and nothing else: no app-wide `tabs`.
+ * `windows` collection and a `Tab` maker, and no app-wide `tabs`. Each tab it
+ * makes is recorded in `writes` as `make Tab`, and each tab added to a
+ * window's tabs as `<label>.push`, so a test can tell whether anything was
+ * created or placed under a window.
  */
-function standInChromium(windows: readonly WindowRow[], urlKey: string, lookups: string[]) {
+function standInChromium(
+  windows: readonly WindowRow[],
+  urlKey: string,
+  lookups: string[],
+  writes: string[] = []
+) {
   const windowRecords = windows.map(windowRecord)
   const windowItems = windows.map((row, index) => {
     const tabRecords = row.tabs.map((tab) => tabRecord(tab, urlKey))
@@ -260,16 +279,25 @@ function standInChromium(windows: readonly WindowRow[], urlKey: string, lookups:
       id: tab.id,
       specifier: { exists: () => true, properties: () => tabRecords[tabIndex] },
     }))
+    const label = `windows.byId(${row.id}).tabs`
+    const tabs = Object.assign(collection(label, tabItems, tabRecords, lookups), {
+      push() {
+        writes.push(`${label}.push`)
+      },
+    })
     return {
       id: row.id,
-      specifier: {
-        exists: () => true,
-        properties: () => windowRecords[index],
-        tabs: collection(`windows.byId(${row.id}).tabs`, tabItems, tabRecords, lookups),
-      },
+      specifier: { exists: () => true, properties: () => windowRecords[index], tabs },
     }
   })
-  return { windows: collection('windows', windowItems, windowRecords, lookups) }
+  return {
+    windows: collection('windows', windowItems, windowRecords, lookups),
+    Tab(props: Readonly<Record<string, unknown>>) {
+      writes.push('make Tab')
+      const record = tabRecord({ id: NEW_TAB_ID, title: '' }, urlKey)
+      return { properties: () => ({ ...record, ...props }) }
+    },
+  }
 }
 
 /** Two windows, front to back, each with its own tabs. */
@@ -305,17 +333,24 @@ async function chromeClient(lookups: string[]) {
   })
 }
 
-/** A local Microsoft Edge client over a stand-in holding {@link WINDOWS}. */
-async function edgeClient(lookups: string[]) {
+/**
+ * A local Microsoft Edge client over a stand-in holding {@link WINDOWS}; the
+ * stand-in records the tabs it makes and places in `writes`.
+ */
+async function edgeClient(lookups: string[], writes: string[] = []) {
   const key = await createApiKey({
     name: 'Edge tab test',
-    permissions: ['microsoft-edge:tabs:get', 'microsoft-edge:tabs:list'],
+    permissions: [
+      'microsoft-edge:tabs:get',
+      'microsoft-edge:tabs:list',
+      'microsoft-edge:tabs:create',
+    ],
   })
   return createClient(microsoftEdgeContract, {
     token: key.token,
     governance: { policy: ALLOW_ALL_POLICY },
     executor: createNativeExecutor({
-      transport: standInTransport(standInChromium(WINDOWS, 'uRL', lookups)),
+      transport: standInTransport(standInChromium(WINDOWS, 'uRL', lookups, writes)),
     }),
   })
 }
@@ -421,5 +456,33 @@ describe('Microsoft Edge tabs, read within their window through the local client
     expect(missingResourceOf(await rejectionOf(client.tabs.get('W2', 'T99')))).toEqual({
       resource: 'Tab',
     })
+  })
+})
+
+// A tab is created within the window `windowId` names (the manifest's
+// createTab records Window as its parent). When that window is missing, the
+// failure names Window, not Tab (phases/13 D6, a missing parent), and no tab
+// is made or added anywhere.
+describe('Microsoft Edge tab creation, within its window through the local client', () => {
+  it('creates a tab in the window it names', async () => {
+    const lookups: string[] = []
+    const writes: string[] = []
+    const client = await edgeClient(lookups, writes)
+    const tab = await client.tabs.create({ windowId: 'W2', uRL: 'https://example.com/new' })
+    expect(tab).toMatchObject({ id: NEW_TAB_ID, uRL: 'https://example.com/new' })
+    expect(lookups).toEqual(['windows.byId(W2)'])
+    expect(writes).toEqual(['make Tab', 'windows.byId(W2).tabs.push'])
+  })
+
+  it('fails with TargetNotFoundError naming Window when the window is missing, and makes no tab', async () => {
+    const lookups: string[] = []
+    const writes: string[] = []
+    const client = await edgeClient(lookups, writes)
+    const error = await rejectionOf(
+      client.tabs.create({ windowId: 'W9', uRL: 'https://example.com/new' })
+    )
+    expect(missingResourceOf(error)).toEqual({ resource: 'Window' })
+    expect(lookups).toEqual(['windows.byId(W9)'])
+    expect(writes).toEqual([])
   })
 })
