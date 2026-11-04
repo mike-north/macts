@@ -43,7 +43,7 @@ import type { GovernancePolicy } from './policy.js'
 import type { AuditWriter } from './writer.js'
 import type { PolicyEvaluation } from './evaluator.js'
 import type { ApprovalCancellation, ApprovalOutcome } from './approval.js'
-import { createAuditRecord, type AuditDecision } from './audit.js'
+import { createAuditRecord, type AuditDecision, type GovernedAuditDecision } from './audit.js'
 import type { LayeredPolicyEvaluation } from './composition.js'
 import { evaluateLayeredPolicy } from './composition.js'
 import type { RiskClass } from '../capabilities/risk.js'
@@ -204,7 +204,7 @@ function evaluationToOutcome(evaluation: PolicyEvaluation): EnforcementOutcome {
  * a withheld confirm-first call). It is likewise not `'approved'`, since no human
  * has approved it yet.
  */
-function outcomeToAuditDecision(outcome: EnforcementOutcome): AuditDecision {
+function outcomeToAuditDecision(outcome: EnforcementOutcome): GovernedAuditDecision {
   switch (outcome) {
     case 'allowed':
       return 'allowed'
@@ -358,7 +358,7 @@ export async function recordApprovalDecision(
   options: RecordApprovalDecisionOptions
 ): Promise<AuditDecision> {
   const { permission, outcome, audit, writer } = options
-  const decision: AuditDecision = outcome.approved ? 'approved' : 'rejected'
+  const decision: GovernedAuditDecision = outcome.approved ? 'approved' : 'rejected'
 
   const record = createAuditRecord({
     capability: permission,
@@ -405,7 +405,7 @@ export async function recordApprovalCancellation(
   options: RecordApprovalCancellationOptions
 ): Promise<AuditDecision> {
   const { permission, cancellation, audit, writer } = options
-  const decision: AuditDecision = 'cancelled'
+  const decision: GovernedAuditDecision = 'cancelled'
   const record = createAuditRecord({
     capability: permission,
     app: deriveAuditApp(permission),
@@ -418,4 +418,59 @@ export async function recordApprovalCancellation(
   })
   await writer.append(record)
   return decision
+}
+
+// ---------------------------------------------------------------------------
+// Invalid-input auditing
+// ---------------------------------------------------------------------------
+
+/**
+ * Options for {@link recordInvalidInput}.
+ *
+ * There is deliberately no field for the call's arguments, an argument
+ * summary, or the validation issues themselves: only their count is recorded.
+ */
+export interface RecordInvalidInputOptions {
+  /**
+   * The permission of the operation the call addressed, in
+   * `app:resource:operation` form: the capability the record is filed under,
+   * as for every other decision about that operation.
+   */
+  readonly permission: string
+  /** Identifier of the API key that made the call, for attribution. */
+  readonly apiKeyId: string
+  /** When the call occurred. Injected so records are deterministic. */
+  readonly timestamp: Date
+  /** How many validation issues the input had. */
+  readonly issueCount: number
+  /** Audit writer. Required: there is no reason to record nowhere. */
+  readonly writer: AuditWriter
+}
+
+/**
+ * Record that a call was rejected by input validation, before governance.
+ *
+ * Writes one `'invalid-input'` record with the call's attribution, time, and
+ * issue count. No policy was evaluated and no approval was sought, so the
+ * record has no reason and no approval correlation id, and it never carries
+ * any part of the input: input that failed its contract has not been shown to
+ * be what a summary of it would claim.
+ *
+ * The write is not optional. If it fails, this rejects, and the caller decides
+ * how to fail closed.
+ *
+ * @param options - Permission, attribution, time, issue count, and writer.
+ */
+export async function recordInvalidInput(options: RecordInvalidInputOptions): Promise<void> {
+  const { permission, apiKeyId, timestamp, issueCount, writer } = options
+  await writer.append(
+    createAuditRecord({
+      capability: permission,
+      app: deriveAuditApp(permission),
+      apiKeyId,
+      decision: 'invalid-input',
+      timestamp,
+      issueCount,
+    })
+  )
 }

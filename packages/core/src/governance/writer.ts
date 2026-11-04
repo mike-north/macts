@@ -59,7 +59,9 @@ export interface AuditWriter {
  * Parent directories are created automatically on first use (equivalent to
  * `mkdir -p`). Each call to `append` serialises the record via
  * {@link serializeAuditRecord}, JSON-encodes the result, appends it with a
- * trailing newline, and resolves. Errors are propagated to the caller.
+ * trailing newline, and resolves. Errors are propagated to the caller,
+ * including the serializer's refusal of a malformed `invalid-input` record,
+ * which writes nothing.
  *
  * The destination path is accepted as-is — no home-directory expansion, no
  * environment-variable lookup. Callers are responsible for supplying an
@@ -77,10 +79,12 @@ export interface AuditWriter {
 export function createFileAuditWriter(path: string): AuditWriter {
   return {
     async append(record: AuditRecord): Promise<void> {
+      // Serialized first, so a record the serializer refuses (see
+      // serializeAuditRecord) touches nothing on disk.
+      const line = JSON.stringify(serializeAuditRecord(record)) + '\n'
       // Ensure the parent directory exists before every write so the writer
       // works even if the directory is created after the writer is constructed.
       await mkdir(dirname(path), { recursive: true })
-      const line = JSON.stringify(serializeAuditRecord(record)) + '\n'
       await appendFile(path, line, { encoding: 'utf8' })
     },
   }
