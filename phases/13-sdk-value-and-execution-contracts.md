@@ -1161,9 +1161,12 @@ is answered `ValidationError`. A permission denial writes no audit record. Valid
 comes before governance, so only well-formed calls reach policy, audit
 summaries, and approvers: an argument summary describes input that passed its
 contract, and names only parameters the contract declares. A key that is not
-a declared parameter (an input schema may let it through, as a manifest
-command's request schema does, or strip it) is counted in `unknownKeys` and
-never named. A call rejected by validation after the permission check writes
+a declared parameter is invalid input under a manifest registration and a
+contract registration alike: a contract's input record and a manifest
+command's declared input (its parameters and nothing else) both reject it.
+The summary still counts any such key that reaches it in `unknownKeys`, never
+naming it, as a backstop for an input schema that admits or strips one
+anyway. A call rejected by validation after the permission check writes
 exactly one `invalid-input` audit record (D6) with the number of validation
 issues and nothing from the input, and is never put to an approver.
 
@@ -1257,7 +1260,16 @@ load or register is likewise reported with its reason and skipped, and the other
 apps still register. An app installed without its host package is reported at
 startup, with the command that installs it. Manifest registration
 (`registerManifest`) remains for embedders and tests; it runs passthrough
-descriptors, validated by each command's request schema.
+descriptors whose input is each command's declared parameters and nothing
+else, so a key that is not a parameter is a `ValidationError`, as it is under
+a contract registration. A manifest-registered list does not page, so its
+input declares no paging inputs. A resource-scoped get, update or delete
+selects its item by its identifier parameter, the first required parameter
+other than its parent's, so a manifest whose get, update or delete declares
+none is refused at registration with `OperationRegistrationError`, naming the
+app and the command. Without one, a get or update would read an undeclared
+`id` no input can carry, and a delete would call the app's delete with no
+target.
 
 ## D6. Structured Error Registry, Wire Codec, and Reconstruction
 
@@ -1272,28 +1284,28 @@ abstract `MactsError<Code>` and carries:
 `AnyMactsError` is the union of all classes. A `switch (error.code)` over it
 narrows `details`.
 
-| Class                           | `code`                       | Distinct meaning                                                                                                                                                        | Default HTTP                                      |
-| ------------------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| `ValidationError`               | `VALIDATION_FAILED`          | Caller input violated the operation contract (`issues[]`). Raised by input validation after the permission check, it is audited with the decision `invalid-input` (D5). | 400                                               |
-| `UnexpectedValueError`          | `UNEXPECTED_VALUE`           | An app result violated the contract. This includes an enum member the SDK does not know and an out-of-policy integer (`issues[]`).                                      | 502                                               |
-| `AuthenticationError`           | `UNAUTHENTICATED`            | Credential missing or unusable (`reason`)                                                                                                                               | 401                                               |
-| `RateLimitedError`              | `RATE_LIMITED`               | The caller exceeded its admission limit; not evaluated further (`retryAfterSeconds`, a non-negative integer)                                                            | 429                                               |
-| `PermissionDeniedError`         | `PERMISSION_DENIED`          | Credential lacks the required permission                                                                                                                                | 403                                               |
-| `PolicyDeniedError`             | `POLICY_DENIED`              | Governance policy forbids the call (`permission`, `layer`)                                                                                                              | 403                                               |
-| `ApprovalPendingError`          | `APPROVAL_PENDING`           | Held for confirmation with nobody to ask; not executed                                                                                                                  | 409                                               |
-| `ApprovalRejectedError`         | `APPROVAL_REJECTED`          | Held, put to a human, and not approved (`state`)                                                                                                                        | 403                                               |
-| `TargetNotFoundError`           | `TARGET_NOT_FOUND`           | A singular target does not exist (`entryIndex` for a missing identity-collection entry)                                                                                 | 404                                               |
-| `FileNotFoundError`             | `FILE_NOT_FOUND`             | A referenced file does not exist or disappeared                                                                                                                         | 404                                               |
-| `InvalidSelectionError`         | `INVALID_SELECTION`          | A range or index selection is invalid for the collection                                                                                                                | 400                                               |
-| `CollectionChangedError`        | `COLLECTION_CHANGED`         | The collection changed while it was being read, so no consistent result exists; the same request is correct and can be retried, from the first page if it was paged.    | 409                                               |
-| `AppUnavailableError`           | `APP_UNAVAILABLE`            | The app is not installed or cannot be reached                                                                                                                           | 503                                               |
-| `AppAuthorizationRequiredError` | `APP_AUTHORIZATION_REQUIRED` | macOS has not authorized automating the app. This is distinct from macts permission denial.                                                                             | 503                                               |
-| `AppOperationError`             | `APP_OPERATION_FAILED`       | The app reported a failure not covered above (`appErrorCode?`)                                                                                                          | 502                                               |
-| `OperationTimeoutError`         | `TIMEOUT`                    | The operation exceeded its time budget                                                                                                                                  | 504                                               |
-| `OperationCancelledError`       | `CANCELLED`                  | The caller aborted the operation                                                                                                                                        | n/a (the caller stopped waiting); recorded as 499 |
-| `TransferError`                 | `TRANSFER_FAILED`            | A transfer expired, was incomplete, was too large, or is unknown                                                                                                        | 400 / 410 / 413                                   |
-| `InternalError`                 | `INTERNAL`                   | An unexpected macts failure, with a sanitized message                                                                                                                   | 500                                               |
-| `TransportError`                | `TRANSPORT_FAILED`           | **Client-side only.** The service was unreachable, sent an invalid response, or uses a different protocol.                                                              | n/a                                               |
+| Class                           | `code`                       | Distinct meaning                                                                                                                                                                                                                                                       | Default HTTP                                      |
+| ------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `ValidationError`               | `VALIDATION_FAILED`          | Caller input violated the operation contract (`issues[]`), including a key that is not a declared parameter, under a manifest or a contract registration. Raised by input validation after the permission check, it is audited with the decision `invalid-input` (D5). | 400                                               |
+| `UnexpectedValueError`          | `UNEXPECTED_VALUE`           | An app result violated the contract. This includes an enum member the SDK does not know and an out-of-policy integer (`issues[]`).                                                                                                                                     | 502                                               |
+| `AuthenticationError`           | `UNAUTHENTICATED`            | Credential missing or unusable (`reason`)                                                                                                                                                                                                                              | 401                                               |
+| `RateLimitedError`              | `RATE_LIMITED`               | The caller exceeded its admission limit; not evaluated further (`retryAfterSeconds`, a non-negative integer)                                                                                                                                                           | 429                                               |
+| `PermissionDeniedError`         | `PERMISSION_DENIED`          | Credential lacks the required permission                                                                                                                                                                                                                               | 403                                               |
+| `PolicyDeniedError`             | `POLICY_DENIED`              | Governance policy forbids the call (`permission`, `layer`)                                                                                                                                                                                                             | 403                                               |
+| `ApprovalPendingError`          | `APPROVAL_PENDING`           | Held for confirmation with nobody to ask; not executed                                                                                                                                                                                                                 | 409                                               |
+| `ApprovalRejectedError`         | `APPROVAL_REJECTED`          | Held, put to a human, and not approved (`state`)                                                                                                                                                                                                                       | 403                                               |
+| `TargetNotFoundError`           | `TARGET_NOT_FOUND`           | A singular target does not exist (`entryIndex` for a missing identity-collection entry)                                                                                                                                                                                | 404                                               |
+| `FileNotFoundError`             | `FILE_NOT_FOUND`             | A referenced file does not exist or disappeared                                                                                                                                                                                                                        | 404                                               |
+| `InvalidSelectionError`         | `INVALID_SELECTION`          | A range or index selection is invalid for the collection                                                                                                                                                                                                               | 400                                               |
+| `CollectionChangedError`        | `COLLECTION_CHANGED`         | The collection changed while it was being read, so no consistent result exists; the same request is correct and can be retried, from the first page if it was paged.                                                                                                   | 409                                               |
+| `AppUnavailableError`           | `APP_UNAVAILABLE`            | The app is not installed or cannot be reached                                                                                                                                                                                                                          | 503                                               |
+| `AppAuthorizationRequiredError` | `APP_AUTHORIZATION_REQUIRED` | macOS has not authorized automating the app. This is distinct from macts permission denial.                                                                                                                                                                            | 503                                               |
+| `AppOperationError`             | `APP_OPERATION_FAILED`       | The app reported a failure not covered above (`appErrorCode?`)                                                                                                                                                                                                         | 502                                               |
+| `OperationTimeoutError`         | `TIMEOUT`                    | The operation exceeded its time budget                                                                                                                                                                                                                                 | 504                                               |
+| `OperationCancelledError`       | `CANCELLED`                  | The caller aborted the operation                                                                                                                                                                                                                                       | n/a (the caller stopped waiting); recorded as 499 |
+| `TransferError`                 | `TRANSFER_FAILED`            | A transfer expired, was incomplete, was too large, or is unknown                                                                                                                                                                                                       | 400 / 410 / 413                                   |
+| `InternalError`                 | `INTERNAL`                   | An unexpected macts failure, with a sanitized message                                                                                                                                                                                                                  | 500                                               |
+| `TransportError`                | `TRANSPORT_FAILED`           | **Client-side only.** The service was unreachable, sent an invalid response, or uses a different protocol.                                                                                                                                                             | n/a                                               |
 
 **Wire codec.** An error response body is
 `{ "error": { "code", "message", "details" } }`. Over HTTP, a 401 also
@@ -2244,11 +2256,11 @@ reads windows:
   approver. Only whether the anchor still sits where it did is decided during
   execution, by the app (below). Every page runs the full D5 pipeline, so a
   cursor carries no authority. Audit and logs record only `cursor: true`. A
-  cursor sent to an operation that declares none fails validation under a
-  contract registration, so that call is audited as `invalid-input`; under a
-  manifest registration, whose request schema admits keys it does not
-  declare, it is counted in `unknownKeys` and never recorded. No message or
-  issue repeats a cursor, since its anchor can be user content.
+  cursor sent to an operation that declares none fails validation under
+  either registration, so that call is audited as `invalid-input`. This
+  includes every manifest-registered list, which does not page and declares
+  no paging inputs. No message or issue repeats a cursor, since its anchor can
+  be user content.
 - The runtime hands the executor a half-open window `{ offset, size, anchor? }`
   and an output plan that is an array of the item plan. The executor answers
   `{ items, length, last? }`: the window's items, the collection's length when

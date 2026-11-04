@@ -21,7 +21,6 @@
 export { SystemEventsClient, SystemEventsError, HttpClient } from './client.js'
 export type { SystemEventsClientOptions } from './client.js'
 export * from './types.js'
-export { DiskItemResourceClient } from './resources/diskitem.js'
 export { ActionResourceClient } from './resources/action.js'
 export { UIElementResourceClient } from './resources/uielement.js'
 export { capabilities } from './capabilities.js'
