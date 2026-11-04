@@ -118,7 +118,7 @@ export interface RedactArgsOptions {
 
 /**
  * Redact sensitive values from a capability-call argument map and return a
- * human-readable summary string suitable for {@link AuditRecordInput.argsSummary}.
+ * human-readable summary string suitable for {@link GovernedAuditRecordInput.argsSummary}.
  *
  * Sensitive key names (matched case-insensitively against
  * {@link DEFAULT_SENSITIVE_KEYS} plus any `extraSensitiveKeys`) have their

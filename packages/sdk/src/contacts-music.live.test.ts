@@ -8,7 +8,7 @@
  *
  *   1. Through `@macts/sdk/local`'s `createClient`, with the default native
  *      executor and a real API key, end to end through the invocation pipeline
- *      (verify, permission, governance, validate input, execute, validate
+ *      (verify, permission, validate input, governance, execute, validate
  *      output): `list`, then `get` of the first listed item, which must come
  *      back with the same identifier.
  *   2. The same `list` and `get`, run by the native executor directly with the

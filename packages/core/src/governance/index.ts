@@ -67,9 +67,17 @@ export {
 export {
   AUDIT_DECISIONS,
   type AuditDecision,
+  type GovernedAuditDecision,
+  type AuditRecordBase,
   type AuditRecordInput,
+  type GovernedAuditRecordInput,
+  type InvalidInputAuditRecordInput,
   type AuditRecord,
+  type GovernedAuditRecord,
+  type InvalidInputAuditRecord,
   type SerializedAuditRecord,
+  type SerializedGovernedAuditRecord,
+  type SerializedInvalidInputAuditRecord,
   createAuditRecord,
   serializeAuditRecord,
 } from './audit.js'
@@ -141,6 +149,8 @@ export {
   recordApprovalDecision,
   recordApprovalCancellation,
   type RecordApprovalCancellationOptions,
+  recordInvalidInput,
+  type RecordInvalidInputOptions,
 } from './enforcement.js'
 
 // Human-in-the-loop approval provider interface (the seam macts owns for

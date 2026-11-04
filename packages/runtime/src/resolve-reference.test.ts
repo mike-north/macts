@@ -9,8 +9,10 @@
  *   operation is invalid against the contract and fails with `ValidationError`
  *   at its resource (`InvalidSelectionError` is only for an index or range the
  *   collection cannot satisfy); the wire rules `t.reference` enforces.
- * - D5: the pipeline order (verify → admission → permission → governance and
- *   approval → validation → executor), failing closed.
+ * - D5: the pipeline order (verify → admission → permission → validation →
+ *   governance and approval → executor), failing closed; a reference rejected
+ *   by validation is audited as `invalid-input`, with no values, and nobody is
+ *   asked to approve it; the argument summary is the validated reference.
  * - D6: which canonical class and details each failure carries.
  * - D11: the runtime validates what it receives, in the same place for
  *   resolution as for `invoke`.
@@ -640,7 +642,11 @@ describe('resolveReference: permission (D7)', () => {
   })
 
   it('denies before validating: a caller without the permission learns nothing about the reference contract', async () => {
-    const { runtime, executor } = harness()
+    const writer = createMemoryAuditWriter()
+    const provider = createRecordingApprovalProvider(() => Promise.resolve({ state: 'approved' }))
+    const { runtime, executor } = harness({
+      governance: { policy: CONFIRM_FIRST_LIBRARY, writer, approvals: { provider } },
+    })
     const negativeIndex = {
       resource: 'Book',
       form: 'selector',
@@ -654,6 +660,9 @@ describe('resolveReference: permission (D7)', () => {
 
     expect(error).toBeInstanceOf(PermissionDeniedError)
     expect(executor.resolutions).toHaveLength(0)
+    // A permission denial writes no audit record, and is never invalid input.
+    expect(writer.records).toEqual([])
+    expect(provider.requests).toHaveLength(0)
   })
 })
 
@@ -753,10 +762,16 @@ describe('resolveReference: governance, approval, and audit (D5)', () => {
       ['library:books:lookupBook', 'pending'],
       ['library:books:lookupBook', 'approved'],
     ])
+    // The summary is the validated reference, each field through redactArgs.
+    const summary = 'resource: Book; form: selector; cardinality: one; selector: [object(2 keys)]'
+    expect(
+      writer.records.map((r) => (r.decision === 'invalid-input' ? '' : r.argsSummary))
+    ).toEqual([summary, summary])
     expect(provider.requests[0]).toMatchObject({
       permission: 'library:books:lookupBook',
       risk: 'read',
       identity: { apiKeyId: 'key_librarian', apiKeyName: 'Librarian' },
+      argsSummary: summary,
       requestedAt: FIXED_NOW,
       layer: 'host',
     })
@@ -781,9 +796,12 @@ describe('resolveReference: governance, approval, and audit (D5)', () => {
     expect(executor.resolutions).toHaveLength(0)
   })
 
-  it('governs and audits a malformed reference from an authorized caller before rejecting it', async () => {
+  it('rejects a malformed reference from an authorized caller before governance, auditing it as invalid input', async () => {
     const writer = createMemoryAuditWriter()
-    const { runtime, executor } = harness({ governance: { policy: FORBID_BOOK_GET, writer } })
+    const provider = createRecordingApprovalProvider(() => Promise.resolve({ state: 'approved' }))
+    const { runtime, executor } = harness({
+      governance: { policy: CONFIRM_FIRST_LIBRARY, writer, approvals: { provider } },
+    })
     const negativeIndex = {
       resource: 'Book',
       form: 'selector',
@@ -795,11 +813,37 @@ describe('resolveReference: governance, approval, and audit (D5)', () => {
       runtime.resolveReference('library', wire(negativeIndex), as(LIBRARIAN_SECRET))
     )
 
-    expect(error).toBeInstanceOf(PolicyDeniedError)
-    expect(writer.records.map((r) => [r.capability, r.decision])).toEqual([
-      ['library:books:lookupBook', 'denied'],
-    ])
+    expect(error).toBeInstanceOf(ValidationError)
+    if (!(error instanceof ValidationError)) return
+    expect(provider.requests).toHaveLength(0)
     expect(executor.resolutions).toHaveLength(0)
+    expect(writer.records).toEqual([
+      {
+        capability: 'library:books:lookupBook',
+        app: 'library',
+        apiKeyId: 'key_librarian',
+        decision: 'invalid-input',
+        timestamp: FIXED_NOW,
+        issueCount: error.details.issues.length,
+      },
+    ])
+  })
+
+  it('never evaluates policy for a malformed reference: a forbidding policy still yields invalid-input', async () => {
+    const writer = createMemoryAuditWriter()
+    const { runtime } = harness({ governance: { policy: FORBID_BOOK_GET, writer } })
+
+    const error = await rejection(
+      runtime.resolveReference(
+        'library',
+        wire({ ...DUNE_BY_NAME, note: 'extra' }),
+        as(LIBRARIAN_SECRET)
+      )
+    )
+
+    expect(error).toBeInstanceOf(ValidationError)
+    expect(writer.records.map((r) => r.decision)).toEqual(['invalid-input'])
+    expect(JSON.stringify(writer.records)).not.toContain('extra')
   })
 })
 
@@ -947,7 +991,7 @@ describe('resolveReference: reference validation (D7)', () => {
       'an identifier of the wrong wire type',
       { resource: 'Stamp', form: 'identity', cardinality: 'one', id: 'seven' },
     ],
-  ])('rejects %s after governance, never resolving', async (_name, payload) => {
+  ])('rejects %s before governance as invalid input, never resolving', async (_name, payload) => {
     const writer = createMemoryAuditWriter()
     const { runtime, executor } = harness({ governance: { policy: ALLOW_ALL_POLICY, writer } })
 
@@ -960,8 +1004,18 @@ describe('resolveReference: reference validation (D7)', () => {
     expect(error.code).toBe('VALIDATION_FAILED')
     expect(error.details.issues.length).toBeGreaterThan(0)
     expect(executor.resolutions).toHaveLength(0)
-    // Validation follows governance, as in invoke: the attempt was audited.
-    expect(writer.records).toHaveLength(1)
+    // Validation precedes governance, as in invoke: the attempt is audited as
+    // invalid input, with the issue count and no part of the reference.
+    expect(writer.records).toEqual([
+      {
+        capability: expect.stringMatching(/^library:/) as unknown,
+        app: 'library',
+        apiKeyId: 'key_librarian',
+        decision: 'invalid-input',
+        timestamp: FIXED_NOW,
+        issueCount: error.details.issues.length,
+      },
+    ])
   })
 })
 

@@ -44,7 +44,12 @@ import {
   type AuditDecision,
   type AuditRecord,
   type AuditRecordInput,
+  type GovernedAuditRecord,
+  type GovernedAuditRecordInput,
+  type InvalidInputAuditRecord,
+  type InvalidInputAuditRecordInput,
   type SerializedAuditRecord,
+  type SerializedInvalidInputAuditRecord,
   type RedactArgsOptions,
   type AuditWriter,
   type PolicyRuleMatch,
@@ -124,6 +129,8 @@ expectAssignable<AuditDecision>('denied')
 expectAssignable<AuditDecision>('pending')
 expectAssignable<AuditDecision>('approved')
 expectAssignable<AuditDecision>('rejected')
+expectAssignable<AuditDecision>('cancelled')
+expectAssignable<AuditDecision>('invalid-input')
 expectNotAssignable<AuditDecision>('maybe')
 
 // =============================================================================
@@ -139,9 +146,17 @@ const validInput: AuditRecordInput = {
   timestamp: new Date('2026-06-14T10:42:12.000Z'),
 }
 
+// `validInput` is narrowed to its governed kind, which the overloads keep.
 const record = createAuditRecord(validInput)
-expectType<AuditRecord>(record)
-expectType<SerializedAuditRecord>(serializeAuditRecord(record))
+expectType<GovernedAuditRecord>(record)
+expectAssignable<AuditRecord>(record)
+expectAssignable<SerializedAuditRecord>(serializeAuditRecord(record))
+
+// A record of either kind serializes to a record of either kind.
+declare const eitherInput: AuditRecordInput
+declare const eitherRecord: AuditRecord
+expectType<AuditRecord>(createAuditRecord(eitherInput))
+expectType<SerializedAuditRecord>(serializeAuditRecord(eitherRecord))
 
 // timestamp is a Date on the record, an ISO string when serialized.
 expectType<Date>(record.timestamp)
@@ -168,6 +183,72 @@ expectNotAssignable<AuditRecordInput>({
   decision: 'maybe',
   timestamp: new Date('2026-06-14T10:42:12.000Z'),
 })
+
+// =============================================================================
+// invalid-input records — discriminated by `decision`, never carrying a summary
+// =============================================================================
+
+const invalidInput: InvalidInputAuditRecordInput = {
+  capability: 'calendar:events:create',
+  app: 'calendar',
+  apiKeyId: 'key-1',
+  decision: 'invalid-input',
+  timestamp: new Date('2026-06-14T10:42:12.000Z'),
+  issueCount: 1,
+}
+expectAssignable<AuditRecordInput>(invalidInput)
+
+// The constructor and serializer keep the kind they were given.
+const invalidRecord = createAuditRecord(invalidInput)
+expectType<InvalidInputAuditRecord>(invalidRecord)
+expectType<SerializedInvalidInputAuditRecord>(serializeAuditRecord(invalidRecord))
+declare const governedInput: GovernedAuditRecordInput
+expectType<GovernedAuditRecord>(createAuditRecord(governedInput))
+
+// An invalid-input record has no summary, reason, or correlation id to read.
+expectType<undefined>(invalidRecord.argsSummary)
+expectType<undefined>(invalidRecord.reason)
+expectType<undefined>(invalidRecord.approvalId)
+
+// An invalid-input record carrying a summary is not a record input.
+const invalidWithSummary = { ...invalidInput, argsSummary: 'title: Groceries' }
+expectNotAssignable<AuditRecordInput>(invalidWithSummary)
+expectNotAssignable<AuditRecordInput>({ ...invalidInput, reason: 'title: Expected string' })
+
+// An invalid-input record without its issue count is not a record input.
+expectNotAssignable<AuditRecordInput>({
+  capability: 'calendar:events:create',
+  app: 'calendar',
+  apiKeyId: 'key-1',
+  decision: 'invalid-input',
+  timestamp: new Date('2026-06-14T10:42:12.000Z'),
+})
+
+// A governed decision still requires its summary, and never takes an issue count.
+expectNotAssignable<AuditRecordInput>({
+  capability: 'calendar:events:create',
+  app: 'calendar',
+  apiKeyId: 'key-1',
+  decision: 'allowed',
+  timestamp: new Date('2026-06-14T10:42:12.000Z'),
+})
+expectNotAssignable<AuditRecordInput>({
+  capability: 'calendar:events:create',
+  app: 'calendar',
+  argsSummary: 'Summary: x',
+  apiKeyId: 'key-1',
+  decision: 'allowed',
+  timestamp: new Date('2026-06-14T10:42:12.000Z'),
+  issueCount: 1,
+})
+
+// Narrowing on `decision` reaches the summary of a governed record.
+declare const anyRecord: AuditRecord
+if (anyRecord.decision !== 'invalid-input') {
+  expectType<string>(anyRecord.argsSummary)
+} else {
+  expectType<number>(anyRecord.issueCount)
+}
 
 // =============================================================================
 // redactArgs — signature

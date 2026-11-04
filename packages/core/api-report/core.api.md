@@ -690,34 +690,23 @@ export const AppRuleSchema: z.ZodObject<{
 }, z.core.$strict>;
 
 // @public
-export const AUDIT_DECISIONS: readonly ["allowed", "denied", "pending", "approved", "rejected", "cancelled"];
+export const AUDIT_DECISIONS: readonly ["allowed", "denied", "pending", "approved", "rejected", "cancelled", "invalid-input"];
 
 // @public
 export type AuditDecision = (typeof AUDIT_DECISIONS)[number];
 
 // @public
-export interface AuditRecord {
+export type AuditRecord = GovernedAuditRecord | InvalidInputAuditRecord;
+
+// @public
+export interface AuditRecordBase {
     readonly apiKeyId: string;
     readonly app: string;
-    readonly approvalId?: string;
-    readonly argsSummary: string;
     readonly capability: string;
-    readonly decision: AuditDecision;
-    readonly reason?: string;
-    readonly timestamp: Date;
 }
 
 // @public
-export interface AuditRecordInput {
-    readonly apiKeyId: string;
-    readonly app: string;
-    readonly approvalId?: string;
-    readonly argsSummary: string;
-    readonly capability: string;
-    readonly decision: AuditDecision;
-    readonly reason?: string;
-    readonly timestamp: Date;
-}
+export type AuditRecordInput = GovernedAuditRecordInput | InvalidInputAuditRecordInput;
 
 // @public
 export interface AuditWriter {
@@ -1078,6 +1067,12 @@ export function contractResourcePlans(manifest: AppManifest): ResourcePlanTable;
 
 // @public
 export function createArrayCoercer<T>(elementCoercer: TypeCoercer<T>): TypeCoercer<T[]>;
+
+// @public
+export function createAuditRecord(input: GovernedAuditRecordInput): GovernedAuditRecord;
+
+// @public
+export function createAuditRecord(input: InvalidInputAuditRecordInput): InvalidInputAuditRecord;
 
 // @public
 export function createAuditRecord(input: AuditRecordInput): AuditRecord;
@@ -1670,6 +1665,29 @@ export interface GovernanceFilter {
 export type GovernancePolicy = z.infer<typeof PolicySchema>;
 
 // @public
+export type GovernedAuditDecision = Exclude<AuditDecision, 'invalid-input'>;
+
+// @public
+export interface GovernedAuditRecord extends AuditRecordBase {
+    readonly approvalId?: string;
+    readonly argsSummary: string;
+    readonly decision: GovernedAuditDecision;
+    readonly issueCount?: never;
+    readonly reason?: string;
+    readonly timestamp: Date;
+}
+
+// @public
+export interface GovernedAuditRecordInput extends AuditRecordBase {
+    readonly approvalId?: string;
+    readonly argsSummary: string;
+    readonly decision: GovernedAuditDecision;
+    readonly issueCount?: never;
+    readonly reason?: string;
+    readonly timestamp: Date;
+}
+
+// @public
 export interface GovernedCapability {
     readonly capability: Capability;
     readonly decision: GovernanceDecision;
@@ -1845,6 +1863,26 @@ export type InspectOutcome = {
     readonly kind: 'denied';
     readonly reason: string | undefined;
 };
+
+// @public
+export interface InvalidInputAuditRecord extends AuditRecordBase {
+    readonly approvalId?: never;
+    readonly argsSummary?: never;
+    readonly decision: 'invalid-input';
+    readonly issueCount: number;
+    readonly reason?: never;
+    readonly timestamp: Date;
+}
+
+// @public
+export interface InvalidInputAuditRecordInput extends AuditRecordBase {
+    readonly approvalId?: never;
+    readonly argsSummary?: never;
+    readonly decision: 'invalid-input';
+    readonly issueCount: number;
+    readonly reason?: never;
+    readonly timestamp: Date;
+}
 
 // @public
 export function isApprovalCancellation(result: ApprovalOutcome | ApprovalCancellation): result is ApprovalCancellation;
@@ -3006,6 +3044,18 @@ export interface RecordApprovalDecisionOptions {
     readonly writer: AuditWriter;
 }
 
+// @public
+export function recordInvalidInput(options: RecordInvalidInputOptions): Promise<void>;
+
+// @public
+export interface RecordInvalidInputOptions {
+    readonly apiKeyId: string;
+    readonly issueCount: number;
+    readonly permission: string;
+    readonly timestamp: Date;
+    readonly writer: AuditWriter;
+}
+
 // @public (undocumented)
 export type RectType = z.infer<typeof RectTypeSchema>;
 
@@ -3644,17 +3694,34 @@ export type SensitivityTag = z.infer<typeof SensitivityTagSchema>;
 export const SensitivityTagSchema: z.ZodString;
 
 // @public
+export function serializeAuditRecord(record: GovernedAuditRecord): SerializedGovernedAuditRecord;
+
+// @public
+export function serializeAuditRecord(record: InvalidInputAuditRecord): SerializedInvalidInputAuditRecord;
+
+// @public
 export function serializeAuditRecord(record: AuditRecord): SerializedAuditRecord;
 
 // @public
-export interface SerializedAuditRecord {
-    readonly apiKeyId: string;
-    readonly app: string;
+export type SerializedAuditRecord = SerializedGovernedAuditRecord | SerializedInvalidInputAuditRecord;
+
+// @public
+export interface SerializedGovernedAuditRecord extends AuditRecordBase {
     readonly approvalId?: string;
     readonly argsSummary: string;
-    readonly capability: string;
-    readonly decision: AuditDecision;
+    readonly decision: GovernedAuditDecision;
+    readonly issueCount?: never;
     readonly reason?: string;
+    readonly timestamp: string;
+}
+
+// @public
+export interface SerializedInvalidInputAuditRecord extends AuditRecordBase {
+    readonly approvalId?: never;
+    readonly argsSummary?: never;
+    readonly decision: 'invalid-input';
+    readonly issueCount: number;
+    readonly reason?: never;
     readonly timestamp: string;
 }
 

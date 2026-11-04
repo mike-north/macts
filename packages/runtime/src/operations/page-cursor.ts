@@ -5,7 +5,7 @@
  * A cursor is opaque to callers and stateless on the service: nothing is
  * stored when one is issued, it is not signed, and it never expires. It
  * carries no authority, because every page runs the full invocation pipeline
- * (credential, permission, governance, validation) like any other call; a
+ * (credential, permission, validation, governance) like any other call; a
  * forged cursor can only name a position in a listing the caller may already
  * read. What it does carry is enough to continue exactly and to refuse to
  * continue anything else:

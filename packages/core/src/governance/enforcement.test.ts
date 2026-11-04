@@ -12,10 +12,16 @@
  *      and reason.
  *
  * @see https://github.com/mike-north/macts/issues/53
+ * @see phases/13-sdk-value-and-execution-contracts.md (D5: `invalid-input` records)
  */
 
 import { describe, expect, it } from 'vitest'
-import { enforceCall, recordApprovalCancellation, recordApprovalDecision } from './enforcement.js'
+import {
+  enforceCall,
+  recordApprovalCancellation,
+  recordApprovalDecision,
+  recordInvalidInput,
+} from './enforcement.js'
 import type { EnforceCallOptions, CallAuditContext } from './enforcement.js'
 import type { ApprovalOutcome } from './approval.js'
 import type { AuditRecord } from './audit.js'
@@ -487,5 +493,48 @@ describe('recordApprovalCancellation', () => {
     expect(records[0]?.app).toBe('calendar')
     expect(records[0]?.approvalId).toBe('approval-123')
     expect(records[0]?.reason).toBe('the caller cancelled while waiting')
+  })
+})
+
+describe('recordInvalidInput', () => {
+  // phases/13 D5: a call rejected by input validation writes one
+  // `invalid-input` record with its issue count and no argument values.
+  it('records the rejection with attribution and the issue count only', async () => {
+    const { writer, records } = makeCapturingWriter()
+
+    await recordInvalidInput({
+      permission: 'calendar:events:create',
+      apiKeyId: 'test-key-001',
+      timestamp: FIXED_TIMESTAMP,
+      issueCount: 3,
+      writer,
+    })
+
+    expect(records).toEqual([
+      {
+        capability: 'calendar:events:create',
+        app: 'calendar',
+        apiKeyId: 'test-key-001',
+        decision: 'invalid-input',
+        timestamp: FIXED_TIMESTAMP,
+        issueCount: 3,
+      },
+    ])
+  })
+
+  it('surfaces a failed write to the caller', async () => {
+    const writer: AuditWriter = {
+      append: () => Promise.reject(new Error('audit disk full')),
+    }
+
+    await expect(
+      recordInvalidInput({
+        permission: 'calendar:events:create',
+        apiKeyId: 'test-key-001',
+        timestamp: FIXED_TIMESTAMP,
+        issueCount: 1,
+        writer,
+      })
+    ).rejects.toThrow('audit disk full')
   })
 })

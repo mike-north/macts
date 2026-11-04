@@ -40,10 +40,12 @@ if (result.valid) {
 
 Every operation runs through one pipeline, in this order, for every caller:
 verify the credential, admit the call against the optional per-subject rate
-limit, check the operation's permission, enforce governance policy (auditing
-the decision and, for a held call, asking a human), validate the input, hand
-the request to the executor the runtime was built with, then validate the
-result against the operation's output contract. Failures are the structured
+limit, check the operation's permission, validate the input, enforce
+governance policy (auditing the decision and, for a held call, asking a
+human), hand the request to the executor the runtime was built with, then
+validate the result against the operation's output contract. A call whose
+input fails validation is recorded as an `invalid-input` audit entry and is
+never put to policy or an approver. Failures are the structured
 errors from `@macts/contracts`.
 
 A result that does not match the operation's output contract fails with
