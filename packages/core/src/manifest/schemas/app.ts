@@ -150,5 +150,9 @@ export const AppManifestSchema = z
     }
   })
   // A singleton root's identity is derived from its kinds (see `../roots.ts`).
+  // Roots must normalise before superclass flattening: normalisation replaces
+  // a root's identifiers whole, so flattening must never see (or copy into the
+  // root) an inherited primary identifier, and nothing may inherit from a root
+  // before its `kind` identity exists.
   .overwrite((data) => normalizeRoots(data))
 export type AppManifest = z.infer<typeof AppManifestSchema>

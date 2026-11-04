@@ -40,7 +40,11 @@ import {
   type ValuePlan,
   type WireRecord,
 } from '@macts/contracts'
-import { archiveManifest } from '../manifest/test-support/archive-key-and-root.js'
+import { parseManifestYaml } from '../manifest/loader.js'
+import {
+  ARCHIVE_MANIFEST_YAML,
+  archiveManifest,
+} from '../manifest/test-support/archive-key-and-root.js'
 import type { NativeScript } from './native-codec.js'
 import { createNativeExecutor } from './native-executor.js'
 import {
@@ -456,6 +460,46 @@ describe('singleton roots against a stand-in Archive', () => {
     expect(error).toBeInstanceOf(AppOperationError)
   })
 
+  it('gets and lists a root with one kind, as it would any other', async () => {
+    // The Archive source with the back desk's kind removed.
+    const oneKind = parseManifestYaml(
+      ARCHIVE_MANIFEST_YAML.replace(/\n {6}back:\n(?: {8}.*\n)+/, '\n')
+    )
+    expect(oneKind.enums['DeskKind']?.values).toEqual([{ name: 'front', value: 'front' }])
+    const frontOnly: ValuePlan = { kind: 'enum', members: ['front'] }
+    const plans = {
+      ...RESOURCE_PLANS,
+      Desk: { id: frontOnly },
+    }
+    const deskPlan: ValuePlan = {
+      kind: 'record',
+      fields: {
+        kind: { presence: 'required', value: frontOnly },
+        clerk: { presence: 'required', value: nullable(text()) },
+        featured: { presence: 'required', value: nullable(ENTRY_REF) },
+        bell: { presence: 'required', value: nullable(text()) },
+      },
+    }
+    const { app } = standInArchive()
+    const executor = createNativeExecutor({ transport: standInTransport(app) })
+    const run = (command: string, input: WireRecord, inputPlan: ValuePlan, outputPlan: ValuePlan) =>
+      executor.execute({
+        manifest: oneKind,
+        target: { command, resource: 'Desk' },
+        input,
+        inputPlan,
+        outputPlan,
+        resourcePlans: plans,
+      })
+
+    await expect(
+      run('getDesk', { kind: 'front' }, inputOf(frontOnly, 'kind'), deskPlan)
+    ).resolves.toEqual({ kind: 'front', clerk: 'Kim', featured: ref('Entry', '/a'), bell: null })
+    await expect(
+      run('listDesks', {}, { kind: 'record', fields: {} }, { kind: 'array', items: deskPlan })
+    ).resolves.toEqual([{ kind: 'front', clerk: 'Kim', featured: ref('Entry', '/a'), bell: null }])
+  })
+
   it('resolves a reference by kind to the record its get returns', async () => {
     const { app } = standInArchive()
 
@@ -571,6 +615,33 @@ describe('absent values against a stand-in Archive', () => {
     })
 
     const error = await rejectionOf(getEntry(app))
+
+    expect(error).toBeInstanceOf(UnexpectedValueError)
+  })
+
+  it('reads -1728 on a property with evidence of it as null when resolving a reference', async () => {
+    const { app } = standInArchive({
+      entryMembers: {
+        properties: () => ({ location: '/a', title: 'A', holder: null, summary: 'Kept' }),
+        shelfMark: failing(-1728),
+      },
+    })
+
+    await expect(resolve(app, ref('Entry', '/a').reference, ENTRY_PLAN)).resolves.toMatchObject({
+      location: '/a',
+      shelfMark: null,
+    })
+  })
+
+  it('fails -1728 on a property with no such evidence when resolving a reference', async () => {
+    const { app } = standInArchive({
+      entryMembers: {
+        properties: () => ({ location: '/a', title: 'A', holder: null, shelfMark: 'S1' }),
+        summary: failing(-1728),
+      },
+    })
+
+    const error = await rejectionOf(resolve(app, ref('Entry', '/a').reference, ENTRY_PLAN))
 
     expect(error).toBeInstanceOf(UnexpectedValueError)
   })

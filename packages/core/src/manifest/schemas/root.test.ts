@@ -26,7 +26,7 @@
 import { load } from 'js-yaml'
 import { describe, expect, it } from 'vitest'
 import { ARCHIVE_MANIFEST_YAML } from '../test-support/archive-key-and-root.js'
-import { resolveRoots, rootProperties } from '../roots.js'
+import { normalizeRoots, resolveRoots, rootProperties } from '../roots.js'
 import { AppManifestSchema } from './app.js'
 
 /** The parts of the Archive source the variants below change. */
@@ -163,6 +163,24 @@ describe('singleton roots: the identity validation derives', () => {
   it('validates a validated manifest to the same manifest', () => {
     const once = AppManifestSchema.parse(archiveSource())
     expect(AppManifestSchema.parse(once)).toEqual(once)
+  })
+
+  it('replaces any identifiers a root already carries with the single kind identifier', () => {
+    const manifest = AppManifestSchema.parse(archiveSource())
+    const desk = manifest.resources['Desk']
+    const entryIdentifiers = manifest.resources['Entry']?.identifiers
+    if (desk === undefined || entryIdentifiers === undefined) throw new Error('fixture lacks Desk')
+    const inherited = {
+      ...manifest,
+      resources: { ...manifest.resources, Desk: { ...desk, identifiers: entryIdentifiers } },
+    }
+    const normalized = normalizeRoots(inherited).resources['Desk']
+    expect(normalized?.identifiers).toHaveLength(1)
+    expect(normalized?.identifiers?.[0]).toMatchObject({
+      property: 'kind',
+      primary: true,
+      targeting: 'byRoot',
+    })
   })
 
   it('gives a one-kind root that kind as its only value', () => {
