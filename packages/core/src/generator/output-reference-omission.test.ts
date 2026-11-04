@@ -1,7 +1,8 @@
 /**
- * Tests for the rule that generated surfaces never declare an output position
- * holding a reference no caller could resolve, over the Shelf fixture (see
- * `shelfManifest` for its cases).
+ * Tests for the interim rule that generated surfaces do not declare an output
+ * position holding a reference macts cannot yet resolve, over the Shelf
+ * fixture (see `shelfManifest` for its cases). Each such position is a
+ * coverage gap (#219), left out until macts provides the missing piece.
  *
  * Every expected value is written by hand from the fixture and the rule
  * (phases/13 D7, "Resolvable targets", "Container scoping", "Name-keyed
@@ -9,8 +10,8 @@
  * resource with no `get`, or whose `get` records a parent, is left out of the
  * contract, the HTTP client, the CLI and the native reads, with a generation
  * warning citing #219; so is one holding a reference to a resource identified
- * by a name its primary identifier does not claim unique, with a warning
- * citing D7, while the same resource with a `unique: true` claim is declared;
+ * by a name its primary identifier does not claim unique, while the same
+ * resource with a `unique: true` claim is declared;
  * input positions follow their own rule and are still generated.
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md §D7
@@ -47,7 +48,7 @@ const OMITTED_FIELDS = ['currentChapter', 'topAuthor', 'authors', 'series', 'gen
 
 /** The warning for a Library field left out because its target is not unique. */
 function notUniqueWarning(field: string, target: string): string {
-  return `shelf: resources.Library.properties.${field}: the Library field "${field}" is left out of output: it holds a reference to "${target}", which is identified by its name, and no unique claim shows the name identifies one object (phases/13 D7, name-keyed resources).`
+  return `shelf: resources.Library.properties.${field}: the Library field "${field}" is left out of output for now: it holds a reference to "${target}", which macts identifies by its name, and macts has no evidence yet that the name identifies one "${target}" (#219).`
 }
 
 describe('the generated contract', () => {
@@ -90,7 +91,7 @@ describe('the generated contract', () => {
     )
   })
 
-  it('declares no result for a command whose result could not be resolved', () => {
+  it('declares no result for a command whose result macts cannot yet resolve', () => {
     const author = declaration(text, / {2}id: 'shelf\.app\.featuredAuthor',[\s\S]*?\n\}/)
     expect(author).toContain('  output: t.none(),')
     const series = declaration(text, / {2}id: 'shelf\.app\.featuredSeries',[\s\S]*?\n\}/)
@@ -105,15 +106,15 @@ describe('the generated contract', () => {
         .filter(({ kind }) => kind === 'omitted-output')
         .map(({ message }) => message)
     ).toEqual([
-      'shelf: resources.Library.properties.currentChapter: the Library field "currentChapter" is left out of output: it holds a reference to "Chapter", which the app gets only within its container, and references read from the app carry no container (#219).',
-      'shelf: resources.Library.properties.topAuthor: the Library field "topAuthor" is left out of output: it holds a reference to "Author", which the app has no operation to get (#219).',
-      'shelf: resources.Library.properties.authors: the Library field "authors" is left out of output: it holds a reference to "Author", which the app has no operation to get (#219).',
+      'shelf: resources.Library.properties.currentChapter: the Library field "currentChapter" is left out of output for now: it holds a reference to "Chapter", which the app finds only within its container, and macts does not yet return a "Chapter" reference with its container (#219, #242).',
+      'shelf: resources.Library.properties.topAuthor: the Library field "topAuthor" is left out of output for now: it holds a reference to "Author", and macts has no get for "Author" yet (#219).',
+      'shelf: resources.Library.properties.authors: the Library field "authors" is left out of output for now: it holds a reference to "Author", and macts has no get for "Author" yet (#219).',
       // A name-keyed identifier with no unique claim.
       notUniqueWarning('series', 'Series'),
       // Matched on its name, and claimed not unique, like Calendar's calendars.
       notUniqueWarning('genre', 'Genre'),
-      'shelf: commands.featuredAuthor.returns: the result of "featuredAuthor" is left out of output: it holds a reference to "Author", which the app has no operation to get (#219).',
-      'shelf: commands.featuredSeries.returns: the result of "featuredSeries" is left out of output: it holds a reference to "Series", which is identified by its name, and no unique claim shows the name identifies one object (phases/13 D7, name-keyed resources).',
+      'shelf: commands.featuredAuthor.returns: the result of "featuredAuthor" is left out of output for now: it holds a reference to "Author", and macts has no get for "Author" yet (#219).',
+      'shelf: commands.featuredSeries.returns: the result of "featuredSeries" is left out of output for now: it holds a reference to "Series", which macts identifies by its name, and macts has no evidence yet that the name identifies one "Series" (#219).',
     ])
     // The unsupported `retiredSeries` is on no surface, so it is not reported.
   })
@@ -172,7 +173,7 @@ describe('a resource with a get but no identifier', () => {
         target: 'Book',
         reason: 'no-identifier',
         message:
-          'shelf: resources.Library.properties.favoriteBook: the Library field "favoriteBook" is left out of output: it holds a reference to "Book", which has no identifier, so no reference read from the app can name one (phases/13 D7, resolvable targets).',
+          'shelf: resources.Library.properties.favoriteBook: the Library field "favoriteBook" is left out of output for now: it holds a reference to "Book", and macts has no identifier for "Book" yet (#219).',
       },
       {
         kind: 'omitted-output',
@@ -181,7 +182,7 @@ describe('a resource with a get but no identifier', () => {
         target: 'Book',
         reason: 'no-identifier',
         message:
-          'shelf: commands.featuredBook.returns: the result of "featuredBook" is left out of output: it holds a reference to "Book", which has no identifier, so no reference read from the app can name one (phases/13 D7, resolvable targets).',
+          'shelf: commands.featuredBook.returns: the result of "featuredBook" is left out of output for now: it holds a reference to "Book", and macts has no identifier for "Book" yet (#219).',
       },
     ])
   })

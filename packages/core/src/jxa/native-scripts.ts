@@ -270,7 +270,8 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
 /**
  * Statements that build the local record `obj` from the properties one item's
  * output record declares (its usable properties, less those holding a
- * reference no caller could resolve, see `outputProperties`), keyed by their
+ * reference macts cannot yet return in a resolvable form, see
+ * `outputProperties`), keyed by their
  * public names. get, create and update all return a record built here, so
  * the three cannot drift, and none reads a field the contract leaves out.
  *

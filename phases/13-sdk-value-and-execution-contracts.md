@@ -1451,26 +1451,34 @@ The contract, HTTP client and CLI generators, the capability registry and the
 permission listing take this judgment from one manifest-level function.
 Generation fails if the contract disagrees with it.
 
-Generated contracts never declare an output position whose reference a
-caller could not use, either. Every reference a manifest type describes is a
-single reference, and an array of them is a list of single references, so
-each needs its target's `get`. An output reference cannot be used when:
+Generated contracts also never declare an output position at which macts
+cannot yet return a reference a caller can resolve. This is an interim truth
+guard, not the goal. Where an app exposes a relationship and a path to its
+target, macts is to provide that path and a reference that hydrates through
+it, and an omitted position is a gap in what macts covers, not something the
+app cannot do (#219). Every reference a manifest type describes is a single
+reference, and an array of them is a list of single references, so each
+needs its target's `get`. macts cannot yet return a usable reference when:
 
-- its target has no usable `get`, so no reference to it can be resolved;
-- its target has no primary identifier, so it has no identity form, and
-  native reads emit only identity references (native emission, below);
-- that `get` records a parent (D10, command parents): native reads emit no
-  container (container scoping, below), so a reference read from the app to a
-  target identified only within its container could not be resolved;
-- or its target is name-keyed and its name is not claimed unique (name-keyed
-  resources, below), so the reference would resolve to whichever object has
-  that name, not necessarily the one the app returned.
+- macts has no usable `get` for the target yet, so no reference to it can be
+  resolved;
+- macts has no primary identifier for the target yet, so the target has no
+  identity form, and native reads emit only identity references (native
+  emission, below);
+- that `get` records a parent (D10, command parents), and native reads do
+  not return containers yet (container scoping, below; #242), so a reference
+  read from the app to a target identified only within its container could
+  not be resolved;
+- or macts identifies the target by its name, and the manifest has no
+  evidence yet that the name is unique (name-keyed resources, below), so the
+  reference would resolve to whichever object has that name, not necessarily
+  the one the app returned.
 
 A position that holds such a reference anywhere, bare, in an array, or as the
-non-null case of a nullable value, is left out of output; generation does not
-fail. `null` and the empty array do not rescue it, as they do an input,
-because the app decides what it returns and every other value would be
-unusable. Leaving it out means:
+non-null case of a nullable value, is left out of output for now; generation
+does not fail. `null` and the empty array do not rescue it, as they do an
+input, because the app decides what it returns and no non-null value could be
+resolved yet. Leaving it out means:
 
 - A record field holding one is declared by no record type: not the
   contract's record and its value type, not the HTTP client's read type and
@@ -1478,23 +1486,26 @@ unusable. Leaving it out means:
   update bodies do not read it.
 - An operation whose result holds one declares no result.
 - Generation warns once per position, naming the app, the resource and field
-  (or the command), the target and the reason. A warning for a missing or
-  parent-scoped `get` cites #219; one for a missing identifier or a name
-  that is not claimed unique cites this decision. The field returns once its
-  target gains a `get` that records no parent, an identifier, or a unique
-  claim with evidence.
+  (or the command), the target and what macts does not provide yet, for
+  example "macts has no get for "Mailbox" yet". Every warning cites #219.
+  The position returns on regeneration once coverage closes the gap: a `get`
+  for the target that records no parent and an identifier, returned
+  containers (#242), or a unique claim with evidence.
 
 Input positions follow the input rule above, so a field left out of output
 may still be settable through create and update. The contract, HTTP client
 and CLI generators and the native reads take this judgment from one
 manifest-level function too, and generation fails if the contract disagrees
 with it. A manifest that is inconsistent, such as an identifier claimed
-unique without evidence, is still rejected. The exact set of output positions
-the shipped contracts leave out, each with its reason, is pinned by hand in
-`packages/core/src/generator/contract/index.test.ts`, so a new omission, or a
-field returning, is reviewed rather than silent.
+unique without evidence, is still rejected.
+
+The coverage ledger is the exact set of output positions the shipped
+contracts leave out, each with its reason, pinned by hand in
+`packages/core/src/generator/contract/index.test.ts`. A new omission fails
+CI until it is reviewed and added. A removed row means coverage was restored,
+and the field is back in output.
 `e2e/mcp-contracts/test/output-references.integration.test.ts` checks that no
-output reference left in a shipped contract is one a caller could not use,
+output reference left in a shipped contract is one macts cannot yet resolve,
 and pins those that remain.
 
 **Encoding.** Encoding reads only the data fields (`app`, `resource`, `form`,

@@ -1,6 +1,8 @@
 /**
  * Integration: no shipped contract declares an output position holding a
- * reference no caller could use.
+ * reference macts cannot yet resolve. This is an interim truth guard; the
+ * positions it keeps out are coverage gaps (#219), recorded in the coverage
+ * ledger in `packages/core/src/generator/contract/index.test.ts`.
  *
  * Each app package's generated contract is read at its `/contract` subpath,
  * and its manifest from `manifests/<app>/app.yaml`. Every reference in every
@@ -11,14 +13,14 @@
  *
  * - its descriptor records a `get` operation;
  * - that operation's manifest command records no parent, since references
- *   read from the app carry no container;
+ *   read from the app do not carry their container yet (#242);
  * - and it is not identified by a name its primary identifier does not claim
  *   unique, since such a reference does not pin the object the app returned.
  *
  * The output positions that remain are pinned by hand, so a field returning
- * to output is reviewed. The positions the generator leaves out are pinned in
- * `packages/core/src/generator/contract/index.test.ts` ("real app
- * manifests").
+ * to output is reviewed. The positions the generator leaves out are the
+ * coverage ledger in `packages/core/src/generator/contract/index.test.ts`
+ * ("real app manifests").
  *
  * Only the records a contract carries at run time can be walked: those of
  * its resource table, which lists only resources with a get or a list, and
@@ -51,7 +53,7 @@ function primaryIdentifier(manifest: AppManifest, resource: string): Identifier 
   return identifiers.find((entry) => entry.primary) ?? identifiers[0]
 }
 
-/** Why a reference to `resource` read from the app could not be used, if it could not. */
+/** What macts does not provide yet for a reference to `resource` read from the app, if anything. */
 function problem({ manifest, contract }: RealApp, resource: string): string | undefined {
   const descriptor = contract.resources[resource]
   if (descriptor?.get === undefined) return 'no get'

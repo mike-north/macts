@@ -220,7 +220,8 @@ function generateTypesFile(manifest: AppManifest): string {
   // Generate resource types
   for (const [resourceName, resource] of resources) {
     // The read type declares the fields the contract's record declares: a
-    // field holding a reference no caller could resolve is left out
+    // field holding a reference macts cannot yet return in a resolvable form
+    // is left out
     // (`outputProperties`, the judgment the contract and native reads use).
     const props = outputProperties(manifest, resource)
 

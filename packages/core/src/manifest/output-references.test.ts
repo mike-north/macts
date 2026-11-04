@@ -78,7 +78,7 @@ describe('omittedOutputReason', () => {
 })
 
 describe('omittedOutput', () => {
-  it('finds an unusable reference bare, in an array, in a nullable, and nested', () => {
+  it('finds a reference macts cannot yet resolve bare, in an array, in a nullable, and nested', () => {
     const author = { target: 'Author', reason: 'no-get' }
     expect(omittedOutput(manifest, reference('Author'))).toEqual(author)
     expect(omittedOutput(manifest, { kind: 'array', item: reference('Author') })).toEqual(author)
@@ -119,7 +119,7 @@ describe('isNameKeyed', () => {
 })
 
 describe('omittedOutputProperties and outputProperties', () => {
-  it('leave out exactly the unusable fields, and keep the rest in declaration order', () => {
+  it('leave out exactly the fields macts cannot yet resolve, and keep the rest in declaration order', () => {
     expect([...omittedOutputProperties(manifest, resource('Library'))]).toEqual([
       ['currentChapter', { target: 'Chapter', reason: 'parent-scoped' }],
       ['topAuthor', { target: 'Author', reason: 'no-get' }],
@@ -155,7 +155,7 @@ describe('omittedOutputProperties and outputProperties', () => {
 })
 
 describe('omittedOutputResult', () => {
-  it('leaves out an unusable result and keeps a usable or absent one', () => {
+  it('leaves out a result macts cannot yet resolve and keeps a usable or absent one', () => {
     expect(omittedOutputResult(manifest, command('featuredAuthor'))).toEqual({
       target: 'Author',
       reason: 'no-get',

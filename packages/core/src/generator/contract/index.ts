@@ -134,11 +134,14 @@ interface ContractDiagnosticBase {
  *   discovery leave it out. The fix is to give the resource a `get`, with
  *   evidence, or to mark the command unsupported.
  * - `omitted-output`: an output position (a record field, or a command's
- *   result) holds a reference no caller could use: its resource has no `get`,
- *   or a `get` that records a parent, or is identified by a name not claimed
- *   unique. The contract, the HTTP client, the CLI and the native reads leave
- *   it out. The fix is a `get` that records no parent, or a `unique` claim on
- *   the identifier, with evidence.
+ *   result) holds a reference macts cannot yet hand back in a form a caller
+ *   can resolve: macts has no `get` for its resource yet, or no identifier,
+ *   or a `get` that needs the container native reads do not return yet, or no
+ *   evidence that the name it is identified by is unique. The contract, the
+ *   HTTP client, the CLI and the native reads leave it out for now. Each one
+ *   is a coverage gap (#219), closed by giving the resource a `get` and an
+ *   identifier, returning containers (#242), or a `unique` claim on the
+ *   identifier, each with evidence.
  */
 export type ContractDiagnostic =
   | (ContractDiagnosticBase & {
@@ -162,7 +165,7 @@ export type ContractDiagnostic =
       readonly kind: 'omitted-output'
       /** The manifest key of the resource the position references. */
       readonly target: string
-      /** Why a reference to it cannot be used. */
+      /** What macts does not provide yet for a reference to it. */
       readonly reason: OmittedOutputReason
     })
 
@@ -210,15 +213,18 @@ export function contractNames(manifest: AppManifest): ContractNames {
   }
 }
 
-/** Why an omitted output position is left out, as its warning says it. */
-const OMITTED_OUTPUT_REASONS: Readonly<Record<OmittedOutputReason, string>> = {
-  'no-get': 'which the app has no operation to get (#219)',
-  'no-identifier':
-    'which has no identifier, so no reference read from the app can name one (phases/13 D7, resolvable targets)',
-  'parent-scoped':
-    'which the app gets only within its container, and references read from the app carry no container (#219)',
-  'not-unique':
-    'which is identified by its name, and no unique claim shows the name identifies one object (phases/13 D7, name-keyed resources)',
+/**
+ * Why an omitted output position is left out, as its warning says it: the
+ * piece of coverage macts does not provide yet for a reference to `target`.
+ * Every reason cites the coverage ledger, #219.
+ */
+const OMITTED_OUTPUT_REASONS: Readonly<Record<OmittedOutputReason, (target: string) => string>> = {
+  'no-get': (target) => `and macts has no get for "${target}" yet (#219)`,
+  'no-identifier': (target) => `and macts has no identifier for "${target}" yet (#219)`,
+  'parent-scoped': (target) =>
+    `which the app finds only within its container, and macts does not yet return a "${target}" reference with its container (#219, #242)`,
+  'not-unique': (target) =>
+    `which macts identifies by its name, and macts has no evidence yet that the name identifies one "${target}" (#219)`,
 }
 
 /**
@@ -227,7 +233,7 @@ const OMITTED_OUTPUT_REASONS: Readonly<Record<OmittedOutputReason, string>> = {
  * every nullability claim on a primary identifier property, which the
  * contract ignores, every required input position that makes its
  * operation unavailable, and every output position left out because it holds
- * a reference no caller could use.
+ * a reference macts cannot yet return in a resolvable form.
  */
 export function collectContractDiagnostics(manifest: AppManifest): ContractDiagnostic[] {
   const app = normalizeAppRouteSegment(manifest.app.name)
@@ -293,7 +299,7 @@ export function collectContractDiagnostics(manifest: AppManifest): ContractDiagn
       position: omitted.position,
       target: omitted.target,
       reason: omitted.reason,
-      message: `${app}: ${omitted.position}: ${what} is left out of output: it holds a reference to "${omitted.target}", ${OMITTED_OUTPUT_REASONS[omitted.reason]}.`,
+      message: `${app}: ${omitted.position}: ${what} is left out of output for now: it holds a reference to "${omitted.target}", ${OMITTED_OUTPUT_REASONS[omitted.reason](omitted.target)}.`,
     })
   }
   return diagnostics
@@ -890,8 +896,8 @@ class ContractBuilder {
 
   /**
    * Every usable property of a resource as a record field, including those
-   * the record leaves out because they hold a reference no caller could
-   * resolve ({@link ContractBuilder.#resolvesOutput}).
+   * the record leaves out for now because they hold a reference macts
+   * cannot yet return in a resolvable form ({@link ContractBuilder.#resolvesOutput}).
    */
   #allRecordFields(resource: Resource): (FieldModel & { readonly readOnly: boolean })[] {
     return usableProperties(resource).map(([name, prop]) => {
@@ -1051,8 +1057,8 @@ class ContractBuilder {
     // read field: a manifest has no evidence that a command always returns a
     // value. (CRUD results above are never nullable: a missing target fails
     // the operation, and a list is a page, possibly empty.)
-    // A result holding a reference no caller could use is left out, as a
-    // record field holding one is (see `../../manifest/output-references.ts`).
+    // A result holding a reference macts cannot yet return in a resolvable
+    // form is left out, as a record field holding one is (see `../../manifest/output-references.ts`).
     const returns = route.command.returns
     if (returns === undefined) return { kind: 'none' }
     const result = nullableShape(this.#map(returns, 'output'))

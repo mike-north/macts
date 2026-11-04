@@ -1,41 +1,48 @@
 /**
- * Which output positions of an app can hold a reference a caller can use.
+ * Which output positions of an app macts can return a usable reference at
+ * today: an interim truth guard over generated output, and the coverage
+ * ledger of the positions it cannot yet serve.
  *
- * A contract may declare an output reference position only when a reference
- * the app returns there can be resolved, and resolved to the object the app
+ * A contract declares an output reference position only when a reference the
+ * app returns there can be resolved, and resolved to the object the app
  * returned (phases/13 D7, "Resolvable targets", "Name-keyed resources"). Every
  * reference a manifest type describes is a single reference, and an array of
  * them is a list of single references, so each one needs its target's `get`
- * ({@link resolvingCommand}). An output reference cannot be used when:
+ * ({@link resolvingCommand}). Where the app exposes the relationship, a
+ * position macts leaves out is a gap in what macts provides, not something the
+ * app cannot do. macts cannot yet return a usable reference when:
  *
- * - its target has no usable `get`, so no reference to it passes validation;
- * - its target has no primary identifier, so it has no identity form: an
- *   object of it can be addressed only by a selector, and native reads emit
- *   only identity references;
- * - its target's `get` records a parent, so the target is identified only
- *   within its container. Native reads emit no container, so a reference read
- *   from the app could not be resolved either (container chains are a later
- *   extension of native reads);
- * - or its target is identified by its name, and its primary identifier is
- *   not claimed unique. Such a reference resolves to whichever object has that
- *   name when it is resolved, so it does not pin the object the app returned.
- *   An identifier's `unique` claim, with its evidence, is the manifest's
- *   evidence that the name is the app's identity for the resource.
+ * - macts has no usable `get` for the target yet, so no reference to it passes
+ *   validation;
+ * - macts has no primary identifier for the target yet, so the target has no
+ *   identity form: an object of it can be addressed only by a selector, and
+ *   native reads emit only identity references;
+ * - the target's `get` records a parent, so the target is identified only
+ *   within its container, and native reads do not return the container yet
+ *   (#242);
+ * - or macts identifies the target by its name, and the manifest has no
+ *   evidence yet that the name is unique. Such a reference resolves to
+ *   whichever object has that name when it is resolved, so it does not pin the
+ *   object the app returned. An identifier's `unique` claim, with its
+ *   evidence, is the manifest's evidence that the name is the app's identity
+ *   for the resource.
  *
  * A position whose value holds such a reference anywhere (bare, in an array,
- * or as the non-null case of a nullable value) is left out of output: a record
- * type declares no such field, and an operation whose result is one declares
- * no result. Unlike an input position, `null` and the empty array do not
- * rescue it, because the app decides what it returns and every non-null value
- * would be unusable. Input positions follow their own rule
+ * or as the non-null case of a nullable value) is left out of output for now:
+ * a record type declares no such field, and an operation whose result is one
+ * declares no result. Unlike an input position, `null` and the empty array do
+ * not rescue it, because the app decides what it returns and no non-null value
+ * could be resolved yet. Coverage work closes each gap (#219), and the
+ * position returns on regeneration. Input positions follow their own rule
  * (`../generator/input-satisfiability.ts`), so a field left out of output may
  * still be settable.
  *
  * This module is the one place the decision is made. The contract, HTTP client
  * and CLI generators read record fields through it, the contract generator
  * checks its own records and results against it, and the native get, list,
- * create and update bodies read only the properties it keeps, so no surface
- * declares or reads a field another leaves out.
+ * create and update bodies read only the properties it keeps, so none of those
+ * surfaces declares or reads a field another leaves out. The older
+ * `generateSdk` path does not use it yet (#253).
  *
  * Internal to this package: nothing here is part of the public entry.
  *
@@ -60,23 +67,25 @@ import {
 } from './value-shapes.js'
 
 /**
- * Why an output reference cannot be used:
+ * What macts does not provide yet for an output reference to be usable. Each
+ * is a coverage gap (#219), not a limit of the app:
  *
- * - `no-get`: its target has no usable `get` command.
- * - `no-identifier`: its target has no primary identifier, so no identity
- *   reference to one exists.
- * - `parent-scoped`: its target's `get` records a parent, and native reads
- *   emit no container.
- * - `not-unique`: its target is identified by its name, and its primary
- *   identifier is not claimed unique, so the name does not pin one object.
+ * - `no-get`: macts has no usable `get` command for the target yet.
+ * - `no-identifier`: macts has no primary identifier for the target yet, so
+ *   no identity reference to one exists.
+ * - `parent-scoped`: the target's `get` records a parent, and native reads do
+ *   not return containers yet (#242).
+ * - `not-unique`: macts identifies the target by its name, and the manifest
+ *   has no evidence yet that the name is unique, so it does not pin one
+ *   object.
  */
 export type OmittedOutputReason = 'no-get' | 'no-identifier' | 'parent-scoped' | 'not-unique'
 
-/** An output reference that cannot be used, and why. */
+/** An output reference macts cannot return in a usable form yet, and why. */
 export interface OmittedOutput {
   /** The manifest key of the resource the position references. */
   readonly target: string
-  /** Why a reference to it cannot be used. */
+  /** What macts does not provide yet for a reference to it. */
   readonly reason: OmittedOutputReason
 }
 
@@ -101,8 +110,8 @@ export function isNameKeyed(manifest: AppManifest, resourceKey: string): boolean
 }
 
 /**
- * Why a reference read from the app to `resourceKey` cannot be used, or
- * `undefined` when it can: the resource has a usable `get` that records no
+ * What macts does not provide yet for a reference read from the app to
+ * `resourceKey` to be usable, or `undefined` when it can be used: the resource has a usable `get` that records no
  * parent and a primary identifier, and is not name-keyed
  * ({@link isNameKeyed}). The reasons are checked in that order, so the first
  * that applies is reported.
@@ -138,10 +147,10 @@ function referencedResources(shape: ValueShape): string[] {
 }
 
 /**
- * The first reference an output value composition holds that cannot be used,
- * or `undefined` when every reference in it can (or it holds none). Arrays and
- * nullables are looked through: an array holds its items, and a nullable value
- * holds its non-null case.
+ * The first reference an output value composition holds that macts cannot
+ * return in a usable form yet, or `undefined` when every reference in it can
+ * be used (or it holds none). Arrays and nullables are looked through: an
+ * array holds its items, and a nullable value holds its non-null case.
  *
  * @param manifest - The app manifest.
  * @param shape - The composition of the output position.
@@ -161,7 +170,8 @@ function outputShape(type: DeclaredType, names: NameResolver): ValueShape {
 
 /**
  * The usable properties of a resource that its output record leaves out, by
- * property name, with the reference each holds that cannot be used.
+ * property name, with the reference each holds that macts cannot return in a
+ * usable form yet.
  *
  * @param manifest - The app manifest.
  * @param resource - One of the manifest's resources.
@@ -182,8 +192,9 @@ export function omittedOutputProperties(
 /**
  * The properties a resource's output record declares, in declaration order:
  * its usable properties less those {@link omittedOutputProperties} leaves out.
- * Every surface that declares or reads a resource's record takes its fields
- * from here.
+ * The contract, HTTP client and CLI generators and the native reads take a
+ * record's fields from here; the older `generateSdk` path does not yet
+ * (#253).
  *
  * @param manifest - The app manifest.
  * @param resource - One of the manifest's resources.
@@ -198,9 +209,9 @@ export function outputProperties(
 }
 
 /**
- * The reference a command's result holds that cannot be used, or `undefined`
- * when the command records no result or its result can be used. An operation
- * whose result holds one declares no result.
+ * The reference a command's result holds that macts cannot return in a usable
+ * form yet, or `undefined` when the command records no result or its result
+ * can be used. An operation whose result holds one declares no result.
  *
  * @param manifest - The app manifest.
  * @param command - The manifest command.

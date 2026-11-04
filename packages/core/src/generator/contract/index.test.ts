@@ -786,7 +786,7 @@ describe('generateContract: identifier nullability', () => {
 
   it('reports only the output fields the unmodified fixture leaves out', () => {
     // Folder.owner holds a reference to a tag and Folder.sticker one to a
-    // sticker. Jotter has no operation to get either, so both fields are left
+    // sticker. macts has no get for either yet, so both fields are left
     // out of output (phases/13 D7, #219), in declaration order.
     expect(jotter.diagnostics).toEqual([
       {
@@ -796,7 +796,7 @@ describe('generateContract: identifier nullability', () => {
         target: 'Tag',
         reason: 'no-get',
         message:
-          'jotter: resources.Folder.properties.owner: the Folder field "owner" is left out of output: it holds a reference to "Tag", which the app has no operation to get (#219).',
+          'jotter: resources.Folder.properties.owner: the Folder field "owner" is left out of output for now: it holds a reference to "Tag", and macts has no get for "Tag" yet (#219).',
       },
       {
         kind: 'omitted-output',
@@ -805,7 +805,7 @@ describe('generateContract: identifier nullability', () => {
         target: 'Sticker',
         reason: 'no-get',
         message:
-          'jotter: resources.Folder.properties.sticker: the Folder field "sticker" is left out of output: it holds a reference to "Sticker", which the app has no operation to get (#219).',
+          'jotter: resources.Folder.properties.sticker: the Folder field "sticker" is left out of output for now: it holds a reference to "Sticker", and macts has no get for "Sticker" yet (#219).',
       },
     ])
   })
@@ -995,15 +995,18 @@ describe('real app manifests', () => {
   })
 
   it('leave out exactly the hand-audited output positions, each for its reason', () => {
-    // Audited by hand against the manifests (phases/13 D7, resolvable
-    // targets; #219). Every entry is a record field holding a single
-    // reference, or an array of them: `no-get` when the target has no command
-    // named get, `not-unique` when the target is identified by a name its
-    // primary identifier does not claim unique. No shipped output references
-    // a resource whose get records a parent, or one with a get and no
-    // identifier, and no shipped command records a result, so no result is
-    // left out. A new omission, or a field returning
-    // to output, must change this list.
+    // The coverage ledger (#219; phases/13 D7, resolvable targets): every
+    // output position macts cannot yet return a resolvable reference at,
+    // audited by hand against the manifests. Each row is a gap in what macts
+    // covers, not something the app cannot do. Every entry is a record field
+    // holding a single reference, or an array of them: `no-get` when macts
+    // has no get for the target yet, `not-unique` when macts identifies the
+    // target by a name the manifest has no uniqueness evidence for yet. No
+    // shipped output references a resource whose get records a parent, or
+    // one with a get and no identifier, and no shipped command records a
+    // result, so no result is left out. A new omission fails until it is
+    // reviewed and added here. Removing a row records restored coverage: the
+    // field is back in output.
     const found = apps
       .flatMap(({ manifest }) => collectContractDiagnostics(manifest))
       .flatMap((diagnostic) => {

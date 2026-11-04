@@ -11,16 +11,16 @@
 '@macts/xcode': minor
 ---
 
-Generated contracts do not declare an output field holding a reference that no caller could use (#219). A field is left out when it references:
+Generated contracts leave out, for now, an output field holding a reference that macts cannot yet return in a form a caller can resolve. Each is a gap in what macts covers, not something the app cannot do. Restoring them is planned under #219, and each field comes back on regeneration once macts provides a way to read its target. A field is left out when it references:
 
-- a resource the app has no operation to get;
-- a resource with no identifier, which therefore has no identity reference;
-- a resource the app gets only within its container. A reference read from the app carries no container, so it could not be resolved;
-- or a resource identified by its name, when the manifest does not claim that name unique. Such a reference resolves to whichever object has that name, which may not be the one the app returned. A primary identifier claimed `unique: true`, with its evidence, counts as identity.
+- a resource macts has no get for yet;
+- a resource macts has no identifier for yet;
+- a resource the app finds only within its container. macts does not yet return a reference with its container (#242);
+- or a resource macts identifies by its name, when the manifest has no evidence yet that the name is unique. Such a reference resolves to whichever object has that name, which may not be the one the app returned. A primary identifier claimed `unique: true`, with its evidence, counts as identity.
 
-A field left out is not declared by the contract's record type or value type, and native reads do not read it. It is also gone from the HTTP client's read type and schema and from what the CLI prints. Input types are unchanged, so a writable field may still be set. Generation warns once per field left out. The warning names the app, the field, the referenced resource and the reason. The same rule applies to a command result, but no manifest records one yet.
+A field left out is not declared by the contract's record type or value type, and native reads do not read it. It is also gone from the HTTP client's read type and schema and from what the CLI prints. Input types are unchanged, so a writable field may still be set. Generation warns once per field left out. The warning names the app, the field, the referenced resource and what macts does not provide yet, for example: macts has no get for "Mailbox" yet. The same rule applies to a command result, but no manifest records one yet. The generator's tests pin every field left out, as a ledger of the coverage still to restore.
 
-Breaking change: these record fields are gone from the HTTP client's read types and schemas, and from what the CLI prints:
+Breaking change: these record fields are gone from the HTTP client's read types and schemas, and from what the CLI prints. Only the four Xcode fields were on records a call returned before this change: RunDestination and WorkspaceDocument have a get and a list. Every other record listed here has no get, list, create or update in macts today, so no call returned it, and only its declared type changes.
 
 - Arc: Window `activeTab` and `activeSpace`.
 - Finder: FinderWindow `listViewOptions`, and ListViewOptions `sortColumn`.
@@ -40,6 +40,4 @@ Breaking change: these record fields are gone from the HTTP client's read types 
   - ScriptingClass `superclass`;
   - ScriptingCommand `directParameter`.
 - TV: BrowserWindow and PlaylistWindow `view`, and Playlist `parent`.
-- Xcode: RunDestination `device` and `companionDevice`, and WorkspaceDocument `lastSchemeActionResult` and `activeRunDestination`. A run destination is identified by its name, which is not claimed unique.
-
-Each field comes back once its resource gains a `get` that does not need a container, or a unique claim for its name with evidence.
+- Xcode, on records a call returns: RunDestination `device` and `companionDevice` (macts has no get for Device yet), and WorkspaceDocument `lastSchemeActionResult` (no get for SchemeActionResult yet) and `activeRunDestination`. A run destination is identified by its name, and the manifest has no evidence yet that the name is unique.
