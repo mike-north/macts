@@ -241,7 +241,7 @@ describe.skipIf(!liveAppsEnabled)(
 
     it(
       'finds no track within a playlist that does not hold it',
-      async () => {
+      async (context) => {
         if (holder === undefined) return
         const chosen = holder
         const first = chosen.tracks[0]
@@ -258,7 +258,13 @@ describe.skipIf(!liveAppsEnabled)(
             `playlists lacking the first track: ${String(lacking.length)}, ` +
             `empty playlists: ${String(listed.filter(({ tracks }) => tracks.length === 0).length)}`
         )
-        expect(foreign.length + lacking.length > 0).toBe(true)
+        // A library with no such pair (only the library playlist, say) cannot
+        // exercise this case. The test is reported as skipped, so it is never
+        // counted as passing without checking anything.
+        if (foreign.length + lacking.length === 0) {
+          context.skip('no playlist lacks a track that another playlist holds')
+          return
+        }
 
         const cases = [
           ...foreign.map((track) => [track.persistentID, chosen.playlist.persistentID] as const),
