@@ -39,7 +39,7 @@ import {
   type ValueType,
 } from '@macts/contracts'
 import { PASSTHROUGH_OUTPUT_TYPE, passthroughInputType } from './passthrough.js'
-import { buildCommandSchema } from './request-schema.js'
+import { buildDeclaredInputSchema } from './request-schema.js'
 
 /**
  * One operation the runtime can invoke.
@@ -216,9 +216,12 @@ function toRegisteredOperation(
  * the manifest command key, and a command scoped to several resource types
  * yields one operation per type.
  *
- * The descriptors use passthrough value types: the input is validated against
- * the command's request schema and must be plain JSON, and the output is any
- * JSON value. They stand in for generated descriptors until generated contracts
+ * The descriptors use passthrough value types: the input must hold exactly
+ * the command's declared parameters (`buildDeclaredInputSchema`), as plain
+ * JSON, so a key that is not a parameter is rejected as it is for an operation
+ * registered from a contract; the output is any JSON value. A
+ * manifest-registered list does not page, so its input declares no paging
+ * inputs. They stand in for generated descriptors until generated contracts
  * carry value types, and the generator never produces them.
  *
  * @param manifest - A validated app manifest.
@@ -233,7 +236,7 @@ export function operationsFromManifest(manifest: AppManifest): RegisteredOperati
   return deriveManifestOperations(manifest).map(({ id, permission, target, command }) => {
     let input = inputTypes.get(target.command)
     if (input === undefined) {
-      input = passthroughInputType(buildCommandSchema(command))
+      input = passthroughInputType(buildDeclaredInputSchema(command))
       inputTypes.set(target.command, input)
     }
     const descriptor: AnyOperationDescriptor = {

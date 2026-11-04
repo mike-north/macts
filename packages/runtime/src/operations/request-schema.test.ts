@@ -7,7 +7,11 @@
 
 import { describe, it, expect } from 'vitest'
 import type { Command } from '@macts/core'
-import { buildCommandSchema, buildSchemaRegistry } from './request-schema.js'
+import {
+  buildCommandSchema,
+  buildDeclaredInputSchema,
+  buildSchemaRegistry,
+} from './request-schema.js'
 
 /**
  * Create a minimal Command for testing, with overrides.
@@ -253,5 +257,65 @@ describe('buildSchemaRegistry', () => {
 
     const invalid = schema.safeParse({ title: 'Test', count: 'not-a-number' })
     expect(invalid.success).toBe(false)
+  })
+})
+
+describe('buildDeclaredInputSchema', () => {
+  const CREATE = createCommand({
+    parameters: [
+      { name: 'title', type: 'string', description: 'Title', required: true },
+      { name: 'count', type: 'integer', description: 'Count', required: false },
+      { name: 'due', type: 'date', description: 'Due', required: false },
+    ],
+  })
+
+  it('accepts every declared parameter, typed as the permissive schema types it', () => {
+    const result = buildDeclaredInputSchema(CREATE).safeParse({
+      title: 'Hello',
+      count: 3,
+      due: '2024-01-15',
+    })
+    expect(result).toEqual({
+      success: true,
+      data: { title: 'Hello', count: 3, due: '2024-01-15' },
+    })
+  })
+
+  it('accepts optional parameters left out', () => {
+    expect(buildDeclaredInputSchema(CREATE).safeParse({ title: 'Hello' }).success).toBe(true)
+  })
+
+  it('rejects a key that is not a declared parameter, with one issue at the record', () => {
+    const result = buildDeclaredInputSchema(CREATE).safeParse({ title: 'Hello', id: 'x' })
+    expect(result.success).toBe(false)
+    expect(result.error?.issues).toHaveLength(1)
+    expect(result.error?.issues[0]).toMatchObject({
+      code: 'unrecognized_keys',
+      path: [],
+      keys: ['id'],
+    })
+  })
+
+  it('reports several undeclared keys in one issue', () => {
+    const result = buildDeclaredInputSchema(CREATE).safeParse({ title: 'Hello', a: 1, b: 2 })
+    expect(result.error?.issues).toHaveLength(1)
+    expect(result.error?.issues[0]).toMatchObject({ code: 'unrecognized_keys', keys: ['a', 'b'] })
+  })
+
+  it('still rejects a wrongly typed or missing declared parameter', () => {
+    expect(buildDeclaredInputSchema(CREATE).safeParse({ title: 1 }).error?.issues[0]?.path).toEqual(
+      ['title']
+    )
+    expect(buildDeclaredInputSchema(CREATE).safeParse({}).error?.issues[0]?.path).toEqual(['title'])
+  })
+
+  it('admits only an empty record when the command has no parameters', () => {
+    const schema = buildDeclaredInputSchema(createCommand({ parameters: [] }))
+    expect(schema.safeParse({}).success).toBe(true)
+    expect(schema.safeParse({ anything: 'goes' }).success).toBe(false)
+  })
+
+  it('leaves the permissive schema of the same command unchanged', () => {
+    expect(buildCommandSchema(CREATE).safeParse({ title: 'Hello', id: 'x' }).success).toBe(true)
   })
 })
