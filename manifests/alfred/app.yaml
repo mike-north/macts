@@ -29,9 +29,13 @@ resources:
     plural: Applications
     description: The Alfred application
     code: capp
+    # The application class is the Standard Suite's `application` (NSCoreSuite's
+    # NSApplication), which declares `name`, `version` and `frontmost` and no `id`
+    # property, so the application is targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
     properties:
       name:
         access: r

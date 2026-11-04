@@ -1998,10 +1998,13 @@ describe('missing targets and parents fail as no such object', () => {
 })
 
 describe('identifier parameter names (issue #26)', () => {
-  it('Notes get reads the `name` parameter, not `id`', () => {
+  // A note's `id` is its dictionary id, and the get takes its name, so the
+  // note is matched on its name (phases/13 D10, identifier targeting).
+  it('Notes get reads the `name` parameter, not `id`, and matches on it', () => {
     const text = buildNativeBody(notes, { command: 'get', resource: 'Note' })
     expect(text).toContain('var itemId = args["name"];')
-    expect(text).toContain('app["notes"].byId(itemId)')
+    expect(text).toContain('app["notes"].whose({ "name": itemId })[0]')
+    expect(text).not.toContain('byId')
     expect(text).not.toContain('args["id"]')
   })
 

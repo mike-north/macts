@@ -244,9 +244,13 @@ resources:
     plural: Settings
     description: A named value in an action
     code: stng
+    # Automator's scripting suite (Automator.scriptSuite) defines a setting
+    # (AMScriptingSetting) with `name`, `value` and `default value`, and no `id`
+    # property, so a setting is targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
     properties:
       name:
         access: r
@@ -269,9 +273,14 @@ resources:
     plural: RequiredResources
     description: A resource required for proper operation of the action
     code: reqr
+    # Automator's scripting suite (Automator.scriptSuite) defines a required
+    # resource (AMScriptingRequiredResource) with `name`, `kind`, `resource` and
+    # `version`, and no `id` property, so a required resource is targeted by name,
+    # never by id.
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
     properties:
       kind:
         access: r

@@ -24,9 +24,14 @@ resources:
     plural: Documents
     description: A TextEdit document
     code: docu
+    # TextEdit's suite (TextEdit.scriptSuite) defines its document as the
+    # Standard Suite's `document` (NSCoreSuite's NSDocument), which declares
+    # `name`, `modified` and `path` and no `id` property, so a document is
+    # targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
     properties:
       name:
         access: rw

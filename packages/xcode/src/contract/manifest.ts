@@ -196,6 +196,7 @@ export const manifest: unknown = {
         {
           property: 'name',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
     },
@@ -266,6 +267,7 @@ export const manifest: unknown = {
         {
           property: 'name',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
     },
@@ -336,6 +338,7 @@ export const manifest: unknown = {
         {
           property: 'name',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
     },
@@ -467,6 +470,7 @@ export const manifest: unknown = {
         {
           property: 'name',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
     },
@@ -495,6 +499,7 @@ export const manifest: unknown = {
         {
           property: 'name',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
     },
@@ -637,6 +642,7 @@ export const manifest: unknown = {
         {
           property: 'deviceIdentifier',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
     },
@@ -747,6 +753,7 @@ export const manifest: unknown = {
         {
           property: 'message',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
     },
@@ -803,6 +810,7 @@ export const manifest: unknown = {
         {
           property: 'message',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
     },
@@ -859,6 +867,7 @@ export const manifest: unknown = {
         {
           property: 'message',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
     },
@@ -915,6 +924,7 @@ export const manifest: unknown = {
         {
           property: 'message',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
     },

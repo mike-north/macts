@@ -42,9 +42,13 @@ resources:
         description: Whether the account has been upgraded
         code: upgr
         optional: false
+    # Notes.sdef gives an account both `id` (code `ID  `) and `name`. This
+    # manifest identifies an account by `name`, which is not the dictionary id,
+    # so an account is targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
     nullabilityProbe:
       observedAt: '2026-11-01T08:33:35.626Z'
       bundleId: com.apple.Notes
@@ -96,9 +100,13 @@ resources:
         description: Whether the folder is shared
         code: NTsh
         optional: false
+    # Notes.sdef gives a folder both `id` (code `ID  `) and `name`. This manifest
+    # identifies a folder by `name`, which is not the dictionary id, so a folder
+    # is targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
     nullabilityProbe:
       observedAt: '2026-11-01T09:28:11.279Z'
       bundleId: com.apple.Notes
@@ -220,9 +228,13 @@ resources:
             sampleSize: 60
             nullCount: 0
             failedReads: 0
+    # Notes.sdef gives a note both `id` (code `ID  `) and `name`. This manifest
+    # identifies a note by `name`, which is not the dictionary id, so a note is
+    # targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
     nullabilityProbe:
       observedAt: '2026-11-01T08:33:35.626Z'
       bundleId: com.apple.Notes

@@ -28,9 +28,14 @@ resources:
     plural: Documents
     description: A system profile document
     code: docu
+    # System Information's suite (System Profiler.scriptSuite) defines its
+    # document (SPDocument) on the Standard Suite's `document` (NSCoreSuite's
+    # NSDocument), which declares `name`, `modified` and `path`. Neither declares
+    # an `id` property, so a document is targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
     properties:
       name:
         access: r
