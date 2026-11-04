@@ -28,7 +28,12 @@ export * from './identifier.js'
 // Which declared parameter selects the item a get, update or delete acts on
 // (single source of truth shared by the generators, the native planner and
 // operation registration, so each refuses the same commands)
-export * from './item-selection.js'
+export {
+  itemIdentifierParameter,
+  itemSelectionProblem,
+  unselectableItemCommands,
+  type UnselectableItemCommand,
+} from './item-selection.js'
 
 // Nullability and resettability decisions for manifest fields (single source
 // of truth shared by the contract generator and the nullability probe)

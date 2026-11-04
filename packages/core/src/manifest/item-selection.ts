@@ -2,13 +2,19 @@
  * Which declared parameter selects the item a command acts on.
  *
  * A resource-scoped `get`, `update` or `delete` acts on one item of its
- * resource, and a `delete` at either scope removes one item. Each selects
- * that item by a parameter the manifest declares: its first required
- * parameter other than its parent's (the parameter `command.parent` names).
- * Every surface reads that one parameter. The generated contract, HTTP client
- * and CLI take it as the item's identifier, the native body addresses the
- * item by it, and registration admits it as input. No surface supplies a name
- * of its own when the manifest declares none.
+ * resource, and selects that item by a parameter the manifest declares: its
+ * first required parameter other than its parent's (the parameter
+ * `command.parent` names). The generated contract, HTTP client and CLI take
+ * that parameter as the item's identifier, the native body addresses the item
+ * in its resource's collection by it, and registration admits it as input.
+ *
+ * A `delete` at application scope must declare a required parameter too. Its
+ * native body is a call on the app: it passes the command's declared
+ * parameters to the app's delete as they are declared, and addresses no item
+ * itself.
+ *
+ * No surface supplies a parameter name of its own when the manifest declares
+ * none.
  *
  * A command that must select an item and declares no such parameter is
  * refused, by generation and by registration alike, through
@@ -27,15 +33,18 @@ import { resolveManifestRoutes } from './route.js'
  * The command names that act on one item of a resource when the command is
  * resource-scoped. A command of any other name selects no item.
  */
-export const ITEM_COMMAND_NAMES: readonly string[] = ['get', 'update', 'delete']
+const ITEM_COMMAND_NAMES: readonly string[] = ['get', 'update', 'delete']
 
 /**
- * Whether a command must select one item by a declared identifier parameter:
- * a resource-scoped `get`, `update` or `delete`, or a `delete` at application
+ * Whether a command must declare a required identifier parameter: a
+ * resource-scoped `get`, `update` or `delete`, or a `delete` at application
  * scope, which has no other way to name what it removes.
  *
  * @param command - A manifest command.
- * @returns `true` when the command acts on one item it must select.
+ * @returns `true` when the command acts on one item it must name.
+ *
+ * @internal Used within this package only; the public rule is
+ *   {@link itemSelectionProblem} and {@link unselectableItemCommands}.
  */
 export function selectsOneItem(command: Command): boolean {
   if (command.scope === 'resource') return ITEM_COMMAND_NAMES.includes(command.name)
@@ -43,8 +52,10 @@ export function selectsOneItem(command: Command): boolean {
 }
 
 /**
- * The declared parameter a command selects its item by: its first required
- * parameter, in declaration order, other than its parent's.
+ * The declared parameter that identifies a command's item: its first required
+ * parameter, in declaration order, other than its parent's. A resource-scoped
+ * command's native body addresses the item by it; an application-scoped
+ * delete passes it to the app's delete with its other declared parameters.
  *
  * @param command - A manifest command.
  * @returns The identifier parameter, or `undefined` when the command declares
@@ -56,8 +67,8 @@ export function itemIdentifierParameter(command: Command): CommandParameter | un
 }
 
 /**
- * Why a command cannot be offered, when it must select one item
- * ({@link selectsOneItem}) and declares no parameter to select it by
+ * Why a command cannot be offered, when it must name one item
+ * ({@link selectsOneItem}) and declares no identifier parameter
  * ({@link itemIdentifierParameter}).
  *
  * @remarks
@@ -67,7 +78,7 @@ export function itemIdentifierParameter(command: Command): CommandParameter | un
  * @param commandKey - The command's key in `manifest.commands`.
  * @param command - The command definition.
  * @returns The reason, starting with "its ...", or `undefined` when the
- *   command selects its item by a declared parameter or selects none.
+ *   command declares its identifier parameter or selects no item.
  */
 export function itemSelectionProblem(commandKey: string, command: Command): string | undefined {
   if (!selectsOneItem(command) || itemIdentifierParameter(command) !== undefined) return undefined

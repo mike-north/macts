@@ -79,7 +79,7 @@ describe('itemIdentifierParameter', () => {
     expect(itemIdentifierParameter(cmd)).toBeUndefined()
   })
 
-  // Guards the removed fallback: no name is supplied when none is declared.
+  // Guards that the rule supplies no name when the manifest declares none.
   it('gives undefined, not an invented name, for a command with no parameters', () => {
     expect(itemIdentifierParameter(command({ name: 'get' }))).toBeUndefined()
   })

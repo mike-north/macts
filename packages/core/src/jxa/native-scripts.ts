@@ -24,10 +24,12 @@
  *   against the previous page's last item in the same request;
  * - a child is created inside its parent by appending it to the parent's
  *   collection;
- * - the request parameter that carries an identifier is distinct from the
- *   resource property that holds it, and is always one the command declares
- *   (`itemIdentifierParameter`): a body is never built for a command that
- *   must select an item and declares no parameter to select it by;
+ * - the request parameter that carries a resource-scoped get, update or
+ *   delete's identifier is distinct from the resource property that holds it,
+ *   and is always one the command declares (`itemIdentifierParameter`). An
+ *   application-scoped command, a delete included, is a call on the app with
+ *   its declared parameters. No body is built for a command that
+ *   `itemSelectionProblem` refuses;
  * - the app is addressed by its own spelling of each collection and property
  *   (`../manifest/native-accessor.ts`), while every record a body returns is
  *   keyed by the manifest's public property names, so no app spelling reaches
@@ -174,8 +176,10 @@ export function buildNativeBody(
 /**
  * Derive the native body and the input keys it requires for one operation.
  *
- * A get, update or delete addresses its item by the identifier parameter the
- * command declares (`itemIdentifierParameter`), never by a name of its own.
+ * A resource-scoped get, update or delete addresses its item by the
+ * identifier parameter the command declares (`itemIdentifierParameter`), never
+ * by a name of its own. An application-scoped command, a delete included, is
+ * called on the app with its declared parameters.
  *
  * @throws `InternalError` when `target` names a command the manifest does not
  *   declare, or a command that must select one item and declares no

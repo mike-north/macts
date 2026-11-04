@@ -196,10 +196,12 @@ function deriveManifestOperations(manifest: AppManifest): ManifestOperation[] {
  * The rule is `unselectableItemCommands` in `@macts/core`, the one generation
  * applies too: a resource-scoped get, update or delete, or a delete at
  * application scope, must declare a required parameter other than its
- * parent's (the parameter `command.parent` names). That parameter is the
- * identifier its native body selects the item by (`planNativeInvocation` in
- * `@macts/core`). Such a manifest is refused rather than registered with an
- * operation that cannot act on the item it names. The rule is the same for
+ * parent's (the parameter `command.parent` names). For a resource-scoped
+ * command that parameter is the identifier its native body addresses the item
+ * by; an application-scoped delete's body passes its declared parameters to
+ * the app's delete (`planNativeInvocation` in `@macts/core`). Such a manifest
+ * is refused rather than registered with an operation that names no item. The
+ * rule is the same for
  * every command it covers; a command is never exempt because of its name. A
  * command or resource marked unsupported has no operation and is never
  * refused.
@@ -207,15 +209,19 @@ function deriveManifestOperations(manifest: AppManifest): ManifestOperation[] {
  * Both registrations run it, so a contract cannot register an operation for a
  * manifest that registration from the manifest alone refuses.
  *
+ * @param registration - What the caller is registering the app from, which
+ *   the refusal names.
  * @throws {@link OperationRegistrationError} naming the app and the command
  *   key, and saying which identifier parameter to declare.
  */
-function assertItemsSelectable(manifest: AppManifest): void {
+function assertItemsSelectable(manifest: AppManifest, registration: 'manifest' | 'contract'): void {
   const [first] = unselectableItemCommands(manifest)
   if (first === undefined) return
-  throw new OperationRegistrationError(
-    `App "${manifest.app.name}" cannot be registered from its manifest: ${first.problem}`
-  )
+  const refused =
+    registration === 'manifest'
+      ? 'cannot be registered from its manifest'
+      : 'cannot be registered from its contract, because its manifest is refused'
+  throw new OperationRegistrationError(`App "${manifest.app.name}" ${refused}: ${first.problem}`)
 }
 
 /** Combine a descriptor with the manifest-side facts for its command. */
@@ -253,7 +259,7 @@ function toRegisteredOperation(
  * registered from a contract; the output is any JSON value. A
  * manifest-registered list does not page, so its input declares no paging
  * inputs. A resource-scoped get, update or delete, or a delete at application
- * scope, must declare the identifier parameter it selects its item by, or the
+ * scope, must declare a required identifier parameter, or the
  * manifest is refused (`unselectableItemCommands` in `@macts/core`). They stand in
  * for generated descriptors until generated contracts carry value types, and
  * the generator never produces them.
@@ -267,7 +273,7 @@ function toRegisteredOperation(
  */
 export function operationsFromManifest(manifest: AppManifest): RegisteredOperation[] {
   assertAppSegmentNotReserved(manifest)
-  assertItemsSelectable(manifest)
+  assertItemsSelectable(manifest, 'manifest')
   const inputTypes = new Map<string, ValueType<unknown>>()
   return deriveManifestOperations(manifest).map(({ id, permission, target, command }) => {
     let input = inputTypes.get(target.command)
@@ -307,8 +313,8 @@ function sameTarget(a: OperationTarget, b: OperationTarget): boolean {
  * refused rather than paging a list that cannot be anchored reliably.
  *
  * The manifest itself must pass the check registration from the manifest
- * alone applies: every command that must select one item declares the
- * identifier parameter it selects it by (`unselectableItemCommands` in
+ * alone applies: every command that must select one item declares a required
+ * identifier parameter (`unselectableItemCommands` in
  * `@macts/core`). A manifest that check refuses registers nothing through a
  * contract either, whichever operations the contract covers.
  *
@@ -334,7 +340,7 @@ export function operationsFromContract(
   manifest: AppManifest
 ): RegisteredOperation[] {
   assertAppSegmentNotReserved(manifest)
-  assertItemsSelectable(manifest)
+  assertItemsSelectable(manifest, 'contract')
   const appSegment = normalizeAppRouteSegment(manifest.app.name)
   if (contract.app !== appSegment) {
     throw new OperationRegistrationError(

@@ -2196,12 +2196,14 @@ describe('required arguments', () => {
     ).toEqual(['calendarId', 'id'])
   })
 
-  // Guards the removed fallback: a get or update that declares no identifier
-  // parameter is refused, naming the command, instead of reading an `id` key
-  // its input does not declare.
-  it.each(['get', 'update'])(
-    'refuses a %s that declares no identifier parameter, naming the command',
-    (shape) => {
+  // Guards that a get or update reads only the identifier key its command
+  // declares: one that declares none is refused, naming the command.
+  it.each([
+    ['a', 'get'],
+    ['an', 'update'],
+  ])(
+    'refuses %s %s that declares no identifier parameter, naming the command',
+    (_article, shape) => {
       const manifest = manifestWith(
         { Entry: { name: 'Entry', plural: 'entries', description: 'e', properties: {} } },
         { [`${shape}Entry`]: resourceCommand(shape, 'Entry', [param('note', false)]) }

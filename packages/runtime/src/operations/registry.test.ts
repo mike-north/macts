@@ -339,9 +339,10 @@ describe('operationsFromManifest', () => {
     expect(message).not.toContain('"id"')
   })
 
-  // Guards the application-scoped delete with no parameters (as Finder, Mail
-  // and Music declared it): it names no item, so the manifest is refused by
-  // the same rule as a resource-scoped delete, and registers nothing.
+  // Guards the application-scoped delete with no parameters (the shape of the
+  // dictionary-level delete in Finder, Google Chrome, iTerm, Mail, Music and
+  // TV): it names no item, so the manifest is refused by the same rule as a
+  // resource-scoped delete, and registers nothing.
   it('refuses an application-scoped delete with no parameters, naming the app and command', () => {
     const broken: AppManifest = {
       ...CALENDAR,
@@ -525,8 +526,8 @@ describe('operationsFromContract', () => {
   })
 
   // Guards that a contract cannot register what the manifest rule refuses:
-  // before, a contract descriptor for a get with no identifier parameter
-  // registered, though registering the same manifest alone was refused.
+  // registration from a contract and from the manifest alone accept the same
+  // manifests, and the refusal says it was the contract registration.
   it('refuses a contract whose operation targets a get with no identifier parameter', () => {
     const manifest: AppManifest = {
       ...CALENDAR,
@@ -549,7 +550,7 @@ describe('operationsFromContract', () => {
     const refusal = (): unknown => operationsFromContract(contractWith([get]), manifest)
     expect(refusal).toThrow(OperationRegistrationError)
     expect(refusal).toThrow(
-      'App "Calendar" cannot be registered from its manifest: its get command "getEvent" declares no identifier parameter.'
+      'App "Calendar" cannot be registered from its contract, because its manifest is refused: its get command "getEvent" declares no identifier parameter.'
     )
   })
 
