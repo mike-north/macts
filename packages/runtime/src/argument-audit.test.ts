@@ -18,7 +18,14 @@
  *   writes exactly one `invalid-input` audit record carrying the operation's
  *   permission, the key, the time, and the number of validation issues, and no
  *   argument values, summary, or issue messages; governance is not evaluated
- *   and nobody is asked to approve it.
+ *   and nobody is asked to approve it;
+ * - a call refused by the permission check, after admission, writes exactly
+ *   one `permission-denied` audit record carrying the operation's permission,
+ *   the key, and the time, and nothing else, so that a caller without the
+ *   permission sees the same error and leaves the same record whatever its
+ *   input; a call turned away before the permission check writes nothing; if
+ *   the record cannot be written, the caller is still answered with
+ *   `PermissionDeniedError` and the failure goes to the operator log.
  *
  * Two registrations of one fixture app are exercised: from its manifest alone
  * and from a contract. Both input contracts reject keys that are not declared
@@ -52,6 +59,7 @@ import {
 import { ALLOW_ALL_POLICY } from './governance/active-policy.js'
 import type { GovernanceContext } from './governance/context.js'
 import { createBearerCredential } from './invocation/credential.js'
+import type { RateLimiter } from './invocation/rate-limiter.js'
 import { createRuntime, type MactsRuntime, type RuntimeLogger } from './runtime.js'
 import {
   FIXED_NOW,
@@ -222,6 +230,7 @@ interface HarnessOptions {
   readonly governance?: GovernanceFor
   readonly writer?: MemoryAuditWriter
   readonly executor?: RecordingExecutor
+  readonly rateLimiter?: RateLimiter
 }
 
 /**
@@ -239,6 +248,7 @@ function harness(options: HarnessOptions = {}): Harness {
     clock: fixedClock,
     logger,
     governance: options.governance?.(writer) ?? { policy: ALLOW_ALL_POLICY, writer },
+    ...(options.rateLimiter === undefined ? {} : { rateLimiter: options.rateLimiter }),
   })
   switch (options.registration ?? 'manifest') {
     case 'manifest':
@@ -282,10 +292,24 @@ function invalidInputRecord(issueCount: number): AuditRecord {
   }
 }
 
+/**
+ * The one record a call of `vault.notes.create` by the reader key, which lacks
+ * its permission, produces: the same whatever the call's input.
+ */
+const PERMISSION_DENIED_RECORD: AuditRecord = {
+  capability: PERMISSION,
+  app: 'vault',
+  apiKeyId: 'key_vault_reader',
+  decision: 'permission-denied',
+  timestamp: FIXED_NOW,
+}
+
 /** The argument summaries of every governed record, in order. */
 function summaries(writer: MemoryAuditWriter): (string | undefined)[] {
   return writer.records.map((record) =>
-    record.decision === 'invalid-input' ? undefined : record.argsSummary
+    record.decision === 'invalid-input' || record.decision === 'permission-denied'
+      ? undefined
+      : record.argsSummary
   )
 }
 
@@ -495,7 +519,7 @@ describe('permission before validation (no schema oracle)', () => {
     ['contract', { title: 42, [UNDECLARED_KEY]: UNDECLARED_VALUE }],
     ['manifest', 'not a record'],
   ])(
-    'denies a caller without the permission (%s registration) before judging its input, writing no record',
+    'denies a caller without the permission (%s registration) before judging its input, writing one permission-denied record',
     async (registration, input) => {
       const { provider, governance } = gated(() => Promise.resolve({ state: 'approved' }))
       const h = harness({ registration, governance })
@@ -503,8 +527,10 @@ describe('permission before validation (no schema oracle)', () => {
       const error = await rejection(h.runtime.invoke(CREATE, input, as(READER_SECRET)))
 
       expect(error).toBeInstanceOf(PermissionDeniedError)
-      // A permission denial writes no audit record, so neither does this one.
-      expect(h.writer.records).toEqual([])
+      // One record, with no argument summary, issue count, or reason: never
+      // an invalid-input record, because the input was never judged.
+      expect(h.writer.records).toEqual([PERMISSION_DENIED_RECORD])
+      expect(JSON.stringify(h.writer.records)).not.toContain(UNDECLARED_VALUE)
       expect(provider.requests).toHaveLength(0)
       expect(h.executor.requests).toHaveLength(0)
     }
@@ -530,12 +556,162 @@ describe('permission before validation (no schema oracle)', () => {
         code: forInvalid.code,
         details: forInvalid.details,
       }).toEqual({ message: forValid.message, code: forValid.code, details: forValid.details })
-      // Neither call has any audit, approval, or execution side effect.
-      expect(h.writer.records).toEqual([])
+      expect(forInvalid.constructor).toBe(forValid.constructor)
+      // Each call leaves one permission-denied record, field for field equal
+      // (the fixed clock gives both the same timestamp), and no approval or
+      // execution side effect.
+      expect(h.writer.records).toEqual([PERMISSION_DENIED_RECORD, PERMISSION_DENIED_RECORD])
       expect(provider.requests).toHaveLength(0)
       expect(h.executor.requests).toHaveLength(0)
     }
   )
+})
+
+describe('permission-denied audit records', () => {
+  it.each<Registration>(['manifest', 'contract'])(
+    'records a denial under any governance policy, which is never consulted (%s registration)',
+    async (registration) => {
+      const h = harness({ registration, governance: (writer) => ({ policy: FORBID_ALL, writer }) })
+
+      const error = await rejection(
+        h.runtime.invoke(CREATE, { title: 'Groceries' }, as(READER_SECRET))
+      )
+
+      expect(error).toBeInstanceOf(PermissionDeniedError)
+      expect(h.writer.records).toEqual([PERMISSION_DENIED_RECORD])
+    }
+  )
+
+  it('consults no key policy for a denied call', async () => {
+    const resolve = vi.fn(() => Promise.resolve(undefined))
+    const h = harness({
+      governance: (writer) => ({
+        policy: ALLOW_ALL_POLICY,
+        writer,
+        keyPolicies: { resolve, invalidate: () => undefined },
+      }),
+    })
+
+    await rejection(h.runtime.invoke(CREATE, { title: 'Groceries' }, as(READER_SECRET)))
+
+    expect(resolve).not.toHaveBeenCalled()
+  })
+
+  it('denies without a record when no audit writer is configured', async () => {
+    const h = harness({ governance: () => ({ policy: ALLOW_ALL_POLICY }) })
+
+    const error = await rejection(
+      h.runtime.invoke(CREATE, { title: 'Groceries' }, as(READER_SECRET))
+    )
+
+    expect(error).toBeInstanceOf(PermissionDeniedError)
+    expect(h.writer.records).toEqual([])
+  })
+
+  it('writes nothing for a call turned away by the rate limit', async () => {
+    const h = harness({
+      rateLimiter: { admit: () => ({ allowed: false, retryAfterSeconds: 5 }) },
+    })
+
+    const error = await rejection(
+      h.runtime.invoke(CREATE, { title: 'Groceries' }, as(READER_SECRET))
+    )
+
+    expect(error).not.toBeInstanceOf(PermissionDeniedError)
+    expect(h.writer.records).toEqual([])
+  })
+
+  it('writes nothing for a credential that cannot be verified', async () => {
+    const h = harness()
+
+    const error = await rejection(
+      h.runtime.invoke(CREATE, { title: 'Groceries' }, as('macts_sk_unknown-credential'))
+    )
+
+    expect(error).not.toBeInstanceOf(PermissionDeniedError)
+    expect(h.writer.records).toEqual([])
+  })
+
+  it('writes nothing for an unknown operation', async () => {
+    const h = harness()
+
+    const error = await rejection(
+      h.runtime.invoke('vault.notes.shred', { title: 'Groceries' }, as(READER_SECRET))
+    )
+
+    expect(error).toBeInstanceOf(ValidationError)
+    expect(h.writer.records).toEqual([])
+  })
+
+  /** The denial a caller without the permission receives, as a comparable value. */
+  function deniedAnswer(error: unknown): {
+    name: string
+    message: string
+    code: string
+    details: unknown
+  } {
+    if (!(error instanceof PermissionDeniedError)) {
+      throw new Error(`expected PermissionDeniedError, got ${String(error)}`)
+    }
+    return { name: error.name, message: error.message, code: error.code, details: error.details }
+  }
+
+  it('still answers PermissionDeniedError, unchanged, when the record cannot be written', async () => {
+    const reference = harness()
+    const expected = deniedAnswer(
+      await rejection(reference.runtime.invoke(CREATE, { title: 'Groceries' }, as(READER_SECRET)))
+    )
+    const h = harness({ writer: createMemoryAuditWriter([1, 2]) })
+
+    for (const input of [{ title: 'Groceries' }, { title: 42 }]) {
+      const error = await rejection(
+        h.runtime.invoke(CREATE, input, as(READER_SECRET, { correlationId: 'req-11' }))
+      )
+      expect(deniedAnswer(error)).toEqual(expected)
+    }
+
+    expect(h.writer.records).toEqual([])
+    expect(h.executor.requests).toHaveLength(0)
+    // One operator log line per failed write, naming the operation, the key,
+    // and the correlation id, and carrying no input and no credential.
+    expect(h.logger.error).toHaveBeenCalledTimes(2)
+    const [fields, message] = h.logger.error.mock.calls[0] as [Record<string, unknown>, string]
+    expect(fields).toMatchObject({
+      operation: CREATE,
+      permission: PERMISSION,
+      apiKeyId: 'key_vault_reader',
+      correlationId: 'req-11',
+    })
+    expect(message).toBe('Permission denial could not be audited')
+    const logged = JSON.stringify(h.logger.error.mock.calls)
+    expect(logged).not.toContain('Groceries')
+    expect(logged).not.toContain(READER_SECRET)
+  })
+
+  it('still answers PermissionDeniedError when governance cannot be loaded to record the denial', async () => {
+    const logger = { error: vi.fn(), warn: vi.fn(), info: vi.fn() }
+    const runtime = createRuntime({
+      executor: createRecordingExecutor(() => Promise.resolve<WireValue>({})),
+      verifier: createFakeVerifier({ [READER_SECRET]: READER }),
+      clock: fixedClock,
+      logger,
+      governance: () => Promise.reject(new Error('policy unreadable at /secret/policy.json')),
+    })
+    runtime.registerManifest(VAULT_MANIFEST)
+
+    const error = await rejection(
+      runtime.invoke(CREATE, { title: 'Groceries' }, as(READER_SECRET, { correlationId: 'req-12' }))
+    )
+
+    expect(error).toBeInstanceOf(PermissionDeniedError)
+    expect(logger.error).toHaveBeenCalledTimes(1)
+    expect(logger.error.mock.calls[0]?.[0]).toMatchObject({
+      operation: CREATE,
+      apiKeyId: 'key_vault_reader',
+      correlationId: 'req-12',
+    })
+    expect(JSON.stringify(logger.error.mock.calls)).not.toContain('Groceries')
+  })
 })
 
 describe('declared parameters in the summary', () => {
