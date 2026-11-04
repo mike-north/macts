@@ -43,10 +43,13 @@ verify the credential, admit the call against the optional per-subject rate
 limit, check the operation's permission, validate the input, enforce
 governance policy (auditing the decision and, for a held call, asking a
 human), hand the request to the executor the runtime was built with, then
-validate the result against the operation's output contract. A call whose
-input fails validation is recorded as an `invalid-input` audit entry and is
-never put to policy or an approver. Failures are the structured
-errors from `@macts/contracts`.
+validate the result against the operation's output contract. When the
+governance context has an audit writer, a call whose key lacks the operation's
+permission is recorded as a `permission-denied` audit entry, which says
+nothing about its input, and a call whose input fails validation is recorded
+as an `invalid-input` audit entry. With no audit writer, neither is recorded.
+A call whose input fails validation is never put to policy or an approver.
+Failures are the structured errors from `@macts/contracts`.
 
 A result that does not match the operation's output contract fails with
 `UnexpectedValueError`, whichever executor produced it. The operation has
@@ -104,7 +107,8 @@ provider registered in `<macts-home>/governance/approval.json`, each key's own
 policy from the key store, and an audit log at
 `<macts-home>/governance/audit.jsonl`. The local SDK client and the HTTP
 server both default to it. Pass the function itself as `governance`, and the
-runtime loads it on the first call:
+runtime loads it on the first call that needs it (to govern the call, or to
+audit a permission denial or invalid input):
 
 ```ts
 import { createRuntime, loadHostGovernance } from '@macts/runtime'
@@ -114,9 +118,14 @@ const runtime = createRuntime({ executor, governance: loadHostGovernance })
 
 - A **missing** policy file means the default policy (`ALLOW_ALL_POLICY`), so a
   first run works. The key's own permissions still gate every call.
-- A **malformed or unreadable** policy or approval file denies every call with
-  `InternalError`. Nothing falls back to allowing everything.
-- An audit record that cannot be written denies the call it describes.
+- A **malformed or unreadable** policy or approval file denies every call that
+  passes the permission check with `InternalError`. Nothing falls back to
+  allowing everything. A caller without the operation's permission is still
+  answered `PermissionDeniedError`; its `permission-denied` record cannot be
+  written without the audit log, so the failure is logged instead.
+- An audit record that cannot be written denies the call it describes with
+  `InternalError`. The exception is a `permission-denied` record: that caller
+  is still answered `PermissionDeniedError`, and the failure is logged.
 
 Tests and embedders that compose governance themselves pass their own context
 instead. To enforce no restrictions, say so explicitly:

@@ -67,7 +67,7 @@ const READER: Authority = { subject: 'key_reader', permissions: ['calendar:event
 /** Holds only the permission `delete` had before it was renamed. */
 const LEGACY: Authority = { subject: 'key_legacy', permissions: ['calendar:events:remove'] }
 
-const VALID_CREATE_INPUT = { summary: 'Standup', password: 'hunter2' }
+const VALID_CREATE_INPUT = { summary: 'Standup', allDay: true }
 
 /** A logger whose calls can be inspected. */
 function createSpyLogger(): RuntimeLogger & {
@@ -413,12 +413,18 @@ describe('step 1b: admission', () => {
   })
 
   it('runs before the permission check: a denied caller without the permission sees the limit', async () => {
+    const writer = createMemoryAuditWriter()
     const limiter = recordingLimiter(() => ({ allowed: false, retryAfterSeconds: 1 }))
-    const { runtime } = harness({ rateLimiter: limiter })
+    const { runtime } = harness({
+      rateLimiter: limiter,
+      governance: { policy: ALLOW_ALL_POLICY, writer },
+    })
 
     const error = await rejection(runtime.invoke(CREATE, VALID_CREATE_INPUT, as(READER_SECRET)))
 
     expect(error).toBeInstanceOf(RateLimitedError)
+    // Turned away before the permission check, so no permission-denied record.
+    expect(writer.records).toHaveLength(0)
   })
 
   it('never grants: an admitted caller without the permission is still denied', async () => {
@@ -492,7 +498,7 @@ describe('step 1b: admission', () => {
 })
 
 describe('step 2: permission check', () => {
-  it('denies a caller without the permission, naming it, before any audit or execution', async () => {
+  it('denies a caller without the permission, naming it, auditing the denial and executing nothing', async () => {
     const writer = createMemoryAuditWriter()
     const { runtime, executor } = harness({ governance: { policy: ALLOW_ALL_POLICY, writer } })
 
@@ -506,7 +512,15 @@ describe('step 2: permission check', () => {
     expect(error.message).toBe(error.details.hint)
     expect(error.message).toContain('calendar:events:create')
     expect(executor.requests).toHaveLength(0)
-    expect(writer.records).toHaveLength(0)
+    expect(writer.records).toEqual([
+      {
+        capability: 'calendar:events:create',
+        app: 'calendar',
+        apiKeyId: 'key_reader',
+        decision: 'permission-denied',
+        timestamp: FIXED_NOW,
+      },
+    ])
   })
 
   it('explains a denial caused by a renamed permission with its changelog', async () => {
@@ -609,8 +623,7 @@ describe('step 4: governance', () => {
       permission: 'calendar:events:create',
       risk: 'write',
       identity: { apiKeyId: 'key_writer', apiKeyName: 'Calendar assistant' },
-      // `password` is not a parameter of `create`, so only its count is recorded.
-      argsSummary: 'summary: Standup; unknownKeys: 1',
+      argsSummary: 'summary: Standup; allDay: true',
       requestedAt: FIXED_NOW,
       layer: 'host',
     })
@@ -758,9 +771,8 @@ describe('step 4: governance', () => {
     await runtime.invoke(CREATE, VALID_CREATE_INPUT, as(WRITER_SECRET))
 
     expect(writer.records).toHaveLength(1)
-    expect(writer.records[0]).toMatchObject({ argsSummary: 'summary: Standup; unknownKeys: 1' })
+    expect(writer.records[0]).toMatchObject({ argsSummary: 'summary: Standup; allDay: true' })
     expect(JSON.stringify(writer.records)).not.toContain(WRITER_SECRET)
-    expect(JSON.stringify(writer.records)).not.toContain('hunter2')
   })
 
   it('records a non-record input as invalid input, without a summary', async () => {
@@ -862,14 +874,17 @@ describe('step 4: governance from a loader', () => {
     expect(executor.requests).toHaveLength(0)
   })
 
-  it('checks permission before loading governance', async () => {
+  it('answers a denied caller with PermissionDeniedError even when governance cannot be loaded', async () => {
     const load = vi.fn(() => Promise.reject(new Error('unreadable')))
-    const { runtime } = harness({ governance: load })
+    const { runtime, logger } = harness({ governance: load })
 
     const error = await rejection(runtime.invoke(CREATE, VALID_CREATE_INPUT, as(READER_SECRET)))
 
+    // The loader is consulted only for the audit writer that records the
+    // denial; its failure is logged and never changes the caller's answer.
     expect(error).toBeInstanceOf(PermissionDeniedError)
-    expect(load).not.toHaveBeenCalled()
+    expect(load).toHaveBeenCalledTimes(1)
+    expect(logger.error).toHaveBeenCalledTimes(1)
   })
 })
 

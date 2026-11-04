@@ -26,6 +26,13 @@
  *   rejected before governance (D5): no approval request is made, and the
  *   audit log gains one `invalid-input` record carrying the issue count and
  *   no argument values
+ * - 403 `PERMISSION_DENIED` for a key without the operation's permission
+ *   (D5, D6): the audit log gains one `permission-denied` record carrying the
+ *   operation, the key, and the time, and the response and the record are the
+ *   same whether the request body was valid or not
+ * - 400 `VALIDATION_FAILED` for a key that is not a declared parameter of a
+ *   manifest-served operation, with its issue at the input itself (D5, D11),
+ *   exactly as for a contract-registered operation
  *
  * Time is fixed by the rate limiters' injected clock, so `Retry-After` is exact:
  * a window that opens at the fixed instant lasts the full 60 seconds.
@@ -330,6 +337,123 @@ describe('HTTP listener: invalid input to an approval-gated operation', () => {
     ])
     expect(log).not.toContain('4242')
     expect(log).not.toContain('hunter2')
+  })
+})
+
+describe('HTTP listener: a request without the operation permission', () => {
+  const auditDirs: string[] = []
+
+  afterEach(async () => {
+    for (const dir of auditDirs.splice(0)) {
+      await rm(dir, { recursive: true, force: true })
+    }
+  })
+
+  /** Every record in the JSON-lines audit log at `path`, parsed. */
+  async function auditRecords(path: string): Promise<unknown[]> {
+    const log = await readFile(path, 'utf8')
+    return log
+      .split('\n')
+      .filter((line) => line.trim().length > 0)
+      .map((line) => JSON.parse(line) as unknown)
+  }
+
+  /** The record a denied `calendar.events.create` by the reader key writes. */
+  const DENIED_CREATE_RECORD = {
+    capability: 'calendar:events:create',
+    app: 'calendar',
+    apiKeyId: 'key_reader',
+    decision: 'permission-denied',
+    timestamp: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/) as unknown,
+  }
+
+  it('answers 403 PERMISSION_DENIED and audits one permission-denied record', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'macts-permission-denied-uat-'))
+    auditDirs.push(dir)
+    const auditPath = join(dir, 'audit.jsonl')
+    const listener = await listenServer({
+      governance: {
+        policy: calendarPolicy('allowed'),
+        writer: createFileAuditWriter(auditPath),
+      },
+    })
+
+    // READER holds only calendar:events:list.
+    const res = await rpc(listener, 'calendar.events.create', READER_TOKEN, {
+      body: { summary: 'Standup', password: 'hunter2' },
+    })
+
+    expect(res.status).toBe(403)
+    const body = await errorBody(res)
+    expect(body.error.code).toBe('PERMISSION_DENIED')
+    expect(body.error.details).toMatchObject({ required: 'calendar:events:create' })
+    expect(listener.executor.requests).toHaveLength(0)
+    expect(await auditRecords(auditPath)).toEqual([DENIED_CREATE_RECORD])
+    const log = await readFile(auditPath, 'utf8')
+    expect(log).not.toContain('Standup')
+    expect(log).not.toContain('hunter2')
+  })
+
+  it('answers and audits a valid and an invalid body identically', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'macts-permission-denied-uat-'))
+    auditDirs.push(dir)
+    const auditPath = join(dir, 'audit.jsonl')
+    const listener = await listenServer({
+      governance: {
+        policy: calendarPolicy('allowed'),
+        writer: createFileAuditWriter(auditPath),
+      },
+    })
+
+    const forValid = await rpc(listener, 'calendar.events.create', READER_TOKEN, {
+      body: { summary: 'Standup' },
+    })
+    // `summary` is a required string; a number violates the request contract.
+    const forInvalid = await rpc(listener, 'calendar.events.create', READER_TOKEN, {
+      body: { summary: 4242 },
+    })
+
+    expect(forValid.status).toBe(403)
+    expect(forInvalid.status).toBe(403)
+    expect(await forInvalid.json()).toEqual(await forValid.json())
+    const records = await auditRecords(auditPath)
+    expect(records).toEqual([DENIED_CREATE_RECORD, DENIED_CREATE_RECORD])
+    // Field for field equal apart from the timestamp.
+    const withoutTime = records.map((record) => ({
+      ...(record as Record<string, unknown>),
+      timestamp: undefined,
+    }))
+    expect(withoutTime[1]).toEqual(withoutTime[0])
+  })
+})
+
+describe('HTTP listener: undeclared keys to a manifest-served operation', () => {
+  it('answers 400 VALIDATION_FAILED at the input itself, never reaching the executor', async () => {
+    const listener = await listenServer()
+
+    // `organizer` is not a parameter of the manifest's `create` command.
+    const res = await rpc(listener, 'calendar.events.create', WRITER_TOKEN, {
+      body: { summary: 'Standup', organizer: 'ada' },
+    })
+
+    expect(res.status).toBe(400)
+    const body = await errorBody(res)
+    expect(body.error.code).toBe('VALIDATION_FAILED')
+    expect(body.error.details).toMatchObject({ issues: [{ path: [] }] })
+    expect(listener.executor.requests).toHaveLength(0)
+  })
+
+  it('still answers 200 for the declared parameters alone', async () => {
+    const executor = createRecordingExecutor(() => Promise.resolve({ created: true }))
+    const listener = await listenServer({ executor })
+
+    const res = await rpc(listener, 'calendar.events.create', WRITER_TOKEN, {
+      body: { summary: 'Standup', password: 'hunter2' },
+    })
+
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ result: { created: true } })
+    expect(executor.requests).toHaveLength(1)
   })
 })
 

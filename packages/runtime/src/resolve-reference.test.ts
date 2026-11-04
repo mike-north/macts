@@ -10,9 +10,11 @@
  *   at its resource (`InvalidSelectionError` is only for an index or range the
  *   collection cannot satisfy); the wire rules `t.reference` enforces.
  * - D5: the pipeline order (verify → admission → permission → validation →
- *   governance and approval → executor), failing closed; a reference rejected
- *   by validation is audited as `invalid-input`, with no values, and nobody is
- *   asked to approve it; the argument summary is the validated reference.
+ *   governance and approval → executor), failing closed; a resolution refused
+ *   by the permission check is audited as `permission-denied`, the same
+ *   whatever the reference; a reference rejected by validation is audited as
+ *   `invalid-input`, with no values, and nobody is asked to approve it; the
+ *   argument summary is the validated reference.
  * - D6: which canonical class and details each failure carries.
  * - D11: the runtime validates what it receives, in the same place for
  *   resolution as for `invoke`.
@@ -296,6 +298,18 @@ async function rejection(promise: Promise<unknown>): Promise<unknown> {
     (error: unknown) => error
   )
 }
+
+/**
+ * The one record a resolution of a single book by the shelf reader, which
+ * lacks the book `get` permission, produces: the same whatever the reference.
+ */
+const SHELF_READER_BOOK_DENIAL = {
+  capability: 'library:books:lookupBook',
+  app: 'library',
+  apiKeyId: 'key_shelf_reader',
+  decision: 'permission-denied',
+  timestamp: FIXED_NOW,
+} as const
 
 describe('resolveReference: allowed resolutions', () => {
   it('resolves a single reference through the executor and returns its record', async () => {
@@ -660,9 +674,112 @@ describe('resolveReference: permission (D7)', () => {
 
     expect(error).toBeInstanceOf(PermissionDeniedError)
     expect(executor.resolutions).toHaveLength(0)
-    // A permission denial writes no audit record, and is never invalid input.
-    expect(writer.records).toEqual([])
+    // A permission denial is audited as one, and is never invalid input.
+    expect(writer.records).toEqual([SHELF_READER_BOOK_DENIAL])
     expect(provider.requests).toHaveLength(0)
+  })
+
+  it('audits a denied resolution as one permission-denied record of the resolving operation', async () => {
+    const writer = createMemoryAuditWriter()
+    const { runtime } = harness({ governance: { policy: ALLOW_ALL_POLICY, writer } })
+
+    const error = await rejection(
+      runtime.resolveReference('library', wire(DUNE_BY_NAME), as(SHELF_READER_SECRET))
+    )
+
+    expect(error).toBeInstanceOf(PermissionDeniedError)
+    expect(writer.records).toEqual([SHELF_READER_BOOK_DENIAL])
+  })
+
+  it('answers and audits a denied resolution identically for a valid and a malformed reference', async () => {
+    const writer = createMemoryAuditWriter()
+    const { runtime, executor } = harness({ governance: { policy: ALLOW_ALL_POLICY, writer } })
+
+    const forValid = await rejection(
+      runtime.resolveReference('library', wire(DUNE_BY_NAME), as(SHELF_READER_SECRET))
+    )
+    const forMalformed = await rejection(
+      runtime.resolveReference(
+        'library',
+        wire({ ...DUNE_BY_NAME, note: 'extra-field-value' }),
+        as(SHELF_READER_SECRET)
+      )
+    )
+
+    expect(forValid).toBeInstanceOf(PermissionDeniedError)
+    expect(forMalformed).toBeInstanceOf(PermissionDeniedError)
+    if (!(forValid instanceof PermissionDeniedError)) return
+    if (!(forMalformed instanceof PermissionDeniedError)) return
+    expect({
+      message: forMalformed.message,
+      code: forMalformed.code,
+      details: forMalformed.details,
+    }).toEqual({ message: forValid.message, code: forValid.code, details: forValid.details })
+    expect(writer.records).toEqual([SHELF_READER_BOOK_DENIAL, SHELF_READER_BOOK_DENIAL])
+    expect(JSON.stringify(writer.records)).not.toContain('extra-field-value')
+    expect(executor.resolutions).toHaveLength(0)
+  })
+
+  it('writes nothing for a resolution against an unknown app', async () => {
+    const writer = createMemoryAuditWriter()
+    const { runtime } = harness({ governance: { policy: ALLOW_ALL_POLICY, writer } })
+
+    const error = await rejection(
+      runtime.resolveReference('magazines', wire(DUNE_BY_NAME), as(SHELF_READER_SECRET))
+    )
+
+    expect(error).toBeInstanceOf(ValidationError)
+    expect(writer.records).toEqual([])
+  })
+
+  it('writes nothing for a credential that cannot be verified', async () => {
+    const writer = createMemoryAuditWriter()
+    const { runtime } = harness({ governance: { policy: ALLOW_ALL_POLICY, writer } })
+
+    const error = await rejection(
+      runtime.resolveReference('library', wire(DUNE_BY_NAME), as('macts_sk_unknown'))
+    )
+
+    expect(error).toBeInstanceOf(AuthenticationError)
+    expect(writer.records).toEqual([])
+  })
+
+  it('still answers PermissionDeniedError when the denial cannot be audited, logging the failure', async () => {
+    const { runtime: reference } = harness()
+    const expected = await rejection(
+      reference.resolveReference('library', wire(DUNE_BY_NAME), as(SHELF_READER_SECRET))
+    )
+    const writer = createMemoryAuditWriter([1])
+    const { runtime, executor, logger } = harness({
+      governance: { policy: ALLOW_ALL_POLICY, writer },
+    })
+
+    const error = await rejection(
+      runtime.resolveReference(
+        'library',
+        wire(DUNE_BY_NAME),
+        as(SHELF_READER_SECRET, { correlationId: 'req-13' })
+      )
+    )
+
+    expect(error).toBeInstanceOf(PermissionDeniedError)
+    expect(expected).toBeInstanceOf(PermissionDeniedError)
+    if (!(error instanceof PermissionDeniedError)) return
+    if (!(expected instanceof PermissionDeniedError)) return
+    expect({ message: error.message, code: error.code, details: error.details }).toEqual({
+      message: expected.message,
+      code: expected.code,
+      details: expected.details,
+    })
+    expect(writer.records).toEqual([])
+    expect(executor.resolutions).toHaveLength(0)
+    expect(logger.error).toHaveBeenCalledTimes(1)
+    expect(logger.error.mock.calls[0]?.[0]).toMatchObject({
+      operation: 'library.books.lookupBook',
+      apiKeyId: 'key_shelf_reader',
+      correlationId: 'req-13',
+    })
+    expect(JSON.stringify(logger.error.mock.calls)).not.toContain(SHELF_READER_SECRET)
   })
 })
 

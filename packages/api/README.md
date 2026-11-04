@@ -87,7 +87,13 @@ await start()
 
 Manifests passed as the first parameter (as in the examples above) are
 registered as passthrough: their operations carry no contract value types,
-and inputs are validated by each command's request schema.
+and each operation's input must hold exactly its command's declared
+parameters. A request with any other key is answered 400 `VALIDATION_FAILED`,
+as it is for an app served from its contract. Lists served from a manifest do
+not page, so they take no `pageSize` or `cursor`. A manifest whose
+resource-scoped get, update or delete command declares no identifier parameter
+is refused when it is registered, with an `OperationRegistrationError` naming
+the app and the command.
 
 ### Creating API Keys
 
@@ -161,8 +167,11 @@ loaded from `MACTS_HOME` on the first call: the policy file at
 `governance/policy.json` (or the default policy when there is none), the
 approval provider registered in `governance/approval.json`, every key's own
 policy, and an audit log at `governance/audit.jsonl`. A malformed or unreadable
-policy or approval file denies every call with `500 INTERNAL`; it never falls
-back to allowing everything. Pass a `GovernanceContext` to enforce something
+policy or approval file denies every call that passes the permission check with
+`500 INTERNAL`; it never falls back to allowing everything. A caller without the
+operation's permission is still answered `403 PERMISSION_DENIED`; its
+`permission-denied` record cannot be written without the audit log, so the
+failure is logged instead. Pass a `GovernanceContext` to enforce something
 else.
 
 **Example:**

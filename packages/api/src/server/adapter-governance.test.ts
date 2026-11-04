@@ -233,7 +233,9 @@ describe('host policy', () => {
   it('allows a delete under the allow-all policy (no-policy default)', async () => {
     const { app } = server({ policy: ALLOW_ALL })
 
-    expect((await post(app, 'calendar.events.delete', {}, INTEGRATION_TOKEN)).status).toBe(200)
+    expect(
+      (await post(app, 'calendar.events.delete', { id: 'event-1' }, INTEGRATION_TOKEN)).status
+    ).toBe(200)
   })
 })
 

@@ -688,7 +688,7 @@ describe('introspection', () => {
           permission: 'calendar:events:delete',
           method: 'POST',
           description: 'Delete an event',
-          parameters: [],
+          parameters: [{ name: 'id', type: 'string', description: 'Identifier', required: true }],
         },
         {
           path: '/rpc/calendar.app.quit',

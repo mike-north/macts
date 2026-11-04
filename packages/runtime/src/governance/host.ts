@@ -18,10 +18,15 @@
  *   default that `loadActivePolicy` returns, so a first run works. The key's
  *   own permissions still gate every call before governance is consulted.
  * - A **malformed or unreadable** policy file or approval registration makes
- *   loading fail. A runtime given this loader then denies every call with
- *   `InternalError`; nothing falls back to allowing everything.
+ *   loading fail. A runtime given this loader then denies every call that
+ *   passes the permission check with `InternalError`; nothing falls back to
+ *   allowing everything. A caller without the operation's permission is still
+ *   answered `PermissionDeniedError`; its `permission-denied` record cannot be
+ *   written without the audit log, so the failure is logged instead.
  * - The audit writer is always present, so every decision is recorded. A
- *   record that cannot be written denies the call it describes.
+ *   record that cannot be written denies the call it describes with
+ *   `InternalError`, except a `permission-denied` record: that caller is
+ *   still answered `PermissionDeniedError`, and the failure is logged.
  *
  * @packageDocumentation
  */

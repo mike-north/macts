@@ -204,6 +204,7 @@ describe('generateServerPackage', () => {
         .files.map((f) => f.path)
         .sort()
     ).toEqual([
+      '.gitattributes',
       '.gitignore',
       'LICENSE',
       'package.json',

@@ -26,7 +26,8 @@
  *   how the macts hosts on this Mac (`macts --serve`) serve installed apps.
  * - **From manifests alone**, through the `manifests` parameter: passthrough
  *   registration for embedders and tests. Operations carry no contract value
- *   types, and inputs are validated by each command's request schema.
+ *   types, and each operation's input must hold exactly its command's declared
+ *   parameters: any other key is rejected as `VALIDATION_FAILED`.
  *
  * @packageDocumentation
  */
@@ -132,13 +133,16 @@ export interface AppRegistrar {
   registerContract(contract: AppContract<unknown>, manifest: AppManifest): void
   /**
    * Register every operation an app manifest exposes, as passthrough: no
-   * contract value types, with inputs validated by each command's request
-   * schema.
+   * contract value types, and each operation's input must hold exactly its
+   * command's declared parameters, so any other key is rejected as
+   * `VALIDATION_FAILED`.
    *
    * @throws `OperationRegistrationError` when the app's route segment is
    *   reserved (`RESERVED_APP_ROUTE_SEGMENTS` in `@macts/runtime`), an
-   *   operation id is already registered, or the manifest yields a malformed
-   *   id or permission.
+   *   operation id is already registered, the manifest yields a malformed id
+   *   or permission, or a resource-scoped get, update or delete command
+   *   declares no identifier parameter (the error names the app and the
+   *   command). A refused registration adds nothing.
    */
   registerManifest(manifest: AppManifest): void
 }
@@ -178,11 +182,14 @@ export interface ServerOptions {
    *
    * When omitted, the server enforces this Mac's governance: `loadHostGovernance`
    * from `@macts/runtime`, loaded on the first call that reaches the governance
-   * step. That is the policy file under `MACTS_HOME` (or the default policy when
-   * there is none), the registered approval provider if any, every key's own
-   * policy, and an audit log under `MACTS_HOME`. If that configuration is
-   * malformed or unreadable, every call is denied with `INTERNAL`; it never
-   * falls back to allowing everything.
+   * step or needs its audit log. That is the policy file under `MACTS_HOME` (or
+   * the default policy when there is none), the registered approval provider if
+   * any, every key's own policy, and an audit log under `MACTS_HOME`. If that
+   * configuration is malformed or unreadable, every call that passes the
+   * permission check is denied with `INTERNAL`; it never falls back to allowing
+   * everything. A caller without the operation's permission is still denied
+   * with `PERMISSION_DENIED`; its `permission-denied` record cannot be written
+   * without the audit log, so the failure is logged instead.
    *
    * Supply a context to enforce something else instead, for example in tests
    * or a custom deployment. Build one from `loadActivePolicy`,
@@ -322,9 +329,10 @@ export const DEFAULT_HOST = 'localhost'
  *
  * @remarks
  * The manifest is registered as passthrough: its operations carry no contract
- * value types, and inputs are validated by each command's request schema. To
- * serve an app from its generated contract instead, use
- * {@link ServerOptions.register}.
+ * value types, and each operation's input must hold exactly its command's
+ * declared parameters, so a request with any other key is rejected as
+ * `VALIDATION_FAILED`. To serve an app from its generated contract instead,
+ * use {@link ServerOptions.register}.
  *
  * @param manifest - App manifest to serve, as passthrough
  * @param options - Server configuration
@@ -351,8 +359,9 @@ export function createServer(manifest: AppManifest, options: ServerOptions = {})
  *
  * @remarks
  * The server serves every app registered when it is constructed: the
- * `manifests`, registered as passthrough (no contract value types; inputs are
- * validated by each command's request schema), and any apps the
+ * `manifests`, registered as passthrough (no contract value types; an input
+ * key that is not a declared parameter of the command is rejected as
+ * `VALIDATION_FAILED`), and any apps the
  * {@link ServerOptions.register} callback registers from their generated
  * contracts (inputs are validated against each contract's wire schemas).
  * Either may be empty. `/health` and `/api/v1` list every registered app.

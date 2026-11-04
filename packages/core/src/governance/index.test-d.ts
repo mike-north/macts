@@ -42,14 +42,18 @@ import {
   type ParsePolicyResult,
   type PolicyIssue,
   type AuditDecision,
+  type GovernedAuditDecision,
   type AuditRecord,
   type AuditRecordInput,
   type GovernedAuditRecord,
   type GovernedAuditRecordInput,
   type InvalidInputAuditRecord,
   type InvalidInputAuditRecordInput,
+  type PermissionDeniedAuditRecord,
+  type PermissionDeniedAuditRecordInput,
   type SerializedAuditRecord,
   type SerializedInvalidInputAuditRecord,
+  type SerializedPermissionDeniedAuditRecord,
   type RedactArgsOptions,
   type AuditWriter,
   type PolicyRuleMatch,
@@ -131,7 +135,12 @@ expectAssignable<AuditDecision>('approved')
 expectAssignable<AuditDecision>('rejected')
 expectAssignable<AuditDecision>('cancelled')
 expectAssignable<AuditDecision>('invalid-input')
+expectAssignable<AuditDecision>('permission-denied')
 expectNotAssignable<AuditDecision>('maybe')
+
+// Neither ungoverned kind is a governance decision.
+expectNotAssignable<GovernedAuditDecision>('invalid-input')
+expectNotAssignable<GovernedAuditDecision>('permission-denied')
 
 // =============================================================================
 // createAuditRecord / serializeAuditRecord — signatures
@@ -242,12 +251,50 @@ expectNotAssignable<AuditRecordInput>({
   issueCount: 1,
 })
 
-// Narrowing on `decision` reaches the summary of a governed record.
+// =============================================================================
+// permission-denied records — attribution and time, nothing about the input
+// =============================================================================
+
+const deniedInput: PermissionDeniedAuditRecordInput = {
+  capability: 'calendar:events:create',
+  app: 'calendar',
+  apiKeyId: 'key-1',
+  decision: 'permission-denied',
+  timestamp: new Date('2026-06-14T10:42:12.000Z'),
+}
+expectAssignable<AuditRecordInput>(deniedInput)
+
+// The constructor and serializer keep the kind they were given.
+const deniedRecord = createAuditRecord(deniedInput)
+expectType<PermissionDeniedAuditRecord>(deniedRecord)
+expectType<SerializedPermissionDeniedAuditRecord>(serializeAuditRecord(deniedRecord))
+
+// A permission-denied record has no summary, reason, correlation id, or issue count.
+expectType<undefined>(deniedRecord.argsSummary)
+expectType<undefined>(deniedRecord.reason)
+expectType<undefined>(deniedRecord.approvalId)
+expectType<undefined>(deniedRecord.issueCount)
+
+// A permission-denied record carrying any of them is not a record input.
+expectNotAssignable<AuditRecordInput>({ ...deniedInput, argsSummary: 'title: Groceries' })
+expectNotAssignable<AuditRecordInput>({ ...deniedInput, reason: 'Missing permission' })
+expectNotAssignable<AuditRecordInput>({ ...deniedInput, approvalId: 'approval-1' })
+expectNotAssignable<AuditRecordInput>({ ...deniedInput, issueCount: 0 })
+
+// Narrowing on `decision` reaches each kind's own fields.
 declare const anyRecord: AuditRecord
-if (anyRecord.decision !== 'invalid-input') {
-  expectType<string>(anyRecord.argsSummary)
-} else {
-  expectType<number>(anyRecord.issueCount)
+switch (anyRecord.decision) {
+  case 'invalid-input':
+    expectType<InvalidInputAuditRecord>(anyRecord)
+    expectType<number>(anyRecord.issueCount)
+    break
+  case 'permission-denied':
+    expectType<PermissionDeniedAuditRecord>(anyRecord)
+    expectType<undefined>(anyRecord.argsSummary)
+    break
+  default:
+    expectType<GovernedAuditRecord>(anyRecord)
+    expectType<string>(anyRecord.argsSummary)
 }
 
 // =============================================================================

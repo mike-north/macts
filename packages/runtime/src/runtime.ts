@@ -11,7 +11,9 @@
  *    1b. when a rate limiter is configured, admit the call for that
  *        authority's subject (admission only turns calls away; it never
  *        changes the authority or grants anything);
- * 2. check the operation's permission against that authority;
+ * 2. check the operation's permission against that authority, auditing a
+ *    denial as `permission-denied` with its attribution and time and nothing
+ *    about the input;
  * 3. validate the input against the operation's wire contract, auditing a
  *    rejection as `invalid-input` with its issue count and no values;
  * 4. enforce governance policy, auditing the decision with a summary of the
@@ -65,6 +67,7 @@ import {
   enforceCall,
   recordApprovalDecision,
   recordInvalidInput,
+  recordPermissionDenied,
   redactArgs,
   isApprovalCancellation,
   recordApprovalCancellation,
@@ -135,12 +138,14 @@ export interface CreateRuntimeOptions {
    *
    * @remarks
    * A loader (for example `loadHostGovernance`) is called once, when the first
-   * call reaches the governance step, and its result is reused for every later
-   * call. If it fails, that call and every later one is denied with
-   * `InternalError` and the cause is logged. The failure is kept rather than
-   * retried, because the usual causes (a malformed or unreadable policy or
-   * approval file) do not fix themselves while the process runs, and a call
-   * must never run under governance that could not be established.
+   * call reaches the governance step or needs its audit writer (to record a
+   * permission denial or invalid input), and its result is reused for every
+   * later call. If it fails, that call and every later one is denied with
+   * `InternalError` and the cause is logged; a call refused by the permission
+   * check is still answered with `PermissionDeniedError`. The failure is kept
+   * rather than retried, because the usual causes (a malformed or unreadable
+   * policy or approval file) do not fix themselves while the process runs, and
+   * a call must never run under governance that could not be established.
    *
    * There is no default: a runtime never runs calls under governance it was
    * not given. Hosts that act for this Mac pass `loadHostGovernance`; a test
@@ -189,8 +194,10 @@ export interface MactsRuntime {
    *
    * @throws `OperationRegistrationError` when the app's route segment is
    *   reserved (`RESERVED_APP_ROUTE_SEGMENTS`), an operation id is already
-   *   registered, or the manifest yields a malformed id or permission. A
-   *   refused registration adds nothing.
+   *   registered, the manifest yields a malformed id or permission, or a
+   *   resource-scoped get, update or delete command declares no identifier
+   *   parameter (the error names the app and the command). A refused
+   *   registration adds nothing.
    */
   registerManifest(manifest: AppManifest): void
   /**
@@ -235,12 +242,18 @@ export interface MactsRuntime {
    * and before permission, governance or approval, so no human is ever asked
    * to approve a call that cannot run.
    *
+   * A caller whose key lacks the operation's permission is denied after
+   * admission and before its input is looked at, and the denial is audited
+   * as `permission-denied`, a record that is the same whatever the input.
+   *
    * Input is validated after the permission check and before governance. A
    * call rejected by validation is audited as `invalid-input`, with its issue
-   * count and none of its arguments, and nobody is asked to approve it. Audit
-   * and approval records of a governed call summarize only the operation's
-   * declared parameters, from the validated input; other keys are counted as
-   * `unknownKeys`, never named.
+   * count and none of its arguments, and nobody is asked to approve it. An
+   * input key that is not a declared parameter is invalid input, whether the
+   * operation was registered from a manifest or a contract. Audit and approval
+   * records of a governed call summarize only the operation's declared
+   * parameters, from the validated input; any other key that reaches them
+   * anyway is counted as `unknownKeys`, never named.
    *
    * @param id - The operation to run.
    * @param input - The input record in wire form, as received.
@@ -266,7 +279,8 @@ export interface MactsRuntime {
    * app contract records for that resource (`ResourceDescriptor.get` and
    * `.list`), never one re-derived from the manifest. A resource whose
    * recorded operation is marked `unavailable` is not resolvable, as if it
-   * recorded none. The caller's key must hold that operation's permission, and the
+   * recorded none. The caller's key must hold that operation's permission (a
+   * denial is audited as `permission-denied` of that operation), and the
    * call is governed, approved, and audited exactly as a direct call of that
    * operation. Only the target resource's permission is required: containers
    * locate the target and contribute no data, so they need none.
@@ -559,16 +573,79 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     )
   }
 
-  /** Step 2: the authority must hold the operation's permission. */
-  function checkPermission(operation: RegisteredOperation, authority: Authority): void {
+  /**
+   * Step 2: the authority must hold the operation's permission. A denial is
+   * audited ({@link auditPermissionDenied}) and then raised as
+   * `PermissionDeniedError`.
+   *
+   * Runs after admission, so where the runtime has a rate limiter (as the
+   * HTTP server configures by default) that limit also bounds how many
+   * denials can be recorded, and before the input is looked at, so neither
+   * the error nor the record depends on it.
+   */
+  async function checkPermission(
+    operation: RegisteredOperation,
+    authority: Authority,
+    context: InvocationContext
+  ): Promise<void> {
     const required = operation.descriptor.permission
     const result = hasPermission([...authority.permissions], required, operation.permissionHistory)
-    if (!result.granted) {
-      throw new PermissionDeniedError(result.hint ?? `Missing required permission: ${required}`, {
-        required,
-        ...(result.hint === undefined ? {} : { hint: result.hint }),
-        ...(result.changelog === undefined ? {} : { changelog: result.changelog }),
-      })
+    if (result.granted) {
+      return
+    }
+    await auditPermissionDenied(operation, authority, context)
+    throw new PermissionDeniedError(result.hint ?? `Missing required permission: ${required}`, {
+      required,
+      ...(result.hint === undefined ? {} : { hint: result.hint }),
+      ...(result.changelog === undefined ? {} : { changelog: result.changelog }),
+    })
+  }
+
+  /**
+   * Record a call refused by the permission check: one `permission-denied`
+   * audit record with the operation's permission, the caller's key, and the
+   * time, written to the governance context's audit writer when it has one.
+   * Governance is not evaluated, no key policy is resolved, and nothing from
+   * the input is recorded or logged.
+   *
+   * Never throws. A denied call runs nothing whether or not it is recorded, so
+   * a record that cannot be written (including because the governance context
+   * that holds the writer cannot be loaded) leaves the caller's answer as the
+   * `PermissionDeniedError` it would otherwise be: the caller cannot tell
+   * whether its denial was recorded. The failure goes to the operator log
+   * instead, with the operation, the key, and the correlation id; if the
+   * operator logger itself fails, that failure is dropped and the answer is
+   * still the same.
+   */
+  async function auditPermissionDenied(
+    operation: RegisteredOperation,
+    authority: Authority,
+    context: InvocationContext
+  ): Promise<void> {
+    const permission = operation.descriptor.permission
+    const apiKeyId = authority.subject
+    try {
+      const { writer } = await loadGovernance()
+      if (writer === undefined) {
+        return
+      }
+      await recordPermissionDenied({ permission, apiKeyId, timestamp: clock(), writer })
+    } catch (error) {
+      try {
+        log().error(
+          {
+            err: loggableError(error, context.credential),
+            operation: operation.descriptor.id,
+            permission,
+            apiKeyId,
+            ...internalDetails(context),
+          },
+          'Permission denial could not be audited'
+        )
+      } catch {
+        // A logger that fails cannot change the answer either: the caller is
+        // still denied with the same PermissionDeniedError.
+      }
     }
   }
 
@@ -1388,7 +1465,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
         })
       }
 
-      checkPermission(operation, authority)
+      await checkPermission(operation, authority, context)
       const call = await validateAudited(operation, authority, context, () =>
         validateCall(operation, input, context)
       )
@@ -1432,7 +1509,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       // Only the target resource's permission is checked. A container chain
       // only locates the target natively and contributes no data to the
       // result, so it needs no permission of its own.
-      checkPermission(operation, authority)
+      await checkPermission(operation, authority, context)
       const validated = await validateAudited(operation, authority, context, () =>
         validateReference(app, target, reference)
       )
@@ -1505,10 +1582,12 @@ function declaredInputNames(operation: RegisteredOperation): readonly string[] {
  * only as present (`true`), never its contents, which can include an item's
  * identifier and therefore user content.
  *
- * Keys of the input as received that are not declared parameters (an input
- * schema may let them through, or strip them) are recorded only as their
- * count, `unknownKeys: N`, never by name or value: nothing but the operation's
- * own contract decides what an audit record or an approver is shown.
+ * Keys of the input as received that are not declared parameters are
+ * recorded only as their count, `unknownKeys: N`, never by name or value:
+ * nothing but the operation's own contract decides what an audit record or an
+ * approver is shown. Both registrations reject such keys during validation,
+ * so the count is normally absent; it is a backstop for an input schema that
+ * admits or strips one anyway.
  *
  * @param declared - The declared parameter names ({@link declaredInputNames}).
  * @param validated - The input as validation returned it; the only source of
