@@ -3,8 +3,10 @@
  *
  * Under `PASSTHROUGH_PLAN` (phases/13 D9) a value is plain JSON with no wire
  * encoding: codecs return the validated value unchanged, and only what JSON can
- * carry is accepted. The input additionally satisfies today's per-command
- * request contract.
+ * carry is accepted. The input additionally satisfies the per-command
+ * request schema it is built from: the permissive schema below, so the JSON
+ * check is exercised under keys of every kind, and the declared-input schema
+ * the runtime registers manifest operations with, which admits no other key.
  *
  * @see https://www.rfc-editor.org/rfc/rfc8259 (JSON values)
  */
@@ -13,7 +15,7 @@ import { describe, expect, it } from 'vitest'
 import type { Command } from '@macts/core'
 import { PASSTHROUGH_PLAN, type DecodeContext } from '@macts/contracts'
 import { PASSTHROUGH_OUTPUT_TYPE, passthroughInputType, toValidationIssues } from './passthrough.js'
-import { buildCommandSchema } from './request-schema.js'
+import { buildCommandSchema, buildDeclaredInputSchema } from './request-schema.js'
 
 /** Passthrough decoding binds nothing, so a context that fails loudly if used is enough. */
 const UNUSED_DECODE_CONTEXT: DecodeContext = {
@@ -69,6 +71,25 @@ describe('passthroughInputType', () => {
     expect(input.wire.safeParse(['Standup']).success).toBe(false)
     expect(input.wire.safeParse('Standup').success).toBe(false)
     expect(input.wire.safeParse(null).success).toBe(false)
+  })
+})
+
+describe('passthroughInputType over the declared-input schema', () => {
+  const input = passthroughInputType(buildDeclaredInputSchema(CREATE_EVENT))
+
+  it('accepts the declared parameters unchanged', () => {
+    const record = { summary: 'Standup', allDay: false }
+    expect(input.encode(record)).toEqual({ ok: true, value: record })
+    expect(input.decode(record, UNUSED_DECODE_CONTEXT)).toEqual({ ok: true, value: record })
+  })
+
+  it('rejects a key that is not a declared parameter, at the record', () => {
+    const result = input.decode({ summary: 'Standup', id: 'event-1' }, UNUSED_DECODE_CONTEXT)
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.issues).toEqual([
+      expect.objectContaining({ path: [], code: 'unrecognized_keys' }),
+    ])
   })
 })
 

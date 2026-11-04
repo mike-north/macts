@@ -119,7 +119,7 @@ export const manifest: unknown = {
         'SystemDomainObject',
         'UserDomainObject',
       ],
-      commands: ['delete', 'move', 'open'],
+      commands: ['move', 'open'],
       enums: ['Edfm'],
     },
     {
@@ -3722,14 +3722,6 @@ export const manifest: unknown = {
       scope: 'application',
       parameters: [],
       code: 'stop',
-    },
-    delete: {
-      name: 'delete',
-      description: 'Delete disk item(s).',
-      scope: 'resource',
-      resourceType: 'DiskItem',
-      parameters: [],
-      code: 'delo',
     },
     move: {
       name: 'move',

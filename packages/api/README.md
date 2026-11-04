@@ -87,7 +87,13 @@ await start()
 
 Manifests passed as the first parameter (as in the examples above) are
 registered as passthrough: their operations carry no contract value types,
-and inputs are validated by each command's request schema.
+and each operation's input must hold exactly its command's declared
+parameters. A request with any other key is answered 400 `VALIDATION_FAILED`,
+as it is for an app served from its contract. Lists served from a manifest do
+not page, so they take no `pageSize` or `cursor`. A manifest whose
+resource-scoped get, update or delete command declares no identifier parameter
+is refused when it is registered, with an `OperationRegistrationError` naming
+the app and the command.
 
 ### Creating API Keys
 

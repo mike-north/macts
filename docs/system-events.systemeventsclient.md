@@ -89,23 +89,6 @@ An action that can be performed on the UI element
 </td></tr>
 <tr><td>
 
-[diskitems](./system-events.systemeventsclient.diskitems.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[DiskItemResourceClient](./system-events.diskitemresourceclient.md)
-
-</td><td>
-
-An item stored in the file system
-
-</td></tr>
-<tr><td>
-
 [http](./system-events.systemeventsclient.http.md)
 
 </td><td>

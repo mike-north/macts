@@ -26,6 +26,9 @@
  *   rejected before governance (D5): no approval request is made, and the
  *   audit log gains one `invalid-input` record carrying the issue count and
  *   no argument values
+ * - 400 `VALIDATION_FAILED` for a key that is not a declared parameter of a
+ *   manifest-served operation, with its issue at the input itself (D5, D11),
+ *   exactly as for a contract-registered operation
  *
  * Time is fixed by the rate limiters' injected clock, so `Retry-After` is exact:
  * a window that opens at the fixed instant lasts the full 60 seconds.
@@ -330,6 +333,36 @@ describe('HTTP listener: invalid input to an approval-gated operation', () => {
     ])
     expect(log).not.toContain('4242')
     expect(log).not.toContain('hunter2')
+  })
+})
+
+describe('HTTP listener: undeclared keys to a manifest-served operation', () => {
+  it('answers 400 VALIDATION_FAILED at the input itself, never reaching the executor', async () => {
+    const listener = await listenServer()
+
+    // `organizer` is not a parameter of the manifest's `create` command.
+    const res = await rpc(listener, 'calendar.events.create', WRITER_TOKEN, {
+      body: { summary: 'Standup', organizer: 'ada' },
+    })
+
+    expect(res.status).toBe(400)
+    const body = await errorBody(res)
+    expect(body.error.code).toBe('VALIDATION_FAILED')
+    expect(body.error.details).toMatchObject({ issues: [{ path: [] }] })
+    expect(listener.executor.requests).toHaveLength(0)
+  })
+
+  it('still answers 200 for the declared parameters alone', async () => {
+    const executor = createRecordingExecutor(() => Promise.resolve({ created: true }))
+    const listener = await listenServer({ executor })
+
+    const res = await rpc(listener, 'calendar.events.create', WRITER_TOKEN, {
+      body: { summary: 'Standup', password: 'hunter2' },
+    })
+
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ result: { created: true } })
+    expect(executor.requests).toHaveLength(1)
   })
 })
 
