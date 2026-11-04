@@ -9,7 +9,10 @@ import { CallOptions } from '@macts/contracts';
 import { ClientBrand } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { Page } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface BookmarkFolder {
@@ -71,15 +74,28 @@ export interface GoogleChromeClient extends ClientBrand<GoogleChromeResources> {
     save(_in?: FileSource, as?: string, options?: CallOptions): Promise<void>;
     selectAll(options?: CallOptions): Promise<void>;
     stop(options?: CallOptions): Promise<void>;
+    readonly tabs: TabResourceClient;
     undo(options?: CallOptions): Promise<void>;
     viewSource(options?: CallOptions): Promise<void>;
+    readonly windows: WindowResourceClient;
 }
 
 // @public
 export const googleChromeContract: AppContract<GoogleChromeClient, GoogleChromeResources>;
 
 // @public
-export type GoogleChromeResources = Readonly<Record<never, never>>;
+export type GoogleChromeResources = Readonly<{
+    Window: ResourceDescriptor<Window, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'google-chrome.windows.get';
+        readonly list: 'google-chrome.windows.list';
+    };
+    Tab: ResourceDescriptor<Tab, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'google-chrome.tabs.get';
+        readonly list: 'google-chrome.tabs.list';
+    };
+}>;
 
 // @public
 export interface Tab {
@@ -92,6 +108,12 @@ export interface Tab {
 // @public
 export interface TabCreateInput {
     uRL?: string;
+}
+
+// @public
+export interface TabResourceClient {
+    get(windowId: string, id: string, options?: CallOptions): Promise<Tab>;
+    list(windowId: string, options?: CallOptions): Promise<Page<Tab>>;
 }
 
 // @public
@@ -127,6 +149,12 @@ export interface WindowCreateInput {
     mode?: string;
     visible?: boolean;
     zoomed?: boolean;
+}
+
+// @public
+export interface WindowResourceClient {
+    get(id: string, options?: CallOptions): Promise<Window>;
+    list(options?: CallOptions): Promise<Page<Window>>;
 }
 
 // @public

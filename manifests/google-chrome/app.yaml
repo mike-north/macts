@@ -232,6 +232,18 @@ enums: {}
 
 hierarchy:
   children:
+    # The dictionary's application has `window` as an element, and its
+    # `window` has `tab` as an element. The application has no `tab` element:
+    # a tab is reached only through its window.
+    windows:
+      resource: Window
+      access: r
+      description: The windows contained within this application, ordered front to back.
+      children:
+        tabs:
+          resource: Tab
+          access: r
+          description: The tabs contained within the window.
     bookmarkFolders:
       resource: BookmarkFolder
       access: r
@@ -242,6 +254,58 @@ hierarchy:
           access: rw
           description: An item consists of an URL and the title of a bookmark
 commands:
+  listWindows:
+    name: list
+    routeName: list
+    description: List the windows
+    scope: resource
+    resourceType: Window
+    parameters: []
+  getWindow:
+    name: get
+    routeName: get
+    description: Get a window by its ID
+    scope: resource
+    resourceType: Window
+    parameters:
+      - name: id
+        type: string
+        description: ID of the window
+        required: true
+  listTabs:
+    name: list
+    routeName: list
+    description: List the tabs of a window
+    scope: resource
+    resourceType: Tab
+    # A tab is an element of its window only, so it is listed and got within
+    # the window, never at the application.
+    parent:
+      resource: Window
+      parameter: windowId
+    parameters:
+      - name: windowId
+        type: string
+        description: ID of the window
+        required: true
+  getTab:
+    name: get
+    routeName: get
+    description: Get a tab of a window by its ID
+    scope: resource
+    resourceType: Tab
+    parent:
+      resource: Window
+      parameter: windowId
+    parameters:
+      - name: windowId
+        type: string
+        description: ID of the window
+        required: true
+      - name: id
+        type: string
+        description: ID of the tab
+        required: true
   save:
     name: save
     description: Save an object.

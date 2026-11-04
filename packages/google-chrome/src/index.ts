@@ -21,6 +21,7 @@
 export { GoogleChromeClient, GoogleChromeError, HttpClient } from './client.js'
 export type { GoogleChromeClientOptions } from './client.js'
 export * from './types.js'
-
+export { WindowResourceClient } from './resources/window.js'
+export { TabResourceClient } from './resources/tab.js'
 export { capabilities } from './capabilities.js'
 export type { CapabilityMetadata, CapabilityRisk } from './capabilities.js'

@@ -57,6 +57,8 @@
     "@macts/api": "workspace:*",
     "@macts/calendar": "workspace:*",
     "@macts/contacts": "workspace:*",
+    "@macts/google-chrome": "workspace:*",
+    "@macts/microsoft-edge": "workspace:*",
     "@macts/music": "workspace:*",
     "@macts/notes": "workspace:*",
     "@macts/reminders": "workspace:*",

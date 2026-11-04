@@ -27,7 +27,10 @@ import {
   type FileSource,
   type Integer,
   type OperationDescriptor,
+  type Page,
   type Rectangle,
+  type ResourceDescriptor,
+  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -294,6 +297,35 @@ export interface BookmarkItemUpdateInput {
   uRL?: string
 }
 
+/** A window. */
+export interface WindowResourceClient {
+  /** List windows, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Window>>
+  /**
+   * Read the window identified by `id`.
+   *
+   * @param id - ID of the window. Does not accept null.
+   */
+  get(id: string, options?: CallOptions): Promise<Window>
+}
+
+/** A tab. */
+export interface TabResourceClient {
+  /**
+   * List tabs, as one page holding all of them.
+   *
+   * @param windowId - ID of the window. Does not accept null.
+   */
+  list(windowId: string, options?: CallOptions): Promise<Page<Tab>>
+  /**
+   * Read the tab identified by `id` within `windowId`.
+   *
+   * @param windowId - ID of the window. Does not accept null.
+   * @param id - ID of the tab. Does not accept null.
+   */
+  get(windowId: string, id: string, options?: CallOptions): Promise<Tab>
+}
+
 /**
  * The Google Chrome client: one namespace per resource that has operations, plus the app's own
  * commands. A client factory creates one from {@link googleChromeContract}. Its type carries the
@@ -301,6 +333,10 @@ export interface BookmarkItemUpdateInput {
  * resource; the brand has no runtime member.
  */
 export interface GoogleChromeClient extends ClientBrand<GoogleChromeResources> {
+  /** A window. */
+  readonly windows: WindowResourceClient
+  /** A tab. */
+  readonly tabs: TabResourceClient
   /**
    * Save an object.
    *
@@ -386,6 +422,43 @@ export interface GoogleChromeClient extends ClientBrand<GoogleChromeResources> {
   execute(javascript: string, options?: CallOptions): Promise<void>
 }
 
+const windowRecordType: ValueType<Window> = t.record(
+  {
+    givenName: t.nullable(t.string(), { description: 'The given name of the window.' }),
+    name: t.nullable(t.string(), { description: 'The full title of the window.' }),
+    id: t.string({ description: 'The unique identifier of the window.' }),
+    index: t.nullable(t.integer(), {
+      description: 'The index of the window, ordered front to back.',
+    }),
+    bounds: t.nullable(t.rectangle(), { description: 'The bounding rectangle of the window.' }),
+    closeable: t.nullable(t.boolean(), { description: 'Whether the window has a close box.' }),
+    minimizable: t.nullable(t.boolean(), { description: 'Whether the window can be minimized.' }),
+    minimized: t.nullable(t.boolean(), {
+      description: 'Whether the window is currently minimized.',
+    }),
+    resizable: t.nullable(t.boolean(), { description: 'Whether the window can be resized.' }),
+    visible: t.nullable(t.boolean(), { description: 'Whether the window is currently visible.' }),
+    zoomable: t.nullable(t.boolean(), { description: 'Whether the window can be zoomed.' }),
+    zoomed: t.nullable(t.boolean(), { description: 'Whether the window is currently zoomed.' }),
+    mode: t.nullable(t.string(), {
+      description:
+        "Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window.",
+    }),
+    activeTabIndex: t.nullable(t.integer(), { description: 'The index of the active tab.' }),
+  },
+  { description: 'A window.' }
+)
+
+const tabRecordType: ValueType<Tab> = t.record(
+  {
+    id: t.string({ description: 'Unique ID of the tab.' }),
+    title: t.nullable(t.string(), { description: 'The title of the tab.' }),
+    uRL: t.nullable(t.string(), { description: 'The url visible to the user.' }),
+    loading: t.nullable(t.boolean(), { description: 'Is loading?' }),
+  },
+  { description: 'A tab.' }
+)
+
 /**
  * The type of the resource table of {@link googleChromeContract}: every resource a
  * reference can name, keyed by manifest resource key, with its record type,
@@ -393,7 +466,18 @@ export interface GoogleChromeClient extends ClientBrand<GoogleChromeResources> {
  * references to it. A client created from the contract carries it, so
  * `bindReference` admits only references the contract can resolve.
  */
-export type GoogleChromeResources = Readonly<Record<never, never>>
+export type GoogleChromeResources = Readonly<{
+  Window: ResourceDescriptor<Window, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'google-chrome.windows.get'
+    readonly list: 'google-chrome.windows.list'
+  }
+  Tab: ResourceDescriptor<Tab, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'google-chrome.tabs.get'
+    readonly list: 'google-chrome.tabs.list'
+  }
+}>
 
 /**
  * The resource table: the implementation of {@link GoogleChromeResources}, which
@@ -403,7 +487,98 @@ export type GoogleChromeResources = Readonly<Record<never, never>>
  * D7, "Resolvable targets"). This table is also the registry that reference
  * value types read, lazily.
  */
-const resources = {} satisfies GoogleChromeResources
+const resources = {
+  Window: {
+    name: 'Window',
+    record: windowRecordType,
+    id: t.string({ description: 'The unique identifier of the window.' }),
+    get: 'google-chrome.windows.get',
+    list: 'google-chrome.windows.list',
+  },
+  Tab: {
+    name: 'Tab',
+    record: tabRecordType,
+    id: t.string({ description: 'Unique ID of the tab.' }),
+    get: 'google-chrome.tabs.get',
+    list: 'google-chrome.tabs.list',
+  },
+} satisfies GoogleChromeResources
+
+const windowListWindowsOperation: OperationDescriptor<Record<string, never>, Page<Window>> = {
+  id: 'google-chrome.windows.list',
+  permission: 'google-chrome:windows:list',
+  target: { command: 'listWindows', resource: 'Window' },
+  description: 'List the windows',
+  input: t.record({}),
+  output: t.page(windowRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
+}
+
+const windowGetWindowOperation: OperationDescriptor<{ readonly id: string }, Window> = {
+  id: 'google-chrome.windows.get',
+  permission: 'google-chrome:windows:get',
+  target: { command: 'getWindow', resource: 'Window' },
+  description: 'Get a window by its ID',
+  input: t.record({
+    id: t.string({ description: 'ID of the window' }),
+  }),
+  output: windowRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'ID of the window' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
+}
+
+const tabListTabsOperation: OperationDescriptor<{ readonly windowId: string }, Page<Tab>> = {
+  id: 'google-chrome.tabs.list',
+  permission: 'google-chrome:tabs:list',
+  target: { command: 'listTabs', resource: 'Tab' },
+  description: 'List the tabs of a window',
+  input: t.record({
+    windowId: t.string({ description: 'ID of the window' }),
+  }),
+  output: t.page(tabRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { windowId: { type: 'string', description: 'ID of the window' } },
+    required: ['windowId'],
+    additionalProperties: false,
+  },
+}
+
+const tabGetTabOperation: OperationDescriptor<
+  { readonly windowId: string; readonly id: string },
+  Tab
+> = {
+  id: 'google-chrome.tabs.get',
+  permission: 'google-chrome:tabs:get',
+  target: { command: 'getTab', resource: 'Tab' },
+  description: 'Get a tab of a window by its ID',
+  input: t.record({
+    windowId: t.string({ description: 'ID of the window' }),
+    id: t.string({ description: 'ID of the tab' }),
+  }),
+  output: tabRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      windowId: { type: 'string', description: 'ID of the window' },
+      id: { type: 'string', description: 'ID of the tab' },
+    },
+    required: ['windowId', 'id'],
+    additionalProperties: false,
+  },
+}
 
 const appSaveOperation: OperationDescriptor<
   { readonly in?: FileSource | undefined; readonly as?: string | undefined },
@@ -999,6 +1174,10 @@ const appExecuteOperation: OperationDescriptor<{ readonly javascript: string }, 
 
 /** Every operation, keyed by its identity. */
 const operations: AppContract<GoogleChromeClient>['operations'] = {
+  'google-chrome.windows.list': windowListWindowsOperation,
+  'google-chrome.windows.get': windowGetWindowOperation,
+  'google-chrome.tabs.list': tabListTabsOperation,
+  'google-chrome.tabs.get': tabGetTabOperation,
   'google-chrome.app.save': appSaveOperation,
   'google-chrome.app.open': appOpenOperation,
   'google-chrome.app.close': appCloseOperation,
@@ -1027,6 +1206,14 @@ const operations: AppContract<GoogleChromeClient>['operations'] = {
 /** Build the client on top of a factory-supplied runtime. */
 function bind(runtime: ClientRuntime): GoogleChromeClient {
   return {
+    windows: {
+      list: (options) => runtime.invoke(windowListWindowsOperation, {}, options),
+      get: (id, options) => runtime.invoke(windowGetWindowOperation, { id }, options),
+    },
+    tabs: {
+      list: (windowId, options) => runtime.invoke(tabListTabsOperation, { windowId }, options),
+      get: (windowId, id, options) => runtime.invoke(tabGetTabOperation, { windowId, id }, options),
+    },
     save: (_in, as, options) => runtime.invoke(appSaveOperation, { in: _in, as }, options),
     open: (options) => runtime.invoke(appOpenOperation, {}, options),
     close: (options) => runtime.invoke(appCloseOperation, {}, options),

@@ -29,10 +29,10 @@ export class TabResourceClient {
   }
 
   /**
-   * Get a tab by id.
+   * Get a tab by id within a parent scope.
    */
-  async get(id: string): Promise<Tab> {
-    return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(windowId: string, id: string): Promise<Tab> {
+    return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.get`, { windowId, id })
   }
 
   /**

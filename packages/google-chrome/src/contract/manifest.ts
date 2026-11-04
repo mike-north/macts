@@ -329,6 +329,18 @@ export const manifest: unknown = {
   enums: {},
   hierarchy: {
     children: {
+      windows: {
+        resource: 'Window',
+        access: 'r',
+        description: 'The windows contained within this application, ordered front to back.',
+        children: {
+          tabs: {
+            resource: 'Tab',
+            access: 'r',
+            description: 'The tabs contained within the window.',
+          },
+        },
+      },
       bookmarkFolders: {
         resource: 'BookmarkFolder',
         access: 'r',
@@ -345,6 +357,73 @@ export const manifest: unknown = {
   },
   relationships: [],
   commands: {
+    listWindows: {
+      name: 'list',
+      description: 'List the windows',
+      scope: 'resource',
+      resourceType: 'Window',
+      parameters: [],
+      routeName: 'list',
+    },
+    getWindow: {
+      name: 'get',
+      description: 'Get a window by its ID',
+      scope: 'resource',
+      resourceType: 'Window',
+      parameters: [
+        {
+          name: 'id',
+          type: 'string',
+          description: 'ID of the window',
+          required: true,
+        },
+      ],
+      routeName: 'get',
+    },
+    listTabs: {
+      name: 'list',
+      description: 'List the tabs of a window',
+      scope: 'resource',
+      resourceType: 'Tab',
+      parameters: [
+        {
+          name: 'windowId',
+          type: 'string',
+          description: 'ID of the window',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
+      routeName: 'list',
+    },
+    getTab: {
+      name: 'get',
+      description: 'Get a tab of a window by its ID',
+      scope: 'resource',
+      resourceType: 'Tab',
+      parameters: [
+        {
+          name: 'windowId',
+          type: 'string',
+          description: 'ID of the window',
+          required: true,
+        },
+        {
+          name: 'id',
+          type: 'string',
+          description: 'ID of the tab',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
+      routeName: 'get',
+    },
     save: {
       name: 'save',
       description: 'Save an object.',

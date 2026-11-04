@@ -440,4 +440,86 @@ export const capabilities: readonly CapabilityMetadata[] = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'google-chrome.tabs.get',
+    app: 'google-chrome',
+    appBundleId: 'com.google.Chrome',
+    resource: 'tabs',
+    operation: 'get',
+    description: 'Get a tab of a window by its ID',
+    permission: 'google-chrome:tabs:get',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        windowId: {
+          description: 'ID of the window',
+          type: 'string',
+        },
+        id: {
+          description: 'ID of the tab',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['windowId', 'id'],
+    },
+  },
+  {
+    name: 'google-chrome.tabs.list',
+    app: 'google-chrome',
+    appBundleId: 'com.google.Chrome',
+    resource: 'tabs',
+    operation: 'list',
+    description: 'List the tabs of a window',
+    permission: 'google-chrome:tabs:list',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        windowId: {
+          description: 'ID of the window',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['windowId'],
+    },
+  },
+  {
+    name: 'google-chrome.windows.get',
+    app: 'google-chrome',
+    appBundleId: 'com.google.Chrome',
+    resource: 'windows',
+    operation: 'get',
+    description: 'Get a window by its ID',
+    permission: 'google-chrome:windows:get',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: {
+          description: 'ID of the window',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['id'],
+    },
+  },
+  {
+    name: 'google-chrome.windows.list',
+    app: 'google-chrome',
+    appBundleId: 'com.google.Chrome',
+    resource: 'windows',
+    operation: 'list',
+    description: 'List the windows',
+    permission: 'google-chrome:windows:list',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+      additionalProperties: false,
+    },
+  },
 ]
