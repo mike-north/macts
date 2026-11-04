@@ -165,9 +165,12 @@ There are no per-tool overrides. If two operations derive the same name, the
 server refuses to start and names both.
 
 **Input schemas.** Each tool's `inputSchema` is
-`z.toJSONSchema(input.wire, { target: 'draft-7' })` of the operation's wire
-contract, so it describes values as they travel in JSON (for example, a date
-is `{ "date": "<ISO 8601>" }`). Every schema is an object schema. A contract
+`z.toJSONSchema(input.wire, { target: 'draft-7', io: 'input' })` of the
+operation's wire contract: the input side, which is what a call may send. It
+describes values as they travel in JSON (for example, a date is
+`{ "date": "<ISO 8601>" }`). An operation registered from a manifest alone
+lists its command's declared parameters, which of them are required, and that
+no other key is accepted. Every schema is an object schema. A contract
 that JSON Schema cannot represent, or that does not describe an object, makes
 the server refuse to start; it never falls back to an empty schema.
 

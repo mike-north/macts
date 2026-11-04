@@ -8,7 +8,8 @@
  *
  * @see Issue #7 — Trust & Governance: boundaries, permissions, audit.
  * @see VISION.md §5.4 "Stronger auditability".
- * @see phases/13-sdk-value-and-execution-contracts.md (D5: `invalid-input` records)
+ * @see phases/13-sdk-value-and-execution-contracts.md (D5: `invalid-input` and
+ *   `permission-denied` records)
  */
 
 import { describe, it, expect } from 'vitest'
@@ -22,6 +23,8 @@ import {
   type GovernedAuditRecordInput,
   type InvalidInputAuditRecord,
   type InvalidInputAuditRecordInput,
+  type PermissionDeniedAuditRecord,
+  type PermissionDeniedAuditRecordInput,
   type SerializedAuditRecord,
 } from './audit.js'
 
@@ -49,6 +52,20 @@ function invalidInput(
     decision: 'invalid-input',
     timestamp: TIMESTAMP,
     issueCount: 2,
+    ...overrides,
+  }
+}
+
+/** A fully-specified record input for a call refused by the permission check. */
+function permissionDenied(
+  overrides: Partial<PermissionDeniedAuditRecordInput> = {}
+): PermissionDeniedAuditRecordInput {
+  return {
+    capability: 'calendar:events:create',
+    app: 'calendar',
+    apiKeyId: 'assistant-calendar-reader',
+    decision: 'permission-denied',
+    timestamp: TIMESTAMP,
     ...overrides,
   }
 }
@@ -160,7 +177,8 @@ describe('serializeAuditRecord', () => {
     // spec: allowed (ran), denied (policy), pending (confirm-first, withheld),
     // approved (human ok), rejected (human no), cancelled (the caller abandoned
     // a held call before any decision), invalid-input (rejected by input
-    // validation before governance).
+    // validation before governance), permission-denied (refused by the
+    // permission check before its input was judged).
     expect(AUDIT_DECISIONS).toEqual([
       'allowed',
       'denied',
@@ -169,6 +187,7 @@ describe('serializeAuditRecord', () => {
       'rejected',
       'cancelled',
       'invalid-input',
+      'permission-denied',
     ])
   })
 })
@@ -239,6 +258,97 @@ describe('invalid-input records', () => {
     ['a non-finite count', Number.POSITIVE_INFINITY],
   ])('refuses %s of issues', (_label, issueCount) => {
     expect(() => createAuditRecord(invalidInput({ issueCount }))).toThrow(TypeError)
+  })
+
+  it('leaves the governed decisions unchanged', () => {
+    for (const decision of GOVERNED_DECISIONS) {
+      expect(serializeAuditRecord(createAuditRecord(baseInput({ decision })))).toEqual({
+        capability: 'calendar:events:create',
+        app: 'calendar',
+        argsSummary: 'Calendar: Work; Summary: Team Meeting; Attendees: 3',
+        apiKeyId: 'assistant-calendar-writer',
+        decision,
+        timestamp: '2026-06-14T10:42:12.000Z',
+      })
+    }
+  })
+})
+
+describe('permission-denied records', () => {
+  // phases/13 D5: a call refused by the permission check is audited with its
+  // operation, key, and time, and nothing else: its input was never judged,
+  // so the record says nothing about it, not even how many issues it had.
+  const EXPECTED_SERIALIZED = {
+    capability: 'calendar:events:create',
+    app: 'calendar',
+    apiKeyId: 'assistant-calendar-reader',
+    decision: 'permission-denied',
+    timestamp: '2026-06-14T10:42:12.000Z',
+  } as const
+
+  it('carries attribution and the time, and nothing else', () => {
+    const record: PermissionDeniedAuditRecord = createAuditRecord(permissionDenied())
+    expect(record).toEqual({
+      capability: 'calendar:events:create',
+      app: 'calendar',
+      apiKeyId: 'assistant-calendar-reader',
+      decision: 'permission-denied',
+      timestamp: TIMESTAMP,
+    })
+    expect(Object.keys(record).sort()).toEqual([
+      'apiKeyId',
+      'app',
+      'capability',
+      'decision',
+      'timestamp',
+    ])
+  })
+
+  it('defensively copies the timestamp', () => {
+    const mutable = new Date('2026-06-14T10:42:12.000Z')
+    const record = createAuditRecord(permissionDenied({ timestamp: mutable }))
+    mutable.setFullYear(1999)
+    expect(record.timestamp.toISOString()).toBe('2026-06-14T10:42:12.000Z')
+  })
+
+  it('serializes without a summary, reason, correlation id, or issue count', () => {
+    expect(serializeAuditRecord(createAuditRecord(permissionDenied()))).toEqual(
+      EXPECTED_SERIALIZED satisfies SerializedAuditRecord
+    )
+  })
+
+  it('round-trips losslessly through JSON', () => {
+    const json = JSON.stringify(serializeAuditRecord(createAuditRecord(permissionDenied())))
+    expect(JSON.parse(json)).toEqual(EXPECTED_SERIALIZED)
+  })
+
+  const FORBIDDEN_FIELDS = [
+    ['an argument summary', { argsSummary: 'title: Groceries' }],
+    ['a reason', { reason: 'Missing required permission: calendar:events:create' }],
+    ['a correlation id', { approvalId: 'approval-1' }],
+    ['an issue count', { issueCount: 0 }],
+  ] as const
+
+  it.each(FORBIDDEN_FIELDS)('refuses to construct a record carrying %s', (_label, extra) => {
+    // A cast stands in for a caller outside the type system.
+    const input = { ...permissionDenied(), ...extra } as unknown as AuditRecordInput
+    expect(() => createAuditRecord(input)).toThrow(TypeError)
+  })
+
+  it.each(FORBIDDEN_FIELDS)('refuses to serialize a record carrying %s', (_label, extra) => {
+    const record = { ...createAuditRecord(permissionDenied()), ...extra } as unknown as AuditRecord
+    expect(() => serializeAuditRecord(record)).toThrow(TypeError)
+  })
+
+  it('leaves the invalid-input kind unchanged', () => {
+    expect(serializeAuditRecord(createAuditRecord(invalidInput()))).toEqual({
+      capability: 'calendar:events:create',
+      app: 'calendar',
+      apiKeyId: 'assistant-calendar-writer',
+      decision: 'invalid-input',
+      timestamp: '2026-06-14T10:42:12.000Z',
+      issueCount: 2,
+    })
   })
 
   it('leaves the governed decisions unchanged', () => {

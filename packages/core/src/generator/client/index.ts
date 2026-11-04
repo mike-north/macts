@@ -15,6 +15,7 @@ import { generateHttpClientSdk } from '../sdk/http-client.js'
 import { generateCliPlugin } from '../cli/index.js'
 import { generateCapabilitiesModule } from '../capabilities/index.js'
 import { generateContract } from '../contract/index.js'
+import { generateGitAttributes } from '../git-attributes.js'
 import { MIT_LICENSE } from '../license.js'
 import { GENERATED_PACKAGE_NODE_ENGINE } from '../package-conventions.js'
 
@@ -77,6 +78,7 @@ const CONFIG_FILE_PATHS = new Set([
  * - The app contract under `src/contract/` (index.ts, manifest.ts)
  * - Unified config files (package.json, tsconfig, tsup, api-extractor), with a
  *   second API Extractor config that reports the `./contract` subpath
+ * - A `.gitattributes` marking the files it generates as generated
  *
  * @param manifest - The app manifest
  * @param options - Generation options
@@ -208,6 +210,9 @@ export function generateClientPackage(
     path: 'LICENSE',
     content: MIT_LICENSE,
   })
+
+  // Last, so it marks every other file this package emits.
+  files.push(generateGitAttributes(files))
 
   return {
     dir: appName,

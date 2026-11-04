@@ -474,3 +474,60 @@ export async function recordInvalidInput(options: RecordInvalidInputOptions): Pr
     })
   )
 }
+
+// ---------------------------------------------------------------------------
+// Permission-denial auditing
+// ---------------------------------------------------------------------------
+
+/**
+ * Options for {@link recordPermissionDenied}.
+ *
+ * There is deliberately no field for the call's arguments, an argument
+ * summary, a reason, or anything else derived from the call's input: a
+ * denied call's input is never judged, so its record cannot depend on it.
+ */
+export interface RecordPermissionDeniedOptions {
+  /**
+   * The permission the caller lacked, in `app:resource:operation` form: the
+   * capability the record is filed under, as for every other decision about
+   * that operation.
+   */
+  readonly permission: string
+  /** Identifier of the API key that made the call, for attribution. */
+  readonly apiKeyId: string
+  /** When the call occurred. Injected so records are deterministic. */
+  readonly timestamp: Date
+  /** Audit writer. Required: there is no reason to record nowhere. */
+  readonly writer: AuditWriter
+}
+
+/**
+ * Record that a call was refused because its caller lacks the operation's
+ * permission, before its input was judged.
+ *
+ * Writes one `'permission-denied'` record with the call's attribution and
+ * time. No input was validated, no policy was evaluated, and no approval was
+ * sought, so the record has no argument summary, issue count, reason, or
+ * approval correlation id. Two denied calls by one key for one operation that
+ * differ only in their input produce records that differ only in their
+ * timestamps.
+ *
+ * The write is not optional. If it fails, this rejects, and the caller decides
+ * how to answer the denied call.
+ *
+ * @param options - Permission, attribution, time, and writer.
+ */
+export async function recordPermissionDenied(
+  options: RecordPermissionDeniedOptions
+): Promise<void> {
+  const { permission, apiKeyId, timestamp, writer } = options
+  await writer.append(
+    createAuditRecord({
+      capability: permission,
+      app: deriveAuditApp(permission),
+      apiKeyId,
+      decision: 'permission-denied',
+      timestamp,
+    })
+  )
+}

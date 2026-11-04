@@ -13,6 +13,7 @@
 
 import type { AppManifest } from '../../manifest/index.js'
 import { contractNames } from '../contract/index.js'
+import { generateGitAttributes } from '../git-attributes.js'
 import { MIT_LICENSE } from '../license.js'
 import { GENERATED_PACKAGE_NODE_ENGINE } from '../package-conventions.js'
 
@@ -46,7 +47,8 @@ export interface GenerateServerPackageResult {
  * Generate a server package from a manifest.
  *
  * The package holds `src/index.ts`, which re-exports the app's contract as
- * `contract`, and its package, TypeScript, build and ignore configuration.
+ * `contract`, its package, TypeScript, build and ignore configuration, and a
+ * `.gitattributes` marking the files it generates as generated.
  *
  * @param manifest - The app manifest
  * @param options - Generation options
@@ -80,6 +82,8 @@ export function generateServerPackage(
     { path: '.gitignore', content: GITIGNORE },
     { path: 'LICENSE', content: MIT_LICENSE },
   ]
+  // Last, so it marks every other file this package emits.
+  files.push(generateGitAttributes(files))
 
   return { dir: unscopedName, files, errors: [] }
 }

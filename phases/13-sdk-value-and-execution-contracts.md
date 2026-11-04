@@ -835,12 +835,12 @@ native values for arguments, and native results to wire values, before
     object the app does not have, the object instead carries
     `missingResource`, the referenced resource.
 - **Reference conversion.** The codec converts a single identity reference
-  to a resource the app finds by its identifier, carrying a container exactly
-  when the resource is found within its parent, and then an identity
-  container converted the same way (D7, native conversion scope). The
-  environment's `references` table, `NativeReferenceTable`, holds one entry
-  per resource, `NativeReferencePlans { id?, addressing? }`: `id` is the
-  resource's identifier plan from the request's `resourcePlans` (D9), and
+  to a resource the app finds by its identifier. The reference carries a
+  container exactly when the resource is found within its parent, and the
+  codec converts that identity container the same way (D7, native conversion
+  scope). The environment's `references` table, `NativeReferenceTable`, holds
+  one entry per resource, `NativeReferencePlans { id?, addressing? }`: `id` is
+  the resource's identifier plan from the request's `resourcePlans` (D9), and
   `addressing` is how the app finds one of its objects from its identifier.
   For a resource held in a collection it is
   `NativeAddressing { collection, lookup, property, within? }`. The native
@@ -1176,7 +1176,7 @@ authority, in both modes. Adapters translate protocol context into an
 | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1. Verify credential → `Authority`                                                                   | `validateApiKey`, moved unchanged to the runtime                                                                                                                                                                                                                                                                                           | `AuthenticationError` with `reason`: `missing`, `malformed` (`INVALID_FORMAT`, `MALFORMED_PAYLOAD`), `invalid` (`INVALID_SIGNATURE`), `expired`, `revoked`                                                                                                                                       |
 | 1b. Admission (optional): `rateLimiter.admit(authority.subject)`                                     | The fixed-window counter of the former HTTP rate-limit middleware, as `createRateLimiter`                                                                                                                                                                                                                                                  | `RateLimitedError` (`retryAfterSeconds`). A limiter that throws denies with `InternalError`, never `RateLimitedError`.                                                                                                                                                                           |
-| 2. Permission check against `descriptor.permission`, using the manifest command's permission history | `checkPayloadPermission` / `hasPermission`                                                                                                                                                                                                                                                                                                 | `PermissionDeniedError` (`required`, `hint`, `changelog`)                                                                                                                                                                                                                                        |
+| 2. Permission check against `descriptor.permission`, using the manifest command's permission history | `checkPayloadPermission` / `hasPermission`; on a denial, `recordPermissionDenied`: one `permission-denied` audit record `{ capability, app, apiKeyId: subject, timestamp: clock() }`, written after admission, with nothing from the input                                                                                                 | `PermissionDeniedError` (`required`, `hint`, `changelog`), the same whatever the input. The input is not looked at, governance is not evaluated, and no approval is sought.                                                                                                                      |
 | 3. Input validation against `descriptor.input.wire`                                                  | `recordInvalidInput`: one `invalid-input` audit record `{ capability, app, apiKeyId: subject, timestamp: clock(), issueCount }`, with no argument values, summary, or issue messages                                                                                                                                                       | `ValidationError`. This catches raw wire requests and casts that bypassed client-side `encode`. For a list that pages it includes reading the page window and checking any cursor against the operation and the call's other inputs (D9). Governance is not evaluated and no approval is sought. |
 | 4. Governance: `resolveGovernanceForRequest(governance, authority.subject)` → `enforceCall`          | Audit context `{ apiKeyId: subject, argsSummary, timestamp: clock(), approvalId }`, where `argsSummary` is `redactArgs` over the operation's declared input parameters, each value taken from the validated input (a `cursor` recorded as `true`), followed by `unknownKeys: N` when the input had N keys that are not declared parameters | `PolicyDeniedError`. With no approval gate, a confirm-first hold raises `ApprovalPendingError`. With a gate, the runtime calls `seekApproval` then `recordApprovalDecision`; a rejection, a timeout, or a failure to record raises `ApprovalRejectedError`.                                      |
 | 5. `executor.execute(...)`                                                                           | —                                                                                                                                                                                                                                                                                                                                          | Canonical errors from the provider; any non-canonical throw becomes `InternalError`                                                                                                                                                                                                              |
@@ -1184,26 +1184,45 @@ authority, in both modes. Adapters translate protocol context into an
 Permission comes before validation, so there is no schema oracle: a caller
 without the permission learns nothing about the operation's input contract,
 and is answered `PermissionDeniedError` whatever its input, never
-`ValidationError`. A caller that has the permission and sends invalid input
-is answered `ValidationError`. A permission denial writes no audit record. Validation
-comes before governance, so only well-formed calls reach policy, audit
-summaries, and approvers: an argument summary describes input that passed its
-contract, and names only parameters the contract declares. A key that is not
-a declared parameter is invalid input under a manifest registration and a
-contract registration alike: a contract's input record and a manifest
-command's declared input (its parameters and nothing else) both reject it.
-The summary still counts any such key that reaches it in `unknownKeys`, never
-naming it, as a backstop for an input schema that admits or strips one
-anyway. A call rejected by validation after the permission check writes
-exactly one `invalid-input` audit record (D6) with the number of validation
-issues and nothing from the input, and is never put to an approver.
+`ValidationError`. A caller that has the permission and sends invalid input is
+answered `ValidationError`. Where the governance context has an audit writer
+(the host governance always does), a permission denial writes exactly one
+`permission-denied` audit record (D6); with no audit writer it writes none.
+The record is written after admission, so where the runtime has a rate limiter
+(step 1b; the HTTP server configures one by default) that limit also bounds
+how many are written, and before validation, so the record carries the
+operation's permission, the key, and the time and nothing else: valid and
+invalid input from a caller without the permission leave records that differ
+only in their timestamps. A call turned away before the permission
+check (an unverified credential, a rate-limited call, an unknown operation or
+app) writes no record. Validation comes before governance, so only well-formed
+calls reach policy, audit summaries, and approvers: an argument summary
+describes input that passed its contract, and names only parameters the
+contract declares. A key that is not a declared parameter is invalid input
+under a manifest registration and a contract registration alike: a contract's
+input record and a manifest command's declared input (its parameters and
+nothing else) both reject it. The summary still counts any such key that
+reaches it in `unknownKeys`, never naming it, as a backstop for an input
+schema that admits or strips one anyway. A call rejected by validation after
+the permission check writes exactly one `invalid-input` audit record (D6),
+where there is an audit writer, with the number of validation issues and
+nothing from the input, and is never put to an approver.
 
 Fail-closed rules carry over unchanged: a resolver failure, an `enforceCall`
 failure, or an audit-write failure denies the call. That includes the
 `invalid-input` record: if it cannot be written, the call fails with
-`InternalError` rather than `ValidationError`. Steps 1–4 also govern reference
-resolution and file fetch, which are read-risk calls (D7, D8). Execution owns
-the pipeline.
+`InternalError` rather than `ValidationError`. A `permission-denied` record is
+the exception to that answer, not to the denial: the call runs nothing either
+way, so if the record cannot be written (or the governance context holding the
+writer cannot be loaded) the caller is still answered `PermissionDeniedError`,
+and the failure is logged to the operator log with the operation, the key, and
+the correlation id, and no values. The caller cannot tell whether its denial
+was recorded. A denied call loads the governance context because the audit
+writer lives there; this is intended and must stay, since the load does not
+depend on the input, and a cached loader failure gives later authorized calls
+the same `InternalError` an authorized first call would get. Steps 1–4 also
+govern reference resolution and file fetch, which are read-risk calls (D7,
+D8). Execution owns the pipeline.
 
 Step 1b is admission, not authority. It runs only when the runtime is
 constructed with a `rateLimiter`, keyed by the verified subject, so it never
@@ -1255,8 +1274,9 @@ single definition of the governance a host enforces when none is supplied. It
 composes the active policy (`<macts-home>/governance/policy.json`), the
 registered approval gate, the stored per-key policy resolver, and a file audit
 writer (`<macts-home>/governance/audit.jsonl`). The local client and the HTTP
-server both default to it, passing the loader itself; the runtime loads it once,
-on the first call that reaches step 3 (to audit invalid input) or step 4. `createRuntime` itself requires a
+server both default to it, passing the loader itself; the runtime loads it
+once, on the first call that reaches step 2 (to audit a permission denial),
+step 3 (to audit invalid input) or step 4. `createRuntime` itself requires a
 `governance` option and has no default, so a host that builds a runtime
 directly (the MCP host included, #101) cannot run calls under governance it
 forgot to supply. Missing and malformed configuration are treated differently:
@@ -1264,10 +1284,16 @@ forgot to supply. Missing and malformed configuration are treated differently:
 - A **missing** policy file resolves to the documented default policy, so a
   first run works. The key's own permissions still gate the call at step 2.
 - A **malformed or unreadable** policy file or approval registration fails
-  closed. Every call fails with `InternalError`, and nothing ever falls back to
-  allow-all. The failed load is kept, not retried, for the life of the runtime.
-- An **audit-write failure** under `MACTS_HOME` denies the call, per the
-  fail-closed rule above.
+  closed. Every call that passes the permission check fails with
+  `InternalError`, and nothing ever falls back to allow-all. A caller without
+  the permission is still answered `PermissionDeniedError`; its
+  `permission-denied` record cannot be written without the audit log, so the
+  failure is logged instead. The failed load is kept, not retried, for the
+  life of the runtime.
+- An **audit-write failure** under `MACTS_HOME` denies the call with
+  `InternalError`, per the fail-closed rule above. The exception is a
+  `permission-denied` record: that caller is still answered
+  `PermissionDeniedError`, and the failure is logged.
 
 **Registering installed apps.** Every macts host on this Mac (`macts --serve`,
 `macts --mcp`, and the MCP server of `macts mcp serve`) registers the installed
@@ -1318,7 +1344,7 @@ narrows `details`.
 | `UnexpectedValueError`          | `UNEXPECTED_VALUE`           | An app result violated the contract. This includes an enum member the SDK does not know and an out-of-policy integer (`issues[]`).                                                                                                                                     | 502                                               |
 | `AuthenticationError`           | `UNAUTHENTICATED`            | Credential missing or unusable (`reason`)                                                                                                                                                                                                                              | 401                                               |
 | `RateLimitedError`              | `RATE_LIMITED`               | The caller exceeded its admission limit; not evaluated further (`retryAfterSeconds`, a non-negative integer)                                                                                                                                                           | 429                                               |
-| `PermissionDeniedError`         | `PERMISSION_DENIED`          | Credential lacks the required permission                                                                                                                                                                                                                               | 403                                               |
+| `PermissionDeniedError`         | `PERMISSION_DENIED`          | Credential lacks the required permission. Raised by the permission check after admission and before input validation, it is audited with the decision `permission-denied` (D5), a record that carries nothing from the input.                                          | 403                                               |
 | `PolicyDeniedError`             | `POLICY_DENIED`              | Governance policy forbids the call (`permission`, `layer`)                                                                                                                                                                                                             | 403                                               |
 | `ApprovalPendingError`          | `APPROVAL_PENDING`           | Held for confirmation with nobody to ask; not executed                                                                                                                                                                                                                 | 409                                               |
 | `ApprovalRejectedError`         | `APPROVAL_REJECTED`          | Held, put to a human, and not approved (`state`)                                                                                                                                                                                                                       | 403                                               |
@@ -1719,18 +1745,18 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   by id needs that parent, and the container is always the record the field
   was read through, known statically from the read path, never a container
   asked of the object: Chrome tabs have no `container` property, and a
-  top-level Mail mailbox's `container` fails (-1728). Asking an object for
-  its container is allowed only through a manifest-curated container
-  accessor with evidence. So a field holding such a reference is kept only
-  on its target's parent's own record, when that parent is a valid container
-  (resolvable targets, above); no membership check runs at emission, because
-  the container holds by construction, and at resolution the child is
-  looked up within the container, so a wrong container fails as
-  `TargetNotFoundError` with no extra request. The container is looked up
-  by its parent's own targeting, and the child within it by the child's: a
-  parent found by its key is looked up by its key (key-targeted resources,
-  below). An object that is identified
-  globally but reached only through a container emits no container.
+  top-level Mail mailbox's `container` fails with the app's no-such-object
+  error, -1728. Asking an object for its container is allowed only through a
+  manifest-curated container accessor with evidence. So a field holding such
+  a reference is kept only on its target's parent's own record, when that
+  parent is a valid container (resolvable targets, above); no membership
+  check runs at emission, because the container holds by construction, and
+  at resolution the child is looked up within the container, so a wrong
+  container fails as `TargetNotFoundError` with no extra request. The
+  container is looked up by its parent's own targeting, and the child within
+  it by the child's: a parent found by its key is looked up by its key
+  (key-targeted resources, below). An object that is identified globally
+  but reached only through a container emits no container.
   Examples are Arc spaces, iTerm sessions, and nested Photos folders. Google
   Chrome and Microsoft Edge tabs are reached only through their window, and
   each tab get records the window, so a tab reference carries its window as
@@ -2427,11 +2453,15 @@ This refactor adopts these items from `phases/12`:
 - `.describe()` carries descriptions on every field.
 - One schema is built per command, using the existing CRUD and identifier
   field-selection logic.
-- An adapter's input schema (MCP `inputSchema`) is
-  `z.toJSONSchema(input.wire, { target: 'draft-7' })` and describes **wire**
-  values. Wire schemas are pure validators, with no defaults or transforms, so
-  input and output forms coincide. A schema JSON Schema can't represent is an
-  error, never an empty schema. An adapter serves the document it derives,
+- An adapter's input schema (MCP `inputSchema`) is the input side of
+  `input.wire`, `z.toJSONSchema(input.wire, { target: 'draft-7', io: 'input' })`,
+  and describes **wire** values. A generated contract's wire schemas are pure
+  validators, with no defaults or transforms, so input and output forms
+  coincide. The passthrough input of an operation registered from a manifest
+  alone is a pipe from the command's declared input into a JSON record: its
+  input side is the declared input, and its output side only the record, so
+  the adapter renders the input side. A schema that JSON Schema can't represent
+  is an error, never an empty schema. An adapter serves the document it derives,
   never a stored one. Every generated descriptor also embeds the document as
   `inputJsonSchema`, for consumers that don't run zod; adapters never read or
   serve it. The generator computes it in process from the value types the

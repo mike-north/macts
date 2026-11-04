@@ -7,7 +7,7 @@
  * *which app* it targeted, *which API key* authorized it, *when* it happened,
  * and the *decision* that was reached.
  *
- * Records come in two kinds, discriminated by `decision`:
+ * Records come in three kinds, discriminated by `decision`:
  *
  * - a {@link GovernedAuditRecord} for a call that passed input validation and
  *   reached governance. It carries a redacted *summary* of the call's
@@ -17,6 +17,11 @@
  *   argument value, an argument summary, or an issue message, because input
  *   that failed its contract has not been shown to be what any summary
  *   describes.
+ * - a {@link PermissionDeniedAuditRecord} for a call refused because its
+ *   caller lacks the operation's permission. It carries only the attribution
+ *   and the time: the call's input was never judged, so the record says
+ *   nothing about it, and two denied calls that differ only in their input
+ *   produce records that differ only in their timestamps.
  *
  * This module is the decision-invariant core: a typed {@link AuditRecord} plus a
  * pure constructor and a deterministic serializer. It deliberately wires NO
@@ -48,13 +53,18 @@
  * - `invalid-input` — the call's input failed validation against the
  *                 operation's contract, so it never reached governance, no
  *                 human was asked about it, and it did NOT execute.
+ * - `permission-denied` — the caller's authority does not hold the
+ *                 operation's permission, so its input was never judged, it
+ *                 never reached governance, and it did NOT execute.
  *
  * Distinguishing `denied` (policy) from `rejected` (human) keeps the audit
  * trail precise about *why* a call did not run. Likewise, `pending` is kept
  * distinct from `denied`: a confirm-first call is not a policy denial — it is a
  * deferral awaiting approval — so recording it as `denied` would misattribute
  * the reason the call did not proceed. `invalid-input` is distinct from all of
- * them: no policy or human judged the call, because it was malformed.
+ * them: no policy or human judged the call, because it was malformed. And
+ * `permission-denied` is distinct from `denied`: the call was refused by the
+ * caller's credential, which governance policy never consulted.
  */
 export const AUDIT_DECISIONS = [
   'allowed',
@@ -64,6 +74,7 @@ export const AUDIT_DECISIONS = [
   'rejected',
   'cancelled',
   'invalid-input',
+  'permission-denied',
 ] as const
 
 /**
@@ -74,9 +85,10 @@ export type AuditDecision = (typeof AUDIT_DECISIONS)[number]
 /**
  * A decision reached by governance (policy, or a human through the approval
  * gate) for a call whose input passed validation: every decision except
- * `invalid-input`. Records of these decisions carry an argument summary.
+ * `invalid-input` and `permission-denied`, which are reached before
+ * governance. Records of these decisions carry an argument summary.
  */
-export type GovernedAuditDecision = Exclude<AuditDecision, 'invalid-input'>
+export type GovernedAuditDecision = Exclude<AuditDecision, 'invalid-input' | 'permission-denied'>
 
 /**
  * The attribution every audit record carries, whatever its kind: what was
@@ -170,10 +182,38 @@ export interface InvalidInputAuditRecordInput extends AuditRecordBase {
 }
 
 /**
+ * The inputs needed to construct a {@link PermissionDeniedAuditRecord}: the
+ * attribution and the time, and nothing else.
+ *
+ * It declares every other record field as `never`, so that no argument
+ * summary, reason, approval correlation id, or issue count can be supplied.
+ */
+export interface PermissionDeniedAuditRecordInput extends AuditRecordBase {
+  /** Marks the record as a call refused by the permission check. */
+  readonly decision: 'permission-denied'
+  /**
+   * When the call occurred. Injected by the caller so records are
+   * deterministic; never read from the wall clock inside this module.
+   */
+  readonly timestamp: Date
+  /** The input of a denied call is never judged, so it is never summarized. */
+  readonly argsSummary?: never
+  /** The record's decision is its whole account of why the call did not run. */
+  readonly reason?: never
+  /** A denied call never raises an approval request. */
+  readonly approvalId?: never
+  /** The input of a denied call is never validated, so it has no issues to count. */
+  readonly issueCount?: never
+}
+
+/**
  * The inputs needed to construct an {@link AuditRecord}, discriminated by
  * `decision`.
  */
-export type AuditRecordInput = GovernedAuditRecordInput | InvalidInputAuditRecordInput
+export type AuditRecordInput =
+  | GovernedAuditRecordInput
+  | InvalidInputAuditRecordInput
+  | PermissionDeniedAuditRecordInput
 
 /**
  * A structured, attributable record of a call that reached governance.
@@ -227,11 +267,39 @@ export interface InvalidInputAuditRecord extends AuditRecordBase {
 }
 
 /**
- * A structured, attributable record of a single capability call, discriminated
- * by `decision`: narrow on `decision !== 'invalid-input'` to read the argument
- * summary.
+ * A structured, attributable record of a call refused because its caller
+ * lacks the operation's permission.
+ *
+ * It says who called what and when, and nothing else: the call's input was
+ * never judged, so the record is the same whatever the input was. The
+ * constructor and the serializer refuse a record of this kind that carries an
+ * argument summary, a reason, an approval correlation id, or an issue count.
  */
-export type AuditRecord = GovernedAuditRecord | InvalidInputAuditRecord
+export interface PermissionDeniedAuditRecord extends AuditRecordBase {
+  /** Marks the record as a call refused by the permission check. */
+  readonly decision: 'permission-denied'
+  /** When the call occurred. */
+  readonly timestamp: Date
+  /** The input of a denied call is never judged, so it is never summarized. */
+  readonly argsSummary?: never
+  /** The record's decision is its whole account of why the call did not run. */
+  readonly reason?: never
+  /** A denied call never raises an approval request. */
+  readonly approvalId?: never
+  /** The input of a denied call is never validated, so it has no issues to count. */
+  readonly issueCount?: never
+}
+
+/**
+ * A structured, attributable record of a single capability call, discriminated
+ * by `decision`. Only a {@link GovernedAuditRecord} carries an argument
+ * summary: narrow on `decision` (a `switch` over every {@link AuditDecision},
+ * or a check against both `invalid-input` and `permission-denied`) to read it.
+ */
+export type AuditRecord =
+  | GovernedAuditRecord
+  | InvalidInputAuditRecord
+  | PermissionDeniedAuditRecord
 
 /**
  * The JSON-serializable form of a {@link GovernedAuditRecord}.
@@ -280,15 +348,43 @@ export interface SerializedInvalidInputAuditRecord extends AuditRecordBase {
 }
 
 /**
+ * The JSON-serializable form of a {@link PermissionDeniedAuditRecord}: its
+ * attribution and the time as an ISO-8601 string.
+ */
+export interface SerializedPermissionDeniedAuditRecord extends AuditRecordBase {
+  /** Marks the record as a call refused by the permission check. */
+  readonly decision: 'permission-denied'
+  /** When the call occurred, as an ISO-8601 timestamp. */
+  readonly timestamp: string
+  /** The input of a denied call is never judged, so it is never summarized. */
+  readonly argsSummary?: never
+  /** The record's decision is its whole account of why the call did not run. */
+  readonly reason?: never
+  /** A denied call never raises an approval request. */
+  readonly approvalId?: never
+  /** The input of a denied call is never validated, so it has no issues to count. */
+  readonly issueCount?: never
+}
+
+/**
  * The JSON-serializable form of an {@link AuditRecord}, discriminated by
  * `decision` as the record is.
  */
 export type SerializedAuditRecord =
   | SerializedGovernedAuditRecord
   | SerializedInvalidInputAuditRecord
+  | SerializedPermissionDeniedAuditRecord
 
 /** The fields an `invalid-input` record never carries. */
 const FIELDS_ABSENT_FROM_INVALID_INPUT = ['argsSummary', 'reason', 'approvalId'] as const
+
+/** The fields a `permission-denied` record never carries. */
+const FIELDS_ABSENT_FROM_PERMISSION_DENIED = [
+  'argsSummary',
+  'reason',
+  'approvalId',
+  'issueCount',
+] as const
 
 /**
  * Refuse an `invalid-input` record (or record input) that carries a field its
@@ -314,6 +410,24 @@ function assertInvalidInputShape(value: object, issueCount: number): void {
 }
 
 /**
+ * Refuse a `permission-denied` record (or record input) that carries any field
+ * beyond its attribution and time.
+ *
+ * As for `invalid-input`, the types already rule this out; this holds the line
+ * for values that reached here outside the type system, so nothing about a
+ * denied call's input can be written into its record.
+ *
+ * @throws `TypeError` naming the offending field.
+ */
+function assertPermissionDeniedShape(value: object): void {
+  for (const field of FIELDS_ABSENT_FROM_PERMISSION_DENIED) {
+    if (Object.hasOwn(value, field)) {
+      throw new TypeError(`A permission-denied audit record never carries "${field}".`)
+    }
+  }
+}
+
+/**
  * Construct an immutable {@link AuditRecord} from its inputs.
  *
  * Pure and deterministic: given the same input (including the injected
@@ -328,7 +442,8 @@ function assertInvalidInputShape(value: object, issueCount: number): void {
  * @returns A new immutable audit record of the same kind as `input`.
  * @throws `TypeError` for an `invalid-input` input that carries an argument
  *   summary, a reason, or an approval id, or whose issue count is not a
- *   non-negative integer.
+ *   non-negative integer; or for a `permission-denied` input that carries
+ *   any of those fields.
  */
 export function createAuditRecord(input: GovernedAuditRecordInput): GovernedAuditRecord
 /**
@@ -342,11 +457,24 @@ export function createAuditRecord(input: GovernedAuditRecordInput): GovernedAudi
  */
 export function createAuditRecord(input: InvalidInputAuditRecordInput): InvalidInputAuditRecord
 /**
+ * Construct an immutable {@link PermissionDeniedAuditRecord}: the attribution
+ * and a defensive copy of the timestamp, and nothing else.
+ *
+ * @param input - The denied call's attribution and timestamp.
+ * @returns A new immutable `permission-denied` record.
+ * @throws `TypeError` when `input` carries an argument summary, a reason, an
+ *   approval id, or an issue count.
+ */
+export function createAuditRecord(
+  input: PermissionDeniedAuditRecordInput
+): PermissionDeniedAuditRecord
+/**
  * Construct an immutable {@link AuditRecord} of whichever kind `input` is.
  *
  * @param input - The capability-call details, including an injected timestamp.
  * @returns A new immutable audit record of the same kind as `input`.
- * @throws `TypeError` as the `invalid-input` signature describes.
+ * @throws `TypeError` as the `invalid-input` and `permission-denied`
+ *   signatures describe.
  */
 export function createAuditRecord(input: AuditRecordInput): AuditRecord
 export function createAuditRecord(input: AuditRecordInput): AuditRecord {
@@ -361,6 +489,16 @@ export function createAuditRecord(input: AuditRecordInput): AuditRecord {
       decision: input.decision,
       timestamp,
       issueCount: input.issueCount,
+    }
+  }
+  if (input.decision === 'permission-denied') {
+    assertPermissionDeniedShape(input)
+    return {
+      capability: input.capability,
+      app: input.app,
+      apiKeyId: input.apiKeyId,
+      decision: input.decision,
+      timestamp,
     }
   }
   return {
@@ -388,7 +526,8 @@ export function createAuditRecord(input: AuditRecordInput): AuditRecord {
  * @returns The JSON-serializable representation, of the same kind.
  * @throws `TypeError` for an `invalid-input` record that carries an argument
  *   summary, a reason, or an approval id, or whose issue count is not a
- *   non-negative integer.
+ *   non-negative integer; or for a `permission-denied` record that carries
+ *   any of those fields.
  */
 export function serializeAuditRecord(record: GovernedAuditRecord): SerializedGovernedAuditRecord
 /**
@@ -404,11 +543,24 @@ export function serializeAuditRecord(
   record: InvalidInputAuditRecord
 ): SerializedInvalidInputAuditRecord
 /**
- * Serialize an {@link AuditRecord} of either kind.
+ * Serialize a {@link PermissionDeniedAuditRecord}: its attribution and the
+ * timestamp as an ISO-8601 string, and nothing else.
+ *
+ * @param record - The `permission-denied` record to serialize.
+ * @returns The JSON-serializable representation.
+ * @throws `TypeError` when `record` carries an argument summary, a reason, an
+ *   approval id, or an issue count.
+ */
+export function serializeAuditRecord(
+  record: PermissionDeniedAuditRecord
+): SerializedPermissionDeniedAuditRecord
+/**
+ * Serialize an {@link AuditRecord} of any kind.
  *
  * @param record - The audit record to serialize.
  * @returns The JSON-serializable representation, of the same kind.
- * @throws `TypeError` as the `invalid-input` signature describes.
+ * @throws `TypeError` as the `invalid-input` and `permission-denied`
+ *   signatures describe.
  */
 export function serializeAuditRecord(record: AuditRecord): SerializedAuditRecord
 export function serializeAuditRecord(record: AuditRecord): SerializedAuditRecord {
@@ -421,6 +573,16 @@ export function serializeAuditRecord(record: AuditRecord): SerializedAuditRecord
       decision: record.decision,
       timestamp: record.timestamp.toISOString(),
       issueCount: record.issueCount,
+    }
+  }
+  if (record.decision === 'permission-denied') {
+    assertPermissionDeniedShape(record)
+    return {
+      capability: record.capability,
+      app: record.app,
+      apiKeyId: record.apiKeyId,
+      decision: record.decision,
+      timestamp: record.timestamp.toISOString(),
     }
   }
   return {
