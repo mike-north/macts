@@ -3,7 +3,9 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
+import type { Playlist } from '../types.js'
 
 /**
  * Client for a list of tracks/streams.
@@ -17,6 +19,23 @@ export class PlaylistResourceClient {
     this.#http = http
     this.#app = app
     this.#resource = resource
+  }
+
+  /**
+   * List the playlists of one source, as one page.
+   */
+  async list(sourceId: string): Promise<Page<Playlist>> {
+    return this.#http.rpc<Page<Playlist>>(`${this.#app}.${this.#resource}.list`, { sourceId })
+  }
+
+  /**
+   * Get a playlist by persistentID within a parent scope.
+   */
+  async get(sourceId: string, persistentID: string): Promise<Playlist> {
+    return this.#http.rpc<Playlist>(`${this.#app}.${this.#resource}.get`, {
+      sourceId,
+      persistentID,
+    })
   }
 
   /**
