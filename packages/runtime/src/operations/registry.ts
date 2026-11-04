@@ -187,6 +187,43 @@ function deriveManifestOperations(manifest: AppManifest): ManifestOperation[] {
   return operations
 }
 
+/** The resource commands whose native body addresses one item by an identifier parameter. */
+const ADDRESSED_COMMAND_NAMES: readonly string[] = ['get', 'update']
+
+/**
+ * Refuse a get or update whose command declares no identifier parameter.
+ *
+ * @remarks
+ * A get or update addresses one item by its identifier parameter: the first
+ * required parameter that is not the parent's (the parameter `command.parent`
+ * names), which is the key its native body reads the item's identifier from
+ * (`planNativeInvocation` in `@macts/core`). Without one, the body would read
+ * the undeclared key `id`, which a manifest-registered operation's input
+ * never admits (`buildDeclaredInputSchema`), so the operation could never
+ * run. Such a manifest is refused rather than registered with an operation
+ * that cannot be called.
+ *
+ * A delete with no required parameter is not refused: its body calls the app
+ * command directly and addresses no item.
+ *
+ * @throws {@link OperationRegistrationError} naming the app, the command key,
+ *   and the identifier parameter the command lacks.
+ */
+function assertIdentifierDeclared(
+  manifest: AppManifest,
+  commandKey: string,
+  command: Command
+): void {
+  if (command.scope !== 'resource' || !ADDRESSED_COMMAND_NAMES.includes(command.name)) return
+  const parent = command.parent?.parameter
+  const identifier = command.parameters.find((p) => p.required && p.name !== parent)
+  if (identifier !== undefined) return
+  const besideParent = parent === undefined ? '' : ` other than its parent parameter "${parent}"`
+  throw new OperationRegistrationError(
+    `App "${manifest.app.name}" cannot be registered from its manifest: its ${command.name} command "${commandKey}" declares no identifier parameter. A ${command.name} addresses one item by a required parameter${besideParent}, and without one it would read the undeclared input "id", which the operation does not accept. Declare the item's identifier as a required parameter of "${commandKey}".`
+  )
+}
+
 /** Combine a descriptor with the manifest-side facts for its command. */
 function toRegisteredOperation(
   descriptor: AnyOperationDescriptor,
@@ -221,19 +258,22 @@ function toRegisteredOperation(
  * JSON, so a key that is not a parameter is rejected as it is for an operation
  * registered from a contract; the output is any JSON value. A
  * manifest-registered list does not page, so its input declares no paging
- * inputs. They stand in for generated descriptors until generated contracts
+ * inputs. A get or update must declare the identifier parameter it addresses
+ * its item by, or the manifest is refused. They stand in for generated descriptors until generated contracts
  * carry value types, and the generator never produces them.
  *
  * @param manifest - A validated app manifest.
  * @returns One registered operation per route, in command-declaration order.
  * @throws {@link OperationRegistrationError} when the app's route segment is
- *   reserved ({@link RESERVED_APP_ROUTE_SEGMENTS}), or a route or permission
- *   is not in operation form.
+ *   reserved ({@link RESERVED_APP_ROUTE_SEGMENTS}), a route or permission is
+ *   not in operation form, or a get or update declares no identifier
+ *   parameter.
  */
 export function operationsFromManifest(manifest: AppManifest): RegisteredOperation[] {
   assertAppSegmentNotReserved(manifest)
   const inputTypes = new Map<string, ValueType<unknown>>()
   return deriveManifestOperations(manifest).map(({ id, permission, target, command }) => {
+    assertIdentifierDeclared(manifest, target.command, command)
     let input = inputTypes.get(target.command)
     if (input === undefined) {
       input = passthroughInputType(buildDeclaredInputSchema(command))

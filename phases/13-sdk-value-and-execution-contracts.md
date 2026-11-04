@@ -1256,7 +1256,11 @@ startup, with the command that installs it. Manifest registration
 descriptors whose input is each command's declared parameters and nothing
 else, so a key that is not a parameter is a `ValidationError`, as it is under
 a contract registration. A manifest-registered list does not page, so its
-input declares no paging inputs.
+input declares no paging inputs. A get or update addresses its item by its
+identifier parameter, the first required parameter other than its parent's,
+so a manifest whose get or update declares none is refused at registration
+with `OperationRegistrationError`, naming the app and the command, rather than
+registered with an operation no input could reach.
 
 ## D6. Structured Error Registry, Wire Codec, and Reconstruction
 
