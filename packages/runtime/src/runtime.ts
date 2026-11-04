@@ -12,9 +12,11 @@
  *        authority's subject (admission only turns calls away; it never
  *        changes the authority or grants anything);
  * 2. check the operation's permission against that authority;
- * 3. enforce governance policy, auditing the decision and, for a held call,
- *    seeking and recording a human decision;
- * 4. validate the input against the operation's wire contract;
+ * 3. validate the input against the operation's wire contract, auditing a
+ *    rejection as `invalid-input` with its issue count and no values;
+ * 4. enforce governance policy, auditing the decision with a summary of the
+ *    declared, validated arguments and, for a held call, seeking and recording
+ *    a human decision;
  * 5. hand the authorized, validated request to the executor;
  * 6. validate the executor's result against the operation's output contract,
  *    unless its output plan is `passthrough` (a value with no wire encoding),
@@ -26,6 +28,11 @@
  * inputs, hands the executor a page window instead, and assembles the page
  * and its next cursor from what the executor read. The cursor's contents are
  * never logged or audited; an audit record says only that one was presented.
+ *
+ * Permission comes before validation, so a caller without the permission
+ * learns nothing about the operation's input contract. Validation comes before
+ * governance, so only well-formed calls reach policy, audit summaries, and
+ * approvers.
  *
  * No step can be skipped: there is no trusted-caller mode, and a local caller
  * presents a credential exactly as a remote one does. Every failure is raised
@@ -56,6 +63,7 @@ import {
   DEFAULT_APPROVAL_TIMEOUT_MS,
   enforceCall,
   recordApprovalDecision,
+  recordInvalidInput,
   redactArgs,
   isApprovalCancellation,
   recordApprovalCancellation,
@@ -226,6 +234,13 @@ export interface MactsRuntime {
    * and before permission, governance or approval, so no human is ever asked
    * to approve a call that cannot run.
    *
+   * Input is validated after the permission check and before governance. A
+   * call rejected by validation is audited as `invalid-input`, with its issue
+   * count and none of its arguments, and nobody is asked to approve it. Audit
+   * and approval records of a governed call summarize only the operation's
+   * declared parameters, from the validated input; other keys are counted as
+   * `unknownKeys`, never named.
+   *
    * @param id - The operation to run.
    * @param input - The input record in wire form, as received.
    * @param context - The caller's credential, and optional cancellation and
@@ -256,8 +271,11 @@ export interface MactsRuntime {
    * locate the target and contribute no data, so they need none.
    *
    * The reference is validated by the app contract's reference value type
-   * (`t.reference` over its resource table) after governance, as `invoke`
-   * validates input, and the executor's result is validated against the
+   * (`t.reference` over its resource table) after the permission check and
+   * before governance, as `invoke` validates input; a malformed reference is
+   * audited as `invalid-input` and never reaches an approver. Audit and
+   * approval records summarize the validated reference. The executor's result
+   * is validated against the
    * operation's output contract, unless its output plan is `passthrough`, as
    * `invoke` validates results. An identity collection's result must hold
    * exactly one record per entry, so an entry is never silently dropped.
@@ -535,21 +553,122 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   }
 
   /**
-   * Step 3: governance. Loads the governance context (once, for a loader),
+   * The governance context, loaded once for a loader. A context that cannot be
+   * loaded denies the call with `InternalError`.
+   */
+  async function governanceFor(
+    operation: RegisteredOperation,
+    apiKeyId: string,
+    context: InvocationContext
+  ): Promise<GovernanceContext> {
+    try {
+      return await loadGovernance()
+    } catch (error) {
+      // Fail closed: governance that could not be established never degrades
+      // into a default policy.
+      log().error(
+        {
+          err: error,
+          operation: operation.descriptor.id,
+          permission: operation.descriptor.permission,
+          apiKeyId,
+        },
+        'Could not load the governance context; denying the call'
+      )
+      throw new InternalError('Governance could not be loaded.', internalDetails(context), {
+        cause: error,
+      })
+    }
+  }
+
+  /**
+   * Step 3, shared by `invoke` and `resolveReference`: run `validate`, the
+   * operation's input validation. A `ValidationError` it raises is audited as
+   * `invalid-input` ({@link auditInvalidInput}) and then rethrown unchanged;
+   * any other failure passes through unaudited, since it is not the caller's
+   * input that failed.
+   */
+  async function validateAudited<T>(
+    operation: RegisteredOperation,
+    authority: Authority,
+    context: InvocationContext,
+    validate: () => T
+  ): Promise<T> {
+    try {
+      return validate()
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        await auditInvalidInput(operation, authority, context, error.details.issues.length)
+      }
+      throw error
+    }
+  }
+
+  /**
+   * Record a call rejected by input validation: one `invalid-input` audit
+   * record with the operation's permission, the caller's key, the time, and
+   * the issue count, written to the governance context's audit writer when it
+   * has one. Governance is not evaluated, no key policy is resolved, and no
+   * approval is sought. Nothing from the input is recorded or logged.
+   *
+   * A record that cannot be written denies the call with `InternalError`, as
+   * a governance decision that cannot be recorded does: the audit trail is
+   * never silently incomplete.
+   */
+  async function auditInvalidInput(
+    operation: RegisteredOperation,
+    authority: Authority,
+    context: InvocationContext,
+    issueCount: number
+  ): Promise<void> {
+    const permission = operation.descriptor.permission
+    const apiKeyId = authority.subject
+    const { writer } = await governanceFor(operation, apiKeyId, context)
+    log().info(
+      { operation: operation.descriptor.id, permission, apiKeyId, issueCount },
+      'Call rejected by input validation'
+    )
+    if (writer === undefined) {
+      return
+    }
+    try {
+      await recordInvalidInput({ permission, apiKeyId, timestamp: clock(), issueCount, writer })
+    } catch (error) {
+      log().error(
+        {
+          err: loggableError(error, context.credential),
+          operation: operation.descriptor.id,
+          permission,
+          apiKeyId,
+        },
+        'Invalid input could not be audited; denying the call'
+      )
+      throw new InternalError('The call could not be audited.', internalDetails(context), {
+        cause: error,
+      })
+    }
+  }
+
+  /**
+   * Step 4: governance. Loads the governance context (once, for a loader),
    * resolves the caller's key policy, enforces and audits the decision, and
    * for a held call either reports it pending (no gate) or obtains and records
    * a human decision. Returns only when the call may run.
+   *
+   * @param argsSummary - The redacted summary of the call's validated
+   *   arguments ({@link argumentSummary}). Governance never sees the input
+   *   itself: the summary is the only form of the arguments that reaches the
+   *   audit trail or an approver.
    */
   async function enforceGovernance(
     operation: RegisteredOperation,
     authority: Authority,
-    input: unknown,
+    argsSummary: string,
     context: InvocationContext
   ): Promise<void> {
     const permission = operation.descriptor.permission
     const risk = operation.risk
     const apiKeyId = authority.subject
-    const argsSummary = redactArgs(auditableArguments(input))
     // Minted before enforcement so a held call's 'pending' record and its
     // resolving record share a correlation key.
     const approvalId = randomUUID()
@@ -569,20 +688,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       })
     }
 
-    let governance: GovernanceContext
-    try {
-      governance = await loadGovernance()
-    } catch (error) {
-      // Fail closed: governance that could not be established never degrades
-      // into a default policy.
-      log().error(
-        { err: error, operation: operation.descriptor.id, permission, apiKeyId },
-        'Could not load the governance context; denying the call'
-      )
-      throw new InternalError('Governance could not be loaded.', internalDetails(context), {
-        cause: error,
-      })
-    }
+    const governance = await governanceFor(operation, apiKeyId, context)
 
     let resolved
     try {
@@ -723,7 +829,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     throw new ApprovalRejectedError(outcome.reason, { permission, layer, state: outcome.state })
   }
 
-  /** Step 4: the input must be a record that satisfies the operation's wire contract. */
+  /** Step 3: the input must be a record that satisfies the operation's wire contract. */
   function validateInput(
     operation: RegisteredOperation,
     input: unknown,
@@ -923,7 +1029,8 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   /**
    * Read the resource and cardinality a reference names, which select the
    * operation it resolves as. Only these routing fields are checked here; the
-   * whole reference is validated after governance ({@link validateReference}).
+   * whole reference is validated after the permission check
+   * ({@link validateReference}).
    */
   function readReferenceTarget(app: RegisteredApp, reference: unknown): ReferenceTarget {
     const payload = isRecord(reference) ? reference['reference'] : undefined
@@ -1218,8 +1325,11 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       }
 
       checkPermission(operation, authority)
-      await enforceGovernance(operation, authority, input, context)
-      const validated = validateInput(operation, input, context)
+      const validated = await validateAudited(operation, authority, context, () =>
+        validateInput(operation, input, context)
+      )
+      const argsSummary = argumentSummary(declaredInputNames(operation), validated, input)
+      await enforceGovernance(operation, authority, argsSummary, context)
 
       throwIfCancelled(context)
       return execute(operation, validated, context)
@@ -1245,11 +1355,12 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       // The resource and cardinality are routing, like `invoke`'s operation id:
       // they select the operation whose permission and policy apply, so they
       // are read first. Everything else about the reference is validated after
-      // governance, in the same place `invoke` validates input (D11): an
-      // unauthorized caller is denied before the app's reference contract (its
-      // resources and identifier types) is used to judge its request, and a
-      // malformed reference from an authorized caller is still governed and
-      // audited like any other call of that operation.
+      // the permission check and before governance, in the same place `invoke`
+      // validates input (D11): an unauthorized caller is denied before the
+      // app's reference contract (its resources and identifier types) is used
+      // to judge its request, and a malformed reference from an authorized
+      // caller is audited as invalid input and never reaches policy or an
+      // approver.
       const target = readReferenceTarget(app, reference)
       const resolving = resolvingOperation(app, target)
       const { operation } = resolving
@@ -1258,8 +1369,13 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       // only locates the target natively and contributes no data to the
       // result, so it needs no permission of its own.
       checkPermission(operation, authority)
-      await enforceGovernance(operation, authority, target.payload, context)
-      const validated = validateReference(app, target, reference)
+      const validated = await validateAudited(operation, authority, context, () =>
+        validateReference(app, target, reference)
+      )
+      // The validated reference's fields are what its schema declares; it
+      // admits no others, so the payload as received adds nothing but a count.
+      const argsSummary = argumentSummary(Object.keys(validated), validated, target.payload)
+      await enforceGovernance(operation, authority, argsSummary, context)
 
       throwIfCancelled(context)
       // Resolution is not paged: a collection resolves to its whole selection,
@@ -1296,21 +1412,64 @@ function pageSizeOf(value: WireValue | undefined): number {
 }
 
 /**
- * A call's arguments as audit and approval records summarize them: a
- * `cursor` is recorded only as present (`true`), never its contents, which can
- * include an item's identifier and therefore user content.
- *
- * Arguments are summarized before the input is validated, so this holds for
- * every operation, whether or not it pages and whether or not it takes a
- * cursor: a cursor sent where it is refused, or copied from another list, is
- * still never recorded. `cursor` is reserved on every list; an argument of
- * that name on another operation is recorded only as present too, which gives
- * up that detail so that no cursor is ever recorded.
+ * The names of an operation's declared input parameters, in declaration
+ * order: the fields of its input record plan when it was registered from a
+ * contract, or its manifest command's parameters when it was registered from
+ * the manifest alone (whose passthrough plan names none). Any other input plan
+ * declares none, so every key it receives is counted, never recorded.
  */
-function auditableArguments(input: unknown): Readonly<Record<string, unknown>> {
-  if (!isRecord(input)) return {}
-  if (!Object.hasOwn(input, CURSOR_INPUT)) return input
-  return { ...input, [CURSOR_INPUT]: true }
+function declaredInputNames(operation: RegisteredOperation): readonly string[] {
+  const { input, target } = operation.descriptor
+  switch (input.plan.kind) {
+    case 'record':
+      return Object.keys(input.plan.fields)
+    case 'passthrough': {
+      const { commands } = operation.manifest
+      const command = Object.hasOwn(commands, target.command) ? commands[target.command] : undefined
+      return command?.parameters.map((parameter) => parameter.name) ?? []
+    }
+    default:
+      return []
+  }
+}
+
+/**
+ * A call's arguments as audit and approval records summarize them
+ * (phases/13 D5): each declared parameter present in the validated input,
+ * in declaration order, through `redactArgs` (sensitive names redacted, long
+ * text cut short, nested values reduced to a size). A `cursor` is recorded
+ * only as present (`true`), never its contents, which can include an item's
+ * identifier and therefore user content.
+ *
+ * Keys of the input as received that are not declared parameters (an input
+ * schema may let them through, or strip them) are recorded only as their
+ * count, `unknownKeys: N`, never by name or value: nothing but the operation's
+ * own contract decides what an audit record or an approver is shown.
+ *
+ * @param declared - The declared parameter names ({@link declaredInputNames}).
+ * @param validated - The input as validation returned it; the only source of
+ *   recorded values.
+ * @param received - The input as received, consulted only for the names of
+ *   its keys.
+ */
+function argumentSummary(
+  declared: readonly string[],
+  validated: Readonly<Record<string, unknown>>,
+  received: unknown
+): string {
+  const recorded = Object.fromEntries(
+    declared
+      .filter((name) => Object.hasOwn(validated, name))
+      .map((name) => [name, name === CURSOR_INPUT ? true : validated[name]])
+  )
+  const known = new Set(declared)
+  const unknownKeys = isRecord(received)
+    ? Object.keys(received).filter((key) => !known.has(key)).length
+    : 0
+  const summary = redactArgs(recorded)
+  if (unknownKeys === 0) return summary
+  const count = `unknownKeys: ${String(unknownKeys)}`
+  return Object.keys(recorded).length === 0 ? count : `${summary}; ${count}`
 }
 
 /** The smallest secret worth scrubbing; shorter text would match unrelated words. */

@@ -22,6 +22,10 @@
  *   `VALIDATION_FAILED` at `pageSize`
  * - 409 `COLLECTION_CHANGED` with empty details for a collection that changed
  *   while it was read
+ * - 400 `VALIDATION_FAILED` for input that violates the operation contract,
+ *   rejected before governance (D5): no approval request is made, and the
+ *   audit log gains one `invalid-input` record carrying the issue count and
+ *   no argument values
  *
  * Time is fixed by the rate limiters' injected clock, so `Retry-After` is exact:
  * a window that opens at the fixed instant lasts the full 60 seconds.
@@ -32,6 +36,9 @@
  * @see https://hono.dev/docs/getting-started/nodejs
  */
 
+import { mkdtemp, readFile, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { Hono } from 'hono'
 import pino from 'pino'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -43,13 +50,15 @@ import {
   type AppContract,
   type WireValue,
 } from '@macts/contracts'
-import type { AppManifest } from '@macts/core'
+import type { AppManifest, ApprovalRequest } from '@macts/core'
+import { createFileAuditWriter } from '@macts/core'
 import { createRateLimiter, createRuntime, type RateLimiter } from '@macts/runtime'
 import { createHttpAdapter } from './adapter.js'
 import {
   CALENDAR_MANIFEST,
   READER_TOKEN,
   WRITER_TOKEN,
+  calendarPolicy,
   createFakeVerifier,
   createListenerPool,
   createRecordingExecutor,
@@ -258,6 +267,71 @@ function typedCalendarContract(): AppContract<unknown> {
     bind: () => ({}),
   }
 }
+
+describe('HTTP listener: invalid input to an approval-gated operation', () => {
+  const auditDirs: string[] = []
+
+  afterEach(async () => {
+    for (const dir of auditDirs.splice(0)) {
+      await rm(dir, { recursive: true, force: true })
+    }
+  })
+
+  it('answers 400 VALIDATION_FAILED, asks no approver, and audits one invalid-input record', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'macts-invalid-input-uat-'))
+    auditDirs.push(dir)
+    const auditPath = join(dir, 'audit.jsonl')
+    const asked: ApprovalRequest[] = []
+    const listener = await listenServer({
+      governance: {
+        policy: calendarPolicy('confirm-first'),
+        writer: createFileAuditWriter(auditPath),
+        approvals: {
+          provider: {
+            name: 'recording-approver',
+            capabilities: { supportsPolicySuggestions: false, supportsDistinctRouting: false },
+            requestApproval: (request) => {
+              asked.push(request)
+              return Promise.resolve({ state: 'approved' })
+            },
+          },
+        },
+      },
+    })
+
+    // `summary` is a required string; a number violates the request contract.
+    const res = await rpc(listener, 'calendar.events.create', WRITER_TOKEN, {
+      body: { summary: 4242, password: 'hunter2' },
+    })
+
+    expect(res.status).toBe(400)
+    const body = await errorBody(res)
+    expect(body.error.code).toBe('VALIDATION_FAILED')
+    expect(body.error.details).toMatchObject({ issues: [{ path: ['summary'] }] })
+    expect(asked).toHaveLength(0)
+    expect(listener.executor.requests).toHaveLength(0)
+
+    const log = await readFile(auditPath, 'utf8')
+    const records = log
+      .split('\n')
+      .filter((line) => line.trim().length > 0)
+      .map((line) => JSON.parse(line) as unknown)
+    expect(records).toEqual([
+      {
+        capability: 'calendar:events:create',
+        app: 'calendar',
+        apiKeyId: 'key_writer',
+        decision: 'invalid-input',
+        timestamp: expect.stringMatching(
+          /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+        ) as unknown,
+        issueCount: 1,
+      },
+    ])
+    expect(log).not.toContain('4242')
+    expect(log).not.toContain('hunter2')
+  })
+})
 
 describe('HTTP listener: results that violate the output contract', () => {
   it('answers 502 UNEXPECTED_VALUE, says the operation ran, and echoes no value', async () => {

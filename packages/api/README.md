@@ -5,8 +5,8 @@ HTTP API server for macOS app automation.
 Serves macts operations over HTTP. The server composes the shared macts
 runtime ([`@macts/runtime`](../runtime/README.md)) with a thin HTTP adapter:
 every operation request is translated into one runtime invocation, which
-verifies the credential, applies the rate limit, checks permission, enforces
-governance, validates input, and only then executes. The HTTP layer adds
+verifies the credential, applies the rate limit, checks permission, validates
+input, enforces governance, and only then executes. The HTTP layer adds
 routing, the error envelope, CORS, logging, TLS, and graceful shutdown; it
 duplicates none of the authorization logic.
 

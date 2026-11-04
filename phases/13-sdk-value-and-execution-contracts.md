@@ -1131,19 +1131,34 @@ Defined in `@macts/contracts` (`invocation/`):
 authority, in both modes. Adapters translate protocol context into an
 `InvocationContext` and nothing more. Each step reuses an existing mechanism:
 
-| Step                                                                                                 | Reuses                                                                                                     | Failure                                                                                                                                                                                                                                                     |
-| ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1. Verify credential → `Authority`                                                                   | `validateApiKey`, moved unchanged to the runtime                                                           | `AuthenticationError` with `reason`: `missing`, `malformed` (`INVALID_FORMAT`, `MALFORMED_PAYLOAD`), `invalid` (`INVALID_SIGNATURE`), `expired`, `revoked`                                                                                                  |
-| 1b. Admission (optional): `rateLimiter.admit(authority.subject)`                                     | The fixed-window counter of the former HTTP rate-limit middleware, as `createRateLimiter`                  | `RateLimitedError` (`retryAfterSeconds`). A limiter that throws denies with `InternalError`, never `RateLimitedError`.                                                                                                                                      |
-| 2. Permission check against `descriptor.permission`, using the manifest command's permission history | `checkPayloadPermission` / `hasPermission`                                                                 | `PermissionDeniedError` (`required`, `hint`, `changelog`)                                                                                                                                                                                                   |
-| 3. Governance: `resolveGovernanceForRequest(governance, authority.subject)` → `enforceCall`          | Audit context `{ apiKeyId: subject, argsSummary: redactArgs(wire input), timestamp: clock(), approvalId }` | `PolicyDeniedError`. With no approval gate, a confirm-first hold raises `ApprovalPendingError`. With a gate, the runtime calls `seekApproval` then `recordApprovalDecision`; a rejection, a timeout, or a failure to record raises `ApprovalRejectedError`. |
-| 4. Input validation against `descriptor.input.wire`                                                  | —                                                                                                          | `ValidationError`. This catches raw wire requests and casts that bypassed client-side `encode`.                                                                                                                                                             |
-| 5. `executor.execute(...)`                                                                           | —                                                                                                          | Canonical errors from the provider; any non-canonical throw becomes `InternalError`                                                                                                                                                                         |
+| Step                                                                                                 | Reuses                                                                                                                                                                                                                                                                                                                                     | Failure                                                                                                                                                                                                                                                     |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1. Verify credential → `Authority`                                                                   | `validateApiKey`, moved unchanged to the runtime                                                                                                                                                                                                                                                                                           | `AuthenticationError` with `reason`: `missing`, `malformed` (`INVALID_FORMAT`, `MALFORMED_PAYLOAD`), `invalid` (`INVALID_SIGNATURE`), `expired`, `revoked`                                                                                                  |
+| 1b. Admission (optional): `rateLimiter.admit(authority.subject)`                                     | The fixed-window counter of the former HTTP rate-limit middleware, as `createRateLimiter`                                                                                                                                                                                                                                                  | `RateLimitedError` (`retryAfterSeconds`). A limiter that throws denies with `InternalError`, never `RateLimitedError`.                                                                                                                                      |
+| 2. Permission check against `descriptor.permission`, using the manifest command's permission history | `checkPayloadPermission` / `hasPermission`                                                                                                                                                                                                                                                                                                 | `PermissionDeniedError` (`required`, `hint`, `changelog`)                                                                                                                                                                                                   |
+| 3. Input validation against `descriptor.input.wire`                                                  | `recordInvalidInput`: one `invalid-input` audit record `{ capability, app, apiKeyId: subject, timestamp: clock(), issueCount }`, with no argument values, summary, or issue messages                                                                                                                                                       | `ValidationError`. This catches raw wire requests and casts that bypassed client-side `encode`. Governance is not evaluated and no approval is sought.                                                                                                      |
+| 4. Governance: `resolveGovernanceForRequest(governance, authority.subject)` → `enforceCall`          | Audit context `{ apiKeyId: subject, argsSummary, timestamp: clock(), approvalId }`, where `argsSummary` is `redactArgs` over the operation's declared input parameters, each value taken from the validated input (a `cursor` recorded as `true`), followed by `unknownKeys: N` when the input had N keys that are not declared parameters | `PolicyDeniedError`. With no approval gate, a confirm-first hold raises `ApprovalPendingError`. With a gate, the runtime calls `seekApproval` then `recordApprovalDecision`; a rejection, a timeout, or a failure to record raises `ApprovalRejectedError`. |
+| 5. `executor.execute(...)`                                                                           | —                                                                                                                                                                                                                                                                                                                                          | Canonical errors from the provider; any non-canonical throw becomes `InternalError`                                                                                                                                                                         |
 
-The step order is today's order. Fail-closed rules carry over unchanged: a
-resolver failure, an `enforceCall` failure, or an audit-write failure denies
-the call. Steps 1–3 also govern reference resolution and file fetch, which are
-read-risk calls (D7, D8). Execution owns the pipeline.
+Permission comes before validation, so there is no schema oracle: a caller
+without the permission learns nothing about the operation's input contract,
+and one that sends invalid input is answered `PermissionDeniedError`, never
+`ValidationError`. A permission denial writes no audit record. Validation
+comes before governance, so only well-formed calls reach policy, audit
+summaries, and approvers: an argument summary describes input that passed its
+contract, and names only parameters the contract declares. A key that is not
+a declared parameter (an input schema may let it through, as a manifest
+command's request schema does, or strip it) is counted in `unknownKeys` and
+never named. A call rejected by validation after the permission check writes
+exactly one `invalid-input` audit record (D6) with the number of validation
+issues and nothing from the input, and is never put to an approver.
+
+Fail-closed rules carry over unchanged: a resolver failure, an `enforceCall`
+failure, or an audit-write failure denies the call. That includes the
+`invalid-input` record: if it cannot be written, the call fails with
+`InternalError` rather than `ValidationError`. Steps 1–4 also govern reference
+resolution and file fetch, which are read-risk calls (D7, D8). Execution owns
+the pipeline.
 
 Step 1b is admission, not authority. It runs only when the runtime is
 constructed with a `rateLimiter`, keyed by the verified subject, so it never
@@ -1188,7 +1203,7 @@ it, not only HTTP. The reserved names are exported as
 
 Locality changes only where the pipeline runs. In remote mode the client
 presents the credential over HTTP and the service runs the same pipeline.
-There is no local shortcut that skips steps 1–3.
+There is no local shortcut that skips steps 1–4.
 
 **This Mac's governance.** `loadHostGovernance()` in `@macts/runtime` is the
 single definition of the governance a host enforces when none is supplied. It
@@ -1196,7 +1211,7 @@ composes the active policy (`<macts-home>/governance/policy.json`), the
 registered approval gate, the stored per-key policy resolver, and a file audit
 writer (`<macts-home>/governance/audit.jsonl`). The local client and the HTTP
 server both default to it, passing the loader itself; the runtime loads it once,
-on the first call that reaches step 3. `createRuntime` itself requires a
+on the first call that reaches step 3 (to audit invalid input) or step 4. `createRuntime` itself requires a
 `governance` option and has no default, so a host that builds a runtime
 directly (the MCP host included, #101) cannot run calls under governance it
 forgot to supply. Missing and malformed configuration are treated differently:
@@ -1243,28 +1258,28 @@ abstract `MactsError<Code>` and carries:
 `AnyMactsError` is the union of all classes. A `switch (error.code)` over it
 narrows `details`.
 
-| Class                           | `code`                       | Distinct meaning                                                                                                                                                     | Default HTTP                                      |
-| ------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| `ValidationError`               | `VALIDATION_FAILED`          | Caller input violated the operation contract (`issues[]`)                                                                                                            | 400                                               |
-| `UnexpectedValueError`          | `UNEXPECTED_VALUE`           | An app result violated the contract. This includes an enum member the SDK does not know and an out-of-policy integer (`issues[]`).                                   | 502                                               |
-| `AuthenticationError`           | `UNAUTHENTICATED`            | Credential missing or unusable (`reason`)                                                                                                                            | 401                                               |
-| `RateLimitedError`              | `RATE_LIMITED`               | The caller exceeded its admission limit; not evaluated further (`retryAfterSeconds`, a non-negative integer)                                                         | 429                                               |
-| `PermissionDeniedError`         | `PERMISSION_DENIED`          | Credential lacks the required permission                                                                                                                             | 403                                               |
-| `PolicyDeniedError`             | `POLICY_DENIED`              | Governance policy forbids the call (`permission`, `layer`)                                                                                                           | 403                                               |
-| `ApprovalPendingError`          | `APPROVAL_PENDING`           | Held for confirmation with nobody to ask; not executed                                                                                                               | 409                                               |
-| `ApprovalRejectedError`         | `APPROVAL_REJECTED`          | Held, put to a human, and not approved (`state`)                                                                                                                     | 403                                               |
-| `TargetNotFoundError`           | `TARGET_NOT_FOUND`           | A singular target does not exist (`entryIndex` for a missing identity-collection entry)                                                                              | 404                                               |
-| `FileNotFoundError`             | `FILE_NOT_FOUND`             | A referenced file does not exist or disappeared                                                                                                                      | 404                                               |
-| `InvalidSelectionError`         | `INVALID_SELECTION`          | A range or index selection is invalid for the collection                                                                                                             | 400                                               |
-| `CollectionChangedError`        | `COLLECTION_CHANGED`         | The collection changed while it was being read, so no consistent result exists; the same request is correct and can be retried, from the first page if it was paged. | 409                                               |
-| `AppUnavailableError`           | `APP_UNAVAILABLE`            | The app is not installed or cannot be reached                                                                                                                        | 503                                               |
-| `AppAuthorizationRequiredError` | `APP_AUTHORIZATION_REQUIRED` | macOS has not authorized automating the app. This is distinct from macts permission denial.                                                                          | 503                                               |
-| `AppOperationError`             | `APP_OPERATION_FAILED`       | The app reported a failure not covered above (`appErrorCode?`)                                                                                                       | 502                                               |
-| `OperationTimeoutError`         | `TIMEOUT`                    | The operation exceeded its time budget                                                                                                                               | 504                                               |
-| `OperationCancelledError`       | `CANCELLED`                  | The caller aborted the operation                                                                                                                                     | n/a (the caller stopped waiting); recorded as 499 |
-| `TransferError`                 | `TRANSFER_FAILED`            | A transfer expired, was incomplete, was too large, or is unknown                                                                                                     | 400 / 410 / 413                                   |
-| `InternalError`                 | `INTERNAL`                   | An unexpected macts failure, with a sanitized message                                                                                                                | 500                                               |
-| `TransportError`                | `TRANSPORT_FAILED`           | **Client-side only.** The service was unreachable, sent an invalid response, or uses a different protocol.                                                           | n/a                                               |
+| Class                           | `code`                       | Distinct meaning                                                                                                                                                        | Default HTTP                                      |
+| ------------------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `ValidationError`               | `VALIDATION_FAILED`          | Caller input violated the operation contract (`issues[]`). Raised by input validation after the permission check, it is audited with the decision `invalid-input` (D5). | 400                                               |
+| `UnexpectedValueError`          | `UNEXPECTED_VALUE`           | An app result violated the contract. This includes an enum member the SDK does not know and an out-of-policy integer (`issues[]`).                                      | 502                                               |
+| `AuthenticationError`           | `UNAUTHENTICATED`            | Credential missing or unusable (`reason`)                                                                                                                               | 401                                               |
+| `RateLimitedError`              | `RATE_LIMITED`               | The caller exceeded its admission limit; not evaluated further (`retryAfterSeconds`, a non-negative integer)                                                            | 429                                               |
+| `PermissionDeniedError`         | `PERMISSION_DENIED`          | Credential lacks the required permission                                                                                                                                | 403                                               |
+| `PolicyDeniedError`             | `POLICY_DENIED`              | Governance policy forbids the call (`permission`, `layer`)                                                                                                              | 403                                               |
+| `ApprovalPendingError`          | `APPROVAL_PENDING`           | Held for confirmation with nobody to ask; not executed                                                                                                                  | 409                                               |
+| `ApprovalRejectedError`         | `APPROVAL_REJECTED`          | Held, put to a human, and not approved (`state`)                                                                                                                        | 403                                               |
+| `TargetNotFoundError`           | `TARGET_NOT_FOUND`           | A singular target does not exist (`entryIndex` for a missing identity-collection entry)                                                                                 | 404                                               |
+| `FileNotFoundError`             | `FILE_NOT_FOUND`             | A referenced file does not exist or disappeared                                                                                                                         | 404                                               |
+| `InvalidSelectionError`         | `INVALID_SELECTION`          | A range or index selection is invalid for the collection                                                                                                                | 400                                               |
+| `CollectionChangedError`        | `COLLECTION_CHANGED`         | The collection changed while it was being read, so no consistent result exists; the same request is correct and can be retried, from the first page if it was paged.    | 409                                               |
+| `AppUnavailableError`           | `APP_UNAVAILABLE`            | The app is not installed or cannot be reached                                                                                                                           | 503                                               |
+| `AppAuthorizationRequiredError` | `APP_AUTHORIZATION_REQUIRED` | macOS has not authorized automating the app. This is distinct from macts permission denial.                                                                             | 503                                               |
+| `AppOperationError`             | `APP_OPERATION_FAILED`       | The app reported a failure not covered above (`appErrorCode?`)                                                                                                          | 502                                               |
+| `OperationTimeoutError`         | `TIMEOUT`                    | The operation exceeded its time budget                                                                                                                                  | 504                                               |
+| `OperationCancelledError`       | `CANCELLED`                  | The caller aborted the operation                                                                                                                                        | n/a (the caller stopped waiting); recorded as 499 |
+| `TransferError`                 | `TRANSFER_FAILED`            | A transfer expired, was incomplete, was too large, or is unknown                                                                                                        | 400 / 410 / 413                                   |
+| `InternalError`                 | `INTERNAL`                   | An unexpected macts failure, with a sanitized message                                                                                                                   | 500                                               |
+| `TransportError`                | `TRANSPORT_FAILED`           | **Client-side only.** The service was unreachable, sent an invalid response, or uses a different protocol.                                                              | n/a                                               |
 
 **Wire codec.** An error response body is
 `{ "error": { "code", "message", "details" } }`. Over HTTP, a 401 also
@@ -1773,16 +1788,18 @@ bypass policy:
    resource's permission is checked. Container traversal needs no container
    permission, because a container only locates the target and contributes no
    data to the result.
-5. Governance, approval, and audit run exactly as for a direct call of the
+5. The whole reference is validated with
+   `t.reference(() => contract, resource, cardinality)`, after the permission
+   check and before governance, as in `invoke` (D5, D11). A malformed
+   reference is a `ValidationError`, audited as `invalid-input` with no part
+   of the reference, and is never put to an approver.
+6. Governance, approval, and audit run exactly as for a direct call of the
    operation: the same permission string and the same decision. The audit
    record has the same capability, app, key, and decision as a direct call;
-   it differs only in `argsSummary`, which holds the redacted reference
-   payload. Nested values in that summary are reduced to a key count, so a
+   it differs only in `argsSummary`, which holds the redacted validated
+   reference. Nested values in that summary are reduced to a key count, so a
    selector is summarized as an object and the name a name selector looked up
    is not recorded. Nothing else marks the record as a resolution.
-6. The whole reference is validated with
-   `t.reference(() => contract, resource, cardinality)`, after governance
-   as in `invoke` (D11). A malformed reference is a `ValidationError`.
 7. The executor's `resolve` runs (D9).
 8. The result is validated against the operation's `output.wire`, as every
    `invoke` result is, unless its output plan is `passthrough` (D11). For an
@@ -2155,10 +2172,10 @@ reads windows:
   cursor from another
   operation or for other inputs is a `ValidationError` at `["cursor"]`,
   never `COLLECTION_CHANGED`. Every page runs the full D5 pipeline, so a
-  cursor carries no authority. Audit and logs record only `cursor: true`, for
-  every operation, since arguments are audited before the input is validated
-  and a cursor can be sent where it is refused. No message or issue repeats a
-  cursor, since its anchor can be user content.
+  cursor carries no authority. Audit and logs record only `cursor: true`. A
+  cursor sent to an operation that does not declare one fails validation, so
+  that call is audited as `invalid-input`, with no values. No message or issue
+  repeats a cursor, since its anchor can be user content.
 - The runtime hands the executor a half-open window `{ offset, size, anchor? }`
   and an output plan that is an array of the item plan. The executor answers
   `{ items, length, last? }`: the window's items, the collection's length when
@@ -2371,7 +2388,7 @@ Values are validated at every trust boundary, using the same schemas:
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Client `encode`               | Before any network or native call. It catches casts.                                                                                                                                                                                                                                |
 | Runtime against `input.wire`  | Catches raw HTTP and MCP requests.                                                                                                                                                                                                                                                  |
-| Runtime against `t.reference` | A reference to resolve, after governance (D7).                                                                                                                                                                                                                                      |
+| Runtime against `t.reference` | A reference to resolve, after the permission check and before governance (D7).                                                                                                                                                                                                      |
 | Runtime against `output.wire` | Every executor result whose output plan is not `passthrough`, on `invoke` and on resolution, before any adapter (HTTP, MCP, CLI) emits it. It catches executors that don't encode, or encode wrongly. A resolution result also holds one record per identity-collection entry (D7). |
 | Native codec inside JXA       | Against the plan, in both directions.                                                                                                                                                                                                                                               |
 | Client `decode`               | Against the operation's output contract.                                                                                                                                                                                                                                            |

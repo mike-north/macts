@@ -6,7 +6,7 @@ Model Context Protocol server for macOS application automation.
 
 The [Model Context Protocol (MCP)](https://modelcontextprotocol.io) is an open protocol that enables AI assistants like Claude to integrate with external tools and data sources. This package serves every installed macts app's operations as MCP tools.
 
-Every tool call runs through the same pipeline as a call to the macts HTTP API: the caller's API key is verified, its permissions are checked, this Mac's governance policy is enforced and audited, and the input is validated against the operation's contract, all before the app is touched. The MCP server adds no policy of its own and has no trusted-caller mode.
+Every tool call runs through the same pipeline as a call to the macts HTTP API: the caller's API key is verified, its permissions are checked, the input is validated against the operation's contract, and this Mac's governance policy is enforced and audited, all before the app is touched. The MCP server adds no policy of its own and has no trusted-caller mode.
 
 ## Installation
 

@@ -23,8 +23,8 @@
  *   operation or for other inputs is a `ValidationError` at `["cursor"]`,
  *   never `COLLECTION_CHANGED`.
  * - The cursor's contents never reach an audit record, a log entry or an
- *   error; audit records say only `cursor: true`, for every operation, even
- *   one that refuses the cursor.
+ *   error; audit records say only `cursor: true`, and an operation that
+ *   refuses the cursor audits the call as `invalid-input`, with no values.
  *
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md (D2, D6, D9, D10)
  */
@@ -740,7 +740,9 @@ describe('cursor privacy', () => {
       asLibrarian()
     )
 
-    const summaries = h.audit.records.map((record) => record.argsSummary)
+    const summaries = h.audit.records.map((record) =>
+      record.decision === 'invalid-input' ? undefined : record.argsSummary
+    )
     expect(summaries.at(-1)).toContain('cursor: true')
     expect(JSON.stringify(h.audit.records)).not.toContain(cursor)
   })
@@ -763,7 +765,7 @@ describe('cursor privacy', () => {
     ['a list that does not page', 'library.pages.list'],
     ['an operation that is not a list', 'library.shelves.get'],
   ] as const)(
-    'audits a cursor sent to %s only as `cursor: true`, though validation refuses it',
+    'audits a cursor sent to %s, which validation refuses, as invalid input with no values',
     async (_kind, id) => {
       const h = harness(windowExecutor(() => books(6)))
       // A cursor anchored on the marker, as another list might have issued it.
@@ -773,14 +775,14 @@ describe('cursor privacy', () => {
 
       expect(error).toBeInstanceOf(ValidationError)
       expect(h.executor.requests).toHaveLength(0)
-      expect(h.audit.records.map((record) => record.argsSummary).at(-1)).toContain('cursor: true')
+      expect(h.audit.records.map((record) => record.decision)).toEqual(['invalid-input'])
       const recorded = everythingRecorded(h, error)
       expect(recorded).not.toContain(MARKER)
       expect(recorded).not.toContain(cursor)
     }
   )
 
-  it('audits a raw marker sent as the cursor of a list that does not page only as `cursor: true`', async () => {
+  it('audits a raw marker sent as the cursor of a list that does not page as invalid input with no values', async () => {
     const h = harness(windowExecutor(() => books(6)))
 
     const error = await rejection(
@@ -788,7 +790,7 @@ describe('cursor privacy', () => {
     )
 
     expect(error).toBeInstanceOf(ValidationError)
-    expect(h.audit.records.length).toBeGreaterThan(0)
+    expect(h.audit.records.map((record) => record.decision)).toEqual(['invalid-input'])
     expect(everythingRecorded(h, error)).not.toContain(MARKER)
   })
 
