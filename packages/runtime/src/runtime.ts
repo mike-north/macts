@@ -195,9 +195,9 @@ export interface MactsRuntime {
    * @throws `OperationRegistrationError` when the app's route segment is
    *   reserved (`RESERVED_APP_ROUTE_SEGMENTS`), an operation id is already
    *   registered, the manifest yields a malformed id or permission, or a
-   *   resource-scoped get, update or delete command declares no identifier
-   *   parameter (the error names the app and the command). A refused
-   *   registration adds nothing.
+   *   resource-scoped get, update or delete command, or an application-scoped
+   *   delete, declares no identifier parameter (the error names the app and
+   *   the command). A refused registration adds nothing.
    */
   registerManifest(manifest: AppManifest): void
   /**
@@ -218,8 +218,9 @@ export interface MactsRuntime {
    *   is already registered, or the contract's resource table records a `get`
    *   or `list` operation that is not one of its operations targeting that
    *   resource, or a resource the manifest does not declare, or an identifier
-   *   type that differs from the manifest's primary identifier property. A
-   *   refused registration adds nothing.
+   *   type that differs from the manifest's primary identifier property, or the
+   *   manifest has a command that `registerManifest` refuses for declaring no
+   *   identifier parameter. A refused registration adds nothing.
    */
   registerContract(contract: AppContract<unknown>, manifest: AppManifest): void
   /**

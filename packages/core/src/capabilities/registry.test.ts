@@ -121,7 +121,11 @@ const ROUTE_PERMISSION_MANIFEST_YAML = `${NOTEBOOK_MANIFEST_YAML}
     description: Get a note (no routeName, no permission)
     scope: resource
     resourceType: Note
-    parameters: []
+    parameters:
+      - name: id
+        type: string
+        description: The note to get
+        required: true
   findNote:
     name: find
     routeName: lookup

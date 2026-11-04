@@ -66,7 +66,11 @@ commands:
     description: Delete a note
     scope: resource
     resourceType: Note
-    parameters: []
+    parameters:
+      - name: id
+        type: string
+        description: The note to delete
+        required: true
     permission: notebook:notes:delete
 `
 

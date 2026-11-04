@@ -42,9 +42,15 @@ function safeParamProperty(paramName: string, commandName: string): string {
  * resource's primary identifier property, which every lookup of one item
  * matches, whatever the get command calls its parameter (Calendar's get takes
  * `id` and matches a calendar's `name`). A resource that declares no
- * identifier is addressed by its get command's identifier parameter. With
- * neither, the identifier is unknown and `undefined` is returned.
+ * identifier is addressed by the identifier parameter its get command
+ * declares ({@link resolveIdParams}). With neither, the identifier is unknown
+ * and `undefined` is returned; no name is supplied in its place.
  */
+function addressingIdentifier(resource: Resource, getCommand: ManifestCommand): string
+function addressingIdentifier(
+  resource: Resource,
+  getCommand: ManifestCommand | undefined
+): string | undefined
 function addressingIdentifier(
   resource: Resource,
   getCommand: ManifestCommand | undefined
@@ -344,13 +350,15 @@ export function generateGetCommand(
   const getCommand = ctx
     .getResourceCommands(hierarchyPath.resourceName)
     .find((cmd) => cmd.name === 'get')
-  const parentParamName =
-    getCommand === undefined ? undefined : resolveIdParams(getCommand).parentParam
-  const parentScopeParams = (getCommand?.parameters ?? []).filter((p) => p.name === parentParamName)
+  // A get command is generated only when a get command backs it, and that
+  // command declares the identifier parameter it selects its item by.
+  if (getCommand === undefined) {
+    throw new Error(`Resource ${resource.name} has no get command to generate a get command from`)
+  }
+  const parentParamName = resolveIdParams(getCommand).parentParam
+  const parentScopeParams = getCommand.parameters.filter((p) => p.name === parentParamName)
   const parentOptions = generateListParamOptions(parentScopeParams)
-  // A get command is generated only when a get command backs it, so its
-  // identifier parameter is always known here.
-  const identifier = addressingIdentifier(resource, getCommand) ?? 'id'
+  const identifier = addressingIdentifier(resource, getCommand)
   const summary = `Get ${withArticle(identifierWords(resource.name))} by ${identifierProse(identifier)}`
 
   const content = `import { Command, Option } from 'clipanion';

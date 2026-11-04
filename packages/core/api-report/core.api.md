@@ -2001,6 +2001,15 @@ export function isSensitiveKey(key: string, extraSensitiveKeys?: readonly string
 export function isValidPermission(permission: string): boolean;
 
 // @public
+export const ITEM_COMMAND_NAMES: readonly string[];
+
+// @public
+export function itemIdentifierParameter(command: Command): CommandParameter | undefined;
+
+// @public
+export function itemSelectionProblem(commandKey: string, command: Command): string | undefined;
+
+// @public
 export interface JsonSchema {
     // (undocumented)
     readonly [key: string]: unknown;
@@ -4028,6 +4037,9 @@ export function selectProbedProperties(manifest: AppManifest, resource: Resource
 };
 
 // @public
+export function selectsOneItem(command: Command): boolean;
+
+// @public
 export type SensitivityTag = z.infer<typeof SensitivityTagSchema>;
 
 // @public
@@ -4177,6 +4189,16 @@ export interface UncheckedKinds {
 
 // @public
 export type UnmappedPermissionPolicy = 'reject' | 'keep';
+
+// @public
+export interface UnselectableItemCommand {
+    readonly command: Command;
+    readonly commandKey: string;
+    readonly problem: string;
+}
+
+// @public
+export function unselectableItemCommands(manifest: AppManifest): UnselectableItemCommand[];
 
 // @public (undocumented)
 export type Unsupported = z.infer<typeof UnsupportedSchema>;

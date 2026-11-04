@@ -11,6 +11,7 @@
  */
 
 import type { AppManifest } from '../../manifest/index.js'
+import { generationRefusals } from '../surface.js'
 import { generateHttpClientSdk } from '../sdk/http-client.js'
 import { generateCliPlugin } from '../cli/index.js'
 import { generateCapabilitiesModule } from '../capabilities/index.js'
@@ -80,6 +81,10 @@ const CONFIG_FILE_PATHS = new Set([
  *   second API Extractor config that reports the `./contract` subpath
  * - A `.gitattributes` marking the files it generates as generated
  *
+ * A manifest with a command that must select one item and declares no
+ * identifier parameter is refused (`generationRefusals`): the result holds
+ * the errors naming each such command, and no files.
+ *
  * @param manifest - The app manifest
  * @param options - Generation options
  * @returns Generated files for the consolidated package
@@ -88,10 +93,12 @@ export function generateClientPackage(
   manifest: AppManifest,
   options: GenerateClientPackageOptions
 ): GenerateClientPackageResult {
+  const appName = options.appName.replace(/\s+/g, '-').toLowerCase()
+  const refusals = generationRefusals(manifest)
+  if (refusals.length > 0) return { dir: appName, files: [], errors: refusals }
+
   const files: { path: string; content: string }[] = []
   const errors: string[] = []
-
-  const appName = options.appName.replace(/\s+/g, '-').toLowerCase()
 
   // Synthetic SDK package name used internally for the CLI generator context.
   // The CLI generator uses this to generate the sdk.ts import, which we then

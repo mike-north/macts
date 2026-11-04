@@ -24,6 +24,7 @@ import {
   listOperationPages,
   normalizeAppRouteSegment,
   resolveCommandRoutes,
+  unselectableItemCommands,
 } from '@macts/core'
 import {
   EMPTY_RESOURCE_PLAN_TABLE,
@@ -188,55 +189,32 @@ function deriveManifestOperations(manifest: AppManifest): ManifestOperation[] {
 }
 
 /**
- * The resource-scoped commands that act on one item, selected by an
- * identifier parameter: a `get`, an `update`, or a `delete`, by its command
- * name. A command of any other name is called on the app with its parameters
- * and selects no item, so it needs no identifier.
- */
-const ITEM_COMMAND_NAMES: readonly string[] = ['get', 'update', 'delete']
-
-/**
- * The rest of a refusal message for an item command with no identifier
- * parameter: what its native body would do without one
- * (`planNativeInvocation` in `@macts/core`).
- *
- * - A get or update would read the item's identifier from the undeclared key
- *   `id`, which a manifest-registered operation's input never admits
- *   (`buildDeclaredInputSchema`), so it could never run.
- * - A delete reads no identifier at all: it would call the app's delete with
- *   no target, so no item can be selected.
- */
-function missingIdentifierConsequence(command: Command): string {
-  return command.name === 'delete'
-    ? "without one no item can be selected: its native body would call the app's delete with no target"
-    : 'without one it would read the undeclared input "id", which the operation does not accept'
-}
-
-/**
- * Refuse a resource-scoped get, update or delete that selects no item.
+ * Refuse a manifest with a command that must select one item and declares no
+ * parameter to select it by.
  *
  * @remarks
- * The condition: the command is resource-scoped, its name is one of
- * {@link ITEM_COMMAND_NAMES}, and it declares no required parameter other
- * than its parent's (the parameter `command.parent` names). That parameter is
- * the identifier its native body selects the item by
- * (`planNativeInvocation` in `@macts/core`); without one the operation cannot
- * act on the item it names ({@link missingIdentifierConsequence}). Such a
- * manifest is refused rather than registered with an operation that cannot
- * do what it says. The rule is the same for all three names; a command is
- * never exempt because of its name.
+ * The rule is `unselectableItemCommands` in `@macts/core`, the one generation
+ * applies too: a resource-scoped get, update or delete, or a delete at
+ * application scope, must declare a required parameter other than its
+ * parent's (the parameter `command.parent` names). That parameter is the
+ * identifier its native body selects the item by (`planNativeInvocation` in
+ * `@macts/core`). Such a manifest is refused rather than registered with an
+ * operation that cannot act on the item it names. The rule is the same for
+ * every command it covers; a command is never exempt because of its name. A
+ * command or resource marked unsupported has no operation and is never
+ * refused.
+ *
+ * Both registrations run it, so a contract cannot register an operation for a
+ * manifest that registration from the manifest alone refuses.
  *
  * @throws {@link OperationRegistrationError} naming the app and the command
- *   key, and saying that the command declares no identifier parameter.
+ *   key, and saying which identifier parameter to declare.
  */
-function assertItemSelectable(manifest: AppManifest, commandKey: string, command: Command): void {
-  if (command.scope !== 'resource' || !ITEM_COMMAND_NAMES.includes(command.name)) return
-  const parent = command.parent?.parameter
-  const identifier = command.parameters.find((p) => p.required && p.name !== parent)
-  if (identifier !== undefined) return
-  const besideParent = parent === undefined ? '' : ` other than its parent parameter "${parent}"`
+function assertItemsSelectable(manifest: AppManifest): void {
+  const [first] = unselectableItemCommands(manifest)
+  if (first === undefined) return
   throw new OperationRegistrationError(
-    `App "${manifest.app.name}" cannot be registered from its manifest: its ${command.name} command "${commandKey}" declares no identifier parameter. A ${command.name} selects one item by a required parameter${besideParent}, and ${missingIdentifierConsequence(command)}. Declare the item's identifier as a required parameter of "${commandKey}".`
+    `App "${manifest.app.name}" cannot be registered from its manifest: ${first.problem}`
   )
 }
 
@@ -274,8 +252,9 @@ function toRegisteredOperation(
  * JSON, so a key that is not a parameter is rejected as it is for an operation
  * registered from a contract; the output is any JSON value. A
  * manifest-registered list does not page, so its input declares no paging
- * inputs. A resource-scoped get, update or delete must declare the identifier
- * parameter it selects its item by, or the manifest is refused. They stand in
+ * inputs. A resource-scoped get, update or delete, or a delete at application
+ * scope, must declare the identifier parameter it selects its item by, or the
+ * manifest is refused (`unselectableItemCommands` in `@macts/core`). They stand in
  * for generated descriptors until generated contracts carry value types, and
  * the generator never produces them.
  *
@@ -283,14 +262,14 @@ function toRegisteredOperation(
  * @returns One registered operation per route, in command-declaration order.
  * @throws {@link OperationRegistrationError} when the app's route segment is
  *   reserved ({@link RESERVED_APP_ROUTE_SEGMENTS}), a route or permission is
- *   not in operation form, or a resource-scoped get, update or delete declares
- *   no identifier parameter.
+ *   not in operation form, or a command that must select one item declares no
+ *   identifier parameter.
  */
 export function operationsFromManifest(manifest: AppManifest): RegisteredOperation[] {
   assertAppSegmentNotReserved(manifest)
+  assertItemsSelectable(manifest)
   const inputTypes = new Map<string, ValueType<unknown>>()
   return deriveManifestOperations(manifest).map(({ id, permission, target, command }) => {
-    assertItemSelectable(manifest, target.command, command)
     let input = inputTypes.get(target.command)
     if (input === undefined) {
       input = passthroughInputType(buildDeclaredInputSchema(command))
@@ -327,6 +306,12 @@ function sameTarget(a: OperationTarget, b: OperationTarget): boolean {
  * so a contract generated before an identifier's uniqueness claim changed is
  * refused rather than paging a list that cannot be anchored reliably.
  *
+ * The manifest itself must pass the check registration from the manifest
+ * alone applies: every command that must select one item declares the
+ * identifier parameter it selects it by (`unselectableItemCommands` in
+ * `@macts/core`). A manifest that check refuses registers nothing through a
+ * contract either, whichever operations the contract covers.
+ *
  * A contract may cover a subset of the manifest's operations. Its resource
  * table must agree with the manifest too: every resource it lists is one the
  * manifest declares, with the identifier type of the manifest's primary
@@ -340,14 +325,16 @@ function sameTarget(a: OperationTarget, b: OperationTarget): boolean {
  * @param manifest - The validated manifest the contract was generated from.
  * @returns One registered operation per contract descriptor, using the
  *   contract's descriptors.
- * @throws {@link OperationRegistrationError} on any disagreement, or when the
- *   app's route segment is reserved ({@link RESERVED_APP_ROUTE_SEGMENTS}).
+ * @throws {@link OperationRegistrationError} on any disagreement, when the
+ *   app's route segment is reserved ({@link RESERVED_APP_ROUTE_SEGMENTS}), or
+ *   when a command that must select one item declares no identifier parameter.
  */
 export function operationsFromContract(
   contract: AppContract<unknown>,
   manifest: AppManifest
 ): RegisteredOperation[] {
   assertAppSegmentNotReserved(manifest)
+  assertItemsSelectable(manifest)
   const appSegment = normalizeAppRouteSegment(manifest.app.name)
   if (contract.app !== appSegment) {
     throw new OperationRegistrationError(

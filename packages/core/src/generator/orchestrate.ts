@@ -9,6 +9,7 @@
 import type { AppManifest } from '../manifest/index.js'
 import { generateClientPackage } from './client/index.js'
 import { generateServerPackage } from './server/index.js'
+import { generationRefusals } from './surface.js'
 
 /**
  * Options for generating consolidated packages (client + server).
@@ -45,6 +46,11 @@ export interface GenerateConsolidatedResult {
  * `@macts/{app}`. The server package, `@macts/{app}-server`, re-exports that
  * contract.
  *
+ * A manifest with a command that must select one item and declares no
+ * identifier parameter is refused before either package is built
+ * (`generationRefusals`): the result holds the errors naming each such
+ * command, once, and no files.
+ *
  * @param manifest - The app manifest
  * @param options - Generation options
  * @returns Generated files for both packages
@@ -58,6 +64,15 @@ export function generateConsolidatedPackages(
 
   const clientPackageName = options.clientPackageName ?? `@macts/${appName}`
   const serverPackageName = options.serverPackageName ?? `@macts/${appName}-server`
+
+  const refusals = generationRefusals(manifest)
+  if (refusals.length > 0) {
+    return {
+      client: { dir: appName, files: [] },
+      server: { dir: serverPackageName.replace(/^@[^/]+\//, ''), files: [] },
+      errors: refusals,
+    }
+  }
 
   const errors: string[] = []
 

@@ -8,6 +8,7 @@ import { generateResourceClass } from './resource.js'
 import { generateCollectionClass } from './collection.js'
 import { generateApplicationClass } from './application.js'
 import { MIT_LICENSE } from './license.js'
+import { generationRefusals } from './surface.js'
 
 export interface GenerateSdkResult {
   files: { path: string; content: string }[]
@@ -16,8 +17,14 @@ export interface GenerateSdkResult {
 
 /**
  * Generate a complete SDK from a manifest.
+ *
+ * A manifest with a command that must select one item and declares no
+ * identifier parameter is refused (`generationRefusals`): the result holds
+ * the errors naming each such command, and no files.
  */
 export function generateSdk(manifest: AppManifest, options: GeneratorOptions): GenerateSdkResult {
+  const refusals = generationRefusals(manifest)
+  if (refusals.length > 0) return { files: [], errors: refusals }
   const ctx = createGeneratorContext(manifest, options)
   const files: { path: string; content: string }[] = []
   const errors: string[] = []
