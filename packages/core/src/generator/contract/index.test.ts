@@ -744,6 +744,80 @@ describe('generateContract: paging on real manifests', () => {
   })
 })
 
+describe('generateContract: TV sources and their playlists (shipped manifest)', () => {
+  // The app addresses a playlist within its source, so the playlist get and
+  // list take the source's persistent ID as `sourceId`, as a direct call of
+  // either does; a source is found at the application and takes none.
+  let text = ''
+  beforeAll(async () => {
+    const manifest = await loadManifest(resolve(MANIFESTS_DIR, 'tv', 'app.yaml'))
+    text = moduleText(generateContract(manifest), CONTRACT_MODULE_PATH)
+  })
+
+  /** The required inputs of operation `id`, from its input JSON Schema. */
+  function requiredInputs(id: string): unknown {
+    const start = text.indexOf(`  id: '${id}',`)
+    if (start < 0) throw new Error(`no descriptor for ${id}`)
+    const schemaStart = text.indexOf('inputJsonSchema: ', start)
+    const line = text.slice(schemaStart, text.indexOf('\n', schemaStart))
+    const schema = JSON.parse(line.slice('inputJsonSchema: '.length).replace(/,$/, '')) as {
+      required?: unknown
+    }
+    return schema.required ?? []
+  }
+
+  it.each([
+    ['tv.playlists.list', ['sourceId']],
+    ['tv.playlists.get', ['sourceId', 'persistentID']],
+  ])('%s requires the source the playlist is in', (id, required) => {
+    expect(requiredInputs(id)).toEqual(required)
+  })
+
+  it.each([
+    ['tv.sources.list', []],
+    ['tv.sources.get', ['persistentID']],
+  ])('%s needs no container: sources are found at the application', (id, required) => {
+    expect(requiredInputs(id)).toEqual(required)
+  })
+
+  it.each([
+    ['tv.browserWindows.list', []],
+    ['tv.browserWindows.get', ['id']],
+    ['tv.playlistWindows.list', []],
+    ['tv.playlistWindows.get', ['id']],
+  ])('%s finds windows at the application, by id', (id, required) => {
+    expect(requiredInputs(id)).toEqual(required)
+  })
+
+  /** The line of the declared resource table type for `resource`. */
+  function declaredEntry(resource: string): string {
+    const start = text.indexOf(`  ${resource}: ResourceDescriptor<`)
+    if (start < 0) throw new Error(`no declared entry for ${resource}`)
+    return text.slice(start, text.indexOf('\n', start))
+  }
+
+  // phases/13 D7, "Parent-scoped targets": the table records, per route, the
+  // parent the command behind it records, so a playlist reference resolved
+  // through either route needs its source as its container.
+  it('records the source as the parent of both playlist routes', () => {
+    expect(declaredEntry('Playlist')).toContain(
+      "readonly get: 'tv.playlists.get'; readonly list: 'tv.playlists.list'; " +
+        "readonly parents: { readonly get: 'Source'; readonly list: 'Source' } }"
+    )
+    expect(text).toContain(`    get: 'tv.playlists.get',
+    list: 'tv.playlists.list',
+    parents: { get: 'Source', list: 'Source' },
+  },`)
+  })
+
+  it.each(['Source', 'BrowserWindow', 'PlaylistWindow'])(
+    'records no parent for %s, found at the application',
+    (resource) => {
+      expect(declaredEntry(resource)).not.toContain('parents')
+    }
+  )
+})
+
 describe('generateContract: identifier nullability', () => {
   it('keeps the primary identifier non-null and reports a contrary claim', () => {
     const manifest = jotterManifest()
@@ -1001,10 +1075,11 @@ describe('real app manifests', () => {
     // covers, not something the app cannot do. Every entry is a record field
     // holding a single reference, or an array of them: `no-get` when macts
     // has no get for the target yet, `not-unique` when macts identifies the
-    // target by a name the manifest has no uniqueness evidence for yet. No
-    // shipped output references a resource whose get records a parent, or
-    // one with a get and no identifier, and no shipped command records a
-    // result, so no result is left out. A new omission fails until it is
+    // target by a name the manifest has no uniqueness evidence for yet, and
+    // `parent-scoped` when the target's get records a parent (a TV playlist,
+    // got within its source). No shipped output references a resource with a
+    // get and no identifier, and no shipped command records a result, so no
+    // result is left out. A new omission fails until it is
     // reviewed and added here. Removing a row records restored coverage: the
     // field is back in output.
     const found = apps
@@ -1086,9 +1161,9 @@ describe('real app manifests', () => {
       ['system-events', 'UserDomainObject', 'temporaryItemsFolder', 'Folder', 'no-get'],
       ['system-events', 'ScriptingClass', 'superclass', 'ScriptingClass', 'no-get'],
       ['system-events', 'ScriptingCommand', 'directParameter', 'ScriptingParameter', 'no-get'],
-      ['tv', 'BrowserWindow', 'view', 'Playlist', 'no-get'],
-      ['tv', 'Playlist', 'parent', 'Playlist', 'no-get'],
-      ['tv', 'PlaylistWindow', 'view', 'Playlist', 'no-get'],
+      ['tv', 'BrowserWindow', 'view', 'Playlist', 'parent-scoped'],
+      ['tv', 'Playlist', 'parent', 'Playlist', 'parent-scoped'],
+      ['tv', 'PlaylistWindow', 'view', 'Playlist', 'parent-scoped'],
       ['xcode', 'WorkspaceDocument', 'lastSchemeActionResult', 'SchemeActionResult', 'no-get'],
       // A run destination is identified by its name, which is not claimed unique.
       ['xcode', 'WorkspaceDocument', 'activeRunDestination', 'RunDestination', 'not-unique'],

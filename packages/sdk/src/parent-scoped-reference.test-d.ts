@@ -2,7 +2,9 @@
  * Type tests for `bindReference` with references resolved through an
  * operation that records a parent, over real generated contracts: Music gets
  * and lists tracks only within a playlist (`Track` is typed with
- * `parents: { get: 'Playlist'; list: 'Playlist' }`); Reminders lists reminders
+ * `parents: { get: 'Playlist'; list: 'Playlist' }`), and TV gets and lists
+ * playlists only within a source (`Playlist` is typed with
+ * `parents: { get: 'Source'; list: 'Source' }`); Reminders lists reminders
  * only within a list and Microsoft Edge tabs only within a window
  * (`parents: { list: … }`), while getting one at the application.
  *
@@ -24,6 +26,12 @@ import {
 } from '@macts/music/contract'
 import { microsoftEdgeContract } from '@macts/microsoft-edge/contract'
 import { remindersContract, type Reminder } from '@macts/reminders/contract'
+import {
+  tvContract,
+  type Playlist as TVPlaylist,
+  type Source as TVSource,
+  type TVResources,
+} from '@macts/tv/contract'
 import type {
   IdentityReference,
   ResolvableReferenceData,
@@ -129,3 +137,64 @@ bindReference(edge, {
     id: 'W1',
   },
 })
+
+const tv = remote.createClient(tvContract, {
+  token: 'macts_sk_example',
+  url: 'http://localhost:8372',
+})
+
+const tvSource = {
+  app: 'tv',
+  resource: 'Source',
+  form: 'identity',
+  cardinality: 'one',
+  id: '1A2B3C4D5E6F7081',
+} as const
+
+const looseTVPlaylist = {
+  app: 'tv',
+  resource: 'Playlist',
+  form: 'identity',
+  cardinality: 'one',
+  id: '8091A2B3C4D5E6F7',
+} as const
+
+// @ts-expect-error -- a TV playlist is read within its source, so it needs one as its container
+bindReference(tv, looseTVPlaylist)
+expectNotAssignable<ResolvableReferenceData<TVResources>>(looseTVPlaylist)
+// A source picked by position supplies no identifier, so it cannot stand as the container.
+expectNotAssignable<ResolvableReferenceData<TVResources>>({
+  ...looseTVPlaylist,
+  container: {
+    app: 'tv',
+    resource: 'Source',
+    form: 'selector',
+    cardinality: 'one',
+    selector: { by: 'index', index: 0 },
+  },
+} as const)
+
+// With its source, it binds to a playlist reference.
+expectType<IdentityReference<TVPlaylist, string, 'Playlist'>>(
+  bindReference(tv, { ...looseTVPlaylist, container: tvSource })
+)
+// A source is got at the application, so it needs no container, and a bound
+// source is a container too.
+const boundSource = bindReference(tv, tvSource)
+expectType<IdentityReference<TVSource, string, 'Source'>>(boundSource)
+expectType<IdentityReference<TVPlaylist, string, 'Playlist'>>(
+  bindReference(tv, { ...looseTVPlaylist, container: boundSource })
+)
+
+const everyTVPlaylist = {
+  app: 'tv',
+  resource: 'Playlist',
+  form: 'selector',
+  cardinality: 'many',
+  selector: { by: 'every' },
+} as const
+// @ts-expect-error -- every playlist is listed within a source, so it needs one as its container
+bindReference(tv, everyTVPlaylist)
+expectType<SelectorCollectionReference<TVPlaylist, 'Playlist'>>(
+  bindReference(tv, { ...everyTVPlaylist, container: tvSource })
+)

@@ -27,7 +27,11 @@ import {
   type FileSource,
   type FileValue,
   type Integer,
+  type ObjectReferenceData,
   type OperationDescriptor,
+  type Page,
+  type ResourceDescriptor,
+  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -93,9 +97,9 @@ export interface Artwork {
 export interface BrowserWindow {
   /**
    * Unique identifier for this window.
-   * Nullable. No evidence that the app always sets it.
+   * Never null: the primary identifier.
    */
-  readonly id: Integer | null
+  readonly id: Integer
   /**
    * the selected tracks.
    * Nullable. No evidence that the app always sets it.
@@ -133,6 +137,11 @@ export interface Playlist {
    * Nullable. No evidence that the app always sets it.
    */
   readonly id: Integer | null
+  /**
+   * the id of the item as a hexadecimal string. This id does not change over time.
+   * Never null: the primary identifier.
+   */
+  readonly persistentID: string
   /**
    * the description of the playlist.
    * Nullable. No evidence that the app always sets it.
@@ -174,9 +183,9 @@ export interface Playlist {
 export interface PlaylistWindow {
   /**
    * Unique identifier for this window.
-   * Nullable. No evidence that the app always sets it.
+   * Never null: the primary identifier.
    */
-  readonly id: Integer | null
+  readonly id: Integer
   /**
    * the selected tracks.
    * Nullable. No evidence that the app always sets it.
@@ -200,6 +209,11 @@ export interface Source {
    * Nullable. No evidence that the app always sets it.
    */
   readonly id: Integer | null
+  /**
+   * the id of the item as a hexadecimal string. This id does not change over time.
+   * Never null: the primary identifier.
+   */
+  readonly persistentID: string
   /**
    * the total size of the source if it has a fixed size.
    * Nullable. No evidence that the app always sets it.
@@ -561,10 +575,19 @@ export interface ArtworkUpdateInput {
 }
 
 /** Input for creating a BrowserWindow. */
-export type BrowserWindowCreateInput = Record<string, never>
+export interface BrowserWindowCreateInput {
+  /** the playlist currently displayed in the window */
+  view?: ObjectReferenceData<string, 'Playlist'>
+}
 
 /** Input for updating a BrowserWindow. Omitted fields are left unchanged. */
-export type BrowserWindowUpdateInput = Record<string, never>
+export interface BrowserWindowUpdateInput {
+  /**
+   * the playlist currently displayed in the window.
+   * Cannot be reset: null is rejected.
+   */
+  view?: ObjectReferenceData<string, 'Playlist'>
+}
 
 /** Input for creating a FileTrack. */
 export interface FileTrackCreateInput {
@@ -918,6 +941,18 @@ export type VideoWindowCreateInput = Record<string, never>
 /** Input for updating a VideoWindow. Omitted fields are left unchanged. */
 export type VideoWindowUpdateInput = Record<string, never>
 
+/** the main window */
+export interface BrowserWindowResourceClient {
+  /** List browser windows, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<BrowserWindow>>
+  /**
+   * Read the browser window identified by `id`.
+   *
+   * @param id - Id of the browser window. Does not accept null.
+   */
+  get(id: Integer, options?: CallOptions): Promise<BrowserWindow>
+}
+
 /** a track representing a video file */
 export interface FileTrackResourceClient {
   /** update file track information from the current information in the track’s file */
@@ -926,6 +961,19 @@ export interface FileTrackResourceClient {
 
 /** a list of tracks/streams */
 export interface PlaylistResourceClient {
+  /**
+   * List playlists, as one page holding all of them.
+   *
+   * @param sourceId - Persistent ID of the source. Does not accept null.
+   */
+  list(sourceId: string, options?: CallOptions): Promise<Page<Playlist>>
+  /**
+   * Read the playlist identified by `persistentID` within `sourceId`.
+   *
+   * @param sourceId - Persistent ID of the source. Does not accept null.
+   * @param persistentID - Persistent ID of the playlist. Does not accept null.
+   */
+  get(sourceId: string, persistentID: string, options?: CallOptions): Promise<Playlist>
   /**
    * Move playlist(s) to a new location
    *
@@ -942,6 +990,30 @@ export interface PlaylistResourceClient {
   search(_for: string, only?: string, options?: CallOptions): Promise<void>
 }
 
+/** a sub-window showing a single playlist */
+export interface PlaylistWindowResourceClient {
+  /** List playlist windows, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<PlaylistWindow>>
+  /**
+   * Read the playlist window identified by `id`.
+   *
+   * @param id - Id of the playlist window. Does not accept null.
+   */
+  get(id: Integer, options?: CallOptions): Promise<PlaylistWindow>
+}
+
+/** a media source (library, CD, device, etc.) */
+export interface SourceResourceClient {
+  /** List sources, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Source>>
+  /**
+   * Read the source identified by `persistentID`.
+   *
+   * @param persistentID - Persistent ID of the source. Does not accept null.
+   */
+  get(persistentID: string, options?: CallOptions): Promise<Source>
+}
+
 /**
  * The TV client: one namespace per resource that has operations, plus the app's own commands. A
  * client factory creates one from {@link tvContract}. Its type carries the contract's resource
@@ -949,10 +1021,16 @@ export interface PlaylistResourceClient {
  * runtime member.
  */
 export interface TVClient extends ClientBrand<TVResources> {
+  /** the main window */
+  readonly browserWindows: BrowserWindowResourceClient
   /** a track representing a video file */
   readonly fileTracks: FileTrackResourceClient
   /** a list of tracks/streams */
   readonly playlists: PlaylistResourceClient
+  /** a sub-window showing a single playlist */
+  readonly playlistWindows: PlaylistWindowResourceClient
+  /** a media source (library, CD, device, etc.) */
+  readonly sources: SourceResourceClient
   /** Close an object */
   close(options?: CallOptions): Promise<void>
   /**
@@ -1035,6 +1113,60 @@ export interface TVClient extends ClientBrand<TVResources> {
   openLocation(options?: CallOptions): Promise<void>
 }
 
+const browserWindowRecordType: ValueType<BrowserWindow> = t.record(
+  {
+    id: t.integer({ description: 'Unique identifier for this window' }),
+    selection: t.nullable(t.string(), { description: 'the selected tracks' }),
+  },
+  { description: 'the main window' }
+)
+
+const playlistRecordType: ValueType<Playlist> = t.record(
+  {
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this playlist' }),
+    persistentID: t.string({
+      description: 'the id of the item as a hexadecimal string. This id does not change over time.',
+    }),
+    description: t.nullable(t.string(), { description: 'the description of the playlist' }),
+    duration: t.nullable(t.integer(), {
+      description: 'the total length of all tracks (in seconds)',
+    }),
+    name: t.nullable(t.string(), { description: 'the name of the playlist' }),
+    size: t.nullable(t.integer(), { description: 'the total size of all tracks (in bytes)' }),
+    specialKind: t.nullable(t.string(), { description: 'special playlist kind' }),
+    time: t.nullable(t.string(), { description: 'the length of all tracks in MM:SS format' }),
+    visible: t.nullable(t.boolean(), {
+      description: 'is this playlist visible in the Source list?',
+    }),
+  },
+  { description: 'a list of tracks/streams' }
+)
+
+const playlistWindowRecordType: ValueType<PlaylistWindow> = t.record(
+  {
+    id: t.integer({ description: 'Unique identifier for this window' }),
+    selection: t.nullable(t.string(), { description: 'the selected tracks' }),
+  },
+  { description: 'a sub-window showing a single playlist' }
+)
+
+const sourceRecordType: ValueType<Source> = t.record(
+  {
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this source' }),
+    persistentID: t.string({
+      description: 'the id of the item as a hexadecimal string. This id does not change over time.',
+    }),
+    capacity: t.nullable(t.double(), {
+      description: 'the total size of the source if it has a fixed size',
+    }),
+    freeSpace: t.nullable(t.double(), {
+      description: 'the free space on the source if it has a fixed size',
+    }),
+    kind: t.nullable(t.string(), { description: 'The kind property' }),
+  },
+  { description: 'a media source (library, CD, device, etc.)' }
+)
+
 /**
  * The type of the resource table of {@link tvContract}: every resource a
  * reference can name, keyed by manifest resource key, with its record type,
@@ -1044,7 +1176,29 @@ export interface TVClient extends ClientBrand<TVResources> {
  * the contract carries it, so `bindReference` admits only references the
  * contract can resolve.
  */
-export type TVResources = Readonly<Record<never, never>>
+export type TVResources = Readonly<{
+  BrowserWindow: ResourceDescriptor<BrowserWindow, Integer> & {
+    readonly id: ValueType<Integer>
+    readonly get: 'tv.browserWindows.get'
+    readonly list: 'tv.browserWindows.list'
+  }
+  Playlist: ResourceDescriptor<Playlist, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'tv.playlists.get'
+    readonly list: 'tv.playlists.list'
+    readonly parents: { readonly get: 'Source'; readonly list: 'Source' }
+  }
+  PlaylistWindow: ResourceDescriptor<PlaylistWindow, Integer> & {
+    readonly id: ValueType<Integer>
+    readonly get: 'tv.playlistWindows.get'
+    readonly list: 'tv.playlistWindows.list'
+  }
+  Source: ResourceDescriptor<Source, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'tv.sources.get'
+    readonly list: 'tv.sources.list'
+  }
+}>
 
 /**
  * The resource table: the implementation of {@link TVResources}, which
@@ -1054,7 +1208,214 @@ export type TVResources = Readonly<Record<never, never>>
  * D7, "Resolvable targets"). This table is also the registry that reference
  * value types read, lazily.
  */
-const resources = {} satisfies TVResources
+const resources = {
+  BrowserWindow: {
+    name: 'BrowserWindow',
+    record: browserWindowRecordType,
+    id: t.integer({ description: 'Unique identifier for this window' }),
+    get: 'tv.browserWindows.get',
+    list: 'tv.browserWindows.list',
+  },
+  Playlist: {
+    name: 'Playlist',
+    record: playlistRecordType,
+    id: t.string({
+      description: 'the id of the item as a hexadecimal string. This id does not change over time.',
+    }),
+    get: 'tv.playlists.get',
+    list: 'tv.playlists.list',
+    parents: { get: 'Source', list: 'Source' },
+  },
+  PlaylistWindow: {
+    name: 'PlaylistWindow',
+    record: playlistWindowRecordType,
+    id: t.integer({ description: 'Unique identifier for this window' }),
+    get: 'tv.playlistWindows.get',
+    list: 'tv.playlistWindows.list',
+  },
+  Source: {
+    name: 'Source',
+    record: sourceRecordType,
+    id: t.string({
+      description: 'the id of the item as a hexadecimal string. This id does not change over time.',
+    }),
+    get: 'tv.sources.get',
+    list: 'tv.sources.list',
+  },
+} satisfies TVResources
+
+const sourceListSourcesOperation: OperationDescriptor<Record<string, never>, Page<Source>> = {
+  id: 'tv.sources.list',
+  permission: 'tv:sources:list',
+  target: { command: 'listSources', resource: 'Source' },
+  description: 'List every source',
+  input: t.record({}),
+  output: t.page(sourceRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
+}
+
+const sourceGetSourceOperation: OperationDescriptor<{ readonly persistentID: string }, Source> = {
+  id: 'tv.sources.get',
+  permission: 'tv:sources:get',
+  target: { command: 'getSource', resource: 'Source' },
+  description: 'Get a source by its persistent ID',
+  input: t.record({
+    persistentID: t.string({ description: 'Persistent ID of the source' }),
+  }),
+  output: sourceRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { persistentID: { type: 'string', description: 'Persistent ID of the source' } },
+    required: ['persistentID'],
+    additionalProperties: false,
+  },
+}
+
+const playlistListPlaylistsOperation: OperationDescriptor<
+  { readonly sourceId: string },
+  Page<Playlist>
+> = {
+  id: 'tv.playlists.list',
+  permission: 'tv:playlists:list',
+  target: { command: 'listPlaylists', resource: 'Playlist' },
+  description: 'List the playlists of a source',
+  input: t.record({
+    sourceId: t.string({ description: 'Persistent ID of the source' }),
+  }),
+  output: t.page(playlistRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { sourceId: { type: 'string', description: 'Persistent ID of the source' } },
+    required: ['sourceId'],
+    additionalProperties: false,
+  },
+}
+
+const playlistGetPlaylistOperation: OperationDescriptor<
+  { readonly sourceId: string; readonly persistentID: string },
+  Playlist
+> = {
+  id: 'tv.playlists.get',
+  permission: 'tv:playlists:get',
+  target: { command: 'getPlaylist', resource: 'Playlist' },
+  description: 'Get a playlist of a source by its persistent ID',
+  input: t.record({
+    sourceId: t.string({ description: 'Persistent ID of the source' }),
+    persistentID: t.string({ description: 'Persistent ID of the playlist' }),
+  }),
+  output: playlistRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      sourceId: { type: 'string', description: 'Persistent ID of the source' },
+      persistentID: { type: 'string', description: 'Persistent ID of the playlist' },
+    },
+    required: ['sourceId', 'persistentID'],
+    additionalProperties: false,
+  },
+}
+
+const browserWindowListBrowserWindowsOperation: OperationDescriptor<
+  Record<string, never>,
+  Page<BrowserWindow>
+> = {
+  id: 'tv.browserWindows.list',
+  permission: 'tv:browserWindows:list',
+  target: { command: 'listBrowserWindows', resource: 'BrowserWindow' },
+  description: 'List every browser window',
+  input: t.record({}),
+  output: t.page(browserWindowRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
+}
+
+const browserWindowGetBrowserWindowOperation: OperationDescriptor<
+  { readonly id: Integer },
+  BrowserWindow
+> = {
+  id: 'tv.browserWindows.get',
+  permission: 'tv:browserWindows:get',
+  target: { command: 'getBrowserWindow', resource: 'BrowserWindow' },
+  description: 'Get a browser window by its id',
+  input: t.record({
+    id: t.integer({ description: 'Id of the browser window' }),
+  }),
+  output: browserWindowRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      id: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Id of the browser window',
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+  },
+}
+
+const playlistWindowListPlaylistWindowsOperation: OperationDescriptor<
+  Record<string, never>,
+  Page<PlaylistWindow>
+> = {
+  id: 'tv.playlistWindows.list',
+  permission: 'tv:playlistWindows:list',
+  target: { command: 'listPlaylistWindows', resource: 'PlaylistWindow' },
+  description: 'List every playlist window',
+  input: t.record({}),
+  output: t.page(playlistWindowRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
+}
+
+const playlistWindowGetPlaylistWindowOperation: OperationDescriptor<
+  { readonly id: Integer },
+  PlaylistWindow
+> = {
+  id: 'tv.playlistWindows.get',
+  permission: 'tv:playlistWindows:get',
+  target: { command: 'getPlaylistWindow', resource: 'PlaylistWindow' },
+  description: 'Get a playlist window by its id',
+  input: t.record({
+    id: t.integer({ description: 'Id of the playlist window' }),
+  }),
+  output: playlistWindowRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      id: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Id of the playlist window',
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+  },
+}
 
 const appCloseOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'tv.app.close',
@@ -1626,6 +1987,14 @@ const appOpenLocationOperation: OperationDescriptor<Record<string, never>, undef
 
 /** Every operation, keyed by its identity. */
 const operations: AppContract<TVClient>['operations'] = {
+  'tv.sources.list': sourceListSourcesOperation,
+  'tv.sources.get': sourceGetSourceOperation,
+  'tv.playlists.list': playlistListPlaylistsOperation,
+  'tv.playlists.get': playlistGetPlaylistOperation,
+  'tv.browserWindows.list': browserWindowListBrowserWindowsOperation,
+  'tv.browserWindows.get': browserWindowGetBrowserWindowOperation,
+  'tv.playlistWindows.list': playlistWindowListPlaylistWindowsOperation,
+  'tv.playlistWindows.get': playlistWindowGetPlaylistWindowOperation,
   'tv.app.close': appCloseOperation,
   'tv.app.count': appCountOperation,
   'tv.app.delete': appDeleteOperation,
@@ -1660,13 +2029,31 @@ const operations: AppContract<TVClient>['operations'] = {
 /** Build the client on top of a factory-supplied runtime. */
 function bind(runtime: ClientRuntime): TVClient {
   return {
+    browserWindows: {
+      list: (options) => runtime.invoke(browserWindowListBrowserWindowsOperation, {}, options),
+      get: (id, options) => runtime.invoke(browserWindowGetBrowserWindowOperation, { id }, options),
+    },
     fileTracks: {
       refresh: (options) => runtime.invoke(fileTrackRefreshOperation, {}, options),
     },
     playlists: {
+      list: (sourceId, options) =>
+        runtime.invoke(playlistListPlaylistsOperation, { sourceId }, options),
+      get: (sourceId, persistentID, options) =>
+        runtime.invoke(playlistGetPlaylistOperation, { sourceId, persistentID }, options),
       move: (to, options) => runtime.invoke(playlistMoveOperation, { to }, options),
       search: (_for, only, options) =>
         runtime.invoke(playlistSearchOperation, { for: _for, only }, options),
+    },
+    playlistWindows: {
+      list: (options) => runtime.invoke(playlistWindowListPlaylistWindowsOperation, {}, options),
+      get: (id, options) =>
+        runtime.invoke(playlistWindowGetPlaylistWindowOperation, { id }, options),
+    },
+    sources: {
+      list: (options) => runtime.invoke(sourceListSourcesOperation, {}, options),
+      get: (persistentID, options) =>
+        runtime.invoke(sourceGetSourceOperation, { persistentID }, options),
     },
     close: (options) => runtime.invoke(appCloseOperation, {}, options),
     count: (each, options) => runtime.invoke(appCountOperation, { each }, options),
