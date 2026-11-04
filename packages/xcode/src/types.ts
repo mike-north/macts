@@ -28,8 +28,6 @@ export interface WorkspaceDocument {
   path: string
   /** Whether the workspace document has finished loading after being opened */
   loaded: boolean
-  /** The workspace's scheme that will be used for scheme actions */
-  activeScheme: Scheme
 }
 
 /** Input for creating a WorkspaceDocument */
@@ -157,8 +155,6 @@ export interface Target {
   id: string
   /** The name of this target */
   name: string
-  /** The project that contains this target */
-  project: Project
 }
 
 /** Input for creating a Target */
@@ -464,7 +460,6 @@ export const WorkspaceDocumentSchema = z.object({
   file: z.string(),
   path: z.string(),
   loaded: z.boolean(),
-  activeScheme: z.string(),
 })
 
 export const FileDocumentSchema = z.object({
@@ -507,7 +502,6 @@ export const ProjectSchema = z.object({
 export const TargetSchema = z.object({
   id: z.string(),
   name: z.string(),
-  project: z.string(),
 })
 
 export const BuildConfigurationSchema = z.object({

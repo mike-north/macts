@@ -329,3 +329,46 @@ export function shelfManifestWithoutBookIdentifier(): AppManifest {
   delete manifest.commands['getChapter']
   return manifest
 }
+
+/**
+ * The Shelf manifest with a hierarchy that holds books, and their chapters,
+ * only within a library, and series only within a library, while `getBook`
+ * and `getSeries` still record no parent. A book or a series is then found
+ * only within a container its `get` does not name, so `Library.favoriteBook`,
+ * `Library.series` and the `featuredBook` and `featuredSeries` results are
+ * left out of output (`unrecorded-parent`). `getChapter` records its book, so
+ * a chapter is still `parent-scoped`.
+ */
+export function shelfManifestWithBooksInLibraries(): AppManifest {
+  const manifest = shelfManifest()
+  const libraries = manifest.hierarchy.children['libraries']
+  if (libraries === undefined) throw new Error('the Shelf fixture has no libraries')
+  libraries.children = {
+    books: {
+      resource: 'Book',
+      access: 'r',
+      description: 'Books in the library',
+      children: {
+        chapters: { resource: 'Chapter', access: 'r', description: 'Chapters of the book' },
+      },
+    },
+    series: { resource: 'Series', access: 'r', description: 'Series in the library' },
+  }
+  return manifest
+}
+
+/**
+ * {@link shelfManifestWithBooksInLibraries}, with books also held by the
+ * application, as Reminders holds reminders both in a list and at the
+ * application. A book can then be found without its library, so
+ * `Library.favoriteBook` and the `featuredBook` result are kept.
+ */
+export function shelfManifestWithBooksAlsoAtTheApplication(): AppManifest {
+  const manifest = shelfManifestWithBooksInLibraries()
+  manifest.hierarchy.children['books'] = {
+    resource: 'Book',
+    access: 'r',
+    description: 'Every book',
+  }
+  return manifest
+}

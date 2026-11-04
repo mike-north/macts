@@ -29,9 +29,9 @@ export class SchemeResourceClient {
   }
 
   /**
-   * Get a scheme by id.
+   * Get a scheme by id within a parent scope.
    */
-  async get(id: string): Promise<Scheme> {
-    return this.#http.rpc<Scheme>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(workspaceName: string, id: string): Promise<Scheme> {
+    return this.#http.rpc<Scheme>(`${this.#app}.${this.#resource}.get`, { workspaceName, id })
   }
 }
