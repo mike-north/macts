@@ -612,8 +612,10 @@ All six are required, the times are whole milliseconds, and `items`, `runs` and
 `range` is the default, because a range page costs what the page holds and so
 keeps paging's latency bound. `read` is `column` only when the column page took
 at most three quarters of the range page's time (`columnMs <= 0.75 × pageMs`),
-and `range` otherwise, ties included; the schema rejects any other `read`. A
-difference within measurement noise never chooses column. A column page costs what the whole collection costs, so it gets
+and `range` otherwise, ties included; the schema rejects any other `read`. The
+margin absorbs typical measurement noise, so a small difference keeps `range`.
+A result near the margin can fall either side when measured again; the
+recorded medians decide. A column page costs what the whole collection costs, so it gets
 slower as the collection grows: the choice holds at the recorded `items`, and
 should be measured again when the collection grows well past it.
 

@@ -61,7 +61,7 @@ const PAGE_READ_BY_LIST: Readonly<Record<string, PageRead>> = {
   'photos.albums.list': 'column',
   'photos.folders.list': 'range',
   'reminders.accounts.list': 'range',
-  'reminders.lists.list': 'column',
+  'reminders.lists.list': 'range',
   'reminders.reminders.list': 'range',
   'shortcuts.folders.list': 'range',
 }

@@ -192,7 +192,7 @@ export const manifest: unknown = {
       },
       rangeRead: {
         supported: true,
-        read: 'column',
+        read: 'range',
         evidence: {
           source: 'probe',
           observedAt: '2026-11-03T17:59:10.000Z',
@@ -200,11 +200,11 @@ export const manifest: unknown = {
           appVersion: '7.0',
           osVersion: '27.2',
           cost: {
-            observedAt: '2026-11-03T21:20:00.000Z',
-            pageMs: 594,
-            columnMs: 436,
+            observedAt: '2026-11-04T00:27:18.000Z',
+            pageMs: 214,
+            columnMs: 166,
             items: 3,
-            runs: 3,
+            runs: 5,
             pageSize: 25,
           },
           note: 'Read-only pages of the lists at the application: a first page of 25, and pages of 2 continued by cursor to the last list, each read as a range of the collection.',

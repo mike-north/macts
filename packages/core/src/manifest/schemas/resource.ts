@@ -250,16 +250,17 @@ export type PageRead = (typeof PAGE_READS)[number]
 
 /**
  * The page read measured page costs choose: `column` only when the column page
- * took at most three quarters of the range page's time (`columnMs <= 0.75 *
- * pageMs`), and `range` otherwise, ties included.
+ * took at most three quarters of the range page's time
+ * (`columnMs <= 0.75 * pageMs`), and `range` otherwise, ties included.
  *
  * Range is the default because a range page costs what the page holds, so it
  * keeps paging's latency bound whatever the collection's size; a column page
  * costs what the whole collection costs. Column gives up that bound, so it is
- * chosen only for a clear measured gain, never for a difference within the
- * noise of a live measurement (collections that fit in one page time the same
- * either way). The comparison is made in whole numbers, so the boundary is
- * exact, and a tie is range even when both reads measured 0 ms.
+ * chosen only for a clear measured gain. The margin absorbs typical
+ * measurement noise, so a small difference keeps range; a result near the
+ * margin can fall either side when measured again, and the recorded median
+ * decides. The comparison is made in whole numbers, so the boundary is exact,
+ * and a tie is range even when both reads measured 0 ms.
  */
 export function pageReadFor(pageMs: number, columnMs: number): PageRead {
   return columnMs < pageMs && columnMs * 4 <= pageMs * 3 ? 'column' : 'range'
