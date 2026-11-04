@@ -315,11 +315,17 @@ export function shelfManifestWithUniqueSeries(): AppManifest {
  * The Shelf manifest with the book's identifier removed, so a book can still
  * be got but has no identity form: `Library.favoriteBook` and the
  * `featuredBook` result are left out of output (`no-identifier`).
+ *
+ * `getChapter` is removed too. It finds a chapter within its book, and a book
+ * with no identifier can be no chapter's container, so generation would fail
+ * on it (phases/13 D7, parent-scoped targets). Without it, the variant tests
+ * the missing identifier alone.
  */
 export function shelfManifestWithoutBookIdentifier(): AppManifest {
   const manifest = shelfManifest()
   const book = manifest.resources['Book']
   if (book === undefined) throw new Error('the Shelf fixture has no Book')
   delete book.identifiers
+  delete manifest.commands['getChapter']
   return manifest
 }
