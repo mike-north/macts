@@ -2353,8 +2353,8 @@ This refactor adopts these items from `phases/12`:
   coincide. The passthrough input of an operation registered from a manifest
   alone is a pipe from the command's declared input into a JSON record: its
   input side is the declared input, and its output side only the record, so
-  the adapter renders the input side. A schema JSON Schema can't represent is an
-  error, never an empty schema. An adapter serves the document it derives,
+  the adapter renders the input side. A schema that JSON Schema can't represent
+  is an error, never an empty schema. An adapter serves the document it derives,
   never a stored one. Every generated descriptor also embeds the document as
   `inputJsonSchema`, for consumers that don't run zod; adapters never read or
   serve it. The generator computes it in process from the value types the
