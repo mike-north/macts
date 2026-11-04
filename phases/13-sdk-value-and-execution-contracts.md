@@ -1156,26 +1156,27 @@ authority, in both modes. Adapters translate protocol context into an
 Permission comes before validation, so there is no schema oracle: a caller
 without the permission learns nothing about the operation's input contract,
 and is answered `PermissionDeniedError` whatever its input, never
-`ValidationError`. A caller that has the permission and sends invalid input
-is answered `ValidationError`. A permission denial writes exactly one
-`permission-denied` audit record (D6) after admission, so the rate limit
-bounds how many are written, and before validation, so the record carries the
-operation's permission, the key, and the time and nothing else: valid and
-invalid input from a caller without the permission leave records that differ
-only in their timestamps. A call turned away before the permission check (an
-unverified credential, a rate-limited call, an unknown operation or app)
-writes no record. Validation comes before governance, so only well-formed
+`ValidationError`. A caller that has the permission and sends invalid input is
+answered `ValidationError`. A permission denial writes exactly one
+`permission-denied` audit record (D6) after admission, so where the runtime
+has a rate limiter (step 1b; the HTTP server configures one by default) that
+limit also bounds how many are written, and before validation, so the record
+carries the operation's permission, the key, and the time and nothing else:
+valid and invalid input from a caller without the permission leave records
+that differ only in their timestamps. A call turned away before the permission
+check (an unverified credential, a rate-limited call, an unknown operation or
+app) writes no record. Validation comes before governance, so only well-formed
 calls reach policy, audit summaries, and approvers: an argument summary
 describes input that passed its contract, and names only parameters the
-contract declares. A key that is not
-a declared parameter is invalid input under a manifest registration and a
-contract registration alike: a contract's input record and a manifest
-command's declared input (its parameters and nothing else) both reject it.
-The summary still counts any such key that reaches it in `unknownKeys`, never
-naming it, as a backstop for an input schema that admits or strips one
-anyway. A call rejected by validation after the permission check writes
-exactly one `invalid-input` audit record (D6) with the number of validation
-issues and nothing from the input, and is never put to an approver.
+contract declares. A key that is not a declared parameter is invalid input
+under a manifest registration and a contract registration alike: a contract's
+input record and a manifest command's declared input (its parameters and
+nothing else) both reject it. The summary still counts any such key that
+reaches it in `unknownKeys`, never naming it, as a backstop for an input
+schema that admits or strips one anyway. A call rejected by validation after
+the permission check writes exactly one `invalid-input` audit record (D6) with
+the number of validation issues and nothing from the input, and is never put
+to an approver.
 
 Fail-closed rules carry over unchanged: a resolver failure, an `enforceCall`
 failure, or an audit-write failure denies the call. That includes the
@@ -1243,8 +1244,9 @@ single definition of the governance a host enforces when none is supplied. It
 composes the active policy (`<macts-home>/governance/policy.json`), the
 registered approval gate, the stored per-key policy resolver, and a file audit
 writer (`<macts-home>/governance/audit.jsonl`). The local client and the HTTP
-server both default to it, passing the loader itself; the runtime loads it once,
-on the first call that reaches step 3 (to audit invalid input) or step 4. `createRuntime` itself requires a
+server both default to it, passing the loader itself; the runtime loads it
+once, on the first call that reaches step 2 (to audit a permission denial),
+step 3 (to audit invalid input) or step 4. `createRuntime` itself requires a
 `governance` option and has no default, so a host that builds a runtime
 directly (the MCP host included, #101) cannot run calls under governance it
 forgot to supply. Missing and malformed configuration are treated differently:
@@ -1252,10 +1254,16 @@ forgot to supply. Missing and malformed configuration are treated differently:
 - A **missing** policy file resolves to the documented default policy, so a
   first run works. The key's own permissions still gate the call at step 2.
 - A **malformed or unreadable** policy file or approval registration fails
-  closed. Every call fails with `InternalError`, and nothing ever falls back to
-  allow-all. The failed load is kept, not retried, for the life of the runtime.
-- An **audit-write failure** under `MACTS_HOME` denies the call, per the
-  fail-closed rule above.
+  closed. Every call that passes the permission check fails with
+  `InternalError`, and nothing ever falls back to allow-all. A caller without
+  the permission is still answered `PermissionDeniedError`; its
+  `permission-denied` record cannot be written without the audit log, so the
+  failure is logged instead. The failed load is kept, not retried, for the
+  life of the runtime.
+- An **audit-write failure** under `MACTS_HOME` denies the call with
+  `InternalError`, per the fail-closed rule above. The exception is a
+  `permission-denied` record: that caller is still answered
+  `PermissionDeniedError`, and the failure is logged.
 
 **Registering installed apps.** Every macts host on this Mac (`macts --serve`,
 `macts --mcp`, and the MCP server of `macts mcp serve`) registers the installed

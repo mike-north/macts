@@ -106,7 +106,8 @@ provider registered in `<macts-home>/governance/approval.json`, each key's own
 policy from the key store, and an audit log at
 `<macts-home>/governance/audit.jsonl`. The local SDK client and the HTTP
 server both default to it. Pass the function itself as `governance`, and the
-runtime loads it on the first call:
+runtime loads it on the first call that needs it (to govern the call, or to
+audit a permission denial or invalid input):
 
 ```ts
 import { createRuntime, loadHostGovernance } from '@macts/runtime'
@@ -116,9 +117,14 @@ const runtime = createRuntime({ executor, governance: loadHostGovernance })
 
 - A **missing** policy file means the default policy (`ALLOW_ALL_POLICY`), so a
   first run works. The key's own permissions still gate every call.
-- A **malformed or unreadable** policy or approval file denies every call with
-  `InternalError`. Nothing falls back to allowing everything.
-- An audit record that cannot be written denies the call it describes.
+- A **malformed or unreadable** policy or approval file denies every call that
+  passes the permission check with `InternalError`. Nothing falls back to
+  allowing everything. A caller without the operation's permission is still
+  answered `PermissionDeniedError`; its `permission-denied` record cannot be
+  written without the audit log, so the failure is logged instead.
+- An audit record that cannot be written denies the call it describes with
+  `InternalError`. The exception is a `permission-denied` record: that caller
+  is still answered `PermissionDeniedError`, and the failure is logged.
 
 Tests and embedders that compose governance themselves pass their own context
 instead. To enforce no restrictions, say so explicitly:

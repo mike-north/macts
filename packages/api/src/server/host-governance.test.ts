@@ -9,7 +9,10 @@
  *
  * - no policy file → the default policy; a permitted call answers 200;
  * - a policy file that forbids the call → 403 `POLICY_DENIED`;
- * - a malformed policy file → 500 `INTERNAL` for every call, never an allow;
+ * - a malformed policy file → 500 `INTERNAL` for every call that passes the
+ *   permission check, never an allow; a caller without the permission is
+ *   still answered 403 `PERMISSION_DENIED`, and the denial record that cannot
+ *   be written without the audit log is reported in the operator log instead;
  * - an explicit `governance` option still overrides the default.
  *
  * @see phases/13-sdk-value-and-execution-contracts.md (D5, D6)
@@ -28,8 +31,10 @@ import {
   createCapturedLogger,
   createFakeVerifier,
   createRecordingExecutor,
+  ERROR,
   errorBody,
   post,
+  type CapturedLogger,
   type RecordingExecutor,
 } from './test-helpers.js'
 
@@ -50,23 +55,26 @@ const governanceDir = join(mactsHome, 'governance')
 const policyPath = join(governanceDir, 'policy.json')
 const auditPath = join(governanceDir, 'audit.jsonl')
 const LIST = 'calendar.events.list'
+const CREATE = 'calendar.events.create'
 
 /** A server over the calendar fixture with no `governance` option unless one is given. */
 function serverApp(governance?: GovernanceContext): {
   app: ReturnType<typeof createServer>['app']
   executor: RecordingExecutor
+  log: CapturedLogger
 } {
   const executor = createRecordingExecutor()
+  const log = createCapturedLogger()
   const { app } = createServer(CALENDAR_MANIFEST, {
     cors: false,
     prettyJson: false,
     rateLimit: false,
     executor,
     verifier: createFakeVerifier(),
-    logger: createCapturedLogger().logger,
+    logger: log.logger,
     ...(governance === undefined ? {} : { governance }),
   })
-  return { app, executor }
+  return { app, executor, log }
 }
 
 beforeEach(async () => {
@@ -110,7 +118,7 @@ describe('createServer: default governance', () => {
     expect(executor.requests).toHaveLength(0)
   })
 
-  it('denies every call with 500 INTERNAL when the policy file is malformed, never allowing', async () => {
+  it('denies every call that passes the permission check with 500 INTERNAL when the policy file is malformed, never allowing', async () => {
     await writeFile(policyPath, '{ not json')
     const { app, executor } = serverApp()
 
@@ -122,6 +130,48 @@ describe('createServer: default governance', () => {
       expect(body.error.message).not.toContain(policyPath)
     }
     expect(executor.requests).toHaveLength(0)
+  })
+
+  it('still answers a caller without the permission 403 PERMISSION_DENIED when the policy file is malformed, logging the unwritten record', async () => {
+    // The reader lacks `calendar:events:create`. Under a readable policy its
+    // call is answered 403 and recorded as `permission-denied`.
+    const reference = serverApp()
+    const referenceRes = await post(reference.app, CREATE, { summary: 'Standup' }, READER_TOKEN)
+    expect(referenceRes.status).toBe(403)
+    const expected = await errorBody(referenceRes)
+    expect(expected.error.code).toBe('PERMISSION_DENIED')
+    expect(JSON.parse((await readFile(auditPath, 'utf8')).trim())).toMatchObject({
+      capability: 'calendar:events:create',
+      apiKeyId: 'key_reader',
+      decision: 'permission-denied',
+    })
+
+    await writeFile(policyPath, '{ not json')
+    const { app, executor, log } = serverApp()
+
+    // A valid and an invalid body get the same answer as under a readable policy.
+    for (const body of [{ summary: 'Standup' }, { summary: 42 }]) {
+      const res = await post(app, CREATE, body, READER_TOKEN)
+      expect(res.status).toBe(403)
+      expect(await errorBody(res)).toEqual(expected)
+    }
+    expect(executor.requests).toHaveLength(0)
+    // Nothing more reached the audit log: the record could not be written.
+    expect((await readFile(auditPath, 'utf8')).trim().split('\n')).toHaveLength(1)
+    // Each denial that could not be recorded is one operator log line.
+    const errors = log.entriesAt(ERROR)
+    expect(errors).toHaveLength(2)
+    for (const entry of errors) {
+      expect(entry).toMatchObject({
+        msg: 'Permission denial could not be audited',
+        operation: CREATE,
+        permission: 'calendar:events:create',
+        apiKeyId: 'key_reader',
+      })
+    }
+    const logged = log.lines.join('\n')
+    expect(logged).not.toContain('Standup')
+    expect(logged).not.toContain(READER_TOKEN)
   })
 
   it('uses an explicit governance option instead of the files under MACTS_HOME', async () => {
