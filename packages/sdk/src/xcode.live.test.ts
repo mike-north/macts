@@ -21,7 +21,10 @@
  *
  * Run destination names are observed, not claimed: the run destination case
  * prints how many the first workspace lists and how many distinct names they
- * have. Nothing here asserts that run destination names are unique.
+ * have. Nothing here asserts that run destination names are unique: they
+ * likely repeat within one workspace (the same simulator name on two
+ * runtimes), so a uniqueness claim needs a live check across two or more
+ * runtimes first.
  *
  * Read-only: nothing is opened, closed, built, run or changed, and Xcode is
  * never quit. The test prints only counts, never a name, id or path. When no

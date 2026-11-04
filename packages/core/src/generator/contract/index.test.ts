@@ -1172,8 +1172,15 @@ describe('real app manifests', () => {
       ['tv', 'Playlist', 'parent', 'Playlist', 'parent-scoped'],
       ['tv', 'PlaylistWindow', 'view', 'Playlist', 'parent-scoped'],
       // A scheme, a run destination and a project are got only within their
-      // workspace document.
+      // workspace document. They return only once a workspace document has an
+      // evidenced identity (likely its path, not its name) and references
+      // carry their container.
       ['xcode', 'WorkspaceDocument', 'activeScheme', 'Scheme', 'parent-scoped'],
+      // Also name-keyed with no unique claim, which is hidden by decision:
+      // once containers are emitted its reason becomes `not-unique`, and it
+      // stays out until run destination names are shown to be unique. They
+      // likely repeat within one workspace (the same simulator name on two
+      // runtimes), so that needs a live check across two or more runtimes.
       ['xcode', 'WorkspaceDocument', 'activeRunDestination', 'RunDestination', 'parent-scoped'],
       ['xcode', 'WorkspaceDocument', 'lastSchemeActionResult', 'SchemeActionResult', 'no-get'],
       ['xcode', 'Target', 'project', 'Project', 'parent-scoped'],

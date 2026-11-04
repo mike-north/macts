@@ -1554,9 +1554,19 @@ curated `get` cannot serve:
 
 Xcode's workspace document `activeScheme` and `activeRunDestination`, and a
 target's `project`, are left out as container-scoped: Xcode gets a scheme, a
-run destination and a project only within its workspace document. Once
-references carry their container, `activeRunDestination` still also needs
-evidence that a run destination's name identifies one object.
+run destination and a project only within its workspace document. Returning
+containers is not enough to bring them back, because the container itself
+needs an evidenced identity. A workspace document is targeted by name today,
+and its name likely cannot be shown unique: two checkouts of the same project
+can be open at once under one name. Its `path` is the likely container
+identity instead, since in the scripting dictionary a path is unique among
+open documents and is how the app itself addresses a document. These fields
+come back once a workspace document has an evidenced identity and references
+carry their container. `activeRunDestination` also needs evidence that a run
+destination's name identifies one object within its workspace. Run
+destination names likely repeat within one workspace (the same simulator name
+on two runtimes), so a live check across two or more runtimes must come
+before any uniqueness claim.
 
 A position that holds such a reference anywhere, bare, in an array, or as the
 non-null case of a nullable value, is left out of output for now; generation
@@ -1628,7 +1638,11 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   by id needs that parent. An object that is identified globally but reached
   only through a container emits no container. Examples are Arc spaces, iTerm
   sessions, and nested Photos folders. Xcode schemes, run destinations and
-  projects are container-scoped: each is got within its workspace document.
+  projects are container-scoped: each is got within its workspace document,
+  because there is no evidence that scheme or project ids are unique across
+  workspaces. That is the same bar as iTerm's sessions: an object reached
+  through a path of containers is identified globally only with evidence
+  that its id is unique across the app.
   Native reads emit no container yet, so
   an output position whose target's identity is scoped to its container is
   left out of output (resolvable targets, above) until reads emit containers

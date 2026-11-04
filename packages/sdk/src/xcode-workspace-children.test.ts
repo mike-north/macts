@@ -13,8 +13,9 @@
  * A workspace document's `activeScheme` and `activeRunDestination`, and a
  * target's `project`, hold references to objects found only within a
  * workspace document. References read from the app do not carry their
- * container yet, so those fields are left out of output (phases/13 D7,
- * "Parent-scoped targets").
+ * container yet, and a workspace document has no evidenced identity to serve
+ * as one (its name can repeat; its path is the likely identity), so those
+ * fields are left out of output (phases/13 D7, "Parent-scoped targets").
  *
  * The native cases run each operation with only the executor's transport
  * replaced: it evaluates the composed script against a stand-in Xcode in an
