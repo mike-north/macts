@@ -116,6 +116,13 @@ resources:
     plural: BrowserWindows
     description: the main window
     code: cBrW
+    # Found at the application by its integer `id` (the dictionary's `item`
+    # class), with no uniqueness claim. Unverified: when the live probe ran on
+    # TV 1.7.2 (macOS 27.2), 2026-11-03, there were 0 browser windows, so no
+    # window was read or looked up.
+    identifiers:
+      - property: id
+        primary: true
     properties:
       id:
         access: r
@@ -169,6 +176,21 @@ resources:
     plural: Playlists
     description: a list of tracks/streams
     code: cPly
+    # Looked up by `persistentID` (pPIS, from the dictionary's `item` class),
+    # matched on that property, not by the numeric `id`. The dictionary
+    # describes the persistent ID as "the id of the item as a hexadecimal
+    # string. This id does not change over time" and makes no such claim for
+    # `id`. A playlist is read within its source (see `listPlaylists`).
+    # Observed on TV 1.7.2 (macOS 27.2), 2026-11-03: the application's 3
+    # playlists had distinct persistent IDs and integer ids, and the 2 sources
+    # held 4 playlists, one of which the application's playlists do not list.
+    identifiers:
+      - property: persistentID
+        primary: true
+        targeting: byProperty
+        # TODO(evidence): claim `unique` (within a source) only with evidence
+        # that no two playlists of one source share a persistent ID; the
+        # observation above covers the application's playlists only.
     properties:
       id:
         access: r
@@ -176,6 +198,11 @@ resources:
         description: Unique identifier for this playlist
         optional: false
         code: 'ID  '
+      persistentID:
+        access: r
+        type: string
+        description: the id of the item as a hexadecimal string. This id does not change over time.
+        code: pPIS
       description:
         access: rw
         type: string
@@ -197,6 +224,11 @@ resources:
           resource: playlist
         description: folder which contains this playlist (if any)
         code: pPlP
+        # Unverified. Observed on TV 1.7.2 (macOS 27.2), 2026-11-03, on 3
+        # playlists, none of them in a folder: the read failed (-1728) on all
+        # 3, and no folder playlist existed to show what a playlist in a folder
+        # reports. Not marked unsupported: output leaves the field out anyway,
+        # because a playlist is got only within its source.
       size:
         access: r
         type: integer
@@ -222,6 +254,13 @@ resources:
     plural: PlaylistWindows
     description: a sub-window showing a single playlist
     code: cPlW
+    # Found at the application by its integer `id` (the dictionary's `item`
+    # class), with no uniqueness claim. Unverified: when the live probe ran on
+    # TV 1.7.2 (macOS 27.2), 2026-11-03, there were 0 playlist windows, so no
+    # window was read or looked up.
+    identifiers:
+      - property: id
+        primary: true
     properties:
       id:
         access: r
@@ -258,6 +297,17 @@ resources:
     plural: Sources
     description: a media source (library, CD, device, etc.)
     code: cSrc
+    # Looked up by `persistentID` (pPIS, from the dictionary's `item` class),
+    # matched on that property, not by the numeric `id`. The dictionary
+    # describes the persistent ID as "the id of the item as a hexadecimal
+    # string. This id does not change over time" and makes no such claim for
+    # `id`. Observed on TV 1.7.2 (macOS 27.2), 2026-11-03: 2 sources.
+    identifiers:
+      - property: persistentID
+        primary: true
+        targeting: byProperty
+        # TODO(evidence): claim `unique` only with evidence that no two of the
+        # application's sources share a persistent ID.
     properties:
       id:
         access: r
@@ -265,6 +315,11 @@ resources:
         description: Unique identifier for this source
         optional: false
         code: 'ID  '
+      persistentID:
+        access: r
+        type: string
+        description: the id of the item as a hexadecimal string. This id does not change over time.
+        code: pPIS
       capacity:
         access: r
         type: number
@@ -808,6 +863,100 @@ hierarchy:
       access: rw
       description: the video window
 commands:
+  # Reads. Sources and the browser and playlist windows are elements of the
+  # application. Playlists are read under their source, as the app addresses
+  # them: a source can hold a playlist that the application's own playlists
+  # do not list, so playlists are never read from the application.
+  listSources:
+    name: list
+    routeName: list
+    description: List every source
+    scope: resource
+    resourceType: Source
+    parameters: []
+  getSource:
+    name: get
+    routeName: get
+    description: Get a source by its persistent ID
+    scope: resource
+    resourceType: Source
+    parameters:
+      - name: persistentID
+        type: string
+        description: Persistent ID of the source
+        required: true
+  listPlaylists:
+    name: list
+    routeName: list
+    description: List the playlists of a source
+    scope: resource
+    resourceType: Playlist
+    # The dictionary's `source` class has `playlist` as an element.
+    parent:
+      resource: Source
+      parameter: sourceId
+    parameters:
+      - name: sourceId
+        type: string
+        description: Persistent ID of the source
+        required: true
+  getPlaylist:
+    name: get
+    routeName: get
+    description: Get a playlist of a source by its persistent ID
+    scope: resource
+    resourceType: Playlist
+    # The dictionary's `source` class has `playlist` as an element.
+    parent:
+      resource: Source
+      parameter: sourceId
+    parameters:
+      - name: sourceId
+        type: string
+        description: Persistent ID of the source
+        required: true
+      - name: persistentID
+        type: string
+        description: Persistent ID of the playlist
+        required: true
+  # The window reads are unverified: there were no windows to read when the
+  # live probe ran.
+  listBrowserWindows:
+    name: list
+    routeName: list
+    description: List every browser window
+    scope: resource
+    resourceType: BrowserWindow
+    parameters: []
+  getBrowserWindow:
+    name: get
+    routeName: get
+    description: Get a browser window by its id
+    scope: resource
+    resourceType: BrowserWindow
+    parameters:
+      - name: id
+        type: integer
+        description: Id of the browser window
+        required: true
+  listPlaylistWindows:
+    name: list
+    routeName: list
+    description: List every playlist window
+    scope: resource
+    resourceType: PlaylistWindow
+    parameters: []
+  getPlaylistWindow:
+    name: get
+    routeName: get
+    description: Get a playlist window by its id
+    scope: resource
+    resourceType: PlaylistWindow
+    parameters:
+      - name: id
+        type: integer
+        description: Id of the playlist window
+        required: true
   close:
     name: close
     description: Close an object
