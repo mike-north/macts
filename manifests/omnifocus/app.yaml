@@ -617,6 +617,10 @@ enums:
         description: The repetition is based on the action's defer date
         code: FRsd
 
+# The hierarchy models the default document as the root. In the scripting
+# dictionary, folders, projects, tags and inbox tasks are elements of
+# `document`, not of the application; the application answers for its default
+# document, so these collections are addressed at the application.
 hierarchy:
   children:
     folders:
