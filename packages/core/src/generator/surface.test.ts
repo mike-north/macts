@@ -151,9 +151,9 @@ describe('resolveIdParams', () => {
     })
   })
 
-  // Guards the removed fallback: an item command that declares no identifier
-  // gets no invented `id` in any generated interface. Generation refuses such
-  // a manifest first; this throw keeps every surface from guessing a name.
+  // Guards that no generated interface takes an identifier the manifest does
+  // not declare. Generation refuses such a manifest first; this throw keeps
+  // every surface from supplying a name of its own.
   it('throws, naming the command, when there are no required parameters', () => {
     expect(() => resolveIdParams(command({ name: 'delete', resourceType: 'Event' }))).toThrow(
       'The delete command of Event declares no identifier parameter'
