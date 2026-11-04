@@ -527,27 +527,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'system-events.diskItems.delete',
-    app: 'system-events',
-    appBundleId: 'com.apple.systemevents',
-    resource: 'diskItems',
-    operation: 'delete',
-    description: 'Delete disk item(s).',
-    permission: 'system-events:diskItems:delete',
-    risk: 'delete',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: {
-          description: 'the unique ID of the disk item',
-          type: 'string',
-        },
-      },
-      additionalProperties: false,
-      required: ['id'],
-    },
-  },
-  {
     name: 'system-events.uiElements.click',
     app: 'system-events',
     appBundleId: 'com.apple.systemevents',

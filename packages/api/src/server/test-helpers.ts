@@ -38,7 +38,7 @@ import { createApp, type AppOptions } from './index.js'
  * - `calendar.events.create` — `calendar:events:create`, write; requires
  *   `summary`, accepts an optional `password` (to observe argument redaction)
  * - `calendar.events.delete` — `calendar:events:delete` (declared), delete;
- *   formerly `calendar:events:remove`
+ *   requires `id`, the event it deletes; formerly `calendar:events:remove`
  * - `calendar.app.quit`      — `calendar:app:quit`, an application command
  */
 export const CALENDAR_MANIFEST: AppManifest = {
@@ -81,7 +81,7 @@ export const CALENDAR_MANIFEST: AppManifest = {
       description: 'Delete an event',
       scope: 'resource',
       resourceType: 'Event',
-      parameters: [],
+      parameters: [{ name: 'id', type: 'string', description: 'Identifier', required: true }],
       permission: 'calendar:events:delete',
       permissionHistory: [
         {

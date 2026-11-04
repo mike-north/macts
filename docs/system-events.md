@@ -26,15 +26,6 @@ Client for an action that can be performed on the ui element.
 </td></tr>
 <tr><td>
 
-[DiskItemResourceClient](./system-events.diskitemresourceclient.md)
-
-</td><td>
-
-Client for an item stored in the file system.
-
-</td></tr>
-<tr><td>
-
 [HttpClient](./system-events.httpclient.md)
 
 </td><td>

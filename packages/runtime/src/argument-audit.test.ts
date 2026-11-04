@@ -20,9 +20,11 @@
  *   argument values, summary, or issue messages; governance is not evaluated
  *   and nobody is asked to approve it.
  *
- * Two registrations of one fixture app are exercised: from its manifest alone,
- * whose request schema lets keys that are not parameters through to the
- * executor, and from a contract, whose input schema rejects them.
+ * Two registrations of one fixture app are exercised: from its manifest alone
+ * and from a contract. Both input contracts reject keys that are not declared
+ * parameters, so such a call is invalid input. The `unknownKeys` count is a
+ * backstop for an input schema that lets such a key through anyway; a third,
+ * hand-built contract whose wire schema does exactly that exercises it.
  *
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md
  */
@@ -125,14 +127,36 @@ function boundedCreateInput(): ValueType<unknown> {
   }
 }
 
-/** A hand-built contract for {@link VAULT_MANIFEST}, standing in for a generated one. */
-function vaultContract(): AppContract<unknown> {
+/**
+ * A contract input of `vault.notes.create` whose wire schema lets keys that
+ * are not declared parameters through, as no generated contract does.
+ *
+ * @remarks
+ * Its plan still names only `title` and `password`, so the summary counts
+ * every other key. It stands for an input schema that admits an undeclared
+ * key despite the strictness rule, which the `unknownKeys` count backstops.
+ */
+function looseCreateInput(): ValueType<unknown> {
+  const declared = t.record({ title: t.string(), password: t.optional(t.string()) })
+  return {
+    ...declared,
+    wire: z
+      .object({ title: z.string(), password: z.string().exactOptional() })
+      .catchall(z.union([z.string(), z.number(), z.array(z.number())])),
+  }
+}
+
+/**
+ * A hand-built contract for {@link VAULT_MANIFEST}, standing in for a
+ * generated one, whose `create` takes `input`.
+ */
+function vaultContract(input: ValueType<unknown> = boundedCreateInput()): AppContract<unknown> {
   const create: AnyOperationDescriptor = {
     id: CREATE,
     permission: PERMISSION,
     target: { command: 'create', resource: 'Note' },
     description: 'Create a note',
-    input: boundedCreateInput(),
+    input,
     output: t.record({}),
   }
   return {
@@ -176,8 +200,12 @@ const CONFIRM_FIRST_VAULT: GovernancePolicy = {
 const UNDECLARED_KEY = 'undeclaredField'
 const UNDECLARED_VALUE = 'undeclared-value-7f3a'
 
-/** How the fixture app is registered: from its manifest alone, or from its contract. */
-type Registration = 'manifest' | 'contract'
+/**
+ * How the fixture app is registered: from its manifest alone, from its
+ * contract, or from a contract whose input lets undeclared keys through
+ * ({@link looseCreateInput}).
+ */
+type Registration = 'manifest' | 'contract' | 'loose-contract'
 
 interface Harness {
   readonly runtime: MactsRuntime
@@ -212,10 +240,16 @@ function harness(options: HarnessOptions = {}): Harness {
     logger,
     governance: options.governance?.(writer) ?? { policy: ALLOW_ALL_POLICY, writer },
   })
-  if ((options.registration ?? 'manifest') === 'manifest') {
-    runtime.registerManifest(VAULT_MANIFEST)
-  } else {
-    runtime.registerContract(vaultContract(), VAULT_MANIFEST)
+  switch (options.registration ?? 'manifest') {
+    case 'manifest':
+      runtime.registerManifest(VAULT_MANIFEST)
+      break
+    case 'contract':
+      runtime.registerContract(vaultContract(), VAULT_MANIFEST)
+      break
+    case 'loose-contract':
+      runtime.registerContract(vaultContract(looseCreateInput()), VAULT_MANIFEST)
+      break
   }
   runtime.registerContract(libraryContract(), LIBRARY_MANIFEST)
   return { runtime, executor, writer, logger }
@@ -269,8 +303,8 @@ function gated(decide: Parameters<typeof createRecordingApprovalProvider>[0]): {
 
 describe('undeclared keys in audit and approval records', () => {
   const INPUT = { title: 'Groceries', [UNDECLARED_KEY]: UNDECLARED_VALUE }
-  // The manifest's request schema lets the undeclared key through, so the
-  // call is governed; only the count of such keys is recorded.
+  // Only an input schema that lets the undeclared key through gets the call
+  // governed; then only the count of such keys is recorded.
   const SUMMARY = 'title: Groceries; unknownKeys: 1'
 
   it.each<[string, GovernanceFor, unknown, readonly string[]]>([
@@ -285,7 +319,7 @@ describe('undeclared keys in audit and approval records', () => {
   ])(
     'records only the count of undeclared keys on a call that is %s',
     async (_decision, governance, errorClass, decisions) => {
-      const h = harness({ governance })
+      const h = harness({ registration: 'loose-contract', governance })
 
       const outcome = h.runtime.invoke(CREATE, INPUT, as(WRITER_SECRET))
       if (errorClass === undefined) await outcome
@@ -305,7 +339,7 @@ describe('undeclared keys in audit and approval records', () => {
     'keeps undeclared keys out of the approval request and a hold that is %s',
     async (decision, decide, errorClass) => {
       const { provider, governance } = gated(decide)
-      const h = harness({ governance })
+      const h = harness({ registration: 'loose-contract', governance })
 
       const outcome = h.runtime.invoke(CREATE, INPUT, as(WRITER_SECRET))
       if (errorClass === undefined) await outcome
@@ -327,7 +361,7 @@ describe('undeclared keys in audit and approval records', () => {
       controller.abort()
       return Promise.resolve({ state: 'approved' })
     })
-    const h = harness({ governance })
+    const h = harness({ registration: 'loose-contract', governance })
 
     const error = await rejection(
       h.runtime.invoke(CREATE, INPUT, as(WRITER_SECRET, { signal: controller.signal }))
@@ -343,7 +377,7 @@ describe('undeclared keys in audit and approval records', () => {
   })
 
   it('counts every undeclared key, naming none', async () => {
-    const h = harness()
+    const h = harness({ registration: 'loose-contract' })
 
     await h.runtime.invoke(
       CREATE,
@@ -354,19 +388,22 @@ describe('undeclared keys in audit and approval records', () => {
     expect(summaries(h.writer)).toEqual(['title: Groceries; unknownKeys: 3'])
   })
 
-  it('rejects an undeclared key where the contract input does not admit it, as invalid input', async () => {
-    const { provider, governance } = gated(() => Promise.resolve({ state: 'approved' }))
-    const h = harness({ registration: 'contract', governance })
+  it.each<Registration>(['manifest', 'contract'])(
+    'rejects an undeclared key as invalid input (%s registration), asking no approver',
+    async (registration) => {
+      const { provider, governance } = gated(() => Promise.resolve({ state: 'approved' }))
+      const h = harness({ registration, governance })
 
-    const error = await rejection(h.runtime.invoke(CREATE, INPUT, as(WRITER_SECRET)))
+      const error = await rejection(h.runtime.invoke(CREATE, INPUT, as(WRITER_SECRET)))
 
-    expect(error).toBeInstanceOf(ValidationError)
-    expect(provider.requests).toHaveLength(0)
-    expect(h.executor.requests).toHaveLength(0)
-    expect(h.writer.records).toEqual([invalidInputRecord(1)])
-    expect(JSON.stringify(h.writer.records)).not.toContain(UNDECLARED_KEY)
-    expect(JSON.stringify(h.writer.records)).not.toContain(UNDECLARED_VALUE)
-  })
+      expect(error).toBeInstanceOf(ValidationError)
+      expect(provider.requests).toHaveLength(0)
+      expect(h.executor.requests).toHaveLength(0)
+      expect(h.writer.records).toEqual([invalidInputRecord(1)])
+      expect(JSON.stringify(h.writer.records)).not.toContain(UNDECLARED_KEY)
+      expect(JSON.stringify(h.writer.records)).not.toContain(UNDECLARED_VALUE)
+    }
+  )
 })
 
 describe('input validation before governance', () => {

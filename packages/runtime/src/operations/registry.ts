@@ -39,7 +39,7 @@ import {
   type ValueType,
 } from '@macts/contracts'
 import { PASSTHROUGH_OUTPUT_TYPE, passthroughInputType } from './passthrough.js'
-import { buildCommandSchema } from './request-schema.js'
+import { buildDeclaredInputSchema } from './request-schema.js'
 
 /**
  * One operation the runtime can invoke.
@@ -187,6 +187,59 @@ function deriveManifestOperations(manifest: AppManifest): ManifestOperation[] {
   return operations
 }
 
+/**
+ * The resource-scoped commands that act on one item, selected by an
+ * identifier parameter: a `get`, an `update`, or a `delete`, by its command
+ * name. A command of any other name is called on the app with its parameters
+ * and selects no item, so it needs no identifier.
+ */
+const ITEM_COMMAND_NAMES: readonly string[] = ['get', 'update', 'delete']
+
+/**
+ * The rest of a refusal message for an item command with no identifier
+ * parameter: what its native body would do without one
+ * (`planNativeInvocation` in `@macts/core`).
+ *
+ * - A get or update would read the item's identifier from the undeclared key
+ *   `id`, which a manifest-registered operation's input never admits
+ *   (`buildDeclaredInputSchema`), so it could never run.
+ * - A delete reads no identifier at all: it would call the app's delete with
+ *   no target, so no item can be selected.
+ */
+function missingIdentifierConsequence(command: Command): string {
+  return command.name === 'delete'
+    ? "without one no item can be selected: its native body would call the app's delete with no target"
+    : 'without one it would read the undeclared input "id", which the operation does not accept'
+}
+
+/**
+ * Refuse a resource-scoped get, update or delete that selects no item.
+ *
+ * @remarks
+ * The condition: the command is resource-scoped, its name is one of
+ * {@link ITEM_COMMAND_NAMES}, and it declares no required parameter other
+ * than its parent's (the parameter `command.parent` names). That parameter is
+ * the identifier its native body selects the item by
+ * (`planNativeInvocation` in `@macts/core`); without one the operation cannot
+ * act on the item it names ({@link missingIdentifierConsequence}). Such a
+ * manifest is refused rather than registered with an operation that cannot
+ * do what it says. The rule is the same for all three names; a command is
+ * never exempt because of its name.
+ *
+ * @throws {@link OperationRegistrationError} naming the app and the command
+ *   key, and saying that the command declares no identifier parameter.
+ */
+function assertItemSelectable(manifest: AppManifest, commandKey: string, command: Command): void {
+  if (command.scope !== 'resource' || !ITEM_COMMAND_NAMES.includes(command.name)) return
+  const parent = command.parent?.parameter
+  const identifier = command.parameters.find((p) => p.required && p.name !== parent)
+  if (identifier !== undefined) return
+  const besideParent = parent === undefined ? '' : ` other than its parent parameter "${parent}"`
+  throw new OperationRegistrationError(
+    `App "${manifest.app.name}" cannot be registered from its manifest: its ${command.name} command "${commandKey}" declares no identifier parameter. A ${command.name} selects one item by a required parameter${besideParent}, and ${missingIdentifierConsequence(command)}. Declare the item's identifier as a required parameter of "${commandKey}".`
+  )
+}
+
 /** Combine a descriptor with the manifest-side facts for its command. */
 function toRegisteredOperation(
   descriptor: AnyOperationDescriptor,
@@ -216,24 +269,31 @@ function toRegisteredOperation(
  * the manifest command key, and a command scoped to several resource types
  * yields one operation per type.
  *
- * The descriptors use passthrough value types: the input is validated against
- * the command's request schema and must be plain JSON, and the output is any
- * JSON value. They stand in for generated descriptors until generated contracts
- * carry value types, and the generator never produces them.
+ * The descriptors use passthrough value types: the input must hold exactly
+ * the command's declared parameters (`buildDeclaredInputSchema`), as plain
+ * JSON, so a key that is not a parameter is rejected as it is for an operation
+ * registered from a contract; the output is any JSON value. A
+ * manifest-registered list does not page, so its input declares no paging
+ * inputs. A resource-scoped get, update or delete must declare the identifier
+ * parameter it selects its item by, or the manifest is refused. They stand in
+ * for generated descriptors until generated contracts carry value types, and
+ * the generator never produces them.
  *
  * @param manifest - A validated app manifest.
  * @returns One registered operation per route, in command-declaration order.
  * @throws {@link OperationRegistrationError} when the app's route segment is
- *   reserved ({@link RESERVED_APP_ROUTE_SEGMENTS}), or a route or permission
- *   is not in operation form.
+ *   reserved ({@link RESERVED_APP_ROUTE_SEGMENTS}), a route or permission is
+ *   not in operation form, or a resource-scoped get, update or delete declares
+ *   no identifier parameter.
  */
 export function operationsFromManifest(manifest: AppManifest): RegisteredOperation[] {
   assertAppSegmentNotReserved(manifest)
   const inputTypes = new Map<string, ValueType<unknown>>()
   return deriveManifestOperations(manifest).map(({ id, permission, target, command }) => {
+    assertItemSelectable(manifest, target.command, command)
     let input = inputTypes.get(target.command)
     if (input === undefined) {
-      input = passthroughInputType(buildCommandSchema(command))
+      input = passthroughInputType(buildDeclaredInputSchema(command))
       inputTypes.set(target.command, input)
     }
     const descriptor: AnyOperationDescriptor = {

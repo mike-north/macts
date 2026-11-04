@@ -97,10 +97,11 @@ function passthroughValueType(schema: z.ZodType<WireValue>): ValueType<unknown> 
  * @remarks
  * Validates the command's request contract first, so parameter issues are
  * reported against the parameter names, then requires every value in the
- * record (including extra, forward-compatible keys) to be plain JSON.
+ * record to be plain JSON.
  *
- * @param requestSchema - The command's request schema, from
- *   `buildCommandSchema`.
+ * @param requestSchema - The command's request schema: for an operation the
+ *   runtime registers from a manifest, its declared input
+ *   (`buildDeclaredInputSchema`), which admits no other key.
  * @returns A passthrough value type for the operation's input record.
  */
 export function passthroughInputType(requestSchema: z.ZodType): ValueType<unknown> {
