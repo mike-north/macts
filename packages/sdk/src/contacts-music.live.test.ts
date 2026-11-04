@@ -22,6 +22,9 @@
  * the library playlist, which holds every track.
  *
  * Nothing is created, changed, deleted, played or paused.
+ * Contacts identifiers are compared as booleans, and a wire schema failure
+ * reports only where each issue is and its kind, so a failure never prints
+ * personal data.
  *
  * ## Why this cannot run in CI
  *
@@ -139,7 +142,10 @@ async function wireReader<Client>(contract: AppContract<Client>): Promise<WireRe
       })
       const wire = page === undefined ? result : { items: result }
       const parsed = operation.output.wire.safeParse(wire)
-      expect(parsed.success, `${id}: ${JSON.stringify(parsed.error?.issues)}`).toBe(true)
+      // Only where each issue is and its kind: an issue's message or received
+      // value could carry personal data.
+      const issues = parsed.error?.issues.map(({ path, code }) => ({ path, code }))
+      expect(parsed.success, `${id}: ${JSON.stringify(issues)}`).toBe(true)
       return wire
     },
   }
@@ -201,12 +207,14 @@ describe.skipIf(!liveAppsEnabled)('Contacts reads against Contacts.app (local on
       const first = people.items[0]
       if (first === undefined) return
       const person = await contacts.people.get(first.id)
-      expect(person.id).toBe(first.id)
+      expect(person.id === first.id).toBe(true)
       expect(person.creationDate).toBeInstanceOf(Date)
 
       const listed = await wire.read('contacts.people.list', {})
       expect(Array.isArray(field(listed, 'items'))).toBe(true)
-      expect(field(await wire.read('contacts.people.get', { id: first.id }), 'id')).toBe(first.id)
+      expect(
+        field(await wire.read('contacts.people.get', { id: first.id }), 'id') === first.id
+      ).toBe(true)
     },
     LIVE_TEST_TIMEOUT_MS
   )
@@ -218,10 +226,12 @@ describe.skipIf(!liveAppsEnabled)('Contacts reads against Contacts.app (local on
       const first = groups.items[0]
       if (first === undefined) return
       const group = await contacts.groups.get(first.id)
-      expect(group.id).toBe(first.id)
+      expect(group.id === first.id).toBe(true)
 
       await wire.read('contacts.groups.list', {})
-      expect(field(await wire.read('contacts.groups.get', { id: first.id }), 'id')).toBe(first.id)
+      expect(
+        field(await wire.read('contacts.groups.get', { id: first.id }), 'id') === first.id
+      ).toBe(true)
     },
     LIVE_TEST_TIMEOUT_MS
   )
@@ -238,10 +248,12 @@ describe.skipIf(!liveAppsEnabled)('Contacts reads against Contacts.app (local on
         const first = items.items[0]
         if (first === undefined) continue
         const item = await contacts[resource].get(personId, first.id)
-        expect(item.id).toBe(first.id)
+        expect(item.id === first.id).toBe(true)
 
         await wire.read(listId, { personId })
-        expect(field(await wire.read(getId, { personId, id: first.id }), 'id')).toBe(first.id)
+        expect(field(await wire.read(getId, { personId, id: first.id }), 'id') === first.id).toBe(
+          true
+        )
         return
       }
     },
