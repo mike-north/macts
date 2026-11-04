@@ -278,11 +278,11 @@ describe.skipIf(!liveAppsEnabled)('Music reads against Music.app (local only)', 
       const first = playlists.items[0]
       if (first === undefined) return
       const playlist = await music.playlists.get(first.persistentID)
-      expect(playlist.persistentID).toBe(first.persistentID)
+      expect(playlist.persistentID === first.persistentID).toBe(true)
 
       await wire.read('music.playlists.list', {})
       const got = await wire.read('music.playlists.get', { persistentID: first.persistentID })
-      expect(field(got, 'persistentID')).toBe(first.persistentID)
+      expect(field(got, 'persistentID') === first.persistentID).toBe(true)
     },
     LIVE_TEST_TIMEOUT_MS
   )
@@ -298,14 +298,14 @@ describe.skipIf(!liveAppsEnabled)('Music reads against Music.app (local only)', 
       const first = tracks.items[0]
       if (first === undefined) return
       const track = await music.tracks.get(library.persistentID, first.persistentID)
-      expect(track.persistentID).toBe(first.persistentID)
+      expect(track.persistentID === first.persistentID).toBe(true)
 
       await wire.read('music.tracks.list', { playlistId: library.persistentID })
       const got = await wire.read('music.tracks.get', {
         playlistId: library.persistentID,
         persistentID: first.persistentID,
       })
-      expect(field(got, 'persistentID')).toBe(first.persistentID)
+      expect(field(got, 'persistentID') === first.persistentID).toBe(true)
     },
     LIVE_TEST_TIMEOUT_MS
   )
@@ -325,7 +325,7 @@ describe.skipIf(!liveAppsEnabled)('Music reads against Music.app (local only)', 
       const first = (await music.tracks.list(other.persistentID)).items[0]
       if (first === undefined) return
       const track = await music.tracks.get(library.persistentID, first.persistentID)
-      expect(track.persistentID).toBe(first.persistentID)
+      expect(track.persistentID === first.persistentID).toBe(true)
     },
     LIVE_TEST_TIMEOUT_MS
   )
