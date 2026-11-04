@@ -845,8 +845,11 @@ native values for arguments, and native results to wire values, before
   `addressing` from the manifest, by the resource's identifier targeting
   (D10): `lookup: 'byId'` addresses `app[collection].byId(id)`, and
   `lookup: 'byProperty'` addresses the first match of
-  `app[collection].whose({ [property]: id })`. Only a resource whose resolving
-  get records no parent (D10, command parents) has `addressing`.
+  `app[collection].whose({ [property]: id })`, and `lookup: 'byKey'`
+  addresses `app[collection].byName(id)`, the collection's key specifier
+  (D10, key targeting). Only a resource whose resolving get records no parent
+  (D10, command parents) has `addressing`, and a singleton root (D10) has
+  none.
   - Decoding runs in two phases. The first converts the whole input with no
     access to the application: the reference's form, its resource's `id` plan
     and `addressing`, and its `id` are checked and converted there, and the
@@ -1626,6 +1629,23 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   _Bounded list pages_). With the claim, the target is used at output
   positions like any other. Without it, including a resource matched on its
   name and claimed not unique, such as Calendar's calendars, it is not.
+- **Key-targeted resources.** A resource whose identifier the app finds
+  through its collection's key specifier (D10, key targeting) is identified
+  like any other: an identity reference carries the key, natively encoded by
+  reading the keyed property back, and resolves by the same key lookup its
+  `get` uses. What the key means is the app's: a key that names a location,
+  such as a file path, resolves to whatever item is at that location when it
+  is resolved, so the reference does not survive a move or rename. A key that
+  finds nothing is `TargetNotFoundError`.
+- **Singleton roots.** A singleton root (D10) is held by the application as
+  one of its own properties and has no identifier, so no reference names it
+  yet. Its get takes no identifier and is not a resolving operation: the
+  resource table leaves the root out, an output position holding one is left
+  out of output with the `singleton-root` reason, and an input position
+  taking one admits nothing, so a required one makes its operation
+  unavailable. A reference to a root would carry the resource alone, with no
+  identity value, and resolve through the application property; it is added
+  when an app's output first needs one.
 
 **Native conversion scope.** The macOS provider converts a reference inside
 the automation process (D4, reference conversion) when it is a single
@@ -2032,7 +2052,9 @@ execute(request), resolve(request) }`.
   `Readonly<Record<string, { readonly id?: ValuePlan }>>`, keyed by manifest
   resource key and declared in `@macts/contracts` next to `ValuePlan`. `id` is
   the plan of the resource's identifier value type, the one a reference's `id`
-  is wire-encoded by, and is absent for a resource with no identifier. Entries
+  is wire-encoded by, and is absent for a resource with no identifier. A
+  singleton root (D10) has no identifier and no entry, since the contract's
+  resource table leaves it out (D7, singleton roots). Entries
   are objects, so a later per-resource field does not change the table's
   shape. The table holds plans only: which native property carries an
   identifier, and how an object is found from it, stays manifest knowledge
@@ -2338,7 +2360,15 @@ Every surface takes the parent from the record. Native bodies address the parent
 
 **Targeting applies at every level of a nested lookup.** A resource's identifier targeting (the app's `id` specifier by default, or `byProperty`, a match on a property) is how every lookup of one of its items is built, wherever the item is: in the application's collection, as the parent of a command, or as the target of a get, update or delete under that parent (`buildTargetExpression` and `buildNestedTargetExpression` in `jxa/native-scripts.ts` share one lookup). Music playlists and tracks are matched on their persistent ID, the dictionary's "id of the item as a hexadecimal string. This id does not change over time", because a track's numeric `id` belongs to its entry in one playlist: on Music 1.7.2, one track was id 2218 in the library playlist and id 2344 in another, while its persistent ID was the same in both, and ids and persistent IDs of 3 playlists and 1220 playlist tracks were unchanged across a relaunch. A get by persistent ID under the 608-track library playlist took a median of 250 ms through the native executor, most of it starting the automation process; the lookup itself took 17 ms, against 18 ms by numeric id.
 
+**Key targeting.** `targeting: byKey` finds an item through its collection's key specifier, applied to the identifier property's value: native bodies and the codec address `collection.byName(value)` (D4, reference conversion), wherever the lookup is made, as with every targeting. The targeting names the lookup mechanism and the identifier names what the value is; the app interprets the key. A key that names a location, such as a file path, finds whatever item is at that location now, so it identifies a location rather than an item that keeps its identity through a move or rename; a manifest choosing such a key states that in its notes. A `byKey` identifier takes no `runtimeProperty`, which names the property a `byProperty` match is made on; the schema rejects one.
+
 **A list's canonical `id` alias never replaces a field.** Results without a typed contract mirror the runtime identifier under `id`, except for a resource with a usable property named `id`, whose own value stays (`resolveCanonicalIdentifierSource` in `manifest/identifier.ts`, which the HTTP client generator also uses for its read types).
+
+### Singleton roots
+
+**A resource whose one object the application holds as a property is a singleton root.** An app may hold an object, such as a front desk, as one of its own properties without having its class as an element. The resource records `root: { property, evidence }`: `property` is the bridge's accessor for the application property, and the evidence is the dictionary term it spells, in the form native spellings use (D10, native spellings). The root's one object needs no identifier and is held in no collection, so the schema rejects a root that declares identifiers, a collection spelling or a range read. Its only standard command is a get, which takes no required parameter and records no parent; the schema rejects a list, create, update or delete that applies to it, a command that records it as parent, and a hierarchy entry that names it, since every entry is a collection.
+
+**Every surface reads the property.** The native get addresses `app[property]`, fails as a missing target when it holds nothing, and reads the record as any get does. The contract operation's input is empty, the clients' `get` takes only call options, and the CLI reaches the get at the root property, as a hierarchy key names a collection; there is no list. No reference names a root yet (D7, singleton roots).
 
 ### Unsupported resources
 
