@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -46,7 +47,16 @@ export interface BrowserWindow {
 }
 
 // @public
-export type BrowserWindowCreateInput = Record<string, never>;
+export interface BrowserWindowCreateInput {
+    view?: Playlist;
+}
+
+// @public
+export class BrowserWindowResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(id: string): Promise<BrowserWindow>;
+    list(): Promise<Page<BrowserWindow>>;
+}
 
 // @public (undocumented)
 export const BrowserWindowSchema: z.ZodObject<{
@@ -148,6 +158,7 @@ export interface Playlist {
     duration: number;
     id: number;
     name: string;
+    persistentID: string;
     size: number;
     specialKind: string;
     time: string;
@@ -163,6 +174,8 @@ export interface PlaylistCreateInput {
 // @public
 export class PlaylistResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
+    get(sourceId: string, persistentID: string): Promise<Playlist>;
+    list(sourceId: string): Promise<Page<Playlist>>;
     move(to: string): Promise<void>;
     search(_for: string, only?: string): Promise<void>;
 }
@@ -170,6 +183,7 @@ export class PlaylistResourceClient {
 // @public (undocumented)
 export const PlaylistSchema: z.ZodObject<{
     id: z.ZodNumber;
+    persistentID: z.ZodString;
     description: z.ZodString;
     duration: z.ZodNumber;
     name: z.ZodString;
@@ -190,6 +204,13 @@ export interface PlaylistWindow {
 
 // @public
 export type PlaylistWindowCreateInput = Record<string, never>;
+
+// @public
+export class PlaylistWindowResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(id: string): Promise<PlaylistWindow>;
+    list(): Promise<Page<PlaylistWindow>>;
+}
 
 // @public (undocumented)
 export const PlaylistWindowSchema: z.ZodObject<{
@@ -222,14 +243,23 @@ export interface Source {
     freeSpace: number;
     id: number;
     kind: string;
+    persistentID: string;
 }
 
 // @public
 export type SourceCreateInput = Record<string, never>;
 
+// @public
+export class SourceResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(persistentID: string): Promise<Source>;
+    list(): Promise<Page<Source>>;
+}
+
 // @public (undocumented)
 export const SourceSchema: z.ZodObject<{
     id: z.ZodNumber;
+    persistentID: z.ZodString;
     capacity: z.ZodNumber;
     freeSpace: z.ZodNumber;
     kind: z.ZodString;
@@ -397,6 +427,7 @@ export class TVClient {
     constructor(options: TVClientOptions);
     add(to?: string): Promise<void>;
     backTrack(): Promise<void>;
+    readonly browserWindows: BrowserWindowResourceClient;
     close(): Promise<void>;
     convert(): Promise<void>;
     count(each: string): Promise<void>;
@@ -414,6 +445,7 @@ export class TVClient {
     pause(): Promise<void>;
     play(once?: boolean): Promise<void>;
     readonly playlists: PlaylistResourceClient;
+    readonly playlistWindows: PlaylistWindowResourceClient;
     playpause(): Promise<void>;
     previousTrack(): Promise<void>;
     quit(): Promise<void>;
@@ -423,6 +455,7 @@ export class TVClient {
     run(): Promise<void>;
     save(): Promise<void>;
     select(): Promise<void>;
+    readonly sources: SourceResourceClient;
     stop(): Promise<void>;
 }
 

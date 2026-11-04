@@ -1,6 +1,14 @@
 import type { CliPlugin } from '@macts/cli'
+import { ListBrowserWindowsCommand } from './commands/browserWindows/list.js'
+import { GetBrowserWindowCommand } from './commands/browserWindows/get.js'
+import { ListPlaylistsCommand } from './commands/playlists/list.js'
+import { GetPlaylistCommand } from './commands/playlists/get.js'
 import { MovePlaylistCommand } from './commands/playlists/move.js'
 import { SearchPlaylistCommand } from './commands/playlists/search.js'
+import { ListPlaylistWindowsCommand } from './commands/playlistWindows/list.js'
+import { GetPlaylistWindowCommand } from './commands/playlistWindows/get.js'
+import { ListSourcesCommand } from './commands/sources/list.js'
+import { GetSourceCommand } from './commands/sources/get.js'
 import { RefreshFileTrackCommand } from './commands/sources/libraryPlaylists/fileTracks/refresh.js'
 import { CloseCommand } from './commands/close.js'
 import { CountCommand } from './commands/count.js'
@@ -36,8 +44,16 @@ export const plugin: CliPlugin = {
   name: 'tv',
   description: 'Commands for TV',
   commands: [
+    ListBrowserWindowsCommand,
+    GetBrowserWindowCommand,
+    ListPlaylistsCommand,
+    GetPlaylistCommand,
     MovePlaylistCommand,
     SearchPlaylistCommand,
+    ListPlaylistWindowsCommand,
+    GetPlaylistWindowCommand,
+    ListSourcesCommand,
+    GetSourceCommand,
     RefreshFileTrackCommand,
     CloseCommand,
     CountCommand,

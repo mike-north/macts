@@ -1790,6 +1790,9 @@ importers:
       '@macts/contacts':
         specifier: workspace:*
         version: link:../contacts
+      '@macts/google-chrome':
+        specifier: workspace:*
+        version: link:../google-chrome
       '@macts/microsoft-edge':
         specifier: workspace:*
         version: link:../microsoft-edge
@@ -1805,6 +1808,9 @@ importers:
       '@macts/reminders':
         specifier: workspace:*
         version: link:../reminders
+      '@macts/tv':
+        specifier: workspace:*
+        version: link:../tv
       '@macts/xcode':
         specifier: workspace:*
         version: link:../xcode

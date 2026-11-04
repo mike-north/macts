@@ -130,6 +130,13 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "The unique identifier of the window.", typed text. A read-only list on Google Chrome 156.0.8078.80 (macOS 27.2), 2026-11-04, found 1 window, too few to show distinctness; its id read as text and a get by id read the same id back. A window''s id identifies it within the running Chrome session; nothing here shows it survives a relaunch.'
+            observedAt: '2026-11-04T03:31:45.000Z'
+            appVersion: 156.0.8078.80
   Tab:
     name: Tab
     plural: Tabs
@@ -167,6 +174,13 @@ resources:
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: sdef
+            note: 'The app''s scripting dictionary describes the property as "Unique ID of the tab.", typed text. The claim is for the tabs of one window, the collection a tab is listed in, and says nothing about uniqueness across windows. A read-only list on Google Chrome 156.0.8078.80 (macOS 27.2), 2026-11-04, found 1 window holding 1 tab, too few to show distinctness; the ids read as text and a get by its window and its id read the same id back. A tab''s id identifies it within the running Chrome session; nothing here shows it survives a relaunch.'
+            observedAt: '2026-11-04T03:31:45.000Z'
+            appVersion: 156.0.8078.80
   BookmarkFolder:
     name: BookmarkFolder
     plural: BookmarkFolders
@@ -232,6 +246,18 @@ enums: {}
 
 hierarchy:
   children:
+    # The dictionary's application has `window` as an element, and its
+    # `window` has `tab` as an element. The application has no `tab` element:
+    # a tab is reached only through its window.
+    windows:
+      resource: Window
+      access: r
+      description: The windows contained within this application, ordered front to back.
+      children:
+        tabs:
+          resource: Tab
+          access: r
+          description: The tabs contained within the window.
     bookmarkFolders:
       resource: BookmarkFolder
       access: r
@@ -242,6 +268,58 @@ hierarchy:
           access: rw
           description: An item consists of an URL and the title of a bookmark
 commands:
+  listWindows:
+    name: list
+    routeName: list
+    description: List the windows
+    scope: resource
+    resourceType: Window
+    parameters: []
+  getWindow:
+    name: get
+    routeName: get
+    description: Get a window by its ID
+    scope: resource
+    resourceType: Window
+    parameters:
+      - name: id
+        type: string
+        description: Window identifier
+        required: true
+  listTabs:
+    name: list
+    routeName: list
+    description: List the tabs of a window
+    scope: resource
+    resourceType: Tab
+    # A tab is an element of its window only, so it is listed and got within
+    # the window, never at the application.
+    parent:
+      resource: Window
+      parameter: windowId
+    parameters:
+      - name: windowId
+        type: string
+        description: Window identifier
+        required: true
+  getTab:
+    name: get
+    routeName: get
+    description: Get a tab of a window by its ID
+    scope: resource
+    resourceType: Tab
+    parent:
+      resource: Window
+      parameter: windowId
+    parameters:
+      - name: windowId
+        type: string
+        description: Window identifier
+        required: true
+      - name: id
+        type: string
+        description: Tab identifier
+        required: true
   save:
     name: save
     description: Save an object.

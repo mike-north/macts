@@ -217,19 +217,23 @@ export const capabilities: readonly CapabilityMetadata[] = [
     appBundleId: 'com.microsoft.edgemac',
     resource: 'tabs',
     operation: 'get',
-    description: 'Get a tab by ID',
+    description: 'Get a tab of a window by ID',
     permission: 'microsoft-edge:tabs:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
       properties: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'string',
+        },
         id: {
           description: 'Tab identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['id'],
+      required: ['windowId', 'id'],
     },
   },
   {

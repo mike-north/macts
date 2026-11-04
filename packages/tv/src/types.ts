@@ -65,7 +65,10 @@ export interface BrowserWindow {
 }
 
 /** Input for creating a BrowserWindow */
-export type BrowserWindowCreateInput = Record<string, never>
+export interface BrowserWindowCreateInput {
+  /** the playlist currently displayed in the window */
+  view?: Playlist
+}
 
 /** Input for updating a BrowserWindow */
 export type BrowserWindowUpdateInput = Partial<BrowserWindowCreateInput>
@@ -103,6 +106,8 @@ export type LibraryPlaylistUpdateInput = Partial<LibraryPlaylistCreateInput>
 export interface Playlist {
   /** Unique identifier for this playlist */
   id: number
+  /** the id of the item as a hexadecimal string. This id does not change over time. */
+  persistentID: string
   /** the description of the playlist */
   description: string
   /** the total length of all tracks (in seconds) */
@@ -160,6 +165,8 @@ export type SharedTrackUpdateInput = Partial<SharedTrackCreateInput>
 export interface Source {
   /** Unique identifier for this source */
   id: number
+  /** the id of the item as a hexadecimal string. This id does not change over time. */
+  persistentID: string
   /** the total size of the source if it has a fixed size */
   capacity: number
   /** the free space on the source if it has a fixed size */
@@ -435,6 +442,7 @@ export const LibraryPlaylistSchema = z.object({
 
 export const PlaylistSchema = z.object({
   id: z.number(),
+  persistentID: z.string(),
   description: z.string(),
   duration: z.number(),
   name: z.string(),
@@ -455,6 +463,7 @@ export const SharedTrackSchema = z.object({
 
 export const SourceSchema = z.object({
   id: z.number(),
+  persistentID: z.string(),
   capacity: z.number(),
   freeSpace: z.number(),
   kind: z.string(),

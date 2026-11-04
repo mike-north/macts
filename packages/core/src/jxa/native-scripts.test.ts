@@ -1796,6 +1796,90 @@ describe('Music read bodies (shipped manifest, #213)', () => {
   )
 })
 
+// TV reads. Sources and playlists are matched by `persistentID` (the
+// dictionary's `item` class: "This id does not change over time"), not by
+// the numeric `id`. Playlists are read under their source, as the app
+// addresses them (the dictionary's `source` class has `playlist` as an
+// element): a source can hold a playlist the application's own playlists do
+// not list. Browser and playlist windows are found at the application by their
+// integer id.
+describe('TV read bodies (shipped manifest)', () => {
+  let tv: AppManifest
+  beforeAll(async () => {
+    tv = await loadManifest(manifestPath('tv'))
+  })
+  const body = (command: string, resource: string, identifierAliases = false): string =>
+    buildNativeBody(tv, { command, resource }, { identifierAliases })
+
+  it('listSources lists sources at the application, identified by persistent ID', () => {
+    const text = body('listSources', 'Source')
+    expect(text).toContain('var col = app["sources"];')
+    for (const read of identifierReads('persistentID')) expect(text).toContain(read)
+    expect(text).toContain('obj["persistentID"] = ids[i];')
+    // The numeric id is an ordinary property, read across the collection.
+    expect(text).toContain(columnRead('id'))
+    expect(text).toMatch(columnField('id'))
+  })
+
+  it('getSource matches the source on its persistent ID', () => {
+    const text = body('getSource', 'Source')
+    expect(text).toContain('var itemId = args["persistentID"];')
+    expect(text).toContain('var item = app["sources"].whose({ "persistentID": itemId })[0];')
+    expect(text).toContain('if (!item.exists()) {')
+    expect(text).not.toContain('.byId(')
+  })
+
+  it('listPlaylists lists the playlists of the source given by sourceId', () => {
+    const text = body('listPlaylists', 'Playlist')
+    expect(text).toContain('var parentId = args["sourceId"];')
+    expect(text).toContain('var parent = app["sources"].whose({ "persistentID": parentId })[0];')
+    expect(text).toContain('var col = parent["playlists"];')
+    // Never the application's own playlists, which can miss a source's playlist.
+    expect(text).not.toContain('app["playlists"]')
+    for (const read of identifierReads('persistentID')) expect(text).toContain(read)
+  })
+
+  it('getPlaylist matches the playlist on its persistent ID under its source', () => {
+    const text = body('getPlaylist', 'Playlist')
+    expect(text).toContain('var parentId = args["sourceId"];')
+    expect(text).toContain('var itemId = args["persistentID"];')
+    expect(text).toContain('var parent = app["sources"].whose({ "persistentID": parentId })[0];')
+    expect(text).toContain('var item = parent["playlists"].whose({ "persistentID": itemId })[0];')
+    expect(text).not.toContain('app["playlists"]')
+    expect(text).not.toContain('.byId(')
+  })
+
+  it.each([
+    ['listBrowserWindows', 'BrowserWindow', 'browserWindows'],
+    ['listPlaylistWindows', 'PlaylistWindow', 'playlistWindows'],
+  ])('%s lists the windows at the application, identified by id', (command, resource, accessor) => {
+    const text = body(command, resource)
+    expect(text).toContain(`var col = app["${accessor}"];`)
+    for (const read of identifierReads('id')) expect(text).toContain(read)
+  })
+
+  it.each([
+    ['getBrowserWindow', 'BrowserWindow', 'browserWindows'],
+    ['getPlaylistWindow', 'PlaylistWindow', 'playlistWindows'],
+  ])('%s finds the window at the application by its id', (command, resource, accessor) => {
+    const text = body(command, resource)
+    expect(text).toContain('var itemId = args["id"];')
+    expect(text).toContain(`var item = app["${accessor}"].byId(itemId);`)
+  })
+
+  it.each([
+    ['listSources', 'Source'],
+    ['listPlaylists', 'Playlist'],
+  ])(
+    '%s never overwrites the numeric id with the persistent ID as a canonical alias',
+    (command, resource) => {
+      const text = body(command, resource, true)
+      expect(text).not.toContain('obj["id"] = obj["persistentID"];')
+      expect(text).toMatch(columnField('id'))
+    }
+  )
+})
+
 // A missing target, or a missing parent of a scoped operation, is a missing
 // object (phases/13 D6), never an invalid selection or an empty result. Without
 // the existence check, a property match (`whose(...)[0]`) that matches nothing
@@ -1872,7 +1956,11 @@ describe('missing targets and parents fail as no such object', () => {
                 endDate: '2024-01-15T11:00:00.000Z',
               }
             : eventArgs
-        expectNoSuchObject(runBody(body, calendarApp(parent), args))
+        const thrown = runBody(body, calendarApp(parent), args)
+        expectNoSuchObject(thrown)
+        // The miss names the parent's resource, so the failure says which
+        // object is missing: the calendar, not an event in it.
+        expect(thrown).toMatchObject({ missingResource: 'Calendar' })
         expect(parent.used).toEqual([])
       }
     )
@@ -1883,7 +1971,11 @@ describe('missing targets and parents fail as no such object', () => {
         const item = fakeSpecifier(false)
         const parent = fakeSpecifier(true, { events: { byId: () => item.specifier } })
         const body = buildNativeBody(calendar, { command, resource: 'Event' })
-        expectNoSuchObject(runBody(body, calendarApp(parent), eventArgs))
+        const thrown = runBody(body, calendarApp(parent), eventArgs)
+        expectNoSuchObject(thrown)
+        // A missing target names no resource of its own: the operation's
+        // resource is the one missing.
+        expect(thrown).not.toHaveProperty('missingResource')
         expect(item.used).toEqual([])
       }
     )

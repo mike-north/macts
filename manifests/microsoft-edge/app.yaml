@@ -319,11 +319,22 @@ commands:
   getTab:
     name: get
     routeName: get
-    description: Get a tab by ID
+    description: Get a tab of a window by ID
     scope: resource
     resourceType: Tab
+    # The Chromium dictionary has `tab` only as an element of `window`, and
+    # the application has no `tab` element, so a tab is got within its
+    # window, as it is listed. Not verified on installed Edge: this follows
+    # the dictionary.
+    parent:
+      resource: Window
+      parameter: windowId
     code: getd
     parameters:
+      - name: windowId
+        type: string
+        description: Window identifier
+        required: true
       - name: id
         type: string
         description: Tab identifier

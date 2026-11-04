@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -97,8 +98,10 @@ export class GoogleChromeClient {
     save(_in?: string, as?: string): Promise<void>;
     selectAll(): Promise<void>;
     stop(): Promise<void>;
+    readonly tabs: TabResourceClient;
     undo(): Promise<void>;
     viewSource(): Promise<void>;
+    readonly windows: WindowResourceClient;
 }
 
 // @public
@@ -131,6 +134,13 @@ export interface Tab {
 // @public
 export interface TabCreateInput {
     uRL?: string;
+}
+
+// @public
+export class TabResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(windowId: string, id: string): Promise<Tab>;
+    list(windowId: string): Promise<Page<Tab>>;
 }
 
 // @public (undocumented)
@@ -182,6 +192,13 @@ export interface WindowCreateInput {
     mode?: string;
     visible?: boolean;
     zoomed?: boolean;
+}
+
+// @public
+export class WindowResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(id: string): Promise<Window>;
+    list(): Promise<Page<Window>>;
 }
 
 // @public (undocumented)

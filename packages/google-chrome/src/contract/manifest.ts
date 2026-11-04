@@ -183,6 +183,15 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "The unique identifier of the window.", typed text. A read-only list on Google Chrome 156.0.8078.80 (macOS 27.2), 2026-11-04, found 1 window, too few to show distinctness; its id read as text and a get by id read the same id back. A window\'s id identifies it within the running Chrome session; nothing here shows it survives a relaunch.',
+              observedAt: '2026-11-04T03:31:45.000Z',
+              appVersion: '156.0.8078.80',
+            },
+          },
         },
       ],
     },
@@ -235,6 +244,15 @@ export const manifest: unknown = {
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'sdef',
+              note: 'The app\'s scripting dictionary describes the property as "Unique ID of the tab.", typed text. The claim is for the tabs of one window, the collection a tab is listed in, and says nothing about uniqueness across windows. A read-only list on Google Chrome 156.0.8078.80 (macOS 27.2), 2026-11-04, found 1 window holding 1 tab, too few to show distinctness; the ids read as text and a get by its window and its id read the same id back. A tab\'s id identifies it within the running Chrome session; nothing here shows it survives a relaunch.',
+              observedAt: '2026-11-04T03:31:45.000Z',
+              appVersion: '156.0.8078.80',
+            },
+          },
         },
       ],
     },
@@ -329,6 +347,18 @@ export const manifest: unknown = {
   enums: {},
   hierarchy: {
     children: {
+      windows: {
+        resource: 'Window',
+        access: 'r',
+        description: 'The windows contained within this application, ordered front to back.',
+        children: {
+          tabs: {
+            resource: 'Tab',
+            access: 'r',
+            description: 'The tabs contained within the window.',
+          },
+        },
+      },
       bookmarkFolders: {
         resource: 'BookmarkFolder',
         access: 'r',
@@ -345,6 +375,73 @@ export const manifest: unknown = {
   },
   relationships: [],
   commands: {
+    listWindows: {
+      name: 'list',
+      description: 'List the windows',
+      scope: 'resource',
+      resourceType: 'Window',
+      parameters: [],
+      routeName: 'list',
+    },
+    getWindow: {
+      name: 'get',
+      description: 'Get a window by its ID',
+      scope: 'resource',
+      resourceType: 'Window',
+      parameters: [
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
+      ],
+      routeName: 'get',
+    },
+    listTabs: {
+      name: 'list',
+      description: 'List the tabs of a window',
+      scope: 'resource',
+      resourceType: 'Tab',
+      parameters: [
+        {
+          name: 'windowId',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
+      routeName: 'list',
+    },
+    getTab: {
+      name: 'get',
+      description: 'Get a tab of a window by its ID',
+      scope: 'resource',
+      resourceType: 'Tab',
+      parameters: [
+        {
+          name: 'windowId',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Tab identifier',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
+      routeName: 'get',
+    },
     save: {
       name: 'save',
       description: 'Save an object.',

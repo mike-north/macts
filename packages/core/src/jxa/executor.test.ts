@@ -557,6 +557,30 @@ describe('runNativeScript', () => {
   )
 
   it(
+    'keeps the missing resource an app failure names, with its number',
+    async () => {
+      // A scoped body's parent check throws the no-such-object number with the
+      // parent's resource, so the failure names the missing parent.
+      const outcome = await runNativeScript(
+        nativeScript({
+          body: "var missing = new Error('No such object.'); missing.errorNumber = -1728; missing.missingResource = 'Window'; throw missing;",
+        }),
+        NATIVE_CODEC
+      )
+      expect(outcome).toEqual({
+        ok: false,
+        failure: {
+          source: 'app',
+          message: 'No such object.',
+          errorNumber: -1728,
+          missingResource: 'Window',
+        },
+      })
+    },
+    HOST_TEST_TIMEOUT_MS
+  )
+
+  it(
     'reports a thrown non-error value as an app failure without a number',
     async () => {
       const outcome = await runNativeScript(
@@ -657,6 +681,10 @@ describe('runNativeScript', () => {
       [
         'an app failure with a non-numeric number',
         '{"ok":false,"failure":{"source":"app","message":"m","errorNumber":"1"}}',
+      ],
+      [
+        'an app failure with a non-text missing resource',
+        '{"ok":false,"failure":{"source":"app","message":"m","errorNumber":-1728,"missingResource":1}}',
       ],
       [
         'a codec failure with no direction',

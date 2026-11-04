@@ -1,4 +1,8 @@
 import type { CliPlugin } from '@macts/cli'
+import { ListWindowsCommand } from './commands/windows/list.js'
+import { GetWindowCommand } from './commands/windows/get.js'
+import { ListTabsCommand } from './commands/windows/tabs/list.js'
+import { GetTabCommand } from './commands/windows/tabs/get.js'
 import { SaveCommand } from './commands/save.js'
 import { OpenCommand } from './commands/open.js'
 import { CloseCommand } from './commands/close.js'
@@ -30,6 +34,10 @@ export const plugin: CliPlugin = {
   name: 'google-chrome',
   description: 'Commands for Google Chrome',
   commands: [
+    ListWindowsCommand,
+    GetWindowCommand,
+    ListTabsCommand,
+    GetTabCommand,
     SaveCommand,
     OpenCommand,
     CloseCommand,

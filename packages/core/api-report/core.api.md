@@ -2125,6 +2125,7 @@ export type NativeFailure = {
     readonly source: 'app';
     readonly message: string;
     readonly errorNumber?: number;
+    readonly missingResource?: string;
 } | {
     readonly source: 'collection';
     readonly message: string;
