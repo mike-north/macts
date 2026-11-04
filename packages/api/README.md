@@ -14,7 +14,7 @@ duplicates none of the authorization logic.
 
 - **Operation endpoints from manifests**: `POST /api/v1/rpc/{app}.{resource}.{operation}` for every manifest operation
 - **Remote reference resolution**: `POST /references/v1/resolve` resolves a reference through the same pipeline as the resource's `get` or `list` operation
-- **One invocation pipeline**: authentication, permissions, governance, and input validation run in `@macts/runtime`, identically for every macts surface
+- **One invocation pipeline**: authentication, permissions, input validation, and governance run in `@macts/runtime`, identically for every macts surface
 - **Structured errors**: every failure is a `{ "error": { code, message, details } }` envelope with a closed set of codes that `@macts/contracts` clients reconstruct into the same error classes
 - **Rate limiting**: per API key after authentication, and per client address before it, across every route that calls the runtime
 - **Pluggable execution**: the native macOS executor by default; inject any `Executor` for tests or alternate providers
