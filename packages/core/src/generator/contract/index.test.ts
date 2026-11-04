@@ -788,6 +788,34 @@ describe('generateContract: TV sources and their playlists (shipped manifest)', 
   ])('%s finds windows at the application, by id', (id, required) => {
     expect(requiredInputs(id)).toEqual(required)
   })
+
+  /** The line of the declared resource table type for `resource`. */
+  function declaredEntry(resource: string): string {
+    const start = text.indexOf(`  ${resource}: ResourceDescriptor<`)
+    if (start < 0) throw new Error(`no declared entry for ${resource}`)
+    return text.slice(start, text.indexOf('\n', start))
+  }
+
+  // phases/13 D7, "Parent-scoped targets": the table records, per route, the
+  // parent the command behind it records, so a playlist reference resolved
+  // through either route needs its source as its container.
+  it('records the source as the parent of both playlist routes', () => {
+    expect(declaredEntry('Playlist')).toContain(
+      "readonly get: 'tv.playlists.get'; readonly list: 'tv.playlists.list'; " +
+        "readonly parents: { readonly get: 'Source'; readonly list: 'Source' } }"
+    )
+    expect(text).toContain(`    get: 'tv.playlists.get',
+    list: 'tv.playlists.list',
+    parents: { get: 'Source', list: 'Source' },
+  },`)
+  })
+
+  it.each(['Source', 'BrowserWindow', 'PlaylistWindow'])(
+    'records no parent for %s, found at the application',
+    (resource) => {
+      expect(declaredEntry(resource)).not.toContain('parents')
+    }
+  )
 })
 
 describe('generateContract: identifier nullability', () => {
