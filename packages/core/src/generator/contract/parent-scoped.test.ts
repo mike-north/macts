@@ -298,7 +298,17 @@ describe('a parent that references cannot resolve', () => {
     // Playlists can no longer be got, so a track's container could not be resolved.
     delete manifest.commands['getPlaylist']
     expect(generateContract(manifest).errors).toEqual([
-      'tunes: resources.Track: the app gets each Track only within its Playlist, but references cannot name the Playlist by its identifier and resolve it through a get, so no Track reference could be resolved (phases/13 D7, resolvable targets).',
+      'tunes: resources.Track: the app gets each Track only within its Playlist, but references cannot name the Playlist by its identifier and resolve it through a get, so no Track reference could be resolved.',
+    ])
+  })
+
+  it('fails generation when the parent has a get but no identifier', () => {
+    const manifest = parseManifestYaml(TUNES)
+    // Playlists stay gettable but can no longer be named by an identifier, so a
+    // track's container could not be written as an identity reference.
+    delete manifest.resources['Playlist']?.identifiers
+    expect(generateContract(manifest).errors).toEqual([
+      'tunes: resources.Track: the app gets each Track only within its Playlist, but references cannot name the Playlist by its identifier and resolve it through a get, so no Track reference could be resolved.',
     ])
   })
 
@@ -307,7 +317,7 @@ describe('a parent that references cannot resolve', () => {
     // Accounts can no longer be got, so a collection of messages could not be resolved.
     delete manifest.commands['getAccount']
     expect(generateContract(manifest).errors).toEqual([
-      'tunes: resources.Message: the app lists Message objects only within their Account, but references cannot name the Account by its identifier and resolve it through a get, so no collection of Message objects could be resolved (phases/13 D7, resolvable targets).',
+      'tunes: resources.Message: the app lists Message objects only within their Account, but references cannot name the Account by its identifier and resolve it through a get, so no collection of Message objects could be resolved.',
     ])
   })
 })

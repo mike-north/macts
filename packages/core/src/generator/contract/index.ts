@@ -578,7 +578,7 @@ class ContractBuilder {
    * the command behind it finds the resource's objects within (D10, command
    * parents), when that command records one; it is absent when neither does.
    * A reference resolved through a route with a parent then needs an identity
-   * reference to that parent as its container (phases/13 D7, "Resolvable
+   * reference to that parent as its container (phases/13 D7, "Parent-scoped
    * targets"). The two parents are read independently and may differ.
    */
   #tableResources(): {
@@ -630,7 +630,7 @@ class ContractBuilder {
                 `no collection of ${resourceKey} objects`,
               ]
         this.errors.push(
-          `${this.#names.app}: resources.${resourceKey}: the app ${within}, but references cannot name the ${parent} by its identifier and resolve it through a get, so ${unresolved} could be resolved (phases/13 D7, resolvable targets).`
+          `${this.#names.app}: resources.${resourceKey}: the app ${within}, but references cannot name the ${parent} by its identifier and resolve it through a get, so ${unresolved} could be resolved.`
         )
       }
     }
