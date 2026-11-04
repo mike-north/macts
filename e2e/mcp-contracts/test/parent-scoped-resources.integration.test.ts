@@ -22,6 +22,11 @@
  */
 
 import { beforeAll, describe, expect, it } from 'vitest'
+import {
+  BOTH_ROUTE_PINS as both,
+  LIST_ONLY_PINS as listOnly,
+  type Pin,
+} from '../src/parent-scoped-pins.js'
 import { APP_NAMES, loadRealApps, type RealApp } from '../src/real-contracts.js'
 
 let apps: RealApp[] = []
@@ -97,40 +102,10 @@ describe('the parents of resolving routes in every real contract', () => {
   })
 
   it('are exactly the hand-audited parents, by route', () => {
-    // Audited by hand against the manifests. Both routes record the parent
-    // for calendar `getEvent`/`listEvents`; contacts `getAddress`/
-    // `listAddresses`, `getEmail`/`listEmails` and `getPhone`/`listPhones`;
-    // music `getTrack`/`listTracks`. Only the list records one for the rest;
-    // their gets work at the application (Edge, OmniGraffle and Xcode await
-    // #173), and Automator's settings and required resources have no get.
+    // Pinned in ../src/parent-scoped-pins.ts.
     const found = tableParents().map(
       ([app, resource, route, parent]) => `${app.name} ${resource} ${route} → ${parent}`
     )
-    /** `[app, resource, parent]`, pinned once per route that records the parent. */
-    type Pin = readonly [string, string, string]
-    const both: Pin[] = [
-      ['calendar', 'Event', 'Calendar'],
-      ['contacts', 'Address', 'Person'],
-      ['contacts', 'Email', 'Person'],
-      ['contacts', 'Phone', 'Person'],
-      ['music', 'Track', 'Playlist'],
-    ]
-    const listOnly: Pin[] = [
-      ['automator', 'AutomatorAction', 'Workflow'],
-      ['automator', 'Variable', 'Workflow'],
-      ['automator', 'Setting', 'AutomatorAction'],
-      ['automator', 'RequiredResource', 'AutomatorAction'],
-      ['microsoft-edge', 'Tab', 'Window'],
-      ['microsoft-edge', 'BookmarkItem', 'BookmarkFolder'],
-      ['omnigraffle', 'Graphic', 'Canvas'],
-      ['omnigraffle', 'Shape', 'Canvas'],
-      ['omnigraffle', 'Line', 'Canvas'],
-      ['omnigraffle', 'Layer', 'Canvas'],
-      ['reminders', 'Reminder', 'List'],
-      ['xcode', 'Project', 'WorkspaceDocument'],
-      ['xcode', 'Scheme', 'WorkspaceDocument'],
-      ['xcode', 'RunDestination', 'WorkspaceDocument'],
-    ]
     expect(both.length + listOnly.length).toBe(19)
     const byRoute = ([app, resource, parent]: Pin, routes: readonly string[]) =>
       routes.map((route) => `${app} ${resource} ${route} → ${parent}`)
