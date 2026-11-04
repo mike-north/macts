@@ -385,9 +385,13 @@ resources:
     plural: RunDestinations
     description: An object which specifies parameters such as the device and architecture for which to perform a scheme action
     code: rund
+    # The dictionary's "run destination" has `name`, `architecture`,
+    # `platform`, `device` and `companion device`, and no `id` property, so a
+    # run destination is found by name, never by id.
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
     properties:
       name:
         access: r

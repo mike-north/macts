@@ -21,11 +21,10 @@
  * isolated context, so the body, input and output plans and the codec are the
  * shipped ones. The stand-in has no app-wide `projects`, `schemes` or
  * `runDestinations` member at all, so a body that addressed one would fail,
- * and it records every lookup it serves. It finds a child by the value the
- * manifest's get passes to `byId`: a project's or scheme's id, and a run
- * destination's name, since the manifest identifies run destinations by
- * name. Whether Xcode itself finds a run destination that way is for the live
- * suite (`xcode.live.test.ts`) to show, with a workspace open.
+ * and it records every lookup it serves. A project or a scheme is found by its
+ * id (`byId`). A run destination has no `id` property in the dictionary, so it
+ * is found by a name query (`whose`), as a workspace document is; its stand-in
+ * collection has no `byId` at all, so a body that tried one would fail.
  *
  * @see ../../../manifests/xcode/app.yaml
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md (D6, D7, D10)
@@ -172,16 +171,19 @@ const MISSING = { exists: () => false }
 
 /**
  * A stand-in element collection of one workspace document: calling it lists
- * its item specifiers, reading a property of it reads that property of every
- * item in order, and `byId` finds one item by `key`, recorded in `lookups` as
- * `<label>.byId(<value>)`.
+ * its item specifiers, and reading a property of it reads that property of
+ * every item in order. With `lookup: 'byId'`, `byId` finds one item by its
+ * `id`, recorded in `lookups` as `<label>.byId(<value>)`. With
+ * `lookup: 'whose'`, `whose({ name })` finds one by its `name`, recorded as
+ * `<label>.whose(name: <value>)`, and the collection has no `byId`.
  */
 function children(
   label: string,
   records: readonly Record<string, unknown>[],
-  key: string,
+  lookup: 'byId' | 'whose',
   lookups: string[]
 ): object {
+  const key = lookup === 'byId' ? 'id' : 'name'
   const items = records.map((record) => ({
     key: record[key],
     specifier: { exists: () => true, properties: () => record },
@@ -193,10 +195,20 @@ function children(
       value: () => records.map((record) => record[property]),
     })
   }
+  const find = (value: unknown): object =>
+    items.find((item) => item.key === value)?.specifier ?? MISSING
+  if (lookup === 'whose') {
+    return Object.assign(list, {
+      whose(query: Readonly<Record<string, unknown>>) {
+        lookups.push(`${label}.whose(name: ${String(query['name'])})`)
+        return [find(query['name'])]
+      },
+    })
+  }
   return Object.assign(list, {
     byId(value: unknown) {
       lookups.push(`${label}.byId(${String(value)})`)
-      return items.find((item) => item.key === value)?.specifier ?? MISSING
+      return find(value)
     },
   })
 }
@@ -226,8 +238,8 @@ function standInXcode(lookups: string[]): object {
       specifier: {
         exists: () => true,
         properties: () => record,
-        projects: children(`${label}.projects`, row.projects, 'id', lookups),
-        schemes: children(`${label}.schemes`, row.schemes, 'id', lookups),
+        projects: children(`${label}.projects`, row.projects, 'byId', lookups),
+        schemes: children(`${label}.schemes`, row.schemes, 'byId', lookups),
         runDestinations: children(
           `${label}.runDestinations`,
           row.runDestinations.map((destination) => ({
@@ -236,7 +248,7 @@ function standInXcode(lookups: string[]): object {
             device: null,
             companionDevice: null,
           })),
-          'name',
+          'whose',
           lookups
         ),
       },
@@ -302,7 +314,8 @@ describe('Xcode workspace children, read within their workspace through the loca
     expect(destination).toMatchObject({ name: 'Phone', platform: 'iphonesimulator' })
     expect(lookups).toEqual([
       'workspaceDocuments.whose(name: App)',
-      'workspaceDocuments[App].runDestinations.byId(Phone)',
+      // A run destination is found by its name, never by id.
+      'workspaceDocuments[App].runDestinations.whose(name: Phone)',
     ])
   })
 
@@ -337,9 +350,15 @@ describe('Xcode workspace children, read within their workspace through the loca
         resource: 'Project',
       })
     }
+    const lookups: string[] = []
+    const destinations = await xcodeClient(lookups)
     expect(
-      missingResourceOf(await rejectionOf(client.runDestinations.get('Lib', 'Phone')))
+      missingResourceOf(await rejectionOf(destinations.runDestinations.get('Lib', 'Phone')))
     ).toEqual({ resource: 'RunDestination' })
+    expect(lookups).toEqual([
+      'workspaceDocuments.whose(name: Lib)',
+      'workspaceDocuments[Lib].runDestinations.whose(name: Phone)',
+    ])
   })
 
   it("returns no active scheme or run destination in a workspace document's record", async () => {
