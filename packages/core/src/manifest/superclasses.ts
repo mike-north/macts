@@ -22,7 +22,9 @@
  * subclass with evidence of its own states the claim in a claims-only overlay
  * (`inheritedClaims`), which replaces that claim and leaves the declaration
  * the ancestor's; a subclass that declares the property itself replaces it
- * whole, and one that declares identifiers replaces them. Records about a
+ * whole, and one that declares identifiers replaces them. Inheritance runs
+ * one way: a subclass's claims are about its own items and never reach an
+ * ancestor. Records about a
  * resource itself (its code, collection spelling, `unsupported` marker, probe
  * blocks) and commands are never inherited.
  *
