@@ -31,6 +31,8 @@ export interface Window {
   zoomable: boolean
   /** Whether the window is currently zoomed. */
   zoomed: boolean
+  /** Returns the currently selected tab */
+  activeTab: Tab
   /** Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window. */
   mode: string
   /** The index of the active tab. */
@@ -140,6 +142,7 @@ export const WindowSchema = z.object({
   visible: z.boolean(),
   zoomable: z.boolean(),
   zoomed: z.boolean(),
+  activeTab: z.string(),
   mode: z.string(),
   activeTabIndex: z.number(),
 })

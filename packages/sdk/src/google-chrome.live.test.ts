@@ -11,14 +11,19 @@
  *   1. `windows.list`, then `windows.get` of the first listed window, which
  *      must come back with the same id;
  *   2. `tabs.list` of that window, then `tabs.get` of its first tab by the
- *      window's id and the tab's id, which must come back with the same id.
+ *      window's id and the tab's id, which must come back with the same id;
+ *   3. that window's `activeTab`, which must carry the window as its
+ *      container (the window it was read through), and whose `resolve()`
+ *      must return the tab with the id the reference carries; and every
+ *      listed window's `activeTab`, which must carry its own window.
  *
  * A tab is read only within its window: the dictionary has `tab` only as an
  * element of `window`. Window and tab ids hold within the running Chrome
  * session; nothing here assumes they survive a relaunch.
  *
- * Read-only: nothing is opened, closed, reloaded or navigated. The test
- * prints only counts, never an id, title or address.
+ * Read-only: nothing is opened, closed, focused, reloaded or navigated. The
+ * test prints only counts and booleans, never an id, title or address, and
+ * compares ids only as booleans, so a failure prints no id either.
  *
  * ## Why this cannot run in CI
  *
@@ -39,7 +44,7 @@
  * ```
  *
  * @see ../../../manifests/google-chrome/app.yaml
- * @see ../../../phases/13-sdk-value-and-execution-contracts.md (D10 command parents)
+ * @see ../../../phases/13-sdk-value-and-execution-contracts.md (D7 container scoping, D10 command parents)
  */
 
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
@@ -129,6 +134,48 @@ describe.skipIf(!liveAppsEnabled)('Google Chrome window and tab reads (local onl
       if (first === undefined) return
       const got = await chrome.tabs.get(windowId, first)
       expect(got.id === first).toBe(true)
+    },
+    LIVE_TEST_TIMEOUT_MS
+  )
+
+  it(
+    "returns the first window's active tab with that window as its container, resolving to that tab",
+    async () => {
+      if (windowId === undefined) throw new Error('no window was listed')
+      const window = await chrome.windows.get(windowId)
+      const activeTab = window.activeTab
+      const present = activeTab !== null && activeTab.form === 'identity'
+      console.info(`Chrome first window has an active tab reference: ${String(present)}`)
+      expect(present).toBe(true)
+      if (activeTab?.form !== 'identity') return
+      const container = activeTab.container
+      const carriesWindow =
+        container?.form === 'identity' &&
+        container.resource === 'Window' &&
+        container.id === windowId
+      console.info(`Its container is that window: ${String(carriesWindow)}`)
+      expect(carriesWindow).toBe(true)
+      const tab = await activeTab.resolve()
+      const sameTab = tab.id === activeTab.id
+      console.info(`Resolving it returns the tab with its id: ${String(sameTab)}`)
+      expect(sameTab).toBe(true)
+    },
+    LIVE_TEST_TIMEOUT_MS
+  )
+
+  it(
+    "returns each listed window's active tab with its own window as container",
+    async () => {
+      const windows = await chrome.windows.list()
+      const own = windows.items.map(
+        ({ id, activeTab }) =>
+          activeTab === null ||
+          (activeTab.container?.form === 'identity' && activeTab.container.id === id)
+      )
+      console.info(
+        `Chrome windows whose active tab carries their own window: ${String(own.filter(Boolean).length)} of ${String(own.length)}`
+      )
+      expect(own.every(Boolean)).toBe(true)
     },
     LIVE_TEST_TIMEOUT_MS
   )

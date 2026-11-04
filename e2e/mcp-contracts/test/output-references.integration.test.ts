@@ -12,8 +12,12 @@
  * targets", "Container scoping", "Name-keyed resources"):
  *
  * - its descriptor records a `get` operation;
- * - that operation's manifest command records no parent, since references
- *   read from the app do not carry their container yet (#242);
+ * - that operation's manifest command records no parent, or the position is
+ *   a field of that parent's own record and the parent is a valid container:
+ *   a reference read from the app carries, as its container, the record it
+ *   was read through, so only there does it carry the container its get
+ *   needs. A valid container is itself such a target, with no parent of its
+ *   own;
  * - and it is not identified by a name its primary identifier does not claim
  *   unique, since such a reference does not pin the object the app returned.
  *
@@ -53,13 +57,23 @@ function primaryIdentifier(manifest: AppManifest, resource: string): Identifier 
   return identifiers.find((entry) => entry.primary) ?? identifiers[0]
 }
 
-/** What macts does not provide yet for a reference to `resource` read from the app, if anything. */
-function problem({ manifest, contract }: RealApp, resource: string): string | undefined {
+/**
+ * What macts does not provide yet for a reference to `resource` read from the
+ * app, if anything, at a field of `source`'s record, or at an operation's
+ * result when `source` is absent.
+ */
+function problem(app: RealApp, resource: string, source?: string): string | undefined {
+  const { manifest, contract } = app
   const descriptor = contract.resources[resource]
   if (descriptor?.get === undefined) return 'no get'
   const get = contract.operations[descriptor.get]
   if (get === undefined) return `get ${descriptor.get} is not an operation`
-  if (manifest.commands[get.target.command]?.parent !== undefined) return 'parent-scoped get'
+  const parent = manifest.commands[get.target.command]?.parent?.resource
+  if (parent !== undefined) {
+    if (parent !== source) return 'parent-scoped get, not read through its parent'
+    const why = problem(app, parent)
+    if (why !== undefined) return `parent-scoped get, within a parent that is no container: ${why}`
+  }
   if (
     resolveIdentifierTargeting(manifest.resources[resource])?.property === 'name' &&
     primaryIdentifier(manifest, resource)?.unique !== true
@@ -85,6 +99,33 @@ function referencedResources(plan: ValuePlan): string[] {
   }
 }
 
+/**
+ * The references an operation's output plan holds, each with the resource
+ * whose record holds it: inside a record, the operation's own resource,
+ * whose record a get, list, create or update returns (a list's page holds
+ * those records); bare in the result, none.
+ */
+function outputReferences(
+  plan: ValuePlan,
+  record: string | undefined,
+  inRecord = false
+): { readonly target: string; readonly source: string | undefined }[] {
+  switch (plan.kind) {
+    case 'reference':
+      return [{ target: plan.resource, source: inRecord ? record : undefined }]
+    case 'array':
+      return outputReferences(plan.items, record, inRecord)
+    case 'nullable':
+      return outputReferences(plan.value, record, inRecord)
+    case 'record':
+      return Object.values(plan.fields).flatMap((field) =>
+        outputReferences(field.value, record, true)
+      )
+    default:
+      return []
+  }
+}
+
 describe('output references in every real contract', () => {
   it('loads every app', () => {
     // Guards against a vacuous pass if the manifests directory moves.
@@ -102,7 +143,7 @@ describe('output references in every real contract', () => {
         for (const [field, { value }] of Object.entries(plan.fields)) {
           for (const target of referencedResources(value)) {
             positions.push(`${app.name} ${resource}.${field} → ${target}`)
-            const why = problem(app, target)
+            const why = problem(app, target, resource)
             if (why !== undefined)
               found.push(`${app.name} ${resource}.${field} → ${target}: ${why}`)
           }
@@ -111,14 +152,22 @@ describe('output references in every real contract', () => {
     }
     expect(found).toEqual([])
     // Every field of a resource-table record that still holds a reference,
-    // audited by hand against the manifests: each target has a get with no
-    // parent, and none is identified by its name. Music BrowserWindow and
+    // audited by hand against the manifests: a Photos folder has a get with no
+    // parent and is not identified by its name, and a Chrome or Edge tab is
+    // got within its window and read through the window's own record, a
+    // top-level window that claims its id unique. Music BrowserWindow and
     // PlaylistWindow `view` and Photos Container `parent` also stay in output,
     // but their resources have neither a get nor a list, so the table carries
     // no record for them. Xcode's WorkspaceDocument `activeScheme` is left
-    // out: a scheme is got only within its workspace document.
+    // out: a scheme is got within its workspace document, which is identified
+    // by its name with no claim, so it is no valid container.
     expect(positions.sort()).toEqual(
-      ['photos Album.parent → Folder', 'photos Folder.parent → Folder'].sort()
+      [
+        'google-chrome Window.activeTab → Tab',
+        'microsoft-edge Window.activeTab → Tab',
+        'photos Album.parent → Folder',
+        'photos Folder.parent → Folder',
+      ].sort()
     )
   })
 
@@ -127,18 +176,25 @@ describe('output references in every real contract', () => {
     const checked = new Set<string>()
     for (const app of apps) {
       for (const operation of Object.values(app.contract.operations)) {
-        for (const resource of referencedResources(operation.output.plan)) {
-          checked.add(`${operation.id} → ${resource}`)
-          const why = problem(app, resource)
-          if (why !== undefined) found.push(`${app.name}: ${operation.id} → ${resource}: ${why}`)
+        const references = outputReferences(operation.output.plan, operation.target.resource)
+        for (const { target, source } of references) {
+          checked.add(`${operation.id} → ${target}`)
+          const why = problem(app, target, source)
+          if (why !== undefined) found.push(`${app.name}: ${operation.id} → ${target}: ${why}`)
         }
       }
     }
     expect(found).toEqual([])
     // Guards against a vacuous pass: the references above, each on a record
-    // that some operation returns.
+    // that some operation returns. Chrome gets and lists windows; Edge also
+    // creates one, and returns its record.
     expect([...checked].sort()).toEqual(
       [
+        'google-chrome.windows.get → Tab',
+        'google-chrome.windows.list → Tab',
+        'microsoft-edge.windows.create → Tab',
+        'microsoft-edge.windows.get → Tab',
+        'microsoft-edge.windows.list → Tab',
         'photos.albums.get → Folder',
         'photos.albums.list → Folder',
         'photos.folders.get → Folder',

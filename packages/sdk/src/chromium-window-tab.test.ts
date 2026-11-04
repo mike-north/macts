@@ -13,6 +13,14 @@
  * contracts declare: the resource table, each operation's target and
  * required inputs, and the parent each tab command records.
  *
+ * A window's `activeTab` holds a reference to a tab, and a tab is identified
+ * only within its window (phases/13 D7, container scoping). The reference is
+ * read through the window's own record, so it carries that window as its
+ * container: the window a get read, or each listed window for its own row.
+ * Resolving it finds the window first, then the tab within it, as the tab
+ * get does. Chrome and Edge window and tab ids identify them within the
+ * running browser session only, so no global tab id is invented.
+ *
  * The native cases run each operation with only the executor's transport
  * replaced: it evaluates the composed script against a stand-in app in an
  * isolated context, so the body, input and output plans and the codec are the
@@ -30,7 +38,12 @@
 
 import { afterAll, describe, expect, it, vi } from 'vitest'
 import { AppManifestSchema, createNativeExecutor, type AppManifest } from '@macts/core'
-import { standInTransport } from '@macts/core/testing'
+import {
+  standInChromium,
+  standInTransport,
+  STAND_IN_NEW_TAB_ID as NEW_TAB_ID,
+  type StandInWindow,
+} from '@macts/core/testing'
 import { TargetNotFoundError, type AppContract } from '@macts/contracts'
 import { googleChromeContract } from '@macts/google-chrome/contract'
 import { microsoftEdgeContract } from '@macts/microsoft-edge/contract'
@@ -41,7 +54,7 @@ import {
   createLogger,
   setLogger,
 } from '@macts/runtime'
-import { createClient } from './local.js'
+import { bindReference, createClient } from './local.js'
 
 // The key store resolves MACTS_HOME when its module loads, so the temporary
 // home must be in place before any import runs.
@@ -152,10 +165,8 @@ describe('the generated Google Chrome contract', () => {
     expect(encoded?.ok).toBe(false)
   })
 
-  it("leaves a window's active tab out of its record until references carry their window", () => {
-    const plan = googleChromeContract.resources.Window.record.plan
-    expect(plan.kind).toBe('record')
-    if (plan.kind === 'record') expect(Object.keys(plan.fields)).not.toContain('activeTab')
+  it("declares a window's active tab as a reference to a tab, which needs its window as container", () => {
+    expectActiveTabNeedsItsWindow(googleChromeContract)
   })
 })
 
@@ -172,136 +183,46 @@ describe('the generated Microsoft Edge contract', () => {
     expect(manifest.commands['listTabs']?.parent).toEqual(parent)
   })
 
-  it("leaves a window's active tab out of its record until references carry their window", () => {
-    const plan = microsoftEdgeContract.resources.Window.record.plan
-    expect(plan.kind).toBe('record')
-    if (plan.kind === 'record') expect(Object.keys(plan.fields)).not.toContain('activeTab')
+  it("declares a window's active tab as a reference to a tab, which needs its window as container", () => {
+    expectActiveTabNeedsItsWindow(microsoftEdgeContract)
   })
 })
+
+/**
+ * Asserts that `contract` declares a window's `activeTab` as a nullable
+ * reference to Tab, and that its window record admits the reference only
+ * with an identity reference to a window as its container: the tab table
+ * entry records Window as the parent its get finds a tab within.
+ */
+function expectActiveTabNeedsItsWindow<Client>(contract: AppContract<Client>): void {
+  const window = contract.resources['Window']
+  const plan = window?.record.plan
+  expect(plan?.kind).toBe('record')
+  if (plan?.kind !== 'record') return
+  expect(plan.fields['activeTab']).toEqual({
+    presence: 'required',
+    value: { kind: 'nullable', value: { kind: 'reference', resource: 'Tab', cardinality: 'one' } },
+  })
+  expect(contract.resources['Tab']?.parents).toEqual({ get: 'Window', list: 'Window' })
+  const tab = { resource: 'Tab', form: 'identity', cardinality: 'one', id: 'T11' }
+  const inWindow = { ...tab, container: { ...tab, resource: 'Window', id: 'W1' } }
+  // Every other field of the record has no value but the window's id.
+  const record = {
+    ...Object.fromEntries(Object.keys(plan.fields).map((key) => [key, null])),
+    id: 'W1',
+  }
+  const wire = window?.record.wire
+  expect(wire?.safeParse({ ...record, activeTab: { reference: inWindow } }).success).toBe(true)
+  expect(wire?.safeParse({ ...record, activeTab: { reference: tab } }).success).toBe(false)
+  expect(wire?.safeParse({ ...record, activeTab: null }).success).toBe(true)
+}
 
 // ---------------------------------------------------------------------------
 // The stand-in Chromium app
 // ---------------------------------------------------------------------------
 
-/** One stand-in tab: its id and title. */
-interface TabRow {
-  readonly id: string
-  readonly title: string
-}
-
-/** One stand-in window: its id, title and tabs. */
-interface WindowRow {
-  readonly id: string
-  readonly name: string
-  readonly tabs: readonly TabRow[]
-}
-
-/**
- * The native record of a stand-in window: every window property the contract
- * declares, keyed by the app's name for it, with no value for most.
- */
-function windowRecord(row: WindowRow, index: number): Record<string, unknown> {
-  return {
-    givenName: null,
-    name: row.name,
-    id: row.id,
-    index: index + 1,
-    bounds: null,
-    closeable: true,
-    minimizable: true,
-    minimized: false,
-    resizable: true,
-    visible: true,
-    zoomable: true,
-    zoomed: false,
-    mode: 'normal',
-    activeTabIndex: 1,
-  }
-}
-
-/**
- * The native record of a stand-in tab, keyed by the app's name for each
- * property. Chrome's manifest records the app's spelling `url` for its `uRL`
- * property; Edge's records none, so its record carries `uRL`.
- */
-function tabRecord(row: TabRow, urlKey: string): Record<string, unknown> {
-  return { id: row.id, title: row.title, [urlKey]: `https://example.com/${row.id}`, loading: false }
-}
-
-/**
- * A stand-in element collection, as the automation bridge presents one:
- * calling it lists its item specifiers, reading a property of it reads that
- * property of every item in order, and `byId` finds one item, recorded in
- * `lookups` as `<label>.byId(<id>)`. An id it does not hold gives a
- * specifier that does not exist.
- */
-function collection(
-  label: string,
-  items: readonly { readonly id: string; readonly specifier: object }[],
-  records: readonly Record<string, unknown>[],
-  lookups: string[]
-): object {
-  const list = (): object[] => items.map((item) => item.specifier)
-  // Defined rather than assigned: a function's own `name` and `length` are
-  // read-only, and a window has a `name` property.
-  const column = (key: string) => ({ value: () => records.map((record) => record[key]) })
-  for (const key of Object.keys(records[0] ?? { id: null })) {
-    Object.defineProperty(list, key, column(key))
-  }
-  return Object.assign(list, {
-    byId(id: unknown) {
-      lookups.push(`${label}.byId(${String(id)})`)
-      return items.find((item) => item.id === id)?.specifier ?? { exists: () => false }
-    },
-  })
-}
-
-/** The id the stand-in gives a tab it makes. */
-const NEW_TAB_ID = 'T-new'
-
-/**
- * A stand-in Chromium app holding `windows`, front to back. It has a
- * `windows` collection and a `Tab` maker, and no app-wide `tabs`. Each tab it
- * makes is recorded in `writes` as `make Tab`, and each tab added to a
- * window's tabs as `<label>.push`, so a test can tell whether anything was
- * created or placed under a window.
- */
-function standInChromium(
-  windows: readonly WindowRow[],
-  urlKey: string,
-  lookups: string[],
-  writes: string[] = []
-) {
-  const windowRecords = windows.map(windowRecord)
-  const windowItems = windows.map((row, index) => {
-    const tabRecords = row.tabs.map((tab) => tabRecord(tab, urlKey))
-    const tabItems = row.tabs.map((tab, tabIndex) => ({
-      id: tab.id,
-      specifier: { exists: () => true, properties: () => tabRecords[tabIndex] },
-    }))
-    const label = `windows.byId(${row.id}).tabs`
-    const tabs = Object.assign(collection(label, tabItems, tabRecords, lookups), {
-      push() {
-        writes.push(`${label}.push`)
-      },
-    })
-    return {
-      id: row.id,
-      specifier: { exists: () => true, properties: () => windowRecords[index], tabs },
-    }
-  })
-  return {
-    windows: collection('windows', windowItems, windowRecords, lookups),
-    Tab(props: Readonly<Record<string, unknown>>) {
-      writes.push('make Tab')
-      const record = tabRecord({ id: NEW_TAB_ID, title: '' }, urlKey)
-      return { properties: () => ({ ...record, ...props }) }
-    },
-  }
-}
-
-/** Two windows, front to back, each with its own tabs. */
-const WINDOWS: readonly WindowRow[] = [
+/** Two windows, front to back, each with its own tabs; the front one's second tab is active. */
+const WINDOWS: readonly StandInWindow[] = [
   {
     id: 'W1',
     name: 'Front',
@@ -309,6 +230,7 @@ const WINDOWS: readonly WindowRow[] = [
       { id: 'T11', title: 'One' },
       { id: 'T12', title: 'Two' },
     ],
+    activeTab: 'T12',
   },
   { id: 'W2', name: 'Back', tabs: [{ id: 'T21', title: 'Three' }] },
 ]
@@ -328,7 +250,7 @@ async function chromeClient(lookups: string[]) {
     token: key.token,
     governance: { policy: ALLOW_ALL_POLICY },
     executor: createNativeExecutor({
-      transport: standInTransport(standInChromium(WINDOWS, 'url', lookups)),
+      transport: standInTransport(standInChromium(WINDOWS, { urlKey: 'url', lookups })),
     }),
   })
 }
@@ -341,6 +263,7 @@ async function edgeClient(lookups: string[], writes: string[] = []) {
   const key = await createApiKey({
     name: 'Edge tab test',
     permissions: [
+      'microsoft-edge:windows:get',
       'microsoft-edge:tabs:get',
       'microsoft-edge:tabs:list',
       'microsoft-edge:tabs:create',
@@ -350,7 +273,7 @@ async function edgeClient(lookups: string[], writes: string[] = []) {
     token: key.token,
     governance: { policy: ALLOW_ALL_POLICY },
     executor: createNativeExecutor({
-      transport: standInTransport(standInChromium(WINDOWS, 'uRL', lookups, writes)),
+      transport: standInTransport(standInChromium(WINDOWS, { urlKey: 'uRL', lookups, writes })),
     }),
   })
 }
@@ -484,5 +407,88 @@ describe('Microsoft Edge tab creation, within its window through the local clien
     expect(missingResourceOf(error)).toEqual({ resource: 'Window' })
     expect(lookups).toEqual(['windows.byId(W9)'])
     expect(writes).toEqual([])
+  })
+})
+
+/** A single identity reference to the tab `id` within the window `windowId`, as data. */
+function tabIn<App extends string>(app: App, windowId: string, id: string) {
+  return {
+    app,
+    resource: 'Tab',
+    form: 'identity',
+    cardinality: 'one',
+    id,
+    container: { app, resource: 'Window', form: 'identity', cardinality: 'one', id: windowId },
+  } as const
+}
+
+describe("a window's active tab, read with its window through the local client", () => {
+  it('carries the window a get read as the tab reference’s container', async () => {
+    const client = await chromeClient([])
+    const window = await client.windows.get('W1')
+    expect(window.activeTab).toMatchObject({
+      resource: 'Tab',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'T12',
+      container: { resource: 'Window', form: 'identity', cardinality: 'one', id: 'W1' },
+    })
+  })
+
+  it('gives each listed window’s active tab its own window', async () => {
+    const client = await chromeClient([])
+    const page = await client.windows.list()
+    expect(
+      page.items.map(({ activeTab }) => ({
+        tab: activeTab?.form === 'identity' ? activeTab.id : undefined,
+        window: activeTab?.container?.form === 'identity' ? activeTab.container.id : undefined,
+      }))
+    ).toEqual([
+      { tab: 'T12', window: 'W1' },
+      { tab: 'T21', window: 'W2' },
+    ])
+  })
+
+  it('resolves the active tab within its window, through the tab get', async () => {
+    const lookups: string[] = []
+    const client = await chromeClient(lookups)
+    const window = await client.windows.get('W2')
+    lookups.length = 0
+    const tab = await window.activeTab?.resolve()
+    expect(tab).toEqual({
+      id: 'T21',
+      title: 'Three',
+      uRL: 'https://example.com/T21',
+      loading: false,
+    })
+    expect(lookups).toEqual(['windows.byId(W2)', 'windows.byId(W2).tabs.byId(T21)'])
+  })
+
+  it('resolves a tab reference a caller builds with its window, and names what is missing', async () => {
+    const lookups: string[] = []
+    const client = await chromeClient(lookups)
+    const resolve = (windowId: string, id: string) =>
+      bindReference(client, tabIn('google-chrome', windowId, id)).resolve()
+    await expect(resolve('W1', 'T11')).resolves.toMatchObject({ id: 'T11', title: 'One' })
+    expect(lookups).toEqual(['windows.byId(W1)', 'windows.byId(W1).tabs.byId(T11)'])
+    expect(missingResourceOf(await rejectionOf(resolve('W9', 'T11')))).toEqual({
+      resource: 'Window',
+    })
+    // T21 is a tab of W2: within W1 it is not found, with no other check.
+    expect(missingResourceOf(await rejectionOf(resolve('W1', 'T21')))).toEqual({
+      resource: 'Tab',
+    })
+  })
+
+  it('does the same for Microsoft Edge', async () => {
+    const lookups: string[] = []
+    const client = await edgeClient(lookups)
+    const window = await client.windows.get('W1')
+    expect(window.activeTab?.container).toMatchObject({ resource: 'Window', id: 'W1' })
+    lookups.length = 0
+    await expect(window.activeTab?.resolve()).resolves.toMatchObject({ id: 'T12', title: 'Two' })
+    expect(lookups).toEqual(['windows.byId(W1)', 'windows.byId(W1).tabs.byId(T12)'])
+    const missing = bindReference(client, tabIn('microsoft-edge', 'W9', 'T12')).resolve()
+    expect(missingResourceOf(await rejectionOf(missing))).toEqual({ resource: 'Window' })
   })
 })

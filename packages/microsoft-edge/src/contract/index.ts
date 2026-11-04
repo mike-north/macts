@@ -25,6 +25,7 @@ import {
   type ClientBrand,
   type ClientRuntime,
   type Integer,
+  type ObjectReferenceVariant,
   type OperationDescriptor,
   type Page,
   type Rectangle,
@@ -96,6 +97,11 @@ export interface Window {
    * Nullable. No evidence that the app always sets it.
    */
   zoomed: boolean | null
+  /**
+   * Returns the currently selected tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly activeTab: ObjectReferenceVariant<Tab, string, 'Tab'> | null
   /**
    * Represents the mode of the window which can be 'normal' or 'incognito', can be set only once
    * during creation of the window.
@@ -468,6 +474,10 @@ const windowRecordType: ValueType<Window> = t.record(
     visible: t.nullable(t.boolean(), { description: 'Whether the window is currently visible.' }),
     zoomable: t.nullable(t.boolean(), { description: 'Whether the window can be zoomed.' }),
     zoomed: t.nullable(t.boolean(), { description: 'Whether the window is currently zoomed.' }),
+    activeTab: t.nullable(
+      t.reference<Tab, string, 'Tab'>(() => microsoftEdgeContract, 'Tab', 'one'),
+      { description: 'Returns the currently selected tab' }
+    ),
     mode: t.nullable(t.string(), {
       description:
         "Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window.",
