@@ -222,6 +222,8 @@ export function contractNames(manifest: AppManifest): ContractNames {
  * Every reason cites the coverage ledger, #219.
  */
 const OMITTED_OUTPUT_REASONS: Readonly<Record<OmittedOutputReason, (target: string) => string>> = {
+  'root-kind-unmapped': (target) =>
+    `which the app holds as one of its own properties, and macts has no curated mapping yet from the field to the "${target}" kind it holds (#219)`,
   'no-get': (target) => `and macts has no get for "${target}" yet (#219)`,
   'no-identifier': (target) => `and macts has no identifier for "${target}" yet (#219)`,
   'parent-scoped': (target) =>

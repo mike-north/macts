@@ -19,6 +19,8 @@ export {
   NATIVE_CODEC_ERROR_NAME,
   NATIVE_COLLECTION_CHANGED_ERROR_NAME,
   type NativeAddressing,
+  type NativeCollectionAddressing,
+  type NativeRootAddressing,
   type NativeCodec,
   type NativeCodecEnvironment,
   type NativeReferencePlans,
