@@ -16,9 +16,9 @@
  * - only an operation registered from a contract pages (D2, D9): its input
  *   record declares `pageSize` and `cursor`. A manifest-registered list reads
  *   its whole result, so the paging inputs are not part of its contract.
- * - a get or update addresses its item by its identifier parameter, the
- *   first required parameter other than its parent's; a manifest whose get or
- *   update declares none is refused at registration with
+ * - a resource-scoped get, update or delete selects its item by its
+ *   identifier parameter, the first required parameter other than its
+ *   parent's; a manifest whose get, update or delete declares none is refused at registration with
  *   `OperationRegistrationError`, and nothing from it is registered.
  *
  * Operation ids and permissions are derived by hand from the manifest route

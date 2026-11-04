@@ -187,40 +187,56 @@ function deriveManifestOperations(manifest: AppManifest): ManifestOperation[] {
   return operations
 }
 
-/** The resource commands whose native body addresses one item by an identifier parameter. */
-const ADDRESSED_COMMAND_NAMES: readonly string[] = ['get', 'update']
+/**
+ * The resource-scoped commands that act on one item, selected by an
+ * identifier parameter: a `get`, an `update`, or a `delete`, by its command
+ * name. A command of any other name is called on the app with its parameters
+ * and selects no item, so it needs no identifier.
+ */
+const ITEM_COMMAND_NAMES: readonly string[] = ['get', 'update', 'delete']
 
 /**
- * Refuse a get or update whose command declares no identifier parameter.
+ * The rest of a refusal message for an item command with no identifier
+ * parameter: what its native body would do without one
+ * (`planNativeInvocation` in `@macts/core`).
+ *
+ * - A get or update would read the item's identifier from the undeclared key
+ *   `id`, which a manifest-registered operation's input never admits
+ *   (`buildDeclaredInputSchema`), so it could never run.
+ * - A delete reads no identifier at all: it would call the app's delete with
+ *   no target, so no item can be selected.
+ */
+function missingIdentifierConsequence(command: Command): string {
+  return command.name === 'delete'
+    ? "without one no item can be selected: its native body would call the app's delete with no target"
+    : 'without one it would read the undeclared input "id", which the operation does not accept'
+}
+
+/**
+ * Refuse a resource-scoped get, update or delete that selects no item.
  *
  * @remarks
- * A get or update addresses one item by its identifier parameter: the first
- * required parameter that is not the parent's (the parameter `command.parent`
- * names), which is the key its native body reads the item's identifier from
- * (`planNativeInvocation` in `@macts/core`). Without one, the body would read
- * the undeclared key `id`, which a manifest-registered operation's input
- * never admits (`buildDeclaredInputSchema`), so the operation could never
- * run. Such a manifest is refused rather than registered with an operation
- * that cannot be called.
+ * The condition: the command is resource-scoped, its name is one of
+ * {@link ITEM_COMMAND_NAMES}, and it declares no required parameter other
+ * than its parent's (the parameter `command.parent` names). That parameter is
+ * the identifier its native body selects the item by
+ * (`planNativeInvocation` in `@macts/core`); without one the operation cannot
+ * act on the item it names ({@link missingIdentifierConsequence}). Such a
+ * manifest is refused rather than registered with an operation that cannot
+ * do what it says. The rule is the same for all three names; a command is
+ * never exempt because of its name.
  *
- * A delete with no required parameter is not refused: its body calls the app
- * command directly and addresses no item.
- *
- * @throws {@link OperationRegistrationError} naming the app, the command key,
- *   and the identifier parameter the command lacks.
+ * @throws {@link OperationRegistrationError} naming the app and the command
+ *   key, and saying that the command declares no identifier parameter.
  */
-function assertIdentifierDeclared(
-  manifest: AppManifest,
-  commandKey: string,
-  command: Command
-): void {
-  if (command.scope !== 'resource' || !ADDRESSED_COMMAND_NAMES.includes(command.name)) return
+function assertItemSelectable(manifest: AppManifest, commandKey: string, command: Command): void {
+  if (command.scope !== 'resource' || !ITEM_COMMAND_NAMES.includes(command.name)) return
   const parent = command.parent?.parameter
   const identifier = command.parameters.find((p) => p.required && p.name !== parent)
   if (identifier !== undefined) return
   const besideParent = parent === undefined ? '' : ` other than its parent parameter "${parent}"`
   throw new OperationRegistrationError(
-    `App "${manifest.app.name}" cannot be registered from its manifest: its ${command.name} command "${commandKey}" declares no identifier parameter. A ${command.name} addresses one item by a required parameter${besideParent}, and without one it would read the undeclared input "id", which the operation does not accept. Declare the item's identifier as a required parameter of "${commandKey}".`
+    `App "${manifest.app.name}" cannot be registered from its manifest: its ${command.name} command "${commandKey}" declares no identifier parameter. A ${command.name} selects one item by a required parameter${besideParent}, and ${missingIdentifierConsequence(command)}. Declare the item's identifier as a required parameter of "${commandKey}".`
   )
 }
 
@@ -258,22 +274,22 @@ function toRegisteredOperation(
  * JSON, so a key that is not a parameter is rejected as it is for an operation
  * registered from a contract; the output is any JSON value. A
  * manifest-registered list does not page, so its input declares no paging
- * inputs. A get or update must declare the identifier parameter it addresses
- * its item by, or the manifest is refused. They stand in for generated descriptors until generated contracts
+ * inputs. A resource-scoped get, update or delete must declare the identifier
+ * parameter it selects its item by, or the manifest is refused. They stand in for generated descriptors until generated contracts
  * carry value types, and the generator never produces them.
  *
  * @param manifest - A validated app manifest.
  * @returns One registered operation per route, in command-declaration order.
  * @throws {@link OperationRegistrationError} when the app's route segment is
  *   reserved ({@link RESERVED_APP_ROUTE_SEGMENTS}), a route or permission is
- *   not in operation form, or a get or update declares no identifier
- *   parameter.
+ *   not in operation form, or a resource-scoped get, update or delete declares
+ *   no identifier parameter.
  */
 export function operationsFromManifest(manifest: AppManifest): RegisteredOperation[] {
   assertAppSegmentNotReserved(manifest)
   const inputTypes = new Map<string, ValueType<unknown>>()
   return deriveManifestOperations(manifest).map(({ id, permission, target, command }) => {
-    assertIdentifierDeclared(manifest, target.command, command)
+    assertItemSelectable(manifest, target.command, command)
     let input = inputTypes.get(target.command)
     if (input === undefined) {
       input = passthroughInputType(buildDeclaredInputSchema(command))

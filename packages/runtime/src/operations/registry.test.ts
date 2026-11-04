@@ -10,10 +10,12 @@
  * else its key, and the target names the manifest command key and resource
  * key. A contract
  * descriptor whose permission disagrees with the manifest is refused at
- * registration (D2, fail closed). A get or update with no identifier
- * parameter (no required parameter other than its parent's) is refused at
- * manifest registration (D5), since no input it accepts could address its
- * item; every shipped manifest still registers.
+ * registration (D2, fail closed). A resource-scoped get, update or
+ * delete with no identifier parameter (no required parameter other than its
+ * parent's) is refused at manifest registration (D5), since it could select
+ * no item: a get or update would read the undeclared `id`, and a delete would
+ * call the app's delete with no target. Every shipped manifest still
+ * registers.
  */
 
 import { readdir } from 'node:fs/promises'
@@ -78,7 +80,7 @@ const CALENDAR: AppManifest = {
       description: 'Delete an event',
       scope: 'resource',
       resourceType: 'Event',
-      parameters: [],
+      parameters: [{ name: 'id', type: 'string', description: 'Identifier', required: true }],
       permission: 'calendar:events:delete',
       permissionHistory: [
         {
@@ -286,7 +288,54 @@ describe('operationsFromManifest', () => {
     ])
   })
 
-  it('still registers a delete with no parameters, which addresses no item', () => {
+  it.each<
+    [
+      string,
+      AppManifest['commands'][string]['parameters'],
+      AppManifest['commands'][string]['parent'],
+    ]
+  >([
+    ['no parameters', [], undefined],
+    [
+      'only an optional parameter',
+      [{ name: 'force', type: 'boolean', description: 'Skip checks', required: false }],
+      undefined,
+    ],
+    [
+      'only its parent parameter',
+      [{ name: 'calendarId', type: 'string', description: 'Calendar', required: true }],
+      { resource: 'Calendar', parameter: 'calendarId' },
+    ],
+  ])('refuses a delete with %s, saying no item can be selected', (_label, parameters, parent) => {
+    const broken: AppManifest = {
+      ...CALENDAR,
+      commands: {
+        removeEvent: {
+          name: 'delete',
+          description: 'Delete an event',
+          scope: 'resource',
+          resourceType: 'Event',
+          ...(parent === undefined ? {} : { parent }),
+          parameters,
+        },
+      },
+    }
+    let message = ''
+    try {
+      operationsFromManifest(broken)
+    } catch (error) {
+      expect(error).toBeInstanceOf(OperationRegistrationError)
+      message = error instanceof Error ? error.message : ''
+    }
+    expect(message).toContain('App "Calendar"')
+    expect(message).toContain('delete command "removeEvent" declares no identifier parameter')
+    expect(message).toContain('no item can be selected')
+    expect(message).toContain('with no target')
+    // A delete never reads the undeclared `id`, so the refusal does not mention it.
+    expect(message).not.toContain('"id"')
+  })
+
+  it('registers a delete with an identifier parameter', () => {
     expect(operations.map((op) => op.descriptor.id)).toContain('calendar.events.deleteEvent')
   })
 

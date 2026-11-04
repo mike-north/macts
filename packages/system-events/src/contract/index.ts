@@ -2094,16 +2094,6 @@ export type ScriptingSuiteCreateInput = Record<string, never>
 /** Input for updating a ScriptingSuite. Omitted fields are left unchanged. */
 export type ScriptingSuiteUpdateInput = Record<string, never>
 
-/** An item stored in the file system */
-export interface DiskItemResourceClient {
-  /**
-   * Delete the disk item identified by `id`.
-   *
-   * @param id - The id.
-   */
-  delete(id: string, options?: CallOptions): Promise<void>
-}
-
 /** An action that can be performed on the UI element */
 export interface ActionResourceClient {
   /** cause the target process to behave as if the action were applied to its UI element */
@@ -2130,8 +2120,6 @@ export interface UIElementResourceClient {
  * resource; the brand has no runtime member.
  */
 export interface SystemEventsClient extends ClientBrand<SystemEventsResources> {
-  /** An item stored in the file system */
-  readonly diskItems: DiskItemResourceClient
   /** An action that can be performed on the UI element */
   readonly actions: ActionResourceClient
   /** A piece of the user interface of a process */
@@ -2371,24 +2359,6 @@ const appStopOperation: OperationDescriptor<Record<string, never>, undefined> = 
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: {},
-    additionalProperties: false,
-  },
-}
-
-const diskItemDeleteOperation: OperationDescriptor<{ readonly id: string }, undefined> = {
-  id: 'system-events.diskItems.delete',
-  permission: 'system-events:diskItems:delete',
-  target: { command: 'delete', resource: 'DiskItem' },
-  description: 'Delete disk item(s).',
-  input: t.record({
-    id: t.string({ description: 'The id.' }),
-  }),
-  output: t.none(),
-  inputJsonSchema: {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: { id: { type: 'string', description: 'The id.' } },
-    required: ['id'],
     additionalProperties: false,
   },
 }
@@ -3016,7 +2986,6 @@ const operations: AppContract<SystemEventsClient>['operations'] = {
   'system-events.app.disconnect': appDisconnectOperation,
   'system-events.app.start': appStartOperation,
   'system-events.app.stop': appStopOperation,
-  'system-events.diskItems.delete': diskItemDeleteOperation,
   'system-events.app.move': appMoveOperation,
   'system-events.app.open': appOpenOperation,
   'system-events.app.logOut': appLogOutOperation,
@@ -3045,9 +3014,6 @@ const operations: AppContract<SystemEventsClient>['operations'] = {
 /** Build the client on top of a factory-supplied runtime. */
 function bind(runtime: ClientRuntime): SystemEventsClient {
   return {
-    diskItems: {
-      delete: (id, options) => runtime.invoke(diskItemDeleteOperation, { id }, options),
-    },
     actions: {
       perform: (options) => runtime.invoke(actionPerformOperation, {}, options),
     },
