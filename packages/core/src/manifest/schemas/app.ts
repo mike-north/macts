@@ -6,6 +6,7 @@ import { HierarchySchema } from './hierarchy.js'
 import { RelationshipSchema } from './relationship.js'
 import { AppMetadataSchema, SuiteSchema, ExtractionMetadataSchema } from './metadata.js'
 import { findDuplicateRoutes } from '../route.js'
+import { findSuperclassIssues, flattenSuperclasses } from '../superclasses.js'
 import {
   findUnsupportedTypeReferences,
   isCommandUnsupported,
@@ -143,6 +144,32 @@ export const AppManifestSchema = z
     }
     for (const issue of findCommandParentIssues(data)) {
       ctx.addIssue({ code: 'custom', ...issue })
+    }
+    for (const issue of findSuperclassIssues(data.resources)) {
+      ctx.addIssue({ code: 'custom', ...issue })
+    }
+  })
+  // Read flattened: a resource that records `inherits` holds what it
+  // inherits (D10, "Superclasses"), so no reader re-derives it. Flattening
+  // keeps the manifest's type, so the schema stays an object schema.
+  .overwrite((data) => flattenSuperclasses(data))
+  .superRefine((data, ctx) => {
+    // A resource's own rules hold for what it inherits too: an inherited
+    // primary identifier, say, cannot be marked unsupported by the subclass.
+    // Checked only on a manifest that is otherwise valid, so an issue of the
+    // resource's own declarations is not reported twice.
+    if (ctx.issues.length > 0) return
+    for (const [key, resource] of Object.entries(data.resources)) {
+      if (resource.inherits === undefined) continue
+      const checked = ResourceSchema.safeParse(resource)
+      if (checked.success) continue
+      for (const issue of checked.error.issues) {
+        ctx.addIssue({
+          code: 'custom',
+          message: issue.message,
+          path: ['resources', key, ...issue.path],
+        })
+      }
     }
   })
 export type AppManifest = z.infer<typeof AppManifestSchema>

@@ -2326,6 +2326,17 @@ Native bodies resolve every name they address through `resolveCollectionAccessor
 
 The probes (`macts probe`, identifiers and `--nullability`) address the app the same way, through the same two functions, and report every observation under the manifest key, so evidence is recorded against the public name. They never probe a resource marked unsupported, even when asked to: the app has none to read.
 
+### Superclasses
+
+**A class's superclass is recorded from the dictionary, and the manifest is read flattened.** A resource whose dictionary class inherits another records `inherits: { resource, evidence }`: `resource` is the key of the superclass resource in the same manifest, and the evidence is the superclass's name exactly as the dictionary's `inherits` writes it ("disk item" for System Events' `folder`), with the app build and macOS version. The manifest schema reads every manifest flattened (`manifest/superclasses.ts`), so the generators, the runtime and the probes all see the same resource:
+
+- It gains each property of its ancestors that it does not declare, nearest ancestor first, after its own: the declaration whole, with its code, its native spelling and any `unsupported` marker. A nullability claim travels with it only when the dictionary backs it (`sdef` evidence).
+- It gains the nearest ancestor's identifiers when it declares none, without their uniqueness claims.
+- A property it declares replaces the inherited one whole. That is also how it marks an inherited property unsupported, with its own evidence, or declares one supported that an ancestor marks.
+- Nothing about the ancestor's own collection is inherited: its code, `native.collection`, `unsupported`, `rangeRead` and probe blocks, a probe or curated nullability claim, a resettability claim, an identifier's uniqueness, its commands and its hierarchy. Those are observations of the items that collection held, so a subclass makes its own claims from its own evidence.
+
+A superclass the manifest does not declare, and a chain of superclasses that loops, are manifest errors at `resources.<R>.inherits.resource`; a cycle is reported once, from its first resource in manifest order. A resource's own rules hold for what it inherits: an inherited primary identifier cannot be marked unsupported. Flattening a flattened manifest changes nothing, so the manifest a contract embeds reads back the same. The probe writer records claims only on properties a resource declares itself; a claim about an inherited property is not written until the resource declares it.
+
 ### Command parents
 
 **A command's parent is recorded, never guessed.** A command on a nested resource records `parent: { resource, parameter }`: `resource` is the key of the resource whose items hold the command's resource as elements, and `parameter` is the command's own required parameter that carries the parent item's identifier. Calendar's `getEvent` records `{ resource: Calendar, parameter: calendarId }`. The parent is a fact the curator records from the app's dictionary (the parent's class has the child as an element); nothing derives it from a parameter's name or position, or from the hierarchy. The manifest schema rejects a parent resource the manifest does not declare, one marked unsupported on a usable command, and a parameter that is not one of the command's required parameters, naming the command, the field and the value.

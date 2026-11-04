@@ -906,6 +906,51 @@ describe('contractNames', () => {
   })
 })
 
+describe('generateContract: a class that inherits its superclass (shipped System Events manifest)', () => {
+  // D10, "Superclasses": the dictionary's `folder` inherits `disk item`, so a
+  // folder record has a disk item's fields. Its `container` is a disk item
+  // reference, which stays out of output until disk items have a get.
+  let text = ''
+  beforeAll(async () => {
+    const manifest = await loadManifest(resolve(MANIFESTS_DIR, 'system-events', 'app.yaml'))
+    text = moduleText(generateContract(manifest), CONTRACT_MODULE_PATH)
+  })
+
+  /** The fields the generated interface `name` declares, in order. */
+  function interfaceFields(name: string): string[] {
+    const start = text.indexOf(`export interface ${name} {`)
+    if (start < 0) throw new Error(`no interface ${name}`)
+    const body = text.slice(start, text.indexOf('\n}\n', start))
+    return [...body.matchAll(/^ {2}(?:readonly )?(\w+)\??:/gm)].map((match) => match[1] ?? '')
+  }
+
+  it("declares a disk item's fields on a folder, without its container", () => {
+    expect(interfaceFields('Folder')).toEqual([
+      'busyStatus',
+      'creationDate',
+      'displayedName',
+      'id',
+      'modificationDate',
+      'name',
+      'nameExtension',
+      'packageFolder',
+      'path',
+      'physicalSize',
+      'pOSIXPath',
+      'size',
+      'uRL',
+      'visible',
+      'volume',
+    ])
+  })
+
+  it("declares the domain's id and name on the user and Classic domains", () => {
+    for (const name of ['UserDomainObject', 'ClassicDomainObject']) {
+      expect(interfaceFields(name)).toEqual(['id', 'name'])
+    }
+  })
+})
+
 describe('real app manifests', () => {
   let apps: { dir: string; manifest: AppManifest }[] = []
 
@@ -1084,6 +1129,33 @@ describe('real app manifests', () => {
       ['system-events', 'UserDomainObject', 'publicFolder', 'Folder', 'no-get'],
       ['system-events', 'UserDomainObject', 'sitesFolder', 'Folder', 'no-get'],
       ['system-events', 'UserDomainObject', 'temporaryItemsFolder', 'Folder', 'no-get'],
+      // Inherited from the dictionary's superclasses: a folder is a disk item,
+      // and the user and Classic domains are domains (D10, "Superclasses").
+      ['system-events', 'Folder', 'container', 'DiskItem', 'no-get'],
+      ['system-events', 'UserDomainObject', 'applicationSupportFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'applicationsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'desktopPicturesFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'folderActionScriptsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'fontsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'libraryFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'preferencesFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'scriptingAdditionsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'scriptsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'sharedDocumentsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'speakableItemsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'utilitiesFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'workflowsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'applicationSupportFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'applicationsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'desktopPicturesFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'folderActionScriptsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'libraryFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'scriptingAdditionsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'scriptsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'sharedDocumentsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'speakableItemsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'utilitiesFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'workflowsFolder', 'Folder', 'no-get'],
       ['system-events', 'ScriptingClass', 'superclass', 'ScriptingClass', 'no-get'],
       ['system-events', 'ScriptingCommand', 'directParameter', 'ScriptingParameter', 'no-get'],
       ['tv', 'BrowserWindow', 'view', 'Playlist', 'no-get'],
@@ -1095,7 +1167,7 @@ describe('real app manifests', () => {
       ['xcode', 'RunDestination', 'device', 'Device', 'no-get'],
       ['xcode', 'RunDestination', 'companionDevice', 'Device', 'no-get'],
     ]
-    expect(expected).toHaveLength(70)
+    expect(expected).toHaveLength(95)
     expect(found.sort()).toEqual(expected.sort())
   })
 

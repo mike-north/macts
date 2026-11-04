@@ -1016,3 +1016,82 @@ describe('writeNullabilityResults on committed manifests (regression)', () => {
     expect(written?.nullabilityProbe).toEqual(block)
   })
 })
+
+/**
+ * A manifest whose Book inherits Item (D10, "Superclasses"): Book declares no
+ * property, so its `size` exists only once the manifest is read flattened.
+ */
+const INHERITING_MANIFEST = `version: '1.0'
+app:
+  name: Catalog
+  bundleId: com.example.catalog
+resources:
+  Item:
+    name: Item
+    plural: Items
+    description: An item
+    properties:
+      id:
+        access: r
+        type: string
+        description: The id
+      size:
+        access: r
+        type: integer
+        description: The size
+    identifiers:
+      - property: id
+        primary: true
+  Book:
+    name: Book
+    plural: Books
+    description: A book
+    inherits:
+      resource: Item
+      evidence:
+        source: dictionary
+        bundleId: com.example.catalog
+        appVersion: '2.0'
+        osVersion: '27.2'
+        term: item
+hierarchy:
+  children: {}
+`
+
+describe('writeNullabilityResults: a property a resource inherits', () => {
+  it('writes no claim for it, because the resource does not declare it, and still loads', async () => {
+    const path = join(dir, 'app.yaml')
+    await writeFile(path, INHERITING_MANIFEST)
+    const evidence = probeEvidence('com.example.catalog', '2.0', 40, 0)
+    const decisions: NullabilityMergeResult = {
+      bundleId: 'com.example.catalog',
+      appName: 'Catalog',
+      resources: [
+        {
+          resource: 'Book',
+          block: {
+            observedAt: OBSERVED_AT,
+            bundleId: 'com.example.catalog',
+            appVersion: '2.0',
+            osVersion: '27.2',
+            accessPath: 'books',
+            itemsRead: 40,
+            status: 'probed',
+            skipped: [],
+          },
+          properties: [claimOutcome('size', 'set', evidence)],
+        },
+      ],
+    }
+    await writeNullabilityResults(path, decisions)
+
+    const after = await readFile(path, 'utf-8')
+    const runs = insertedRuns(INHERITING_MANIFEST, after)
+    expect(runs).toHaveLength(1)
+    expect(Object.keys(parseBlock(runs[0] ?? []) as object)).toEqual(['nullabilityProbe'])
+    const manifest = parseManifestYaml(after)
+    // Book still inherits Item's size, with no claim; Item keeps none either.
+    expect(manifest.resources['Book']?.properties['size']?.nullable).toBeUndefined()
+    expect(manifest.resources['Item']?.properties['size']?.nullable).toBeUndefined()
+  })
+})

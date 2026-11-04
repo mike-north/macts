@@ -289,6 +289,16 @@ export const AppManifestSchema: z.ZodObject<{
                 term: z.ZodString;
             }, z.core.$strict>;
         }, z.core.$strict>>;
+        inherits: z.ZodOptional<z.ZodObject<{
+            resource: z.ZodString;
+            evidence: z.ZodObject<{
+                source: z.ZodLiteral<"dictionary">;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                term: z.ZodString;
+            }, z.core.$strict>;
+        }, z.core.$strict>>;
         unsupported: z.ZodOptional<z.ZodObject<{
             evidence: z.ZodDiscriminatedUnion<[z.ZodObject<{
                 source: z.ZodLiteral<"dictionary">;
@@ -1178,10 +1188,22 @@ export const DictionaryAbsenceFindingSchema: z.ZodEnum<{
 }>;
 
 // @public (undocumented)
-export type DictionarySpellingEvidence = z.infer<typeof DictionarySpellingEvidenceSchema>;
+export type DictionarySpellingEvidence = DictionaryTermEvidence;
 
 // @public
 export const DictionarySpellingEvidenceSchema: z.ZodObject<{
+    source: z.ZodLiteral<"dictionary">;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    term: z.ZodString;
+}, z.core.$strict>;
+
+// @public (undocumented)
+export type DictionaryTermEvidence = z.infer<typeof DictionaryTermEvidenceSchema>;
+
+// @public
+export const DictionaryTermEvidenceSchema: z.ZodObject<{
     source: z.ZodLiteral<"dictionary">;
     bundleId: z.ZodString;
     appVersion: z.ZodString;
@@ -3131,6 +3153,21 @@ export const ResourceAbsenceEvidenceSchema: z.ZodDiscriminatedUnion<[z.ZodObject
     errorNumber: z.ZodNumber;
 }, z.core.$strict>], "source">;
 
+// @public (undocumented)
+export type ResourceInherits = z.infer<typeof ResourceInheritsSchema>;
+
+// @public
+export const ResourceInheritsSchema: z.ZodObject<{
+    resource: z.ZodString;
+    evidence: z.ZodObject<{
+        source: z.ZodLiteral<"dictionary">;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        term: z.ZodString;
+    }, z.core.$strict>;
+}, z.core.$strict>;
+
 // @public
 export interface ResourceMergeOutcome {
     readonly block: NullabilityProbe;
@@ -3386,6 +3423,16 @@ export const ResourceSchema: z.ZodObject<{
     }, z.core.$strip>>;
     native: z.ZodOptional<z.ZodObject<{
         collection: z.ZodString;
+        evidence: z.ZodObject<{
+            source: z.ZodLiteral<"dictionary">;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            term: z.ZodString;
+        }, z.core.$strict>;
+    }, z.core.$strict>>;
+    inherits: z.ZodOptional<z.ZodObject<{
+        resource: z.ZodString;
         evidence: z.ZodObject<{
             source: z.ZodLiteral<"dictionary">;
             bundleId: z.ZodString;

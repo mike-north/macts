@@ -651,7 +651,136 @@ export const manifest: unknown = {
           code: 'macs',
           optional: false,
         },
+        applicationSupportFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Application Support folder',
+          code: 'asup',
+          optional: false,
+        },
+        applicationsFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Applications folder',
+          code: 'apps',
+          optional: false,
+        },
+        desktopPicturesFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Desktop Pictures folder',
+          code: 'dtp$',
+          optional: false,
+        },
+        folderActionScriptsFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Folder Action Scripts folder',
+          code: 'fasf',
+          optional: false,
+        },
+        id: {
+          access: 'r',
+          type: 'string',
+          description: 'the unique identifier of the domain',
+          code: 'ID  ',
+          optional: false,
+        },
+        libraryFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Library folder',
+          code: 'dlib',
+          optional: false,
+        },
+        name: {
+          access: 'r',
+          type: 'string',
+          description: 'the name of the domain',
+          code: 'pnam',
+          optional: false,
+        },
+        scriptingAdditionsFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Scripting Additions folder',
+          code: '$scr',
+          optional: false,
+        },
+        scriptsFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Scripts folder',
+          code: 'scr$',
+          optional: false,
+        },
+        sharedDocumentsFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Shared Documents folder',
+          code: 'sdat',
+          optional: false,
+        },
+        speakableItemsFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Speakable Items folder',
+          code: 'spki',
+          optional: false,
+        },
+        utilitiesFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Utilities folder',
+          code: 'uti$',
+          optional: false,
+        },
+        workflowsFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Automator Workflows folder',
+          code: 'flow',
+          optional: false,
+        },
       },
+      inherits: {
+        resource: 'Domain',
+        evidence: {
+          source: 'dictionary',
+          bundleId: 'com.apple.systemevents',
+          appVersion: '1.3.6',
+          osVersion: '27.2',
+          term: 'domain',
+        },
+      },
+      identifiers: [
+        {
+          property: 'id',
+          primary: true,
+        },
+      ],
     },
     Disk: {
       name: 'Disk',
@@ -1109,14 +1238,157 @@ export const manifest: unknown = {
       description: 'A folder in the file system',
       code: 'cfol',
       properties: {
+        busyStatus: {
+          access: 'r',
+          type: 'boolean',
+          description: 'Is the disk item busy?',
+          code: 'busy',
+          optional: false,
+        },
+        container: {
+          access: 'r',
+          type: {
+            resource: 'disk item',
+          },
+          description: 'the folder or disk which has this disk item as an element',
+          code: 'ctnr',
+          optional: false,
+        },
+        creationDate: {
+          access: 'r',
+          type: 'date',
+          description: 'the date on which the disk item was created',
+          code: 'ascd',
+          optional: false,
+        },
+        displayedName: {
+          access: 'r',
+          type: 'string',
+          description: 'the name of the disk item as displayed in the User Interface',
+          code: 'dnam',
+          optional: false,
+        },
         id: {
           access: 'r',
           type: 'string',
-          description: 'Unique identifier for this folder',
+          description: 'the unique ID of the disk item',
           code: 'ID  ',
           optional: false,
         },
+        modificationDate: {
+          access: 'rw',
+          type: 'date',
+          description: 'the date on which the disk item was last modified',
+          code: 'asmo',
+          optional: false,
+        },
+        name: {
+          access: 'rw',
+          type: 'string',
+          description: 'the name of the disk item',
+          code: 'pnam',
+          optional: false,
+        },
+        nameExtension: {
+          access: 'r',
+          type: 'string',
+          description: 'the extension portion of the name',
+          code: 'extn',
+          optional: false,
+        },
+        packageFolder: {
+          access: 'r',
+          type: 'boolean',
+          description: 'Is the disk item a package?',
+          code: 'pkgf',
+          optional: false,
+        },
+        path: {
+          access: 'r',
+          type: 'string',
+          description: 'the file system path of the disk item',
+          code: 'ppth',
+          optional: false,
+        },
+        physicalSize: {
+          access: 'r',
+          type: 'integer',
+          description: 'the actual space used by the disk item on disk',
+          code: 'phys',
+          optional: false,
+        },
+        pOSIXPath: {
+          access: 'r',
+          type: 'string',
+          description: 'the POSIX file system path of the disk item',
+          code: 'posx',
+          optional: false,
+          native: {
+            name: 'posixPath',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              term: 'POSIX path',
+            },
+          },
+        },
+        size: {
+          access: 'r',
+          type: 'integer',
+          description: 'the logical size of the disk item',
+          code: 'ptsz',
+          optional: false,
+        },
+        uRL: {
+          access: 'r',
+          type: 'string',
+          description: 'the URL of the disk item',
+          code: 'url',
+          optional: false,
+          native: {
+            name: 'url',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              term: 'URL',
+            },
+          },
+        },
+        visible: {
+          access: 'rw',
+          type: 'boolean',
+          description: 'Is the disk item visible?',
+          code: 'pvis',
+          optional: false,
+        },
+        volume: {
+          access: 'r',
+          type: 'string',
+          description: 'the volume on which the disk item resides',
+          code: 'volu',
+          optional: false,
+        },
       },
+      inherits: {
+        resource: 'DiskItem',
+        evidence: {
+          source: 'dictionary',
+          bundleId: 'com.apple.systemevents',
+          appVersion: '1.3.6',
+          osVersion: '27.2',
+          term: 'disk item',
+        },
+      },
+      identifiers: [
+        {
+          property: 'id',
+          primary: true,
+        },
+      ],
     },
     LocalDomainObject: {
       name: 'LocalDomainObject',
@@ -1268,7 +1540,154 @@ export const manifest: unknown = {
           code: 'temp',
           optional: false,
         },
+        applicationSupportFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Application Support folder',
+          code: 'asup',
+          optional: false,
+        },
+        applicationsFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Applications folder',
+          code: 'apps',
+          optional: false,
+        },
+        desktopPicturesFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Desktop Pictures folder',
+          code: 'dtp$',
+          optional: false,
+        },
+        folderActionScriptsFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Folder Action Scripts folder',
+          code: 'fasf',
+          optional: false,
+        },
+        fontsFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Fonts folder',
+          code: 'font',
+          optional: false,
+        },
+        id: {
+          access: 'r',
+          type: 'string',
+          description: 'the unique identifier of the domain',
+          code: 'ID  ',
+          optional: false,
+        },
+        libraryFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Library folder',
+          code: 'dlib',
+          optional: false,
+        },
+        name: {
+          access: 'r',
+          type: 'string',
+          description: 'the name of the domain',
+          code: 'pnam',
+          optional: false,
+        },
+        preferencesFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Preferences folder',
+          code: 'pref',
+          optional: false,
+        },
+        scriptingAdditionsFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Scripting Additions folder',
+          code: '$scr',
+          optional: false,
+        },
+        scriptsFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Scripts folder',
+          code: 'scr$',
+          optional: false,
+        },
+        sharedDocumentsFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Shared Documents folder',
+          code: 'sdat',
+          optional: false,
+        },
+        speakableItemsFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Speakable Items folder',
+          code: 'spki',
+          optional: false,
+        },
+        utilitiesFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Utilities folder',
+          code: 'uti$',
+          optional: false,
+        },
+        workflowsFolder: {
+          access: 'r',
+          type: {
+            resource: 'Folder',
+          },
+          description: 'The Automator Workflows folder',
+          code: 'flow',
+          optional: false,
+        },
       },
+      inherits: {
+        resource: 'Domain',
+        evidence: {
+          source: 'dictionary',
+          bundleId: 'com.apple.systemevents',
+          appVersion: '1.3.6',
+          osVersion: '27.2',
+          term: 'domain',
+        },
+      },
+      identifiers: [
+        {
+          property: 'id',
+          primary: true,
+        },
+      ],
     },
     Action: {
       name: 'Action',

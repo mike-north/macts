@@ -151,6 +151,11 @@ export async function writeNullabilityResults(
       for (const outcome of resource.properties) {
         if (outcome.claim === undefined || outcome.change === 'unchanged') continue
         const path = ['resources', resource.resource, 'properties', outcome.property]
+        // A property the resource does not declare itself, such as one it
+        // inherits from its superclass (D10, "Superclasses"), has no node to
+        // hold the claim, and the claim describes this resource's items, not
+        // the superclass's. It is not written; declaring the property on the
+        // resource lets a later probe record it.
         if (!isMap(doc.getIn(path))) continue
         doc.setIn([...path, 'nullable'], outcome.claim.nullable)
         const evidence = doc.getIn([...path, 'evidence'])
