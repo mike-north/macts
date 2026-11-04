@@ -24,8 +24,7 @@
  * @see phases/13-sdk-value-and-execution-contracts.md §D10 (native missing value maps to null at nullable fields)
  */
 
-import { spawnSync } from 'node:child_process'
-import { mkdir, mkdtemp, readdir, rm, symlink, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -54,44 +53,16 @@ import { resolveManifestRoutes } from '../../manifest/index.js'
 import { loadManifest } from '../../manifest/loader.js'
 import { generateContract } from './index.js'
 import { jotterManifest } from './test-fixtures.js'
+import {
+  REPO_ROOT,
+  call,
+  linkContracts,
+  objectAt,
+  runTsc,
+  tsconfig,
+} from '../test-support/compiled-contract.js'
 
-const PACKAGE_ROOT = process.cwd()
-const REPO_ROOT = resolve(PACKAGE_ROOT, '../..')
-const CONTRACTS_PACKAGE = resolve(PACKAGE_ROOT, '../contracts')
-const TSC = resolve(PACKAGE_ROOT, 'node_modules/typescript/bin/tsc')
 const MANIFESTS_DIR = resolve(REPO_ROOT, 'manifests')
-
-/** A strict tsconfig for a temporary package that resolves `@macts/contracts`. */
-function tsconfig(include: readonly string[], noEmit: boolean): string {
-  return JSON.stringify({
-    extends: join(REPO_ROOT, 'tsconfig.base.json'),
-    compilerOptions: {
-      rootDir: '.',
-      outDir: 'dist',
-      noEmit,
-      declaration: false,
-      declarationMap: false,
-      sourceMap: false,
-      typeRoots: [join(REPO_ROOT, 'node_modules', '@types')],
-      types: ['node'],
-    },
-    include,
-  })
-}
-
-/** Link the workspace `@macts/contracts` into a temporary package. */
-async function linkContracts(dir: string): Promise<void> {
-  await mkdir(join(dir, 'node_modules', '@macts'), { recursive: true })
-  await symlink(CONTRACTS_PACKAGE, join(dir, 'node_modules', '@macts', 'contracts'), 'dir')
-}
-
-/** Type-check (and, unless `noEmit`, compile) a temporary package. */
-function runTsc(dir: string): { status: number | null; output: string } {
-  const tsc = spawnSync(process.execPath, [TSC, '-p', join(dir, 'tsconfig.json')], {
-    encoding: 'utf-8',
-  })
-  return { status: tsc.status, output: `${tsc.stdout}${tsc.stderr}` }
-}
 
 /**
  * Compiled alongside the generated contract. Every `@ts-expect-error` line is
@@ -1042,29 +1013,6 @@ function boundClient(): { client: unknown; calls: RecordedCall[] } {
 function cannedWire(operation: AnyOperationDescriptor): unknown {
   if (isPageValueType(operation.output)) return { items: [] }
   return operation.output.plan.kind === 'none' ? null : NOTE_WIRE
-}
-
-function objectAt(root: unknown, path: readonly string[]): Record<string, unknown> {
-  let current: unknown = root
-  for (const key of path) {
-    if (typeof current !== 'object' || current === null) throw new Error(`no ${path.join('.')}`)
-    current = Reflect.get(current, key)
-  }
-  if (typeof current !== 'object' || current === null) throw new Error(`no ${path.join('.')}`)
-  return Object.fromEntries(Object.entries(current))
-}
-
-/** Call the client method at `path` (e.g. `['notes', 'get']`) with `args`. */
-async function call(
-  client: unknown,
-  path: readonly string[],
-  ...args: unknown[]
-): Promise<unknown> {
-  const owner = objectAt(client, path.slice(0, -1))
-  const method = owner[path[path.length - 1] ?? '']
-  if (typeof method !== 'function') throw new Error(`no method ${path.join('.')}`)
-  const result: unknown = await Reflect.apply(method, owner, args)
-  return result
 }
 
 function isAppContract(value: unknown): value is AppContract<unknown> {

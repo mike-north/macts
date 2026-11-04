@@ -43,6 +43,7 @@ import {
   ValidationError,
   PASSTHROUGH_PLAN,
   type AnyMactsError,
+  type FieldPlan,
   type IssuePath,
   type OperationTarget,
   type ReferenceWire,
@@ -56,6 +57,7 @@ import type { ExecutionRequest, Executor, ResolutionRequest } from '../execution
 import { isWireValue, JxaExecutionError, MAX_OUTPUT_BYTES, runNativeScript } from './executor.js'
 import {
   NATIVE_CODEC,
+  type NativeAddressing,
   type NativeFailure,
   type NativeOutcome,
   type NativeReferencePlans,
@@ -70,9 +72,11 @@ import {
   planNativeInvocation,
   referenceAddressing,
   RESOLUTION_ENTRIES_ARGUMENT,
+  RESOLUTION_KINDS_ARGUMENT,
   RESOLUTION_TARGET_ARGUMENT,
 } from './native-scripts.js'
 import { resolvingCommand } from '../manifest/resource-commands.js'
+import { resolveRoots } from '../manifest/roots.js'
 
 /** Time limit for one operation when none is configured, in milliseconds. */
 const DEFAULT_TIMEOUT_MS = 30_000
@@ -218,7 +222,11 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       const { manifest, reference, outputPlan, resourcePlans, signal } = request
       throwIfAborted(signal)
 
-      const resolution = planResolution(reference)
+      const rooted = resolveRoots(manifest, reference.resource) !== undefined
+      const resolution = planResolution(
+        reference,
+        rooted ? resourcePlans[reference.resource]?.id : undefined
+      )
       const references = nativeReferenceTable(manifest, resourcePlans, [
         resolution.inputPlan,
         outputPlan,
@@ -316,24 +324,59 @@ interface ResolutionInput {
   readonly entryCount?: number
 }
 
-function planResolution(reference: ReferenceWire): ResolutionInput {
+/**
+ * The resolution input for `reference` ({@link ResolutionInput}).
+ *
+ * @param kindPlan - The identifier plan of a singleton root, whose kinds the
+ *   resolution body also receives ({@link RESOLUTION_KINDS_ARGUMENT}), decoded
+ *   after the references so a malformed one is reported at the reference;
+ *   `undefined` for any other resource.
+ */
+function planResolution(
+  reference: ReferenceWire,
+  kindPlan: ValuePlan | undefined
+): ResolutionInput {
   const single: ValuePlan = {
     kind: 'reference',
     resource: reference.resource,
     cardinality: 'one',
   }
+  const kindsField = (ids: readonly WireValue[]): ResolutionKinds =>
+    kindPlan === undefined
+      ? { input: {}, fields: {} }
+      : {
+          input: { [RESOLUTION_KINDS_ARGUMENT]: [...ids] },
+          fields: {
+            [RESOLUTION_KINDS_ARGUMENT]: {
+              presence: 'required',
+              value: { kind: 'array', items: kindPlan },
+            },
+          },
+        }
   if (reference.cardinality === 'one') {
+    const kinds = kindsField(reference.form === 'identity' ? [reference.id] : [])
     return {
-      input: { [RESOLUTION_TARGET_ARGUMENT]: { reference } },
+      input: { [RESOLUTION_TARGET_ARGUMENT]: { reference }, ...kinds.input },
       inputPlan: {
         kind: 'record',
-        fields: { [RESOLUTION_TARGET_ARGUMENT]: { presence: 'required', value: single } },
+        fields: {
+          [RESOLUTION_TARGET_ARGUMENT]: { presence: 'required', value: single },
+          ...kinds.fields,
+        },
       },
     }
   }
   const entries = reference.form === 'identity' ? reference.entries : []
+  const kinds = kindsField(
+    entries.flatMap((entry) =>
+      entry.form === 'identity' && entry.cardinality === 'one' ? [entry.id] : []
+    )
+  )
   return {
-    input: { [RESOLUTION_ENTRIES_ARGUMENT]: entries.map((entry) => ({ reference: entry })) },
+    input: {
+      [RESOLUTION_ENTRIES_ARGUMENT]: entries.map((entry) => ({ reference: entry })),
+      ...kinds.input,
+    },
     inputPlan: {
       kind: 'record',
       fields: {
@@ -341,10 +384,17 @@ function planResolution(reference: ReferenceWire): ResolutionInput {
           presence: 'required',
           value: { kind: 'array', items: single },
         },
+        ...kinds.fields,
       },
     },
     ...(reference.form === 'identity' ? { entryCount: entries.length } : {}),
   }
+}
+
+/** The kinds a singleton root's resolution input carries, and their plans. */
+interface ResolutionKinds {
+  readonly input: WireRecord
+  readonly fields: Readonly<Record<string, FieldPlan>>
 }
 
 /**
@@ -413,7 +463,7 @@ function unresolvableChain(
 ): 'container' | Unresolvable | undefined {
   const missing = unresolvableTarget(reference.resource, references)
   if (missing !== undefined) return missing
-  const within = references[reference.resource]?.addressing?.within
+  const within = parentWithin(references[reference.resource]?.addressing)
   const container =
     reference.form === 'identity' && reference.cardinality === 'one'
       ? reference.container
@@ -521,6 +571,15 @@ function describeResolutionFailure(
 }
 
 /**
+ * The manifest key of the parent a resource with `addressing` is found
+ * within, or `undefined` when it is found at the application or has no
+ * addressing. A singleton root is held by the application itself.
+ */
+function parentWithin(addressing: NativeAddressing | undefined): string | undefined {
+  return addressing === undefined || addressing.lookup === 'byRoot' ? undefined : addressing.within
+}
+
+/**
  * The reference table of a native script: an entry for every resource a
  * reference in `plans` names, directly or inside another resource's
  * identifier, and for every parent such a resource is found within, level by
@@ -549,7 +608,8 @@ function nativeReferenceTable(
       ...(addressing === undefined ? {} : { addressing }),
     })
     if (id !== undefined) pending.push(...referencedResources(id))
-    if (addressing?.within !== undefined) pending.push(addressing.within)
+    const within = parentWithin(addressing)
+    if (within !== undefined) pending.push(within)
   }
   // `Object.fromEntries` defines own properties, so no resource key can reach
   // the table's prototype.

@@ -158,24 +158,34 @@ export const NATIVE_CODEC: NativeCodec = Object.freeze({
  *
  * @remarks
  * It follows the resource's identifier targeting (phases/13 D10), as a
- * generated get does: `byId` asks the collection for the item with that id,
- * and `byProperty` matches `property` against the identifier. Either way the
- * identifier a reference carries is the value of `property`, so reading it
- * back from an object gives the identifier that finds the object again.
+ * generated get does. A resource found in a collection is addressed by
+ * {@link NativeCollectionAddressing}; a singleton root, which the app holds
+ * as its own properties, by {@link NativeRootAddressing}.
+ */
+export type NativeAddressing = NativeCollectionAddressing | NativeRootAddressing
+
+/**
+ * How a resource's collection finds an object from its identifier: `byId`
+ * asks the collection for the item with that id, `byProperty` matches
+ * `property` against the identifier, and `byKey` applies the collection's key
+ * specifier to it. In each case the identifier a reference carries is the
+ * value of `property`, so reading it back from an object gives the identifier
+ * that finds the object again.
  *
  * When the resource's get records a parent, `within` names that parent: the
  * resource is identified only within its container (phases/13 D7, container
  * scoping), so `collection` is the container's, a reference to it carries the
- * container, and the container is found by the parent's own addressing first.
+ * container, and the container is found first by the parent's own addressing,
+ * whatever its targeting.
  */
-export interface NativeAddressing {
+export interface NativeCollectionAddressing {
   /**
    * The app's spelling of the resource's collection: at the application, or
    * at the container when `within` is set.
    */
   readonly collection: string
   /** How the collection finds an item from its identifier. */
-  readonly lookup: 'byId' | 'byProperty'
+  readonly lookup: 'byId' | 'byProperty' | 'byKey'
   /** The app's spelling of the property that holds the identifier. */
   readonly property: string
   /**
@@ -183,6 +193,21 @@ export interface NativeAddressing {
    * a resource found at the application.
    */
   readonly within?: string
+}
+
+/**
+ * How the app holds the objects of a singleton root: the identifier a
+ * reference carries is a kind, and `roots` maps each kind to the app's
+ * spelling of the application property that holds its object. A kind the map
+ * does not hold names no object. The object holds nothing that says which
+ * kind it is, so an object read from the app cannot be encoded as a reference
+ * to a root.
+ */
+export interface NativeRootAddressing {
+  /** The object is the application property its kind names. */
+  readonly lookup: 'byRoot'
+  /** Each kind, with the app's spelling of the application property holding it. */
+  readonly roots: Readonly<Record<string, string>>
 }
 
 /**

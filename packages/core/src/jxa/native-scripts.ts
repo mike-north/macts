@@ -55,7 +55,7 @@
 import { InternalError, ValidationError, type OperationTarget } from '@macts/contracts'
 import type { AppManifest } from '../manifest/schemas/app.js'
 import type { Command, CommandParameter } from '../manifest/schemas/command.js'
-import type { PageRead, Resource } from '../manifest/schemas/resource.js'
+import type { PageRead, Resource, ResourceRoots } from '../manifest/schemas/resource.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
   listOperationPages,
@@ -71,11 +71,13 @@ import {
   outputProperties,
 } from '../manifest/output-references.js'
 import { resolvingCommand } from '../manifest/resource-commands.js'
+import { ROOT_KIND_PROPERTY, rootProperties } from '../manifest/roots.js'
 import {
   NATIVE_CODEC_ERROR_NAME,
   NATIVE_COLLECTION_CHANGED_ERROR_NAME,
   NATIVE_CONTAINED_REFERENCE_KEY,
   type NativeAddressing,
+  type NativeCollectionAddressing,
 } from './native-codec.js'
 
 /**
@@ -326,20 +328,42 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * `properties()` fails (a Calendar calendar's record includes the failing
  * `calendarIdentifier`), each property is read on its own. Every read on its
  * own is by the app's name and guarded, so a property the item cannot report
- * is omitted rather than failing the operation. A body with no resource reads
+ * is omitted rather than failing the operation, and its record then fails
+ * the contract unless the field may be absent. A body with no resource reads
  * `name`.
+ *
+ * A singleton root's object holds nothing that says which kind it is, so its
+ * `kind` is not read from the app: it is set from `kindExpression`, the kind
+ * the object was found by.
  *
  * A field holding a reference to a target got within the item is then handed
  * to the codec together with the item, as the reference's container
- * ({@link wrapContained}).
+ * ({@link wrapContained}); for a singleton root, together with its kind.
+ *
+ * @throws `InternalError` when `source` reads a singleton root and no
+ *   `kindExpression` is given.
  */
 function readOutputProperties(
   manifest: AppManifest,
   source: RecordSource,
-  itemLocal: string
+  itemLocal: string,
+  kindExpression?: string
 ): string {
   const { resource } = source
-  const keys = itemReadKeys(manifest, source.key, resource)
+  const rooted = resource?.roots !== undefined
+  if (rooted && kindExpression === undefined) {
+    throw new InternalError('A root object is read with the kind it was found by.', {})
+  }
+  const keys = itemReadKeys(manifest, source.key, resource).filter(
+    (key) => !rooted || key !== ROOT_KIND_PROPERTY
+  )
+  // A root's object cannot say which kind it is, so a reference held within
+  // it carries the kind it was found by, the identifier its container is
+  // looked up by, rather than the object.
+  const heldWithContainer = (value: string): string =>
+    rooted && kindExpression !== undefined
+      ? wrapContained(value, 'containerId', kindExpression)
+      : wrapContained(value, 'container', itemLocal)
   const native = (key: string): string => nativePropertyName(resource, key)
   const readOnItsOwn = (key: string): string =>
     `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {}`
@@ -354,9 +378,12 @@ function readOutputProperties(
     '} catch (e) {',
     ...keys.map(readOnItsOwn),
     '}',
+    rooted && kindExpression !== undefined
+      ? `${member('obj', ROOT_KIND_PROPERTY)} = ${kindExpression};`
+      : '',
     ...containedKeys(manifest, source).map(
       (key) =>
-        `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${wrapContained(member('obj', key), 'container', itemLocal)}; }`
+        `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${heldWithContainer(member('obj', key))}; }`
     )
   )
 }
@@ -500,6 +527,12 @@ function buildCommandCallBody(command: Command, resultLocal = false): string {
  *   the declared identifier fails at run time (Calendar's
  *   `calendarIdentifier`), so the item is matched on a working property such as
  *   `name`. The property is named by the app's spelling of it.
+ * - `byKey`: `app["<plural>"].byName(<value>)`, the collection's key
+ *   specifier, which the app interprets (an app that keys files by path finds
+ *   whatever file is at that path).
+ *
+ * A singleton root (`byRoot`) is held by the application, not in a
+ * collection, so it has no expression here (see {@link buildRootGetBody}).
  *
  * @param resourcePlural - The collection's accessor in the app (see
  *   `resolveCollectionAccessor`).
@@ -520,7 +553,8 @@ export function buildTargetExpression(
  * {@link buildTargetExpression}:
  *
  * - `byId`: `<parentTarget>["<childPlural>"].byId(<childId>)`;
- * - `byProperty`: `<parentTarget>["<childPlural>"].whose({ "<property>": <childId> })[0]`.
+ * - `byProperty`: `<parentTarget>["<childPlural>"].whose({ "<property>": <childId> })[0]`;
+ * - `byKey`: `<parentTarget>["<childPlural>"].byName(<childId>)`.
  *
  * Calendar events are reachable only this way. `app.events.byId(uid)` builds a
  * specifier that fails with "no such object" when used, because events are not
@@ -541,6 +575,10 @@ export function buildNestedTargetExpression(
  * Expression addressing the item of `collection` whose identifier is
  * `valueExpression`, in the form the resource's identifier targeting selects.
  * A resource with no identifier takes the `byId` form.
+ *
+ * @throws `InternalError` for a singleton root, which no collection holds.
+ *   The manifest schema lets no command reach a root through a collection,
+ *   so reaching this is a macts defect.
  */
 function lookupInCollection(
   resource: Resource | undefined,
@@ -548,9 +586,15 @@ function lookupInCollection(
   valueExpression: string
 ): string {
   const lookup = identifierLookup(resource)
+  if (lookup?.lookup === 'byRoot') {
+    throw new InternalError('A root is held by the application, not in a collection.', {})
+  }
   if (lookup?.lookup === 'byProperty') {
     return `${collection}.whose({ ${literal(lookup.property)}: ${valueExpression} })[0]`
   }
+  // The bridge spells the key specifier `byName` whatever the key means to
+  // the app: the value here is the resource's identifier.
+  if (lookup?.lookup === 'byKey') return `${collection}.byName(${valueExpression})`
   return `${collection}.byId(${valueExpression})`
 }
 
@@ -560,11 +604,15 @@ function lookupInCollection(
  * that holds the identifier; `undefined` for a resource with no identifier.
  * Bodies ({@link lookupInCollection}) and reference conversion
  * ({@link referenceAddressing}) both take it from here, so an object a
- * reference names is the one a get of its identifier finds.
+ * reference names is the one a get of its identifier finds. A singleton
+ * root's lookup is `byRoot`, which no collection serves.
  */
-function identifierLookup(
-  resource: Resource | undefined
-): Pick<NativeAddressing, 'lookup' | 'property'> | undefined {
+function identifierLookup(resource: Resource | undefined):
+  | {
+      readonly lookup: NativeCollectionAddressing['lookup'] | 'byRoot'
+      readonly property: string
+    }
+  | undefined {
   const targeting = resolveIdentifierTargeting(resource)
   if (targeting === undefined) return undefined
   return {
@@ -586,9 +634,14 @@ function identifierLookup(
  * track within its playlist), the resource is identified within its
  * container (phases/13 D7, container scoping): the collection is the
  * container's, and `within` names the parent, whose own addressing finds the
- * container. So a resource is addressable only when its parent is, level by
- * level. There is no addressing for a resource with no identifier, with no
- * get, or whose parent has none.
+ * container by the parent's own targeting (`byKey` for a parent found by its
+ * key, its kind for a singleton root). So a resource is addressable only when
+ * its parent is, level by level. There is no addressing for a resource with
+ * no identifier, with no get, or whose parent has none.
+ *
+ * A singleton root is addressed by its kinds: the application property each
+ * one names (`NativeRootAddressing`). It is held by the application itself,
+ * so a root whose get records a parent has no addressing.
  *
  * Inputs, resolution and emission all take a resource's addressing from here,
  * so an object a reference names is the one a get of its identifier finds.
@@ -620,13 +673,23 @@ function addressingWithin(
   if (resource === undefined || lookup === undefined || seen.has(resourceKey)) return undefined
   const get = resolvingCommand(manifest, resourceKey, 'get')
   if (get === undefined) return undefined
-  const collection = resolveCollectionAccessor(resource)
   const parent = get[1].parent?.resource
-  if (parent === undefined) return { collection, ...lookup }
+  if (resource.roots !== undefined) {
+    return parent === undefined
+      ? { lookup: 'byRoot', roots: rootProperties(resource.roots) }
+      : undefined
+  }
+  if (lookup.lookup === 'byRoot') return undefined
+  const addressing = {
+    collection: resolveCollectionAccessor(resource),
+    lookup: lookup.lookup,
+    property: lookup.property,
+  }
+  if (parent === undefined) return addressing
   if (addressingWithin(manifest, parent, new Set([...seen, resourceKey])) === undefined) {
     return undefined
   }
-  return { collection, ...lookup, within: parent }
+  return { ...addressing, within: parent }
 }
 
 /**
@@ -1391,6 +1454,9 @@ function buildListBody(
   paged: boolean
 ): ResourceBody {
   const { resource } = source
+  if (resource?.roots !== undefined) {
+    return buildRootListBody(source, resource, resource.roots, manifest, identifierAliases, paged)
+  }
   // The identifier is always read; every other property is read only when the
   // output record declares it (see `outputProperties`).
   const allPropNames = listReadKeys(manifest, source.key, resource)
@@ -1519,7 +1585,8 @@ function buildListBody(
  * Read one item's usable properties into a record keyed by their public names
  * (see {@link readOutputProperties}). A command that records a parent
  * addresses the item under the parent item; any other addresses it at the
- * application. The item must exist (see
+ * application. A singleton root is found by its kind
+ * ({@link buildRootGetBody}). The item must exist (see
  * {@link failIfMissing}) before any property is read.
  */
 function buildGetBody(
@@ -1528,6 +1595,10 @@ function buildGetBody(
   resourcePlural: string,
   manifest: AppManifest
 ): ResourceBody {
+  const { resource } = source
+  if (resource?.roots !== undefined) {
+    return buildRootGetBody(command, source, resource.roots, manifest)
+  }
   const parentScope = recordedParentScope(command, manifest)
   const identifierParam = resolveIdentifierParam(command, parentScope)
   const bindItem = bindTarget(
@@ -1539,6 +1610,90 @@ function buildGetBody(
   )
   const body = lines(bindItem, readOutputProperties(manifest, source, 'item'), 'return obj;')
   return { body, identifierArguments: identifierArgumentsOf(parentScope, identifierParam) }
+}
+
+/** Local holding the application property each kind of a singleton root names. */
+const ROOTS_LOCAL = 'roots'
+/** Local holding the kind a singleton root's object was found by. */
+const KIND_LOCAL = 'itemKind'
+
+/** Statement binding {@link ROOTS_LOCAL} to each kind's application property. */
+function bindRoots(roots: ResourceRoots): string {
+  return `var ${ROOTS_LOCAL} = ${JSON.stringify(rootProperties(roots))};`
+}
+
+/**
+ * Read the object of one kind of a singleton root: the application property
+ * the kind names. A kind the resource does not have, and a kind whose
+ * property holds no object on this Mac, both fail as "no such object", never
+ * as an empty record. The record's `kind` is the kind it was found by.
+ */
+function buildRootGetBody(
+  command: Command,
+  source: RecordSource,
+  roots: ResourceRoots,
+  manifest: AppManifest
+): ResourceBody {
+  const kindParam = resolveIdentifierParam(command, undefined)
+  const body = lines(
+    bindRoots(roots),
+    `var ${KIND_LOCAL} = ${argument(kindParam)};`,
+    `if (typeof ${KIND_LOCAL} !== "string" || !Object.prototype.hasOwnProperty.call(${ROOTS_LOCAL}, ${KIND_LOCAL})) {`,
+    "  var unknownKind = new Error('No such object.');",
+    `  unknownKind.errorNumber = ${String(NO_SUCH_OBJECT_ERROR_NUMBER)};`,
+    '  throw unknownKind;',
+    '}',
+    `var item = app[${ROOTS_LOCAL}[${KIND_LOCAL}]];`,
+    failIfMissing('item'),
+    readOutputProperties(manifest, source, 'item', KIND_LOCAL),
+    'return obj;'
+  )
+  return { body, identifierArguments: [kindParam] }
+}
+
+/**
+ * List a singleton root: one record per kind whose application property holds
+ * an object on this Mac, in the order the kinds are declared. A kind whose
+ * property holds none (the app reports it missing, or "no such object") is
+ * skipped, so the list holds the roots this Mac has; any other failure fails
+ * the list. Each record is read as a get reads it, so a listed record is the
+ * record a get of its kind returns.
+ *
+ * @throws `InternalError` when `paged` is set: a root's kinds are a fixed,
+ *   short set, so its list never pages.
+ */
+function buildRootListBody(
+  source: RecordSource,
+  resource: Resource,
+  roots: ResourceRoots,
+  manifest: AppManifest,
+  identifierAliases: boolean,
+  paged: boolean
+): ResourceBody {
+  if (paged) throw new InternalError('A root is listed whole, never by page.', {})
+  const aliasSource = resolveCanonicalIdentifierSource(resource)
+  const body = lines(
+    bindRoots(roots),
+    `var kinds = ${JSON.stringify(Object.keys(roots))};`,
+    'function readRecord(item, itemKind) {',
+    readOutputProperties(manifest, source, 'item', 'itemKind'),
+    identifierAliases && aliasSource !== undefined
+      ? `${member('obj', CANONICAL_IDENTIFIER_KEY)} = ${member('obj', aliasSource)};`
+      : '',
+    'return obj;',
+    '}',
+    'var result = [];',
+    'for (var k = 0; k < kinds.length; k++) {',
+    `  var item = app[${ROOTS_LOCAL}[kinds[k]]];`,
+    '  var present;',
+    '  try { present = item.exists(); } catch (e) {',
+    `    if (e && e.errorNumber === ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}) { present = false; } else { throw e; }`,
+    '  }',
+    '  if (present) { result.push(readRecord(item, kinds[k])); }',
+    '}',
+    'return result;'
+  )
+  return { body, identifierArguments: [] }
 }
 
 /**
@@ -1668,6 +1823,14 @@ export const RESOLUTION_TARGET_ARGUMENT = 'target'
 export const RESOLUTION_ENTRIES_ARGUMENT = 'entries'
 
 /**
+ * The input key under which a resolution body for a singleton root receives
+ * the kind of each object it reads, in target or entry order. A root's object
+ * holds nothing that says which kind it is, so its record takes the kind the
+ * reference named.
+ */
+export const RESOLUTION_KINDS_ARGUMENT = 'kinds'
+
+/**
  * Build the body that reads the record, or records, a resolved reference
  * denotes.
  *
@@ -1683,6 +1846,9 @@ export const RESOLUTION_ENTRIES_ARGUMENT = 'entries'
  * - `'one'`: the object at `args.target`, read into one record.
  * - `'many'`: each object of the list at `args.entries`, read into one record
  *   per object, in entry order.
+ *
+ * A singleton root's records take their `kind` from `args.kinds`
+ * ({@link RESOLUTION_KINDS_ARGUMENT}).
  *
  * @param manifest - The validated manifest of the target app.
  * @param resourceKey - The manifest key of the referenced resource.
@@ -1708,22 +1874,24 @@ export function buildResolutionBody(
     resource,
     containerReferences: options.containerReferences !== false,
   }
+  const kinds = argument(RESOLUTION_KINDS_ARGUMENT)
+  const rooted = resource.roots !== undefined
   if (cardinality === 'one') {
     return lines(
       `var item = ${argument(RESOLUTION_TARGET_ARGUMENT)};`,
-      readOutputProperties(manifest, source, 'item'),
+      readOutputProperties(manifest, source, 'item', rooted ? `${kinds}[0]` : undefined),
       'return obj;'
     )
   }
   return lines(
-    'function readRecord(item) {',
-    readOutputProperties(manifest, source, 'item'),
+    rooted ? 'function readRecord(item, i) {' : 'function readRecord(item) {',
+    readOutputProperties(manifest, source, 'item', rooted ? `${kinds}[i]` : undefined),
     'return obj;',
     '}',
     `var targets = ${argument(RESOLUTION_ENTRIES_ARGUMENT)};`,
     'var result = [];',
     'for (var i = 0; i < targets.length; i++) {',
-    'result.push(readRecord(targets[i]));',
+    rooted ? 'result.push(readRecord(targets[i], i));' : 'result.push(readRecord(targets[i]));',
     '}',
     'return result;'
   )

@@ -6,6 +6,7 @@ import {
   usableResources,
 } from '../../manifest/unsupported.js'
 import { isOperationAvailable, omittedInputs } from '../input-satisfiability.js'
+import { resourceNamespace } from '../surface.js'
 
 export interface CliGeneratorOptions {
   /** Package name (e.g., @macts/calendar) */
@@ -44,7 +45,10 @@ export interface CliGeneratorContext {
   /** Get application class name (PascalCase) */
   getAppClassName(): string
 
-  /** Get the hierarchy as a flat list of paths */
+  /**
+   * Get the hierarchy as a flat list of paths, followed by one path per
+   * singleton root resource, at its public segment.
+   */
   getHierarchyPaths(): HierarchyPath[]
 
   /**
@@ -98,6 +102,18 @@ export function createCliGeneratorContext(
   // Build hierarchy paths
   const hierarchyPaths: HierarchyPath[] = []
   buildHierarchyPaths(manifest, manifest.hierarchy.children, [], [], hierarchyPaths)
+  // A singleton root's objects are in no collection, so no hierarchy entry
+  // names the resource; it is reached at its public segment, where its list
+  // and its get by kind are generated as for any resource.
+  for (const [resourceName, resource] of resourceMap) {
+    if (resource.roots === undefined) continue
+    hierarchyPaths.push({
+      path: [resourceNamespace(resource)],
+      resourceName,
+      canCreate: false,
+      parentParams: [],
+    })
+  }
 
   return {
     manifest,

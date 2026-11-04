@@ -12,6 +12,10 @@
  * position macts leaves out is a gap in what macts provides, not something the
  * app cannot do. macts cannot yet return a usable reference when:
  *
+ * - the target is a singleton root, which the app holds as one of its own
+ *   properties, one per kind: a reference to one names its kind, and macts
+ *   has no curated mapping yet from the field the app returned to the kind
+ *   it holds;
  * - macts has no usable `get` for the target yet, so no reference to it passes
  *   validation;
  * - macts has no primary identifier for the target yet, so the target has no
@@ -67,6 +71,7 @@ import type { Resource } from './schemas/resource.js'
 import { resolveIdentifierTargeting, resolvePrimaryIdentifierProperty } from './identifier.js'
 import { nestedOnlyResources } from './hierarchy-placement.js'
 import { resolvePrimaryIdentifier } from './primary-identifier.js'
+import { resolveRoots } from './roots.js'
 import { resolvingCommand } from './resource-commands.js'
 import { usableCommands, usableProperties, usableResources } from './unsupported.js'
 import {
@@ -81,6 +86,9 @@ import {
  * What macts does not provide yet for an output reference to be usable. Each
  * is a coverage gap (#219), not a limit of the app:
  *
+ * - `root-kind-unmapped`: the target is a singleton root, which the app
+ *   holds as one of its own properties, and no curated mapping yet says
+ *   which kind the field holds.
  * - `no-get`: macts has no usable `get` command for the target yet.
  * - `no-identifier`: macts has no primary identifier for the target yet, so
  *   no identity reference to one exists.
@@ -99,6 +107,7 @@ import {
  *   object.
  */
 export type OmittedOutputReason =
+  | 'root-kind-unmapped'
   | 'no-get'
   | 'no-identifier'
   | 'parent-scoped'
@@ -145,24 +154,34 @@ export function isNameKeyed(manifest: AppManifest, resourceKey: string): boolean
  * A container whose own `get` records a parent would need its own container
  * in turn (a nested chain), which a native read does not return.
  *
+ * A singleton root is the exception to that test: a reference to one read
+ * from the app is left out because nothing on the object says which kind it
+ * is (`root-kind-unmapped`), but a read through a root's own record knows the
+ * kind it found the record by, which is all the container needs. So a root
+ * with a usable `get` is a valid container; the root is held by the
+ * application itself, so it is always top-level.
+ *
  * @param manifest - The app manifest.
  * @param containerKey - The manifest key of the would-be container.
  */
 export function isValidContainer(manifest: AppManifest, containerKey: string): boolean {
+  if (resolveRoots(manifest, containerKey) !== undefined) {
+    return resolvingCommand(manifest, containerKey, 'get') !== undefined
+  }
   return omittedOutputReason(manifest, containerKey) === undefined
 }
 
 /**
  * What macts does not provide yet for a reference read from the app to
  * `resourceKey` to be usable, or `undefined` when it can be used: the
- * resource has a usable `get` and a primary identifier; that `get` records no
- * parent, or it records `sourceKey` and that is a valid container
- * ({@link isValidContainer}); the hierarchy does not hold the resource only
- * within another resource while its `get` records no parent
- * ({@link nestedOnlyResources}); and the resource is not name-keyed
- * ({@link isNameKeyed}). The reasons are checked in that order (`no-get`,
- * `no-identifier`, `parent-scoped`, `unrecorded-parent`, `not-unique`), so
- * the first that applies is reported.
+ * resource is not a singleton root; it has a usable `get` and a primary
+ * identifier; that `get` records no parent, or it records `sourceKey` and
+ * that is a valid container ({@link isValidContainer}); the hierarchy does not
+ * hold the resource only within another resource while its `get` records no
+ * parent ({@link nestedOnlyResources}); and the resource is not name-keyed
+ * ({@link isNameKeyed}). The reasons are checked in that order
+ * (`root-kind-unmapped`, `no-get`, `no-identifier`, `parent-scoped`,
+ * `unrecorded-parent`, `not-unique`), so the first that applies is reported.
  *
  * The judgment is positional for a target whose `get` records a parent: a
  * native read hands the codec, as the reference's container, the record the
@@ -180,6 +199,7 @@ export function omittedOutputReason(
   resourceKey: string,
   sourceKey?: string
 ): OmittedOutputReason | undefined {
+  if (resolveRoots(manifest, resourceKey) !== undefined) return 'root-kind-unmapped'
   const get = resolvingCommand(manifest, resourceKey, 'get')
   if (get === undefined) return 'no-get'
   if (resolvePrimaryIdentifierProperty(manifest.resources[resourceKey]) === undefined) {

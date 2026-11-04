@@ -37,7 +37,11 @@
  */
 
 import type { FieldPlan, IssuePath, ValuePlan } from '@macts/contracts'
-import type { NativeAddressing, NativeCodecEnvironment } from './native-codec.js'
+import type {
+  NativeAddressing,
+  NativeCodecEnvironment,
+  NativeRootAddressing,
+} from './native-codec.js'
 
 /** Which conversion a codec failure happened in. */
 export type NativeCodecDirection = 'decode' | 'encode'
@@ -729,6 +733,15 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   }
 
   /**
+   * The manifest key of the parent `addressing`'s resource is found within,
+   * or `undefined` for one found at the application. A singleton root is
+   * always held by the application itself.
+   */
+  function containerOf(addressing: NativeAddressing): string | undefined {
+    return addressing.lookup === 'byRoot' ? undefined : addressing.within
+  }
+
+  /**
    * The app's object of `addressing`'s resource whose identifier is `id`,
    * found as a generated get finds it, in `owner`'s collection: the
    * application's, or a container's. The object must exist: a miss fails as a
@@ -741,6 +754,8 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     resource: string,
     path: Path
   ): HostObject {
+    // A root has no container (`containerOf`), so its owner is the application.
+    if (addressing.lookup === 'byRoot') return addressRoot(owner, addressing, id, resource, path)
     const expected =
       (addressing.within === undefined ? 'the application' : 'the container') +
       ' to have a collection ' +
@@ -759,11 +774,47 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       setOwn(match, addressing.property, id)
       const matches = callMember('decode', collection, 'whose', [match], path, expected)
       object = isHostObject(matches) ? matches[0] : undefined
+    } else if (addressing.lookup === 'byKey') {
+      // The bridge's key specifier: the identifier is the key the app interprets.
+      object = callMember('decode', collection, 'byName', [id], path, expected)
     } else {
       object = callMember('decode', collection, 'byId', [id], path, expected)
     }
     if (!isHostObject(object)) {
       return fail('decode', path, 'Expected ' + expected + ', received ' + describeValue(object))
+    }
+    if (callMember('decode', object, 'exists', [], path, 'an object') !== true) {
+      return failMissing(path, resource)
+    }
+    return object
+  }
+
+  /**
+   * The app's object of a singleton root whose kind is `id`: the application
+   * property `addressing` maps the kind to. A kind the map does not hold, and
+   * an object the app does not have at that property on this Mac, both fail
+   * as a missing target.
+   */
+  function addressRoot(
+    app: HostObject,
+    addressing: NativeRootAddressing,
+    id: unknown,
+    resource: string,
+    path: Path
+  ): HostObject {
+    const roots = addressing.roots
+    const property = typeof id === 'string' && hasOwn(roots, id) ? roots[id] : undefined
+    if (property === undefined) return failMissing(path, resource)
+    const object = app[property]
+    if (!isHostObject(object)) {
+      return fail(
+        'decode',
+        path,
+        'Expected the application to have a property ' +
+          quote(property) +
+          ', received ' +
+          describeValue(object)
+      )
     }
     if (callMember('decode', object, 'exists', [], path, 'an object') !== true) {
       return failMissing(path, resource)
@@ -853,7 +904,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     }
     if (!hasOwn(payload, 'id')) fail('decode', path, 'Missing required field "id"')
     const plans = referencePlansOf('decode', env, plan.resource, path)
-    const within = plans.addressing.within
+    const within = containerOf(plans.addressing)
     const hasContainer = hasOwn(payload, 'container')
     if (within === undefined && hasContainer) {
       return failUnsupported(
@@ -979,14 +1030,14 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       )
     }
     const plans = referencePlansOf('encode', env, plan.resource, path)
-    const within = plans.addressing.within
+    const within = containerOf(plans.addressing)
     const held = within === undefined ? undefined : containedValue(native, plan.resource, path)
     const target = held === undefined ? native : held.value
     const payload = identityPayload(plan.resource, target, plans, env, path)
     if (within !== undefined && held !== undefined) {
       const containerPath = path.concat(['container'])
       const parentPlans = referencePlansOf('encode', env, within, containerPath)
-      if (parentPlans.addressing.within !== undefined) {
+      if (containerOf(parentPlans.addressing) !== undefined) {
         return failUnsupported(
           'encode',
           containerPath,
@@ -1058,6 +1109,16 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     const expected = 'an object of ' + quote(resource)
     if (!isHostObject(native)) {
       return fail('encode', path, 'Expected ' + expected + ', received ' + describeValue(native))
+    }
+    if (plans.addressing.lookup === 'byRoot') {
+      return failUnsupported(
+        'encode',
+        path,
+        'reference',
+        'References to ' +
+          quote(resource) +
+          ' have no conversion from the app: its objects do not say which kind they are'
+      )
     }
     const id = callMember('encode', native, plans.addressing.property, [], path, expected)
     return identityFromId(resource, id, plans, env, path)

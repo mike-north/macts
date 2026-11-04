@@ -6,7 +6,9 @@
  * JavaScript context against a stand-in application: the composition of the
  * script the built-in transport runs, the reading of the outcome it prints,
  * a transport that runs that script against a stand-in application, a
- * stand-in Chromium browser application, and the record keys the native get and list bodies read for a resource.
+ * stand-in Chromium browser application, the record keys the native get and
+ * list bodies read for a resource, and the Archive stand-in manifest that
+ * exercises key targeting, singleton roots and reported absences.
  * Tests in other macts packages use it to drive the real native executor end
  * to end with only the transport replaced.
  *
@@ -28,3 +30,4 @@ export {
   type StandInWindow,
 } from './jxa/test-support/stand-in-chromium.js'
 export { nativeReadKeys, type NativeReadKeys } from './jxa/native-scripts.js'
+export { archiveManifest } from './manifest/test-support/archive-key-and-root.js'
