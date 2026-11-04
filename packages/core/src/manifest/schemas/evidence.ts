@@ -304,21 +304,6 @@ export const DictionaryTermEvidenceSchema = z
 export type DictionaryTermEvidence = z.infer<typeof DictionaryTermEvidenceSchema>
 
 /**
- * The former name of {@link DictionaryTermEvidenceSchema}, from when the
- * evidence was recorded only for native spellings.
- *
- * @deprecated Use {@link DictionaryTermEvidenceSchema}: the same schema,
- * named for every dictionary declaration a manifest records.
- */
-export const DictionarySpellingEvidenceSchema = DictionaryTermEvidenceSchema
-/**
- * The former name of {@link DictionaryTermEvidence}.
- *
- * @deprecated Use {@link DictionaryTermEvidence}.
- */
-export type DictionarySpellingEvidence = DictionaryTermEvidence
-
-/**
  * How an app's dictionary lacks a collection the manifest declares.
  *
  * - `no-class`: the dictionary declares no class with the resource's code or

@@ -489,7 +489,7 @@ unsupported records no native name, and a resource marked unsupported no native
 collection. The native executor addresses the app by the recorded spelling, and
 returns records keyed by the public names.
 
-**Schemas:** [`ResourceNativeSpellingSchema`](../packages/core/src/manifest/schemas/resource.ts), [`PropertyNativeSpellingSchema`](../packages/core/src/manifest/schemas/property.ts), [`DictionarySpellingEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts)
+**Schemas:** [`ResourceNativeSpellingSchema`](../packages/core/src/manifest/schemas/resource.ts), [`PropertyNativeSpellingSchema`](../packages/core/src/manifest/schemas/property.ts), [`DictionaryTermEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts)
 
 ##### Unsupported resources
 

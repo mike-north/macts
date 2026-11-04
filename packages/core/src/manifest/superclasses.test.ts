@@ -7,13 +7,16 @@
  * `phases/13-sdk-value-and-execution-contracts.md` (D10, "Superclasses"):
  *
  * - a resource gains each ancestor property it does not declare, nearest
- *   ancestor first, whole, with its code, native spelling and `unsupported`
- *   marker, and with only the claims the dictionary itself backs (an `sdef`
- *   nullability claim); claims observed on, or curated for, the ancestor's
- *   own collection (probe or curated nullability, resettability) stay with it;
+ *   ancestor first, whole: its code, native spelling, `unsupported` marker
+ *   and every claim, whatever the evidence (probe, curated or dictionary
+ *   nullability, resettability), as the ancestor's evidence;
+ * - a claims-only overlay (`inheritedClaims`) replaces each inherited claim
+ *   it states and leaves the declaration the ancestor's; a marker it states
+ *   also drops the inherited claims and native spelling. An overlay is only
+ *   for a property the resource inherits and does not declare;
  * - a property the resource declares replaces the inherited one whole;
  * - the resource gains the nearest ancestor's identifiers when it declares
- *   none, without uniqueness claims, which describe one collection's items;
+ *   none, with their targeting and uniqueness claims;
  * - collection-level records (`code`, `native`, `unsupported`, probe blocks)
  *   are never inherited;
  * - an unknown superclass and a cycle are manifest errors at
@@ -69,6 +72,16 @@ const LEGACY_UNSUPPORTED = {
   },
 } as const
 
+/** The identifiers of the Catalog item class, with its uniqueness claim. */
+const ITEM_IDENTIFIERS = [
+  {
+    property: 'id',
+    primary: true,
+    unique: true,
+    evidence: { unique: { source: 'curated', note: '40 items read, ids distinct.' } },
+  },
+] as const
+
 /** The Catalog item class: every kind of the app's item inherits it. */
 function item(): Record<string, unknown> {
   return {
@@ -121,14 +134,7 @@ function item(): Record<string, unknown> {
         unsupported: LEGACY_UNSUPPORTED,
       },
     },
-    identifiers: [
-      {
-        property: 'id',
-        primary: true,
-        unique: true,
-        evidence: { unique: { source: 'curated', note: '40 items read, ids distinct.' } },
-      },
-    ],
+    identifiers: ITEM_IDENTIFIERS.map((identifier) => ({ ...identifier })),
   }
 }
 
@@ -144,7 +150,12 @@ function catalog(resources: Record<string, unknown>): Record<string, unknown> {
 
 /** The stand-in Catalog: Item, Book and Novel in a chain, Magazine and Pamphlet beside Book. */
 function catalogManifest(): Record<string, unknown> {
-  return catalog({
+  return catalog(catalogResources())
+}
+
+/** The resources of the stand-in Catalog, in manifest order. */
+function catalogResources(): Record<string, unknown> {
+  return {
     Item: item(),
     Book: {
       name: 'Book',
@@ -202,7 +213,7 @@ function catalogManifest(): Record<string, unknown> {
         },
       },
     },
-  })
+  }
 }
 
 /** The flattened Catalog. */
@@ -273,26 +284,30 @@ describe('a resource that inherits a superclass', () => {
     })
   })
 
-  it("leaves claims observed on the superclass's collection with it", () => {
+  it("inherits every claim made about the superclass's property, as its evidence", () => {
     const book = resourceOf(parsed(), 'Book')
-    // A probe of items says nothing yet about books, so the size falls back
-    // to the default, and so does the curated resettability of the note.
+    // A book is an item, so what a probe observed of items holds for it.
     expect(book.properties['size']).toEqual({
       access: 'r',
       type: 'integer',
       description: 'The size of the item',
       code: 'ptsz',
       optional: false,
+      nullable: false,
+      evidence: { nullable: PROBE_NON_NULL },
     })
+    // So does a curated claim.
     expect(book.properties['note']).toEqual({
       access: 'rw',
       type: 'string',
       description: 'A note about the item',
       code: 'note',
       optional: false,
+      resettable: true,
+      evidence: {
+        resettable: { source: 'curated', note: 'Setting it to missing value clears it.' },
+      },
     })
-    // The superclass keeps its own claims.
-    expect(resourceOf(parsed(), 'Item').properties['size']?.nullable).toBe(false)
   })
 
   it('inherits a property marked unsupported, still marked', () => {
@@ -318,10 +333,32 @@ describe('a resource that inherits a superclass', () => {
     })
   })
 
-  it("inherits the superclass's identifiers when it declares none, without uniqueness claims", () => {
-    expect(resourceOf(parsed(), 'Book').identifiers).toEqual([{ property: 'id', primary: true }])
-    // The superclass keeps its claim.
-    expect(resourceOf(parsed(), 'Item').identifiers?.[0]?.unique).toBe(true)
+  it("inherits the superclass's identifiers when it declares none, with their claims", () => {
+    expect(resourceOf(parsed(), 'Book').identifiers).toEqual(ITEM_IDENTIFIERS)
+  })
+
+  it("inherits an identifier's targeting", () => {
+    const base = item()
+    const manifest = AppManifestSchema.parse(
+      catalog({
+        Item: {
+          ...base,
+          identifiers: [
+            { property: 'id', primary: true, targeting: 'byProperty', runtimeProperty: 'name' },
+          ],
+        },
+        Book: {
+          name: 'Book',
+          plural: 'Books',
+          description: 'A book',
+          inherits: inherits('Item', 'item'),
+          properties: {},
+        },
+      })
+    )
+    expect(resourceOf(manifest, 'Book').identifiers).toEqual([
+      { property: 'id', primary: true, targeting: 'byProperty', runtimeProperty: 'name' },
+    ])
   })
 
   it('keeps the identifiers it declares', () => {
@@ -363,7 +400,160 @@ describe('a chain of superclasses', () => {
   })
 
   it("inherits the nearest ancestor's identifiers", () => {
-    expect(resourceOf(parsed(), 'Novel').identifiers).toEqual([{ property: 'id', primary: true }])
+    expect(resourceOf(parsed(), 'Novel').identifiers).toEqual(ITEM_IDENTIFIERS)
+  })
+
+  // Regression: a superclass declared after a subclass was flattened first,
+  // for the subclass, and moved ahead of it in the read manifest, reordering
+  // every generated surface.
+  it("keeps the manifest's resource order when a subclass is declared before its superclass", () => {
+    const { Item, ...rest } = catalogResources()
+    const manifest = AppManifestSchema.parse(catalog({ ...rest, Item }))
+    expect(Object.keys(manifest.resources)).toEqual([
+      'Book',
+      'Novel',
+      'Magazine',
+      'Pamphlet',
+      'Item',
+    ])
+  })
+})
+
+describe('a claims-only overlay', () => {
+  const PROBE_NULLABLE = { ...PROBE_NON_NULL, nullCount: 4 } as const
+
+  /** A Catalog whose Book states `claims` about the properties it inherits. */
+  const withOverlay = (claims: Record<string, unknown>): Record<string, unknown> => {
+    const manifest = catalogManifest()
+    const resources = manifest['resources'] as Record<string, Record<string, unknown>>
+    resources['Book'] = { ...resources['Book'], inheritedClaims: claims }
+    return manifest
+  }
+
+  it("replaces the inherited claim with the resource's own, keeping the declaration", () => {
+    const manifest = AppManifestSchema.parse(
+      withOverlay({ size: { nullable: true, evidence: { nullable: PROBE_NULLABLE } } })
+    )
+    expect(resourceOf(manifest, 'Book').properties['size']).toEqual({
+      access: 'r',
+      type: 'integer',
+      description: 'The size of the item',
+      code: 'ptsz',
+      optional: false,
+      nullable: true,
+      evidence: { nullable: PROBE_NULLABLE },
+    })
+    // The superclass keeps its claim, and a subclass of Book inherits Book's.
+    expect(resourceOf(manifest, 'Item').properties['size']?.nullable).toBe(false)
+    expect(resourceOf(manifest, 'Novel').properties['size']?.nullable).toBe(true)
+  })
+
+  it('replaces only the claims it states', () => {
+    const manifest = AppManifestSchema.parse(
+      withOverlay({
+        note: {
+          nullable: true,
+          evidence: { nullable: { source: 'curated', note: 'Often empty.' } },
+        },
+      })
+    )
+    expect(resourceOf(manifest, 'Book').properties['note']).toMatchObject({
+      nullable: true,
+      resettable: true,
+      evidence: {
+        nullable: { source: 'curated', note: 'Often empty.' },
+        resettable: { source: 'curated', note: 'Setting it to missing value clears it.' },
+      },
+    })
+  })
+
+  it('marks an inherited property unsupported, dropping its claims and native spelling', () => {
+    const marker = { ...LEGACY_UNSUPPORTED, reason: 'Books have no URL; every read fails.' }
+    const manifest = AppManifestSchema.parse(
+      withOverlay({ uRL: { unsupported: marker }, size: { unsupported: marker } })
+    )
+    expect(resourceOf(manifest, 'Book').properties['uRL']).toEqual({
+      access: 'r',
+      type: 'string',
+      description: 'The URL of the item',
+      code: 'url ',
+      optional: false,
+      unsupported: marker,
+    })
+    expect(resourceOf(manifest, 'Book').properties['size']).toEqual({
+      access: 'r',
+      type: 'integer',
+      description: 'The size of the item',
+      code: 'ptsz',
+      optional: false,
+      unsupported: marker,
+    })
+  })
+
+  it('is merged when read, so the read manifest records none and reads back the same', () => {
+    const once = AppManifestSchema.parse(
+      withOverlay({ size: { nullable: true, evidence: { nullable: PROBE_NULLABLE } } })
+    )
+    expect(resourceOf(once, 'Book').inheritedClaims).toBeUndefined()
+    expect(AppManifestSchema.parse(once)).toEqual(once)
+  })
+
+  it('rejects an overlay for a property the resource declares itself', () => {
+    expect(
+      issues(withOverlay({ name: { nullable: true, evidence: { nullable: PROBE_NULLABLE } } }))
+    ).toEqual([
+      {
+        path: ['resources', 'Book', 'inheritedClaims', 'name'],
+        message:
+          'resources.Book.inheritedClaims.name: "Book" declares "name" itself, so the claim belongs on that declaration.',
+      },
+    ])
+  })
+
+  it('rejects an overlay for a property no superclass declares', () => {
+    expect(
+      issues(withOverlay({ pages: { nullable: true, evidence: { nullable: PROBE_NULLABLE } } }))
+    ).toEqual([
+      {
+        path: ['resources', 'Book', 'inheritedClaims', 'pages'],
+        message:
+          'resources.Book.inheritedClaims.pages: no superclass of "Book" declares "pages", so there is no inherited property to make the claim about.',
+      },
+    ])
+  })
+
+  it('rejects an overlay on a resource that records no superclass', () => {
+    const manifest = catalog({
+      Item: {
+        ...item(),
+        inheritedClaims: { size: { nullable: true, evidence: { nullable: PROBE_NULLABLE } } },
+      },
+    })
+    expect(issues(manifest).map(({ path }) => path)).toEqual([
+      ['resources', 'Item', 'inheritedClaims', 'size'],
+    ])
+  })
+
+  it('rejects an overlay that states no claim, or a claim without its evidence', () => {
+    expect(issues(withOverlay({ size: {} })).map(({ path }) => path)).toEqual([
+      ['resources', 'Book', 'inheritedClaims', 'size'],
+    ])
+    expect(issues(withOverlay({ size: { nullable: true } })).map(({ path }) => path)).toEqual([
+      ['resources', 'Book', 'inheritedClaims', 'size', 'evidence', 'nullable'],
+    ])
+  })
+
+  it("holds an overlay's claim to the inherited declaration's rules", () => {
+    // The inherited shelfMark is marked unsupported, so it takes no nullability claim.
+    expect(
+      issues(withOverlay({ shelfMark: { nullable: true, evidence: { nullable: PROBE_NULLABLE } } }))
+    ).toEqual([
+      {
+        path: ['resources', 'Book', 'properties', 'shelfMark', 'unsupported'],
+        message:
+          'An unsupported property cannot carry a nullable or resettable claim: every surface leaves it out.',
+      },
+    ])
   })
 })
 
@@ -467,6 +657,81 @@ describe('an invalid superclass', () => {
         message:
           'The primary identifier "id" cannot be marked unsupported: choose a different identifier.',
       },
+    ])
+  })
+})
+
+describe("a resource's own rules, applied to what it inherits", () => {
+  /** Dictionary evidence that the app has no class `term`. */
+  const noClass = (term: string) => ({
+    evidence: { ...DICTIONARY, term, finding: 'no-class' },
+  })
+
+  // Regression: an unsupported superclass's property typed by another
+  // unsupported resource reached a usable subclass unchecked, and the contract
+  // declared it as `unknown`.
+  it('rejects an inherited property whose type names an unsupported resource', () => {
+    const manifest = catalog({
+      Item: {
+        name: 'Item',
+        plural: 'Items',
+        description: 'An item',
+        unsupported: noClass('item'),
+        properties: {
+          ghost: { access: 'r', type: { resource: 'Gone' }, description: 'A gone thing' },
+        },
+      },
+      Gone: {
+        name: 'Gone',
+        plural: 'Gones',
+        description: 'A thing the app does not have',
+        unsupported: noClass('gone'),
+        properties: {},
+      },
+      Book: {
+        name: 'Book',
+        plural: 'Books',
+        description: 'A book',
+        inherits: inherits('Item', 'item'),
+        properties: {},
+      },
+    })
+    expect(issues(manifest)).toEqual([
+      {
+        path: ['resources', 'Book', 'properties', 'ghost', 'type'],
+        message:
+          'resources.Book.properties.ghost: its type names the resource "Gone", which is marked unsupported, so no generated surface declares it; change the type, or mark the property unsupported too.',
+      },
+    ])
+  })
+
+  it('reports such a property once, on the resource that declares it', () => {
+    const manifest = catalog({
+      Item: {
+        name: 'Item',
+        plural: 'Items',
+        description: 'An item',
+        properties: {
+          ghost: { access: 'r', type: { resource: 'Gone' }, description: 'A gone thing' },
+        },
+      },
+      Gone: {
+        name: 'Gone',
+        plural: 'Gones',
+        description: 'A thing the app does not have',
+        unsupported: noClass('gone'),
+        properties: {},
+      },
+      Book: {
+        name: 'Book',
+        plural: 'Books',
+        description: 'A book',
+        inherits: inherits('Item', 'item'),
+        properties: {},
+      },
+    })
+    expect(issues(manifest).map(({ path }) => path)).toEqual([
+      ['resources', 'Item', 'properties', 'ghost', 'type'],
     ])
   })
 })

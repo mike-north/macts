@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { PropertySchema } from './property.js'
+import { PropertyClaimsSchema, PropertySchema } from './property.js'
 import {
   DictionaryTermEvidenceSchema,
   IdentifierUniquenessEvidenceSchema,
@@ -436,6 +436,14 @@ export const ResourceSchema = z
      * holds what it inherits.
      */
     inherits: ResourceInheritsSchema.optional(),
+    /**
+     * Claims about properties the resource inherits, by property key, stated
+     * without redeclaring the property (`PropertyClaimsSchema`). Only a
+     * resource that records `inherits` has them, each for a property an
+     * ancestor declares and the resource does not. The manifest is read
+     * flattened, so a parsed resource holds them merged into its properties.
+     */
+    inheritedClaims: z.record(z.string(), PropertyClaimsSchema).optional(),
     /**
      * Set when the app cannot provide the resource (its dictionary has no
      * collection for it, or every read of it fails), with the evidence.

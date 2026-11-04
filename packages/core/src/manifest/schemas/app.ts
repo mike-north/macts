@@ -6,9 +6,10 @@ import { HierarchySchema } from './hierarchy.js'
 import { RelationshipSchema } from './relationship.js'
 import { AppMetadataSchema, SuiteSchema, ExtractionMetadataSchema } from './metadata.js'
 import { findDuplicateRoutes } from '../route.js'
-import { findSuperclassIssues, flattenSuperclasses } from '../superclasses.js'
+import { findSuperclassIssues, flattenSuperclasses, superclassChain } from '../superclasses.js'
 import {
   findUnsupportedTypeReferences,
+  type UnsupportedTypeReference,
   isCommandUnsupported,
   isResourceUnsupported,
 } from '../unsupported.js'
@@ -134,13 +135,8 @@ export const AppManifestSchema = z
     }
     // No generated surface declares a resource marked unsupported, so a usable
     // declaration whose type names one would refer to nothing.
-    for (const { site, path, resourceKey } of findUnsupportedTypeReferences(data)) {
-      const declaration = path[0] === 'resources' ? 'the property' : 'the command'
-      ctx.addIssue({
-        code: 'custom',
-        message: `${site}: its type names the resource "${resourceKey}", which is marked unsupported, so no generated surface declares it; change the type, or mark ${declaration} unsupported too.`,
-        path: [...path],
-      })
+    for (const reference of findUnsupportedTypeReferences(data)) {
+      ctx.addIssue({ code: 'custom', ...unsupportedTypeIssue(reference) })
     }
     for (const issue of findCommandParentIssues(data)) {
       ctx.addIssue({ code: 'custom', ...issue })
@@ -159,11 +155,27 @@ export const AppManifestSchema = z
     // Checked only on a manifest that is otherwise valid, so an issue of the
     // resource's own declarations is not reported twice.
     if (ctx.issues.length > 0) return
+    // An inherited property is checked where it is used: a usable subclass of
+    // an unsupported superclass must not inherit a type naming an unsupported
+    // resource. Every other site was checked before flattening.
+    for (const reference of findUnsupportedTypeReferences(data)) {
+      const [section, key] = reference.path
+      if (section !== 'resources' || typeof key !== 'string') continue
+      if (data.resources[key]?.inherits === undefined) continue
+      ctx.addIssue({ code: 'custom', ...unsupportedTypeIssue(reference) })
+    }
+    // A subclass inherits its superclass as flattened, so an issue there would
+    // be reported again on every subclass; it is reported where it arises.
+    const failed = new Set<string>()
     for (const [key, resource] of Object.entries(data.resources)) {
       if (resource.inherits === undefined) continue
       const checked = ResourceSchema.safeParse(resource)
-      if (checked.success) continue
-      for (const issue of checked.error.issues) {
+      if (!checked.success) failed.add(key)
+    }
+    for (const key of failed) {
+      if (superclassChain(key, data.resources).some((ancestor) => failed.has(ancestor))) continue
+      const checked = ResourceSchema.safeParse(data.resources[key])
+      for (const issue of checked.error?.issues ?? []) {
         ctx.addIssue({
           code: 'custom',
           message: issue.message,
@@ -173,3 +185,15 @@ export const AppManifestSchema = z
     }
   })
 export type AppManifest = z.infer<typeof AppManifestSchema>
+
+/** The issue for a usable declaration whose type names an unsupported resource. */
+function unsupportedTypeIssue({ site, path, resourceKey }: UnsupportedTypeReference): {
+  message: string
+  path: (string | number)[]
+} {
+  const declaration = path[0] === 'resources' ? 'the property' : 'the command'
+  return {
+    message: `${site}: its type names the resource "${resourceKey}", which is marked unsupported, so no generated surface declares it; change the type, or mark ${declaration} unsupported too.`,
+    path: [...path],
+  }
+}
