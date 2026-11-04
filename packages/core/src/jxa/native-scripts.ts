@@ -1045,6 +1045,13 @@ function rangeWindowReader(columnReads: readonly string[]): string {
  * longer reaches the window's end shrank meanwhile, a changed `Inconsistent`,
  * as by range.
  *
+ * A property the app cannot read across the items falls back to one request
+ * per item (see `readColumn` in {@link listReadHelpers}) over what the failed
+ * read covered: the whole collection, not the page. Such a page costs one
+ * request per item of the collection, where by range it costs one per item of
+ * the page. A measured column cost reflects that only when the fallback fired
+ * while it was timed.
+ *
  * `within(values, start, end)` is the one place a whole-collection read is
  * cut to positions: the values at the half-open, zero-based `[start, end)`,
  * or `null` when the read is not a list or does not reach `end`, which the

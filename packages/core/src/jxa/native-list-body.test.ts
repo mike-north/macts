@@ -742,15 +742,22 @@ describe('list bodies: a property the app cannot read across the collection', ()
   })
 })
 
+/**
+ * Each communication failure (-600, -609, -1712, -128, -1743) and the error
+ * the executor classifies it as. A request that failed this way says nothing
+ * about whether the property can be read, so no list body ever falls back on
+ * it.
+ */
+const COMMUNICATION_FAILURES = [
+  [COMMUNICATION_FAILURE_ERROR_NUMBERS.appNotRunning, AppUnavailableError],
+  [COMMUNICATION_FAILURE_ERROR_NUMBERS.connectionInvalid, AppUnavailableError],
+  [COMMUNICATION_FAILURE_ERROR_NUMBERS.noReply, AppUnavailableError],
+  [COMMUNICATION_FAILURE_ERROR_NUMBERS.userCancelled, AppOperationError],
+  [COMMUNICATION_FAILURE_ERROR_NUMBERS.notAuthorized, AppAuthorizationRequiredError],
+] as const
+
 describe('list bodies: a failed request is never taken for an unreadable property', () => {
-  // Each communication failure and the error the executor classifies it as.
-  const FAILURES = [
-    [COMMUNICATION_FAILURE_ERROR_NUMBERS.appNotRunning, AppUnavailableError],
-    [COMMUNICATION_FAILURE_ERROR_NUMBERS.connectionInvalid, AppUnavailableError],
-    [COMMUNICATION_FAILURE_ERROR_NUMBERS.noReply, AppUnavailableError],
-    [COMMUNICATION_FAILURE_ERROR_NUMBERS.userCancelled, AppOperationError],
-    [COMMUNICATION_FAILURE_ERROR_NUMBERS.notAuthorized, AppAuthorizationRequiredError],
-  ] as const
+  const FAILURES = COMMUNICATION_FAILURES
 
   it.each(FAILURES)(
     'fails the list when a read across the collection fails with %i, instead of falling back',
@@ -1576,7 +1583,55 @@ describe.each(PAGE_READS)(
       const result = windowOf(await readWindow(app, { offset: 2, size: 3, anchor: 'T2' }, read))
       expect(result.items.map((item) => item['title'])).toEqual(['Task 3', 'Task 4', 'Task 5'])
       expect(uidsOf(result)).toEqual(['T3', 'T4', 'T5'])
+      // The fallback reads per item over what the failed read covered: by
+      // range the page's 3 items, by column all 7 items of the collection.
+      const perItemReads = app.requests.filter((request) => request === 'item title')
+      expect(perItemReads).toHaveLength(read === 'range' ? 3 : 7)
     })
+  }
+)
+
+describe.each(PAGE_READS)(
+  'paged list bodies read by %s: a failed request is never taken for an unreadable value',
+  (read) => {
+    /** The requests a failed page made that read one item at a time. */
+    const perItem = (requests: readonly string[]): string[] =>
+      requests.filter((request) => request.startsWith('item ') || request === 'properties')
+
+    it.each(COMMUNICATION_FAILURES)(
+      'fails a continuing page when a property read fails with %i, instead of falling back',
+      async (errorNumber, errorClass) => {
+        const app = fakePlanner(SEVEN_TASKS, { bulk: ['secret'], bulkErrorNumber: errorNumber })
+        const error = errorOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' }, read))
+        expect(error).toBeInstanceOf(errorClass)
+        // No per-item read was tried, and the failed read was the last request.
+        expect(perItem(app.requests)).toEqual([])
+        expect(app.requests.at(-1)).toBe(pageRequest(read, 3, 5, 'secret'))
+      }
+    )
+
+    it.each(COMMUNICATION_FAILURES)(
+      'fails a first page when the identifier read fails with %i, without reading per item',
+      async (errorNumber, errorClass) => {
+        const app = fakePlanner(SEVEN_TASKS, { bulk: ['uid'], bulkErrorNumber: errorNumber })
+        const error = errorOf(await readWindow(app, { offset: 0, size: 3 }, read))
+        expect(error).toBeInstanceOf(errorClass)
+        expect(app.requests).toEqual(['shelf todos', 'count', pageRequest(read, 0, 2, 'uid')])
+      }
+    )
+
+    it.each(COMMUNICATION_FAILURES)(
+      'fails a continuing page when the anchor read fails with %i, never as a changed collection',
+      async (errorNumber, errorClass) => {
+        const app = fakePlanner(SEVEN_TASKS, { bulk: ['uid'], bulkErrorNumber: errorNumber })
+        const error = errorOf(await readWindow(app, { offset: 3, size: 3, anchor: 'T3' }, read))
+        expect(error).toBeInstanceOf(errorClass)
+        expect(error).not.toBeInstanceOf(CollectionChangedError)
+        // The anchor is the first identifier read of a continuing page: by
+        // range the item before the window, by column the whole collection.
+        expect(app.requests).toEqual(['shelf todos', 'count', pageRequest(read, 2, 2, 'uid')])
+      }
+    )
   }
 )
 
