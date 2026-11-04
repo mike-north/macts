@@ -1319,11 +1319,15 @@ else, so a key that is not a parameter is a `ValidationError`, as it is under
 a contract registration. A manifest-registered list does not page, so its
 input declares no paging inputs. A resource-scoped get, update or delete
 selects its item by its identifier parameter, the first required parameter
-other than its parent's, so a manifest whose get, update or delete declares
-none is refused at registration with `OperationRegistrationError`, naming the
-app and the command. Without one, a get or update would read an undeclared
-`id` no input can carry, and a delete would call the app's delete with no
-target.
+other than its parent's, and a delete at application scope must declare one
+too. No surface supplies an identifier name the manifest does not declare: the
+generated contract, HTTP client and CLI take exactly that parameter, and the
+native body addresses the item by it. A manifest with a command that must
+select an item and declares no such parameter is refused by generation, which
+emits no files for it, and at registration, from the manifest or from a
+contract, with `OperationRegistrationError`; both name the app and the command
+and say to declare the item's identifier. An application-scoped get or update
+is a plain command call and selects no item, so the rule does not reach it.
 
 ## D6. Structured Error Registry, Wire Codec, and Reconstruction
 

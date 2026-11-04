@@ -91,9 +91,10 @@ and each operation's input must hold exactly its command's declared
 parameters. A request with any other key is answered 400 `VALIDATION_FAILED`,
 as it is for an app served from its contract. Lists served from a manifest do
 not page, so they take no `pageSize` or `cursor`. A manifest whose
-resource-scoped get, update or delete command declares no identifier parameter
-is refused when it is registered, with an `OperationRegistrationError` naming
-the app and the command.
+resource-scoped get, update or delete command, or application-scoped delete,
+declares no identifier parameter is refused when it is registered, from the
+manifest or from a contract, with an `OperationRegistrationError` naming the app
+and the command.
 
 ### Creating API Keys
 
