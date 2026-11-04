@@ -310,8 +310,12 @@ export const AppManifestSchema: z.ZodObject<{
                 errorNumber: z.ZodNumber;
             }, z.core.$strict>], "source">;
         }, z.core.$strict>>;
-        rangeRead: z.ZodOptional<z.ZodObject<{
-            supported: z.ZodBoolean;
+        rangeRead: z.ZodOptional<z.ZodDiscriminatedUnion<[z.ZodObject<{
+            supported: z.ZodLiteral<true>;
+            read: z.ZodEnum<{
+                range: "range";
+                column: "column";
+            }>;
             evidence: z.ZodObject<{
                 source: z.ZodLiteral<"probe">;
                 observedAt: z.ZodISODateTime;
@@ -319,9 +323,36 @@ export const AppManifestSchema: z.ZodObject<{
                 appVersion: z.ZodString;
                 osVersion: z.ZodString;
                 errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
+                cost: z.ZodOptional<z.ZodObject<{
+                    observedAt: z.ZodISODateTime;
+                    pageMs: z.ZodNumber;
+                    columnMs: z.ZodNumber;
+                    items: z.ZodNumber;
+                    runs: z.ZodNumber;
+                    pageSize: z.ZodNumber;
+                }, z.core.$strict>>;
                 note: z.ZodOptional<z.ZodString>;
             }, z.core.$strict>;
-        }, z.core.$strict>>;
+        }, z.core.$strict>, z.ZodObject<{
+            supported: z.ZodLiteral<false>;
+            evidence: z.ZodObject<{
+                source: z.ZodLiteral<"probe">;
+                observedAt: z.ZodISODateTime;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
+                cost: z.ZodOptional<z.ZodObject<{
+                    observedAt: z.ZodISODateTime;
+                    pageMs: z.ZodNumber;
+                    columnMs: z.ZodNumber;
+                    items: z.ZodNumber;
+                    runs: z.ZodNumber;
+                    pageSize: z.ZodNumber;
+                }, z.core.$strict>>;
+                note: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>;
+        }, z.core.$strict>], "supported">>;
     }, z.core.$strip>>;
     enums: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodObject<{
         name: z.ZodString;
@@ -2301,7 +2332,29 @@ export const OWNED_OUTPUT_RECORD_FILE = ".macts-generated.json";
 export type OwnedOutputSource = 'record' | 'headers' | 'none';
 
 // @public
+export const PAGE_READS: readonly ["range", "column"];
+
+// @public
 export type PageAnchor = string | number;
+
+// @public (undocumented)
+export type PageCost = z.infer<typeof PageCostSchema>;
+
+// @public
+export const PageCostSchema: z.ZodObject<{
+    observedAt: z.ZodISODateTime;
+    pageMs: z.ZodNumber;
+    columnMs: z.ZodNumber;
+    items: z.ZodNumber;
+    runs: z.ZodNumber;
+    pageSize: z.ZodNumber;
+}, z.core.$strict>;
+
+// @public
+export type PageRead = (typeof PAGE_READS)[number];
+
+// @public
+export function pageReadFor(pageMs: number, columnMs: number): PageRead;
 
 // @public
 export interface PageWindow {
@@ -2825,6 +2878,14 @@ export const RangeReadEvidenceSchema: z.ZodObject<{
     appVersion: z.ZodString;
     osVersion: z.ZodString;
     errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
+    cost: z.ZodOptional<z.ZodObject<{
+        observedAt: z.ZodISODateTime;
+        pageMs: z.ZodNumber;
+        columnMs: z.ZodNumber;
+        items: z.ZodNumber;
+        runs: z.ZodNumber;
+        pageSize: z.ZodNumber;
+    }, z.core.$strict>>;
     note: z.ZodOptional<z.ZodString>;
 }, z.core.$strict>;
 
@@ -3123,8 +3184,12 @@ export interface ResourceProbeResult {
 export type ResourceRangeRead = z.infer<typeof ResourceRangeReadSchema>;
 
 // @public
-export const ResourceRangeReadSchema: z.ZodObject<{
-    supported: z.ZodBoolean;
+export const ResourceRangeReadSchema: z.ZodDiscriminatedUnion<[z.ZodObject<{
+    supported: z.ZodLiteral<true>;
+    read: z.ZodEnum<{
+        range: "range";
+        column: "column";
+    }>;
     evidence: z.ZodObject<{
         source: z.ZodLiteral<"probe">;
         observedAt: z.ZodISODateTime;
@@ -3132,9 +3197,36 @@ export const ResourceRangeReadSchema: z.ZodObject<{
         appVersion: z.ZodString;
         osVersion: z.ZodString;
         errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
+        cost: z.ZodOptional<z.ZodObject<{
+            observedAt: z.ZodISODateTime;
+            pageMs: z.ZodNumber;
+            columnMs: z.ZodNumber;
+            items: z.ZodNumber;
+            runs: z.ZodNumber;
+            pageSize: z.ZodNumber;
+        }, z.core.$strict>>;
         note: z.ZodOptional<z.ZodString>;
     }, z.core.$strict>;
-}, z.core.$strict>;
+}, z.core.$strict>, z.ZodObject<{
+    supported: z.ZodLiteral<false>;
+    evidence: z.ZodObject<{
+        source: z.ZodLiteral<"probe">;
+        observedAt: z.ZodISODateTime;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
+        cost: z.ZodOptional<z.ZodObject<{
+            observedAt: z.ZodISODateTime;
+            pageMs: z.ZodNumber;
+            columnMs: z.ZodNumber;
+            items: z.ZodNumber;
+            runs: z.ZodNumber;
+            pageSize: z.ZodNumber;
+        }, z.core.$strict>>;
+        note: z.ZodOptional<z.ZodString>;
+    }, z.core.$strict>;
+}, z.core.$strict>], "supported">;
 
 // @public
 export const ResourceSchema: z.ZodObject<{
@@ -3323,8 +3415,12 @@ export const ResourceSchema: z.ZodObject<{
             errorNumber: z.ZodNumber;
         }, z.core.$strict>], "source">;
     }, z.core.$strict>>;
-    rangeRead: z.ZodOptional<z.ZodObject<{
-        supported: z.ZodBoolean;
+    rangeRead: z.ZodOptional<z.ZodDiscriminatedUnion<[z.ZodObject<{
+        supported: z.ZodLiteral<true>;
+        read: z.ZodEnum<{
+            range: "range";
+            column: "column";
+        }>;
         evidence: z.ZodObject<{
             source: z.ZodLiteral<"probe">;
             observedAt: z.ZodISODateTime;
@@ -3332,9 +3428,36 @@ export const ResourceSchema: z.ZodObject<{
             appVersion: z.ZodString;
             osVersion: z.ZodString;
             errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
+            cost: z.ZodOptional<z.ZodObject<{
+                observedAt: z.ZodISODateTime;
+                pageMs: z.ZodNumber;
+                columnMs: z.ZodNumber;
+                items: z.ZodNumber;
+                runs: z.ZodNumber;
+                pageSize: z.ZodNumber;
+            }, z.core.$strict>>;
             note: z.ZodOptional<z.ZodString>;
         }, z.core.$strict>;
-    }, z.core.$strict>>;
+    }, z.core.$strict>, z.ZodObject<{
+        supported: z.ZodLiteral<false>;
+        evidence: z.ZodObject<{
+            source: z.ZodLiteral<"probe">;
+            observedAt: z.ZodISODateTime;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
+            cost: z.ZodOptional<z.ZodObject<{
+                observedAt: z.ZodISODateTime;
+                pageMs: z.ZodNumber;
+                columnMs: z.ZodNumber;
+                items: z.ZodNumber;
+                runs: z.ZodNumber;
+                pageSize: z.ZodNumber;
+            }, z.core.$strict>>;
+            note: z.ZodOptional<z.ZodString>;
+        }, z.core.$strict>;
+    }, z.core.$strict>], "supported">>;
 }, z.core.$strip>;
 
 // @public (undocumented)
