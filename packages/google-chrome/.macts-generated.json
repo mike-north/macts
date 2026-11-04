@@ -13,7 +13,6 @@
     "src/cli/commands/copy-selection.ts",
     "src/cli/commands/count.ts",
     "src/cli/commands/cut-selection.ts",
-    "src/cli/commands/delete.ts",
     "src/cli/commands/duplicate.ts",
     "src/cli/commands/execute.ts",
     "src/cli/commands/exists.ts",

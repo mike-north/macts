@@ -17,7 +17,6 @@ suites:
       - print
       - close
       - count
-      - delete
       - duplicate
       - exists
       - make
@@ -1569,12 +1568,8 @@ commands:
         description: the class of the elements to be counted. Keyword 'each' is optional in AppleScript
         required: true
         code: kocl
-  delete:
-    name: delete
-    description: Delete an element from an object
-    scope: application
-    code: delo
-    parameters: []
+  # Delete is not offered yet: as declared at application scope, it names no
+  # item. A delete returns once it can name the item it acts on.
   duplicate:
     name: duplicate
     description: Duplicate one or more object(s)

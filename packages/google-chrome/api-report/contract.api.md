@@ -58,7 +58,6 @@ export interface GoogleChromeClient extends ClientBrand<GoogleChromeResources> {
     copySelection(options?: CallOptions): Promise<void>;
     count(each?: string, options?: CallOptions): Promise<void>;
     cutSelection(options?: CallOptions): Promise<void>;
-    _delete(options?: CallOptions): Promise<void>;
     duplicate(to?: string, withProperties?: unknown, options?: CallOptions): Promise<void>;
     execute(javascript: string, options?: CallOptions): Promise<void>;
     exists(options?: CallOptions): Promise<void>;

@@ -24,8 +24,12 @@
  *   against the previous page's last item in the same request;
  * - a child is created inside its parent by appending it to the parent's
  *   collection;
- * - the request parameter that carries an identifier is distinct from the
- *   resource property that holds it;
+ * - the request parameter that carries a resource-scoped get, update or
+ *   delete's identifier is distinct from the resource property that holds it,
+ *   and is always one the command declares (`itemIdentifierParameter`). An
+ *   application-scoped command, a delete included, is a call on the app with
+ *   its declared parameters. No body is built for a command that
+ *   `itemSelectionProblem` refuses;
  * - the app is addressed by its own spelling of each collection and property
  *   (`../manifest/native-accessor.ts`), while every record a body returns is
  *   keyed by the manifest's public property names, so no app spelling reaches
@@ -56,6 +60,7 @@ import { InternalError, ValidationError, type OperationTarget } from '@macts/con
 import type { AppManifest } from '../manifest/schemas/app.js'
 import type { Command, CommandParameter } from '../manifest/schemas/command.js'
 import type { PageRead, Resource, ResourceRoots } from '../manifest/schemas/resource.js'
+import { itemIdentifierParameter, itemSelectionProblem } from '../manifest/item-selection.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
   listOperationPages,
@@ -172,8 +177,15 @@ export function buildNativeBody(
 /**
  * Derive the native body and the input keys it requires for one operation.
  *
+ * A resource-scoped get, update or delete addresses its item by the
+ * identifier parameter the command declares (`itemIdentifierParameter`), never
+ * by a name of its own. An application-scoped command, a delete included, is
+ * called on the app with its declared parameters.
+ *
  * @throws `InternalError` when `target` names a command the manifest does not
- *   declare: the operation and the manifest disagree, which is a macts defect.
+ *   declare, or a command that must select one item and declares no
+ *   identifier parameter (`itemSelectionProblem`): registration and generation
+ *   both refuse such a manifest, so either is a macts defect.
  */
 export function planNativeInvocation(
   manifest: AppManifest,
@@ -185,6 +197,12 @@ export function planNativeInvocation(
     : undefined
   if (command === undefined) {
     throw new InternalError('The operation does not match any command of its app.', {})
+  }
+  if (itemSelectionProblem(target.command, command) !== undefined) {
+    throw new InternalError(
+      `The command "${target.command}" declares no identifier parameter, so no item can be selected.`,
+      {}
+    )
   }
   const requiredParameters = command.parameters.filter((p) => p.required).map((p) => p.name)
 
@@ -945,16 +963,24 @@ function buildResourceBody(
 }
 
 /**
- * The identifier parameter of a get or update: the first required parameter
- * that is not the parent identifier, or `id` when the command declares none.
- * This is the request key the input schema validates, never the resource's
- * identifier property.
+ * The identifier parameter of a get, update or delete: the parameter the
+ * command declares to select its item by (`itemIdentifierParameter`). This is
+ * the request key the input schema validates, never the resource's identifier
+ * property.
+ *
+ * @throws `InternalError` when the command declares none.
+ *   {@link planNativeInvocation} refuses such a command first, so reaching
+ *   this is a macts defect.
  */
-function resolveIdentifierParam(command: Command, parentScope: ParentScope | undefined): string {
-  return (
-    command.parameters.find((p) => p.required && p.name !== parentScope?.parentIdParam)?.name ??
-    'id'
-  )
+function resolveIdentifierParam(command: Command): string {
+  const identifier = itemIdentifierParameter(command)
+  if (identifier === undefined) {
+    throw new InternalError(
+      `The ${command.name} command declares no identifier parameter, so no item can be selected.`,
+      {}
+    )
+  }
+  return identifier.name
 }
 
 /** Local that holds the specifier a list body reads its items through. */
@@ -1634,7 +1660,7 @@ function buildGetBody(
     return buildRootGetBody(command, source, resource.roots, manifest)
   }
   const parentScope = recordedParentScope(command, manifest)
-  const identifierParam = resolveIdentifierParam(command, parentScope)
+  const identifierParam = resolveIdentifierParam(command)
   const bindItem = bindTarget(
     command,
     source.resource,
@@ -1668,7 +1694,7 @@ function buildRootGetBody(
   roots: ResourceRoots,
   manifest: AppManifest
 ): ResourceBody {
-  const kindParam = resolveIdentifierParam(command, undefined)
+  const kindParam = resolveIdentifierParam(command)
   const body = lines(
     bindRoots(roots),
     `var ${KIND_LOCAL} = ${argument(kindParam)};`,
@@ -1733,9 +1759,8 @@ function buildRootListBody(
 /**
  * Delete one item, addressed like a get: Calendar's `deleteEvent` binds the
  * event its `id` parameter names, under the calendar its `calendarId` names,
- * and deletes it. A delete command with no required parameter other than its
- * parent's has no item to address and is called on the app with its
- * parameters instead.
+ * and deletes it. The item is always the one the command's declared
+ * identifier parameter names ({@link resolveIdentifierParam}).
  */
 function buildDeleteBody(
   command: Command,
@@ -1744,12 +1769,7 @@ function buildDeleteBody(
   manifest: AppManifest
 ): ResourceBody {
   const parentScope = recordedParentScope(command, manifest)
-  const identifierParam = command.parameters.find(
-    (p) => p.required && p.name !== parentScope?.parentIdParam
-  )?.name
-  if (identifierParam === undefined) {
-    return { body: buildCommandCallBody(command, true), identifierArguments: [] }
-  }
+  const identifierParam = resolveIdentifierParam(command)
   const bindItem = bindTarget(command, resource, resourcePlural, parentScope, identifierParam)
   const body = lines(bindItem, 'item.delete();', 'return null;')
   return { body, identifierArguments: identifierArgumentsOf(parentScope, identifierParam) }
@@ -1825,7 +1845,7 @@ function buildUpdateBody(
 ): ResourceBody {
   const { resource } = source
   const parentScope = recordedParentScope(command, manifest)
-  const identifierParam = resolveIdentifierParam(command, parentScope)
+  const identifierParam = resolveIdentifierParam(command)
   const excluded = new Set([identifierParam, parentScope?.parentIdParam])
   const writableFields = command.parameters.filter((p) => !excluded.has(p.name))
   const bindItem = bindTarget(command, resource, resourcePlural, parentScope, identifierParam)

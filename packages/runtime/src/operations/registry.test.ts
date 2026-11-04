@@ -12,10 +12,10 @@
  * descriptor whose permission disagrees with the manifest is refused at
  * registration (D2, fail closed). A resource-scoped get, update or
  * delete with no identifier parameter (no required parameter other than its
- * parent's) is refused at manifest registration (D5), since it could select
- * no item: a get or update would read the undeclared `id`, and a delete would
- * call the app's delete with no target. Every shipped manifest still
- * registers.
+ * parent's), or an application-scoped delete with none, selects no item and
+ * is refused at registration (D5), from the manifest or from a contract. The
+ * refusal names the app and the command and says what to declare. Every
+ * shipped manifest still registers, and none declares such a command.
  */
 
 import { readdir } from 'node:fs/promises'
@@ -233,7 +233,9 @@ describe('operationsFromManifest', () => {
       expect(refusal).toThrow(`App "Calendar"`)
       expect(refusal).toThrow(`"${shape}Event"`)
       expect(refusal).toThrow('identifier parameter')
-      expect(refusal).toThrow('"id"')
+      expect(refusal).toThrow(
+        `Declare the item's identifier as a required parameter of "${shape}Event"`
+      )
     }
   )
 
@@ -330,9 +332,60 @@ describe('operationsFromManifest', () => {
     expect(message).toContain('App "Calendar"')
     expect(message).toContain('delete command "removeEvent" declares no identifier parameter')
     expect(message).toContain('no item can be selected')
-    expect(message).toContain('with no target')
-    // A delete never reads the undeclared `id`, so the refusal does not mention it.
+    expect(message).toContain(
+      `Declare the item's identifier as a required parameter of "removeEvent"`
+    )
+    // No identifier name is supplied on the command's behalf.
     expect(message).not.toContain('"id"')
+  })
+
+  // Guards the application-scoped delete with no parameters (the shape of the
+  // dictionary-level delete in Finder, Google Chrome, iTerm, Mail, Music and
+  // TV): it names no item, so the manifest is refused by the same rule as a
+  // resource-scoped delete, and registers nothing.
+  it('refuses an application-scoped delete with no parameters, naming the app and command', () => {
+    const broken: AppManifest = {
+      ...CALENDAR,
+      commands: {
+        ...CALENDAR.commands,
+        delete: {
+          name: 'delete',
+          description: 'Delete an object',
+          scope: 'application',
+          parameters: [],
+        },
+      },
+    }
+    const refusal = (): unknown => operationsFromManifest(broken)
+    expect(refusal).toThrow(OperationRegistrationError)
+    expect(refusal).toThrow(
+      'App "Calendar" cannot be registered from its manifest: its application-scoped delete command "delete" declares no identifier parameter.'
+    )
+    expect(refusal).toThrow(
+      `Scope "delete" to the resource whose items it deletes and declare the item's identifier as a required parameter.`
+    )
+  })
+
+  // Guards that the rule at application scope covers delete only: an
+  // application-scoped update selects no item (Finder's refreshes the display
+  // of items), so it still registers.
+  it('registers an application-scoped update that declares no identifier', () => {
+    const manifest: AppManifest = {
+      ...CALENDAR,
+      commands: {
+        update: {
+          name: 'update',
+          description: 'Refresh the display of items',
+          scope: 'application',
+          parameters: [
+            { name: 'necessity', type: 'boolean', description: 'Always', required: false },
+          ],
+        },
+      },
+    }
+    expect(operationsFromManifest(manifest).map((op) => op.descriptor.id)).toEqual([
+      'calendar.app.update',
+    ])
   })
 
   it('registers a delete with an identifier parameter', () => {
@@ -471,6 +524,52 @@ describe('operationsFromContract', () => {
       OperationRegistrationError
     )
   })
+
+  // Guards that a contract cannot register what the manifest rule refuses:
+  // registration from a contract and from the manifest alone accept the same
+  // manifests, and the refusal says it was the contract registration.
+  it('refuses a contract whose operation targets a get with no identifier parameter', () => {
+    const manifest: AppManifest = {
+      ...CALENDAR,
+      commands: {
+        ...CALENDAR.commands,
+        getEvent: {
+          name: 'get',
+          description: 'Get an event',
+          scope: 'resource',
+          resourceType: 'Event',
+          parameters: [],
+        },
+      },
+    }
+    const get = descriptor({
+      id: 'calendar.events.getEvent',
+      permission: 'calendar:events:getEvent',
+      target: { command: 'getEvent', resource: 'Event' },
+    })
+    const refusal = (): unknown => operationsFromContract(contractWith([get]), manifest)
+    expect(refusal).toThrow(OperationRegistrationError)
+    expect(refusal).toThrow(
+      'App "Calendar" cannot be registered from its contract, because its manifest is refused: its get command "getEvent" declares no identifier parameter.'
+    )
+  })
+
+  // Guards that the check covers the manifest, not only the contract's
+  // operations: a contract that leaves out the application-scoped delete is
+  // still refused for a manifest that declares it, as registering the
+  // manifest alone is.
+  it('refuses a contract for a manifest with an application-scoped delete it does not cover', () => {
+    const manifest: AppManifest = {
+      ...CALENDAR,
+      commands: {
+        ...CALENDAR.commands,
+        delete: { name: 'delete', description: 'Delete', scope: 'application', parameters: [] },
+      },
+    }
+    expect(() => operationsFromContract(contractWith([descriptor()]), manifest)).toThrow(
+      /App "Calendar".*application-scoped delete command "delete" declares no identifier parameter/
+    )
+  })
 })
 
 /** A range read marker for a fixture resource whose range reads passed. */
@@ -605,15 +704,20 @@ describe('OperationRegistry', () => {
   })
 })
 
+/** Every manifest the repository ships, loaded and validated. */
+async function shippedManifests(): Promise<AppManifest[]> {
+  const manifestsDir = fileURLToPath(new URL('../../../../manifests/', import.meta.url))
+  const entries = await readdir(manifestsDir, { withFileTypes: true })
+  return Promise.all(
+    entries
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => loadManifest(`${manifestsDir}${entry.name}/app.yaml`))
+  )
+}
+
 describe('repository manifests', () => {
   it('every shipped manifest registers into one registry without conflicts', async () => {
-    const manifestsDir = fileURLToPath(new URL('../../../../manifests/', import.meta.url))
-    const entries = await readdir(manifestsDir, { withFileTypes: true })
-    const manifests = await Promise.all(
-      entries
-        .filter((entry) => entry.isDirectory())
-        .map((entry) => loadManifest(`${manifestsDir}${entry.name}/app.yaml`))
-    )
+    const manifests = await shippedManifests()
     expect(manifests.length).toBeGreaterThan(0)
 
     const registry = new OperationRegistry()
@@ -623,5 +727,27 @@ describe('repository manifests', () => {
 
     const routeCount = manifests.reduce((n, m) => n + resolveManifestRoutes(m).length, 0)
     expect(registry.list()).toHaveLength(routeCount)
+  })
+
+  // Guards the shipped manifests directly, by the rule as phases/13 D5 states
+  // it rather than through the registry's own check: every routed
+  // resource-scoped get, update or delete, and every routed delete at
+  // application scope, declares a required parameter other than its
+  // parent's. A manifest that regressed would fail here with the offending
+  // app and command named, before any surface was generated from it.
+  it('no shipped manifest offers a command that cannot select its item', async () => {
+    const offenders: string[] = []
+    for (const manifest of await shippedManifests()) {
+      for (const { commandKey, command } of resolveManifestRoutes(manifest)) {
+        const itemCommand =
+          command.name === 'delete' ||
+          (command.scope === 'resource' && (command.name === 'get' || command.name === 'update'))
+        if (!itemCommand) continue
+        const parent = command.parent?.parameter
+        if (command.parameters.some((p) => p.required && p.name !== parent)) continue
+        offenders.push(`${manifest.app.name}: ${commandKey}`)
+      }
+    }
+    expect([...new Set(offenders)]).toEqual([])
   })
 })

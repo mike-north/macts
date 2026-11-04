@@ -128,7 +128,9 @@ export interface AppRegistrar {
    *   operation the manifest does not expose, an operation id is already
    *   registered, a contract for the same app is already registered, or the
    *   contract's resource table records a `get` or `list` operation that is not
-   *   one of its operations targeting that resource.
+   *   one of its operations targeting that resource, or the manifest has a
+   *   command that `registerManifest` refuses for declaring no identifier
+   *   parameter.
    */
   registerContract(contract: AppContract<unknown>, manifest: AppManifest): void
   /**
@@ -140,9 +142,9 @@ export interface AppRegistrar {
    * @throws `OperationRegistrationError` when the app's route segment is
    *   reserved (`RESERVED_APP_ROUTE_SEGMENTS` in `@macts/runtime`), an
    *   operation id is already registered, the manifest yields a malformed id
-   *   or permission, or a resource-scoped get, update or delete command
-   *   declares no identifier parameter (the error names the app and the
-   *   command). A refused registration adds nothing.
+   *   or permission, or a resource-scoped get, update or delete command, or an
+   *   application-scoped delete, declares no identifier parameter (the error
+   *   names the app and the command). A refused registration adds nothing.
    */
   registerManifest(manifest: AppManifest): void
 }

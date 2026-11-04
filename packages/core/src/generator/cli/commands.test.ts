@@ -82,7 +82,12 @@ function buildManifest(): AppManifest {
     relationships: [],
     commands: {
       list: { name: 'list', description: 'List', scope: 'resource', parameters: [] },
-      get: { name: 'get', description: 'Get', scope: 'resource', parameters: [] },
+      get: {
+        name: 'get',
+        description: 'Get',
+        scope: 'resource',
+        parameters: [{ name: 'id', type: 'string', description: 'The item', required: true }],
+      },
       create: { name: 'create', description: 'Create', scope: 'resource', parameters: [] },
       // App command whose parameter name (`path`) clashes with Clipanion's reserved
       // `Command.path` member, and which has a non-string-overlapping return-less param.

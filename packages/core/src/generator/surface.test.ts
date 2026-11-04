@@ -151,20 +151,26 @@ describe('resolveIdParams', () => {
     })
   })
 
-  it('falls back to id with no required parameters', () => {
-    expect(resolveIdParams(command({ name: 'delete' }))).toEqual({
-      parentParam: undefined,
-      childParam: 'id',
-    })
+  // Guards that no generated interface takes an identifier the manifest does
+  // not declare. Generation refuses such a manifest first; this throw keeps
+  // every surface from supplying a name of its own.
+  it('throws, naming the command, when there are no required parameters', () => {
+    expect(() => resolveIdParams(command({ name: 'delete', resourceType: 'Event' }))).toThrow(
+      'The delete command of Event declares no identifier parameter'
+    )
   })
 
-  it('falls back to id for the child when the only required parameter is the parent', () => {
+  // Guards that the parent parameter alone is not taken as the item's identifier.
+  it('throws, naming the command, when the only required parameter is the parent', () => {
     const cmd = command({
       name: 'get',
+      resourceType: 'Event',
       parameters: [param('calendarId', true)],
       parent: { resource: 'Calendar', parameter: 'calendarId' },
     })
-    expect(resolveIdParams(cmd)).toEqual({ parentParam: 'calendarId', childParam: 'id' })
+    expect(() => resolveIdParams(cmd)).toThrow(
+      'The get command of Event declares no identifier parameter other than its parent parameter "calendarId"'
+    )
   })
 })
 

@@ -315,7 +315,6 @@ export type MailboxUpdateInput = Partial<MailboxCreateInput>;
 export class MailClient {
     constructor(options: MailClientOptions);
     checkForNewMail(): Promise<void>;
-    _delete(): Promise<void>;
     duplicate(to?: string, withProperties?: unknown): Promise<void>;
     extractAddressFrom(): Promise<void>;
     extractNameFrom(): Promise<void>;

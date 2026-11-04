@@ -243,7 +243,6 @@ export class FinderClient {
     copy(): Promise<void>;
     count(each: string): Promise<void>;
     dataSize(as?: string): Promise<void>;
-    _delete(): Promise<void>;
     duplicate(to?: string, replacing?: boolean, routingSuppressed?: boolean, exactCopy?: boolean): Promise<void>;
     eject(): Promise<void>;
     empty(security?: boolean): Promise<void>;

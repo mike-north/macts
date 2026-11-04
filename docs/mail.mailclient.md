@@ -140,17 +140,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[\_delete()](./mail.mailclient._delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete an object.
-
-</td></tr>
-<tr><td>
-
 [checkForNewMail(\_for)](./mail.mailclient.checkfornewmail.md)
 
 </td><td>

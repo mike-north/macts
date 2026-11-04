@@ -8,6 +8,7 @@
 
 import { join } from 'node:path'
 import type { AppManifest } from '../../manifest/index.js'
+import { generationRefusals } from '../surface.js'
 import {
   createCliGeneratorContext,
   type CliGeneratorOptions,
@@ -33,11 +34,17 @@ export interface GenerateCliPluginResult {
 
 /**
  * Generate a complete CLI plugin from a manifest.
+ *
+ * A manifest with a command that must select one item and declares no
+ * identifier parameter is refused (`generationRefusals`): the result holds
+ * the errors naming each such command, and no files.
  */
 export function generateCliPlugin(
   manifest: AppManifest,
   options: CliGeneratorOptions
 ): GenerateCliPluginResult {
+  const refusals = generationRefusals(manifest)
+  if (refusals.length > 0) return { files: [], errors: refusals }
   const ctx = createCliGeneratorContext(manifest, options)
   const files: { path: string; content: string }[] = []
   const errors: string[] = []

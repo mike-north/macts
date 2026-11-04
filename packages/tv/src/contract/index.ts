@@ -1040,8 +1040,6 @@ export interface TVClient extends ClientBrand<TVResources> {
    * AppleScript. Does not accept null.
    */
   count(each: string, options?: CallOptions): Promise<void>
-  /** Delete an element from an object */
-  _delete(options?: CallOptions): Promise<void>
   /**
    * Duplicate one or more object(s)
    *
@@ -1455,21 +1453,6 @@ const appCountOperation: OperationDescriptor<{ readonly each: string }, undefine
       },
     },
     required: ['each'],
-    additionalProperties: false,
-  },
-}
-
-const appDeleteOperation: OperationDescriptor<Record<string, never>, undefined> = {
-  id: 'tv.app.delete',
-  permission: 'tv:app:delete',
-  target: { command: 'delete' },
-  description: 'Delete an element from an object',
-  input: t.record({}),
-  output: t.none(),
-  inputJsonSchema: {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: {},
     additionalProperties: false,
   },
 }
@@ -1997,7 +1980,6 @@ const operations: AppContract<TVClient>['operations'] = {
   'tv.playlistWindows.get': playlistWindowGetPlaylistWindowOperation,
   'tv.app.close': appCloseOperation,
   'tv.app.count': appCountOperation,
-  'tv.app.delete': appDeleteOperation,
   'tv.app.duplicate': appDuplicateOperation,
   'tv.app.exists': appExistsOperation,
   'tv.app.make': appMakeOperation,
@@ -2057,7 +2039,6 @@ function bind(runtime: ClientRuntime): TVClient {
     },
     close: (options) => runtime.invoke(appCloseOperation, {}, options),
     count: (each, options) => runtime.invoke(appCountOperation, { each }, options),
-    _delete: (options) => runtime.invoke(appDeleteOperation, {}, options),
     duplicate: (to, options) => runtime.invoke(appDuplicateOperation, { to }, options),
     exists: (options) => runtime.invoke(appExistsOperation, {}, options),
     make: (_new, at, withProperties, options) =>

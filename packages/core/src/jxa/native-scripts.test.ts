@@ -2011,16 +2011,42 @@ describe('identifier parameter names (issue #26)', () => {
     expect(text).not.toContain('args["id"]')
   })
 
-  it('delete with no required identifier calls the command on the app', () => {
+  // Guards that a delete is only ever built to act on the item a declared
+  // parameter names: one that declares none gets no body, rather than a call
+  // on the app that names no item.
+  it('refuses a delete with no required identifier, naming the command', () => {
     const manifest = manifestWith(
       {
         DiskItem: { name: 'DiskItem', plural: 'diskItems', description: 'd', properties: {} },
       },
-      { delete: resourceCommand('delete', 'DiskItem') }
+      { removeItem: resourceCommand('delete', 'DiskItem') }
     )
-    const text = buildNativeBody(manifest, { command: 'delete', resource: 'DiskItem' })
-    expect(text).toContain('var result = app["delete"]();')
-    expect(text).not.toContain('.byId(')
+    const plan = (): unknown =>
+      buildNativeBody(manifest, { command: 'removeItem', resource: 'DiskItem' })
+    expect(plan).toThrow(InternalError)
+    expect(plan).toThrow('The command "removeItem" declares no identifier parameter')
+  })
+
+  // Guards the application-scoped delete with no parameters: it names no item,
+  // so it gets no body either.
+  it('refuses an application-scoped delete with no parameters, naming the command', () => {
+    const manifest = manifestWith(
+      {},
+      { delete: { name: 'delete', description: 'Delete', scope: 'application', parameters: [] } }
+    )
+    expect(() => planNativeInvocation(manifest, { command: 'delete' })).toThrow(
+      'The command "delete" declares no identifier parameter'
+    )
+  })
+
+  // Guards that the rule at application scope covers delete only: an
+  // application-scoped update (Finder's display refresh) is still a call.
+  it('still calls an application-scoped update with no identifier on the app', () => {
+    const manifest = manifestWith(
+      {},
+      { update: { name: 'update', description: 'Refresh', scope: 'application', parameters: [] } }
+    )
+    expect(buildNativeBody(manifest, { command: 'update' })).toBe('return app["update"]();')
   })
 
   it('get with an `id` parameter addresses by id', () => {
@@ -2172,15 +2198,24 @@ describe('required arguments', () => {
     ).toEqual(['calendarId', 'id'])
   })
 
-  it('requires `id` for a get that declares no identifier parameter', () => {
-    const manifest = manifestWith(
-      { Entry: { name: 'Entry', plural: 'entries', description: 'e', properties: {} } },
-      { get: resourceCommand('get', 'Entry') }
-    )
-    expect(
-      planNativeInvocation(manifest, { command: 'get', resource: 'Entry' }).requiredArguments
-    ).toEqual(['id'])
-  })
+  // Guards that a get or update reads only the identifier key its command
+  // declares: one that declares none is refused, naming the command.
+  it.each([
+    ['a', 'get'],
+    ['an', 'update'],
+  ])(
+    'refuses %s %s that declares no identifier parameter, naming the command',
+    (_article, shape) => {
+      const manifest = manifestWith(
+        { Entry: { name: 'Entry', plural: 'entries', description: 'e', properties: {} } },
+        { [`${shape}Entry`]: resourceCommand(shape, 'Entry', [param('note', false)]) }
+      )
+      const plan = (): unknown =>
+        planNativeInvocation(manifest, { command: `${shape}Entry`, resource: 'Entry' })
+      expect(plan).toThrow(InternalError)
+      expect(plan).toThrow(`The command "${shape}Entry" declares no identifier parameter`)
+    }
+  )
 
   it('accepts input that supplies every required key', () => {
     expect(() => {

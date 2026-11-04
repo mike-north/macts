@@ -26,6 +26,7 @@ import {
   commandMethodParameters,
   createInputFields,
   findCrudCommand,
+  generationRefusals,
   identifierWords,
   isCrudName,
   listMethodParameters,
@@ -85,6 +86,8 @@ export function generateHttpClientSdk(
   manifest: AppManifest,
   options: HttpClientGeneratorOptions
 ): GeneratedHttpClientSdk {
+  const refusals = generationRefusals(manifest)
+  if (refusals.length > 0) return { files: [], errors: refusals }
   const files: { path: string; content: string }[] = []
   const errors: string[] = []
   const appName = manifest.app.name.replace(/\s+/g, '')

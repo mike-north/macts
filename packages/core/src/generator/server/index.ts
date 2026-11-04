@@ -12,6 +12,7 @@
  */
 
 import type { AppManifest } from '../../manifest/index.js'
+import { generationRefusals } from '../surface.js'
 import { contractNames } from '../contract/index.js'
 import { generateGitAttributes } from '../git-attributes.js'
 import { MIT_LICENSE } from '../license.js'
@@ -50,6 +51,11 @@ export interface GenerateServerPackageResult {
  * `contract`, its package, TypeScript, build and ignore configuration, and a
  * `.gitattributes` marking the files it generates as generated.
  *
+ * A manifest with a command that must select one item and declares no
+ * identifier parameter is refused (`generationRefusals`), as it is for the
+ * client package whose contract this one re-exports: the result holds the
+ * errors naming each such command, and no files.
+ *
  * @param manifest - The app manifest
  * @param options - Generation options
  * @returns Generated files and any errors
@@ -60,6 +66,8 @@ export function generateServerPackage(
 ): GenerateServerPackageResult {
   const { serverPackageName, clientPackageName, version } = options
   const unscopedName = serverPackageName.replace(/^@[^/]+\//, '')
+  const refusals = generationRefusals(manifest)
+  if (refusals.length > 0) return { dir: unscopedName, files: [], errors: refusals }
   const capitalizedAppName = manifest.app.name.replace(/\s+/g, '')
 
   const files: { path: string; content: string }[] = [

@@ -140,17 +140,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[\_delete()](./tv.tvclient._delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete an element from an object
-
-</td></tr>
-<tr><td>
-
 [add(to)](./tv.tvclient.add.md)
 
 </td><td>

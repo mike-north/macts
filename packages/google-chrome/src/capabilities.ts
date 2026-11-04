@@ -107,21 +107,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'google-chrome.app.delete',
-    app: 'google-chrome',
-    appBundleId: 'com.google.Chrome',
-    resource: 'app',
-    operation: 'delete',
-    description: 'Delete an object.',
-    permission: 'google-chrome:app:delete',
-    risk: 'delete',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-      additionalProperties: false,
-    },
-  },
-  {
     name: 'google-chrome.app.duplicate',
     app: 'google-chrome',
     appBundleId: 'com.google.Chrome',

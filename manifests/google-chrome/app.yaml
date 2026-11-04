@@ -18,7 +18,6 @@ suites:
       - close
       - quit
       - count
-      - delete
       - duplicate
       - exists
       - make
@@ -377,12 +376,8 @@ commands:
         description: The class of objects to be counted.
         required: false
         code: kocl
-  delete:
-    name: delete
-    description: Delete an object.
-    scope: application
-    code: delo
-    parameters: []
+  # Delete is not offered yet: as declared at application scope, it names no
+  # item. A delete returns once it can name the item it acts on.
   duplicate:
     name: duplicate
     description: Copy object(s) and put the copies at a new location.

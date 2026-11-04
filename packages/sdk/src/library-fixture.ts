@@ -80,7 +80,7 @@ export const LIBRARY_MANIFEST: AppManifest = {
       description: 'Get one item',
       scope: 'resource',
       resourceType: ['Branch', 'Shelf', 'Book'],
-      parameters: [],
+      parameters: [{ name: 'id', type: 'string', description: 'Identifier', required: true }],
     },
     list: {
       name: 'list',

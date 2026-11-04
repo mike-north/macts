@@ -16,6 +16,7 @@
  */
 
 import type { AppManifest, Command, CommandParameter, Resource } from '../manifest/index.js'
+import { itemIdentifierParameter, unselectableItemCommands } from '../manifest/item-selection.js'
 import { normalizeResourceRouteSegment } from '../manifest/route.js'
 import { splitIdentifierWords } from '../manifest/lower-camel.js'
 import {
@@ -179,27 +180,64 @@ export function findResourceCreateCommand(
 }
 
 /**
+ * The errors that refuse generating anything from a manifest: one per command
+ * that must select one item and declares no identifier parameter to select it
+ * by (`unselectableItemCommands`), each naming the app and the command key and
+ * saying what to declare.
+ *
+ * Every package and SDK generator checks this before it builds any file and
+ * returns these errors with no files, and `generateCapabilitiesModule` throws
+ * them, so no generated interface takes an identifier the manifest does not
+ * declare. Registration refuses the same commands by the same rule.
+ */
+export function generationRefusals(manifest: AppManifest): string[] {
+  return unselectableItemCommands(manifest).map(
+    ({ problem }) => `App "${manifest.app.name}" cannot be generated from its manifest: ${problem}`
+  )
+}
+
+/**
  * The request parameter names that identify the target of a get, update, or
  * delete command.
  *
  * A command on a nested resource records its parent (`command.parent`), and
  * the parent scope is the parameter it names (`calendarId` on `getEvent`).
- * The child identifier is the first other required parameter (`id`), or `id`
- * when the command has none. A command that records no parent has no parent
- * scope, whatever its parameters are named or however many are required:
- * nothing about the parent is inferred.
+ * The child identifier is the parameter `itemIdentifierParameter` selects:
+ * the first other required parameter (`id`). A command that records no parent
+ * has no parent scope, whatever its parameters are named or however many are
+ * required: nothing about the parent is inferred.
  *
  * The names are exactly the `command.parameters` entries the server validates
- * and binds, so every surface sends them under these names.
+ * and binds, so every surface sends them under these names. No name is
+ * supplied for a command that declares none.
+ *
+ * @throws `Error` naming the command when it declares no identifier
+ *   parameter. Generation refuses such a manifest before any surface asks
+ *   (`unselectableItemCommands`), so reaching this is a generator defect.
  */
 export function resolveIdParams(command: Command): {
   parentParam: string | undefined
   childParam: string
 } {
   const parentParam = command.parent?.parameter
-  const childParam =
-    command.parameters.find((p) => p.required && p.name !== parentParam)?.name ?? 'id'
-  return { parentParam, childParam }
+  const child = itemIdentifierParameter(command)
+  if (child === undefined) {
+    const besideParent =
+      parentParam === undefined ? '' : ` other than its parent parameter "${parentParam}"`
+    throw new Error(
+      `${describeCommand(command)} declares no identifier parameter${besideParent}, so no item can be selected.`
+    )
+  }
+  return { parentParam, childParam: child.name }
+}
+
+/** A command in error prose: `The get command of Event`. */
+function describeCommand(command: Command): string {
+  const resources =
+    command.resourceType === undefined
+      ? ''
+      : ` of ${Array.isArray(command.resourceType) ? command.resourceType.join(', ') : command.resourceType}`
+  return `The ${command.name} command${resources}`
 }
 
 /**

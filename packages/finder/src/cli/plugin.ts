@@ -6,7 +6,6 @@ import { ActivateCommand } from './commands/activate.js'
 import { CloseCommand } from './commands/close.js'
 import { CountCommand } from './commands/count.js'
 import { DataSizeCommand } from './commands/data-size.js'
-import { DeleteCommand } from './commands/delete.js'
 import { DuplicateCommand } from './commands/duplicate.js'
 import { ExistsCommand } from './commands/exists.js'
 import { MakeCommand } from './commands/make.js'
@@ -39,7 +38,6 @@ export const plugin: CliPlugin = {
     CloseCommand,
     CountCommand,
     DataSizeCommand,
-    DeleteCommand,
     DuplicateCommand,
     ExistsCommand,
     MakeCommand,

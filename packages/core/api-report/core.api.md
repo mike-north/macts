@@ -2007,6 +2007,12 @@ export function isSensitiveKey(key: string, extraSensitiveKeys?: readonly string
 export function isValidPermission(permission: string): boolean;
 
 // @public
+export function itemIdentifierParameter(command: Command): CommandParameter | undefined;
+
+// @public
+export function itemSelectionProblem(commandKey: string, command: Command): string | undefined;
+
+// @public
 export interface JsonSchema {
     // (undocumented)
     readonly [key: string]: unknown;
@@ -4204,6 +4210,16 @@ export interface UncheckedKinds {
 
 // @public
 export type UnmappedPermissionPolicy = 'reject' | 'keep';
+
+// @public
+export interface UnselectableItemCommand {
+    readonly command: Command;
+    readonly commandKey: string;
+    readonly problem: string;
+}
+
+// @public
+export function unselectableItemCommands(manifest: AppManifest): UnselectableItemCommand[];
 
 // @public (undocumented)
 export type Unsupported = z.infer<typeof UnsupportedSchema>;

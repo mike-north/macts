@@ -1032,16 +1032,22 @@ class ContractBuilder {
   /**
    * The identifier parameters of a get, update, or delete command, in
    * positional order (parent scope, then child), each typed by its parameter
-   * declaration. A child identifier the command does not declare (it has no
-   * required parameters) is a string named `id`.
+   * declaration. Both are parameters the command declares
+   * ({@link resolveIdParams}); none is supplied for a command that declares
+   * none.
+   *
+   * @throws `Error` naming the command when it declares no identifier
+   *   parameter, or when its recorded parent names a parameter it does not
+   *   declare (the manifest schema rejects both).
    */
   #identifierFields(command: Command): FieldModel[] {
     const { parentParam, childParam } = resolveIdParams(command)
     const field = (name: string): FieldModel => {
       const param = command.parameters.find((p) => p.name === name)
-      return param === undefined
-        ? { name, shape: { kind: 'string' }, optional: false, description: `The ${name}.` }
-        : { ...this.#parameterField(param), optional: false }
+      if (param === undefined) {
+        throw new Error(`The ${command.name} command does not declare its parameter "${name}".`)
+      }
+      return { ...this.#parameterField(param), optional: false }
     }
     return parentParam === undefined ? [field(childParam)] : [field(parentParam), field(childParam)]
   }

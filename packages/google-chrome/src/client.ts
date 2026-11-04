@@ -141,13 +141,6 @@ export class GoogleChromeClient {
   }
 
   /**
-   * Delete an object.
-   */
-  async _delete(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('google-chrome.app.delete', {})
-  }
-
-  /**
    * Copy object(s) and put the copies at a new location.
    */
   async duplicate(to?: string, withProperties?: unknown): Promise<void> {

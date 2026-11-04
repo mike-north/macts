@@ -18,7 +18,6 @@ suites:
       - close
       - count
       - dataSize
-      - delete
       - duplicate
       - exists
       - make
@@ -1226,12 +1225,8 @@ commands:
         description: the data type for which the size is calculated
         required: false
         code: rtyp
-  delete:
-    name: delete
-    description: Move an item from its container to the trash
-    scope: application
-    code: delo
-    parameters: []
+  # Delete is not offered yet: as declared at application scope, it names no
+  # item. A delete returns once it can name the item it acts on.
   duplicate:
     name: duplicate
     description: Duplicate one or more object(s)

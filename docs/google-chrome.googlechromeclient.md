@@ -106,17 +106,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[\_delete()](./google-chrome.googlechromeclient._delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete an object.
-
-</td></tr>
-<tr><td>
-
 [close()](./google-chrome.googlechromeclient.close.md)
 
 </td><td>

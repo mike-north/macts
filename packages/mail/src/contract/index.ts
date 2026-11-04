@@ -1568,8 +1568,6 @@ export interface MailClient extends ClientBrand<MailResources> {
   readonly outgoingMessages: OutgoingMessageResourceClient
   /** An email message */
   readonly messages: MessageResourceClient
-  /** Delete an object. */
-  _delete(options?: CallOptions): Promise<void>
   /**
    * Copy an object.
    *
@@ -1633,21 +1631,6 @@ export type MailResources = Readonly<Record<never, never>>
  * value types read, lazily.
  */
 const resources = {} satisfies MailResources
-
-const appDeleteOperation: OperationDescriptor<Record<string, never>, undefined> = {
-  id: 'mail.app.delete',
-  permission: 'mail:app:delete',
-  target: { command: 'delete' },
-  description: 'Delete an object.',
-  input: t.record({}),
-  output: t.none(),
-  inputJsonSchema: {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: {},
-    additionalProperties: false,
-  },
-}
 
 const appDuplicateOperation: OperationDescriptor<
   { readonly to?: string | undefined; readonly withProperties?: unknown },
@@ -2086,7 +2069,6 @@ const appSynchronizeOperation: OperationDescriptor<
 
 /** Every operation, keyed by its identity. */
 const operations: AppContract<MailClient>['operations'] = {
-  'mail.app.delete': appDeleteOperation,
   'mail.app.duplicate': appDuplicateOperation,
   'mail.app.move': appMoveOperation,
   'mail.messages.bounce': messageBounceOperation,
@@ -2119,7 +2101,6 @@ function bind(runtime: ClientRuntime): MailClient {
       reply: (openingWindow, replyToAll, options) =>
         runtime.invoke(messageReplyOperation, { openingWindow, replyToAll }, options),
     },
-    _delete: (options) => runtime.invoke(appDeleteOperation, {}, options),
     duplicate: (to, withProperties, options) =>
       runtime.invoke(appDuplicateOperation, { to, withProperties }, options),
     move: (to, options) => runtime.invoke(appMoveOperation, { to }, options),

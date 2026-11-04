@@ -4,7 +4,6 @@ import { ForwardMessageCommand } from './commands/accounts/mailboxes/messages/fo
 import { RedirectMessageCommand } from './commands/accounts/mailboxes/messages/redirect.js'
 import { ReplyMessageCommand } from './commands/accounts/mailboxes/messages/reply.js'
 import { SendOutgoingMessageCommand } from './commands/outgoingMessages/send.js'
-import { DeleteCommand } from './commands/delete.js'
 import { DuplicateCommand } from './commands/duplicate.js'
 import { MoveCommand } from './commands/move.js'
 import { CheckForNewMailCommand } from './commands/check-for-new-mail.js'
@@ -27,7 +26,6 @@ export const plugin: CliPlugin = {
     RedirectMessageCommand,
     ReplyMessageCommand,
     SendOutgoingMessageCommand,
-    DeleteCommand,
     DuplicateCommand,
     MoveCommand,
     CheckForNewMailCommand,

@@ -19,6 +19,7 @@
 import type { AppManifest } from '../../manifest/index.js'
 import { deriveCapabilities } from '../../capabilities/registry.js'
 import type { Capability } from '../../capabilities/types.js'
+import { generationRefusals } from '../surface.js'
 
 /**
  * Serialize a single capability to the plain-data shape embedded in generated
@@ -43,10 +44,18 @@ function toMetadata(capability: Capability): Record<string, unknown> {
 /**
  * Generate the contents of the `src/capabilities.ts` metadata module for an app.
  *
+ * A manifest the package generators refuse (`generationRefusals`) is refused
+ * here too, so no capability is described for a command that must name one
+ * item and declares no identifier parameter.
+ *
  * @param manifest - The app manifest
  * @returns TypeScript source for the capabilities metadata module
+ * @throws `Error` whose message holds one refusal per such command, each
+ *   naming the app and the command key and saying what to declare.
  */
 export function generateCapabilitiesModule(manifest: AppManifest): string {
+  const refusals = generationRefusals(manifest)
+  if (refusals.length > 0) throw new Error(refusals.join('\n'))
   const capabilities = deriveCapabilities(manifest)
   const data = capabilities.map(toMetadata)
   const dataLiteral = JSON.stringify(data, null, 2)

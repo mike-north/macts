@@ -41,7 +41,6 @@ export class iTermClient {
     createTabWithDefaultProfile(command?: string): Promise<void>;
     createWindowWithDefaultProfile(command?: string): Promise<void>;
     createWindowWithProfile(command?: string): Promise<void>;
-    _delete(): Promise<void>;
     duplicate(to: string, withProperties?: unknown): Promise<void>;
     exists(): Promise<void>;
     hideHotkeyWindow(): Promise<void>;

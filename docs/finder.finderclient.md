@@ -106,17 +106,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[\_delete()](./finder.finderclient._delete.md)
-
-</td><td>
-
-</td><td>
-
-Move an item from its container to the trash
-
-</td></tr>
-<tr><td>
-
 [activate()](./finder.finderclient.activate.md)
 
 </td><td>
