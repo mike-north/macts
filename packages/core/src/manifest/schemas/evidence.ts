@@ -587,11 +587,23 @@ export function checkNullabilityClaim(claim: NullabilityClaim, ctx: z.Refinement
       })
     }
     if (evidence.nullCount === 0 && claim.nullable === true && !reportsAbsence(evidence)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: `The probe observed no empty value, and its failed reads are not all the app reporting no value (${String(ABSENT_VALUE_ERROR_NUMBER)}), so it cannot show that the field is nullable.`,
-        path: ['evidence', 'nullable', 'nullCount'],
-      })
+      if (failedReadsAllReportedAbsence(evidence)) {
+        // Every read failed with "no value": absence on every instance is
+        // structural, so the property is unsupported, not nullable (D10).
+        ctx.addIssue({
+          code: 'custom',
+          message:
+            'Every probed read failed, so absence is structural rather than dependent on the data; mark the property unsupported instead of nullable.',
+          path: ['evidence', 'nullable', 'sampleSize'],
+        })
+      } else {
+        const cause = evidence.errorNumbers === undefined ? 'nullCount' : 'errorNumbers'
+        ctx.addIssue({
+          code: 'custom',
+          message: `The probe observed no empty value, and its failed reads are not all the app reporting no value (${String(ABSENT_VALUE_ERROR_NUMBER)}), so it cannot show that the field is nullable.`,
+          path: ['evidence', 'nullable', cause],
+        })
+      }
     }
     if (reportsAbsence(evidence) && claim.nullable === false) {
       ctx.addIssue({
@@ -621,15 +633,26 @@ export function checkNullabilityClaim(claim: NullabilityClaim, ctx: z.Refinement
 }
 
 /**
- * Whether probe evidence shows the app reporting an absent value by failing
- * the read: some reads failed, and every one raised the absent-value number
- * ({@link ABSENT_VALUE_ERROR_NUMBER}).
+ * Whether some probed reads failed and every failure raised the absent-value
+ * number ({@link ABSENT_VALUE_ERROR_NUMBER}), whatever else the probe read.
  */
-export function reportsAbsence(evidence: ProbeNullabilityEvidence): boolean {
+function failedReadsAllReportedAbsence(evidence: ProbeNullabilityEvidence): boolean {
   return (
     evidence.failedReads > 0 &&
     evidence.errorNumbers?.every((number) => number === ABSENT_VALUE_ERROR_NUMBER) === true
   )
+}
+
+/**
+ * Whether probe evidence shows the app reporting an absent value by failing
+ * the read on some instances only: failed reads all raised the absent-value
+ * number ({@link ABSENT_VALUE_ERROR_NUMBER}), and at least one read succeeded
+ * (failed reads count toward neither `sampleSize` nor `nullCount`, so
+ * `sampleSize` above 0 is a successful read). A property whose every read
+ * failed is absent structurally, which phases/13 D10 calls unsupported.
+ */
+export function reportsAbsence(evidence: ProbeNullabilityEvidence): boolean {
+  return evidence.sampleSize > 0 && failedReadsAllReportedAbsence(evidence)
 }
 
 /**

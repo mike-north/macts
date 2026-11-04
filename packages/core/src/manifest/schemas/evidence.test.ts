@@ -147,9 +147,18 @@ describe('property nullability claims', () => {
     for (const errorNumbers of [[-1700], [-1728, -1700]]) {
       const evidence = { nullable: probe({ failedReads: 2, errorNumbers }) }
       expect(issuePaths(PropertySchema.safeParse({ ...BASE, nullable: true, evidence }))).toEqual([
-        ['evidence', 'nullable', 'nullCount'],
+        ['evidence', 'nullable', 'errorNumbers'],
       ])
     }
+  })
+
+  it('rejects a probe nullable claim whose every read failed with -1728 (structural absence is unsupported, D10)', () => {
+    const evidence = { nullable: probe({ sampleSize: 0, failedReads: 5, errorNumbers: [-1728] }) }
+    const claim = { ...BASE, nullable: true, evidence }
+    expect(issuePaths(PropertySchema.safeParse(claim))).toEqual([
+      ['evidence', 'nullable', 'sampleSize'],
+    ])
+    expect(readsAbsentAsNull({ nullable: true, evidence })).toBe(false)
   })
 
   it('rejects a probe nullable claim from failed reads whose error numbers were not recorded', () => {
