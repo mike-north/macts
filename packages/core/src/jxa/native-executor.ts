@@ -57,6 +57,7 @@ import type { ExecutionRequest, Executor, ResolutionRequest } from '../execution
 import { isWireValue, JxaExecutionError, MAX_OUTPUT_BYTES, runNativeScript } from './executor.js'
 import {
   NATIVE_CODEC,
+  type NativeAddressing,
   type NativeFailure,
   type NativeOutcome,
   type NativeReferencePlans,
@@ -162,18 +163,20 @@ export type NativeRunFailure =
  *
  * Reference resolution: `resolve` resolves the references the provider can
  * also convert at operation positions (phases/13 D7, native conversion
- * scope), and identity collections of them: a single identity reference with
- * no container, to a resource the app finds at the application by its
- * identifier. The object is found exactly as conversion finds it, by the
- * codec, and read as the resource's get reads its item, in one automation
+ * scope), and identity collections of them: a single identity reference to a
+ * resource the app finds by its identifier, carrying, exactly when the
+ * resource's get records a parent, its container in the same form. The
+ * object is found exactly as conversion finds it, by the codec, container
+ * first, and read as the resource's get reads its item, in one automation
  * process per request. A missing object fails with `TargetNotFoundError`
  * naming the referenced resource, with `entryIndex` for an identity
- * collection's entry. An empty identity collection resolves to `[]` without
- * starting an automation process; the runtime has already run permission,
- * governance, approval and audit for it, as for any resolution. Every other
- * reference (a selector, a reference located through a container, or one to
- * a resource outside that scope) fails with `InternalError` naming the form,
- * before any automation runs.
+ * collection's entry; a missing container names the container's resource.
+ * An empty identity collection resolves to `[]` without starting an
+ * automation process; the runtime has already run permission, governance,
+ * approval and audit for it, as for any resolution. Every other reference (a
+ * selector, a container the target is not found within, a missing container,
+ * or one to a resource outside that scope) fails with `InternalError` naming
+ * the form, before any automation runs.
  *
  * @param options - Time limit and, for tests, the transport.
  * @returns An `Executor` whose provider is `'macos'`.
@@ -194,6 +197,9 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       const plan = planNativeInvocation(manifest, target, {
         identifierAliases: outputPlan.kind === 'passthrough',
         paged: page !== undefined,
+        // A passthrough result is not encoded, so nothing would unwrap a
+        // reference handed over with its container.
+        containerReferences: outputPlan.kind !== 'passthrough',
       })
       assertRequiredArguments(plan.requiredArguments, input)
       const script: NativeScript = {
@@ -243,7 +249,9 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       }
       const script: NativeScript = {
         bundleId: manifest.app.bundleId,
-        body: buildResolutionBody(manifest, reference.resource, reference.cardinality),
+        body: buildResolutionBody(manifest, reference.resource, reference.cardinality, {
+          containerReferences: outputPlan.kind !== 'passthrough',
+        }),
         input: resolution.input,
         inputPlan: resolution.inputPlan,
         outputPlan,
@@ -396,9 +404,11 @@ interface ResolutionKinds {
  * @remarks
  * The provider resolves exactly what it converts at operation positions
  * (phases/13 D7, native conversion scope), and identity collections of it: a
- * single identity reference with no container, to a resource whose entry in
- * the script's reference table has both an identifier plan and addressing.
- * The table is the one the codec reads, built by the same helper that decides
+ * single identity reference to a resource whose entry in the script's
+ * reference table has both an identifier plan and addressing, carrying a
+ * container exactly when that addressing is `within` a parent, and then an
+ * identity container of that parent, judged the same way level by level. The
+ * table is the one the codec reads, built by the same helper that decides
  * conversion ({@link referenceAddressing}), so the two cannot disagree.
  */
 function unresolvableForm(
@@ -409,6 +419,8 @@ function unresolvableForm(
   const app = manifest.app.name
   const target = `the ${app} resource ${JSON.stringify(reference.resource)}`
   const cannot = (form: string): string => `The macOS provider cannot resolve ${form} yet.`
+  // A caller error, not a missing feature (phases/13 D7, container scoping).
+  const misplacedContainer = `The macOS provider cannot resolve a reference to ${target} through that container: a reference carries a container only when ${app} finds its resource within another, and then as an identity reference to that resource.`
   if (reference.form === 'selector') {
     return cannot(
       reference.cardinality === 'one'
@@ -416,31 +428,81 @@ function unresolvableForm(
         : `a selector collection reference to ${target}`
     )
   }
-  if (reference.cardinality === 'one') {
-    if (reference.container !== undefined) {
-      return cannot(`a reference to ${target} located through a container`)
-    }
-  } else {
+  if (reference.cardinality === 'many') {
     for (const entry of reference.entries) {
       if (entry.form !== 'identity' || entry.cardinality !== 'one') {
         return cannot(
           `an identity collection of ${target} whose entries are not identity references`
         )
       }
-      if (entry.container !== undefined) {
-        return cannot(
-          `an identity collection of ${target} whose entries are located through a container`
-        )
-      }
+      const unresolvable = unresolvableChain(entry, references)
+      if (unresolvable === 'container') return misplacedContainer
+      if (unresolvable !== undefined) return unresolvableMessage(manifest, unresolvable)
     }
+    return unresolvableMessage(manifest, unresolvableTarget(reference.resource, references))
   }
-  const entry = Object.hasOwn(references, reference.resource)
-    ? references[reference.resource]
+  const unresolvable = unresolvableChain(reference, references)
+  if (unresolvable === 'container') return misplacedContainer
+  return unresolvableMessage(manifest, unresolvable)
+}
+
+/**
+ * Why a single reference's chain does not resolve: `'container'` for a
+ * container the reference's resource is not found within (one on a resource
+ * found at the application, one of another resource, or one not in identity
+ * form); a {@link Unresolvable} for a resource with no addressing or a missing
+ * container; `undefined` when every level resolves.
+ */
+function unresolvableChain(
+  reference: ReferenceWire,
+  references: NativeReferenceTable
+): 'container' | Unresolvable | undefined {
+  const missing = unresolvableTarget(reference.resource, references)
+  if (missing !== undefined) return missing
+  const within = parentWithin(references[reference.resource]?.addressing)
+  const container =
+    reference.form === 'identity' && reference.cardinality === 'one'
+      ? reference.container
+      : undefined
+  if (within === undefined) return container === undefined ? undefined : 'container'
+  if (container === undefined) return { kind: 'no-container', resource: reference.resource, within }
+  if (
+    container.resource !== within ||
+    container.form !== 'identity' ||
+    container.cardinality !== 'one'
+  ) {
+    return 'container'
+  }
+  return unresolvableChain(container, references)
+}
+
+/** A level of a reference that the provider cannot resolve, and why. */
+type Unresolvable =
+  | { readonly kind: 'no-addressing'; readonly resource: string }
+  | { readonly kind: 'no-container'; readonly resource: string; readonly within: string }
+
+/** Why references to `resource` do not resolve at all, if they do not. */
+function unresolvableTarget(
+  resource: string,
+  references: NativeReferenceTable
+): Unresolvable | undefined {
+  const entry = Object.hasOwn(references, resource) ? references[resource] : undefined
+  return entry?.id === undefined || entry.addressing === undefined
+    ? { kind: 'no-addressing', resource }
     : undefined
-  if (entry?.id === undefined || entry.addressing === undefined) {
-    return `The macOS provider cannot resolve references to ${target} yet: ${app} does not find one by its identifier alone.`
-  }
-  return undefined
+}
+
+/** The message for an {@link Unresolvable}, or `undefined` when there is none. */
+function unresolvableMessage(
+  manifest: AppManifest,
+  unresolvable: Unresolvable | undefined
+): string | undefined {
+  if (unresolvable === undefined) return undefined
+  const app = manifest.app.name
+  const target = `the ${app} resource ${JSON.stringify(unresolvable.resource)}`
+  return unresolvable.kind === 'no-addressing'
+    ? `The macOS provider cannot resolve references to ${target} yet: ${app} does not find one by its identifier alone.`
+    : `The macOS provider cannot resolve a reference to ${target} without its container: ${app} finds one only within its ${JSON.stringify(unresolvable.within)}.`
 }
 
 /**
@@ -505,9 +567,19 @@ function describeResolutionFailure(
 }
 
 /**
+ * The manifest key of the parent a resource with `addressing` is found
+ * within, or `undefined` when it is found at the application or has no
+ * addressing. A singleton root is held by the application itself.
+ */
+function parentWithin(addressing: NativeAddressing | undefined): string | undefined {
+  return addressing === undefined || addressing.lookup === 'byRoot' ? undefined : addressing.within
+}
+
+/**
  * The reference table of a native script: an entry for every resource a
  * reference in `plans` names, directly or inside another resource's
- * identifier, with the identifier plan `resourcePlans` holds for it and the
+ * identifier, and for every parent such a resource is found within, level by
+ * level, with the identifier plan `resourcePlans` holds for it and the
  * addressing the manifest gives it ({@link referenceAddressing}).
  *
  * @remarks
@@ -532,6 +604,8 @@ function nativeReferenceTable(
       ...(addressing === undefined ? {} : { addressing }),
     })
     if (id !== undefined) pending.push(...referencedResources(id))
+    const within = parentWithin(addressing)
+    if (within !== undefined) pending.push(within)
   }
   // `Object.fromEntries` defines own properties, so no resource key can reach
   // the table's prototype.

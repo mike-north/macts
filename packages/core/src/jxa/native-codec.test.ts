@@ -31,6 +31,7 @@ import { createNativeCodecFunctions } from './native-codec-functions.js'
 import {
   NATIVE_CODEC,
   NATIVE_CODEC_ERROR_NAME,
+  NATIVE_CONTAINED_REFERENCE_KEY,
   NATIVE_DECODE_FUNCTION,
   NATIVE_ENCODE_FUNCTION,
   type NativeCodecEnvironment,
@@ -1346,19 +1347,19 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
         'a resource found only within its container',
         identity('Email', 'e-1'),
         EMAIL_REF,
-        'does not find its objects at the application',
+        'does not find its objects by their identifier',
       ],
       [
         'a resource with no identifier',
         identity('Note', 'n-1'),
         NOTE_REF,
-        'does not find its objects at the application',
+        'does not find its objects by their identifier',
       ],
       [
         'a resource the table does not list',
         identity('Album', 'a-1'),
         ALBUM_REF,
-        'does not find its objects at the application',
+        'does not find its objects by their identifier',
       ],
     ] as const)(
       'marks %s as a reference it cannot convert, and addresses nothing',
@@ -1767,6 +1768,323 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
   })
 })
 
+// ---------------------------------------------------------------------------
+// References within a container (D7, container scoping)
+// ---------------------------------------------------------------------------
+
+const TAB_REF: ValuePlan = { kind: 'reference', resource: 'Tab', cardinality: 'one' }
+const CELL_REF: ValuePlan = { kind: 'reference', resource: 'Cell', cardinality: 'one' }
+
+/**
+ * A reference table with resources found within a container: `Tab` (text
+ * id) within a `Window` (integer id, found at the application), and `Cell`
+ * within a `Tab`, a nested chain.
+ */
+const CONTAINED_REFERENCES: NativeReferenceTable = {
+  Window: { id: INTEGER, addressing: { collection: 'windows', lookup: 'byId', property: 'id' } },
+  Tab: {
+    id: STRING,
+    addressing: { collection: 'tabs', lookup: 'byId', property: 'id', within: 'Window' },
+  },
+  Cell: {
+    id: STRING,
+    addressing: { collection: 'cells', lookup: 'byId', property: 'id', within: 'Tab' },
+  },
+}
+
+/**
+ * A stand-in app with windows 7 and 8, holding tabs `t-1` and `t-2` and tab
+ * `t-3` respectively, each tab holding cell `c-1`. Every lookup and read is
+ * recorded.
+ */
+function standInBrowser() {
+  const calls: string[] = []
+  const absent = (label: string) => ({
+    exists: () => {
+      calls.push(`${label}.exists()`)
+      return false
+    },
+  })
+  const node = <T extends object>(label: string, id: unknown, children: T) =>
+    Object.assign(
+      {
+        exists: () => {
+          calls.push(`${label}.exists()`)
+          return true
+        },
+        id: () => {
+          calls.push(`${label}.id()`)
+          return id
+        },
+      },
+      children
+    )
+  const lookup = (label: string, items: Readonly<Record<string, object>>) => ({
+    byId: (id: unknown) => {
+      calls.push(`${label}.byId(${JSON.stringify(id)})`)
+      const key = String(id)
+      return Object.hasOwn(items, key) ? items[key] : absent(`${label}.byId(${JSON.stringify(id)})`)
+    },
+  })
+  const tab = (windowId: number, id: string) => {
+    const label = `window ${String(windowId)} tab ${id}`
+    return node(label, id, {
+      cells: lookup(`${label} cells`, { 'c-1': node(`${label} cell`, 'c-1', {}) }),
+    })
+  }
+  const window = (id: number, tabIds: readonly string[]) =>
+    node(`window ${String(id)}`, id, {
+      tabs: lookup(
+        `window ${String(id)} tabs`,
+        Object.fromEntries(tabIds.map((tabId) => [tabId, tab(id, tabId)]))
+      ),
+    })
+  const windows = { '7': window(7, ['t-1', 't-2']), '8': window(8, ['t-3']) }
+  return { calls, app: { windows: lookup('windows', windows) }, windows, tab }
+}
+
+/** An application that fails the test when anything of it is used. */
+function untouchableBrowser(): object {
+  const touched = (): never => {
+    throw new Error('the application was used before the input converted')
+  }
+  return new Proxy({}, { get: touched, has: touched, ownKeys: touched })
+}
+
+/** The single identity reference payload to `resource` `id`, within `container`. */
+function within(resource: string, id: unknown, container?: Record<string, unknown>) {
+  return {
+    resource,
+    form: 'identity',
+    cardinality: 'one',
+    id,
+    ...(container === undefined ? {} : { container }),
+  }
+}
+
+/** The value a body hands over with the record it was read through. */
+function contained(value: unknown, how: { container: unknown } | { containerId: unknown }) {
+  return { [NATIVE_CONTAINED_REFERENCE_KEY]: { value, ...how } }
+}
+
+describe.each(IMPLEMENTATIONS)(
+  '%s: references within a container',
+  (_label, { decode, encode }) => {
+    describe('encode', () => {
+      it('encodes a value handed over with its record as identity with that record as container', () => {
+        const { app, windows, tab, calls } = standInBrowser()
+        const env = { app, references: CONTAINED_REFERENCES }
+
+        expect(encode(contained(tab(8, 't-3'), { container: windows['8'] }), TAB_REF, env)).toEqual(
+          {
+            reference: within('Tab', 't-3', within('Window', { integer: '8' })),
+          }
+        )
+        // The target's id is read from the value, the container's from the record.
+        expect(calls).toEqual(['window 8 tab t-3.id()', 'window 8.id()'])
+      })
+
+      it('encodes the container from an identifier already read, reading nothing for it', () => {
+        const { app, tab, calls } = standInBrowser()
+        const env = { app, references: CONTAINED_REFERENCES }
+
+        expect(encode(contained(tab(7, 't-2'), { containerId: 7 }), TAB_REF, env)).toEqual({
+          reference: within('Tab', 't-2', within('Window', { integer: '7' })),
+        })
+        expect(calls).toEqual(['window 7 tab t-2.id()'])
+      })
+
+      it('hands a null value through a nullable position, and each item of a list its container', () => {
+        const { app, windows, tab } = standInBrowser()
+        const env = { app, references: CONTAINED_REFERENCES }
+
+        expect(encode(null, nullable(TAB_REF), env)).toBeNull()
+        expect(
+          encode(
+            [
+              contained(tab(7, 't-1'), { containerId: 7 }),
+              contained(tab(8, 't-3'), { container: windows['8'] }),
+            ],
+            arrayOf(TAB_REF),
+            env
+          )
+        ).toEqual([
+          { reference: within('Tab', 't-1', within('Window', { integer: '7' })) },
+          { reference: within('Tab', 't-3', within('Window', { integer: '8' })) },
+        ])
+      })
+
+      it('marks a value that comes without its record as a reference it cannot convert', () => {
+        const { app, tab, calls } = standInBrowser()
+        expectCodecError(
+          () => encode(tab(7, 't-1'), TAB_REF, { app, references: CONTAINED_REFERENCES }),
+          {
+            direction: 'encode',
+            path: [],
+            includes: ['"Tab"', 'without the record it was read through'],
+            unsupportedKind: 'reference',
+          }
+        )
+        expect(calls).toEqual([])
+      })
+
+      it('marks a container that is itself found within a container, a nested chain', () => {
+        const { app, tab } = standInBrowser()
+        expectCodecError(
+          () =>
+            encode(contained(tab(7, 't-1'), { container: tab(7, 't-1') }), CELL_REF, {
+              app,
+              references: CONTAINED_REFERENCES,
+            }),
+          { direction: 'encode', path: ['container'], unsupportedKind: 'reference' }
+        )
+      })
+
+      it('rejects a container identifier that violates its plan, at the container id', () => {
+        const { app, tab } = standInBrowser()
+        expectCodecError(
+          () =>
+            encode(contained(tab(7, 't-1'), { containerId: 'seven' }), TAB_REF, {
+              app,
+              references: CONTAINED_REFERENCES,
+            }),
+          { direction: 'encode', path: ['container', 'id'] }
+        )
+      })
+    })
+
+    describe('decode', () => {
+      it('finds the container first, then the object within it', () => {
+        const { app, windows, calls } = standInBrowser()
+        const decoded = decode(
+          { reference: within('Tab', 't-3', within('Window', { integer: '8' })) },
+          TAB_REF,
+          { app, references: CONTAINED_REFERENCES }
+        )
+
+        expect(decoded).toBe(windows['8'].tabs.byId('t-3'))
+        expect(calls.slice(0, 4)).toEqual([
+          'windows.byId(8)',
+          'window 8.exists()',
+          'window 8 tabs.byId("t-3")',
+          'window 8 tab t-3.exists()',
+        ])
+      })
+
+      it('follows a chain of containers level by level', () => {
+        const { app, calls } = standInBrowser()
+        decode(
+          {
+            reference: within(
+              'Cell',
+              'c-1',
+              within('Tab', 't-1', within('Window', { integer: '7' }))
+            ),
+          },
+          CELL_REF,
+          { app, references: CONTAINED_REFERENCES }
+        )
+
+        expect(calls).toEqual([
+          'windows.byId(7)',
+          'window 7.exists()',
+          'window 7 tabs.byId("t-1")',
+          'window 7 tab t-1.exists()',
+          'window 7 tab t-1 cells.byId("c-1")',
+          'window 7 tab t-1 cell.exists()',
+        ])
+      })
+
+      it('reports a missing container as missing, naming its resource, before looking up the object', () => {
+        const { app, calls } = standInBrowser()
+        expectCodecError(
+          () =>
+            decode(
+              { reference: within('Tab', 't-1', within('Window', { integer: '9' })) },
+              TAB_REF,
+              {
+                app,
+                references: CONTAINED_REFERENCES,
+              }
+            ),
+          { direction: 'decode', path: ['container'], missingResource: 'Window' }
+        )
+        expect(calls).toEqual(['windows.byId(9)', 'windows.byId(9).exists()'])
+      })
+
+      it('reports an object its container does not hold as missing, naming its resource', () => {
+        // t-3 is a tab of window 8; the reference names window 7.
+        const { app, calls } = standInBrowser()
+        expectCodecError(
+          () =>
+            decode(
+              { reference: within('Tab', 't-3', within('Window', { integer: '7' })) },
+              TAB_REF,
+              {
+                app,
+                references: CONTAINED_REFERENCES,
+              }
+            ),
+          { direction: 'decode', path: [], missingResource: 'Tab' }
+        )
+        expect(calls).toEqual([
+          'windows.byId(7)',
+          'window 7.exists()',
+          'window 7 tabs.byId("t-3")',
+          'window 7 tabs.byId("t-3").exists()',
+        ])
+      })
+
+      it('rejects a reference with no container, or one of another resource, before using the app', () => {
+        const env = { app: untouchableBrowser(), references: CONTAINED_REFERENCES }
+        expectCodecError(() => decode({ reference: within('Tab', 't-1') }, TAB_REF, env), {
+          direction: 'decode',
+          path: [],
+          includes: ['"container"'],
+        })
+        expectCodecError(
+          () => decode({ reference: within('Tab', 't-1', within('Tab', 't-2')) }, TAB_REF, env),
+          { direction: 'decode', path: ['container', 'resource'] }
+        )
+      })
+
+      it('marks a selector container, and a container on a resource found at the application', () => {
+        const env = { app: untouchableBrowser(), references: CONTAINED_REFERENCES }
+        expectCodecError(
+          () =>
+            decode(
+              {
+                reference: within('Tab', 't-1', {
+                  resource: 'Window',
+                  form: 'selector',
+                  cardinality: 'one',
+                  selector: { by: 'name', name: 'Front' },
+                }),
+              },
+              TAB_REF,
+              env
+            ),
+          { direction: 'decode', path: ['container'], unsupportedKind: 'reference' }
+        )
+        expectCodecError(
+          () =>
+            decode(
+              { reference: within('Window', { integer: '7' }, within('Window', { integer: '8' })) },
+              WINDOW_REF,
+              env
+            ),
+          {
+            direction: 'decode',
+            path: [],
+            includes: ['located through a container'],
+            unsupportedKind: 'reference',
+          }
+        )
+      })
+    })
+  }
+)
+
 describe('NATIVE_CODEC.prelude', () => {
   it('defines exactly the decode and encode globals and nothing else', () => {
     expect(embedded.addedGlobals).toEqual([NATIVE_DECODE_FUNCTION, NATIVE_ENCODE_FUNCTION].sort())
@@ -1799,5 +2117,6 @@ describe('codec literals', () => {
       record: WIRE_KEYS.record,
       reference: WIRE_KEYS.reference,
     })
+    expect(literals.containedReference).toBe(NATIVE_CONTAINED_REFERENCE_KEY)
   })
 })

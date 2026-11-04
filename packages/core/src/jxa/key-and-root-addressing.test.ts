@@ -553,3 +553,199 @@ describe('singleton roots against a stand-in Archive', () => {
     expect(error).toBeInstanceOf(InternalError)
   })
 })
+
+/**
+ * Where key targeting and singleton roots meet references that carry their
+ * container (phases/13 D7, container scoping): the container is looked up by
+ * the parent's own targeting, and the child within it by the child's. A label
+ * is found by id within the entry its key finds; a mark by key within the
+ * volume its id finds.
+ */
+describe('containers found by key targeting', () => {
+  const LABEL_REF: ValuePlan = { kind: 'reference', resource: 'Label', cardinality: 'one' }
+  const LABEL_PLAN: ValuePlan = {
+    kind: 'record',
+    fields: {
+      id: { presence: 'required', value: text() },
+      text: { presence: 'required', value: nullable(text()) },
+    },
+  }
+  const MARK_PLAN: ValuePlan = {
+    kind: 'record',
+    fields: { location: { presence: 'required', value: text() } },
+  }
+  const PLANS: ResourcePlanTable = { ...RESOURCE_PLANS, Mark: { id: text() } }
+
+  /** A reference to `resource` by `id`, within the container `container`. */
+  function contained(resource: string, id: string, container: ReturnType<typeof ref>) {
+    return {
+      reference: {
+        resource,
+        form: 'identity',
+        cardinality: 'one',
+        id,
+        container: container.reference,
+      },
+    } as const
+  }
+
+  /** Resolve `reference` against `app` with Mark in the resource table. */
+  function resolveWithin(app: object, reference: unknown, outputPlan: ValuePlan) {
+    return createNativeExecutor({ transport: standInTransport(app) }).resolve({
+      manifest,
+      reference: reference as never,
+      outputPlan,
+      resourcePlans: PLANS,
+    })
+  }
+
+  it('addresses a label within its entry, whose own addressing is by key', () => {
+    expect(referenceAddressing(manifest, 'Label')).toEqual({
+      collection: 'labels',
+      lookup: 'byId',
+      property: 'id',
+      within: 'Entry',
+    })
+    expect(referenceAddressing(manifest, 'Entry')?.lookup).toBe('byKey')
+  })
+
+  it('addresses a keyed mark within its volume', () => {
+    expect(referenceAddressing(manifest, 'Mark')).toEqual({
+      collection: 'marks',
+      lookup: 'byKey',
+      property: 'location',
+      within: 'Volume',
+    })
+  })
+
+  it('resolves a label by looking its entry up by key, then the label by id within it', async () => {
+    const { app, uses } = standInArchive()
+
+    await expect(
+      resolveWithin(app, contained('Label', 'l1', ref('Entry', '/a')).reference, LABEL_PLAN)
+    ).resolves.toEqual({ id: 'l1', text: 'Fragile' })
+    expect(uses.slice(0, 9)).toEqual([
+      'read app.entries',
+      'read app.entries.byName',
+      'call app.entries.byName',
+      'read app.entries.byName().exists',
+      'call app.entries.byName().exists',
+      'read app.entries.byName().labels',
+      'read app.entries.byName().labels.byId',
+      'call app.entries.byName().labels.byId',
+      'read app.entries.byName().labels.byId().exists',
+    ])
+  })
+
+  it('resolves a mark by looking its volume up by id, then the mark by key within it', async () => {
+    const { app, uses } = standInArchive()
+
+    await expect(
+      resolveWithin(app, contained('Mark', '/m', ref('Volume', 'v1')).reference, MARK_PLAN)
+    ).resolves.toEqual({ location: '/m' })
+    expect(uses).toContain('call app.volumes.byId().marks.byName')
+  })
+
+  it('fails a label whose entry key finds nothing as a missing entry, looking up no label', async () => {
+    const { app, uses } = standInArchive()
+
+    const error = await rejectionOf(
+      resolveWithin(app, contained('Label', 'l1', ref('Entry', '/missing')).reference, LABEL_PLAN)
+    )
+
+    expect(error).toBeInstanceOf(TargetNotFoundError)
+    expect((error as TargetNotFoundError).message).toContain('Entry')
+    expect(uses.some((use) => use.includes('labels'))).toBe(false)
+  })
+
+  it('emits a label read through an entry with that entry as its container, by its key', async () => {
+    // The Archive source with an entry field referencing a label on that entry.
+    const pinnedManifest = parseManifestYaml(
+      ARCHIVE_MANIFEST_YAML.replace(
+        '        description: The entry that holds this one\n',
+        [
+          '        description: The entry that holds this one',
+          '      pinned:',
+          '        access: r',
+          '        type: { resource: Label }',
+          '        description: The label pinned to the entry',
+          '',
+        ].join('\n')
+      )
+    )
+    const label = object({ id: 'l1', text: 'Fragile' }, { id: () => 'l1' })
+    const pinnedEntry = (pinned: unknown) =>
+      object({ location: '/a', title: 'A', holder: null, pinned }, { location: () => '/a' })
+    const get = (pinned: unknown) =>
+      createNativeExecutor({
+        transport: standInTransport({
+          includeStandardAdditions: false,
+          entries: { byName: (key: unknown) => (key === '/a' ? pinnedEntry(pinned) : ABSENT) },
+        }),
+      }).execute({
+        manifest: pinnedManifest,
+        target: { command: 'getEntry', resource: 'Entry' },
+        input: { location: '/a' },
+        inputPlan: inputOf(text(), 'location'),
+        outputPlan: {
+          kind: 'record',
+          fields: {
+            location: { presence: 'required', value: text() },
+            title: { presence: 'required', value: nullable(text()) },
+            holder: { presence: 'required', value: nullable(ENTRY_REF) },
+            pinned: { presence: 'required', value: nullable(LABEL_REF) },
+          },
+        },
+        resourcePlans: PLANS,
+      })
+
+    await expect(get(label)).resolves.toEqual({
+      location: '/a',
+      title: 'A',
+      holder: null,
+      pinned: contained('Label', 'l1', ref('Entry', '/a')),
+    })
+    // The app reports no pinned label: a missing value stays null.
+    await expect(get(null)).resolves.toMatchObject({ pinned: null })
+  })
+})
+
+/**
+ * A singleton root is never a container, nor found within one: the manifest
+ * schema rejects a command that records a root as its parent. A manifest that skipped
+ * validation is the only way to record one, and the provider refuses it as a
+ * macts defect rather than looking a container up, or encoding one, by kind.
+ */
+describe('a singleton root as a container', () => {
+  it('is refused as a broken invariant, naming the root', () => {
+    const getDesk = manifest.commands['getDesk']
+    if (getDesk === undefined) throw new Error('Archive has a desk get')
+    const label = manifest.resources['Label']
+    if (label === undefined) throw new Error('Archive has a label')
+    // Skips validation: a slip got within a desk.
+    const slipWithinDesk: typeof manifest = {
+      ...manifest,
+      resources: { ...manifest.resources, Slip: { ...label, name: 'Slip', plural: 'Slips' } },
+      commands: {
+        ...manifest.commands,
+        getSlip: {
+          ...getDesk,
+          resourceType: 'Slip',
+          parent: { resource: 'Desk', parameter: 'deskKind' },
+        },
+      },
+    }
+
+    expect(() => referenceAddressing(slipWithinDesk, 'Slip')).toThrow(InternalError)
+    expect(() => referenceAddressing(slipWithinDesk, 'Slip')).toThrow(
+      'The macOS provider cannot use the singleton root "Desk" as a container.'
+    )
+    // Skips validation: the desk got within an entry.
+    const getDeskInEntry = { ...getDesk, parent: { resource: 'Entry', parameter: 'entryKey' } }
+    const deskInEntry = { ...manifest, commands: { ...manifest.commands, getDesk: getDeskInEntry } }
+    expect(() => referenceAddressing(deskInEntry, 'Desk')).toThrow(InternalError)
+    expect(() => referenceAddressing(deskInEntry, 'Desk')).toThrow(
+      'The macOS provider cannot find the singleton root "Desk" within a container.'
+    )
+  })
+})

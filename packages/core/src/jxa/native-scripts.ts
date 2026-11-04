@@ -30,6 +30,12 @@
  *   (`../manifest/native-accessor.ts`), while every record a body returns is
  *   keyed by the manifest's public property names, so no app spelling reaches
  *   the caller.
+ * - a field holding a reference to a target got within the record being read
+ *   (a Chrome window's `activeTab`) is handed to the codec together with that
+ *   record, which becomes the reference's container: the item for a get,
+ *   create, update or resolution body, the row's identifier for a list. The
+ *   container comes from the read path, never from asking the object for its
+ *   own container.
  *
  * No input value is ever written into a body. Every argument is read at run
  * time as `args["<name>"]`, so the source text depends only on the manifest and
@@ -59,12 +65,17 @@ import {
   resolvePrimaryIdentifierProperty,
 } from '../manifest/identifier.js'
 import { resolveCollectionAccessor, resolvePropertyAccessor } from '../manifest/native-accessor.js'
-import { omittedOutputProperties, outputProperties } from '../manifest/output-references.js'
+import {
+  containedOutputProperties,
+  omittedOutputProperties,
+  outputProperties,
+} from '../manifest/output-references.js'
 import { resolvingCommand } from '../manifest/resource-commands.js'
 import { ROOT_KIND_PROPERTY, rootProperties } from '../manifest/roots.js'
 import {
   NATIVE_CODEC_ERROR_NAME,
   NATIVE_COLLECTION_CHANGED_ERROR_NAME,
+  NATIVE_CONTAINED_REFERENCE_KEY,
   type NativeAddressing,
   type NativeCollectionAddressing,
 } from './native-codec.js'
@@ -111,6 +122,32 @@ export interface NativeBodyOptions {
    * Defaults to `false`.
    */
   readonly paged?: boolean
+  /**
+   * Hand the codec each reference whose target is got within the record
+   * being read together with that record, so the codec encodes the reference
+   * with the record as its container (phases/13 D7, container scoping). A get,
+   * create, update or resolution body hands over the item it read; a list
+   * body, the row's identifier it already read.
+   *
+   * Only a body whose result the codec encodes by a typed plan wants this.
+   * Under a passthrough plan the codec converts nothing, so the hand-over
+   * would reach the caller as it is. Defaults to `true`.
+   */
+  readonly containerReferences?: boolean
+}
+
+/**
+ * The resource a body reads records of, and whether the references in them
+ * are handed to the codec with their container
+ * ({@link NativeBodyOptions.containerReferences}).
+ */
+interface RecordSource {
+  /** The manifest key of the resource; `undefined` for a body with none. */
+  readonly key: string | undefined
+  /** The resource's definition; `undefined` for a body with none. */
+  readonly resource: Resource | undefined
+  /** Whether references to targets got within a record carry it as their container. */
+  readonly containerReferences: boolean
 }
 
 /**
@@ -158,9 +195,14 @@ export function planNativeInvocation(
     target.resource !== undefined && Object.hasOwn(manifest.resources, target.resource)
       ? manifest.resources[target.resource]
       : undefined
+  const source: RecordSource = {
+    key: resource === undefined ? undefined : target.resource,
+    resource,
+    containerReferences: options.containerReferences !== false,
+  }
   const { body, identifierArguments } = buildResourceBody(
     command,
-    resource,
+    source,
     manifest,
     options.identifierAliases === true,
     options.paged === true
@@ -294,20 +336,25 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * `kind` is not read from the app: it is set from `kindExpression`, the kind
  * the object was found by.
  *
- * @throws `InternalError` when `resource` is a singleton root and no
+ * A field holding a reference to a target got within the item is then handed
+ * to the codec together with the item, as the reference's container
+ * ({@link wrapContained}).
+ *
+ * @throws `InternalError` when `source` reads a singleton root and no
  *   `kindExpression` is given.
  */
 function readOutputProperties(
   manifest: AppManifest,
-  resource: Resource | undefined,
+  source: RecordSource,
   itemLocal: string,
   kindExpression?: string
 ): string {
+  const { resource } = source
   const rooted = resource?.roots !== undefined
   if (rooted && kindExpression === undefined) {
     throw new InternalError('A root object is read with the kind it was found by.', {})
   }
-  const keys = itemReadKeys(manifest, resource).filter(
+  const keys = itemReadKeys(manifest, source.key, resource).filter(
     (key) => !rooted || key !== ROOT_KIND_PROPERTY
   )
   const native = (key: string): string => nativePropertyName(resource, key)
@@ -326,8 +373,46 @@ function readOutputProperties(
     '}',
     rooted && kindExpression !== undefined
       ? `${member('obj', ROOT_KIND_PROPERTY)} = ${kindExpression};`
-      : ''
+      : '',
+    ...containedKeys(manifest, source).map(
+      (key) =>
+        `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${wrapContained(member('obj', key), 'container', itemLocal)}; }`
+    )
   )
+}
+
+/**
+ * Expression handing `valueExpression`, a native value read through a record,
+ * to the codec together with that record as its container: the record's item
+ * (`how` is `container`), or its identifier already read (`containerId`).
+ * The codec reads the target's id from the value and encodes the container in
+ * the same request (`NATIVE_CONTAINED_REFERENCE_KEY` in `native-codec.ts`).
+ *
+ * `null`, the app's missing value, is left as it is, so a nullable field
+ * holds `null`; a list is handed over item by item. The expression uses only
+ * built-ins, so the body stays self-contained.
+ */
+function wrapContained(
+  valueExpression: string,
+  how: 'container' | 'containerId',
+  containerExpression: string
+): string {
+  const wrap = (value: string): string =>
+    `{ ${literal(NATIVE_CONTAINED_REFERENCE_KEY)}: { value: ${value}, ${how}: ${containerExpression} } }`
+  return `(function (v) { return v === null ? null : Array.isArray(v) ? v.map(function (e) { return e === null ? null : ${wrap('e')}; }) : ${wrap('v')}; })(${valueExpression})`
+}
+
+/**
+ * The public keys of the fields a body hands to the codec with their record
+ * as container ({@link wrapContained}): the resource's output properties whose
+ * references carry it as their container (`containedOutputProperties`), or
+ * none when the body does not hand references over with their container.
+ */
+function containedKeys(manifest: AppManifest, source: RecordSource): string[] {
+  if (!source.containerReferences || source.key === undefined || source.resource === undefined) {
+    return []
+  }
+  return containedOutputProperties(manifest, source.key, source.resource)
 }
 
 /**
@@ -335,10 +420,14 @@ function readOutputProperties(
  * ({@link readOutputProperties}): the resource's properties that its output
  * record declares (`outputProperties`), or `name` for a body with no resource.
  */
-function itemReadKeys(manifest: AppManifest, resource: Resource | undefined): string[] {
-  return resource === undefined
+function itemReadKeys(
+  manifest: AppManifest,
+  resourceKey: string | undefined,
+  resource: Resource | undefined
+): string[] {
+  return resource === undefined || resourceKey === undefined
     ? ['name']
-    : outputProperties(manifest, resource).map(([key]) => key)
+    : outputProperties(manifest, resourceKey, resource).map(([key]) => key)
 }
 
 /**
@@ -347,9 +436,15 @@ function itemReadKeys(manifest: AppManifest, resource: Resource | undefined): st
  * record leaves out (`omittedOutputProperties`). The identifier is never left
  * out, so it is always read.
  */
-function listReadKeys(manifest: AppManifest, resource: Resource | undefined): string[] {
+function listReadKeys(
+  manifest: AppManifest,
+  resourceKey: string | undefined,
+  resource: Resource | undefined
+): string[] {
   const omitted: ReadonlyMap<string, unknown> =
-    resource === undefined ? new Map() : omittedOutputProperties(manifest, resource)
+    resource === undefined || resourceKey === undefined
+      ? new Map()
+      : omittedOutputProperties(manifest, resourceKey, resource)
   return resolveListOutputProperties(resource).filter((key) => !omitted.has(key))
 }
 
@@ -376,13 +471,19 @@ export interface NativeReadKeys {
  * both sets yet in neither record.
  *
  * @param manifest - The validated manifest of the resource's app.
+ * @param resourceKey - The resource's manifest key; `undefined` for a body
+ *   with no resource.
  * @param resource - The resource definition from the manifest.
  */
 export function nativeReadKeys(
   manifest: AppManifest,
+  resourceKey: string | undefined,
   resource: Resource | undefined
 ): NativeReadKeys {
-  return { get: itemReadKeys(manifest, resource), list: listReadKeys(manifest, resource) }
+  return {
+    get: itemReadKeys(manifest, resourceKey, resource),
+    list: listReadKeys(manifest, resourceKey, resource),
+  }
 }
 
 /**
@@ -516,41 +617,87 @@ function identifierLookup(resource: Resource | undefined):
 /**
  * How the app finds an object of `resourceKey` from the identifier a reference
  * carries, and reads that identifier back, or `undefined` when references to
- * it cannot be converted at the application.
+ * it cannot be converted.
  *
  * @remarks
  * The object is addressed as the resource's get addresses its item: in the
- * resource's collection at the application ({@link resolveCollectionAccessor}),
- * by its identifier targeting. That holds only when the get records no parent;
- * a resource whose get is parent-scoped (a Music track under its playlist, a
- * Calendar event under its calendar) is identified within its container, and
- * a reference to it needs that container (phases/13 D7, container scoping).
- * There is no addressing for such a resource, for one with no identifier, or
- * for one with no get. A singleton root is addressed by its kinds: the
- * application property each one names (`NativeRootAddressing`).
+ * resource's collection ({@link resolveCollectionAccessor}), by its identifier
+ * targeting. When the get records no parent, the collection is the
+ * application's. When it records one (a Chrome tab within its window, a Music
+ * track within its playlist), the resource is identified within its
+ * container (phases/13 D7, container scoping): the collection is the
+ * container's, and `within` names the parent, whose own addressing finds the
+ * container by the parent's own targeting (`byKey` for a parent found by its
+ * key). So a resource is addressable only when its parent is, level by
+ * level. There is no addressing for a resource with no identifier, with no
+ * get, or whose parent has none.
+ *
+ * A singleton root is addressed by its kinds: the application property each
+ * one names (`NativeRootAddressing`). It is held by the application itself,
+ * so a root whose get records a parent is refused (below). A root is never a
+ * container: the manifest schema rejects a command that records a root as
+ * its parent.
+ *
+ * Inputs, resolution and emission all take a resource's addressing from here,
+ * so an object a reference names is the one a get of its identifier finds.
  *
  * @param manifest - The validated app manifest.
  * @param resourceKey - The manifest resource key a reference names.
+ * @throws `InternalError` when a get records a singleton root as its parent,
+ *   or a root's get records a parent, which a validated manifest never does:
+ *   no container lookup or encoding can use a root, so reaching this is a
+ *   macts defect.
  */
 export function referenceAddressing(
   manifest: AppManifest,
   resourceKey: string
 ): NativeAddressing | undefined {
+  return addressingWithin(manifest, resourceKey, new Set())
+}
+
+/**
+ * {@link referenceAddressing}, refusing a chain of parents that comes back to
+ * a resource already in it (`seen`): such a chain has no top-level container
+ * to start from, so nothing in it is addressable.
+ */
+function addressingWithin(
+  manifest: AppManifest,
+  resourceKey: string,
+  seen: ReadonlySet<string>
+): NativeAddressing | undefined {
   const resource = Object.hasOwn(manifest.resources, resourceKey)
     ? manifest.resources[resourceKey]
     : undefined
   const lookup = identifierLookup(resource)
-  if (resource === undefined || lookup === undefined) return undefined
+  if (resource === undefined || lookup === undefined || seen.has(resourceKey)) return undefined
   const get = resolvingCommand(manifest, resourceKey, 'get')
-  if (get === undefined || get[1].parent !== undefined) return undefined
-  if (resource.roots !== undefined)
+  if (get === undefined) return undefined
+  const parent = get[1].parent?.resource
+  if (resource.roots !== undefined) {
+    if (parent !== undefined) {
+      throw new InternalError(
+        `The macOS provider cannot find the singleton root ${JSON.stringify(resourceKey)} within a container.`,
+        {}
+      )
+    }
     return { lookup: 'byRoot', roots: rootProperties(resource.roots) }
+  }
   if (lookup.lookup === 'byRoot') return undefined
-  return {
+  const addressing = {
     collection: resolveCollectionAccessor(resource),
     lookup: lookup.lookup,
     property: lookup.property,
   }
+  if (parent === undefined) return addressing
+  const container = addressingWithin(manifest, parent, new Set([...seen, resourceKey]))
+  if (container === undefined) return undefined
+  if (container.lookup === 'byRoot') {
+    throw new InternalError(
+      `The macOS provider cannot use the singleton root ${JSON.stringify(parent)} as a container.`,
+      {}
+    )
+  }
+  return { ...addressing, within: parent }
 }
 
 /**
@@ -749,26 +896,27 @@ interface ResourceBody {
  */
 function buildResourceBody(
   command: Command,
-  resource: Resource | undefined,
+  source: RecordSource,
   manifest: AppManifest,
   identifierAliases: boolean,
   paged: boolean
 ): ResourceBody {
+  const { resource } = source
   const resourcePlural = resource === undefined ? 'items' : resolveCollectionAccessor(resource)
   if (paged && command.name !== 'list') {
     throw new InternalError('Only a list operation can read a page.', {})
   }
   switch (command.name) {
     case 'list':
-      return buildListBody(command, resource, resourcePlural, manifest, identifierAliases, paged)
+      return buildListBody(command, source, resourcePlural, manifest, identifierAliases, paged)
     case 'get':
-      return buildGetBody(command, resource, resourcePlural, manifest)
+      return buildGetBody(command, source, resourcePlural, manifest)
     case 'delete':
       return buildDeleteBody(command, resource, resourcePlural, manifest)
     case 'create':
-      return buildCreateBody(command, resource, resourcePlural, manifest)
+      return buildCreateBody(command, source, resourcePlural, manifest)
     case 'update':
-      return buildUpdateBody(command, resource, resourcePlural, manifest)
+      return buildUpdateBody(command, source, resourcePlural, manifest)
     default:
       return { body: buildCommandCallBody(command, true), identifierArguments: [] }
   }
@@ -1307,18 +1455,19 @@ function pageReadOf(resource: Resource | undefined): PageRead {
  */
 function buildListBody(
   command: Command,
-  resource: Resource | undefined,
+  source: RecordSource,
   resourcePlural: string,
   manifest: AppManifest,
   identifierAliases: boolean,
   paged: boolean
 ): ResourceBody {
+  const { resource } = source
   if (resource?.roots !== undefined) {
-    return buildRootListBody(resource, resource.roots, manifest, identifierAliases, paged)
+    return buildRootListBody(source, resource, resource.roots, manifest, identifierAliases, paged)
   }
   // The identifier is always read; every other property is read only when the
   // output record declares it (see `outputProperties`).
-  const allPropNames = listReadKeys(manifest, resource)
+  const allPropNames = listReadKeys(manifest, source.key, resource)
   const targeting = resolveIdentifierTargeting(resource)
   const runtimeIdProperty = targeting?.property
   const declaredIdProperty = resolvePrimaryIdentifierProperty(resource)
@@ -1349,9 +1498,20 @@ function buildListBody(
     (p, index) =>
       `${columnLocal(index)} = readColumn(${literal(`the property "${p}"`)}, ${literal(native(p))});`
   )
+  // A field whose references carry the row as their container is handed to
+  // the codec with the row's identifier, already read and checked, so the
+  // container costs no read of its own.
+  const contained = new Set(containedKeys(manifest, source))
+  if (contained.size > 0 && runtimeIdProperty === undefined) {
+    throw new InternalError(
+      'A list cannot return references with their container without the identifiers of its items.',
+      {}
+    )
+  }
   const recordFields = bestEffortProps.map((p, index) => {
     const value = `${columnLocal(index)}[i]`
-    return `if (${value} !== undefined) { ${member('obj', p)} = ${value}; }`
+    const held = contained.has(p) ? wrapContained(value, 'containerId', `${IDS_LOCAL}[i]`) : value
+    return `if (${value} !== undefined) { ${member('obj', p)} = ${held}; }`
   })
   const idField =
     runtimeIdProperty !== undefined ? `${member('obj', runtimeIdProperty)} = ${IDS_LOCAL}[i];` : ''
@@ -1439,17 +1599,24 @@ function buildListBody(
  */
 function buildGetBody(
   command: Command,
-  resource: Resource | undefined,
+  source: RecordSource,
   resourcePlural: string,
   manifest: AppManifest
 ): ResourceBody {
+  const { resource } = source
   if (resource?.roots !== undefined) {
-    return buildRootGetBody(command, resource, resource.roots, manifest)
+    return buildRootGetBody(command, source, resource.roots, manifest)
   }
   const parentScope = recordedParentScope(command, manifest)
   const identifierParam = resolveIdentifierParam(command, parentScope)
-  const bindItem = bindTarget(command, resource, resourcePlural, parentScope, identifierParam)
-  const body = lines(bindItem, readOutputProperties(manifest, resource, 'item'), 'return obj;')
+  const bindItem = bindTarget(
+    command,
+    source.resource,
+    resourcePlural,
+    parentScope,
+    identifierParam
+  )
+  const body = lines(bindItem, readOutputProperties(manifest, source, 'item'), 'return obj;')
   return { body, identifierArguments: identifierArgumentsOf(parentScope, identifierParam) }
 }
 
@@ -1471,7 +1638,7 @@ function bindRoots(roots: ResourceRoots): string {
  */
 function buildRootGetBody(
   command: Command,
-  resource: Resource,
+  source: RecordSource,
   roots: ResourceRoots,
   manifest: AppManifest
 ): ResourceBody {
@@ -1486,7 +1653,7 @@ function buildRootGetBody(
     '}',
     `var item = app[${ROOTS_LOCAL}[${KIND_LOCAL}]];`,
     failIfMissing('item'),
-    readOutputProperties(manifest, resource, 'item', KIND_LOCAL),
+    readOutputProperties(manifest, source, 'item', KIND_LOCAL),
     'return obj;'
   )
   return { body, identifierArguments: [kindParam] }
@@ -1504,6 +1671,7 @@ function buildRootGetBody(
  *   short set, so its list never pages.
  */
 function buildRootListBody(
+  source: RecordSource,
   resource: Resource,
   roots: ResourceRoots,
   manifest: AppManifest,
@@ -1516,7 +1684,7 @@ function buildRootListBody(
     bindRoots(roots),
     `var kinds = ${JSON.stringify(Object.keys(roots))};`,
     'function readRecord(item, itemKind) {',
-    readOutputProperties(manifest, resource, 'item', 'itemKind'),
+    readOutputProperties(manifest, source, 'item', 'itemKind'),
     identifierAliases && aliasSource !== undefined
       ? `${member('obj', CANONICAL_IDENTIFIER_KEY)} = ${member('obj', aliasSource)};`
       : '',
@@ -1574,10 +1742,11 @@ function buildDeleteBody(
  */
 function buildCreateBody(
   command: Command,
-  resource: Resource | undefined,
+  source: RecordSource,
   resourcePlural: string,
   manifest: AppManifest
 ): ResourceBody {
+  const { resource } = source
   const itemClass = member('app', resource?.name ?? 'Item')
   const parentScope = recordedParentScope(command, manifest)
 
@@ -1593,7 +1762,7 @@ function buildCreateBody(
       ),
       `var item = ${itemClass}(props);`,
       `${member(PARENT_LOCAL, resourcePlural)}.push(item);`,
-      readOutputProperties(manifest, resource, 'item'),
+      readOutputProperties(manifest, source, 'item'),
       'return obj;'
     )
     return { body, identifierArguments: [parentScope.parentIdParam] }
@@ -1607,7 +1776,7 @@ function buildCreateBody(
     collectSuppliedParameters('props', command.parameters, native),
     `var item = ${itemClass}(props);`,
     'item.make();',
-    readOutputProperties(manifest, resource, 'item'),
+    readOutputProperties(manifest, source, 'item'),
     'return obj;'
   )
   return { body, identifierArguments: [] }
@@ -1624,10 +1793,11 @@ function buildCreateBody(
  */
 function buildUpdateBody(
   command: Command,
-  resource: Resource | undefined,
+  source: RecordSource,
   resourcePlural: string,
   manifest: AppManifest
 ): ResourceBody {
+  const { resource } = source
   const parentScope = recordedParentScope(command, manifest)
   const identifierParam = resolveIdentifierParam(command, parentScope)
   const excluded = new Set([identifierParam, parentScope?.parentIdParam])
@@ -1639,7 +1809,7 @@ function buildUpdateBody(
       (p) =>
         `if (${supplied(p.name)}) { try { ${member('item', nativePropertyName(resource, p.name))} = ${argumentValue(p.name, p)}; } catch (e) {} }`
     ),
-    readOutputProperties(manifest, resource, 'item'),
+    readOutputProperties(manifest, source, 'item'),
     'return obj;'
   )
   return { body, identifierArguments: identifierArgumentsOf(parentScope, identifierParam) }
@@ -1693,12 +1863,15 @@ export const RESOLUTION_KINDS_ARGUMENT = 'kinds'
  * @param manifest - The validated manifest of the target app.
  * @param resourceKey - The manifest key of the referenced resource.
  * @param cardinality - Whether one object or a list of objects is read.
+ * @param options - Whether references in the records carry their container
+ *   (`containerReferences`, as for an operation body).
  * @throws `InternalError` when the manifest does not declare `resourceKey`.
  */
 export function buildResolutionBody(
   manifest: AppManifest,
   resourceKey: string,
-  cardinality: 'one' | 'many'
+  cardinality: 'one' | 'many',
+  options: Pick<NativeBodyOptions, 'containerReferences'> = {}
 ): string {
   const resource = Object.hasOwn(manifest.resources, resourceKey)
     ? manifest.resources[resourceKey]
@@ -1706,18 +1879,23 @@ export function buildResolutionBody(
   if (resource === undefined) {
     throw new InternalError('The reference does not match any resource of its app.', {})
   }
+  const source: RecordSource = {
+    key: resourceKey,
+    resource,
+    containerReferences: options.containerReferences !== false,
+  }
   const kinds = argument(RESOLUTION_KINDS_ARGUMENT)
   const rooted = resource.roots !== undefined
   if (cardinality === 'one') {
     return lines(
       `var item = ${argument(RESOLUTION_TARGET_ARGUMENT)};`,
-      readOutputProperties(manifest, resource, 'item', rooted ? `${kinds}[0]` : undefined),
+      readOutputProperties(manifest, source, 'item', rooted ? `${kinds}[0]` : undefined),
       'return obj;'
     )
   }
   return lines(
     rooted ? 'function readRecord(item, i) {' : 'function readRecord(item) {',
-    readOutputProperties(manifest, resource, 'item', rooted ? `${kinds}[i]` : undefined),
+    readOutputProperties(manifest, source, 'item', rooted ? `${kinds}[i]` : undefined),
     'return obj;',
     '}',
     `var targets = ${argument(RESOLUTION_ENTRIES_ARGUMENT)};`,

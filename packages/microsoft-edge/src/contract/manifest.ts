@@ -87,7 +87,8 @@ export const manifest: unknown = {
         id: {
           access: 'r',
           type: 'string',
-          description: 'The unique identifier of the window.',
+          description:
+            'The unique identifier of the window, within one browser session: ids start over each time the browser is relaunched, so an id kept across a relaunch may find a different window, not merely none.',
           code: 'ID  ',
           optional: false,
         },
@@ -159,7 +160,8 @@ export const manifest: unknown = {
           type: {
             resource: 'Tab',
           },
-          description: 'Returns the currently selected tab',
+          description:
+            'Returns the currently selected tab, as a reference that carries this window as its container. Window and tab ids start over each time the browser is relaunched, so this reference, kept across a relaunch, may resolve to a different tab or window, not merely fail, and an action through it, such as closing the tab, would act on that other tab.',
           code: 'acTa',
           optional: false,
         },
@@ -202,7 +204,8 @@ export const manifest: unknown = {
         id: {
           access: 'r',
           type: 'string',
-          description: 'Unique ID of the tab.',
+          description:
+            'Unique ID of the tab among the tabs of its window, within one browser session: ids start over each time the browser is relaunched, so an id kept across a relaunch may find a different tab, not merely none, and an action through it, such as closing the tab, would act on that other tab.',
           code: 'ID  ',
           optional: false,
         },

@@ -110,7 +110,7 @@ describe('the generated contract', () => {
         .filter(({ kind }) => kind === 'omitted-output')
         .map(({ message }) => message)
     ).toEqual([
-      'shelf: resources.Library.properties.currentChapter: the Library field "currentChapter" is left out of output for now: it holds a reference to "Chapter", which the app finds only within its container, and macts does not yet return a "Chapter" reference with its container (#219, #242).',
+      'shelf: resources.Library.properties.currentChapter: the Library field "currentChapter" is left out of output for now: it holds a reference to "Chapter", which the app finds only within its container, and this field is not read through a valid container for "Chapter" (#219, #242).',
       'shelf: resources.Library.properties.topAuthor: the Library field "topAuthor" is left out of output for now: it holds a reference to "Author", and macts has no get for "Author" yet (#219).',
       'shelf: resources.Library.properties.authors: the Library field "authors" is left out of output for now: it holds a reference to "Author", and macts has no get for "Author" yet (#219).',
       // A name-keyed identifier with no unique claim.

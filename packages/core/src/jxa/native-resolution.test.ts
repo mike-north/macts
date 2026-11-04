@@ -3,14 +3,16 @@
  *
  * The provider resolves exactly the references it converts at operation
  * positions, and identity collections of them (phases/13 D7, native
- * conversion scope): a single identity reference with no container, to a
- * resource the app finds at the application by its identifier. Expected
- * outcomes are written by hand from D7 and D9:
+ * conversion scope): a single identity reference to a resource the app finds
+ * by its identifier, carrying its container exactly when the resource's get
+ * records a parent. Expected outcomes are written by hand from D7 and D9:
  *
  * - the object is found as the resource's get finds it, and read as the get
  *   reads its item; the result is shaped by the request's output plan;
  * - a missing object is `TargetNotFoundError` naming the referenced resource,
  *   with `entryIndex` for an identity collection's entry;
+ * - a reference to a resource got within its parent is found within its
+ *   container, container first, and a missing container names the parent;
  * - an identity collection resolves its entries in order, and to `[]` when it
  *   has none;
  * - a result that breaks the output plan is `UnexpectedValueError`;
@@ -20,7 +22,8 @@
  * evaluated in an isolated context against a stand-in Contacts application
  * that records every use made of it. Contacts finds a person by its id in
  * `people` (manifest identifier targeting `byId`), and its email get records
- * the person as its parent.
+ * the person as its parent, so an email is found by its id in its person's
+ * `emails`.
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md (D4, D7, D9)
  */
@@ -84,10 +87,11 @@ function people(...ids: string[]): ReferenceWire {
   return { resource: 'Person', form: 'identity', cardinality: 'many', entries: ids.map(person) }
 }
 
-/** One stand-in person's native property record. */
+/** One stand-in person's native property record, and the ids of its emails. */
 interface StandInPerson {
   readonly id: unknown
   readonly firstName: string
+  readonly emails?: readonly string[]
 }
 
 /**
@@ -98,10 +102,25 @@ function standInContacts(persons: readonly StandInPerson[]) {
   const uses: string[] = []
   const absent = { exists: () => false }
   const objects = new Map(
-    persons.map((record) => [
-      record.id,
-      { exists: () => true, id: () => record.id, properties: () => ({ ...record }) },
-    ])
+    persons.map(({ emails = [], ...record }) => {
+      const held = new Map(
+        emails.map((id) => [
+          id,
+          { exists: () => true, id: () => id, properties: () => ({ id, label: 'work' }) },
+        ])
+      )
+      return [
+        record.id,
+        {
+          exists: () => true,
+          id: () => record.id,
+          properties: () => ({ ...record }),
+          emails: {
+            byId: (id: unknown) => (typeof id === 'string' ? held.get(id) : undefined) ?? absent,
+          },
+        },
+      ]
+    })
   )
   const app = {
     includeStandardAdditions: false,
@@ -174,7 +193,7 @@ describe('buildResolutionBody', () => {
 describe('nativeReadKeys', () => {
   it('reads the same person properties in a get and in a list', () => {
     const person = contacts.resources['Person']
-    const keys = nativeReadKeys(contacts, person)
+    const keys = nativeReadKeys(contacts, 'Person', person)
 
     expect([...keys.get].sort()).toEqual([...keys.list].sort())
     expect(keys.get).toContain('id')
@@ -182,7 +201,7 @@ describe('nativeReadKeys', () => {
   })
 
   it('has a list read an identifier that is not a usable property, and a get not', () => {
-    const keys = nativeReadKeys(contacts, {
+    const keys = nativeReadKeys(contacts, 'Book', {
       name: 'Book',
       plural: 'Books',
       description: 'A book',
@@ -201,14 +220,17 @@ describe('nativeReadKeys', () => {
     // unique) are left out of output, and retiredSeries is unsupported; id and
     // favoriteBook remain.
     const shelf = shelfManifest()
-    expect(nativeReadKeys(shelf, shelf.resources['Library'])).toEqual({
+    expect(nativeReadKeys(shelf, 'Library', shelf.resources['Library'])).toEqual({
       get: ['id', 'favoriteBook'],
       list: ['id', 'favoriteBook'],
     })
   })
 
   it('reads name for a body with no resource', () => {
-    expect(nativeReadKeys(contacts, undefined)).toEqual({ get: ['name'], list: ['name'] })
+    expect(nativeReadKeys(contacts, undefined, undefined)).toEqual({
+      get: ['name'],
+      list: ['name'],
+    })
   })
 })
 
@@ -290,6 +312,71 @@ describe('resolving a single identity reference', () => {
 
     expect(error).toBeInstanceOf(OperationCancelledError)
     expect(run).not.toHaveBeenCalled()
+  })
+})
+
+describe('resolving a reference through its container', () => {
+  /** An email record's plan, cut down to the fields these cases read. */
+  const EMAIL_PLAN: ValuePlan = {
+    kind: 'record',
+    fields: {
+      id: { presence: 'required', value: { kind: 'string' } },
+      label: { presence: 'required', value: { kind: 'string' } },
+    },
+  }
+  /** A single identity reference to the email `id` of the person `personId`. */
+  const email = (personId: string, id: string): ReferenceWire => ({
+    resource: 'Email',
+    form: 'identity',
+    cardinality: 'one',
+    id,
+    container: person(personId),
+  })
+
+  it('finds the person, then the email within it, and reads the email', async () => {
+    // An email's get records the person as its parent, and a person is
+    // top-level, so the email is found within its container.
+    const { app, uses } = standInContacts([{ ...ADA, emails: ['e-1'] }, GRACE])
+
+    const result = await resolveAgainst(
+      app,
+      resolution(email('p-ada', 'e-1'), { outputPlan: EMAIL_PLAN })
+    )
+
+    expect(result).toEqual({ id: 'e-1', label: 'work' })
+    expect(uses.filter((use) => use.startsWith('call'))).toEqual([
+      'call app.people.byId',
+      'call app.people.byId().exists',
+      'call app.people.byId().emails.byId',
+      'call app.people.byId().emails.byId().exists',
+      'call app.people.byId().emails.byId().properties',
+    ])
+  })
+
+  it('fails with TargetNotFoundError naming Person when the person is missing, looking up no email', async () => {
+    const { app, uses } = standInContacts([ADA])
+
+    const error = await rejectionOf(
+      resolveAgainst(app, resolution(email('p-missing', 'e-1'), { outputPlan: EMAIL_PLAN }))
+    )
+
+    expect(error).toBeInstanceOf(TargetNotFoundError)
+    if (!(error instanceof TargetNotFoundError)) return
+    expect(error.details).toEqual({ resource: 'Person' })
+    expect(uses.filter((use) => use.includes('emails'))).toEqual([])
+  })
+
+  it('fails with TargetNotFoundError naming Email when the person has no such email', async () => {
+    // e-1 is Grace's email; the reference names Ada as its container.
+    const { app } = standInContacts([ADA, { ...GRACE, emails: ['e-1'] }])
+
+    const error = await rejectionOf(
+      resolveAgainst(app, resolution(email('p-ada', 'e-1'), { outputPlan: EMAIL_PLAN }))
+    )
+
+    expect(error).toBeInstanceOf(TargetNotFoundError)
+    if (!(error instanceof TargetNotFoundError)) return
+    expect(error.details).toEqual({ resource: 'Email' })
   })
 })
 
@@ -415,13 +502,6 @@ describe('references outside the native conversion scope', () => {
     cardinality: 'many',
     selector: { by: 'every' },
   }
-  const emailOfPerson: ReferenceWire = {
-    resource: 'Email',
-    form: 'identity',
-    cardinality: 'one',
-    id: 'e-1',
-    container: person('p-ada'),
-  }
   const personInGroup: ReferenceWire = {
     resource: 'Person',
     form: 'identity',
@@ -453,27 +533,33 @@ describe('references outside the native conversion scope', () => {
       'a reference with a container',
       personInGroup,
       RESOURCE_PLANS,
-      'The macOS provider cannot resolve a reference to the Contacts resource "Person" located through a container yet.',
+      'The macOS provider cannot resolve a reference to the Contacts resource "Person" through that container: a reference carries a container only when Contacts finds its resource within another, and then as an identity reference to that resource.',
     ],
     [
       'an identity collection with an entry located through a container',
       entriesInGroup,
       RESOURCE_PLANS,
-      'The macOS provider cannot resolve an identity collection of the Contacts resource "Person" whose entries are located through a container yet.',
+      'The macOS provider cannot resolve a reference to the Contacts resource "Person" through that container: a reference carries a container only when Contacts finds its resource within another, and then as an identity reference to that resource.',
     ],
     [
       // An email's get records the person as its parent: it is found only
       // within its container, and here it has none.
-      'a reference to a resource that is not top-level',
+      'a reference to a resource that is not top-level, without its container',
       { resource: 'Email', form: 'identity', cardinality: 'one', id: 'e-1' },
       RESOURCE_PLANS,
-      'The macOS provider cannot resolve references to the Contacts resource "Email" yet: Contacts does not find one by its identifier alone.',
+      'The macOS provider cannot resolve a reference to the Contacts resource "Email" without its container: Contacts finds one only within its "Person".',
     ],
     [
-      'a reference to a resource that is not top-level, through its container',
-      emailOfPerson,
-      RESOURCE_PLANS,
-      'The macOS provider cannot resolve a reference to the Contacts resource "Email" located through a container yet.',
+      'a reference through a container whose resource has no identifier plan',
+      {
+        resource: 'Email',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'e-1',
+        container: person('p-ada'),
+      },
+      { Email: { id: { kind: 'string' } } },
+      'The macOS provider cannot resolve references to the Contacts resource "Person" yet: Contacts does not find one by its identifier alone.',
     ],
     [
       'a reference to a resource with no identifier plan',

@@ -11,7 +11,7 @@ export interface Window {
   givenName: string
   /** The full title of the window. */
   name: string
-  /** The unique identifier of the window. */
+  /** The unique identifier of the window, within one browser session: ids start over each time the browser is relaunched, so an id kept across a relaunch may find a different window, not merely none. */
   id: string
   /** The index of the window, ordered front to back. */
   index: number
@@ -31,6 +31,8 @@ export interface Window {
   zoomable: boolean
   /** Whether the window is currently zoomed. */
   zoomed: boolean
+  /** Returns the currently selected tab, as a reference that carries this window as its container. Window and tab ids start over each time the browser is relaunched, so this reference, kept across a relaunch, may resolve to a different tab or window, not merely fail, and an action through it, such as closing the tab, would act on that other tab. */
+  activeTab: Tab
   /** Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window. */
   mode: string
   /** The index of the active tab. */
@@ -62,7 +64,7 @@ export type WindowUpdateInput = Partial<WindowCreateInput>
 
 /** A tab. */
 export interface Tab {
-  /** Unique ID of the tab. */
+  /** Unique ID of the tab among the tabs of its window, within one browser session: ids start over each time the browser is relaunched, so an id kept across a relaunch may find a different tab, not merely none, and an action through it, such as closing the tab, would act on that other tab. */
   id: string
   /** The title of the tab. */
   title: string
@@ -140,6 +142,7 @@ export const WindowSchema = z.object({
   visible: z.boolean(),
   zoomable: z.boolean(),
   zoomed: z.boolean(),
+  activeTab: z.string(),
   mode: z.string(),
   activeTabIndex: z.number(),
 })
