@@ -323,9 +323,14 @@ export const AppManifestSchema: z.ZodObject<{
                 appVersion: z.ZodString;
                 osVersion: z.ZodString;
                 errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
-                pageMs: z.ZodOptional<z.ZodNumber>;
-                columnMs: z.ZodOptional<z.ZodNumber>;
-                items: z.ZodOptional<z.ZodNumber>;
+                cost: z.ZodOptional<z.ZodObject<{
+                    observedAt: z.ZodISODateTime;
+                    pageMs: z.ZodNumber;
+                    columnMs: z.ZodNumber;
+                    items: z.ZodNumber;
+                    runs: z.ZodNumber;
+                    pageSize: z.ZodNumber;
+                }, z.core.$strict>>;
                 note: z.ZodOptional<z.ZodString>;
             }, z.core.$strict>;
         }, z.core.$strict>, z.ZodObject<{
@@ -337,9 +342,14 @@ export const AppManifestSchema: z.ZodObject<{
                 appVersion: z.ZodString;
                 osVersion: z.ZodString;
                 errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
-                pageMs: z.ZodOptional<z.ZodNumber>;
-                columnMs: z.ZodOptional<z.ZodNumber>;
-                items: z.ZodOptional<z.ZodNumber>;
+                cost: z.ZodOptional<z.ZodObject<{
+                    observedAt: z.ZodISODateTime;
+                    pageMs: z.ZodNumber;
+                    columnMs: z.ZodNumber;
+                    items: z.ZodNumber;
+                    runs: z.ZodNumber;
+                    pageSize: z.ZodNumber;
+                }, z.core.$strict>>;
                 note: z.ZodOptional<z.ZodString>;
             }, z.core.$strict>;
         }, z.core.$strict>], "supported">>;
@@ -2327,6 +2337,19 @@ export const PAGE_READS: readonly ["range", "column"];
 // @public
 export type PageAnchor = string | number;
 
+// @public (undocumented)
+export type PageCost = z.infer<typeof PageCostSchema>;
+
+// @public
+export const PageCostSchema: z.ZodObject<{
+    observedAt: z.ZodISODateTime;
+    pageMs: z.ZodNumber;
+    columnMs: z.ZodNumber;
+    items: z.ZodNumber;
+    runs: z.ZodNumber;
+    pageSize: z.ZodNumber;
+}, z.core.$strict>;
+
 // @public
 export type PageRead = (typeof PAGE_READS)[number];
 
@@ -2855,9 +2878,14 @@ export const RangeReadEvidenceSchema: z.ZodObject<{
     appVersion: z.ZodString;
     osVersion: z.ZodString;
     errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
-    pageMs: z.ZodOptional<z.ZodNumber>;
-    columnMs: z.ZodOptional<z.ZodNumber>;
-    items: z.ZodOptional<z.ZodNumber>;
+    cost: z.ZodOptional<z.ZodObject<{
+        observedAt: z.ZodISODateTime;
+        pageMs: z.ZodNumber;
+        columnMs: z.ZodNumber;
+        items: z.ZodNumber;
+        runs: z.ZodNumber;
+        pageSize: z.ZodNumber;
+    }, z.core.$strict>>;
     note: z.ZodOptional<z.ZodString>;
 }, z.core.$strict>;
 
@@ -3169,9 +3197,14 @@ export const ResourceRangeReadSchema: z.ZodDiscriminatedUnion<[z.ZodObject<{
         appVersion: z.ZodString;
         osVersion: z.ZodString;
         errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
-        pageMs: z.ZodOptional<z.ZodNumber>;
-        columnMs: z.ZodOptional<z.ZodNumber>;
-        items: z.ZodOptional<z.ZodNumber>;
+        cost: z.ZodOptional<z.ZodObject<{
+            observedAt: z.ZodISODateTime;
+            pageMs: z.ZodNumber;
+            columnMs: z.ZodNumber;
+            items: z.ZodNumber;
+            runs: z.ZodNumber;
+            pageSize: z.ZodNumber;
+        }, z.core.$strict>>;
         note: z.ZodOptional<z.ZodString>;
     }, z.core.$strict>;
 }, z.core.$strict>, z.ZodObject<{
@@ -3183,9 +3216,14 @@ export const ResourceRangeReadSchema: z.ZodDiscriminatedUnion<[z.ZodObject<{
         appVersion: z.ZodString;
         osVersion: z.ZodString;
         errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
-        pageMs: z.ZodOptional<z.ZodNumber>;
-        columnMs: z.ZodOptional<z.ZodNumber>;
-        items: z.ZodOptional<z.ZodNumber>;
+        cost: z.ZodOptional<z.ZodObject<{
+            observedAt: z.ZodISODateTime;
+            pageMs: z.ZodNumber;
+            columnMs: z.ZodNumber;
+            items: z.ZodNumber;
+            runs: z.ZodNumber;
+            pageSize: z.ZodNumber;
+        }, z.core.$strict>>;
         note: z.ZodOptional<z.ZodString>;
     }, z.core.$strict>;
 }, z.core.$strict>], "supported">;
@@ -3390,9 +3428,14 @@ export const ResourceSchema: z.ZodObject<{
             appVersion: z.ZodString;
             osVersion: z.ZodString;
             errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
-            pageMs: z.ZodOptional<z.ZodNumber>;
-            columnMs: z.ZodOptional<z.ZodNumber>;
-            items: z.ZodOptional<z.ZodNumber>;
+            cost: z.ZodOptional<z.ZodObject<{
+                observedAt: z.ZodISODateTime;
+                pageMs: z.ZodNumber;
+                columnMs: z.ZodNumber;
+                items: z.ZodNumber;
+                runs: z.ZodNumber;
+                pageSize: z.ZodNumber;
+            }, z.core.$strict>>;
             note: z.ZodOptional<z.ZodString>;
         }, z.core.$strict>;
     }, z.core.$strict>, z.ZodObject<{
@@ -3404,9 +3447,14 @@ export const ResourceSchema: z.ZodObject<{
             appVersion: z.ZodString;
             osVersion: z.ZodString;
             errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
-            pageMs: z.ZodOptional<z.ZodNumber>;
-            columnMs: z.ZodOptional<z.ZodNumber>;
-            items: z.ZodOptional<z.ZodNumber>;
+            cost: z.ZodOptional<z.ZodObject<{
+                observedAt: z.ZodISODateTime;
+                pageMs: z.ZodNumber;
+                columnMs: z.ZodNumber;
+                items: z.ZodNumber;
+                runs: z.ZodNumber;
+                pageSize: z.ZodNumber;
+            }, z.core.$strict>>;
             note: z.ZodOptional<z.ZodString>;
         }, z.core.$strict>;
     }, z.core.$strict>], "supported">>;

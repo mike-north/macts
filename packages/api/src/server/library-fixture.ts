@@ -50,9 +50,14 @@ const RANGE_READ_SUPPORTED = {
       bundleId: 'com.example.library',
       appVersion: '1.0',
       osVersion: '27.2',
-      pageMs: 400,
-      columnMs: 900,
-      items: 120,
+      cost: {
+        observedAt: '2026-01-15T10:30:00.000Z',
+        pageMs: 400,
+        columnMs: 900,
+        items: 120,
+        runs: 5,
+        pageSize: 25,
+      },
     },
   },
 } as const

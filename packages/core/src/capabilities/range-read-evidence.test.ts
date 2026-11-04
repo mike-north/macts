@@ -18,6 +18,7 @@
 
 import { readdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
+import { PAGE_SIZE_LIMITS } from '@macts/contracts'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { loadManifest } from '../manifest/loader.js'
 import { normalizeResourceRouteSegment } from '../manifest/route.js'
@@ -123,10 +124,11 @@ describe('paging on shipped manifests rests on live range-read evidence', () => 
     for (const list of pagedLists()) {
       const marker = list.resource?.rangeRead
       if (marker?.supported !== true) throw new Error(`${list.name}: no supported range read`)
-      const { pageMs, columnMs, items } = marker.evidence
-      expect(pageMs, `${list.name}: pageMs`).toBeTypeOf('number')
-      expect(columnMs, `${list.name}: columnMs`).toBeTypeOf('number')
-      expect(items, `${list.name}: items`).toBeTypeOf('number')
+      const cost = marker.evidence.cost
+      expect(cost, `${list.name}: evidence.cost`).toBeDefined()
+      // Every cost is timed at the default page size, the page a caller gets.
+      expect(cost?.pageSize, `${list.name}: cost.pageSize`).toBe(PAGE_SIZE_LIMITS.default)
+      expect(cost?.observedAt, `${list.name}: cost.observedAt`).toBeTypeOf('string')
       reads[list.name] = marker.read
     }
     expect(reads).toEqual(PAGE_READ_BY_LIST)

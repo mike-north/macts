@@ -248,9 +248,6 @@ export const PAGE_READS = ['range', 'column'] as const
 /** One way a list that pages reads a page (see {@link PAGE_READS}). */
 export type PageRead = (typeof PAGE_READS)[number]
 
-/** The page-cost fields a passing observation records and a failing one cannot. */
-const PAGE_COST_FIELDS = ['pageMs', 'columnMs', 'items'] as const
-
 /**
  * The page read measured page costs choose: `column` only when the column page
  * took at most three quarters of the range page's time (`columnMs <= 0.75 *
@@ -283,11 +280,12 @@ export function pageReadFor(pageMs: number, columnMs: number): PageRead {
  * collection wherever the resource's lists read it, at the application or
  * under a parent item.
  *
- * A passing marker records `read` (see {@link PAGE_READS}) and the evidence's
- * page costs (`pageMs`, `columnMs`, `items`), and `read` must be the read
- * those costs choose (see {@link pageReadFor}): `range` unless the column page
- * was clearly faster. The choice holds at the recorded collection size; a
- * column page costs more as the collection grows.
+ * A passing marker records `read` (see {@link PAGE_READS}) and the measured
+ * page cost (`evidence.cost`, see `PageCostSchema`), and `read` must be the
+ * read that cost chooses (see {@link pageReadFor}): `range` unless the column
+ * page was clearly faster. The choice holds at the recorded collection size; a
+ * column page costs more as the collection grows. A failed marker records no
+ * `read` and no cost.
  */
 export const ResourceRangeReadSchema = z
   .discriminatedUnion('supported', [
@@ -322,14 +320,12 @@ export const ResourceRangeReadSchema = z
           path: ['evidence', 'errorNumbers'],
         })
       }
-      for (const field of PAGE_COST_FIELDS) {
-        if (evidence[field] !== undefined) {
-          ctx.addIssue({
-            code: 'custom',
-            message: `evidence.${field} records the cost of a page, which a failed range read cannot have.`,
-            path: ['evidence', field],
-          })
-        }
+      if (evidence.cost !== undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'evidence.cost records what a page cost, which a failed range read cannot have.',
+          path: ['evidence', 'cost'],
+        })
       }
       return
     }
@@ -341,16 +337,17 @@ export const ResourceRangeReadSchema = z
         path: ['evidence', 'errorNumbers'],
       })
     }
-    const missing = PAGE_COST_FIELDS.filter((field) => evidence[field] === undefined)
-    for (const field of missing) {
+    const cost = evidence.cost
+    if (cost === undefined) {
       ctx.addIssue({
         code: 'custom',
-        message: `A list that pages records what a page cost, both ways it can be read, and the collection size it was measured at: set evidence.${field}.`,
-        path: ['evidence', field],
+        message:
+          'A list that pages records what a page cost, both ways it can be read, and how it was measured: set evidence.cost.',
+        path: ['evidence', 'cost'],
       })
+      return
     }
-    const { pageMs, columnMs } = evidence
-    if (pageMs === undefined || columnMs === undefined) return
+    const { pageMs, columnMs } = cost
     const chosen = pageReadFor(pageMs, columnMs)
     if (marker.read !== chosen) {
       ctx.addIssue({

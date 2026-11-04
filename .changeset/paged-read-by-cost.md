@@ -18,4 +18,12 @@ Both ways return the same page, cursor and `COLLECTION_CHANGED` error. Range is 
 
 A page read by column costs what the whole collection costs, so it gets slower as the collection grows.
 
-A manifest's `rangeRead` marker with `supported: true` now requires `read: range` or `read: column`. Its evidence also requires `pageMs` and `columnMs`, the measured time of one page read each way, and `items`, the collection size they were measured at. `read` must be `column` exactly when `columnMs` is at most 0.75 × `pageMs`, and `range` otherwise. `PAGE_READS`, the `PageRead` type and `pageReadFor`, which applies that rule, are exported from `@macts/core`.
+A manifest's `rangeRead` marker with `supported: true` now requires `read: range` or `read: column`. Its evidence also requires `cost`, what a page cost, as its own observation:
+
+- `observedAt`, when the page was timed;
+- `pageMs` and `columnMs`, the time of the first page read each way, in milliseconds;
+- `items`, the collection size they were measured at;
+- `runs`, how many times the page was read each way, each time being the median of those runs;
+- `pageSize`, the size of the page timed.
+
+All six are required, and a `rangeRead` marker with `supported: false` records no `read` and no `cost`. `read` must be `column` exactly when `columnMs` is at most 0.75 × `pageMs`, and `range` otherwise. `PAGE_READS`, the `PageRead` type and `pageReadFor`, which applies that rule, are exported from `@macts/core`.

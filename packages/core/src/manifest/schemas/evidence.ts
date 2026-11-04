@@ -407,6 +407,41 @@ export const IdentifierUniquenessEvidenceSchema = z
   .strict()
 export type IdentifierUniquenessEvidence = z.infer<typeof IdentifierUniquenessEvidenceSchema>
 
+/** A count that is at least one: a page size, a number of runs, a collection size. */
+const PositiveCountSchema = z.number().int().min(1)
+
+/**
+ * What one page of a resource's collection cost, timed live and read-only
+ * through the real list body, both ways a page can be read (see `PAGE_READS`
+ * in the resource schema): its own observation, dated by its own
+ * `observedAt`, because it is measured apart from the range-read check it
+ * belongs to.
+ *
+ * The first page at `pageSize` items is read `runs` times each way, the two
+ * reads interleaved so that load on the machine affects both alike, and each
+ * time is the median of its runs. A page read by range costs what the page
+ * holds; a page read by column costs what the whole collection costs, so
+ * `columnMs` holds only near the recorded `items`. Only timings and a count
+ * are recorded, never a value.
+ */
+export const PageCostSchema = z
+  .object({
+    /** When the timing was taken: an ISO 8601 UTC timestamp. */
+    observedAt: ObservedAtSchema,
+    /** Milliseconds the page took read by range: the median of `runs` reads. */
+    pageMs: CountSchema,
+    /** Milliseconds the same page took read by column: the median of `runs` reads. */
+    columnMs: CountSchema,
+    /** How many items the collection held when the page was timed. */
+    items: PositiveCountSchema,
+    /** How many times the page was read each way; each time is the median of these runs. */
+    runs: PositiveCountSchema,
+    /** How many items the timed page asked for. */
+    pageSize: PositiveCountSchema,
+  })
+  .strict()
+export type PageCost = z.infer<typeof PageCostSchema>
+
 /**
  * Evidence for a claim that the running app does, or does not, read a range
  * of a resource's collection: a live, read-only observation of the collection
@@ -421,14 +456,11 @@ export type IdentifierUniquenessEvidence = z.infer<typeof IdentifierUniquenessEv
  * raised, which tell a request the app does not understand (`-1708`) from a
  * permission problem; when they passed it lists none.
  *
- * When the reads passed it also records what one page cost, measured live at
- * the default page size through the real list body, both ways a page can be
- * read: `pageMs` by range (each property read over the page's items), and
- * `columnMs` by column (each property read over the whole collection, then
- * cut to the page). `items` is the size of the collection the page was read
- * from. The resource's marker chooses its page read from these two times
- * (see `pageReadFor`). A column page costs what the whole
- * collection costs, so its time holds only near the recorded size.
+ * When the reads passed it also records what a page cost, as its own
+ * observation (`cost`, see {@link PageCostSchema}), since the timing is taken
+ * separately from the check that range reads work, and may be taken again
+ * without repeating it. The resource's marker chooses its page read from that
+ * cost (see `pageReadFor`).
  */
 export const RangeReadEvidenceSchema = z
   .object({
@@ -447,20 +479,10 @@ export const RangeReadEvidenceSchema = z
      */
     errorNumbers: z.array(z.number().int()).min(1).optional(),
     /**
-     * Milliseconds one page at the default size took, read by range. Present
-     * exactly when the reads passed.
+     * What a page cost, read both ways a page can be read. Present exactly
+     * when the reads passed.
      */
-    pageMs: CountSchema.optional(),
-    /**
-     * Milliseconds the same page took, read by column. Present exactly when
-     * the reads passed.
-     */
-    columnMs: CountSchema.optional(),
-    /**
-     * How many items the collection held when the page was timed. Present
-     * exactly when the reads passed.
-     */
-    items: z.number().int().min(1).optional(),
+    cost: PageCostSchema.optional(),
     /**
      * What was read, in words and never as a value, e.g. which collection,
      * which page sizes, and whether a following page was read.

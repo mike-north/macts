@@ -153,9 +153,13 @@ resources:
         bundleId: com.example.jotter
         appVersion: '2.1'
         osVersion: '27.2'
-        pageMs: 400
-        columnMs: 900
-        items: 120
+        cost:
+          observedAt: '2026-10-31T12:00:00.000Z'
+          pageMs: 400
+          columnMs: 900
+          items: 120
+          runs: 5
+          pageSize: 25
   Folder:
     name: Folder
     plural: Folders

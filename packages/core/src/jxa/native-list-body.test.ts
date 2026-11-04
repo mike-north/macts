@@ -120,9 +120,13 @@ resources:
         bundleId: com.example.planner
         appVersion: '1.0'
         osVersion: '27.2'
-        pageMs: 400
-        columnMs: 900
-        items: 120
+        cost:
+          observedAt: '2026-01-15T10:30:00.000Z'
+          pageMs: 400
+          columnMs: 900
+          items: 120
+          runs: 5
+          pageSize: 25
   Folder:
     name: Folder
     plural: Folders
@@ -1155,11 +1159,13 @@ function plannerReading(read: PageRead): AppManifest {
   const manifest = structuredClone(planner)
   const tasks = manifest.resources['Task']
   if (tasks?.rangeRead?.supported !== true) throw new Error('fixture tasks do not page')
-  const costs = read === 'column' ? { pageMs: 900, columnMs: 400 } : { pageMs: 400, columnMs: 900 }
+  const { evidence } = tasks.rangeRead
+  if (evidence.cost === undefined) throw new Error('fixture tasks record no page cost')
+  const times = read === 'column' ? { pageMs: 900, columnMs: 400 } : { pageMs: 400, columnMs: 900 }
   tasks.rangeRead = {
     ...tasks.rangeRead,
     read,
-    evidence: { ...tasks.rangeRead.evidence, ...costs },
+    evidence: { ...evidence, cost: { ...evidence.cost, ...times } },
   }
   return manifest
 }
