@@ -145,7 +145,7 @@ describe('check-clean-tree', () => {
     expect(stderr).toContain('modified  packages/widgets/.gitattributes')
   })
 
-  it('fails when regeneration emits a .gitattributes the package never committed', async () => {
+  it('fails when regeneration emits a .gitattributes the package never committed', () => {
     git('rm', '--quiet', '--cached', 'packages/widgets/.gitattributes')
     git('commit', '--quiet', '-m', 'drop .gitattributes')
     // Regeneration writes the file back; it is now untracked.
