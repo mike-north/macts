@@ -690,13 +690,13 @@ export const AppRuleSchema: z.ZodObject<{
 }, z.core.$strict>;
 
 // @public
-export const AUDIT_DECISIONS: readonly ["allowed", "denied", "pending", "approved", "rejected", "cancelled", "invalid-input"];
+export const AUDIT_DECISIONS: readonly ["allowed", "denied", "pending", "approved", "rejected", "cancelled", "invalid-input", "permission-denied"];
 
 // @public
 export type AuditDecision = (typeof AUDIT_DECISIONS)[number];
 
 // @public
-export type AuditRecord = GovernedAuditRecord | InvalidInputAuditRecord;
+export type AuditRecord = GovernedAuditRecord | InvalidInputAuditRecord | PermissionDeniedAuditRecord;
 
 // @public
 export interface AuditRecordBase {
@@ -706,7 +706,7 @@ export interface AuditRecordBase {
 }
 
 // @public
-export type AuditRecordInput = GovernedAuditRecordInput | InvalidInputAuditRecordInput;
+export type AuditRecordInput = GovernedAuditRecordInput | InvalidInputAuditRecordInput | PermissionDeniedAuditRecordInput;
 
 // @public
 export interface AuditWriter {
@@ -1073,6 +1073,9 @@ export function createAuditRecord(input: GovernedAuditRecordInput): GovernedAudi
 
 // @public
 export function createAuditRecord(input: InvalidInputAuditRecordInput): InvalidInputAuditRecord;
+
+// @public
+export function createAuditRecord(input: PermissionDeniedAuditRecordInput): PermissionDeniedAuditRecord;
 
 // @public
 export function createAuditRecord(input: AuditRecordInput): AuditRecord;
@@ -1665,7 +1668,7 @@ export interface GovernanceFilter {
 export type GovernancePolicy = z.infer<typeof PolicySchema>;
 
 // @public
-export type GovernedAuditDecision = Exclude<AuditDecision, 'invalid-input'>;
+export type GovernedAuditDecision = Exclude<AuditDecision, 'invalid-input' | 'permission-denied'>;
 
 // @public
 export interface GovernedAuditRecord extends AuditRecordBase {
@@ -2471,6 +2474,26 @@ export interface PermissionCheckResult {
 }
 
 // @public
+export interface PermissionDeniedAuditRecord extends AuditRecordBase {
+    readonly approvalId?: never;
+    readonly argsSummary?: never;
+    readonly decision: 'permission-denied';
+    readonly issueCount?: never;
+    readonly reason?: never;
+    readonly timestamp: Date;
+}
+
+// @public
+export interface PermissionDeniedAuditRecordInput extends AuditRecordBase {
+    readonly approvalId?: never;
+    readonly argsSummary?: never;
+    readonly decision: 'permission-denied';
+    readonly issueCount?: never;
+    readonly reason?: never;
+    readonly timestamp: Date;
+}
+
+// @public
 export class PermissionExpansionError extends Error {
     constructor(permission: string, message: string);
     // (undocumented)
@@ -3051,6 +3074,17 @@ export function recordInvalidInput(options: RecordInvalidInputOptions): Promise<
 export interface RecordInvalidInputOptions {
     readonly apiKeyId: string;
     readonly issueCount: number;
+    readonly permission: string;
+    readonly timestamp: Date;
+    readonly writer: AuditWriter;
+}
+
+// @public
+export function recordPermissionDenied(options: RecordPermissionDeniedOptions): Promise<void>;
+
+// @public
+export interface RecordPermissionDeniedOptions {
+    readonly apiKeyId: string;
     readonly permission: string;
     readonly timestamp: Date;
     readonly writer: AuditWriter;
@@ -3700,10 +3734,13 @@ export function serializeAuditRecord(record: GovernedAuditRecord): SerializedGov
 export function serializeAuditRecord(record: InvalidInputAuditRecord): SerializedInvalidInputAuditRecord;
 
 // @public
+export function serializeAuditRecord(record: PermissionDeniedAuditRecord): SerializedPermissionDeniedAuditRecord;
+
+// @public
 export function serializeAuditRecord(record: AuditRecord): SerializedAuditRecord;
 
 // @public
-export type SerializedAuditRecord = SerializedGovernedAuditRecord | SerializedInvalidInputAuditRecord;
+export type SerializedAuditRecord = SerializedGovernedAuditRecord | SerializedInvalidInputAuditRecord | SerializedPermissionDeniedAuditRecord;
 
 // @public
 export interface SerializedGovernedAuditRecord extends AuditRecordBase {
@@ -3721,6 +3758,16 @@ export interface SerializedInvalidInputAuditRecord extends AuditRecordBase {
     readonly argsSummary?: never;
     readonly decision: 'invalid-input';
     readonly issueCount: number;
+    readonly reason?: never;
+    readonly timestamp: string;
+}
+
+// @public
+export interface SerializedPermissionDeniedAuditRecord extends AuditRecordBase {
+    readonly approvalId?: never;
+    readonly argsSummary?: never;
+    readonly decision: 'permission-denied';
+    readonly issueCount?: never;
     readonly reason?: never;
     readonly timestamp: string;
 }
