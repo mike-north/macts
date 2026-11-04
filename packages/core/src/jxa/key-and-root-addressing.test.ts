@@ -36,7 +36,6 @@ import {
   type WireRecord,
 } from '@macts/contracts'
 import { parseManifestYaml } from '../manifest/loader.js'
-import { isValidContainer, omittedOutputReason } from '../manifest/output-references.js'
 import {
   ARCHIVE_MANIFEST_YAML,
   archiveManifest,
@@ -712,73 +711,34 @@ describe('containers found by key targeting', () => {
 })
 
 /**
- * A singleton root as a container. The schema rejects a command that records
- * a root as its parent, so no validated manifest reaches this; the rule is
- * still decided so that the container of a field read through a root's own
- * record would be the kind the record was found by, since nothing on the
- * object says which kind it is.
+ * A singleton root is never a container: the manifest schema rejects a
+ * command that records a root as its parent. A manifest that skipped
+ * validation is the only way to record one, and the provider refuses it as a
+ * macts defect rather than looking a container up, or encoding one, by kind.
  */
 describe('a singleton root as a container', () => {
-  it('is a valid container, though a root reference read from the app is left out', () => {
-    expect(isValidContainer(manifest, 'Desk')).toBe(true)
-    expect(omittedOutputReason(manifest, 'Desk')).toBe('root-kind-unmapped')
-  })
-
-  it('would hand a field held within it to the codec with the kind it was found by', () => {
-    // Bypasses validation: a clerk got within its desk, held at the desk's `onDuty`.
-    const desk = manifest.resources['Desk']
+  it('is refused as a broken invariant, naming the root', () => {
     const getDesk = manifest.commands['getDesk']
-    if (desk === undefined || getDesk === undefined) throw new Error('Archive has a desk get')
-    const withClerk: typeof manifest = {
+    if (getDesk === undefined) throw new Error('Archive has a desk get')
+    const label = manifest.resources['Label']
+    if (label === undefined) throw new Error('Archive has a label')
+    // Skips validation: a slip got within a desk.
+    const slipWithinDesk: typeof manifest = {
       ...manifest,
-      resources: {
-        ...manifest.resources,
-        Desk: {
-          ...desk,
-          properties: {
-            ...desk.properties,
-            onDuty: {
-              access: 'r',
-              optional: false,
-              type: { resource: 'Clerk' },
-              description: 'The clerk on duty',
-            },
-          },
-        },
-        Clerk: {
-          name: 'Clerk',
-          plural: 'Clerks',
-          description: 'A clerk at a desk',
-          properties: {
-            id: { access: 'r', optional: false, type: 'string', description: 'The clerk' },
-          },
-          identifiers: [{ property: 'id', primary: true }],
-        },
-      },
+      resources: { ...manifest.resources, Slip: { ...label, name: 'Slip', plural: 'Slips' } },
       commands: {
         ...manifest.commands,
-        getClerk: {
+        getSlip: {
           ...getDesk,
-          description: 'Get a clerk at a desk',
-          resourceType: 'Clerk',
+          resourceType: 'Slip',
           parent: { resource: 'Desk', parameter: 'deskKind' },
-          parameters: [
-            {
-              name: 'deskKind',
-              required: true,
-              type: { enum: 'DeskKind' },
-              description: 'The desk',
-            },
-            { name: 'id', required: true, type: 'string', description: 'The clerk' },
-          ],
         },
       },
     }
 
-    const body = buildNativeBody(withClerk, { command: 'getDesk', resource: 'Desk' })
-
-    expect(body).toContain('obj["onDuty"] = (function (v)')
-    expect(body).toContain('containerId: itemKind')
-    expect(body).not.toContain('container: item')
+    expect(() => referenceAddressing(slipWithinDesk, 'Slip')).toThrow(InternalError)
+    expect(() => referenceAddressing(slipWithinDesk, 'Slip')).toThrow(
+      'The macOS provider cannot use the singleton root "Desk" as a container.'
+    )
   })
 })

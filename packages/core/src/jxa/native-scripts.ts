@@ -338,7 +338,7 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  *
  * A field holding a reference to a target got within the item is then handed
  * to the codec together with the item, as the reference's container
- * ({@link wrapContained}); for a singleton root, together with its kind.
+ * ({@link wrapContained}).
  *
  * @throws `InternalError` when `source` reads a singleton root and no
  *   `kindExpression` is given.
@@ -357,13 +357,6 @@ function readOutputProperties(
   const keys = itemReadKeys(manifest, source.key, resource).filter(
     (key) => !rooted || key !== ROOT_KIND_PROPERTY
   )
-  // A root's object cannot say which kind it is, so a reference held within
-  // it carries the kind it was found by, the identifier its container is
-  // looked up by, rather than the object.
-  const heldWithContainer = (value: string): string =>
-    rooted && kindExpression !== undefined
-      ? wrapContained(value, 'containerId', kindExpression)
-      : wrapContained(value, 'container', itemLocal)
   const native = (key: string): string => nativePropertyName(resource, key)
   const readOnItsOwn = (key: string): string =>
     `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {}`
@@ -383,7 +376,7 @@ function readOutputProperties(
       : '',
     ...containedKeys(manifest, source).map(
       (key) =>
-        `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${heldWithContainer(member('obj', key))}; }`
+        `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${wrapContained(member('obj', key), 'container', itemLocal)}; }`
     )
   )
 }
@@ -635,19 +628,25 @@ function identifierLookup(resource: Resource | undefined):
  * container (phases/13 D7, container scoping): the collection is the
  * container's, and `within` names the parent, whose own addressing finds the
  * container by the parent's own targeting (`byKey` for a parent found by its
- * key, its kind for a singleton root). So a resource is addressable only when
- * its parent is, level by level. There is no addressing for a resource with
- * no identifier, with no get, or whose parent has none.
+ * key). So a resource is addressable only when its parent is, level by
+ * level. There is no addressing for a resource with no identifier, with no
+ * get, or whose parent has none.
  *
  * A singleton root is addressed by its kinds: the application property each
  * one names (`NativeRootAddressing`). It is held by the application itself,
- * so a root whose get records a parent has no addressing.
+ * so a root whose get records a parent has no addressing. A root is never a
+ * container: the manifest schema rejects a command that records a root as
+ * its parent.
  *
  * Inputs, resolution and emission all take a resource's addressing from here,
  * so an object a reference names is the one a get of its identifier finds.
  *
  * @param manifest - The validated app manifest.
  * @param resourceKey - The manifest resource key a reference names.
+ * @throws `InternalError` when a get records a singleton root as its parent,
+ *   which a validated manifest never does: neither the container lookup nor
+ *   the container encoding can use a root, so reaching this is a macts
+ *   defect.
  */
 export function referenceAddressing(
   manifest: AppManifest,
@@ -686,8 +685,13 @@ function addressingWithin(
     property: lookup.property,
   }
   if (parent === undefined) return addressing
-  if (addressingWithin(manifest, parent, new Set([...seen, resourceKey])) === undefined) {
-    return undefined
+  const container = addressingWithin(manifest, parent, new Set([...seen, resourceKey]))
+  if (container === undefined) return undefined
+  if (container.lookup === 'byRoot') {
+    throw new InternalError(
+      `The macOS provider cannot use the singleton root ${JSON.stringify(parent)} as a container.`,
+      {}
+    )
   }
   return { ...addressing, within: parent }
 }

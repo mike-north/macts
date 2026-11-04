@@ -1577,13 +1577,10 @@ needs its target's `get`. macts cannot yet return a usable reference when:
   and only when that parent is a valid container. A valid container is
   itself a target a reference could be returned to with no container: it has
   a `get` that records no parent, an identifier, and is not name-keyed
-  without a unique claim. A singleton root (D10) with a `get` is a valid
-  container too: a reference to a root read from the app is left out
-  because nothing on the object says its kind (singleton roots, below), but
-  a read through the root's own record knows the kind it found the record
-  by, which is all the container needs. The schema rejects a command that
-  records a root as its parent, so no field reaches that case today. A
-  command result is read through no record, so it holds no container.
+  without a unique claim. A singleton root (D10) is not a container today:
+  the schema rejects a command that records a root as its parent, so no
+  target is got within one, and the macOS provider refuses a root as a
+  container as a broken invariant (`InternalError`). A command result is read through no record, so it holds no container.
   Nested chains, where the parent is itself found within a container, are
   not returned yet;
 - that `get` records no parent, but the manifest hierarchy holds the target
@@ -1720,7 +1717,7 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   `TargetNotFoundError` with no extra request. The container is looked up
   by its parent's own targeting, and the child within it by the child's: a
   parent found by its key is looked up by its key (key-targeted resources,
-  below), and a root parent by its kind. An object that is identified
+  below). An object that is identified
   globally but reached only through a container emits no container.
   Examples are Arc spaces, iTerm sessions, and nested Photos folders. Google
   Chrome and Microsoft Edge tabs are reached only through their window, and

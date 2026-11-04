@@ -154,20 +154,15 @@ export function isNameKeyed(manifest: AppManifest, resourceKey: string): boolean
  * A container whose own `get` records a parent would need its own container
  * in turn (a nested chain), which a native read does not return.
  *
- * A singleton root is the exception to that test: a reference to one read
- * from the app is left out because nothing on the object says which kind it
- * is (`root-kind-unmapped`), but a read through a root's own record knows the
- * kind it found the record by, which is all the container needs. So a root
- * with a usable `get` is a valid container; the root is held by the
- * application itself, so it is always top-level.
+ * A singleton root is never a valid container: a reference to one read from
+ * the app is left out (`root-kind-unmapped`), and the manifest schema
+ * rejects a command that records a root as its parent, so no target is got
+ * within one.
  *
  * @param manifest - The app manifest.
  * @param containerKey - The manifest key of the would-be container.
  */
 export function isValidContainer(manifest: AppManifest, containerKey: string): boolean {
-  if (resolveRoots(manifest, containerKey) !== undefined) {
-    return resolvingCommand(manifest, containerKey, 'get') !== undefined
-  }
   return omittedOutputReason(manifest, containerKey) === undefined
 }
 
