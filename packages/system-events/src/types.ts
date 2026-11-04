@@ -217,7 +217,12 @@ export interface AliasCreateInput {
 export type AliasUpdateInput = Partial<AliasCreateInput>
 
 /** The Classic domain in the file system */
-export type ClassicDomainObject = Record<string, never>
+export interface ClassicDomainObject {
+  /** the unique identifier of the domain */
+  id: string
+  /** the name of the domain */
+  name: string
+}
 
 /** Input for creating a ClassicDomainObject */
 export type ClassicDomainObjectCreateInput = Record<string, never>
@@ -368,12 +373,47 @@ export type FilePackageUpdateInput = Partial<FilePackageCreateInput>
 
 /** A folder in the file system */
 export interface Folder {
-  /** Unique identifier for this folder */
+  /** Is the disk item busy? */
+  busyStatus: boolean
+  /** the date on which the disk item was created */
+  creationDate: Date
+  /** the name of the disk item as displayed in the User Interface */
+  displayedName: string
+  /** the unique ID of the disk item */
   id: string
+  /** the date on which the disk item was last modified */
+  modificationDate: Date
+  /** the name of the disk item */
+  name: string
+  /** the extension portion of the name */
+  nameExtension: string
+  /** Is the disk item a package? */
+  packageFolder: boolean
+  /** the file system path of the disk item */
+  path: string
+  /** the actual space used by the disk item on disk */
+  physicalSize: number
+  /** the POSIX file system path of the disk item */
+  pOSIXPath: string
+  /** the logical size of the disk item */
+  size: number
+  /** the URL of the disk item */
+  uRL: string
+  /** Is the disk item visible? */
+  visible: boolean
+  /** the volume on which the disk item resides */
+  volume: string
 }
 
 /** Input for creating a Folder */
-export type FolderCreateInput = Record<string, never>
+export interface FolderCreateInput {
+  /** the date on which the disk item was last modified */
+  modificationDate?: Date
+  /** the name of the disk item */
+  name?: string
+  /** Is the disk item visible? */
+  visible?: boolean
+}
 
 /** Input for updating a Folder */
 export type FolderUpdateInput = Partial<FolderCreateInput>
@@ -415,7 +455,12 @@ export type SystemDomainObjectCreateInput = Record<string, never>
 export type SystemDomainObjectUpdateInput = Partial<SystemDomainObjectCreateInput>
 
 /** The user domain in the file system */
-export type UserDomainObject = Record<string, never>
+export interface UserDomainObject {
+  /** the unique identifier of the domain */
+  id: string
+  /** the name of the domain */
+  name: string
+}
 
 /** Input for creating a UserDomainObject */
 export type UserDomainObjectCreateInput = Record<string, never>
@@ -1330,7 +1375,10 @@ export const AliasSchema = z.object({
   version: z.string(),
 })
 
-export const ClassicDomainObjectSchema = z.object({})
+export const ClassicDomainObjectSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+})
 
 export const DiskSchema = z.object({
   capacity: z.number(),
@@ -1384,7 +1432,21 @@ export const FilePackageSchema = z.object({
 })
 
 export const FolderSchema = z.object({
+  busyStatus: z.boolean(),
+  creationDate: z.string(),
+  displayedName: z.string(),
   id: z.string(),
+  modificationDate: z.string(),
+  name: z.string(),
+  nameExtension: z.string(),
+  packageFolder: z.boolean(),
+  path: z.string(),
+  physicalSize: z.number(),
+  pOSIXPath: z.string(),
+  size: z.number(),
+  uRL: z.string(),
+  visible: z.boolean(),
+  volume: z.string(),
 })
 
 export const LocalDomainObjectSchema = z.object({
@@ -1399,7 +1461,10 @@ export const SystemDomainObjectSchema = z.object({
   id: z.string(),
 })
 
-export const UserDomainObjectSchema = z.object({})
+export const UserDomainObjectSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+})
 
 export const ActionSchema = z.object({
   description: z.string(),

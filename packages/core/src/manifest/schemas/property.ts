@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { possibleValueKinds } from '../value-kinds.js'
 import {
-  DictionarySpellingEvidenceSchema,
+  DictionaryTermEvidenceSchema,
   NullabilityEvidenceSchema,
   ResettabilityEvidenceSchema,
   UnsupportedSchema,
@@ -84,7 +84,7 @@ export const PropertyNativeSpellingSchema = z
     /** The name the automation bridge resolves for the property, e.g. `ansiBlackColor`. */
     name: z.string().min(1),
     /** The dictionary term the name is the bridge's spelling of. */
-    evidence: DictionarySpellingEvidenceSchema,
+    evidence: DictionaryTermEvidenceSchema,
   })
   .strict()
 export type PropertyNativeSpelling = z.infer<typeof PropertyNativeSpellingSchema>
@@ -188,6 +188,77 @@ export const PropertySchema = z
     }
   })
 export type Property = z.infer<typeof PropertySchema>
+
+/**
+ * The claims a resource makes about a property it inherits, without
+ * redeclaring the property: a claims-only overlay (D10, "Superclasses").
+ *
+ * An inherited property carries its ancestor's claims, observed on the
+ * ancestor's class. A subclass that has its own evidence states the claim
+ * here instead of copying the ancestor's declaration, so the declaration
+ * stays the ancestor's and cannot drift. Each claim it states replaces the
+ * inherited one: the nullability claim (`nullable` with `evidence.nullable`),
+ * the resettability claim (`resettable` with `evidence.resettable`), and the
+ * `unsupported` marker. A marker also drops the inherited nullability and
+ * resettability claims and the native spelling, which an unsupported property
+ * cannot carry. A claim and its evidence follow the rules they follow on a
+ * declaration.
+ */
+export const PropertyClaimsSchema = z
+  .object({
+    /** The nullability claim, as on a declaration. */
+    nullable: z.boolean().optional(),
+    /** The resettability claim, as on a declaration. */
+    resettable: z.boolean().optional(),
+    /** The evidence for the claims stated here. */
+    evidence: PropertyEvidenceSchema.optional(),
+    /** The marker, as on a declaration. */
+    unsupported: UnsupportedSchema.optional(),
+  })
+  .strict()
+  .superRefine((claims, ctx) => {
+    if (
+      claims.nullable === undefined &&
+      claims.resettable === undefined &&
+      claims.evidence === undefined &&
+      claims.unsupported === undefined
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'A claims-only overlay states at least one claim: nullable, resettable or unsupported, with its evidence.',
+        path: [],
+      })
+    }
+    if (
+      claims.unsupported !== undefined &&
+      (claims.nullable !== undefined || claims.resettable !== undefined)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'An unsupported property cannot carry a nullable or resettable claim: every surface leaves it out.',
+        path: ['unsupported'],
+      })
+    }
+    checkNullabilityClaim(claims, ctx)
+    const evidence = claims.evidence?.resettable
+    if (claims.resettable === true && evidence === undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'A resettable claim needs evidence: set evidence.resettable.',
+        path: ['evidence', 'resettable'],
+      })
+    }
+    if (claims.resettable !== true && evidence !== undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Resettability evidence needs a claim: set resettable: true.',
+        path: ['resettable'],
+      })
+    }
+  })
+export type PropertyClaims = z.infer<typeof PropertyClaimsSchema>
 
 /**
  * An `unsupported` marker's kind evidence must contradict the declared type:

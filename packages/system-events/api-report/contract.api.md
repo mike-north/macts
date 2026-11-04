@@ -127,7 +127,10 @@ export type CheckboxCreateInput = Record<string, never>;
 export type CheckboxUpdateInput = Record<string, never>;
 
 // @public
-export type ClassicDomainObject = Record<string, never>;
+export interface ClassicDomainObject {
+    readonly id: string;
+    readonly name: string | null;
+}
 
 // @public
 export type ClassicDomainObjectCreateInput = Record<string, never>;
@@ -335,14 +338,36 @@ export interface FileUpdateInput {
 
 // @public
 export interface Folder {
-    readonly id: string | null;
+    readonly busyStatus: boolean | null;
+    readonly creationDate: Date | null;
+    readonly displayedName: string | null;
+    readonly id: string;
+    modificationDate: Date | null;
+    name: string | null;
+    readonly nameExtension: string | null;
+    readonly packageFolder: boolean | null;
+    readonly path: string | null;
+    readonly physicalSize: Integer | null;
+    readonly pOSIXPath: string | null;
+    readonly size: Integer | null;
+    readonly uRL: string | null;
+    visible: boolean | null;
+    readonly volume: string | null;
 }
 
 // @public
-export type FolderCreateInput = Record<string, never>;
+export interface FolderCreateInput {
+    modificationDate?: Date;
+    name?: string;
+    visible?: boolean;
+}
 
 // @public
-export type FolderUpdateInput = Record<string, never>;
+export interface FolderUpdateInput {
+    modificationDate?: Date;
+    name?: string;
+    visible?: boolean;
+}
 
 // @public
 export type FontSmoothingStyles = 'automatic' | 'light' | 'medium' | 'standard' | 'strong';
@@ -1061,7 +1086,10 @@ export interface UIElementUpdateInput {
 }
 
 // @public
-export type UserDomainObject = Record<string, never>;
+export interface UserDomainObject {
+    readonly id: string;
+    readonly name: string | null;
+}
 
 // @public
 export type UserDomainObjectCreateInput = Record<string, never>;
