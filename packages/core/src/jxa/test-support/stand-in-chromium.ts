@@ -47,12 +47,18 @@ export interface StandInChromiumOptions {
   readonly urlKey: string
   /** Receives one entry per lookup by id the app serves. */
   readonly lookups?: string[]
-  /** Receives `make Tab` per tab made and `<label>.push` per tab added to a window. */
+  /**
+   * Receives `make Tab` per tab made, `<label>.push` per tab added to a
+   * window, and `make Window` per window made.
+   */
   readonly writes?: string[]
 }
 
-/** The id the stand-in gives a tab it makes. */
+/** The id the stand-in gives a tab it makes, and the one tab of a window it makes. */
 export const STAND_IN_NEW_TAB_ID = 'T-new'
+
+/** The id the stand-in gives a window it makes. */
+export const STAND_IN_NEW_WINDOW_ID = 'W-new'
 
 /** A specifier for an object that does not exist. */
 const ABSENT = Object.freeze({ exists: () => false })
@@ -106,7 +112,7 @@ export function standInChromium(
   options: StandInChromiumOptions
 ): object {
   const { urlKey, lookups = [], writes = [] } = options
-  const windowItems = windows.map((row, index) => {
+  const windowItem = (row: StandInWindow, index: number) => {
     const tabRecords = row.tabs.map((tab) => tabRecord(tab, urlKey))
     const tabItems = row.tabs.map((tab, tabIndex) => ({
       id: tab.id,
@@ -151,7 +157,8 @@ export function standInChromium(
       record,
       specifier: { exists: () => true, id: () => row.id, properties: () => record, tabs },
     }
-  })
+  }
+  const windowItems = windows.map(windowItem)
   return {
     windows: collection(
       'windows',
@@ -163,6 +170,20 @@ export function standInChromium(
       writes.push('make Tab')
       const record = tabRecord({ id: STAND_IN_NEW_TAB_ID, title: '' }, urlKey)
       return { properties: () => ({ ...record, ...props }) }
+    },
+    // A made window opens holding one new tab, which is its active tab, as
+    // the app's does; it is the window itself once made.
+    Window() {
+      const made = windowItem(
+        { id: STAND_IN_NEW_WINDOW_ID, name: '', tabs: [{ id: STAND_IN_NEW_TAB_ID, title: '' }] },
+        windows.length
+      )
+      return {
+        ...made.specifier,
+        make() {
+          writes.push('make Window')
+        },
+      }
     },
   }
 }

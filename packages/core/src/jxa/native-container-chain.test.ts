@@ -10,15 +10,17 @@
  * - emission: a window's `activeTab` is read through the window's record, so
  *   the body hands the codec the tab together with that window, and the
  *   reference carries the window as its container, in identity form, with the
- *   id of the window the record was read through. A get and a list emit it
- *   alike; a list gives each row its own window. The tab's id is read from
- *   the value the app returned, a property specifier of the window.
+ *   id of the window the record was read through. A get, a list and Edge's
+ *   create emit it alike; a list gives each row its own window, and a create
+ *   the window it made. The tab's id is read from the value the app returned,
+ *   a property specifier of the window.
  * - a value at such a position that comes without its container is a macts
  *   defect, `InternalError`.
  * - decode and resolution address the container first, then the child within
  *   it, as the generated parent-scoped get does: a missing container is
  *   `TargetNotFoundError` naming Window, with no tab looked up; a missing
- *   child names Tab.
+ *   child names Tab. An identity collection does so entry by entry, and a
+ *   missing container names Window with the entry's index.
  * - no membership check is made: a tab looked up within another window is
  *   not found, `TargetNotFoundError` naming Tab, from one lookup within the
  *   window the reference names.
@@ -31,6 +33,7 @@
  * against a stand-in Chrome that records every lookup it serves.
  *
  * @see ../../../../manifests/google-chrome/app.yaml
+ * @see ../../../../manifests/microsoft-edge/app.yaml
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md (D4, D7, D9)
  */
 
@@ -49,16 +52,24 @@ import type { AppManifest } from '../manifest/schemas/app.js'
 import type { NativeScript } from './native-codec.js'
 import { createNativeExecutor, type NativeTransport } from './native-executor.js'
 import { referenceAddressing } from './native-scripts.js'
-import { standInChromium, type StandInWindow } from './test-support/stand-in-chromium.js'
+import {
+  STAND_IN_NEW_TAB_ID,
+  STAND_IN_NEW_WINDOW_ID,
+  standInChromium,
+  type StandInWindow,
+} from './test-support/stand-in-chromium.js'
 import { standInTransport } from './test-support/stand-in-app.js'
 
-const CHROME_MANIFEST = fileURLToPath(
-  new URL('../../../../manifests/google-chrome/app.yaml', import.meta.url)
-)
+/** The shipped manifest of the app `name`. */
+function manifestPath(name: string): string {
+  return fileURLToPath(new URL(`../../../../manifests/${name}/app.yaml`, import.meta.url))
+}
 
 let chrome: AppManifest
+let edge: AppManifest
 beforeAll(async () => {
-  chrome = await loadManifest(CHROME_MANIFEST)
+  chrome = await loadManifest(manifestPath('google-chrome'))
+  edge = await loadManifest(manifestPath('microsoft-edge'))
 })
 
 /** Chrome's window and tab identifiers are text, as its manifest says. */
@@ -148,8 +159,8 @@ function operation(
 }
 
 /** A resolution request for `reference`, against Chrome. */
-function resolution(reference: ReferenceWire): ResolutionRequest {
-  return { manifest: chrome, reference, outputPlan: TAB_PLAN, resourcePlans: RESOURCE_PLANS }
+function resolution(reference: ReferenceWire, outputPlan: ValuePlan = TAB_PLAN): ResolutionRequest {
+  return { manifest: chrome, reference, outputPlan, resourcePlans: RESOURCE_PLANS }
 }
 
 /** What a call rejected with; fails if it resolved. */
@@ -209,6 +220,23 @@ describe('emitting a window’s active tab with its window', () => {
     // The container is the row's identifier the list already read: no window
     // is looked up again to encode it.
     expect(lookups).toEqual([])
+  })
+
+  it('carries the window Edge’s create made as its active tab’s container', async () => {
+    const writes: string[] = []
+    const app = standInChromium(WINDOWS, { urlKey: 'uRL', writes })
+    const executor = createNativeExecutor({ transport: standInTransport(app) })
+
+    const result = await executor.execute({
+      ...operation('createWindow', 'Window', WINDOW_PLAN),
+      manifest: edge,
+    })
+
+    expect(result).toEqual({
+      id: STAND_IN_NEW_WINDOW_ID,
+      activeTab: { reference: tab(STAND_IN_NEW_WINDOW_ID, STAND_IN_NEW_TAB_ID) },
+    })
+    expect(writes).toEqual(['make Window'])
   })
 
   it('fails with InternalError when a value at such a position comes without its container', async () => {
@@ -281,6 +309,41 @@ describe('resolving a tab within its window', () => {
     expect(lookups).toEqual(['windows.byId(W2)', 'windows.byId(W2).tabs.byId(T99)'])
   })
 
+  it('resolves an identity collection entry by entry, each window before its tab', async () => {
+    const lookups: string[] = []
+    const tabs: ReferenceWire = {
+      resource: 'Tab',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [tab('W1', 'T11'), tab('W2', 'T22')],
+    }
+
+    const result = await chromeExecutor(lookups).resolve(
+      resolution(tabs, { kind: 'array', items: TAB_PLAN })
+    )
+
+    expect(result).toEqual([
+      { id: 'T11', title: 'One' },
+      { id: 'T22', title: 'Four' },
+    ])
+    expect(lookups).toEqual([
+      'windows.byId(W1)',
+      'windows.byId(W1).tabs.byId(T11)',
+      'windows.byId(W2)',
+      'windows.byId(W2).tabs.byId(T22)',
+    ])
+
+    const missing = await rejectionOf(
+      chromeExecutor().resolve(
+        resolution(
+          { ...tabs, entries: [tab('W1', 'T11'), tab('W9', 'T22')] },
+          { kind: 'array', items: TAB_PLAN }
+        )
+      )
+    )
+    expect(notFoundDetails(missing)).toEqual({ resource: 'Window', entryIndex: 1 })
+  })
+
   it('finds no tab within a window it is not in, with no membership check beyond that lookup', async () => {
     // T21 is a real tab, of W2; the reference names W1 as its container.
     const lookups: string[] = []
@@ -303,7 +366,7 @@ describe('containers the executor refuses before anything runs', () => {
         id: 'W1',
         container: window('W2'),
       },
-      'The macOS provider cannot resolve a reference to the Google Chrome resource "Window" located through a container yet.',
+      'The macOS provider cannot resolve a reference to the Google Chrome resource "Window" that carries a container: Google Chrome finds one by its identifier alone, so its references carry no container.',
     ],
     [
       'a container of another resource than the target’s get records',
@@ -314,7 +377,7 @@ describe('containers the executor refuses before anything runs', () => {
         id: 'T11',
         container: { resource: 'BookmarkFolder', form: 'identity', cardinality: 'one', id: 'F1' },
       },
-      'The macOS provider cannot resolve a reference to the Google Chrome resource "Tab" located through a container yet.',
+      'The macOS provider cannot resolve a reference to the Google Chrome resource "Tab" through that container: Google Chrome finds one only within its "Window", so the container must be an identity reference to a "Window".',
     ],
     [
       'a selector container',
@@ -330,7 +393,7 @@ describe('containers the executor refuses before anything runs', () => {
           selector: { by: 'name', name: 'Front' },
         },
       },
-      'The macOS provider cannot resolve a reference to the Google Chrome resource "Tab" located through a container yet.',
+      'The macOS provider cannot resolve a reference to the Google Chrome resource "Tab" through that container: Google Chrome finds one only within its "Window", so the container must be an identity reference to a "Window".',
     ],
     [
       'a target got within a container, with none',

@@ -634,19 +634,18 @@ function identifierLookup(resource: Resource | undefined):
  *
  * A singleton root is addressed by its kinds: the application property each
  * one names (`NativeRootAddressing`). It is held by the application itself,
- * so a root whose get records a parent has no addressing. A root is never a
- * container: the manifest schema rejects a command that records a root as
- * its parent.
+ * so it is never found within a container, and is never one: the manifest
+ * schema rejects a command that records a root as its parent.
  *
  * Inputs, resolution and emission all take a resource's addressing from here,
  * so an object a reference names is the one a get of its identifier finds.
  *
  * @param manifest - The validated app manifest.
  * @param resourceKey - The manifest resource key a reference names.
- * @throws `InternalError` when a get records a singleton root as its parent,
- *   which a validated manifest never does: neither the container lookup nor
- *   the container encoding can use a root, so reaching this is a macts
- *   defect.
+ * @throws `InternalError` when a singleton root's get records a parent, or a
+ *   get records a singleton root as its parent, which a validated manifest
+ *   never does: no lookup or encoding finds a root within a container or
+ *   uses one as a container, so reaching either is a macts defect.
  */
 export function referenceAddressing(
   manifest: AppManifest,
@@ -673,10 +672,17 @@ function addressingWithin(
   const get = resolvingCommand(manifest, resourceKey, 'get')
   if (get === undefined) return undefined
   const parent = get[1].parent?.resource
+  // A root is held by the application itself, on either side of a parent:
+  // the root's own get recording a parent here, and a parent that is a root
+  // below, once its addressing is known.
   if (resource.roots !== undefined) {
-    return parent === undefined
-      ? { lookup: 'byRoot', roots: rootProperties(resource.roots) }
-      : undefined
+    if (parent !== undefined) {
+      throw new InternalError(
+        `The macOS provider cannot find the singleton root ${JSON.stringify(resourceKey)} within a container.`,
+        {}
+      )
+    }
+    return { lookup: 'byRoot', roots: rootProperties(resource.roots) }
   }
   if (lookup.lookup === 'byRoot') return undefined
   const addressing = {

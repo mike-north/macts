@@ -533,13 +533,13 @@ describe('references outside the native conversion scope', () => {
       'a reference with a container',
       personInGroup,
       RESOURCE_PLANS,
-      'The macOS provider cannot resolve a reference to the Contacts resource "Person" located through a container yet.',
+      'The macOS provider cannot resolve a reference to the Contacts resource "Person" that carries a container: Contacts finds one by its identifier alone, so its references carry no container.',
     ],
     [
       'an identity collection with an entry located through a container',
       entriesInGroup,
       RESOURCE_PLANS,
-      'The macOS provider cannot resolve an identity collection of the Contacts resource "Person" whose entries are located through a container yet.',
+      'The macOS provider cannot resolve a reference to the Contacts resource "Person" that carries a container: Contacts finds one by its identifier alone, so its references carry no container.',
     ],
     [
       // An email's get records the person as its parent: it is found only
@@ -559,7 +559,7 @@ describe('references outside the native conversion scope', () => {
         container: { resource: 'Group', form: 'identity', cardinality: 'one', id: 'g-1' },
       },
       RESOURCE_PLANS,
-      'The macOS provider cannot resolve a reference to the Contacts resource "Email" located through a container yet.',
+      'The macOS provider cannot resolve a reference to the Contacts resource "Email" through that container: Contacts finds one only within its "Person", so the container must be an identity reference to a "Person".',
     ],
     [
       'a reference through a container whose resource has no identifier plan',
