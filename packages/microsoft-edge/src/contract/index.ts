@@ -48,7 +48,9 @@ export interface Window {
    */
   readonly name: string | null
   /**
-   * The unique identifier of the window.
+   * The unique identifier of the window, within one browser session: ids start over each time the
+   * browser is relaunched, so an id kept across a relaunch may find a different window, not merely
+   * none.
    * Never null: the primary identifier.
    */
   readonly id: string
@@ -98,7 +100,10 @@ export interface Window {
    */
   zoomed: boolean | null
   /**
-   * Returns the currently selected tab.
+   * Returns the currently selected tab, as a reference that carries this window as its container.
+   * Window and tab ids start over each time the browser is relaunched, so this reference, kept
+   * across a relaunch, may resolve to a different tab or window, not merely fail, and an action
+   * through it, such as closing the tab, would act on that other tab.
    * Nullable. No evidence that the app always sets it.
    */
   readonly activeTab: ObjectReferenceVariant<Tab, string, 'Tab'> | null
@@ -118,7 +123,10 @@ export interface Window {
 /** A tab. */
 export interface Tab {
   /**
-   * Unique ID of the tab.
+   * Unique ID of the tab among the tabs of its window, within one browser session: ids start over
+   * each time the browser is relaunched, so an id kept across a relaunch may find a different tab,
+   * not merely none, and an action through it, such as closing the tab, would act on that other
+   * tab.
    * Never null: the primary identifier.
    */
   readonly id: string
@@ -460,7 +468,10 @@ const windowRecordType: ValueType<Window> = t.record(
   {
     givenName: t.nullable(t.string(), { description: 'The given name of the window.' }),
     name: t.nullable(t.string(), { description: 'The full title of the window.' }),
-    id: t.string({ description: 'The unique identifier of the window.' }),
+    id: t.string({
+      description:
+        'The unique identifier of the window, within one browser session: ids start over each time the browser is relaunched, so an id kept across a relaunch may find a different window, not merely none.',
+    }),
     index: t.nullable(t.integer(), {
       description: 'The index of the window, ordered front to back.',
     }),
@@ -476,7 +487,10 @@ const windowRecordType: ValueType<Window> = t.record(
     zoomed: t.nullable(t.boolean(), { description: 'Whether the window is currently zoomed.' }),
     activeTab: t.nullable(
       t.reference<Tab, string, 'Tab'>(() => microsoftEdgeContract, 'Tab', 'one'),
-      { description: 'Returns the currently selected tab' }
+      {
+        description:
+          'Returns the currently selected tab, as a reference that carries this window as its container. Window and tab ids start over each time the browser is relaunched, so this reference, kept across a relaunch, may resolve to a different tab or window, not merely fail, and an action through it, such as closing the tab, would act on that other tab.',
+      }
     ),
     mode: t.nullable(t.string(), {
       description:
@@ -489,7 +503,10 @@ const windowRecordType: ValueType<Window> = t.record(
 
 const tabRecordType: ValueType<Tab> = t.record(
   {
-    id: t.string({ description: 'Unique ID of the tab.' }),
+    id: t.string({
+      description:
+        'Unique ID of the tab among the tabs of its window, within one browser session: ids start over each time the browser is relaunched, so an id kept across a relaunch may find a different tab, not merely none, and an action through it, such as closing the tab, would act on that other tab.',
+    }),
     title: t.nullable(t.string(), { description: 'The title of the tab.' }),
     uRL: t.nullable(t.string(), { description: 'The url visible to the user.' }),
     loading: t.nullable(t.boolean(), { description: 'Is loading?' }),
@@ -582,14 +599,20 @@ const resources = {
   Window: {
     name: 'Window',
     record: windowRecordType,
-    id: t.string({ description: 'The unique identifier of the window.' }),
+    id: t.string({
+      description:
+        'The unique identifier of the window, within one browser session: ids start over each time the browser is relaunched, so an id kept across a relaunch may find a different window, not merely none.',
+    }),
     get: 'microsoft-edge.windows.get',
     list: 'microsoft-edge.windows.list',
   },
   Tab: {
     name: 'Tab',
     record: tabRecordType,
-    id: t.string({ description: 'Unique ID of the tab.' }),
+    id: t.string({
+      description:
+        'Unique ID of the tab among the tabs of its window, within one browser session: ids start over each time the browser is relaunched, so an id kept across a relaunch may find a different tab, not merely none, and an action through it, such as closing the tab, would act on that other tab.',
+    }),
     get: 'microsoft-edge.tabs.get',
     list: 'microsoft-edge.tabs.list',
     parents: { get: 'Window', list: 'Window' },

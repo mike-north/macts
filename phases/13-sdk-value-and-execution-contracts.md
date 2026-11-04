@@ -1588,7 +1588,8 @@ run destination and a project only within its workspace document. References
 now carry their container, but a workspace document is no valid container
 yet: it is identified by its name, with no unique claim. Its identity is its
 document path, a location identity, since two checkouts with the same name
-can be open at once, so no name claim is to be added. The fields return with
+can be open at once (a reason from how documents are opened; no live check
+has observed it yet), so no name claim is to be added. The fields return with
 path curation of the workspace document, with evidence: `byKey` if the app
 looks documents up by path, otherwise `byProperty` on `path`.
 `activeRunDestination` also needs evidence, from a live check with two or more
@@ -1684,10 +1685,26 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   each tab get records the window, so a tab reference carries its window as
   its container (a window's `activeTab` carries the window it was read
   through), and no global tab id is invented. Chrome and Edge window and tab
-  ids are session-scoped: identity holds within the running browser session,
-  with no promise across a relaunch. Xcode schemes, run destinations and
+  ids are session-scoped: identity holds within one browser session, and
+  nothing shows an id changing while the browser keeps running, but ids start
+  over when it is relaunched. A reference kept across a relaunch may
+  therefore resolve to a different tab or window, not merely fail, and an
+  action through it, such as closing the tab or executing script in it,
+  would act on that other tab. The window and tab `id` and the window
+  `activeTab` field docs say so. Xcode schemes, run destinations and
   projects are container-scoped: each is got within its workspace document,
   which is no valid container yet (resolvable targets, above).
+- **What the positional rule leaves out.** Because a field is kept only on
+  its target's parent's own record, of the fields left out as
+  container-scoped this restores only Chrome and Edge `Window.activeTab`.
+  TV's browser window and playlist window `view`, and a playlist's `parent`,
+  reference a playlist, which TV gets within its source, but are read
+  through a window or a playlist, not through that source; they wait for a
+  manifest-curated container accessor with evidence. Xcode's target
+  `project` is read through a target, not through its workspace document,
+  and waits for nested chains and path curation of the workspace document.
+  Mail's message `mailbox` stays out for another reason: macts has no
+  mailbox `get` yet.
 - **Name-keyed resources.** A resource whose primary identifier is its name
   keeps `ResourceDescriptor.id`. Resolving an identity reference to it means
   the same as a name selector: it resolves to whichever object has that name
@@ -1743,8 +1760,12 @@ left out of generation until nested chains are emitted
 ([#219](https://github.com/mike-north/macts/issues/219),
 [#242](https://github.com/mike-north/macts/issues/242)). So Contacts emails,
 phones and addresses within a person, Music tracks within a playlist and
-Calendar events within a calendar convert and resolve with their container;
-each still needs a live check against its app.
+Calendar events within a calendar convert and resolve with their container,
+and each still needs its own live check against its app before it is
+claimed. For Calendar the resolution is not exact: a calendar container is
+name-keyed with no unique claim, and an event's `uid` is not unique, so a
+caller-built event reference addresses the first match, as the existing
+Calendar operations that take a calendar already do.
 
 The provider resolves references (resolution, below) within the same scope,
 plus identity collections whose entries are in it:

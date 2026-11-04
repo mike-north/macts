@@ -1219,8 +1219,8 @@ describe('real app manifests', () => {
   it("leave out an Xcode workspace document's active scheme and run destination: the document is no valid container yet", () => {
     // A workspace document is identified by its name, with no unique claim.
     // Its identity is its document path, since two checkouts with the same
-    // name can be open at once, so no name claim is to be added; the fields
-    // return with path curation of the document.
+    // name can be open at once (not yet observed live), so no name claim is
+    // to be added; the fields return with path curation of the document.
     const xcode = manifestOf('xcode')
     expect(isNameKeyed(xcode, 'WorkspaceDocument')).toBe(true)
     expect(isValidContainer(xcode, 'WorkspaceDocument')).toBe(false)

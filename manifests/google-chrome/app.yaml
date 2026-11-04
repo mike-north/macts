@@ -64,7 +64,10 @@ resources:
       id:
         access: r
         type: string
-        description: The unique identifier of the window.
+        description: >-
+          The unique identifier of the window, within one browser session: ids start
+          over each time the browser is relaunched, so an id kept across a relaunch may
+          find a different window, not merely none.
         code: 'ID  '
       index:
         access: rw
@@ -115,7 +118,12 @@ resources:
         access: r
         type:
           resource: tab
-        description: Returns the currently selected tab
+        description: >-
+          Returns the currently selected tab, as a reference that carries this window as
+          its container. Window and tab ids start over each time the browser is
+          relaunched, so this reference, kept across a relaunch, may resolve to a
+          different tab or window, not merely fail, and an action through it, such as
+          closing the tab, would act on that other tab.
         code: acTa
       mode:
         access: rw
@@ -134,7 +142,7 @@ resources:
         evidence:
           unique:
             source: sdef
-            note: 'The app''s scripting dictionary describes the property as "The unique identifier of the window.", typed text. A read-only list on Google Chrome 156.0.8078.80 (macOS 27.2), 2026-11-04, found 1 window, too few to show distinctness; its id read as text and a get by id read the same id back. A window''s id identifies it within the running Chrome session; nothing here shows it survives a relaunch.'
+            note: 'The app''s scripting dictionary describes the property as "The unique identifier of the window.", typed text. A read-only list on Google Chrome 156.0.8078.80 (macOS 27.2), 2026-11-04, found 1 window, too few to show distinctness; its id read as text and a get by id read the same id back. A window''s id identifies it within the running Chrome session, and nothing here shows it changes while Chrome keeps running. Nothing here shows it survives a relaunch either: after one, the same id may belong to a different window, so a reference kept across a relaunch may resolve to a different tab or window, not merely fail.'
             observedAt: '2026-11-04T03:31:45.000Z'
             appVersion: 156.0.8078.80
   Tab:
@@ -146,7 +154,11 @@ resources:
       id:
         access: r
         type: string
-        description: Unique ID of the tab.
+        description: >-
+          Unique ID of the tab among the tabs of its window, within one browser session:
+          ids start over each time the browser is relaunched, so an id kept across a
+          relaunch may find a different tab, not merely none, and an action through it,
+          such as closing the tab, would act on that other tab.
         code: 'ID  '
       title:
         access: r
@@ -178,7 +190,7 @@ resources:
         evidence:
           unique:
             source: sdef
-            note: 'The app''s scripting dictionary describes the property as "Unique ID of the tab.", typed text. The claim is for the tabs of one window, the collection a tab is listed in, and says nothing about uniqueness across windows. A read-only list on Google Chrome 156.0.8078.80 (macOS 27.2), 2026-11-04, found 1 window holding 1 tab, too few to show distinctness; the ids read as text and a get by its window and its id read the same id back. A tab''s id identifies it within the running Chrome session; nothing here shows it survives a relaunch.'
+            note: 'The app''s scripting dictionary describes the property as "Unique ID of the tab.", typed text. The claim is for the tabs of one window, the collection a tab is listed in, and says nothing about uniqueness across windows. A read-only list on Google Chrome 156.0.8078.80 (macOS 27.2), 2026-11-04, found 1 window holding 1 tab, too few to show distinctness; the ids read as text and a get by its window and its id read the same id back. A tab''s id identifies it within the running Chrome session, and nothing here shows it changes while Chrome keeps running. Nothing here shows it survives a relaunch either: after one, the same id may belong to a different tab, so a reference kept across a relaunch may resolve to a different tab or window, not merely fail.'
             observedAt: '2026-11-04T03:31:45.000Z'
             appVersion: 156.0.8078.80
   BookmarkFolder:
