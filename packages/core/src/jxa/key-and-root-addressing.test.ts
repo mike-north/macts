@@ -929,18 +929,41 @@ describe('a singleton root as a container', () => {
  * missing before any of its properties is read.
  */
 describe('reported absences next to a contained reference', () => {
-  /** The Archive manifest with an entry property holding a reference to its label. */
-  const withLabel = parseManifestYaml(
-    ARCHIVE_MANIFEST_YAML.replace(
-      '      shelfMark:\n',
-      `      label:
+  /**
+   * The Archive manifest with an entry property holding a reference to its
+   * label; with `absent`, that property also claims nullable on probe
+   * evidence whose failed reads all found no such object (like `shelfMark`).
+   */
+  function archiveWithLabelProperty(absent: boolean) {
+    const evidence = absent
+      ? `
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T12:00:00.000Z'
+            bundleId: com.example.archive
+            appVersion: '1.0'
+            osVersion: '27.2'
+            sampleSize: 3
+            nullCount: 0
+            failedReads: 2
+            errorNumbers: [-1728]`
+      : ''
+    return parseManifestYaml(
+      ARCHIVE_MANIFEST_YAML.replace(
+        '      shelfMark:\n',
+        `      label:
         access: r
         type: { resource: Label }
-        description: The entry's first label
+        description: The entry's first label${evidence}
       shelfMark:
 `
+      )
     )
-  )
+  }
+  const withLabel = archiveWithLabelProperty(false)
+  const withAbsentLabel = archiveWithLabelProperty(true)
   const LABEL_REF: ValuePlan = { kind: 'reference', resource: 'Label', cardinality: 'one' }
   const ENTRY_WITH_LABEL: ValuePlan = {
     kind: 'record',
@@ -968,9 +991,9 @@ describe('reported absences next to a contained reference', () => {
     )
   }
 
-  const getEntry = (app: object, location: string) =>
+  const getEntry = (app: object, location: string, entryManifest = withLabel) =>
     createNativeExecutor({ transport: standInTransport(app) }).execute({
-      manifest: withLabel,
+      manifest: entryManifest,
       target: { command: 'getEntry', resource: 'Entry' },
       input: { location },
       inputPlan: inputOf(text(), 'location'),
@@ -1004,5 +1027,65 @@ describe('reported absences next to a contained reference', () => {
 
     expect(error).toBeInstanceOf(TargetNotFoundError)
     expect(uses.some((use) => use.includes('shelfMark') || use.includes('label'))).toBe(false)
+  })
+
+  it('reads a contained reference field that is itself absence-evidenced as null, with no container', async () => {
+    const entry = object(
+      { location: '/a' },
+      { location: () => '/a', label: failing(-1728), shelfMark: failing(-1728) }
+    )
+    const app = {
+      includeStandardAdditions: false,
+      entries: { byName: (key: unknown) => (key === '/a' ? entry : ABSENT) },
+    }
+
+    await expect(getEntry(app, '/a', withAbsentLabel)).resolves.toEqual({
+      location: '/a',
+      label: null,
+      shelfMark: null,
+    })
+  })
+
+  it('does the same item by item in a list: a null label has no container, a held one keeps it', async () => {
+    const label = { id: () => 'l1' }
+    const row = (location: string, held: () => unknown) => ({
+      location: () => location,
+      label: held,
+      shelfMark: failing(-1728),
+    })
+    const items = [row('/a', () => label), row('/root', failing(-1728))]
+    const entries = Object.assign(() => items, {
+      location: () => ['/a', '/root'],
+      label: failing(-1728),
+      shelfMark: failing(-1728),
+    })
+
+    const result = await createNativeExecutor({
+      transport: standInTransport({ includeStandardAdditions: false, entries }),
+    }).execute({
+      manifest: withAbsentLabel,
+      target: { command: 'listEntries', resource: 'Entry' },
+      input: {},
+      inputPlan: { kind: 'record', fields: {} },
+      outputPlan: { kind: 'array', items: ENTRY_WITH_LABEL },
+      resourcePlans: RESOURCE_PLANS,
+    })
+
+    expect(result).toEqual([
+      {
+        location: '/a',
+        label: {
+          reference: {
+            resource: 'Label',
+            form: 'identity',
+            cardinality: 'one',
+            id: 'l1',
+            container: { resource: 'Entry', form: 'identity', cardinality: 'one', id: '/a' },
+          },
+        },
+        shelfMark: null,
+      },
+      { location: '/root', label: null, shelfMark: null },
+    ])
   })
 })
