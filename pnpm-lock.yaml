@@ -1796,6 +1796,9 @@ importers:
       '@macts/reminders':
         specifier: workspace:*
         version: link:../reminders
+      '@macts/tv':
+        specifier: workspace:*
+        version: link:../tv
       tsd:
         specifier: 'catalog:'
         version: 0.31.2

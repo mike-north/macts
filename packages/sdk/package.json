@@ -60,6 +60,7 @@
     "@macts/music": "workspace:*",
     "@macts/notes": "workspace:*",
     "@macts/reminders": "workspace:*",
+    "@macts/tv": "workspace:*",
     "tsd": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",
