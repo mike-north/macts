@@ -419,6 +419,8 @@ function unresolvableForm(
   const app = manifest.app.name
   const target = `the ${app} resource ${JSON.stringify(reference.resource)}`
   const cannot = (form: string): string => `The macOS provider cannot resolve ${form} yet.`
+  // A caller error, not a missing feature (phases/13 D7, container scoping).
+  const misplacedContainer = `The macOS provider cannot resolve a reference to ${target} through that container: a reference carries a container only when ${app} finds its resource within another, and then as an identity reference to that resource.`
   if (reference.form === 'selector') {
     return cannot(
       reference.cardinality === 'one'
@@ -434,21 +436,27 @@ function unresolvableForm(
         )
       }
       const unresolvable = unresolvableChain(entry, references)
+      if (unresolvable === 'container') return misplacedContainer
       if (unresolvable !== undefined) return unresolvableMessage(manifest, unresolvable)
     }
     return unresolvableMessage(manifest, unresolvableTarget(reference.resource, references))
   }
-  return unresolvableMessage(manifest, unresolvableChain(reference, references))
+  const unresolvable = unresolvableChain(reference, references)
+  if (unresolvable === 'container') return misplacedContainer
+  return unresolvableMessage(manifest, unresolvable)
 }
 
 /**
- * Why a single reference's chain does not resolve, at the first level that
- * does not ({@link Unresolvable}), or `undefined` when every level resolves.
+ * Why a single reference's chain does not resolve: `'container'` for a
+ * container the reference's resource is not found within (one on a resource
+ * found at the application, one of another resource, or one not in identity
+ * form); a {@link Unresolvable} for a resource with no addressing or a missing
+ * container; `undefined` when every level resolves.
  */
 function unresolvableChain(
   reference: ReferenceWire,
   references: NativeReferenceTable
-): Unresolvable | undefined {
+): 'container' | Unresolvable | undefined {
   const missing = unresolvableTarget(reference.resource, references)
   if (missing !== undefined) return missing
   const within = parentWithin(references[reference.resource]?.addressing)
@@ -456,39 +464,22 @@ function unresolvableChain(
     reference.form === 'identity' && reference.cardinality === 'one'
       ? reference.container
       : undefined
-  if (within === undefined) {
-    return container === undefined
-      ? undefined
-      : { kind: 'unexpected-container', resource: reference.resource }
-  }
+  if (within === undefined) return container === undefined ? undefined : 'container'
   if (container === undefined) return { kind: 'no-container', resource: reference.resource, within }
   if (
     container.resource !== within ||
     container.form !== 'identity' ||
     container.cardinality !== 'one'
   ) {
-    return { kind: 'wrong-container', resource: reference.resource, within }
+    return 'container'
   }
   return unresolvableChain(container, references)
 }
 
-/**
- * A level of a reference that the provider cannot resolve, and why:
- * `no-addressing`, the app does not find its resource by its identifier at
- * all; and three caller errors against the container rule (phases/13 D7):
- * `no-container`, a resource found only within a parent comes without it;
- * `unexpected-container`, a resource found at the application comes with
- * one; `wrong-container`, the container is not a single identity reference
- * to the parent its resource is found within.
- */
+/** A level of a reference that the provider cannot resolve, and why. */
 type Unresolvable =
   | { readonly kind: 'no-addressing'; readonly resource: string }
-  | { readonly kind: 'unexpected-container'; readonly resource: string }
-  | {
-      readonly kind: 'no-container' | 'wrong-container'
-      readonly resource: string
-      readonly within: string
-    }
+  | { readonly kind: 'no-container'; readonly resource: string; readonly within: string }
 
 /** Why references to `resource` do not resolve at all, if they do not. */
 function unresolvableTarget(
@@ -509,18 +500,9 @@ function unresolvableMessage(
   if (unresolvable === undefined) return undefined
   const app = manifest.app.name
   const target = `the ${app} resource ${JSON.stringify(unresolvable.resource)}`
-  switch (unresolvable.kind) {
-    case 'no-addressing':
-      return `The macOS provider cannot resolve references to ${target} yet: ${app} does not find one by its identifier alone.`
-    case 'unexpected-container':
-      return `The macOS provider cannot resolve a reference to ${target} that carries a container: ${app} finds one by its identifier alone, so its references carry no container.`
-    case 'no-container':
-      return `The macOS provider cannot resolve a reference to ${target} without its container: ${app} finds one only within its ${JSON.stringify(unresolvable.within)}.`
-    case 'wrong-container': {
-      const within = JSON.stringify(unresolvable.within)
-      return `The macOS provider cannot resolve a reference to ${target} through that container: ${app} finds one only within its ${within}, so the container must be an identity reference to a ${within}.`
-    }
-  }
+  return unresolvable.kind === 'no-addressing'
+    ? `The macOS provider cannot resolve references to ${target} yet: ${app} does not find one by its identifier alone.`
+    : `The macOS provider cannot resolve a reference to ${target} without its container: ${app} finds one only within its ${JSON.stringify(unresolvable.within)}.`
 }
 
 /**

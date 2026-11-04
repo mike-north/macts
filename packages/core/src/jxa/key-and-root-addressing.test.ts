@@ -711,13 +711,12 @@ describe('containers found by key targeting', () => {
 })
 
 /**
- * A singleton root is held by the application itself, so it is never found
- * within a container and never is one: the manifest schema rejects a command
- * that records a root as its parent. A manifest that skipped validation is
- * the only way to record one, and the provider refuses it as a macts defect
- * rather than looking a root up, or encoding one, through a container.
+ * A singleton root is never a container, nor found within one: the manifest
+ * schema rejects a command that records a root as its parent. A manifest that skipped
+ * validation is the only way to record one, and the provider refuses it as a
+ * macts defect rather than looking a container up, or encoding one, by kind.
  */
-describe('a singleton root on either side of a container', () => {
+describe('a singleton root as a container', () => {
   it('is refused as a broken invariant, naming the root', () => {
     const getDesk = manifest.commands['getDesk']
     if (getDesk === undefined) throw new Error('Archive has a desk get')
@@ -736,21 +735,16 @@ describe('a singleton root on either side of a container', () => {
         },
       },
     }
-    // Skips validation: the desk got within an entry.
-    const deskWithinEntry: typeof manifest = {
-      ...manifest,
-      commands: {
-        ...manifest.commands,
-        getDesk: { ...getDesk, parent: { resource: 'Entry', parameter: 'entryKey' } },
-      },
-    }
 
     expect(() => referenceAddressing(slipWithinDesk, 'Slip')).toThrow(InternalError)
     expect(() => referenceAddressing(slipWithinDesk, 'Slip')).toThrow(
       'The macOS provider cannot use the singleton root "Desk" as a container.'
     )
-    expect(() => referenceAddressing(deskWithinEntry, 'Desk')).toThrow(InternalError)
-    expect(() => referenceAddressing(deskWithinEntry, 'Desk')).toThrow(
+    // Skips validation: the desk got within an entry.
+    const getDeskInEntry = { ...getDesk, parent: { resource: 'Entry', parameter: 'entryKey' } }
+    const deskInEntry = { ...manifest, commands: { ...manifest.commands, getDesk: getDeskInEntry } }
+    expect(() => referenceAddressing(deskInEntry, 'Desk')).toThrow(InternalError)
+    expect(() => referenceAddressing(deskInEntry, 'Desk')).toThrow(
       'The macOS provider cannot find the singleton root "Desk" within a container.'
     )
   })

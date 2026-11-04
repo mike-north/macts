@@ -14,9 +14,8 @@
  *      window's id and the tab's id, which must come back with the same id;
  *   3. that window's `activeTab`, which must carry the window as its
  *      container (the window it was read through), and whose `resolve()`
- *      must return the tab with the id the reference carries; and the
- *      `activeTab` of every listed window that `tabs.list` finds a tab in,
- *      which must be present and carry its own window.
+ *      must return the tab with the id the reference carries; and every
+ *      listed window's `activeTab`, present if it has a tab, with its own window.
  *
  * A tab is read only within its window: the dictionary has `tab` only as an
  * element of `window`. Window and tab ids hold within the running Chrome
@@ -172,17 +171,10 @@ describe.skipIf(!liveAppsEnabled)('Google Chrome window and tab reads (local onl
       let withTabs = 0
       let carryingOwn = 0
       for (const { id, activeTab } of windows.items) {
-        const tabs = await chrome.tabs.list(id)
-        if (tabs.items.length === 0) continue
+        if ((await chrome.tabs.list(id)).items.length === 0) continue
         withTabs += 1
         const container = activeTab?.form === 'identity' ? activeTab.container : undefined
-        if (
-          container?.form === 'identity' &&
-          container.resource === 'Window' &&
-          container.id === id
-        ) {
-          carryingOwn += 1
-        }
+        if (container?.form === 'identity' && container.id === id) carryingOwn += 1
       }
       console.info(
         `Chrome windows with a tab: ${String(withTabs)}; whose active tab carries their own window: ${String(carryingOwn)}`

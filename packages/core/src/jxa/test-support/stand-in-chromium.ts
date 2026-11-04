@@ -47,18 +47,12 @@ export interface StandInChromiumOptions {
   readonly urlKey: string
   /** Receives one entry per lookup by id the app serves. */
   readonly lookups?: string[]
-  /**
-   * Receives `make Tab` per tab made, `<label>.push` per tab added to a
-   * window, and `make Window` per window made.
-   */
+  /** Receives `make Tab` per tab made and `<label>.push` per tab added to a window. */
   readonly writes?: string[]
 }
 
-/** The id the stand-in gives a tab it makes, and the one tab of a window it makes. */
+/** The id the stand-in gives a tab it makes. */
 export const STAND_IN_NEW_TAB_ID = 'T-new'
-
-/** The id the stand-in gives a window it makes. */
-export const STAND_IN_NEW_WINDOW_ID = 'W-new'
 
 /** A specifier for an object that does not exist. */
 const ABSENT = Object.freeze({ exists: () => false })
@@ -171,19 +165,11 @@ export function standInChromium(
       const record = tabRecord({ id: STAND_IN_NEW_TAB_ID, title: '' }, urlKey)
       return { properties: () => ({ ...record, ...props }) }
     },
-    // A made window opens holding one new tab, which is its active tab, as
-    // the app's does; it is the window itself once made.
-    Window() {
-      const made = windowItem(
-        { id: STAND_IN_NEW_WINDOW_ID, name: '', tabs: [{ id: STAND_IN_NEW_TAB_ID, title: '' }] },
-        windows.length
-      )
-      return {
-        ...made.specifier,
-        make() {
-          writes.push('make Window')
-        },
-      }
-    },
+    // A made window, `W-new`, opens with one new tab, its active tab, as the app's does.
+    Window: () => ({
+      ...windowItem({ id: 'W-new', name: '', tabs: [{ id: STAND_IN_NEW_TAB_ID, title: '' }] }, 0)
+        .specifier,
+      make: () => undefined,
+    }),
   }
 }

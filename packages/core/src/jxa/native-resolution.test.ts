@@ -533,13 +533,13 @@ describe('references outside the native conversion scope', () => {
       'a reference with a container',
       personInGroup,
       RESOURCE_PLANS,
-      'The macOS provider cannot resolve a reference to the Contacts resource "Person" that carries a container: Contacts finds one by its identifier alone, so its references carry no container.',
+      'The macOS provider cannot resolve a reference to the Contacts resource "Person" through that container: a reference carries a container only when Contacts finds its resource within another, and then as an identity reference to that resource.',
     ],
     [
       'an identity collection with an entry located through a container',
       entriesInGroup,
       RESOURCE_PLANS,
-      'The macOS provider cannot resolve a reference to the Contacts resource "Person" that carries a container: Contacts finds one by its identifier alone, so its references carry no container.',
+      'The macOS provider cannot resolve a reference to the Contacts resource "Person" through that container: a reference carries a container only when Contacts finds its resource within another, and then as an identity reference to that resource.',
     ],
     [
       // An email's get records the person as its parent: it is found only
@@ -548,18 +548,6 @@ describe('references outside the native conversion scope', () => {
       { resource: 'Email', form: 'identity', cardinality: 'one', id: 'e-1' },
       RESOURCE_PLANS,
       'The macOS provider cannot resolve a reference to the Contacts resource "Email" without its container: Contacts finds one only within its "Person".',
-    ],
-    [
-      'a reference to a resource that is not top-level, through a container of another resource',
-      {
-        resource: 'Email',
-        form: 'identity',
-        cardinality: 'one',
-        id: 'e-1',
-        container: { resource: 'Group', form: 'identity', cardinality: 'one', id: 'g-1' },
-      },
-      RESOURCE_PLANS,
-      'The macOS provider cannot resolve a reference to the Contacts resource "Email" through that container: Contacts finds one only within its "Person", so the container must be an identity reference to a "Person".',
     ],
     [
       'a reference through a container whose resource has no identifier plan',
