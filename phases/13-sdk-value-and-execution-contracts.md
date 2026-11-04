@@ -1464,10 +1464,10 @@ resolved. A guard over the shipped contracts
 every table's `parents` to the manifest commands behind its routes and pins
 them by hand.
 
-A Calendar is name-keyed, and its name is not claimed unique. The container
-of an event reference therefore names its calendar by name, and a container
-naming a calendar by a name others share resolves to the first match the app
-returns. How name-keyed resources are looked up is
+A container whose parent is name-keyed and not claimed unique (Calendar
+calendars, Automator workflows, Xcode workspace documents) names the parent by
+name, and a name others share resolves to the first match the app returns. How
+name-keyed resources are looked up is
 [#208](https://github.com/mike-north/macts/issues/208).
 
 Generated surfaces never publish an operation an agent cannot call. Some input
