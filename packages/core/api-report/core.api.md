@@ -15,6 +15,9 @@ import { WireValue } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
+export const ABSENT_VALUE_ERROR_NUMBER = -1728;
+
+// @public
 export function activateApp(bundleId: string): Promise<undefined>;
 
 // @public
@@ -168,6 +171,7 @@ export const AppManifestSchema: z.ZodObject<{
                     sampleSize: z.ZodNumber;
                     nullCount: z.ZodNumber;
                     failedReads: z.ZodNumber;
+                    errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
                     note: z.ZodOptional<z.ZodString>;
                 }, z.core.$strip>, z.ZodObject<{
                     source: z.ZodLiteral<"curated">;
@@ -314,6 +318,7 @@ export const AppManifestSchema: z.ZodObject<{
                     sampleSize: z.ZodNumber;
                     nullCount: z.ZodNumber;
                     failedReads: z.ZodNumber;
+                    errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
                     note: z.ZodOptional<z.ZodString>;
                 }, z.core.$strip>, z.ZodObject<{
                     source: z.ZodLiteral<"curated">;
@@ -502,6 +507,7 @@ export const AppManifestSchema: z.ZodObject<{
                     sampleSize: z.ZodNumber;
                     nullCount: z.ZodNumber;
                     failedReads: z.ZodNumber;
+                    errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
                     note: z.ZodOptional<z.ZodString>;
                 }, z.core.$strip>, z.ZodObject<{
                     source: z.ZodLiteral<"curated">;
@@ -868,8 +874,6 @@ export const CardinalitySchema: z.ZodEnum<{
     "many-to-many": "many-to-many";
 }>;
 
-// Warning: (ae-forgotten-export) The symbol "NullabilityClaim" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function checkNullabilityClaim(claim: NullabilityClaim, ctx: z.RefinementCtx): void;
 
@@ -982,6 +986,7 @@ export const CommandParameterSchema: z.ZodObject<{
             sampleSize: z.ZodNumber;
             nullCount: z.ZodNumber;
             failedReads: z.ZodNumber;
+            errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
             note: z.ZodOptional<z.ZodString>;
         }, z.core.$strip>, z.ZodObject<{
             source: z.ZodLiteral<"curated">;
@@ -1034,6 +1039,7 @@ export const CommandSchema: z.ZodObject<{
                 sampleSize: z.ZodNumber;
                 nullCount: z.ZodNumber;
                 failedReads: z.ZodNumber;
+                errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
                 note: z.ZodOptional<z.ZodString>;
             }, z.core.$strip>, z.ZodObject<{
                 source: z.ZodLiteral<"curated">;
@@ -2322,6 +2328,14 @@ export interface NotWrittenClaim {
 // @public
 export type NullabilityBasis = 'identifier' | 'default' | NullabilityEvidence;
 
+// @public
+export interface NullabilityClaim {
+    readonly evidence?: {
+        readonly nullable?: NullabilityEvidence | undefined;
+    } | undefined;
+    readonly nullable?: boolean | undefined;
+}
+
 // @public (undocumented)
 export type NullabilityEvidence = z.infer<typeof NullabilityEvidenceSchema>;
 
@@ -2335,6 +2349,7 @@ export const NullabilityEvidenceSchema: z.ZodDiscriminatedUnion<[z.ZodObject<{
     sampleSize: z.ZodNumber;
     nullCount: z.ZodNumber;
     failedReads: z.ZodNumber;
+    errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
     note: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>, z.ZodObject<{
     source: z.ZodLiteral<"curated">;
@@ -2806,6 +2821,7 @@ export const ProbeNullabilityEvidenceSchema: z.ZodObject<{
     sampleSize: z.ZodNumber;
     nullCount: z.ZodNumber;
     failedReads: z.ZodNumber;
+    errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
     note: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
 
@@ -2858,6 +2874,7 @@ export const PropertyClaimsSchema: z.ZodObject<{
             sampleSize: z.ZodNumber;
             nullCount: z.ZodNumber;
             failedReads: z.ZodNumber;
+            errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
             note: z.ZodOptional<z.ZodString>;
         }, z.core.$strip>, z.ZodObject<{
             source: z.ZodLiteral<"curated">;
@@ -2923,6 +2940,7 @@ export const PropertyEvidenceSchema: z.ZodObject<{
         sampleSize: z.ZodNumber;
         nullCount: z.ZodNumber;
         failedReads: z.ZodNumber;
+        errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
         note: z.ZodOptional<z.ZodString>;
     }, z.core.$strip>, z.ZodObject<{
         source: z.ZodLiteral<"curated">;
@@ -3023,6 +3041,7 @@ export const PropertySchema: z.ZodObject<{
             sampleSize: z.ZodNumber;
             nullCount: z.ZodNumber;
             failedReads: z.ZodNumber;
+            errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
             note: z.ZodOptional<z.ZodString>;
         }, z.core.$strip>, z.ZodObject<{
             source: z.ZodLiteral<"curated">;
@@ -3228,6 +3247,9 @@ export interface ReadFailureDefect {
 export function readMacosVersion(): Promise<string>;
 
 // @public
+export function readsAbsentAsNull(claim: NullabilityClaim): boolean;
+
+// @public
 export function recordApprovalCancellation(options: RecordApprovalCancellationOptions): Promise<AuditDecision>;
 
 // @public
@@ -3311,6 +3333,9 @@ export const RelationshipSchema: z.ZodObject<{
     property: z.ZodOptional<z.ZodString>;
     description: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
+
+// @public
+export function reportsAbsence(evidence: ProbeNullabilityEvidence): boolean;
 
 // @public (undocumented)
 export type ResettabilityEvidence = z.infer<typeof ResettabilityEvidenceSchema>;
@@ -3585,6 +3610,7 @@ export const ResourceSchema: z.ZodObject<{
                 sampleSize: z.ZodNumber;
                 nullCount: z.ZodNumber;
                 failedReads: z.ZodNumber;
+                errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
                 note: z.ZodOptional<z.ZodString>;
             }, z.core.$strip>, z.ZodObject<{
                 source: z.ZodLiteral<"curated">;
@@ -3731,6 +3757,7 @@ export const ResourceSchema: z.ZodObject<{
                 sampleSize: z.ZodNumber;
                 nullCount: z.ZodNumber;
                 failedReads: z.ZodNumber;
+                errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
                 note: z.ZodOptional<z.ZodString>;
             }, z.core.$strip>, z.ZodObject<{
                 source: z.ZodLiteral<"curated">;
