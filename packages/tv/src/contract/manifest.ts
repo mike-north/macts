@@ -306,6 +306,13 @@ export const manifest: unknown = {
           property: 'persistentID',
           primary: true,
           targeting: 'byProperty',
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'curated',
+              note: "A read-only list of the playlists of every source on TV 1.7.2 (macOS 27.2), 2026-11-04, found 3 playlists in one source and 1 in the other, with persistent IDs distinct within each source and across all 4. Each of the application's 3 playlists is under exactly one source with the same persistent ID. The fourth is found by its persistent ID only within its source, not among the application's playlists, which is why a playlist is read under its source. The dictionary describes the property as an id that does not change over time, which is about persistence, not uniqueness.",
+            },
+          },
         },
       ],
     },
@@ -409,6 +416,13 @@ export const manifest: unknown = {
           property: 'persistentID',
           primary: true,
           targeting: 'byProperty',
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'curated',
+              note: 'A read-only list of the sources on TV 1.7.2 (macOS 27.2), 2026-11-04, found 2 sources with distinct persistent IDs and distinct numeric ids. The dictionary describes the property as an id that does not change over time, which is about persistence, not uniqueness.',
+            },
+          },
         },
       ],
     },
