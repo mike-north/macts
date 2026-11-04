@@ -6,6 +6,7 @@ import { HierarchySchema, type HierarchyChild } from './hierarchy.js'
 import { RelationshipSchema } from './relationship.js'
 import { AppMetadataSchema, SuiteSchema, ExtractionMetadataSchema } from './metadata.js'
 import { findDuplicateRoutes } from '../route.js'
+import { findRootIssues, normalizeRoots } from '../roots.js'
 import { findSuperclassIssues, flattenSuperclasses, superclassChain } from '../superclasses.js'
 import {
   findUnsupportedTypeReferences,
@@ -169,6 +170,9 @@ export const AppManifestSchema = z
     for (const issue of findCommandParentIssues(data)) {
       ctx.addIssue({ code: 'custom', ...issue })
     }
+    for (const issue of findRootIssues(data)) {
+      ctx.addIssue({ code: 'custom', ...issue })
+    }
     for (const issue of findHierarchyResourceIssues(data)) {
       ctx.addIssue({ code: 'custom', ...issue })
     }
@@ -176,10 +180,17 @@ export const AppManifestSchema = z
       ctx.addIssue({ code: 'custom', ...issue })
     }
   })
+  // A singleton root's identity is derived from its kinds (see `../roots.ts`),
+  // and roots normalise before superclass flattening. A root replaces its
+  // identifiers whole, so flattening must never see (or copy into the root) an
+  // inherited primary identifier, and a resource that inherits must never see
+  // a root's `kind` identity, which `findRootIssues` rejects. Normalising and
+  // flattening are one step so that order cannot be reversed.
+  //
   // Read flattened: a resource that records `inherits` holds what it
   // inherits (D10, "Superclasses"), so no reader re-derives it. Flattening
   // keeps the manifest's type, so the schema stays an object schema.
-  .overwrite((data) => flattenSuperclasses(data))
+  .overwrite((data) => flattenSuperclasses(normalizeRoots(data)))
   .superRefine((data, ctx) => {
     // A resource's own rules hold for what it inherits too: an inherited
     // primary identifier, say, cannot be marked unsupported by the subclass.

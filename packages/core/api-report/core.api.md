@@ -234,6 +234,8 @@ export const AppManifestSchema: z.ZodObject<{
             targeting: z.ZodOptional<z.ZodEnum<{
                 byId: "byId";
                 byProperty: "byProperty";
+                byKey: "byKey";
+                byRoot: "byRoot";
             }>>;
             runtimeProperty: z.ZodOptional<z.ZodString>;
             unique: z.ZodOptional<z.ZodBoolean>;
@@ -426,6 +428,16 @@ export const AppManifestSchema: z.ZodObject<{
                 note: z.ZodOptional<z.ZodString>;
             }, z.core.$strict>;
         }, z.core.$strict>], "supported">>;
+        roots: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodObject<{
+            property: z.ZodString;
+            evidence: z.ZodObject<{
+                source: z.ZodLiteral<"dictionary">;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                term: z.ZodString;
+            }, z.core.$strict>;
+        }, z.core.$strict>>>;
     }, z.core.$strip>>;
     enums: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodObject<{
         name: z.ZodString;
@@ -1861,6 +1873,8 @@ export const IdentifierSchema: z.ZodObject<{
     targeting: z.ZodOptional<z.ZodEnum<{
         byId: "byId";
         byProperty: "byProperty";
+        byKey: "byKey";
+        byRoot: "byRoot";
     }>>;
     runtimeProperty: z.ZodOptional<z.ZodString>;
     unique: z.ZodOptional<z.ZodBoolean>;
@@ -1890,6 +1904,8 @@ export interface IdentifierTargetingResolution {
 export const IdentifierTargetingSchema: z.ZodEnum<{
     byId: "byId";
     byProperty: "byProperty";
+    byKey: "byKey";
+    byRoot: "byRoot";
 }>;
 
 // @public (undocumented)
@@ -2180,11 +2196,7 @@ export const NATIVE_DECODE_FUNCTION = "__mactsDecode";
 export const NATIVE_ENCODE_FUNCTION = "__mactsEncode";
 
 // @public
-export interface NativeAddressing {
-    readonly collection: string;
-    readonly lookup: 'byId' | 'byProperty';
-    readonly property: string;
-}
+export type NativeAddressing = NativeCollectionAddressing | NativeRootAddressing;
 
 // @public
 export interface NativeBodyOptions {
@@ -2201,6 +2213,13 @@ export interface NativeCodec {
 export interface NativeCodecEnvironment {
     readonly app: unknown;
     readonly references: NativeReferenceTable;
+}
+
+// @public
+export interface NativeCollectionAddressing {
+    readonly collection: string;
+    readonly lookup: 'byId' | 'byProperty' | 'byKey';
+    readonly property: string;
 }
 
 // @public
@@ -2244,6 +2263,12 @@ export interface NativeReferencePlans {
 
 // @public
 export type NativeReferenceTable = Readonly<Record<string, NativeReferencePlans>>;
+
+// @public
+export interface NativeRootAddressing {
+    readonly lookup: 'byRoot';
+    readonly roots: Readonly<Record<string, string>>;
+}
 
 // @public
 export interface NativeRunOptions {
@@ -3443,6 +3468,36 @@ export const ResourceRangeReadSchema: z.ZodDiscriminatedUnion<[z.ZodObject<{
     }, z.core.$strict>;
 }, z.core.$strict>], "supported">;
 
+// @public (undocumented)
+export type ResourceRoot = z.infer<typeof ResourceRootSchema>;
+
+// @public (undocumented)
+export type ResourceRoots = z.infer<typeof ResourceRootsSchema>;
+
+// @public
+export const ResourceRootSchema: z.ZodObject<{
+    property: z.ZodString;
+    evidence: z.ZodObject<{
+        source: z.ZodLiteral<"dictionary">;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        term: z.ZodString;
+    }, z.core.$strict>;
+}, z.core.$strict>;
+
+// @public
+export const ResourceRootsSchema: z.ZodRecord<z.ZodString, z.ZodObject<{
+    property: z.ZodString;
+    evidence: z.ZodObject<{
+        source: z.ZodLiteral<"dictionary">;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        term: z.ZodString;
+    }, z.core.$strict>;
+}, z.core.$strict>>;
+
 // @public
 export const ResourceSchema: z.ZodObject<{
     name: z.ZodString;
@@ -3554,6 +3609,8 @@ export const ResourceSchema: z.ZodObject<{
         targeting: z.ZodOptional<z.ZodEnum<{
             byId: "byId";
             byProperty: "byProperty";
+            byKey: "byKey";
+            byRoot: "byRoot";
         }>>;
         runtimeProperty: z.ZodOptional<z.ZodString>;
         unique: z.ZodOptional<z.ZodBoolean>;
@@ -3746,6 +3803,16 @@ export const ResourceSchema: z.ZodObject<{
             note: z.ZodOptional<z.ZodString>;
         }, z.core.$strict>;
     }, z.core.$strict>], "supported">>;
+    roots: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodObject<{
+        property: z.ZodString;
+        evidence: z.ZodObject<{
+            source: z.ZodLiteral<"dictionary">;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            term: z.ZodString;
+        }, z.core.$strict>;
+    }, z.core.$strict>>>;
 }, z.core.$strip>;
 
 // @public (undocumented)

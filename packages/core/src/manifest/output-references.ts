@@ -12,6 +12,10 @@
  * position macts leaves out is a gap in what macts provides, not something the
  * app cannot do. macts cannot yet return a usable reference when:
  *
+ * - the target is a singleton root, which the app holds as one of its own
+ *   properties, one per kind: a reference to one names its kind, and macts
+ *   has no curated mapping yet from the field the app returned to the kind
+ *   it holds;
  * - macts has no usable `get` for the target yet, so no reference to it passes
  *   validation;
  * - macts has no primary identifier for the target yet, so the target has no
@@ -61,6 +65,7 @@ import type { Resource } from './schemas/resource.js'
 import { resolveIdentifierTargeting, resolvePrimaryIdentifierProperty } from './identifier.js'
 import { nestedOnlyResources } from './hierarchy-placement.js'
 import { resolvePrimaryIdentifier } from './primary-identifier.js'
+import { resolveRoots } from './roots.js'
 import { resolvingCommand } from './resource-commands.js'
 import { usableCommands, usableProperties, usableResources } from './unsupported.js'
 import {
@@ -75,6 +80,9 @@ import {
  * What macts does not provide yet for an output reference to be usable. Each
  * is a coverage gap (#219), not a limit of the app:
  *
+ * - `root-kind-unmapped`: the target is a singleton root, which the app
+ *   holds as one of its own properties, and no curated mapping yet says
+ *   which kind the field holds.
  * - `no-get`: macts has no usable `get` command for the target yet.
  * - `no-identifier`: macts has no primary identifier for the target yet, so
  *   no identity reference to one exists.
@@ -91,6 +99,7 @@ import {
  *   object.
  */
 export type OmittedOutputReason =
+  | 'root-kind-unmapped'
   | 'no-get'
   | 'no-identifier'
   | 'parent-scoped'
@@ -127,13 +136,13 @@ export function isNameKeyed(manifest: AppManifest, resourceKey: string): boolean
 
 /**
  * What macts does not provide yet for a reference read from the app to
- * `resourceKey` to be usable, or `undefined` when it can be used: the
- * resource has a usable `get` and a primary identifier, that `get` records no
- * parent, the hierarchy does not hold the resource only within another
- * resource ({@link nestedOnlyResources}), and the resource is not name-keyed
- * ({@link isNameKeyed}). The reasons are checked in that order (`no-get`,
- * `no-identifier`, `parent-scoped`, `unrecorded-parent`, `not-unique`), so
- * the first that applies is reported.
+ * `resourceKey` to be usable, or `undefined` when it can be used: the resource
+ * is not a singleton root, has a usable `get` and a primary identifier, that
+ * `get` records no parent, the hierarchy does not hold the resource only
+ * within another resource ({@link nestedOnlyResources}), and the resource is
+ * not name-keyed ({@link isNameKeyed}). The reasons are checked in that order
+ * (`root-kind-unmapped`, `no-get`, `no-identifier`, `parent-scoped`,
+ * `unrecorded-parent`, `not-unique`), so the first that applies is reported.
  *
  * @param manifest - The app manifest.
  * @param resourceKey - The manifest key of the referenced resource.
@@ -142,6 +151,7 @@ export function omittedOutputReason(
   manifest: AppManifest,
   resourceKey: string
 ): OmittedOutputReason | undefined {
+  if (resolveRoots(manifest, resourceKey) !== undefined) return 'root-kind-unmapped'
   const get = resolvingCommand(manifest, resourceKey, 'get')
   if (get === undefined) return 'no-get'
   if (resolvePrimaryIdentifierProperty(manifest.resources[resourceKey]) === undefined) {

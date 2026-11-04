@@ -236,7 +236,8 @@ function generateTypesFile(manifest: AppManifest): string {
     // The value mirrors the RUNTIME targeting property, not necessarily the
     // declared identifier: a `byProperty` resource (e.g. Calendar, whose declared
     // `calendarIdentifier` throws via JXA) surfaces its working property (`name`),
-    // since that is the value get/delete/create accept as the lookup.
+    // since that is the value get/delete/create accept as the lookup. A `byKey`
+    // resource surfaces its key, which is its declared identifier.
     const idProperty = resolveCanonicalIdentifierSource(resource)
     const emitCanonicalId = idProperty !== undefined
 

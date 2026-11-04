@@ -19,8 +19,15 @@ import { defaultCollectionAccessor } from '../native-accessor.js'
  *   dictionary-declared identifier is NOT runtime-valid (throws via JXA) and the
  *   resource must instead be matched on a property that does work (e.g. matching
  *   a Calendar on its `name`, since `calendarIdentifier()` throws at runtime).
+ * - `byKey`: the collection's key specifier, applied to the identifier
+ *   property's value. The app interprets the key: for a file system it is a
+ *   path, which finds whatever item is at that path now. The targeting names
+ *   the lookup mechanism; the identifier property says what the value is.
+ * - `byRoot`: the application property a singleton root's kind names (see
+ *   `../roots.ts`). Only the identifier normalisation gives a root is
+ *   `byRoot`; a manifest never writes it.
  */
-export const IdentifierTargetingSchema = z.enum(['byId', 'byProperty'])
+export const IdentifierTargetingSchema = z.enum(['byId', 'byProperty', 'byKey', 'byRoot'])
 export type IdentifierTargeting = z.infer<typeof IdentifierTargetingSchema>
 
 /**
@@ -39,8 +46,10 @@ export const IdentifierSchema = z.object({
    * a required field, which would break every already-generated plugin manifest
    * literal cast `as AppManifest`. Set `byProperty` when the dictionary-declared
    * identifier is not runtime-valid via JXA and the resource must be matched on a
-   * working property instead. Consumers resolve the effective strategy via
-   * `resolveIdentifierTargeting`, which applies the `byId` default.
+   * working property instead, and `byKey` when the app finds an item from the
+   * identifier's value through its collection's key specifier. Consumers resolve
+   * the effective strategy via `resolveIdentifierTargeting`, which applies the
+   * `byId` default.
    */
   targeting: IdentifierTargetingSchema.optional(),
   /**
@@ -48,7 +57,8 @@ export const IdentifierSchema = z.object({
    *
    * Optional: when omitted, the runtime layer matches on `property`. Provide it
    * only when the value-carrying property differs from the property the runtime
-   * `whose({ ... })` clause must match (it is the same in the common case).
+   * `whose({ ... })` clause must match (it is the same in the common case). It
+   * is rejected under `byKey`, whose key is the identifier value itself.
    */
   runtimeProperty: z.string().optional(),
   /**
@@ -207,6 +217,47 @@ export const ResourceNativeSpellingSchema = z
   })
   .strict()
 export type ResourceNativeSpelling = z.infer<typeof ResourceNativeSpellingSchema>
+
+/**
+ * One kind of a singleton root: the application property that holds the
+ * object of that kind, with the evidence for it.
+ *
+ * `property` is the app's spelling of the application property, and the
+ * evidence is the dictionary term it spells, for one app build on one macOS
+ * version.
+ */
+export const ResourceRootSchema = z
+  .object({
+    /** The app's spelling of the application property, e.g. `frontDesk`. */
+    property: z.string().min(1),
+    /** The dictionary term the property is the app's spelling of. */
+    evidence: DictionaryTermEvidenceSchema,
+  })
+  .strict()
+export type ResourceRoot = z.infer<typeof ResourceRootSchema>
+
+/**
+ * The form of a root kind: lower camel case, letters and digits, so a kind is
+ * a valid enum value, CLI argument and permission-free identifier.
+ */
+const ROOT_KIND_PATTERN = /^[a-z][A-Za-z0-9]*$/
+
+/**
+ * The kinds of a singleton root resource: each kind names the application
+ * property that holds that kind's one object (an app holding a front desk as
+ * `frontDesk` and a back desk as `backDesk`). The objects are in no
+ * collection; the resource's identity is the kind (see `../roots.ts`).
+ */
+export const ResourceRootsSchema = z.record(
+  z
+    .string()
+    .regex(
+      ROOT_KIND_PATTERN,
+      'A root kind is lower camel case, letters and digits only, such as "front" or "userDomain"'
+    ),
+  ResourceRootSchema
+)
+export type ResourceRoots = z.infer<typeof ResourceRootsSchema>
 
 /**
  * The class a resource's dictionary class inherits, recorded from the
@@ -456,9 +507,17 @@ export const ResourceSchema = z
      * only when it is `supported: true` (see `listOperationPages`).
      */
     rangeRead: ResourceRangeReadSchema.optional(),
+    /**
+     * Set when the resource is a singleton root: the app holds each of its
+     * objects as an application property, one per kind, named here with the
+     * evidence. Absent for a resource reached through a collection.
+     */
+    roots: ResourceRootsSchema.optional(),
   })
   .superRefine((resource, ctx) => {
     checkNativeSpellings(resource, ctx)
+    checkRoots(resource, ctx)
+    checkKeyTargeting(resource.identifiers ?? [], ctx)
     if (resource.rangeRead !== undefined && resource.unsupported !== undefined) {
       ctx.addIssue({
         code: 'custom',
@@ -484,6 +543,68 @@ export const ResourceSchema = z
     }
   })
 export type Resource = z.infer<typeof ResourceSchema>
+
+/**
+ * A singleton root's objects are held by the application as properties, not
+ * in a collection: it has at least one kind, and records no collection
+ * spelling and no range read.
+ */
+function checkRoots(
+  resource: {
+    readonly roots?: ResourceRoots | undefined
+    readonly native?: unknown
+    readonly rangeRead?: unknown
+  },
+  ctx: z.RefinementCtx
+): void {
+  const roots = resource.roots
+  if (roots === undefined) return
+  if (Object.keys(roots).length === 0) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'A root names at least one kind and the application property that holds it.',
+      path: ['roots'],
+    })
+  }
+  const held = 'A root is held by the application as its properties, not in a collection'
+  if (resource.native !== undefined) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `${held}, so it records no collection spelling; remove native.`,
+      path: ['native'],
+    })
+  }
+  if (resource.rangeRead !== undefined) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `${held}, so it records no range read; remove rangeRead.`,
+      path: ['rangeRead'],
+    })
+  }
+}
+
+/**
+ * A key-targeted identifier is looked up by its own value, so it takes no
+ * `runtimeProperty`, which names the property a `byProperty` match is made on.
+ */
+function checkKeyTargeting(
+  identifiers: readonly {
+    readonly targeting?: IdentifierTargeting | undefined
+    readonly runtimeProperty?: string | undefined
+  }[],
+  ctx: z.RefinementCtx
+): void {
+  identifiers.forEach((identifier, index) => {
+    if (identifier.targeting === 'byKey' && identifier.runtimeProperty !== undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'runtimeProperty names the property a byProperty match is made on; byKey looks the item up by the identifier value itself, so remove it.',
+        path: ['identifiers', index, 'runtimeProperty'],
+      })
+    }
+  })
+}
 
 /**
  * An identifier's uniqueness claim and its evidence come together: a claim
