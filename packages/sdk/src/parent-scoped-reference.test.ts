@@ -2,7 +2,8 @@
  * Tests for binding and resolving caller-built references resolved through an
  * operation that records a parent, over real generated contracts: Music gets
  * and lists a track only within a playlist (`parents: { get: 'Playlist',
- * list: 'Playlist' }`); Reminders lists reminders only within a list and
+ * list: 'Playlist' }`), and TV a playlist only within a source (`parents:
+ * { get: 'Source', list: 'Source' }`); Reminders lists reminders only within a list and
  * Microsoft Edge tabs only within a window, while getting one at the
  * application (`parents: { list: … }`).
  *
@@ -19,6 +20,7 @@
 import { microsoftEdgeContract } from '@macts/microsoft-edge/contract'
 import { musicContract } from '@macts/music/contract'
 import { remindersContract } from '@macts/reminders/contract'
+import { tvContract } from '@macts/tv/contract'
 import {
   ValidationError,
   type ClientBrand,
@@ -218,5 +220,105 @@ describe('bindReference with a collection the app lists only within a parent', (
       id: 'x-apple-reminder://R1',
     } as const
     expect(bindReference(client, reminder)).toMatchObject(reminder)
+  })
+})
+
+describe('bindReference with a TV playlist, read only within its source', () => {
+  // Made-up persistent IDs, in the form the app uses.
+  const source = {
+    app: 'tv',
+    resource: 'Source',
+    form: 'identity',
+    cardinality: 'one',
+    id: '1A2B3C4D5E6F7081',
+  } as const
+  const playlist = {
+    app: 'tv',
+    resource: 'Playlist',
+    form: 'identity',
+    cardinality: 'one',
+    id: '8091A2B3C4D5E6F7',
+  } as const
+
+  it('raises ValidationError naming the source when one playlist has no container, sending nothing', () => {
+    const { client, sent } = recordingClient(tvContract, {})
+    expect(bindingIssues(client, playlist)).toEqual([
+      {
+        path: ['container'],
+        message:
+          'The required field "container" is missing; expected an identity reference to the ' +
+          '"Source" the "Playlist" is in, because the app finds each "Playlist" only within ' +
+          'its "Source".',
+      },
+    ])
+    expect(sent).toEqual([])
+  })
+
+  it('raises ValidationError when the container picks a source by position, not identifier', () => {
+    const { client } = recordingClient(tvContract, {})
+    const firstSource = {
+      app: 'tv',
+      resource: 'Source',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'index', index: 0 },
+    }
+    expect(bindingIssues(client, { ...playlist, container: firstSource })).toEqual([
+      {
+        path: ['container'],
+        message:
+          'The app finds each "Playlist" only within its "Source", by that "Source"\'s ' +
+          'identifier, so the container must be an identity reference to the resource ' +
+          '"Source"; received a selector reference to "Source".',
+      },
+    ])
+  })
+
+  it('binds a playlist within its source, and resolves it with the container', async () => {
+    const { client, sent } = recordingClient(tvContract, {})
+    const bound = bindReference(client, { ...playlist, container: source })
+    expect(bound).toMatchObject({ ...playlist, container: source })
+    await bound.resolve().catch(() => undefined)
+    expect(sent[0]).toEqual({
+      kind: 'resolve',
+      wire: {
+        reference: {
+          resource: 'Playlist',
+          form: 'identity',
+          cardinality: 'one',
+          id: playlist.id,
+          container: { resource: 'Source', form: 'identity', cardinality: 'one', id: source.id },
+        },
+      },
+    })
+  })
+
+  it('raises ValidationError naming the source when every playlist has no container', () => {
+    const { client } = recordingClient(tvContract, [])
+    const everyPlaylist = {
+      app: 'tv',
+      resource: 'Playlist',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'every' },
+    } as const
+    expect(bindingIssues(client, everyPlaylist)).toEqual([
+      {
+        path: ['container'],
+        message:
+          'The required field "container" is missing; expected an identity reference to the ' +
+          '"Source" whose "Playlist" objects are selected, because the app lists "Playlist" ' +
+          'objects only within their "Source".',
+      },
+    ])
+    expect(bindReference(client, { ...everyPlaylist, container: source })).toMatchObject({
+      ...everyPlaylist,
+      container: source,
+    })
+  })
+
+  it('leaves a source, found at the application, without a container', () => {
+    const { client } = recordingClient(tvContract, {})
+    expect(bindReference(client, source)).toMatchObject(source)
   })
 })
