@@ -12,7 +12,8 @@
  *      and reason.
  *
  * @see https://github.com/mike-north/macts/issues/53
- * @see phases/13-sdk-value-and-execution-contracts.md (D5: `invalid-input` records)
+ * @see phases/13-sdk-value-and-execution-contracts.md (D5: `invalid-input` and
+ *   `permission-denied` records)
  */
 
 import { describe, expect, it } from 'vitest'
@@ -21,6 +22,7 @@ import {
   recordApprovalCancellation,
   recordApprovalDecision,
   recordInvalidInput,
+  recordPermissionDenied,
 } from './enforcement.js'
 import type { EnforceCallOptions, CallAuditContext } from './enforcement.js'
 import type { ApprovalOutcome } from './approval.js'
@@ -533,6 +535,60 @@ describe('recordInvalidInput', () => {
         apiKeyId: 'test-key-001',
         timestamp: FIXED_TIMESTAMP,
         issueCount: 1,
+        writer,
+      })
+    ).rejects.toThrow('audit disk full')
+  })
+})
+
+describe('recordPermissionDenied', () => {
+  // phases/13 D5: a call refused by the permission check writes one
+  // `permission-denied` record with its attribution and time, and nothing
+  // about its input.
+  it('records the denial with attribution and the time only', async () => {
+    const { writer, records } = makeCapturingWriter()
+
+    await recordPermissionDenied({
+      permission: 'calendar:events:create',
+      apiKeyId: 'test-key-001',
+      timestamp: FIXED_TIMESTAMP,
+      writer,
+    })
+
+    expect(records).toEqual([
+      {
+        capability: 'calendar:events:create',
+        app: 'calendar',
+        apiKeyId: 'test-key-001',
+        decision: 'permission-denied',
+        timestamp: FIXED_TIMESTAMP,
+      },
+    ])
+  })
+
+  it('files a malformed permission under a non-empty app', async () => {
+    const { writer, records } = makeCapturingWriter()
+
+    await recordPermissionDenied({
+      permission: ':events:create',
+      apiKeyId: 'test-key-001',
+      timestamp: FIXED_TIMESTAMP,
+      writer,
+    })
+
+    expect(records[0]?.app).toBe(':events:create')
+  })
+
+  it('surfaces a failed write to the caller', async () => {
+    const writer: AuditWriter = {
+      append: () => Promise.reject(new Error('audit disk full')),
+    }
+
+    await expect(
+      recordPermissionDenied({
+        permission: 'calendar:events:create',
+        apiKeyId: 'test-key-001',
+        timestamp: FIXED_TIMESTAMP,
         writer,
       })
     ).rejects.toThrow('audit disk full')
