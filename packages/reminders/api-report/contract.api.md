@@ -126,6 +126,9 @@ export type RemindersResources = Readonly<{
         readonly id: ValueType<string>;
         readonly get: 'reminders.reminders.get';
         readonly list: 'reminders.reminders.list';
+        readonly parents: {
+            readonly list: 'List';
+        };
     };
 }>;
 

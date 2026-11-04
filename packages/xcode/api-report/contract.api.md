@@ -423,16 +423,25 @@ export type XcodeResources = Readonly<{
         readonly id: ValueType<string>;
         readonly get: 'xcode.projects.get';
         readonly list: 'xcode.projects.list';
+        readonly parents: {
+            readonly list: 'WorkspaceDocument';
+        };
     };
     Scheme: ResourceDescriptor<Scheme, string> & {
         readonly id: ValueType<string>;
         readonly get: 'xcode.schemes.get';
         readonly list: 'xcode.schemes.list';
+        readonly parents: {
+            readonly list: 'WorkspaceDocument';
+        };
     };
     RunDestination: ResourceDescriptor<RunDestination, string> & {
         readonly id: ValueType<string>;
         readonly get: 'xcode.runDestinations.get';
         readonly list: 'xcode.runDestinations.list';
+        readonly parents: {
+            readonly list: 'WorkspaceDocument';
+        };
     };
 }>;
 

@@ -711,6 +711,7 @@ export type ReferenceRegistry = Readonly<Record<string, {
     readonly id?: ValueType<unknown>;
     readonly get?: OperationId;
     readonly list?: OperationId;
+    readonly parents?: ResourceParents;
 }>>;
 
 // @public
@@ -756,8 +757,8 @@ export interface Resolvable<Result> {
 // @public
 export type ResolvableCollectionReferenceData<Resources extends ResourceTable> = {
     [Key in ResolvableResourceKey<Resources, 'many'>]: (Key extends ResolvableResourceKey<Resources, 'one'> ? IdentityCollectionReferenceData<ResourceIdOf<Resources, Key>, Key> & {
-        readonly entries: readonly (IdentityReferenceData<ResourceIdOf<Resources, Key>, Key> & ResolvableContainment<Resources>)[];
-    } : never) | (SelectorCollectionReferenceData<Key> & ResolvableContainment<Resources>);
+        readonly entries: readonly (IdentityReferenceData<ResourceIdOf<Resources, Key>, Key> & ResolvableContainmentOf<Resources, Key, 'get'>)[];
+    } : never) | (SelectorCollectionReferenceData<Key> & ResolvableContainmentOf<Resources, Key, 'list'>);
 }[ResolvableResourceKey<Resources, 'many'>];
 
 // @public
@@ -766,9 +767,17 @@ export interface ResolvableContainment<Resources extends ResourceTable> {
 }
 
 // @public
+export type ResolvableContainmentOf<Resources extends ResourceTable, Key extends string, Operation extends 'get' | 'list'> = [ResourceParentOf<Resources, Key, Operation>] extends [never] ? ResolvableContainment<Resources> : ResolvableParentContainment<Resources, ResourceParentOf<Resources, Key, Operation>>;
+
+// @public
 export type ResolvableObjectReferenceData<Resources extends ResourceTable> = {
-    [Key in ResolvableResourceKey<Resources, 'one'>]: (IdentityReferenceData<ResourceIdOf<Resources, Key>, Key> & ResolvableContainment<Resources>) | (SelectorReferenceData<Key> & ResolvableContainment<Resources>);
+    [Key in ResolvableResourceKey<Resources, 'one'>]: (IdentityReferenceData<ResourceIdOf<Resources, Key>, Key> & ResolvableContainmentOf<Resources, Key, 'get'>) | (SelectorReferenceData<Key> & ResolvableContainmentOf<Resources, Key, 'get'>);
 }[ResolvableResourceKey<Resources, 'one'>];
+
+// @public
+export interface ResolvableParentContainment<Resources extends ResourceTable, Parent extends string> {
+    readonly container: Parent extends ResolvableResourceKey<Resources, 'one'> ? (IdentityReferenceData<ResourceIdOf<Resources, Parent>, Parent> & ResolvableContainmentOf<Resources, Parent, 'get'>) | IdentityReference<unknown, unknown, Parent> : never;
+}
 
 // @public
 export type ResolvableReferenceData<Resources extends ResourceTable> = ResolvableObjectReferenceData<Resources> | ResolvableCollectionReferenceData<Resources>;
@@ -787,6 +796,7 @@ export interface ResourceDescriptor<RecordType, Id = unknown> {
     readonly id?: ValueType<Id>;
     readonly list?: OperationId;
     readonly name: string;
+    readonly parents?: ResourceParents;
     readonly record: ValueType<RecordType>;
 }
 
@@ -794,6 +804,17 @@ export interface ResourceDescriptor<RecordType, Id = unknown> {
 export type ResourceIdOf<Resources extends ResourceTable, Key extends string> = string extends keyof Resources ? unknown : Key extends keyof Resources ? Resources[Key] extends {
     readonly id: ValueType<infer Id>;
 } ? Id : never : never;
+
+// @public
+export type ResourceParentOf<Resources extends ResourceTable, Key extends string, Operation extends 'get' | 'list'> = Key extends keyof Resources ? Resources[Key] extends {
+    readonly parents: Readonly<Record<Operation, infer Parent extends string>>;
+} ? string extends Parent ? never : Parent : never : never;
+
+// @public
+export interface ResourceParents {
+    readonly get?: string;
+    readonly list?: string;
+}
 
 // @public
 export interface ResourcePlans {

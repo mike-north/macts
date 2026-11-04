@@ -76,6 +76,10 @@ export type CalendarResources = Readonly<{
         readonly id: ValueType<string>;
         readonly get: 'calendar.events.get';
         readonly list: 'calendar.events.list';
+        readonly parents: {
+            readonly get: 'Calendar';
+            readonly list: 'Calendar';
+        };
     };
 }>;
 

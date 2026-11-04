@@ -211,12 +211,21 @@ const PAGED_CALENDAR_MANIFEST: AppManifest = {
       ],
       rangeRead: {
         supported: true,
+        read: 'range',
         evidence: {
           source: 'probe',
           observedAt: '2026-01-15T10:30:00.000Z',
           bundleId: 'com.apple.iCal',
           appVersion: '1.0',
           osVersion: '27.2',
+          cost: {
+            observedAt: '2026-01-15T10:30:00.000Z',
+            pageMs: 400,
+            columnMs: 900,
+            items: 120,
+            runs: 5,
+            pageSize: 25,
+          },
         },
       },
     },

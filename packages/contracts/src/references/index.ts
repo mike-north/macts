@@ -465,9 +465,17 @@ export type CollectionReferenceVariant<T, Id = unknown, R extends string = strin
  * operation (`get` for a single object, a container, and an
  * identity-collection entry; `list` for a collection), because a reference
  * that names a resource without it could never be resolved. Reference value
- * types enforce this in their wire schema, so every boundary applies it. An
- * app contract's `resources` table is assignable to this
- * type; reference value types read it through the {@link ReferenceScope}.
+ * types enforce this in their wire schema, so every boundary applies it.
+ *
+ * An entry names its `parents` when an operation resolving references to the
+ * resource finds objects only within an object of another resource, by that
+ * object's identifier ({@link ResourceParents}). A reference resolved through
+ * such an operation must carry, as its container, an identity reference to
+ * that parent, which is itself resolvable; one without it could never be
+ * resolved.
+ *
+ * An app contract's `resources` table is assignable to this type; reference
+ * value types read it through the {@link ReferenceScope}.
  */
 export type ReferenceRegistry = Readonly<
   Record<
@@ -476,9 +484,35 @@ export type ReferenceRegistry = Readonly<
       readonly id?: ValueType<unknown>
       readonly get?: OperationId
       readonly list?: OperationId
+      readonly parents?: ResourceParents
     }
   >
 >
+
+/**
+ * The parent each operation resolving references to a resource finds its
+ * objects within, keyed like the operations: `get` for the resource the get
+ * takes an object's identifier within, `list` for the one the list selects
+ * within. Each is a key of the same resource table.
+ *
+ * @remarks
+ * A field is present exactly when the manifest command behind the operation
+ * of the same name records a parent (phases/13 D10, command parents), and the
+ * whole object is absent when neither does. The two may name different
+ * resources, or only one may be present: Reminders lists reminders within a
+ * list, but gets one at the application.
+ *
+ * A reference takes the parent of the operation that resolves it: a
+ * single-object reference, a container and an identity-collection entry the
+ * `get` parent, and a selector collection the `list` parent. Its container is
+ * then required, and must be an identity reference to that parent.
+ */
+export interface ResourceParents {
+  /** The resource whose object the `get` finds this resource's object within. */
+  readonly get?: string
+  /** The resource whose object the `list` selects this resource's objects within. */
+  readonly list?: string
+}
 
 /**
  * What a reference value type needs to know about the app its references

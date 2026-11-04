@@ -88,19 +88,31 @@ export type AutomatorResources = Readonly<{
         readonly id: ValueType<string>;
         readonly get: 'automator.automatorActions.get';
         readonly list: 'automator.automatorActions.list';
+        readonly parents: {
+            readonly list: 'Workflow';
+        };
     };
     Variable: ResourceDescriptor<Variable, string> & {
         readonly id: ValueType<string>;
         readonly get: 'automator.variables.get';
         readonly list: 'automator.variables.list';
+        readonly parents: {
+            readonly list: 'Workflow';
+        };
     };
     Setting: ResourceDescriptor<Setting, string> & {
         readonly id: ValueType<string>;
         readonly list: 'automator.settings.list';
+        readonly parents: {
+            readonly list: 'AutomatorAction';
+        };
     };
     RequiredResource: ResourceDescriptor<RequiredResource, string> & {
         readonly id: ValueType<string>;
         readonly list: 'automator.requiredResources.list';
+        readonly parents: {
+            readonly list: 'AutomatorAction';
+        };
     };
 }>;
 

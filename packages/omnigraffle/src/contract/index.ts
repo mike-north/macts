@@ -1761,9 +1761,11 @@ const layerCreateInputType: ValueType<LayerCreateInput> = t.record({
 /**
  * The type of the resource table of {@link omniGraffleContract}: every resource a
  * reference can name, keyed by manifest resource key, with its record type,
- * its identifier type (when it has one), and the operations that resolve
- * references to it. A client created from the contract carries it, so
- * `bindReference` admits only references the contract can resolve.
+ * its identifier type (when it has one), the operations that resolve
+ * references to it, and, for each of those operations that finds the
+ * resource only within another resource, that parent. A client created from
+ * the contract carries it, so `bindReference` admits only references the
+ * contract can resolve.
  */
 export type OmniGraffleResources = Readonly<{
   Canvas: ResourceDescriptor<Canvas, string> & {
@@ -1775,21 +1777,25 @@ export type OmniGraffleResources = Readonly<{
     readonly id: ValueType<string>
     readonly get: 'omnigraffle.graphics.get'
     readonly list: 'omnigraffle.graphics.list'
+    readonly parents: { readonly list: 'Canvas' }
   }
   Shape: ResourceDescriptor<Shape, string> & {
     readonly id: ValueType<string>
     readonly get: 'omnigraffle.shapes.get'
     readonly list: 'omnigraffle.shapes.list'
+    readonly parents: { readonly list: 'Canvas' }
   }
   Line: ResourceDescriptor<Line, string> & {
     readonly id: ValueType<string>
     readonly get: 'omnigraffle.lines.get'
     readonly list: 'omnigraffle.lines.list'
+    readonly parents: { readonly list: 'Canvas' }
   }
   Layer: ResourceDescriptor<Layer, string> & {
     readonly id: ValueType<string>
     readonly get: 'omnigraffle.layers.get'
     readonly list: 'omnigraffle.layers.list'
+    readonly parents: { readonly list: 'Canvas' }
   }
 }>
 
@@ -1815,6 +1821,7 @@ const resources = {
     id: t.string({ description: 'Unique identifier' }),
     get: 'omnigraffle.graphics.get',
     list: 'omnigraffle.graphics.list',
+    parents: { list: 'Canvas' },
   },
   Shape: {
     name: 'Shape',
@@ -1822,6 +1829,7 @@ const resources = {
     id: t.string({ description: 'Unique identifier' }),
     get: 'omnigraffle.shapes.get',
     list: 'omnigraffle.shapes.list',
+    parents: { list: 'Canvas' },
   },
   Line: {
     name: 'Line',
@@ -1829,6 +1837,7 @@ const resources = {
     id: t.string({ description: 'Unique identifier' }),
     get: 'omnigraffle.lines.get',
     list: 'omnigraffle.lines.list',
+    parents: { list: 'Canvas' },
   },
   Layer: {
     name: 'Layer',
@@ -1836,6 +1845,7 @@ const resources = {
     id: t.string({ description: 'Name of the layer' }),
     get: 'omnigraffle.layers.get',
     list: 'omnigraffle.layers.list',
+    parents: { list: 'Canvas' },
   },
 } satisfies OmniGraffleResources
 

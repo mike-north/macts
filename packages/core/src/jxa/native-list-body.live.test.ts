@@ -359,10 +359,13 @@ describe.skipIf(!liveAppsEnabled)(
           await read.list({ command: 'listPlaylists', resource: 'Playlist' }, {}),
           'playlists'
         ).map((playlist) => stringField(playlist, 'persistentID'))
-        for (const playlistId of playlists) {
-          summary[`tracks of ${playlistId}`] = await compareList(
+        // Each playlist is named by its position in the listing, never by its
+        // identifier: a live run reports counts and distinctness only.
+        for (const [position, playlistId] of playlists.entries()) {
+          const label = `tracks of playlist #${String(position)}`
+          summary[label] = await compareList(
             read,
-            `tracks of playlist ${playlistId}`,
+            label,
             'persistentID',
             { command: 'listTracks', resource: 'Track' },
             { playlistId },

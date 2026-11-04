@@ -10,6 +10,10 @@
  * reference is resolvable only through the operation its resource records
  * for its cardinality (`resolvingOperationKey`): `get` for a single object,
  * a container, and an identity-collection entry; `list` for a collection.
+ * When that operation finds the resource's objects only within an object of
+ * another resource (the entry's `parents` names one for the operation), data
+ * resolved through it must carry an identity reference to that parent as its
+ * container.
  *
  * A table whose keys are not known (the default {@link ResourceTable}, used by
  * a contract that declares no table type) admits any reference data, with
@@ -145,9 +149,9 @@ export type ResourceIdOf<
     : never
 
 /**
- * The `container` of resolvable reference data: single-object reference data
- * to a resource with `get`, whose own container is likewise, or a reference
- * a client bound.
+ * The `container` of resolvable reference data to a resource found at the
+ * application: optional, and single-object reference data to a resource with
+ * `get`, whose own container is likewise, or a reference a client bound.
  *
  * @remarks
  * A bound reference's resource is not a literal type, but a client decoded it
@@ -161,23 +165,93 @@ export interface ResolvableContainment<Resources extends ResourceTable> {
 }
 
 /**
+ * The resource that operation `Operation` of resource `Key` in `Resources`
+ * finds objects within, when the entry names one (a literal
+ * `parents[Operation]`), and `never` otherwise.
+ *
+ * @typeParam Resources - The contract's resource table type.
+ * @typeParam Key - The resource key.
+ * @typeParam Operation - The resolving operation: `get` for a single object, a
+ * container and an identity-collection entry; `list` for a selector collection.
+ */
+export type ResourceParentOf<
+  Resources extends ResourceTable,
+  Key extends string,
+  Operation extends 'get' | 'list',
+> = Key extends keyof Resources
+  ? Resources[Key] extends {
+      readonly parents: Readonly<Record<Operation, infer Parent extends string>>
+    }
+    ? string extends Parent
+      ? never
+      : Parent
+    : never
+  : never
+
+/**
+ * The `container` of resolvable reference data to a resource found only
+ * within an object of `Parent`: required, and an identity reference to that
+ * object, as data whose own container follows its resource's rule, or as a
+ * reference a client bound.
+ *
+ * @typeParam Resources - The contract's resource table type.
+ * @typeParam Parent - The parent resource key.
+ */
+export interface ResolvableParentContainment<
+  Resources extends ResourceTable,
+  Parent extends string,
+> {
+  /** The parent object, which supplies the identifier the resolving operation needs. */
+  readonly container: Parent extends ResolvableResourceKey<Resources, 'one'>
+    ?
+        | (IdentityReferenceData<ResourceIdOf<Resources, Parent>, Parent> &
+            ResolvableContainmentOf<Resources, Parent, 'get'>)
+        | IdentityReference<unknown, unknown, Parent>
+    : never
+}
+
+/**
+ * The containment rule of reference data to resource `Key` resolved through
+ * `Operation`: the parent's identity container
+ * ({@link ResolvableParentContainment}) when that operation records a parent,
+ * and an optional resolvable container ({@link ResolvableContainment})
+ * otherwise. A container resolves through its own resource's `get`, so its
+ * containment is read with `'get'` at every level.
+ *
+ * @typeParam Resources - The contract's resource table type.
+ * @typeParam Key - The resource key.
+ * @typeParam Operation - The operation that resolves the reference.
+ */
+export type ResolvableContainmentOf<
+  Resources extends ResourceTable,
+  Key extends string,
+  Operation extends 'get' | 'list',
+> = [ResourceParentOf<Resources, Key, Operation>] extends [never]
+  ? ResolvableContainment<Resources>
+  : ResolvableParentContainment<Resources, ResourceParentOf<Resources, Key, Operation>>
+
+/**
  * Data of a single-object reference to `Resources` that a client can resolve:
  * the resource has `get`, and so does that of every container, at every
- * level.
+ * level, and a resource whose `get` records a parent carries that parent's
+ * identity container.
  *
  * @typeParam Resources - The contract's resource table type.
  */
 export type ResolvableObjectReferenceData<Resources extends ResourceTable> = {
   [Key in ResolvableResourceKey<Resources, 'one'>]:
-    | (IdentityReferenceData<ResourceIdOf<Resources, Key>, Key> & ResolvableContainment<Resources>)
-    | (SelectorReferenceData<Key> & ResolvableContainment<Resources>)
+    | (IdentityReferenceData<ResourceIdOf<Resources, Key>, Key> &
+        ResolvableContainmentOf<Resources, Key, 'get'>)
+    | (SelectorReferenceData<Key> & ResolvableContainmentOf<Resources, Key, 'get'>)
 }[ResolvableResourceKey<Resources, 'one'>]
 
 /**
  * Data of a collection reference to `Resources` that a client can resolve:
  * the resource has `list`, its container (for a selector collection) has
  * `get`, and for an identity collection the resource also has `get`, through
- * which each entry resolves.
+ * which each entry resolves. A selector collection carries the identity
+ * container of its `list`'s parent, and each entry that of its `get`'s parent,
+ * when the operation records one.
  *
  * @typeParam Resources - The contract's resource table type.
  */
@@ -186,10 +260,10 @@ export type ResolvableCollectionReferenceData<Resources extends ResourceTable> =
     | (Key extends ResolvableResourceKey<Resources, 'one'>
         ? IdentityCollectionReferenceData<ResourceIdOf<Resources, Key>, Key> & {
             readonly entries: readonly (IdentityReferenceData<ResourceIdOf<Resources, Key>, Key> &
-              ResolvableContainment<Resources>)[]
+              ResolvableContainmentOf<Resources, Key, 'get'>)[]
           }
         : never)
-    | (SelectorCollectionReferenceData<Key> & ResolvableContainment<Resources>)
+    | (SelectorCollectionReferenceData<Key> & ResolvableContainmentOf<Resources, Key, 'list'>)
 }[ResolvableResourceKey<Resources, 'many'>]
 
 /**

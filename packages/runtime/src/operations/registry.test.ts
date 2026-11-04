@@ -311,12 +311,21 @@ describe('operationsFromContract', () => {
 /** A range read marker for a fixture resource whose range reads passed. */
 const RANGE_READ_PASSED = {
   supported: true,
+  read: 'range',
   evidence: {
     source: 'probe',
     observedAt: '2026-01-15T10:30:00.000Z',
     bundleId: 'com.apple.iCal',
     appVersion: '1.0',
     osVersion: '27.2',
+    cost: {
+      observedAt: '2026-01-15T10:30:00.000Z',
+      pageMs: 400,
+      columnMs: 900,
+      items: 120,
+      runs: 5,
+      pageSize: 25,
+    },
   },
 } as const
 

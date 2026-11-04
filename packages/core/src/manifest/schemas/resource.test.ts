@@ -5,6 +5,7 @@ import {
   ResourceSchema,
   RuntimeProbeSchema,
   ProbeStatusSchema,
+  pageReadFor,
 } from './resource.js'
 import { ZodError } from 'zod'
 
@@ -237,16 +238,37 @@ describe('ResourceSchema identifier uniqueness claims', () => {
 })
 
 describe('ResourceSchema range read marker', () => {
-  /** Evidence of a passing range read, as a live observation records it. */
-  const PASSED = {
+  /** What a live observation records of any range read: the app, build and time. */
+  const OBSERVED = {
     source: 'probe',
     observedAt: '2026-11-03T17:58:53.000Z',
     bundleId: 'com.example.app',
     appVersion: '1.0',
     osVersion: '27.2',
   }
+  /**
+   * A measured page cost, timed after the range-read check: a first page of 25
+   * took 600 ms by range and 90 ms by column, the median of five runs each,
+   * over a collection of 300 items.
+   */
+  const COST = {
+    observedAt: '2026-11-03T21:20:00.000Z',
+    pageMs: 600,
+    columnMs: 90,
+    items: 300,
+    runs: 5,
+    pageSize: 25,
+  }
+  /** The fields a page cost must record. */
+  const COST_FIELDS = ['observedAt', 'pageMs', 'columnMs', 'items', 'runs', 'pageSize'] as const
+  /** Evidence of a passing range read with its measured page cost. */
+  const PASSED = { ...OBSERVED, cost: COST }
+  /** Evidence of a passing range read whose cost differs from {@link COST} in `changes`. */
+  function costing(changes: Record<string, unknown>) {
+    return { ...OBSERVED, cost: { ...COST, ...changes } }
+  }
   /** Evidence of a range read the app did not understand. */
-  const FAILED = { ...PASSED, errorNumbers: [-1708] }
+  const FAILED = { ...OBSERVED, errorNumbers: [-1708] }
 
   /** A resource carrying `rangeRead`, and anything else in `extra`. */
   function withRangeRead(rangeRead: unknown, extra: Record<string, unknown> = {}) {
@@ -265,13 +287,93 @@ describe('ResourceSchema range read marker', () => {
     return parsed.error?.issues.map((issue) => issue.path) ?? []
   }
 
-  it('accepts a supported range read with its evidence', () => {
-    const parsed = withRangeRead({ supported: true, evidence: { ...PASSED, note: 'Pages of 2' } })
+  it('accepts a supported range read with its page read and measured costs', () => {
+    const marker = { supported: true, read: 'column', evidence: { ...PASSED, note: 'Pages of 25' } }
+    const parsed = withRangeRead(marker)
 
     expect(parsed.success).toBe(true)
-    expect(parsed.data?.rangeRead).toEqual({
+    expect(parsed.data?.rangeRead).toEqual(marker)
+  })
+
+  it('accepts read: range when the range page was faster', () => {
+    const parsed = withRangeRead({
       supported: true,
-      evidence: { ...PASSED, note: 'Pages of 2' },
+      read: 'range',
+      evidence: costing({ pageMs: 450, columnMs: 4900, items: 332 }),
+    })
+
+    expect(parsed.success).toBe(true)
+  })
+
+  it('accepts read: range when both page reads took the same time', () => {
+    // Range is the default; a tie never chooses column.
+    const parsed = withRangeRead({
+      supported: true,
+      read: 'range',
+      evidence: costing({ pageMs: 300, columnMs: 300, items: 1 }),
+    })
+
+    expect(parsed.success).toBe(true)
+  })
+
+  describe('the column margin: column only when columnMs <= 0.75 x pageMs', () => {
+    it('accepts read: column when the column page took exactly 0.75 of the range page', () => {
+      const parsed = withRangeRead({
+        supported: true,
+        read: 'column',
+        evidence: costing({ pageMs: 400, columnMs: 300 }),
+      })
+
+      expect(parsed.success).toBe(true)
+    })
+
+    it('rejects read: column when the column page took just over 0.75 of the range page, at read', () => {
+      const parsed = withRangeRead({
+        supported: true,
+        read: 'column',
+        evidence: costing({ pageMs: 400, columnMs: 301 }),
+      })
+
+      expect(parsed.success).toBe(false)
+      expect(issuePaths(parsed)).toEqual([['rangeRead', 'read']])
+    })
+
+    it('accepts read: range when the column page was faster, but by less than the margin', () => {
+      // A difference within live-measurement noise (Contacts emails measured
+      // 272 ms by range and 263 ms by column) keeps the latency bound.
+      const parsed = withRangeRead({
+        supported: true,
+        read: 'range',
+        evidence: costing({ pageMs: 272, columnMs: 263, items: 3 }),
+      })
+
+      expect(parsed.success).toBe(true)
+    })
+
+    it('rejects read: range when the column page took exactly 0.75 of the range page, at read', () => {
+      const parsed = withRangeRead({
+        supported: true,
+        read: 'range',
+        evidence: costing({ pageMs: 400, columnMs: 300 }),
+      })
+
+      expect(parsed.success).toBe(false)
+      expect(issuePaths(parsed)).toEqual([['rangeRead', 'read']])
+    })
+  })
+
+  describe('pageReadFor', () => {
+    it.each([
+      [400, 300, 'column'],
+      [400, 301, 'range'],
+      [600, 90, 'column'],
+      [300, 300, 'range'],
+      [450, 4900, 'range'],
+      [0, 0, 'range'],
+      [1, 0, 'column'],
+      [0, 1, 'range'],
+    ] as const)('chooses for pageMs %d and columnMs %d: %s', (pageMs, columnMs, read) => {
+      expect(pageReadFor(pageMs, columnMs)).toBe(read)
     })
   })
 
@@ -294,18 +396,126 @@ describe('ResourceSchema range read marker', () => {
     expect(parsed.data?.rangeRead).toBeUndefined()
   })
 
+  it('rejects a supported range read with no page read, at read', () => {
+    const parsed = withRangeRead({ supported: true, evidence: PASSED })
+
+    expect(parsed.success).toBe(false)
+    expect(issuePaths(parsed)).toEqual([['rangeRead', 'read']])
+  })
+
+  it('rejects a supported range read with no measured cost, at evidence.cost', () => {
+    const parsed = withRangeRead({ supported: true, read: 'column', evidence: OBSERVED })
+
+    expect(parsed.success).toBe(false)
+    expect(issuePaths(parsed)).toEqual([['rangeRead', 'evidence', 'cost']])
+  })
+
+  it.each(COST_FIELDS)('rejects a measured cost with no %s, at the missing field', (field) => {
+    const { [field]: _omitted, ...cost } = COST
+    const parsed = withRangeRead({
+      supported: true,
+      read: 'column',
+      evidence: { ...OBSERVED, cost },
+    })
+
+    expect(parsed.success).toBe(false)
+    expect(issuePaths(parsed)).toEqual([['rangeRead', 'evidence', 'cost', field]])
+  })
+
+  it.each([
+    // A negative page time is never more than the column time, so the read it
+    // chooses is range.
+    { label: 'a negative page time', field: 'pageMs', value: -1, read: 'range' },
+    { label: 'a fractional page time', field: 'pageMs', value: 600.5 },
+    { label: 'a page time that is not a number', field: 'pageMs', value: '600' },
+    { label: 'a negative column time', field: 'columnMs', value: -1 },
+    { label: 'a fractional column time', field: 'columnMs', value: 1.5 },
+    { label: 'a collection of no items', field: 'items', value: 0 },
+    { label: 'a fractional collection size', field: 'items', value: 2.5 },
+    { label: 'no runs', field: 'runs', value: 0 },
+    { label: 'a fractional number of runs', field: 'runs', value: 2.5 },
+    { label: 'a page size of zero', field: 'pageSize', value: 0 },
+    { label: 'a fractional page size', field: 'pageSize', value: 12.5 },
+    { label: 'a timestamp that is not ISO 8601 UTC', field: 'observedAt', value: '3 Nov 2026' },
+  ] as const)('rejects a measured cost with $label, at the field', (row) => {
+    const { field, value } = row
+    const parsed = withRangeRead({
+      supported: true,
+      read: 'read' in row ? row.read : 'column',
+      evidence: costing({ [field]: value }),
+    })
+
+    expect(parsed.success).toBe(false)
+    expect(issuePaths(parsed)).toEqual([['rangeRead', 'evidence', 'cost', field]])
+  })
+
+  it('rejects a measured cost with an unknown field', () => {
+    const parsed = withRangeRead({
+      supported: true,
+      read: 'column',
+      evidence: costing({ medianOf: 5 }),
+    })
+
+    expect(parsed.success).toBe(false)
+    expect(issuePaths(parsed)).toEqual([['rangeRead', 'evidence', 'cost']])
+  })
+
+  it('dates the measured cost apart from the range-read check', () => {
+    // The timing is its own observation: a cost timed hours after the check
+    // keeps both times.
+    const parsed = withRangeRead({ supported: true, read: 'column', evidence: PASSED })
+
+    expect(parsed.success).toBe(true)
+    if (parsed.data?.rangeRead?.supported !== true) throw new Error('the marker did not parse')
+    expect(parsed.data.rangeRead.evidence.observedAt).toBe('2026-11-03T17:58:53.000Z')
+    expect(parsed.data.rangeRead.evidence.cost?.observedAt).toBe('2026-11-03T21:20:00.000Z')
+  })
+
+  it('rejects read: column when the column page was slower, at read', () => {
+    const parsed = withRangeRead({
+      supported: true,
+      read: 'column',
+      evidence: costing({ pageMs: 450, columnMs: 4900 }),
+    })
+
+    expect(parsed.success).toBe(false)
+    expect(issuePaths(parsed)).toEqual([['rangeRead', 'read']])
+  })
+
+  it('rejects read: range when the column page was faster by more than the margin, at read', () => {
+    const parsed = withRangeRead({ supported: true, read: 'range', evidence: PASSED })
+
+    expect(parsed.success).toBe(false)
+    expect(issuePaths(parsed)).toEqual([['rangeRead', 'read']])
+  })
+
   it('rejects a failed range read with no error numbers, at the missing numbers', () => {
-    const parsed = withRangeRead({ supported: false, evidence: PASSED })
+    const parsed = withRangeRead({ supported: false, evidence: OBSERVED })
 
     expect(parsed.success).toBe(false)
     expect(issuePaths(parsed)).toEqual([['rangeRead', 'evidence', 'errorNumbers']])
   })
 
   it('rejects a supported range read whose evidence records failures, at the numbers', () => {
-    const parsed = withRangeRead({ supported: true, evidence: FAILED })
+    const parsed = withRangeRead({
+      supported: true,
+      read: 'column',
+      evidence: { ...FAILED, cost: COST },
+    })
 
     expect(parsed.success).toBe(false)
     expect(issuePaths(parsed)).toEqual([['rangeRead', 'evidence', 'errorNumbers']])
+  })
+
+  it('rejects a measured cost on a failed range read, at the cost', () => {
+    const parsed = withRangeRead({ supported: false, evidence: { ...FAILED, cost: COST } })
+
+    expect(parsed.success).toBe(false)
+    expect(issuePaths(parsed)).toEqual([['rangeRead', 'evidence', 'cost']])
+  })
+
+  it('rejects a page read on a failed range read', () => {
+    expect(withRangeRead({ supported: false, read: 'range', evidence: FAILED }).success).toBe(false)
   })
 
   it('rejects a range read marked on a resource marked unsupported, at the marker', () => {
@@ -320,52 +530,70 @@ describe('ResourceSchema range read marker', () => {
         errorNumber: -1728,
       },
     }
-    const parsed = withRangeRead({ supported: false, evidence: FAILED }, { unsupported })
+    const parsed = withRangeRead(
+      { supported: true, read: 'column', evidence: PASSED },
+      { unsupported }
+    )
 
     expect(parsed.success).toBe(false)
     expect(issuePaths(parsed)).toEqual([['rangeRead']])
   })
 
   it.each([
-    { label: 'no evidence', marker: { supported: true } },
-    { label: 'no supported flag', marker: { evidence: PASSED } },
-    { label: 'an unknown marker field', marker: { supported: true, evidence: PASSED, extra: 1 } },
+    { label: 'no evidence', marker: { supported: true, read: 'range' } },
+    { label: 'no supported flag', marker: { read: 'column', evidence: PASSED } },
+    {
+      label: 'an unknown marker field',
+      marker: { supported: true, read: 'column', evidence: PASSED, extra: 1 },
+    },
+    { label: 'an unknown page read', marker: { supported: true, read: 'whole', evidence: PASSED } },
     {
       label: 'a source other than a probe',
-      marker: { supported: true, evidence: { ...PASSED, source: 'sdef' } },
+      marker: { supported: true, read: 'column', evidence: { ...PASSED, source: 'sdef' } },
     },
     {
       label: 'a timestamp that is not ISO 8601 UTC',
-      marker: { supported: true, evidence: { ...PASSED, observedAt: '3 Nov 2026' } },
+      marker: {
+        supported: true,
+        read: 'column',
+        evidence: { ...PASSED, observedAt: '3 Nov 2026' },
+      },
     },
     {
       label: 'no app version',
-      marker: { supported: true, evidence: { ...PASSED, appVersion: undefined } },
+      marker: { supported: true, read: 'column', evidence: { ...PASSED, appVersion: undefined } },
     },
     {
       label: 'an empty bundle identifier',
-      marker: { supported: true, evidence: { ...PASSED, bundleId: '' } },
+      marker: { supported: true, read: 'column', evidence: { ...PASSED, bundleId: '' } },
     },
     {
       label: 'no macOS version',
-      marker: { supported: true, evidence: { ...PASSED, osVersion: undefined } },
+      marker: { supported: true, read: 'column', evidence: { ...PASSED, osVersion: undefined } },
     },
     {
       label: 'an empty list of error numbers',
-      marker: { supported: false, evidence: { ...PASSED, errorNumbers: [] } },
+      marker: { supported: false, evidence: { ...OBSERVED, errorNumbers: [] } },
     },
     {
       label: 'a repeated error number',
-      marker: { supported: false, evidence: { ...PASSED, errorNumbers: [-1708, -1708] } },
+      marker: { supported: false, evidence: { ...OBSERVED, errorNumbers: [-1708, -1708] } },
     },
     {
       label: 'an error number that is not an integer',
-      marker: { supported: false, evidence: { ...PASSED, errorNumbers: [-17.08] } },
+      marker: { supported: false, evidence: { ...OBSERVED, errorNumbers: [-17.08] } },
     },
-    { label: 'an empty note', marker: { supported: true, evidence: { ...PASSED, note: '' } } },
+    {
+      label: 'an empty note',
+      marker: { supported: true, read: 'column', evidence: { ...PASSED, note: '' } },
+    },
     {
       label: 'an unknown evidence field',
-      marker: { supported: true, evidence: { ...PASSED, sampleSize: 3 } },
+      marker: { supported: true, read: 'column', evidence: { ...PASSED, sampleSize: 3 } },
+    },
+    {
+      label: 'a page time recorded on the evidence rather than in its cost',
+      marker: { supported: true, read: 'column', evidence: { ...PASSED, pageMs: 600 } },
     },
   ])('rejects a marker with $label', ({ marker }) => {
     expect(withRangeRead(marker).success).toBe(false)
