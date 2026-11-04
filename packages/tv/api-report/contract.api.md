@@ -380,6 +380,10 @@ export type TVResources = Readonly<{
         readonly id: ValueType<string>;
         readonly get: 'tv.playlists.get';
         readonly list: 'tv.playlists.list';
+        readonly parents: {
+            readonly get: 'Source';
+            readonly list: 'Source';
+        };
     };
     PlaylistWindow: ResourceDescriptor<PlaylistWindow, Integer> & {
         readonly id: ValueType<Integer>;
