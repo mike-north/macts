@@ -1809,7 +1809,8 @@ only for a reference a caller supplies:
 - every selector form, at any position;
 - identity collections;
 - a container on a top-level resource, a container of another resource than
-  the one its `get` records, or a selector container;
+  the one its `get` records, or a selector container: each breaks the
+  container rule, so it is a caller error, not a form awaiting support;
 - a resource with no identifier, or with no `get`, or whose parent has no
   addressing;
 - a resource with no entry in the request's `resourcePlans`, so none in the
@@ -1823,13 +1824,17 @@ only: a field whose target's parent is itself found within a container stays
 left out of generation until nested chains are emitted
 ([#219](https://github.com/mike-north/macts/issues/219),
 [#242](https://github.com/mike-north/macts/issues/242)). So Contacts emails,
-phones and addresses within a person, Music tracks within a playlist and
-Calendar events within a calendar convert and resolve with their container,
-and each still needs its own live check against its app before it is
-claimed. For Calendar the resolution is not exact: a calendar container is
-name-keyed with no unique claim, and an event's `uid` is not unique, so a
-caller-built event reference addresses the first match, as the existing
-Calendar operations that take a calendar already do.
+phones and addresses within a person, Music tracks within a playlist,
+Calendar events within a calendar, TV playlists within a source, and Xcode
+projects, schemes and run destinations within a workspace document convert
+and resolve with their container, and each still needs its own live check
+against its app before it is claimed. For Calendar the resolution is not
+exact: a calendar container is name-keyed with no unique claim, and an
+event's `uid` is not unique, so a caller-built event reference addresses the
+first match, as the existing Calendar operations that take a calendar already
+do. Xcode is not exact either: a workspace document is found by name with no
+unique claim, and a run destination by name within it, so a caller-built
+reference addresses the first match.
 
 The provider resolves references (resolution, below) within the same scope,
 plus identity collections whose entries are in it:
