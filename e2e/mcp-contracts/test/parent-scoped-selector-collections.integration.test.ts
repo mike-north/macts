@@ -30,8 +30,8 @@ describe('a collection of every object of a list-only-parent resource', () => {
     '%s %s needs its %s as its container',
     (appName, resource, parent) => {
       const app = apps.find(({ name }) => name === appName)
-      if (app === undefined || resource === undefined || parent === undefined) {
-        throw new Error(`no contract for ${String(appName)}`)
+      if (app === undefined) {
+        throw new Error(`no contract for ${appName}`)
       }
       const collection = t.reference(() => app.contract, resource, 'many')
       const every = {
