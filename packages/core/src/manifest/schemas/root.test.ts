@@ -449,3 +449,95 @@ describe('singleton roots: commands and the hierarchy', () => {
     ])
   })
 })
+
+describe('singleton roots and superclasses', () => {
+  const dictionary = {
+    source: 'dictionary',
+    bundleId: 'com.example.archive',
+    appVersion: '1.0',
+    osVersion: '27.2',
+  }
+  const inheritsFurniture = {
+    resource: 'Furniture',
+    evidence: { ...dictionary, term: 'furniture' },
+  }
+
+  /** The Archive source with a `Furniture` superclass holding the primary `id`, and the desk inheriting it. */
+  function withFurniture(
+    furniture: Record<string, unknown> = {},
+    desk: Record<string, unknown> = {}
+  ): ArchiveSource {
+    const source = archiveSource()
+    source.resources['Furniture'] = {
+      name: 'Furniture',
+      plural: 'Furnitures',
+      description: 'A piece of furniture',
+      properties: {
+        id: { access: 'r', type: 'string', description: 'The furniture identifier' },
+      },
+      identifiers: [{ property: 'id', primary: true }],
+      ...furniture,
+    }
+    Object.assign(resourceOf(source, 'Desk'), { inherits: inheritsFurniture, ...desk })
+    return source
+  }
+
+  it('gives a root with a superclass only its kind identifier, and lets it mark the inherited id unsupported', () => {
+    const source = withFurniture(
+      {},
+      {
+        properties: {
+          ...(resourceOf(archiveSource(), 'Desk')['properties'] as Record<string, unknown>),
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'The furniture identifier',
+            unsupported: {
+              reason: 'A desk is not identified by the furniture id.',
+              evidence: {
+                source: 'probe',
+                observedAt: '2026-11-01T12:00:00.000Z',
+                bundleId: 'com.example.archive',
+                appVersion: '1.0',
+                osVersion: '27.2',
+                sampleSize: 3,
+                failedReads: 3,
+                errorNumbers: [-1728],
+              },
+            },
+          },
+        },
+      }
+    )
+    expect(issuesOf(source)).toEqual([])
+    const manifest = AppManifestSchema.parse(source)
+    const desk = manifest.resources['Desk']
+    expect(desk?.identifiers).toHaveLength(1)
+    expect(desk?.identifiers?.[0]?.property).toBe('kind')
+    expect(desk?.properties['id']?.unsupported).toBeDefined()
+    // Re-validating the validated manifest changes nothing.
+    expect(AppManifestSchema.parse(JSON.parse(JSON.stringify(manifest)))).toEqual(manifest)
+  })
+
+  it('rejects a resource that inherits a root', () => {
+    const source = archiveSource()
+    Object.assign(resourceOf(source, 'Entry'), {
+      inherits: { resource: 'Desk', evidence: { ...dictionary, term: 'desk' } },
+    })
+    expect(issuesOf(source)).toEqual([
+      'resources.Entry.inherits.resource: "Entry" inherits "Desk", a singleton root, whose identity is its kind and whose objects are the application\'s own properties; inherit a collection resource instead.',
+    ])
+  })
+
+  it('rejects a root that would inherit a kind property, which its derived kind would shadow', () => {
+    const source = withFurniture({
+      properties: {
+        id: { access: 'r', type: 'string', description: 'The furniture identifier' },
+        kind: { access: 'r', type: 'string', description: 'The furniture kind' },
+      },
+    })
+    expect(issuesOf(source)).toEqual([
+      'resources.Desk.inherits.resource: "Desk" would inherit a "kind" property from "Furniture", but its "kind" is derived from its roots and would shadow it; rename the property on "Furniture", or inherit from a resource without one.',
+    ])
+  })
+})

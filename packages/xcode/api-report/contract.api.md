@@ -10,7 +10,6 @@ import { ClientBrand } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceData } from '@macts/contracts';
-import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
@@ -175,7 +174,7 @@ export type ProjectCreateInput = Record<string, never>;
 
 // @public
 export interface ProjectResourceClient {
-    get(id: string, options?: CallOptions): Promise<Project>;
+    get(workspaceName: string, id: string, options?: CallOptions): Promise<Project>;
     list(workspaceName: string, options?: CallOptions): Promise<Page<Project>>;
 }
 
@@ -212,7 +211,7 @@ export type RunDestinationCreateInput = Record<string, never>;
 
 // @public
 export interface RunDestinationResourceClient {
-    get(name: string, options?: CallOptions): Promise<RunDestination>;
+    get(workspaceName: string, name: string, options?: CallOptions): Promise<RunDestination>;
     list(workspaceName: string, options?: CallOptions): Promise<Page<RunDestination>>;
 }
 
@@ -256,7 +255,7 @@ export type SchemeCreateInput = Record<string, never>;
 
 // @public
 export interface SchemeResourceClient {
-    get(id: string, options?: CallOptions): Promise<Scheme>;
+    get(workspaceName: string, id: string, options?: CallOptions): Promise<Scheme>;
     list(workspaceName: string, options?: CallOptions): Promise<Page<Scheme>>;
 }
 
@@ -295,7 +294,6 @@ export interface SourceDocumentUpdateInput {
 export interface Target {
     readonly id: string;
     name: string | null;
-    readonly project: ObjectReferenceVariant<Project, string, 'Project'> | null;
 }
 
 // @public
@@ -368,7 +366,6 @@ export interface TextDocumentUpdateInput {
 
 // @public
 export interface WorkspaceDocument {
-    activeScheme: ObjectReferenceVariant<Scheme, string, 'Scheme'> | null;
     readonly file: FileValue | null;
     readonly loaded: boolean | null;
     readonly modified: boolean | null;
@@ -424,6 +421,7 @@ export type XcodeResources = Readonly<{
         readonly get: 'xcode.projects.get';
         readonly list: 'xcode.projects.list';
         readonly parents: {
+            readonly get: 'WorkspaceDocument';
             readonly list: 'WorkspaceDocument';
         };
     };
@@ -432,6 +430,7 @@ export type XcodeResources = Readonly<{
         readonly get: 'xcode.schemes.get';
         readonly list: 'xcode.schemes.list';
         readonly parents: {
+            readonly get: 'WorkspaceDocument';
             readonly list: 'WorkspaceDocument';
         };
     };
@@ -440,6 +439,7 @@ export type XcodeResources = Readonly<{
         readonly get: 'xcode.runDestinations.get';
         readonly list: 'xcode.runDestinations.list';
         readonly parents: {
+            readonly get: 'WorkspaceDocument';
             readonly list: 'WorkspaceDocument';
         };
     };

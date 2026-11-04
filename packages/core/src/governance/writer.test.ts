@@ -11,6 +11,7 @@
  *
  * @see Issue #7 — Trust & Governance: every capability call is audit-logged.
  * @see Issue #52 — Governance foundation acceptance criteria.
+ * @see phases/13-sdk-value-and-execution-contracts.md (D5: `invalid-input` records)
  */
 
 import { describe, it, expect, afterEach } from 'vitest'
@@ -20,14 +21,14 @@ import { join } from 'node:path'
 import { createFileAuditWriter } from './writer.js'
 import { createAuditRecord, serializeAuditRecord } from './audit.js'
 import { redactArgs } from './redaction.js'
-import type { AuditRecord, SerializedAuditRecord } from './audit.js'
+import type { AuditRecord, GovernedAuditRecordInput, SerializedAuditRecord } from './audit.js'
 
 // Fixed, deterministic timestamps — never Date.now() or new Date() in test data.
 const TIMESTAMP_A = new Date('2026-06-14T10:42:12.000Z')
 const TIMESTAMP_B = new Date('2026-06-14T11:00:00.000Z')
 
 /** Minimal well-formed record for writer tests. */
-function makeRecord(overrides: Partial<Parameters<typeof createAuditRecord>[0]> = {}): AuditRecord {
+function makeRecord(overrides: Partial<GovernedAuditRecordInput> = {}): AuditRecord {
   return createAuditRecord({
     capability: 'calendar:events:create',
     app: 'calendar',
@@ -178,6 +179,57 @@ describe('createFileAuditWriter — parent-directory creation', () => {
 // ---------------------------------------------------------------------------
 // Error handling
 // ---------------------------------------------------------------------------
+
+describe('createFileAuditWriter — invalid-input records', () => {
+  // phases/13 D5: a call rejected by input validation is recorded as
+  // `invalid-input` with its issue count and no argument summary.
+  it('writes and reads back an invalid-input record without a summary', async () => {
+    const dir = await makeTempDir()
+    const logPath = join(dir, 'audit.jsonl')
+    const writer = createFileAuditWriter(logPath)
+
+    await writer.append(
+      createAuditRecord({
+        capability: 'calendar:events:create',
+        app: 'calendar',
+        apiKeyId: 'assistant-calendar-writer',
+        decision: 'invalid-input',
+        timestamp: TIMESTAMP_A,
+        issueCount: 1,
+      })
+    )
+
+    expect(await readJsonLines(logPath)).toEqual([
+      {
+        capability: 'calendar:events:create',
+        app: 'calendar',
+        apiKeyId: 'assistant-calendar-writer',
+        decision: 'invalid-input',
+        timestamp: '2026-06-14T10:42:12.000Z',
+        issueCount: 1,
+      },
+    ])
+  })
+
+  it('refuses an invalid-input record carrying a summary, writing nothing', async () => {
+    const dir = await makeTempDir()
+    const logPath = join(dir, 'audit.jsonl')
+    const writer = createFileAuditWriter(logPath)
+    // A cast stands in for a record built outside the type system.
+    const record = {
+      capability: 'calendar:events:create',
+      app: 'calendar',
+      argsSummary: 'title: Groceries',
+      apiKeyId: 'assistant-calendar-writer',
+      decision: 'invalid-input',
+      timestamp: TIMESTAMP_A,
+      issueCount: 1,
+    } as unknown as AuditRecord
+
+    await expect(writer.append(record)).rejects.toThrow(TypeError)
+    await expect(readFile(logPath, 'utf8')).rejects.toMatchObject({ code: 'ENOENT' })
+  })
+})
 
 describe('createFileAuditWriter — error handling', () => {
   it('surfaces an error when the path is not writable (directory used as file path)', async () => {

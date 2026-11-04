@@ -258,7 +258,9 @@ export interface NativeScript {
  * @remarks
  * - `app`: the application or the automation bridge raised an error.
  *   `errorNumber` is the bridge's numeric error code when one was provided; the
- *   executor maps it to a canonical structured error.
+ *   executor maps it to a canonical structured error. `missingResource` is set
+ *   when a body found the parent of a scoped operation missing: the failure
+ *   names that resource rather than the operation's own.
  * - `codec`: the codec could not convert a value. Without `unsupportedKind`,
  *   the value violated its plan: on `encode` the app returned something the
  *   contract does not allow, and on `decode` a bridge form could not be
@@ -272,7 +274,16 @@ export interface NativeScript {
  *   {@link NATIVE_COLLECTION_CHANGED_ERROR_NAME}).
  */
 export type NativeFailure =
-  | { readonly source: 'app'; readonly message: string; readonly errorNumber?: number }
+  | {
+      readonly source: 'app'
+      readonly message: string
+      readonly errorNumber?: number
+      /**
+       * The resource of the object the body found missing, when it is not the
+       * operation's own: the parent of a scoped operation.
+       */
+      readonly missingResource?: string
+    }
   | { readonly source: 'collection'; readonly message: string }
   | {
       readonly source: 'codec'

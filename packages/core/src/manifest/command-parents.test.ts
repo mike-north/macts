@@ -10,9 +10,9 @@
  * This suite fails when, in any shipped manifest, a usable list, get, create,
  * update or delete command on a resource that the hierarchy nests under
  * another resource, and that is not also a top-level child of the hierarchy
- * (`usableHierarchyChildren` of `manifest.hierarchy.children`), records no
- * parent. Only those five command shapes address a collection; every other
- * command is called on the application with its parameters. A resource the
+ * (`nestedOnlyResources`, `./hierarchy-placement.ts`), records no parent.
+ * Only those five command shapes address a collection; every other command
+ * is called on the application with its parameters. A resource the
  * hierarchy does not place at all has no parent to record, and is not
  * checked. A recorded parent is always accepted here; the manifest schema
  * checks that it names a declared resource and a required parameter.
@@ -30,7 +30,9 @@
  * `listVariables`, `listSettings` and `listRequiredResources` took a parent
  * guessed from their parameter's name, and addressed `folders`,
  * `workspaceNames`, `workflowNames` and `actions`, which those apps do not
- * have.
+ * have. Xcode's `getProject`, `getScheme` and `getRunDestination` recorded no
+ * parent and looked their objects up at the application, which holds
+ * projects, schemes and run destinations only within a workspace document.
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md §D10 (command parents)
  * @see https://github.com/mike-north/macts/issues/165
@@ -41,10 +43,10 @@ import { readdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { isCrudName } from '../generator/surface.js'
+import { nestedOnlyResources, placedEntries } from './hierarchy-placement.js'
 import { loadManifest } from './loader.js'
 import { resolveManifestRoutes } from './route.js'
-import type { AppManifest, HierarchyChild } from './schemas/index.js'
-import { usableHierarchyChildren } from './unsupported.js'
+import type { AppManifest } from './schemas/index.js'
 
 const MANIFESTS_DIR = resolve(process.cwd(), '../../manifests')
 
@@ -55,7 +57,6 @@ const MANIFESTS_DIR = resolve(process.cwd(), '../../manifests')
  * @see https://github.com/mike-north/macts/issues/173
  */
 const AWAITING_PARENT_DESIGN: ReadonlySet<string> = new Set([
-  'microsoft-edge: getTab',
   'microsoft-edge: getBookmarkItem',
   'omnigraffle: getGraphic',
   'omnigraffle: getShape',
@@ -75,48 +76,10 @@ const AWAITING_PARENT_DESIGN: ReadonlySet<string> = new Set([
   'omniplan: listViolations',
   'omniplan: listScenarios',
   'omniplan: getScenario',
-  'xcode: getProject',
-  'xcode: getScheme',
-  'xcode: getRunDestination',
   'omnifocus: listTasks',
   'omnifocus: getTask',
   'omnifocus: createTask',
 ])
-
-/** Every usable entry of a hierarchy, at any depth, with the resource holding it. */
-interface PlacedEntry {
-  /** The resource whose items hold the entry, or `undefined` at the application. */
-  readonly holder: string | undefined
-  readonly child: HierarchyChild
-}
-
-function placedEntries(manifest: AppManifest): PlacedEntry[] {
-  const entries: PlacedEntry[] = []
-  const walk = (children: Record<string, HierarchyChild>, holder: string | undefined): void => {
-    for (const [, child] of usableHierarchyChildren(manifest, children)) {
-      entries.push({ holder, child })
-      if (child.children !== undefined) walk(child.children, child.resource)
-    }
-  }
-  walk(manifest.hierarchy.children, undefined)
-  return entries
-}
-
-/**
- * The resources the hierarchy nests under another resource and does not also
- * place at the application: their items exist only inside a parent.
- */
-function nestedOnlyResources(manifest: AppManifest): Set<string> {
-  const entries = placedEntries(manifest)
-  const topLevel = new Set(
-    entries.filter((entry) => entry.holder === undefined).map((entry) => entry.child.resource)
-  )
-  return new Set(
-    entries
-      .filter((entry) => entry.holder !== undefined && !topLevel.has(entry.child.resource))
-      .map((entry) => entry.child.resource)
-  )
-}
 
 /** One usable command and the resource it addresses, from a resolved route. */
 interface AddressedCommand {

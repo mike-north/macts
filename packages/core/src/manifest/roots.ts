@@ -25,6 +25,7 @@ import type { HierarchyChild } from './schemas/hierarchy.js'
 import type { Property } from './schemas/property.js'
 import type { Identifier, Resource, ResourceRoots } from './schemas/resource.js'
 import { commandAppliesToResource } from './resource-commands.js'
+import { superclassChain } from './superclasses.js'
 
 /** The property that holds a root object's kind, and its primary identifier. */
 export const ROOT_KIND_PROPERTY = 'kind'
@@ -93,8 +94,17 @@ const KIND_IDENTIFIER: Identifier = {
  * The manifest with every root resource's kind enum, `kind` property and
  * primary identifier in place (see the module comment). A manifest with no
  * roots is returned unchanged.
+ *
+ * The manifest is described structurally rather than as `AppManifest`: the
+ * schema applies this step in its own pipeline, so naming the schema's output
+ * type here would make that type refer to itself.
  */
-export function normalizeRoots<M extends Pick<AppManifest, 'resources' | 'enums'>>(manifest: M): M {
+export function normalizeRoots<
+  M extends {
+    readonly resources: Record<string, Resource>
+    readonly enums: Record<string, Enum>
+  },
+>(manifest: M): M {
   const rooted = Object.entries(manifest.resources).filter(
     (entry): entry is [string, Resource & { roots: ResourceRoots }] => entry[1].roots !== undefined
   )
@@ -169,6 +179,9 @@ function isSameData(a: unknown, b: unknown): boolean {
  *   takes none. Neither records a parent, and no command records a root as
  *   its parent: a root is found at the application only.
  * - No hierarchy entry names a root: each entry is a collection.
+ * - A root inherits no `kind` property, and no resource inherits a root:
+ *   roots normalise before superclass flattening, so a root's identity is
+ *   never copied from an ancestor and an ancestor's is never a root's.
  */
 export function findRootIssues(
   manifest: Pick<AppManifest, 'resources' | 'commands' | 'hierarchy' | 'enums'>
@@ -191,10 +204,29 @@ export function findRootIssues(
   }
   if (roots.size === 0) return issues
 
+  for (const [key, resource] of Object.entries(manifest.resources)) {
+    const superclass = resource.inherits?.resource
+    if (superclass !== undefined && roots.has(superclass)) {
+      issues.push({
+        message: `"${key}" inherits "${superclass}", a singleton root, whose identity is its kind and whose objects are the application's own properties; inherit a collection resource instead.`,
+        path: ['resources', key, 'inherits', 'resource'],
+      })
+    }
+  }
+
   for (const [key, kinds] of roots) {
     const resource = manifest.resources[key]
     if (resource === undefined) continue
     const enumKey = rootKindEnumKey(key)
+    const shadowing = superclassChain(key, manifest.resources).find((ancestor) =>
+      Object.hasOwn(manifest.resources[ancestor]?.properties ?? {}, ROOT_KIND_PROPERTY)
+    )
+    if (shadowing !== undefined) {
+      issues.push({
+        message: `"${key}" would inherit a "${ROOT_KIND_PROPERTY}" property from "${shadowing}", but its "${ROOT_KIND_PROPERTY}" is derived from its roots and would shadow it; rename the property on "${shadowing}", or inherit from a resource without one.`,
+        path: ['resources', key, 'inherits', 'resource'],
+      })
+    }
     const identifiers = resource.identifiers
     if (
       identifiers !== undefined &&

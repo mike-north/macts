@@ -113,16 +113,12 @@ describe('output references in every real contract', () => {
     // Every field of a resource-table record that still holds a reference,
     // audited by hand against the manifests: each target has a get with no
     // parent, and none is identified by its name. Music BrowserWindow and
-    // PlaylistWindow `view`, Photos Container `parent` and Xcode Target
-    // `project` also stay in output, but their resources have neither a get
-    // nor a list, so the table carries no record for them.
+    // PlaylistWindow `view` and Photos Container `parent` also stay in output,
+    // but their resources have neither a get nor a list, so the table carries
+    // no record for them. Xcode's WorkspaceDocument `activeScheme` is left
+    // out: a scheme is got only within its workspace document.
     expect(positions.sort()).toEqual(
-      [
-        'microsoft-edge Window.activeTab → Tab',
-        'photos Album.parent → Folder',
-        'photos Folder.parent → Folder',
-        'xcode WorkspaceDocument.activeScheme → Scheme',
-      ].sort()
+      ['photos Album.parent → Folder', 'photos Folder.parent → Folder'].sort()
     )
   })
 
@@ -143,15 +139,10 @@ describe('output references in every real contract', () => {
     // that some operation returns.
     expect([...checked].sort()).toEqual(
       [
-        'microsoft-edge.windows.create → Tab',
-        'microsoft-edge.windows.get → Tab',
-        'microsoft-edge.windows.list → Tab',
         'photos.albums.get → Folder',
         'photos.albums.list → Folder',
         'photos.folders.get → Folder',
         'photos.folders.list → Folder',
-        'xcode.workspaceDocuments.get → Scheme',
-        'xcode.workspaceDocuments.list → Scheme',
       ].sort()
     )
   })

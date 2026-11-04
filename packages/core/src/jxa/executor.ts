@@ -302,7 +302,7 @@ function embedJson(value: unknown): string {
  * has one; a changed collection, recognized by its marker name, keeps its
  * message; anything else
  * is an app or bridge failure that keeps its message and, when it carries one,
- * its numeric error code.
+ * its numeric error code and the resource of the object found missing.
  */
 const DESCRIBE_THROWN = [
   `    if (e !== null && typeof e === 'object' && e.name === ${JSON.stringify(NATIVE_CODEC_ERROR_NAME)}) {`,
@@ -321,6 +321,9 @@ const DESCRIBE_THROWN = [
   "    var failure = { source: 'app', message: String(e && e.message || e) };",
   "    if (e !== null && e !== undefined && typeof e.errorNumber === 'number') {",
   '      failure.errorNumber = e.errorNumber;',
+  '    }',
+  "    if (e !== null && e !== undefined && typeof e.missingResource === 'string') {",
+  '      failure.missingResource = e.missingResource;',
   '    }',
   '    return { ok: false, failure: failure };',
 ].join('\n')
@@ -417,9 +420,19 @@ function parseNativeFailure(value: unknown): NativeFailure | string {
   switch (value['source']) {
     case 'app': {
       const errorNumber = value['errorNumber']
-      if (errorNumber === undefined) return { source: 'app', message }
-      if (typeof errorNumber !== 'number') return 'the app failure has a non-numeric error number'
-      return { source: 'app', message, errorNumber }
+      const missingResource = value['missingResource']
+      if (errorNumber !== undefined && typeof errorNumber !== 'number') {
+        return 'the app failure has a non-numeric error number'
+      }
+      if (missingResource !== undefined && typeof missingResource !== 'string') {
+        return 'the app failure has a non-text missing resource'
+      }
+      return {
+        source: 'app',
+        message,
+        ...(errorNumber === undefined ? {} : { errorNumber }),
+        ...(missingResource === undefined ? {} : { missingResource }),
+      }
     }
     case 'collection':
       return { source: 'collection', message }

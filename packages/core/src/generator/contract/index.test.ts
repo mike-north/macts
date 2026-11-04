@@ -980,6 +980,51 @@ describe('contractNames', () => {
   })
 })
 
+describe('generateContract: a class that inherits its superclass (shipped System Events manifest)', () => {
+  // D10, "Superclasses": the dictionary's `folder` inherits `disk item`, so a
+  // folder record has a disk item's fields. Its `container` is a disk item
+  // reference, which stays out of output until disk items have a get.
+  let text = ''
+  beforeAll(async () => {
+    const manifest = await loadManifest(resolve(MANIFESTS_DIR, 'system-events', 'app.yaml'))
+    text = moduleText(generateContract(manifest), CONTRACT_MODULE_PATH)
+  })
+
+  /** The fields the generated interface `name` declares, in order. */
+  function interfaceFields(name: string): string[] {
+    const start = text.indexOf(`export interface ${name} {`)
+    if (start < 0) throw new Error(`no interface ${name}`)
+    const body = text.slice(start, text.indexOf('\n}\n', start))
+    return [...body.matchAll(/^ {2}(?:readonly )?(\w+)\??:/gm)].map((match) => match[1] ?? '')
+  }
+
+  it("declares a disk item's fields on a folder, without its container", () => {
+    expect(interfaceFields('Folder')).toEqual([
+      'busyStatus',
+      'creationDate',
+      'displayedName',
+      'id',
+      'modificationDate',
+      'name',
+      'nameExtension',
+      'packageFolder',
+      'path',
+      'physicalSize',
+      'pOSIXPath',
+      'size',
+      'uRL',
+      'visible',
+      'volume',
+    ])
+  })
+
+  it("declares the domain's id and name on the user and Classic domains", () => {
+    for (const name of ['UserDomainObject', 'ClassicDomainObject']) {
+      expect(interfaceFields(name)).toEqual(['id', 'name'])
+    }
+  })
+})
+
 describe('real app manifests', () => {
   let apps: { dir: string; manifest: AppManifest }[] = []
 
@@ -1076,12 +1121,21 @@ describe('real app manifests', () => {
     // holding a single reference, or an array of them: `no-get` when macts
     // has no get for the target yet, `not-unique` when macts identifies the
     // target by a name the manifest has no uniqueness evidence for yet, and
-    // `parent-scoped` when the target's get records a parent (a TV playlist,
-    // got within its source). No shipped output references a resource with a
-    // get and no identifier, and no shipped command records a result, so no
-    // result is left out. A new omission fails until it is
-    // reviewed and added here. Removing a row records restored coverage: the
-    // field is back in output.
+    // `parent-scoped` when the target's get records a parent and native reads
+    // do not return the container yet (a Chrome or Edge tab, got within its
+    // window; a TV playlist, got within its source; an Xcode scheme, run
+    // destination or project, got within its workspace document). No shipped
+    // output references a resource with a get and no identifier, no shipped
+    // output references a resource the hierarchy holds only within another
+    // resource while its get records no parent (`unrecorded-parent`), and no
+    // shipped command records a result, so no result is left out. A new omission
+    // fails until it is reviewed and added here. Removing a row records
+    // restored coverage: the field is back in output. The 25 System Events
+    // rows marked as inherited (a folder's `container`, and the domain
+    // folders the user and Classic domains inherit) are references macts did
+    // not read at all before those resources were read with their
+    // superclass's properties (D10, "Superclasses"); each stays out until its
+    // target has a read.
     const found = apps
       .flatMap(({ manifest }) => collectContractDiagnostics(manifest))
       .flatMap((diagnostic) => {
@@ -1102,7 +1156,8 @@ describe('real app manifests', () => {
       ['arc', 'Window', 'activeSpace', 'Space', 'no-get'],
       ['finder', 'FinderWindow', 'listViewOptions', 'ListViewOptions', 'no-get'],
       ['finder', 'ListViewOptions', 'sortColumn', 'Column', 'no-get'],
-      ['google-chrome', 'Window', 'activeTab', 'Tab', 'no-get'],
+      // A tab is got only within its window.
+      ['google-chrome', 'Window', 'activeTab', 'Tab', 'parent-scoped'],
       ['iterm', 'Window', 'currentTab', 'Tab', 'no-get'],
       ['iterm', 'Window', 'currentSession', 'Session', 'no-get'],
       ['iterm', 'Tab', 'currentSession', 'Session', 'no-get'],
@@ -1120,6 +1175,8 @@ describe('real app manifests', () => {
       ['mail', 'Rule', 'moveMessage', 'Mailbox', 'no-get'],
       ['messages', 'Participant', 'account', 'Account', 'no-get'],
       ['messages', 'Chat', 'account', 'Account', 'no-get'],
+      // A tab is got only within its window.
+      ['microsoft-edge', 'Window', 'activeTab', 'Tab', 'parent-scoped'],
       ['system-events', 'NetworkPreferencesObject', 'currentLocation', 'Location', 'no-get'],
       ['system-events', 'Service', 'currentConfiguration', 'Configuration', 'no-get'],
       ['system-events', 'Service', 'interface', 'Interface', 'no-get'],
@@ -1159,18 +1216,55 @@ describe('real app manifests', () => {
       ['system-events', 'UserDomainObject', 'publicFolder', 'Folder', 'no-get'],
       ['system-events', 'UserDomainObject', 'sitesFolder', 'Folder', 'no-get'],
       ['system-events', 'UserDomainObject', 'temporaryItemsFolder', 'Folder', 'no-get'],
+      // Inherited: a folder is a disk item, and the user and Classic domains
+      // are domains (D10, "Superclasses"). 1 + 13 + 11 rows.
+      ['system-events', 'Folder', 'container', 'DiskItem', 'no-get'],
+      ['system-events', 'UserDomainObject', 'applicationSupportFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'applicationsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'desktopPicturesFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'folderActionScriptsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'fontsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'libraryFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'preferencesFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'scriptingAdditionsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'scriptsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'sharedDocumentsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'speakableItemsFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'utilitiesFolder', 'Folder', 'no-get'],
+      ['system-events', 'UserDomainObject', 'workflowsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'applicationSupportFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'applicationsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'desktopPicturesFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'folderActionScriptsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'libraryFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'scriptingAdditionsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'scriptsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'sharedDocumentsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'speakableItemsFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'utilitiesFolder', 'Folder', 'no-get'],
+      ['system-events', 'ClassicDomainObject', 'workflowsFolder', 'Folder', 'no-get'],
       ['system-events', 'ScriptingClass', 'superclass', 'ScriptingClass', 'no-get'],
       ['system-events', 'ScriptingCommand', 'directParameter', 'ScriptingParameter', 'no-get'],
       ['tv', 'BrowserWindow', 'view', 'Playlist', 'parent-scoped'],
       ['tv', 'Playlist', 'parent', 'Playlist', 'parent-scoped'],
       ['tv', 'PlaylistWindow', 'view', 'Playlist', 'parent-scoped'],
+      // A scheme, a run destination and a project are got only within their
+      // workspace document. They return only once a workspace document has an
+      // evidenced identity, its path rather than its name, and references
+      // carry their container.
+      ['xcode', 'WorkspaceDocument', 'activeScheme', 'Scheme', 'parent-scoped'],
+      // Also name-keyed with no unique claim, which is hidden by decision:
+      // once containers are emitted its reason becomes `not-unique`, and it
+      // stays out until run destination names are shown to be unique. They
+      // likely repeat within one workspace (the same simulator name on two
+      // runtimes), so that needs a live check across two or more runtimes.
+      ['xcode', 'WorkspaceDocument', 'activeRunDestination', 'RunDestination', 'parent-scoped'],
       ['xcode', 'WorkspaceDocument', 'lastSchemeActionResult', 'SchemeActionResult', 'no-get'],
-      // A run destination is identified by its name, which is not claimed unique.
-      ['xcode', 'WorkspaceDocument', 'activeRunDestination', 'RunDestination', 'not-unique'],
+      ['xcode', 'Target', 'project', 'Project', 'parent-scoped'],
       ['xcode', 'RunDestination', 'device', 'Device', 'no-get'],
       ['xcode', 'RunDestination', 'companionDevice', 'Device', 'no-get'],
     ]
-    expect(expected).toHaveLength(70)
+    expect(expected).toHaveLength(98)
     expect(found.sort()).toEqual(expected.sort())
   })
 

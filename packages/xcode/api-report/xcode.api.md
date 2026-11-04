@@ -240,7 +240,7 @@ export type ProjectCreateInput = Record<string, never>;
 // @public
 export class ProjectResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Project>;
+    get(workspaceName: string, id: string): Promise<Project>;
     list(workspaceName: string): Promise<Page<Project>>;
 }
 
@@ -290,7 +290,7 @@ export type RunDestinationCreateInput = Record<string, never>;
 // @public
 export class RunDestinationResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<RunDestination>;
+    get(workspaceName: string, name: string): Promise<RunDestination>;
     list(workspaceName: string): Promise<Page<RunDestination>>;
 }
 
@@ -348,7 +348,7 @@ export type SchemeCreateInput = Record<string, never>;
 // @public
 export class SchemeResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Scheme>;
+    get(workspaceName: string, id: string): Promise<Scheme>;
     list(workspaceName: string): Promise<Page<Scheme>>;
 }
 
@@ -402,7 +402,6 @@ export type SourceDocumentUpdateInput = Partial<SourceDocumentCreateInput>;
 export interface Target {
     id: string;
     name: string;
-    project: Project;
 }
 
 // @public
@@ -414,7 +413,6 @@ export interface TargetCreateInput {
 export const TargetSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
-    project: z.ZodString;
 }, z.core.$strip>;
 
 // @public
@@ -494,7 +492,6 @@ export type TextDocumentUpdateInput = Partial<TextDocumentCreateInput>;
 
 // @public
 export interface WorkspaceDocument {
-    activeScheme: Scheme;
     file: string;
     id?: string;
     loaded: boolean;
@@ -531,7 +528,6 @@ export const WorkspaceDocumentSchema: z.ZodObject<{
     file: z.ZodString;
     path: z.ZodString;
     loaded: z.ZodBoolean;
-    activeScheme: z.ZodString;
 }, z.core.$strip>;
 
 // @public

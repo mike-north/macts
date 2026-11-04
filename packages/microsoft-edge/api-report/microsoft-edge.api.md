@@ -137,7 +137,7 @@ export class TabResourceClient {
     create(input: TabCreateInput): Promise<Tab>;
     cutSelection(tabId: string): Promise<void>;
     execute(tabId: string, javascript: string): Promise<void>;
-    get(id: string): Promise<Tab>;
+    get(windowId: string, id: string): Promise<Tab>;
     goBack(tabId: string): Promise<void>;
     goForward(tabId: string): Promise<void>;
     list(windowId: string): Promise<Page<Tab>>;
@@ -163,7 +163,6 @@ export type TabUpdateInput = Partial<TabCreateInput>;
 
 // @public
 export interface Window {
-    activeTab: Tab;
     activeTabIndex: number;
     bounds: {
         x: number;
@@ -229,7 +228,6 @@ export const WindowSchema: z.ZodObject<{
     visible: z.ZodBoolean;
     zoomable: z.ZodBoolean;
     zoomed: z.ZodBoolean;
-    activeTab: z.ZodString;
     mode: z.ZodString;
     activeTabIndex: z.ZodNumber;
 }, z.core.$strip>;

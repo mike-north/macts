@@ -560,6 +560,8 @@ export function referenceAddressing(
 interface ParentScope {
   /** The request parameter carrying the parent's identifier. */
   readonly parentIdParam: string
+  /** The manifest key of the parent's resource, named when the parent is missing. */
+  readonly parentResource: string
   /**
    * Expression addressing the parent item in its resource's collection,
    * reading its identifier from {@link PARENT_ID_LOCAL}.
@@ -613,12 +615,20 @@ const PARENT_LOCAL = 'parent'
  * object. It covers identifier lookups and property matches alike. An
  * unchecked property match (`whose(...)[0]`) that matches nothing would
  * otherwise surface as an invalid index when it is first used.
+ *
+ * `missingResource`, given for a parent, is the manifest key of the resource
+ * the specifier addresses. The error carries it, so the failure names the
+ * missing parent rather than the operation's own resource. A missing target
+ * carries none: the operation's resource is the one missing.
  */
-function failIfMissing(local: string): string {
+function failIfMissing(local: string, missingResource?: string): string {
   return [
     `if (!${local}.exists()) {`,
     "  var missing = new Error('No such object.');",
     `  missing.errorNumber = ${String(NO_SUCH_OBJECT_ERROR_NUMBER)};`,
+    ...(missingResource === undefined
+      ? []
+      : [`  missing.missingResource = ${literal(missingResource)};`]),
     '  throw missing;',
     '}',
   ].join('\n')
@@ -626,11 +636,15 @@ function failIfMissing(local: string): string {
 
 /**
  * Statements binding the parent specifier of a scoped operation to
- * {@link PARENT_LOCAL}, failing as "no such object" when the parent does not
- * exist. `parentTarget` reads the parent identifier from {@link PARENT_ID_LOCAL}.
+ * {@link PARENT_LOCAL}, failing as "no such object", naming the parent's
+ * resource, when the parent does not exist. The parent target reads the parent
+ * identifier from {@link PARENT_ID_LOCAL}.
  */
-function bindParent(parentTarget: string): string {
-  return lines(`var ${PARENT_LOCAL} = ${parentTarget};`, failIfMissing(PARENT_LOCAL))
+function bindParent(parentScope: ParentScope): string {
+  return lines(
+    `var ${PARENT_LOCAL} = ${parentScope.parentTarget};`,
+    failIfMissing(PARENT_LOCAL, parentScope.parentResource)
+  )
 }
 
 /**
@@ -662,6 +676,7 @@ function recordedParentScope(command: Command, manifest: AppManifest): ParentSco
   }
   return {
     parentIdParam: parent.parameter,
+    parentResource: parent.resource,
     parentTarget: buildTargetExpression(
       resource,
       resolveCollectionAccessor(resource),
@@ -711,7 +726,7 @@ function bindTarget(
   return lines(
     readParentId(command, parentScope),
     itemId,
-    bindParent(parentScope.parentTarget),
+    bindParent(parentScope),
     `var item = ${buildNestedTargetExpression(resource, PARENT_LOCAL, resourcePlural, ITEM_ID_LOCAL)};`,
     failIfMissing('item')
   )
@@ -1361,7 +1376,7 @@ function buildListBody(
   let parentBinding = ''
   let collectionExpression = member('app', resourcePlural)
   if (parentScope !== undefined) {
-    parentBinding = lines(readParentId(command, parentScope), bindParent(parentScope.parentTarget))
+    parentBinding = lines(readParentId(command, parentScope), bindParent(parentScope))
     collectionExpression = member(PARENT_LOCAL, resourcePlural)
   }
 
@@ -1568,7 +1583,7 @@ function buildCreateBody(
   if (parentScope !== undefined) {
     const body = lines(
       readParentId(command, parentScope),
-      bindParent(parentScope.parentTarget),
+      bindParent(parentScope),
       collectSuppliedParameters(
         'props',
         command.parameters.filter((p) => p.name !== parentScope.parentIdParam),

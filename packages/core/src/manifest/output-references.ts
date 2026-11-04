@@ -24,6 +24,10 @@
  * - the target's `get` records a parent, so the target is identified only
  *   within its container, and native reads do not return the container yet
  *   (#242);
+ * - the target's `get` records no parent, but the manifest hierarchy holds the
+ *   target only within another resource, never at the application, so the
+ *   `get` looks for it in a collection the app does not have, and macts does
+ *   not record the parent it needs yet;
  * - or macts identifies the target by its name, and the manifest has no
  *   evidence yet that the name is unique. Such a reference resolves to
  *   whichever object has that name when it is resolved, so it does not pin the
@@ -59,6 +63,7 @@ import type { Command } from './schemas/command.js'
 import type { Property } from './schemas/property.js'
 import type { Resource } from './schemas/resource.js'
 import { resolveIdentifierTargeting, resolvePrimaryIdentifierProperty } from './identifier.js'
+import { nestedOnlyResources } from './hierarchy-placement.js'
 import { resolvePrimaryIdentifier } from './primary-identifier.js'
 import { resolveRoots } from './roots.js'
 import { resolvingCommand } from './resource-commands.js'
@@ -83,6 +88,12 @@ import {
  *   no identity reference to one exists.
  * - `parent-scoped`: the target's `get` records a parent, and native reads do
  *   not return containers yet (#242).
+ * - `unrecorded-parent`: the target's `get` records no parent, but the app
+ *   holds the target only within a container: the manifest hierarchy, which
+ *   records the app's element containment, places it under another resource
+ *   and never at the application. The parent that `get` would need is what
+ *   is missing. When the hierarchy cannot decide where the target lives,
+ *   because it places the target nowhere, this reason does not apply.
  * - `not-unique`: macts identifies the target by its name, and the manifest
  *   has no evidence yet that the name is unique, so it does not pin one
  *   object.
@@ -92,6 +103,7 @@ export type OmittedOutputReason =
   | 'no-get'
   | 'no-identifier'
   | 'parent-scoped'
+  | 'unrecorded-parent'
   | 'not-unique'
 
 /** An output reference macts cannot return in a usable form yet, and why. */
@@ -125,10 +137,12 @@ export function isNameKeyed(manifest: AppManifest, resourceKey: string): boolean
 /**
  * What macts does not provide yet for a reference read from the app to
  * `resourceKey` to be usable, or `undefined` when it can be used: the resource
- * is not a singleton root, has a usable `get` that records no parent and a
- * primary identifier, and is not name-keyed
- * ({@link isNameKeyed}). The reasons are checked in that order, so the first
- * that applies is reported.
+ * is not a singleton root, has a usable `get` and a primary identifier, that
+ * `get` records no parent, the hierarchy does not hold the resource only
+ * within another resource ({@link nestedOnlyResources}), and the resource is
+ * not name-keyed ({@link isNameKeyed}). The reasons are checked in that order
+ * (`root-kind-unmapped`, `no-get`, `no-identifier`, `parent-scoped`,
+ * `unrecorded-parent`, `not-unique`), so the first that applies is reported.
  *
  * @param manifest - The app manifest.
  * @param resourceKey - The manifest key of the referenced resource.
@@ -144,6 +158,7 @@ export function omittedOutputReason(
     return 'no-identifier'
   }
   if (get[1].parent !== undefined) return 'parent-scoped'
+  if (nestedOnlyResources(manifest).has(resourceKey)) return 'unrecorded-parent'
   return isNameKeyed(manifest, resourceKey) ? 'not-unique' : undefined
 }
 

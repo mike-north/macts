@@ -8,7 +8,6 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
-import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
 import { ResourceDescriptor } from '@macts/contracts';
@@ -86,6 +85,7 @@ export type MicrosoftEdgeResources = Readonly<{
         readonly get: 'microsoft-edge.tabs.get';
         readonly list: 'microsoft-edge.tabs.list';
         readonly parents: {
+            readonly get: 'Window';
             readonly list: 'Window';
         };
     };
@@ -124,7 +124,7 @@ export interface TabResourceClient {
     create(input: TabCreateInput, options?: CallOptions): Promise<Tab>;
     cutSelection(tabId: string, options?: CallOptions): Promise<void>;
     execute(tabId: string, javascript: string, options?: CallOptions): Promise<void>;
-    get(id: string, options?: CallOptions): Promise<Tab>;
+    get(windowId: string, id: string, options?: CallOptions): Promise<Tab>;
     goBack(tabId: string, options?: CallOptions): Promise<void>;
     goForward(tabId: string, options?: CallOptions): Promise<void>;
     list(windowId: string, options?: CallOptions): Promise<Page<Tab>>;
@@ -145,7 +145,6 @@ export interface TabUpdateInput {
 
 // @public
 export interface Window {
-    readonly activeTab: ObjectReferenceVariant<Tab, string, 'Tab'> | null;
     activeTabIndex: Integer | null;
     bounds: Rectangle | null;
     readonly closeable: boolean | null;

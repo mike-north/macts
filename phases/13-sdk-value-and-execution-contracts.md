@@ -981,6 +981,12 @@ The native `Executor` maps a `NativeOutcome` failure to canonical errors:
   and a message naming the position: Contacts has no Person matching the
   reference at `for`. It is not read from an app error number; the codec
   checks existence before any command runs.
+- An app failure with -1728 and `missingResource` maps to
+  `TargetNotFoundError` with `details: { resource }`, that resource: a scoped
+  operation's body checks its parent exists before it addresses anything
+  under it, and a missing parent names the parent's resource, not the
+  operation's. Google Chrome has no Window matching the request, for a tab
+  got within a window that does not exist.
 
 Native error numbers map to D6 classes as follows:
 
@@ -1138,19 +1144,35 @@ Defined in `@macts/contracts` (`invocation/`):
 authority, in both modes. Adapters translate protocol context into an
 `InvocationContext` and nothing more. Each step reuses an existing mechanism:
 
-| Step                                                                                                 | Reuses                                                                                                     | Failure                                                                                                                                                                                                                                                     |
-| ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1. Verify credential → `Authority`                                                                   | `validateApiKey`, moved unchanged to the runtime                                                           | `AuthenticationError` with `reason`: `missing`, `malformed` (`INVALID_FORMAT`, `MALFORMED_PAYLOAD`), `invalid` (`INVALID_SIGNATURE`), `expired`, `revoked`                                                                                                  |
-| 1b. Admission (optional): `rateLimiter.admit(authority.subject)`                                     | The fixed-window counter of the former HTTP rate-limit middleware, as `createRateLimiter`                  | `RateLimitedError` (`retryAfterSeconds`). A limiter that throws denies with `InternalError`, never `RateLimitedError`.                                                                                                                                      |
-| 2. Permission check against `descriptor.permission`, using the manifest command's permission history | `checkPayloadPermission` / `hasPermission`                                                                 | `PermissionDeniedError` (`required`, `hint`, `changelog`)                                                                                                                                                                                                   |
-| 3. Governance: `resolveGovernanceForRequest(governance, authority.subject)` → `enforceCall`          | Audit context `{ apiKeyId: subject, argsSummary: redactArgs(wire input), timestamp: clock(), approvalId }` | `PolicyDeniedError`. With no approval gate, a confirm-first hold raises `ApprovalPendingError`. With a gate, the runtime calls `seekApproval` then `recordApprovalDecision`; a rejection, a timeout, or a failure to record raises `ApprovalRejectedError`. |
-| 4. Input validation against `descriptor.input.wire`                                                  | —                                                                                                          | `ValidationError`. This catches raw wire requests and casts that bypassed client-side `encode`.                                                                                                                                                             |
-| 5. `executor.execute(...)`                                                                           | —                                                                                                          | Canonical errors from the provider; any non-canonical throw becomes `InternalError`                                                                                                                                                                         |
+| Step                                                                                                 | Reuses                                                                                                                                                                                                                                                                                                                                     | Failure                                                                                                                                                                                                                                                                                          |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1. Verify credential → `Authority`                                                                   | `validateApiKey`, moved unchanged to the runtime                                                                                                                                                                                                                                                                                           | `AuthenticationError` with `reason`: `missing`, `malformed` (`INVALID_FORMAT`, `MALFORMED_PAYLOAD`), `invalid` (`INVALID_SIGNATURE`), `expired`, `revoked`                                                                                                                                       |
+| 1b. Admission (optional): `rateLimiter.admit(authority.subject)`                                     | The fixed-window counter of the former HTTP rate-limit middleware, as `createRateLimiter`                                                                                                                                                                                                                                                  | `RateLimitedError` (`retryAfterSeconds`). A limiter that throws denies with `InternalError`, never `RateLimitedError`.                                                                                                                                                                           |
+| 2. Permission check against `descriptor.permission`, using the manifest command's permission history | `checkPayloadPermission` / `hasPermission`                                                                                                                                                                                                                                                                                                 | `PermissionDeniedError` (`required`, `hint`, `changelog`)                                                                                                                                                                                                                                        |
+| 3. Input validation against `descriptor.input.wire`                                                  | `recordInvalidInput`: one `invalid-input` audit record `{ capability, app, apiKeyId: subject, timestamp: clock(), issueCount }`, with no argument values, summary, or issue messages                                                                                                                                                       | `ValidationError`. This catches raw wire requests and casts that bypassed client-side `encode`. For a list that pages it includes reading the page window and checking any cursor against the operation and the call's other inputs (D9). Governance is not evaluated and no approval is sought. |
+| 4. Governance: `resolveGovernanceForRequest(governance, authority.subject)` → `enforceCall`          | Audit context `{ apiKeyId: subject, argsSummary, timestamp: clock(), approvalId }`, where `argsSummary` is `redactArgs` over the operation's declared input parameters, each value taken from the validated input (a `cursor` recorded as `true`), followed by `unknownKeys: N` when the input had N keys that are not declared parameters | `PolicyDeniedError`. With no approval gate, a confirm-first hold raises `ApprovalPendingError`. With a gate, the runtime calls `seekApproval` then `recordApprovalDecision`; a rejection, a timeout, or a failure to record raises `ApprovalRejectedError`.                                      |
+| 5. `executor.execute(...)`                                                                           | —                                                                                                                                                                                                                                                                                                                                          | Canonical errors from the provider; any non-canonical throw becomes `InternalError`                                                                                                                                                                                                              |
 
-The step order is today's order. Fail-closed rules carry over unchanged: a
-resolver failure, an `enforceCall` failure, or an audit-write failure denies
-the call. Steps 1–3 also govern reference resolution and file fetch, which are
-read-risk calls (D7, D8). Execution owns the pipeline.
+Permission comes before validation, so there is no schema oracle: a caller
+without the permission learns nothing about the operation's input contract,
+and is answered `PermissionDeniedError` whatever its input, never
+`ValidationError`. A caller that has the permission and sends invalid input
+is answered `ValidationError`. A permission denial writes no audit record. Validation
+comes before governance, so only well-formed calls reach policy, audit
+summaries, and approvers: an argument summary describes input that passed its
+contract, and names only parameters the contract declares. A key that is not
+a declared parameter (an input schema may let it through, as a manifest
+command's request schema does, or strip it) is counted in `unknownKeys` and
+never named. A call rejected by validation after the permission check writes
+exactly one `invalid-input` audit record (D6) with the number of validation
+issues and nothing from the input, and is never put to an approver.
+
+Fail-closed rules carry over unchanged: a resolver failure, an `enforceCall`
+failure, or an audit-write failure denies the call. That includes the
+`invalid-input` record: if it cannot be written, the call fails with
+`InternalError` rather than `ValidationError`. Steps 1–4 also govern reference
+resolution and file fetch, which are read-risk calls (D7, D8). Execution owns
+the pipeline.
 
 Step 1b is admission, not authority. It runs only when the runtime is
 constructed with a `rateLimiter`, keyed by the verified subject, so it never
@@ -1195,7 +1217,7 @@ it, not only HTTP. The reserved names are exported as
 
 Locality changes only where the pipeline runs. In remote mode the client
 presents the credential over HTTP and the service runs the same pipeline.
-There is no local shortcut that skips steps 1–3.
+There is no local shortcut that skips steps 1–4.
 
 **This Mac's governance.** `loadHostGovernance()` in `@macts/runtime` is the
 single definition of the governance a host enforces when none is supplied. It
@@ -1203,7 +1225,7 @@ composes the active policy (`<macts-home>/governance/policy.json`), the
 registered approval gate, the stored per-key policy resolver, and a file audit
 writer (`<macts-home>/governance/audit.jsonl`). The local client and the HTTP
 server both default to it, passing the loader itself; the runtime loads it once,
-on the first call that reaches step 3. `createRuntime` itself requires a
+on the first call that reaches step 3 (to audit invalid input) or step 4. `createRuntime` itself requires a
 `governance` option and has no default, so a host that builds a runtime
 directly (the MCP host included, #101) cannot run calls under governance it
 forgot to supply. Missing and malformed configuration are treated differently:
@@ -1250,28 +1272,28 @@ abstract `MactsError<Code>` and carries:
 `AnyMactsError` is the union of all classes. A `switch (error.code)` over it
 narrows `details`.
 
-| Class                           | `code`                       | Distinct meaning                                                                                                                                                     | Default HTTP                                      |
-| ------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| `ValidationError`               | `VALIDATION_FAILED`          | Caller input violated the operation contract (`issues[]`)                                                                                                            | 400                                               |
-| `UnexpectedValueError`          | `UNEXPECTED_VALUE`           | An app result violated the contract. This includes an enum member the SDK does not know and an out-of-policy integer (`issues[]`).                                   | 502                                               |
-| `AuthenticationError`           | `UNAUTHENTICATED`            | Credential missing or unusable (`reason`)                                                                                                                            | 401                                               |
-| `RateLimitedError`              | `RATE_LIMITED`               | The caller exceeded its admission limit; not evaluated further (`retryAfterSeconds`, a non-negative integer)                                                         | 429                                               |
-| `PermissionDeniedError`         | `PERMISSION_DENIED`          | Credential lacks the required permission                                                                                                                             | 403                                               |
-| `PolicyDeniedError`             | `POLICY_DENIED`              | Governance policy forbids the call (`permission`, `layer`)                                                                                                           | 403                                               |
-| `ApprovalPendingError`          | `APPROVAL_PENDING`           | Held for confirmation with nobody to ask; not executed                                                                                                               | 409                                               |
-| `ApprovalRejectedError`         | `APPROVAL_REJECTED`          | Held, put to a human, and not approved (`state`)                                                                                                                     | 403                                               |
-| `TargetNotFoundError`           | `TARGET_NOT_FOUND`           | A singular target does not exist (`entryIndex` for a missing identity-collection entry)                                                                              | 404                                               |
-| `FileNotFoundError`             | `FILE_NOT_FOUND`             | A referenced file does not exist or disappeared                                                                                                                      | 404                                               |
-| `InvalidSelectionError`         | `INVALID_SELECTION`          | A range or index selection is invalid for the collection                                                                                                             | 400                                               |
-| `CollectionChangedError`        | `COLLECTION_CHANGED`         | The collection changed while it was being read, so no consistent result exists; the same request is correct and can be retried, from the first page if it was paged. | 409                                               |
-| `AppUnavailableError`           | `APP_UNAVAILABLE`            | The app is not installed or cannot be reached                                                                                                                        | 503                                               |
-| `AppAuthorizationRequiredError` | `APP_AUTHORIZATION_REQUIRED` | macOS has not authorized automating the app. This is distinct from macts permission denial.                                                                          | 503                                               |
-| `AppOperationError`             | `APP_OPERATION_FAILED`       | The app reported a failure not covered above (`appErrorCode?`)                                                                                                       | 502                                               |
-| `OperationTimeoutError`         | `TIMEOUT`                    | The operation exceeded its time budget                                                                                                                               | 504                                               |
-| `OperationCancelledError`       | `CANCELLED`                  | The caller aborted the operation                                                                                                                                     | n/a (the caller stopped waiting); recorded as 499 |
-| `TransferError`                 | `TRANSFER_FAILED`            | A transfer expired, was incomplete, was too large, or is unknown                                                                                                     | 400 / 410 / 413                                   |
-| `InternalError`                 | `INTERNAL`                   | An unexpected macts failure, with a sanitized message                                                                                                                | 500                                               |
-| `TransportError`                | `TRANSPORT_FAILED`           | **Client-side only.** The service was unreachable, sent an invalid response, or uses a different protocol.                                                           | n/a                                               |
+| Class                           | `code`                       | Distinct meaning                                                                                                                                                        | Default HTTP                                      |
+| ------------------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `ValidationError`               | `VALIDATION_FAILED`          | Caller input violated the operation contract (`issues[]`). Raised by input validation after the permission check, it is audited with the decision `invalid-input` (D5). | 400                                               |
+| `UnexpectedValueError`          | `UNEXPECTED_VALUE`           | An app result violated the contract. This includes an enum member the SDK does not know and an out-of-policy integer (`issues[]`).                                      | 502                                               |
+| `AuthenticationError`           | `UNAUTHENTICATED`            | Credential missing or unusable (`reason`)                                                                                                                               | 401                                               |
+| `RateLimitedError`              | `RATE_LIMITED`               | The caller exceeded its admission limit; not evaluated further (`retryAfterSeconds`, a non-negative integer)                                                            | 429                                               |
+| `PermissionDeniedError`         | `PERMISSION_DENIED`          | Credential lacks the required permission                                                                                                                                | 403                                               |
+| `PolicyDeniedError`             | `POLICY_DENIED`              | Governance policy forbids the call (`permission`, `layer`)                                                                                                              | 403                                               |
+| `ApprovalPendingError`          | `APPROVAL_PENDING`           | Held for confirmation with nobody to ask; not executed                                                                                                                  | 409                                               |
+| `ApprovalRejectedError`         | `APPROVAL_REJECTED`          | Held, put to a human, and not approved (`state`)                                                                                                                        | 403                                               |
+| `TargetNotFoundError`           | `TARGET_NOT_FOUND`           | A singular target does not exist (`entryIndex` for a missing identity-collection entry)                                                                                 | 404                                               |
+| `FileNotFoundError`             | `FILE_NOT_FOUND`             | A referenced file does not exist or disappeared                                                                                                                         | 404                                               |
+| `InvalidSelectionError`         | `INVALID_SELECTION`          | A range or index selection is invalid for the collection                                                                                                                | 400                                               |
+| `CollectionChangedError`        | `COLLECTION_CHANGED`         | The collection changed while it was being read, so no consistent result exists; the same request is correct and can be retried, from the first page if it was paged.    | 409                                               |
+| `AppUnavailableError`           | `APP_UNAVAILABLE`            | The app is not installed or cannot be reached                                                                                                                           | 503                                               |
+| `AppAuthorizationRequiredError` | `APP_AUTHORIZATION_REQUIRED` | macOS has not authorized automating the app. This is distinct from macts permission denial.                                                                             | 503                                               |
+| `AppOperationError`             | `APP_OPERATION_FAILED`       | The app reported a failure not covered above (`appErrorCode?`)                                                                                                          | 502                                               |
+| `OperationTimeoutError`         | `TIMEOUT`                    | The operation exceeded its time budget                                                                                                                                  | 504                                               |
+| `OperationCancelledError`       | `CANCELLED`                  | The caller aborted the operation                                                                                                                                        | n/a (the caller stopped waiting); recorded as 499 |
+| `TransferError`                 | `TRANSFER_FAILED`            | A transfer expired, was incomplete, was too large, or is unknown                                                                                                        | 400 / 410 / 413                                   |
+| `InternalError`                 | `INTERNAL`                   | An unexpected macts failure, with a sanitized message                                                                                                                   | 500                                               |
+| `TransportError`                | `TRANSPORT_FAILED`           | **Client-side only.** The service was unreachable, sent an invalid response, or uses a different protocol.                                                              | n/a                                               |
 
 **Wire codec.** An error response body is
 `{ "error": { "code", "message", "details" } }`. Over HTTP, a 401 also
@@ -1435,25 +1457,27 @@ identity collection has no entry to resolve, so it is admitted.
 an object of another resource: their command records a parent (D10, command
 parents) and takes that parent's identifier. Music gets and lists tracks
 within a playlist; Contacts addresses, emails and phones within a person;
-Calendar events within a calendar; TV playlists within a source. Reminders lists reminders only within a
-list but gets one at the application, and Automator, Microsoft Edge,
-OmniGraffle and Xcode list some resources only within a parent in the same
-way. A reference resolved through such an operation can be resolved only when
-it carries the parent's identifier, so its `container` is required and must
-be an identity reference to that operation's parent. A reference takes the
-parent of the operation that resolves it: a single-object reference in
-either form (a name or index selector included), a container and an
+Calendar events within a calendar; Google Chrome and Microsoft Edge tabs within
+a window; TV playlists within a source; Xcode projects, schemes and run
+destinations within a workspace document. Reminders lists reminders only
+within a list but gets one at the application, and Automator, Microsoft Edge
+(bookmark items) and OmniGraffle list some resources only within a parent in
+the same way. A reference resolved through such an operation can be resolved only
+when it carries the parent's identifier, so its `container` is required and
+must be an identity reference to that operation's parent. A reference takes the
+parent of the operation that resolves it: a single-object reference in either
+form (a name or index selector included), a container and an
 identity-collection entry take the `get` parent, and a selector collection
 (every or range) takes the `list` parent. A missing container, one naming
-another resource, and a selector container (which supplies no identifier)
-are encode and decode issues at `[...path, 'container']`, and the wire and
-SDK schemas reject them, so the derived JSON Schema of such a position lists
-`container` as required and admits only the parent's identity form there.
-The container is read by the same rules, so a chain of parents is checked
-level by level. A reference resolved through an operation at the application
-keeps an optional container of any resolvable resource. The rule narrows
-what bound and data reference types admit, so `bindReference` and every
-typed input position reject the same references at compile time.
+another resource, and a selector container (which supplies no identifier) are
+encode and decode issues at `[...path, 'container']`, and the wire and SDK
+schemas reject them, so the derived JSON Schema of such a position lists
+`container` as required and admits only the parent's identity form there. The
+container is read by the same rules, so a chain of parents is checked level by
+level. A reference resolved through an operation at the application keeps an
+optional container of any resolvable resource. The rule narrows what bound and
+data reference types admit, so `bindReference` and every typed input position
+reject the same references at compile time.
 
 The resource table records the parents once, as `ResourceDescriptor.parents`,
 `{ get?, list? }`, keyed like the routes: each field is the key of the parent
@@ -1522,6 +1546,14 @@ needs its target's `get`. macts cannot yet return a usable reference when:
   not return containers yet (container scoping, below; #242), so a reference
   read from the app to a target identified only within its container could
   not be resolved;
+- that `get` records no parent, but the manifest hierarchy holds the target
+  only within another resource and never at the application, so the `get`
+  looks for it in a collection the app does not have; what is missing is the
+  parent the `get` does not record (`unrecorded-parent`). The hierarchy is
+  the manifest's record of the app's element containment, and one helper
+  reads it for this rule and for the command-parent guard (D10). When the
+  hierarchy places the target nowhere, it cannot say where the target lives,
+  and this case does not apply;
 - or macts identifies the target by its name, and the manifest has no
   evidence yet that the name is unique (name-keyed resources, below), so the
   reference would resolve to whichever object has that name, not necessarily
@@ -1543,8 +1575,22 @@ curated `get` cannot serve:
   position within its container, once output references carry containers
   (#242).
 
-Xcode's workspace document `activeRunDestination` stays left out until
-evidence shows that a run destination's name identifies one object.
+Xcode's workspace document `activeScheme` and `activeRunDestination`, and a
+target's `project`, are left out as container-scoped: Xcode gets a scheme, a
+run destination and a project only within its workspace document. Returning
+containers is not enough to bring them back, because the container itself
+needs an evidenced identity. A workspace document is targeted by name today,
+and its name likely cannot be shown unique: two checkouts of the same project
+can be open at once under one name. Its container identity is its `path`
+instead, a location identity: in the scripting dictionary a path is unique
+among open documents and is how the app itself addresses a document. These
+fields come back once a workspace document is curated by its path, with
+evidence (looked up by path directly if the app supports it, otherwise matched
+on `path`), and references carry their container. `activeRunDestination` also needs evidence that a run
+destination's name identifies one object within its workspace. Run
+destination names likely repeat within one workspace (the same simulator name
+on two runtimes), so a live check across two or more runtimes must come
+before any uniqueness claim.
 
 A position that holds such a reference anywhere, bare, in an array, or as the
 non-null case of a nullable value, is left out of output for now; generation
@@ -1561,8 +1607,9 @@ resolved yet. Leaving it out means:
   (or the command), the target and what macts does not provide yet, for
   example "macts has no get for "Mailbox" yet". Every warning cites #219.
   The position returns on regeneration once coverage closes the gap: a `get`
-  for the target that records no parent and an identifier, returned
-  containers (#242), or a unique claim with evidence.
+  for the target that records no parent and an identifier, the parent a
+  nested target's `get` needs, returned containers (#242), or a unique claim
+  with evidence.
 
 Input positions follow the input rule above, so a field left out of output
 may still be settable through create and update. The contract, HTTP client
@@ -1613,11 +1660,17 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   exactly when its `get` is parent-scoped, meaning the command records a
   parent. A native read emits a container exactly when resolving the object
   by id needs that parent. An object that is identified globally but reached
-  only through a container emits no container. Examples are Chrome and Edge
-  tabs, Arc spaces, iTerm sessions, and nested Photos folders. Native reads
-  emit no container yet, so an output position whose target's identity is
-  scoped to its container is left out of output (resolvable targets, above)
-  until reads emit containers (#242).
+  only through a container emits no container. Examples are Arc spaces, iTerm
+  sessions, and nested Photos folders. Xcode schemes, run destinations and
+  projects are container-scoped: each is got within its workspace document,
+  because there is no evidence that scheme or project ids are unique across
+  workspaces. That is the same bar as iTerm's sessions: an object reached
+  through a path of containers is identified globally only with evidence
+  that its id is unique across the app.
+  Native reads emit no container yet, so
+  an output position whose target's identity is scoped to its container is
+  left out of output (resolvable targets, above) until reads emit containers
+  (#242).
 - **Name-keyed resources.** A resource whose primary identifier is its name
   keeps `ResourceDescriptor.id`. Resolving an identity reference to it means
   the same as a name selector: it resolves to whichever object has that name
@@ -1801,16 +1854,18 @@ bypass policy:
    resource's permission is checked. Container traversal needs no container
    permission, because a container only locates the target and contributes no
    data to the result.
-5. Governance, approval, and audit run exactly as for a direct call of the
+5. The whole reference is validated with
+   `t.reference(() => contract, resource, cardinality)`, after the permission
+   check and before governance, as in `invoke` (D5, D11). A malformed
+   reference is a `ValidationError`, audited as `invalid-input` with no part
+   of the reference, and is never put to an approver.
+6. Governance, approval, and audit run exactly as for a direct call of the
    operation: the same permission string and the same decision. The audit
    record has the same capability, app, key, and decision as a direct call;
-   it differs only in `argsSummary`, which holds the redacted reference
-   payload. Nested values in that summary are reduced to a key count, so a
-   selector is summarized as an object and the name a name selector looked up
-   is not recorded. Nothing else marks the record as a resolution.
-6. The whole reference is validated with
-   `t.reference(() => contract, resource, cardinality)`, after governance
-   as in `invoke` (D11). A malformed reference is a `ValidationError`.
+   it differs only in `argsSummary`, which holds the redacted validated
+   reference. Nested values in that summary are reduced to a key count, so a
+   selector is summarized as an object, and the name that a name selector
+   looked up is not recorded. Nothing else marks the record as a resolution.
 7. The executor's `resolve` runs (D9).
 8. The result is validated against the operation's `output.wire`, as every
    `invoke` result is, unless its output plan is `passthrough` (D11). For an
@@ -2182,13 +2237,18 @@ reads windows:
   a cursor issued through one surface continues through any other for the
   same inputs. It is a consistency check that the caller sent the same query
   again, not a security control. A malformed cursor, an unknown version, or a
-  cursor from another
-  operation or for other inputs is a `ValidationError` at `["cursor"]`,
-  never `COLLECTION_CHANGED`. Every page runs the full D5 pipeline, so a
-  cursor carries no authority. Audit and logs record only `cursor: true`, for
-  every operation, since arguments are audited before the input is validated
-  and a cursor can be sent where it is refused. No message or issue repeats a
-  cursor, since its anchor can be user content.
+  cursor from another operation or for other inputs is a `ValidationError` at
+  `["cursor"]`, never `COLLECTION_CHANGED`. These checks need only the input,
+  so they are part of input validation (D5 step 3), before governance: such a
+  call is audited as `invalid-input`, with no values, and never put to an
+  approver. Only whether the anchor still sits where it did is decided during
+  execution, by the app (below). Every page runs the full D5 pipeline, so a
+  cursor carries no authority. Audit and logs record only `cursor: true`. A
+  cursor sent to an operation that declares none fails validation under a
+  contract registration, so that call is audited as `invalid-input`; under a
+  manifest registration, whose request schema admits keys it does not
+  declare, it is counted in `unknownKeys` and never recorded. No message or
+  issue repeats a cursor, since its anchor can be user content.
 - The runtime hands the executor a half-open window `{ offset, size, anchor? }`
   and an output plan that is an array of the item plan. The executor answers
   `{ items, length, last? }`: the window's items, the collection's length when
@@ -2356,13 +2416,25 @@ Native bodies resolve every name they address through `resolveCollectionAccessor
 
 The probes (`macts probe`, identifiers and `--nullability`) address the app the same way, through the same two functions, and report every observation under the manifest key, so evidence is recorded against the public name. They never probe a resource marked unsupported, even when asked to: the app has none to read.
 
+### Superclasses
+
+**A class's superclass is recorded from the dictionary, and the manifest is read flattened.** A resource whose dictionary class inherits another records `inherits: { resource, evidence }`: `resource` is the key of the superclass resource in the same manifest, and the evidence is the superclass's name exactly as the dictionary's `inherits` writes it ("disk item" for System Events' `folder`), with the app build and macOS version. The manifest schema reads every manifest flattened (`manifest/superclasses.ts`), so the generators, the runtime and the probes all see the same resource. Five rules decide what it holds:
+
+- **Every claim on an inherited property travels with it, as the ancestor's evidence.** The resource gains each property of its ancestors that it does not declare, nearest ancestor first, after its own: the declaration whole, with its code, its native spelling, its `unsupported` marker and its evidence, and every claim the ancestor records about it, whatever backs the claim (dictionary, probe or curated nullability and resettability). Every item of the subclass is an item of the ancestor's class, so a claim that holds across the ancestor's class holds for any part of it, and there is no exception by kind of evidence. The claim stays the ancestor's evidence, gathered on the ancestor's collection, and keeps naming where it was observed. A subclass whose items are addressed through a different collection must override every inherited claim that depends on the collection, an identifier's `unique` included, with its own evidence. The reverse does not hold: a subclass's claim, declared or overlaid, is about the subclass's items only and never widens to the ancestor.
+- **A subclass replaces an inherited claim through a claims-only overlay.** `inheritedClaims.<property>` states claims about an inherited property without redeclaring it: a nullability claim (`nullable` with `evidence.nullable`), a resettability claim (`resettable` with `evidence.resettable`), or an `unsupported` marker with its evidence. Each claim the overlay states replaces the inherited one, with the subclass's own evidence; a claim it does not state stays inherited. A marker takes the property off the subclass's surfaces, so it also drops the inherited nullability and resettability claims and the native spelling. The overlaid property is what the subclass's own subclasses inherit. An overlay is a manifest error at `resources.<R>.inheritedClaims.<property>` when the resource records no superclass, when it declares the property itself (the claim belongs on that declaration), when no ancestor declares the property, when it states no claim, and when a claim has no evidence.
+- **An own declaration replaces an inherited one whole.** A property the resource declares is the resource's, field for field: declaring it is how a resource changes more than a claim (its type, access or description), and how it declares supported a property an ancestor marks unsupported.
+- **Identifiers travel with their claims.** A resource that declares no identifiers gains the nearest ancestor's whole: `unique` with its evidence, the targeting and `runtimeProperty`. Uniqueness across the ancestor's class holds for the subclass's items, which are part of it. A resource that declares identifiers keeps its own list, whole; there is no overlay for a single identifier, so a subclass addressed through a different collection states its uniqueness by declaring its identifiers.
+- **Commands, the hierarchy and collection-level fields are not inherited.** A resource's code, `native.collection`, `unsupported`, `rangeRead` and probe blocks describe its own collection, and commands and hierarchy entries name their resource; none passes to a subclass.
+
+A superclass the manifest does not declare, and a chain of superclasses that loops, are manifest errors at `resources.<R>.inherits.resource`; a cycle is reported once, from its first resource in manifest order. A resource's own rules hold for what it inherits, overlays applied, and an error is reported once, on the resource where it arises rather than on each subclass: an inherited primary identifier cannot be marked unsupported, a property cannot have a type the manifest marks unsupported, and an overlay cannot claim nullability for an inherited property that stays marked unsupported. Flattening folds each overlay into its property and drops `inheritedClaims`, so flattening a flattened manifest changes nothing and the manifest a contract embeds reads back the same. The nullability probe writes a claim about a property the resource declares on that declaration, and a claim about an inherited property as the resource's overlay; a claim with nowhere to go (the resource neither declares nor inherits the property) is not written, and the probe names it rather than reporting it written.
+
 ### Command parents
 
 **A command's parent is recorded, never guessed.** A command on a nested resource records `parent: { resource, parameter }`: `resource` is the key of the resource whose items hold the command's resource as elements, and `parameter` is the command's own required parameter that carries the parent item's identifier. Calendar's `getEvent` records `{ resource: Calendar, parameter: calendarId }`. The parent is a fact the curator records from the app's dictionary (the parent's class has the child as an element); nothing derives it from a parameter's name or position, or from the hierarchy. The manifest schema rejects a parent resource the manifest does not declare, one marked unsupported on a usable command, and a parameter that is not one of the command's required parameters, naming the command, the field and the value.
 
 Every surface takes the parent from the record. Native bodies address the parent resource's collection (`resolveCollectionAccessor`), the parent item in it by that resource's identifier targeting, the command's resource collection under that item, and a get, update or delete's item in it by the command resource's identifier targeting (D4, command parents); a command with no parent addresses its resource at the application. The generated SDKs, the contract and the CLI take a get, update or delete's parent scope from `parent.parameter`, and the child identifier is the first other required parameter (`resolveIdParams` in `generator/surface.ts`).
 
-**A guard holds every shipped manifest to the rule** (`manifest/command-parents.test.ts`). Every usable list, get, create, update or delete command on a resource the hierarchy nests under another resource, and does not also place at the application (`usableHierarchyChildren` of the top-level entries), records a parent; only those shapes address a collection. A recorded parent must hold the command's resource in the hierarchy. A resource the hierarchy does not place has no parent to record and is not checked. The only exceptions are the nested commands whose parent awaits a design decision, [#173](https://github.com/mike-north/macts/issues/173): Microsoft Edge's `getTab` and `getBookmarkItem`; OmniGraffle's `getGraphic`, `getShape`, `getLine` and `getLayer`; OmniPlan's task, milestone, resource, assignment, dependency, violation and scenario commands; Xcode's `getProject`, `getScheme` and `getRunDestination`; and OmniFocus's `listTasks`, `getTask` and `createTask`. The list is exact: an entry that records a parent, or whose resource becomes a top-level child, fails the guard until it is removed.
+**A guard holds every shipped manifest to the rule** (`manifest/command-parents.test.ts`). Every usable list, get, create, update or delete command on a resource the hierarchy nests under another resource, and does not also place at the application (`nestedOnlyResources` in `manifest/hierarchy-placement.ts`, the same helper the output rule's `unrecorded-parent` case reads), records a parent; only those shapes address a collection. A recorded parent must hold the command's resource in the hierarchy. A resource the hierarchy does not place has no parent to record and is not checked. The only exceptions are the nested commands whose parent awaits a design decision, [#173](https://github.com/mike-north/macts/issues/173): Microsoft Edge's `getBookmarkItem`; OmniGraffle's `getGraphic`, `getShape`, `getLine` and `getLayer`; OmniPlan's task, milestone, resource, assignment, dependency, violation and scenario commands; and OmniFocus's `listTasks`, `getTask` and `createTask`. The list is exact: an entry that records a parent, or whose resource becomes a top-level child, fails the guard until it is removed.
 
 ### Identifier targeting
 
@@ -2413,7 +2485,7 @@ Values are validated at every trust boundary, using the same schemas:
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Client `encode`               | Before any network or native call. It catches casts.                                                                                                                                                                                                                                |
 | Runtime against `input.wire`  | Catches raw HTTP and MCP requests.                                                                                                                                                                                                                                                  |
-| Runtime against `t.reference` | A reference to resolve, after governance (D7).                                                                                                                                                                                                                                      |
+| Runtime against `t.reference` | A reference to resolve, after the permission check and before governance (D7).                                                                                                                                                                                                      |
 | Runtime against `output.wire` | Every executor result whose output plan is not `passthrough`, on `invoke` and on resolution, before any adapter (HTTP, MCP, CLI) emits it. It catches executors that don't encode, or encode wrongly. A resolution result also holds one record per identity-collection entry (D7). |
 | Native codec inside JXA       | Against the plan, in both directions.                                                                                                                                                                                                                                               |
 | Client `decode`               | Against the operation's output contract.                                                                                                                                                                                                                                            |

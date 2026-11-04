@@ -8,6 +8,7 @@
  *
  * @see Issue #7 — Trust & Governance: boundaries, permissions, audit.
  * @see VISION.md §5.4 "Stronger auditability".
+ * @see phases/13-sdk-value-and-execution-contracts.md (D5: `invalid-input` records)
  */
 
 import { describe, it, expect } from 'vitest'
@@ -17,17 +18,46 @@ import {
   AUDIT_DECISIONS,
   type AuditRecord,
   type AuditRecordInput,
+  type GovernedAuditDecision,
+  type GovernedAuditRecordInput,
+  type InvalidInputAuditRecord,
+  type InvalidInputAuditRecordInput,
   type SerializedAuditRecord,
 } from './audit.js'
 
 // Fixed, deterministic timestamp (no Date.now()/new Date() without an argument).
 const TIMESTAMP = new Date('2026-06-14T10:42:12.000Z')
 
+/** Every decision reached by governance, whose records carry an argument summary. */
+const GOVERNED_DECISIONS: readonly GovernedAuditDecision[] = [
+  'allowed',
+  'denied',
+  'pending',
+  'approved',
+  'rejected',
+  'cancelled',
+]
+
+/** A fully-specified record input for a call rejected by input validation. */
+function invalidInput(
+  overrides: Partial<InvalidInputAuditRecordInput> = {}
+): InvalidInputAuditRecordInput {
+  return {
+    capability: 'calendar:events:create',
+    app: 'calendar',
+    apiKeyId: 'assistant-calendar-writer',
+    decision: 'invalid-input',
+    timestamp: TIMESTAMP,
+    issueCount: 2,
+    ...overrides,
+  }
+}
+
 /**
  * A reusable, fully-specified record input. Individual tests override single
  * fields rather than re-specifying the whole object.
  */
-function baseInput(overrides: Partial<AuditRecordInput> = {}): AuditRecordInput {
+function baseInput(overrides: Partial<GovernedAuditRecordInput> = {}): GovernedAuditRecordInput {
   return {
     capability: 'calendar:events:create',
     app: 'calendar',
@@ -78,7 +108,7 @@ describe('createAuditRecord', () => {
     expect(record.timestamp.toISOString()).toBe('2026-06-14T10:42:12.000Z')
   })
 
-  it.each(AUDIT_DECISIONS)('records the "%s" decision', (decision) => {
+  it.each(GOVERNED_DECISIONS)('records the "%s" decision', (decision) => {
     const record = createAuditRecord(baseInput({ decision }))
     expect(record.decision).toBe(decision)
   })
@@ -129,7 +159,8 @@ describe('serializeAuditRecord', () => {
   it('exposes the canonical decision set', () => {
     // spec: allowed (ran), denied (policy), pending (confirm-first, withheld),
     // approved (human ok), rejected (human no), cancelled (the caller abandoned
-    // a held call before any decision).
+    // a held call before any decision), invalid-input (rejected by input
+    // validation before governance).
     expect(AUDIT_DECISIONS).toEqual([
       'allowed',
       'denied',
@@ -137,6 +168,89 @@ describe('serializeAuditRecord', () => {
       'approved',
       'rejected',
       'cancelled',
+      'invalid-input',
     ])
+  })
+})
+
+describe('invalid-input records', () => {
+  // phases/13 D5: a call rejected by input validation is audited with its
+  // operation, key, time, and the number of validation issues, and with no
+  // argument values, argument summary, or issue messages.
+  it('carries attribution and the issue count, and nothing else', () => {
+    const record: InvalidInputAuditRecord = createAuditRecord(invalidInput())
+    expect(record).toEqual({
+      capability: 'calendar:events:create',
+      app: 'calendar',
+      apiKeyId: 'assistant-calendar-writer',
+      decision: 'invalid-input',
+      timestamp: TIMESTAMP,
+      issueCount: 2,
+    })
+    expect('argsSummary' in record).toBe(false)
+  })
+
+  it('serializes without a summary, reason, or correlation id', () => {
+    expect(serializeAuditRecord(createAuditRecord(invalidInput()))).toEqual({
+      capability: 'calendar:events:create',
+      app: 'calendar',
+      apiKeyId: 'assistant-calendar-writer',
+      decision: 'invalid-input',
+      timestamp: '2026-06-14T10:42:12.000Z',
+      issueCount: 2,
+    } satisfies SerializedAuditRecord)
+  })
+
+  it('round-trips losslessly through JSON', () => {
+    const json = JSON.stringify(serializeAuditRecord(createAuditRecord(invalidInput())))
+    expect(JSON.parse(json)).toEqual({
+      capability: 'calendar:events:create',
+      app: 'calendar',
+      apiKeyId: 'assistant-calendar-writer',
+      decision: 'invalid-input',
+      timestamp: '2026-06-14T10:42:12.000Z',
+      issueCount: 2,
+    })
+  })
+
+  it.each([
+    ['an argument summary', { argsSummary: 'title: Groceries' }],
+    ['a reason', { reason: 'title: Expected string, received number' }],
+    ['a correlation id', { approvalId: 'approval-1' }],
+  ])('refuses to construct a record carrying %s', (_label, extra) => {
+    // A cast stands in for a caller outside the type system (plain JavaScript,
+    // or data that was never checked).
+    const input = { ...invalidInput(), ...extra } as unknown as AuditRecordInput
+    expect(() => createAuditRecord(input)).toThrow(TypeError)
+  })
+
+  it.each([
+    ['an argument summary', { argsSummary: 'title: Groceries' }],
+    ['a reason', { reason: 'title: Expected string, received number' }],
+    ['a correlation id', { approvalId: 'approval-1' }],
+  ])('refuses to serialize a record carrying %s', (_label, extra) => {
+    const record = { ...createAuditRecord(invalidInput()), ...extra } as unknown as AuditRecord
+    expect(() => serializeAuditRecord(record)).toThrow(TypeError)
+  })
+
+  it.each([
+    ['a negative count', -1],
+    ['a fractional count', 1.5],
+    ['a non-finite count', Number.POSITIVE_INFINITY],
+  ])('refuses %s of issues', (_label, issueCount) => {
+    expect(() => createAuditRecord(invalidInput({ issueCount }))).toThrow(TypeError)
+  })
+
+  it('leaves the governed decisions unchanged', () => {
+    for (const decision of GOVERNED_DECISIONS) {
+      expect(serializeAuditRecord(createAuditRecord(baseInput({ decision })))).toEqual({
+        capability: 'calendar:events:create',
+        app: 'calendar',
+        argsSummary: 'Calendar: Work; Summary: Team Meeting; Attendees: 3',
+        apiKeyId: 'assistant-calendar-writer',
+        decision,
+        timestamp: '2026-06-14T10:42:12.000Z',
+      })
+    }
   })
 })

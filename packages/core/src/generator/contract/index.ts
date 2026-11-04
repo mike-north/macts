@@ -137,12 +137,14 @@ interface ContractDiagnosticBase {
  * - `omitted-output`: an output position (a record field, or a command's
  *   result) holds a reference macts cannot yet hand back in a form a caller
  *   can resolve: macts has no `get` for its resource yet, or no identifier,
- *   or a `get` that needs the container native reads do not return yet, or no
- *   evidence that the name it is identified by is unique. The contract, the
- *   HTTP client, the CLI and the native reads leave it out for now. Each one
- *   is a coverage gap (#219), closed by giving the resource a `get` and an
- *   identifier, returning containers (#242), or a `unique` claim on the
- *   identifier, each with evidence.
+ *   or a `get` that needs the container native reads do not return yet, or a
+ *   `get` that names no container for a resource the app holds only within
+ *   one, or no evidence that the name it is identified by is unique. The
+ *   contract, the HTTP client, the CLI and the native reads leave it out for
+ *   now. Each one is a coverage gap (#219), closed by giving the resource a
+ *   `get` and an identifier, recording the parent its `get` needs, returning
+ *   containers (#242), or a `unique` claim on the identifier, each with
+ *   evidence.
  */
 export type ContractDiagnostic =
   | (ContractDiagnosticBase & {
@@ -226,6 +228,8 @@ const OMITTED_OUTPUT_REASONS: Readonly<Record<OmittedOutputReason, (target: stri
   'no-identifier': (target) => `and macts has no identifier for "${target}" yet (#219)`,
   'parent-scoped': (target) =>
     `which the app finds only within its container, and macts does not yet return a "${target}" reference with its container (#219, #242)`,
+  'unrecorded-parent': (target) =>
+    `which the app holds only within a container, and macts's get for "${target}" does not name that container yet (#219)`,
   'not-unique': (target) =>
     `which macts identifies by its name, and macts has no evidence yet that the name identifies one "${target}" (#219)`,
 }

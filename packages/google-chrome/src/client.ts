@@ -5,6 +5,9 @@
  * @packageDocumentation
  */
 
+import { WindowResourceClient } from './resources/window.js'
+import { TabResourceClient } from './resources/tab.js'
+
 /**
  * Client configuration options.
  */
@@ -82,9 +85,17 @@ export class GoogleChromeError extends Error {
 export class GoogleChromeClient {
   readonly #httpClient: HttpClient
 
+  /** A window. */
+  readonly windows: WindowResourceClient
+
+  /** A tab. */
+  readonly tabs: TabResourceClient
+
   constructor(options: GoogleChromeClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
+    this.windows = new WindowResourceClient(this.#httpClient, 'google-chrome', 'windows')
+    this.tabs = new TabResourceClient(this.#httpClient, 'google-chrome', 'tabs')
   }
 
   /**

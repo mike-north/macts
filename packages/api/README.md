@@ -5,8 +5,8 @@ HTTP API server for macOS app automation.
 Serves macts operations over HTTP. The server composes the shared macts
 runtime ([`@macts/runtime`](../runtime/README.md)) with a thin HTTP adapter:
 every operation request is translated into one runtime invocation, which
-verifies the credential, applies the rate limit, checks permission, enforces
-governance, validates input, and only then executes. The HTTP layer adds
+verifies the credential, applies the rate limit, checks permission, validates
+input, enforces governance, and only then executes. The HTTP layer adds
 routing, the error envelope, CORS, logging, TLS, and graceful shutdown; it
 duplicates none of the authorization logic.
 
@@ -14,7 +14,7 @@ duplicates none of the authorization logic.
 
 - **Operation endpoints from manifests**: `POST /api/v1/rpc/{app}.{resource}.{operation}` for every manifest operation
 - **Remote reference resolution**: `POST /references/v1/resolve` resolves a reference through the same pipeline as the resource's `get` or `list` operation
-- **One invocation pipeline**: authentication, permissions, governance, and input validation run in `@macts/runtime`, identically for every macts surface
+- **One invocation pipeline**: authentication, permissions, input validation, and governance run in `@macts/runtime`, identically for every macts surface
 - **Structured errors**: every failure is a `{ "error": { code, message, details } }` envelope with a closed set of codes that `@macts/contracts` clients reconstruct into the same error classes
 - **Rate limiting**: per API key after authentication, and per client address before it, across every route that calls the runtime
 - **Pluggable execution**: the native macOS executor by default; inject any `Executor` for tests or alternate providers

@@ -2,7 +2,7 @@
  * Tests for the runtime's invocation pipeline.
  *
  * Expected outcomes are hand-written from phases/13: the D5 pipeline table
- * (verify → admission → permission → governance → input validation →
+ * (verify → admission → permission → input validation → governance →
  * execute, in that order, failing closed) and the D6 error table (which canonical class and
  * details each failure carries). Every branch that must not execute is
  * asserted against the recording executor, so "denied" always means "the
@@ -538,7 +538,7 @@ describe('step 2: permission check', () => {
   })
 })
 
-describe('step 3: governance', () => {
+describe('step 4: governance', () => {
   it('denies a call the host policy forbids, auditing it against the subject', async () => {
     const writer = createMemoryAuditWriter()
     const { runtime, executor } = harness({ governance: { policy: FORBID_ALL, writer } })
@@ -609,7 +609,8 @@ describe('step 3: governance', () => {
       permission: 'calendar:events:create',
       risk: 'write',
       identity: { apiKeyId: 'key_writer', apiKeyName: 'Calendar assistant' },
-      argsSummary: 'summary: Standup; password: [redacted]',
+      // `password` is not a parameter of `create`, so only its count is recorded.
+      argsSummary: 'summary: Standup; unknownKeys: 1',
       requestedAt: FIXED_NOW,
       layer: 'host',
     })
@@ -757,22 +758,40 @@ describe('step 3: governance', () => {
     await runtime.invoke(CREATE, VALID_CREATE_INPUT, as(WRITER_SECRET))
 
     expect(writer.records).toHaveLength(1)
-    expect(writer.records[0]?.argsSummary).toBe('summary: Standup; password: [redacted]')
+    expect(writer.records[0]).toMatchObject({ argsSummary: 'summary: Standup; unknownKeys: 1' })
     expect(JSON.stringify(writer.records)).not.toContain(WRITER_SECRET)
     expect(JSON.stringify(writer.records)).not.toContain('hunter2')
   })
 
-  it('summarizes a non-record input as no arguments', async () => {
+  it('records a non-record input as invalid input, without a summary', async () => {
     const writer = createMemoryAuditWriter()
     const { runtime } = harness({ governance: { policy: ALLOW_ALL_POLICY, writer } })
 
     await rejection(runtime.invoke(LIST, ['not', 'a', 'record'], as(READER_SECRET)))
 
-    expect(writer.records[0]?.argsSummary).toBe('(no arguments)')
+    expect(writer.records).toEqual([
+      {
+        capability: 'calendar:events:list',
+        app: 'calendar',
+        apiKeyId: 'key_reader',
+        decision: 'invalid-input',
+        timestamp: FIXED_NOW,
+        issueCount: 1,
+      },
+    ])
+  })
+
+  it('summarizes a call with no arguments as no arguments', async () => {
+    const writer = createMemoryAuditWriter()
+    const { runtime } = harness({ governance: { policy: ALLOW_ALL_POLICY, writer } })
+
+    await runtime.invoke(LIST, {}, as(READER_SECRET))
+
+    expect(writer.records[0]).toMatchObject({ argsSummary: '(no arguments)' })
   })
 })
 
-describe('step 3: governance from a loader', () => {
+describe('step 4: governance from a loader', () => {
   it('loads governance once, on the first call that reaches the governance step', async () => {
     const writer = createMemoryAuditWriter()
     const load = vi.fn(() =>
@@ -854,8 +873,8 @@ describe('step 3: governance from a loader', () => {
   })
 })
 
-describe('step 4: input validation', () => {
-  it('rejects input that violates the operation contract after governance, never executing', async () => {
+describe('step 3: input validation', () => {
+  it('rejects input that violates the operation contract before governance, never executing', async () => {
     const writer = createMemoryAuditWriter()
     const { runtime, executor } = harness({ governance: { policy: ALLOW_ALL_POLICY, writer } })
 
@@ -865,8 +884,17 @@ describe('step 4: input validation', () => {
     if (!(error instanceof ValidationError)) return
     expect(error.details.issues.map((issue) => issue.path)).toEqual([['summary'], ['allDay']])
     expect(executor.requests).toHaveLength(0)
-    // Governance ran first and audited the call.
-    expect(writer.records.map((r) => r.decision)).toEqual(['allowed'])
+    // Governance never ran: the call is audited only as invalid input.
+    expect(writer.records).toEqual([
+      {
+        capability: 'calendar:events:create',
+        app: 'calendar',
+        apiKeyId: 'key_writer',
+        decision: 'invalid-input',
+        timestamp: FIXED_NOW,
+        issueCount: 2,
+      },
+    ])
   })
 
   it.each([

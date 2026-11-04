@@ -18,11 +18,12 @@ Some reference inputs now require a container. When the operation that resolves 
 - Music gets and lists tracks within a playlist.
 - Contacts gets and lists addresses, emails and phones within a person.
 - Calendar gets and lists events within a calendar.
+- Google Chrome and Microsoft Edge get and list tabs within a window.
+- Xcode gets and lists projects, schemes and run destinations within a workspace document.
 - Some apps list resources only within a parent, though each gets a single one without a parent:
   - Reminders lists reminders within a list.
-  - Microsoft Edge lists tabs within a window, and bookmark items within a bookmark folder.
+  - Microsoft Edge lists bookmark items within a bookmark folder.
   - OmniGraffle lists graphics, shapes, lines and layers within a canvas.
-  - Xcode lists projects, schemes and run destinations within a workspace document.
   - Automator lists actions and variables within a workflow, and an action's settings and required resources within that action.
 
 The generated resource table records this for each resolving operation, as `parents: { get?, list? }` on the resource. `ResourceDescriptor.parents` (of type `ResourceParents`) in `@macts/contracts` describes it. A reference takes the parent of the operation that resolves it:

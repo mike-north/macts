@@ -106,7 +106,8 @@ describe('the parents of resolving routes in every real contract', () => {
     const found = tableParents().map(
       ([app, resource, route, parent]) => `${app.name} ${resource} ${route} → ${parent}`
     )
-    expect(both.length + listOnly.length).toBe(20)
+    expect(both.length).toBe(11)
+    expect(listOnly.length).toBe(10)
     const byRoute = ([app, resource, parent]: Pin, routes: readonly string[]) =>
       routes.map((route) => `${app} ${resource} ${route} → ${parent}`)
     expect(found.sort()).toEqual(

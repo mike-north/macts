@@ -31,9 +31,12 @@ export class RunDestinationResourceClient {
   }
 
   /**
-   * Get a run destination by name.
+   * Get a run destination by name within a parent scope.
    */
-  async get(name: string): Promise<RunDestination> {
-    return this.#http.rpc<RunDestination>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(workspaceName: string, name: string): Promise<RunDestination> {
+    return this.#http.rpc<RunDestination>(`${this.#app}.${this.#resource}.get`, {
+      workspaceName,
+      name,
+    })
   }
 }

@@ -2,7 +2,7 @@
 
 The MCP daemon server provides the HTTP transports of the Model Context Protocol, allowing multiple clients to connect to a single MCP server instance. It is what `macts mcp serve` and `macts mcp start` run; for an MCP client that starts its server itself over stdio, use `macts --mcp` instead.
 
-The daemon is a transport only. Every tool call is answered by the adapter it is given, which runs each call through a `MactsRuntime`: the caller's key is verified, its permissions are checked, governance is enforced, and the input is validated, exactly as for the HTTP API.
+The daemon is a transport only. Every tool call is answered by the adapter it is given, which runs each call through a `MactsRuntime`: the caller's key is verified, its permissions are checked, the input is validated, and governance is enforced, exactly as for the HTTP API.
 
 ## Overview
 
