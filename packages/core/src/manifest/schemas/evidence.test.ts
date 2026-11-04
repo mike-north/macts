@@ -163,9 +163,10 @@ describe('property nullability claims', () => {
 
   it('rejects a probe nullable claim from failed reads whose error numbers were not recorded', () => {
     const evidence = { nullable: probe({ failedReads: 2 }) }
-    expect(issuePaths(PropertySchema.safeParse({ ...BASE, nullable: true, evidence }))).toEqual([
-      ['evidence', 'nullable', 'nullCount'],
-    ])
+    const result = PropertySchema.safeParse({ ...BASE, nullable: true, evidence })
+    // The fix is to record the error numbers, so the issue points there.
+    expect(issuePaths(result)).toEqual([['evidence', 'nullable', 'errorNumbers']])
+    expect(result.error?.issues[0]?.message).toContain('record errorNumbers')
   })
 
   it('rejects a non-null claim whose probe saw reads report no value', () => {

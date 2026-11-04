@@ -605,6 +605,14 @@ export function checkNullabilityClaim(claim: NullabilityClaim, ctx: z.Refinement
             'Every probed read failed, so absence is structural rather than dependent on the data; mark the property unsupported instead of nullable.',
           path: ['evidence', 'nullable', 'sampleSize'],
         })
+      } else if (evidence.failedReads > 0 && evidence.errorNumbers === undefined) {
+        // Failed reads with no recorded error numbers: the fix is to record
+        // them, so the issue points there rather than at the empty-value count.
+        ctx.addIssue({
+          code: 'custom',
+          message: `The probe's failed reads have no recorded error numbers; record errorNumbers to show the app reported no value (${String(ABSENT_VALUE_ERROR_NUMBER)}).`,
+          path: ['evidence', 'nullable', 'errorNumbers'],
+        })
       } else {
         const cause = evidence.errorNumbers === undefined ? 'nullCount' : 'errorNumbers'
         ctx.addIssue({
