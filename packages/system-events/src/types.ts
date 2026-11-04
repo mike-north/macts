@@ -150,10 +150,7 @@ export interface LocationCreateInput {
 export type LocationUpdateInput = Partial<LocationCreateInput>
 
 /** the preferences for the current user's network */
-export interface NetworkPreferencesObject {
-  /** the current location */
-  currentLocation: Location
-}
+export type NetworkPreferencesObject = Record<string, never>
 
 /** Input for creating a NetworkPreferencesObject */
 export type NetworkPreferencesObjectCreateInput = Record<string, never>
@@ -165,12 +162,8 @@ export type NetworkPreferencesObjectUpdateInput = Partial<NetworkPreferencesObje
 export interface Service {
   /** Is the service active? */
   active: boolean
-  /** the currently selected configuration */
-  currentConfiguration: Configuration
   /** the unique identifier for the service */
   id: string
-  /** the interface the service is built on */
-  interface: Interface
   /** the type of service */
   kind: number
   /** the name of the service */
@@ -224,30 +217,7 @@ export interface AliasCreateInput {
 export type AliasUpdateInput = Partial<AliasCreateInput>
 
 /** The Classic domain in the file system */
-export interface ClassicDomainObject {
-  /** The Apple Menu Items folder */
-  appleMenuFolder: Folder
-  /** The Control Panels folder */
-  controlPanelsFolder: Folder
-  /** The Control Strip Modules folder */
-  controlStripModulesFolder: Folder
-  /** The Classic Desktop folder */
-  desktopFolder: Folder
-  /** The Extensions folder */
-  extensionsFolder: Folder
-  /** The Fonts folder */
-  fontsFolder: Folder
-  /** The Launcher Items folder */
-  launcherItemsFolder: Folder
-  /** The Classic Preferences folder */
-  preferencesFolder: Folder
-  /** The Shutdown Items folder */
-  shutdownFolder: Folder
-  /** The StartupItems folder */
-  startupItemsFolder: Folder
-  /** The System folder */
-  systemFolder: Folder
-}
+export type ClassicDomainObject = Record<string, never>
 
 /** Input for creating a ClassicDomainObject */
 export type ClassicDomainObjectCreateInput = Record<string, never>
@@ -290,8 +260,6 @@ export type DiskUpdateInput = Partial<DiskCreateInput>
 export interface DiskItem {
   /** Is the disk item busy? */
   busyStatus: boolean
-  /** the folder or disk which has this disk item as an element */
-  container: unknown
   /** the date on which the disk item was created */
   creationDate: Date
   /** the name of the disk item as displayed in the User Interface */
@@ -337,36 +305,10 @@ export type DiskItemUpdateInput = Partial<DiskItemCreateInput>
 
 /** A domain in the file system */
 export interface Domain {
-  /** The Application Support folder */
-  applicationSupportFolder: Folder
-  /** The Applications folder */
-  applicationsFolder: Folder
-  /** The Desktop Pictures folder */
-  desktopPicturesFolder: Folder
-  /** The Folder Action Scripts folder */
-  folderActionScriptsFolder: Folder
-  /** The Fonts folder */
-  fontsFolder: Folder
   /** the unique identifier of the domain */
   id: string
-  /** The Library folder */
-  libraryFolder: Folder
   /** the name of the domain */
   name: string
-  /** The Preferences folder */
-  preferencesFolder: Folder
-  /** The Scripting Additions folder */
-  scriptingAdditionsFolder: Folder
-  /** The Scripts folder */
-  scriptsFolder: Folder
-  /** The Shared Documents folder */
-  sharedDocumentsFolder: Folder
-  /** The Speakable Items folder */
-  speakableItemsFolder: Folder
-  /** The Utilities folder */
-  utilitiesFolder: Folder
-  /** The Automator Workflows folder */
-  workflowsFolder: Folder
 }
 
 /** Input for creating a Domain */
@@ -473,30 +415,7 @@ export type SystemDomainObjectCreateInput = Record<string, never>
 export type SystemDomainObjectUpdateInput = Partial<SystemDomainObjectCreateInput>
 
 /** The user domain in the file system */
-export interface UserDomainObject {
-  /** The user's Desktop folder */
-  desktopFolder: Folder
-  /** The user's Documents folder */
-  documentsFolder: Folder
-  /** The user's Downloads folder */
-  downloadsFolder: Folder
-  /** The user's Favorites folder */
-  favoritesFolder: Folder
-  /** The user's Home folder */
-  homeFolder: Folder
-  /** The user's Movies folder */
-  moviesFolder: Folder
-  /** The user's Music folder */
-  musicFolder: Folder
-  /** The user's Pictures folder */
-  picturesFolder: Folder
-  /** The user's Public folder */
-  publicFolder: Folder
-  /** The user's Sites folder */
-  sitesFolder: Folder
-  /** The Temporary Items folder */
-  temporaryItemsFolder: Folder
-}
+export type UserDomainObject = Record<string, never>
 
 /** Input for creating a UserDomainObject */
 export type UserDomainObjectCreateInput = Record<string, never>
@@ -1211,8 +1130,6 @@ export interface ScriptingClass {
   pluralName: string
   /** The name of the suite to which this class belongs */
   suiteName: string
-  /** The class from which this class inherits */
-  superclass: unknown
 }
 
 /** Input for creating a ScriptingClass */
@@ -1229,8 +1146,6 @@ export interface ScriptingCommand {
   id: string
   /** The description of the command */
   description: string
-  /** The direct parameter of the command */
-  directParameter: unknown
   /** Is the command hidden? */
   hidden: boolean
   /** The object or data returned by this command */
@@ -1394,15 +1309,11 @@ export const LocationSchema = z.object({
   name: z.string(),
 })
 
-export const NetworkPreferencesObjectSchema = z.object({
-  currentLocation: z.string(),
-})
+export const NetworkPreferencesObjectSchema = z.object({})
 
 export const ServiceSchema = z.object({
   active: z.boolean(),
-  currentConfiguration: z.string(),
   id: z.string(),
-  interface: z.string(),
   kind: z.number(),
   name: z.string(),
 })
@@ -1419,19 +1330,7 @@ export const AliasSchema = z.object({
   version: z.string(),
 })
 
-export const ClassicDomainObjectSchema = z.object({
-  appleMenuFolder: z.string(),
-  controlPanelsFolder: z.string(),
-  controlStripModulesFolder: z.string(),
-  desktopFolder: z.string(),
-  extensionsFolder: z.string(),
-  fontsFolder: z.string(),
-  launcherItemsFolder: z.string(),
-  preferencesFolder: z.string(),
-  shutdownFolder: z.string(),
-  startupItemsFolder: z.string(),
-  systemFolder: z.string(),
-})
+export const ClassicDomainObjectSchema = z.object({})
 
 export const DiskSchema = z.object({
   capacity: z.number(),
@@ -1447,7 +1346,6 @@ export const DiskSchema = z.object({
 
 export const DiskItemSchema = z.object({
   busyStatus: z.boolean(),
-  container: z.string(),
   creationDate: z.string(),
   displayedName: z.string(),
   id: z.string(),
@@ -1465,21 +1363,8 @@ export const DiskItemSchema = z.object({
 })
 
 export const DomainSchema = z.object({
-  applicationSupportFolder: z.string(),
-  applicationsFolder: z.string(),
-  desktopPicturesFolder: z.string(),
-  folderActionScriptsFolder: z.string(),
-  fontsFolder: z.string(),
   id: z.string(),
-  libraryFolder: z.string(),
   name: z.string(),
-  preferencesFolder: z.string(),
-  scriptingAdditionsFolder: z.string(),
-  scriptsFolder: z.string(),
-  sharedDocumentsFolder: z.string(),
-  speakableItemsFolder: z.string(),
-  utilitiesFolder: z.string(),
-  workflowsFolder: z.string(),
 })
 
 export const FileSchema = z.object({
@@ -1514,19 +1399,7 @@ export const SystemDomainObjectSchema = z.object({
   id: z.string(),
 })
 
-export const UserDomainObjectSchema = z.object({
-  desktopFolder: z.string(),
-  documentsFolder: z.string(),
-  downloadsFolder: z.string(),
-  favoritesFolder: z.string(),
-  homeFolder: z.string(),
-  moviesFolder: z.string(),
-  musicFolder: z.string(),
-  picturesFolder: z.string(),
-  publicFolder: z.string(),
-  sitesFolder: z.string(),
-  temporaryItemsFolder: z.string(),
-})
+export const UserDomainObjectSchema = z.object({})
 
 export const ActionSchema = z.object({
   description: z.string(),
@@ -1770,14 +1643,12 @@ export const ScriptingClassSchema = z.object({
   hidden: z.boolean(),
   pluralName: z.string(),
   suiteName: z.string(),
-  superclass: z.string(),
 })
 
 export const ScriptingCommandSchema = z.object({
   name: z.string(),
   id: z.string(),
   description: z.string(),
-  directParameter: z.string(),
   hidden: z.boolean(),
   scriptingResult: z.string(),
   suiteName: z.string(),

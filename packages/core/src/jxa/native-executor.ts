@@ -4,11 +4,12 @@
  *
  * It owns three things and nothing else:
  *
- * - building the `NativeScript` for one operation from the native body (see
- *   `native-scripts.ts`), the app's bundle identifier, the input record, the
- *   operation's input and output value plans, and the reference table: the
- *   identifier plans the request carries for the app's resources, merged with
- *   how the manifest says the app finds each resource's objects;
+ * - building the `NativeScript` for one operation, or for one reference to
+ *   resolve, from the native body (see `native-scripts.ts`), the app's bundle
+ *   identifier, the input record, the input and output value plans, and the
+ *   reference table: the identifier plans the request carries for the app's
+ *   resources, merged with how the manifest says the app finds each
+ *   resource's objects;
  * - running it through the {@link NativeTransport} with the in-process value
  *   codec, honoring the time limit and the caller's abort signal;
  * - classifying failures, whether reported by the automation process as a
@@ -44,8 +45,10 @@ import {
   type AnyMactsError,
   type IssuePath,
   type OperationTarget,
+  type ReferenceWire,
   type ResourcePlanTable,
   type ValuePlan,
+  type WireRecord,
   type WireValue,
 } from '@macts/contracts'
 import type { AppManifest } from '../manifest/schemas/app.js'
@@ -61,11 +64,15 @@ import {
 } from './native-codec.js'
 import {
   assertRequiredArguments,
+  buildResolutionBody,
   COMMUNICATION_FAILURE_ERROR_NUMBERS,
   NO_SUCH_OBJECT_ERROR_NUMBER,
   planNativeInvocation,
   referenceAddressing,
+  RESOLUTION_ENTRIES_ARGUMENT,
+  RESOLUTION_TARGET_ARGUMENT,
 } from './native-scripts.js'
+import { resolvingCommand } from '../manifest/resource-commands.js'
 
 /** Time limit for one operation when none is configured, in milliseconds. */
 const DEFAULT_TIMEOUT_MS = 30_000
@@ -150,9 +157,20 @@ export type NativeRunFailure =
  * stays done: whether it completed the operation is unknown after a mid-run
  * abort.
  *
- * Reference resolution: the macOS provider does not resolve references.
- * `resolve` fails every request with `InternalError`, before any automation
- * runs.
+ * Reference resolution: `resolve` resolves the references the provider can
+ * also convert at operation positions (phases/13 D7, native conversion
+ * scope), and identity collections of them: a single identity reference with
+ * no container, to a resource the app finds at the application by its
+ * identifier. The object is found exactly as conversion finds it, by the
+ * codec, and read as the resource's get reads its item, in one automation
+ * process per request. A missing object fails with `TargetNotFoundError`
+ * naming the referenced resource, with `entryIndex` for an identity
+ * collection's entry. An empty identity collection resolves to `[]` without
+ * starting an automation process; the runtime has already run permission,
+ * governance, approval and audit for it, as for any resolution. Every other
+ * reference (a selector, a reference located through a container, or one to
+ * a resource outside that scope) fails with `InternalError` naming the form,
+ * before any automation runs.
  *
  * @param options - Time limit and, for tests, the transport.
  * @returns An `Executor` whose provider is `'macos'`.
@@ -186,29 +204,255 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       }
 
       const context: NativeFailureContext = { app: manifest.app.name, operation: target, timeoutMs }
-      const outcome = await runCancellable(
-        () => transport.run(script, { timeoutMs, signal }),
-        context,
-        signal
-      )
-      if (!outcome.ok) {
-        throw describeNativeFailure({ kind: 'reported', failure: outcome.failure }, context)
-      }
-      // The codec already produced a wire value; this guards a replaced
-      // transport that does not honor the outcome contract.
-      const value: unknown = outcome.value
-      if (value === undefined) return null
-      if (!isWireValue(value)) {
-        throw new InternalError('The operation produced a result that is not valid JSON.', {})
-      }
-      return value
+      return runToWireValue(transport, script, context, signal, {
+        subject: 'The operation',
+        describeFailure: (failure) => describeNativeFailure({ kind: 'reported', failure }, context),
+      })
     },
-    resolve(_request: ResolutionRequest): Promise<WireValue> {
-      return Promise.reject(
-        new InternalError('The macOS provider does not resolve references.', {})
-      )
+    async resolve(request: ResolutionRequest): Promise<WireValue> {
+      const { manifest, reference, outputPlan, resourcePlans, signal } = request
+      throwIfAborted(signal)
+
+      const resolution = planResolution(reference)
+      const references = nativeReferenceTable(manifest, resourcePlans, [
+        resolution.inputPlan,
+        outputPlan,
+      ])
+      const unresolvable = unresolvableForm(manifest, reference, references)
+      if (unresolvable !== undefined) throw new InternalError(unresolvable, {})
+      // An identity collection with no entries names no object, so there is
+      // nothing to address and nothing to read. The runtime has already
+      // authorized, governed and audited the call before it reached here.
+      if (resolution.entryCount === 0) return []
+
+      // Failures are described as the operation the runtime ran the call as:
+      // the resource's get for a single reference, its list for a collection.
+      const shape = reference.cardinality === 'one' ? 'get' : 'list'
+      const resolving = resolvingCommand(manifest, reference.resource, shape)
+      const context: NativeFailureContext = {
+        app: manifest.app.name,
+        operation: { command: resolving?.[0] ?? shape, resource: reference.resource },
+        timeoutMs,
+      }
+      const script: NativeScript = {
+        bundleId: manifest.app.bundleId,
+        body: buildResolutionBody(manifest, reference.resource, reference.cardinality),
+        input: resolution.input,
+        inputPlan: resolution.inputPlan,
+        outputPlan,
+        references,
+      }
+      return runToWireValue(transport, script, context, signal, {
+        subject: 'Resolving the reference',
+        describeFailure: (failure) => describeResolutionFailure(failure, reference, context),
+      })
     },
   }
+}
+
+/** How {@link runToWireValue} reports what went wrong, for the call it runs. */
+interface WireValueReporting {
+  /**
+   * What produced the result, starting a sentence: `The operation` for an
+   * operation, `Resolving the reference` for a resolution.
+   */
+  readonly subject: string
+  /** Classifies a failure the automation process reported. */
+  readonly describeFailure: (failure: NativeFailure) => AnyMactsError
+}
+
+/**
+ * Run `script` and return its result as a wire value, classifying a reported
+ * failure with `reporting.describeFailure` and a process failure as
+ * {@link describeNativeFailure} does. A result that is not a wire value is an
+ * `InternalError` naming `reporting.subject`.
+ */
+async function runToWireValue(
+  transport: NativeTransport,
+  script: NativeScript,
+  context: NativeFailureContext,
+  signal: AbortSignal | undefined,
+  reporting: WireValueReporting
+): Promise<WireValue> {
+  const { timeoutMs } = context
+  const outcome = await runCancellable(
+    () => transport.run(script, { timeoutMs, signal }),
+    context,
+    signal
+  )
+  if (!outcome.ok) throw reporting.describeFailure(outcome.failure)
+  // The codec already produced a wire value; this guards a replaced
+  // transport that does not honor the outcome contract.
+  const value: unknown = outcome.value
+  if (value === undefined) return null
+  if (!isWireValue(value)) {
+    throw new InternalError(`${reporting.subject} produced a result that is not valid JSON.`, {})
+  }
+  return value
+}
+
+// ---------------------------------------------------------------------------
+// Reference resolution
+// ---------------------------------------------------------------------------
+
+/**
+ * The input a resolution script decodes, and its plan: the reference, or each
+ * entry of an identity collection, as a single reference control record at a
+ * single reference position. The codec converts each one into the app's
+ * object exactly as it converts a reference an operation takes as input, so
+ * resolution has no addressing of its own.
+ */
+interface ResolutionInput {
+  readonly input: WireRecord
+  readonly inputPlan: ValuePlan
+  /** How many entries an identity collection has; `undefined` for any other reference. */
+  readonly entryCount?: number
+}
+
+function planResolution(reference: ReferenceWire): ResolutionInput {
+  const single: ValuePlan = {
+    kind: 'reference',
+    resource: reference.resource,
+    cardinality: 'one',
+  }
+  if (reference.cardinality === 'one') {
+    return {
+      input: { [RESOLUTION_TARGET_ARGUMENT]: { reference } },
+      inputPlan: {
+        kind: 'record',
+        fields: { [RESOLUTION_TARGET_ARGUMENT]: { presence: 'required', value: single } },
+      },
+    }
+  }
+  const entries = reference.form === 'identity' ? reference.entries : []
+  return {
+    input: { [RESOLUTION_ENTRIES_ARGUMENT]: entries.map((entry) => ({ reference: entry })) },
+    inputPlan: {
+      kind: 'record',
+      fields: {
+        [RESOLUTION_ENTRIES_ARGUMENT]: {
+          presence: 'required',
+          value: { kind: 'array', items: single },
+        },
+      },
+    },
+    ...(reference.form === 'identity' ? { entryCount: entries.length } : {}),
+  }
+}
+
+/**
+ * The message naming the reference form `reference` has that the macOS
+ * provider does not resolve, or `undefined` when it resolves it.
+ *
+ * @remarks
+ * The provider resolves exactly what it converts at operation positions
+ * (phases/13 D7, native conversion scope), and identity collections of it: a
+ * single identity reference with no container, to a resource whose entry in
+ * the script's reference table has both an identifier plan and addressing.
+ * The table is the one the codec reads, built by the same helper that decides
+ * conversion ({@link referenceAddressing}), so the two cannot disagree.
+ */
+function unresolvableForm(
+  manifest: AppManifest,
+  reference: ReferenceWire,
+  references: NativeReferenceTable
+): string | undefined {
+  const app = manifest.app.name
+  const target = `the ${app} resource ${JSON.stringify(reference.resource)}`
+  const cannot = (form: string): string => `The macOS provider cannot resolve ${form} yet.`
+  if (reference.form === 'selector') {
+    return cannot(
+      reference.cardinality === 'one'
+        ? `a selector reference to ${target}`
+        : `a selector collection reference to ${target}`
+    )
+  }
+  if (reference.cardinality === 'one') {
+    if (reference.container !== undefined) {
+      return cannot(`a reference to ${target} located through a container`)
+    }
+  } else {
+    for (const entry of reference.entries) {
+      if (entry.form !== 'identity' || entry.cardinality !== 'one') {
+        return cannot(
+          `an identity collection of ${target} whose entries are not identity references`
+        )
+      }
+      if (entry.container !== undefined) {
+        return cannot(
+          `an identity collection of ${target} whose entries are located through a container`
+        )
+      }
+    }
+  }
+  const entry = Object.hasOwn(references, reference.resource)
+    ? references[reference.resource]
+    : undefined
+  if (entry?.id === undefined || entry.addressing === undefined) {
+    return `The macOS provider cannot resolve references to ${target} yet: ${app} does not find one by its identifier alone.`
+  }
+  return undefined
+}
+
+/**
+ * The position in the request's reference that a codec failure at `path` in
+ * the resolution input describes: the target is the reference itself, and an
+ * entry is the same entry of the reference, so a path names a field the caller
+ * sent.
+ */
+function referencePath(path: IssuePath): IssuePath {
+  const [head, ...rest] = path
+  if (head === RESOLUTION_TARGET_ARGUMENT) return ['reference', ...rest]
+  if (head === RESOLUTION_ENTRIES_ARGUMENT) return ['reference', 'entries', ...rest]
+  return path
+}
+
+/**
+ * Classify a failure a resolution script reported.
+ *
+ * @remarks
+ * A referenced object the app does not have is a missing target of the
+ * referenced resource, with `entryIndex` naming the entry of an identity
+ * collection, since the codec finds entries in order and stops at the first
+ * missing one. A reference the codec could not convert is an internal
+ * limitation, as for an operation. Every other failure is classified as an
+ * operation's (see {@link describeNativeFailure}), with codec paths rewritten
+ * to the reference's own fields.
+ */
+function describeResolutionFailure(
+  failure: NativeFailure,
+  reference: ReferenceWire,
+  context: NativeFailureContext
+): AnyMactsError {
+  if (failure.source !== 'codec') {
+    return describeNativeFailure({ kind: 'reported', failure }, context)
+  }
+  const path = failure.direction === 'decode' ? referencePath(failure.path) : failure.path
+  const cause = Object.assign(new Error(failure.message), { path })
+  const { app } = context
+  if (failure.missingResource !== undefined) {
+    const resource = failure.missingResource
+    const entryIndex = path[0] === 'reference' && path[1] === 'entries' ? path[2] : undefined
+    return typeof entryIndex === 'number'
+      ? new TargetNotFoundError(
+          `${app} has no ${resource} matching entry ${String(entryIndex)} of the identity collection.`,
+          { resource, entryIndex },
+          { cause }
+        )
+      : new TargetNotFoundError(
+          `${app} has no ${resource} matching the reference.`,
+          { resource },
+          { cause }
+        )
+  }
+  if (failure.unsupportedKind !== undefined) {
+    return new InternalError(
+      `The macOS provider cannot resolve this reference to the ${app} resource ${JSON.stringify(reference.resource)} yet.`,
+      {},
+      { cause }
+    )
+  }
+  return describeNativeFailure({ kind: 'reported', failure: { ...failure, path } }, context)
 }
 
 /**

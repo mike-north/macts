@@ -25,7 +25,6 @@ import {
   type ClientBrand,
   type ClientRuntime,
   type Integer,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
 } from '@macts/contracts'
 
@@ -83,16 +82,6 @@ export interface Window {
    * Nullable. No evidence that the app always sets it.
    */
   zoomed: boolean | null
-  /**
-   * Returns the currently selected tab.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly activeTab: ObjectReferenceVariant<Tab, string, 'Tab'> | null
-  /**
-   * Returns the currently active space.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly activeSpace: ObjectReferenceVariant<Space, string, 'Space'> | null
   /**
    * Whether the window is an incognito window.
    * Nullable. No evidence that the app always sets it.

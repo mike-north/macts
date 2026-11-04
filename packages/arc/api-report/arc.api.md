@@ -107,8 +107,6 @@ export type TabUpdateInput = Partial<TabCreateInput>;
 
 // @public
 export interface Window {
-    activeSpace: Space;
-    activeTab: Tab;
     closeable: boolean;
     id: string;
     incognito: boolean;
@@ -145,8 +143,6 @@ export const WindowSchema: z.ZodObject<{
     visible: z.ZodBoolean;
     zoomable: z.ZodBoolean;
     zoomed: z.ZodBoolean;
-    activeTab: z.ZodString;
-    activeSpace: z.ZodString;
     incognito: z.ZodBoolean;
     mode: z.ZodString;
 }, z.core.$strip>;

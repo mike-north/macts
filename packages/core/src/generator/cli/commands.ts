@@ -1,4 +1,5 @@
 import type {
+  AppManifest,
   Resource,
   Command as ManifestCommand,
   CommandParameter,
@@ -6,6 +7,7 @@ import type {
 import { PAGE_SIZE_LIMITS } from '@macts/contracts'
 import { listOperationPages, resolvePrimaryIdentifierProperty } from '../../manifest/index.js'
 import { usableProperties } from '../../manifest/unsupported.js'
+import { outputProperties } from '../../manifest/output-references.js'
 import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.js'
 import {
   identifierWords,
@@ -200,7 +202,7 @@ ${parentOptions}${pageOptions}
       const page = await client.${resourceAccess}.list(${listArgs});
 
       const output = formatter.${format}(page.items.map(item => ({
-${generateListFieldMapping(resource)}
+${generateListFieldMapping(ctx.manifest, resource)}
       }))${formatTail});
 
       this.context.stdout.write(output + '\\n');
@@ -293,7 +295,7 @@ ${createInput}
 
       const output = formatter.format({
         message: '${resource.name} created successfully',
-${generateListFieldMapping(resource, '        ')}
+${generateListFieldMapping(ctx.manifest, resource, '        ')}
       });
 
       this.context.stdout.write(output + '\\n');
@@ -377,7 +379,7 @@ ${identifierPositional(idParamName, identifier)}
       const item = await client.${resourceAccess}.get(${[...parentScopeParams.map((p) => `this.${safeParamProperty(p.name, 'list')}`), `this.${idParamName}`].join(', ')});
 
       const output = formatter.format({
-${generateListFieldMapping(resource)}
+${generateListFieldMapping(ctx.manifest, resource)}
       });
 
       this.context.stdout.write(output + '\\n');
@@ -720,10 +722,19 @@ function generateParameterFlag(
   return `  ${propName} = Option.String('--${flagName}', { required: ${String(param.required)}, description: ${JSON.stringify(param.description)} });`
 }
 
-function generateListFieldMapping(resource: Resource, indent = '        '): string {
+/**
+ * The fields a command prints for one record: the fields its output record
+ * declares ({@link outputProperties}), so a field the record leaves out is
+ * never read.
+ */
+function generateListFieldMapping(
+  manifest: AppManifest,
+  resource: Resource,
+  indent = '        '
+): string {
   const fields: string[] = []
 
-  for (const [propName] of usableProperties(resource)) {
+  for (const [propName] of outputProperties(manifest, resource)) {
     fields.push(`${indent}${propName}: item.${propName},`)
   }
 

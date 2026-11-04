@@ -25,7 +25,6 @@ import {
   type ClientBrand,
   type ClientRuntime,
   type Integer,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
   type Rectangle,
 } from '@macts/contracts'
@@ -186,13 +185,7 @@ export interface Location {
 }
 
 /** the preferences for the current user's network */
-export interface NetworkPreferencesObject {
-  /**
-   * the current location.
-   * Nullable. No evidence that the app always sets it.
-   */
-  currentLocation: ObjectReferenceVariant<Location, string, 'Location'> | null
-}
+export type NetworkPreferencesObject = Record<string, never>
 
 /** A collection of settings for a network service */
 export interface Service {
@@ -202,20 +195,10 @@ export interface Service {
    */
   readonly active: boolean | null
   /**
-   * the currently selected configuration.
-   * Nullable. No evidence that the app always sets it.
-   */
-  currentConfiguration: ObjectReferenceVariant<Configuration, string, 'Configuration'> | null
-  /**
    * the unique identifier for the service.
    * Never null: the primary identifier.
    */
   readonly id: string
-  /**
-   * the interface the service is built on.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly interface: ObjectReferenceVariant<Interface, string, 'Interface'> | null
   /**
    * the type of service.
    * Nullable. No evidence that the app always sets it.
@@ -279,63 +262,7 @@ export interface Alias {
 }
 
 /** The Classic domain in the file system */
-export interface ClassicDomainObject {
-  /**
-   * The Apple Menu Items folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly appleMenuFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Control Panels folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly controlPanelsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Control Strip Modules folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly controlStripModulesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Classic Desktop folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly desktopFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Extensions folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly extensionsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Fonts folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly fontsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Launcher Items folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly launcherItemsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Classic Preferences folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly preferencesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Shutdown Items folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly shutdownFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The StartupItems folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly startupItemsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The System folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly systemFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-}
+export type ClassicDomainObject = Record<string, never>
 
 /** A disk in the file system */
 export interface Disk {
@@ -393,11 +320,6 @@ export interface DiskItem {
    * Nullable. No evidence that the app always sets it.
    */
   readonly busyStatus: boolean | null
-  /**
-   * the folder or disk which has this disk item as an element.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly container: ObjectReferenceVariant<DiskItem, string, 'DiskItem'> | null
   /**
    * the date on which the disk item was created.
    * Nullable. No evidence that the app always sets it.
@@ -473,80 +395,15 @@ export interface DiskItem {
 /** A domain in the file system */
 export interface Domain {
   /**
-   * The Application Support folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly applicationSupportFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Applications folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly applicationsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Desktop Pictures folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly desktopPicturesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Folder Action Scripts folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly folderActionScriptsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Fonts folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly fontsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
    * the unique identifier of the domain.
    * Never null: the primary identifier.
    */
   readonly id: string
   /**
-   * The Library folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly libraryFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
    * the name of the domain.
    * Nullable. No evidence that the app always sets it.
    */
   readonly name: string | null
-  /**
-   * The Preferences folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly preferencesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Scripting Additions folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly scriptingAdditionsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Scripts folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly scriptsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Shared Documents folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly sharedDocumentsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Speakable Items folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly speakableItemsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Utilities folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly utilitiesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Automator Workflows folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly workflowsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
 }
 
 /** A file in the file system */
@@ -644,63 +501,7 @@ export interface SystemDomainObject {
 }
 
 /** The user domain in the file system */
-export interface UserDomainObject {
-  /**
-   * The user's Desktop folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly desktopFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Documents folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly documentsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Downloads folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly downloadsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Favorites folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly favoritesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Home folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly homeFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Movies folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly moviesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Music folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly musicFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Pictures folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly picturesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Public folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly publicFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The user's Sites folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly sitesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-  /**
-   * The Temporary Items folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly temporaryItemsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null
-}
+export type UserDomainObject = Record<string, never>
 
 /** An action that can be performed on the UI element */
 export interface Action {
@@ -1395,11 +1196,6 @@ export interface ScriptingClass {
    * Nullable. No evidence that the app always sets it.
    */
   readonly suiteName: string | null
-  /**
-   * The class from which this class inherits.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly superclass: ObjectReferenceVariant<ScriptingClass, string, 'ScriptingClass'> | null
 }
 
 /** A command within a suite within a scripting definition */
@@ -1419,15 +1215,6 @@ export interface ScriptingCommand {
    * Nullable. No evidence that the app always sets it.
    */
   readonly description: string | null
-  /**
-   * The direct parameter of the command.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly directParameter: ObjectReferenceVariant<
-    ScriptingParameter,
-    string,
-    'ScriptingParameter'
-  > | null
   /**
    * Is the command hidden?
    * Nullable. No evidence that the app always sets it.

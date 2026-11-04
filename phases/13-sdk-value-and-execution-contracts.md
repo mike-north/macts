@@ -669,9 +669,11 @@ Manifest types map to value types as follows:
 Generation diagnostics are warnings, not errors. `macts generate` prints each
 one to stderr as `warning: <app>: <position>: …` and still exits 0, and
 `scripts/regenerate.mjs` reports their total across apps. Only generation
-errors fail generation. The shipped manifests produce three: Finder's
-`iconViewOptions` and `columnViewOptions`, and System Events'
-`scriptingResult`.
+errors fail generation. The shipped manifests produce three kinds: unknown
+types (Finder's `iconViewOptions` and `columnViewOptions`, and System Events'
+`scriptingResult`), an unavailable operation (Mail's `synchronize`), and the
+output fields left out under the resolvable-target rule (D7), which
+`packages/core/src/generator/contract/index.test.ts` pins.
 
 The generator owns its output. Each generated package carries a committed
 `.macts-generated.json` that lists the sorted package-relative paths the last
@@ -1495,6 +1497,82 @@ The contract, HTTP client and CLI generators, the capability registry and the
 permission listing take this judgment from one manifest-level function.
 Generation fails if the contract disagrees with it.
 
+Generated contracts also never declare an output position at which macts
+cannot yet return a reference a caller can resolve. This is an interim truth
+guard, not the goal. Where an app exposes a relationship and a path to its
+target, macts is to provide that path and a reference that hydrates through
+it, and an omitted position is a gap in what macts covers, not something the
+app cannot do (#219). Every reference a manifest type describes is a single
+reference, and an array of them is a list of single references, so each
+needs its target's `get`. macts cannot yet return a usable reference when:
+
+- macts has no usable `get` for the target yet, so no reference to it can be
+  resolved;
+- macts has no primary identifier for the target yet, so the target has no
+  identity form, and native reads emit only identity references (native
+  emission, below);
+- that `get` records a parent (D10, command parents), and native reads do
+  not return containers yet (container scoping, below; #242), so a reference
+  read from the app to a target identified only within its container could
+  not be resolved;
+- or macts identifies the target by its name, and the manifest has no
+  evidence yet that the name is unique (name-keyed resources, below), so the
+  reference would resolve to whichever object has that name, not necessarily
+  the one the app returned.
+
+Coverage closes most gaps by curating a `get`, a `list` and an identifier
+for the target, and for most shipped rows first a `get` or `list` for the
+record that holds the field. Two shapes are decided for targets that a
+curated `get` cannot serve:
+
+- A target that is never an element of the app, only an object held in a
+  property (Finder's list view options and their sort column, Mail's
+  message content, Xcode's run destination `device` and `companionDevice`),
+  will be returned as an embedded value record: the object's properties
+  inline in the holding record, not a reference. This is a new output kind,
+  with no `get` and no identity.
+- A target with no identifier, only a position within its container (iTerm's
+  window `currentTab`), will be returned as a selector reference by that
+  position within its container, once output references carry containers
+  (#242).
+
+Xcode's workspace document `activeRunDestination` stays left out until
+evidence shows that a run destination's name identifies one object.
+
+A position that holds such a reference anywhere, bare, in an array, or as the
+non-null case of a nullable value, is left out of output for now; generation
+does not fail. `null` and the empty array do not rescue it, as they do an
+input, because the app decides what it returns and no non-null value could be
+resolved yet. Leaving it out means:
+
+- A record field holding one is declared by no record type: not the
+  contract's record and its value type, not the HTTP client's read type and
+  its schema, and not what the CLI prints. The native get, list, create and
+  update bodies do not read it.
+- An operation whose result holds one declares no result.
+- Generation warns once per position, naming the app, the resource and field
+  (or the command), the target and what macts does not provide yet, for
+  example "macts has no get for "Mailbox" yet". Every warning cites #219.
+  The position returns on regeneration once coverage closes the gap: a `get`
+  for the target that records no parent and an identifier, returned
+  containers (#242), or a unique claim with evidence.
+
+Input positions follow the input rule above, so a field left out of output
+may still be settable through create and update. The contract, HTTP client
+and CLI generators and the native reads take this judgment from one
+manifest-level function too, and generation fails if the contract disagrees
+with it. A manifest that is inconsistent, such as an identifier claimed
+unique without evidence, is still rejected.
+
+The coverage ledger is the exact set of output positions the shipped
+contracts leave out, each with its reason, pinned by hand in
+`packages/core/src/generator/contract/index.test.ts`. A new omission fails
+CI until it is reviewed and added. A removed row means coverage was restored,
+and the field is back in output.
+`e2e/mcp-contracts/test/output-references.integration.test.ts` checks that no
+output reference left in a shipped contract is one macts cannot yet resolve,
+and pins those that remain.
+
 **Encoding.** Encoding reads only the data fields (`app`, `resource`, `form`,
 `cardinality`, and `id`, `selector`, `entries`, or `container`). It never
 calls `resolve` or any other live member, so a bound reference and a plain
@@ -1529,19 +1607,25 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   parent. A native read emits a container exactly when resolving the object
   by id needs that parent. An object that is identified globally but reached
   only through a container emits no container. Examples are Chrome and Edge
-  tabs, Arc spaces, iTerm sessions, and nested Photos folders. An output
-  position whose target's identity is scoped to its container fails
-  generation. Until outputs to such targets are generated, no native read
-  emits a container.
+  tabs, Arc spaces, iTerm sessions, and nested Photos folders. Native reads
+  emit no container yet, so an output position whose target's identity is
+  scoped to its container is left out of output (resolvable targets, above)
+  until reads emit containers (#242).
 - **Name-keyed resources.** A resource whose primary identifier is its name
   keeps `ResourceDescriptor.id`. Resolving an identity reference to it means
   the same as a name selector: it resolves to whichever object has that name
   when it is resolved. When several objects share the name, the app defines
-  which one that is, so the reference does not pin one object. A name-keyed
-  target fails generation only at an output position. Input positions to it
-  are generated. Manifest evidence that a name is the app's identity for a
-  resource is not recorded, so no name-keyed target is exempt at output
-  positions.
+  which one that is, so the reference does not pin one object. An output
+  position referencing a name-keyed target is left out of output when the
+  name is not claimed unique (resolvable targets, above). Input positions to
+  it are generated. A resource is name-keyed when the property its identity
+  references carry and are resolved by (its targeting property, D10) is
+  `name`. The manifest's
+  evidence that a name is the app's identity for a resource is its primary
+  identifier's `unique: true` claim, with the evidence for that claim (D9,
+  _Bounded list pages_). With the claim, the target is used at output
+  positions like any other. Without it, including a resource matched on its
+  name and claimed not unique, such as Calendar's calendars, it is not.
 
 **Native conversion scope.** The macOS provider converts a reference inside
 the automation process (D4, reference conversion) when it is a single
@@ -1554,7 +1638,10 @@ naming the referenced resource before any command runs. An app object at an
 output position becomes the identity reference above, with no container.
 
 Every other reference keeps the codec's unsupported marker and fails as
-`InternalError` (D4), in either direction:
+`InternalError` (D4), in either direction. Generation leaves out every output
+position whose target has no identifier, no `get`, or a `get` that records a
+parent (resolvable targets, above), so for those targets the failure arises
+only for a reference a caller supplies:
 
 - every selector form, at any position;
 - identity collections;
@@ -1577,6 +1664,42 @@ parent-scoped targets are still left out of generation
 ([#219](https://github.com/mike-north/macts/issues/219),
 [#242](https://github.com/mike-north/macts/issues/242)). Native container
 conversion is still to come.
+
+The provider resolves references (resolution, below) within the same scope,
+plus identity collections whose entries are in it:
+
+- A single identity reference with no container, to a top-level resource with
+  an identifier, resolves to its object's record. The object is found by the
+  codec exactly as an input reference is converted: the resolution script
+  takes the reference as its input at a single reference position, so there
+  is no second addressing. Its body reads the object with the get body's
+  record read, and the result is encoded by the request's `outputPlan` in the
+  automation process, as `execute` encodes an operation result. A missing
+  object is `TargetNotFoundError` naming the referenced resource.
+- An identity collection of such references takes its entries as a list of
+  single references, so each is found the same way, all before any record is
+  read, and read the same way, in entry order, in one automation process. The
+  result is validated against the `list` item plan although it is read with
+  the get record read. That is correct because, for every resource with both,
+  the get record plan equals the list item plan and the get body reads the
+  same properties as the list body; a test over every shipped contract
+  enforces both. A missing entry is `TargetNotFoundError` with `entryIndex`,
+  the first missing entry.
+- An identity collection with no entries resolves to `[]` without starting an
+  automation process. Permission, governance, approval and audit still run
+  for it, as for any resolution: the runtime runs them as the resource's
+  `list` (resolution, steps 1 to 6, below) before the executor is called, and
+  only the automation process is skipped.
+- Every other reference fails as `InternalError` whose message names the form
+  the provider does not resolve, before any automation runs: every selector
+  form; a reference, or an identity-collection entry, with a container; and a
+  reference to a resource that is not top-level, has no identifier, has no
+  `get`, or has no entry in `resourcePlans`. Whether the resource is in scope
+  is read from the script's reference table, the one the codec reads, so
+  resolution and conversion share one boundary.
+
+Identity collections at operation positions still do not convert: only
+resolution reads them, entry by entry.
 
 **Binding.** References are live objects bound to the client that decoded
 them, via `DecodeContext.bindReference`. The binder receives decoded
@@ -1705,8 +1828,8 @@ is rejected wherever it appears, so no bound reference to it ever exists:
   `input.wire` rejects it with `ValidationError` (D11).
 - **Returned by an operation.** This is a defect on our side, never the
   caller's. A contract may declare an output reference position only when its
-  target has its resolving operation, so such a reference means the contract
-  is wrong.
+  target has its resolving operation, which generation enforces (resolvable
+  targets, above), so such a reference means the contract is wrong.
   The runtime's check of the result against `output.wire` rejects it with
   `UnexpectedValueError` (step 8 above), and so does the client's decoding.
 - **Sent to the resolve route.** A target whose resource is absent from the
@@ -1899,10 +2022,12 @@ execute(request), resolve(request) }`.
   `InvalidSelectionError` for an index or range past the end,
   `TargetNotFoundError` with `entryIndex` for a missing identity-collection
   entry, and `[]` for an empty identity collection.
-- The native JXA executor is one implementation. Its `resolve` fails with
-  `InternalError`: the macOS provider does not resolve references. It does
-  convert references at operation positions, within the scope in D7 (native
-  conversion scope).
+- The native JXA executor is one implementation. It converts references at
+  operation positions, and its `resolve` resolves references, within the
+  scope in D7 (native conversion scope): single identity references with no
+  container to top-level resources with an identifier, and identity
+  collections of them. It fails every other reference as `InternalError`,
+  before any automation runs.
 - **Resource plans.** `ResourcePlanTable` is
   `Readonly<Record<string, { readonly id?: ValuePlan }>>`, keyed by manifest
   resource key and declared in `@macts/contracts` next to `ValuePlan`. `id` is

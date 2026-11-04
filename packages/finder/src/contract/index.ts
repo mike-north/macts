@@ -25,7 +25,6 @@ import {
   type ClientBrand,
   type ClientRuntime,
   type Integer,
-  type ObjectReferenceVariant,
   type OperationDescriptor,
 } from '@macts/contracts'
 
@@ -303,11 +302,6 @@ export interface FinderWindow {
    */
   readonly iconViewOptions: unknown
   /**
-   * the list view options for the container window.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly listViewOptions: ObjectReferenceVariant<ListViewOptions, never, 'ListViewOptions'> | null
-  /**
    * the column view options for the container window.
    * Nullable. No evidence that the app always sets it.
    */
@@ -365,11 +359,6 @@ export interface ListViewOptions {
    * Nullable. No evidence that the app always sets it.
    */
   textSize: Integer | null
-  /**
-   * the column that the list view is sorted on.
-   * Nullable. No evidence that the app always sets it.
-   */
-  sortColumn: ObjectReferenceVariant<Column, never, 'Column'> | null
   /**
    * Are relative dates (e.g., today, yesterday) shown in the list view?
    * Nullable. No evidence that the app always sets it.

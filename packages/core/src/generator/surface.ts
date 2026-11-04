@@ -29,7 +29,7 @@ import {
   resourceCommandEntries,
   type CrudOperation,
 } from '../manifest/resource-commands.js'
-import type { PropertyType } from '../manifest/schemas/property.js'
+import type { DeclaredType } from '../manifest/value-shapes.js'
 
 // Which commands apply to a resource and which backs each CRUD shape are
 // manifest knowledge (../manifest/resource-commands.ts). They are re-exported
@@ -259,12 +259,9 @@ export function commandMethodParameters(command: Command): {
   return { signature, body }
 }
 
-/**
- * A type as a manifest declares it: a property type (absent means the
- * property has no declared type), or a command parameter type (a type name or
- * a flat reference record such as `{ resource: 'Calendar' }`).
- */
-export type DeclaredType = CommandParameter['type'] | Exclude<PropertyType, string> | undefined
+// How a manifest declares a type is manifest knowledge
+// (../manifest/value-shapes.ts).
+export type { DeclaredType }
 
 /** One field of a resource's create input. */
 export interface CreateInputField {

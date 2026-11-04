@@ -182,37 +182,13 @@ export const CheckboxSchema: z.ZodObject<{
 export type CheckboxUpdateInput = Partial<CheckboxCreateInput>;
 
 // @public
-export interface ClassicDomainObject {
-    appleMenuFolder: Folder;
-    controlPanelsFolder: Folder;
-    controlStripModulesFolder: Folder;
-    desktopFolder: Folder;
-    extensionsFolder: Folder;
-    fontsFolder: Folder;
-    launcherItemsFolder: Folder;
-    preferencesFolder: Folder;
-    shutdownFolder: Folder;
-    startupItemsFolder: Folder;
-    systemFolder: Folder;
-}
+export type ClassicDomainObject = Record<string, never>;
 
 // @public
 export type ClassicDomainObjectCreateInput = Record<string, never>;
 
 // @public (undocumented)
-export const ClassicDomainObjectSchema: z.ZodObject<{
-    appleMenuFolder: z.ZodString;
-    controlPanelsFolder: z.ZodString;
-    controlStripModulesFolder: z.ZodString;
-    desktopFolder: z.ZodString;
-    extensionsFolder: z.ZodString;
-    fontsFolder: z.ZodString;
-    launcherItemsFolder: z.ZodString;
-    preferencesFolder: z.ZodString;
-    shutdownFolder: z.ZodString;
-    startupItemsFolder: z.ZodString;
-    systemFolder: z.ZodString;
-}, z.core.$strip>;
+export const ClassicDomainObjectSchema: z.ZodObject<{}, z.core.$strip>;
 
 // @public
 export type ClassicDomainObjectUpdateInput = Partial<ClassicDomainObjectCreateInput>;
@@ -313,7 +289,6 @@ export interface DiskCreateInput {
 // @public
 export interface DiskItem {
     busyStatus: boolean;
-    container: unknown;
     creationDate: Date;
     displayedName: string;
     id: string;
@@ -346,7 +321,6 @@ export class DiskItemResourceClient {
 // @public (undocumented)
 export const DiskItemSchema: z.ZodObject<{
     busyStatus: z.ZodBoolean;
-    container: z.ZodString;
     creationDate: z.ZodString;
     displayedName: z.ZodString;
     id: z.ZodString;
@@ -384,21 +358,8 @@ export type DiskUpdateInput = Partial<DiskCreateInput>;
 
 // @public
 export interface Domain {
-    applicationsFolder: Folder;
-    applicationSupportFolder: Folder;
-    desktopPicturesFolder: Folder;
-    folderActionScriptsFolder: Folder;
-    fontsFolder: Folder;
     id: string;
-    libraryFolder: Folder;
     name: string;
-    preferencesFolder: Folder;
-    scriptingAdditionsFolder: Folder;
-    scriptsFolder: Folder;
-    sharedDocumentsFolder: Folder;
-    speakableItemsFolder: Folder;
-    utilitiesFolder: Folder;
-    workflowsFolder: Folder;
 }
 
 // @public
@@ -406,21 +367,8 @@ export type DomainCreateInput = Record<string, never>;
 
 // @public (undocumented)
 export const DomainSchema: z.ZodObject<{
-    applicationSupportFolder: z.ZodString;
-    applicationsFolder: z.ZodString;
-    desktopPicturesFolder: z.ZodString;
-    folderActionScriptsFolder: z.ZodString;
-    fontsFolder: z.ZodString;
     id: z.ZodString;
-    libraryFolder: z.ZodString;
     name: z.ZodString;
-    preferencesFolder: z.ZodString;
-    scriptingAdditionsFolder: z.ZodString;
-    scriptsFolder: z.ZodString;
-    sharedDocumentsFolder: z.ZodString;
-    speakableItemsFolder: z.ZodString;
-    utilitiesFolder: z.ZodString;
-    workflowsFolder: z.ZodString;
 }, z.core.$strip>;
 
 // @public
@@ -796,17 +744,13 @@ export const NetworkDomainObjectSchema: z.ZodObject<{
 export type NetworkDomainObjectUpdateInput = Partial<NetworkDomainObjectCreateInput>;
 
 // @public
-export interface NetworkPreferencesObject {
-    currentLocation: Location;
-}
+export type NetworkPreferencesObject = Record<string, never>;
 
 // @public
 export type NetworkPreferencesObjectCreateInput = Record<string, never>;
 
 // @public (undocumented)
-export const NetworkPreferencesObjectSchema: z.ZodObject<{
-    currentLocation: z.ZodString;
-}, z.core.$strip>;
+export const NetworkPreferencesObjectSchema: z.ZodObject<{}, z.core.$strip>;
 
 // @public
 export type NetworkPreferencesObjectUpdateInput = Partial<NetworkPreferencesObjectCreateInput>;
@@ -1030,7 +974,6 @@ export interface ScriptingClass {
     name: string;
     pluralName: string;
     suiteName: string;
-    superclass: unknown;
 }
 
 // @public
@@ -1044,7 +987,6 @@ export const ScriptingClassSchema: z.ZodObject<{
     hidden: z.ZodBoolean;
     pluralName: z.ZodString;
     suiteName: z.ZodString;
-    superclass: z.ZodString;
 }, z.core.$strip>;
 
 // @public
@@ -1053,7 +995,6 @@ export type ScriptingClassUpdateInput = Partial<ScriptingClassCreateInput>;
 // @public
 export interface ScriptingCommand {
     description: string;
-    directParameter: unknown;
     hidden: boolean;
     id: string;
     name: string;
@@ -1069,7 +1010,6 @@ export const ScriptingCommandSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
     description: z.ZodString;
-    directParameter: z.ZodString;
     hidden: z.ZodBoolean;
     scriptingResult: z.ZodString;
     suiteName: z.ZodString;
@@ -1268,9 +1208,7 @@ export type ScrollPageBehaviors = 'jumpToHere' | 'jumpToNextPage';
 // @public
 export interface Service {
     active: boolean;
-    currentConfiguration: Configuration;
     id: string;
-    interface: Interface;
     kind: number;
     name: string;
 }
@@ -1283,9 +1221,7 @@ export interface ServiceCreateInput {
 // @public (undocumented)
 export const ServiceSchema: z.ZodObject<{
     active: z.ZodBoolean;
-    currentConfiguration: z.ZodString;
     id: z.ZodString;
-    interface: z.ZodString;
     kind: z.ZodNumber;
     name: z.ZodString;
 }, z.core.$strip>;
@@ -1589,37 +1525,13 @@ export const UIElementSchema: z.ZodObject<{
 export type UIElementUpdateInput = Partial<UIElementCreateInput>;
 
 // @public
-export interface UserDomainObject {
-    desktopFolder: Folder;
-    documentsFolder: Folder;
-    downloadsFolder: Folder;
-    favoritesFolder: Folder;
-    homeFolder: Folder;
-    moviesFolder: Folder;
-    musicFolder: Folder;
-    picturesFolder: Folder;
-    publicFolder: Folder;
-    sitesFolder: Folder;
-    temporaryItemsFolder: Folder;
-}
+export type UserDomainObject = Record<string, never>;
 
 // @public
 export type UserDomainObjectCreateInput = Record<string, never>;
 
 // @public (undocumented)
-export const UserDomainObjectSchema: z.ZodObject<{
-    desktopFolder: z.ZodString;
-    documentsFolder: z.ZodString;
-    downloadsFolder: z.ZodString;
-    favoritesFolder: z.ZodString;
-    homeFolder: z.ZodString;
-    moviesFolder: z.ZodString;
-    musicFolder: z.ZodString;
-    picturesFolder: z.ZodString;
-    publicFolder: z.ZodString;
-    sitesFolder: z.ZodString;
-    temporaryItemsFolder: z.ZodString;
-}, z.core.$strip>;
+export const UserDomainObjectSchema: z.ZodObject<{}, z.core.$strip>;
 
 // @public
 export type UserDomainObjectUpdateInput = Partial<UserDomainObjectCreateInput>;

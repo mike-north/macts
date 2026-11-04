@@ -203,8 +203,6 @@ export interface ResolvedBuildSettingUpdateInput {
 // @public
 export interface RunDestination {
     readonly architecture: string | null;
-    readonly companionDevice: ObjectReferenceVariant<Device, string, 'Device'> | null;
-    readonly device: ObjectReferenceVariant<Device, string, 'Device'> | null;
     readonly name: string;
     readonly platform: string | null;
 }
@@ -370,10 +368,8 @@ export interface TextDocumentUpdateInput {
 
 // @public
 export interface WorkspaceDocument {
-    activeRunDestination: ObjectReferenceVariant<RunDestination, string, 'RunDestination'> | null;
     activeScheme: ObjectReferenceVariant<Scheme, string, 'Scheme'> | null;
     readonly file: FileValue | null;
-    readonly lastSchemeActionResult: ObjectReferenceVariant<SchemeActionResult, string, 'SchemeActionResult'> | null;
     readonly loaded: boolean | null;
     readonly modified: boolean | null;
     readonly name: string;

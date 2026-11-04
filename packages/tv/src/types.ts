@@ -62,8 +62,6 @@ export interface BrowserWindow {
   id: number
   /** the selected tracks */
   selection: string
-  /** the playlist currently displayed in the window */
-  view: Playlist
 }
 
 /** Input for creating a BrowserWindow */
@@ -111,8 +109,6 @@ export interface Playlist {
   duration: number
   /** the name of the playlist */
   name: string
-  /** folder which contains this playlist (if any) */
-  parent: Playlist
   /** the total size of all tracks (in bytes) */
   size: number
   /** special playlist kind */
@@ -140,8 +136,6 @@ export interface PlaylistWindow {
   id: number
   /** the selected tracks */
   selection: string
-  /** the playlist displayed in the window */
-  view: Playlist
 }
 
 /** Input for creating a PlaylistWindow */
@@ -428,7 +422,6 @@ export const ArtworkSchema = z.object({
 export const BrowserWindowSchema = z.object({
   id: z.number(),
   selection: z.string(),
-  view: z.string(),
 })
 
 export const FileTrackSchema = z.object({
@@ -445,7 +438,6 @@ export const PlaylistSchema = z.object({
   description: z.string(),
   duration: z.number(),
   name: z.string(),
-  parent: z.string(),
   size: z.number(),
   specialKind: z.string(),
   time: z.string(),
@@ -455,7 +447,6 @@ export const PlaylistSchema = z.object({
 export const PlaylistWindowSchema = z.object({
   id: z.number(),
   selection: z.string(),
-  view: z.string(),
 })
 
 export const SharedTrackSchema = z.object({

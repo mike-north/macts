@@ -80,20 +80,6 @@ export interface WorkspaceDocument {
    * Nullable. No evidence that the app always sets it.
    */
   activeScheme: ObjectReferenceVariant<Scheme, string, 'Scheme'> | null
-  /**
-   * The workspace's run destination that will be used for scheme actions.
-   * Nullable. No evidence that the app always sets it.
-   */
-  activeRunDestination: ObjectReferenceVariant<RunDestination, string, 'RunDestination'> | null
-  /**
-   * The scheme action result for the last scheme action command issued to the workspace document.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly lastSchemeActionResult: ObjectReferenceVariant<
-    SchemeActionResult,
-    string,
-    'SchemeActionResult'
-  > | null
 }
 
 /** A document that represents a file on disk */
@@ -328,16 +314,6 @@ export interface RunDestination {
    * Nullable. No evidence that the app always sets it.
    */
   readonly platform: string | null
-  /**
-   * The physical or virtual device which this run destination targets.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly device: ObjectReferenceVariant<Device, string, 'Device'> | null
-  /**
-   * If the run destination's device has a companion, this is that device.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly companionDevice: ObjectReferenceVariant<Device, string, 'Device'> | null
 }
 
 /** A device which can be used as the target for a scheme action, as part of a run destination */
@@ -1149,25 +1125,6 @@ const workspaceDocumentRecordType: ValueType<WorkspaceDocument> = t.record(
       t.reference<Scheme, string, 'Scheme'>(() => xcodeContract, 'Scheme', 'one'),
       { description: "The workspace's scheme that will be used for scheme actions" }
     ),
-    activeRunDestination: t.nullable(
-      t.reference<RunDestination, string, 'RunDestination'>(
-        () => xcodeContract,
-        'RunDestination',
-        'one'
-      ),
-      { description: "The workspace's run destination that will be used for scheme actions" }
-    ),
-    lastSchemeActionResult: t.nullable(
-      t.reference<SchemeActionResult, string, 'SchemeActionResult'>(
-        () => xcodeContract,
-        'SchemeActionResult',
-        'one'
-      ),
-      {
-        description:
-          'The scheme action result for the last scheme action command issued to the workspace document',
-      }
-    ),
   },
   {
     description:
@@ -1208,14 +1165,6 @@ const runDestinationRecordType: ValueType<RunDestination> = t.record(
     platform: t.nullable(t.string(), {
       description: 'The identifier of the platform which this run destination targets',
     }),
-    device: t.nullable(
-      t.reference<Device, string, 'Device'>(() => xcodeContract, 'Device', 'one'),
-      { description: 'The physical or virtual device which this run destination targets' }
-    ),
-    companionDevice: t.nullable(
-      t.reference<Device, string, 'Device'>(() => xcodeContract, 'Device', 'one'),
-      { description: "If the run destination's device has a companion, this is that device" }
-    ),
   },
   {
     description:

@@ -53,7 +53,6 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Chat {
-    account: Account;
     id: string;
     name: string;
 }
@@ -65,7 +64,6 @@ export type ChatCreateInput = Record<string, never>;
 export const ChatSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
-    account: z.ZodString;
 }, z.core.$strip>;
 
 // @public
@@ -107,7 +105,6 @@ export class MessagesError extends Error {
 
 // @public
 export interface Participant {
-    account: Account;
     firstName: string;
     fullName: string;
     handle: string;
@@ -122,7 +119,6 @@ export type ParticipantCreateInput = Record<string, never>;
 // @public (undocumented)
 export const ParticipantSchema: z.ZodObject<{
     id: z.ZodString;
-    account: z.ZodString;
     name: z.ZodString;
     handle: z.ZodString;
     firstName: z.ZodString;

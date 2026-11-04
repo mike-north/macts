@@ -25,7 +25,6 @@
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md (D4)
  */
 
-import { createContext, runInContext } from 'node:vm'
 import { fileURLToPath } from 'node:url'
 import { beforeAll, describe, expect, it } from 'vitest'
 import {
@@ -39,10 +38,9 @@ import {
 import type { ExecutionRequest } from '../execution/executor.js'
 import { loadManifest } from '../manifest/loader.js'
 import type { AppManifest } from '../manifest/schemas/app.js'
-import { composeNativeScript } from './executor.js'
-import { NATIVE_CODEC, type NativeScript } from './native-codec.js'
-import { createNativeExecutor, type NativeTransport } from './native-executor.js'
-import { parseNativeOutcome } from './test-support/native-harness.js'
+import type { NativeScript } from './native-codec.js'
+import { createNativeExecutor } from './native-executor.js'
+import { recorded, standInTransport } from './test-support/stand-in-app.js'
 
 const CONTACTS_MANIFEST = fileURLToPath(
   new URL('../../../../manifests/contacts/app.yaml', import.meta.url)
@@ -77,47 +75,6 @@ const PERSON_BY_NAME = {
   },
 }
 
-/**
- * Wraps `target` so that every read, call, or inspection of it is appended to
- * `uses`, and so is every use of a member value it hands out. Setting
- * `includeStandardAdditions` on the application is not recorded.
- */
-function recorded<T extends object>(target: T, name: string, uses: string[]): T {
-  const wrap = (value: unknown, label: string): unknown =>
-    (typeof value === 'object' || typeof value === 'function') && value !== null
-      ? recorded(value, label, uses)
-      : value
-  return new Proxy(target, {
-    get(object, key, receiver) {
-      const label = `${name}.${String(key)}`
-      uses.push(`read ${label}`)
-      return wrap(Reflect.get(object, key, receiver), label)
-    },
-    apply(fn, thisArg, args: unknown[]) {
-      uses.push(`call ${name}`)
-      return wrap(Reflect.apply(fn as (...a: unknown[]) => unknown, thisArg, args), `${name}()`)
-    },
-    set(object, key, value) {
-      if (!(name === 'app' && key === 'includeStandardAdditions')) {
-        uses.push(`set ${name}.${String(key)}`)
-      }
-      return Reflect.set(object, key, value)
-    },
-    has(object, key) {
-      uses.push(`has ${name}.${String(key)}`)
-      return Reflect.has(object, key)
-    },
-    ownKeys(object) {
-      uses.push(`keys ${name}`)
-      return Reflect.ownKeys(object)
-    },
-    getOwnPropertyDescriptor(object, key) {
-      uses.push(`describe ${name}.${String(key)}`)
-      return Reflect.getOwnPropertyDescriptor(object, key)
-    },
-  })
-}
-
 /** A stand-in Contacts application with one person, recording every use. */
 function standInContacts() {
   const uses: string[] = []
@@ -128,18 +85,6 @@ function standInContacts() {
     actionTitle: (_params: unknown) => 'Title',
   }
   return { app: recorded(app, 'app', uses), uses }
-}
-
-/** A transport that evaluates the composed script against `app` in an isolated context. */
-function standInTransport(app: object, scripts: NativeScript[] = []): NativeTransport {
-  return {
-    run(script) {
-      scripts.push(script)
-      const context = createContext({ ObjC: { import: () => undefined }, Application: () => app })
-      const stdout: unknown = runInContext(composeNativeScript(script, NATIVE_CODEC), context)
-      return Promise.resolve(parseNativeOutcome(String(stdout)))
-    },
-  }
 }
 
 /** Runs Contacts' `actionTitle` with `input` under `inputPlan` against `app`. */
