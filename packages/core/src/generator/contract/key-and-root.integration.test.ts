@@ -7,11 +7,13 @@
  *
  * - A key-targeted resource's get takes its key, and binds onto its get
  *   descriptor with the key under the get command's parameter.
- * - A singleton root's get takes only call options, binds onto its get
- *   descriptor with an empty input, and the root has no list; its client
- *   rejects an identifier at compile time.
- * - An operation whose required input takes a reference to a root cannot be
- *   called, so no client method offers it.
+ * - A singleton root's get takes its kind, one of a closed set, and binds onto
+ *   its get descriptor with the kind under the get command's parameter; its
+ *   list takes nothing. Its client rejects a kind outside the set, and a get
+ *   with no kind, at compile time. Its records carry their kind.
+ * - An operation whose input takes a reference to a root accepts an identity
+ *   reference by kind, and rejects one by any other identifier at compile
+ *   time.
  *
  * @see ../../../../../phases/13-sdk-value-and-execution-contracts.md (D2, D7, D10)
  */
@@ -38,24 +40,26 @@ import { generateContract } from './index.js'
  */
 const CONSUMER_SOURCE = `
 import type { ClientRuntime } from '@macts/contracts'
-import { archiveContract, type ArchiveClient, type Desk, type Entry, type Label } from './contract/index.js'
+import { archiveContract, type ArchiveClient, type Desk, type DeskKind, type Entry, type Label } from './contract/index.js'
 
 declare const runtime: ClientRuntime
 const client: ArchiveClient = archiveContract.bind(runtime)
 
 export async function usage(): Promise<void> {
-  const desk: Desk = await client.desks.get()
+  const desk: Desk = await client.desks.get('front')
+  const kind: DeskKind = desk.kind
   const clerk: string | null = desk.clerk
+  const desks: readonly Desk[] = (await client.desks.list()).items
   const entry: Entry = await client.entries.get('/a')
   const label: Label = await client.labels.get('/a', 'l1')
-  void [clerk, entry, label]
-  await client.desks.get({ signal: new AbortController().signal })
-  // @ts-expect-error -- a root's get reads an application property: it takes no identifier
-  await client.desks.get('front')
-  // @ts-expect-error -- a root has no list
-  await client.desks.list()
-  // @ts-expect-error -- ring's required desk takes a reference to a root, so it cannot be called
-  await client.ring()
+  void [kind, clerk, desks, entry, label]
+  await client.ring({ app: 'archive', resource: 'Desk', form: 'identity', cardinality: 'one', id: 'back' })
+  // @ts-expect-error -- a root's kinds are a closed set
+  await client.desks.get('side')
+  // @ts-expect-error -- a root's get takes a kind
+  await client.desks.get()
+  // @ts-expect-error -- a reference to a root carries a kind
+  await client.ring({ app: 'archive', resource: 'Desk', form: 'identity', cardinality: 'one', id: 'side' })
 }
 `
 
@@ -128,11 +132,13 @@ describe('the Archive contract', () => {
     expect(tscStatus).toBe(0)
   })
 
-  it('binds the root get onto its descriptor with an empty input', async () => {
+  it('binds the root get onto its descriptor with the kind, and its list with no input', async () => {
     const { client, calls } = boundClient()
-    await call(client, ['desks', 'get'])
+    await call(client, ['desks', 'get'], 'front')
+    await call(client, ['desks', 'list'])
     expect(calls.map(({ operation, input }) => [operation.id, input])).toEqual([
-      ['archive.desks.getDesk', {}],
+      ['archive.desks.getDesk', { kind: 'front' }],
+      ['archive.desks.listDesks', {}],
     ])
   })
 
@@ -146,14 +152,15 @@ describe('the Archive contract', () => {
     ])
   })
 
-  it('offers only the root get, and no method for the operation that cannot be called', () => {
+  it('offers the root get and list, and the operation taking a reference by kind', () => {
     const { client } = boundClient()
-    expect(Object.keys(objectAt(client, ['desks']))).toEqual(['get'])
+    expect(Object.keys(objectAt(client, ['desks'])).sort()).toEqual(['get', 'list'])
     expect(Object.keys(objectAt(client, [])).sort()).toEqual([
       'desks',
       'entries',
       'labels',
       'marks',
+      'ring',
       'volumes',
     ])
   })

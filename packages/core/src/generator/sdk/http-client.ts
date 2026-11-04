@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 
-import type { AppManifest, Resource, ResourceRoot, Command } from '../../manifest/index.js'
+import type { AppManifest, Resource, Command } from '../../manifest/index.js'
 import type { PropertyType } from '../../manifest/schemas/property.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
@@ -724,13 +724,7 @@ function generateResourceClient(
         )
       : '',
     getCmd
-      ? generateGetMethod(
-          commandRouteSegment(...getCmd),
-          getCmd[1],
-          resourceName,
-          nameWords,
-          resource.root
-        )
+      ? generateGetMethod(commandRouteSegment(...getCmd), getCmd[1], resourceName, nameWords)
       : '',
     createCmd
       ? generateCreateMethod(
@@ -919,27 +913,13 @@ function uniquePageBinding(taken: readonly string[]): string {
  * it is included as the first argument so the server can scope the JXA query to
  * the correct parent collection — e.g. `app.calendars.whose({name:calendarId})[0]
  * .events.byId(id)` instead of the broken `app.events.byId(id)`.
- *
- * A singleton root's get takes no argument: the server reads the application
- * property that holds the root's one object.
  */
 function generateGetMethod(
   routeSegment: string,
   command: Command,
   resourceName: string,
-  nameWords: string,
-  root: ResourceRoot | undefined
+  nameWords: string
 ): string {
-  if (root !== undefined) {
-    return `
-  /**
-   * Get the ${root.evidence.term}.
-   */
-  async get(): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, {});
-  }
-`
-  }
   const { parentParam, childParam } = resolveIdParams(command)
   if (parentParam !== undefined) {
     return `

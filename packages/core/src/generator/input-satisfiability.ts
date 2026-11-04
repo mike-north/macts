@@ -40,33 +40,7 @@ import {
   type DeclaredType,
 } from './surface.js'
 import { resolvingCommand } from '../manifest/resource-commands.js'
-import { resolveRoot } from '../manifest/roots.js'
 import { createNameResolver, mapDeclaredType, type ValueShape } from './contract/value-mapping.js'
-
-/**
- * Why no reference to a resource can be given:
- *
- * - `no-get`: the app has no operation to get one.
- * - `singleton-root`: the resource is a singleton root, which the app holds
- *   as one of its own properties; it has no identity value, so no reference
- *   names it yet (`../manifest/roots.ts`).
- */
-export type UnsatisfiableReason = 'no-get' | 'singleton-root'
-
-/** Why no reference to `resourceKey` can be given, for a resource none can name. */
-export function unsatisfiableReason(
-  manifest: AppManifest,
-  resourceKey: string
-): UnsatisfiableReason {
-  return resolveRoot(manifest, resourceKey) === undefined ? 'no-get' : 'singleton-root'
-}
-
-/** Each {@link UnsatisfiableReason} as a clause about the resource, for generated messages. */
-export const UNSATISFIABLE_REASON_CLAUSES: Readonly<Record<UnsatisfiableReason, string>> = {
-  'no-get': 'which the app has no operation to get',
-  'singleton-root':
-    'which the app holds as one of its own properties, and a reference cannot name such an object yet',
-}
 
 /** An input position of an operation that admits no value. */
 export interface UnsatisfiableInput {
@@ -74,8 +48,6 @@ export interface UnsatisfiableInput {
   readonly name: string
   /** The manifest key of the resource the position references. */
   readonly resource: string
-  /** Why no reference to that resource can be given. */
-  readonly reason: UnsatisfiableReason
   /** Whether the request must supply the field. */
   readonly required: boolean
   /**
@@ -88,8 +60,7 @@ export interface UnsatisfiableInput {
 /**
  * Whether the app can resolve a single reference to `resourceKey`: it has a
  * usable `get` command for that resource, the same one whose operation the
- * contract's resource table records ({@link resolvingCommand}). A singleton
- * root has none, since no reference names it.
+ * contract's resource table records ({@link resolvingCommand}).
  */
 export function resolvesSingleReferences(manifest: AppManifest, resourceKey: string): boolean {
   return resolvingCommand(manifest, resourceKey, 'get') !== undefined
@@ -150,13 +121,7 @@ export function unsatisfiableInputs(
     seen.add(name)
     const resource = fieldTarget(manifest, names, type, position.nullable)
     if (resource === undefined) return
-    found.push({
-      name,
-      resource,
-      reason: unsatisfiableReason(manifest, resource),
-      required: position.required,
-      source: position.source,
-    })
+    found.push({ name, resource, required: position.required, source: position.source })
   }
   const nullable = (param: CommandParameter): boolean => resolveParameterNullability(param).nullable
 

@@ -135,19 +135,42 @@ export const NATIVE_CODEC: NativeCodec = Object.freeze({
  *
  * @remarks
  * It follows the resource's identifier targeting (phases/13 D10), as a
- * generated get does: `byId` asks the collection for the item with that id,
+ * generated get does. A resource found in a collection is addressed by
+ * {@link NativeCollectionAddressing}; a singleton root, which the app holds
+ * as its own properties, by {@link NativeRootAddressing}.
+ */
+export type NativeAddressing = NativeCollectionAddressing | NativeRootAddressing
+
+/**
+ * How a resource's collection at the application finds an object from its
+ * identifier: `byId` asks the collection for the item with that id,
  * `byProperty` matches `property` against the identifier, and `byKey` applies
  * the collection's key specifier to it. In each case the identifier a
  * reference carries is the value of `property`, so reading it back from an
  * object gives the identifier that finds the object again.
  */
-export interface NativeAddressing {
+export interface NativeCollectionAddressing {
   /** The app's spelling of the resource's collection at the application. */
   readonly collection: string
   /** How the collection finds an item from its identifier. */
   readonly lookup: 'byId' | 'byProperty' | 'byKey'
   /** The app's spelling of the property that holds the identifier. */
   readonly property: string
+}
+
+/**
+ * How the app holds the objects of a singleton root: the identifier a
+ * reference carries is a kind, and `roots` maps each kind to the app's
+ * spelling of the application property that holds its object. A kind the map
+ * does not hold names no object. The object holds nothing that says which
+ * kind it is, so an object read from the app cannot be encoded as a reference
+ * to a root.
+ */
+export interface NativeRootAddressing {
+  /** The object is the application property its kind names. */
+  readonly lookup: 'byRoot'
+  /** Each kind, with the app's spelling of the application property holding it. */
+  readonly roots: Readonly<Record<string, string>>
 }
 
 /**

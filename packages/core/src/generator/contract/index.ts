@@ -85,13 +85,7 @@ import {
   type CrudOperation,
   type DeclaredType,
 } from '../surface.js'
-import {
-  UNSATISFIABLE_REASON_CLAUSES,
-  unsatisfiableInputs,
-  unsatisfiableReason,
-  unsatisfiableTarget,
-  type UnsatisfiableReason,
-} from '../input-satisfiability.js'
+import { unsatisfiableInputs, unsatisfiableTarget } from '../input-satisfiability.js'
 import {
   ValueBuilder,
   ValueRenderer,
@@ -226,8 +220,8 @@ export function contractNames(manifest: AppManifest): ContractNames {
  * Every reason cites the coverage ledger, #219.
  */
 const OMITTED_OUTPUT_REASONS: Readonly<Record<OmittedOutputReason, (target: string) => string>> = {
-  'singleton-root': () =>
-    'which the app holds as one of its own properties, and a reference cannot name such an object yet (#219)',
+  'root-kind-unmapped': (target) =>
+    `which the app holds as one of its own properties, and macts has no curated mapping yet from the field to the "${target}" kind it holds (#219)`,
   'no-get': (target) => `and macts has no get for "${target}" yet (#219)`,
   'no-identifier': (target) => `and macts has no identifier for "${target}" yet (#219)`,
   'parent-scoped': (target) =>
@@ -293,7 +287,7 @@ export function collectContractDiagnostics(manifest: AppManifest): ContractDiagn
         position,
         operation: operationId(route.route),
         resource: input.resource,
-        message: `${app}: ${position}: ${route.route} cannot be called and is left out of MCP tools, HTTP routes, the generated clients, CLI commands and capability discovery: the required input "${input.name}" takes a reference to "${input.resource}", ${UNSATISFIABLE_REASON_CLAUSES[input.reason]}.`,
+        message: `${app}: ${position}: ${route.route} cannot be called and is left out of MCP tools, HTTP routes, the generated clients, CLI commands and capability discovery: the required input "${input.name}" takes a reference to "${input.resource}", which the app has no operation to get.`,
       })
     }
   }
@@ -425,11 +419,7 @@ interface OperationModel {
    * references (see `../input-satisfiability.ts`); empty when the operation
    * can be called.
    */
-  readonly unavailable: readonly {
-    readonly name: string
-    readonly resource: string
-    readonly reason: UnsatisfiableReason
-  }[]
+  readonly unavailable: readonly { readonly name: string; readonly resource: string }[]
 }
 
 /** One client method, and the operation it invokes. */
@@ -788,9 +778,7 @@ class ContractBuilder {
       const input = this.#inputModel(route)
       const unavailable = this.#inputFields(input).flatMap(({ name, shape }) => {
         const resource = unsatisfiableTarget(this.#manifest, shape)
-        return resource === undefined
-          ? []
-          : [{ name, resource, reason: unsatisfiableReason(this.#manifest, resource) }]
+        return resource === undefined ? [] : [{ name, resource }]
       })
       this.#checkSatisfiability(route, input, unavailable)
       const operation: OperationModel = {
@@ -891,11 +879,9 @@ class ContractBuilder {
     }
     const fields = new Map<string, FieldModel>()
     const identifiers = new Map<string, FieldModel>()
-    // A singleton root's get reads an application property: it takes no identifier.
     if (
       (shape === 'get' || shape === 'update' || shape === 'delete') &&
-      this.#isChosenCrud(route, shape) &&
-      route.resource?.root === undefined
+      this.#isChosenCrud(route, shape)
     ) {
       for (const field of this.#identifierFields(route.command)) identifiers.set(field.name, field)
     }
@@ -1246,18 +1232,6 @@ class ContractBuilder {
   }
 
   #getMethod(resource: Resource, command: Command, operation: OperationModel): MethodModel {
-    const root = resource.root
-    if (root !== undefined) {
-      // A singleton root's get reads the application property that holds it.
-      return {
-        name: 'get',
-        doc: `Read the ${root.evidence.term}.`,
-        params: [],
-        returnType: resource.name,
-        operation,
-        body: { kind: 'fields', fields: [] },
-      }
-    }
     const { fields, phrase } = this.#identified(resource, command)
     return {
       name: 'get',
@@ -1908,8 +1882,8 @@ const RESULT_NULLABILITY_NOTE = 'Nullable. No evidence that the app always retur
 function unavailableReason(operation: OperationModel): string | undefined {
   if (operation.unavailable.length === 0) return undefined
   const causes = operation.unavailable.map(
-    ({ name, resource, reason }) =>
-      `\`${name}\` takes a reference to ${withArticle(identifierWords(resource))}, ${UNSATISFIABLE_REASON_CLAUSES[reason]}`
+    ({ name, resource }) =>
+      `\`${name}\` takes a reference to ${withArticle(identifierWords(resource))}, which the app has no operation to get`
   )
   return `Not available: ${causes.join('; ')}, so the operation cannot be called.`
 }

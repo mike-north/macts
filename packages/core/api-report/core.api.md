@@ -15,6 +15,9 @@ import { WireValue } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
+export const ABSENT_VALUE_ERROR_NUMBER = -1728;
+
+// @public
 export function activateApp(bundleId: string): Promise<undefined>;
 
 // @public
@@ -168,6 +171,7 @@ export const AppManifestSchema: z.ZodObject<{
                     sampleSize: z.ZodNumber;
                     nullCount: z.ZodNumber;
                     failedReads: z.ZodNumber;
+                    errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
                     note: z.ZodOptional<z.ZodString>;
                 }, z.core.$strip>, z.ZodObject<{
                     source: z.ZodLiteral<"curated">;
@@ -235,6 +239,7 @@ export const AppManifestSchema: z.ZodObject<{
                 byId: "byId";
                 byProperty: "byProperty";
                 byKey: "byKey";
+                byRoot: "byRoot";
             }>>;
             runtimeProperty: z.ZodOptional<z.ZodString>;
             unique: z.ZodOptional<z.ZodBoolean>;
@@ -354,7 +359,7 @@ export const AppManifestSchema: z.ZodObject<{
                 note: z.ZodOptional<z.ZodString>;
             }, z.core.$strict>;
         }, z.core.$strict>], "supported">>;
-        root: z.ZodOptional<z.ZodObject<{
+        roots: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodObject<{
             property: z.ZodString;
             evidence: z.ZodObject<{
                 source: z.ZodLiteral<"dictionary">;
@@ -363,7 +368,7 @@ export const AppManifestSchema: z.ZodObject<{
                 osVersion: z.ZodString;
                 term: z.ZodString;
             }, z.core.$strict>;
-        }, z.core.$strict>>;
+        }, z.core.$strict>>>;
     }, z.core.$strip>>;
     enums: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodObject<{
         name: z.ZodString;
@@ -428,6 +433,7 @@ export const AppManifestSchema: z.ZodObject<{
                     sampleSize: z.ZodNumber;
                     nullCount: z.ZodNumber;
                     failedReads: z.ZodNumber;
+                    errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
                     note: z.ZodOptional<z.ZodString>;
                 }, z.core.$strip>, z.ZodObject<{
                     source: z.ZodLiteral<"curated">;
@@ -919,6 +925,7 @@ export const CommandParameterSchema: z.ZodObject<{
             sampleSize: z.ZodNumber;
             nullCount: z.ZodNumber;
             failedReads: z.ZodNumber;
+            errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
             note: z.ZodOptional<z.ZodString>;
         }, z.core.$strip>, z.ZodObject<{
             source: z.ZodLiteral<"curated">;
@@ -971,6 +978,7 @@ export const CommandSchema: z.ZodObject<{
                 sampleSize: z.ZodNumber;
                 nullCount: z.ZodNumber;
                 failedReads: z.ZodNumber;
+                errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
                 note: z.ZodOptional<z.ZodString>;
             }, z.core.$strip>, z.ZodObject<{
                 source: z.ZodLiteral<"curated">;
@@ -1782,6 +1790,7 @@ export const IdentifierSchema: z.ZodObject<{
         byId: "byId";
         byProperty: "byProperty";
         byKey: "byKey";
+        byRoot: "byRoot";
     }>>;
     runtimeProperty: z.ZodOptional<z.ZodString>;
     unique: z.ZodOptional<z.ZodBoolean>;
@@ -1812,6 +1821,7 @@ export const IdentifierTargetingSchema: z.ZodEnum<{
     byId: "byId";
     byProperty: "byProperty";
     byKey: "byKey";
+    byRoot: "byRoot";
 }>;
 
 // @public (undocumented)
@@ -2082,11 +2092,7 @@ export const NATIVE_DECODE_FUNCTION = "__mactsDecode";
 export const NATIVE_ENCODE_FUNCTION = "__mactsEncode";
 
 // @public
-export interface NativeAddressing {
-    readonly collection: string;
-    readonly lookup: 'byId' | 'byProperty' | 'byKey';
-    readonly property: string;
-}
+export type NativeAddressing = NativeCollectionAddressing | NativeRootAddressing;
 
 // @public
 export interface NativeBodyOptions {
@@ -2103,6 +2109,13 @@ export interface NativeCodec {
 export interface NativeCodecEnvironment {
     readonly app: unknown;
     readonly references: NativeReferenceTable;
+}
+
+// @public
+export interface NativeCollectionAddressing {
+    readonly collection: string;
+    readonly lookup: 'byId' | 'byProperty' | 'byKey';
+    readonly property: string;
 }
 
 // @public
@@ -2145,6 +2158,12 @@ export interface NativeReferencePlans {
 
 // @public
 export type NativeReferenceTable = Readonly<Record<string, NativeReferencePlans>>;
+
+// @public
+export interface NativeRootAddressing {
+    readonly lookup: 'byRoot';
+    readonly roots: Readonly<Record<string, string>>;
+}
 
 // @public
 export interface NativeRunOptions {
@@ -2193,6 +2212,7 @@ export const NullabilityEvidenceSchema: z.ZodDiscriminatedUnion<[z.ZodObject<{
     sampleSize: z.ZodNumber;
     nullCount: z.ZodNumber;
     failedReads: z.ZodNumber;
+    errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
     note: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>, z.ZodObject<{
     source: z.ZodLiteral<"curated">;
@@ -2643,6 +2663,7 @@ export const ProbeNullabilityEvidenceSchema: z.ZodObject<{
     sampleSize: z.ZodNumber;
     nullCount: z.ZodNumber;
     failedReads: z.ZodNumber;
+    errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
     note: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
 
@@ -2692,6 +2713,7 @@ export const PropertyEvidenceSchema: z.ZodObject<{
         sampleSize: z.ZodNumber;
         nullCount: z.ZodNumber;
         failedReads: z.ZodNumber;
+        errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
         note: z.ZodOptional<z.ZodString>;
     }, z.core.$strip>, z.ZodObject<{
         source: z.ZodLiteral<"curated">;
@@ -2792,6 +2814,7 @@ export const PropertySchema: z.ZodObject<{
             sampleSize: z.ZodNumber;
             nullCount: z.ZodNumber;
             failedReads: z.ZodNumber;
+            errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
             note: z.ZodOptional<z.ZodString>;
         }, z.core.$strip>, z.ZodObject<{
             source: z.ZodLiteral<"curated">;
@@ -2997,6 +3020,9 @@ export interface ReadFailureDefect {
 export function readMacosVersion(): Promise<string>;
 
 // @public
+export function readsAbsentAsNull(claim: NullabilityClaim): boolean;
+
+// @public
 export function recordApprovalCancellation(options: RecordApprovalCancellationOptions): Promise<AuditDecision>;
 
 // @public
@@ -3057,6 +3083,9 @@ export const RelationshipSchema: z.ZodObject<{
     property: z.ZodOptional<z.ZodString>;
     description: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
+
+// @public
+export function reportsAbsence(evidence: ProbeNullabilityEvidence): boolean;
 
 // @public (undocumented)
 export type ResettabilityEvidence = z.infer<typeof ResettabilityEvidenceSchema>;
@@ -3244,6 +3273,9 @@ export const ResourceRangeReadSchema: z.ZodDiscriminatedUnion<[z.ZodObject<{
 // @public (undocumented)
 export type ResourceRoot = z.infer<typeof ResourceRootSchema>;
 
+// @public (undocumented)
+export type ResourceRoots = z.infer<typeof ResourceRootsSchema>;
+
 // @public
 export const ResourceRootSchema: z.ZodObject<{
     property: z.ZodString;
@@ -3255,6 +3287,18 @@ export const ResourceRootSchema: z.ZodObject<{
         term: z.ZodString;
     }, z.core.$strict>;
 }, z.core.$strict>;
+
+// @public
+export const ResourceRootsSchema: z.ZodRecord<z.ZodString, z.ZodObject<{
+    property: z.ZodString;
+    evidence: z.ZodObject<{
+        source: z.ZodLiteral<"dictionary">;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        term: z.ZodString;
+    }, z.core.$strict>;
+}, z.core.$strict>>;
 
 // @public
 export const ResourceSchema: z.ZodObject<{
@@ -3301,6 +3345,7 @@ export const ResourceSchema: z.ZodObject<{
                 sampleSize: z.ZodNumber;
                 nullCount: z.ZodNumber;
                 failedReads: z.ZodNumber;
+                errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
                 note: z.ZodOptional<z.ZodString>;
             }, z.core.$strip>, z.ZodObject<{
                 source: z.ZodLiteral<"curated">;
@@ -3368,6 +3413,7 @@ export const ResourceSchema: z.ZodObject<{
             byId: "byId";
             byProperty: "byProperty";
             byKey: "byKey";
+            byRoot: "byRoot";
         }>>;
         runtimeProperty: z.ZodOptional<z.ZodString>;
         unique: z.ZodOptional<z.ZodBoolean>;
@@ -3487,7 +3533,7 @@ export const ResourceSchema: z.ZodObject<{
             note: z.ZodOptional<z.ZodString>;
         }, z.core.$strict>;
     }, z.core.$strict>], "supported">>;
-    root: z.ZodOptional<z.ZodObject<{
+    roots: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodObject<{
         property: z.ZodString;
         evidence: z.ZodObject<{
             source: z.ZodLiteral<"dictionary">;
@@ -3496,7 +3542,7 @@ export const ResourceSchema: z.ZodObject<{
             osVersion: z.ZodString;
             term: z.ZodString;
         }, z.core.$strict>;
-    }, z.core.$strict>>;
+    }, z.core.$strict>>>;
 }, z.core.$strip>;
 
 // @public (undocumented)

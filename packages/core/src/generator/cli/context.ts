@@ -1,11 +1,4 @@
-import type {
-  AppManifest,
-  Resource,
-  ResourceRoot,
-  Command,
-  Enum,
-  HierarchyChild,
-} from '../../manifest/index.js'
+import type { AppManifest, Resource, Command, Enum, HierarchyChild } from '../../manifest/index.js'
 import {
   isUnsupportedResourceKey,
   usableCommands,
@@ -13,6 +6,7 @@ import {
   usableResources,
 } from '../../manifest/unsupported.js'
 import { isOperationAvailable, omittedInputs } from '../input-satisfiability.js'
+import { resourceNamespace } from '../surface.js'
 
 export interface CliGeneratorOptions {
   /** Package name (e.g., @macts/calendar) */
@@ -53,7 +47,7 @@ export interface CliGeneratorContext {
 
   /**
    * Get the hierarchy as a flat list of paths, followed by one path per
-   * singleton root, at the application property that holds it.
+   * singleton root resource, at its public segment.
    */
   getHierarchyPaths(): HierarchyPath[]
 
@@ -83,13 +77,6 @@ export interface HierarchyPath {
   canCreate: boolean
   /** Parameter names needed to reach this path (e.g., ['calendarId'] for events) */
   parentParams: ParentParam[]
-  /**
-   * The application property holding the resource's one object, when the
-   * path reaches a singleton root rather than a collection. Its segment is
-   * the property, as a hierarchy key is its collection, and only a get is
-   * generated under it.
-   */
-  root?: ResourceRoot | undefined
 }
 
 export interface ParentParam {
@@ -115,17 +102,16 @@ export function createCliGeneratorContext(
   // Build hierarchy paths
   const hierarchyPaths: HierarchyPath[] = []
   buildHierarchyPaths(manifest, manifest.hierarchy.children, [], [], hierarchyPaths)
-  // A singleton root is in no collection, so no hierarchy entry names it; it
-  // is reached at the application property that holds it.
+  // A singleton root's objects are in no collection, so no hierarchy entry
+  // names the resource; it is reached at its public segment, where its list
+  // and its get by kind are generated as for any resource.
   for (const [resourceName, resource] of resourceMap) {
-    const root = resource.root
-    if (root === undefined) continue
+    if (resource.roots === undefined) continue
     hierarchyPaths.push({
-      path: [root.property],
+      path: [resourceNamespace(resource)],
       resourceName,
       canCreate: false,
       parentParams: [],
-      root,
     })
   }
 

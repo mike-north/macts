@@ -37,7 +37,11 @@
  */
 
 import type { FieldPlan, IssuePath, ValuePlan } from '@macts/contracts'
-import type { NativeAddressing, NativeCodecEnvironment } from './native-codec.js'
+import type {
+  NativeAddressing,
+  NativeCodecEnvironment,
+  NativeRootAddressing,
+} from './native-codec.js'
 
 /** Which conversion a codec failure happened in. */
 export type NativeCodecDirection = 'decode' | 'encode'
@@ -732,6 +736,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     resource: string,
     path: Path
   ): HostObject {
+    if (addressing.lookup === 'byRoot') return addressRoot(app, addressing, id, resource, path)
     const expected = 'the application to have a collection ' + quote(addressing.collection)
     const collection = app[addressing.collection]
     if (!isHostObject(collection)) {
@@ -755,6 +760,39 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     }
     if (!isHostObject(object)) {
       return fail('decode', path, 'Expected ' + expected + ', received ' + describeValue(object))
+    }
+    if (callMember('decode', object, 'exists', [], path, 'an object') !== true) {
+      return failMissing(path, resource)
+    }
+    return object
+  }
+
+  /**
+   * The app's object of a singleton root whose kind is `id`: the application
+   * property `addressing` maps the kind to. A kind the map does not hold, and
+   * an object the app does not have at that property on this Mac, both fail
+   * as a missing target.
+   */
+  function addressRoot(
+    app: HostObject,
+    addressing: NativeRootAddressing,
+    id: unknown,
+    resource: string,
+    path: Path
+  ): HostObject {
+    const roots = addressing.roots
+    const property = typeof id === 'string' && hasOwn(roots, id) ? roots[id] : undefined
+    if (property === undefined) return failMissing(path, resource)
+    const object = app[property]
+    if (!isHostObject(object)) {
+      return fail(
+        'decode',
+        path,
+        'Expected the application to have a property ' +
+          quote(property) +
+          ', received ' +
+          describeValue(object)
+      )
     }
     if (callMember('decode', object, 'exists', [], path, 'an object') !== true) {
       return failMissing(path, resource)
@@ -902,6 +940,16 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     const expected = 'an object of ' + quote(plan.resource)
     if (!isHostObject(native)) {
       return fail('encode', path, 'Expected ' + expected + ', received ' + describeValue(native))
+    }
+    if (plans.addressing.lookup === 'byRoot') {
+      return failUnsupported(
+        'encode',
+        path,
+        'reference',
+        'References to ' +
+          quote(plan.resource) +
+          ' have no conversion from the app: its objects do not say which kind they are'
+      )
     }
     const id = callMember('encode', native, plans.addressing.property, [], path, expected)
     const payload: Record<string, unknown> = {}

@@ -29,6 +29,15 @@ import { VALUE_KINDS } from '../value-kinds.js'
 export const NON_NULL_SAMPLE_THRESHOLD = 30
 
 /**
+ * The native "no such object" error number, as a probe records it: the app
+ * reports that an item has no object at a property, which for a property
+ * that holds an object (a folder an item may not have) is how the app says
+ * the value is absent. Mirrors the native layer's own constant, which this
+ * layer cannot import.
+ */
+export const ABSENT_VALUE_ERROR_NUMBER = -1728
+
+/**
  * When evidence was observed or confirmed: an ISO 8601 UTC timestamp, e.g.
  * `2026-10-31T12:00:00.000Z`. UTC only, so timestamps compare as written.
  */
@@ -66,12 +75,41 @@ export const ProbeNullabilityEvidenceSchema = z
      * it counts toward neither `sampleSize` nor `nullCount`.
      */
     failedReads: CountSchema,
+    /**
+     * The distinct error numbers the failed reads raised, each once, when they
+     * were recorded. When they are exactly the absent-value number
+     * ({@link ABSENT_VALUE_ERROR_NUMBER}), the failures are the app reporting
+     * no value, so they support a nullable claim, and a read that fails that
+     * way is taken as the empty value (see {@link readsAbsentAsNull}).
+     */
+    errorNumbers: z.array(z.number().int()).min(1).optional(),
     /** Why this observation replaced an earlier claim, when it did. */
     note: z.string().min(1).optional(),
   })
-  .refine((evidence) => evidence.nullCount <= evidence.sampleSize, {
-    message: 'nullCount cannot exceed sampleSize: every empty read is a successful read.',
-    path: ['nullCount'],
+  .superRefine((evidence, ctx) => {
+    if (evidence.nullCount > evidence.sampleSize) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'nullCount cannot exceed sampleSize: every empty read is a successful read.',
+        path: ['nullCount'],
+      })
+    }
+    const numbers = evidence.errorNumbers
+    if (numbers === undefined) return
+    if (evidence.failedReads === 0) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'errorNumbers records what failed reads raised, so it needs failedReads above 0.',
+        path: ['errorNumbers'],
+      })
+    }
+    if (new Set(numbers).size !== numbers.length) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'errorNumbers lists each distinct error number once.',
+        path: ['errorNumbers'],
+      })
+    }
   })
 export type ProbeNullabilityEvidence = z.infer<typeof ProbeNullabilityEvidenceSchema>
 
@@ -514,7 +552,9 @@ interface NullabilityClaim {
  *
  * - A claim needs evidence, and evidence needs a claim.
  * - Probe evidence that observed an empty value supports only `nullable: true`,
- *   and probe evidence supports `nullable: true` only when it observed one.
+ *   and probe evidence supports `nullable: true` only when it observed one,
+ *   or when its failed reads all reported an absent value
+ *   ({@link reportsAbsence}).
  * - Probe evidence supports `nullable: false` only when it observed no empty
  *   value across at least {@link NON_NULL_SAMPLE_THRESHOLD} reads.
  * - Dictionary evidence supports only `nullable: true`.
@@ -546,11 +586,18 @@ export function checkNullabilityClaim(claim: NullabilityClaim, ctx: z.Refinement
         path: ['nullable'],
       })
     }
-    if (evidence.nullCount === 0 && claim.nullable === true) {
+    if (evidence.nullCount === 0 && claim.nullable === true && !reportsAbsence(evidence)) {
       ctx.addIssue({
         code: 'custom',
-        message: 'The probe observed no empty value, so it cannot show that the field is nullable.',
+        message: `The probe observed no empty value, and its failed reads are not all the app reporting no value (${String(ABSENT_VALUE_ERROR_NUMBER)}), so it cannot show that the field is nullable.`,
         path: ['evidence', 'nullable', 'nullCount'],
+      })
+    }
+    if (reportsAbsence(evidence) && claim.nullable === false) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `The probe's failed reads reported no value (${String(ABSENT_VALUE_ERROR_NUMBER)}), so the field is nullable.`,
+        path: ['nullable'],
       })
     }
     if (
@@ -571,4 +618,28 @@ export function checkNullabilityClaim(claim: NullabilityClaim, ctx: z.Refinement
       path: ['nullable'],
     })
   }
+}
+
+/**
+ * Whether probe evidence shows the app reporting an absent value by failing
+ * the read: some reads failed, and every one raised the absent-value number
+ * ({@link ABSENT_VALUE_ERROR_NUMBER}).
+ */
+export function reportsAbsence(evidence: ProbeNullabilityEvidence): boolean {
+  return (
+    evidence.failedReads > 0 &&
+    evidence.errorNumbers?.every((number) => number === ABSENT_VALUE_ERROR_NUMBER) === true
+  )
+}
+
+/**
+ * Whether a read of the field that fails with the absent-value number
+ * ({@link ABSENT_VALUE_ERROR_NUMBER}) is the field's empty value: the field
+ * is claimed nullable, on probe evidence whose failed reads all reported an
+ * absent value ({@link reportsAbsence}). Any other failure of the read is
+ * still a failure, and so is this one for any field without that evidence.
+ */
+export function readsAbsentAsNull(claim: NullabilityClaim): boolean {
+  const evidence = claim.evidence?.nullable
+  return claim.nullable === true && evidence?.source === 'probe' && reportsAbsence(evidence)
 }

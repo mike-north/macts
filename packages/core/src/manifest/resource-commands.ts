@@ -79,17 +79,11 @@ export function findCrudCommand(
  * asks whether a `get` exists, and the native executor addresses a referenced
  * object at the application only when that `get` records no parent, so none of
  * them can disagree.
- *
- * A singleton root has none: its get reads an application property and takes
- * no identifier, so no reference names its object yet (see `./roots.ts`).
  */
 export function resolvingCommand(
   manifest: AppManifest,
   resourceName: string,
   shape: 'get' | 'list'
 ): [string, Command] | undefined {
-  if (Object.hasOwn(manifest.resources, resourceName)) {
-    if (manifest.resources[resourceName]?.root !== undefined) return undefined
-  }
   return findCrudCommand(resourceCommandEntries(manifest, resourceName), shape)
 }

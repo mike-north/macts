@@ -13,8 +13,9 @@
  * app cannot do. macts cannot yet return a usable reference when:
  *
  * - the target is a singleton root, which the app holds as one of its own
- *   properties: a reference carries an identity value, and a root has none,
- *   so no reference names one yet;
+ *   properties, one per kind: a reference to one names its kind, and macts
+ *   has no curated mapping yet from the field the app returned to the kind
+ *   it holds;
  * - macts has no usable `get` for the target yet, so no reference to it passes
  *   validation;
  * - macts has no primary identifier for the target yet, so the target has no
@@ -59,7 +60,7 @@ import type { Property } from './schemas/property.js'
 import type { Resource } from './schemas/resource.js'
 import { resolveIdentifierTargeting, resolvePrimaryIdentifierProperty } from './identifier.js'
 import { resolvePrimaryIdentifier } from './primary-identifier.js'
-import { resolveRoot } from './roots.js'
+import { resolveRoots } from './roots.js'
 import { resolvingCommand } from './resource-commands.js'
 import { usableCommands, usableProperties, usableResources } from './unsupported.js'
 import {
@@ -74,8 +75,9 @@ import {
  * What macts does not provide yet for an output reference to be usable. Each
  * is a coverage gap (#219), not a limit of the app:
  *
- * - `singleton-root`: the target is a singleton root, which the app holds as
- *   one of its own properties, and no reference names one yet.
+ * - `root-kind-unmapped`: the target is a singleton root, which the app
+ *   holds as one of its own properties, and no curated mapping yet says
+ *   which kind the field holds.
  * - `no-get`: macts has no usable `get` command for the target yet.
  * - `no-identifier`: macts has no primary identifier for the target yet, so
  *   no identity reference to one exists.
@@ -86,7 +88,7 @@ import {
  *   object.
  */
 export type OmittedOutputReason =
-  | 'singleton-root'
+  | 'root-kind-unmapped'
   | 'no-get'
   | 'no-identifier'
   | 'parent-scoped'
@@ -135,7 +137,7 @@ export function omittedOutputReason(
   manifest: AppManifest,
   resourceKey: string
 ): OmittedOutputReason | undefined {
-  if (resolveRoot(manifest, resourceKey) !== undefined) return 'singleton-root'
+  if (resolveRoots(manifest, resourceKey) !== undefined) return 'root-kind-unmapped'
   const get = resolvingCommand(manifest, resourceKey, 'get')
   if (get === undefined) return 'no-get'
   if (resolvePrimaryIdentifierProperty(manifest.resources[resourceKey]) === undefined) {

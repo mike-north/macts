@@ -23,8 +23,11 @@ import { defaultCollectionAccessor } from '../native-accessor.js'
  *   property's value. The app interprets the key: for a file system it is a
  *   path, which finds whatever item is at that path now. The targeting names
  *   the lookup mechanism; the identifier property says what the value is.
+ * - `byRoot`: the application property a singleton root's kind names (see
+ *   `../roots.ts`). Only the identifier normalisation gives a root is
+ *   `byRoot`; a manifest never writes it.
  */
-export const IdentifierTargetingSchema = z.enum(['byId', 'byProperty', 'byKey'])
+export const IdentifierTargetingSchema = z.enum(['byId', 'byProperty', 'byKey', 'byRoot'])
 export type IdentifierTargeting = z.infer<typeof IdentifierTargetingSchema>
 
 /**
@@ -216,24 +219,45 @@ export const ResourceNativeSpellingSchema = z
 export type ResourceNativeSpelling = z.infer<typeof ResourceNativeSpellingSchema>
 
 /**
- * How the app reaches a singleton root: the one object of the resource is the
- * value of an application property, not an element of a collection (an app
- * holding its one front desk as the application's `frontDesk` property).
+ * One kind of a singleton root: the application property that holds the
+ * object of that kind, with the evidence for it.
  *
- * The root's get reads that property, so it needs no identifier, and the
- * resource declares none. `property` is the automation bridge's spelling of
- * the application property, and the evidence is the dictionary term it
- * spells, for one app build on one macOS version.
+ * `property` is the app's spelling of the application property, and the
+ * evidence is the dictionary term it spells, for one app build on one macOS
+ * version.
  */
 export const ResourceRootSchema = z
   .object({
-    /** The bridge's accessor for the application property, e.g. `frontDesk`. */
+    /** The app's spelling of the application property, e.g. `frontDesk`. */
     property: z.string().min(1),
-    /** The dictionary term the accessor is the bridge's spelling of. */
+    /** The dictionary term the property is the app's spelling of. */
     evidence: DictionarySpellingEvidenceSchema,
   })
   .strict()
 export type ResourceRoot = z.infer<typeof ResourceRootSchema>
+
+/**
+ * The form of a root kind: lower camel case, letters and digits, so a kind is
+ * a valid enum value, CLI argument and permission-free identifier.
+ */
+const ROOT_KIND_PATTERN = /^[a-z][A-Za-z0-9]*$/
+
+/**
+ * The kinds of a singleton root resource: each kind names the application
+ * property that holds that kind's one object (an app holding a front desk as
+ * `frontDesk` and a back desk as `backDesk`). The objects are in no
+ * collection; the resource's identity is the kind (see `../roots.ts`).
+ */
+export const ResourceRootsSchema = z.record(
+  z
+    .string()
+    .regex(
+      ROOT_KIND_PATTERN,
+      'A root kind is lower camel case, letters and digits only, such as "front" or "userDomain"'
+    ),
+  ResourceRootSchema
+)
+export type ResourceRoots = z.infer<typeof ResourceRootsSchema>
 
 /**
  * The marker on a resource the app cannot provide: its dictionary has no
@@ -448,15 +472,15 @@ export const ResourceSchema = z
      */
     rangeRead: ResourceRangeReadSchema.optional(),
     /**
-     * Set when the resource is a singleton root: the app holds its one object
-     * as an application property, named here with its evidence. Absent for a
-     * resource reached through a collection.
+     * Set when the resource is a singleton root: the app holds each of its
+     * objects as an application property, one per kind, named here with the
+     * evidence. Absent for a resource reached through a collection.
      */
-    root: ResourceRootSchema.optional(),
+    roots: ResourceRootsSchema.optional(),
   })
   .superRefine((resource, ctx) => {
     checkNativeSpellings(resource, ctx)
-    checkRoot(resource, ctx)
+    checkRoots(resource, ctx)
     checkKeyTargeting(resource.identifiers ?? [], ctx)
     if (resource.rangeRead !== undefined && resource.unsupported !== undefined) {
       ctx.addIssue({
@@ -485,29 +509,28 @@ export const ResourceSchema = z
 export type Resource = z.infer<typeof ResourceSchema>
 
 /**
- * A singleton root is held by the application as a property, so it has no
- * identity value and no collection: it declares no identifiers, no collection
+ * A singleton root's objects are held by the application as properties, not
+ * in a collection: it has at least one kind, and records no collection
  * spelling and no range read.
  */
-function checkRoot(
+function checkRoots(
   resource: {
-    readonly root?: ResourceRoot | undefined
-    readonly identifiers?: readonly unknown[] | undefined
+    readonly roots?: ResourceRoots | undefined
     readonly native?: unknown
     readonly rangeRead?: unknown
   },
   ctx: z.RefinementCtx
 ): void {
-  const root = resource.root
-  if (root === undefined) return
-  const held = `A root is held by the application as its "${root.property}" property, not in a collection`
-  if (resource.identifiers !== undefined) {
+  const roots = resource.roots
+  if (roots === undefined) return
+  if (Object.keys(roots).length === 0) {
     ctx.addIssue({
       code: 'custom',
-      message: `The application holds one ${root.evidence.term} as its "${root.property}" property, so a root declares no identifier; remove identifiers.`,
-      path: ['identifiers'],
+      message: 'A root names at least one kind and the application property that holds it.',
+      path: ['roots'],
     })
   }
+  const held = 'A root is held by the application as its properties, not in a collection'
   if (resource.native !== undefined) {
     ctx.addIssue({
       code: 'custom',

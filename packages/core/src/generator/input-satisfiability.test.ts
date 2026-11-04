@@ -53,24 +53,18 @@ function unsatisfiableAt(id: string): ReturnType<typeof unsatisfiableInputs> {
 describe('unsatisfiableInputs', () => {
   it('reports a required reference to a resource without get', () => {
     expect(unsatisfiableAt('jotter.notes.tagNote')).toEqual([
-      { name: 'tag', resource: 'Tag', reason: 'no-get', required: true, source: 'parameter' },
+      { name: 'tag', resource: 'Tag', required: true, source: 'parameter' },
     ])
   })
 
   it('reports an optional reference to a resource without get, but not one that admits null', () => {
     expect(unsatisfiableAt('jotter.app.exportNotes')).toEqual([
-      { name: 'tagged', resource: 'Tag', reason: 'no-get', required: false, source: 'parameter' },
+      { name: 'tagged', resource: 'Tag', required: false, source: 'parameter' },
     ])
   })
 
   it('reports a writable reference property in the create and update inputs, but not a list', () => {
-    const primaryTag = {
-      name: 'primaryTag',
-      resource: 'Tag',
-      reason: 'no-get',
-      required: false,
-      source: 'property',
-    }
+    const primaryTag = { name: 'primaryTag', resource: 'Tag', required: false, source: 'property' }
     expect(unsatisfiableAt('jotter.notes.createNote')).toEqual([primaryTag])
     expect(unsatisfiableAt('jotter.notes.updateNote')).toEqual([primaryTag])
   })

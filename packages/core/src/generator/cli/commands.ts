@@ -351,22 +351,7 @@ export function generateGetCommand(
   // A get command is generated only when a get command backs it, so its
   // identifier parameter is always known here.
   const identifier = addressingIdentifier(resource, getCommand) ?? 'id'
-  // A singleton root's get reads the application property that holds it, so
-  // the command takes no identifier and no parent.
-  const root = hierarchyPath.root
-  const summary =
-    root === undefined
-      ? `Get ${withArticle(identifierWords(resource.name))} by ${identifierProse(identifier)}`
-      : `Get the ${root.evidence.term}`
-  const addressing =
-    root === undefined ? `${parentOptions}\n${identifierPositional(idParamName, identifier)}` : ''
-  const getArguments =
-    root === undefined
-      ? [
-          ...parentScopeParams.map((p) => `this.${safeParamProperty(p.name, 'list')}`),
-          `this.${idParamName}`,
-        ].join(', ')
-      : ''
+  const summary = `Get ${withArticle(identifierWords(resource.name))} by ${identifierProse(identifier)}`
 
   const content = `import { Command, Option } from 'clipanion';
 import { getClient } from '${sdkImportPath}';
@@ -383,14 +368,15 @@ export class Get${resource.name}Command extends Command {
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
-${addressing}
+${parentOptions}
+${identifierPositional(idParamName, identifier)}
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false);
 
     try {
       const client = getClient();
-      const item = await client.${resourceAccess}.get(${getArguments});
+      const item = await client.${resourceAccess}.get(${[...parentScopeParams.map((p) => `this.${safeParamProperty(p.name, 'list')}`), `this.${idParamName}`].join(', ')});
 
       const output = formatter.format({
 ${generateListFieldMapping(ctx.manifest, resource)}

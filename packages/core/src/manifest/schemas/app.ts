@@ -6,7 +6,7 @@ import { HierarchySchema } from './hierarchy.js'
 import { RelationshipSchema } from './relationship.js'
 import { AppMetadataSchema, SuiteSchema, ExtractionMetadataSchema } from './metadata.js'
 import { findDuplicateRoutes } from '../route.js'
-import { findRootIssues } from '../roots.js'
+import { findRootIssues, normalizeRoots } from '../roots.js'
 import {
   findUnsupportedTypeReferences,
   isCommandUnsupported,
@@ -149,4 +149,6 @@ export const AppManifestSchema = z
       ctx.addIssue({ code: 'custom', ...issue })
     }
   })
+  // A singleton root's identity is derived from its kinds (see `../roots.ts`).
+  .overwrite((data) => normalizeRoots(data))
 export type AppManifest = z.infer<typeof AppManifestSchema>

@@ -95,6 +95,9 @@ export interface IdentifierTargetingResolution {
  * - `byKey`: the collection's key specifier applied to the identifier value,
  *   which the app interprets (an app that keys files by path finds whatever
  *   file is at that path).
+ * - `byRoot`: a singleton root's kind, which names the application property
+ *   holding its object (`../manifest/roots.ts`); normalisation gives every
+ *   root this identifier, and no collection is involved.
  *
  * Returns `undefined` when the resource declares no identifiers — such a resource
  * cannot be addressed by identifier at all, and callers handle that explicitly.
