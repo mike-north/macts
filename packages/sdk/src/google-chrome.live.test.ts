@@ -6,7 +6,7 @@
  *
  * Through `@macts/sdk/local`'s `createClient`, with the default native
  * executor and a real API key, end to end through the invocation pipeline
- * (verify, permission, governance, validate input, execute, validate output):
+ * (verify, permission, validate input, governance, execute, validate output):
  *
  *   1. `windows.list`, then `windows.get` of the first listed window, which
  *      must come back with the same id;

@@ -7,7 +7,7 @@
  * form, to `<url>/references/v1/resolve` with the same credential and the
  * same handling of every outcome (phases/13 D7). The service runs the same
  * invocation pipeline a local client does (verify the credential, check
- * permission, enforce governance, validate, execute); this module only carries
+ * permission, validate, enforce governance, execute); this module only carries
  * the call there and back and turns every outcome into the same canonical
  * results and errors a local call produces:
  *

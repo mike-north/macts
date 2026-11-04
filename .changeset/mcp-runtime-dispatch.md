@@ -6,7 +6,7 @@
 
 MCP tool calls run through the same pipeline as the HTTP API
 
-`macts --mcp` (stdio) and the MCP daemon (`macts mcp serve` and `macts mcp start`, over HTTP) now run every tool call through the shared runtime: the caller's API key is verified, its permissions are checked, this Mac's governance policy is enforced and audited, and the input is validated against the operation's contract, all before the app is touched. Both register the installed apps through the same host path as `macts --serve`, serve one tool per operation of every installed app beside the capability-discovery tool, and no longer route a call through an HTTP hop to the API server.
+`macts --mcp` (stdio) and the MCP daemon (`macts mcp serve` and `macts mcp start`, over HTTP) now run every tool call through the shared runtime: the caller's API key is verified, its permissions are checked, the input is validated against the operation's contract, and this Mac's governance policy is enforced and audited, all before the app is touched. Both register the installed apps through the same host path as `macts --serve`, serve one tool per operation of every installed app beside the capability-discovery tool, and no longer route a call through an HTTP hop to the API server.
 
 Results and errors use the structured shapes of the HTTP API. A successful call returns one text item holding `{ "result": <wire value> }`; a failed call is a tool result with `isError: true` holding `{ "error": { "code", "message", "details" } }`, with the same code, message, and details as the HTTP API for the same call. An unexpected failure is reported as `INTERNAL`, and its original text is logged on the host, never returned.
 

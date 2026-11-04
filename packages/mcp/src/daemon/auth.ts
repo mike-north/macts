@@ -6,7 +6,7 @@
  * not authorization: it keeps unauthenticated clients from opening sessions,
  * and it hands the request's bearer to the MCP SDK as `AuthInfo`, which the SDK
  * attaches to every message the request carries. Each tool call is then
- * verified again, with permissions, governance, and validation, by the runtime
+ * verified again, with permissions, validation, and governance, by the runtime
  * (phases/13 A1, D5). Nothing here grants anything.
  *
  * A refusal is answered with the same structured envelope the HTTP API uses
