@@ -16,7 +16,7 @@
  */
 
 import type { CallOptions } from '../call-options.js'
-import type { ReferenceData } from '../references/index.js'
+import type { ReferenceData, ResourceParents } from '../references/index.js'
 import type { ValueType } from '../values/value-type.js'
 import type { ClientBrand, ResourceTable } from './resource-table.js'
 
@@ -25,10 +25,13 @@ export type {
   ClientBrand,
   ResolvableCollectionReferenceData,
   ResolvableContainment,
+  ResolvableContainmentOf,
   ResolvableObjectReferenceData,
+  ResolvableParentContainment,
   ResolvableReferenceData,
   ResolvableResourceKey,
   ResourceIdOf,
+  ResourceParentOf,
   ResourceRecordOf,
   ResourceTable,
 } from './resource-table.js'
@@ -156,6 +159,22 @@ export interface ResourceDescriptor<RecordType, Id = unknown> {
   readonly get?: OperationId
   /** Operation that lists objects, used to resolve collection references. */
   readonly list?: OperationId
+  /**
+   * The resources whose objects contain this one, per resolving operation:
+   * `get` when the app gets one of this resource only within such an object,
+   * taking its identifier along with the object's own; `list` when it lists
+   * them only within one.
+   *
+   * @remarks
+   * Absent when both operations work at the application. A reference resolved
+   * through an operation with a parent (a single-object reference, a
+   * container or an identity-collection entry through `get`; a selector
+   * collection through `list`) must carry as its container an identity
+   * reference to an object of that parent, which supplies the parent
+   * identifier. Encoding, the wire schema and `bindReference` reject one
+   * without it.
+   */
+  readonly parents?: ResourceParents
 }
 
 /**

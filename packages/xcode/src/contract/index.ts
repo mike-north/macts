@@ -1175,9 +1175,11 @@ const runDestinationRecordType: ValueType<RunDestination> = t.record(
 /**
  * The type of the resource table of {@link xcodeContract}: every resource a
  * reference can name, keyed by manifest resource key, with its record type,
- * its identifier type (when it has one), and the operations that resolve
- * references to it. A client created from the contract carries it, so
- * `bindReference` admits only references the contract can resolve.
+ * its identifier type (when it has one), the operations that resolve
+ * references to it, and, for each of those operations that finds the
+ * resource only within another resource, that parent. A client created from
+ * the contract carries it, so `bindReference` admits only references the
+ * contract can resolve.
  */
 export type XcodeResources = Readonly<{
   WorkspaceDocument: ResourceDescriptor<WorkspaceDocument, string> & {
@@ -1189,16 +1191,19 @@ export type XcodeResources = Readonly<{
     readonly id: ValueType<string>
     readonly get: 'xcode.projects.get'
     readonly list: 'xcode.projects.list'
+    readonly parents: { readonly list: 'WorkspaceDocument' }
   }
   Scheme: ResourceDescriptor<Scheme, string> & {
     readonly id: ValueType<string>
     readonly get: 'xcode.schemes.get'
     readonly list: 'xcode.schemes.list'
+    readonly parents: { readonly list: 'WorkspaceDocument' }
   }
   RunDestination: ResourceDescriptor<RunDestination, string> & {
     readonly id: ValueType<string>
     readonly get: 'xcode.runDestinations.get'
     readonly list: 'xcode.runDestinations.list'
+    readonly parents: { readonly list: 'WorkspaceDocument' }
   }
 }>
 
@@ -1224,6 +1229,7 @@ const resources = {
     id: t.string({ description: 'The unique identifier for the project' }),
     get: 'xcode.projects.get',
     list: 'xcode.projects.list',
+    parents: { list: 'WorkspaceDocument' },
   },
   Scheme: {
     name: 'Scheme',
@@ -1231,6 +1237,7 @@ const resources = {
     id: t.string({ description: 'The unique identifier for the scheme' }),
     get: 'xcode.schemes.get',
     list: 'xcode.schemes.list',
+    parents: { list: 'WorkspaceDocument' },
   },
   RunDestination: {
     name: 'RunDestination',
@@ -1240,6 +1247,7 @@ const resources = {
     }),
     get: 'xcode.runDestinations.get',
     list: 'xcode.runDestinations.list',
+    parents: { list: 'WorkspaceDocument' },
   },
 } satisfies XcodeResources
 

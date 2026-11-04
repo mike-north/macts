@@ -567,9 +567,11 @@ const requiredResourceRecordType: ValueType<RequiredResource> = t.record(
 /**
  * The type of the resource table of {@link automatorContract}: every resource a
  * reference can name, keyed by manifest resource key, with its record type,
- * its identifier type (when it has one), and the operations that resolve
- * references to it. A client created from the contract carries it, so
- * `bindReference` admits only references the contract can resolve.
+ * its identifier type (when it has one), the operations that resolve
+ * references to it, and, for each of those operations that finds the
+ * resource only within another resource, that parent. A client created from
+ * the contract carries it, so `bindReference` admits only references the
+ * contract can resolve.
  */
 export type AutomatorResources = Readonly<{
   Workflow: ResourceDescriptor<Workflow, string> & {
@@ -581,19 +583,23 @@ export type AutomatorResources = Readonly<{
     readonly id: ValueType<string>
     readonly get: 'automator.automatorActions.get'
     readonly list: 'automator.automatorActions.list'
+    readonly parents: { readonly list: 'Workflow' }
   }
   Variable: ResourceDescriptor<Variable, string> & {
     readonly id: ValueType<string>
     readonly get: 'automator.variables.get'
     readonly list: 'automator.variables.list'
+    readonly parents: { readonly list: 'Workflow' }
   }
   Setting: ResourceDescriptor<Setting, string> & {
     readonly id: ValueType<string>
     readonly list: 'automator.settings.list'
+    readonly parents: { readonly list: 'AutomatorAction' }
   }
   RequiredResource: ResourceDescriptor<RequiredResource, string> & {
     readonly id: ValueType<string>
     readonly list: 'automator.requiredResources.list'
+    readonly parents: { readonly list: 'AutomatorAction' }
   }
 }>
 
@@ -619,6 +625,7 @@ const resources = {
     id: t.string({ description: 'The unique identifier for the action' }),
     get: 'automator.automatorActions.get',
     list: 'automator.automatorActions.list',
+    parents: { list: 'Workflow' },
   },
   Variable: {
     name: 'Variable',
@@ -626,18 +633,21 @@ const resources = {
     id: t.string({ description: 'The unique identifier for the variable' }),
     get: 'automator.variables.get',
     list: 'automator.variables.list',
+    parents: { list: 'Workflow' },
   },
   Setting: {
     name: 'Setting',
     record: settingRecordType,
     id: t.string({ description: 'The name of the setting' }),
     list: 'automator.settings.list',
+    parents: { list: 'AutomatorAction' },
   },
   RequiredResource: {
     name: 'RequiredResource',
     record: requiredResourceRecordType,
     id: t.string({ description: 'The name of the required resource' }),
     list: 'automator.requiredResources.list',
+    parents: { list: 'AutomatorAction' },
   },
 } satisfies AutomatorResources
 
