@@ -368,8 +368,10 @@ describe('list bodies: batched reads (issue #89, issue #204)', () => {
 
   it('falls back to guarded per-item reads for a property the collection cannot report', () => {
     const body = listBody(eventResource)
-    expect(body).toContain('return readEach(itemList(), name, true);')
-    expect(body).toContain('values.push(undefined);')
+    expect(body).toContain('return readEach(itemList(), name, true, absentAsNull);')
+    expect(body).toContain(
+      'values.push(absentAsNull === true && e && e.errorNumber === -1728 ? null : undefined);'
+    )
   })
 
   it('lets no guard or fallback absorb a communication failure', () => {

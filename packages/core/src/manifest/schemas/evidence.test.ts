@@ -8,7 +8,9 @@
  * nullable claim only when it saw one; a probe supports a non-null
  * claim only with no empty value in at least NON_NULL_SAMPLE_THRESHOLD reads;
  * dictionary evidence supports only a nullable claim; and a resettable claim
- * needs a curated note.
+ * needs a curated note. Failed probe reads that all raised -1728 (the app
+ * reporting no object at the property) also support a nullable claim, and
+ * only that evidence makes such a failed read the field's empty value.
  *
  * @see phases/13-sdk-value-and-execution-contracts.md §A4 (presence, nullability, and updates)
  * @see phases/13-sdk-value-and-execution-contracts.md §D10 (native missing value; evidence-based defaults)
@@ -20,6 +22,7 @@ import { CommandParameterSchema } from './command.js'
 import {
   NON_NULL_SAMPLE_THRESHOLD,
   NullabilityEvidenceSchema,
+  readsAbsentAsNull,
   type ProbeNullabilityEvidence,
 } from './evidence.js'
 import { PropertySchema } from './property.js'
@@ -129,6 +132,76 @@ describe('property nullability claims', () => {
     expect(issuePaths(PropertySchema.safeParse({ ...BASE, nullable: true, evidence }))).toEqual([
       ['evidence', 'nullable', 'nullCount'],
     ])
+  })
+
+  it('accepts a probe nullable claim whose failed reads all reported no value (-1728)', () => {
+    const evidence = { nullable: probe({ sampleSize: 3, failedReads: 2, errorNumbers: [-1728] }) }
+    const parsed = PropertySchema.safeParse({ ...BASE, nullable: true, evidence })
+    expect(issuePaths(parsed)).toEqual([])
+    expect(readsAbsentAsNull(PropertySchema.parse({ ...BASE, nullable: true, evidence }))).toBe(
+      true
+    )
+  })
+
+  it('rejects a probe nullable claim from failed reads that raised anything but -1728', () => {
+    for (const errorNumbers of [[-1700], [-1728, -1700]]) {
+      const evidence = { nullable: probe({ failedReads: 2, errorNumbers }) }
+      expect(issuePaths(PropertySchema.safeParse({ ...BASE, nullable: true, evidence }))).toEqual([
+        ['evidence', 'nullable', 'errorNumbers'],
+      ])
+    }
+  })
+
+  it('rejects a probe nullable claim whose every read failed with -1728 (structural absence is unsupported, D10)', () => {
+    const evidence = { nullable: probe({ sampleSize: 0, failedReads: 5, errorNumbers: [-1728] }) }
+    const claim = { ...BASE, nullable: true, evidence }
+    expect(issuePaths(PropertySchema.safeParse(claim))).toEqual([
+      ['evidence', 'nullable', 'sampleSize'],
+    ])
+    expect(readsAbsentAsNull({ nullable: true, evidence })).toBe(false)
+  })
+
+  it('rejects a probe nullable claim from failed reads whose error numbers were not recorded', () => {
+    const evidence = { nullable: probe({ failedReads: 2 }) }
+    const result = PropertySchema.safeParse({ ...BASE, nullable: true, evidence })
+    // The fix is to record the error numbers, so the issue points there.
+    expect(issuePaths(result)).toEqual([['evidence', 'nullable', 'errorNumbers']])
+    expect(result.error?.issues[0]?.message).toContain('record errorNumbers')
+  })
+
+  it('rejects a non-null claim whose probe saw reads report no value', () => {
+    const evidence = { nullable: probe({ failedReads: 1, errorNumbers: [-1728] }) }
+    expect(issuePaths(PropertySchema.safeParse({ ...BASE, nullable: false, evidence }))).toEqual([
+      ['nullable'],
+    ])
+  })
+
+  it('rejects error numbers without failed reads, and a repeated error number', () => {
+    expect(
+      issuePaths(NullabilityEvidenceSchema.safeParse(probe({ errorNumbers: [-1728] })))
+    ).toEqual([['errorNumbers']])
+    expect(
+      issuePaths(
+        NullabilityEvidenceSchema.safeParse(probe({ failedReads: 2, errorNumbers: [-1728, -1728] }))
+      )
+    ).toEqual([['errorNumbers']])
+    expect(
+      NullabilityEvidenceSchema.safeParse(probe({ failedReads: 2, errorNumbers: [] })).success
+    ).toBe(false)
+  })
+
+  it('takes a failed read as the empty value only on evidence that every failure reported no value', () => {
+    const nullable = (evidence: ProbeNullabilityEvidence): boolean =>
+      readsAbsentAsNull({ nullable: true, evidence: { nullable: evidence } })
+    expect(nullable(probe({ failedReads: 1, errorNumbers: [-1728] }))).toBe(true)
+    expect(nullable(probe({ nullCount: 2, failedReads: 1, errorNumbers: [-1728] }))).toBe(true)
+    expect(nullable(probe({ nullCount: 2 }))).toBe(false)
+    expect(nullable(probe({ nullCount: 2, failedReads: 1 }))).toBe(false)
+    expect(nullable(probe({ nullCount: 2, failedReads: 1, errorNumbers: [-1700] }))).toBe(false)
+    expect(readsAbsentAsNull({ nullable: true, evidence: { nullable: { source: 'sdef' } } })).toBe(
+      false
+    )
+    expect(readsAbsentAsNull({})).toBe(false)
   })
 
   it('requires the probe provenance fields', () => {

@@ -8,7 +8,7 @@
  * - `Volume` is found by its id (`byId`), at the application.
  * - `Entry` is found by the app's key specifier (`byKey`), keyed by its
  *   `location`: the value names where the entry is, and the app interprets
- *   it. Its get addresses it at the application.
+ *   it. Its get and list address it at the application.
  * - `Mark` is keyed by its `location` too, but is found within its volume:
  *   its get records the volume as parent, so the key lookup is nested.
  * - `Label` is found by its id within its entry: its get records the entry as
@@ -21,6 +21,11 @@
  * Positions that reference the root: `Volume.desk`, an output field whose
  * kind no curated mapping names, and the `ring` command's `desk` parameter,
  * an input reference by kind.
+ *
+ * Absence (phases/13 D10, nullability evidence): `Entry.shelfMark` and
+ * `Desk.bell` claim nullable with probe evidence whose failed reads all found
+ * no such object, so such a read is an empty value. `Entry.summary` makes no
+ * claim, so a failed read of it is not.
  */
 
 import { parseManifestYaml } from '../loader.js'
@@ -74,6 +79,26 @@ resources:
         access: r
         type: { resource: Entry }
         description: The entry that holds this one
+      shelfMark:
+        access: r
+        type: string
+        description: The shelf mark, on entries that have been shelved
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T12:00:00.000Z'
+            bundleId: com.example.archive
+            appVersion: '1.0'
+            osVersion: '27.2'
+            sampleSize: 3
+            nullCount: 0
+            failedReads: 2
+            errorNumbers: [-1728]
+      summary:
+        access: r
+        type: string
+        description: The entry's summary
     identifiers:
       - property: location
         primary: true
@@ -120,6 +145,22 @@ resources:
         access: r
         type: { resource: Entry }
         description: The entry on display
+      bell:
+        access: r
+        type: string
+        description: The desk's bell, on desks that have one
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T12:00:00.000Z'
+            bundleId: com.example.archive
+            appVersion: '1.0'
+            osVersion: '27.2'
+            sampleSize: 1
+            nullCount: 0
+            failedReads: 1
+            errorNumbers: [-1728]
     roots:
       front:
         property: frontDesk
@@ -168,6 +209,11 @@ commands:
       - name: location
         type: string
         description: Where the entry is kept
+  listEntries:
+    name: list
+    description: List entries
+    scope: resource
+    resourceType: Entry
   getMark:
     name: get
     description: Get a mark within its volume
