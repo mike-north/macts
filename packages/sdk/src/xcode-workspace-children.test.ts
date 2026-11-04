@@ -14,7 +14,7 @@
  * target's `project`, hold references to objects found only within a
  * workspace document. References read from the app do not carry their
  * container yet, and a workspace document has no evidenced identity to serve
- * as one (its name can repeat; its path is the likely identity), so those
+ * as one (its name can repeat; its path is to be that identity), so those
  * fields are left out of output (phases/13 D7, "Parent-scoped targets").
  *
  * The native cases run each operation with only the executor's transport

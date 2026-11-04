@@ -1173,7 +1173,7 @@ describe('real app manifests', () => {
       ['tv', 'PlaylistWindow', 'view', 'Playlist', 'parent-scoped'],
       // A scheme, a run destination and a project are got only within their
       // workspace document. They return only once a workspace document has an
-      // evidenced identity (likely its path, not its name) and references
+      // evidenced identity, its path rather than its name, and references
       // carry their container.
       ['xcode', 'WorkspaceDocument', 'activeScheme', 'Scheme', 'parent-scoped'],
       // Also name-keyed with no unique claim, which is hidden by decision:

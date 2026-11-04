@@ -1558,11 +1558,12 @@ run destination and a project only within its workspace document. Returning
 containers is not enough to bring them back, because the container itself
 needs an evidenced identity. A workspace document is targeted by name today,
 and its name likely cannot be shown unique: two checkouts of the same project
-can be open at once under one name. Its `path` is the likely container
-identity instead, since in the scripting dictionary a path is unique among
-open documents and is how the app itself addresses a document. These fields
-come back once a workspace document has an evidenced identity and references
-carry their container. `activeRunDestination` also needs evidence that a run
+can be open at once under one name. Its container identity is its `path`
+instead, a location identity: in the scripting dictionary a path is unique
+among open documents and is how the app itself addresses a document. These
+fields come back once a workspace document is curated by its path, with
+evidence (looked up by path directly if the app supports it, otherwise matched
+on `path`), and references carry their container. `activeRunDestination` also needs evidence that a run
 destination's name identifies one object within its workspace. Run
 destination names likely repeat within one workspace (the same simulator name
 on two runtimes), so a live check across two or more runtimes must come
