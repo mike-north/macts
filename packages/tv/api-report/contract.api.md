@@ -10,6 +10,10 @@ import { ClientBrand } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { ObjectReferenceData } from '@macts/contracts';
+import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Artwork {
@@ -40,15 +44,25 @@ export interface ArtworkUpdateInput {
 
 // @public
 export interface BrowserWindow {
-    readonly id: Integer | null;
+    readonly id: Integer;
     readonly selection: string | null;
 }
 
 // @public
-export type BrowserWindowCreateInput = Record<string, never>;
+export interface BrowserWindowCreateInput {
+    view?: ObjectReferenceData<string, 'Playlist'>;
+}
 
 // @public
-export type BrowserWindowUpdateInput = Record<string, never>;
+export interface BrowserWindowResourceClient {
+    get(id: Integer, options?: CallOptions): Promise<BrowserWindow>;
+    list(options?: CallOptions): Promise<Page<BrowserWindow>>;
+}
+
+// @public
+export interface BrowserWindowUpdateInput {
+    view?: ObjectReferenceData<string, 'Playlist'>;
+}
 
 // @public
 export type EMdK = 'homeVideo' | 'movie' | 'tVShow' | 'unknown';
@@ -106,6 +120,7 @@ export interface Playlist {
     readonly duration: Integer | null;
     readonly id: Integer | null;
     name: string | null;
+    readonly persistentID: string;
     readonly size: Integer | null;
     readonly specialKind: string | null;
     readonly time: string | null;
@@ -120,6 +135,8 @@ export interface PlaylistCreateInput {
 
 // @public
 export interface PlaylistResourceClient {
+    get(sourceId: string, persistentID: string, options?: CallOptions): Promise<Playlist>;
+    list(sourceId: string, options?: CallOptions): Promise<Page<Playlist>>;
     move(to: string, options?: CallOptions): Promise<void>;
     search(_for: string, only?: string, options?: CallOptions): Promise<void>;
 }
@@ -132,12 +149,18 @@ export interface PlaylistUpdateInput {
 
 // @public
 export interface PlaylistWindow {
-    readonly id: Integer | null;
+    readonly id: Integer;
     readonly selection: string | null;
 }
 
 // @public
 export type PlaylistWindowCreateInput = Record<string, never>;
+
+// @public
+export interface PlaylistWindowResourceClient {
+    get(id: Integer, options?: CallOptions): Promise<PlaylistWindow>;
+    list(options?: CallOptions): Promise<Page<PlaylistWindow>>;
+}
 
 // @public
 export type PlaylistWindowUpdateInput = Record<string, never>;
@@ -159,10 +182,17 @@ export interface Source {
     readonly freeSpace: number | null;
     readonly id: Integer | null;
     readonly kind: string | null;
+    readonly persistentID: string;
 }
 
 // @public
 export type SourceCreateInput = Record<string, never>;
+
+// @public
+export interface SourceResourceClient {
+    get(persistentID: string, options?: CallOptions): Promise<Source>;
+    list(options?: CallOptions): Promise<Page<Source>>;
+}
 
 // @public
 export type SourceUpdateInput = Record<string, never>;
@@ -305,6 +335,7 @@ export interface TrackUpdateInput {
 export interface TVClient extends ClientBrand<TVResources> {
     add(to?: string, options?: CallOptions): Promise<void>;
     backTrack(options?: CallOptions): Promise<void>;
+    readonly browserWindows: BrowserWindowResourceClient;
     close(options?: CallOptions): Promise<void>;
     convert(options?: CallOptions): Promise<void>;
     count(each: string, options?: CallOptions): Promise<void>;
@@ -321,6 +352,7 @@ export interface TVClient extends ClientBrand<TVResources> {
     pause(options?: CallOptions): Promise<void>;
     play(once?: boolean, options?: CallOptions): Promise<void>;
     readonly playlists: PlaylistResourceClient;
+    readonly playlistWindows: PlaylistWindowResourceClient;
     playpause(options?: CallOptions): Promise<void>;
     previousTrack(options?: CallOptions): Promise<void>;
     quit(options?: CallOptions): Promise<void>;
@@ -330,6 +362,7 @@ export interface TVClient extends ClientBrand<TVResources> {
     run(options?: CallOptions): Promise<void>;
     save(options?: CallOptions): Promise<void>;
     select(options?: CallOptions): Promise<void>;
+    readonly sources: SourceResourceClient;
     stop(options?: CallOptions): Promise<void>;
 }
 
@@ -337,7 +370,32 @@ export interface TVClient extends ClientBrand<TVResources> {
 export const tvContract: AppContract<TVClient, TVResources>;
 
 // @public
-export type TVResources = Readonly<Record<never, never>>;
+export type TVResources = Readonly<{
+    BrowserWindow: ResourceDescriptor<BrowserWindow, Integer> & {
+        readonly id: ValueType<Integer>;
+        readonly get: 'tv.browserWindows.get';
+        readonly list: 'tv.browserWindows.list';
+    };
+    Playlist: ResourceDescriptor<Playlist, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'tv.playlists.get';
+        readonly list: 'tv.playlists.list';
+        readonly parents: {
+            readonly get: 'Source';
+            readonly list: 'Source';
+        };
+    };
+    PlaylistWindow: ResourceDescriptor<PlaylistWindow, Integer> & {
+        readonly id: ValueType<Integer>;
+        readonly get: 'tv.playlistWindows.get';
+        readonly list: 'tv.playlistWindows.list';
+    };
+    Source: ResourceDescriptor<Source, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'tv.sources.get';
+        readonly list: 'tv.sources.list';
+    };
+}>;
 
 // @public
 export interface URLTrack {

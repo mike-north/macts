@@ -12,7 +12,7 @@ export type Pin = readonly [app: string, resource: string, parent: string]
  * Resources whose `get` and `list` both record the parent: calendar
  * `getEvent`/`listEvents`; contacts `getAddress`/`listAddresses`,
  * `getEmail`/`listEmails` and `getPhone`/`listPhones`; music
- * `getTrack`/`listTracks`.
+ * `getTrack`/`listTracks`; tv `getPlaylist`/`listPlaylists`.
  */
 export const BOTH_ROUTE_PINS: readonly Pin[] = [
   ['calendar', 'Event', 'Calendar'],
@@ -20,6 +20,7 @@ export const BOTH_ROUTE_PINS: readonly Pin[] = [
   ['contacts', 'Email', 'Person'],
   ['contacts', 'Phone', 'Person'],
   ['music', 'Track', 'Playlist'],
+  ['tv', 'Playlist', 'Source'],
 ]
 
 /**

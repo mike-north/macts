@@ -63,6 +63,7 @@
     "@macts/notes": "workspace:*",
     "@macts/omnigraffle": "workspace:*",
     "@macts/reminders": "workspace:*",
+    "@macts/tv": "workspace:*",
     "@macts/xcode": "workspace:*",
     "tsd": "catalog:",
     "tsup": "catalog:",

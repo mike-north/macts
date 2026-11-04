@@ -1428,7 +1428,7 @@ identity collection has no entry to resolve, so it is admitted.
 an object of another resource: their command records a parent (D10, command
 parents) and takes that parent's identifier. Music gets and lists tracks
 within a playlist; Contacts addresses, emails and phones within a person;
-Calendar events within a calendar. Reminders lists reminders only within a
+Calendar events within a calendar; TV playlists within a source. Reminders lists reminders only within a
 list but gets one at the application, and Automator, Microsoft Edge,
 OmniGraffle and Xcode list some resources only within a parent in the same
 way. A reference resolved through such an operation can be resolved only when

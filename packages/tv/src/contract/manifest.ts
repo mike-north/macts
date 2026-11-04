@@ -177,6 +177,12 @@ export const manifest: unknown = {
           optional: false,
         },
       },
+      identifiers: [
+        {
+          property: 'id',
+          primary: true,
+        },
+      ],
     },
     FileTrack: {
       name: 'FileTrack',
@@ -226,6 +232,14 @@ export const manifest: unknown = {
           type: 'integer',
           description: 'Unique identifier for this playlist',
           code: 'ID  ',
+          optional: false,
+        },
+        persistentID: {
+          access: 'r',
+          type: 'string',
+          description:
+            'the id of the item as a hexadecimal string. This id does not change over time.',
+          code: 'pPIS',
           optional: false,
         },
         description: {
@@ -287,6 +301,20 @@ export const manifest: unknown = {
           optional: false,
         },
       },
+      identifiers: [
+        {
+          property: 'persistentID',
+          primary: true,
+          targeting: 'byProperty',
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'curated',
+              note: "A read-only list of the playlists of every source on TV 1.7.2 (macOS 27.2), 2026-11-04, found 3 playlists in one source and 1 in the other, with persistent IDs distinct within each source and across all 4. Each of the application's 3 playlists is under exactly one source with the same persistent ID. The fourth is found by its persistent ID only within its source, not among the application's playlists, which is why a playlist is read under its source. The dictionary describes the property as an id that does not change over time, which is about persistence, not uniqueness.",
+            },
+          },
+        },
+      ],
     },
     PlaylistWindow: {
       name: 'PlaylistWindow',
@@ -318,6 +346,12 @@ export const manifest: unknown = {
           optional: false,
         },
       },
+      identifiers: [
+        {
+          property: 'id',
+          primary: true,
+        },
+      ],
     },
     SharedTrack: {
       name: 'SharedTrack',
@@ -347,6 +381,14 @@ export const manifest: unknown = {
           code: 'ID  ',
           optional: false,
         },
+        persistentID: {
+          access: 'r',
+          type: 'string',
+          description:
+            'the id of the item as a hexadecimal string. This id does not change over time.',
+          code: 'pPIS',
+          optional: false,
+        },
         capacity: {
           access: 'r',
           type: 'number',
@@ -369,6 +411,20 @@ export const manifest: unknown = {
           optional: false,
         },
       },
+      identifiers: [
+        {
+          property: 'persistentID',
+          primary: true,
+          targeting: 'byProperty',
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'curated',
+              note: 'A read-only list of the sources on TV 1.7.2 (macOS 27.2), 2026-11-04, found 2 sources with distinct persistent IDs and distinct numeric ids. The dictionary describes the property as an id that does not change over time, which is about persistence, not uniqueness.',
+            },
+          },
+        },
+      ],
     },
     Track: {
       name: 'Track',
@@ -1116,6 +1172,119 @@ export const manifest: unknown = {
   },
   relationships: [],
   commands: {
+    listSources: {
+      name: 'list',
+      description: 'List every source',
+      scope: 'resource',
+      resourceType: 'Source',
+      parameters: [],
+      routeName: 'list',
+    },
+    getSource: {
+      name: 'get',
+      description: 'Get a source by its persistent ID',
+      scope: 'resource',
+      resourceType: 'Source',
+      parameters: [
+        {
+          name: 'persistentID',
+          type: 'string',
+          description: 'Persistent ID of the source',
+          required: true,
+        },
+      ],
+      routeName: 'get',
+    },
+    listPlaylists: {
+      name: 'list',
+      description: 'List the playlists of a source',
+      scope: 'resource',
+      resourceType: 'Playlist',
+      parameters: [
+        {
+          name: 'sourceId',
+          type: 'string',
+          description: 'Persistent ID of the source',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Source',
+        parameter: 'sourceId',
+      },
+      routeName: 'list',
+    },
+    getPlaylist: {
+      name: 'get',
+      description: 'Get a playlist of a source by its persistent ID',
+      scope: 'resource',
+      resourceType: 'Playlist',
+      parameters: [
+        {
+          name: 'sourceId',
+          type: 'string',
+          description: 'Persistent ID of the source',
+          required: true,
+        },
+        {
+          name: 'persistentID',
+          type: 'string',
+          description: 'Persistent ID of the playlist',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Source',
+        parameter: 'sourceId',
+      },
+      routeName: 'get',
+    },
+    listBrowserWindows: {
+      name: 'list',
+      description: 'List every browser window',
+      scope: 'resource',
+      resourceType: 'BrowserWindow',
+      parameters: [],
+      routeName: 'list',
+    },
+    getBrowserWindow: {
+      name: 'get',
+      description: 'Get a browser window by its id',
+      scope: 'resource',
+      resourceType: 'BrowserWindow',
+      parameters: [
+        {
+          name: 'id',
+          type: 'integer',
+          description: 'Id of the browser window',
+          required: true,
+        },
+      ],
+      routeName: 'get',
+    },
+    listPlaylistWindows: {
+      name: 'list',
+      description: 'List every playlist window',
+      scope: 'resource',
+      resourceType: 'PlaylistWindow',
+      parameters: [],
+      routeName: 'list',
+    },
+    getPlaylistWindow: {
+      name: 'get',
+      description: 'Get a playlist window by its id',
+      scope: 'resource',
+      resourceType: 'PlaylistWindow',
+      parameters: [
+        {
+          name: 'id',
+          type: 'integer',
+          description: 'Id of the playlist window',
+          required: true,
+        },
+      ],
+      routeName: 'get',
+    },
     close: {
       name: 'close',
       description: 'Close an object',
