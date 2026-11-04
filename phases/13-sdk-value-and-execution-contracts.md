@@ -835,41 +835,69 @@ native values for arguments, and native results to wire values, before
     object the app does not have, the object instead carries
     `missingResource`, the referenced resource.
 - **Reference conversion.** The codec converts a single identity reference
-  with no container, to a resource the app finds at the application by its
-  identifier (D7, native conversion scope). The environment's `references`
-  table, `NativeReferenceTable`, holds one entry per resource,
-  `NativeReferencePlans { id?, addressing? }`: `id` is the resource's
-  identifier plan from the request's `resourcePlans` (D9), and `addressing`,
-  `NativeAddressing { collection, lookup, property }`, is how the app finds
-  one of its objects from its identifier. The native executor derives
-  `addressing` from the manifest, by the resource's identifier targeting
-  (D10): `lookup: 'byId'` addresses `app[collection].byId(id)`, and
-  `lookup: 'byProperty'` addresses the first match of
-  `app[collection].whose({ [property]: id })`, and `lookup: 'byKey'`
-  addresses `app[collection].byName(id)`, the collection's key specifier
-  (D10, key targeting). A singleton root (D10) is addressed by its kind:
-  `lookup: 'byRoot'` maps each kind to the application property holding its
-  object, so a decoded reference addresses `app[roots[id]]`, and a kind the
-  map does not hold is a missing target. Encoding an object at a reference
-  position to a root fails as unsupported, since nothing on the object says
-  which kind it is (D7, singleton roots). Only a resource whose resolving get
-  records no parent (D10, command parents) has `addressing`.
+  to a resource the app finds by its identifier, carrying a container exactly
+  when the resource is found within its parent, and then an identity
+  container converted the same way (D7, native conversion scope). The
+  environment's `references` table, `NativeReferenceTable`, holds one entry
+  per resource, `NativeReferencePlans { id?, addressing? }`: `id` is the
+  resource's identifier plan from the request's `resourcePlans` (D9), and
+  `addressing` is how the app finds one of its objects from its identifier.
+  For a resource held in a collection it is
+  `NativeAddressing { collection, lookup, property, within? }`. The native
+  executor derives `addressing` from the manifest, by the resource's
+  identifier targeting (D10): `lookup: 'byId'` addresses
+  `owner[collection].byId(id)`, `lookup: 'byProperty'` addresses the first
+  match of `owner[collection].whose({ [property]: id })`, and
+  `lookup: 'byKey'` addresses `owner[collection].byName(id)`, the
+  collection's key specifier (D10, key targeting). The owner is the
+  application when the resolving get records no parent (D10, command
+  parents). When it records one, `within` names the parent, and the owner is
+  the container, found first by the parent's own addressing, whatever its
+  targeting: a parent found by its key is looked up by its key. A resource is
+  addressable only when its parent is, level by level, and the table carries
+  the entry of every parent a reached resource is found within. A singleton
+  root (D10) is addressed by its kind: `lookup: 'byRoot'` maps each kind to
+  the application property holding its object, so a decoded reference
+  addresses `app[roots[id]]`, and a kind the map does not hold is a missing
+  target. A root is held by the application itself, so it carries no
+  `within`. Encoding an object at a reference position to a root fails as
+  unsupported, since nothing on the object says which kind it is (D7,
+  singleton roots). Inputs, resolution and emission share this one
+  addressing.
   - Decoding runs in two phases. The first converts the whole input with no
     access to the application: the reference's form, its resource's `id` plan
     and `addressing`, and its `id` are checked and converted there, and the
     reference becomes a pending address. Every validation failure and every
     `unsupportedKind` failure, at any position, happens in this phase. Only
     then does the second phase address each pending address's object, in
-    input order, and require its `exists()` to be `true`. A miss throws the
-    codec error with `missingResource`, before any command uses the object.
+    input order, container first, and require its `exists()` to be `true`. A
+    miss throws the codec error with `missingResource`, before any command
+    uses the object: a missing container names the container's resource, and
+    the child is then not looked up; a missing child names its own. No
+    membership check is made beyond that lookup: a child looked up within a
+    container that does not hold it is simply not found.
   - Encoding reads the object's identifier as `native[property]()`, converts
     it by the `id` plan, and emits
     `{ reference: { resource, form: 'identity', cardinality: 'one', id } }`.
-    The SDK stamps the app on decode; the wire form has none.
-  - A selector, a collection, a container, or a resource with no `id` plan or
-    no `addressing` throws the codec error with `unsupportedKind: 'reference'`,
-    in either direction. So does a reference when the codec is called with no
-    environment.
+    For a resource found within its parent, the body hands the codec the
+    value together with the record the field was read through, under the
+    sole key `NATIVE_CONTAINED_REFERENCE_KEY` (D9, below), and the codec
+    emits that record as `container`, in identity form, its id read by the
+    parent's addressing (or taken from the row's identifier the list already
+    read) and converted by the parent's `id` plan, in the same request.
+    Reading the target's id from the value also turns a property specifier
+    the app returns (Chrome's `windows.byId(W).activeTab`) into the target's
+    own id; no raw specifier is ever emitted. A value at such a position
+    that comes without its record is a macts defect, marked
+    `unsupportedKind: 'reference'`, so it fails as `InternalError`. Only a
+    top-level container is emitted. The SDK stamps the app on decode; the
+    wire form has none.
+  - A selector, a collection, a container on a resource found at the
+    application, a container of another resource than `within` names, or a
+    resource with no `id` plan or no `addressing` throws the codec error with
+    `unsupportedKind: 'reference'`, in either direction. So does a reference
+    when the codec is called with no environment. A missing container on a
+    resource found within its parent is invalid input.
   - The codec calls only members of the objects passed to it (the
     application, its collections and objects) and reads no globals.
 - **`NativeScript`** — `{ bundleId, body, input, inputPlan, outputPlan, references, page? }`.
@@ -1542,10 +1570,19 @@ needs its target's `get`. macts cannot yet return a usable reference when:
 - macts has no primary identifier for the target yet, so the target has no
   identity form, and native reads emit only identity references (native
   emission, below);
-- that `get` records a parent (D10, command parents), and native reads do
-  not return containers yet (container scoping, below; #242), so a reference
-  read from the app to a target identified only within its container could
-  not be resolved;
+- that `get` records a parent (D10, command parents), and the position holds
+  no container for it (container scoping, below): a native read hands over,
+  as the container, the record the field is read through, so a reference to
+  such a target can be returned only at a field of its parent's own record,
+  and only when that parent is a valid container. A valid container is
+  itself a target a reference could be returned to with no container: it has
+  a `get` that records no parent, an identifier, and is not name-keyed
+  without a unique claim. A singleton root (D10) is not a container today:
+  the schema rejects a command that records a root as its parent, so no
+  target is got within one, and the macOS provider refuses a root as a
+  container as a broken invariant (`InternalError`). A command result is read through no record, so it holds no container.
+  Nested chains, where the parent is itself found within a container, are
+  not returned yet;
 - that `get` records no parent, but the manifest hierarchy holds the target
   only within another resource and never at the application, so the `get`
   looks for it in a collection the app does not have; what is missing is the
@@ -1577,20 +1614,24 @@ curated `get` cannot serve:
 
 Xcode's workspace document `activeScheme` and `activeRunDestination`, and a
 target's `project`, are left out as container-scoped: Xcode gets a scheme, a
-run destination and a project only within its workspace document. Returning
-containers is not enough to bring them back, because the container itself
-needs an evidenced identity. A workspace document is targeted by name today,
-and its name likely cannot be shown unique: two checkouts of the same project
-can be open at once under one name. Its container identity is its `path`
-instead, a location identity: in the scripting dictionary a path is unique
-among open documents and is how the app itself addresses a document. These
-fields come back once a workspace document is curated by its path, with
-evidence (looked up by path directly if the app supports it, otherwise matched
-on `path`), and references carry their container. `activeRunDestination` also needs evidence that a run
-destination's name identifies one object within its workspace. Run
-destination names likely repeat within one workspace (the same simulator name
-on two runtimes), so a live check across two or more runtimes must come
-before any uniqueness claim.
+run destination and a project only within its workspace document.
+References now carry their container, but that is not enough to bring them
+back, because the container itself needs an evidenced identity, and a
+workspace document is no valid container yet: it is targeted by its name,
+with no unique claim, and its name likely cannot be shown unique, since two
+checkouts of the same project can be open at once under one name (a reason
+from how documents are opened; no live check has observed it yet). So no
+name claim is to be added. Its container identity is its `path` instead, a
+location identity: in the scripting dictionary a path is unique among open
+documents and is how the app itself addresses a document. The fields come
+back with path curation of the workspace document, with evidence: `byKey` if
+the app looks documents up by path, otherwise `byProperty` on `path`.
+`activeRunDestination` also needs evidence that a run destination's name
+identifies one object within its workspace. Run destination names likely
+repeat within one workspace (the same simulator name on two runtimes), so a
+live check across two or more runtimes must come before any uniqueness
+claim. A target's `project` also needs nested chains, since it is read
+through a target, not through its workspace document.
 
 A position that holds such a reference anywhere, bare, in an array, or as the
 non-null case of a nullable value, is left out of output for now; generation
@@ -1608,8 +1649,8 @@ resolved yet. Leaving it out means:
   example "macts has no get for "Mailbox" yet". Every warning cites #219.
   The position returns on regeneration once coverage closes the gap: a `get`
   for the target that records no parent and an identifier, the parent a
-  nested target's `get` needs, returned containers (#242), or a unique claim
-  with evidence.
+  nested target's `get` needs, a parent that is a valid container or nested
+  containers (#242), or a unique claim with evidence.
 
 Input positions follow the input rule above, so a field left out of output
 may still be settable through create and update. The contract, HTTP client
@@ -1653,24 +1694,60 @@ cannot be resolved.
 identity form only:
 `{"reference":{resource, form: "identity", cardinality: "one", id, container?}}`.
 `id` is encoded through the plan by the resource's identifier value type.
+`container` is present exactly when the resource's get records a parent; it
+is then the identity reference of the record the field was read through,
+with its own `id` encoded by the parent's identifier value type, and carries
+no container of its own, since only top-level containers are emitted.
 Native reads never emit a selector form; selectors are constructed only by
 callers. SDK output types stay `ObjectReference<R>`, with the form left open.
 
 - **Container scoping.** A resource's identity is scoped to its container
   exactly when its `get` is parent-scoped, meaning the command records a
   parent. A native read emits a container exactly when resolving the object
-  by id needs that parent. An object that is identified globally but reached
-  only through a container emits no container. Examples are Arc spaces, iTerm
-  sessions, and nested Photos folders. Xcode schemes, run destinations and
+  by id needs that parent, and the container is always the record the field
+  was read through, known statically from the read path, never a container
+  asked of the object: Chrome tabs have no `container` property, and a
+  top-level Mail mailbox's `container` fails (-1728). Asking an object for
+  its container is allowed only through a manifest-curated container
+  accessor with evidence. So a field holding such a reference is kept only
+  on its target's parent's own record, when that parent is a valid container
+  (resolvable targets, above); no membership check runs at emission, because
+  the container holds by construction, and at resolution the child is
+  looked up within the container, so a wrong container fails as
+  `TargetNotFoundError` with no extra request. The container is looked up
+  by its parent's own targeting, and the child within it by the child's: a
+  parent found by its key is looked up by its key (key-targeted resources,
+  below). An object that is identified
+  globally but reached only through a container emits no container.
+  Examples are Arc spaces, iTerm sessions, and nested Photos folders. Google
+  Chrome and Microsoft Edge tabs are reached only through their window, and
+  each tab get records the window, so a tab reference carries its window as
+  its container (a window's `activeTab` carries the window it was read
+  through), and no global tab id is invented. Chrome and Edge window and tab
+  ids are session-scoped: identity holds within one browser session, and
+  nothing shows an id changing while the browser keeps running, but ids start
+  over when it is relaunched. A reference kept across a relaunch may
+  therefore resolve to a different tab or window, not merely fail, and an
+  action through it, such as closing the tab or executing script in it,
+  would act on that other tab. The window and tab `id` and the window
+  `activeTab` field docs say so. Xcode schemes, run destinations and
   projects are container-scoped: each is got within its workspace document,
   because there is no evidence that scheme or project ids are unique across
   workspaces. That is the same bar as iTerm's sessions: an object reached
   through a path of containers is identified globally only with evidence
-  that its id is unique across the app.
-  Native reads emit no container yet, so
-  an output position whose target's identity is scoped to its container is
-  left out of output (resolvable targets, above) until reads emit containers
-  (#242).
+  that its id is unique across the app. A workspace document is no valid
+  container yet (resolvable targets, above).
+- **What the positional rule leaves out.** Because a field is kept only on
+  its target's parent's own record, of the fields left out as
+  container-scoped this restores only Chrome and Edge `Window.activeTab`.
+  TV's browser window and playlist window `view`, and a playlist's `parent`,
+  reference a playlist, which TV gets within its source, but are read
+  through a window or a playlist, not through that source; they wait for a
+  manifest-curated container accessor with evidence. Xcode's target
+  `project` is read through a target, not through its workspace document,
+  and waits for nested chains and path curation of the workspace document.
+  Mail's message `mailbox` stays out for another reason: macts has no
+  mailbox `get` yet.
 - **Name-keyed resources.** A resource whose primary identifier is its name
   keeps `ResourceDescriptor.id`. Resolving an identity reference to it means
   the same as a name selector: it resolves to whichever object has that name
@@ -1710,13 +1787,18 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
 
 **Native conversion scope.** The macOS provider converts a reference inside
 the automation process (D4, reference conversion) when it is a single
-identity reference with no container, to a top-level resource with an
-identifier. A resource is top-level when its resolving `get` records no parent
-(D10, command parents); one helper answers it for both directions. In that
-scope, an input reference becomes the app's object, found as the resource's
-generated `get` finds it, and a missing one fails as `TargetNotFoundError`
-naming the referenced resource before any command runs. An app object at an
-output position becomes the identity reference above, with no container.
+identity reference to a resource with an identifier and a `get`: with no
+container when the resource is top-level, and with an identity container of
+its parent, judged the same way level by level, when its `get` records one.
+A resource is top-level when its resolving `get` records no parent (D10,
+command parents); one helper answers it, and gives the parent, for both
+directions and for resolution. In that scope, an input reference becomes the
+app's object, found as the resource's generated `get` finds it, container
+first, and a missing one fails as `TargetNotFoundError` naming the missing
+resource (the container's when the container is missing) before any command
+runs. An app object at an output position becomes the identity reference
+above, carrying the record it was read through as its container when its
+resource's `get` records a parent (native emission, above).
 
 Every other reference keeps the codec's unsupported marker and fails as
 `InternalError` (D4), in either direction. Generation leaves out every output
@@ -1726,37 +1808,47 @@ only for a reference a caller supplies:
 
 - every selector form, at any position;
 - identity collections;
-- a reference with a container, so a parent-scoped target cannot be passed;
-- a resource with no identifier, or with no `get`;
+- a container on a top-level resource, a container of another resource than
+  the one its `get` records, or a selector container;
+- a resource with no identifier, or with no `get`, or whose parent has no
+  addressing;
 - a resource with no entry in the request's `resourcePlans`, so none in the
-  script's reference table;
-- a resource whose `get` records a parent (Music tracks, Contacts emails,
-  phones and addresses, Calendar events).
+  script's reference table.
 
 Selectors and collections address the app through mechanisms other than an
-identifier lookup, and container chains need the parent's own addressing, so
-each is a separate extension of this scope. In particular, the contract now
-requires the parent's container on every reference resolved through an
-operation that records a parent (parent-scoped targets, above), but the macOS
-provider does not yet convert a
-container: such a reference passes encoding and the runtime's checks and then
-fails as `InternalError` at an operation position, and output positions to
-parent-scoped targets are still left out of generation
+identifier lookup, so each is a separate extension of this scope. Container
+chains convert at input and resolution positions at any depth, because each
+level is found by its own addressing. Emission returns top-level containers
+only: a field whose target's parent is itself found within a container stays
+left out of generation until nested chains are emitted
 ([#219](https://github.com/mike-north/macts/issues/219),
-[#242](https://github.com/mike-north/macts/issues/242)). Native container
-conversion is still to come.
+[#242](https://github.com/mike-north/macts/issues/242)). So Contacts emails,
+phones and addresses within a person, Music tracks within a playlist,
+Calendar events within a calendar, TV playlists within a source, and Xcode
+projects, schemes and run destinations within a workspace document convert
+and resolve with their container, and each still needs its own live check
+against its app before it is claimed. For Calendar the resolution is not
+exact: a calendar container is name-keyed with no unique claim, and an
+event's `uid` is not unique, so a caller-built event reference addresses the
+first match, as the existing Calendar operations that take a calendar already
+do. Xcode is not exact either: a workspace document is found by name with no
+unique claim, and a run destination by name within it, so a caller-built
+reference addresses the first match.
 
 The provider resolves references (resolution, below) within the same scope,
 plus identity collections whose entries are in it:
 
-- A single identity reference with no container, to a top-level resource with
-  an identifier, resolves to its object's record. The object is found by the
-  codec exactly as an input reference is converted: the resolution script
-  takes the reference as its input at a single reference position, so there
-  is no second addressing. Its body reads the object with the get body's
-  record read, and the result is encoded by the request's `outputPlan` in the
-  automation process, as `execute` encodes an operation result. A missing
-  object is `TargetNotFoundError` naming the referenced resource.
+- A single identity reference in that scope resolves to its object's record:
+  one with no container to a top-level resource, or one with its parent's
+  identity container to a resource whose `get` records that parent. The
+  object is found by the codec exactly as an input reference is converted,
+  container first: the resolution script takes the reference as its input at
+  a single reference position, so there is no second addressing. Its body
+  reads the object with the get body's record read, and the result is
+  encoded by the request's `outputPlan` in the automation process, as
+  `execute` encodes an operation result. A missing object is
+  `TargetNotFoundError` naming the referenced resource; a missing container
+  names the container's resource, and no child is looked up.
 - An identity collection of such references takes its entries as a list of
   single references, so each is found the same way, all before any record is
   read, and read the same way, in entry order, in one automation process. The
@@ -1773,9 +1865,12 @@ plus identity collections whose entries are in it:
   only the automation process is skipped.
 - Every other reference fails as `InternalError` whose message names the form
   the provider does not resolve, before any automation runs: every selector
-  form; a reference, or an identity-collection entry, with a container; and a
-  reference to a resource that is not top-level, has no identifier, has no
-  `get`, or has no entry in `resourcePlans`. Whether the resource is in scope
+  form; a reference, or an identity-collection entry, with a container its
+  resource is not found within (one on a top-level resource, one of another
+  resource, or a selector container); a reference to a resource found within
+  its parent that carries no container; and a reference to a resource that
+  has no identifier, has no `get`, has no addressable parent, or has no entry
+  in `resourcePlans`. Whether the resource is in scope
   is read from the script's reference table, the one the codec reads, so
   resolution and conversion share one boundary.
 
@@ -2107,10 +2202,21 @@ execute(request), resolve(request) }`.
   entry, and `[]` for an empty identity collection.
 - The native JXA executor is one implementation. It converts references at
   operation positions, and its `resolve` resolves references, within the
-  scope in D7 (native conversion scope): single identity references with no
-  container to top-level resources with an identifier, and identity
-  collections of them. It fails every other reference as `InternalError`,
-  before any automation runs.
+  scope in D7 (native conversion scope): single identity references to
+  resources with an identifier, carrying their parent's identity container
+  exactly when the resource's get records one, and identity collections of
+  them. It fails every other reference as `InternalError`, before any
+  automation runs. Its bodies hand the codec the container of every output
+  reference whose target is got within the record being read: a get,
+  create, update or resolution body wraps such a field's value with the item
+  it read, and a list body with the row's identifier it already read and
+  checked. Which fields are wrapped comes from the same manifest-level
+  judgment that keeps them in output (D7, resolvable targets). The codec
+  reads the target's id from the value and encodes the container in the same
+  native request, so emitting a container costs at most one read of the
+  container's id, and none in a list. Only a body whose result the codec
+  encodes by a typed plan wraps; under a `passthrough` plan nothing would
+  unwrap it.
 - **Resource plans.** `ResourcePlanTable` is
   `Readonly<Record<string, { readonly id?: ValuePlan }>>`, keyed by manifest
   resource key and declared in `@macts/contracts` next to `ValuePlan`. `id` is
@@ -2481,14 +2587,14 @@ Live evidence, for a resource the dictionary declares but the running app fails 
 
 Values are validated at every trust boundary, using the same schemas:
 
-| Boundary                      | Check                                                                                                                                                                                                                                                                               |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client `encode`               | Before any network or native call. It catches casts.                                                                                                                                                                                                                                |
-| Runtime against `input.wire`  | Catches raw HTTP and MCP requests.                                                                                                                                                                                                                                                  |
-| Runtime against `t.reference` | A reference to resolve, after the permission check and before governance (D7).                                                                                                                                                                                                      |
-| Runtime against `output.wire` | Every executor result whose output plan is not `passthrough`, on `invoke` and on resolution, before any adapter (HTTP, MCP, CLI) emits it. It catches executors that don't encode, or encode wrongly. A resolution result also holds one record per identity-collection entry (D7). |
-| Native codec inside JXA       | Against the plan, in both directions.                                                                                                                                                                                                                                               |
-| Client `decode`               | Against the operation's output contract.                                                                                                                                                                                                                                            |
+| Boundary                      | Check                                                                                                                                                                                                                                                                                                                                                                 |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Client `encode`               | Before any network or native call. It catches casts.                                                                                                                                                                                                                                                                                                                  |
+| Runtime against `input.wire`  | Catches raw HTTP and MCP requests.                                                                                                                                                                                                                                                                                                                                    |
+| Runtime against `t.reference` | A reference to resolve, after the permission check and before governance (D7).                                                                                                                                                                                                                                                                                        |
+| Runtime against `output.wire` | Every executor result whose output plan is not `passthrough`, on `invoke` and on resolution, before any adapter (HTTP, MCP, CLI) emits it. It catches executors that don't encode, or encode wrongly, including an emitted reference without the container its target's get needs (D7). A resolution result also holds one record per identity-collection entry (D7). |
+| Native codec inside JXA       | Against the plan, in both directions.                                                                                                                                                                                                                                                                                                                                 |
+| Client `decode`               | Against the operation's output contract.                                                                                                                                                                                                                                                                                                                              |
 
 **Output validation.** The runtime's check of `output.wire` is the same for
 every executor: the native executor, a custom one, a remote one, and a test
