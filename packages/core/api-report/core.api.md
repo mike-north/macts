@@ -2209,6 +2209,7 @@ export type NativeAddressing = NativeCollectionAddressing | NativeRootAddressing
 
 // @public
 export interface NativeBodyOptions {
+    readonly containerReferences?: boolean;
     readonly identifierAliases?: boolean;
     readonly paged?: boolean;
 }
@@ -2229,6 +2230,7 @@ export interface NativeCollectionAddressing {
     readonly collection: string;
     readonly lookup: 'byId' | 'byProperty' | 'byKey';
     readonly property: string;
+    readonly within?: string;
 }
 
 // @public

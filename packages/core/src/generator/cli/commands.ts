@@ -202,7 +202,7 @@ ${parentOptions}${pageOptions}
       const page = await client.${resourceAccess}.list(${listArgs});
 
       const output = formatter.${format}(page.items.map(item => ({
-${generateListFieldMapping(ctx.manifest, resource)}
+${generateListFieldMapping(ctx.manifest, hierarchyPath.resourceName, resource)}
       }))${formatTail});
 
       this.context.stdout.write(output + '\\n');
@@ -295,7 +295,7 @@ ${createInput}
 
       const output = formatter.format({
         message: '${resource.name} created successfully',
-${generateListFieldMapping(ctx.manifest, resource, '        ')}
+${generateListFieldMapping(ctx.manifest, hierarchyPath.resourceName, resource, '        ')}
       });
 
       this.context.stdout.write(output + '\\n');
@@ -379,7 +379,7 @@ ${identifierPositional(idParamName, identifier)}
       const item = await client.${resourceAccess}.get(${[...parentScopeParams.map((p) => `this.${safeParamProperty(p.name, 'list')}`), `this.${idParamName}`].join(', ')});
 
       const output = formatter.format({
-${generateListFieldMapping(ctx.manifest, resource)}
+${generateListFieldMapping(ctx.manifest, hierarchyPath.resourceName, resource)}
       });
 
       this.context.stdout.write(output + '\\n');
@@ -729,12 +729,13 @@ function generateParameterFlag(
  */
 function generateListFieldMapping(
   manifest: AppManifest,
+  resourceKey: string,
   resource: Resource,
   indent = '        '
 ): string {
   const fields: string[] = []
 
-  for (const [propName] of outputProperties(manifest, resource)) {
+  for (const [propName] of outputProperties(manifest, resourceKey, resource)) {
     fields.push(`${indent}${propName}: item.${propName},`)
   }
 

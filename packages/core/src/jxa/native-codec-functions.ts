@@ -64,10 +64,12 @@ export type NativeCodecDirection = 'decode' | 'encode'
  *   Neither is present: the fault is the value's.
  * - The plan has a kind the codec has no conversion for (`file`,
  *   `file-source`, or a kind it does not recognize), or a reference the codec
- *   cannot convert: a selector, a collection, one located through a
- *   container, or one to a resource the app does not find at the application
- *   by its identifier. `unsupportedKind` holds the kind: the fault is the
- *   codec's, whatever the value is.
+ *   cannot convert: a selector, a collection, one located through a container
+ *   its resource is not found within, one to a resource the app does not find
+ *   by its identifier, or, on encode, an object of a resource found within a
+ *   container that came without the record it was read through.
+ *   `unsupportedKind` holds the kind: the fault is the codec's, whatever the
+ *   value is.
  * - A reference being decoded names an object the app does not have.
  *   `missingResource` holds the reference's resource: the target is missing.
  */
@@ -101,6 +103,8 @@ export interface NativeCodecLiterals {
     readonly record: string
     readonly reference: string
   }
+  /** Mirrors `NATIVE_CONTAINED_REFERENCE_KEY`. */
+  readonly containedReference: string
   /** Mirrors `SPECIAL_DOUBLE_STATES`, in the same order. */
   readonly specialDoubleStates: readonly string[]
 }
@@ -142,15 +146,17 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   type ReferencePlan = Extract<ValuePlan, { readonly kind: 'reference' }>
   /**
    * A reference that converted in decoding's first phase and is yet to be
-   * found in the app: the addressing and decoded identifier of its object.
-   * It stands at the reference's position until the second phase replaces
-   * it with the object.
+   * found in the app: the addressing and decoded identifier of its object,
+   * and the pending address of the container it is found within, when its
+   * resource is found within one. It stands at the reference's position until
+   * the second phase replaces it with the object.
    */
   interface PendingAddress {
     readonly pendingAddress: true
     readonly resource: string
     readonly addressing: NativeAddressing
     readonly id: unknown
+    readonly container?: PendingAddress
   }
   /** An object of the automation bridge: the application, or one of its objects. */
   type HostObject = Readonly<Record<string, unknown>>
@@ -167,6 +173,8 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   const KEY_DATE = 'date'
   const KEY_RECORD = 'record'
   const KEY_REFERENCE = 'reference'
+  /** Sole key of a value a body hands over with the record it was read through. */
+  const KEY_CONTAINED = '__mactsContainedReference'
 
   const STATE_NAN = 'NaN'
   const STATE_INFINITY = 'Infinity'
@@ -690,8 +698,8 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   /**
    * What converting references to `resource` needs: its identifier plan and
    * its addressing. A resource the environment has neither for (it has no
-   * identifier, the app finds it only within a container, or the script was
-   * given no environment) fails as unsupported at the reference's position.
+   * identifier, the app has no addressing for it, or the script was given no
+   * environment) fails as unsupported at the reference's position.
    */
   function referencePlansOf(
     direction: Direction,
@@ -718,27 +726,41 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         'reference',
         'References to ' +
           quote(resource) +
-          ' have no conversion in this codec: the app does not find its objects at the application by their identifier'
+          ' have no conversion in this codec: the app does not find its objects by their identifier'
       )
     }
     return { id, addressing }
   }
 
   /**
+   * The manifest key of the parent `addressing`'s resource is found within,
+   * or `undefined` for one found at the application. A singleton root is
+   * always held by the application itself.
+   */
+  function containerOf(addressing: NativeAddressing): string | undefined {
+    return addressing.lookup === 'byRoot' ? undefined : addressing.within
+  }
+
+  /**
    * The app's object of `addressing`'s resource whose identifier is `id`,
-   * found as a generated get finds it. The object must exist: a miss fails as
-   * a missing target, before any command uses it.
+   * found as a generated get finds it, in `owner`'s collection: the
+   * application's, or a container's. The object must exist: a miss fails as a
+   * missing target, before any command uses it.
    */
   function addressObject(
-    app: HostObject,
+    owner: HostObject,
     addressing: NativeAddressing,
     id: unknown,
     resource: string,
     path: Path
   ): HostObject {
-    if (addressing.lookup === 'byRoot') return addressRoot(app, addressing, id, resource, path)
-    const expected = 'the application to have a collection ' + quote(addressing.collection)
-    const collection = app[addressing.collection]
+    // A root has no container (`containerOf`), so its owner is the application.
+    if (addressing.lookup === 'byRoot') return addressRoot(owner, addressing, id, resource, path)
+    const expected =
+      (addressing.within === undefined ? 'the application' : 'the container') +
+      ' to have a collection ' +
+      quote(addressing.collection)
+    const collection = owner[addressing.collection]
     if (!isHostObject(collection)) {
       return fail(
         'decode',
@@ -802,12 +824,15 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
 
   /**
    * Decodes a reference, in decoding's first phase, to the pending address of
-   * the app's object it names. Converted: a single identity reference, with no
-   * container, to a resource the app finds at the application by its
-   * identifier. Its `id` is decoded by the resource's identifier plan. Every
-   * other reference, including selectors and collections, fails as
-   * unsupported; a malformed one fails as invalid. The application is not
-   * used: only whether there is one to address is checked.
+   * the app's object it names. Converted: a single identity reference to a
+   * resource the app finds by its identifier, with no container when it is
+   * found at the application, and with its container, itself converted the
+   * same way, when it is found within its parent (`addressing.within`). Its
+   * `id` is decoded by the resource's identifier plan. Every other reference,
+   * including selectors, collections and a container on a resource found at
+   * the application, fails as unsupported; a malformed one fails as invalid,
+   * as does a missing container or one of another resource. The application
+   * is not used: only whether there is one to address is checked.
    */
   function decodeReference(
     wire: unknown,
@@ -815,7 +840,24 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     env: Env,
     path: Path
   ): PendingAddress {
-    const payload = controlPayload(wire, KEY_REFERENCE, 'a reference', path)
+    return decodeReferencePayload(
+      controlPayload(wire, KEY_REFERENCE, 'a reference', path),
+      plan,
+      env,
+      path
+    )
+  }
+
+  /**
+   * {@link decodeReference} of a reference's payload: what a `reference`
+   * control record holds, and what a reference's `container` holds directly.
+   */
+  function decodeReferencePayload(
+    payload: unknown,
+    plan: ReferencePlan,
+    env: Env,
+    path: Path
+  ): PendingAddress {
     if (!isKeyed(payload)) {
       return fail('decode', path, 'Expected a reference, received ' + describeValue(payload))
     }
@@ -850,21 +892,43 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       )
     }
     for (const key of Object.keys(payload)) {
-      if (key !== 'resource' && key !== 'form' && key !== 'cardinality' && key !== 'id') {
-        if (key === 'container') {
-          return failUnsupported(
-            'decode',
-            path,
-            'reference',
-            'References located through a container have no conversion in this codec'
-          )
-        }
+      if (
+        key !== 'resource' &&
+        key !== 'form' &&
+        key !== 'cardinality' &&
+        key !== 'id' &&
+        key !== 'container'
+      ) {
         fail('decode', path.concat([key]), 'Unexpected field ' + quote(key))
       }
     }
     if (!hasOwn(payload, 'id')) fail('decode', path, 'Missing required field "id"')
     const plans = referencePlansOf('decode', env, plan.resource, path)
+    const within = containerOf(plans.addressing)
+    const hasContainer = hasOwn(payload, 'container')
+    if (within === undefined && hasContainer) {
+      return failUnsupported(
+        'decode',
+        path,
+        'reference',
+        'References to ' +
+          quote(plan.resource) +
+          ' located through a container have no conversion in this codec: the app finds them at the application'
+      )
+    }
+    if (within !== undefined && !hasContainer) {
+      fail('decode', path, 'Missing required field "container": a ' + quote(within))
+    }
     const id = decodeValue(payload['id'], plans.id, path.concat(['id']), env)
+    const container =
+      within === undefined
+        ? undefined
+        : decodeReferencePayload(
+            payload['container'],
+            { kind: 'reference', resource: within, cardinality: 'one' },
+            env,
+            path.concat(['container'])
+          )
     if (env === undefined || !isHostObject(env.app)) {
       return failUnsupported(
         'decode',
@@ -873,7 +937,29 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         'References have no conversion without an application to address'
       )
     }
-    return { pendingAddress: true, resource: plan.resource, addressing: plans.addressing, id }
+    const pending: PendingAddress = {
+      pendingAddress: true,
+      resource: plan.resource,
+      addressing: plans.addressing,
+      id,
+    }
+    if (container !== undefined) setOwn(pending, 'container', container)
+    return pending
+  }
+
+  /**
+   * The app's object a pending address names: its container first, when it
+   * has one, then the object within it, exactly as a generated parent-scoped
+   * get finds them. A missing container fails as missing, naming the
+   * container's resource, before the object is looked up; a missing object
+   * names its own resource.
+   */
+  function addressPending(app: HostObject, pending: PendingAddress, path: Path): HostObject {
+    const owner =
+      pending.container === undefined
+        ? app
+        : addressPending(app, pending.container, path.concat(['container']))
+    return addressObject(owner, pending.addressing, pending.id, pending.resource, path)
   }
 
   /**
@@ -889,7 +975,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         if (!isPendingAddress(value) || env === undefined || !isHostObject(env.app)) {
           return fail('decode', path, 'Expected a converted reference')
         }
-        return addressObject(env.app, value.addressing, value.id, value.resource, path)
+        return addressPending(env.app, value, path)
       }
       case 'array': {
         if (!Array.isArray(value)) return value
@@ -923,9 +1009,16 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   /**
    * Encodes an app object at a reference position as the identity reference
    * that finds it again: its identifier is read as the resource's addressing
-   * says and encoded by its identifier plan. A native read emits no container
-   * and no selector. Collections, and resources the app does not find at the
-   * application by their identifier, fail as unsupported.
+   * says and encoded by its identifier plan. A native read emits no selector.
+   *
+   * A resource found within a container (`addressing.within`) is encoded with
+   * that container, which the body hands over with the value
+   * ({@link containedValue}): the record the field was read through, never a
+   * container asked of the object. The container is encoded in identity form
+   * by the parent's own addressing and identifier plan, in the same request.
+   * Only a top-level container is emitted: a parent that is itself found
+   * within a container fails as unsupported, as do collections and resources
+   * the app does not find by their identifier.
    */
   function encodeReference(native: unknown, plan: ReferencePlan, env: Env, path: Path): unknown {
     if (plan.cardinality !== 'one') {
@@ -937,7 +1030,83 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       )
     }
     const plans = referencePlansOf('encode', env, plan.resource, path)
-    const expected = 'an object of ' + quote(plan.resource)
+    const within = containerOf(plans.addressing)
+    const held = within === undefined ? undefined : containedValue(native, plan.resource, path)
+    const target = held === undefined ? native : held.value
+    const payload = identityPayload(plan.resource, target, plans, env, path)
+    if (within !== undefined && held !== undefined) {
+      const containerPath = path.concat(['container'])
+      const parentPlans = referencePlansOf('encode', env, within, containerPath)
+      if (containerOf(parentPlans.addressing) !== undefined) {
+        return failUnsupported(
+          'encode',
+          containerPath,
+          'reference',
+          'References to ' +
+            quote(plan.resource) +
+            ' within a ' +
+            quote(within) +
+            ' have no conversion in this codec: the ' +
+            quote(within) +
+            ' is itself found within a container'
+        )
+      }
+      const containerPayload =
+        held.containerId === undefined
+          ? identityPayload(within, held.container, parentPlans, env, containerPath)
+          : identityFromId(within, held.containerId, parentPlans, env, containerPath)
+      setOwn(payload, 'container', containerPayload)
+    }
+    const out: Record<string, unknown> = {}
+    setOwn(out, KEY_REFERENCE, payload)
+    return out
+  }
+
+  /**
+   * What a body handed over at a position whose resource is found within a
+   * container: the value the app returned there, and the record it was read
+   * through, as the record's item (`container`) or its identifier already
+   * read (`containerId`). A value with no record is a body that did not hand
+   * over its container, a macts defect, so it fails as unsupported rather
+   * than as the app's value: the codec never emits a reference without the
+   * container its resource is found within.
+   */
+  function containedValue(
+    native: unknown,
+    resource: string,
+    path: Path
+  ): { readonly value: unknown; readonly container: unknown; readonly containerId: unknown } {
+    const inner =
+      soleKey(native) === KEY_CONTAINED && isKeyed(native) ? native[KEY_CONTAINED] : null
+    if (!isPlainObject(inner) || !hasOwn(inner, 'value')) {
+      return failUnsupported(
+        'encode',
+        path,
+        'reference',
+        'An object of ' +
+          quote(resource) +
+          ' came without the record it was read through, so its container cannot be encoded'
+      )
+    }
+    return {
+      value: inner['value'],
+      container: ownValue(inner, 'container'),
+      containerId: ownValue(inner, 'containerId'),
+    }
+  }
+
+  /**
+   * The identity payload of an app object of `resource`: its identifier read
+   * as `plans.addressing` says, encoded by `plans.id`.
+   */
+  function identityPayload(
+    resource: string,
+    native: unknown,
+    plans: { readonly id: ValuePlan; readonly addressing: NativeAddressing },
+    env: Env,
+    path: Path
+  ): Record<string, unknown> {
+    const expected = 'an object of ' + quote(resource)
     if (!isHostObject(native)) {
       return fail('encode', path, 'Expected ' + expected + ', received ' + describeValue(native))
     }
@@ -947,19 +1116,28 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         path,
         'reference',
         'References to ' +
-          quote(plan.resource) +
+          quote(resource) +
           ' have no conversion from the app: its objects do not say which kind they are'
       )
     }
     const id = callMember('encode', native, plans.addressing.property, [], path, expected)
+    return identityFromId(resource, id, plans, env, path)
+  }
+
+  /** The identity payload of the object of `resource` whose identifier is `id`. */
+  function identityFromId(
+    resource: string,
+    id: unknown,
+    plans: { readonly id: ValuePlan },
+    env: Env,
+    path: Path
+  ): Record<string, unknown> {
     const payload: Record<string, unknown> = {}
-    setOwn(payload, 'resource', plan.resource)
+    setOwn(payload, 'resource', resource)
     setOwn(payload, 'form', 'identity')
     setOwn(payload, 'cardinality', 'one')
     setOwn(payload, 'id', encodeValue(id, plans.id, path.concat(['id']), env))
-    const out: Record<string, unknown> = {}
-    setOwn(out, KEY_REFERENCE, payload)
-    return out
+    return payload
   }
 
   /** Encodes a native value by its plan. */
@@ -1381,6 +1559,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         record: KEY_RECORD,
         reference: KEY_REFERENCE,
       },
+      containedReference: KEY_CONTAINED,
       specialDoubleStates: [
         STATE_NAN,
         STATE_INFINITY,

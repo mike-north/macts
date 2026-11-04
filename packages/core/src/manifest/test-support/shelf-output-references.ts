@@ -7,7 +7,8 @@
  *
  * - `Book` has a `get` that records no parent: usable.
  * - `Chapter` has a `get` that records its book as parent: parent-scoped, so
- *   not usable at outputs (native reads emit no container).
+ *   usable only at a field of a book's own record, which a native read hands
+ *   over as its container ({@link shelfManifestWithContainedFields}).
  * - `Author` has a `list` but no `get`: not usable, alone or in an array.
  * - `Series` is identified by its `name`, with no `unique` claim, and has a
  *   top-level `get`: name-keyed, so not usable at outputs.
@@ -301,7 +302,11 @@ export function shelfManifest(): AppManifest {
  * `featuredSeries` result are declared.
  */
 export function shelfManifestWithUniqueSeries(): AppManifest {
-  const manifest = shelfManifest()
+  return claimSeriesNamesUnique(shelfManifest())
+}
+
+/** Claims a Shelf manifest's series names unique, with evidence, in place. */
+function claimSeriesNamesUnique(manifest: AppManifest): AppManifest {
   const identifier = manifest.resources['Series']?.identifiers?.[0]
   if (identifier === undefined) throw new Error('the Shelf fixture has no Series identifier')
   identifier.unique = true
@@ -309,6 +314,140 @@ export function shelfManifestWithUniqueSeries(): AppManifest {
     unique: { source: 'curated', note: 'Shelf refuses a second series with a taken name.' },
   }
   return manifest
+}
+
+/** Resources {@link shelfManifestWithContainedFields} adds, as YAML. */
+const CONTAINED_RESOURCES_YAML = yaml`
+  Paragraph:
+    name: Paragraph
+    plural: Paragraphs
+    description: A paragraph of a chapter
+    properties:
+      id:
+        access: r
+        type: string
+        description: The paragraph's identifier
+    identifiers:
+      - property: id
+        primary: true
+  Volume:
+    name: Volume
+    plural: Volumes
+    description: A volume of a series
+    properties:
+      id:
+        access: r
+        type: string
+        description: The volume's identifier
+    identifiers:
+      - property: id
+        primary: true
+`
+
+/** Commands {@link shelfManifestWithContainedFields} adds, as YAML. */
+const CONTAINED_COMMANDS_YAML = yaml`
+  getParagraph:
+    name: get
+    description: Get a paragraph of a chapter
+    scope: resource
+    resourceType: Paragraph
+    parent:
+      resource: Chapter
+      parameter: chapterId
+    parameters:
+      - name: chapterId
+        type: string
+        description: The chapter holding the paragraph
+      - name: id
+        type: string
+        description: The paragraph to read
+  getVolume:
+    name: get
+    description: Get a volume of a series
+    scope: resource
+    resourceType: Volume
+    parent:
+      resource: Series
+      parameter: seriesName
+    parameters:
+      - name: seriesName
+        type: string
+        description: The series holding the volume
+      - name: id
+        type: string
+        description: The volume to read
+  featuredChapter:
+    name: featuredChapter
+    description: The featured chapter
+    scope: application
+    returns: Chapter
+`
+
+/** A record field of a Shelf resource, as YAML under its `properties`. */
+function fieldYaml(name: string, target: string, description: string): string {
+  return yaml`
+      ${name}:
+        access: r
+        type: { resource: ${target} }
+        description: ${description}`
+}
+
+/**
+ * `text` with `addition` inserted after `anchor`, which must occur exactly
+ * once in it.
+ */
+function insertAfter(text: string, anchor: string, addition: string): string {
+  const at = text.indexOf(anchor)
+  if (at < 0 || text.includes(anchor, at + 1)) {
+    throw new Error(`the Shelf fixture does not hold ${JSON.stringify(anchor)} exactly once`)
+  }
+  return text.slice(0, at + anchor.length) + addition + text.slice(at + anchor.length)
+}
+
+/**
+ * The Shelf manifest with a field of each kind the positional rule judges for
+ * a target whose `get` records a parent (phases/13 D7, container scoping).
+ * The container a reference carries is the record the field is read through,
+ * so such a field is kept only on a record of the target's parent, and only
+ * when that parent is a valid container: top-level, with an identifier, and
+ * not identified by a name it does not claim unique.
+ *
+ * - `Book.bookmark` (Chapter, got within its Book): read through a Book, a
+ *   top-level resource with an id. Kept.
+ * - `Library.currentChapter` (Chapter): read through a Library, not the
+ *   chapter's Book. Left out, parent-scoped.
+ * - `Chapter.firstParagraph` (Paragraph, got within its Chapter): read
+ *   through a Chapter, whose own `get` records a parent, a nested chain. Left
+ *   out, parent-scoped.
+ * - `Series.latestVolume` (Volume, got within its Series): read through a
+ *   Series, which is name-keyed. Left out, parent-scoped, unless the series'
+ *   name is claimed unique (`uniqueSeries`).
+ * - The `featuredChapter` result (Chapter) has no record it is read through.
+ *   Left out, parent-scoped.
+ *
+ * @param options - `uniqueSeries` claims series names unique, with evidence.
+ */
+export function shelfManifestWithContainedFields(
+  options: { readonly uniqueSeries?: boolean } = {}
+): AppManifest {
+  let text = insertAfter(SHELF_MANIFEST_YAML, '\nresources:', CONTAINED_RESOURCES_YAML.trimEnd())
+  text = insertAfter(
+    text,
+    "description: The book's title",
+    fieldYaml('bookmark', 'Chapter', 'The chapter the reader stopped at')
+  )
+  text = insertAfter(
+    text,
+    "description: The chapter's identifier",
+    fieldYaml('firstParagraph', 'Paragraph', "The chapter's first paragraph")
+  )
+  text = insertAfter(
+    text,
+    "description: The series' name",
+    fieldYaml('latestVolume', 'Volume', "The series' latest volume")
+  )
+  const manifest = parseManifestYaml(text.trimEnd() + CONTAINED_COMMANDS_YAML)
+  return options.uniqueSeries === true ? claimSeriesNamesUnique(manifest) : manifest
 }
 
 /**

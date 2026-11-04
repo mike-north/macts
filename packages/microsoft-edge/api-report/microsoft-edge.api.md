@@ -163,6 +163,7 @@ export type TabUpdateInput = Partial<TabCreateInput>;
 
 // @public
 export interface Window {
+    activeTab: Tab;
     activeTabIndex: number;
     bounds: {
         x: number;
@@ -228,6 +229,7 @@ export const WindowSchema: z.ZodObject<{
     visible: z.ZodBoolean;
     zoomable: z.ZodBoolean;
     zoomed: z.ZodBoolean;
+    activeTab: z.ZodString;
     mode: z.ZodString;
     activeTabIndex: z.ZodNumber;
 }, z.core.$strip>;
