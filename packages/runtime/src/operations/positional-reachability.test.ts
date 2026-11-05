@@ -231,3 +231,101 @@ describe.each(['list', 'create'] as const)('%s multiple holders', (operation) =>
     expectAdmission(manifest, !nested)
   })
 })
+
+/** Declared addressing mode survives resource omission for an executing child route. */
+describe('unsupported positional parent declaration', () => {
+  it.each([
+    'scalar-active',
+    'array-active',
+    'mixed',
+    'omitted-active',
+    'application',
+    'scalar-inactive',
+    'array-inactive',
+    'omitted-inactive',
+    'command-inactive',
+  ] as const)('%s preserves active refusal and route-free compatibility', (shape) => {
+    const manifest = panesManifest()
+    required(manifest.resources['Tab']).unsupported = { evidence }
+    delete required(manifest.resources['Window']).properties['currentTab']
+    delete manifest.commands['frontTab']
+    manifest.resources['Pane'] = {
+      ...required(manifest.resources['Window']),
+      name: 'Pane',
+      plural: 'Panes',
+      unsupported: { evidence },
+    }
+    const active = !shape.endsWith('inactive')
+    manifest.commands['subject'] = {
+      name: 'list',
+      description: 'Subject collection',
+      scope: shape === 'application' ? 'application' : 'resource',
+      parent: { resource: 'Tab', parameter: 'tabId' },
+      parameters: [
+        { name: 'tabId', type: 'integer', required: true, description: 'Parent identity' },
+      ],
+      ...(shape.startsWith('omitted')
+        ? {}
+        : {
+            resourceType:
+              shape === 'array-active'
+                ? ['Window']
+                : shape === 'mixed'
+                  ? ['Pane', 'Window']
+                  : shape === 'array-inactive'
+                    ? ['Pane']
+                    : shape === 'scalar-inactive'
+                      ? 'Pane'
+                      : 'Window',
+          }),
+      ...(shape === 'command-inactive' ? { unsupported: { evidence } } : {}),
+    }
+    if (shape === 'omitted-inactive') {
+      required(manifest.resources['Window']).unsupported = { evidence }
+    }
+    // The general schema rejects an unsupported recorded parent even if a
+    // resource command has no targets. Keep that independent boundary visible
+    // rather than expanding this positional fix into legacy parent policy.
+    const parsed = AppManifestSchema.safeParse(manifest)
+    expect(parsed.success).toBe(shape === 'command-inactive')
+    if (!parsed.success) {
+      expect(
+        parsed.error.issues.some(
+          ({ path }) => path.join('.') === 'commands.subject.parent.resource'
+        )
+      ).toBe(true)
+    }
+    expect(generateConsolidatedPackages(manifest, { appName: 'panes' }).errors.length === 0).toBe(
+      !active
+    )
+    const contract: AppContract<unknown> = {
+      app: 'panes',
+      operations: {},
+      resources: {},
+      loadManifest: () => Promise.resolve(manifest),
+      bind: () => ({}),
+    }
+    for (const register of [
+      () => operationsFromManifest(manifest),
+      () => operationsFromContract(contract, manifest),
+    ]) {
+      if (active) {
+        expect(register).toThrow(/positional resource "Tab"/)
+      } else {
+        expect(register).not.toThrow()
+      }
+    }
+    if (active && shape !== 'application') {
+      expect(() => buildNativeBody(manifest, { command: 'subject', resource: 'Window' })).toThrow(
+        /identifier|positional/i
+      )
+    }
+    if (!active) {
+      expect(
+        operationsFromManifest(manifest).some(({ descriptor }) =>
+          descriptor.id.endsWith('.subject')
+        )
+      ).toBe(false)
+    }
+  })
+})

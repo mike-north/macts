@@ -262,7 +262,14 @@ export function findPositionalIssues(manifest: AppManifest): PositionalIssue[] {
   )
   for (const [commandKey, command] of commands) {
     const parent = command.parent?.resource
-    if (parent === undefined || !isPositional(manifest, parent)) continue
+    // Executability belongs to the command's effective routes. A parent's
+    // declared positional addressing mode still prevents identity binding when
+    // that resource is unsupported; omission does not give it an identifier.
+    const parentResource =
+      parent !== undefined && Object.hasOwn(manifest.resources, parent)
+        ? manifest.resources[parent]
+        : undefined
+    if (parent === undefined || parentResource?.positional === undefined) continue
     issues.push({
       message: `The command "${commandKey}" records the positional resource "${parent}" as its parent, but a parent is found by its identifier and "${parent}" has none. Commands under a positional parent are not supported yet.`,
       path: ['commands', commandKey, 'parent'],
