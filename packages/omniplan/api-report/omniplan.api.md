@@ -128,7 +128,7 @@ export interface MilestoneCreateInput {
 export class MilestoneResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: MilestoneCreateInput): Promise<Milestone>;
-    get(id: string): Promise<Milestone>;
+    get(id: string | number): Promise<Milestone>;
     list(): Promise<Page<Milestone>>;
 }
 
@@ -253,7 +253,7 @@ export interface ResourceCreateInput {
 export class ResourceResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: ResourceCreateInput): Promise<Resource>;
-    get(id: string): Promise<Resource>;
+    get(id: string | number): Promise<Resource>;
     list(): Promise<Page<Resource>>;
 }
 
@@ -389,7 +389,7 @@ export interface TaskCreateInput {
 export class TaskResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: TaskCreateInput): Promise<Task>;
-    get(id: string): Promise<Task>;
+    get(id: string | number): Promise<Task>;
     list(): Promise<Page<Task>>;
 }
 

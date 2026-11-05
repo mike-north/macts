@@ -84,7 +84,11 @@ export const ProbeNullabilityEvidenceSchema = z
      * way is taken as the empty value (see {@link readsAbsentAsNull}).
      */
     errorNumbers: z.array(z.number().int()).min(1).optional(),
-    /** Why this observation replaced an earlier claim, when it did. */
+    /**
+     * How the observation read the property, when that is more than a plain
+     * read (for a reference, the identity read that encodes it), or why it
+     * replaced an earlier claim, when it did.
+     */
     note: z.string().min(1).optional(),
   })
   .superRefine((evidence, ctx) => {
@@ -115,8 +119,75 @@ export const ProbeNullabilityEvidenceSchema = z
 export type ProbeNullabilityEvidence = z.infer<typeof ProbeNullabilityEvidenceSchema>
 
 /**
+ * The end of the message for a curated absence claim that cannot stand,
+ * naming the evidence that can: probe evidence with a successful read for
+ * absence that depends on the data, or an `unsupported` marker for structural
+ * absence.
+ */
+const CURATED_ABSENCE_ALTERNATIVES =
+  'record probe evidence whose failed reads all reported no value and at least one read succeeded, or mark the property unsupported if its absence is structural'
+
+/**
+ * Reads, observed live by a read-only probe, in which the app failed with the
+ * absent-value number ({@link ABSENT_VALUE_ERROR_NUMBER}) at a property of a
+ * resource with a single instance ({@link hasSingleInstance}), and why that
+ * absence depends on the data.
+ *
+ * With several instances, a probe tells the two kinds of absence apart: some
+ * instances reading is absence that depends on the data (nullable, see
+ * {@link reportsAbsence}), and every one failing is structural (unsupported).
+ * One instance cannot show which it is, so the curated reason decides: a
+ * folder the app has only once the user creates one, say. The record keeps
+ * the probe's provenance and counts, never a value.
+ */
+export const CuratedAbsentReadsSchema = z
+  .object({
+    /** When the probe observed the failed reads: an ISO 8601 UTC timestamp. */
+    observedAt: ObservedAtSchema,
+    /** The bundle identifier of the observed app. */
+    bundleId: z.string().min(1),
+    /** The observed app's version. */
+    appVersion: z.string().min(1),
+    /** The macOS product version the app ran on, e.g. `27.2`. */
+    osVersion: z.string().min(1),
+    /** Reads that failed: at least one. */
+    failedReads: z.number().int().min(1),
+    /** The distinct error numbers the failed reads raised: the absent-value number only. */
+    errorNumbers: z.array(z.number().int()).min(1),
+    /** Why the property's absence depends on the data rather than on the app's structure. */
+    reason: z
+      .string({
+        error: `A curated absence claim needs a reason saying why the absence depends on the data; without one, ${CURATED_ABSENCE_ALTERNATIVES}.`,
+      })
+      .regex(
+        /\S/,
+        `A curated absence claim's reason cannot be blank; without one, ${CURATED_ABSENCE_ALTERNATIVES}.`
+      ),
+  })
+  .strict()
+  .superRefine((reads, ctx) => {
+    if (new Set(reads.errorNumbers).size !== reads.errorNumbers.length) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'errorNumbers lists each distinct error number once.',
+        path: ['errorNumbers'],
+      })
+    }
+    if (reads.errorNumbers.some((number) => number !== ABSENT_VALUE_ERROR_NUMBER)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `A curated absence claim records only reads in which the app reported no value (${String(ABSENT_VALUE_ERROR_NUMBER)}); any other failure is not an absent value.`,
+        path: ['errorNumbers'],
+      })
+    }
+  })
+export type CuratedAbsentReads = z.infer<typeof CuratedAbsentReadsSchema>
+
+/**
  * Evidence a manifest author supplies: a note naming why the claim holds (an
- * app guarantee, a structural invariant, documentation, or a test).
+ * app guarantee, a structural invariant, documentation, or a test), and, on a
+ * resource with a single instance, the reads in which the app reported no
+ * value (`absentReads`).
  */
 export const CuratedNullabilityEvidenceSchema = z.object({
   source: z.literal('curated'),
@@ -126,6 +197,13 @@ export const CuratedNullabilityEvidenceSchema = z.object({
   observedAt: ObservedAtSchema.optional(),
   /** The app version the claim was confirmed against, if recorded. */
   appVersion: z.string().min(1).optional(),
+  /**
+   * The reads in which the app reported no value, when the claim is that a
+   * read failing that way is the field's empty value. Only a nullable claim
+   * may record them, and only on a resource with a single instance
+   * ({@link checkCuratedAbsence}).
+   */
+  absentReads: CuratedAbsentReadsSchema.optional(),
 })
 export type CuratedNullabilityEvidence = z.infer<typeof CuratedNullabilityEvidenceSchema>
 
@@ -590,6 +668,9 @@ export interface NullabilityClaim {
  * - Probe evidence supports `nullable: false` only when it observed no empty
  *   value across at least {@link NON_NULL_SAMPLE_THRESHOLD} reads.
  * - Dictionary evidence supports only `nullable: true`.
+ * - Curated evidence that records reads the app reported no value in
+ *   (`absentReads`) supports only `nullable: true`. Whether its resource has
+ *   a single instance is checked with the resource ({@link checkCuratedAbsence}).
  */
 export function checkNullabilityClaim(claim: NullabilityClaim, ctx: z.RefinementCtx): void {
   const evidence = claim.evidence?.nullable
@@ -625,7 +706,7 @@ export function checkNullabilityClaim(claim: NullabilityClaim, ctx: z.Refinement
         ctx.addIssue({
           code: 'custom',
           message:
-            'Every probed read failed, so absence is structural rather than dependent on the data; mark the property unsupported instead of nullable.',
+            'Every probed read failed, so absence is structural rather than dependent on the data; mark the property unsupported instead of nullable. On a resource with a single instance, which one probe cannot tell apart, curated evidence with absentReads and a reason can say that the absence depends on the data.',
           path: ['evidence', 'nullable', 'sampleSize'],
         })
       } else if (evidence.failedReads > 0 && evidence.errorNumbers === undefined) {
@@ -670,6 +751,17 @@ export function checkNullabilityClaim(claim: NullabilityClaim, ctx: z.Refinement
       path: ['nullable'],
     })
   }
+  if (
+    evidence.source === 'curated' &&
+    evidence.absentReads !== undefined &&
+    claim.nullable !== true
+  ) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `The curated reads reported no value (${String(ABSENT_VALUE_ERROR_NUMBER)}), so the field is nullable.`,
+      path: ['nullable'],
+    })
+  }
 }
 
 /**
@@ -696,13 +788,98 @@ export function reportsAbsence(evidence: ProbeNullabilityEvidence): boolean {
 }
 
 /**
- * Whether a read of the field that fails with the absent-value number
- * ({@link ABSENT_VALUE_ERROR_NUMBER}) is the field's empty value: the field
- * is claimed nullable, on probe evidence whose failed reads all reported an
- * absent value ({@link reportsAbsence}). Any other failure of the read is
- * still a failure, and so is this one for any field without that evidence.
+ * The resource a property belongs to, as far as how many instances it has: a
+ * singleton root names the kinds the application holds, one instance each.
  */
-export function readsAbsentAsNull(claim: NullabilityClaim): boolean {
+export interface ClaimResource {
+  /** The resource's singleton root kinds, when it is a singleton root. */
+  readonly roots?: Readonly<Record<string, unknown>> | undefined
+}
+
+/**
+ * Whether the resource has a single instance: it is a singleton root with
+ * exactly one kind, so the app holds one object of it. Reading that object
+ * cannot show whether a property's absence is structural or depends on the
+ * data, which a resource with several instances shows by some reading and
+ * some not.
+ */
+export function hasSingleInstance(resource: ClaimResource): boolean {
+  return resource.roots !== undefined && Object.keys(resource.roots).length === 1
+}
+
+/**
+ * Whether curated evidence records reads in which the app reported no value
+ * at a property of a resource with a single instance: every recorded failure
+ * raised the absent-value number, and a reason says why the absence depends
+ * on the data.
+ */
+function curatedReportsAbsence(
+  evidence: CuratedNullabilityEvidence,
+  resource: ClaimResource
+): boolean {
+  const reads = evidence.absentReads
+  return (
+    reads !== undefined &&
+    hasSingleInstance(resource) &&
+    reads.failedReads > 0 &&
+    reads.errorNumbers.length > 0 &&
+    reads.errorNumbers.every((number) => number === ABSENT_VALUE_ERROR_NUMBER) &&
+    /\S/.test(reads.reason)
+  )
+}
+
+/**
+ * Check that curated absence evidence (`absentReads`) is recorded only on a
+ * resource with a single instance ({@link hasSingleInstance}), for its own
+ * properties and for the inherited ones it states claims about, reporting
+ * each other use as an issue on `ctx`. With several instances a probe tells
+ * structural absence from absence that depends on the data, so its evidence,
+ * not curation, decides.
+ */
+export function checkCuratedAbsence(
+  resource: ClaimResource & {
+    readonly properties: Readonly<Record<string, NullabilityClaim>>
+    readonly inheritedClaims?: Readonly<Record<string, NullabilityClaim>> | undefined
+  },
+  ctx: z.RefinementCtx
+): void {
+  if (hasSingleInstance(resource)) return
+  const sections = [
+    ['properties', resource.properties],
+    ['inheritedClaims', resource.inheritedClaims ?? {}],
+  ] as const
+  for (const [section, claims] of sections) {
+    for (const [key, claim] of Object.entries(claims)) {
+      const evidence = claim.evidence?.nullable
+      if (evidence?.source !== 'curated' || evidence.absentReads === undefined) continue
+      ctx.addIssue({
+        code: 'custom',
+        message: `A curated absence claim is allowed only on a resource with a single instance (a singleton root with one kind), where one instance cannot show whether the absence is structural; this resource has several, so ${CURATED_ABSENCE_ALTERNATIVES}.`,
+        path: [section, key, 'evidence', 'nullable', 'absentReads'],
+      })
+    }
+  }
+}
+
+/**
+ * Whether a read of the field that fails with the absent-value number
+ * ({@link ABSENT_VALUE_ERROR_NUMBER}) is the field's empty value. The field
+ * is claimed nullable, either on probe evidence whose failed reads all
+ * reported an absent value ({@link reportsAbsence}), or, on a resource with a
+ * single instance ({@link hasSingleInstance}), on curated evidence recording
+ * such reads with a reason the absence depends on the data. Any other failure
+ * of the read is still a failure, and so is this one for any field without
+ * that evidence.
+ */
+export function readsAbsentAsNull(claim: NullabilityClaim, resource: ClaimResource): boolean {
+  if (claim.nullable !== true) return false
   const evidence = claim.evidence?.nullable
-  return claim.nullable === true && evidence?.source === 'probe' && reportsAbsence(evidence)
+  switch (evidence?.source) {
+    case 'probe':
+      return reportsAbsence(evidence)
+    case 'curated':
+      return curatedReportsAbsence(evidence, resource)
+    default:
+      return false
+  }
 }

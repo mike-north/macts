@@ -2,6 +2,27 @@ import { Command, Option } from 'clipanion'
 import { getClient } from '../../../sdk.js'
 import { createFormatter } from '../../../output/index.js'
 
+import {
+  ValueTypes as __mactsValueTypes,
+  ValidationError as __mactsValidationError,
+} from '@macts/contracts'
+
+/** The contract's canonical decimal and safe-integer policy, built once. */
+const __mactsIntegerOptionWire = __mactsValueTypes.integer().wire
+
+/**
+ * Check the original CLI spelling before converting to the numeric SDK input.
+ * Canonical safe-integer text is exactly representable, so conversion after
+ * this check cannot round or reinterpret the caller's chosen value.
+ */
+function __mactsParseIntegerOption(text: string): number {
+  if (!__mactsIntegerOptionWire.safeParse({ integer: text }).success) {
+    const message = 'Expected a canonical decimal integer within the safe-integer range.'
+    throw new __mactsValidationError(message, { issues: [{ path: [], message }] })
+  }
+  return Number(text)
+}
+
 /**
  * List emails.
  */
@@ -30,7 +51,9 @@ export class ListEmailsCommand extends Command {
     try {
       const client = getClient()
       const page = await client.emails.list(this.personId, {
-        ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }),
+        ...(this.pageSize === undefined
+          ? {}
+          : { pageSize: __mactsParseIntegerOption(this.pageSize) }),
         ...(this.cursor === undefined ? {} : { cursor: this.cursor }),
       })
 

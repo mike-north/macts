@@ -1,3 +1,11 @@
+/**
+ * Generate CLI command modules from manifest operations and hierarchy paths.
+ * CLI options are textual user inputs; adapters validate their meaning before
+ * converting them to the SDK's domain types, preserving exact item selection.
+ *
+ * @packageDocumentation
+ */
+
 import type {
   AppManifest,
   Resource,
@@ -186,9 +194,14 @@ export function generateListCommand(
   // holds every item.
   const paged = listCommand !== undefined && listOperationPages(listCommand, resource)
   const pageArgument =
-    '{ ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }), ...(this.cursor === undefined ? {} : { cursor: this.cursor }) }'
+    '{ ...(this.pageSize === undefined ? {} : { pageSize: __mactsParseIntegerOption(this.pageSize) }), ...(this.cursor === undefined ? {} : { cursor: this.cursor }) }'
+  // CLI text is checked for canonical spelling and safe bounds before exact
+  // conversion to the SDK's numeric input; parsing first could change scope.
   const listArgs = [
-    ...listRequiredParams.map((p) => `this.${safeParamProperty(p.name, 'list')}`),
+    ...listRequiredParams.map((p) => {
+      const property = `this.${safeParamProperty(p.name, 'list')}`
+      return p.type === 'integer' ? `__mactsParseIntegerOption(${property})` : property
+    }),
     ...(paged ? [pageArgument] : []),
   ].join(', ')
   const pageOptions = paged
@@ -202,9 +215,15 @@ export function generateListCommand(
     listCommand === undefined ? undefined : parentFirstMatchNote(listCommand, ctx.manifest),
   ])
 
+  const integerSupport =
+    paged || listRequiredParams.some((parameter) => parameter.type === 'integer')
+      ? integerOptionSupport()
+      : ''
+
   const content = `import { Command, Option } from 'clipanion';
 import { getClient } from '${sdkImportPath}';
 import { createFormatter } from '${outputImportPath}';
+${integerSupport}
 
 /**
  * List ${identifierWords(resource.plural)}.
@@ -804,4 +823,32 @@ function toCamelCase(str: string): string {
 
 function toPascalCase(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+/**
+ * Emit the CLI's text-to-number boundary only for integer-bearing lists.
+ * The public SDK still takes numbers; canonical safe-range validation must
+ * precede conversion, since Number() alone can round a fraction into another
+ * parent identity or accept a nondecimal spelling.
+ */
+function integerOptionSupport(): string {
+  return `
+import { ValueTypes as __mactsValueTypes, ValidationError as __mactsValidationError } from '@macts/contracts';
+
+/** The contract's canonical decimal and safe-integer policy, built once. */
+const __mactsIntegerOptionWire = __mactsValueTypes.integer().wire;
+
+/**
+ * Check the original CLI spelling before converting to the numeric SDK input.
+ * Canonical safe-integer text is exactly representable, so conversion after
+ * this check cannot round or reinterpret the caller's chosen value.
+ */
+function __mactsParseIntegerOption(text: string): number {
+  if (!__mactsIntegerOptionWire.safeParse({ integer: text }).success) {
+    const message = 'Expected a canonical decimal integer within the safe-integer range.';
+    throw new __mactsValidationError(message, { issues: [{ path: [], message }] });
+  }
+  return Number(text);
+}
+`
 }
