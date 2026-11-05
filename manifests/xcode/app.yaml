@@ -609,7 +609,7 @@ resources:
     code: saai
     # The dictionary's "analyzer issue" inherits "scheme action issue", which has
     # `message`, a file path and line and column numbers, and no `id` property,
-    # so a analyzer issue is targeted by its message, never by id.
+    # so an analyzer issue is targeted by its message, never by id.
     identifiers:
       - property: message
         primary: true
