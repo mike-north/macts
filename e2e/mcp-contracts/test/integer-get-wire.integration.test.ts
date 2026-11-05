@@ -12,9 +12,10 @@
  * - the CLI `get` command from the package's CLI plugin, run with the
  *   positional a user types, through the client it calls.
  *
- * A command's optional integer parameter takes the same path through the
- * HTTP client: it is sent in the wire form when supplied, and not at all
- * when omitted.
+ * Every shipped command with an integer parameter takes the same path through
+ * the HTTP client, which sent the integer as a bare JSON number. Each is
+ * called through its real built client; an optional integer is sent in the
+ * wire form when supplied, and not at all when omitted.
  *
  * Both send their request through `fetch`, which records the body. The body
  * must equal the hand-written wire value and must be admitted by the
@@ -26,14 +27,22 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { OperationId } from '@macts/contracts'
+import { AutomatorClient } from '@macts/automator'
+import { automatorContract } from '@macts/automator/contract'
+import { MicrosoftWordClient } from '@macts/microsoft-word'
+import { microsoftWordContract } from '@macts/microsoft-word/contract'
 import { OmniPlanClient } from '@macts/omniplan'
 import { plugin as omniPlanCli } from '@macts/omniplan/cli'
 import { omniPlanContract } from '@macts/omniplan/contract'
 import { QuickTimePlayerClient } from '@macts/quicktime-player'
 import { quickTimePlayerContract } from '@macts/quicktime-player/contract'
+import { SystemEventsClient } from '@macts/system-events'
+import { systemEventsContract } from '@macts/system-events/contract'
 import { TVClient } from '@macts/tv'
 import { plugin as tvCli } from '@macts/tv/cli'
 import { tvContract } from '@macts/tv/contract'
+import { XcodeClient } from '@macts/xcode'
+import { xcodeContract } from '@macts/xcode/contract'
 
 /** The server the clients are pointed at; nothing listens there, `fetch` is stubbed. */
 const BASE_URL = 'http://macts.test'
@@ -219,26 +228,127 @@ describe('a get by an integer id sends the id in the contract wire form (#207)',
   )
 })
 
-describe("a command's optional integer parameter is sent in the contract wire form (#207)", () => {
-  const client = (): QuickTimePlayerClient =>
-    new QuickTimePlayerClient({ apiKey: 'k', baseUrl: BASE_URL })
-  const wire = (): ReturnType<typeof inputWire> =>
-    inputWire(quickTimePlayerContract, 'quicktime-player.app.stepForward')
+/** One shipped command whose integer parameter the HTTP client sent as a bare number. */
+interface IntegerCommand {
+  /** The app and command, for the test name. */
+  readonly label: string
+  readonly operation: OperationId
+  readonly wire: () => ReturnType<typeof inputWire>
+  /** Call the command on the package's HTTP client. */
+  readonly call: () => Promise<unknown>
+  /** The body the call must send, written by hand from the contract's input. */
+  readonly expected: Readonly<Record<string, unknown>>
+  /** The body the client sent before the fix: the integers as bare numbers. */
+  readonly before: Readonly<Record<string, unknown>>
+}
 
-  // QuickTime's `step forward` takes `by`, an optional integer. The HTTP
-  // client sent it as a bare number, which the input rejects.
-  it('QuickTime stepForward: sends `by` as an integer wire value its input admits (bug #207)', async () => {
-    await client().stepForward(2)
-    const body = onlyRequest('quicktime-player.app.stepForward')
-    expect(body).toEqual({ by: { integer: '2' } })
-    expect(wire().safeParse(body).success).toBe(true)
-    expect(wire().safeParse({ by: 2 }).success).toBe(false)
-  })
+const automator = (): AutomatorClient => new AutomatorClient({ apiKey: 'k', baseUrl: BASE_URL })
+const word = (): MicrosoftWordClient => new MicrosoftWordClient({ apiKey: 'k', baseUrl: BASE_URL })
+const quickTime = (): QuickTimePlayerClient =>
+  new QuickTimePlayerClient({ apiKey: 'k', baseUrl: BASE_URL })
+const systemEvents = (): SystemEventsClient =>
+  new SystemEventsClient({ apiKey: 'k', baseUrl: BASE_URL })
+const xcode = (): XcodeClient => new XcodeClient({ apiKey: 'k', baseUrl: BASE_URL })
 
-  it('QuickTime stepForward: sends no `by` when it is omitted', async () => {
-    await client().stepForward()
+const INTEGER_COMMANDS: readonly IntegerCommand[] = [
+  {
+    label: 'Automator add (atIndex)',
+    operation: 'automator.app.add',
+    wire: () => inputWire(automatorContract, 'automator.app.add'),
+    call: () => automator().add('Ask for Text', 'Morning', 3),
+    expected: { object: 'Ask for Text', to: 'Morning', atIndex: { integer: '3' } },
+    before: { object: 'Ask for Text', to: 'Morning', atIndex: 3 },
+  },
+  {
+    label: 'Microsoft Word insertText (at)',
+    operation: 'microsoft-word.app.insertText',
+    wire: () => inputWire(microsoftWordContract, 'microsoft-word.app.insertText'),
+    call: () => word().insertText('Hello', 5),
+    expected: { text: 'Hello', at: { integer: '5' } },
+    before: { text: 'Hello', at: 5 },
+  },
+  {
+    label: 'Microsoft Word createRange (start, end)',
+    operation: 'microsoft-word.documents.createRange',
+    wire: () => inputWire(microsoftWordContract, 'microsoft-word.documents.createRange'),
+    call: () => word().documents.createRange(1, 4),
+    expected: { start: { integer: '1' }, end: { integer: '4' } },
+    before: { start: 1, end: 4 },
+  },
+  {
+    label: 'QuickTime Player stepForward (by)',
+    operation: 'quicktime-player.app.stepForward',
+    wire: () => inputWire(quickTimePlayerContract, 'quicktime-player.app.stepForward'),
+    call: () => quickTime().stepForward(2),
+    expected: { by: { integer: '2' } },
+    before: { by: 2 },
+  },
+  {
+    label: 'QuickTime Player stepBackward (by)',
+    operation: 'quicktime-player.app.stepBackward',
+    wire: () => inputWire(quickTimePlayerContract, 'quicktime-player.app.stepBackward'),
+    call: () => quickTime().stepBackward(2),
+    expected: { by: { integer: '2' } },
+    before: { by: 2 },
+  },
+  {
+    label: 'System Events editActionOf (usingActionNumber)',
+    operation: 'system-events.app.editActionOf',
+    wire: () => inputWire(systemEventsContract, 'system-events.app.editActionOf'),
+    call: () => systemEvents().editActionOf(undefined, 2),
+    expected: { usingActionNumber: { integer: '2' } },
+    before: { usingActionNumber: 2 },
+  },
+  {
+    label: 'System Events removeActionFrom (usingActionNumber)',
+    operation: 'system-events.app.removeActionFrom',
+    wire: () => inputWire(systemEventsContract, 'system-events.app.removeActionFrom'),
+    call: () => systemEvents().removeActionFrom(undefined, 2),
+    expected: { usingActionNumber: { integer: '2' } },
+    before: { usingActionNumber: 2 },
+  },
+  {
+    label: 'Xcode attach (toProcessIdentifier)',
+    operation: 'xcode.workspaceDocuments.attach',
+    wire: () => inputWire(xcodeContract, 'xcode.workspaceDocuments.attach'),
+    call: () => xcode().workspaceDocuments.attach('MyApp', 4242, false),
+    expected: {
+      workspaceName: 'MyApp',
+      toProcessIdentifier: { integer: '4242' },
+      suspended: false,
+    },
+    before: { workspaceName: 'MyApp', toProcessIdentifier: 4242, suspended: false },
+  },
+]
+
+describe("a command's integer parameter is sent in the contract wire form (#207)", () => {
+  // The contract must reject the body the client sent before the fix, so the
+  // admission checks below cannot pass vacuously.
+  it.each(INTEGER_COMMANDS.map((command) => [command.label, command]))(
+    '%s: its contract input rejects the integer as a bare number',
+    (_label, command) => {
+      expect(command.wire().safeParse(command.before).success).toBe(false)
+    }
+  )
+
+  it.each(INTEGER_COMMANDS.map((command) => [command.label, command]))(
+    '%s: the HTTP client sends a body its contract input admits (bug #207: integer sent as a bare number)',
+    async (_label, command) => {
+      await command.call()
+      const body = onlyRequest(command.operation)
+      expect(body).toEqual(command.expected)
+      expect(command.wire().safeParse(body).success).toBe(true)
+    }
+  )
+
+  // An optional integer that is omitted sends no field: its wire form would
+  // be `{ integer: "undefined" }`, which the input rejects.
+  it('QuickTime Player stepForward: sends no `by` when it is omitted (#207)', async () => {
+    await quickTime().stepForward()
     const body = onlyRequest('quicktime-player.app.stepForward')
     expect(body).toEqual({})
-    expect(wire().safeParse(body).success).toBe(true)
+    expect(
+      inputWire(quickTimePlayerContract, 'quicktime-player.app.stepForward').safeParse(body).success
+    ).toBe(true)
   })
 })

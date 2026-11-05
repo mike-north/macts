@@ -176,6 +176,9 @@ importers:
       '@macts/omnigraffle-server':
         specifier: workspace:*
         version: link:../../packages/omnigraffle-server
+      '@macts/omniplan':
+        specifier: workspace:*
+        version: link:../../packages/omniplan
       '@macts/omniplan-server':
         specifier: workspace:*
         version: link:../../packages/omniplan-server
