@@ -7,7 +7,10 @@
  * travels as canonical decimal text). The client method takes the text a CLI
  * passes or a number alike, so the request body converts it with `String()`.
  * An identifier of any other type is sent as given. A parent's identifier
- * follows the same rule.
+ * follows the same rule, and so does every other integer input the client
+ * sends: a delete's identifier, and a command's parameters, a resource
+ * command's item identifier included. An optional integer is sent only when
+ * it is supplied.
  *
  * Expected text is written by hand from that wire form.
  *
@@ -129,5 +132,64 @@ describe('legacy resource client get identifier encoding (#207)', () => {
     )
     expect(text).toContain('async get(rackId: string | number, name: string): Promise<Gadget>')
     expect(text).toContain('{ rackId: { integer: String(rackId) }, name });')
+  })
+})
+
+/**
+ * {@link manifestWithGet} with a gadget keyed by an integer `id`, plus a
+ * delete and a resource command, `stamp`, that selects its gadget by that
+ * `id` and declares an optional integer `copies` and an optional string
+ * `note`.
+ */
+function manifestWithCommands(): AppManifest {
+  const base = manifestWithGet([identifier('id', 'integer')], 'integer')
+  return {
+    ...base,
+    commands: {
+      ...base.commands,
+      delete: {
+        name: 'delete',
+        description: 'Delete a gadget',
+        scope: 'resource',
+        resourceType: 'Gadget',
+        parameters: [identifier('id', 'integer')],
+      },
+      stamp: {
+        name: 'stamp',
+        description: 'Stamp a gadget',
+        scope: 'resource',
+        resourceType: 'Gadget',
+        parameters: [
+          identifier('id', 'integer'),
+          { name: 'copies', type: 'integer', description: 'How many', required: false },
+          { name: 'note', type: 'string', description: 'A note', required: false },
+        ],
+      },
+    },
+  }
+}
+
+describe('legacy resource client command and delete integer encoding (#207)', () => {
+  const text = gadgetClient(manifestWithCommands())
+
+  // The same bug class as the get: a resource command's integer item
+  // identifier was sent as the caller's text, `{ id }`.
+  it("sends a resource command's integer item identifier in its integer wire form", () => {
+    expect(text).toContain('async stamp(id: number, copies?: number, note?: string): Promise<void>')
+    expect(text).toContain('.stamp`, { id: { integer: String(id) }, ')
+  })
+
+  // An absent optional integer must send no field: its wire form would be
+  // `{ integer: "undefined" }`, which the input rejects. An optional string
+  // is sent as given, and JSON leaves it out when absent.
+  it('sends an optional integer parameter only when it is supplied, and a string as given', () => {
+    expect(text).toContain(
+      '...(copies === undefined ? {} : { copies: { integer: String(copies) } }), note });'
+    )
+  })
+
+  it("sends a delete's integer identifier in its integer wire form", () => {
+    expect(text).toContain('async delete(id: string | number): Promise<void>')
+    expect(text).toContain('.delete`, { id: { integer: String(id) } });')
   })
 })

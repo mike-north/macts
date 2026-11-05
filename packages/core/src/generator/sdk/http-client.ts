@@ -893,7 +893,7 @@ function generateListMethod(
   // An `integer` parameter is sent in its integer wire form, as the page size
   // is; the operation's input rejects a bare JSON number.
   const bodyProps = requiredParams.map((p) =>
-    bodyField(p.name, safeIdentifier(p.name), p.type === 'integer')
+    bodyField({ name: p.name, binding: safeIdentifier(p.name), integer: p.type === 'integer' })
   )
   if (paged) {
     bodyProps.unshift(
@@ -965,7 +965,7 @@ function generateGetMethod(
 ): string {
   const { parentParam, childParam } = resolveIdParams(command)
   const noteLine = docNoteLines(notes)
-  const field = (name: string): string => bodyField(name, name, isIntegerParameter(command, name))
+  const field = (name: string): string => identifierField(command, name)
   if (parentParam !== undefined) {
     return `
   /**
@@ -996,19 +996,46 @@ function integerWire(value: string): string {
   return `{ integer: String(${value}) }`
 }
 
-/**
- * One request-body field of a generated client method: the parameter `name`,
- * whose value is bound to `binding`, sent in its integer wire form
- * ({@link integerWire}) when it is an `integer` and as given otherwise.
- */
-function bodyField(name: string, binding: string, integer: boolean): string {
-  const key = binding === name ? name : `'${name}'`
-  if (integer) return `${key}: ${integerWire(binding)}`
-  return binding === name ? binding : `${key}: ${binding}`
+/** What {@link bodyField} needs to know about one request-body field. */
+interface BodyFieldSpec {
+  /** The field's key in the request body: the parameter's manifest name. */
+  readonly name: string
+  /** The generated local holding the field's value. */
+  readonly binding: string
+  /** Whether the parameter is declared `integer`. */
+  readonly integer: boolean
+  /** Whether the value may be absent; an absent value sends no field. */
+  readonly optional?: boolean
 }
 
 /**
- * The TypeScript type of a get's identifier argument. An `integer` identifier
+ * One request-body field of a generated client method, as object-literal
+ * text. Every input the generated client sends goes through it: a get's,
+ * update's or delete's identifiers, a list's parameters, and a command's
+ * parameters, a resource command's item included.
+ *
+ * An `integer` is sent in its integer wire form ({@link integerWire}), the
+ * only form the operation's input admits; an optional one is sent only when
+ * it is supplied, since the wire form of an absent value is not absence. Any
+ * other value is sent as given, and JSON leaves an absent one out.
+ */
+function bodyField({ name, binding, integer, optional = false }: BodyFieldSpec): string {
+  const key = binding === name ? name : `'${name}'`
+  if (!integer) return binding === name ? binding : `${key}: ${binding}`
+  const field = `${key}: ${integerWire(binding)}`
+  return optional ? `...(${binding} === undefined ? {} : { ${field} })` : field
+}
+
+/**
+ * The request-body field of the identifier parameter `name` of `command`, a
+ * get, update or delete, bound to a local of the same name.
+ */
+function identifierField(command: Command, name: string): string {
+  return bodyField({ name, binding: name, integer: isIntegerParameter(command, name) })
+}
+
+/**
+ * The TypeScript type of a get's, update's or delete's identifier argument. An `integer` identifier
  * is taken as the number it is or as the text a CLI passes, and sent in its
  * integer wire form; any other identifier is a string.
  */
@@ -1070,11 +1097,11 @@ function generateUpdateMethod(
   /**
    * Update an existing ${nameWords} within a parent scope.${noteLine}
    */
-  async update(${parentParam}: string, ${childParam}: string, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
+  async update(${parentParam}: ${identifierType(command, parentParam)}, ${childParam}: ${identifierType(command, childParam)}, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
     const { ${parentParam}: _p, ...updateFields } = input as ${resourceName}UpdateInput & { ${parentParam}?: string };
     void _p;
     const defined = Object.fromEntries(Object.entries(updateFields as Record<string, unknown>).filter(([, v]) => v !== undefined));
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${parentParam}, ${childParam}, ...defined });
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, parentParam)}, ${identifierField(command, childParam)}, ...defined });
   }
 `
   }
@@ -1082,9 +1109,9 @@ function generateUpdateMethod(
   /**
    * Update an existing ${nameWords}.${noteLine}
    */
-  async update(${childParam}: string, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
+  async update(${childParam}: ${identifierType(command, childParam)}, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
     const defined = Object.fromEntries(Object.entries(input as Record<string, unknown>).filter(([, v]) => v !== undefined));
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${childParam}, ...defined });
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, childParam)}, ...defined });
   }
 `
 }
@@ -1109,8 +1136,8 @@ function generateDeleteMethod(
   /**
    * Delete an ${nameWords} within a parent scope.${noteLine}
    */
-  async delete(${parentParam}: string, ${childParam}: string): Promise<void> {
-    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${parentParam}, ${childParam} });
+  async delete(${parentParam}: ${identifierType(command, parentParam)}, ${childParam}: ${identifierType(command, childParam)}): Promise<void> {
+    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, parentParam)}, ${identifierField(command, childParam)} });
   }
 `
   }
@@ -1118,15 +1145,16 @@ function generateDeleteMethod(
   /**
    * Delete an ${nameWords}.${noteLine}
    */
-  async delete(${childParam}: string): Promise<void> {
-    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${childParam} });
+  async delete(${childParam}: ${identifierType(command, childParam)}): Promise<void> {
+    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, childParam)} });
   }
 `
 }
 
 /**
  * Render a command method's signature and request-body argument from the shared
- * surface derivation (`commandMethodParameters`).
+ * surface derivation (`commandMethodParameters`). Each parameter, a resource
+ * command's item identifier included, is sent through {@link bodyField}.
  */
 function buildParamsAndBody(command: Command): { signature: string; bodyArg: string } {
   const { signature: signatureParams, body } = commandMethodParameters(command)
@@ -1137,10 +1165,17 @@ function buildParamsAndBody(command: Command): { signature: string; bodyArg: str
     })
     .join(', ')
 
+  const declared = new Map(command.parameters.map((parameter) => [parameter.name, parameter]))
   const bodyProps = body
-    .map(({ fieldName, bindingName }) =>
-      bindingName === fieldName ? bindingName : `'${fieldName}': ${bindingName}`
-    )
+    .map(({ fieldName, bindingName }) => {
+      const parameter = declared.get(fieldName)
+      return bodyField({
+        name: fieldName,
+        binding: bindingName,
+        integer: parameter?.type === 'integer',
+        optional: parameter?.required !== true,
+      })
+    })
     .join(', ')
   const bodyArg = bodyProps ? `{ ${bodyProps} }` : '{}'
 
