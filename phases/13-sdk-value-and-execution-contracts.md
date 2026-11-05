@@ -427,10 +427,10 @@ and "execution" means [#129](https://github.com/mike-north/macts/issues/129).
 
 **Public shape — confirmed: one package with subpath exports.**
 
-| Entry point        | Contents                                                                                                                                                                                                   | Loads native execution?              |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| `@macts/sdk`       | Remote client factory `createClient(app, { token, url })`, plus re-exports of every public contract symbol: error classes, `UnreachableError`, `Integer` and its helpers, value, reference, and file types | No — imports only `@macts/contracts` |
-| `@macts/sdk/local` | Local client factory `createClient(app, { token })`, with the same name and the same `AppContract` parameter                                                                                               | Yes, and only on the Mac             |
+| Entry point        | Contents                                                                                                                                                                                                   | Loads native execution?                                             |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `@macts/sdk`       | Remote client factory `createClient(app, { token, url })`, plus re-exports of every public contract symbol: error classes, `UnreachableError`, `Integer` and its helpers, value, reference, and file types | No — imports only the root and client entries of `@macts/contracts` |
+| `@macts/sdk/local` | Local client factory `createClient(app, { token })`, with the same name and the same `AppContract` parameter                                                                                               | Yes, and only on the Mac                                            |
 
 Switching locality means changing the import specifier and the options object
 (`url` exists only for remote). Consumer code, values, references, files, and
@@ -452,7 +452,7 @@ construction.
    ↑               governance and permission primitives
 @macts/runtime     (new; Mac-side shared execution runtime)
    ↑
-@macts/sdk         "."  → contracts only      "./local" → runtime
+@macts/sdk         "."  → contracts root/client      "./local" → runtime + contracts/client
    ↑
 @macts/api         HTTP adapter (remote service) and transfer endpoints → runtime
 @macts/mcp         stdio / HTTP MCP adapter → runtime
@@ -469,12 +469,23 @@ carries no adapter code.
 
 **Who owns what.**
 
-| Package            | Owns                                                                                                                                                                                                                                                                              | Created by            |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| `@macts/contracts` | Value types, wire shapes, value plans, the integer brand, `UnreachableError`; the reference hierarchy; file and transfer handle shapes; invocation context and authority types; canonical error classes and their registry; operation descriptors, `AppContract`, `ClientRuntime` | This phase (skeleton) |
-| `@macts/core`      | Manifest, generator, `Executor` seam (`src/execution/`), native provider (JXA executor and native codec, `src/jxa/`), governance and permission primitives                                                                                                                        | Exists                |
-| `@macts/runtime`   | Credential verification and key store, moved from `@macts/api/keys`; governance context loading, moved from `packages/api/src/server/governance/`; the invocation pipeline; reference resolution dispatch; the transfer store                                                     | Execution             |
-| `@macts/sdk`       | Public factories and re-exports                                                                                                                                                                                                                                                   | Execution             |
+| Package                   | Owns                                                                                                                                                                                                                                                                              | Created by                |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `@macts/contracts`        | Value types, wire shapes, value plans, the integer brand, `UnreachableError`; the reference hierarchy; file and transfer handle shapes; invocation context and authority types; canonical error classes and their registry; operation descriptors, `AppContract`, `ClientRuntime` | This phase (skeleton)     |
+| `@macts/core`             | Manifest, generator, `Executor` seam (`src/execution/`), native provider (JXA executor and native codec, `src/jxa/`), governance and permission primitives                                                                                                                        | Exists                    |
+| `@macts/runtime`          | Credential verification and key store, moved from `@macts/api/keys`; governance context loading, moved from `packages/api/src/server/governance/`; the invocation pipeline; reference resolution dispatch; the transfer store                                                     | Execution                 |
+| `@macts/contracts/client` | Platform-neutral codec client composition; the single client binding registry and bound-reference implementation; remote HTTP transport, credential closure, cancellation and canonical error decoding                                                                            | Shared client composition |
+| `@macts/sdk`              | Public factory aliases and contract re-exports; environment option resolution; local host adapter connecting shared client composition to the Mac-side runtime                                                                                                                    | Execution                 |
+
+The contracts root remains independent of its client subpath. Client composition
+imports the canonical root values, errors and types; it never imports core,
+runtime, SDK, or a native provider. SDK remote and local factories use the same
+codec and binding implementation, so reference authority and canonical error
+identity do not vary with the import path. Generated facades can compose this
+same client seam without acquiring a dependency on SDK or Mac-side execution.
+The SDK retains the user-facing locality factories and local runtime adaptation;
+contract-based client composition does not own host credential verification,
+governance, or native execution.
 
 **Why a separate runtime package.** Token verification needs the signing
 secret on disk and the SQLite revocation store. The local

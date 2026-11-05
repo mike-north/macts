@@ -156,7 +156,7 @@ describe('packed install: identity across entry points', () => {
     })
   })
 
-  it('type-checks an Integer from @macts/sdk where @macts/sdk/local requires one', async () => {
+  it('type-checks shared client, reference, and value brands through packed exports', async () => {
     expect((await typecheckBrandCheck(consumer)).trim()).toBe('')
   })
 })
