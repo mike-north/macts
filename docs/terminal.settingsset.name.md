@@ -4,7 +4,7 @@
 
 ## SettingsSet.name property
 
-The name of the settings set
+The name of the settings set. Never null: the primary identifier.
 
 **Signature:**
 

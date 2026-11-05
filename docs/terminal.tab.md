@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the tab is busy running a process
+boolean \| null
+
+</td><td>
+
+Whether the tab is busy running a process. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ Whether the tab is busy running a process
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The visible contents of the tab
+string \| null
+
+</td><td>
+
+The visible contents of the tab. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +73,11 @@ The visible contents of the tab
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the current settings set
+The name of the current settings set. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +88,11 @@ The name of the current settings set
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The custom title of the tab
+The custom title of the tab. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,28 +101,15 @@ The custom title of the tab
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The complete history contents of the tab
-
-</td></tr>
-<tr><td>
-
-[id?](./terminal.tab.id.md)
+string \| null
 
 </td><td>
 
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `tty`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
+The complete history contents of the tab. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +118,15 @@ _(Optional)_ Canonical identifier (mirrors `tty`<!-- -->); populated by list, pa
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The currently running processes in the tab
+string \| null
+
+</td><td>
+
+The currently running processes in the tab. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +137,11 @@ The currently running processes in the tab
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the tab is selected
+Whether the tab is selected. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +152,11 @@ Whether the tab is selected
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the title displays a custom title
+Whether the title displays a custom title. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -172,13 +165,15 @@ Whether the title displays a custom title
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The tty device of the tab
+The tty device of the tab. Never null: the primary identifier.
 
 </td></tr>
 </tbody></table>

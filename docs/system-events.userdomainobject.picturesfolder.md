@@ -4,10 +4,10 @@
 
 ## UserDomainObject.picturesFolder property
 
-The user's Pictures folder
+The user's Pictures folder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-picturesFolder: Folder
+readonly picturesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

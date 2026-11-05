@@ -4,7 +4,7 @@
 
 ## DocumentCreateInput interface
 
-Input for creating a Document
+Input for creating a Document.
 
 **Signature:**
 

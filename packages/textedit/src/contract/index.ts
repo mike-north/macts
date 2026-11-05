@@ -95,9 +95,9 @@ export interface DocumentResourceClient {
 
 /**
  * The TextEdit client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link textEditContract}. Its type carries the contract's
- * resource table, {@link TextEditResources}, so references can be bound to it by resource; the
- * brand has no runtime member.
+ * A client factory creates one from `textEditContract` in the app's `/contract` entry. Its type
+ * carries the contract's resource table, {@link TextEditResources}, so references can be bound to
+ * it by resource; the brand has no runtime member.
  */
 export interface TextEditClient extends ClientBrand<TextEditResources> {
   /** A TextEdit document */
@@ -122,7 +122,7 @@ const documentCreateInputType: ValueType<DocumentCreateInput> = t.record({
 })
 
 /**
- * The type of the resource table of {@link textEditContract}: every resource a
+ * The type of the resource table in `textEditContract` (the app's `/contract` entry): every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
  * references to it, and, for each of those operations that finds the

@@ -4,7 +4,7 @@
 
 ## ScriptingParameterCreateInput type
 
-Input for creating a ScriptingParameter
+Input for creating a ScriptingParameter.
 
 **Signature:**
 

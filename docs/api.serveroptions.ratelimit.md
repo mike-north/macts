@@ -4,7 +4,7 @@
 
 ## ServerOptions.rateLimit property
 
-Rate limiting configuration, or false to disable (default: enabled with 100 req/min)
+Rate limiting, or `false` to disable both the per-subject and the per-address limit.
 
 **Signature:**
 

@@ -4,10 +4,10 @@
 
 ## EQPreset.band4 property
 
-the equalizer 250 Hz band level (-12.0 dB to +12.0 dB)
+the equalizer 250 Hz band level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-band4: number
+band4: number | null
 ```

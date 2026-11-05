@@ -4,10 +4,10 @@
 
 ## Service.active property
 
-Is the service active?
+Is the service active? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-active: boolean
+readonly active: boolean | null;
 ```

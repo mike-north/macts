@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether this is the active document
+boolean \| null
+
+</td><td>
+
+Whether this is the active document. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ Whether this is the active document
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The main document text
+string \| null
+
+</td><td>
+
+The main document text. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +73,11 @@ The main document text
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The interval in points between default tab stops
+The interval in points between default tab stops. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,28 +86,15 @@ The interval in points between default tab stops
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The full path of the document in HFS format
-
-</td></tr>
-<tr><td>
-
-[id?](./microsoft-word.document.id.md)
+string \| null
 
 </td><td>
 
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
+The full path of the document in HFS format. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,13 +103,15 @@ _(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, p
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The name of the document
+The name of the document. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -127,13 +120,15 @@ The name of the document
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The path to the document (HFS format)
+string \| null
+
+</td><td>
+
+The path to the document (HFS format). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +137,15 @@ The path to the document (HFS format)
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The full path of the document in POSIX format
+string \| null
+
+</td><td>
+
+The full path of the document in POSIX format. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +154,15 @@ The full path of the document in POSIX format
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the document is read-only
+boolean \| null
+
+</td><td>
+
+Whether the document is read-only. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -174,11 +173,11 @@ Whether the document is read-only
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the document has been saved
+Whether the document has been saved. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -189,11 +188,11 @@ Whether the document has been saved
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether tracked changes are shown
+Whether tracked changes are shown. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -204,11 +203,11 @@ Whether tracked changes are shown
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether changes are tracked in the document
+Whether changes are tracked in the document. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

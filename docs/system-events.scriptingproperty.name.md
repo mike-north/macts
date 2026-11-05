@@ -4,10 +4,10 @@
 
 ## ScriptingProperty.name property
 
-The name of the property
+The name of the property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

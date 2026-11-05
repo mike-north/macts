@@ -4,10 +4,10 @@
 
 ## Graphic.strokePattern property
 
-Dash pattern of the stroke
+Dash pattern of the stroke. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-strokePattern: number
+strokePattern: Integer | null
 ```

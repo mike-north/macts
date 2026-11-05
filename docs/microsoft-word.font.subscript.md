@@ -4,10 +4,10 @@
 
 ## Font.subscript property
 
-Whether the font is subscript
+Whether the font is subscript. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-subscript: boolean
+subscript: boolean | null
 ```

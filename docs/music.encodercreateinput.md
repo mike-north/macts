@@ -4,7 +4,7 @@
 
 ## EncoderCreateInput type
 
-Input for creating a Encoder
+Input for creating an Encoder.
 
 **Signature:**
 

@@ -2,106 +2,14 @@
 
 [Home](./index.md) &gt; [@macts/preview](./preview.md) &gt; [PreviewClient](./preview.previewclient.md)
 
-## PreviewClient class
+## PreviewClient interface
 
-Preview client for HTTP-based macOS automation.
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 **Signature:**
 
 ```typescript
-declare class PreviewClient
+interface PreviewClient extends ClientBrand<PreviewResources>
 ```
 
-## Example
-
-```typescript
-const client = new PreviewClient({
-  apiKey: process.env.MACTS_API_KEY!,
-})
-
-// List calendars
-const calendars = await client.calendars.list()
-```
-
-## Constructors
-
-<table><thead><tr><th>
-
-Constructor
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[(constructor)(options)](./preview.previewclient._constructor_.md)
-
-</td><td>
-
-</td><td>
-
-Constructs a new instance of the `PreviewClient` class
-
-</td></tr>
-</tbody></table>
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[documents](./preview.previewclient.documents.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[DocumentResourceClient](./preview.documentresourceclient.md)
-
-</td><td>
-
-A Preview document
-
-</td></tr>
-<tr><td>
-
-[http](./preview.previewclient.http.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[HttpClient](./preview.httpclient.md)
-
-</td><td>
-
-Get the HTTP client for making custom requests.
-
-</td></tr>
-</tbody></table>
+**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[PreviewResources](./preview.previewresources.md)<!-- -->&gt;

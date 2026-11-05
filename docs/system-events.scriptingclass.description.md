@@ -4,10 +4,10 @@
 
 ## ScriptingClass.description property
 
-The description of the class
+The description of the class. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-description: string
+readonly description: string | null;
 ```

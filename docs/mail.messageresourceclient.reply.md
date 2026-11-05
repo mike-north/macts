@@ -4,12 +4,12 @@
 
 ## MessageResourceClient.reply() method
 
-Creates a reply message.
+Creates a reply message. macts does not yet send the message to the app, so the app acts on whatever it chooses.
 
 **Signature:**
 
 ```typescript
-reply(openingWindow?: boolean, replyToAll?: boolean): Promise<void>;
+reply(openingWindow?: boolean, replyToAll?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -47,6 +47,19 @@ replyToAll
 </td><td>
 
 boolean
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

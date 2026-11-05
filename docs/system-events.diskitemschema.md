@@ -4,6 +4,8 @@
 
 ## DiskItemSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -20,7 +22,7 @@ DiskItemSchema: z.ZodObject<
     packageFolder: z.ZodBoolean
     path: z.ZodString
     physicalSize: z.ZodNumber
-    pOSIXPath: z.ZodString
+    posixPath: z.ZodString
     size: z.ZodNumber
     uRL: z.ZodString
     visible: z.ZodBoolean

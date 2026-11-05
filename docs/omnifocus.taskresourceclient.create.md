@@ -9,7 +9,7 @@ Create a new task.
 **Signature:**
 
 ```typescript
-create(input: TaskCreateInput): Promise<Task>;
+create(input: TaskCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Task>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [TaskCreateInput](./omnifocus.taskcreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

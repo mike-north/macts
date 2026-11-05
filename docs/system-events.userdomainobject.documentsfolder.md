@@ -4,10 +4,10 @@
 
 ## UserDomainObject.documentsFolder property
 
-The user's Documents folder
+The user's Documents folder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-documentsFolder: Folder
+readonly documentsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

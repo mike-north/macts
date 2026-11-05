@@ -4,6 +4,8 @@
 
 ## CalendarSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -20,7 +22,6 @@ CalendarSchema: z.ZodObject<
       },
       z.core.$strip
     >
-    calendarIdentifier: z.ZodString
     writable: z.ZodBoolean
     description: z.ZodString
   },

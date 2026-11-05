@@ -9,7 +9,5 @@ The Hono app
 **Signature:**
 
 ```typescript
-app: Hono<{
-  Variables: AuthVariables
-}>
+app: Hono
 ```

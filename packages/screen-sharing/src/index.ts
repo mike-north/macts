@@ -21,6 +21,7 @@
 export { ScreenSharingClient, ScreenSharingError, HttpClient } from './client.js'
 export type { ScreenSharingClientOptions } from './client.js'
 export * from './types.js'
+export type { ScreenSharingResources } from './contract/index.js'
 
 export { capabilities } from './capabilities.js'
 export type { CapabilityMetadata, CapabilityRisk } from './capabilities.js'

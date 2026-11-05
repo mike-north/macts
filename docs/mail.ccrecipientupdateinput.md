@@ -4,12 +4,10 @@
 
 ## CcRecipientUpdateInput type
 
-Input for updating a CcRecipient
+Input for updating a CcRecipient. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type CcRecipientUpdateInput = Partial<CcRecipientCreateInput>
+type CcRecipientUpdateInput = Record<string, never>
 ```
-
-**References:** [CcRecipientCreateInput](./mail.ccrecipientcreateinput.md)

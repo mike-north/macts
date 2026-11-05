@@ -4,10 +4,10 @@
 
 ## TextDocument.text property
 
-The text of the text file referenced
+The text of the text file referenced. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-text: string
+text: string | null
 ```

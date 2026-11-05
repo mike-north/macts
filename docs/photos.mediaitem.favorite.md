@@ -4,10 +4,10 @@
 
 ## MediaItem.favorite property
 
-Whether the media item has been favorited
+Whether the media item has been favorited. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-favorite: boolean
+favorite: boolean | null
 ```

@@ -4,10 +4,10 @@
 
 ## UIElement.accessibilityDescription property
 
-a more complete description of the UI element and its capabilities
+a more complete description of the UI element and its capabilities. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-accessibilityDescription: string
+readonly accessibilityDescription: string | null;
 ```

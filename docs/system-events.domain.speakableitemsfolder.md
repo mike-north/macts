@@ -4,10 +4,10 @@
 
 ## Domain.speakableItemsFolder property
 
-The Speakable Items folder
+The Speakable Items folder. Nullable. The app reported no value in 4 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 **Signature:**
 
 ```typescript
-speakableItemsFolder: Folder
+readonly speakableItemsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

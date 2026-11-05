@@ -4,10 +4,10 @@
 
 ## Pane.name property
 
-The name of the settings pane.
+The name of the settings pane. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

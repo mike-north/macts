@@ -2,14 +2,183 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-word](./microsoft-word.md) &gt; [ParagraphUpdateInput](./microsoft-word.paragraphupdateinput.md)
 
-## ParagraphUpdateInput type
+## ParagraphUpdateInput interface
 
-Input for updating a Paragraph
+Input for updating a Paragraph. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ParagraphUpdateInput = Partial<ParagraphCreateInput>
+interface ParagraphUpdateInput
 ```
 
-**References:** [ParagraphCreateInput](./microsoft-word.paragraphcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[alignment?](./microsoft-word.paragraphupdateinput.alignment.md)
+
+</td><td>
+
+</td><td>
+
+[ParagraphAlignment](./microsoft-word.paragraphalignment.md)
+
+</td><td>
+
+_(Optional)_ The alignment for the paragraph. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[firstLineIndent?](./microsoft-word.paragraphupdateinput.firstlineindent.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The first-line or hanging indent value in points. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[keepTogether?](./microsoft-word.paragraphupdateinput.keeptogether.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether all lines remain on the same page. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[keepWithNext?](./microsoft-word.paragraphupdateinput.keepwithnext.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether paragraph stays with next paragraph. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[leftIndent?](./microsoft-word.paragraphupdateinput.leftindent.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The left indent in points. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[lineSpacing?](./microsoft-word.paragraphupdateinput.linespacing.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The line spacing in points. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[pageBreakBefore?](./microsoft-word.paragraphupdateinput.pagebreakbefore.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether a page break is forced before the paragraph. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[rightIndent?](./microsoft-word.paragraphupdateinput.rightindent.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The right indent in points. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[spaceAfter?](./microsoft-word.paragraphupdateinput.spaceafter.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The spacing in points after the paragraph. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[spaceBefore?](./microsoft-word.paragraphupdateinput.spacebefore.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The spacing in points before the paragraph. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

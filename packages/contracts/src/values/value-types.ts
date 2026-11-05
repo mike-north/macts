@@ -31,6 +31,7 @@ import type { FileSource, FileValue } from '../files/index.js'
 import type { IssuePath } from '../issues.js'
 import type {
   CollectionReferenceVariant,
+  IndexSelectorReference,
   ObjectReferenceVariant,
   ReferenceScope,
 } from '../references/index.js'
@@ -59,7 +60,7 @@ import {
 } from './leaf-codecs.js'
 import { PAGE_SIZE_LIMITS, type Page, type PageInputFields, type PageValueType } from './page.js'
 import type { FieldPlan, ValuePlan } from './plan.js'
-import { referenceType } from './reference-type.js'
+import { indexSelectorReferenceType, referenceType } from './reference-type.js'
 import type { ValueType } from './value-type.js'
 import { dateSdkSchema, integerSdkSchema } from './sdk-schemas.js'
 import { checkIntegerText, wireIntegerSchema } from './wire-checks.js'
@@ -313,6 +314,36 @@ export interface ValueTypeConstructors {
     cardinality: 'many',
     options?: ValueTypeOptions
   ): ValueType<CollectionReferenceVariant<T, Id, R>>
+  /**
+   * A reference to one object of `resource` by its zero-based position within
+   * its container: an {@link IndexSelectorReference}, and no other form.
+   *
+   * @remarks
+   * For an output position whose target has no identifier and is found by its
+   * position within its parent: `resource`'s `get` records that parent, and
+   * the container is an identity reference to the object the field was read
+   * through. It reads references by the same rules as
+   * `t.reference(scope, resource, 'one')`, and admits only
+   * `{ form: 'selector', cardinality: 'one', selector: { by: 'index', index }, container }`;
+   * an identity reference, a name selector, a missing container and a
+   * resource whose `get` records no parent are issues. Its plan records the
+   * form (`form: 'index'`), so the native codec emits it at the position.
+   *
+   * The reference means whatever object holds the position when it is
+   * resolved, so it drifts as objects are added to, removed from or moved
+   * within the container.
+   *
+   * @typeParam T - The referenced record.
+   * @typeParam R - The resource key, inferred from `resource` as a literal.
+   * @throws `TypeError` when `scope` is not a function or `resource` is not a
+   * non-empty string; and, when the value type is used, when `scope` returns
+   * something other than an app and its resource table.
+   */
+  indexSelectorReference<T = unknown, R extends string = string>(
+    scope: () => ReferenceScope,
+    resource: R,
+    options?: ValueTypeOptions
+  ): ValueType<IndexSelectorReference<T, R>>
   /**
    * A {@link FileValue} an operation returns: `{"file": {…}}` on the wire.
    *
@@ -922,6 +953,7 @@ export const ValueTypes: ValueTypeConstructors = Object.freeze({
   unknown: unknownType,
   none: noneType,
   reference: referenceType,
+  indexSelectorReference: indexSelectorReferenceType,
   file: fileType,
   fileSource: fileSourceType,
   page: pageType,

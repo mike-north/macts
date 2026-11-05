@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the total size of the source if it has a fixed size
+number \| null
+
+</td><td>
+
+the total size of the source if it has a fixed size. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ the total size of the source if it has a fixed size
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the free space on the source if it has a fixed size
+number \| null
+
+</td><td>
+
+the free space on the source if it has a fixed size. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ the free space on the source if it has a fixed size
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Unique identifier for this source
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+Unique identifier for this source. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,32 @@ Unique identifier for this source
 
 </td><td>
 
+`readonly`
+
+</td><td>
+
+string \| null
+
+</td><td>
+
+The kind property. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[persistentID](./tv.source.persistentid.md)
+
+</td><td>
+
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The kind property
+the id of the item as a hexadecimal string. This id does not change over time. Never null: the primary identifier.
 
 </td></tr>
 </tbody></table>

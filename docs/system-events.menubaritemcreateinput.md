@@ -4,7 +4,7 @@
 
 ## MenuBarItemCreateInput type
 
-Input for creating a MenuBarItem
+Input for creating a MenuBarItem.
 
 **Signature:**
 

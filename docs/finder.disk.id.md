@@ -4,10 +4,10 @@
 
 ## Disk.id property
 
-the unique id for this disk (unchanged while disk remains connected and Finder remains running)
+the unique id for this disk (unchanged while disk remains connected and Finder remains running). Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: Integer;
 ```

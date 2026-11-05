@@ -66,7 +66,17 @@ export type ValueShape =
   | { readonly kind: LeafKind }
   | { readonly kind: 'enum'; readonly enumKey: string }
   | { readonly kind: 'array'; readonly item: ValueShape }
-  | { readonly kind: 'reference'; readonly resourceKey: string }
+  | {
+      readonly kind: 'reference'
+      readonly resourceKey: string
+      /**
+       * The form a native read emits at an output position, when it is not
+       * the identity form: `'index'` for a positional target
+       * (`withEmittedForms` in `./output-references.ts`). Absent at inputs,
+       * which accept every form.
+       */
+      readonly form?: 'index'
+    }
   | { readonly kind: 'nullable'; readonly inner: ValueShape }
 
 /**

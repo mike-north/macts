@@ -1,22 +1,13 @@
 /**
- * The shipped resource commands that cannot yet select the item they act on,
- * and what each needs before it can.
+ * Shipped resource commands the manifest cannot yet address: their resource
+ * lacks an identifier/get, or their item needs more than one recorded parent.
+ * They remain available as legacy itemless app calls, with explicit generated
+ * documentation, instead of removing native-supported operations.
  *
- * Every resource-scoped command other than a list or create acts on one item,
- * selected by an identifier parameter it declares, and the app receives that
- * item as the command's direct parameter (`./item-selection.ts`). Generation
- * and registration refuse a command that declares none. A few shipped
- * commands cannot declare one yet, because the manifest model cannot reach
- * their item: the resource has no identifier or get to look the item up by,
- * or the item lies more than one parent deep, while a command records one
- * parent only. Removing them would drop operations people use, so they stay
- * offered, as a call on the app with their declared parameters that sends no
- * item, and their generated docs say so.
- *
- * The list is a ratchet. It names exactly these commands, by app and command
- * key, with a typed reason, and a test pins its contents: an entry is removed
- * once its command can select its item, and nothing is added to it. Any
- * other command that cannot select its item is refused.
+ * This frozen list is a ratchet keyed by app and command, with typed blockers.
+ * Tests pin its contents and require removal once an item becomes selectable;
+ * entries cannot be added. Generation and registration refuse every unlisted
+ * itemless resource command (`./item-selection.ts`).
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md §D5, §D10 (Command parents)
  * @see https://github.com/mike-north/macts/issues/287

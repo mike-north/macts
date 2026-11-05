@@ -21,6 +21,7 @@
 export { MusicClient, MusicError, HttpClient } from './client.js'
 export type { MusicClientOptions } from './client.js'
 export * from './types.js'
+export type { MusicResources } from './contract/index.js'
 export { FileTrackResourceClient } from './resources/filetrack.js'
 export { PlaylistResourceClient } from './resources/playlist.js'
 export { TrackResourceClient } from './resources/track.js'

@@ -4,10 +4,10 @@
 
 ## Canvas.columnSpacing property
 
-Spacing between graphics in a column
+Spacing between graphics in a column. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-columnSpacing: number
+columnSpacing: number | null
 ```

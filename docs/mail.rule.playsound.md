@@ -4,10 +4,10 @@
 
 ## Rule.playSound property
 
-If rule matches, play this sound (specify name of sound or path to sound)
+If rule matches, play this sound (specify name of sound or path to sound). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-playSound: string
+playSound: string | null
 ```

@@ -4,10 +4,10 @@
 
 ## Rule.redirectMessage property
 
-If rule matches, redirect message to this address or multiple addresses, separate by commas. Set to empty string to disable this action
+If rule matches, redirect message to this address or multiple addresses, separate by commas. Set to empty string to disable this action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-redirectMessage: string
+redirectMessage: string | null
 ```

@@ -4,10 +4,10 @@
 
 ## Service.id property
 
-the unique identifier for the service
+the unique identifier for the service. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

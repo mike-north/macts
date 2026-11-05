@@ -4,10 +4,10 @@
 
 ## Domain.libraryFolder property
 
-The Library folder
+The Library folder. Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-05).
 
 **Signature:**
 
 ```typescript
-libraryFolder: Folder
+readonly libraryFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

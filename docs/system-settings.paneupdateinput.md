@@ -4,12 +4,10 @@
 
 ## PaneUpdateInput type
 
-Input for updating a Pane
+Input for updating a Pane. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type PaneUpdateInput = Partial<PaneCreateInput>
+type PaneUpdateInput = Record<string, never>
 ```
-
-**References:** [PaneCreateInput](./system-settings.panecreateinput.md)

@@ -4,10 +4,10 @@
 
 ## FileTrack.id property
 
-Unique identifier for this track
+Unique identifier for this track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: Integer | null;
 ```

@@ -4,7 +4,7 @@
 
 ## SourceCreateInput type
 
-Input for creating a Source
+Input for creating a Source.
 
 **Signature:**
 

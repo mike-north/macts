@@ -85,13 +85,16 @@ import {
   omittedOutputProperties,
   outputProperties,
 } from '../manifest/output-references.js'
+import { isPositional } from '../manifest/positional.js'
 import { resolvingCommand } from '../manifest/resource-commands.js'
 import { ROOT_KIND_PROPERTY, rootProperties } from '../manifest/roots.js'
 import { ABSENT_VALUE_ERROR_NUMBER, readsAbsentAsNull } from '../manifest/schemas/evidence.js'
 import {
   NATIVE_CODEC_ERROR_NAME,
   NATIVE_COLLECTION_CHANGED_ERROR_NAME,
+  NATIVE_ABSENT_AS_NULL_KEY,
   NATIVE_CONTAINED_REFERENCE_KEY,
+  NATIVE_READING_KEY,
   type NativeAddressing,
   type NativeCollectionAddressing,
 } from './native-codec.js'
@@ -150,6 +153,18 @@ export interface NativeBodyOptions {
    * would reach the caller as it is. Defaults to `true`.
    */
   readonly containerReferences?: boolean
+  /**
+   * Hand the codec the value of each property whose evidence makes the app's
+   * "no such object" failure its empty value marked as such, so the codec
+   * takes that failure, raised while it reads the value's identity, as `null`
+   * ({@link markAbsentAsNull}).
+   *
+   * Only a body whose result the codec encodes by a typed plan wants this.
+   * Under a passthrough plan the codec returns the result unchanged, so a
+   * marker would reach the caller as it is. A failed read of such a property
+   * is `null` either way. Defaults to `true`.
+   */
+  readonly absentValueMarkers?: boolean
 }
 
 /**
@@ -164,6 +179,8 @@ interface RecordSource {
   readonly resource: Resource | undefined
   /** Whether references to targets got within a record carry it as their container. */
   readonly containerReferences: boolean
+  /** Whether values of absent-as-null properties go to the codec marked. */
+  readonly absentValueMarkers: boolean
 }
 
 /**
@@ -236,6 +253,7 @@ export function planNativeInvocation(
     key: resource === undefined ? undefined : target.resource,
     resource,
     containerReferences: options.containerReferences !== false,
+    absentValueMarkers: options.absentValueMarkers !== false,
   }
   const { body, identifierArguments } = buildResourceBody(
     command,
@@ -368,11 +386,17 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * is omitted rather than failing the operation, and its record then fails
  * the contract unless the field may be absent. A property whose evidence
  * shows the app reporting an absent value by failing the read with "no such
- * object" ({@link absentAsNull}) takes `null` from that failure instead; the
- * item's own existence is checked before this read, so a missing item still
- * fails as missing. That holds for a get, a resolved reference and an update's
- * read-back (checked before its writes); a create's read-back needs no check,
- * because the item was just made. A body with no resource reads `name`.
+ * object" ({@link absentAsNull}) takes `null` from that failure instead, and
+ * is always read on its own, never taken from the record, because the
+ * evidence is of what a read of the property reports. The app can still hand
+ * back an object it reports missing only when the codec reads the object's
+ * identifier, so such a property's value goes to the codec marked
+ * ({@link markAbsentAsNull}), which takes that failure as `null` too, as a
+ * list's rows do. The item's own existence is checked before this read, so a
+ * missing item still fails as missing. That holds for a get, a resolved
+ * reference and an update's read-back (checked before its writes); a
+ * create's read-back needs no check, because the item was just made. A body
+ * with no resource reads `name`.
  *
  * A singleton root's object holds nothing that says which kind it is, so its
  * `kind` is not read from the app: it is set from `kindExpression`, the kind
@@ -408,9 +432,10 @@ function readOutputProperties(
     'var obj = {};',
     'try {',
     `var props = ${itemLocal}.properties();`,
-    ...keys.map(
-      (key) =>
-        `if (${member('props', native(key))} !== undefined) { ${member('obj', key)} = ${member('props', native(key))}; } else { ${readOnItsOwn(key)} }`
+    ...keys.map((key) =>
+      absentAsNull(resource, key)
+        ? readOnItsOwn(key)
+        : `if (${member('props', native(key))} !== undefined) { ${member('obj', key)} = ${member('props', native(key))}; } else { ${readOnItsOwn(key)} }`
     ),
     '} catch (e) {',
     ...keys.map(readOnItsOwn),
@@ -421,22 +446,47 @@ function readOutputProperties(
     ...containedKeys(manifest, source).map(
       (key) =>
         `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${wrapContained(member('obj', key), 'container', itemLocal)}; }`
-    )
+    ),
+    ...keys
+      .filter((key) => marksAbsentAsNull(source, key))
+      .map(
+        (key) =>
+          `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${markAbsentAsNull(member('obj', key))}; }`
+      )
   )
+}
+
+/**
+ * Expression handing `valueExpression`, read for a property whose evidence
+ * makes the app's "no such object" failure its empty value ({@link
+ * absentAsNull}), to the codec marked as such: an object whose only own
+ * property is the registry symbol `NATIVE_ABSENT_AS_NULL_KEY` (in
+ * `native-codec.ts`), which no app record can carry. The app can report the
+ * object missing only when the codec reads it (a reference's identifier), so
+ * the codec, not the read, takes that failure as `null`. `null` is left as it
+ * is. A body marks values only when the codec encodes its result by a typed
+ * plan ({@link NativeBodyOptions.absentValueMarkers}).
+ */
+function markAbsentAsNull(valueExpression: string): string {
+  return `(function (v) { if (v === null) { return null; } var m = {}; m[Symbol.for(${literal(NATIVE_ABSENT_AS_NULL_KEY)})] = v; return m; })(${valueExpression})`
+}
+
+/** Whether `source` marks the values of property `key` for the codec ({@link markAbsentAsNull}). */
+function marksAbsentAsNull(source: RecordSource, key: string): boolean {
+  return source.absentValueMarkers && absentAsNull(source.resource, key)
 }
 
 /**
  * Whether a failed read of `key` with "no such object" is the property's
  * empty value: its nullability evidence shows the app failing that way when
- * an item has no value (`readsAbsentAsNull`). Every other failure, and this
- * one for any other property, is still a failure.
+ * an item has no value, observed across the resource's items or, for a
+ * resource with a single instance, curated (`readsAbsentAsNull`). Every
+ * other failure, and this one for any other property, is still a failure.
  */
 function absentAsNull(resource: Resource | undefined, key: string): boolean {
-  const property =
-    resource !== undefined && Object.hasOwn(resource.properties, key)
-      ? resource.properties[key]
-      : undefined
-  return property !== undefined && readsAbsentAsNull(property)
+  if (resource === undefined || !Object.hasOwn(resource.properties, key)) return false
+  const property = resource.properties[key]
+  return property !== undefined && readsAbsentAsNull(property, resource)
 }
 
 /**
@@ -444,7 +494,9 @@ function absentAsNull(resource: Resource | undefined, key: string): boolean {
  * to the codec together with that record as its container: the record's item
  * (`how` is `container`), or its identifier already read (`containerId`).
  * The codec reads the target's id from the value and encodes the container in
- * the same request (`NATIVE_CONTAINED_REFERENCE_KEY` in `native-codec.ts`).
+ * the same request. The value is handed over marked: an object whose only own
+ * property is the registry symbol `NATIVE_CONTAINED_REFERENCE_KEY` (in
+ * `native-codec.ts`), which no app record can carry.
  *
  * `null`, the app's missing value, is left as it is, so a nullable field
  * holds `null`; a list is handed over item by item. The expression uses only
@@ -455,9 +507,8 @@ function wrapContained(
   how: 'container' | 'containerId',
   containerExpression: string
 ): string {
-  const wrap = (value: string): string =>
-    `{ ${literal(NATIVE_CONTAINED_REFERENCE_KEY)}: { value: ${value}, ${how}: ${containerExpression} } }`
-  return `(function (v) { return v === null ? null : Array.isArray(v) ? v.map(function (e) { return e === null ? null : ${wrap('e')}; }) : ${wrap('v')}; })(${valueExpression})`
+  const held = `function held(e) { var m = {}; m[Symbol.for(${literal(NATIVE_CONTAINED_REFERENCE_KEY)})] = { value: e, ${how}: ${containerExpression} }; return m; }`
+  return `(function (v) { ${held} return v === null ? null : Array.isArray(v) ? v.map(function (e) { return e === null ? null : held(e); }) : held(v); })(${valueExpression})`
 }
 
 /**
@@ -629,15 +680,24 @@ export function buildNestedTargetExpression(
  * `valueExpression`, in the form the resource's identifier targeting selects.
  * A resource with no identifier takes the `byId` form.
  *
- * @throws `InternalError` for a singleton root, which no collection holds.
- *   The manifest schema lets no command reach a root through a collection,
- *   so reaching this is a macts defect.
+ * @throws `InternalError` for a singleton root, which no collection holds,
+ *   and for a positional resource, which has no identifier: its items are
+ *   found by position ({@link bindTarget}). The manifest schema lets no
+ *   command reach a root through a collection, and requires a positional
+ *   resource's commands to record a parent, so reaching this is a macts
+ *   defect.
  */
 function lookupInCollection(
   resource: Resource | undefined,
   collection: string,
   valueExpression: string
 ): string {
+  if (resource?.positional !== undefined) {
+    throw new InternalError(
+      'A positional item is found by its position within its parent, not by an identifier.',
+      {}
+    )
+  }
   const lookup = identifierLookup(resource)
   if (lookup?.lookup === 'byRoot') {
     throw new InternalError('A root is held by the application, not in a collection.', {})
@@ -689,8 +749,10 @@ function identifierLookup(resource: Resource | undefined):
  * container's, and `within` names the parent, whose own addressing finds the
  * container by the parent's own targeting (`byKey` for a parent found by its
  * key). So a resource is addressable only when its parent is, level by
- * level. There is no addressing for a resource with no identifier, with no
- * get, or whose parent has none.
+ * level. A positional resource, which has no identifier, is found by its
+ * position within the parent its get records (`NativePositionalAddressing`).
+ * There is no addressing for any other resource with no identifier, for one
+ * with no get, or for one whose parent has none.
  *
  * A singleton root is addressed by its kinds: the application property each
  * one names (`NativeRootAddressing`). It is held by the application itself,
@@ -729,10 +791,25 @@ function addressingWithin(
     ? manifest.resources[resourceKey]
     : undefined
   const lookup = identifierLookup(resource)
-  if (resource === undefined || lookup === undefined || seen.has(resourceKey)) return undefined
+  if (resource === undefined || seen.has(resourceKey)) return undefined
   const get = resolvingCommand(manifest, resourceKey, 'get')
   if (get === undefined) return undefined
   const parent = get[1].parent?.resource
+  if (isPositional(manifest, resourceKey)) {
+    // Found by its position within its parent, which the manifest schema
+    // requires the get to record and the app to find by its identifier.
+    if (parent === undefined) return undefined
+    const container = addressingWithin(manifest, parent, new Set([...seen, resourceKey]))
+    if (container === undefined) return undefined
+    if (container.lookup === 'byRoot') {
+      throw new InternalError(
+        `The macOS provider cannot use the singleton root ${JSON.stringify(parent)} as a container.`,
+        {}
+      )
+    }
+    return { lookup: 'byIndex', collection: resolveCollectionAccessor(resource), within: parent }
+  }
+  if (lookup === undefined) return undefined
   if (resource.roots !== undefined) {
     if (parent !== undefined) {
       throw new InternalError(
@@ -913,7 +990,9 @@ function findParameter(command: Command, name: string): CommandParameter | undef
  * when it, or the parent it is scoped under, does not exist.
  *
  * Every get, update, and delete addresses its target this way, so a missing
- * target is reported identically whichever operation reached it.
+ * target is reported identically whichever operation reached it. A
+ * positional resource's item is the one at the zero-based position its item
+ * parameter carries, within the parent ({@link bindPosition}).
  */
 function bindTarget(
   command: Command,
@@ -923,6 +1002,20 @@ function bindTarget(
   identifierParam: string
 ): string {
   const itemId = `var ${ITEM_ID_LOCAL} = ${argumentValue(identifierParam, findParameter(command, identifierParam))};`
+  if (resource?.positional !== undefined) {
+    if (parentScope === undefined) {
+      throw new InternalError(
+        'A positional item is found by its position within its parent, which its command records.',
+        {}
+      )
+    }
+    return lines(
+      readParentId(command, parentScope),
+      itemId,
+      bindParent(parentScope),
+      bindPosition(member(PARENT_LOCAL, resourcePlural))
+    )
+  }
   if (parentScope === undefined) {
     return lines(
       itemId,
@@ -935,6 +1028,32 @@ function bindTarget(
     itemId,
     bindParent(parentScope),
     `var item = ${buildNestedTargetExpression(resource, PARENT_LOCAL, resourcePlural, ITEM_ID_LOCAL)};`,
+    failIfMissing('item')
+  )
+}
+
+/**
+ * Statements binding `item` to the item at the zero-based position
+ * {@link ITEM_ID_LOCAL} holds in `collection`, the app's element addressing
+ * (`collection.at(position)`). A position must be a non-negative safe integer
+ * before the collection is constructed, and must be within its length. A
+ * violation raises the native invalid-index number, so it is classified as
+ * an invalid selection, never as a missing object.
+ */
+function bindPosition(collection: string): string {
+  return lines(
+    `if (!Number.isSafeInteger(${ITEM_ID_LOCAL}) || ${ITEM_ID_LOCAL} < 0) {`,
+    "  var invalidPosition = new Error('Invalid item position.');",
+    `  invalidPosition.errorNumber = ${String(INVALID_RANGE_ERROR_NUMBER)};`,
+    '  throw invalidPosition;',
+    '}',
+    `var positions = ${collection};`,
+    `if (!(${ITEM_ID_LOCAL} < positions.length)) {`,
+    "  var outOfRange = new Error('No item at this position.');",
+    `  outOfRange.errorNumber = ${String(INVALID_RANGE_ERROR_NUMBER)};`,
+    '  throw outOfRange;',
+    '}',
+    `var item = positions.at(${ITEM_ID_LOCAL});`,
     failIfMissing('item')
   )
 }
@@ -1062,19 +1181,26 @@ const COLLECTION_CHANGED_MESSAGE =
  * - `aligned(what, values)` returns `values` when it is an array with one
  *   element per item, and otherwise throws a misaligned `Inconsistent`. `what`
  *   names the read in the message.
+ * - `noteReading(e, what)` returns `e`, an app error the body lets through,
+ *   noting `what` was being read when the app failed ({@link
+ *   NATIVE_READING_KEY}): `the items`, or a property by its name. A codec
+ *   failure, or an error that already says what was read, is left alone.
+ * - `listItems()` lists the item specifiers, noting a failure as a read of
+ *   the items.
  * - `itemList()` lists the item specifiers once per attempt, on first use,
  *   checked against the item count. Only reads that fall back to one request
  *   per item need them.
  * - `communicationFailed(e)` tells whether a thrown error is one of
  *   {@link COMMUNICATION_FAILURE_ERROR_NUMBERS}: the request failed, so no
  *   guard or fallback may absorb it.
- * - `readEach(list, name, guarded, absentAsNull)` reads one property of
- *   every item of `list`, one request per item. A guarded read the item
+ * - `readEach(what, list, name, guarded, absentAsNull)` reads one property
+ *   of every item of `list`, one request per item. A guarded read the item
  *   cannot answer leaves `undefined` at its position, so the record omits
  *   that property, unless `absentAsNull` is `true` and the read failed with
  *   "no such object": that is the property's empty value (see
  *   {@link absentAsNull}), so `null` is left there. An unguarded failure, or
- *   a communication failure, fails the list. `absentAsNull` may be left out.
+ *   a communication failure, fails the list; an unguarded one notes `what`
+ *   was being read. `absentAsNull` may be left out.
  * - `readColumn(what, name, absentAsNull)` reads one property across the
  *   items in one request. When that request fails other than by a
  *   communication failure, it falls back to `readEach` with every read
@@ -1105,11 +1231,20 @@ function listReadHelpers(): string {
     '  }',
     '  return values;',
     '}',
+    'function noteReading(e, what) {',
+    `  if (e !== null && typeof e === "object" && e.name !== ${literal(NATIVE_CODEC_ERROR_NAME)} && typeof e[${literal(NATIVE_READING_KEY)}] !== "string") {`,
+    `    try { e[${literal(NATIVE_READING_KEY)}] = what; } catch (ignored) {}`,
+    '  }',
+    '  return e;',
+    '}',
+    'function listItems() {',
+    `  try { return ${COLLECTION_LOCAL}(); } catch (e) { throw noteReading(e, "the items"); }`,
+    '}',
     'function itemList() {',
-    `  if (items === null) { items = aligned("the items", ${COLLECTION_LOCAL}()); }`,
+    '  if (items === null) { items = aligned("the items", listItems()); }',
     '  return items;',
     '}',
-    'function readEach(list, name, guarded, absentAsNull) {',
+    'function readEach(what, list, name, guarded, absentAsNull) {',
     '  var values = [];',
     '  for (var i = 0; i < list.length; i++) {',
     '    if (guarded) {',
@@ -1118,7 +1253,7 @@ function listReadHelpers(): string {
     `        values.push(absentAsNull === true && e && e.errorNumber === ${String(NO_SUCH_OBJECT_ERROR_NUMBER)} ? null : undefined);`,
     '      }',
     '    } else {',
-    '      values.push(list[i][name]());',
+    '      try { values.push(list[i][name]()); } catch (e) { throw noteReading(e, what); }',
     '    }',
     '  }',
     '  return values;',
@@ -1127,7 +1262,7 @@ function listReadHelpers(): string {
     '  var values;',
     `  try { values = ${COLLECTION_LOCAL}[name](); } catch (e) {`,
     '    if (communicationFailed(e)) { throw e; }',
-    '    return readEach(itemList(), name, true, absentAsNull);',
+    '    return readEach(what, itemList(), name, true, absentAsNull);',
     '  }',
     '  return aligned(what, values);',
     '}'
@@ -1135,8 +1270,18 @@ function listReadHelpers(): string {
 }
 
 /**
+ * The runtime identifier a list body reads: its manifest name (`name`), by
+ * which a failed read is noted, and the app's name for it (`native`), by
+ * which it is read.
+ */
+interface ListIdentifier {
+  readonly name: string
+  readonly native: string
+}
+
+/**
  * Statements declaring `readIdentifiers()`, which reads the runtime
- * identifier `nativeIdName` of every item {@link COLLECTION_LOCAL} addresses,
+ * identifier `identifier` of every item {@link COLLECTION_LOCAL} addresses,
  * in item order.
  *
  * The identifier read is never guarded. When the read across the items fails
@@ -1146,16 +1291,16 @@ function listReadHelpers(): string {
  * rather than returning records with no usable id. The listed specifiers
  * become the attempt's item list.
  */
-function identifierReader(nativeIdName: string): string {
+function identifierReader(identifier: ListIdentifier): string {
   return lines(
     'function readIdentifiers() {',
     '  var values;',
-    `  try { values = ${member(COLLECTION_LOCAL, nativeIdName)}(); } catch (e) {`,
+    `  try { values = ${member(COLLECTION_LOCAL, identifier.native)}(); } catch (e) {`,
     '    if (communicationFailed(e)) { throw e; }',
-    `    var list = ${COLLECTION_LOCAL}();`,
+    '    var list = listItems();',
     '    if (!Array.isArray(list)) { unassemblable("Listing the items gave no list, so the records cannot be assembled."); }',
     '    items = list;',
-    `    return readEach(list, ${literal(nativeIdName)}, false);`,
+    `    return readEach(${literal(`the property "${identifier.name}"`)}, list, ${literal(identifier.native)}, false);`,
     '  }',
     '  if (!Array.isArray(values)) { unassemblable("Reading the identifiers gave no list, so the records cannot be assembled."); }',
     '  return values;',
@@ -1224,8 +1369,11 @@ function sameIdentifiersHelper(): string {
  * per-item reads lists the items afresh rather than reusing a list from an
  * attempt that saw a different collection.
  */
-function attemptReader(nativeIdName: string | undefined, columnReads: readonly string[]): string {
-  if (nativeIdName === undefined) {
+function attemptReader(
+  identifier: ListIdentifier | undefined,
+  columnReads: readonly string[]
+): string {
+  if (identifier === undefined) {
     return lines(
       'function readAll() {',
       '  items = null;',
@@ -1236,7 +1384,7 @@ function attemptReader(nativeIdName: string | undefined, columnReads: readonly s
     )
   }
   return lines(
-    identifierReader(nativeIdName),
+    identifierReader(identifier),
     sameIdentifiersHelper(),
     'function readAll() {',
     '  items = null;',
@@ -1272,7 +1420,7 @@ function attemptReader(nativeIdName: string | undefined, columnReads: readonly s
  * `0 <= offset < end <= length`.
  */
 function pagedAttemptReader(
-  nativeIdName: string,
+  identifier: ListIdentifier,
   columnLocals: readonly string[],
   columnReads: readonly string[],
   read: PageRead
@@ -1280,10 +1428,10 @@ function pagedAttemptReader(
   const offset = `${PAGE_PARAMETER}.offset`
   const anchorRead =
     read === 'range'
-      ? `${member(`window(${offset} - 1, ${offset})`, nativeIdName)}()`
-      : `within(${member(WHOLE_LOCAL, nativeIdName)}(), ${offset} - 1, ${offset})`
+      ? `${member(`window(${offset} - 1, ${offset})`, identifier.native)}()`
+      : `within(${member(WHOLE_LOCAL, identifier.native)}(), ${offset} - 1, ${offset})`
   return lines(
-    identifierReader(nativeIdName),
+    identifierReader(identifier),
     sameIdentifiersHelper(),
     read === 'range'
       ? rangeWindowReader(columnReads)
@@ -1590,7 +1738,8 @@ function buildListBody(
   const recordFields = bestEffortProps.map((p, index) => {
     const value = `${columnLocal(index)}[i]`
     const held = contained.has(p) ? wrapContained(value, 'containerId', `${IDS_LOCAL}[i]`) : value
-    return `if (${value} !== undefined) { ${member('obj', p)} = ${held}; }`
+    const marked = marksAbsentAsNull(source, p) ? markAbsentAsNull(held) : held
+    return `if (${value} !== undefined) { ${member('obj', p)} = ${marked}; }`
   })
   const idField =
     runtimeIdProperty !== undefined ? `${member('obj', runtimeIdProperty)} = ${IDS_LOCAL}[i];` : ''
@@ -1619,9 +1768,12 @@ function buildListBody(
     collectionExpression = member(PARENT_LOCAL, resourcePlural)
   }
 
-  const nativeIdName = runtimeIdProperty === undefined ? undefined : native(runtimeIdProperty)
-  const pagedIdName = paged ? nativeIdName : undefined
-  const pageRead = pagedIdName === undefined ? undefined : pageReadOf(resource)
+  const identifier: ListIdentifier | undefined =
+    runtimeIdProperty === undefined
+      ? undefined
+      : { name: runtimeIdProperty, native: native(runtimeIdProperty) }
+  const pagedIdentifier = paged ? identifier : undefined
+  const pageRead = pagedIdentifier === undefined ? undefined : pageReadOf(resource)
   const body = lines(
     parentBinding,
     pageRead === undefined
@@ -1637,10 +1789,10 @@ function buildListBody(
       ? ''
       : `var ${bestEffortProps.map((_p, index) => columnLocal(index)).join(', ')};`,
     listReadHelpers(),
-    pagedIdName === undefined || pageRead === undefined
-      ? attemptReader(nativeIdName, columnReads)
+    pagedIdentifier === undefined || pageRead === undefined
+      ? attemptReader(identifier, columnReads)
       : pagedAttemptReader(
-          pagedIdName,
+          pagedIdentifier,
           bestEffortProps.map((_p, index) => columnLocal(index)),
           columnReads,
           pageRead
@@ -1654,7 +1806,7 @@ function buildListBody(
     idAlias,
     'result.push(obj);',
     '}',
-    pagedIdName === undefined
+    pagedIdentifier === undefined
       ? 'return result;'
       : lines(
           `var windowResult = { items: result, length: ${LENGTH_LOCAL} };`,
@@ -1668,10 +1820,7 @@ function buildListBody(
   }
 }
 
-/**
- * The one item a resource-scoped command acts on, bound to `item` by
- * {@link bindSelectedItem}.
- */
+/** The selected `item` and the addressing context needed by its command. */
 interface SelectedItem {
   /** Statements that bind `item`, failing as "no such object" when it is missing. */
   readonly statements: string
@@ -1681,30 +1830,18 @@ interface SelectedItem {
   readonly parentParameter: string | undefined
   /** The parameter carrying the item's identifier ({@link resolveIdentifierParam}). */
   readonly itemParameter: string
-  /**
-   * The local holding the kind a singleton root's object was found by, which
-   * its record reads as its `kind`; `undefined` for an item in a collection.
-   */
+  /** A singleton root's kind local, emitted as record kind; absent for collection items. */
   readonly kindLocal: string | undefined
 }
 
 /**
- * Bind the item a resource-scoped command acts on to `item`, as every get
- * finds its item, so every command that names one item of a resource selects
- * the same item a get of the same identifier reads.
- *
- * - An item in a collection is found by the resource's identifier targeting,
- *   with the identifier read from the command's identifier parameter
- *   ({@link resolveIdentifierParam}). A command that records a parent finds
- *   it under the parent item, which is checked first, so a missing parent
- *   names the parent's resource ({@link bindTarget}); any other finds it at
- *   the application.
- * - A singleton root's object is the application property its kind names
- *   (D10, singleton roots). A kind the resource does not have, and a kind
- *   whose property holds no object on this Mac, both fail as "no such
- *   object".
- *
- * Either way the item must exist ({@link failIfMissing}) before it is used.
+ * Bind the same `item` for every command as a get with that identifier reads.
+ * Collection items use {@link bindTarget}, including recorded parent scope
+ * and positional addressing. A missing parent is checked first and names its
+ * resource; an unscoped collection is addressed at the application.
+ * Singleton roots use the application property named by their kind. Unknown
+ * kinds and missing properties fail as "no such object". Every selected item
+ * must exist ({@link failIfMissing}) before the command uses it.
  */
 function bindSelectedItem(
   command: Command,
@@ -1765,22 +1902,12 @@ function buildGetBody(
 }
 
 /**
- * Run a resource-scoped command that is not a standard CRUD shape on the one
- * item it names, as `app["<command>"](item, params)`.
- *
- * Such a command is one the app's dictionary defines on the resource's class,
- * and the app takes the item it acts on as the command's direct parameter
- * (Notes' `show` a note, Xcode's `build` a workspace document, Mail's `send`
- * an outgoing message). The item is selected exactly as a get selects it
- * ({@link bindSelectedItem}), so a missing item, or a missing parent, fails
- * as "no such object" before the command is sent.
- *
- * The named-parameter record carries only the command's other declared
- * parameters, the ones the dictionary declares, as each is supplied. The
- * item's and the parent's identifier parameters are lookup keys, never
- * parameters of the app's command, so neither is ever sent to it. With no
- * other parameter supplied, the command is sent the item alone. The app's
- * result is returned as it is.
+ * Send a non-CRUD resource command its selected item as the direct argument,
+ * as the dictionary requires (Notes show, Xcode build, Mail send).
+ * {@link bindSelectedItem} checks item and parent existence before dispatch.
+ * Only supplied dictionary parameters enter the named record; item and parent
+ * identifiers are lookup keys and never enter it. With no named values the
+ * app receives the item alone. The app's result is returned unchanged.
  */
 function buildItemCommandBody(
   command: Command,
@@ -2010,14 +2137,15 @@ export const RESOLUTION_KINDS_ARGUMENT = 'kinds'
  * @param resourceKey - The manifest key of the referenced resource.
  * @param cardinality - Whether one object or a list of objects is read.
  * @param options - Whether references in the records carry their container
- *   (`containerReferences`, as for an operation body).
+ *   (`containerReferences`), and whether absent-as-null values go to the
+ *   codec marked (`absentValueMarkers`), as for an operation body.
  * @throws `InternalError` when the manifest does not declare `resourceKey`.
  */
 export function buildResolutionBody(
   manifest: AppManifest,
   resourceKey: string,
   cardinality: 'one' | 'many',
-  options: Pick<NativeBodyOptions, 'containerReferences'> = {}
+  options: Pick<NativeBodyOptions, 'containerReferences' | 'absentValueMarkers'> = {}
 ): string {
   const resource = Object.hasOwn(manifest.resources, resourceKey)
     ? manifest.resources[resourceKey]
@@ -2029,6 +2157,7 @@ export function buildResolutionBody(
     key: resourceKey,
     resource,
     containerReferences: options.containerReferences !== false,
+    absentValueMarkers: options.absentValueMarkers !== false,
   }
   const kinds = argument(RESOLUTION_KINDS_ARGUMENT)
   const rooted = resource.roots !== undefined

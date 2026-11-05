@@ -4,29 +4,40 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { FileSource } from '@macts/contracts';
+import { FileValue } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
+import { ObjectReferenceData } from '@macts/contracts';
+import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface AirPlayDevice {
-    active: boolean;
-    available: boolean;
-    kind: string;
-    networkAddress: string;
-    protected: boolean;
-    selected: boolean;
-    soundVolume: number;
-    supportsAudio: boolean;
-    supportsVideo: boolean;
+    readonly active: boolean | null;
+    readonly available: boolean | null;
+    readonly kind: string | null;
+    readonly networkAddress: string | null;
+    readonly protected: boolean | null;
+    selected: boolean | null;
+    soundVolume: Integer | null;
+    readonly supportsAudio: boolean | null;
+    readonly supportsVideo: boolean | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "AirPlayDeviceCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type AirPlayDeviceCreateInput = Omit<AirPlayDeviceCreateInput_2, 'soundVolume'> & {
+    soundVolume?: null extends AirPlayDeviceCreateInput_2['soundVolume'] ? number | null : number;
+};
 
 // @public
-export interface AirPlayDeviceCreateInput {
-    selected?: boolean;
-    soundVolume?: number;
-}
-
-// @public (undocumented)
 export const AirPlayDeviceSchema: z.ZodObject<{
     active: z.ZodBoolean;
     available: z.ZodBoolean;
@@ -39,28 +50,31 @@ export const AirPlayDeviceSchema: z.ZodObject<{
     soundVolume: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "AirPlayDeviceUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AirPlayDeviceUpdateInput = Partial<AirPlayDeviceCreateInput>;
+export type AirPlayDeviceUpdateInput = Omit<AirPlayDeviceUpdateInput_2, 'soundVolume'> & {
+    soundVolume?: null extends AirPlayDeviceUpdateInput_2['soundVolume'] ? number | null : number;
+};
 
 // @public
 export interface Artwork {
-    data: string;
-    description: string;
-    downloaded: boolean;
-    format: string;
-    kind: number;
+    data: string | null;
+    description: string | null;
+    readonly downloaded: boolean | null;
+    readonly format: string | null;
+    kind: Integer | null;
     rawData: unknown;
 }
 
+// Warning: (ae-forgotten-export) The symbol "ArtworkCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface ArtworkCreateInput {
-    data?: string;
-    description?: string;
-    kind?: number;
-    rawData?: unknown;
-}
+export type ArtworkCreateInput = Omit<ArtworkCreateInput_2, 'kind'> & {
+    kind?: null extends ArtworkCreateInput_2['kind'] ? number | null : number;
+};
 
-// @public (undocumented)
+// @public
 export const ArtworkSchema: z.ZodObject<{
     data: z.ZodString;
     description: z.ZodString;
@@ -70,32 +84,34 @@ export const ArtworkSchema: z.ZodObject<{
     rawData: z.ZodUnknown;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "ArtworkUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ArtworkUpdateInput = Partial<ArtworkCreateInput>;
+export type ArtworkUpdateInput = Omit<ArtworkUpdateInput_2, 'kind'> & {
+    kind?: null extends ArtworkUpdateInput_2['kind'] ? number | null : number;
+};
 
 // @public
 export interface AudioCDPlaylist {
-    artist: string;
-    compilation: boolean;
-    composer: string;
-    discCount: number;
-    discNumber: number;
-    genre: string;
-    year: number;
+    artist: string | null;
+    compilation: boolean | null;
+    composer: string | null;
+    discCount: Integer | null;
+    discNumber: Integer | null;
+    genre: string | null;
+    year: Integer | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "AudioCDPlaylistCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type AudioCDPlaylistCreateInput = Omit<AudioCDPlaylistCreateInput_2, 'discCount' | 'discNumber' | 'year'> & {
+    discCount?: null extends AudioCDPlaylistCreateInput_2['discCount'] ? number | null : number;
+    discNumber?: null extends AudioCDPlaylistCreateInput_2['discNumber'] ? number | null : number;
+    year?: null extends AudioCDPlaylistCreateInput_2['year'] ? number | null : number;
+};
 
 // @public
-export interface AudioCDPlaylistCreateInput {
-    artist?: string;
-    compilation?: boolean;
-    composer?: string;
-    discCount?: number;
-    discNumber?: number;
-    genre?: string;
-    year?: number;
-}
-
-// @public (undocumented)
 export const AudioCDPlaylistSchema: z.ZodObject<{
     artist: z.ZodString;
     compilation: z.ZodBoolean;
@@ -106,44 +122,52 @@ export const AudioCDPlaylistSchema: z.ZodObject<{
     year: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "AudioCDPlaylistUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AudioCDPlaylistUpdateInput = Partial<AudioCDPlaylistCreateInput>;
+export type AudioCDPlaylistUpdateInput = Omit<AudioCDPlaylistUpdateInput_2, 'discCount' | 'discNumber' | 'year'> & {
+    discCount?: null extends AudioCDPlaylistUpdateInput_2['discCount'] ? number | null : number;
+    discNumber?: null extends AudioCDPlaylistUpdateInput_2['discNumber'] ? number | null : number;
+    year?: null extends AudioCDPlaylistUpdateInput_2['year'] ? number | null : number;
+};
 
 // @public
 export interface AudioCDTrack {
-    location: string;
+    readonly location: FileValue | null;
 }
 
 // @public
 export type AudioCDTrackCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const AudioCDTrackSchema: z.ZodObject<{
     location: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type AudioCDTrackUpdateInput = Partial<AudioCDTrackCreateInput>;
+export type AudioCDTrackUpdateInput = Record<string, never>;
 
 // @public
 export interface BrowserWindow {
-    selection: string;
-    view: Playlist;
+    readonly selection: string | null;
+    view: ObjectReferenceVariant<Playlist, string, 'Playlist'> | null;
 }
 
 // @public
 export interface BrowserWindowCreateInput {
-    view?: Playlist;
+    view?: ObjectReferenceData<string, 'Playlist'>;
 }
 
-// @public (undocumented)
+// @public
 export const BrowserWindowSchema: z.ZodObject<{
     selection: z.ZodString;
     view: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type BrowserWindowUpdateInput = Partial<BrowserWindowCreateInput>;
+export interface BrowserWindowUpdateInput {
+    view?: ObjectReferenceData<string, 'Playlist'>;
+}
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -181,19 +205,19 @@ export type EMdK = 'song' | 'musicVideo' | 'movie' | 'tVShow' | 'unknown';
 
 // @public
 export interface Encoder {
-    format: string;
+    readonly format: string | null;
 }
 
 // @public
 export type EncoderCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const EncoderSchema: z.ZodObject<{
     format: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type EncoderUpdateInput = Partial<EncoderCreateInput>;
+export type EncoderUpdateInput = Record<string, never>;
 
 // @public
 export type Enum = 'standard' | 'detailed';
@@ -203,19 +227,19 @@ export type EPlS = 'stopped' | 'playing' | 'paused' | 'fastForwarding' | 'rewind
 
 // @public
 export interface EQPreset {
-    band1: number;
-    band10: number;
-    band2: number;
-    band3: number;
-    band4: number;
-    band5: number;
-    band6: number;
-    band7: number;
-    band8: number;
-    band9: number;
-    modifiable: boolean;
-    preamp: number;
-    updateTracks: boolean;
+    band1: number | null;
+    band10: number | null;
+    band2: number | null;
+    band3: number | null;
+    band4: number | null;
+    band5: number | null;
+    band6: number | null;
+    band7: number | null;
+    band8: number | null;
+    band9: number | null;
+    readonly modifiable: boolean | null;
+    preamp: number | null;
+    updateTracks: boolean | null;
 }
 
 // @public
@@ -234,7 +258,7 @@ export interface EQPresetCreateInput {
     updateTracks?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const EQPresetSchema: z.ZodObject<{
     band1: z.ZodNumber;
     band2: z.ZodNumber;
@@ -252,23 +276,36 @@ export const EQPresetSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type EQPresetUpdateInput = Partial<EQPresetCreateInput>;
+export interface EQPresetUpdateInput {
+    band1?: number;
+    band10?: number;
+    band2?: number;
+    band3?: number;
+    band4?: number;
+    band5?: number;
+    band6?: number;
+    band7?: number;
+    band8?: number;
+    band9?: number;
+    preamp?: number;
+    updateTracks?: boolean;
+}
 
 // @public
 export interface EQWindow {
-    id: number;
+    readonly id: Integer | null;
 }
 
 // @public
 export type EQWindowCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const EQWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type EQWindowUpdateInput = Partial<EQWindowCreateInput>;
+export type EQWindowUpdateInput = Record<string, never>;
 
 // @public
 export type ERpt = 'off' | 'one' | 'all';
@@ -290,99 +327,110 @@ export type ESrc = 'library' | 'audioCD' | 'mP3CD' | 'radioTuner' | 'sharedLibra
 
 // @public
 export interface FileTrack {
-    location: string;
+    location: FileValue | null;
 }
 
 // @public
 export interface FileTrackCreateInput {
-    location?: string;
+    location?: FileSource;
 }
 
 // @public
 export class FileTrackResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    refresh(): Promise<void>;
+    refresh(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const FileTrackSchema: z.ZodObject<{
     location: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type FileTrackUpdateInput = Partial<FileTrackCreateInput>;
+export interface FileTrackUpdateInput {
+    location?: FileSource;
+}
 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface LibraryPlaylist {
-    id: number;
+    readonly id: Integer | null;
 }
 
 // @public
 export type LibraryPlaylistCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const LibraryPlaylistSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type LibraryPlaylistUpdateInput = Partial<LibraryPlaylistCreateInput>;
+export type LibraryPlaylistUpdateInput = Record<string, never>;
 
 // @public
 export interface MiniplayerWindow {
-    id: number;
+    readonly id: Integer | null;
 }
 
 // @public
 export type MiniplayerWindowCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const MiniplayerWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type MiniplayerWindowUpdateInput = Partial<MiniplayerWindowCreateInput>;
+export type MiniplayerWindowUpdateInput = Record<string, never>;
+
+// @public
+export interface MusicClient extends ClientBrand<MusicResources> {
+}
 
 // @public
 export class MusicClient {
     constructor(options: MusicClientOptions);
-    add(to?: string): Promise<void>;
-    backTrack(): Promise<void>;
-    close(): Promise<void>;
-    convert(): Promise<void>;
-    count(each: string): Promise<void>;
-    download(): Promise<void>;
-    duplicate(to?: string): Promise<void>;
-    exists(): Promise<void>;
-    _export(as?: string, to?: string): Promise<void>;
-    fastForward(): Promise<void>;
+    add(to?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    backTrack(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    close(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    convert(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    count(each: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    download(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    duplicate(to?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    exists(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "MusicClient_2" needs to be exported by the entry point index.d.ts
+    _export(as?: string, to?: Parameters<MusicClient_2['_export']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    fastForward(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly fileTracks: FileTrackResourceClient;
     get http(): HttpClient;
-    make(_new: string, at?: string, withProperties?: unknown): Promise<void>;
-    nextTrack(): Promise<void>;
-    open(): Promise<void>;
-    openLocation(): Promise<void>;
-    pause(): Promise<void>;
-    play(once?: boolean): Promise<void>;
+    make(_new: string, at?: string, withProperties?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    nextTrack(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    open(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    openLocation(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    pause(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    play(once?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly playlists: PlaylistResourceClient;
-    playpause(): Promise<void>;
-    previousTrack(): Promise<void>;
-    print(printDialog?: boolean, withProperties?: string, kind?: string, theme?: string): Promise<void>;
-    quit(): Promise<void>;
-    resume(): Promise<void>;
-    reveal(): Promise<void>;
-    rewind(): Promise<void>;
-    run(): Promise<void>;
-    save(): Promise<void>;
-    select(): Promise<void>;
-    stop(): Promise<void>;
+    playpause(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    previousTrack(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    print(printDialog?: boolean, withProperties?: string, kind?: string, theme?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    quit(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    resume(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    reveal(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    rewind(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    run(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    save(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    select(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    stop(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly tracks: TrackResourceClient;
 }
 
@@ -400,19 +448,37 @@ export class MusicError extends Error {
 }
 
 // @public
+export type MusicResources = Readonly<{
+    Playlist: ResourceDescriptor<Playlist, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'music.playlists.get';
+        readonly list: 'music.playlists.list';
+    };
+    Track: ResourceDescriptor<Track, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'music.tracks.get';
+        readonly list: 'music.tracks.list';
+        readonly parents: {
+            readonly get: 'Playlist';
+            readonly list: 'Playlist';
+        };
+    };
+}>;
+
+// @public
 export interface Playlist {
-    description: string;
-    disliked: boolean;
-    duration: number;
-    favorited: boolean;
-    id: number;
-    index: number;
-    name: string;
-    persistentID: string;
-    size: number;
-    specialKind: string;
-    time: string;
-    visible: boolean;
+    description: string | null;
+    disliked: boolean | null;
+    readonly duration: Integer | null;
+    favorited: boolean | null;
+    readonly id: Integer | null;
+    readonly index: Integer | null;
+    name: string | null;
+    readonly persistentID: string;
+    readonly size: Integer | null;
+    readonly specialKind: string | null;
+    readonly time: string | null;
+    readonly visible: boolean | null;
 }
 
 // @public
@@ -426,13 +492,13 @@ export interface PlaylistCreateInput {
 // @public
 export class PlaylistResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(persistentID: string): Promise<Playlist>;
-    list(): Promise<Page<Playlist>>;
-    move(persistentID: string, to: string): Promise<void>;
-    search(persistentID: string, _for: string, only?: string): Promise<void>;
+    get(persistentID: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Playlist>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Playlist>>;
+    move(persistentID: string, to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    search(persistentID: string, _for: string, only?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const PlaylistSchema: z.ZodObject<{
     id: z.ZodNumber;
     index: z.ZodNumber;
@@ -449,69 +515,74 @@ export const PlaylistSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type PlaylistUpdateInput = Partial<PlaylistCreateInput>;
+export interface PlaylistUpdateInput {
+    description?: string;
+    disliked?: boolean;
+    favorited?: boolean;
+    name?: string;
+}
 
 // @public
 export interface PlaylistWindow {
-    selection: string;
-    view: Playlist;
+    readonly selection: string | null;
+    readonly view: ObjectReferenceVariant<Playlist, string, 'Playlist'> | null;
 }
 
 // @public
 export type PlaylistWindowCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const PlaylistWindowSchema: z.ZodObject<{
     selection: z.ZodString;
     view: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type PlaylistWindowUpdateInput = Partial<PlaylistWindowCreateInput>;
+export type PlaylistWindowUpdateInput = Record<string, never>;
 
 // @public
 export interface RadioTunerPlaylist {
-    id: number;
+    readonly id: Integer | null;
 }
 
 // @public
 export type RadioTunerPlaylistCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const RadioTunerPlaylistSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type RadioTunerPlaylistUpdateInput = Partial<RadioTunerPlaylistCreateInput>;
+export type RadioTunerPlaylistUpdateInput = Record<string, never>;
 
 // @public
 export interface SharedTrack {
-    id: number;
+    readonly id: Integer | null;
 }
 
 // @public
 export type SharedTrackCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const SharedTrackSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type SharedTrackUpdateInput = Partial<SharedTrackCreateInput>;
+export type SharedTrackUpdateInput = Record<string, never>;
 
 // @public
 export interface Source {
-    capacity: number;
-    freeSpace: number;
-    kind: string;
+    readonly capacity: number | null;
+    readonly freeSpace: number | null;
+    readonly kind: string | null;
 }
 
 // @public
 export type SourceCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const SourceSchema: z.ZodObject<{
     capacity: z.ZodNumber;
     freeSpace: z.ZodNumber;
@@ -519,168 +590,131 @@ export const SourceSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type SourceUpdateInput = Partial<SourceCreateInput>;
+export type SourceUpdateInput = Record<string, never>;
 
 // @public
 export interface SubscriptionPlaylist {
-    id: number;
+    readonly id: Integer | null;
 }
 
 // @public
 export type SubscriptionPlaylistCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const SubscriptionPlaylistSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type SubscriptionPlaylistUpdateInput = Partial<SubscriptionPlaylistCreateInput>;
+export type SubscriptionPlaylistUpdateInput = Record<string, never>;
 
 // @public
 export interface Track {
-    album: string;
-    albumArtist: string;
-    albumDisliked: boolean;
-    albumFavorited: boolean;
-    albumRating: number;
-    albumRatingKind: string;
-    artist: string;
-    bitRate: number;
-    bookmark: number;
-    bookmarkable: boolean;
-    bpm: number;
-    category: string;
-    cloudStatus: string;
-    comment: string;
-    compilation: boolean;
-    composer: string;
-    databaseID: number;
-    dateAdded: Date;
-    description: string;
-    discCount: number;
-    discNumber: number;
-    disliked: boolean;
-    downloaderAccount: string;
-    downloaderName: string;
-    duration: number;
-    enabled: boolean;
-    episodeID: string;
-    episodeNumber: number;
-    eQ: string;
-    favorited: boolean;
-    finish: number;
-    gapless: boolean;
-    genre: string;
-    grouping: string;
-    id: number;
-    index: number;
-    kind: string;
-    longDescription: string;
-    lyrics: string;
-    mediaKind: string;
-    modificationDate: Date;
-    movement: string;
-    movementCount: number;
-    movementNumber: number;
-    name: string;
-    persistentID: string;
-    playedCount: number;
-    playedDate: Date;
-    purchaserAccount: string;
-    purchaserName: string;
-    rating: number;
-    ratingKind: string;
-    releaseDate: Date;
-    sampleRate: number;
-    seasonNumber: number;
-    show: string;
-    shufflable: boolean;
-    size: number;
-    skippedCount: number;
-    skippedDate: Date;
-    sortAlbum: string;
-    sortAlbumArtist: string;
-    sortArtist: string;
-    sortComposer: string;
-    sortName: string;
-    sortShow: string;
-    start: number;
-    time: string;
-    trackCount: number;
-    trackNumber: number;
-    unplayed: boolean;
-    volumeAdjustment: number;
-    work: string;
-    year: number;
+    album: string | null;
+    albumArtist: string | null;
+    albumDisliked: boolean | null;
+    albumFavorited: boolean | null;
+    albumRating: Integer | null;
+    readonly albumRatingKind: string | null;
+    artist: string | null;
+    readonly bitRate: Integer | null;
+    bookmark: number | null;
+    bookmarkable: boolean | null;
+    bpm: Integer | null;
+    category: string | null;
+    readonly cloudStatus: string | null;
+    comment: string | null;
+    compilation: boolean | null;
+    composer: string | null;
+    readonly databaseID: Integer | null;
+    readonly dateAdded: Date | null;
+    description: string | null;
+    discCount: Integer | null;
+    discNumber: Integer | null;
+    disliked: boolean | null;
+    readonly downloaderAccount: string | null;
+    readonly downloaderName: string | null;
+    readonly duration: number | null;
+    enabled: boolean | null;
+    episodeID: string | null;
+    episodeNumber: Integer | null;
+    eQ: string | null;
+    favorited: boolean | null;
+    finish: number | null;
+    gapless: boolean | null;
+    genre: string | null;
+    grouping: string | null;
+    readonly id: Integer | null;
+    readonly index: Integer | null;
+    readonly kind: string | null;
+    longDescription: string | null;
+    lyrics: string | null;
+    mediaKind: string | null;
+    readonly modificationDate: Date | null;
+    movement: string | null;
+    movementCount: Integer | null;
+    movementNumber: Integer | null;
+    name: string | null;
+    readonly persistentID: string;
+    playedCount: Integer | null;
+    playedDate: Date | null;
+    readonly purchaserAccount: string | null;
+    readonly purchaserName: string | null;
+    rating: Integer | null;
+    readonly ratingKind: string | null;
+    readonly releaseDate: Date | null;
+    readonly sampleRate: Integer | null;
+    seasonNumber: Integer | null;
+    show: string | null;
+    shufflable: boolean | null;
+    readonly size: number | null;
+    skippedCount: Integer | null;
+    skippedDate: Date | null;
+    sortAlbum: string | null;
+    sortAlbumArtist: string | null;
+    sortArtist: string | null;
+    sortComposer: string | null;
+    sortName: string | null;
+    sortShow: string | null;
+    start: number | null;
+    readonly time: string | null;
+    trackCount: Integer | null;
+    trackNumber: Integer | null;
+    unplayed: boolean | null;
+    volumeAdjustment: Integer | null;
+    work: string | null;
+    year: Integer | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "TrackCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface TrackCreateInput {
-    album?: string;
-    albumArtist?: string;
-    albumDisliked?: boolean;
-    albumFavorited?: boolean;
-    albumRating?: number;
-    artist?: string;
-    bookmark?: number;
-    bookmarkable?: boolean;
-    bpm?: number;
-    category?: string;
-    comment?: string;
-    compilation?: boolean;
-    composer?: string;
-    description?: string;
-    discCount?: number;
-    discNumber?: number;
-    disliked?: boolean;
-    enabled?: boolean;
-    episodeID?: string;
-    episodeNumber?: number;
-    eQ?: string;
-    favorited?: boolean;
-    finish?: number;
-    gapless?: boolean;
-    genre?: string;
-    grouping?: string;
-    longDescription?: string;
-    lyrics?: string;
-    mediaKind?: string;
-    movement?: string;
-    movementCount?: number;
-    movementNumber?: number;
-    name?: string;
-    playedCount?: number;
-    playedDate?: Date;
-    rating?: number;
-    seasonNumber?: number;
-    show?: string;
-    shufflable?: boolean;
-    skippedCount?: number;
-    skippedDate?: Date;
-    sortAlbum?: string;
-    sortAlbumArtist?: string;
-    sortArtist?: string;
-    sortComposer?: string;
-    sortName?: string;
-    sortShow?: string;
-    start?: number;
-    trackCount?: number;
-    trackNumber?: number;
-    unplayed?: boolean;
-    volumeAdjustment?: number;
-    work?: string;
-    year?: number;
-}
+export type TrackCreateInput = Omit<TrackCreateInput_2, 'albumRating' | 'bpm' | 'discCount' | 'discNumber' | 'episodeNumber' | 'movementCount' | 'movementNumber' | 'playedCount' | 'rating' | 'seasonNumber' | 'skippedCount' | 'trackCount' | 'trackNumber' | 'volumeAdjustment' | 'year'> & {
+    albumRating?: null extends TrackCreateInput_2['albumRating'] ? number | null : number;
+    bpm?: null extends TrackCreateInput_2['bpm'] ? number | null : number;
+    discCount?: null extends TrackCreateInput_2['discCount'] ? number | null : number;
+    discNumber?: null extends TrackCreateInput_2['discNumber'] ? number | null : number;
+    episodeNumber?: null extends TrackCreateInput_2['episodeNumber'] ? number | null : number;
+    movementCount?: null extends TrackCreateInput_2['movementCount'] ? number | null : number;
+    movementNumber?: null extends TrackCreateInput_2['movementNumber'] ? number | null : number;
+    playedCount?: null extends TrackCreateInput_2['playedCount'] ? number | null : number;
+    rating?: null extends TrackCreateInput_2['rating'] ? number | null : number;
+    seasonNumber?: null extends TrackCreateInput_2['seasonNumber'] ? number | null : number;
+    skippedCount?: null extends TrackCreateInput_2['skippedCount'] ? number | null : number;
+    trackCount?: null extends TrackCreateInput_2['trackCount'] ? number | null : number;
+    trackNumber?: null extends TrackCreateInput_2['trackNumber'] ? number | null : number;
+    volumeAdjustment?: null extends TrackCreateInput_2['volumeAdjustment'] ? number | null : number;
+    year?: null extends TrackCreateInput_2['year'] ? number | null : number;
+};
 
 // @public
 export class TrackResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(playlistId: string, persistentID: string): Promise<Track>;
-    list(playlistId: string): Promise<Page<Track>>;
+    get(playlistId: string, persistentID: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Track>;
+    list(playlistId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Track>>;
 }
 
-// @public (undocumented)
+// @public
 export const TrackSchema: z.ZodObject<{
     id: z.ZodNumber;
     index: z.ZodNumber;
@@ -758,12 +792,30 @@ export const TrackSchema: z.ZodObject<{
     year: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "TrackUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type TrackUpdateInput = Partial<TrackCreateInput>;
+export type TrackUpdateInput = Omit<TrackUpdateInput_2, 'albumRating' | 'bpm' | 'discCount' | 'discNumber' | 'episodeNumber' | 'movementCount' | 'movementNumber' | 'playedCount' | 'rating' | 'seasonNumber' | 'skippedCount' | 'trackCount' | 'trackNumber' | 'volumeAdjustment' | 'year'> & {
+    albumRating?: null extends TrackUpdateInput_2['albumRating'] ? number | null : number;
+    bpm?: null extends TrackUpdateInput_2['bpm'] ? number | null : number;
+    discCount?: null extends TrackUpdateInput_2['discCount'] ? number | null : number;
+    discNumber?: null extends TrackUpdateInput_2['discNumber'] ? number | null : number;
+    episodeNumber?: null extends TrackUpdateInput_2['episodeNumber'] ? number | null : number;
+    movementCount?: null extends TrackUpdateInput_2['movementCount'] ? number | null : number;
+    movementNumber?: null extends TrackUpdateInput_2['movementNumber'] ? number | null : number;
+    playedCount?: null extends TrackUpdateInput_2['playedCount'] ? number | null : number;
+    rating?: null extends TrackUpdateInput_2['rating'] ? number | null : number;
+    seasonNumber?: null extends TrackUpdateInput_2['seasonNumber'] ? number | null : number;
+    skippedCount?: null extends TrackUpdateInput_2['skippedCount'] ? number | null : number;
+    trackCount?: null extends TrackUpdateInput_2['trackCount'] ? number | null : number;
+    trackNumber?: null extends TrackUpdateInput_2['trackNumber'] ? number | null : number;
+    volumeAdjustment?: null extends TrackUpdateInput_2['volumeAdjustment'] ? number | null : number;
+    year?: null extends TrackUpdateInput_2['year'] ? number | null : number;
+};
 
 // @public
 export interface URLTrack {
-    address: string;
+    address: string | null;
 }
 
 // @public
@@ -771,19 +823,21 @@ export interface URLTrackCreateInput {
     address?: string;
 }
 
-// @public (undocumented)
+// @public
 export const URLTrackSchema: z.ZodObject<{
     address: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type URLTrackUpdateInput = Partial<URLTrackCreateInput>;
+export interface URLTrackUpdateInput {
+    address?: string;
+}
 
 // @public
 export interface UserPlaylist {
-    genius: boolean;
-    shared: boolean;
-    smart: boolean;
+    readonly genius: boolean | null;
+    shared: boolean | null;
+    readonly smart: boolean | null;
 }
 
 // @public
@@ -791,7 +845,7 @@ export interface UserPlaylistCreateInput {
     shared?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const UserPlaylistSchema: z.ZodObject<{
     shared: z.ZodBoolean;
     smart: z.ZodBoolean;
@@ -799,39 +853,41 @@ export const UserPlaylistSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type UserPlaylistUpdateInput = Partial<UserPlaylistCreateInput>;
+export interface UserPlaylistUpdateInput {
+    shared?: boolean;
+}
 
 // @public
 export interface VideoWindow {
-    id: number;
+    readonly id: Integer | null;
 }
 
 // @public
 export type VideoWindowCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const VideoWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type VideoWindowUpdateInput = Partial<VideoWindowCreateInput>;
+export type VideoWindowUpdateInput = Record<string, never>;
 
 // @public
 export interface Visual {
-    id: number;
+    readonly id: Integer | null;
 }
 
 // @public
 export type VisualCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const VisualSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type VisualUpdateInput = Partial<VisualCreateInput>;
+export type VisualUpdateInput = Record<string, never>;
 
 // (No @packageDocumentation comment for this package)
 

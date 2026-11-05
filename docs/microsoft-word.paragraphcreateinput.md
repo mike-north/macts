@@ -4,7 +4,7 @@
 
 ## ParagraphCreateInput interface
 
-Input for creating a Paragraph
+Input for creating a Paragraph.
 
 **Signature:**
 

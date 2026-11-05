@@ -4,10 +4,10 @@
 
 ## Rule.shouldMoveMessage property
 
-Indicates whether the rule has a move action
+Indicates whether the rule has a move action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-shouldMoveMessage: boolean
+shouldMoveMessage: boolean | null
 ```

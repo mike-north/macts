@@ -4,6 +4,8 @@
 
 ## RuleSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -21,8 +23,6 @@ RuleSchema: z.ZodObject<
     replyText: z.ZodString
     runScript: z.ZodString
     allConditionsMustBeMet: z.ZodBoolean
-    copyMessage: z.ZodString
-    moveMessage: z.ZodString
     highlightTextUsingColor: z.ZodBoolean
     enabled: z.ZodBoolean
     name: z.ZodString

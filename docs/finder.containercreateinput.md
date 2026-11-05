@@ -2,63 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [ContainerCreateInput](./finder.containercreateinput.md)
 
-## ContainerCreateInput interface
+## ContainerCreateInput type
 
-Input for creating a Container
+Input for creating a Container.
 
 **Signature:**
 
 ```typescript
-interface ContainerCreateInput
+type ContainerCreateInput = Record<string, never>
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[completelyExpanded?](./finder.containercreateinput.completelyexpanded.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ (NOT AVAILABLE YET) Are the container and all of its children opened as outlines? (can only be set for containers viewed as lists)
-
-</td></tr>
-<tr><td>
-
-[expanded?](./finder.containercreateinput.expanded.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ (NOT AVAILABLE YET) Is the container opened as an outline? (can only be set for containers viewed as lists)
-
-</td></tr>
-</tbody></table>

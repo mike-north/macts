@@ -5,6 +5,7 @@ import { CommandSchema } from './command.js'
 import { HierarchySchema, type HierarchyChild } from './hierarchy.js'
 import { RelationshipSchema } from './relationship.js'
 import { AppMetadataSchema, SuiteSchema, ExtractionMetadataSchema } from './metadata.js'
+import { findPositionalIssues } from '../positional.js'
 import { findDuplicateRoutes } from '../route.js'
 import { findRootIssues, normalizeRoots } from '../roots.js'
 import { findSuperclassIssues, flattenSuperclasses, superclassChain } from '../superclasses.js'
@@ -197,6 +198,11 @@ export const AppManifestSchema = z
     // Checked only on a manifest that is otherwise valid, so an issue of the
     // resource's own declarations is not reported twice.
     if (ctx.issues.length > 0) return
+    // A positional marker is judged on what the resource inherits too: an
+    // inherited primary identifier means it is found by that identifier.
+    for (const issue of findPositionalIssues(data)) {
+      ctx.addIssue({ code: 'custom', ...issue })
+    }
     // An inherited property is checked where it is used: a usable subclass of
     // an unsupported superclass must not inherit a type naming an unsupported
     // resource. Every other site was checked before flattening.

@@ -4,7 +4,7 @@
 
 ## RowCreateInput type
 
-Input for creating a Row
+Input for creating a Row.
 
 **Signature:**
 

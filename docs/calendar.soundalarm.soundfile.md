@@ -4,10 +4,10 @@
 
 ## SoundAlarm.soundFile property
 
-The (POSIX) path to the sound file to be used for the alarm
+The (POSIX) path to the sound file to be used for the alarm. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-soundFile: string
+soundFile: string | null
 ```

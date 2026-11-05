@@ -4,10 +4,10 @@
 
 ## Document.text property
 
-The text content of the document
+The text content of the document. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-text: string
+text: string | null
 ```

@@ -560,6 +560,20 @@ export const manifest: unknown = {
           description: 'The Apple Menu Items folder',
           code: 'amnu',
           optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no Apple Menu Items folder on current macOS; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T01:22:55.365Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         controlPanelsFolder: {
           access: 'r',
@@ -569,6 +583,20 @@ export const manifest: unknown = {
           description: 'The Control Panels folder',
           code: 'ctrl',
           optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no Control Panels folder on current macOS; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T01:22:55.365Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         controlStripModulesFolder: {
           access: 'r',
@@ -578,6 +606,20 @@ export const manifest: unknown = {
           description: 'The Control Strip Modules folder',
           code: 'sdev',
           optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no Control Strip Modules folder on current macOS; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T01:22:55.365Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         desktopFolder: {
           access: 'r',
@@ -587,6 +629,20 @@ export const manifest: unknown = {
           description: 'The Classic Desktop folder',
           code: 'desk',
           optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no Desktop folder on current macOS; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T01:22:55.365Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         extensionsFolder: {
           access: 'r',
@@ -596,6 +652,20 @@ export const manifest: unknown = {
           description: 'The Extensions folder',
           code: 'extz',
           optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no Extensions folder on current macOS; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T01:22:55.365Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         fontsFolder: {
           access: 'r',
@@ -605,6 +675,20 @@ export const manifest: unknown = {
           description: 'The Fonts folder',
           code: 'font',
           optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no Fonts folder on current macOS; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T01:22:55.365Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         launcherItemsFolder: {
           access: 'r',
@@ -614,6 +698,20 @@ export const manifest: unknown = {
           description: 'The Launcher Items folder',
           code: 'laun',
           optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no Launcher Items folder on current macOS; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T01:22:55.365Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         preferencesFolder: {
           access: 'r',
@@ -632,6 +730,20 @@ export const manifest: unknown = {
           description: 'The Shutdown Items folder',
           code: 'shdf',
           optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no Shutdown Items folder on current macOS; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T01:22:55.365Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         startupItemsFolder: {
           access: 'r',
@@ -641,6 +753,20 @@ export const manifest: unknown = {
           description: 'The StartupItems folder',
           code: 'empz',
           optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no Startup Items folder on current macOS; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T01:22:55.365Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         systemFolder: {
           access: 'r',
@@ -649,6 +775,29 @@ export const manifest: unknown = {
           },
           description: 'The System folder',
           code: 'macs',
+          optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no System Folder on current macOS; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T01:22:55.365Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
+        },
+        kind: {
+          access: 'r',
+          type: {
+            enum: 'ClassicDomainObjectKind',
+          },
+          description:
+            'Which ClassicDomainObject this is: the kind naming the application property that holds it',
           optional: false,
         },
         applicationSupportFolder: {
@@ -659,6 +808,21 @@ export const manifest: unknown = {
           description: 'The Application Support folder',
           code: 'asup',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-05T03:10:09.000Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 4,
+              nullCount: 0,
+              failedReads: 1,
+              errorNumbers: [-1728],
+              note: "A read-only probe read this folder on each of the 5 domains the way the generated body does, the folder and then its POSIX path; an earlier probe read only the folder's id, which every domain answered.",
+            },
+          },
         },
         applicationsFolder: {
           access: 'r',
@@ -668,6 +832,21 @@ export const manifest: unknown = {
           description: 'The Applications folder',
           code: 'apps',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-05T03:10:09.000Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 4,
+              nullCount: 0,
+              failedReads: 1,
+              errorNumbers: [-1728],
+              note: "A read-only probe read this folder on each of the 5 domains the way the generated body does, the folder and then its POSIX path; an earlier probe read only the folder's id, which every domain answered.",
+            },
+          },
         },
         desktopPicturesFolder: {
           access: 'r',
@@ -677,6 +856,20 @@ export const manifest: unknown = {
           description: 'The Desktop Pictures folder',
           code: 'dtp$',
           optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no Desktop Pictures folder on macOS 27.2, which has no Classic environment; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:51:11Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         folderActionScriptsFolder: {
           access: 'r',
@@ -686,6 +879,20 @@ export const manifest: unknown = {
           description: 'The Folder Action Scripts folder',
           code: 'fasf',
           optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no Folder Action Scripts folder on macOS 27.2, which has no Classic environment; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:51:11Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         id: {
           access: 'r',
@@ -702,6 +909,21 @@ export const manifest: unknown = {
           description: 'The Library folder',
           code: 'dlib',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-05T03:10:09.000Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 4,
+              nullCount: 0,
+              failedReads: 1,
+              errorNumbers: [-1728],
+              note: "A read-only probe read this folder on each of the 5 domains the way the generated body does, the folder and then its POSIX path; an earlier probe read only the folder's id, which every domain answered.",
+            },
+          },
         },
         name: {
           access: 'r',
@@ -718,6 +940,20 @@ export const manifest: unknown = {
           description: 'The Scripting Additions folder',
           code: '$scr',
           optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no Scripting Additions folder on macOS 27.2, which has no Classic environment; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:51:11Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         scriptsFolder: {
           access: 'r',
@@ -727,6 +963,20 @@ export const manifest: unknown = {
           description: 'The Scripts folder',
           code: 'scr$',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 3,
+              nullCount: 0,
+              failedReads: 2,
+              errorNumbers: [-1728],
+            },
+          },
         },
         sharedDocumentsFolder: {
           access: 'r',
@@ -736,6 +986,20 @@ export const manifest: unknown = {
           description: 'The Shared Documents folder',
           code: 'sdat',
           optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no Shared Documents folder on macOS 27.2, which has no Classic environment; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:51:11Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         speakableItemsFolder: {
           access: 'r',
@@ -745,6 +1009,20 @@ export const manifest: unknown = {
           description: 'The Speakable Items folder',
           code: 'spki',
           optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no Speakable Items folder on macOS 27.2, which has no Classic environment; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:51:11Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         utilitiesFolder: {
           access: 'r',
@@ -754,6 +1032,20 @@ export const manifest: unknown = {
           description: 'The Utilities folder',
           code: 'uti$',
           optional: false,
+          unsupported: {
+            reason:
+              'The Classic domain has no Utilities folder on macOS 27.2, which has no Classic environment; every read of it fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:51:11Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         workflowsFolder: {
           access: 'r',
@@ -763,6 +1055,20 @@ export const manifest: unknown = {
           description: 'The Automator Workflows folder',
           code: 'flow',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 2,
+              nullCount: 0,
+              failedReads: 3,
+              errorNumbers: [-1728],
+            },
+          },
         },
       },
       inherits: {
@@ -775,10 +1081,30 @@ export const manifest: unknown = {
           term: 'domain',
         },
       },
+      roots: {
+        classic: {
+          property: 'classicDomain',
+          evidence: {
+            source: 'dictionary',
+            bundleId: 'com.apple.systemevents',
+            appVersion: '1.3.6',
+            osVersion: '27.2',
+            term: 'Classic domain',
+          },
+        },
+      },
       identifiers: [
         {
-          property: 'id',
+          property: 'kind',
           primary: true,
+          targeting: 'byRoot',
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'curated',
+              note: 'Each kind names one application property, which holds one object.',
+            },
+          },
         },
       ],
     },
@@ -938,22 +1264,12 @@ export const manifest: unknown = {
           code: 'phys',
           optional: false,
         },
-        pOSIXPath: {
+        posixPath: {
           access: 'r',
           type: 'string',
           description: 'the POSIX file system path of the disk item',
           code: 'posx',
           optional: false,
-          native: {
-            name: 'posixPath',
-            evidence: {
-              source: 'dictionary',
-              bundleId: 'com.apple.systemevents',
-              appVersion: '1.3.6',
-              osVersion: '27.2',
-              term: 'POSIX path',
-            },
-          },
         },
         size: {
           access: 'r',
@@ -996,8 +1312,18 @@ export const manifest: unknown = {
       },
       identifiers: [
         {
-          property: 'id',
+          property: 'posixPath',
           primary: true,
+          targeting: 'byKey',
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'curated',
+              note: 'A path names one item at a time. A read-only probe of System Events 1.3.6 on macOS 27.2 looked up a folder (the home folder), a disk (the startup disk, "/") and a file by their POSIX paths through the disk items\' key, and each read the same item back; the disk items\' own ids are not found by an id lookup.',
+              observedAt: '2026-11-04T04:44:08Z',
+              appVersion: '1.3.6',
+            },
+          },
         },
       ],
     },
@@ -1015,6 +1341,21 @@ export const manifest: unknown = {
           description: 'The Application Support folder',
           code: 'asup',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-05T03:10:09.000Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 4,
+              nullCount: 0,
+              failedReads: 1,
+              errorNumbers: [-1728],
+              note: "A read-only probe read this folder on each of the 5 domains the way the generated body does, the folder and then its POSIX path; an earlier probe read only the folder's id, which every domain answered.",
+            },
+          },
         },
         applicationsFolder: {
           access: 'r',
@@ -1024,6 +1365,21 @@ export const manifest: unknown = {
           description: 'The Applications folder',
           code: 'apps',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-05T03:10:09.000Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 4,
+              nullCount: 0,
+              failedReads: 1,
+              errorNumbers: [-1728],
+              note: "A read-only probe read this folder on each of the 5 domains the way the generated body does, the folder and then its POSIX path; an earlier probe read only the folder's id, which every domain answered.",
+            },
+          },
         },
         desktopPicturesFolder: {
           access: 'r',
@@ -1033,6 +1389,20 @@ export const manifest: unknown = {
           description: 'The Desktop Pictures folder',
           code: 'dtp$',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              nullCount: 0,
+              failedReads: 4,
+              errorNumbers: [-1728],
+            },
+          },
         },
         folderActionScriptsFolder: {
           access: 'r',
@@ -1042,6 +1412,20 @@ export const manifest: unknown = {
           description: 'The Folder Action Scripts folder',
           code: 'fasf',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              nullCount: 0,
+              failedReads: 4,
+              errorNumbers: [-1728],
+            },
+          },
         },
         fontsFolder: {
           access: 'r',
@@ -1051,6 +1435,20 @@ export const manifest: unknown = {
           description: 'The Fonts folder',
           code: 'font',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 3,
+              nullCount: 0,
+              failedReads: 2,
+              errorNumbers: [-1728],
+            },
+          },
         },
         id: {
           access: 'r',
@@ -1067,6 +1465,21 @@ export const manifest: unknown = {
           description: 'The Library folder',
           code: 'dlib',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-05T03:10:09.000Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 4,
+              nullCount: 0,
+              failedReads: 1,
+              errorNumbers: [-1728],
+              note: "A read-only probe read this folder on each of the 5 domains the way the generated body does, the folder and then its POSIX path; an earlier probe read only the folder's id, which every domain answered.",
+            },
+          },
         },
         name: {
           access: 'r',
@@ -1083,6 +1496,20 @@ export const manifest: unknown = {
           description: 'The Preferences folder',
           code: 'pref',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 4,
+              nullCount: 0,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         scriptingAdditionsFolder: {
           access: 'r',
@@ -1092,6 +1519,20 @@ export const manifest: unknown = {
           description: 'The Scripting Additions folder',
           code: '$scr',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 2,
+              nullCount: 0,
+              failedReads: 3,
+              errorNumbers: [-1728],
+            },
+          },
         },
         scriptsFolder: {
           access: 'r',
@@ -1101,6 +1542,20 @@ export const manifest: unknown = {
           description: 'The Scripts folder',
           code: 'scr$',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 3,
+              nullCount: 0,
+              failedReads: 2,
+              errorNumbers: [-1728],
+            },
+          },
         },
         sharedDocumentsFolder: {
           access: 'r',
@@ -1110,6 +1565,20 @@ export const manifest: unknown = {
           description: 'The Shared Documents folder',
           code: 'sdat',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 4,
+              nullCount: 0,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         speakableItemsFolder: {
           access: 'r',
@@ -1119,6 +1588,20 @@ export const manifest: unknown = {
           description: 'The Speakable Items folder',
           code: 'spki',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              nullCount: 0,
+              failedReads: 4,
+              errorNumbers: [-1728],
+            },
+          },
         },
         utilitiesFolder: {
           access: 'r',
@@ -1128,6 +1611,20 @@ export const manifest: unknown = {
           description: 'The Utilities folder',
           code: 'uti$',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 2,
+              nullCount: 0,
+              failedReads: 3,
+              errorNumbers: [-1728],
+            },
+          },
         },
         workflowsFolder: {
           access: 'r',
@@ -1137,12 +1634,35 @@ export const manifest: unknown = {
           description: 'The Automator Workflows folder',
           code: 'flow',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 2,
+              nullCount: 0,
+              failedReads: 3,
+              errorNumbers: [-1728],
+            },
+          },
         },
       },
       identifiers: [
         {
           property: 'id',
           primary: true,
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'curated',
+              note: "A read-only probe of System Events 1.3.6 on macOS 27.2 read the 5 domains' ids, which were distinct, and an id lookup of each read the same domain back.",
+              observedAt: '2026-11-04T04:41:36Z',
+              appVersion: '1.3.6',
+            },
+          },
         },
       ],
     },
@@ -1317,22 +1837,12 @@ export const manifest: unknown = {
           code: 'phys',
           optional: false,
         },
-        pOSIXPath: {
+        posixPath: {
           access: 'r',
           type: 'string',
           description: 'the POSIX file system path of the disk item',
           code: 'posx',
           optional: false,
-          native: {
-            name: 'posixPath',
-            evidence: {
-              source: 'dictionary',
-              bundleId: 'com.apple.systemevents',
-              appVersion: '1.3.6',
-              osVersion: '27.2',
-              term: 'POSIX path',
-            },
-          },
         },
         size: {
           access: 'r',
@@ -1373,6 +1883,22 @@ export const manifest: unknown = {
           optional: false,
         },
       },
+      identifiers: [
+        {
+          property: 'posixPath',
+          primary: true,
+          targeting: 'byKey',
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'curated',
+              note: "A path names one item at a time. A read-only probe of System Events 1.3.6 on macOS 27.2 looked up the home folder by its POSIX path through the folders' key and read the same folder back; the folders' key finds nothing at a file's path.",
+              observedAt: '2026-11-04T04:44:08Z',
+              appVersion: '1.3.6',
+            },
+          },
+        },
+      ],
       inherits: {
         resource: 'DiskItem',
         evidence: {
@@ -1383,12 +1909,6 @@ export const manifest: unknown = {
           term: 'disk item',
         },
       },
-      identifiers: [
-        {
-          property: 'id',
-          primary: true,
-        },
-      ],
     },
     LocalDomainObject: {
       name: 'LocalDomainObject',
@@ -1530,6 +2050,22 @@ export const manifest: unknown = {
           description: "The user's Sites folder",
           code: 'site',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'curated',
+              note: 'System Events holds one user domain, so its reads cannot show whether a missing Sites folder is structural. Read-only probes read it twice, at 2026-11-04T04:41:36Z and 04:51:11Z, and both reads failed as no such object.',
+              absentReads: {
+                observedAt: '2026-11-04T04:51:11Z',
+                bundleId: 'com.apple.systemevents',
+                appVersion: '1.3.6',
+                osVersion: '27.2',
+                failedReads: 1,
+                errorNumbers: [-1728],
+                reason: 'The Sites folder exists only once the user creates one',
+              },
+            },
+          },
         },
         temporaryItemsFolder: {
           access: 'r',
@@ -1540,6 +2076,15 @@ export const manifest: unknown = {
           code: 'temp',
           optional: false,
         },
+        kind: {
+          access: 'r',
+          type: {
+            enum: 'UserDomainObjectKind',
+          },
+          description:
+            'Which UserDomainObject this is: the kind naming the application property that holds it',
+          optional: false,
+        },
         applicationSupportFolder: {
           access: 'r',
           type: {
@@ -1548,6 +2093,21 @@ export const manifest: unknown = {
           description: 'The Application Support folder',
           code: 'asup',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-05T03:10:09.000Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 4,
+              nullCount: 0,
+              failedReads: 1,
+              errorNumbers: [-1728],
+              note: "A read-only probe read this folder on each of the 5 domains the way the generated body does, the folder and then its POSIX path; an earlier probe read only the folder's id, which every domain answered.",
+            },
+          },
         },
         applicationsFolder: {
           access: 'r',
@@ -1557,6 +2117,21 @@ export const manifest: unknown = {
           description: 'The Applications folder',
           code: 'apps',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-05T03:10:09.000Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 4,
+              nullCount: 0,
+              failedReads: 1,
+              errorNumbers: [-1728],
+              note: "A read-only probe read this folder on each of the 5 domains the way the generated body does, the folder and then its POSIX path; an earlier probe read only the folder's id, which every domain answered.",
+            },
+          },
         },
         desktopPicturesFolder: {
           access: 'r',
@@ -1566,6 +2141,20 @@ export const manifest: unknown = {
           description: 'The Desktop Pictures folder',
           code: 'dtp$',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              nullCount: 0,
+              failedReads: 4,
+              errorNumbers: [-1728],
+            },
+          },
         },
         folderActionScriptsFolder: {
           access: 'r',
@@ -1575,6 +2164,20 @@ export const manifest: unknown = {
           description: 'The Folder Action Scripts folder',
           code: 'fasf',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              nullCount: 0,
+              failedReads: 4,
+              errorNumbers: [-1728],
+            },
+          },
         },
         fontsFolder: {
           access: 'r',
@@ -1584,6 +2187,20 @@ export const manifest: unknown = {
           description: 'The Fonts folder',
           code: 'font',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 3,
+              nullCount: 0,
+              failedReads: 2,
+              errorNumbers: [-1728],
+            },
+          },
         },
         id: {
           access: 'r',
@@ -1600,6 +2217,21 @@ export const manifest: unknown = {
           description: 'The Library folder',
           code: 'dlib',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-05T03:10:09.000Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 4,
+              nullCount: 0,
+              failedReads: 1,
+              errorNumbers: [-1728],
+              note: "A read-only probe read this folder on each of the 5 domains the way the generated body does, the folder and then its POSIX path; an earlier probe read only the folder's id, which every domain answered.",
+            },
+          },
         },
         name: {
           access: 'r',
@@ -1616,6 +2248,20 @@ export const manifest: unknown = {
           description: 'The Preferences folder',
           code: 'pref',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 4,
+              nullCount: 0,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         scriptingAdditionsFolder: {
           access: 'r',
@@ -1625,6 +2271,20 @@ export const manifest: unknown = {
           description: 'The Scripting Additions folder',
           code: '$scr',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 2,
+              nullCount: 0,
+              failedReads: 3,
+              errorNumbers: [-1728],
+            },
+          },
         },
         scriptsFolder: {
           access: 'r',
@@ -1634,6 +2294,20 @@ export const manifest: unknown = {
           description: 'The Scripts folder',
           code: 'scr$',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 3,
+              nullCount: 0,
+              failedReads: 2,
+              errorNumbers: [-1728],
+            },
+          },
         },
         sharedDocumentsFolder: {
           access: 'r',
@@ -1643,6 +2317,20 @@ export const manifest: unknown = {
           description: 'The Shared Documents folder',
           code: 'sdat',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 4,
+              nullCount: 0,
+              failedReads: 1,
+              errorNumbers: [-1728],
+            },
+          },
         },
         speakableItemsFolder: {
           access: 'r',
@@ -1652,6 +2340,20 @@ export const manifest: unknown = {
           description: 'The Speakable Items folder',
           code: 'spki',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 1,
+              nullCount: 0,
+              failedReads: 4,
+              errorNumbers: [-1728],
+            },
+          },
         },
         utilitiesFolder: {
           access: 'r',
@@ -1661,6 +2363,20 @@ export const manifest: unknown = {
           description: 'The Utilities folder',
           code: 'uti$',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 2,
+              nullCount: 0,
+              failedReads: 3,
+              errorNumbers: [-1728],
+            },
+          },
         },
         workflowsFolder: {
           access: 'r',
@@ -1670,6 +2386,20 @@ export const manifest: unknown = {
           description: 'The Automator Workflows folder',
           code: 'flow',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-04T04:41:36Z',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              sampleSize: 2,
+              nullCount: 0,
+              failedReads: 3,
+              errorNumbers: [-1728],
+            },
+          },
         },
       },
       inherits: {
@@ -1682,10 +2412,30 @@ export const manifest: unknown = {
           term: 'domain',
         },
       },
+      roots: {
+        user: {
+          property: 'userDomain',
+          evidence: {
+            source: 'dictionary',
+            bundleId: 'com.apple.systemevents',
+            appVersion: '1.3.6',
+            osVersion: '27.2',
+            term: 'user domain',
+          },
+        },
+      },
       identifiers: [
         {
-          property: 'id',
+          property: 'kind',
           primary: true,
+          targeting: 'byRoot',
+          unique: true,
+          evidence: {
+            unique: {
+              source: 'curated',
+              note: 'Each kind names one application property, which holds one object.',
+            },
+          },
         },
       ],
     },
@@ -3668,9 +4418,47 @@ export const manifest: unknown = {
         },
       ],
     },
+    ClassicDomainObjectKind: {
+      name: 'ClassicDomainObjectKind',
+      description:
+        'The kinds of ClassicDomainObject: each names the application property that holds one.',
+      values: [
+        {
+          name: 'classic',
+          value: 'classic',
+        },
+      ],
+    },
+    UserDomainObjectKind: {
+      name: 'UserDomainObjectKind',
+      description:
+        'The kinds of UserDomainObject: each names the application property that holds one.',
+      values: [
+        {
+          name: 'user',
+          value: 'user',
+        },
+      ],
+    },
   },
   hierarchy: {
-    children: {},
+    children: {
+      diskItems: {
+        resource: 'DiskItem',
+        access: 'r',
+        description: 'The disk items of the file system, got by POSIX path',
+      },
+      domains: {
+        resource: 'Domain',
+        access: 'r',
+        description: 'The domains of the file system',
+      },
+      folders: {
+        resource: 'Folder',
+        access: 'r',
+        description: 'The folders of the file system, got by POSIX path',
+      },
+    },
   },
   relationships: [],
   commands: {
@@ -3996,6 +4784,111 @@ export const manifest: unknown = {
         },
       ],
       code: 'rmfa',
+    },
+    getDiskItem: {
+      name: 'get',
+      description: 'Get the disk item at a POSIX path',
+      scope: 'resource',
+      resourceType: 'DiskItem',
+      parameters: [
+        {
+          name: 'posixPath',
+          type: 'string',
+          description:
+            'The POSIX path of the disk item. It names a location, so it finds whatever is at that path now.',
+          required: true,
+        },
+      ],
+      routeName: 'get',
+    },
+    getFolder: {
+      name: 'get',
+      description: 'Get the folder at a POSIX path',
+      scope: 'resource',
+      resourceType: 'Folder',
+      parameters: [
+        {
+          name: 'posixPath',
+          type: 'string',
+          description:
+            'The POSIX path of the folder. It names a location, so it finds whatever folder is at that path now.',
+          required: true,
+        },
+      ],
+      routeName: 'get',
+    },
+    listDomains: {
+      name: 'list',
+      description: 'List the domains of the file system',
+      scope: 'resource',
+      resourceType: 'Domain',
+      parameters: [],
+      routeName: 'list',
+    },
+    getDomain: {
+      name: 'get',
+      description: 'Get a domain by its id',
+      scope: 'resource',
+      resourceType: 'Domain',
+      parameters: [
+        {
+          name: 'id',
+          type: 'string',
+          description: 'The id of the domain',
+          required: true,
+        },
+      ],
+      routeName: 'get',
+    },
+    listUserDomainObjects: {
+      name: 'list',
+      description: 'List the user domain',
+      scope: 'resource',
+      resourceType: 'UserDomainObject',
+      parameters: [],
+      routeName: 'list',
+    },
+    getUserDomainObject: {
+      name: 'get',
+      description: 'Get the user domain by its kind',
+      scope: 'resource',
+      resourceType: 'UserDomainObject',
+      parameters: [
+        {
+          name: 'kind',
+          type: {
+            enum: 'UserDomainObjectKind',
+          },
+          description: 'Which user domain',
+          required: true,
+        },
+      ],
+      routeName: 'get',
+    },
+    listClassicDomainObjects: {
+      name: 'list',
+      description: 'List the Classic domain',
+      scope: 'resource',
+      resourceType: 'ClassicDomainObject',
+      parameters: [],
+      routeName: 'list',
+    },
+    getClassicDomainObject: {
+      name: 'get',
+      description: 'Get the Classic domain by its kind',
+      scope: 'resource',
+      resourceType: 'ClassicDomainObject',
+      parameters: [
+        {
+          name: 'kind',
+          type: {
+            enum: 'ClassicDomainObjectKind',
+          },
+          description: 'Which Classic domain',
+          required: true,
+        },
+      ],
+      routeName: 'get',
     },
   },
 }

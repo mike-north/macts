@@ -57,35 +57,35 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[forward(openingWindow)](./mail.messageresourceclient.forward.md)
+[forward(openingWindow, \_\_mactsOptions)](./mail.messageresourceclient.forward.md)
 
 </td><td>
 
 </td><td>
 
-Creates a forwarded message.
+Creates a forwarded message. macts does not yet send the message to the app, so the app acts on whatever it chooses.
 
 </td></tr>
 <tr><td>
 
-[redirect(openingWindow)](./mail.messageresourceclient.redirect.md)
+[redirect(openingWindow, \_\_mactsOptions)](./mail.messageresourceclient.redirect.md)
 
 </td><td>
 
 </td><td>
 
-Creates a redirected message.
+Creates a redirected message. macts does not yet send the message to the app, so the app acts on whatever it chooses.
 
 </td></tr>
 <tr><td>
 
-[reply(openingWindow, replyToAll)](./mail.messageresourceclient.reply.md)
+[reply(openingWindow, replyToAll, \_\_mactsOptions)](./mail.messageresourceclient.reply.md)
 
 </td><td>
 
 </td><td>
 
-Creates a reply message.
+Creates a reply message. macts does not yet send the message to the app, so the app acts on whatever it chooses.
 
 </td></tr>
 </tbody></table>

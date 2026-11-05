@@ -4,14 +4,23 @@
 
 ## AUDIT_DECISIONS variable
 
-The outcome a governance evaluation reached for a capability call.
+The outcome reached for a capability call.
 
-- `allowed` — the call was permitted and executed. - `denied` — the call was blocked by policy (out-of-bounds capability). - `approved` — the call required confirmation and a human approved it. - `rejected` — the call required confirmation and a human declined it.
+- `allowed` — the call was permitted and executed. - `denied` — the call was blocked by policy (out-of-bounds capability). - `pending` — the call requires human confirmation (`confirm-first`<!-- -->) and is withheld awaiting approval. It has neither been approved nor rejected yet, and it did NOT execute. - `approved` — the call required confirmation and a human approved it. - `rejected` — the call required confirmation and a human declined it. - `cancelled` — the call required confirmation and its caller abandoned it before any decision. Nobody approved or rejected it, and it did NOT execute. - `invalid-input` — the call's input failed validation against the operation's contract, so it never reached governance, no human was asked about it, and it did NOT execute. - `permission-denied` — the caller's authority does not hold the operation's permission, so its input was never judged, it never reached governance, and it did NOT execute.
 
-Distinguishing `denied` (policy) from `rejected` (human) keeps the audit trail precise about \*why\* a call did not run.
+Distinguishing `denied` (policy) from `rejected` (human) keeps the audit trail precise about \*why\* a call did not run. Likewise, `pending` is kept distinct from `denied`<!-- -->: a confirm-first call is not a policy denial — it is a deferral awaiting approval — so recording it as `denied` would misattribute the reason the call did not proceed. `invalid-input` is distinct from all of them: no policy or human judged the call, because it was malformed. And `permission-denied` is distinct from `denied`<!-- -->: the call was refused by the caller's credential, which governance policy never consulted.
 
 **Signature:**
 
 ```typescript
-AUDIT_DECISIONS: readonly[('allowed', 'denied', 'approved', 'rejected')]
+AUDIT_DECISIONS: readonly[
+  ('allowed',
+  'denied',
+  'pending',
+  'approved',
+  'rejected',
+  'cancelled',
+  'invalid-input',
+  'permission-denied')
+]
 ```

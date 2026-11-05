@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ConfigurationUpdateInput](./system-events.configurationupdateinput.md)
 
-## ConfigurationUpdateInput type
+## ConfigurationUpdateInput interface
 
-Input for updating a Configuration
+Input for updating a Configuration. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ConfigurationUpdateInput = Partial<ConfigurationCreateInput>
+interface ConfigurationUpdateInput
 ```
 
-**References:** [ConfigurationCreateInput](./system-events.configurationcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[accountName?](./system-events.configurationupdateinput.accountname.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the name used to authenticate. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

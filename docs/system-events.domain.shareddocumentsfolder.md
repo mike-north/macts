@@ -4,10 +4,10 @@
 
 ## Domain.sharedDocumentsFolder property
 
-The Shared Documents folder
+The Shared Documents folder. Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 **Signature:**
 
 ```typescript
-sharedDocumentsFolder: Folder
+readonly sharedDocumentsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

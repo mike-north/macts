@@ -4,31 +4,38 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { FileValue } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
+import { ObjectReferenceData } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface AnalyzerIssue {
-    endingColumnNumber: number;
-    endingLineNumber: number;
-    filePath: string;
-    id?: string;
+    endingColumnNumber: Integer | null;
+    endingLineNumber: Integer | null;
+    filePath: string | null;
     message: string;
-    startingColumnNumber: number;
-    startingLineNumber: number;
+    startingColumnNumber: Integer | null;
+    startingLineNumber: Integer | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "AnalyzerIssueCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type AnalyzerIssueCreateInput = Omit<AnalyzerIssueCreateInput_2, 'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'> & {
+    startingLineNumber?: null extends AnalyzerIssueCreateInput_2['startingLineNumber'] ? number | null : number;
+    endingLineNumber?: null extends AnalyzerIssueCreateInput_2['endingLineNumber'] ? number | null : number;
+    startingColumnNumber?: null extends AnalyzerIssueCreateInput_2['startingColumnNumber'] ? number | null : number;
+    endingColumnNumber?: null extends AnalyzerIssueCreateInput_2['endingColumnNumber'] ? number | null : number;
+};
 
 // @public
-export interface AnalyzerIssueCreateInput {
-    endingColumnNumber?: number;
-    endingLineNumber?: number;
-    filePath?: string;
-    message?: string;
-    startingColumnNumber?: number;
-    startingLineNumber?: number;
-}
-
-// @public (undocumented)
 export const AnalyzerIssueSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     message: z.ZodString;
@@ -39,49 +46,55 @@ export const AnalyzerIssueSchema: z.ZodObject<{
     endingColumnNumber: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "AnalyzerIssueUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AnalyzerIssueUpdateInput = Partial<AnalyzerIssueCreateInput>;
+export type AnalyzerIssueUpdateInput = Omit<AnalyzerIssueUpdateInput_2, 'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'> & {
+    startingLineNumber?: null extends AnalyzerIssueUpdateInput_2['startingLineNumber'] ? number | null : number;
+    endingLineNumber?: null extends AnalyzerIssueUpdateInput_2['endingLineNumber'] ? number | null : number;
+    startingColumnNumber?: null extends AnalyzerIssueUpdateInput_2['startingColumnNumber'] ? number | null : number;
+    endingColumnNumber?: null extends AnalyzerIssueUpdateInput_2['endingColumnNumber'] ? number | null : number;
+};
 
 // @public
 export interface BuildConfiguration {
-    id: string;
-    name: string;
+    readonly id: string;
+    readonly name: string | null;
 }
 
 // @public
 export type BuildConfigurationCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const BuildConfigurationSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type BuildConfigurationUpdateInput = Partial<BuildConfigurationCreateInput>;
+export type BuildConfigurationUpdateInput = Record<string, never>;
 
 // @public
 export interface BuildError {
-    endingColumnNumber: number;
-    endingLineNumber: number;
-    filePath: string;
-    id?: string;
+    endingColumnNumber: Integer | null;
+    endingLineNumber: Integer | null;
+    filePath: string | null;
     message: string;
-    startingColumnNumber: number;
-    startingLineNumber: number;
+    startingColumnNumber: Integer | null;
+    startingLineNumber: Integer | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "BuildErrorCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type BuildErrorCreateInput = Omit<BuildErrorCreateInput_2, 'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'> & {
+    startingLineNumber?: null extends BuildErrorCreateInput_2['startingLineNumber'] ? number | null : number;
+    endingLineNumber?: null extends BuildErrorCreateInput_2['endingLineNumber'] ? number | null : number;
+    startingColumnNumber?: null extends BuildErrorCreateInput_2['startingColumnNumber'] ? number | null : number;
+    endingColumnNumber?: null extends BuildErrorCreateInput_2['endingColumnNumber'] ? number | null : number;
+};
 
 // @public
-export interface BuildErrorCreateInput {
-    endingColumnNumber?: number;
-    endingLineNumber?: number;
-    filePath?: string;
-    message?: string;
-    startingColumnNumber?: number;
-    startingLineNumber?: number;
-}
-
-// @public (undocumented)
 export const BuildErrorSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     message: z.ZodString;
@@ -92,14 +105,20 @@ export const BuildErrorSchema: z.ZodObject<{
     endingColumnNumber: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "BuildErrorUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type BuildErrorUpdateInput = Partial<BuildErrorCreateInput>;
+export type BuildErrorUpdateInput = Omit<BuildErrorUpdateInput_2, 'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'> & {
+    startingLineNumber?: null extends BuildErrorUpdateInput_2['startingLineNumber'] ? number | null : number;
+    endingLineNumber?: null extends BuildErrorUpdateInput_2['endingLineNumber'] ? number | null : number;
+    startingColumnNumber?: null extends BuildErrorUpdateInput_2['startingColumnNumber'] ? number | null : number;
+    endingColumnNumber?: null extends BuildErrorUpdateInput_2['endingColumnNumber'] ? number | null : number;
+};
 
 // @public
 export interface BuildSetting {
-    id?: string;
     name: string;
-    value: string;
+    value: string | null;
 }
 
 // @public
@@ -108,7 +127,7 @@ export interface BuildSettingCreateInput {
     value?: string;
 }
 
-// @public (undocumented)
+// @public
 export const BuildSettingSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -116,30 +135,32 @@ export const BuildSettingSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type BuildSettingUpdateInput = Partial<BuildSettingCreateInput>;
+export interface BuildSettingUpdateInput {
+    name?: string;
+    value?: string;
+}
 
 // @public
 export interface BuildWarning {
-    endingColumnNumber: number;
-    endingLineNumber: number;
-    filePath: string;
-    id?: string;
+    endingColumnNumber: Integer | null;
+    endingLineNumber: Integer | null;
+    filePath: string | null;
     message: string;
-    startingColumnNumber: number;
-    startingLineNumber: number;
+    startingColumnNumber: Integer | null;
+    startingLineNumber: Integer | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "BuildWarningCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type BuildWarningCreateInput = Omit<BuildWarningCreateInput_2, 'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'> & {
+    startingLineNumber?: null extends BuildWarningCreateInput_2['startingLineNumber'] ? number | null : number;
+    endingLineNumber?: null extends BuildWarningCreateInput_2['endingLineNumber'] ? number | null : number;
+    startingColumnNumber?: null extends BuildWarningCreateInput_2['startingColumnNumber'] ? number | null : number;
+    endingColumnNumber?: null extends BuildWarningCreateInput_2['endingColumnNumber'] ? number | null : number;
+};
 
 // @public
-export interface BuildWarningCreateInput {
-    endingColumnNumber?: number;
-    endingLineNumber?: number;
-    filePath?: string;
-    message?: string;
-    startingColumnNumber?: number;
-    startingLineNumber?: number;
-}
-
-// @public (undocumented)
 export const BuildWarningSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     message: z.ZodString;
@@ -150,8 +171,15 @@ export const BuildWarningSchema: z.ZodObject<{
     endingColumnNumber: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "BuildWarningUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type BuildWarningUpdateInput = Partial<BuildWarningCreateInput>;
+export type BuildWarningUpdateInput = Omit<BuildWarningUpdateInput_2, 'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'> & {
+    startingLineNumber?: null extends BuildWarningUpdateInput_2['startingLineNumber'] ? number | null : number;
+    endingLineNumber?: null extends BuildWarningUpdateInput_2['endingLineNumber'] ? number | null : number;
+    startingColumnNumber?: null extends BuildWarningUpdateInput_2['startingColumnNumber'] ? number | null : number;
+    endingColumnNumber?: null extends BuildWarningUpdateInput_2['endingColumnNumber'] ? number | null : number;
+};
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -174,18 +202,17 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Device {
-    deviceIdentifier: string;
-    deviceModel: string;
-    generic: boolean;
-    id?: string;
-    name: string;
-    operatingSystemVersion: string;
+    readonly deviceIdentifier: string;
+    readonly deviceModel: string | null;
+    readonly generic: boolean | null;
+    readonly name: string | null;
+    readonly operatingSystemVersion: string | null;
 }
 
 // @public
 export type DeviceCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const DeviceSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -196,21 +223,20 @@ export const DeviceSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type DeviceUpdateInput = Partial<DeviceCreateInput>;
+export type DeviceUpdateInput = Record<string, never>;
 
 // @public
 export interface FileDocument {
-    file: string;
-    id?: string;
-    modified: boolean;
-    name: string;
-    path: string;
+    readonly file: FileValue | null;
+    readonly modified: boolean | null;
+    readonly name: string;
+    readonly path: string | null;
 }
 
 // @public
 export type FileDocumentCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const FileDocumentSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -220,18 +246,22 @@ export const FileDocumentSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type FileDocumentUpdateInput = Partial<FileDocumentCreateInput>;
+export type FileDocumentUpdateInput = Record<string, never>;
 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface Project {
-    id: string;
-    name: string;
+    readonly id: string;
+    readonly name: string | null;
 }
 
 // @public
@@ -240,24 +270,23 @@ export type ProjectCreateInput = Record<string, never>;
 // @public
 export class ProjectResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(workspaceName: string, id: string): Promise<Project>;
-    list(workspaceName: string): Promise<Page<Project>>;
+    get(workspaceName: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Project>;
+    list(workspaceName: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Project>>;
 }
 
-// @public (undocumented)
+// @public
 export const ProjectSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ProjectUpdateInput = Partial<ProjectCreateInput>;
+export type ProjectUpdateInput = Record<string, never>;
 
 // @public
 export interface ResolvedBuildSetting {
-    id?: string;
     name: string;
-    value: string;
+    value: string | null;
 }
 
 // @public
@@ -266,7 +295,7 @@ export interface ResolvedBuildSettingCreateInput {
     value?: string;
 }
 
-// @public (undocumented)
+// @public
 export const ResolvedBuildSettingSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -274,14 +303,16 @@ export const ResolvedBuildSettingSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ResolvedBuildSettingUpdateInput = Partial<ResolvedBuildSettingCreateInput>;
+export interface ResolvedBuildSettingUpdateInput {
+    name?: string;
+    value?: string;
+}
 
 // @public
 export interface RunDestination {
-    architecture: string;
-    id?: string;
-    name: string;
-    platform: string;
+    readonly architecture: string | null;
+    readonly name: string;
+    readonly platform: string | null;
 }
 
 // @public
@@ -290,11 +321,11 @@ export type RunDestinationCreateInput = Record<string, never>;
 // @public
 export class RunDestinationResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(workspaceName: string, name: string): Promise<RunDestination>;
-    list(workspaceName: string): Promise<Page<RunDestination>>;
+    get(workspaceName: string, name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<RunDestination>;
+    list(workspaceName: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<RunDestination>>;
 }
 
-// @public (undocumented)
+// @public
 export const RunDestinationSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -303,21 +334,21 @@ export const RunDestinationSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type RunDestinationUpdateInput = Partial<RunDestinationCreateInput>;
+export type RunDestinationUpdateInput = Record<string, never>;
 
 // @public
 export interface Scheme {
-    id: string;
-    name: string;
+    readonly id: string;
+    readonly name: string | null;
 }
 
 // @public
 export interface SchemeActionResult {
-    buildLog: string;
-    completed: boolean;
-    errorMessage: string;
-    id: string;
-    status: SchemeActionResultStatus;
+    buildLog: string | null;
+    readonly completed: boolean | null;
+    errorMessage: string | null;
+    readonly id: string;
+    status: SchemeActionResultStatus | null;
 }
 
 // @public
@@ -327,7 +358,7 @@ export interface SchemeActionResultCreateInput {
     status?: SchemeActionResultStatus;
 }
 
-// @public (undocumented)
+// @public
 export const SchemeActionResultSchema: z.ZodObject<{
     id: z.ZodString;
     completed: z.ZodBoolean;
@@ -340,7 +371,11 @@ export const SchemeActionResultSchema: z.ZodObject<{
 export type SchemeActionResultStatus = 'notYetStarted' | 'running' | 'cancelled' | 'failed' | 'errorOccurred' | 'succeeded';
 
 // @public
-export type SchemeActionResultUpdateInput = Partial<SchemeActionResultCreateInput>;
+export interface SchemeActionResultUpdateInput {
+    buildLog?: string;
+    errorMessage?: string;
+    status?: SchemeActionResultStatus;
+}
 
 // @public
 export type SchemeCreateInput = Record<string, never>;
@@ -348,30 +383,29 @@ export type SchemeCreateInput = Record<string, never>;
 // @public
 export class SchemeResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(workspaceName: string, id: string): Promise<Scheme>;
-    list(workspaceName: string): Promise<Page<Scheme>>;
+    get(workspaceName: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Scheme>;
+    list(workspaceName: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Scheme>>;
 }
 
-// @public (undocumented)
+// @public
 export const SchemeSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type SchemeUpdateInput = Partial<SchemeCreateInput>;
+export type SchemeUpdateInput = Record<string, never>;
 
 // @public
 export interface SourceDocument {
-    file: string;
-    id?: string;
-    modified: boolean;
-    name: string;
-    notifiesWhenClosing: boolean;
-    path: string;
+    readonly file: FileValue | null;
+    readonly modified: boolean | null;
+    readonly name: string;
+    notifiesWhenClosing: boolean | null;
+    readonly path: string | null;
     selectedCharacterRange: unknown;
     selectedParagraphRange: unknown;
-    text: string;
+    text: string | null;
 }
 
 // @public
@@ -382,7 +416,7 @@ export interface SourceDocumentCreateInput {
     text?: string;
 }
 
-// @public (undocumented)
+// @public
 export const SourceDocumentSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -396,12 +430,17 @@ export const SourceDocumentSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type SourceDocumentUpdateInput = Partial<SourceDocumentCreateInput>;
+export interface SourceDocumentUpdateInput {
+    notifiesWhenClosing?: boolean;
+    selectedCharacterRange?: unknown;
+    selectedParagraphRange?: unknown;
+    text?: string;
+}
 
 // @public
 export interface Target {
-    id: string;
-    name: string;
+    readonly id: string;
+    name: string | null;
 }
 
 // @public
@@ -409,37 +448,38 @@ export interface TargetCreateInput {
     name?: string;
 }
 
-// @public (undocumented)
+// @public
 export const TargetSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type TargetUpdateInput = Partial<TargetCreateInput>;
+export interface TargetUpdateInput {
+    name?: string;
+}
 
 // @public
 export interface TestFailure {
-    endingColumnNumber: number;
-    endingLineNumber: number;
-    filePath: string;
-    id?: string;
+    endingColumnNumber: Integer | null;
+    endingLineNumber: Integer | null;
+    filePath: string | null;
     message: string;
-    startingColumnNumber: number;
-    startingLineNumber: number;
+    startingColumnNumber: Integer | null;
+    startingLineNumber: Integer | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "TestFailureCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type TestFailureCreateInput = Omit<TestFailureCreateInput_2, 'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'> & {
+    startingLineNumber?: null extends TestFailureCreateInput_2['startingLineNumber'] ? number | null : number;
+    endingLineNumber?: null extends TestFailureCreateInput_2['endingLineNumber'] ? number | null : number;
+    startingColumnNumber?: null extends TestFailureCreateInput_2['startingColumnNumber'] ? number | null : number;
+    endingColumnNumber?: null extends TestFailureCreateInput_2['endingColumnNumber'] ? number | null : number;
+};
 
 // @public
-export interface TestFailureCreateInput {
-    endingColumnNumber?: number;
-    endingLineNumber?: number;
-    filePath?: string;
-    message?: string;
-    startingColumnNumber?: number;
-    startingLineNumber?: number;
-}
-
-// @public (undocumented)
 export const TestFailureSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     message: z.ZodString;
@@ -450,20 +490,26 @@ export const TestFailureSchema: z.ZodObject<{
     endingColumnNumber: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "TestFailureUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type TestFailureUpdateInput = Partial<TestFailureCreateInput>;
+export type TestFailureUpdateInput = Omit<TestFailureUpdateInput_2, 'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'> & {
+    startingLineNumber?: null extends TestFailureUpdateInput_2['startingLineNumber'] ? number | null : number;
+    endingLineNumber?: null extends TestFailureUpdateInput_2['endingLineNumber'] ? number | null : number;
+    startingColumnNumber?: null extends TestFailureUpdateInput_2['startingColumnNumber'] ? number | null : number;
+    endingColumnNumber?: null extends TestFailureUpdateInput_2['endingColumnNumber'] ? number | null : number;
+};
 
 // @public
 export interface TextDocument {
-    file: string;
-    id?: string;
-    modified: boolean;
-    name: string;
-    notifiesWhenClosing: boolean;
-    path: string;
+    readonly file: FileValue | null;
+    readonly modified: boolean | null;
+    readonly name: string;
+    notifiesWhenClosing: boolean | null;
+    readonly path: string | null;
     selectedCharacterRange: unknown;
     selectedParagraphRange: unknown;
-    text: string;
+    text: string | null;
 }
 
 // @public
@@ -474,7 +520,7 @@ export interface TextDocumentCreateInput {
     text?: string;
 }
 
-// @public (undocumented)
+// @public
 export const TextDocumentSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -488,39 +534,43 @@ export const TextDocumentSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type TextDocumentUpdateInput = Partial<TextDocumentCreateInput>;
+export interface TextDocumentUpdateInput {
+    notifiesWhenClosing?: boolean;
+    selectedCharacterRange?: unknown;
+    selectedParagraphRange?: unknown;
+    text?: string;
+}
 
 // @public
 export interface WorkspaceDocument {
-    file: string;
-    id?: string;
-    loaded: boolean;
-    modified: boolean;
-    name: string;
-    path: string;
+    readonly file: FileValue | null;
+    readonly loaded: boolean | null;
+    readonly modified: boolean | null;
+    readonly name: string;
+    readonly path: string | null;
 }
 
 // @public
 export interface WorkspaceDocumentCreateInput {
-    activeRunDestination?: RunDestination;
-    activeScheme?: Scheme;
+    activeRunDestination?: ObjectReferenceData<string, 'RunDestination'>;
+    activeScheme?: ObjectReferenceData<string, 'Scheme'>;
 }
 
 // @public
 export class WorkspaceDocumentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    attach(name: string, toProcessIdentifier: number, suspended: boolean): Promise<void>;
-    build(name: string): Promise<void>;
-    clean(name: string): Promise<void>;
-    debug(name: string, scheme?: string, runDestinationSpecifier?: string, skipBuilding?: boolean, commandLineArguments?: unknown, environmentVariables?: unknown): Promise<void>;
-    get(name: string): Promise<WorkspaceDocument>;
-    list(): Promise<Page<WorkspaceDocument>>;
-    run(name: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void>;
-    stop(name: string): Promise<void>;
-    test(name: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void>;
+    attach(name: string, toProcessIdentifier: number, suspended: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    build(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    clean(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    debug(name: string, scheme?: string, runDestinationSpecifier?: string, skipBuilding?: boolean, commandLineArguments?: unknown, environmentVariables?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<WorkspaceDocument>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<WorkspaceDocument>>;
+    run(name: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    stop(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    test(name: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const WorkspaceDocumentSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -531,7 +581,14 @@ export const WorkspaceDocumentSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type WorkspaceDocumentUpdateInput = Partial<WorkspaceDocumentCreateInput>;
+export interface WorkspaceDocumentUpdateInput {
+    activeRunDestination?: ObjectReferenceData<string, 'RunDestination'>;
+    activeScheme?: ObjectReferenceData<string, 'Scheme'>;
+}
+
+// @public
+export interface XcodeClient extends ClientBrand<XcodeResources> {
+}
 
 // @public
 export class XcodeClient {
@@ -555,6 +612,42 @@ export class XcodeError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type XcodeResources = Readonly<{
+    WorkspaceDocument: ResourceDescriptor<WorkspaceDocument, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'xcode.workspaceDocuments.get';
+        readonly list: 'xcode.workspaceDocuments.list';
+    };
+    Project: ResourceDescriptor<Project, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'xcode.projects.get';
+        readonly list: 'xcode.projects.list';
+        readonly parents: {
+            readonly get: 'WorkspaceDocument';
+            readonly list: 'WorkspaceDocument';
+        };
+    };
+    Scheme: ResourceDescriptor<Scheme, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'xcode.schemes.get';
+        readonly list: 'xcode.schemes.list';
+        readonly parents: {
+            readonly get: 'WorkspaceDocument';
+            readonly list: 'WorkspaceDocument';
+        };
+    };
+    RunDestination: ResourceDescriptor<RunDestination, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'xcode.runDestinations.get';
+        readonly list: 'xcode.runDestinations.list';
+        readonly parents: {
+            readonly get: 'WorkspaceDocument';
+            readonly list: 'WorkspaceDocument';
+        };
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

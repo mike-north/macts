@@ -4,10 +4,10 @@
 
 ## File_2.defaultApplication property
 
-the application that will launch if the file is opened
+the application that will launch if the file is opened. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-defaultApplication: string
+defaultApplication: string | null
 ```

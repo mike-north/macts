@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-An absolute alarm date
+An absolute alarm date. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ An absolute alarm date
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The interval in minutes between the event and the alarm (positive for after, negative for before)
+The interval in minutes between the event and the alarm (positive for after, negative for before). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -57,24 +57,24 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(name)](./notes.accountresourceclient.get.md)
+[get(name, \_\_mactsOptions)](./notes.accountresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a account by name.
+Get a account by name. When several accounts share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[list()](./notes.accountresourceclient.list.md)
+[list(\_\_mactsOptions)](./notes.accountresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all accounts.
+List all accounts, as one page.
 
 </td></tr>
 </tbody></table>

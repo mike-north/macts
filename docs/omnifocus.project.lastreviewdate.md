@@ -4,10 +4,10 @@
 
 ## Project.lastReviewDate property
 
-When the project was last reviewed
+When the project was last reviewed. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-lastReviewDate: Date
+lastReviewDate: Date | null
 ```

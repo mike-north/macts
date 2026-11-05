@@ -4,10 +4,10 @@
 
 ## ClassicDomainObject.preferencesFolder property
 
-The Classic Preferences folder
+The Classic Preferences folder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-preferencesFolder: Folder
+readonly preferencesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

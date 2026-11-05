@@ -4,10 +4,10 @@
 
 ## Window.index property
 
-The index of the window, ordered front to back.
+The index of the window, ordered front to back. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-index: number
+index: Integer | null
 ```

@@ -4,10 +4,10 @@
 
 ## AutomatorAction.version property
 
-The version of the action
+The version of the action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-version: string
+readonly version: string | null;
 ```

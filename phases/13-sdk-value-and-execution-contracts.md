@@ -427,10 +427,10 @@ and "execution" means [#129](https://github.com/mike-north/macts/issues/129).
 
 **Public shape — confirmed: one package with subpath exports.**
 
-| Entry point        | Contents                                                                                                                                                                                                   | Loads native execution?              |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| `@macts/sdk`       | Remote client factory `createClient(app, { token, url })`, plus re-exports of every public contract symbol: error classes, `UnreachableError`, `Integer` and its helpers, value, reference, and file types | No — imports only `@macts/contracts` |
-| `@macts/sdk/local` | Local client factory `createClient(app, { token })`, with the same name and the same `AppContract` parameter                                                                                               | Yes, and only on the Mac             |
+| Entry point        | Contents                                                                                                                                                                                                   | Loads native execution?                                             |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `@macts/sdk`       | Remote client factory `createClient(app, { token, url })`, plus re-exports of every public contract symbol: error classes, `UnreachableError`, `Integer` and its helpers, value, reference, and file types | No — imports only the root and client entries of `@macts/contracts` |
+| `@macts/sdk/local` | Local client factory `createClient(app, { token })`, with the same name and the same `AppContract` parameter                                                                                               | Yes, and only on the Mac                                            |
 
 Switching locality means changing the import specifier and the options object
 (`url` exists only for remote). Consumer code, values, references, files, and
@@ -452,7 +452,7 @@ construction.
    ↑               governance and permission primitives
 @macts/runtime     (new; Mac-side shared execution runtime)
    ↑
-@macts/sdk         "."  → contracts only      "./local" → runtime
+@macts/sdk         "."  → contracts root/client      "./local" → runtime + contracts/client
    ↑
 @macts/api         HTTP adapter (remote service) and transfer endpoints → runtime
 @macts/mcp         stdio / HTTP MCP adapter → runtime
@@ -469,12 +469,23 @@ carries no adapter code.
 
 **Who owns what.**
 
-| Package            | Owns                                                                                                                                                                                                                                                                              | Created by            |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| `@macts/contracts` | Value types, wire shapes, value plans, the integer brand, `UnreachableError`; the reference hierarchy; file and transfer handle shapes; invocation context and authority types; canonical error classes and their registry; operation descriptors, `AppContract`, `ClientRuntime` | This phase (skeleton) |
-| `@macts/core`      | Manifest, generator, `Executor` seam (`src/execution/`), native provider (JXA executor and native codec, `src/jxa/`), governance and permission primitives                                                                                                                        | Exists                |
-| `@macts/runtime`   | Credential verification and key store, moved from `@macts/api/keys`; governance context loading, moved from `packages/api/src/server/governance/`; the invocation pipeline; reference resolution dispatch; the transfer store                                                     | Execution             |
-| `@macts/sdk`       | Public factories and re-exports                                                                                                                                                                                                                                                   | Execution             |
+| Package                   | Owns                                                                                                                                                                                                                                                                              | Created by                |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `@macts/contracts`        | Value types, wire shapes, value plans, the integer brand, `UnreachableError`; the reference hierarchy; file and transfer handle shapes; invocation context and authority types; canonical error classes and their registry; operation descriptors, `AppContract`, `ClientRuntime` | This phase (skeleton)     |
+| `@macts/core`             | Manifest, generator, `Executor` seam (`src/execution/`), native provider (JXA executor and native codec, `src/jxa/`), governance and permission primitives                                                                                                                        | Exists                    |
+| `@macts/runtime`          | Credential verification and key store, moved from `@macts/api/keys`; governance context loading, moved from `packages/api/src/server/governance/`; the invocation pipeline; reference resolution dispatch; the transfer store                                                     | Execution                 |
+| `@macts/contracts/client` | Platform-neutral codec client composition; the single client binding registry and bound-reference implementation; remote HTTP transport, credential closure, cancellation and canonical error decoding                                                                            | Shared client composition |
+| `@macts/sdk`              | Public factory aliases and contract re-exports; environment option resolution; local host adapter connecting shared client composition to the Mac-side runtime                                                                                                                    | Execution                 |
+
+The contracts root remains independent of its client subpath. Client composition
+imports the canonical root values, errors and types; it never imports core,
+runtime, SDK, or a native provider. SDK remote and local factories use the same
+codec and binding implementation, so reference authority and canonical error
+identity do not vary with the import path. Generated facades can compose this
+same client seam without acquiring a dependency on SDK or Mac-side execution.
+The SDK retains the user-facing locality factories and local runtime adaptation;
+contract-based client composition does not own host credential verification,
+governance, or native execution.
 
 **Why a separate runtime package.** Token verification needs the signing
 secret on disk and the SQLite revocation store. The local
@@ -647,6 +658,20 @@ record, input, and enum types. The contract itself is named
 existing generated client until that client is retired, and the contract's
 names then move to the root. The contract depends only on `@macts/contracts`,
 and its manifest module is imported only by `loadManifest`.
+
+The retained root constructor is a facade over the same `contracts/client`
+composition. It registers the actual public client through an instance-local
+`AppContract.bind` adapter, reuses canonical record/input/enum types, and
+validates numeric convenience arguments before the shared codec encodes them.
+Resource constructors, `.http`, raw `HttpClient.rpc`, app-specific errors and
+raw response validators remain available. Typed methods use canonical SDK
+values and errors against contract registration; raw calls explicitly retain
+wire/passthrough semantics. A typed invocation still passes through the public
+`rpc` hook. Both paths share one HTTP wire-outcome boundary; raw calls preserve
+valid results and arbitrary server app-error codes, while typed calls map server
+errors through the canonical registry. Malformed JSON or missing success results
+raise `TransportError` on either path. Forwarding optional call options preserves
+cancellation; protocol handling does not depend on forwarding hidden metadata.
 
 Manifest types map to value types as follows:
 
@@ -1689,9 +1714,10 @@ curated `get` cannot serve:
   inline in the holding record, not a reference. This is a new output kind,
   with no `get` and no identity.
 - A target with no identifier, only a position within its container (iTerm's
-  window `currentTab`), will be returned as a selector reference by that
-  position within its container, once output references carry containers
-  (#242).
+  window `currentTab`), is returned as an index selector by that position
+  within the record it was read through, once its manifest marks it
+  positional, with evidence (emitted forms, below; D10, positional
+  resources). Until then it stays out as `no-identifier`.
 
 Xcode's workspace document `activeScheme` and `activeRunDestination`, and a
 target's `project`, are left out as container-scoped: Xcode gets a scheme, a
@@ -1744,7 +1770,12 @@ The coverage ledger is the exact set of output positions the shipped
 contracts leave out, each with its reason, pinned by hand in
 `packages/core/src/generator/contract/index.test.ts`. A new omission fails
 CI until it is reviewed and added. A removed row means coverage was restored,
-and the field is back in output.
+and the field is back in output, or that the manifest now marks the field
+unsupported (D10), which only a structural absence justifies: every observed
+instance fails to read it, for a reason of the platform, such as the System
+Events Classic domain's folders on a macOS with no Classic environment. A field
+that fails on some instances and reads on others is not unsupported; it is
+nullable, with the probe that observed it as evidence, and stays in output.
 `e2e/mcp-contracts/test/output-references.integration.test.ts` checks that no
 output reference left in a shipped contract is one macts cannot yet resolve,
 and pins those that remain.
@@ -1772,15 +1803,18 @@ field. A wire reference carrying `app` is an issue, and so is one whose target
 cannot be resolved.
 
 **Native emission.** A native read emits exactly the wire form above, in
-identity form only:
+identity form, with one exception for a positional target (emitted forms,
+below):
 `{"reference":{resource, form: "identity", cardinality: "one", id, container?}}`.
 `id` is encoded through the plan by the resource's identifier value type.
 `container` is present exactly when the resource's get records a parent; it
 is then the identity reference of the record the field was read through,
 with its own `id` encoded by the parent's identifier value type, and carries
 no container of its own, since only top-level containers are emitted.
-Native reads never emit a selector form; selectors are constructed only by
-callers. SDK output types stay `ObjectReference<R>`, with the form left open.
+Apart from that exception, native reads never emit a selector form, and
+selectors are constructed only by callers. SDK output types stay
+`ObjectReference<R>`, with the form left open, except at an index-selector
+position.
 
 - **Container scoping.** A resource's identity is scoped to its container
   exactly when its `get` is parent-scoped, meaning the command records a
@@ -1866,11 +1900,51 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   and nothing on it says which kind it is, so the reference needs a curated
   mapping from the field to its kind, which no manifest records yet.
 
+**Emitted forms.** A native read emits identity form, with one exception. An
+output position whose target resource is positional (D10, positional
+resources: it has no identifier, and its objects are found by their position
+within their parent) emits an **index selector** within the object it was
+read through:
+`{form: 'selector', cardinality: 'one', selector: {by: 'index', index}, container}`.
+
+- **Container.** `container` is the identity reference of the parent, the
+  record the field was read through, for example the window that holds a
+  tab. Every level of a container chain is in identity form, so a selector
+  never appears inside a container, and the chain ends at a parent the app
+  finds at the application, which has no container. The position's wire
+  schema and its value type admit no other chain (D11).
+- **Meaning.** The reference means whatever object holds that position when
+  it is resolved (A6), not the object observed at read time. The field's
+  generated documentation says that the object has no id, that it is
+  returned by its zero-based position within this parent, and that the
+  position drifts when objects of its kind open, close or move.
+- **Typing.** The generated output position is typed as the narrow
+  `IndexSelectorReference<Record, 'Key'>`, built by
+  `t.indexSelectorReference`: a `SelectorReference` whose selector is
+  `{ by: 'index' }` and whose container is an identity reference. That type
+  is assignable to `ObjectReference`, so generic hydration accepts it, while
+  typed callers can see that it is positional. An input position to a
+  positional target keeps `t.reference`.
+- **Gate.** A position gets this type only when the target is positional,
+  its parent chain is identifiable, and the field is read through that
+  parent's own record (container scoping, above). The manifest schema
+  refuses the marker otherwise (D10). A command result, read through no
+  record, holding a positional target stays out of output as parent-scoped.
+- **Wire.** Nothing changes: this is the existing selector form.
+
 **Native conversion scope.** The macOS provider converts a reference inside
 the automation process (D4, reference conversion) when it is a single
 identity reference to a resource with an identifier and a `get`: with no
 container when the resource is top-level, and with an identity container of
 its parent, judged the same way level by level, when its `get` records one.
+It also converts a single index selector to a positional resource (D10),
+with an identity container of the parent its `get` records, judged the same
+way: at input and resolution positions the selector becomes the object at
+that zero-based position in the container's collection, found as the
+positional `get` finds it, container first, and a position the collection
+does not reach fails as `InvalidSelectionError` naming the resource; at an
+output position an app object becomes the index selector above (emitted
+forms).
 A resource is top-level when its resolving `get` records no parent (D10,
 command parents); one helper answers it, and gives the parent, for both
 directions and for resolution. In that scope, an input reference becomes the
@@ -1887,13 +1961,15 @@ position whose target has no identifier, no `get`, or a `get` that records a
 parent (resolvable targets, above), so for those targets the failure arises
 only for a reference a caller supplies:
 
-- every selector form, at any position;
+- every selector form, at any position, except an index selector to a
+  positional resource;
 - identity collections;
 - a container on a top-level resource, a container of another resource than
   the one its `get` records, or a selector container: each breaks the
   container rule, so it is a caller error, not a form awaiting support;
-- a resource with no identifier, or with no `get`, or whose parent has no
-  addressing;
+- a resource with no identifier that is not positional, or with no `get`,
+  or whose parent has no addressing; an identity reference to a positional
+  resource, which has no identifier;
 - a resource with no entry in the request's `resourcePlans`, so none in the
   script's reference table.
 
@@ -1945,9 +2021,17 @@ plus identity collections whose entries are in it:
   for it, as for any resolution: the runtime runs them as the resource's
   `list` (resolution, steps 1 to 6, below) before the executor is called, and
   only the automation process is skipped.
+- A single index selector to a positional resource, with an identity
+  container of its parent, resolves the same way: the codec finds the
+  container, then the object at the selected position within it, and the
+  body reads it with the get body's record read. A position the container's
+  collection does not reach is `InvalidSelectionError` naming the resource;
+  a missing container is `TargetNotFoundError` naming the container's
+  resource, and no position is looked up.
 - Every other reference fails as `InternalError` whose message names the form
   the provider does not resolve, before any automation runs: every selector
-  form; a reference, or an identity-collection entry, with a container its
+  form but that one, including an index selector to a resource that is not
+  positional; a reference, or an identity-collection entry, with a container its
   resource is not found within (one on a top-level resource, one of another
   resource, or a selector container); a reference to a resource found within
   its parent that carries no container; and a reference to a resource that
@@ -2078,6 +2162,11 @@ collection resolves its entries in order. When an entry's target no longer
 exists, it raises `TargetNotFoundError` whose `entryIndex` detail is that
 entry's zero-based position; the entry is never silently dropped. An identity
 collection with no entries resolves to `[]`.
+
+An emitted index selector resolves within its container, like a caller-built
+one. An index past the end of the container's collection raises
+`InvalidSelectionError`. A container that no longer exists raises
+`TargetNotFoundError` naming the container's resource.
 
 A reference whose target, container, or entry lacks its resolving operation
 is rejected wherever it appears, so no bound reference to it ever exists:
@@ -2287,8 +2376,10 @@ execute(request), resolve(request) }`.
   scope in D7 (native conversion scope): single identity references to
   resources with an identifier, carrying their parent's identity container
   exactly when the resource's get records one, and identity collections of
-  them. It fails every other reference as `InternalError`, before any
-  automation runs. Its bodies hand the codec the container of every output
+  them, and single index selectors to positional resources within their
+  parent's identity container. It fails every other reference as
+  `InternalError`, before any automation runs. Its bodies hand the codec the
+  container of every output
   reference whose target is got within the record being read: a get,
   create, update or resolution body wraps such a field's value with the item
   it read, and a list body with the row's identifier it already read and
@@ -2299,6 +2390,24 @@ execute(request), resolve(request) }`.
   container's id, and none in a list. Only a body whose result the codec
   encodes by a typed plan wraps; under a `passthrough` plan nothing would
   unwrap it.
+- **Plans record the emitted form.** A reference position's output plan
+  records which form the native codec emits: identity when `form` is absent,
+  or `form: 'index'` for a positional target (D7, emitted forms). It is
+  derived from the same predicate as the position's type, and the codec
+  never chooses at run time.
+- **The index is the specifier's position.** For `index`, the codec reads
+  the target's position and the container's identity in the same native
+  request, and emits the position as the zero-based position in its
+  container, taken from the app's specifier, never from a dictionary `index`
+  property. The script hands the codec a host reader, `positionOf`, which
+  reads the bridge's display form of the specifier the app returned
+  (`Automation.getDisplayString`) and accepts only a final `.at(N)` step; any
+  other specifier is a reference the codec cannot convert, `InternalError`,
+  with no fallback. Dictionary `index` properties differ in base from app to
+  app and from class to class, so none is read.
+- **Output validation.** The runtime's output check (D11) admits only that
+  form at that position: an index selector with an identity container of the
+  target's parent.
 - **Resource plans.** `ResourcePlanTable` is
   `Readonly<Record<string, { readonly id?: ValuePlan }>>`, keyed by manifest
   resource key and declared in `@macts/contracts` next to `ValuePlan`. `id` is
@@ -2564,7 +2673,11 @@ Why the default is nullable: evidence of non-null narrows an output from `T | nu
 
 **Observations outrank claims.** A probe that sees a null sets `nullable: true` and replaces an earlier non-null claim from any source except structure. The probe output and the evidence note report the contradiction. A probe that sees no nulls never removes a `nullable: true` claim from any source, including an earlier probe's observation, and never overrides a curated claim. Only curation can narrow a property that has been observed or declared nullable. A property read that throws is not null evidence: it counts toward neither the null count nor the sample size.
 
-**A read the app fails with "no such object" can be the empty value.** Some apps report that an item has no value at a property that holds an object, such as a folder an item may not have, by failing the read with "no such object" (-1728) instead of returning a missing value. Probe evidence may record the distinct error numbers its failed reads raised (`errorNumbers`). When there are failed reads, every one raised -1728, and at least one read succeeded (`sampleSize` above 0), the evidence supports `nullable: true` even though no read returned a missing value, and contradicts `nullable: false`. For a property claimed nullable on that evidence, and no other, a native read that fails with -1728 is the empty value, `null`: in a get, a resolved reference, a create or update's read-back, and a list's item-by-item reads. The item's own existence is checked first, so a missing item still fails as missing, and any other failure of the read still fails. In a list, enumeration is that existence check: each item was found by the enumeration, so an item deleted between the enumeration and its read yields `null` for that property. An update checks the item's existence before its writes, so its read-back follows that check; a create needs none, because the item was just made. The generated SDK's documentation for such a property says the app reported no value in some reads, and names the empty values too when the probe saw both. Whether absence of that kind is nullable or unsupported is curated: unsupported when it is structural, with a platform reason and every instance failing (D10, unsupported properties), which is why evidence whose every read failed does not support `nullable: true`; nullable when it depends on the data.
+**A read the app fails with "no such object" can be the empty value.** Some apps report that an item has no value at a property that holds an object, such as a folder an item may not have, by failing the read with "no such object" (-1728) instead of returning a missing value. Probe evidence may record the distinct error numbers its failed reads raised (`errorNumbers`). When there are failed reads, every one raised -1728, and at least one read succeeded (`sampleSize` above 0), the evidence supports `nullable: true` even though no read returned a missing value, and contradicts `nullable: false`. For a property claimed nullable on that evidence, and no other, a native read that fails with -1728 is the empty value, `null`: in a get, a resolved reference, a create or update's read-back, and a list's item-by-item reads. The item's own existence is checked first, so a missing item still fails as missing, and any other failure of the read still fails. In a list, enumeration is that existence check: each item was found by the enumeration, so an item deleted between the enumeration and its read yields `null` for that property. An update checks the item's existence before its writes, so its read-back follows that check; a create needs none, because the item was just made. The generated SDK's documentation for such a property says the app reported no value in some reads, and names the empty values too when the probe saw both. The app can also hand back an object it reports missing only when the object is read, which for a reference is when its identifier is read to encode it; that failure is the empty value too, wherever the value came from (an item's property record, a column read across a list, or a read on its own), so the body hands such a property's value to the codec marked, and the codec takes -1728 while encoding it as `null` at a nullable position. Only the read of the property's own object counts: the same failure while reading the identity of the item the property was read through, such as a reference's container, is the item's absence and still fails. The list rule: the empty value is the field's, not an element's, so when the property holds a list of references and the app reports one element's object missing, the whole field is `null`, never a shorter list or a list holding `null`. Handling each element on its own is a recorded follow-up. Whether absence of that kind is nullable or unsupported is curated: unsupported when it is structural, with a platform reason and every instance failing (D10, unsupported properties), which is why evidence whose every read failed does not support `nullable: true`; nullable when it depends on the data.
+
+**One instance cannot show structure, so a curated reason decides.** On a resource with a single instance, a singleton root with exactly one kind, a failed read cannot tell structural absence from absence that depends on the data. There, and only there, curated nullability evidence may record the probe's failed reads (`absentReads`: its provenance, `failedReads`, and `errorNumbers` of -1728 only) with a `reason` stating the data dependence, such as "the Sites folder exists only once the user creates one"; the claim is `nullable: true`, and a read failing with -1728 is `null` as above. A curated absence claim without the reason, or on a resource with several instances, is rejected, pointing to probe evidence or to `unsupported`.
+
+**Evidence reads what ships.** Nullability evidence covers only the read it observed, so a probe reads a property through the same path the generated body uses: the property as the body reads it and, for a reference, the identity read the codec makes to encode it, such as a disk item's POSIX path. A read that stops short, such as an object's `id` where the body encodes its POSIX path, can succeed where the shipped read fails, and is no evidence for it. The evidence `note` says how the probe read the property when that is more than a plain read.
 
 **Probe evidence records** the app bundle id, app version, macOS version, sample size, null count, failed-read count, and observation time. For each resource, it also records the collection path it read and the properties it skipped. The probe records presence only. Values are never returned, logged, or persisted. It never writes app data. It reads at most 60 items per collection within a per-app time budget, at evenly spaced positions across the collection and with a share for each parent collection, so one list or calendar cannot make up the whole sample. For a nested collection it does not enumerate every parent: it looks in evenly spaced parents, 20 at first and twice as many in each later round, until the leaves it has found hold enough items, it has looked in 1,000 collections, or half the call's time limit is spent. It records how many parents it looked in, so a resource with no items found says how much of the store it covered rather than claiming the store is empty. It skips file and data properties and body-like content properties, which can be large or trigger downloads, and it reports what it skipped.
 
@@ -2650,6 +2763,16 @@ Every surface takes the parent from the record. Native bodies address the parent
 
 **Every surface follows the kind.** The native get looks the kind up in the root's kinds, addresses the application property it names, and fails as a missing target when the kind is not one of them or its property holds no object on this Mac (the app reports it missing, or "no such object"); it never returns an empty record. The native list reads each kind in declaration order, skips a kind whose property holds no object, fails on any other error, and reads each record as the get does. Every record's `kind` is the kind it was found by, since the object does not say. A list of roots reads every kind it has, so it never pages. The contract, the clients and the CLI treat the root as an identified resource whose identifier is its kind: the CLI reaches it at its namespace, as it would a collection. References follow D7 (singleton roots).
 
+### Positional resources
+
+**A resource whose objects have no identifier, and are found only by their position within their parent, is positional.** Some apps address an object only as an element of its container, by position: an iTerm tab has no id, and the app's own specifier for one is `….windows.byId(7).tabs.at(0)`. The resource records `positional: { evidence }`, curated: `source: curated`, a `note` saying what was observed, `observedAt` and the `appVersion` it was observed on. Nothing is inferred from a missing identifier: a resource with no identifier that is not marked stays out of output as `no-identifier` (D7, resolvable targets).
+
+**The marker's rule.** One rule (`manifest/positional.ts`) is applied by the manifest schema, by every generator (`generationRefusals`), and by both operation registrations (`operationsFromManifest` and `operationsFromContract`), so each refuses the same manifests, alongside the identifier-targeting rule (identifier targeting, above), which judges only resources that have an identifier, so the two never apply to one resource. It refuses the marker on a resource that has a primary identifier, which it would be found by instead; on one with no `get`, or whose `get` records no parent; on one whose parent the app does not find at the application by its identifier (the get, update and delete bodies bind the parent there, so a parent found within another is refused until they bind a whole chain); on one with an item command that does not record the parent its get records; and on one whose item commands (get, update, delete) declare no item parameter, or select an item by anything but a parameter of type `integer`. It also refuses any command with an executable route that records a positional resource as its parent: a parent is bound by its identifier, so commands under a positional parent wait for native binding to support them.
+
+For all five positional CRUD shapes, the same rule checks usable hierarchy placements: a collection placed only within parents requires one of those parents, and a recorded parent must be a declared holder when the hierarchy places the resource. A collection also placed at the application may be addressed there. A resource with no usable placement retains its scope compatibility because the hierarchy makes no claim about its collection. Every recorded parent must independently be an ordinary identified collection resource with a usable get recording no parent; known nested-only parent placement is refused. A top-level parent collection does not erase an explicitly recorded get ancestor: the command supplies only one parent identity, and metadata does not establish globally equivalent identity namespaces. The command must declare its required parent parameter. List/create may choose any independently qualified holder; item commands must still use the resolving get's parent. Command executability comes from canonical routes: unsupported commands or resource targets supply none, while application scope remains active regardless of resourceType.
+
+**Every surface follows the position.** A positional resource's native get, update and delete find their item at the zero-based position the item parameter carries, within the parent the command records: `parent[collection].at(index)`, after checking that the position is within the collection's length. A position the collection does not reach is `InvalidSelectionError` naming the resource; a missing parent is `TargetNotFoundError` naming the parent's resource. The codec addresses an input or resolved index selector the same way (D7, native conversion scope). The generated get, and its position parameter, say that the object has no id, is selected by its zero-based position within its parent, and that the position drifts when objects of its kind open, close or move. References follow D7 (emitted forms).
+
 ### Unsupported resources
 
 **A manifest never drops a resource it declares; a resource the app cannot provide is marked `unsupported`.** The marker records absence evidence in one of two forms. Dictionary evidence, for a collection the app's dictionary does not have, records the source (`dictionary`), the app's bundle identifier, app version and macOS version, the term the manifest expected, and a finding:
@@ -2692,7 +2815,10 @@ stub. Whether it applies is decided by the operation's output plan, which the
 runtime holds, and never by anything an executor sets or declares about
 itself. A `passthrough` result has no wire encoding, so `output.wire` does not
 describe it and it is not checked (D9). The identity-collection count check
-applies whatever the plan.
+applies whatever the plan. At a positional target's output position,
+`output.wire` admits only the index selector with an identity container of
+the target's parent (D7, emitted forms), so a tab returned in identity form,
+or without its window, is `UnexpectedValueError`.
 
 A result passes these steps in order:
 

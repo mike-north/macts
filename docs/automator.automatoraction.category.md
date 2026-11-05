@@ -4,10 +4,10 @@
 
 ## AutomatorAction.category property
 
-The category that contains the action
+The category that contains the action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-category: string[];
+readonly category: readonly string[] | null;
 ```

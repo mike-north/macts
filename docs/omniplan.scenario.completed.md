@@ -4,10 +4,10 @@
 
 ## Scenario.completed property
 
-The percentage complete (1.0 = 100%)
+The percentage complete (1.0 = 100%). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-completed: number
+readonly completed: number | null;
 ```

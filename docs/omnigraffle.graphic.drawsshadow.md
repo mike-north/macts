@@ -4,10 +4,10 @@
 
 ## Graphic.drawsShadow property
 
-Does this graphic draw its shadow?
+Does this graphic draw its shadow? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-drawsShadow: boolean
+drawsShadow: boolean | null
 ```

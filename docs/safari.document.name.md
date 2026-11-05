@@ -4,10 +4,10 @@
 
 ## Document.name property
 
-The document name
+The document name. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

@@ -4,10 +4,10 @@
 
 ## RequiredResource.kind property
 
-The kind of required resource
+The kind of required resource. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-kind: string
+readonly kind: string | null;
 ```

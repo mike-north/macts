@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[send()](./mail.outgoingmessageresourceclient.send.md)
+[send(id, \_\_mactsOptions)](./mail.outgoingmessageresourceclient.send.md)
 
 </td><td>
 

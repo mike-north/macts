@@ -4,6 +4,8 @@
 
 ## MessageSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -12,8 +14,6 @@ MessageSchema: z.ZodObject<
     id: z.ZodNumber
     allHeaders: z.ZodString
     backgroundColor: z.ZodString
-    mailbox: z.ZodString
-    content: z.ZodString
     dateReceived: z.ZodString
     dateSent: z.ZodString
     deletedStatus: z.ZodBoolean

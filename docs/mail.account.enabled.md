@@ -4,10 +4,10 @@
 
 ## Account.enabled property
 
-Indicates whether the account is enabled or not
+Indicates whether the account is enabled or not. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-enabled: boolean
+enabled: boolean | null
 ```

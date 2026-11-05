@@ -4,10 +4,10 @@
 
 ## MediaItem.name property
 
-The name (title) of the media item
+The name (title) of the media item. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

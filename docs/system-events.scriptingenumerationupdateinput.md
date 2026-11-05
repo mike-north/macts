@@ -4,12 +4,10 @@
 
 ## ScriptingEnumerationUpdateInput type
 
-Input for updating a ScriptingEnumeration
+Input for updating a ScriptingEnumeration. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ScriptingEnumerationUpdateInput = Partial<ScriptingEnumerationCreateInput>
+type ScriptingEnumerationUpdateInput = Record<string, never>
 ```
-
-**References:** [ScriptingEnumerationCreateInput](./system-events.scriptingenumerationcreateinput.md)

@@ -2,123 +2,14 @@
 
 [Home](./index.md) &gt; [@macts/shortcuts](./shortcuts.md) &gt; [ShortcutsClient](./shortcuts.shortcutsclient.md)
 
-## ShortcutsClient class
+## ShortcutsClient interface
 
-Shortcuts client for HTTP-based macOS automation.
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 **Signature:**
 
 ```typescript
-declare class ShortcutsClient
+interface ShortcutsClient extends ClientBrand<ShortcutsResources>
 ```
 
-## Example
-
-```typescript
-const client = new ShortcutsClient({
-  apiKey: process.env.MACTS_API_KEY!,
-})
-
-// List calendars
-const calendars = await client.calendars.list()
-```
-
-## Constructors
-
-<table><thead><tr><th>
-
-Constructor
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[(constructor)(options)](./shortcuts.shortcutsclient._constructor_.md)
-
-</td><td>
-
-</td><td>
-
-Constructs a new instance of the `ShortcutsClient` class
-
-</td></tr>
-</tbody></table>
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[folders](./shortcuts.shortcutsclient.folders.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[FolderResourceClient](./shortcuts.folderresourceclient.md)
-
-</td><td>
-
-A folder containing shortcuts
-
-</td></tr>
-<tr><td>
-
-[http](./shortcuts.shortcutsclient.http.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[HttpClient](./shortcuts.httpclient.md)
-
-</td><td>
-
-Get the HTTP client for making custom requests.
-
-</td></tr>
-<tr><td>
-
-[shortcuts](./shortcuts.shortcutsclient.shortcuts.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[ShortcutResourceClient](./shortcuts.shortcutresourceclient.md)
-
-</td><td>
-
-A shortcut in the Shortcuts application
-
-</td></tr>
-</tbody></table>
+**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[ShortcutsResources](./shortcuts.shortcutsresources.md)<!-- -->&gt;

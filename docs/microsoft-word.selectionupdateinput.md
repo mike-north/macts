@@ -2,14 +2,108 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-word](./microsoft-word.md) &gt; [SelectionUpdateInput](./microsoft-word.selectionupdateinput.md)
 
-## SelectionUpdateInput type
+## SelectionUpdateInput interface
 
-Input for updating a Selection
+Input for updating a Selection. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SelectionUpdateInput = Partial<SelectionCreateInput>
+interface SelectionUpdateInput
 ```
 
-**References:** [SelectionCreateInput](./microsoft-word.selectioncreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[bold?](./microsoft-word.selectionupdateinput.bold.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether the selection is formatted as bold. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[content?](./microsoft-word.selectionupdateinput.content.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The text in the selection. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[fontName?](./microsoft-word.selectionupdateinput.fontname.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The font name of the selection. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[fontSize?](./microsoft-word.selectionupdateinput.fontsize.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The font size of the selection in points. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[italic?](./microsoft-word.selectionupdateinput.italic.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether the selection is formatted as italic. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

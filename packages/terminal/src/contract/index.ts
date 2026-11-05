@@ -286,9 +286,9 @@ export interface SettingsSetResourceClient {
 
 /**
  * The Terminal client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link terminalContract}. Its type carries the contract's
- * resource table, {@link TerminalResources}, so references can be bound to it by resource; the
- * brand has no runtime member.
+ * A client factory creates one from `terminalContract` in the app's `/contract` entry. Its type
+ * carries the contract's resource table, {@link TerminalResources}, so references can be bound to
+ * it by resource; the brand has no runtime member.
  */
 export interface TerminalClient extends ClientBrand<TerminalResources> {
   /** A Terminal window */
@@ -353,7 +353,7 @@ const settingsSetRecordType: ValueType<SettingsSet> = t.record(
 )
 
 /**
- * The type of the resource table of {@link terminalContract}: every resource a
+ * The type of the resource table in `terminalContract` (the app's `/contract` entry): every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
  * references to it, and, for each of those operations that finds the

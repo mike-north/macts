@@ -2,14 +2,123 @@
 
 [Home](./index.md) &gt; [@macts/omnifocus](./omnifocus.md) &gt; [InboxTaskUpdateInput](./omnifocus.inboxtaskupdateinput.md)
 
-## InboxTaskUpdateInput type
+## InboxTaskUpdateInput interface
 
-Input for updating a InboxTask
+Input for updating an InboxTask. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type InboxTaskUpdateInput = Partial<InboxTaskCreateInput>
+interface InboxTaskUpdateInput
 ```
 
-**References:** [InboxTaskCreateInput](./omnifocus.inboxtaskcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[creationDate?](./omnifocus.inboxtaskupdateinput.creationdate.md)
+
+</td><td>
+
+</td><td>
+
+Date
+
+</td><td>
+
+_(Optional)_ When the task was created. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[deferDate?](./omnifocus.inboxtaskupdateinput.deferdate.md)
+
+</td><td>
+
+</td><td>
+
+Date
+
+</td><td>
+
+_(Optional)_ When the task should become available for action. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[dueDate?](./omnifocus.inboxtaskupdateinput.duedate.md)
+
+</td><td>
+
+</td><td>
+
+Date
+
+</td><td>
+
+_(Optional)_ When the task must be finished. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[flagged?](./omnifocus.inboxtaskupdateinput.flagged.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ True if flagged. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[name?](./omnifocus.inboxtaskupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Task name. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[note?](./omnifocus.inboxtaskupdateinput.note.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Task note. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

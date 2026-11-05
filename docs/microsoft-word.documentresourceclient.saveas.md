@@ -4,12 +4,12 @@
 
 ## DocumentResourceClient.saveAs() method
 
-Save the document with a new name or format
+Save the document with a new name or format. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 **Signature:**
 
 ```typescript
-saveAs(fileName: string, fileFormat?: SaveFormat): Promise<void>;
+saveAs(id: string, fileName: string, fileFormat?: Parameters<DocumentResourceClient$1['saveAs']>[2], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -29,6 +29,17 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+id
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 fileName
 
 </td><td>
@@ -44,7 +55,20 @@ fileFormat
 
 </td><td>
 
-[SaveFormat](./microsoft-word.saveformat.md)
+Parameters&lt;DocumentResourceClient$1\['saveAs'\]&gt;\[2\]
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

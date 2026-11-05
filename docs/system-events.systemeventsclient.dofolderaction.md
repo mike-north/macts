@@ -9,12 +9,7 @@ Send a folder action code to a folder action script
 **Signature:**
 
 ```typescript
-doFolderAction(folderActionCode: string, withItemList?: unknown, withWindowSize?: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    }): Promise<void>;
+doFolderAction(folderActionCode: string, withItemList?: unknown, withWindowSize?: Parameters<SystemEventsClient$1['doFolderAction']>[2], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -62,7 +57,20 @@ withWindowSize
 
 </td><td>
 
-{ x: number; y: number; width: number; height: number; }
+Parameters&lt;SystemEventsClient$1\['doFolderAction'\]&gt;\[2\]
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

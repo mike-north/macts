@@ -1,3 +1,11 @@
+/**
+ * Generate CLI command modules from manifest operations and hierarchy paths.
+ * CLI options are textual user inputs; adapters validate their meaning before
+ * converting them to the SDK's domain types, preserving exact item selection.
+ *
+ * @packageDocumentation
+ */
+
 import type {
   AppManifest,
   Resource,
@@ -194,9 +202,14 @@ export function generateListCommand(
   // holds every item.
   const paged = listCommand !== undefined && listOperationPages(listCommand, resource)
   const pageArgument =
-    '{ ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }), ...(this.cursor === undefined ? {} : { cursor: this.cursor }) }'
+    '{ ...(this.pageSize === undefined ? {} : { pageSize: __mactsParseIntegerOption(this.pageSize) }), ...(this.cursor === undefined ? {} : { cursor: this.cursor }) }'
+  // CLI text is checked for canonical spelling and safe bounds before exact
+  // conversion to the SDK's numeric input; parsing first could change scope.
   const listArgs = [
-    ...listRequiredParams.map((p) => `this.${safeParamProperty(p.name, 'list')}`),
+    ...listRequiredParams.map((p) => {
+      const property = `this.${safeParamProperty(p.name, 'list')}`
+      return p.type === 'integer' ? `__mactsParseIntegerOption(${property})` : property
+    }),
     ...(paged ? [pageArgument] : []),
   ].join(', ')
   const pageOptions = paged
@@ -210,9 +223,15 @@ export function generateListCommand(
     listCommand === undefined ? undefined : parentFirstMatchNote(listCommand, ctx.manifest),
   ])
 
+  const integerSupport =
+    paged || listRequiredParams.some((parameter) => parameter.type === 'integer')
+      ? integerOptionSupport()
+      : ''
+
   const content = `import { Command, Option } from 'clipanion';
 import { getClient } from '${sdkImportPath}';
 import { createFormatter } from '${outputImportPath}';
+${integerSupport}
 
 /**
  * List ${identifierWords(resource.plural)}.
@@ -566,9 +585,13 @@ export function generateResourceCommand(
   const description = describeWithNotes(cmd.description, notes)
 
   const needsTypanion = inputs.includes('t.isEnum')
+  const integerSupport = methodArgs.includes('__mactsParseIntegerOption(')
+    ? integerOptionSupport()
+    : ''
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
 import { getClient } from '${sdkImportPath}';
 import { createFormatter } from '${outputImportPath}';
+${integerSupport}
 
 /**
  * ${description}
@@ -607,27 +630,16 @@ ${inputs}
   }
 }
 
-/**
- * The inputs a generated resource command declares, as option field lines,
- * and the arguments its SDK call passes, in the SDK method's order.
- */
+/** Declared CLI option fields and the SDK arguments they supply, in method order. */
 interface ResourceCommandInputs {
   readonly inputs: string
   readonly methodArgs: string
 }
 
 /**
- * The inputs of a resource command that selects its item: only those the
- * operation uses, in the SDK method's order (`commandMethodParameters`).
- *
- * - a flag for the parent's identifier, when the command records a parent;
- * - one positional argument for the item's identifier (the command's
- *   identifier parameter, `resolveIdParams`), labelled with the identifier a
- *   get takes, as the get command's is;
- * - a flag for each other declared parameter.
- *
- * Nothing comes from the resource's place in the hierarchy: a parent the
- * command does not record has no flag.
+ * Expose exactly the operation's inputs in SDK order: recorded parent flag,
+ * one item positional labelled as get labels it, then other parameter flags.
+ * Hierarchy alone supplies no parent flag or argument.
  */
 function itemCommandInputs(
   cmd: ManifestCommand,
@@ -664,7 +676,8 @@ function itemCommandInputs(
       sdkArgument(
         parameter.name === childParam ? itemProperty : safeParamProperty(parameter.name, cmd.name),
         methodRef,
-        i
+        i,
+        parameter
       )
     )
     .join(', ')
@@ -672,16 +685,9 @@ function itemCommandInputs(
 }
 
 /**
- * The inputs of a known gap (`KNOWN_ITEM_SELECTION_GAPS`), which cannot
- * select its item yet and is called on the app with its declared parameters
- * alone. It keeps the inputs it has always had, until the item can be
- * selected:
- *
- * - a flag for each parent on the resource's place in the hierarchy;
- * - a positional for the resource's identifier;
- * - a flag for each declared parameter.
- *
- * Only the declared parameters reach the SDK call.
+ * Preserve a known gap's existing CLI: hierarchy parent flags, item positional
+ * and declared parameter flags. Only declared parameters reach the SDK call;
+ * the extra legacy inputs cannot select its item yet.
  */
 function itemlessCommandInputs(
   cmd: ManifestCommand,
@@ -712,20 +718,28 @@ function itemlessCommandInputs(
   )
   const methodArgs = signature
     .map(({ parameter }, i) =>
-      sdkArgument(safeParamProperty(parameter.name, cmd.name), methodRef, i)
+      sdkArgument(safeParamProperty(parameter.name, cmd.name), methodRef, i, parameter)
     )
     .join(', ')
   return { inputs: `${parentOptions}${idOption}${paramFlags}`, methodArgs }
 }
 
 /**
- * One argument of a generated SDK call: the command's `property`, asserted
- * to the SDK method's parameter type at `index`. CLI inputs surface values as
- * broad primitives (string/boolean), which may not structurally overlap the
- * SDK's narrower types (enums, Date, number, arrays), so the assertion goes
- * via `unknown`; the RPC layer validates and coerces the value at run time.
+ * One argument of a generated SDK call. Integer text is checked before exact
+ * conversion to the method's declared numeric input; omitted optional inputs
+ * remain omitted. Other CLI primitives retain the existing assertion to the
+ * method's narrower declared type, whose contract validates the supplied value.
  */
-function sdkArgument(property: string, methodRef: string, index: number): string {
+function sdkArgument(
+  property: string,
+  methodRef: string,
+  index: number,
+  parameter: CommandParameter
+): string {
+  if (parameter.type === 'integer') {
+    const parsed = `__mactsParseIntegerOption(this.${property})`
+    return parameter.required ? parsed : `this.${property} === undefined ? undefined : ${parsed}`
+  }
   return `this.${property} as unknown as Parameters<typeof ${methodRef}>[${String(index)}]`
 }
 
@@ -901,4 +915,32 @@ function toCamelCase(str: string): string {
 
 function toPascalCase(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+/**
+ * Emit the CLI's text-to-number boundary for commands with integer inputs.
+ * The public SDK still takes numbers; canonical safe-range validation must
+ * precede conversion, since Number() alone can round a fraction into another
+ * parent identity or accept a nondecimal spelling.
+ */
+function integerOptionSupport(): string {
+  return `
+import { ValueTypes as __mactsValueTypes, ValidationError as __mactsValidationError } from '@macts/contracts';
+
+/** The contract's canonical decimal and safe-integer policy, built once. */
+const __mactsIntegerOptionWire = __mactsValueTypes.integer().wire;
+
+/**
+ * Check the original CLI spelling before converting to the numeric SDK input.
+ * Canonical safe-integer text is exactly representable, so conversion after
+ * this check cannot round or reinterpret the caller's chosen value.
+ */
+function __mactsParseIntegerOption(text: string): number {
+  if (!__mactsIntegerOptionWire.safeParse({ integer: text }).success) {
+    const message = 'Expected a canonical decimal integer within the safe-integer range.';
+    throw new __mactsValidationError(message, { issues: [{ path: [], message }] });
+  }
+  return Number(text);
+}
+`
 }

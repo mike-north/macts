@@ -57,24 +57,24 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(name)](./xcode.rundestinationresourceclient.get.md)
+[get(workspaceName, name, \_\_mactsOptions)](./xcode.rundestinationresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a rundestination by name.
+Get a run destination by name within a parent scope. When several run destinations share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous. When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
 
 </td></tr>
 <tr><td>
 
-[list()](./xcode.rundestinationresourceclient.list.md)
+[list(workspaceName, \_\_mactsOptions)](./xcode.rundestinationresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all rundestinations.
+List the run destinations of one workspace document, as one page. When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
 
 </td></tr>
 </tbody></table>

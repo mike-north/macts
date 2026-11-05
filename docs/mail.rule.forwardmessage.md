@@ -4,10 +4,10 @@
 
 ## Rule.forwardMessage property
 
-If rule matches, forward message to this address, or multiple addresses, separated by commas. Set to empty string to disable this action
+If rule matches, forward message to this address, or multiple addresses, separated by commas. Set to empty string to disable this action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-forwardMessage: string
+forwardMessage: string | null
 ```

@@ -4,10 +4,10 @@
 
 ## FinderWindow.target property
 
-the container at which this file viewer is targeted
+the container at which this file viewer is targeted. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-target: string
+target: string | null
 ```

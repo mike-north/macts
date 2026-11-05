@@ -4,10 +4,10 @@
 
 ## Document.defaultTabStop property
 
-The interval in points between default tab stops
+The interval in points between default tab stops. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-defaultTabStop: number
+defaultTabStop: number | null
 ```

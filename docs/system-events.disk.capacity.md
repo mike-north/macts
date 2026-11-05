@@ -4,10 +4,10 @@
 
 ## Disk.capacity property
 
-the total number of bytes (free or used) on the disk
+the total number of bytes (free or used) on the disk. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-capacity: number
+readonly capacity: number | null;
 ```

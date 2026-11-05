@@ -9,7 +9,7 @@ Create a new resource.
 **Signature:**
 
 ```typescript
-create(input: ResourceCreateInput): Promise<Resource>;
+create(input: ResourceCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Resource>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [ResourceCreateInput](./omniplan.resourcecreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

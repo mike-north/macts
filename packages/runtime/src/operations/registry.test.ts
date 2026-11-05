@@ -32,6 +32,7 @@ import {
   resolveManifestRoutes,
   type AppManifest,
 } from '@macts/core'
+import { panesManifest } from '@macts/core/testing'
 import {
   PASSTHROUGH_PLAN,
   ValueTypes as t,
@@ -541,6 +542,54 @@ function contractWith(
     bind: () => ({}),
   }
 }
+
+/**
+ * The Panes manifest, whose tabs are positional, with a tab get that selects
+ * its tab by text: past the schema, as a caller may register a manifest
+ * object, but against the `positional` marker's rule (phases/13 D10).
+ */
+function panesWithTextPosition(): AppManifest {
+  const manifest = panesManifest()
+  const position = manifest.commands['getTab']?.parameters[1]
+  if (position === undefined) throw new Error('the Panes fixture has no tab position')
+  position.type = 'string'
+  return manifest
+}
+
+/** What the `positional` marker's rule says of {@link panesWithTextPosition}. */
+const TEXT_POSITION_PROBLEM =
+  'The get command "getTab" selects an item of the positional resource "Tab" by its zero-based position, so its item parameter "index" must be of type integer.'
+
+describe('registration of a manifest whose positional marker does not hold', () => {
+  // Guards that registration refuses what generation and the schema refuse.
+  it('refuses it from the manifest alone', () => {
+    expect(() => operationsFromManifest(panesWithTextPosition())).toThrow(
+      new OperationRegistrationError(
+        `App "Panes" cannot be registered from its manifest: ${TEXT_POSITION_PROBLEM}`
+      )
+    )
+  })
+
+  it('refuses it from a contract, whichever operations the contract covers', () => {
+    expect(() =>
+      operationsFromContract(contractWith([], 'panes'), panesWithTextPosition())
+    ).toThrow(
+      new OperationRegistrationError(
+        `App "Panes" cannot be registered from its contract, because its manifest is refused: ${TEXT_POSITION_PROBLEM}`
+      )
+    )
+  })
+
+  it('registers the manifest when the marker holds', () => {
+    expect(operationsFromManifest(panesManifest()).map(({ descriptor }) => descriptor.id)).toEqual([
+      'panes.windows.listWindows',
+      'panes.windows.getWindow',
+      'panes.tabs.listTabs',
+      'panes.tabs.getTab',
+      'panes.app.frontTab',
+    ])
+  })
+})
 
 describe('operationsFromContract', () => {
   it('registers descriptors whose permission and target match the manifest', () => {

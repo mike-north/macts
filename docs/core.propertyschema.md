@@ -20,8 +20,8 @@ PropertySchema: z.ZodObject<
         | 'string'
         | 'number'
         | 'boolean'
-        | 'integer'
         | 'date'
+        | 'integer'
         | 'data'
         | 'any'
         | 'file'
@@ -42,8 +42,8 @@ PropertySchema: z.ZodObject<
           | 'string'
           | 'number'
           | 'boolean'
-          | 'integer'
           | 'date'
+          | 'integer'
           | 'data'
           | 'any'
           | 'file'
@@ -76,7 +76,153 @@ PropertySchema: z.ZodObject<
         z.core.$strip
       >
     >
+    nullable: z.ZodOptional<z.ZodBoolean>
+    resettable: z.ZodOptional<z.ZodBoolean>
+    evidence: z.ZodOptional<
+      z.ZodObject<
+        {
+          nullable: z.ZodOptional<
+            z.ZodDiscriminatedUnion<
+              [
+                z.ZodObject<
+                  {
+                    source: z.ZodLiteral<'probe'>
+                    observedAt: z.ZodISODateTime
+                    bundleId: z.ZodString
+                    appVersion: z.ZodString
+                    osVersion: z.ZodString
+                    sampleSize: z.ZodNumber
+                    nullCount: z.ZodNumber
+                    failedReads: z.ZodNumber
+                    errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>
+                    note: z.ZodOptional<z.ZodString>
+                  },
+                  z.core.$strip
+                >,
+                z.ZodObject<
+                  {
+                    source: z.ZodLiteral<'curated'>
+                    note: z.ZodString
+                    observedAt: z.ZodOptional<z.ZodISODateTime>
+                    appVersion: z.ZodOptional<z.ZodString>
+                    absentReads: z.ZodOptional<
+                      z.ZodObject<
+                        {
+                          observedAt: z.ZodISODateTime
+                          bundleId: z.ZodString
+                          appVersion: z.ZodString
+                          osVersion: z.ZodString
+                          failedReads: z.ZodNumber
+                          errorNumbers: z.ZodArray<z.ZodNumber>
+                          reason: z.ZodString
+                        },
+                        z.core.$strict
+                      >
+                    >
+                  },
+                  z.core.$strip
+                >,
+                z.ZodObject<
+                  {
+                    source: z.ZodLiteral<'sdef'>
+                    note: z.ZodOptional<z.ZodString>
+                  },
+                  z.core.$strip
+                >,
+              ],
+              'source'
+            >
+          >
+          resettable: z.ZodOptional<
+            z.ZodObject<
+              {
+                source: z.ZodLiteral<'curated'>
+                note: z.ZodString
+                observedAt: z.ZodOptional<z.ZodISODateTime>
+                appVersion: z.ZodOptional<z.ZodString>
+              },
+              z.core.$strip
+            >
+          >
+        },
+        z.core.$strip
+      >
+    >
+    unsupported: z.ZodOptional<
+      z.ZodObject<
+        {
+          reason: z.ZodString
+          dictionaryNote: z.ZodOptional<z.ZodString>
+          trackingIssue: z.ZodOptional<z.ZodNumber>
+          evidence: z.ZodUnion<
+            readonly [
+              z.ZodObject<
+                {
+                  source: z.ZodLiteral<'probe'>
+                  observedAt: z.ZodISODateTime
+                  bundleId: z.ZodString
+                  appVersion: z.ZodString
+                  osVersion: z.ZodString
+                  sampleSize: z.ZodNumber
+                  failedReads: z.ZodNumber
+                  errorNumbers: z.ZodArray<z.ZodNumber>
+                },
+                z.core.$strict
+              >,
+              z.ZodObject<
+                {
+                  source: z.ZodLiteral<'probe'>
+                  observedAt: z.ZodISODateTime
+                  bundleId: z.ZodString
+                  appVersion: z.ZodString
+                  osVersion: z.ZodString
+                  sampleSize: z.ZodNumber
+                  observedKinds: z.ZodRecord<
+                    z.ZodEnum<{
+                      string: 'string'
+                      number: 'number'
+                      boolean: 'boolean'
+                      date: 'date'
+                      record: 'record'
+                      list: 'list'
+                      reference: 'reference'
+                      other: 'other'
+                    }> &
+                      z.core.$partial,
+                    z.ZodNumber
+                  >
+                },
+                z.core.$strict
+              >,
+            ]
+          >
+        },
+        z.core.$strip
+      >
+    >
+    native: z.ZodOptional<
+      z.ZodObject<
+        {
+          name: z.ZodString
+          evidence: z.ZodObject<
+            {
+              source: z.ZodLiteral<'dictionary'>
+              bundleId: z.ZodString
+              appVersion: z.ZodString
+              osVersion: z.ZodString
+              term: z.ZodString
+            },
+            z.core.$strict
+          >
+        },
+        z.core.$strict
+      >
+    >
   },
   z.core.$strip
 >
 ```
+
+## Remarks
+
+`optional` and `nullable` are separate axes: `optional` says whether the property may be absent from a record, and `nullable` whether a present property may hold no value. `resettable` says whether an update can clear the property by setting it to `null`<!-- -->. A nullability or resettability claim must carry its evidence (see `./evidence.ts`<!-- -->); without a claim, generators apply their defaults. `unsupported` marks a declared property that cannot be used at runtime (the app cannot provide it, or returns values the generated code cannot decode yet): generated surfaces omit it, and it carries no nullability or resettability claim and no native spelling. Kind evidence must show only kinds the declared type does not expect. `native` records the app's own spelling of the property where it differs from the key.

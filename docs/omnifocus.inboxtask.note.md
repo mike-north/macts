@@ -4,10 +4,10 @@
 
 ## InboxTask.note property
 
-The note of the inbox task
+The note of the inbox task. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-note: string
+note: string | null
 ```

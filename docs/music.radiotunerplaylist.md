@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Unique identifier for this playlist
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+Unique identifier for this playlist. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -4,10 +4,10 @@
 
 ## Pane.id property
 
-The id of the settings pane.
+The id of the settings pane. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

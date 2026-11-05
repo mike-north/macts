@@ -57,35 +57,35 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./omnifocus.inboxtaskresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./omnifocus.inboxtaskresourceclient.create.md)
 
 </td><td>
 
 </td><td>
 
-Create a new inboxtask.
+Create a new inbox task.
 
 </td></tr>
 <tr><td>
 
-[get(id)](./omnifocus.inboxtaskresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./omnifocus.inboxtaskresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a inboxtask by id.
+Get a inbox task by id.
 
 </td></tr>
 <tr><td>
 
-[list()](./omnifocus.inboxtaskresourceclient.list.md)
+[list(\_\_mactsOptions)](./omnifocus.inboxtaskresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all inboxtasks.
+List all inbox tasks, as one page.
 
 </td></tr>
 </tbody></table>

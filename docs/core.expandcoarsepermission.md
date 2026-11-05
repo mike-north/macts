@@ -6,12 +6,15 @@
 
 Expand a coarse permission to its constituent fine-grained permissions.
 
+A permission whose operation is a key of its resource's mapping expands to that key's list. A fine-grained permission the mapping lists expands to itself; one the mapping does not list throws, unless `options.unmapped` is `keep`<!-- -->, in which case it too expands to itself.
+
 **Signature:**
 
 ```typescript
 declare function expandCoarsePermission(
   permission: string,
-  permissionsSection: PermissionsSection
+  permissionsSection: PermissionsSection,
+  options?: ExpandPermissionOptions
 ): string[]
 ```
 
@@ -54,6 +57,19 @@ permissionsSection
 </td><td>
 
 The permissions mapping from the manifest
+
+</td></tr>
+<tr><td>
+
+options
+
+</td><td>
+
+[ExpandPermissionOptions](./core.expandpermissionoptions.md)
+
+</td><td>
+
+_(Optional)_ How to treat a permission the mapping does not contain
 
 </td></tr>
 </tbody></table>

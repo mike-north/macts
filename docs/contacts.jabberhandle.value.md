@@ -4,10 +4,10 @@
 
 ## JabberHandle.value property
 
-The Jabber handle value
+The Jabber handle value. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-value: string
+value: string | null
 ```

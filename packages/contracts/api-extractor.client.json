@@ -1,0 +1,26 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
+  "extends": "../../api-extractor.base.json",
+  "mainEntryPointFilePath": "<projectFolder>/dist/client/index.d.ts",
+  "apiReport": {
+    "enabled": true,
+    "reportFolder": "<projectFolder>/api-report",
+    "reportFileName": "contracts-client.api.md"
+  },
+  "docModel": {
+    "enabled": false
+  },
+  "dtsRollup": {
+    "enabled": false
+  },
+  "compiler": {
+    "overrideTsconfig": {
+      "extends": "./tsconfig.json",
+      "compilerOptions": {
+        "paths": {
+          "@macts/contracts": ["./dist/contracts.d.ts"]
+        }
+      }
+    }
+  }
+}

@@ -6,7 +6,7 @@
 
 Build the canonical route for a resource-scoped command.
 
-Resource commands are addressed as `{app}.{resourcePlural}.{commandKey}`<!-- -->.
+Resource commands are addressed as `{app}.{resourcePlural}.{segment}`<!-- -->.
 
 **Signature:**
 
@@ -14,7 +14,7 @@ Resource commands are addressed as `{app}.{resourcePlural}.{commandKey}`<!-- -->
 declare function buildResourceCommandRoute(
   appName: string,
   resourcePlural: string,
-  commandKey: string
+  segment: string
 ): string
 ```
 
@@ -61,7 +61,7 @@ The resource's `plural` name from the manifest.
 </td></tr>
 <tr><td>
 
-commandKey
+segment
 
 </td><td>
 
@@ -69,7 +69,7 @@ string
 
 </td><td>
 
-The command's key in `manifest.commands` (NOT `command.name`<!-- -->). The key is globally unique within the manifest, whereas `name` is shared across resources, so two distinct operations (`list` for Calendar, `listEvents` for Event) would otherwise collide.
+The command's route segment ([commandRouteSegment()](./core.commandroutesegment.md)<!-- -->): its `routeName`<!-- -->, else its key in `manifest.commands` (NOT `command.name`<!-- -->, which is shared across resources, so two distinct operations — `list` for Calendar, `listEvents` for Event — would otherwise collide).
 
 </td></tr>
 </tbody></table>

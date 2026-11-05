@@ -4,10 +4,10 @@
 
 ## Variable.name property
 
-The name of the variable
+The name of the variable. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

@@ -24,21 +24,39 @@ export class ProjectResourceClient {
   /**
    * List all projects, as one page.
    */
-  async list(): Promise<Page<Project>> {
-    return this.#http.rpc<Page<Project>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Project>> {
+    return this.#http.invoke<Page<Project>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'Project'
+    )
   }
 
   /**
    * Get a project by id.
    */
-  async get(id: string): Promise<Project> {
-    return this.#http.rpc<Project>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Project> {
+    return this.#http.invoke<Project>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Project'
+    )
   }
 
   /**
    * Create a new project.
    */
-  async create(input: ProjectCreateInput): Promise<Project> {
-    return this.#http.rpc<Project>(`${this.#app}.${this.#resource}.create`, input)
+  async create(
+    input: ProjectCreateInput,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Project> {
+    return this.#http.invoke<Project>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'Project'
+    )
   }
 }

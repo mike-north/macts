@@ -2,14 +2,93 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [PlaylistUpdateInput](./music.playlistupdateinput.md)
 
-## PlaylistUpdateInput type
+## PlaylistUpdateInput interface
 
-Input for updating a Playlist
+Input for updating a Playlist. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type PlaylistUpdateInput = Partial<PlaylistCreateInput>
+interface PlaylistUpdateInput
 ```
 
-**References:** [PlaylistCreateInput](./music.playlistcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[description?](./music.playlistupdateinput.description.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the description of the playlist. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[disliked?](./music.playlistupdateinput.disliked.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ is this playlist disliked? Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[favorited?](./music.playlistupdateinput.favorited.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ is this playlist favorited? Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[name?](./music.playlistupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the name of the playlist. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

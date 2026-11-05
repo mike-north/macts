@@ -4,10 +4,10 @@
 
 ## Note.shared property
 
-Whether the note is shared
+Whether the note is shared. Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-shared: boolean
+readonly shared: boolean;
 ```

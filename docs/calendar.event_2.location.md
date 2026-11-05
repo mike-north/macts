@@ -4,10 +4,10 @@
 
 ## Event_2.location property
 
-The event location
+The event location. Nullable. Observed missing in 35 of 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-location: string
+location: string | null
 ```

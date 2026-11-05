@@ -4,10 +4,10 @@
 
 ## Shortcut.acceptsInput property
 
-Indicates whether or not the shortcut accepts input data
+Indicates whether or not the shortcut accepts input data. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-acceptsInput: boolean
+readonly acceptsInput: boolean | null;
 ```

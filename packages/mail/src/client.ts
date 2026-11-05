@@ -7,6 +7,26 @@
 
 import { OutgoingMessageResourceClient } from './resources/outgoingmessage.js'
 import { MessageResourceClient } from './resources/message.js'
+import { mailContract as appContract } from './contract/index.js'
+import {
+  createCodecClient,
+  createRemoteTransport,
+  type RemoteTransport,
+} from '@macts/contracts/client'
+import {
+  MactsError,
+  OperationCancelledError,
+  TransportError,
+  ValidationError,
+  fromWireErrorEnvelope,
+  type AppContract,
+  type CallOptions,
+  type ClientBrand,
+  type ClientRuntime,
+  type OperationId,
+  type WireValue,
+} from '@macts/contracts'
+import type { MailResources } from './contract/index.js'
 
 /**
  * Client configuration options.
@@ -18,41 +38,96 @@ export interface MailClientOptions {
   baseUrl?: string
 }
 
-/**
- * HTTP client wrapper for making authenticated requests.
- */
+/** Canonical failures retained privately while raw RPC preserves the legacy error class. */
+const canonicalFailures = new WeakMap<Error, MactsError>()
+
+/** Raw RPC compatibility and canonical typed invocation for this app and credential. */
 export class HttpClient {
-  readonly #baseUrl: string
-  readonly #apiKey: string
+  readonly #transport: RemoteTransport
+  #runtime: ClientRuntime | undefined
 
   constructor(baseUrl: string, apiKey: string) {
-    this.#baseUrl = baseUrl
-    this.#apiKey = apiKey
+    this.#transport = createRemoteTransport(appContract, { url: baseUrl, token: apiKey })
   }
 
   /**
-   * Make an authenticated POST request to an RPC endpoint.
+   * Bind the actual public facade in the shared reference registry. Standalone
+   * resource clients lazily bind an ordinary contract client instead. A copied
+   * contract changes only construction; its descriptors and codecs are shared.
+   * @internal
    */
-  async rpc<T>(path: string, body: object = {}): Promise<T> {
-    const url = `${this.#baseUrl}/api/v1/rpc/${path}`
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${this.#apiKey}`,
-        'Content-Type': 'application/json',
+  bind(client?: object): void {
+    const contract: AppContract<object, MailResources> = {
+      ...appContract,
+      bind: (runtime) => {
+        this.#runtime = runtime
+        return client ?? appContract.bind(runtime)
       },
-      body: JSON.stringify(body),
-    })
-
-    if (!response.ok) {
-      const error = (await response.json()) as { error?: { code?: string; message?: string } }
-      const code = error.error?.code ?? 'UNKNOWN_ERROR'
-      const message = error.error?.message ?? `HTTP ${String(response.status)}`
-      throw new MailError(code, message)
     }
+    createCodecClient(contract, {
+      invoke: async (operation, input, options) => {
+        try {
+          return await this.rpc(operation, input as object, options)
+        } catch (error) {
+          if (error instanceof MactsError) throw error
+          if (error instanceof Error) {
+            const canonical = canonicalFailures.get(error)
+            if (canonical !== undefined) throw canonical
+          }
+          if (options?.signal?.aborted === true)
+            throw new OperationCancelledError('The operation was cancelled.', {})
+          throw new TransportError('The custom RPC transport failed.', { reason: 'unreachable' })
+        }
+      },
+      resolve: this.#transport.resolve,
+    })
+  }
 
-    const result = (await response.json()) as { result: T }
-    return result.result
+  /** Invoke a descriptor with SDK input; generated return types come from that contract and its output codec validates the result. @internal */
+  async invoke<T>(
+    path: string,
+    input: object = {},
+    options?: CallOptions,
+    expectedResource?: string
+  ): Promise<T> {
+    const operation = Object.values(appContract.operations).find(
+      (candidate) => candidate.id === path
+    )
+    if (
+      operation === undefined ||
+      operation.unavailable !== undefined ||
+      (expectedResource !== undefined && operation.target.resource !== expectedResource)
+    ) {
+      throw new ValidationError('The operation is not registered in this app contract.', {
+        issues: [{ path: [], message: 'Unknown or mismatched operation route.' }],
+      })
+    }
+    if (this.#runtime === undefined) this.bind()
+    if (this.#runtime === undefined) throw new Error('Client runtime was not initialized.')
+    return this.#runtime.invoke(operation, input, options) as Promise<T>
+  }
+
+  /** Raw wire RPC for explicit passthrough consumers; typed methods use invoke. */
+  async rpc<T>(path: string, body: object = {}, options?: CallOptions): Promise<T> {
+    // Typed wrappers dispatch through this public hook, including overrides
+    // that forward only two arguments. Shared protocol handling needs no hidden
+    // request metadata; forwarding options preserves cancellation only.
+    const outcome = await this.#transport.requestRpc(
+      path as OperationId,
+      body as WireValue,
+      options
+    )
+    if (outcome.ok) return outcome.result as T
+    const error = outcome.envelope as { error?: { code?: string; message?: string } } | null
+    const legacy = new MailError(
+      error?.error?.code ?? 'UNKNOWN_ERROR',
+      error?.error?.message ?? `HTTP ${String(outcome.status)}`
+    )
+    canonicalFailures.set(
+      legacy,
+      fromWireErrorEnvelope(outcome.envelope, { status: outcome.status })
+    )
+    throw legacy
   }
 }
 
@@ -70,6 +145,14 @@ export class MailError extends Error {
 }
 
 /**
+ * The shared type-only resource brand lets caller-built references target this facade.
+ * It adds no runtime fields; construction registers the actual instance.
+ * @public
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-declaration-merging -- Only the non-runtime brand is merged into the retained class constructor.
+export interface MailClient extends ClientBrand<MailResources> {}
+
+/**
  * Mail client for HTTP-based macOS automation.
  *
  * @example
@@ -82,6 +165,7 @@ export class MailError extends Error {
  * const calendars = await client.calendars.list();
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging -- The merged interface contributes only the shared phantom brand, never runtime members.
 export class MailClient {
   readonly #httpClient: HttpClient
 
@@ -100,6 +184,7 @@ export class MailClient {
       'outgoingMessages'
     )
     this.messages = new MessageResourceClient(this.#httpClient, 'mail', 'messages')
+    this.#httpClient.bind(this)
   }
 
   /**
@@ -112,63 +197,80 @@ export class MailClient {
   /**
    * Copy an object.
    */
-  async duplicate(to?: string, withProperties?: unknown): Promise<void> {
-    await this.#httpClient.rpc<undefined>('mail.app.duplicate', { to, withProperties })
+  async duplicate(
+    to?: string,
+    withProperties?: unknown,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'mail.app.duplicate',
+      { to, withProperties },
+      __mactsOptions
+    )
   }
 
   /**
    * Move an object to a new location.
    */
-  async move(to: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('mail.app.move', { to })
+  async move(to: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('mail.app.move', { to }, __mactsOptions)
   }
 
   /**
    * Triggers a check for email.
    */
-  async checkForNewMail(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('mail.app.checkForNewMail', {})
+  async checkForNewMail(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('mail.app.checkForNewMail', {}, __mactsOptions)
   }
 
   /**
    * Command to get the full name out of a fully specified email address. E.g. Calling this with "John Doe <jdoe@example.com>" as the direct object would return "John Doe"
    */
-  async extractNameFrom(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('mail.app.extractNameFrom', {})
+  async extractNameFrom(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('mail.app.extractNameFrom', {}, __mactsOptions)
   }
 
   /**
    * Command to get just the email address of a fully specified email address. E.g. Calling this with "John Doe <jdoe@example.com>" as the direct object would return "jdoe@example.com"
    */
-  async extractAddressFrom(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('mail.app.extractAddressFrom', {})
+  async extractAddressFrom(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('mail.app.extractAddressFrom', {}, __mactsOptions)
   }
 
   /**
    * Opens a mailto URL.
    */
-  async getURL(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('mail.app.getURL', {})
+  async getURL(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('mail.app.getURL', {}, __mactsOptions)
   }
 
   /**
    * Imports a mailbox created by Mail.
    */
-  async importMailMailbox(at: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('mail.app.importMailMailbox', { at })
+  async importMailMailbox(
+    at: Parameters<import('./contract/index.js').MailClient['importMailMailbox']>[0],
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>('mail.app.importMailMailbox', { at }, __mactsOptions)
   }
 
   /**
    * Opens a mailto URL.
    */
-  async mailto(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('mail.app.mailto', {})
+  async mailto(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('mail.app.mailto', {}, __mactsOptions)
   }
 
   /**
    * Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of this handler is a list of messages being acted upon.
    */
-  async performMailActionWithMessages(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('mail.app.performMailActionWithMessages', {})
+  async performMailActionWithMessages(
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'mail.app.performMailActionWithMessages',
+      {},
+      __mactsOptions
+    )
   }
 }

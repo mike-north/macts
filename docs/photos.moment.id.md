@@ -4,10 +4,10 @@
 
 ## Moment.id property
 
-The unique ID of the Moment
+The unique ID of the Moment. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

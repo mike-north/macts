@@ -4,12 +4,15 @@
 
 ## SourceSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
 SourceSchema: z.ZodObject<
   {
     id: z.ZodNumber
+    persistentID: z.ZodString
     capacity: z.ZodNumber
     freeSpace: z.ZodNumber
     kind: z.ZodString

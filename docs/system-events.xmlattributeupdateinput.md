@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [XMLAttributeUpdateInput](./system-events.xmlattributeupdateinput.md)
 
-## XMLAttributeUpdateInput type
+## XMLAttributeUpdateInput interface
 
-Input for updating a XMLAttribute
+Input for updating a XMLAttribute. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type XMLAttributeUpdateInput = Partial<XMLAttributeCreateInput>
+interface XMLAttributeUpdateInput
 ```
 
-**References:** [XMLAttributeCreateInput](./system-events.xmlattributecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[value?](./system-events.xmlattributeupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the value of the XML attribute. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

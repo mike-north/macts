@@ -4,10 +4,10 @@
 
 ## Album.name property
 
-The name of this album
+The name of this album. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

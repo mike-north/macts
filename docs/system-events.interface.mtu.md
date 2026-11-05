@@ -4,10 +4,10 @@
 
 ## Interface.mtu property
 
-the packet size
+the packet size. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-mtu: number
+mtu: Integer | null
 ```

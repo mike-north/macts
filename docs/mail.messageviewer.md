@@ -33,62 +33,19 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[draftsMailbox](./mail.messageviewer.draftsmailbox.md)
-
-</td><td>
-
-</td><td>
-
-[Mailbox](./mail.mailbox.md)
-
-</td><td>
-
-The top level Drafts mailbox
-
-</td></tr>
-<tr><td>
-
 [id](./mail.messageviewer.id.md)
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The unique identifier of the message viewer
-
-</td></tr>
-<tr><td>
-
-[inbox](./mail.messageviewer.inbox.md)
+[Integer](./contracts.integer.md)
 
 </td><td>
 
-</td><td>
-
-[Mailbox](./mail.mailbox.md)
-
-</td><td>
-
-The top level In mailbox
-
-</td></tr>
-<tr><td>
-
-[junkMailbox](./mail.messageviewer.junkmailbox.md)
-
-</td><td>
-
-</td><td>
-
-[Mailbox](./mail.mailbox.md)
-
-</td><td>
-
-The top level Junk mailbox
+The unique identifier of the message viewer. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -99,26 +56,11 @@ The top level Junk mailbox
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Controls whether the list of mailboxes is visible or not
-
-</td></tr>
-<tr><td>
-
-[outbox](./mail.messageviewer.outbox.md)
-
-</td><td>
-
-</td><td>
-
-[Mailbox](./mail.mailbox.md)
-
-</td><td>
-
-The top level Out mailbox
+Controls whether the list of mailboxes is visible or not. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +71,11 @@ The top level Out mailbox
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Controls whether the preview pane of the message viewer window is visible or not
+Controls whether the preview pane of the message viewer window is visible or not. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +86,11 @@ Controls whether the preview pane of the message viewer window is visible or not
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-List of mailboxes currently selected in the list of mailboxes
+List of mailboxes currently selected in the list of mailboxes. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,26 +101,11 @@ List of mailboxes currently selected in the list of mailboxes
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-List of messages currently selected
-
-</td></tr>
-<tr><td>
-
-[sentMailbox](./mail.messageviewer.sentmailbox.md)
-
-</td><td>
-
-</td><td>
-
-[Mailbox](./mail.mailbox.md)
-
-</td><td>
-
-The top level Sent mailbox
+List of messages currently selected. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -189,11 +116,11 @@ The top level Sent mailbox
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The column that is currently sorted in the viewer
+The column that is currently sorted in the viewer. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -204,26 +131,11 @@ The column that is currently sorted in the viewer
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the viewer is sorted ascending or not
-
-</td></tr>
-<tr><td>
-
-[trashMailbox](./mail.messageviewer.trashmailbox.md)
-
-</td><td>
-
-</td><td>
-
-[Mailbox](./mail.mailbox.md)
-
-</td><td>
-
-The top level Trash mailbox
+Whether the viewer is sorted ascending or not. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -234,11 +146,11 @@ The top level Trash mailbox
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-List of columns that are visible. The subject column and the message status column will always be visible
+List of columns that are visible. The subject column and the message status column will always be visible. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -249,11 +161,11 @@ List of columns that are visible. The subject column and the message status colu
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-List of messages currently being displayed in the viewer
+List of messages currently being displayed in the viewer. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -4,10 +4,10 @@
 
 ## Calendar.title property
 
-The calendar title (synonym for name)
+The calendar title (synonym for name). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-title: string
+title: string | null
 ```

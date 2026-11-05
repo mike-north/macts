@@ -4,7 +4,7 @@
 
 ## createServer() function
 
-Create a macts API server for a single app.
+Create a macts API server for a single app, registered from its manifest.
 
 **Signature:**
 
@@ -37,7 +37,7 @@ manifest
 
 </td><td>
 
-App manifest to serve
+App manifest to serve, as passthrough
 
 </td></tr>
 <tr><td>
@@ -60,6 +60,10 @@ _(Optional)_ Server configuration
 [ServerInstance](./api.serverinstance.md)
 
 Hono app configured with routes
+
+## Remarks
+
+The manifest is registered as passthrough: its operations carry no contract value types, and each operation's input must hold exactly its command's declared parameters, so a request with any other key is rejected as `VALIDATION_FAILED`<!-- -->. To serve an app from its generated contract instead, use [ServerOptions.register](./api.serveroptions.register.md)<!-- -->.
 
 ## Example
 

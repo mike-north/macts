@@ -4,6 +4,8 @@
 
 ## MailboxSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -11,8 +13,6 @@ MailboxSchema: z.ZodObject<
   {
     name: z.ZodString
     unreadCount: z.ZodNumber
-    account: z.ZodString
-    container: z.ZodString
   },
   z.core.$strip
 >

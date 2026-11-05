@@ -6,7 +6,9 @@
 
 Generate a consolidated client package from a manifest.
 
-Combines the HTTP client SDK and CLI plugin into a single package with: - SDK source files at `src/` root (client.ts, types.ts, resources/, index.ts) - CLI source files under `src/cli/` (commands/, plugin.ts, index.ts, output/, sdk.ts) - Unified config files (package.json, tsconfig, tsup, api-extractor)
+Combines the HTTP client SDK and CLI plugin into a single package with: - SDK source files at `src/` root (client.ts, types.ts, resources/, index.ts) - CLI source files under `src/cli/` (commands/, plugin.ts, index.ts, output/, sdk.ts) - The app contract under `src/contract/` (index.ts, manifest.ts) - Unified config files (package.json, tsconfig, tsup, api-extractor), with a second API Extractor config that reports the `./contract` subpath - A `.gitattributes` marking the files it generates as generated
+
+A manifest with a command that must select one item and declares no identifier parameter, or a resource whose identifier declares no targeting and is not the class's dictionary id, is refused (`generationRefusals`<!-- -->): the result holds the errors naming each such command or resource, and no files.
 
 **Signature:**
 

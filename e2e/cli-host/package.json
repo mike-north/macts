@@ -32,6 +32,7 @@
     "@macts/notes-server": "workspace:*",
     "@macts/omnifocus-server": "workspace:*",
     "@macts/omnigraffle-server": "workspace:*",
+    "@macts/omniplan": "workspace:*",
     "@macts/omniplan-server": "workspace:*",
     "@macts/photos-server": "workspace:*",
     "@macts/preview-server": "workspace:*",

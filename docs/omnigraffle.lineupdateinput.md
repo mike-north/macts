@@ -4,12 +4,13 @@
 
 ## LineUpdateInput type
 
-Input for updating a Line
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type LineUpdateInput = Partial<LineCreateInput>
+type LineUpdateInput = Omit<LineUpdateInput$1, 'headMagnet' | 'tailMagnet'> & {
+  headMagnet?: null extends LineUpdateInput$1['headMagnet'] ? number | null : number
+  tailMagnet?: null extends LineUpdateInput$1['tailMagnet'] ? number | null : number
+}
 ```
-
-**References:** [LineCreateInput](./omnigraffle.linecreateinput.md)

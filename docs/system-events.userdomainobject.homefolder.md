@@ -4,10 +4,10 @@
 
 ## UserDomainObject.homeFolder property
 
-The user's Home folder
+The user's Home folder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-homeFolder: Folder
+readonly homeFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

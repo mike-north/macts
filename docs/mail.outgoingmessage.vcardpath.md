@@ -4,10 +4,10 @@
 
 ## OutgoingMessage.vcardPath property
 
-Does nothing at all (deprecated)
+Does nothing at all (deprecated). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-vcardPath: string
+vcardPath: FileValue | null
 ```

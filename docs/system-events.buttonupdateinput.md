@@ -4,12 +4,10 @@
 
 ## ButtonUpdateInput type
 
-Input for updating a Button
+Input for updating a Button. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ButtonUpdateInput = Partial<ButtonCreateInput>
+type ButtonUpdateInput = Record<string, never>
 ```
-
-**References:** [ButtonCreateInput](./system-events.buttoncreateinput.md)

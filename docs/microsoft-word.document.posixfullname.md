@@ -4,10 +4,10 @@
 
 ## Document.posixFullName property
 
-The full path of the document in POSIX format
+The full path of the document in POSIX format. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-posixFullName: string
+readonly posixFullName: string | null;
 ```

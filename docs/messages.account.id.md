@@ -4,10 +4,10 @@
 
 ## Account.id property
 
-A unique identifier for this account.
+A unique identifier for this account. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

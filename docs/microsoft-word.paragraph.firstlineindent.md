@@ -4,10 +4,10 @@
 
 ## Paragraph.firstLineIndent property
 
-The first-line or hanging indent value in points
+The first-line or hanging indent value in points. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-firstLineIndent: number
+firstLineIndent: number | null
 ```

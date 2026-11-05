@@ -4,12 +4,24 @@
 
 ## AccountUpdateInput type
 
-Input for updating a Account
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type AccountUpdateInput = Partial<AccountCreateInput>
+type AccountUpdateInput = Omit<
+  AccountUpdateInput$1,
+  'emptyJunkMessagesFrequency' | 'emptySentMessagesFrequency' | 'emptyTrashFrequency' | 'port'
+> & {
+  emptyJunkMessagesFrequency?: null extends AccountUpdateInput$1['emptyJunkMessagesFrequency']
+    ? number | null
+    : number
+  emptySentMessagesFrequency?: null extends AccountUpdateInput$1['emptySentMessagesFrequency']
+    ? number | null
+    : number
+  emptyTrashFrequency?: null extends AccountUpdateInput$1['emptyTrashFrequency']
+    ? number | null
+    : number
+  port?: null extends AccountUpdateInput$1['port'] ? number | null : number
+}
 ```
-
-**References:** [AccountCreateInput](./mail.accountcreateinput.md)

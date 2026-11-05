@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./calendar.calendarresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./calendar.calendarresourceclient.create.md)
 
 </td><td>
 
@@ -68,24 +68,24 @@ Create a new calendar.
 </td></tr>
 <tr><td>
 
-[get(id)](./calendar.calendarresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./calendar.calendarresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a calendar by id.
+Get a calendar by id. When several calendars share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[list()](./calendar.calendarresourceclient.list.md)
+[list(\_\_mactsOptions)](./calendar.calendarresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all calendars.
+List all calendars, as one page.
 
 </td></tr>
 </tbody></table>

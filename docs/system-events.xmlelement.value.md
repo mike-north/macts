@@ -4,10 +4,10 @@
 
 ## XMLElement.value property
 
-the value of the XML element
+the value of the XML element. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-value: string
+value: string | null
 ```

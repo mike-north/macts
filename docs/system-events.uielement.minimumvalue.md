@@ -4,10 +4,10 @@
 
 ## UIElement.minimumValue property
 
-the minimum value that the UI element can take on
+the minimum value that the UI element can take on. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-minimumValue: string
+readonly minimumValue: string | null;
 ```

@@ -4,10 +4,10 @@
 
 ## InboxTask.dueDate property
 
-When the task must be finished
+When the task must be finished. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-dueDate: Date
+dueDate: Date | null
 ```

@@ -4,10 +4,10 @@
 
 ## EventCreateInput.excludedDates property
 
-The exception dates for recurring events
+Exception dates for recurring events
 
 **Signature:**
 
 ```typescript
-excludedDates?: Date[];
+excludedDates?: readonly Date[];
 ```

@@ -4,7 +4,7 @@
 
 ## EventCreateInput.status property
 
-The event status
+Event status
 
 **Signature:**
 

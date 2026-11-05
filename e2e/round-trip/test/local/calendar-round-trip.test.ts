@@ -90,7 +90,7 @@
 
 import { describe, expect, it } from 'vitest'
 import { CalendarClient } from '@macts/calendar'
-import { runCalendarRoundTrip } from '../../src/harness.js'
+import { runCalendarRoundTrip, type CalendarClientFacade } from '../../src/harness.js'
 
 // Gate: skip the entire suite if the live environment is absent.
 // MACTS_API_KEY is the canonical signal that the macts server is reachable and
@@ -113,7 +113,36 @@ describe.skipIf(!liveEnvPresent)(
 
       // runCalendarRoundTrip throws on any invariant violation, so a passing
       // test is a full structural pass — not just "no exception".
-      const result = await runCalendarRoundTrip(client)
+      // Calendar's lists are unpaged and calendars are addressed by its primary name in the canonical
+      // contract. Project only the harness fields; do not invent an SDK id alias.
+      const facade: CalendarClientFacade = {
+        calendars: {
+          list: async () => {
+            const page = await client.calendars.list()
+            return {
+              items: page.items.map((calendar) => ({
+                id: calendar.name,
+                name: calendar.name,
+                writable: calendar.writable === true,
+              })),
+            }
+          },
+        },
+        events: {
+          list: async (calendarId) => {
+            const result = await client.events.list(calendarId)
+            return {
+              ...result,
+              items: result.items.map((event) => ({ id: event.uid, summary: event.summary })),
+            }
+          },
+          create: async (input) => {
+            const result = await client.events.create(input)
+            return { id: result.uid, summary: result.summary }
+          },
+        },
+      }
+      const result = await runCalendarRoundTrip(facade)
 
       // Each assertion maps to a specific acceptance criterion from issue #84:
       //

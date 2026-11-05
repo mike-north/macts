@@ -4,10 +4,10 @@
 
 ## Service.kind property
 
-the type of service
+the type of service. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-kind: number
+readonly kind: Integer | null;
 ```

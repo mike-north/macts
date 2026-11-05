@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(id)](./omnifocus.perspectiveresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./omnifocus.perspectiveresourceclient.get.md)
 
 </td><td>
 
@@ -68,13 +68,13 @@ Get a perspective by id.
 </td></tr>
 <tr><td>
 
-[list()](./omnifocus.perspectiveresourceclient.list.md)
+[list(\_\_mactsOptions)](./omnifocus.perspectiveresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all perspectives.
+List all perspectives, as one page.
 
 </td></tr>
 </tbody></table>

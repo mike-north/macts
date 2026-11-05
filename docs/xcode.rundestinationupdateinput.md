@@ -4,12 +4,10 @@
 
 ## RunDestinationUpdateInput type
 
-Input for updating a RunDestination
+Input for updating a RunDestination. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type RunDestinationUpdateInput = Partial<RunDestinationCreateInput>
+type RunDestinationUpdateInput = Record<string, never>
 ```
-
-**References:** [RunDestinationCreateInput](./xcode.rundestinationcreateinput.md)

@@ -4,7 +4,7 @@
 
 ## FileTrackCreateInput interface
 
-Input for creating a FileTrack
+Input for creating a FileTrack.
 
 **Signature:**
 
@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-string
+[FileSource](./contracts.filesource.md)
 
 </td><td>
 

@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the disk item busy?
+boolean \| null
+
+</td><td>
+
+Is the disk item busy? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ Is the disk item busy?
 
 </td><td>
 
-</td><td>
-
-unknown
+`readonly`
 
 </td><td>
 
-the folder or disk which has this disk item as an element
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[DiskItem](./system-events.diskitem.md)<!-- -->, string, 'DiskItem'&gt; \| null
+
+</td><td>
+
+the folder or disk which has this disk item as an element. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ the folder or disk which has this disk item as an element
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-the date on which the disk item was created
+Date \| null
+
+</td><td>
+
+the date on which the disk item was created. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ the date on which the disk item was created
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the name of the disk item as displayed in the User Interface
+string \| null
+
+</td><td>
+
+the name of the disk item as displayed in the User Interface. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +105,15 @@ the name of the disk item as displayed in the User Interface
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the unique ID of the disk item
+string \| null
+
+</td><td>
+
+the unique ID of the disk item. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +124,11 @@ the unique ID of the disk item
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-the date on which the disk item was last modified
+the date on which the disk item was last modified. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +139,11 @@ the date on which the disk item was last modified
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the name of the disk item
+the name of the disk item. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +152,15 @@ the name of the disk item
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the extension portion of the name
+string \| null
+
+</td><td>
+
+the extension portion of the name. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +169,15 @@ the extension portion of the name
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the disk item a package?
+boolean \| null
+
+</td><td>
+
+Is the disk item a package? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -172,13 +186,15 @@ Is the disk item a package?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the file system path of the disk item
+string \| null
+
+</td><td>
+
+the file system path of the disk item. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -187,20 +203,24 @@ the file system path of the disk item
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the actual space used by the disk item on disk
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the actual space used by the disk item on disk. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
 
-[pOSIXPath](./system-events.diskitem.posixpath.md)
+[posixPath](./system-events.diskitem.posixpath.md)
 
 </td><td>
+
+`readonly`
 
 </td><td>
 
@@ -208,7 +228,7 @@ string
 
 </td><td>
 
-the POSIX file system path of the disk item
+the POSIX file system path of the disk item. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -217,13 +237,15 @@ the POSIX file system path of the disk item
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the logical size of the disk item
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the logical size of the disk item. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -232,13 +254,15 @@ the logical size of the disk item
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the URL of the disk item
+string \| null
+
+</td><td>
+
+the URL of the disk item. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -249,11 +273,11 @@ the URL of the disk item
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Is the disk item visible?
+Is the disk item visible? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -262,13 +286,15 @@ Is the disk item visible?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the volume on which the disk item resides
+string \| null
+
+</td><td>
+
+the volume on which the disk item resides. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

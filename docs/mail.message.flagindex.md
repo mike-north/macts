@@ -4,10 +4,10 @@
 
 ## Message.flagIndex property
 
-The flag on the message, or -1 if the message is not flagged
+The flag on the message, or -1 if the message is not flagged. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-flagIndex: number
+flagIndex: Integer | null
 ```

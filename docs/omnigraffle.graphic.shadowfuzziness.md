@@ -4,10 +4,10 @@
 
 ## Graphic.shadowFuzziness property
 
-The 'fuzziness' of the graphic's shadow
+The 'fuzziness' of the graphic's shadow. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-shadowFuzziness: number
+shadowFuzziness: number | null
 ```

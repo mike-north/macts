@@ -4,10 +4,10 @@
 
 ## Track.start property
 
-the start time of the track in seconds
+the start time of the track in seconds. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-start: number
+start: number | null
 ```

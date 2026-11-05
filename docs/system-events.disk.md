@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the total number of bytes (free or used) on the disk
+number \| null
+
+</td><td>
+
+the total number of bytes (free or used) on the disk. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ the total number of bytes (free or used) on the disk
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Can the media be ejected (floppies, CD's, and so on)?
+boolean \| null
+
+</td><td>
+
+Can the media be ejected (floppies, CD's, and so on)? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ Can the media be ejected (floppies, CD's, and so on)?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the file system format of this disk
+string \| null
+
+</td><td>
+
+the file system format of this disk. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ the file system format of this disk
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the number of free bytes left on the disk
+number \| null
+
+</td><td>
+
+the number of free bytes left on the disk. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +107,11 @@ the number of free bytes left on the disk
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Ignore permissions on this disk?
+Ignore permissions on this disk? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,13 +120,15 @@ Ignore permissions on this disk?
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the media a local volume (as opposed to a file server)?
+boolean \| null
+
+</td><td>
+
+Is the media a local volume (as opposed to a file server)? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +137,15 @@ Is the media a local volume (as opposed to a file server)?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the server on which the disk resides, AFP volumes only
+string \| null
+
+</td><td>
+
+the server on which the disk resides, AFP volumes only. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +154,15 @@ the server on which the disk resides, AFP volumes only
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is this disk the boot disk?
+boolean \| null
+
+</td><td>
+
+Is this disk the boot disk? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +171,15 @@ Is this disk the boot disk?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the zone in which the disk's server resides, AFP volumes only
+string \| null
+
+</td><td>
+
+the zone in which the disk's server resides, AFP volumes only. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/tv](./tv.md) &gt; [URLTrackUpdateInput](./tv.urltrackupdateinput.md)
 
-## URLTrackUpdateInput type
+## URLTrackUpdateInput interface
 
-Input for updating a URLTrack
+Input for updating an URLTrack. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type URLTrackUpdateInput = Partial<URLTrackCreateInput>
+interface URLTrackUpdateInput
 ```
 
-**References:** [URLTrackCreateInput](./tv.urltrackcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[address?](./tv.urltrackupdateinput.address.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the URL for this track. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

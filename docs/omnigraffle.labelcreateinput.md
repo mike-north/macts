@@ -4,7 +4,7 @@
 
 ## LabelCreateInput interface
 
-Input for creating a Label
+Input for creating a Label.
 
 **Signature:**
 

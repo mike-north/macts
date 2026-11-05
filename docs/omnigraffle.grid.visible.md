@@ -4,10 +4,10 @@
 
 ## Grid.visible property
 
-Is the grid visible?
+Is the grid visible? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-visible: boolean
+visible: boolean | null
 ```

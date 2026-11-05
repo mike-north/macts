@@ -4,12 +4,10 @@
 
 ## MenuUpdateInput type
 
-Input for updating a Menu
+Input for updating a Menu. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type MenuUpdateInput = Partial<MenuCreateInput>
+type MenuUpdateInput = Record<string, never>
 ```
-
-**References:** [MenuCreateInput](./system-events.menucreateinput.md)

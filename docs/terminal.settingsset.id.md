@@ -4,10 +4,10 @@
 
 ## SettingsSet.id property
 
-The unique identifier of the settings set
+The unique identifier of the settings set. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: number | null;
 ```

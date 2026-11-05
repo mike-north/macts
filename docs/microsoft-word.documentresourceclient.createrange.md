@@ -4,12 +4,12 @@
 
 ## DocumentResourceClient.createRange() method
 
-Create a text range by character positions
+Create a text range by character positions. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 **Signature:**
 
 ```typescript
-createRange(start?: number, end?: number): Promise<void>;
+createRange(id: string, start?: number, end?: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -29,6 +29,17 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+id
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 start
 
 </td><td>
@@ -47,6 +58,19 @@ end
 </td><td>
 
 number
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

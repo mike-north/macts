@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-a more complete description of the UI element and its capabilities
+string \| null
+
+</td><td>
+
+a more complete description of the UI element and its capabilities. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ a more complete description of the UI element and its capabilities
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the class of the UI Element, which identifies it function
+string \| null
+
+</td><td>
+
+the class of the UI Element, which identifies it function. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ the class of the UI Element, which identifies it function
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the accessibility description, if available; otherwise, the role description
+string \| null
+
+</td><td>
+
+the accessibility description, if available; otherwise, the role description. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ the accessibility description, if available; otherwise, the role description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-Is the UI element enabled? ( Does it accept clicks? )
+string \| null
+
+</td><td>
+
+Is the UI element enabled? ( Does it accept clicks? ). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +105,15 @@ Is the UI element enabled? ( Does it accept clicks? )
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-a list of every UI element contained in this UI element and its child UI elements, to the limits of the tree
+string \| null
+
+</td><td>
+
+a list of every UI element contained in this UI element and its child UI elements, to the limits of the tree. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +124,11 @@ a list of every UI element contained in this UI element and its child UI element
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Is the focus on this UI element?
+Is the focus on this UI element? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +137,15 @@ Is the focus on this UI element?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-an elaborate description of the UI element and its capabilities
+string \| null
+
+</td><td>
+
+an elaborate description of the UI element and its capabilities. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +154,15 @@ an elaborate description of the UI element and its capabilities
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the maximum value that the UI element can take on
+string \| null
+
+</td><td>
+
+the maximum value that the UI element can take on. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +171,15 @@ the maximum value that the UI element can take on
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the minimum value that the UI element can take on
+string \| null
+
+</td><td>
+
+the minimum value that the UI element can take on. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -172,13 +188,15 @@ the minimum value that the UI element can take on
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the name of the UI Element, which identifies it within its container
+string \| null
+
+</td><td>
+
+the name of the UI Element, which identifies it within its container. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -187,13 +205,15 @@ the name of the UI Element, which identifies it within its container
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the orientation of the UI element
+string \| null
+
+</td><td>
+
+the orientation of the UI element. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -204,11 +224,11 @@ the orientation of the UI element
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the position of the UI element
+the position of the UI element. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -217,13 +237,15 @@ the position of the UI element
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-an encoded description of the UI element and its capabilities
+string \| null
+
+</td><td>
+
+an encoded description of the UI element and its capabilities. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -232,13 +254,15 @@ an encoded description of the UI element and its capabilities
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-a more complete description of the UI element's role
+string \| null
+
+</td><td>
+
+a more complete description of the UI element's role. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -249,11 +273,11 @@ a more complete description of the UI element's role
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Is the UI element selected?
+Is the UI element selected? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -264,11 +288,11 @@ Is the UI element selected?
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the size of the UI element
+the size of the UI element. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -277,13 +301,15 @@ the size of the UI element
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-an encoded description of the UI element and its capabilities
+string \| null
+
+</td><td>
+
+an encoded description of the UI element and its capabilities. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -292,13 +318,15 @@ an encoded description of the UI element and its capabilities
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the title of the UI element as it appears on the screen
+string \| null
+
+</td><td>
+
+the title of the UI element as it appears on the screen. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -309,11 +337,11 @@ the title of the UI element as it appears on the screen
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the current value of the UI element
+the current value of the UI element. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -4,12 +4,10 @@
 
 ## MomentUpdateInput type
 
-Input for updating a Moment
+Input for updating a Moment. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type MomentUpdateInput = Partial<MomentCreateInput>
+type MomentUpdateInput = Record<string, never>
 ```
-
-**References:** [MomentCreateInput](./photos.momentcreateinput.md)

@@ -4,10 +4,10 @@
 
 ## Track.movementCount property
 
-the total number of movements in the work
+the total number of movements in the work. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-movementCount: number
+movementCount: Integer | null
 ```

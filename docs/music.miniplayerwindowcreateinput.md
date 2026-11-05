@@ -4,7 +4,7 @@
 
 ## MiniplayerWindowCreateInput type
 
-Input for creating a MiniplayerWindow
+Input for creating a MiniplayerWindow.
 
 **Signature:**
 

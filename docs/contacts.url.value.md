@@ -4,10 +4,10 @@
 
 ## Url.value property
 
-The URL value
+The URL value. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-value: string
+value: string | null
 ```

@@ -4,7 +4,7 @@
 
 ## BccRecipientCreateInput type
 
-Input for creating a BccRecipient
+Input for creating a BccRecipient.
 
 **Signature:**
 

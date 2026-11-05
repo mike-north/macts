@@ -37,28 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the service active?
-
-</td></tr>
-<tr><td>
-
-[currentConfiguration](./system-events.service.currentconfiguration.md)
+boolean \| null
 
 </td><td>
 
-</td><td>
-
-[Configuration](./system-events.configuration.md)
-
-</td><td>
-
-the currently selected configuration
+Is the service active? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,28 +54,15 @@ the currently selected configuration
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-the unique identifier for the service
-
-</td></tr>
-<tr><td>
-
-[interface](./system-events.service.interface.md)
-
-</td><td>
-
-</td><td>
-
-[Interface](./system-events.interface.md)
-
-</td><td>
-
-the interface the service is built on
+the unique identifier for the service. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -97,13 +71,15 @@ the interface the service is built on
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the type of service
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the type of service. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +90,11 @@ the type of service
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the name of the service
+the name of the service. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

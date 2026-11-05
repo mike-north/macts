@@ -2,139 +2,14 @@
 
 [Home](./index.md) &gt; [@macts/messages](./messages.md) &gt; [MessagesClient](./messages.messagesclient.md)
 
-## MessagesClient class
+## MessagesClient interface
 
-Messages client for HTTP-based macOS automation.
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 **Signature:**
 
 ```typescript
-declare class MessagesClient
+interface MessagesClient extends ClientBrand<MessagesResources>
 ```
 
-## Example
-
-```typescript
-const client = new MessagesClient({
-  apiKey: process.env.MACTS_API_KEY!,
-})
-
-// List calendars
-const calendars = await client.calendars.list()
-```
-
-## Constructors
-
-<table><thead><tr><th>
-
-Constructor
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[(constructor)(options)](./messages.messagesclient._constructor_.md)
-
-</td><td>
-
-</td><td>
-
-Constructs a new instance of the `MessagesClient` class
-
-</td></tr>
-</tbody></table>
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[http](./messages.messagesclient.http.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[HttpClient](./messages.httpclient.md)
-
-</td><td>
-
-Get the HTTP client for making custom requests.
-
-</td></tr>
-</tbody></table>
-
-## Methods
-
-<table><thead><tr><th>
-
-Method
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[login()](./messages.messagesclient.login.md)
-
-</td><td>
-
-</td><td>
-
-Login to all accounts.
-
-</td></tr>
-<tr><td>
-
-[logout()](./messages.messagesclient.logout.md)
-
-</td><td>
-
-</td><td>
-
-Logout of all accounts.
-
-</td></tr>
-<tr><td>
-
-[send(to)](./messages.messagesclient.send.md)
-
-</td><td>
-
-</td><td>
-
-Sends a message to a participant or to a chat.
-
-</td></tr>
-</tbody></table>
+**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[MessagesResources](./messages.messagesresources.md)<!-- -->&gt;

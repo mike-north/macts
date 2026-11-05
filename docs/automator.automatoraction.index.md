@@ -4,10 +4,10 @@
 
 ## AutomatorAction.index property
 
-The index of the action
+The index of the action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-index: number
+index: Integer | null
 ```

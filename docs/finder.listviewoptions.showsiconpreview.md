@@ -4,10 +4,10 @@
 
 ## ListViewOptions.showsIconPreview property
 
-displays a preview of the item in list view
+displays a preview of the item in list view. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-showsIconPreview: boolean
+showsIconPreview: boolean | null
 ```

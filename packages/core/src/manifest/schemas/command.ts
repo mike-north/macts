@@ -62,7 +62,20 @@ export const CommandParameterSchema = z
       })
       .optional(),
   })
-  .superRefine(checkNullabilityClaim)
+  .superRefine((parameter, ctx) => {
+    checkNullabilityClaim(parameter, ctx)
+    // Absent reads are failed reads of a property; a parameter is never read.
+    if (parameter.evidence?.nullable?.source === 'curated') {
+      if (parameter.evidence.nullable.absentReads !== undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          message:
+            'absentReads records reads of a property in which the app reported no value; a parameter is never read, so it cannot record them.',
+          path: ['evidence', 'nullable', 'absentReads'],
+        })
+      }
+    }
+  })
 export type CommandParameter = z.infer<typeof CommandParameterSchema>
 
 /**

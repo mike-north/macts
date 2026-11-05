@@ -4,10 +4,10 @@
 
 ## UserDomainObject.musicFolder property
 
-The user's Music folder
+The user's Music folder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-musicFolder: Folder
+readonly musicFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

@@ -4,12 +4,10 @@
 
 ## UserDomainObjectUpdateInput type
 
-Input for updating a UserDomainObject
+Input for updating an UserDomainObject. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type UserDomainObjectUpdateInput = Partial<UserDomainObjectCreateInput>
+type UserDomainObjectUpdateInput = Record<string, never>
 ```
-
-**References:** [UserDomainObjectCreateInput](./system-events.userdomainobjectcreateinput.md)

@@ -4,7 +4,7 @@
 
 ## ViolationCreateInput type
 
-Input for creating a Violation
+Input for creating a Violation.
 
 **Signature:**
 

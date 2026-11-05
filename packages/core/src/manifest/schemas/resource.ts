@@ -1,9 +1,11 @@
 import { z } from 'zod'
 import { PropertyClaimsSchema, PropertySchema } from './property.js'
 import {
+  checkCuratedAbsence,
   DictionaryTermEvidenceSchema,
   IdentifierUniquenessEvidenceSchema,
   ObservedAtSchema,
+  PositionalEvidenceSchema,
   RangeReadEvidenceSchema,
   ResourceAbsenceEvidenceSchema,
 } from './evidence.js'
@@ -433,6 +435,25 @@ export const ResourceRangeReadSchema = z
 export type ResourceRangeRead = z.infer<typeof ResourceRangeReadSchema>
 
 /**
+ * The marker of a resource whose objects have no identifier and are found by
+ * their zero-based position within their parent: the app's element
+ * addressing within that parent, `container[collection].at(index)`. Its
+ * `get` (and `update` and `delete`) takes the position as its item parameter,
+ * and a reference to one of its objects is an index selector within the
+ * object its parent is (phases/13 D7, "Emitted forms").
+ *
+ * A position means whatever object holds it when it is used: it drifts as
+ * objects are added to, removed from or moved within the container.
+ *
+ * It is curated with evidence and never inferred, from a missing identifier
+ * or from anything else. A resource with a primary identifier is found by
+ * that identifier, so it cannot be positional; and the parent must be one the
+ * app finds by its identifier (`findPositionalIssues` in `../positional.ts`).
+ */
+export const ResourcePositionalSchema = z.object({ evidence: PositionalEvidenceSchema }).strict()
+export type ResourcePositional = z.infer<typeof ResourcePositionalSchema>
+
+/**
  * Schema for a resource type definition.
  */
 export const ResourceSchema = z
@@ -513,11 +534,19 @@ export const ResourceSchema = z
      * evidence. Absent for a resource reached through a collection.
      */
     roots: ResourceRootsSchema.optional(),
+    /**
+     * Set when the resource's objects have no identifier and are found by
+     * their position within their parent, with the evidence
+     * (`ResourcePositionalSchema`). Absent for a resource found by its
+     * identifier.
+     */
+    positional: ResourcePositionalSchema.optional(),
   })
   .superRefine((resource, ctx) => {
     checkNativeSpellings(resource, ctx)
     checkRoots(resource, ctx)
     checkKeyTargeting(resource.identifiers ?? [], ctx)
+    checkCuratedAbsence(resource, ctx)
     if (resource.rangeRead !== undefined && resource.unsupported !== undefined) {
       ctx.addIssue({
         code: 'custom',

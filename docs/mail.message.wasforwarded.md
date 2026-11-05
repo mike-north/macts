@@ -4,10 +4,10 @@
 
 ## Message.wasForwarded property
 
-Indicates whether the message was forwarded or not
+Indicates whether the message was forwarded or not. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-wasForwarded: boolean
+readonly wasForwarded: boolean | null;
 ```

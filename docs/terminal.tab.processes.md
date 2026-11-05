@@ -4,10 +4,10 @@
 
 ## Tab.processes property
 
-The currently running processes in the tab
+The currently running processes in the tab. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-processes: string
+readonly processes: string | null;
 ```

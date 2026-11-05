@@ -5,336 +5,105 @@
 
 import { z } from 'zod'
 
-/** Status of a project */
-export type ProjectStatus = 'active' | 'onHold' | 'done' | 'dropped'
+export type { ProjectStatus } from './contract/index.js'
 
-/** Unit for time intervals */
-export type IntervalUnit = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
+export type { IntervalUnit } from './contract/index.js'
 
-/** Method for task repetition */
-export type RepetitionMethod = 'fixedRepetition' | 'startAfterCompletion' | 'dueAfterCompletion'
+export type { RepetitionMethod } from './contract/index.js'
 
-/** Schedule type for repetition */
-export type RepetitionSchedule = 'regularly' | 'fromCompletion'
+export type { RepetitionSchedule } from './contract/index.js'
 
-/** Which date property to base repetition on */
-export type RepetitionBasedOn = 'basedOnDue' | 'basedOnPlanned' | 'basedOnDefer'
+export type { RepetitionBasedOn } from './contract/index.js'
 
-/** A task within OmniFocus */
-export interface Task {
-  /** The unique identifier of the task */
-  id: string
-  /** The name of the task */
-  name: string
-  /** The note of the task */
-  note: string
-  /** True if flagged */
-  flagged: boolean
-  /** True if the task is completed */
-  completed: boolean
-  /** When the task should become available for action */
-  deferDate: Date
-  /** The date at which work for this task is intended */
-  plannedDate: Date
-  /** When the task must be finished */
-  dueDate: Date
-  /** The task's date of completion */
-  completionDate: Date
-  /** The date the task was dropped */
-  droppedDate: Date
-  /** When the task was created */
-  creationDate: Date
-  /** When the task was last modified */
-  modificationDate: Date
-  /** The estimated time, in whole minutes, that this task will take to finish */
-  estimatedMinutes: number
-  /** If true, any children are sequentially dependent */
-  sequential: boolean
-  /** If true, complete when children are completed */
-  completedByChildren: boolean
-  /** Returns true if the task itself is an inbox task or if the task is contained by an inbox task */
-  inInbox: boolean
-  /** If the task is the next task of its containing project, next is true */
-  next: boolean
-  /** True if the task has a task that must be completed prior to it being actionable */
-  blocked: boolean
-  /** When the task should become available for action (including inherited) */
-  effectiveDeferDate: Date
-  /** The date at which work for this task is intended (including inherited) */
-  effectivePlannedDate: Date
-  /** When the task must be finished (including inherited) */
-  effectiveDueDate: Date
-  /** True if the task is completed, or any of its containing tasks or project are completed */
-  effectivelyCompleted: boolean
-  /** True if the task is dropped, or any of its containing tasks or project are dropped */
-  effectivelyDropped: boolean
-  /** True if the task is dropped */
-  dropped: boolean
-  /** The number of direct children of this task */
-  numberOfTasks: number
-  /** The number of available direct children of this task */
-  numberOfAvailableTasks: number
-  /** The number of completed direct children of this task */
-  numberOfCompletedTasks: number
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Task } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type TaskCreateInput = Omit<
+  import('./contract/index.js').TaskCreateInput,
+  'estimatedMinutes'
+> & {
+  /** The estimated time, in whole minutes, that this task will take to finish Numeric values are validated by the contract before dispatch. */
+  estimatedMinutes?: null extends import('./contract/index.js').TaskCreateInput['estimatedMinutes']
+    ? number | null
+    : number
 }
 
-/** Input for creating a Task */
-export interface TaskCreateInput {
-  /** Task name */
-  name: string
-  /** Task note */
-  note?: string
-  /** True if flagged */
-  flagged?: boolean
-  /** Defer date */
-  deferDate?: Date
-  /** The date at which work for this task is intended */
-  plannedDate?: Date
-  /** Due date */
-  dueDate?: Date
-  /** The task's date of completion */
-  completionDate?: Date
-  /** The date the task was dropped */
-  droppedDate?: Date
-  /** When the task was created */
-  creationDate?: Date
-  /** The estimated time, in whole minutes, that this task will take to finish */
-  estimatedMinutes?: number
-  /** If true, any children are sequentially dependent */
-  sequential?: boolean
-  /** If true, complete when children are completed */
-  completedByChildren?: boolean
+/** Canonical update input, retaining checked numeric conveniences. */
+export type TaskUpdateInput = Omit<
+  import('./contract/index.js').TaskUpdateInput,
+  'estimatedMinutes'
+> & {
+  /** The estimated time, in whole minutes, that this task will take to finish Numeric values are validated by the contract before dispatch. */
+  estimatedMinutes?: null extends import('./contract/index.js').TaskUpdateInput['estimatedMinutes']
+    ? number | null
+    : number
 }
 
-/** Input for updating a Task */
-export type TaskUpdateInput = Partial<TaskCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Project } from './contract/index.js'
 
-/** A project in OmniFocus */
-export interface Project {
-  /** The unique identifier of the project */
-  id: string
-  /** The name of the project */
-  name: string
-  /** The note of the project */
-  note: string
-  /** The status of the project */
-  status: ProjectStatus
-  /** The effective status of the project */
-  effectiveStatus: ProjectStatus
-  /** True if flagged */
-  flagged: boolean
-  /** True if the project is completed */
-  completed: boolean
-  /** When the project should become available for action */
-  deferDate: Date
-  /** The date at which work for this project is intended */
-  plannedDate: Date
-  /** When the project must be finished */
-  dueDate: Date
-  /** The project's date of completion */
-  completionDate: Date
-  /** The date the project was dropped */
-  droppedDate: Date
-  /** When the project was created */
-  creationDate: Date
-  /** When the project was last modified */
-  modificationDate: Date
-  /** When the project was last reviewed */
-  lastReviewDate: Date
-  /** When the project should next be reviewed */
-  nextReviewDate: Date
-  /** The estimated time, in whole minutes, that this project will take to finish */
-  estimatedMinutes: number
-  /** If true, any children are sequentially dependent */
-  sequential: boolean
-  /** If true, complete when children are completed */
-  completedByChildren: boolean
-  /** True if the project contains singleton actions */
-  singletonActionHolder: boolean
-  /** True if the project is the default holder of singleton actions */
-  defaultSingletonActionHolder: boolean
-  /** True if the project has a project that must be completed prior to it being actionable */
-  blocked: boolean
-  /** When the project should become available for action (including inherited) */
-  effectiveDeferDate: Date
-  /** The date at which work for this project is intended (including inherited) */
-  effectivePlannedDate: Date
-  /** When the project must be finished (including inherited) */
-  effectiveDueDate: Date
-  /** True if the project is completed */
-  effectivelyCompleted: boolean
-  /** True if the project is dropped */
-  effectivelyDropped: boolean
-  /** True if the project is dropped */
-  dropped: boolean
-  /** The number of direct children of this project */
-  numberOfTasks: number
-  /** The number of available direct children of this project */
-  numberOfAvailableTasks: number
-  /** The number of completed direct children of this project */
-  numberOfCompletedTasks: number
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ProjectCreateInput = Omit<
+  import('./contract/index.js').ProjectCreateInput,
+  'estimatedMinutes'
+> & {
+  /** The estimated time, in whole minutes, that this project will take to finish Numeric values are validated by the contract before dispatch. */
+  estimatedMinutes?: null extends import('./contract/index.js').ProjectCreateInput['estimatedMinutes']
+    ? number | null
+    : number
 }
 
-/** Input for creating a Project */
-export interface ProjectCreateInput {
-  /** Project name */
-  name: string
-  /** Project note */
-  note?: string
-  /** Project status */
-  status?: ProjectStatus
-  /** True if flagged */
-  flagged?: boolean
-  /** When the project should become available for action */
-  deferDate?: Date
-  /** The date at which work for this project is intended */
-  plannedDate?: Date
-  /** When the project must be finished */
-  dueDate?: Date
-  /** The project's date of completion */
-  completionDate?: Date
-  /** The date the project was dropped */
-  droppedDate?: Date
-  /** When the project was created */
-  creationDate?: Date
-  /** When the project was last reviewed */
-  lastReviewDate?: Date
-  /** When the project should next be reviewed */
-  nextReviewDate?: Date
-  /** The estimated time, in whole minutes, that this project will take to finish */
-  estimatedMinutes?: number
-  /** If true, any children are sequentially dependent */
-  sequential?: boolean
-  /** If true, complete when children are completed */
-  completedByChildren?: boolean
-  /** True if the project contains singleton actions */
-  singletonActionHolder?: boolean
-  /** True if the project is the default holder of singleton actions */
-  defaultSingletonActionHolder?: boolean
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ProjectUpdateInput = Omit<
+  import('./contract/index.js').ProjectUpdateInput,
+  'estimatedMinutes'
+> & {
+  /** The estimated time, in whole minutes, that this project will take to finish Numeric values are validated by the contract before dispatch. */
+  estimatedMinutes?: null extends import('./contract/index.js').ProjectUpdateInput['estimatedMinutes']
+    ? number | null
+    : number
 }
 
-/** Input for updating a Project */
-export type ProjectUpdateInput = Partial<ProjectCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Folder } from './contract/index.js'
 
-/** A group of projects and sub-folders representing an area of responsibility */
-export interface Folder {
-  /** The unique identifier of the folder */
-  id: string
-  /** The name of the folder */
-  name: string
-  /** The note of the folder */
-  note: string
-  /** Set if the folder is currently hidden */
-  hidden: boolean
-  /** Set if the folder is currently hidden or any of its container folders are hidden */
-  effectivelyHidden: boolean
-  /** When the folder was created */
-  creationDate: Date
-  /** When the folder was last modified */
-  modificationDate: Date
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { FolderCreateInput } from './contract/index.js'
 
-/** Input for creating a Folder */
-export interface FolderCreateInput {
-  /** Folder name */
-  name: string
-  /** Folder note */
-  note?: string
-  /** Set if the folder is currently hidden */
-  hidden?: boolean
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { FolderUpdateInput } from './contract/index.js'
 
-/** Input for updating a Folder */
-export type FolderUpdateInput = Partial<FolderCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Tag } from './contract/index.js'
 
-/** A tag for organizing and filtering tasks */
-export interface Tag {
-  /** The unique identifier of the tag */
-  id: string
-  /** The name of the tag */
-  name: string
-  /** The note of the tag */
-  note: string
-  /** If false, tasks associated with this tag will be skipped when determining the next action for a project */
-  allowsNextAction: boolean
-  /** Set if the tag is currently hidden */
-  hidden: boolean
-  /** Set if the tag is currently hidden or any of its container tags are hidden */
-  effectivelyHidden: boolean
-  /** The number of available tasks */
-  availableTaskCount: number
-  /** The number of remaining tasks */
-  remainingTaskCount: number
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { TagCreateInput } from './contract/index.js'
 
-/** Input for creating a Tag */
-export interface TagCreateInput {
-  /** Tag name */
-  name: string
-  /** The note of the tag */
-  note?: string
-  /** If false, tasks associated with this tag will be skipped when determining the next action for a project */
-  allowsNextAction?: boolean
-  /** Set if the tag is currently hidden */
-  hidden?: boolean
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { TagUpdateInput } from './contract/index.js'
 
-/** Input for updating a Tag */
-export type TagUpdateInput = Partial<TagCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { InboxTask } from './contract/index.js'
 
-/** A task that is in the document's inbox */
-export interface InboxTask {
-  /** The unique identifier of the inbox task */
-  id: string
-  /** The name of the inbox task */
-  name: string
-  /** The note of the inbox task */
-  note: string
-  /** True if flagged */
-  flagged: boolean
-  /** When the task should become available for action */
-  deferDate: Date
-  /** When the task must be finished */
-  dueDate: Date
-  /** When the task was created */
-  creationDate: Date
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { InboxTaskCreateInput } from './contract/index.js'
 
-/** Input for creating a InboxTask */
-export interface InboxTaskCreateInput {
-  /** Task name */
-  name: string
-  /** Task note */
-  note?: string
-  /** True if flagged */
-  flagged?: boolean
-  /** When the task should become available for action */
-  deferDate?: Date
-  /** When the task must be finished */
-  dueDate?: Date
-  /** When the task was created */
-  creationDate?: Date
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { InboxTaskUpdateInput } from './contract/index.js'
 
-/** Input for updating a InboxTask */
-export type InboxTaskUpdateInput = Partial<InboxTaskCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Perspective } from './contract/index.js'
 
-/** A saved view or filter configuration */
-export interface Perspective {
-  /** The unique identifier of the perspective */
-  id: string
-  /** The name of the perspective */
-  name: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { PerspectiveCreateInput } from './contract/index.js'
 
-/** Input for creating a Perspective */
-export type PerspectiveCreateInput = Record<string, never>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { PerspectiveUpdateInput } from './contract/index.js'
 
-/** Input for updating a Perspective */
-export type PerspectiveUpdateInput = Partial<PerspectiveCreateInput>
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
-// Zod schemas for runtime validation
-
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const TaskSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -365,6 +134,7 @@ export const TaskSchema = z.object({
   numberOfCompletedTasks: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ProjectSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -399,6 +169,7 @@ export const ProjectSchema = z.object({
   numberOfCompletedTasks: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const FolderSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -409,6 +180,7 @@ export const FolderSchema = z.object({
   modificationDate: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const TagSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -420,6 +192,7 @@ export const TagSchema = z.object({
   remainingTaskCount: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const InboxTaskSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -430,6 +203,7 @@ export const InboxTaskSchema = z.object({
   creationDate: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const PerspectiveSchema = z.object({
   id: z.string(),
   name: z.string(),

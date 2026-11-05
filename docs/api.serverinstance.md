@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-Hono&lt;{ Variables: [AuthVariables](./api.authvariables.md)<!-- -->; }&gt;
+Hono
 
 </td><td>
 
@@ -80,7 +80,7 @@ Description
 
 </td><td>
 
-Start the server
+Start the server.
 
 </td></tr>
 <tr><td>

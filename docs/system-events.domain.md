@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Applications folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Applications folder. Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-05).
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The Applications folder
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Application Support folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Application Support folder. Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-05).
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ The Application Support folder
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Desktop Pictures folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Desktop Pictures folder. Nullable. The app reported no value in 4 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ The Desktop Pictures folder
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Folder Action Scripts folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Folder Action Scripts folder. Nullable. The app reported no value in 4 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 </td></tr>
 <tr><td>
@@ -97,13 +105,15 @@ The Folder Action Scripts folder
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Fonts folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Fonts folder. Nullable. The app reported no value in 2 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 </td></tr>
 <tr><td>
@@ -112,13 +122,15 @@ The Fonts folder
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-the unique identifier of the domain
+the unique identifier of the domain. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -127,13 +139,15 @@ the unique identifier of the domain
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Library folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Library folder. Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-05).
 
 </td></tr>
 <tr><td>
@@ -142,13 +156,15 @@ The Library folder
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the name of the domain
+string \| null
+
+</td><td>
+
+the name of the domain. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +173,15 @@ the name of the domain
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Preferences folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Preferences folder. Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 </td></tr>
 <tr><td>
@@ -172,13 +190,15 @@ The Preferences folder
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Scripting Additions folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Scripting Additions folder. Nullable. The app reported no value in 3 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 </td></tr>
 <tr><td>
@@ -187,13 +207,15 @@ The Scripting Additions folder
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Scripts folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Scripts folder. Nullable. The app reported no value in 2 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 </td></tr>
 <tr><td>
@@ -202,13 +224,15 @@ The Scripts folder
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Shared Documents folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Shared Documents folder. Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 </td></tr>
 <tr><td>
@@ -217,13 +241,15 @@ The Shared Documents folder
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Speakable Items folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Speakable Items folder. Nullable. The app reported no value in 4 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 </td></tr>
 <tr><td>
@@ -232,13 +258,15 @@ The Speakable Items folder
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Utilities folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Utilities folder. Nullable. The app reported no value in 3 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 </td></tr>
 <tr><td>
@@ -247,13 +275,15 @@ The Utilities folder
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Automator Workflows folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Automator Workflows folder. Nullable. The app reported no value in 3 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 </td></tr>
 </tbody></table>

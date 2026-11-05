@@ -4,13 +4,54 @@
 
 ## DocumentResourceClient.print() method
 
-Print the specified document
+Print the specified document. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 **Signature:**
 
 ```typescript
-print(): Promise<void>;
+print(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+id
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 

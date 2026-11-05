@@ -24,15 +24,25 @@ export class ViolationResourceClient {
   /**
    * List all violations, as one page.
    */
-  async list(): Promise<Page<Violation>> {
-    return this.#http.rpc<Page<Violation>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Violation>> {
+    return this.#http.invoke<Page<Violation>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'Violation'
+    )
   }
 
   /**
    * Fix a violation.
    * macts does not yet send the violation to the app, so the app acts on whatever it chooses.
    */
-  async fix(): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.fix`, {})
+  async fix(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.fix`,
+      {},
+      __mactsOptions,
+      'Violation'
+    )
   }
 }

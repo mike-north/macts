@@ -4,7 +4,7 @@
 
 ## NetworkDomainObjectCreateInput type
 
-Input for creating a NetworkDomainObject
+Input for creating a NetworkDomainObject.
 
 **Signature:**
 

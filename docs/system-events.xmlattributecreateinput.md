@@ -4,7 +4,7 @@
 
 ## XMLAttributeCreateInput interface
 
-Input for creating a XMLAttribute
+Input for creating a XMLAttribute.
 
 **Signature:**
 

@@ -4,6 +4,8 @@
 
 ## RpcSuccessResponse.result property
 
+The call's result in wire form.
+
 **Signature:**
 
 ```typescript

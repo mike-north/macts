@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The id of the settings pane.
+The id of the settings pane. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The id of the settings pane.
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the settings pane.
+string \| null
+
+</td><td>
+
+The name of the settings pane. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

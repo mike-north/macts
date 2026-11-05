@@ -4,7 +4,7 @@
 
 ## ApplicationCreateInput type
 
-Input for creating a Application
+Input for creating an Application.
 
 **Signature:**
 

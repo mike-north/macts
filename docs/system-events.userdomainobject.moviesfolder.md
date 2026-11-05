@@ -4,10 +4,10 @@
 
 ## UserDomainObject.moviesFolder property
 
-The user's Movies folder
+The user's Movies folder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-moviesFolder: Folder
+readonly moviesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

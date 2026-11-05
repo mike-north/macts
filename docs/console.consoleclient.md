@@ -2,117 +2,14 @@
 
 [Home](./index.md) &gt; [@macts/console](./console.md) &gt; [ConsoleClient](./console.consoleclient.md)
 
-## ConsoleClient class
+## ConsoleClient interface
 
-Console client for HTTP-based macOS automation.
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 **Signature:**
 
 ```typescript
-declare class ConsoleClient
+interface ConsoleClient extends ClientBrand<ConsoleResources>
 ```
 
-## Example
-
-```typescript
-const client = new ConsoleClient({
-  apiKey: process.env.MACTS_API_KEY!,
-})
-
-// List calendars
-const calendars = await client.calendars.list()
-```
-
-## Constructors
-
-<table><thead><tr><th>
-
-Constructor
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[(constructor)(options)](./console.consoleclient._constructor_.md)
-
-</td><td>
-
-</td><td>
-
-Constructs a new instance of the `ConsoleClient` class
-
-</td></tr>
-</tbody></table>
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[http](./console.consoleclient.http.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[HttpClient](./console.httpclient.md)
-
-</td><td>
-
-Get the HTTP client for making custom requests.
-
-</td></tr>
-</tbody></table>
-
-## Methods
-
-<table><thead><tr><th>
-
-Method
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[selectDevice()](./console.consoleclient.selectdevice.md)
-
-</td><td>
-
-</td><td>
-
-Select a device.
-
-</td></tr>
-</tbody></table>
+**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[ConsoleResources](./console.consoleresources.md)<!-- -->&gt;

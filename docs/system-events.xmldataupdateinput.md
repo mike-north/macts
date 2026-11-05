@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [XMLDataUpdateInput](./system-events.xmldataupdateinput.md)
 
-## XMLDataUpdateInput type
+## XMLDataUpdateInput interface
 
-Input for updating a XMLData
+Input for updating a XMLData. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type XMLDataUpdateInput = Partial<XMLDataCreateInput>
+interface XMLDataUpdateInput
 ```
 
-**References:** [XMLDataCreateInput](./system-events.xmldatacreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[name?](./system-events.xmldataupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the name of the XML data. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[text?](./system-events.xmldataupdateinput.text.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the text representation of the XML data. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

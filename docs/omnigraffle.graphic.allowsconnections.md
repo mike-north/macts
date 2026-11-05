@@ -4,10 +4,10 @@
 
 ## Graphic.allowsConnections property
 
-Does this graphic allow connections to it?
+Does this graphic allow connections to it? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-allowsConnections: boolean
+allowsConnections: boolean | null
 ```

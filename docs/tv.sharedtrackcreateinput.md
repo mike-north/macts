@@ -4,7 +4,7 @@
 
 ## SharedTrackCreateInput type
 
-Input for creating a SharedTrack
+Input for creating a SharedTrack.
 
 **Signature:**
 

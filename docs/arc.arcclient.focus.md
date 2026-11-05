@@ -9,8 +9,38 @@ Focus on a space.
 **Signature:**
 
 ```typescript
-focus(): Promise<void>;
+focus(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 

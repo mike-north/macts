@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Internal identifier for this milestone
+[Integer](./contracts.integer.md)
+
+</td><td>
+
+Internal identifier for this milestone. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ Internal identifier for this milestone
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the milestone
+The name of the milestone. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +71,11 @@ The name of the milestone
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Notes
+Notes. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +86,11 @@ Notes
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The date of the milestone
+The date of the milestone. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

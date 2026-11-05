@@ -4,10 +4,10 @@
 
 ## Paragraph.spaceBefore property
 
-The spacing in points before the paragraph
+The spacing in points before the paragraph. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-spaceBefore: number
+spaceBefore: number | null
 ```

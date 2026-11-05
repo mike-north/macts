@@ -4,10 +4,10 @@
 
 ## Tab.source property
 
-The HTML source of the web page currently loaded in the tab
+The HTML source of the web page currently loaded in the tab. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-source: string
+readonly source: string | null;
 ```

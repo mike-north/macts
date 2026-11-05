@@ -4,7 +4,7 @@
 
 ## ClassicDomainObjectCreateInput type
 
-Input for creating a ClassicDomainObject
+Input for creating a ClassicDomainObject.
 
 **Signature:**
 

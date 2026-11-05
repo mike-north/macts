@@ -4,10 +4,10 @@
 
 ## Participant.handle property
 
-The participant's handle.
+The participant's handle. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-handle: string
+readonly handle: string | null;
 ```

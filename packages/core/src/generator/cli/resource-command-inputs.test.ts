@@ -191,7 +191,7 @@ describe('a generated CLI resource command', () => {
     expect(rate).toContain(
       'await client.tracks.rate(' +
         'this.trackId as unknown as Parameters<typeof client.tracks.rate>[0], ' +
-        'this.stars as unknown as Parameters<typeof client.tracks.rate>[1]);'
+        '__mactsParseIntegerOption(this.stars));'
     )
   })
 

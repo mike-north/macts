@@ -4,7 +4,7 @@
 
 ## RadioGroupCreateInput type
 
-Input for creating a RadioGroup
+Input for creating a RadioGroup.
 
 **Signature:**
 

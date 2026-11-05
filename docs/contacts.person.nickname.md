@@ -4,10 +4,10 @@
 
 ## Person.nickname property
 
-The Nickname of this person.
+The Nickname of this person. Nullable. Observed missing in 22 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-nickname: string
+nickname: string | null
 ```

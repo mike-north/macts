@@ -4,10 +4,10 @@
 
 ## MediaItem.filename property
 
-The name of the file on disk
+The name of the file on disk. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-filename: string
+readonly filename: string | null;
 ```

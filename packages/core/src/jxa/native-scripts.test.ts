@@ -263,14 +263,15 @@ function columnField(key: string): RegExp {
 }
 
 /**
- * The statements of a list body that read the runtime identifier
- * `nativeName`, unguarded, across the collection or per item, before and
- * after the properties.
+ * The statements of a list body that read the runtime identifier `name`,
+ * unguarded, by the app's name for it, `nativeName`, across the collection or
+ * per item, before and after the properties. A failed read per item is noted
+ * by the manifest name.
  */
-function identifierReads(nativeName: string): readonly string[] {
+function identifierReads(name: string, nativeName = name): readonly string[] {
   return [
     `try { values = col[${JSON.stringify(nativeName)}](); } catch (e) {`,
-    `return readEach(list, ${JSON.stringify(nativeName)}, false);`,
+    `return readEach(${JSON.stringify(`the property "${name}"`)}, list, ${JSON.stringify(nativeName)}, false);`,
     'ids = readIdentifiers();',
     'sameIdentifiers(readIdentifiers())',
   ]
@@ -371,7 +372,7 @@ describe('list bodies: batched reads (issue #89, issue #204)', () => {
 
   it('falls back to guarded per-item reads for a property the collection cannot report', () => {
     const body = listBody(eventResource)
-    expect(body).toContain('return readEach(itemList(), name, true, absentAsNull);')
+    expect(body).toContain('return readEach(what, itemList(), name, true, absentAsNull);')
     expect(body).toContain(
       'values.push(absentAsNull === true && e && e.errorNumber === -1728 ? null : undefined);'
     )
@@ -390,7 +391,7 @@ describe('list bodies: batched reads (issue #89, issue #204)', () => {
     for (const read of identifierReads('uid')) expect(body).toContain(read)
     expect(body).toContain('obj["uid"] = ids[i];')
     expect(body).not.toContain(columnRead('uid'))
-    expect(body).not.toContain('readEach(list, "uid", true)')
+    expect(body).not.toContain('list, "uid", true)')
   })
 
   it('counts the items by the identifier read and checks every other read against it', () => {
@@ -570,7 +571,7 @@ describe('list bodies: identifier population', () => {
   it('reads a byId primary identifier and aliases it as id', () => {
     const body = listBody(calendarById)
     for (const read of identifierReads('calendarIdentifier')) expect(body).toContain(read)
-    expect(body).not.toContain('readEach(list, "calendarIdentifier", true)')
+    expect(body).not.toContain('list, "calendarIdentifier", true)')
     expect(body).toContain('obj["calendarIdentifier"] = ids[i];')
     expect(body).toContain('obj["id"] = obj["calendarIdentifier"];')
   })
@@ -578,7 +579,7 @@ describe('list bodies: identifier population', () => {
   it('sources id from the working property for a byProperty resource', () => {
     const body = listBody(calendarByName)
     for (const read of identifierReads('name')) expect(body).toContain(read)
-    expect(body).not.toContain('readEach(list, "name", true)')
+    expect(body).not.toContain('list, "name", true)')
     expect(body).toContain('obj["name"] = ids[i];')
     expect(body).toContain('obj["id"] = obj["name"];')
   })
@@ -1303,9 +1304,10 @@ describe('native spellings: the app is addressed by its own names (issue #165)',
     expect(text).not.toContain('"uRL")')
   })
 
-  it('a list reads the runtime identifier by the app name', () => {
+  it('a list reads the runtime identifier by the app name, noting a failed read by the manifest name', () => {
     const text = body('list', 'AirPlayDevice')
-    for (const read of identifierReads('macAddress')) expect(text).toContain(read)
+    for (const read of identifierReads('mACAddress', 'macAddress')) expect(text).toContain(read)
+    expect(text).not.toContain('"the property \\"macAddress\\""')
     expect(text).toContain('obj["mACAddress"] = ids[i];')
     expect(text).not.toContain('col["mACAddress"]')
     expect(text).not.toContain('"mACAddress")')
@@ -1536,7 +1538,7 @@ describe('native spellings: the app is addressed by its own names (issue #165)',
   it('a byId list reads its identifier by the app name', () => {
     // Stream is addressed by id, so its identifier `uRL` is read, never matched.
     const text = body('listStreams', 'Stream')
-    for (const read of identifierReads('url')) expect(text).toContain(read)
+    for (const read of identifierReads('uRL', 'url')) expect(text).toContain(read)
     expect(text).toContain('obj["uRL"] = ids[i];')
   })
 })

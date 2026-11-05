@@ -4,10 +4,10 @@
 
 ## Paragraph.content property
 
-The text content of the paragraph
+The text content of the paragraph. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-content: string
+readonly content: string | null;
 ```

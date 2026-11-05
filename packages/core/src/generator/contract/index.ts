@@ -67,8 +67,11 @@ import {
   omittedOutputPositions,
   omittedOutputProperties,
   omittedOutputResult,
+  withEmittedForms,
   type OmittedOutputReason,
 } from '../../manifest/output-references.js'
+import { isPositional } from '../../manifest/positional.js'
+import { positionalFieldNote, positionalSelectionNote } from '../positional-docs.js'
 import {
   appCommandEntries,
   commandMethodParameters,
@@ -894,7 +897,8 @@ class ContractBuilder {
       (shape === 'get' || shape === 'update' || shape === 'delete') &&
       this.#isChosenCrud(route, shape)
     ) {
-      for (const field of this.#identifierFields(route.command)) identifiers.set(field.name, field)
+      for (const field of this.#identifierFields(route.command, route.resourceType))
+        identifiers.set(field.name, field)
     }
     for (const [name, field] of identifiers) fields.set(name, field)
     if (shape === 'update' && resourceKey !== undefined && this.#isChosenCrud(route, shape)) {
@@ -978,12 +982,18 @@ class ContractBuilder {
   #allRecordFields(resource: Resource): (FieldModel & { readonly readOnly: boolean })[] {
     return usableProperties(resource).map(([name, prop]) => {
       const resolution = resolveReadNullability(resource, name, prop)
-      const shape = this.#map(prop.type, 'output')
+      // A native read emits a reference to a positional target as an index
+      // selector, so the field is typed and documented as one.
+      const shape = withEmittedForms(this.#manifest, this.#map(prop.type, 'output'))
+      const positional = indexSelectorTarget(shape)
       return {
         name,
         shape: resolution.nullable ? nullableShape(shape) : shape,
         optional: prop.optional,
-        description: prop.description,
+        description:
+          positional === undefined
+            ? prop.description
+            : `${sentence(prop.description)} ${positionalFieldNote(this.#manifest, positional)}`,
         nullabilityNote: readNullabilityNote(resolution, this.#manifest.app.name),
         readOnly: prop.access === 'r',
       }
@@ -1044,14 +1054,23 @@ class ContractBuilder {
    *   parameter, or when its recorded parent names a parameter it does not
    *   declare (the manifest schema rejects both).
    */
-  #identifierFields(command: Command): FieldModel[] {
+  #identifierFields(command: Command, resourceKey: string | undefined): FieldModel[] {
     const { parentParam, childParam } = resolveIdParams(command)
+    const positional = this.#positionalResource(resourceKey)
     const field = (name: string): FieldModel => {
       const param = command.parameters.find((p) => p.name === name)
       if (param === undefined) {
         throw new Error(`The ${command.name} command does not declare its parameter "${name}".`)
       }
-      return { ...this.#parameterField(param), optional: false }
+      const model = { ...this.#parameterField(param), optional: false }
+      // The item of a positional resource is selected by its position, which
+      // its parameter documents.
+      return positional === undefined || name !== childParam
+        ? model
+        : {
+            ...model,
+            description: `${sentence(model.description)} ${positionalSelectionNote(this.#manifest, positional)}`,
+          }
     }
     return parentParam === undefined ? [field(childParam)] : [field(parentParam), field(childParam)]
   }
@@ -1266,21 +1285,44 @@ class ContractBuilder {
     return [doc, ...notes].join(' ')
   }
 
-  #identified(resource: Resource, command: Command): { fields: FieldModel[]; phrase: string } {
-    const fields = this.#identifierFields(command)
+  #identified(
+    resource: Resource,
+    command: Command,
+    resourceKey: string | undefined
+  ): { fields: FieldModel[]; phrase: string } {
+    const fields = this.#identifierFields(command, resourceKey)
     const { parentParam, childParam } = resolveIdParams(command)
     const scope = parentParam === undefined ? '' : ` within \`${parentParam}\``
+    const selected =
+      this.#positionalResource(resourceKey) === undefined
+        ? `identified by \`${childParam}\``
+        : `at the zero-based position \`${childParam}\``
     return {
       fields,
-      phrase: `the ${identifierWords(resource.name)} identified by \`${childParam}\`${scope}`,
+      phrase: `the ${identifierWords(resource.name)} ${selected}${scope}`,
     }
   }
 
+  /**
+   * The resource a command acts on, when it is positional and so selects its
+   * item by position (`../../manifest/positional.ts`).
+   */
+  #positionalResource(key: string | undefined): string | undefined {
+    return key !== undefined && isPositional(this.#manifest, key) ? key : undefined
+  }
+
   #getMethod(resource: Resource, command: Command, operation: OperationModel): MethodModel {
-    const { fields, phrase } = this.#identified(resource, command)
+    const { fields, phrase } = this.#identified(resource, command, operation.route.resourceType)
+    const positional = this.#positionalResource(operation.route.resourceType)
     return {
       name: 'get',
-      doc: this.#withFirstMatchNotes(`Read ${phrase}.`, command, resource),
+      doc: this.#withFirstMatchNotes(
+        positional === undefined
+          ? `Read ${phrase}.`
+          : `Read ${phrase}. ${positionalSelectionNote(this.#manifest, positional)}`,
+        command,
+        resource
+      ),
       params: this.#positional(fields),
       returnType: resource.name,
       operation,
@@ -1313,7 +1355,7 @@ class ContractBuilder {
     command: Command,
     operation: OperationModel
   ): MethodModel {
-    const { fields, phrase } = this.#identified(resource, command)
+    const { fields, phrase } = this.#identified(resource, command, operation.route.resourceType)
     const params = this.#positional(fields)
     const input = uniqueName('input', new Set(params.map((param) => param.binding)))
     return {
@@ -1331,7 +1373,7 @@ class ContractBuilder {
   }
 
   #deleteMethod(resource: Resource, command: Command, operation: OperationModel): MethodModel {
-    const { fields, phrase } = this.#identified(resource, command)
+    const { fields, phrase } = this.#identified(resource, command, operation.route.resourceType)
     return {
       name: 'delete',
       doc: this.#withFirstMatchNotes(`Delete ${phrase}.`, command, resource),
@@ -1537,7 +1579,7 @@ class ContractBuilder {
     // interface, not only one a factory returned, can be passed to functions
     // that read the table, such as `bindReference`.
     const doc = docComment(
-      `The ${this.#manifest.app.name} client: one namespace per resource that has operations, plus the app's own commands. A client factory creates one from {@link ${contract}}. Its type carries the contract's resource table, {@link ${resources}}, so references can be bound to it by resource; the brand has no runtime member.`,
+      `The ${this.#manifest.app.name} client: one namespace per resource that has operations, plus the app's own commands. A client factory creates one from \`${contract}\` in the app's \`/contract\` entry. Its type carries the contract's resource table, {@link ${resources}}, so references can be bound to it by resource; the brand has no runtime member.`,
       ''
     )
     const brand = `ClientBrand<${resources}>`
@@ -1689,7 +1731,7 @@ class ContractBuilder {
         ? 'Readonly<Record<never, never>>'
         : `Readonly<{\n${typeEntries.join('\n')}\n}>`
     return `/**
- * The type of the resource table of {@link ${contract}}: every resource a
+ * The type of the resource table in \`${contract}\` (the app's \`/contract\` entry): every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
  * references to it, and, for each of those operations that finds the
@@ -1954,6 +1996,24 @@ function unavailableReason(operation: OperationModel): string | undefined {
 }
 
 /**
+ * The positional resource an output composition references as an index
+ * selector (`form: 'index'`), looking through arrays and nullables, or
+ * `undefined` when it holds none.
+ */
+function indexSelectorTarget(shape: ValueShape): string | undefined {
+  switch (shape.kind) {
+    case 'reference':
+      return shape.form === 'index' ? shape.resourceKey : undefined
+    case 'array':
+      return indexSelectorTarget(shape.item)
+    case 'nullable':
+      return indexSelectorTarget(shape.inner)
+    default:
+      return undefined
+  }
+}
+
+/**
  * A field's documentation: its description, then its nullability note, on
  * the next line (`separator`, for a field's own comment) or the same one (for
  * a `@param` tag).
@@ -2020,8 +2080,17 @@ export function readNullabilityNote(resolution: NullabilityResolution, appName: 
       }
       return `Nullable. Observed missing in ${String(basis.nullCount)} of ${String(basis.sampleSize)} items (${provenance}).`
     }
-    case 'curated':
+    case 'curated': {
+      const reads = basis.absentReads
+      if (nullable && reads !== undefined) {
+        // A single instance's absence, curated as depending on the data
+        // (phases/13 D10): the reason, then the reads that showed it.
+        const reason = reads.reason.trim().replace(/[.!?]$/, '')
+        const count = String(reads.failedReads)
+        return `Nullable: ${reason}. The app reported no value in ${count} of ${count} reads (${observationProvenance(appName, reads)}).`
+      }
       return `${nullable ? 'Nullable' : 'Never null'}: ${curatedBasis(appName, basis)}`
+    }
     case 'sdef':
       return "Nullable: declared by the app's scripting dictionary."
   }

@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-the unique identifier of the XML element
+the unique identifier of the XML element. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ the unique identifier of the XML element
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the name of the XML element
+string \| null
+
+</td><td>
+
+the name of the XML element. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +73,11 @@ the name of the XML element
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the value of the XML element
+the value of the XML element. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

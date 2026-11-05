@@ -4,10 +4,10 @@
 
 ## Track.eQ property
 
-the name of the EQ preset of the track
+the name of the EQ preset of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-eQ: string
+eQ: string | null
 ```

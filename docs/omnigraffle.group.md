@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Only connect to the group?
+Only connect to the group? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +52,15 @@ Only connect to the group?
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-Unique identifier
+Unique identifier. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -69,11 +71,11 @@ Unique identifier
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Rotation of the group in degrees
+Rotation of the group in degrees. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

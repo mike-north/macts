@@ -24,6 +24,7 @@ import {
 } from '../manifest/item-selection.js'
 import { untargetedIdentifiers } from '../manifest/identifier-targeting.js'
 import { resolveIdentifierTargeting } from '../manifest/identifier.js'
+import { positionalProblems } from '../manifest/positional.js'
 import { resolvePrimaryIdentifier } from '../manifest/primary-identifier.js'
 import { normalizeResourceRouteSegment } from '../manifest/route.js'
 import { splitIdentifierWords } from '../manifest/lower-camel.js'
@@ -235,18 +236,9 @@ function firstMatchProperty(resource: Resource | undefined): string | undefined 
 }
 
 /**
- * The sentence a generated resource command's doc adds when the command
- * sends the app no item, or `undefined` when it sends one.
- *
- * Such a command is a known gap (`KNOWN_ITEM_SELECTION_GAPS`): it acts on one
- * item, but the manifest cannot yet select it, so it is called on the app
- * with its declared parameters alone and the app picks what it acts on.
- * Generation refuses any other command that declares no item, so only a
- * known gap ever gets the sentence.
- *
- * @param command - The resource command.
- * @param resource - The resource the command acts on.
- * @returns One sentence, naming the resource's item in prose.
+ * Explain a known gap's itemless call in generated docs, or return undefined
+ * when the command selects an item. Generation refuses unlisted itemless
+ * commands, so this notice applies only to `KNOWN_ITEM_SELECTION_GAPS`.
  */
 export function itemNotSentNote(command: Command, resource: Resource): string | undefined {
   if (!sendsNoItem(command)) return undefined
@@ -254,28 +246,17 @@ export function itemNotSentNote(command: Command, resource: Resource): string | 
 }
 
 /**
- * `description` followed by the sentences `notes`, as one paragraph of
- * generated doc or help text: the description alone when there is no note,
- * or else the description ending in one full stop (any trailing whitespace or
- * full stops replaced), then each note.
- *
- * A manifest description need not end in a full stop ("Fix a violation"),
- * so appending a note to it directly would run the two sentences together.
- * Every surface that appends notes to a command's description (the HTTP
- * client, the contract client and the CLI) ends it this way.
- *
- * @param description - The command's description, as the manifest has it.
- * @param notes - The sentences to append, in order.
- * @returns The paragraph.
+ * Append ordered notes as one paragraph on every generated surface. Preserve
+ * a description without notes; otherwise end it in exactly one full stop so
+ * a manifest description without punctuation cannot run into the first note.
  */
 export function describeWithNotes(description: string, notes: readonly string[]): string {
   return describedSentences(description, notes).join(' ')
 }
 
 /**
- * {@link describeWithNotes} as separate sentences, for a surface that sets
- * each on its own line: the description, ending in a full stop when notes
- * follow, then each note.
+ * The same punctuation contract as {@link describeWithNotes}, with separate
+ * sentences for surfaces that put each on its own line.
  */
 export function describedSentences(description: string, notes: readonly string[]): string[] {
   if (notes.length === 0) return [description]
@@ -332,7 +313,9 @@ export function findResourceCreateCommand(
  *   command key;
  * - one per resource whose primary identifier declares no targeting and is
  *   not the class's dictionary id, code `ID  ` (`untargetedIdentifiers`),
- *   naming the resource and the identifier property.
+ *   naming the resource and the identifier property;
+ * - one per broken `positional` marker (`positionalProblems`), naming the
+ *   resource or command.
  *
  * Every package and SDK generator checks this before it builds any file and
  * returns these errors with no files, and `generateCapabilitiesModule` throws
@@ -345,6 +328,7 @@ export function generationRefusals(manifest: AppManifest): string[] {
   return [
     ...unselectableItemCommands(manifest).map(({ problem }) => `${refused}: ${problem}`),
     ...untargetedIdentifiers(manifest).map(({ problem }) => `${refused}: ${problem}`),
+    ...positionalProblems(manifest).map((problem) => `${refused}: ${problem}`),
   ]
 }
 

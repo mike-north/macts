@@ -4,10 +4,10 @@
 
 ## Session.profileName property
 
-The session's profile name
+The session's profile name. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-profileName: string
+readonly profileName: string | null;
 ```

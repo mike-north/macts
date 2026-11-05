@@ -4,10 +4,10 @@
 
 ## Grid.spacing property
 
-Number of pixels between minor grid lines
+Number of pixels between minor grid lines. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-spacing: number
+spacing: number | null
 ```

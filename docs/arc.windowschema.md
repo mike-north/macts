@@ -4,6 +4,8 @@
 
 ## WindowSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -19,8 +21,6 @@ WindowSchema: z.ZodObject<
     visible: z.ZodBoolean
     zoomable: z.ZodBoolean
     zoomed: z.ZodBoolean
-    activeTab: z.ZodString
-    activeSpace: z.ZodString
     incognito: z.ZodBoolean
     mode: z.ZodString
   },

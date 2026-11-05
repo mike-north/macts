@@ -4,10 +4,10 @@
 
 ## Cell.verticalAlignment property
 
-The vertical alignment of text in the cell
+The vertical alignment of text in the cell. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-verticalAlignment: string
+verticalAlignment: string | null
 ```

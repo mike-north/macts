@@ -4,12 +4,10 @@
 
 ## MenuBarUpdateInput type
 
-Input for updating a MenuBar
+Input for updating a MenuBar. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type MenuBarUpdateInput = Partial<MenuBarCreateInput>
+type MenuBarUpdateInput = Record<string, never>
 ```
-
-**References:** [MenuBarCreateInput](./system-events.menubarcreateinput.md)

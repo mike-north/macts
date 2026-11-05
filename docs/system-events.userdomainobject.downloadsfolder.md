@@ -4,10 +4,10 @@
 
 ## UserDomainObject.downloadsFolder property
 
-The user's Downloads folder
+The user's Downloads folder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-downloadsFolder: Folder
+readonly downloadsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

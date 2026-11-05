@@ -4,10 +4,10 @@
 
 ## ExportSettings.includeNonprintingLayers property
 
-Whether to export with non printing layers
+Whether to export with non printing layers. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-includeNonprintingLayers: boolean
+includeNonprintingLayers: boolean | null
 ```

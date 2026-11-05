@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/quicktime-player](./quicktime-player.md) &gt; [DocumentUpdateInput](./quicktime-player.documentupdateinput.md)
 
-## DocumentUpdateInput type
+## DocumentUpdateInput interface
 
-Input for updating a Document
+Input for updating a Document. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type DocumentUpdateInput = Partial<DocumentCreateInput>
+interface DocumentUpdateInput
 ```
 
-**References:** [DocumentCreateInput](./quicktime-player.documentcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[currentTime?](./quicktime-player.documentupdateinput.currenttime.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The current playback time in seconds. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[playing?](./quicktime-player.documentupdateinput.playing.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether the document is currently playing. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

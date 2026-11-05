@@ -4,14 +4,44 @@
 
 ## ViolationResourceClient.list() method
 
-List all violations.
+List all violations, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Violation[]>;
+list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Violation>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Violation](./omniplan.violation.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Violation](./omniplan.violation.md)<!-- -->&gt;&gt;

@@ -4,10 +4,10 @@
 
 ## SoundAlarm.triggerDate property
 
-An absolute alarm date
+An absolute alarm date. Nullable. Observed missing in 9 of 9 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-triggerDate: Date
+triggerDate: Date | null
 ```

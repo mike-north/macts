@@ -57,24 +57,24 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(id)](./automator.automatoractionresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./automator.automatoractionresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a automatoraction by id.
+Get a automator action by id.
 
 </td></tr>
 <tr><td>
 
-[list()](./automator.automatoractionresourceclient.list.md)
+[list(workflowName, \_\_mactsOptions)](./automator.automatoractionresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all automatoractions.
+List the automator actions of one workflow, as one page. When several workflows share the same name, the first match in the app's order is used as the workflow.
 
 </td></tr>
 </tbody></table>

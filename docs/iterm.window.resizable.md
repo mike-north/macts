@@ -4,10 +4,10 @@
 
 ## Window.resizable property
 
-Whether the window can be resized.
+Whether the window can be resized. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-resizable: boolean
+readonly resizable: boolean | null;
 ```

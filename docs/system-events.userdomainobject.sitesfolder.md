@@ -4,10 +4,10 @@
 
 ## UserDomainObject.sitesFolder property
 
-The user's Sites folder
+The user's Sites folder. Nullable: The Sites folder exists only once the user creates one. The app reported no value in 1 of 1 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 **Signature:**
 
 ```typescript
-sitesFolder: Folder
+readonly sitesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

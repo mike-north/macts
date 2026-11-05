@@ -4,10 +4,10 @@
 
 ## Label.id property
 
-Unique identifier
+Unique identifier. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

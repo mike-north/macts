@@ -4,12 +4,10 @@
 
 ## ScrollAreaUpdateInput type
 
-Input for updating a ScrollArea
+Input for updating a ScrollArea. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ScrollAreaUpdateInput = Partial<ScrollAreaCreateInput>
+type ScrollAreaUpdateInput = Record<string, never>
 ```
-
-**References:** [ScrollAreaCreateInput](./system-events.scrollareacreateinput.md)

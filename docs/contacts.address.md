@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-City part of the address.
+City part of the address. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ City part of the address.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Country part of the address.
+Country part of the address. Nullable. Observed missing in 4 of 12 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ Country part of the address.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Country code part of the address (should be a two character iso country code).
+Country code part of the address (should be a two character iso country code). Nullable. Observed missing in 6 of 12 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -82,13 +82,15 @@ Country code part of the address (should be a two character iso country code).
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-properly formatted string for this address.
+string \| null
+
+</td><td>
+
+properly formatted string for this address. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -103,7 +105,7 @@ string
 
 </td><td>
 
-unique identifier for this address.
+unique identifier for this address. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -114,11 +116,11 @@ unique identifier for this address.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Label.
+Label. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +131,11 @@ Label.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-State, Province, or Region part of the address.
+State, Province, or Region part of the address. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +146,11 @@ State, Province, or Region part of the address.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Street part of the address, multiple lines separated by carriage returns.
+Street part of the address, multiple lines separated by carriage returns. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +161,11 @@ Street part of the address, multiple lines separated by carriage returns.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Zip or postal code of the address.
+Zip or postal code of the address. Nullable. Observed missing in 1 of 12 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 </tbody></table>

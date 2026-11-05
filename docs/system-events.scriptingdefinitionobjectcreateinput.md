@@ -4,7 +4,7 @@
 
 ## ScriptingDefinitionObjectCreateInput type
 
-Input for creating a ScriptingDefinitionObject
+Input for creating a ScriptingDefinitionObject.
 
 **Signature:**
 

@@ -21,6 +21,8 @@ Description
 
 </td><td>
 
+A failure at the automation-host process boundary: the process could not be started, exited with an error, was stopped, or produced output that could not be read.
+
 </td></tr>
 <tr><td>
 
@@ -56,6 +58,19 @@ Error thrown when permission expansion fails.
 </td><td>
 
 Error thrown when a permission string is invalid.
+
+</td></tr>
+<tr><td>
+
+[PolicyGovernanceFilter](./core.policygovernancefilter.md)
+
+</td><td>
+
+A governance filter backed by a parsed [GovernancePolicy](./core.governancepolicy.md)<!-- -->.
+
+Applies `findMatchingPolicyRule` to each capability's `app:resource:operation` triple. When a rule matches, its effective disposition (the operation-level override if present, otherwise the app-level default) is translated into a [GovernanceDecision](./core.governancedecision.md)<!-- -->. When no rule matches, the policy's `defaultDisposition` is used (fail-closed: `forbidden` unless overridden).
+
+Create via [createPolicyGovernanceFilter()](./core.createpolicygovernancefilter.md)<!-- -->; do not construct directly.
 
 </td></tr>
 </tbody></table>
@@ -104,13 +119,13 @@ Mirrors the permission-system rule: the wildcard `'*'` matches any value; any ot
 </td></tr>
 <tr><td>
 
-[buildAppCommandRoute(appName, commandKey)](./core.buildappcommandroute.md)
+[buildAppCommandRoute(appName, segment)](./core.buildappcommandroute.md)
 
 </td><td>
 
 Build the canonical route for an application-scoped command.
 
-Application commands are addressed as `{app}.app.{commandKey}`<!-- -->.
+Application commands are addressed as `{app}.app.{segment}`<!-- -->.
 
 </td></tr>
 <tr><td>
@@ -137,13 +152,42 @@ This function analyzes element relationships to determine: - Which classes are r
 </td></tr>
 <tr><td>
 
-[buildResourceCommandRoute(appName, resourcePlural, commandKey)](./core.buildresourcecommandroute.md)
+[buildNativeBody(manifest, target, options)](./core.buildnativebody.md)
+
+</td><td>
+
+Build the native function body for one operation.
+
+</td></tr>
+<tr><td>
+
+[buildResourceCommandRoute(appName, resourcePlural, segment)](./core.buildresourcecommandroute.md)
 
 </td><td>
 
 Build the canonical route for a resource-scoped command.
 
-Resource commands are addressed as `{app}.{resourcePlural}.{commandKey}`<!-- -->.
+Resource commands are addressed as `{app}.{resourcePlural}.{segment}`<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[checkCuratedAbsence(resource, ctx)](./core.checkcuratedabsence.md)
+
+</td><td>
+
+Check that curated absence evidence (`absentReads`<!-- -->) is recorded only on a resource with a single instance ([hasSingleInstance()](./core.hassingleinstance.md)<!-- -->), for its own properties and for the inherited ones it states claims about, reporting each other use as an issue on `ctx`<!-- -->. With several instances a probe tells structural absence from absence that depends on the data, so its evidence, not curation, decides.
+
+</td></tr>
+<tr><td>
+
+[checkNullabilityClaim(claim, ctx)](./core.checknullabilityclaim.md)
+
+</td><td>
+
+Check that a field's nullability claim and its evidence agree, reporting each disagreement as an issue on `ctx`<!-- -->.
+
+- A claim needs evidence, and evidence needs a claim. - Probe evidence that observed an empty value supports only `nullable: true`<!-- -->, and probe evidence supports `nullable: true` only when it observed one, or when its failed reads all reported an absent value ([reportsAbsence()](./core.reportsabsence.md)<!-- -->). - Probe evidence supports `nullable: false` only when it observed no empty value across at least [NON_NULL_SAMPLE_THRESHOLD](./core.non_null_sample_threshold.md) reads. - Dictionary evidence supports only `nullable: true`<!-- -->. - Curated evidence that records reads the app reported no value in (`absentReads`<!-- -->) supports only `nullable: true`<!-- -->. Whether its resource has a single instance is checked with the resource ([checkCuratedAbsence()](./core.checkcuratedabsence.md)<!-- -->).
 
 </td></tr>
 <tr><td>
@@ -177,6 +221,15 @@ Precedence: 1. An explicit, valid `risk` on the command (manifest override / los
 </td></tr>
 <tr><td>
 
+[classifyPresence(presence)](./core.classifypresence.md)
+
+</td><td>
+
+Classify one property's counts.
+
+</td></tr>
+<tr><td>
+
 [classifyRiskFromOperation(operationName)](./core.classifyriskfromoperation.md)
 
 </td><td>
@@ -197,6 +250,37 @@ Create a coarse permission string.
 </td></tr>
 <tr><td>
 
+[commandRouteSegment(commandKey, command)](./core.commandroutesegment.md)
+
+</td><td>
+
+A command's operation segment in its public route and default permission: its `routeName` when it declares one, else its key in `manifest.commands`<!-- -->.
+
+Every surface that encodes a route or an operation name (the server router, the generated clients, the contract) MUST use this segment, never the bare command key, so a `routeName` override reaches all of them.
+
+</td></tr>
+<tr><td>
+
+[compareDispositionStrictness(a, b)](./core.comparedispositionstrictness.md)
+
+</td><td>
+
+Compare two declared [PolicyDisposition](./core.policydisposition.md)<!-- -->s by the declarative ordering in [POLICY_DISPOSITIONS_BY_STRICTNESS](./core.policy_dispositions_by_strictness.md)<!-- -->.
+
+See that constant for why this must not be used to compose layers.
+
+</td></tr>
+<tr><td>
+
+[comparePolicyDecisionStrictness(a, b)](./core.comparepolicydecisionstrictness.md)
+
+</td><td>
+
+Compare two [PolicyDecision](./core.policydecision.md)<!-- -->s by strictness.
+
+</td></tr>
+<tr><td>
+
 [compareRisk(a, b)](./core.comparerisk.md)
 
 </td><td>
@@ -206,11 +290,70 @@ Compare two risk classes by severity (ascending). Useful for deterministic sorti
 </td></tr>
 <tr><td>
 
+[compilePolicyToPermissions(policy, candidates)](./core.compilepolicytopermissions.md)
+
+</td><td>
+
+Compile a governance policy to the set of `app:resource:operation` permissions it grants, drawn from a list of candidate capabilities.
+
+For each candidate, the policy is evaluated via [evaluatePolicy()](./core.evaluatepolicy.md)<!-- -->; the candidate's permission is included in the result \*\*iff\*\* the decision is `'allowed'`<!-- -->. `'confirm-first'` candidates are intentionally excluded — they are gated behind human approval rather than granted as a standing permission — as are `'denied'` candidates.
+
+Because granting reuses the evaluator, this set is guaranteed consistent with call-time enforcement: a permission present here will pass enforcement, and one absent here (for a `denied` reason) will be rejected.
+
+The result preserves candidate order and de-duplicates repeated permission strings (keeping the first occurrence).
+
+</td></tr>
+<tr><td>
+
+[composedRestrictionsPermit(composed, kind, candidate, matches)](./core.composedrestrictionspermit.md)
+
+</td><td>
+
+Test a candidate path or URL against [ComposedRestrictions](./core.composedrestrictions.md)<!-- -->.
+
+The rule is fail-closed in the direction that matters:
+
+1. If the candidate matches \*\*any\*\* deny pattern (from either layer), it is rejected — union of denies. 2. Otherwise it must match at least one pattern in \*\*every\*\* allow group — intersection of allows. With no groups it is unconstrained.
+
+</td></tr>
+<tr><td>
+
+[composePolicyEvaluations(host, key)](./core.composepolicyevaluations.md)
+
+</td><td>
+
+Compose two already-computed layer evaluations into one effective evaluation.
+
+Exposed separately from [evaluateLayeredPolicy()](./core.evaluatelayeredpolicy.md) so a caller that already holds per-layer evaluations (or that evaluates layers from different sources) can reuse the exact composition semantics rather than re-deriving them.
+
+</td></tr>
+<tr><td>
+
+[composeRestrictions(host, key)](./core.composerestrictions.md)
+
+</td><td>
+
+Compose the path/URL restrictions of a host layer and a key layer as \*\*union of denies, intersection of allows\*\*.
+
+Either side may be `undefined` (no matched app rule, or no key policy at all), in which case only the other side constrains — so composing a single layer is exactly that layer's own restrictions.
+
+</td></tr>
+<tr><td>
+
 [connect(bundleId, \_options)](./core.connect.md)
 
 </td><td>
 
 Create a connection object for an application.
+
+</td></tr>
+<tr><td>
+
+[contractResourcePlans(manifest)](./core.contractresourceplans.md)
+
+</td><td>
+
+The value plans of the resources in the contract generated from `manifest`<!-- -->: what `resourcePlanTable(contract.resources)` gives for that contract.
 
 </td></tr>
 <tr><td>
@@ -230,7 +373,34 @@ Create an array coercer from element coercer.
 
 Construct an immutable [AuditRecord](./core.auditrecord.md) from its inputs.
 
-Pure and deterministic: given the same input (including the injected `timestamp`<!-- -->) it always produces the same record. The input `timestamp` is defensively copied so the returned record cannot be mutated by later changes to the caller's `Date` instance. The optional `reason` is included only when provided, matching `exactOptionalPropertyTypes` semantics.
+Pure and deterministic: given the same input (including the injected `timestamp`<!-- -->) it always produces the same record. The input `timestamp` is defensively copied so the returned record cannot be mutated by later changes to the caller's `Date` instance. The optional `reason` and `approvalId` of a governed record are included only when provided, matching `exactOptionalPropertyTypes` semantics. Only the fields of the record's kind are copied.
+
+</td></tr>
+<tr><td>
+
+[createAuditRecord(input)](./core.createauditrecord_1.md)
+
+</td><td>
+
+Construct an immutable [InvalidInputAuditRecord](./core.invalidinputauditrecord.md)<!-- -->: the attribution, a defensive copy of the timestamp, and the issue count, and nothing else.
+
+</td></tr>
+<tr><td>
+
+[createAuditRecord(input)](./core.createauditrecord_2.md)
+
+</td><td>
+
+Construct an immutable [PermissionDeniedAuditRecord](./core.permissiondeniedauditrecord.md)<!-- -->: the attribution and a defensive copy of the timestamp, and nothing else.
+
+</td></tr>
+<tr><td>
+
+[createAuditRecord(input)](./core.createauditrecord_3.md)
+
+</td><td>
+
+Construct an immutable [AuditRecord](./core.auditrecord.md) of whichever kind `input` is.
 
 </td></tr>
 <tr><td>
@@ -250,7 +420,7 @@ Create an enum coercer from enum definition.
 
 Create an [AuditWriter](./core.auditwriter.md) that appends to a JSON-lines file at the given absolute path.
 
-Parent directories are created automatically on first use (equivalent to `mkdir -p`<!-- -->). Each call to `append` serialises the record via [serializeAuditRecord()](./core.serializeauditrecord.md)<!-- -->, JSON-encodes the result, appends it with a trailing newline, and resolves. Errors are propagated to the caller.
+Parent directories are created automatically on first use (equivalent to `mkdir -p`<!-- -->). Each call to `append` serialises the record via , JSON-encodes the result, appends it with a trailing newline, and resolves. Errors are propagated to the caller, including the serializer's refusal of a malformed `invalid-input` or `permission-denied` record, which writes nothing.
 
 The destination path is accepted as-is — no home-directory expansion, no environment-variable lookup. Callers are responsible for supplying an absolute path.
 
@@ -264,13 +434,46 @@ The destination path is accepted as-is — no home-directory expansion, no envir
 </td></tr>
 <tr><td>
 
+[createNativeExecutor(options)](./core.createnativeexecutor.md)
+
+</td><td>
+
+Create the native macOS executor.
+
+</td></tr>
+<tr><td>
+
+[createPolicyGovernanceFilter(policy)](./core.createpolicygovernancefilter.md)
+
+</td><td>
+
+Create a [GovernanceFilter](./core.governancefilter.md) backed by a parsed [GovernancePolicy](./core.governancepolicy.md)<!-- -->.
+
+This is the primary integration point for wiring a real governance policy into capability discovery (CLI `capabilities search`<!-- -->, MCP discovery tool). Pass the result as the `filter` / `governance` option of [governedDiscoverySearch()](./core.governeddiscoverysearch.md) or .
+
+When no policy is active, use [ALLOW_ALL_GOVERNANCE](./core.allow_all_governance.md) instead (the default when no filter is supplied to discovery functions).
+
+</td></tr>
+<tr><td>
+
+[createStaticApprovalProvider(options)](./core.createstaticapprovalprovider.md)
+
+</td><td>
+
+Create a provider that answers every request with the same fixed state.
+
+Intended for tests and for verifying that a deployment's approval wiring is connected. With `state: 'rejected'` it is a fail-closed no-op: every `confirm-first` call is denied and audited as `rejected`<!-- -->, which is the safe placeholder while a real provider is being installed.
+
+</td></tr>
+<tr><td>
+
 [deriveCapabilities(manifest)](./core.derivecapabilities.md)
 
 </td><td>
 
 Derive the list of capabilities from a single manifest.
 
-Mirrors the MCP generator's traversal so the registry and generated tools stay in lock-step: one capability per resource command per matching resource, plus one per application command.
+One capability per operation the manifest exposes: one per resource command per matching resource, plus one per application command. These are the same operations the app's generated contract describes, so every capability has exactly one contract operation and shares its MCP tool name. An operation that cannot be called, because a required input admits no value, has no capability, as it has no MCP tool and no CLI command.
 
 </td></tr>
 <tr><td>
@@ -284,20 +487,78 @@ Get a human-readable description of what permissions grant.
 </td></tr>
 <tr><td>
 
-[expandCoarsePermission(permission, permissionsSection)](./core.expandcoarsepermission.md)
+[enforceCall(options)](./core.enforcecall.md)
+
+</td><td>
+
+Enforce the active governance policy against a single capability call.
+
+This is the primary entry point for call-time enforcement. It:
+
+1. Evaluates the host policy — and the key policy, when `options.keyPolicy` is supplied — via [evaluateLayeredPolicy()](./core.evaluatelayeredpolicy.md)<!-- -->, which delegates each layer to the evaluator (the single source of truth: fail-closed defaults, malformed permission denial, and `read-only` handling all live there) and returns the stricter decision along with the layer that produced it. 2. Maps the evaluation decision to an [EnforcementOutcome](./core.enforcementoutcome.md)<!-- -->. 3. Writes an audit record to `options.writer` (when supplied), unconditionally, for allow, deny, and pending-approval alike.
+
+\*\*Note on `confirm-first`<!-- -->\*\*: this function surfaces a `'pending-approval'` outcome; it does not ask anyone. Callers must gate the actual invocation on a human decision obtained through the approval seam (`seekApproval`<!-- -->), then record the answer with [recordApprovalDecision()](./core.recordapprovaldecision.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[evaluateLayeredPolicy(options)](./core.evaluatelayeredpolicy.md)
+
+</td><td>
+
+Evaluate a capability against a host policy and an optional per-key policy, returning the effective (stricter) decision and its provenance.
+
+Each layer is evaluated independently by [evaluatePolicy()](./core.evaluatepolicy.md) — the single source of truth for a \*single\* policy's decision — and the two decisions are combined by [composePolicyEvaluations()](./core.composepolicyevaluations.md)<!-- -->. This module never re-implements matching or disposition semantics.
+
+With no key policy the result is the host evaluation verbatim, plus `layer: 'host'`<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[evaluatePolicy(policy, permission, risk)](./core.evaluatepolicy.md)
+
+</td><td>
+
+Evaluate a governance policy against a single capability.
+
+This is the canonical "does this policy allow this capability?" decision — the single source of truth consumed by call-time enforcement (<!-- -->), discovery filtering (issue \#55), and compile-to-permissions (<!-- -->).
+
+Steps:
+
+1. Parse `permission` into `app:resource:operation`<!-- -->. A malformed string is denied (fail-closed) with a `'default'`<!-- -->-sourced `forbidden` rule. 2. Resolve the governing [MatchedPolicyRule](./core.matchedpolicyrule.md) via [findMatchingPolicyRule()](./core.findmatchingpolicyrule.md)<!-- -->. 3. Map its disposition to a [PolicyDecision](./core.policydecision.md) (applying `read-only` semantics with `risk`<!-- -->). 4. Build a human-readable `reason` naming the rule and the exact permission.
+
+The function is pure and deterministic: given the same policy, permission, and risk it always returns the same evaluation. It performs no I/O and has no dependency on any server, CLI, or audit backend.
+
+</td></tr>
+<tr><td>
+
+[expandCoarsePermission(permission, permissionsSection, options)](./core.expandcoarsepermission.md)
 
 </td><td>
 
 Expand a coarse permission to its constituent fine-grained permissions.
 
+A permission whose operation is a key of its resource's mapping expands to that key's list. A fine-grained permission the mapping lists expands to itself; one the mapping does not list throws, unless `options.unmapped` is `keep`<!-- -->, in which case it too expands to itself.
+
 </td></tr>
 <tr><td>
 
-[expandPermissions(permissions, permissionsSection)](./core.expandpermissions.md)
+[expandPermissions(permissions, permissionsSection, options)](./core.expandpermissions.md)
 
 </td><td>
 
 Expand multiple permissions, handling coarse and wildcard permissions.
+
+Each permission expands as [expandCoarsePermission()](./core.expandcoarsepermission.md) describes. A fine-grained permission the mapping lists is included as-is; one it does not list is included as-is only when `options.unmapped` is `keep`<!-- -->, and otherwise throws.
+
+</td></tr>
+<tr><td>
+
+[explainInvalidPermission(permission, known)](./core.explaininvalidpermission.md)
+
+</td><td>
+
+An actionable explanation for a permission string that fails the grammar: the format rule, plus the closest valid permission(s) when known.
 
 </td></tr>
 <tr><td>
@@ -338,11 +599,29 @@ Filter a list of permissions to only those matching an app.
 </td></tr>
 <tr><td>
 
+[findCaseOnlyMismatch(permission, known)](./core.findcaseonlymismatch.md)
+
+</td><td>
+
+The known permission that equals `permission` once letter case is ignored, but is not equal to it. Such a string is well-formed yet can never authorize the permission it was meant to be.
+
+</td></tr>
+<tr><td>
+
 [findCoarseCategory(finePermission, permissionsSection)](./core.findcoarsecategory.md)
 
 </td><td>
 
 Find the coarse category that contains a fine-grained permission.
+
+</td></tr>
+<tr><td>
+
+[findDuplicateRoutes(manifest)](./core.findduplicateroutes.md)
+
+</td><td>
+
+The route strings two or more of a manifest's commands resolve to, each with the command keys that share it. A route identifies one operation, so any entry here is a manifest error.
 
 </td></tr>
 <tr><td>
@@ -395,6 +674,8 @@ Generate the root application class.
 
 Generate the contents of the `src/capabilities.ts` metadata module for an app.
 
+A manifest the package generators refuse (`generationRefusals`<!-- -->) is refused here too, so no capability is described for a command that must name one item and declares no identifier parameter, or for a resource whose identifier declares no targeting and is not the class's dictionary id.
+
 </td></tr>
 <tr><td>
 
@@ -404,7 +685,9 @@ Generate the contents of the `src/capabilities.ts` metadata module for an app.
 
 Generate a consolidated client package from a manifest.
 
-Combines the HTTP client SDK and CLI plugin into a single package with: - SDK source files at `src/` root (client.ts, types.ts, resources/, index.ts) - CLI source files under `src/cli/` (commands/, plugin.ts, index.ts, output/, sdk.ts) - Unified config files (package.json, tsconfig, tsup, api-extractor)
+Combines the HTTP client SDK and CLI plugin into a single package with: - SDK source files at `src/` root (client.ts, types.ts, resources/, index.ts) - CLI source files under `src/cli/` (commands/, plugin.ts, index.ts, output/, sdk.ts) - The app contract under `src/contract/` (index.ts, manifest.ts) - Unified config files (package.json, tsconfig, tsup, api-extractor), with a second API Extractor config that reports the `./contract` subpath - A `.gitattributes` marking the files it generates as generated
+
+A manifest with a command that must select one item and declares no identifier parameter, or a resource whose identifier declares no targeting and is not the class's dictionary id, is refused (`generationRefusals`<!-- -->): the result holds the errors naming each such command or resource, and no files.
 
 </td></tr>
 <tr><td>
@@ -414,6 +697,8 @@ Combines the HTTP client SDK and CLI plugin into a single package with: - SDK so
 </td><td>
 
 Generate a complete CLI plugin from a manifest.
+
+A manifest with a command that must select one item and declares no identifier parameter, or a resource whose identifier declares no targeting and is not the class's dictionary id, is refused (`generationRefusals`<!-- -->): the result holds the errors naming each such command or resource, and no files.
 
 </td></tr>
 <tr><td>
@@ -433,7 +718,9 @@ Generate collection class code.
 
 Generate consolidated packages (client + server) from a manifest.
 
-The client package combines SDK + CLI into `@macts/{app}`<!-- -->. The server package combines API + MCP into `@macts/{app}-server`<!-- -->.
+The client package combines the SDK, the CLI and the contract into `@macts/{app}`<!-- -->. The server package, `@macts/{app}-server`<!-- -->, re-exports that contract.
+
+A manifest with a command that must select one item and declares no identifier parameter, or a resource whose identifier declares no targeting and is not the class's dictionary id, is refused before either package is built (`generationRefusals`<!-- -->): the result holds the errors naming each such command or resource, once, and no files.
 
 </td></tr>
 <tr><td>
@@ -538,6 +825,8 @@ Generate all schemas for a context.
 
 Generate a complete SDK from a manifest.
 
+A manifest with a command that must select one item and declares no identifier parameter, or a resource whose identifier declares no targeting and is not the class's dictionary id, is refused (`generationRefusals`<!-- -->): the result holds the errors naming each such command or resource, and no files.
+
 </td></tr>
 <tr><td>
 
@@ -545,9 +834,11 @@ Generate a complete SDK from a manifest.
 
 </td><td>
 
-Generate a consolidated server package from a manifest.
+Generate a server package from a manifest.
 
-Combines an API plugin (at `src/`<!-- -->) and an MCP plugin (at `src/mcp/`<!-- -->) into a single package with subpath exports for `.` (API) and `./mcp` (MCP).
+The package holds `src/index.ts`<!-- -->, which re-exports the app's contract as `contract`<!-- -->, its package, TypeScript, build and ignore configuration, and a `.gitattributes` marking the files it generates as generated.
+
+A manifest with a command that must select one item and declares no identifier parameter, or a resource whose identifier declares no targeting and is not the class's dictionary id, is refused (`generationRefusals`<!-- -->), as it is for the client package whose contract this one re-exports: the result holds the errors naming each such command or resource, and no files.
 
 </td></tr>
 <tr><td>
@@ -645,11 +936,58 @@ Permissions are stored and matched as fine-grained only. Coarse permissions are 
 </td></tr>
 <tr><td>
 
+[hasSingleInstance(resource)](./core.hassingleinstance.md)
+
+</td><td>
+
+Whether the resource has a single instance: it is a singleton root with exactly one kind, so the app holds one object of it. Reading that object cannot show whether a property's absence is structural or depends on the data, which a resource with several instances shows by some reading and some not.
+
+</td></tr>
+<tr><td>
+
+[identifierTargetingProblem(resourceKey, resource)](./core.identifiertargetingproblem.md)
+
+</td><td>
+
+Why a resource cannot be offered, when its primary identifier declares no targeting and its property is not the class's dictionary id, code `ID  `<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[ignoredIdentifierNullability(resource, propertyName, property)](./core.ignoredidentifiernullability.md)
+
+</td><td>
+
+Whether the manifest claims nullability for a resource's primary identifier property, a claim [resolveReadNullability()](./core.resolvereadnullability.md) ignores. Returns the claim's evidence when there is such a claim.
+
+</td></tr>
+<tr><td>
+
 [inspectCapability(registry, name, filter)](./core.inspectcapability.md)
 
 </td><td>
 
 Inspect a single capability by exact name, applying the active governance filter — the same seam search uses — so a `deny`<!-- -->d capability is never leaked through inspection.
+
+</td></tr>
+<tr><td>
+
+[isApprovalCancellation(result)](./core.isapprovalcancellation.md)
+
+</td><td>
+
+Whether a [seekApprovalUnlessCancelled()](./core.seekapprovalunlesscancelled.md) result is a cancellation rather than a decision.
+
+</td></tr>
+<tr><td>
+
+[isApprovalState(value)](./core.isapprovalstate.md)
+
+</td><td>
+
+Narrow an unknown value to an [ApprovalState](./core.approvalstate.md)<!-- -->.
+
+Used at the provider trust boundary: a provider is third-party code, so its returned `state` is validated rather than trusted.
 
 </td></tr>
 <tr><td>
@@ -668,6 +1006,15 @@ Check if an application is currently running.
 </td><td>
 
 Check whether an operation token is one of the canonical coarse operations.
+
+</td></tr>
+<tr><td>
+
+[isPositional(manifest, resourceKey)](./core.ispositional.md)
+
+</td><td>
+
+Whether the objects of `resourceKey` are found by their position within their parent: the resource is declared, usable, and marked `positional`<!-- -->.
 
 </td></tr>
 <tr><td>
@@ -710,6 +1057,59 @@ Validate a permission string without parsing it.
 </td></tr>
 <tr><td>
 
+[itemIdentifierParameter(command)](./core.itemidentifierparameter.md)
+
+</td><td>
+
+The declared parameter that identifies a command's item: its first required parameter, in declaration order, other than its parent's. A resource-scoped command's native body addresses the item by it; an application-scoped delete passes it to the app's delete with its other declared parameters.
+
+</td></tr>
+<tr><td>
+
+[itemSelectionProblem(commandKey, command)](./core.itemselectionproblem.md)
+
+</td><td>
+
+Why a command cannot be offered, when it must name one item (a resource-scoped command other than a list or create, or a delete at application scope) and declares no identifier parameter ([itemIdentifierParameter()](./core.itemidentifierparameter.md)<!-- -->).
+
+</td></tr>
+<tr><td>
+
+[knownItemSelectionGap(manifest, commandKey)](./core.knownitemselectiongap.md)
+
+</td><td>
+
+The known gap for `commandKey` of `manifest`<!-- -->'s app, or `undefined` when the command is not one.
+
+</td></tr>
+<tr><td>
+
+[listKnownPermissions(manifest)](./core.listknownpermissions.md)
+
+</td><td>
+
+The permissions an app's manifest defines, which are the ones worth granting or suggesting: the permission of every route whose operation can be called, each resource wildcard (`app:resource:*`<!-- -->) that covers them, and the app wildcard (`app:*:*`<!-- -->).
+
+</td></tr>
+<tr><td>
+
+[listOperationPages(command, resource)](./core.listoperationpages.md)
+
+</td><td>
+
+Whether a manifest list operation returns bounded pages, taking `pageSize` and `cursor` inputs, rather than its whole collection as one page.
+
+This is the single paging-eligibility rule. The contract generator, the generated SDK and CLI surfaces, the capability registry, the native list body, and the runtime's contract registration check all ask it, so they agree by construction.
+
+A list pages exactly when its command is the resource-scoped `list` and both of these hold, each from curated manifest evidence:
+
+- The resource's primary identifier is claimed unique (`unique: true`<!-- -->). Each page is anchored on the identifier of the item just before it, and the anchor check can detect a shift of the collection only if no two items share that value; with adjacent duplicates a shift by one leaves the same value in place, and a page would silently skip or repeat an item. The claim is independent of how the identifier is targeted. - The resource records that the running app reads a range of its collection (`rangeRead.supported: true`<!-- -->), as a live read-only observation showed. Every page is read as such a range, and an app that rejects it fails every page, so a list never pages on an untested collection.
+
+Anything less gives a list that reads its whole collection as one page: an identifier with no claim or one claimed not unique, a resource with no identifier, and a resource whose range read is unobserved or observed to fail.
+
+</td></tr>
+<tr><td>
+
 [loadCapabilityRegistry(manifestsDir)](./core.loadcapabilityregistry.md)
 
 </td><td>
@@ -739,6 +1139,26 @@ Each immediate subdirectory containing an `app.yaml` is treated as one app. Subd
 </td></tr>
 <tr><td>
 
+[loadPolicyFromFile(path)](./core.loadpolicyfromfile.md)
+
+</td><td>
+
+Load and validate a governance policy from a JSON file at `path`<!-- -->.
+
+The caller is responsible for constructing `path` (e.g. from `getMactsHome()`<!-- -->). This function never reads `MACTS_HOME` itself.
+
+</td></tr>
+<tr><td>
+
+[mergeNullabilityObservations(manifest, observed)](./core.mergenullabilityobservations.md)
+
+</td><td>
+
+Decide what a nullability probe's observations mean for the manifest it probed. Pure: it reads the manifest and the observations, and returns the decisions.
+
+</td></tr>
+<tr><td>
+
 [normalizeAppRouteSegment(appName)](./core.normalizeapproutesegment.md)
 
 </td><td>
@@ -754,7 +1174,22 @@ Whitespace is collapsed to single hyphens and the result is lowercased, so multi
 
 </td><td>
 
-Normalize a resource's plural name into the canonical route segment.
+A resource's segment: the one spelling of a resource on every public surface.
+
+It is the acronym-aware lower camel case of the resource's plural (`MediaItems` → `mediaItems`<!-- -->, `AIMHandles` → `aimHandles`<!-- -->, `Notes` → `notes`<!-- -->). The route and operation id (`photos.mediaItems.list`<!-- -->), the SDK resource accessor in the HTTP client and the contract (`photos.mediaItems`<!-- -->), the MCP tool name, the capability's resource, and the scope of a derived permission (`photos:mediaItems:list`<!-- -->) all take it from here, so a caller can carry one name from any of them to the others. No surface may derive its own spelling.
+
+</td></tr>
+<tr><td>
+
+[nullabilityProbeBody(accessors, properties, maxItems, timeLimitMs, nativeNames)](./core.nullabilityprobebody.md)
+
+</td><td>
+
+The function body that probes one resource inside the automation process.
+
+Collection accessors and property names are embedded as JSON literals and used only with bracket notation, so no manifest-supplied text becomes code. Every collection along the way, top level or nested, is read through its element specifier's `length` and by index, so only the items actually read are ever referenced; a collection whose `length` throws or is not a number is unreachable (at the top) or contributes no items (below a parent).
+
+Selection, for a nested resource: a pre-scan first finds non-empty collections at the last level of the chain, reading only lengths and never every parent. In each intermediate collection of length `n` it visits the parents at `floor(k * n / m)` for `m = min(n, PARENT_SPREAD)`<!-- -->; if the collections found hold fewer than `maxItems` items, it visits the further parents of `m = 2 * PARENT_SPREAD`<!-- -->, `4 * PARENT_SPREAD`<!-- -->, and so on. It stops at `MAX_PARENT_VISITS` collections, or once `PARENT_SCAN_TIME_SHARE` of the time limit is spent, and samples what it found. The same app state always yields the same parents and items. The sample gives each collection found a quota of `ceil(maxItems / parents)` items, read at evenly spaced indices `floor(k * n / m)` (`m = min(n, quota)`<!-- -->), parent by parent until the cap. With more parents than `maxItems`<!-- -->, evenly spaced parents are chosen, one item each. A top-level resource is one parent: the app. Each property read is wrapped in its own `try`<!-- -->/`catch`<!-- -->; the body returns only the counts, the kind label counts of the values found (see `../manifest/value-kinds.ts`<!-- -->), and whether the collection was reachable, never a value.
 
 </td></tr>
 <tr><td>
@@ -775,6 +1210,26 @@ Wrap a coercer to handle null/undefined values.
 Check whether a governance policy operation pattern matches a concrete operation name.
 
 Mirrors the permission-system rule: the wildcard `'*'` matches any value; any other pattern must equal the concrete value exactly.
+
+</td></tr>
+<tr><td>
+
+[pageReadFor(pageMs, columnMs)](./core.pagereadfor.md)
+
+</td><td>
+
+The page read measured page costs choose: `column` only when the column page took at most three quarters of the range page's time (`columnMs <= 0.75 * pageMs`<!-- -->), and `range` otherwise, ties included.
+
+Range is the default because a range page costs what the page holds, so it keeps paging's latency bound whatever the collection's size; a column page costs what the whole collection costs. Column gives up that bound, so it is chosen only for a clear measured gain. The margin absorbs typical measurement noise, so a small difference keeps range; a result near the margin can fall either side when measured again, and the recorded median decides. The comparison is made in whole numbers, so the boundary is exact, and a tie is range even when both reads measured 0 ms.
+
+</td></tr>
+<tr><td>
+
+[parseApprovalConfig(input)](./core.parseapprovalconfig.md)
+
+</td><td>
+
+Parse and validate an untrusted value as an approval-provider registration.
 
 </td></tr>
 <tr><td>
@@ -814,6 +1269,46 @@ This function does NOT compile the declaration to enforcement permissions, resol
 </td></tr>
 <tr><td>
 
+[policyGrantsPermission(policy, candidate)](./core.policygrantspermission.md)
+
+</td><td>
+
+Test whether a policy grants a single concrete permission as a standing (non-confirmation-gated) permission.
+
+A thin convenience over [compilePolicyToPermissions()](./core.compilepolicytopermissions.md) for the common "is this one permission in-policy?" question. Returns `true` only when the evaluator's decision is `'allowed'`<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[positionalProblems(manifest)](./core.positionalproblems.md)
+
+</td><td>
+
+Why a manifest's `positional` markers refuse it, one reason per issue (<!-- -->), each naming the resource or command. The generators and operation registration prefix each with the app and what is refused, as they do the item-selection rule's.
+
+</td></tr>
+<tr><td>
+
+[probeManifest(manifest, runner, options)](./core.probemanifest.md)
+
+</td><td>
+
+Probe all (or selected) resources in a manifest against the live app. Collections and properties are addressed by the app's names for them (see `manifest/native-accessor.ts`<!-- -->) and reported under their manifest keys. A resource the manifest marks unsupported is never probed, even when requested.
+
+</td></tr>
+<tr><td>
+
+[probeNullability(manifest, runner, options)](./core.probenullability.md)
+
+</td><td>
+
+Probe which properties of a live app's resources are sometimes empty.
+
+Resources are probed one at a time, in manifest order (or the order of `options.resources`<!-- -->), each in a single automation call. Once the budget is spent, the remaining resources are reported with status `budget` and are not read. A resource the probe cannot reach, or whose call fails, is reported and the probe moves on; neither is fatal. A resource the manifest marks unsupported is never probed, even when requested: the app has none. Collections and properties are addressed by the app's names for them (see `manifest/native-accessor.ts`<!-- -->), and reported under their manifest keys.
+
+</td></tr>
+<tr><td>
+
 [propertyTypeToTs(type)](./core.propertytypetots.md)
 
 </td><td>
@@ -845,11 +1340,83 @@ Quit an application.
 </td></tr>
 <tr><td>
 
+[readMacosVersion()](./core.readmacosversion.md)
+
+</td><td>
+
+Read the macOS product version with `sw_vers -productVersion`<!-- -->, run directly (no shell).
+
+</td></tr>
+<tr><td>
+
+[readsAbsentAsNull(claim, resource)](./core.readsabsentasnull.md)
+
+</td><td>
+
+Whether a read of the field that fails with the absent-value number ([ABSENT_VALUE_ERROR_NUMBER](./core.absent_value_error_number.md)<!-- -->) is the field's empty value. The field is claimed nullable, either on probe evidence whose failed reads all reported an absent value ([reportsAbsence()](./core.reportsabsence.md)<!-- -->), or, on a resource with a single instance ([hasSingleInstance()](./core.hassingleinstance.md)<!-- -->), on curated evidence recording such reads with a reason the absence depends on the data. Any other failure of the read is still a failure, and so is this one for any field without that evidence.
+
+</td></tr>
+<tr><td>
+
+[recordApprovalCancellation(options)](./core.recordapprovalcancellation.md)
+
+</td><td>
+
+Record that the caller abandoned a held `confirm-first` call before any decision.
+
+It resolves the `'pending'` record that [enforceCall()](./core.enforcecall.md) wrote, as [recordApprovalDecision()](./core.recordapprovaldecision.md) does for a decision, but records `'cancelled'`<!-- -->: nobody approved or rejected the call, and it did not run. Recording it as approved or rejected would misstate what happened.
+
+</td></tr>
+<tr><td>
+
+[recordApprovalDecision(options)](./core.recordapprovaldecision.md)
+
+</td><td>
+
+Record the human decision that resolved a previously-held `confirm-first` call.
+
+A held call produces \*\*two\*\* audit records, not one: [enforceCall()](./core.enforcecall.md) writes `'pending'` when the call is withheld, and this writes `'approved'` or `'rejected'` when a human (or the fail-closed gate) resolves it. Keeping both preserves the sequence — a reader can see how long a call waited and how it ended, which a single collapsed record would lose.
+
+The mapping is deliberately binary: anything other than an explicit approval — an explicit rejection, a timeout, a provider failure — records as `'rejected'`<!-- -->, because the call did not run and a human did not permit it. The finer distinction (a human declined vs. nobody answered) is preserved in the record's human-readable reason.
+
+The record carries , not : the audit trail is the place for the full detail (including third-party exception text), while the client-safe reason is what a caller sees.
+
+The write is not optional. If it fails, this rejects — and the caller must treat that as a denial, because an approved call it cannot record is a call that must not run.
+
+</td></tr>
+<tr><td>
+
+[recordInvalidInput(options)](./core.recordinvalidinput.md)
+
+</td><td>
+
+Record that a call was rejected by input validation, before governance.
+
+Writes one `'invalid-input'` record with the call's attribution, time, and issue count. No policy was evaluated and no approval was sought, so the record has no reason and no approval correlation id, and it never carries any part of the input: input that failed its contract has not been shown to be what a summary of it would claim.
+
+The write is not optional. If it fails, this rejects, and the caller decides how to fail closed.
+
+</td></tr>
+<tr><td>
+
+[recordPermissionDenied(options)](./core.recordpermissiondenied.md)
+
+</td><td>
+
+Record that a call was refused because its caller lacks the operation's permission, before its input was judged.
+
+Writes one `'permission-denied'` record with the call's attribution and time. No input was validated, no policy was evaluated, and no approval was sought, so the record has no argument summary, issue count, reason, or approval correlation id. Two denied calls by one key for one operation that differ only in their input produce records that differ only in their timestamps.
+
+The write is not optional. If it fails, this rejects, and the caller decides how to answer the denied call.
+
+</td></tr>
+<tr><td>
+
 [redactArgs(args, options)](./core.redactargs.md)
 
 </td><td>
 
-Redact sensitive values from a capability-call argument map and return a human-readable summary string suitable for [AuditRecordInput.argsSummary](./core.auditrecordinput.argssummary.md)<!-- -->.
+Redact sensitive values from a capability-call argument map and return a human-readable summary string suitable for [GovernedAuditRecordInput.argsSummary](./core.governedauditrecordinput.argssummary.md)<!-- -->.
 
 Sensitive key names (matched case-insensitively against [DEFAULT_SENSITIVE_KEYS](./core.default_sensitive_keys.md) plus any `extraSensitiveKeys`<!-- -->) have their values replaced with [REDACTED_PLACEHOLDER](./core.redacted_placeholder.md)<!-- -->. All other values are summarised safely (scalars inline, large objects/arrays collapsed to a size hint) so the record never contains raw bulk data.
 
@@ -860,11 +1427,64 @@ Key ordering in the output follows `Object.entries` order (i.e. insertion order 
 </td></tr>
 <tr><td>
 
+[reportsAbsence(evidence)](./core.reportsabsence.md)
+
+</td><td>
+
+Whether probe evidence shows the app reporting an absent value by failing the read on some instances only: failed reads all raised the absent-value number ([ABSENT_VALUE_ERROR_NUMBER](./core.absent_value_error_number.md)<!-- -->), and at least one read succeeded (failed reads count toward neither `sampleSize` nor `nullCount`<!-- -->, so `sampleSize` above 0 is a successful read). A property whose every read failed is absent structurally, which phases/13 D10 calls unsupported.
+
+</td></tr>
+<tr><td>
+
+[resolveAccessChain(manifest, resourceKey)](./core.resolveaccesschain.md)
+
+</td><td>
+
+The shortest chain of resource keys from the app to `resourceKey` in the manifest's containment hierarchy, e.g. `['Calendar', 'Event']`<!-- -->. A resource the hierarchy does not mention is read as a top-level collection, as the identifier probe reads it.
+
+</td></tr>
+<tr><td>
+
+[resolveActivePolicyPath(home)](./core.resolveactivepolicypath.md)
+
+</td><td>
+
+Resolve the canonical absolute path to the active governance policy file.
+
+The file lives at `<home>/governance/policy.json`<!-- -->. Both the enforcement layer (`@macts/api`<!-- -->) and the discovery layer (`@macts/cli`<!-- -->, `@macts/mcp`<!-- -->) MUST call this function — never build the path inline — so that both always read the same file.
+
+</td></tr>
+<tr><td>
+
+[resolveApprovalConfigPath(home)](./core.resolveapprovalconfigpath.md)
+
+</td><td>
+
+Resolve the canonical absolute path to the approval-provider registration file (`<home>/governance/approval.json`<!-- -->).
+
+Every surface MUST call this rather than building the path inline, so a declaration written by one surface is read by all of them.
+
+</td></tr>
+<tr><td>
+
+[resolveCanonicalIdentifierSource(resource)](./core.resolvecanonicalidentifiersource.md)
+
+</td><td>
+
+Resolve the property whose value a resource's records mirror under [CANONICAL_IDENTIFIER_KEY](./core.canonical_identifier_key.md)<!-- -->, or `undefined` when they carry no alias.
+
+The alias mirrors the runtime targeting property: the value sibling operations accept as the lookup (for a `byProperty` resource its working property, not the declared identifier). There is no alias when the resource declares no identifier, or when it has a usable property literally named `id`<!-- -->: that key is then a regular field with its own value and type, and an alias would overwrite it (a Music track's numeric `id` with its persistent ID). Every surface that writes or types the alias takes it from here, so the records a list returns and the read types that describe them agree.
+
+</td></tr>
+<tr><td>
+
 [resolveCommandRoutes(manifest, commandKey, command)](./core.resolvecommandroutes.md)
 
 </td><td>
 
 Resolve every canonical RPC route for a single manifest command.
+
+A command marked unsupported has no route, and a resource marked unsupported contributes none, so every surface built from these routes (the server router, the runtime's operation registry, the contract, capabilities, derived permissions) omits them.
 
 </td></tr>
 <tr><td>
@@ -880,13 +1500,28 @@ The discovery surfaces accept a `--limit` flag / `limit` argument that flows int
 </td></tr>
 <tr><td>
 
+[resolveIdentifierTargeting(resource)](./core.resolveidentifiertargeting.md)
+
+</td><td>
+
+Resolve how the runtime layer must target a resource by its primary identifier.
+
+The structured layer addresses a resource through its primary identifier, but a dictionary-declared identifier is not always runtime-valid via JXA. This resolution captures BOTH which property carries the identifier value AND how the runtime must use it:
+
+- `byId` (default): `app.<plural>.byId(value)` — the dictionary id specifier works at runtime. - `byProperty`<!-- -->: `app.<plural>.whose({ <property>: value })[0]` — the declared identifier throws at runtime (e.g. Calendar's `calendarIdentifier()`<!-- -->), so the resource is matched on a property that works (e.g. `name`<!-- -->). - `byKey`<!-- -->: the collection's key specifier applied to the identifier value, which the app interprets (an app that keys files by path finds whatever file is at that path). - `byRoot`<!-- -->: a singleton root's kind, which names the application property holding its object (`../manifest/roots.ts`<!-- -->); normalisation gives every root this identifier, and no collection is involved.
+
+Returns `undefined` when the resource declares no identifiers — such a resource cannot be addressed by identifier at all, and callers handle that explicitly.
+
+</td></tr>
+<tr><td>
+
 [resolveListOutputProperties(resource)](./core.resolvelistoutputproperties.md)
 
 </td><td>
 
 Resolve the set of property names a `list` operation must read for a resource so its output is usable by sibling operations.
 
-This is every declared property plus the primary-identifier property (which a manifest may declare in `identifiers` without also listing it under `properties`<!-- -->). Deriving the list here — rather than reading `Object.keys(resource.properties)` directly — guarantees the identifier is always present in list output even when it is not a regular property.
+This is every usable property (declared and not marked unsupported, see `usableProperties`<!-- -->) plus the primary-identifier property, which a manifest may declare in `identifiers` without also listing it under `properties` and which cannot be marked unsupported. Deriving the list here — rather than reading `Object.keys(resource.properties)` directly — guarantees the identifier is always present in list output even when it is not a regular property, and that a property the app cannot provide is never read.
 
 </td></tr>
 <tr><td>
@@ -896,6 +1531,15 @@ This is every declared property plus the primary-identifier property (which a ma
 </td><td>
 
 Resolve every canonical RPC route for an entire manifest, across all commands.
+
+</td></tr>
+<tr><td>
+
+[resolveParameterNullability(parameter)](./core.resolveparameternullability.md)
+
+</td><td>
+
+Whether a command parameter accepts `null`<!-- -->: only when the manifest claims it, with evidence. Without a claim, it does not.
 
 </td></tr>
 <tr><td>
@@ -911,6 +1555,26 @@ The identifier is taken from the resource's `identifiers` array: the entry flagg
 </td></tr>
 <tr><td>
 
+[resolveReadNullability(resource, propertyName, property)](./core.resolvereadnullability.md)
+
+</td><td>
+
+Whether reading a resource property can find it empty (`null`<!-- -->).
+
+- The primary identifier property is never nullable, whatever the manifest claims. A claim to the contrary is ignored here; generators report it, since an identifier observed empty means the identifier choice is wrong. - Otherwise the manifest's claim decides, with its evidence as the basis. - Without a claim, the property is nullable (see the module comment for why the read default is nullable).
+
+</td></tr>
+<tr><td>
+
+[resolveResettability(property)](./core.resolveresettability.md)
+
+</td><td>
+
+The verified way to reset a property with `null` in an update, or `undefined` when there is none, in which case an update cannot set it to `null`<!-- -->.
+
+</td></tr>
+<tr><td>
+
 [runJxa(code, options)](./core.runjxa.md)
 
 </td><td>
@@ -920,11 +1584,33 @@ Execute raw JXA code and return the result. Uses osascript -l JavaScript under t
 </td></tr>
 <tr><td>
 
+[runNativeScript(script, codec, options)](./core.runnativescript.md)
+
+</td><td>
+
+Run one native invocation in the automation host, converting values through `codec` inside the process.
+
+</td></tr>
+<tr><td>
+
 [runWithApp(bundleId, fn, options)](./core.runwithapp.md)
 
 </td><td>
 
 Execute JXA code in the context of an application.
+
+</td></tr>
+<tr><td>
+
+[scanExhaustedNote(result)](./core.scanexhaustednote.md)
+
+</td><td>
+
+The note on a nested resource whose parent scan ran out of time before it found an item, or `undefined` for any other result. Such a resource was probed, not skipped, and whether it has items is unknown: only the parents counted here were looked in. A top-level resource, or one the budget left unread (no parent looked in), gets no such note.
+
+It keys on the `budget` status, which a call that looked in parents gets when the time ran out before any item was read. That is the pre-scan's deadline, which falls at `PARENT_SCAN_TIME_SHARE` of the call's time limit, so the sample always has the rest: only a single app round trip longer than that share could instead spend the sample's time first.
+
+Shared by the manifest's probe block and the CLI's report, so the two say the same thing.
 
 </td></tr>
 <tr><td>
@@ -949,13 +1635,104 @@ When `options.filter` is provided, governance is applied to the \*\*full\*\* ran
 </td></tr>
 <tr><td>
 
+[seekApproval(options)](./core.seekapproval.md)
+
+</td><td>
+
+Ask a provider for a human decision, bounded by the request's `timeoutMs`<!-- -->, and normalize the answer fail-closed.
+
+This is the only function callers should use to invoke a provider: it owns the timeout bound, the abort signal, and every failure mode, so no call site can accidentally treat a hang or a crash as approval. See the table in the module documentation for the full mapping.
+
+</td></tr>
+<tr><td>
+
+[seekApprovalUnlessCancelled(options)](./core.seekapprovalunlesscancelled.md)
+
+</td><td>
+
+Ask a provider for a human decision, as [seekApproval()](./core.seekapproval.md) does, while letting the caller abandon the wait.
+
+An abort before a decision resolves at once to an [ApprovalCancellation](./core.approvalcancellation.md) instead of waiting out the approval timeout, and aborts the provider's signal so it can retract its prompt. A signal that is already aborted never reaches the provider. Every other outcome is exactly [seekApproval()](./core.seekapproval.md)<!-- -->'s.
+
+</td></tr>
+<tr><td>
+
+[selectProbedProperties(manifest, resource, skipProperties)](./core.selectprobedproperties.md)
+
+</td><td>
+
+Split a resource's properties into those to read and those to skip. The primary identifier property is always read.
+
+</td></tr>
+<tr><td>
+
 [serializeAuditRecord(record)](./core.serializeauditrecord.md)
 
 </td><td>
 
 Serialize an [AuditRecord](./core.auditrecord.md) to its JSON-safe [SerializedAuditRecord](./core.serializedauditrecord.md) form.
 
-Deterministic: the `timestamp` becomes a stable ISO-8601 string and `reason` is included only when present. No storage is performed — the caller decides where the serialized record goes.
+Deterministic: the `timestamp` becomes a stable ISO-8601 string, and only the fields of the record's kind are written, with `reason` and `approvalId` included only when present. No storage is performed — the caller decides where the serialized record goes.
+
+</td></tr>
+<tr><td>
+
+[serializeAuditRecord(record)](./core.serializeauditrecord_1.md)
+
+</td><td>
+
+Serialize an [InvalidInputAuditRecord](./core.invalidinputauditrecord.md)<!-- -->: its attribution, the timestamp as an ISO-8601 string, and the issue count, and nothing else.
+
+</td></tr>
+<tr><td>
+
+[serializeAuditRecord(record)](./core.serializeauditrecord_2.md)
+
+</td><td>
+
+Serialize a [PermissionDeniedAuditRecord](./core.permissiondeniedauditrecord.md)<!-- -->: its attribution and the timestamp as an ISO-8601 string, and nothing else.
+
+</td></tr>
+<tr><td>
+
+[serializeAuditRecord(record)](./core.serializeauditrecord_3.md)
+
+</td><td>
+
+Serialize an [AuditRecord](./core.auditrecord.md) of any kind.
+
+</td></tr>
+<tr><td>
+
+[splitIdentifierWords(identifier)](./core.splitidentifierwords.md)
+
+</td><td>
+
+The words of an identifier, as written.
+
+A run of capitals is one acronym, except that its last capital begins the next word when a lower-case letter follows (`XMLParser` → `XML`<!-- -->, `Parser`<!-- -->). A lone `s` after an acronym is its plural, not a word (`URLs`<!-- -->, `listURLs` → `list`<!-- -->, `URLs`<!-- -->). Digits stay with the word before them (`ID3Tags` → `ID3`<!-- -->, `Tags`<!-- -->).
+
+</td></tr>
+<tr><td>
+
+[strictestPolicyDecision(a, b)](./core.strictestpolicydecision.md)
+
+</td><td>
+
+The stricter of two [PolicyDecision](./core.policydecision.md)<!-- -->s (`denied` &gt; `confirm-first` &gt; `allowed`<!-- -->).
+
+Ties return `a`<!-- -->, which callers rely on to attribute an unchanged decision to the host layer.
+
+</td></tr>
+<tr><td>
+
+[suggestPermissions(requested, known)](./core.suggestpermissions.md)
+
+</td><td>
+
+The known permissions closest to a requested one, best first.
+
+Only permissions of the same app (compared case-insensitively) are considered. A permission differing only in letter case ranks first; otherwise candidates within a small edit distance follow, nearest first and alphabetical among equals.
 
 </td></tr>
 <tr><td>
@@ -998,6 +1775,24 @@ Tokenize an intent string into lowercase terms.
 </td></tr>
 <tr><td>
 
+[unselectableItemCommands(manifest)](./core.unselectableitemcommands.md)
+
+</td><td>
+
+The commands of a manifest that would be offered as an operation but cannot select the item they act on, in declaration order, each once.
+
+</td></tr>
+<tr><td>
+
+[untargetedIdentifiers(manifest)](./core.untargetedidentifiers.md)
+
+</td><td>
+
+The resources of a manifest whose primary identifier declares no targeting and is not the class's dictionary id, in declaration order, each once.
+
+</td></tr>
+<tr><td>
+
 [validateCommandPermissions(commandPermissions, permissionsSection)](./core.validatecommandpermissions.md)
 
 </td><td>
@@ -1023,6 +1818,41 @@ Create a wildcard permission string.
 Write generated files to disk.
 
 Creates directories as needed and writes each file's content.
+
+</td></tr>
+<tr><td>
+
+[writeGeneratedPackage(files, packageDir)](./core.writegeneratedpackage.md)
+
+</td><td>
+
+Write one generated package: a record widened to the previous set plus this run's files, then the files, then the pruning of what the previous run emitted and this one did not, then the record of exactly this run's files.
+
+A run interrupted at any point leaves a record listing every file it may have written, so the next run prunes whatever of them it no longer emits.
+
+</td></tr>
+<tr><td>
+
+[writeNullabilityResults(manifestPath, merged)](./core.writenullabilityresults.md)
+
+</td><td>
+
+Apply a nullability probe's merged decisions to the manifest at `manifestPath`<!-- -->.
+
+For each resource it upserts the `nullabilityProbe` block, and for each property whose claim the merge sets or refreshes it upserts `nullable` and `evidence.nullable`<!-- -->: on the property's declaration, or, for a property the resource inherits from a superclass (D10, "Superclasses"), in a claims-only overlay, `inheritedClaims.<property>`<!-- -->, so the claim is the resource's own and the declaration stays the superclass's. Nothing else changes: `evidence.resettable`<!-- -->, claims the merge left unchanged, and every other line keep their text. A claim with nowhere to go (the resource neither declares nor inherits the property, or its evidence is not a mapping) is not written, and is reported in `notWritten`<!-- -->.
+
+A resource whose new probe read no item (out of time, unreachable, failed, or empty) keeps an earlier `nullabilityProbe` block that did read items: that block describes the sample the resource's probe claims came from, and a probe that saw nothing must not erase that record.
+
+</td></tr>
+<tr><td>
+
+[writeProbeResults(manifestPath, result)](./core.writeproberesults.md)
+
+</td><td>
+
+Merge the identifier probe's results into the manifest at `manifestPath`<!-- -->.
+
+Each probed resource's `probe` block is replaced under `resources.<Name>.probe`<!-- -->. The sdef-declared `identifiers` array is not touched — probe metadata is purely additive — and neither is any other line of the file.
 
 </td></tr>
 <tr><td>
@@ -1067,11 +1897,20 @@ API key payload structure.
 </td></tr>
 <tr><td>
 
-[ApiKeyValidationResult](./core.apikeyvalidationresult.md)
+[ApiKeyValidationFailure](./core.apikeyvalidationfailure.md)
 
 </td><td>
 
-Result of API key validation.
+Failed API key validation.
+
+</td></tr>
+<tr><td>
+
+[ApiKeyValidationSuccess](./core.apikeyvalidationsuccess.md)
+
+</td><td>
+
+Successful API key validation.
 
 </td></tr>
 <tr><td>
@@ -1090,24 +1929,142 @@ Result of API key validation.
 </td></tr>
 <tr><td>
 
-[AuditRecord](./core.auditrecord.md)
+[AppNullabilityResult](./core.appnullabilityresult.md)
 
 </td><td>
 
-A structured, attributable record of a single capability call.
-
-Every field is a string except `timestamp`<!-- -->, which is a `Date`<!-- -->. To serialize a record losslessly to JSON, convert it with [serializeAuditRecord()](./core.serializeauditrecord.md)<!-- -->, which renders the `timestamp` as an ISO-8601 string. All fields are `readonly`<!-- -->, so the record reference is shallowly immutable; note the `timestamp` `Date` is itself mutable (the constructor stores a defensive copy — see [createAuditRecord()](./core.createauditrecord.md)<!-- -->).
+What a nullability probe of one app observed, with its provenance.
 
 </td></tr>
 <tr><td>
 
-[AuditRecordInput](./core.auditrecordinput.md)
+[AppProbeResult](./core.appproberesult.md)
 
 </td><td>
 
-The inputs needed to construct an [AuditRecord](./core.auditrecord.md)<!-- -->.
+Result of probing an entire app manifest.
 
-The timestamp is supplied by the caller (injected, never read from `Date.now()` inside this module) so records are deterministic and testable.
+</td></tr>
+<tr><td>
+
+[ApprovalApprovedOutcome](./core.approvalapprovedoutcome.md)
+
+</td><td>
+
+A held call that a human explicitly approved.
+
+</td></tr>
+<tr><td>
+
+[ApprovalCancellation](./core.approvalcancellation.md)
+
+</td><td>
+
+The caller abandoned a held call before any decision was reached.
+
+This is not a decision. Nobody approved or rejected the call, and it must not run. Its audit record is `'cancelled'`<!-- -->, written with `recordApprovalCancellation`<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[ApprovalConfigIssue](./core.approvalconfigissue.md)
+
+</td><td>
+
+A single structured validation issue from [parseApprovalConfig()](./core.parseapprovalconfig.md)<!-- -->.
+
+Mirrors the policy parser's issue shape: `path` is the dotted location of the offending field, `message` is the human-readable reason.
+
+</td></tr>
+<tr><td>
+
+[ApprovalDecision](./core.approvaldecision.md)
+
+</td><td>
+
+What a provider returns for one [ApprovalRequest](./core.approvalrequest.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[ApprovalDeniedOutcome](./core.approvaldeniedoutcome.md)
+
+</td><td>
+
+A held call that was not approved, for any reason.
+
+</td></tr>
+<tr><td>
+
+[ApprovalPolicySuggestion](./core.approvalpolicysuggestion.md)
+
+</td><td>
+
+A standing-rule edit a provider suggests alongside its decision — for example "stop asking me about `calendar:events:list`<!-- -->".
+
+\*\*Reserved shape; not implemented.\*\* macts does not act on suggestions today. When it does, a suggestion will only ever be \*offered\* to the operator through the normal policy-editing path — never auto-applied, because a provider that could silently widen a policy would defeat the point of holding the call. Providers must not emit one unless they declare [ApprovalProviderCapabilities.supportsPolicySuggestions](./core.approvalprovidercapabilities.supportspolicysuggestions.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[ApprovalProvider](./core.approvalprovider.md)
+
+</td><td>
+
+The interface a HITL approval provider implements.
+
+Implementations are third-party code and are treated as untrusted: a malformed decision, a thrown error, or a hang all deny the call (see [seekApproval()](./core.seekapproval.md)<!-- -->).
+
+</td></tr>
+<tr><td>
+
+[ApprovalProviderCapabilities](./core.approvalprovidercapabilities.md)
+
+</td><td>
+
+Optional features a provider declares support for.
+
+Both flags are required (no defaults) so a provider author has to make a deliberate statement about each capability rather than inheriting one.
+
+</td></tr>
+<tr><td>
+
+[ApprovalRequest](./core.approvalrequest.md)
+
+</td><td>
+
+Everything a provider needs to render a decision-grade approval prompt.
+
+Deliberately carries a \*\*redacted\*\* argument summary and never raw arguments: the prompt has to be safe to display on a phone, in a chat client, or in a third-party service.
+
+</td></tr>
+<tr><td>
+
+[ApprovalRequestContext](./core.approvalrequestcontext.md)
+
+</td><td>
+
+Context handed to a provider for a single request.
+
+</td></tr>
+<tr><td>
+
+[ApprovalRequesterIdentity](./core.approvalrequesteridentity.md)
+
+</td><td>
+
+Who is asking — the API key that authorized the held call.
+
+This is what makes an approval prompt attributable: a human is answering "may \*this\* agent do \*this\*", not just "may this happen".
+
+</td></tr>
+<tr><td>
+
+[AuditRecordBase](./core.auditrecordbase.md)
+
+</td><td>
+
+The attribution every audit record carries, whatever its kind: what was called, on which app, by which key, and when.
 
 </td></tr>
 <tr><td>
@@ -1119,6 +2076,17 @@ The timestamp is supplied by the caller (injected, never read from `Date.now()` 
 A sink for [AuditRecord](./core.auditrecord.md) instances.
 
 Implementations must append one complete, newline-terminated JSON object per call and must surface I/O errors rather than swallowing them.
+
+</td></tr>
+<tr><td>
+
+[CallAuditContext](./core.callauditcontext.md)
+
+</td><td>
+
+Context about the capability invocation that feeds the audit record.
+
+Supplies the parts [enforceCall()](./core.enforcecall.md) cannot determine itself: who called, a redacted argument summary, and when.
 
 </td></tr>
 <tr><td>
@@ -1152,6 +2120,15 @@ A scored search result.
 </td></tr>
 <tr><td>
 
+[ClaimResource](./core.claimresource.md)
+
+</td><td>
+
+The resource a property belongs to, as far as how many instances it has: a singleton root names the kinds the application holds, one instance each.
+
+</td></tr>
+<tr><td>
+
 [CliGeneratorContext](./core.cligeneratorcontext.md)
 
 </td><td>
@@ -1171,6 +2148,77 @@ A scored search result.
 </td><td>
 
 Coarse-grained permission - CRUD-style groups. Format: `app:resource:crud-operation`
+
+</td></tr>
+<tr><td>
+
+[ComposedRestrictions](./core.composedrestrictions.md)
+
+</td><td>
+
+Path and URL restrictions after composing two layers.
+
+Deny lists compose as a plain \*\*union\*\*: a pattern denied by either layer is denied outright.
+
+Allow lists cannot be flattened the same way. An allow list is a conjunctive constraint ("only these"), and two allow lists over \*opaque patterns\* cannot be intersected into a single list without either widening (host `/Users/me/**` ∩ key `/Users/me/projects/**` has no common literal, and an empty allow list means "unconstrained" — the widest possible answer) or inventing pattern algebra this layer has no business owning. So each constraining layer contributes its own \*\*group\*\*, and a candidate must satisfy \*every\* group. That is the intersection, expressed exactly.
+
+A layer that declares no allow patterns contributes no group (it constrains nothing); an empty `groups` array therefore means "unconstrained", matching the single-layer semantics of [Restrictions](./core.restrictions.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[EnforceCallOptions](./core.enforcecalloptions.md)
+
+</td><td>
+
+Options for a single [enforceCall()](./core.enforcecall.md) invocation.
+
+</td></tr>
+<tr><td>
+
+[EnforcementDecision](./core.enforcementdecision.md)
+
+</td><td>
+
+The result of enforcing a governance policy against a single capability call.
+
+Every decision carries an `outcome`<!-- -->, a `reason` (naming the violated/governing rule and the exact `app:resource:operation`<!-- -->), and the full underlying [PolicyEvaluation](./core.policyevaluation.md) for callers that need the matched rule or raw disposition without re-evaluating.
+
+</td></tr>
+<tr><td>
+
+[EvaluateLayeredPolicyOptions](./core.evaluatelayeredpolicyoptions.md)
+
+</td><td>
+
+Options for [evaluateLayeredPolicy()](./core.evaluatelayeredpolicy.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[ExecutionRequest](./core.executionrequest.md)
+
+</td><td>
+
+One operation, already authorized and validated, handed to an executor.
+
+</td></tr>
+<tr><td>
+
+[Executor](./core.executor.md)
+
+</td><td>
+
+Carries out operations, and resolves references, for one provider.
+
+</td></tr>
+<tr><td>
+
+[ExpandPermissionOptions](./core.expandpermissionoptions.md)
+
+</td><td>
+
+Options for [expandCoarsePermission()](./core.expandcoarsepermission.md) and [expandPermissions()](./core.expandpermissions.md)<!-- -->.
 
 </td></tr>
 <tr><td>
@@ -1279,6 +2327,17 @@ Result of HTTP client SDK generation.
 </td></tr>
 <tr><td>
 
+[GeneratedPackageWriteResult](./core.generatedpackagewriteresult.md)
+
+</td><td>
+
+The outcome of writing one generated package.
+
+Every path is package-relative, uses `/` separators, and every list is sorted.
+
+</td></tr>
+<tr><td>
+
 [GeneratedSchema](./core.generatedschema.md)
 
 </td><td>
@@ -1352,6 +2411,28 @@ Implemented by the governance workstream to plug a real policy into discovery. I
 </td></tr>
 <tr><td>
 
+[GovernedAuditRecord](./core.governedauditrecord.md)
+
+</td><td>
+
+A structured, attributable record of a call that reached governance.
+
+Every field is a string except `timestamp`<!-- -->, which is a `Date`<!-- -->. To serialize a record losslessly to JSON, convert it with , which renders the `timestamp` as an ISO-8601 string. All fields are `readonly`<!-- -->, so the record reference is shallowly immutable; note the `timestamp` `Date` is itself mutable (the constructor stores a defensive copy — see ).
+
+</td></tr>
+<tr><td>
+
+[GovernedAuditRecordInput](./core.governedauditrecordinput.md)
+
+</td><td>
+
+The inputs needed to construct a [GovernedAuditRecord](./core.governedauditrecord.md)<!-- -->.
+
+The timestamp is supplied by the caller (injected, never read from `Date.now()` inside this module) so records are deterministic and testable.
+
+</td></tr>
+<tr><td>
+
 [GovernedCapability](./core.governedcapability.md)
 
 </td><td>
@@ -1390,6 +2471,55 @@ Options for HTTP client SDK generation.
 </td></tr>
 <tr><td>
 
+[IdentifierDefect](./core.identifierdefect.md)
+
+</td><td>
+
+A manifest defect: the resource's primary identifier property was not present in every item the probe read. Counts only, never a value.
+
+</td></tr>
+<tr><td>
+
+[IdentifierProbeResult](./core.identifierproberesult.md)
+
+</td><td>
+
+Outcome of probing a single identifier candidate property.
+
+</td></tr>
+<tr><td>
+
+[IdentifierTargetingResolution](./core.identifiertargetingresolution.md)
+
+</td><td>
+
+How the runtime layer must target a resource by its primary identifier.
+
+</td></tr>
+<tr><td>
+
+[InvalidInputAuditRecord](./core.invalidinputauditrecord.md)
+
+</td><td>
+
+A structured, attributable record of a call rejected by input validation.
+
+It says who called what and when, and how many validation issues the input had, and nothing about the input itself. The constructor and the serializer refuse a record of this kind that carries an argument summary, a reason, or an approval correlation id.
+
+</td></tr>
+<tr><td>
+
+[InvalidInputAuditRecordInput](./core.invalidinputauditrecordinput.md)
+
+</td><td>
+
+The inputs needed to construct an [InvalidInputAuditRecord](./core.invalidinputauditrecord.md)<!-- -->: the attribution, the time, and how many validation issues the input had.
+
+It has no field for argument values, an argument summary, issue messages, a reason, or an approval correlation id, and declares each of those as `never` so that no value can be supplied for them.
+
+</td></tr>
+<tr><td>
+
 [JsonSchema](./core.jsonschema.md)
 
 </td><td>
@@ -1417,9 +2547,49 @@ Enum value for JXA coercion (name and four-char code).
 </td></tr>
 <tr><td>
 
+[JxaExecutionErrorOptions](./core.jxaexecutionerroroptions.md)
+
+</td><td>
+
+Additional facts about a [JxaExecutionError](./core.jxaexecutionerror.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
 [JxaExecutorOptions](./core.jxaexecutoroptions.md)
 
 </td><td>
+
+Options for [runJxa()](./core.runjxa.md) and [runWithApp()](./core.runwithapp.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[KindMismatchDefect](./core.kindmismatchdefect.md)
+
+</td><td>
+
+A manifest defect: the kinds of a property's values contradict its declared type (a property declared `string` whose values are dates, say), so every generated decoder of it fails. Reported when at least one value has a kind the declared type does not expect; a mix reports both counts. Labels and counts only, never a value.
+
+</td></tr>
+<tr><td>
+
+[KnownItemSelectionGap](./core.knownitemselectiongap.md)
+
+</td><td>
+
+One shipped resource command that cannot yet select its item.
+
+</td></tr>
+<tr><td>
+
+[LayeredPolicyEvaluation](./core.layeredpolicyevaluation.md)
+
+</td><td>
+
+The result of evaluating a capability against a host policy and an optional per-key policy.
+
+Extends [PolicyEvaluation](./core.policyevaluation.md)<!-- -->, so its `decision`<!-- -->, `permission`<!-- -->, `rule`<!-- -->, and `reason` are the \*\*effective\*\* (composed) values and it can be handed to any consumer that expects a plain evaluation. The extra fields carry the provenance a plain evaluation cannot express.
 
 </td></tr>
 <tr><td>
@@ -1435,6 +2605,176 @@ A resource-scoped command may resolve to multiple routes if it applies to multip
 </td></tr>
 <tr><td>
 
+[MatchedPolicyRule](./core.matchedpolicyrule.md)
+
+</td><td>
+
+The rule (and its provenance) that produced an evaluation decision.
+
+When `source` is `'default'`<!-- -->, no app/operation rule matched and the policy's `defaultDisposition` was used; `appRule` and `operationRule` are then `undefined`<!-- -->. Otherwise `appRule` is always present and `operationRule` is present only when an operation-level override matched (`source === 'operation'`<!-- -->).
+
+</td></tr>
+<tr><td>
+
+[NativeBodyOptions](./core.nativebodyoptions.md)
+
+</td><td>
+
+How a body shapes the records it returns.
+
+</td></tr>
+<tr><td>
+
+[NativeCodec](./core.nativecodec.md)
+
+</td><td>
+
+Source for the in-process value codec.
+
+</td></tr>
+<tr><td>
+
+[NativeCodecEnvironment](./core.nativecodecenvironment.md)
+
+</td><td>
+
+What the codec functions are given besides a value and its plan.
+
+</td></tr>
+<tr><td>
+
+[NativeCollectionAddressing](./core.nativecollectionaddressing.md)
+
+</td><td>
+
+How a resource's collection finds an object from its identifier: `byId` asks the collection for the item with that id, `byProperty` matches `property` against the identifier, and `byKey` applies the collection's key specifier to it. In each case the identifier a reference carries is the value of `property`<!-- -->, so reading it back from an object gives the identifier that finds the object again.
+
+When the resource's get records a parent, `within` names that parent: the resource is identified only within its container (phases/13 D7, container scoping), so `collection` is the container's, a reference to it carries the container, and the container is found first by the parent's own addressing, whatever its targeting.
+
+</td></tr>
+<tr><td>
+
+[NativeExecutorOptions](./core.nativeexecutoroptions.md)
+
+</td><td>
+
+Configuration for [createNativeExecutor()](./core.createnativeexecutor.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[NativePositionalAddressing](./core.nativepositionaladdressing.md)
+
+</td><td>
+
+How the app finds an object of a positional resource, which has no identifier: by its zero-based position within its container, as `container[collection].at(index)`<!-- -->, the app's element addressing. A position the collection does not reach is an invalid selection.
+
+A reference to one is an index selector whose container is an identity reference to `within`<!-- -->, found first by the parent's own addressing. An object read from the app is encoded with the position its own specifier gives (`NativeCodecEnvironment.positionOf`<!-- -->), never with a dictionary `index` property.
+
+</td></tr>
+<tr><td>
+
+[NativeReferencePlans](./core.nativereferenceplans.md)
+
+</td><td>
+
+Everything the codec knows about references to one resource: the identifier plan from the app's contract, and the addressing from its manifest.
+
+</td></tr>
+<tr><td>
+
+[NativeRootAddressing](./core.nativerootaddressing.md)
+
+</td><td>
+
+How the app holds the objects of a singleton root: the identifier a reference carries is a kind, and `roots` maps each kind to the app's spelling of the application property that holds its object. A kind the map does not hold names no object. The object holds nothing that says which kind it is, so an object read from the app cannot be encoded as a reference to a root.
+
+</td></tr>
+<tr><td>
+
+[NativeRunOptions](./core.nativerunoptions.md)
+
+</td><td>
+
+Limits and cancellation for one [NativeTransport.run()](./core.nativetransport.run.md) call.
+
+</td></tr>
+<tr><td>
+
+[NativeScript](./core.nativescript.md)
+
+</td><td>
+
+One native invocation, expressed without interpolating any value into source text.
+
+</td></tr>
+<tr><td>
+
+[NativeTransport](./core.nativetransport.md)
+
+</td><td>
+
+Runs one `NativeScript` with the in-process value codec and reports how it ended.
+
+`run` resolves to the `NativeOutcome` the automation process reported: everything the app or the codec raised inside the process is a failed outcome, not a rejection. It rejects only when the process itself failed, with a [JxaExecutionError](./core.jxaexecutionerror.md) whose `kind` says whether the script was stopped by the time limit or the caller, could not start, exceeded the output limit, died, exited with a native error described by `stderr`<!-- -->, or produced an unreadable outcome. The executor classifies failures from those fields alone; any other rejection is a host defect.
+
+</td></tr>
+<tr><td>
+
+[NotWrittenClaim](./core.notwrittenclaim.md)
+
+</td><td>
+
+A claim the probe decided on and [writeNullabilityResults()](./core.writenullabilityresults.md) did not write.
+
+</td></tr>
+<tr><td>
+
+[NullabilityClaim](./core.nullabilityclaim.md)
+
+</td><td>
+
+The parts of a field that make or support a nullability claim.
+
+</td></tr>
+<tr><td>
+
+[NullabilityMergeResult](./core.nullabilitymergeresult.md)
+
+</td><td>
+
+The merge's decisions for one app, ready for the writer and the CLI.
+
+</td></tr>
+<tr><td>
+
+[NullabilityProbeEnvironment](./core.nullabilityprobeenvironment.md)
+
+</td><td>
+
+Everything the probe learns from outside the app, injectable so tests can fake it.
+
+</td></tr>
+<tr><td>
+
+[NullabilityResolution](./core.nullabilityresolution.md)
+
+</td><td>
+
+Whether a field is nullable, and why.
+
+</td></tr>
+<tr><td>
+
+[NullabilityWriteResult](./core.nullabilitywriteresult.md)
+
+</td><td>
+
+What [writeNullabilityResults()](./core.writenullabilityresults.md) wrote.
+
+</td></tr>
+<tr><td>
+
 [OperationVocabulary](./core.operationvocabulary.md)
 
 </td><td>
@@ -1442,6 +2782,24 @@ A resource-scoped command may resolve to multiple routes if it applies to multip
 The operation vocabulary for a single app, derived from its manifest.
 
 `coarse` is always the fixed [COARSE_OPERATIONS](./core.coarse_operations.md) set; `fine` is the set of fine-grained operation names the manifest actually declares.
+
+</td></tr>
+<tr><td>
+
+[PageWindow](./core.pagewindow.md)
+
+</td><td>
+
+Which items of a collection one page reads, in the collection's order.
+
+</td></tr>
+<tr><td>
+
+[PageWindowResult](./core.pagewindowresult.md)
+
+</td><td>
+
+What `execute` resolves to for a request with a [PageWindow](./core.pagewindow.md)<!-- -->, as a wire record.
 
 </td></tr>
 <tr><td>
@@ -1455,11 +2813,57 @@ Result of permission check.
 </td></tr>
 <tr><td>
 
+[PermissionDeniedAuditRecord](./core.permissiondeniedauditrecord.md)
+
+</td><td>
+
+A structured, attributable record of a call refused because its caller lacks the operation's permission.
+
+It says who called what and when, and nothing else: the call's input was never judged, so the record is the same whatever the input was. The constructor and the serializer refuse a record of this kind that carries an argument summary, a reason, an approval correlation id, or an issue count.
+
+</td></tr>
+<tr><td>
+
+[PermissionDeniedAuditRecordInput](./core.permissiondeniedauditrecordinput.md)
+
+</td><td>
+
+The inputs needed to construct a [PermissionDeniedAuditRecord](./core.permissiondeniedauditrecord.md)<!-- -->: the attribution and the time, and nothing else.
+
+It declares every other record field as `never`<!-- -->, so that no argument summary, reason, approval correlation id, or issue count can be supplied.
+
+</td></tr>
+<tr><td>
+
 [PermissionMap](./core.permissionmap.md)
 
 </td><td>
 
 Generate a complete permission map from a manifest's permissions section. The map contains both directions: coarse→fine and fine→coarse.
+
+</td></tr>
+<tr><td>
+
+[PolicyCandidate](./core.policycandidate.md)
+
+</td><td>
+
+A candidate capability to test against a policy when compiling.
+
+The `risk` is required so `read-only` rules can be resolved correctly (a read-only rule grants read-class operations only).
+
+</td></tr>
+<tr><td>
+
+[PolicyEvaluation](./core.policyevaluation.md)
+
+</td><td>
+
+The structured result of evaluating a governance policy against one capability.
+
+Carries the terminal [PolicyDecision](./core.policydecision.md)<!-- -->, the [MatchedPolicyRule](./core.matchedpolicyrule.md) that produced it, and a human-readable `reason` that names the rule and the exact `app:resource:operation` so callers can surface it without re-deriving it.
+
+The `permission` is echoed back so consumers (discovery filtering, audit) have the exact capability string the decision applies to.
 
 </td></tr>
 <tr><td>
@@ -1480,6 +2884,44 @@ A single structured validation issue from [parsePolicy()](./core.parsepolicy.md)
 </td><td>
 
 The result of resolving which governance rule governs a capability call.
+
+</td></tr>
+<tr><td>
+
+[ProbeManifestOptions](./core.probemanifestoptions.md)
+
+</td><td>
+
+Options for [probeManifest()](./core.probemanifest.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[ProbeNullabilityOptions](./core.probenullabilityoptions.md)
+
+</td><td>
+
+Options for [probeNullability()](./core.probenullability.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[PropertyMergeOutcome](./core.propertymergeoutcome.md)
+
+</td><td>
+
+The merge's decision for one property.
+
+</td></tr>
+<tr><td>
+
+[PropertyPresence](./core.propertypresence.md)
+
+</td><td>
+
+What the probe observed for one property, as counts only.
+
+Every item read contributes to exactly one of `reads` or `failures`<!-- -->; a read that found no value counts in both `reads` and `nulls`<!-- -->. Each read that found a value counts once in `kinds`<!-- -->, so the kind counts sum to `reads - nulls`<!-- -->.
 
 </td></tr>
 <tr><td>
@@ -1565,11 +3007,105 @@ Raw suite - a logical grouping of related classes, commands, and enumerations. S
 </td></tr>
 <tr><td>
 
+[ReadFailureDefect](./core.readfailuredefect.md)
+
+</td><td>
+
+A manifest defect: every read of a (non-identifier) property failed, in a resource whose items were read. A property that always fails is most likely misnamed in the manifest, unsupported by the app, or obsolete. Counts only, never a value.
+
+</td></tr>
+<tr><td>
+
+[RecordApprovalCancellationOptions](./core.recordapprovalcancellationoptions.md)
+
+</td><td>
+
+Options for [recordApprovalCancellation()](./core.recordapprovalcancellation.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[RecordApprovalDecisionOptions](./core.recordapprovaldecisionoptions.md)
+
+</td><td>
+
+Options for [recordApprovalDecision()](./core.recordapprovaldecision.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[RecordInvalidInputOptions](./core.recordinvalidinputoptions.md)
+
+</td><td>
+
+Options for [recordInvalidInput()](./core.recordinvalidinput.md)<!-- -->.
+
+There is deliberately no field for the call's arguments, an argument summary, or the validation issues themselves: only their count is recorded.
+
+</td></tr>
+<tr><td>
+
+[RecordPermissionDeniedOptions](./core.recordpermissiondeniedoptions.md)
+
+</td><td>
+
+Options for [recordPermissionDenied()](./core.recordpermissiondenied.md)<!-- -->.
+
+There is deliberately no field for the call's arguments, an argument summary, a reason, or anything else derived from the call's input: a denied call's input is never judged, so its record cannot depend on it.
+
+</td></tr>
+<tr><td>
+
 [RedactArgsOptions](./core.redactargsoptions.md)
 
 </td><td>
 
 Options for [redactArgs()](./core.redactargs.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[ResolutionRequest](./core.resolutionrequest.md)
+
+</td><td>
+
+One reference, already authorized and validated, handed to an executor to resolve into the record or records it denotes.
+
+</td></tr>
+<tr><td>
+
+[ResourceMergeOutcome](./core.resourcemergeoutcome.md)
+
+</td><td>
+
+The merge's decisions for one resource.
+
+</td></tr>
+<tr><td>
+
+[ResourceNullabilityResult](./core.resourcenullabilityresult.md)
+
+</td><td>
+
+What the probe observed for one resource.
+
+</td></tr>
+<tr><td>
+
+[ResourceProbeResult](./core.resourceproberesult.md)
+
+</td><td>
+
+Full probe outcome for one resource.
+
+</td></tr>
+<tr><td>
+
+[RunNativeScriptOptions](./core.runnativescriptoptions.md)
+
+</td><td>
+
+Options for [runNativeScript()](./core.runnativescript.md)<!-- -->.
 
 </td></tr>
 <tr><td>
@@ -1583,13 +3119,58 @@ Options for [searchCapabilities()](./core.searchcapabilities.md)<!-- -->.
 </td></tr>
 <tr><td>
 
-[SerializedAuditRecord](./core.serializedauditrecord.md)
+[SeekApprovalOptions](./core.seekapprovaloptions.md)
 
 </td><td>
 
-The JSON-serializable form of an [AuditRecord](./core.auditrecord.md)<!-- -->.
+Options for [seekApproval()](./core.seekapproval.md)<!-- -->.
 
-Identical to [AuditRecord](./core.auditrecord.md) except `timestamp` is an ISO-8601 string so the record round-trips through JSON without losing precision or type. The `reason` field is omitted entirely when absent (rather than serialized as `null`<!-- -->/`undefined`<!-- -->) to keep records compact and stable.
+</td></tr>
+<tr><td>
+
+[SeekCancellableApprovalOptions](./core.seekcancellableapprovaloptions.md)
+
+</td><td>
+
+Options for [seekApprovalUnlessCancelled()](./core.seekapprovalunlesscancelled.md)<!-- -->: a held call whose caller can abandon it while it waits.
+
+</td></tr>
+<tr><td>
+
+[SerializedGovernedAuditRecord](./core.serializedgovernedauditrecord.md)
+
+</td><td>
+
+The JSON-serializable form of a [GovernedAuditRecord](./core.governedauditrecord.md)<!-- -->.
+
+Identical to [GovernedAuditRecord](./core.governedauditrecord.md) except `timestamp` is an ISO-8601 string so the record round-trips through JSON without losing precision or type. The `reason` and `approvalId` fields are omitted entirely when absent (rather than serialized as `null`<!-- -->/`undefined`<!-- -->) to keep records compact and stable.
+
+</td></tr>
+<tr><td>
+
+[SerializedInvalidInputAuditRecord](./core.serializedinvalidinputauditrecord.md)
+
+</td><td>
+
+The JSON-serializable form of an [InvalidInputAuditRecord](./core.invalidinputauditrecord.md)<!-- -->: its attribution, the time as an ISO-8601 string, and the issue count.
+
+</td></tr>
+<tr><td>
+
+[SerializedPermissionDeniedAuditRecord](./core.serializedpermissiondeniedauditrecord.md)
+
+</td><td>
+
+The JSON-serializable form of a [PermissionDeniedAuditRecord](./core.permissiondeniedauditrecord.md)<!-- -->: its attribution and the time as an ISO-8601 string.
+
+</td></tr>
+<tr><td>
+
+[SkippedProperty](./core.skippedproperty.md)
+
+</td><td>
+
+A property the probe did not read.
 
 </td></tr>
 <tr><td>
@@ -1603,11 +3184,47 @@ A single step in an object specifier chain.
 </td></tr>
 <tr><td>
 
+[StaticApprovalProviderOptions](./core.staticapprovalprovideroptions.md)
+
+</td><td>
+
+Options for [createStaticApprovalProvider()](./core.createstaticapprovalprovider.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
 [TypeCoercer](./core.typecoercer.md)
 
 </td><td>
 
 Type coercer interface - converts between TypeScript and JXA.
+
+</td></tr>
+<tr><td>
+
+[UncheckedKinds](./core.uncheckedkinds.md)
+
+</td><td>
+
+A property whose value kinds were not compared with its declared type, because the type has no expected kinds (`any`<!-- -->, files, or a type that names no resource or enum).
+
+</td></tr>
+<tr><td>
+
+[UnselectableItemCommand](./core.unselectableitemcommand.md)
+
+</td><td>
+
+A routed command that must select one item and declares no parameter to do so.
+
+</td></tr>
+<tr><td>
+
+[UntargetedIdentifier](./core.untargetedidentifier.md)
+
+</td><td>
+
+A resource whose primary identifier may not rely on the default targeting.
 
 </td></tr>
 <tr><td>
@@ -1634,11 +3251,29 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[ABSENT_VALUE_ERROR_NUMBER](./core.absent_value_error_number.md)
+
+</td><td>
+
+The native "no such object" error number, as a probe records it: the app reports that an item has no object at a property, which for a property that holds an object (a folder an item may not have) is how the app says the value is absent. The native layer defines its own "no such object" constant from this one, so a probe's evidence and a body's reads agree on the number.
+
+</td></tr>
+<tr><td>
+
 [ALLOW_ALL_GOVERNANCE](./core.allow_all_governance.md)
 
 </td><td>
 
 The default governance filter: a no-op pass-through that allows every capability. Used when no policy is active, so discovery behaves identically to having no governance layer at all.
+
+</td></tr>
+<tr><td>
+
+[APP_VERSION_BODY](./core.app_version_body.md)
+
+</td><td>
+
+The function body that reads the app's version, as text.
 
 </td></tr>
 <tr><td>
@@ -1672,6 +3307,54 @@ The app segment of `app:resource:operation`<!-- -->, or `*` to mean "every app".
 </td></tr>
 <tr><td>
 
+[APPROVAL_FAILURES](./core.approval_failures.md)
+
+</td><td>
+
+Why an approval attempt failed on the macts side rather than producing a human decision.
+
+- `provider-error` — the provider threw or its promise rejected. - `malformed-response` — the provider resolved with something that is not a valid [ApprovalDecision](./core.approvaldecision.md)<!-- -->.
+
+Both deny the call. The category is stable and safe to surface to a caller; the underlying detail is not (see ).
+
+</td></tr>
+<tr><td>
+
+[APPROVAL_LAYERS](./core.approval_layers.md)
+
+</td><td>
+
+Which policy layer held the call and is asking for approval.
+
+- `host` — the machine-wide governance policy held the call. - `key` — the narrower policy attached to the API key that made the call.
+
+Kept in step with [POLICY_LAYERS](./core.policy_layers.md) — the layer a request carries is the one the policy evaluation reported, not a separate approval-side notion. A provider declaring [ApprovalProviderCapabilities.supportsDistinctRouting](./core.approvalprovidercapabilities.supportsdistinctrouting.md) routes on it.
+
+</td></tr>
+<tr><td>
+
+[APPROVAL_STATES](./core.approval_states.md)
+
+</td><td>
+
+The terminal states a HITL approval provider may report for one request.
+
+- `approved` — a human explicitly approved this exact request. - `rejected` — a human explicitly declined it. - `timeout` — no human decision arrived in time.
+
+`timeout` is treated as a denial by [seekApproval()](./core.seekapproval.md) (fail-closed) but is kept distinct so the reason a call did not run is never ambiguous.
+
+</td></tr>
+<tr><td>
+
+[ApprovalConfigSchema](./core.approvalconfigschema.md)
+
+</td><td>
+
+Schema for the approval-provider registration declaration.
+
+</td></tr>
+<tr><td>
+
 [AppRuleSchema](./core.appruleschema.md)
 
 </td><td>
@@ -1687,11 +3370,11 @@ The `disposition` is the app-level default; `operations` carries finer-grained o
 
 </td><td>
 
-The outcome a governance evaluation reached for a capability call.
+The outcome reached for a capability call.
 
-- `allowed` — the call was permitted and executed. - `denied` — the call was blocked by policy (out-of-bounds capability). - `approved` — the call required confirmation and a human approved it. - `rejected` — the call required confirmation and a human declined it.
+- `allowed` — the call was permitted and executed. - `denied` — the call was blocked by policy (out-of-bounds capability). - `pending` — the call requires human confirmation (`confirm-first`<!-- -->) and is withheld awaiting approval. It has neither been approved nor rejected yet, and it did NOT execute. - `approved` — the call required confirmation and a human approved it. - `rejected` — the call required confirmation and a human declined it. - `cancelled` — the call required confirmation and its caller abandoned it before any decision. Nobody approved or rejected it, and it did NOT execute. - `invalid-input` — the call's input failed validation against the operation's contract, so it never reached governance, no human was asked about it, and it did NOT execute. - `permission-denied` — the caller's authority does not hold the operation's permission, so its input was never judged, it never reached governance, and it did NOT execute.
 
-Distinguishing `denied` (policy) from `rejected` (human) keeps the audit trail precise about \*why\* a call did not run.
+Distinguishing `denied` (policy) from `rejected` (human) keeps the audit trail precise about \*why\* a call did not run. Likewise, `pending` is kept distinct from `denied`<!-- -->: a confirm-first call is not a policy denial — it is a deferral awaiting approval — so recording it as `denied` would misattribute the reason the call did not proceed. `invalid-input` is distinct from all of them: no policy or human judged the call, because it was malformed. And `permission-denied` is distinct from `denied`<!-- -->: the call was refused by the caller's credential, which governance policy never consulted.
 
 </td></tr>
 <tr><td>
@@ -1774,6 +3457,19 @@ Command parameter schema.
 </td></tr>
 <tr><td>
 
+[CommandParentSchema](./core.commandparentschema.md)
+
+</td><td>
+
+The parent a resource command's target is reached through: the resource whose items hold the command's resource as elements, and the command's own parameter that carries the parent item's identifier.
+
+A Calendar event exists only inside a calendar, so `getEvent` records `{ resource: Calendar, parameter: calendarId }`<!-- -->. Native bodies address the parent resource's collection in the app, the parent item in it by that resource's identifier targeting, with the identifier read from the named parameter, and then the command's resource collection under that item.
+
+The parent is a fact the curator records from the app's dictionary (the parent's class has the command's resource as an element), never derived: not from a parameter's name or position, and not from the hierarchy. A command without a parent addresses its resource's collection at the application. The manifest schema rejects a parent resource the manifest does not declare or marks unsupported, and a parameter that is not one of the command's required parameters.
+
+</td></tr>
+<tr><td>
+
 [CommandSchema](./core.commandschema.md)
 
 </td><td>
@@ -1792,11 +3488,42 @@ Command scope - whether command operates on application or specific resource.
 </td></tr>
 <tr><td>
 
+[CommandUnsupportedSchema](./core.commandunsupportedschema.md)
+
+</td><td>
+
+The marker on a command the running app cannot carry out: addressing what the command reads failed in a live, read-only observation (a collection a get command looks an item up in, say, that the app does not have at the application).
+
+The manifest keeps such a command, so the record of what macts expected stays complete and the omission stays auditable; the command has no route, and every generated surface (the operations behind routes, the contract, SDKs, tools, the CLI, capabilities and derived permissions) leaves it out. The marker is curated from the observation: no probe writes or changes it.
+
+</td></tr>
+<tr><td>
+
 [ConfidenceSchema](./core.confidenceschema.md)
 
 </td><td>
 
 Schema for extraction confidence scores. Values from 0.0 (no confidence) to 1.0 (fully confident).
+
+</td></tr>
+<tr><td>
+
+[CuratedAbsentReadsSchema](./core.curatedabsentreadsschema.md)
+
+</td><td>
+
+Reads, observed live by a read-only probe, in which the app failed with the absent-value number ([ABSENT_VALUE_ERROR_NUMBER](./core.absent_value_error_number.md)<!-- -->) at a property of a resource with a single instance ([hasSingleInstance()](./core.hassingleinstance.md)<!-- -->), and why that absence depends on the data.
+
+With several instances, a probe tells the two kinds of absence apart: some instances reading is absence that depends on the data (nullable, see [reportsAbsence()](./core.reportsabsence.md)<!-- -->), and every one failing is structural (unsupported). One instance cannot show which it is, so the curated reason decides: a folder the app has only once the user creates one, say. The record keeps the probe's provenance and counts, never a value.
+
+</td></tr>
+<tr><td>
+
+[CuratedNullabilityEvidenceSchema](./core.curatednullabilityevidenceschema.md)
+
+</td><td>
+
+Evidence a manifest author supplies: a note naming why the claim holds (an app guarantee, a structural invariant, documentation, or a test), and, on a resource with a single instance, the reads in which the app reported no value (`absentReads`<!-- -->).
 
 </td></tr>
 <tr><td>
@@ -1815,6 +3542,35 @@ Coerce dates between TypeScript Date and JXA. JXA handles dates as JavaScript Da
 </td><td>
 
 ISO 8601 date-time string or Date object. Used for dates throughout macts.
+
+</td></tr>
+<tr><td>
+
+[DEFAULT_APPROVAL_TIMEOUT_MS](./core.default_approval_timeout_ms.md)
+
+</td><td>
+
+Default bound for a human decision: two minutes.
+
+Long enough for a human to notice a prompt and answer, short enough that a held HTTP request does not sit open indefinitely.
+
+</td></tr>
+<tr><td>
+
+[DEFAULT_NULLABILITY_BUDGET_MS](./core.default_nullability_budget_ms.md)
+
+</td><td>
+
+The default time budget for probing one app: two minutes.
+
+</td></tr>
+<tr><td>
+
+[DEFAULT_NULLABILITY_ENVIRONMENT](./core.default_nullability_environment.md)
+
+</td><td>
+
+The real environment: `sw_vers`<!-- -->, the wall clock, and a monotonic clock.
 
 </td></tr>
 <tr><td>
@@ -1846,6 +3602,39 @@ The list covers the most common secrets that appear as call arguments. Callers m
 </td><td>
 
 Schema for deprecation information.
+
+</td></tr>
+<tr><td>
+
+[DictionaryAbsenceEvidenceSchema](./core.dictionaryabsenceevidenceschema.md)
+
+</td><td>
+
+Evidence that an app's scripting dictionary has no collection for a resource the manifest declares: what was looked for, what the dictionary showed, and which app build on which macOS version it holds for.
+
+</td></tr>
+<tr><td>
+
+[DictionaryAbsenceFindingSchema](./core.dictionaryabsencefindingschema.md)
+
+</td><td>
+
+How an app's dictionary lacks a collection the manifest declares.
+
+- `no-class`<!-- -->: the dictionary declares no class with the resource's code or name, so the app has no such object at all. - `not-an-element`<!-- -->: the class exists, but no class has it as an element, so there is no collection of it; the app reaches it some other way (Finder's desktop is the application's `desktop` property).
+
+</td></tr>
+<tr><td>
+
+[DictionaryTermEvidenceSchema](./core.dictionarytermevidenceschema.md)
+
+</td><td>
+
+Evidence from an app's scripting dictionary: a term exactly as the dictionary writes it, for one app build on one macOS version.
+
+The term is what the dictionary shows; the provenance fields say which build the dictionary was read from, because a later release can rename a term or change a class. A manifest records it where it states something the dictionary declares and macts cannot derive: an app's own spelling of a collection or a property (`native` in `./resource.ts` and `./property.ts`<!-- -->), or the class a class inherits (`inherits` in `./resource.ts`<!-- -->).
+
+For a native spelling the term is the evidence because the bridge's spelling follows from the term itself (its first word lowercased whole, each later word capitalized): "AirPlay devices" is `airplayDevices`<!-- -->, "ANSI black color" is `ansiBlackColor`<!-- -->.
 
 </td></tr>
 <tr><td>
@@ -1904,6 +3693,17 @@ File reference (POSIX path).
 </td></tr>
 <tr><td>
 
+[HEAVY_PROPERTY_NAMES](./core.heavy_property_names.md)
+
+</td><td>
+
+Property names the probe never reads, because reading them loads large content (a note body, a web page source, a terminal history, a build log, image data) or can trigger a download (mail message source, iCloud-backed bodies, artwork). Matched exactly against manifest property keys.
+
+Audited against the shipped manifests: `body` (Notes Note, Reminders Reminder), `content` (Mail Message and Header, Microsoft Word), `contents` (iTerm Session, Terminal Tab, Script Editor Document), `entireContents` (Finder Container, recursive), `text` (TextEdit, Safari Tab, iTerm, OmniGraffle, Xcode, System Events), `plaintext` (Notes), `plainText` and `xmlText` (System Information), `source` (Mail Message, Safari Tab), `html` (OmniPlan), `history` (Terminal Tab), `buildLog` (Xcode), `data` and `rawData` (Music and TV Artwork), `image` (Contacts Person), `artwork` (Spotify Track), `lyrics` (Music Track); plus `htmlContent`<!-- -->, a common name for the same kind of content.
+
+</td></tr>
+<tr><td>
+
 [HexColorSchema](./core.hexcolorschema.md)
 
 </td><td>
@@ -1940,6 +3740,30 @@ Identifier configuration for a resource.
 </td></tr>
 <tr><td>
 
+[IdentifierTargetingSchema](./core.identifiertargetingschema.md)
+
+</td><td>
+
+How the structured/runtime layer addresses a resource by its identifier.
+
+- `byId` (default): the JXA `byId(value)` accessor — correct when the app's scripting dictionary exposes a real id specifier that works at runtime. - `byProperty`<!-- -->: a `whose({ <property>: value })[0]` lookup — used when the dictionary-declared identifier is NOT runtime-valid (throws via JXA) and the resource must instead be matched on a property that does work (e.g. matching a Calendar on its `name`<!-- -->, since `calendarIdentifier()` throws at runtime). - `byKey`<!-- -->: the collection's key specifier, applied to the identifier property's value. The app interprets the key: for a file system it is a path, which finds whatever item is at that path now. The targeting names the lookup mechanism; the identifier property says what the value is. - `byRoot`<!-- -->: the application property a singleton root's kind names (see `../roots.ts`<!-- -->). Only the identifier normalisation gives a root is `byRoot`<!-- -->; a manifest never writes it.
+
+</td></tr>
+<tr><td>
+
+[IdentifierUniquenessEvidenceSchema](./core.identifieruniquenessevidenceschema.md)
+
+</td><td>
+
+Evidence for a claim that an identifier's values are, or are not, unique within its resource's collection: no two items the collection holds at the same time share one value.
+
+Uniqueness decides whether a list can page (phases/13 D9, \_Bounded list pages\_): a page is anchored on the identifier of the item before it, and an identifier two items can share cannot show that the collection shifted by one position. The claim is never inferred, from the identifier's name or from how it is targeted; it is curated, and must say where it comes from:
+
+- `sdef`<!-- -->: the app's scripting dictionary describes the property as the object's unique identifier. The note quotes or names that description. - `curated`<!-- -->: an observation or a structural fact, such as recurring event occurrences sharing one identifier, or names the user chooses freely.
+
+</td></tr>
+<tr><td>
+
 [InheritanceSchema](./core.inheritanceschema.md)
 
 </td><td>
@@ -1949,11 +3773,167 @@ Schema for resource type inheritance/variants. Used for union types like Alarm (
 </td></tr>
 <tr><td>
 
+[KNOWN_ITEM_SELECTION_GAPS](./core.known_item_selection_gaps.md)
+
+</td><td>
+
+Every shipped resource command that cannot yet select its item. Only an entry's removal is expected; see the module documentation.
+
+</td></tr>
+<tr><td>
+
+[LiveAbsenceEvidenceSchema](./core.liveabsenceevidenceschema.md)
+
+</td><td>
+
+Evidence that something a manifest declares is absent from the running app: a live, read-only observation in which addressing it failed, for one app build on one macOS version.
+
+It records what was addressed, in words, and the error number the app raised, never a value. The error number tells a missing collection (`-1728`<!-- -->, no such object) from an unreadable one (`-1700`<!-- -->, a value that cannot be converted) or a permission problem.
+
+</td></tr>
+<tr><td>
+
+[MAX_APPROVAL_TIMEOUT_MS](./core.max_approval_timeout_ms.md)
+
+</td><td>
+
+Upper bound on a configured approval timeout: one hour.
+
+A held call occupies an in-flight request, so an unbounded timeout would let a forgotten prompt pin server resources indefinitely. An operator who needs longer than this wants asynchronous approval, not a longer synchronous wait.
+
+</td></tr>
+<tr><td>
+
+[MAX_CALL_MS](./core.max_call_ms.md)
+
+</td><td>
+
+The longest a single automation call may run. Each resource is probed in one call, which stops reading new items at this limit (or when the budget runs out, if sooner), so the call finishes within the automation runner's default 30 second timeout.
+
+</td></tr>
+<tr><td>
+
+[MAX_ITEMS_PER_COLLECTION](./core.max_items_per_collection.md)
+
+</td><td>
+
+The most items the probe reads per resource. Enough items to establish a non-null claim (`NON_NULL_SAMPLE_THRESHOLD`<!-- -->) with room to spare, while bounding the time a probe spends in one collection.
+
+</td></tr>
+<tr><td>
+
+[MAX_OUTPUT_BYTES](./core.max_output_bytes.md)
+
+</td><td>
+
+The most output, in bytes, read from the automation process on each of standard output and standard error.
+
+A list result carries every item's properties in one JSON document, so it grows with the collection: a large mailbox or photo library produces tens of megabytes. The whole document is held in memory before it is parsed, so the limit bounds the memory one call can take. A process that exceeds it is stopped and the call fails with `kind: 'output-too-large'`<!-- -->; it is never truncated.
+
+</td></tr>
+<tr><td>
+
+[NATIVE_CODEC_ERROR_NAME](./core.native_codec_error_name.md)
+
+</td><td>
+
+Marker `name` of the objects a codec function throws when a value violates its plan. The executor uses it to tell codec failures from app failures.
+
+</td></tr>
+<tr><td>
+
+[NATIVE_CODEC](./core.native_codec.md)
+
+</td><td>
+
+The in-process value codec.
+
+</td></tr>
+<tr><td>
+
+[NATIVE_COLLECTION_CHANGED_ERROR_NAME](./core.native_collection_changed_error_name.md)
+
+</td><td>
+
+Marker `name` of the object a list body throws when its collection changed while it was read, so no consistent result exists. The executor reports it as a changed collection, distinct from both an app failure and a result that breaks the contract.
+
+</td></tr>
+<tr><td>
+
+[NATIVE_DECODE_FUNCTION](./core.native_decode_function.md)
+
+</td><td>
+
+Name of the top-level function a [NativeCodec](./core.nativecodec.md) prelude defines to turn wire values into native values: `(wire, plan, env) => native`<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[NATIVE_ENCODE_FUNCTION](./core.native_encode_function.md)
+
+</td><td>
+
+Name of the top-level function a [NativeCodec](./core.nativecodec.md) prelude defines to turn native values into JSON-safe wire values: `(native, plan, env) => wire`<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[NON_NULL_SAMPLE_THRESHOLD](./core.non_null_sample_threshold.md)
+
+</td><td>
+
+The fewest successful reads a probe must make, all of them non-null, before its observation can support a non-null claim.
+
+A probe can show that a field is sometimes empty by observing it once; it can never prove that a field is always set. A sample of at least this many items, none empty, is the bar for treating "always set" as established. The manifest schema enforces it on probe evidence, and the probe applies it when merging observations.
+
+</td></tr>
+<tr><td>
+
+[NullabilityEvidenceSchema](./core.nullabilityevidenceschema.md)
+
+</td><td>
+
+Evidence for a nullability claim, by where it comes from.
+
+</td></tr>
+<tr><td>
+
+[NullabilityProbeSchema](./core.nullabilityprobeschema.md)
+
+</td><td>
+
+Record of the last nullability probe of a resource, written by `macts probe --nullability`<!-- -->.
+
+It is separate from the identifier [probe](./core.runtimeprobeschema.md) block: it describes how the per-property nullability evidence was gathered (which app build and macOS version, how the collection was reached, and how many items were read), and names the properties it deliberately did not read. It never contains an observed value.
+
+</td></tr>
+<tr><td>
+
+[NullabilityProbeStatusSchema](./core.nullabilityprobestatusschema.md)
+
+</td><td>
+
+Outcome of a nullability probe of one resource.
+
+- `probed` – items were read; their properties' evidence is recorded - `no-items` – the collection was reachable but empty - `unreachable` – the collection could not be reached from the app - `budget` – the probe's time budget ran out before this resource - `error` – the probe of this resource failed as a whole
+
+</td></tr>
+<tr><td>
+
 [numberCoercer](./core.numbercoercer.md)
 
 </td><td>
 
 Coerce numbers - straightforward conversion.
+
+</td></tr>
+<tr><td>
+
+[ObservedAtSchema](./core.observedatschema.md)
+
+</td><td>
+
+When evidence was observed or confirmed: an ISO 8601 UTC timestamp, e.g. `2026-10-31T12:00:00.000Z`<!-- -->. UTC only, so timestamps compare as written.
 
 </td></tr>
 <tr><td>
@@ -1989,6 +3969,39 @@ Lets a declaration set a disposition (and optional tags / human-readable reason)
 </td></tr>
 <tr><td>
 
+[OWNED_OUTPUT_RECORD_FILE](./core.owned_output_record_file.md)
+
+</td><td>
+
+The name of the owned-output record at the root of each generated package.
+
+</td></tr>
+<tr><td>
+
+[PAGE_READS](./core.page_reads.md)
+
+</td><td>
+
+How a list that pages reads the items of one page, chosen per resource from live measurement.
+
+- `range`<!-- -->: each property is read once over the page's items, as a range of the collection. A page costs what it holds, whatever the collection's size. - `column`<!-- -->: each property is read once over the whole collection, and the values are cut to the page inside the automation process. Some apps answer a range read item by item but a whole-collection read at once (Contacts people), so this is the faster page there. A page costs what the whole collection costs, so it grows with the collection.
+
+Both give the same page, cursor, anchor check and changed-collection failure; only how the values are fetched differs.
+
+</td></tr>
+<tr><td>
+
+[PageCostSchema](./core.pagecostschema.md)
+
+</td><td>
+
+What one page of a resource's collection cost, timed live and read-only through the real list body, both ways a page can be read (see `PAGE_READS` in the resource schema): its own observation, dated by its own `observedAt`<!-- -->, because it is measured apart from the range-read check it belongs to.
+
+The first page at `pageSize` items is read `runs` times each way, the two reads interleaved so that load on the machine affects both alike, and each time is the median of its runs. A page read by range costs what the page holds; a page read by column costs what the whole collection costs, so `columnMs` holds only near the recorded `items`<!-- -->. Only timings and a count are recorded, never a value.
+
+</td></tr>
+<tr><td>
+
 [pathCoercer](./core.pathcoercer.md)
 
 </td><td>
@@ -2014,6 +4027,15 @@ POSIX path string.
 A glob/pattern restriction on filesystem paths or URLs.
 
 Restrictions are expressed as opaque, non-empty pattern strings; this module validates only that they are well-formed strings, not that a given path matches (matching semantics belong to the enforcement/compilation layer that the design decision governs).
+
+</td></tr>
+<tr><td>
+
+[PERMISSION_FORMAT_DESCRIPTION](./core.permission_format_description.md)
+
+</td><td>
+
+The permission format in user terms, for error messages and CLI help. Kept next to the regex it describes.
 
 </td></tr>
 <tr><td>
@@ -2045,6 +4067,28 @@ Point with x, y coordinates.
 </td></tr>
 <tr><td>
 
+[POLICY_DECISIONS_BY_STRICTNESS](./core.policy_decisions_by_strictness.md)
+
+</td><td>
+
+The terminal [PolicyDecision](./core.policydecision.md)<!-- -->s ordered \*\*loosest to strictest\*\*.
+
+This is the operative tightening lattice: `allowed` &lt; `confirm-first` &lt; `denied`<!-- -->. Unlike an ordering over declared dispositions it is a true total order — it is evaluated \*after\* the operation's risk class has been applied, so there is no case where the relative strictness of two entries depends on the call being composed.
+
+</td></tr>
+<tr><td>
+
+[POLICY_DISPOSITIONS_BY_STRICTNESS](./core.policy_dispositions_by_strictness.md)
+
+</td><td>
+
+Declared [PolicyDisposition](./core.policydisposition.md)<!-- -->s ordered \*\*loosest to strictest\*\*, as a declarative convenience for policy authoring and inspection tooling.
+
+\*\*This is not the composition rule.\*\* Composing two layers by this ordering is unsound, because `read-only` and `confirm-first` swap places depending on the operation's risk class — see the module documentation. Composition goes through [composePolicyEvaluations()](./core.composepolicyevaluations.md)<!-- -->, which combines terminal decisions. Use this ordering only where the question really is "which of these two \*declarations\* is the more restrictive statement of intent?".
+
+</td></tr>
+<tr><td>
+
 [POLICY_DISPOSITIONS](./core.policy_dispositions.md)
 
 </td><td>
@@ -2056,6 +4100,17 @@ Mirrors the four states the issue enumerates:
 - `allowed` — the agent may invoke the operation without friction. - `read-only` — only non-mutating (observational) use is permitted; any mutating use is treated as if forbidden. - `confirm-first` — permitted, but a human must approve each invocation before it runs (the approval-gate wiring itself is decision-dependent and is NOT implemented here). - `forbidden` — the agent may never invoke the operation.
 
 Ordered least-to-most restrictive for stable, deterministic iteration.
+
+</td></tr>
+<tr><td>
+
+[POLICY_LAYERS](./core.policy_layers.md)
+
+</td><td>
+
+Which policy layer a decision came from.
+
+- `'host'` — the machine-wide governance policy. - `'key'` — the narrower policy attached to the authenticated API key.
 
 </td></tr>
 <tr><td>
@@ -2080,6 +4135,17 @@ A declaration is a list of app rules plus a global `defaultDisposition` that app
 </td></tr>
 <tr><td>
 
+[PositionalEvidenceSchema](./core.positionalevidenceschema.md)
+
+</td><td>
+
+The evidence that the objects of a resource are found by their position within their container (`ResourceSchema.positional`<!-- -->): a curated observation, dated and tied to the app version it was made on.
+
+The note says what was observed, in counts and booleans only, never a value: for example that the app's own specifier for each object reads back as a position within its container, and that addressing that position gives the same object.
+
+</td></tr>
+<tr><td>
+
 [PrimitiveTypeSchema](./core.primitivetypeschema.md)
 
 </td><td>
@@ -2089,11 +4155,64 @@ Primitive property types supported by AppleScript/JXA.
 </td></tr>
 <tr><td>
 
+[ProbeNullabilityEvidenceSchema](./core.probenullabilityevidenceschema.md)
+
+</td><td>
+
+Evidence gathered by observing the live app (`macts probe --nullability`<!-- -->).
+
+It records presence only: how many reads succeeded, how many found no value, and how many threw. It never records an observed value. The provenance fields say exactly which app build, on which macOS version, the observation holds for, because whether an app leaves a field empty can change between releases.
+
+</td></tr>
+<tr><td>
+
+[ProbeStatusSchema](./core.probestatusschema.md)
+
+</td><td>
+
+Status of a runtime identifier probe against the live app.
+
+- `probed` – probe ran successfully, result is in `runtimeIdentifier` - `no-items` – the resource's collection was empty; could not probe - `failed` – probe ran but every candidate identifier threw or returned nothing - `error` – an unexpected error prevented the probe from completing
+
+</td></tr>
+<tr><td>
+
 [PropertyAccessSchema](./core.propertyaccessschema.md)
 
 </td><td>
 
 Property access mode - whether a property is read-only or read-write.
+
+</td></tr>
+<tr><td>
+
+[PropertyClaimsSchema](./core.propertyclaimsschema.md)
+
+</td><td>
+
+The claims a resource makes about a property it inherits, without redeclaring the property: a claims-only overlay (D10, "Superclasses").
+
+An inherited property carries its ancestor's claims, observed on the ancestor's class. A subclass that has its own evidence states the claim here instead of copying the ancestor's declaration, so the declaration stays the ancestor's and cannot drift. Each claim it states replaces the inherited one: the nullability claim (`nullable` with `evidence.nullable`<!-- -->), the resettability claim (`resettable` with `evidence.resettable`<!-- -->), and the `unsupported` marker. A marker also drops the inherited nullability and resettability claims and the native spelling, which an unsupported property cannot carry. A claim and its evidence follow the rules they follow on a declaration.
+
+</td></tr>
+<tr><td>
+
+[PropertyEvidenceSchema](./core.propertyevidenceschema.md)
+
+</td><td>
+
+The evidence behind a property's nullability and resettability claims.
+
+</td></tr>
+<tr><td>
+
+[PropertyNativeSpellingSchema](./core.propertynativespellingschema.md)
+
+</td><td>
+
+The app's own spelling of a property, recorded where it differs from the property's manifest key, with the dictionary term that shows it.
+
+The key stays the property's public name in every generated surface and in every record returned to a caller; native bodies address the property in the app by this name instead (see `../native-accessor.ts`<!-- -->). Recording a name equal to the key is redundant and rejected, in `ResourceSchema`<!-- -->, which knows the key.
 
 </td></tr>
 <tr><td>
@@ -2129,6 +4248,19 @@ Manifests must not declare a command whose operation is a grouping-only coarse a
 </td></tr>
 <tr><td>
 
+[RangeReadEvidenceSchema](./core.rangereadevidenceschema.md)
+
+</td><td>
+
+Evidence for a claim that the running app does, or does not, read a range of a resource's collection: a live, read-only observation of the collection read by position, from a start index to an end index, in one request.
+
+A list pages only on positive evidence (phases/13 D9, \_Bounded list pages\_): a page is read as a range of the collection, and an app whose collection rejects that read fails every page, so paging is never inferred from the dictionary, which does not say whether ranges work. Like the other live evidence it records the app build and macOS version it holds for, and never a value. When the reads failed it lists the distinct error numbers they raised, which tell a request the app does not understand (`-1708`<!-- -->) from a permission problem; when they passed it lists none.
+
+When the reads passed it also records what a page cost, as its own observation (`cost`<!-- -->, see [PageCostSchema](./core.pagecostschema.md)<!-- -->), since the timing is taken separately from the check that range reads work, and may be taken again without repeating it. The resource's marker chooses its page read from that cost (see `pageReadFor`<!-- -->).
+
+</td></tr>
+<tr><td>
+
 [RectTypeSchema](./core.recttypeschema.md)
 
 </td><td>
@@ -2156,11 +4288,110 @@ Schema for non-hierarchical relationships between resources.
 </td></tr>
 <tr><td>
 
+[ResettabilityEvidenceSchema](./core.resettabilityevidenceschema.md)
+
+</td><td>
+
+Evidence that an update can reset a field by setting it to `null`<!-- -->.
+
+Only curation can supply it: proving a reset works requires writing to the app, which the probe never does. The note names the verification, ideally a locally runnable test, so a later run can reconfirm it.
+
+</td></tr>
+<tr><td>
+
+[ResourceAbsenceEvidenceSchema](./core.resourceabsenceevidenceschema.md)
+
+</td><td>
+
+The evidence behind a resource's `unsupported` marker, in one of two forms: the app's dictionary has no collection for it ([DictionaryAbsenceEvidenceSchema](./core.dictionaryabsenceevidenceschema.md)<!-- -->), or the running app fails every read of it ([LiveAbsenceEvidenceSchema](./core.liveabsenceevidenceschema.md)<!-- -->).
+
+</td></tr>
+<tr><td>
+
+[ResourceInheritsSchema](./core.resourceinheritsschema.md)
+
+</td><td>
+
+The class a resource's dictionary class inherits, recorded from the dictionary's `inherits` attribute, never guessed.
+
+The manifest is read flattened (`../superclasses.ts`<!-- -->, phases/13 D10, "Superclasses"): the resource gains each ancestor property it does not declare, and the nearest ancestor's identifiers when it declares none, so every surface sees a subclass's record and identity as its superclass's unless the resource says otherwise. The superclass must be a resource of the same manifest, and the chain must not loop.
+
+</td></tr>
+<tr><td>
+
+[ResourceNativeSpellingSchema](./core.resourcenativespellingschema.md)
+
+</td><td>
+
+The app's own spelling of a resource's collection, recorded where it differs from the spelling derived from the plural (`defaultCollectionAccessor` in `../native-accessor.ts`<!-- -->), with the dictionary term that shows it.
+
+The plural stays the source of the resource's public segment on every surface; native bodies address the collection in the app by this accessor instead. Recording the derived spelling is redundant and rejected.
+
+</td></tr>
+<tr><td>
+
+[ResourcePositionalSchema](./core.resourcepositionalschema.md)
+
+</td><td>
+
+The marker of a resource whose objects have no identifier and are found by their zero-based position within their parent: the app's element addressing within that parent, `container[collection].at(index)`<!-- -->. Its `get` (and `update` and `delete`<!-- -->) takes the position as its item parameter, and a reference to one of its objects is an index selector within the object its parent is (phases/13 D7, "Emitted forms").
+
+A position means whatever object holds it when it is used: it drifts as objects are added to, removed from or moved within the container.
+
+It is curated with evidence and never inferred, from a missing identifier or from anything else. A resource with a primary identifier is found by that identifier, so it cannot be positional; and the parent must be one the app finds by its identifier (`findPositionalIssues` in `../positional.ts`<!-- -->).
+
+</td></tr>
+<tr><td>
+
+[ResourceRangeReadSchema](./core.resourcerangereadschema.md)
+
+</td><td>
+
+The marker recording whether the running app reads a range of a resource's collection, by position, in one request, with the live evidence, and how a page of it is read.
+
+A list pages only when its resource carries `supported: true` (see `listOperationPages`<!-- -->): paging is enabled only on a live observation of the collection read page by page, since an app that rejects range reads failed every page (Music playlists). `supported: false` records a range read observed to fail, with the error numbers it raised; absent means no observation, and the resource's lists do not page. The marker is curated from a read-only observation of the app: no probe writes or changes it. It covers the collection wherever the resource's lists read it, at the application or under a parent item.
+
+A passing marker records `read` (see [PAGE_READS](./core.page_reads.md)<!-- -->) and the measured page cost (`evidence.cost`<!-- -->, see `PageCostSchema`<!-- -->), and `read` must be the read that cost chooses (see [pageReadFor()](./core.pagereadfor.md)<!-- -->): `range` unless the column page was clearly faster. The choice holds at the recorded collection size; a column page costs more as the collection grows. A failed marker records no `read` and no cost.
+
+</td></tr>
+<tr><td>
+
+[ResourceRootSchema](./core.resourcerootschema.md)
+
+</td><td>
+
+One kind of a singleton root: the application property that holds the object of that kind, with the evidence for it.
+
+`property` is the app's spelling of the application property, and the evidence is the dictionary term it spells, for one app build on one macOS version.
+
+</td></tr>
+<tr><td>
+
+[ResourceRootsSchema](./core.resourcerootsschema.md)
+
+</td><td>
+
+The kinds of a singleton root resource: each kind names the application property that holds that kind's one object (an app holding a front desk as `frontDesk` and a back desk as `backDesk`<!-- -->). The objects are in no collection; the resource's identity is the kind (see `../roots.ts`<!-- -->).
+
+</td></tr>
+<tr><td>
+
 [ResourceSchema](./core.resourceschema.md)
 
 </td><td>
 
 Schema for a resource type definition.
+
+</td></tr>
+<tr><td>
+
+[ResourceUnsupportedSchema](./core.resourceunsupportedschema.md)
+
+</td><td>
+
+The marker on a resource the app cannot provide: its dictionary has no collection for it, or the running app fails every read of it.
+
+The manifest keeps such a resource, so the record of what macts expected stays complete and the omission stays auditable; every generated surface (routes and the operations behind them, the contract, SDKs, tools, the CLI, capabilities and derived permissions) leaves out the resource, its hierarchy entries, and every entry nested under them. The marker is curated, from the dictionary or a live read-only observation: no probe writes or changes it.
 
 </td></tr>
 <tr><td>
@@ -2203,6 +4434,26 @@ Ordered from least to most sensitive for stable, deterministic sorting.
 Risk classification for a command.
 
 Risk is normally \*derived deterministically\* from the operation semantics by the capability layer (see `capabilities/risk.ts`<!-- -->); this manifest field exists only as an optional override for the rare case where the derived value is wrong (lossless-plus). It must be one of the canonical risk classes.
+
+</td></tr>
+<tr><td>
+
+[RuntimeProbeSchema](./core.runtimeprobeschema.md)
+
+</td><td>
+
+Runtime-probe metadata persisted on a resource after running `macts probe`<!-- -->.
+
+The sdef-declared identifier is preserved in `identifiers` for provenance; this section records which property \*actually\* works at runtime.
+
+</td></tr>
+<tr><td>
+
+[SdefNullabilityEvidenceSchema](./core.sdefnullabilityevidenceschema.md)
+
+</td><td>
+
+Evidence from the app's own scripting dictionary, which declares that the field can hold "missing value". It can therefore support only a nullable claim.
 
 </td></tr>
 <tr><td>
@@ -2254,6 +4505,59 @@ TCC (Transparency, Consent, and Control) entitlements.
 </td></tr>
 <tr><td>
 
+[UnsupportedEvidenceSchema](./core.unsupportedevidenceschema.md)
+
+</td><td>
+
+The evidence behind an `unsupported` marker, in one of two forms: every read failed ([UnsupportedReadFailureEvidenceSchema](./core.unsupportedreadfailureevidenceschema.md)<!-- -->), or every value had a kind the declared type does not expect ([UnsupportedKindEvidenceSchema](./core.unsupportedkindevidenceschema.md)<!-- -->).
+
+</td></tr>
+<tr><td>
+
+[UnsupportedKindEvidenceSchema](./core.unsupportedkindevidenceschema.md)
+
+</td><td>
+
+Evidence that the values of a property the app declares cannot be decoded yet: a live, read-only observation in which the reads succeeded but every value had a kind its declared type does not expect (a property declared `string` whose values are object references, say). Without the marker, every read of the resource would fail to decode.
+
+It records the app build and macOS version, and the values counted by kind label (see `../value-kinds.ts`<!-- -->), never a value. That no observed kind is one the declared type expects is checked against the property's type, in `PropertySchema`<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[UnsupportedReadFailureEvidenceSchema](./core.unsupportedreadfailureevidenceschema.md)
+
+</td><td>
+
+Evidence that a property the app declares cannot be read at runtime: a live, read-only observation in which every read of it failed.
+
+Like nullability evidence it records the app build and macOS version it holds for, and counts only, never a value. It adds the distinct error numbers the failed reads raised, which tell a missing implementation from a misnamed property or a permission problem.
+
+</td></tr>
+<tr><td>
+
+[UnsupportedSchema](./core.unsupportedschema.md)
+
+</td><td>
+
+The marker on a property the app's dictionary declares but that cannot be used at runtime, as its evidence shows: the app cannot provide it (unimplemented, obsolete, or otherwise unreadable), or it returns values of a kind the generated code cannot decode yet.
+
+The manifest keeps such a property, so the record of what the dictionary declares stays complete and the omission stays auditable; every generated surface (the contract, SDKs, tool schemas, the CLI) leaves it out, and the nullability probe does not read it. The marker is curated: no probe writes or changes it. A property marked unsupported carries no nullability or resettability claim, and a resource's primary identifier cannot be marked.
+
+</td></tr>
+<tr><td>
+
+[VALUE_KINDS](./core.value_kinds.md)
+
+</td><td>
+
+The labels for the kind of a non-null value read from an app, in the order reports list them:
+
+- `date`<!-- -->: a `Date` (judged by its built-in tag, so a date from another realm qualifies). - `number`<!-- -->, `boolean`<!-- -->, `string`<!-- -->: the primitive of that type. - `record`<!-- -->: a plain keyed object. - `list`<!-- -->: an array. - `reference`<!-- -->: an app object specifier. The automation bridge represents one as a callable value, and no other property value is callable. - `other`<!-- -->: anything else, e.g. a path object or a host object.
+
+</td></tr>
+<tr><td>
+
 [VERSION](./core.version.md)
 
 </td><td>
@@ -2287,6 +4591,26 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[ApiKeyValidationErrorCode](./core.apikeyvalidationerrorcode.md)
+
+</td><td>
+
+Error codes for API key validation failures.
+
+</td></tr>
+<tr><td>
+
+[ApiKeyValidationResult](./core.apikeyvalidationresult.md)
+
+</td><td>
+
+Result of API key validation.
+
+Discriminated on `valid`<!-- -->: narrowing on `result.valid` gives direct access to `payload` (success) or `error`<!-- -->/`errorCode` (failure) without guards.
+
+</td></tr>
+<tr><td>
+
 [AppManifest](./core.appmanifest.md)
 
 </td><td>
@@ -2310,6 +4634,66 @@ An app pattern: a concrete app name or the `*` wildcard.
 </td></tr>
 <tr><td>
 
+[ApprovalConfig](./core.approvalconfig.md)
+
+</td><td>
+
+A fully-parsed, validated approval-provider registration.
+
+All defaultable fields are present after parsing, so consumers never have to special-case "absent vs. default".
+
+</td></tr>
+<tr><td>
+
+[ApprovalDeniedState](./core.approvaldeniedstate.md)
+
+</td><td>
+
+The terminal states that deny a held call.
+
+Everything except `approved`<!-- -->. Response and audit shapes that only ever describe a denial should use this rather than [ApprovalState](./core.approvalstate.md)<!-- -->, so an "approved denial" is not merely undocumented but unrepresentable.
+
+</td></tr>
+<tr><td>
+
+[ApprovalFailure](./core.approvalfailure.md)
+
+</td><td>
+
+A single approval-failure category. See [APPROVAL_FAILURES](./core.approval_failures.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[ApprovalLayer](./core.approvallayer.md)
+
+</td><td>
+
+A single approval-layer value — an alias of [PolicyLayer](./core.policylayer.md)<!-- -->, so the two seams cannot drift into two spellings of the same idea. See [APPROVAL_LAYERS](./core.approval_layers.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[ApprovalOutcome](./core.approvaloutcome.md)
+
+</td><td>
+
+The normalized result of asking a provider for a decision.
+
+A discriminated union on `approved`<!-- -->: `approved: true` implies `state: 'approved'`<!-- -->, and `approved: false` implies a denied state. Contradictory combinations are unrepresentable, so a consumer-supplied outcome cannot be persisted as approved while carrying a rejected state.
+
+</td></tr>
+<tr><td>
+
+[ApprovalState](./core.approvalstate.md)
+
+</td><td>
+
+A single approval state value. See [APPROVAL_STATES](./core.approval_states.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
 [AppRule](./core.apprule.md)
 
 </td><td>
@@ -2328,9 +4712,38 @@ A single audit decision value.
 </td></tr>
 <tr><td>
 
+[AuditRecord](./core.auditrecord.md)
+
+</td><td>
+
+A structured, attributable record of a single capability call, discriminated by `decision`<!-- -->. Only a [GovernedAuditRecord](./core.governedauditrecord.md) carries an argument summary: narrow on `decision` (a `switch` over every [AuditDecision](./core.auditdecision.md)<!-- -->, or a check against both `invalid-input` and `permission-denied`<!-- -->) to read it.
+
+</td></tr>
+<tr><td>
+
+[AuditRecordInput](./core.auditrecordinput.md)
+
+</td><td>
+
+The inputs needed to construct an [AuditRecord](./core.auditrecord.md)<!-- -->, discriminated by `decision`<!-- -->.
+
+</td></tr>
+<tr><td>
+
 [Cardinality](./core.cardinality.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+[ClaimChange](./core.claimchange.md)
+
+</td><td>
+
+What the merge does to a property's claim:
+
+- `set`<!-- -->: writes a new probe claim (there was none, or it replaces a contradicted non-null claim). - `refreshed`<!-- -->: replaces an earlier probe claim with the same verdict. - `unchanged`<!-- -->: leaves the manifest as it is.
 
 </td></tr>
 <tr><td>
@@ -2372,6 +4785,15 @@ A coarse CRUD operation name.
 </td></tr>
 <tr><td>
 
+[CommandParent](./core.commandparent.md)
+
+</td><td>
+
+The parent a command on a nested resource records: the resource whose items hold the command's resource, and the command's required parameter carrying the parent item's identifier (see [CommandParentSchema](./core.commandparentschema.md)<!-- -->).
+
+</td></tr>
+<tr><td>
+
 [CommandScope](./core.commandscope.md)
 
 </td><td>
@@ -2379,7 +4801,28 @@ A coarse CRUD operation name.
 </td></tr>
 <tr><td>
 
+[CommandUnsupported](./core.commandunsupported.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [Confidence](./core.confidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[CuratedAbsentReads](./core.curatedabsentreads.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[CuratedNullabilityEvidence](./core.curatednullabilityevidence.md)
 
 </td><td>
 
@@ -2394,6 +4837,27 @@ A coarse CRUD operation name.
 <tr><td>
 
 [Deprecation](./core.deprecation.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[DictionaryAbsenceEvidence](./core.dictionaryabsenceevidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[DictionaryAbsenceFinding](./core.dictionaryabsencefinding.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[DictionaryTermEvidence](./core.dictionarytermevidence.md)
 
 </td><td>
 
@@ -2421,6 +4885,17 @@ A discriminated union so callers can render the three distinct cases correctly �
 [DurationType](./core.durationtype.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+[EnforcementOutcome](./core.enforcementoutcome.md)
+
+</td><td>
+
+The call-time outcome of enforcing a governance policy against a single capability invocation.
+
+- `'allowed'` — the policy permits the call; it may proceed. - `'denied'` — the policy blocks the call; it must not proceed. - `'pending-approval'` — the policy requires human confirmation before the call runs (evaluator decision `'confirm-first'`<!-- -->). The approval flow itself lives behind the approval seam (<!-- -->); this module only surfaces the signal.
 
 </td></tr>
 <tr><td>
@@ -2475,6 +4950,15 @@ All defaultable fields are present after parsing (defaults applied), so consumer
 </td></tr>
 <tr><td>
 
+[GovernedAuditDecision](./core.governedauditdecision.md)
+
+</td><td>
+
+A decision reached by governance (policy, or a human through the approval gate) for a call whose input passed validation: every decision except `invalid-input` and `permission-denied`<!-- -->, which are reached before governance. Records of these decisions carry an argument summary.
+
+</td></tr>
+<tr><td>
+
 [HexColor](./core.hexcolor.md)
 
 </td><td>
@@ -2503,6 +4987,20 @@ All defaultable fields are present after parsing (defaults applied), so consumer
 </td></tr>
 <tr><td>
 
+[IdentifierTargeting](./core.identifiertargeting.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[IdentifierUniquenessEvidence](./core.identifieruniquenessevidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [Inheritance](./core.inheritance.md)
 
 </td><td>
@@ -2515,6 +5013,125 @@ All defaultable fields are present after parsing (defaults applied), so consumer
 </td><td>
 
 The outcome of a governance-aware inspect-by-name lookup.
+
+</td></tr>
+<tr><td>
+
+[ItemSelectionNeed](./core.itemselectionneed.md)
+
+</td><td>
+
+What a known gap needs before its command can select its item.
+
+- `resource-identifier-and-get`<!-- -->: the command's resource declares no identifier and no get, so there is nothing to look the item up by. It needs both, from evidence. - `multi-level-command-parents`<!-- -->: the item exists only within a parent that is itself within another (a Mail message within a mailbox within an account, an OmniPlan violation within a scenario within a project), and a command records one parent only.
+
+</td></tr>
+<tr><td>
+
+[JxaFailureKind](./core.jxafailurekind.md)
+
+</td><td>
+
+Why a call to the automation host failed.
+
+- `timed-out`<!-- -->: the transport stopped the process because its time limit elapsed. This is the only kind that means a timeout. - `cancelled`<!-- -->: the transport stopped the process because the caller's signal aborted, or did not start it because the signal had already aborted. - `output-too-large`<!-- -->: the process wrote more than its output limit (by default [MAX_OUTPUT_BYTES](./core.max_output_bytes.md)<!-- -->) and was stopped. - `not-started`<!-- -->: the host process could not be started at all (it is missing, or the system refused to spawn it). - `signalled`<!-- -->: the process was killed by a signal the transport did not send. - `exited`<!-- -->: the process exited with a failure status. `stderr` describes the failure, normally ending in the native error number. - `unreadable-output`<!-- -->: the process exited normally, but its output is not the document the caller expected (JSON, or a well-formed native outcome).
+
+</td></tr>
+<tr><td>
+
+[JxaRunner](./core.jxarunner.md)
+
+</td><td>
+
+Minimal JXA executor interface accepted by the probe.
+
+The real implementation is `runWithApp` from `@macts/core/jxa/executor`<!-- -->. Tests inject a fake that simulates property-level success or failure without starting `osascript`<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[LiveAbsenceEvidence](./core.liveabsenceevidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[LoadPolicyResult](./core.loadpolicyresult.md)
+
+</td><td>
+
+The result of attempting to load a governance policy from disk.
+
+A discriminated union that distinguishes "no policy configured" (expected) from "policy file found but invalid" (unexpected, caller should warn) from "policy loaded and valid".
+
+</td></tr>
+<tr><td>
+
+[NativeAddressing](./core.nativeaddressing.md)
+
+</td><td>
+
+How the app finds an object of one resource from its identifier, and where the object holds that identifier: manifest knowledge the codec needs to turn a reference into the app's object and back.
+
+</td></tr>
+<tr><td>
+
+[NativeFailure](./core.nativefailure.md)
+
+</td><td>
+
+Why a native invocation did not produce a wire value.
+
+</td></tr>
+<tr><td>
+
+[NativeOutcome](./core.nativeoutcome.md)
+
+</td><td>
+
+What the automation process reports for one [NativeScript](./core.nativescript.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[NativeReferenceTable](./core.nativereferencetable.md)
+
+</td><td>
+
+The resources whose references a native script may convert, keyed by manifest resource key. A resource found within a parent comes with the parent's entry too.
+
+</td></tr>
+<tr><td>
+
+[NullabilityBasis](./core.nullabilitybasis.md)
+
+</td><td>
+
+Why a field is or is not nullable:
+
+- `'identifier'`<!-- -->: the resource's primary identifier property, which is never null, because a reference to an object cannot exist without it. - `'default'`<!-- -->: the manifest makes no claim, so the position's default applies (nullable for reads, not nullable for inputs). - a [NullabilityEvidence](./core.nullabilityevidence.md)<!-- -->: the manifest's claim, and the evidence it rests on.
+
+</td></tr>
+<tr><td>
+
+[NullabilityEvidence](./core.nullabilityevidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[NullabilityProbe](./core.nullabilityprobe.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[NullabilityProbeStatus](./core.nullabilityprobestatus.md)
+
+</td><td>
 
 </td></tr>
 <tr><td>
@@ -2540,6 +5157,49 @@ An operation pattern: a concrete operation name or the `*` wildcard.
 </td><td>
 
 A single operation-level rule within an app rule.
+
+</td></tr>
+<tr><td>
+
+[OwnedOutputSource](./core.ownedoutputsource.md)
+
+</td><td>
+
+Where a package's previous owned-output set came from: its record; for a package without one, the files carrying a generated header; or nowhere, for a directory that is not yet a package, whose previous set is empty.
+
+</td></tr>
+<tr><td>
+
+[PageAnchor](./core.pageanchor.md)
+
+</td><td>
+
+The identifier of a listed item as the app reports it, used to anchor a page: a string, or a number for an app whose identifiers are numbers.
+
+</td></tr>
+<tr><td>
+
+[PageCost](./core.pagecost.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[PageRead](./core.pageread.md)
+
+</td><td>
+
+One way a list that pages reads a page (see [PAGE_READS](./core.page_reads.md)<!-- -->).
+
+</td></tr>
+<tr><td>
+
+[ParseApprovalConfigResult](./core.parseapprovalconfigresult.md)
+
+</td><td>
+
+The result of [parseApprovalConfig()](./core.parseapprovalconfig.md)<!-- -->: a discriminated union of success/failure. Returning a result (rather than throwing) makes this safe to call directly at a trust boundary.
 
 </td></tr>
 <tr><td>
@@ -2592,6 +5252,19 @@ Success carries the parsed, defaults-applied [GovernancePolicy](./core.governanc
 </td></tr>
 <tr><td>
 
+[PolicyDecision](./core.policydecision.md)
+
+</td><td>
+
+The terminal decision the evaluator reaches for a capability.
+
+- `'allowed'` — the policy permits the call. - `'denied'` — the policy blocks the call. - `'confirm-first'` — the policy permits the call only after a human confirms it (disposition `confirm-first`<!-- -->). The approval flow itself is out of scope here; this module only surfaces the pending-approval signal.
+
+Note this is distinct from [PolicyDisposition](./core.policydisposition.md) (the \*declared\* disposition on a rule): `read-only` and `forbidden` dispositions both reduce to a `'denied'` or `'allowed'` decision depending on the operation's risk.
+
+</td></tr>
+<tr><td>
+
 [PolicyDisposition](./core.policydisposition.md)
 
 </td><td>
@@ -2601,7 +5274,48 @@ A single policy disposition value (`allowed` \| `read-only` \| `confirm-first` \
 </td></tr>
 <tr><td>
 
+[PolicyLayer](./core.policylayer.md)
+
+</td><td>
+
+A single policy layer. See [POLICY_LAYERS](./core.policy_layers.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[PolicyRuleSource](./core.policyrulesource.md)
+
+</td><td>
+
+The source of the disposition that governed an evaluation.
+
+- `'operation'` — a per-operation override inside a matched app rule. - `'app'` — the matched app rule's top-level disposition. - `'default'` — no rule matched; `policy.defaultDisposition` applied.
+
+</td></tr>
+<tr><td>
+
+[PositionalEvidence](./core.positionalevidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [PrimitiveType](./core.primitivetype.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[ProbeNullabilityEvidence](./core.probenullabilityevidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[ProbeStatus](./core.probestatus.md)
 
 </td><td>
 
@@ -2622,6 +5336,38 @@ A single policy disposition value (`allowed` \| `read-only` \| `confirm-first` \
 </td></tr>
 <tr><td>
 
+[PropertyClaims](./core.propertyclaims.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[PropertyEvidence](./core.propertyevidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[PropertyNativeSpelling](./core.propertynativespelling.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[PropertyObservation](./core.propertyobservation.md)
+
+</td><td>
+
+What the counts for one property show, independent of any claim:
+
+- `nullable`<!-- -->: at least one successful read found no value. - `non-null`<!-- -->: no empty value in at least `NON_NULL_SAMPLE_THRESHOLD` reads. - `insufficient-sample`<!-- -->: no empty value, but too few reads to say more. - `read-failed`<!-- -->: no read succeeded, and at least one threw. - `not-read`<!-- -->: no read was attempted, because the resource yielded no items (it was empty, unreachable, failed, or out of time).
+
+</td></tr>
+<tr><td>
+
 [PropertyType](./core.propertytype.md)
 
 </td><td>
@@ -2634,6 +5380,13 @@ A single policy disposition value (`allowed` \| `read-only` \| `confirm-first` \
 </td><td>
 
 A grouping-only coarse operation name (`read` \| `write`<!-- -->).
+
+</td></tr>
+<tr><td>
+
+[RangeReadEvidence](./core.rangereadevidence.md)
+
+</td><td>
 
 </td></tr>
 <tr><td>
@@ -2652,9 +5405,92 @@ A grouping-only coarse operation name (`read` \| `write`<!-- -->).
 </td></tr>
 <tr><td>
 
+[ResettabilityEvidence](./core.resettabilityevidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [Resource](./core.resource.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+[ResourceAbsenceEvidence](./core.resourceabsenceevidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[ResourceInherits](./core.resourceinherits.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[ResourceNativeSpelling](./core.resourcenativespelling.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[ResourcePositional](./core.resourcepositional.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[ResourceRangeRead](./core.resourcerangeread.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[ResourceRoot](./core.resourceroot.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[ResourceRoots](./core.resourceroots.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[ResourceUnsupported](./core.resourceunsupported.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[RestrictionKind](./core.restrictionkind.md)
+
+</td><td>
+
+Which restriction dimension a check applies to.
+
+</td></tr>
+<tr><td>
+
+[RestrictionPatternMatcher](./core.restrictionpatternmatcher.md)
+
+</td><td>
+
+Decides whether a single pattern matches a candidate path/URL.
+
+Injected rather than implemented here: pattern-matching semantics belong to the enforcement layer that owns them, and this module's job is composition, not glob evaluation.
 
 </td></tr>
 <tr><td>
@@ -2691,6 +5527,20 @@ A single risk classification value.
 </td></tr>
 <tr><td>
 
+[RuntimeProbe](./core.runtimeprobe.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[SdefNullabilityEvidence](./core.sdefnullabilityevidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [Selector](./core.selector.md)
 
 </td><td>
@@ -2705,6 +5555,26 @@ Selector types for narrowing collections.
 </td><td>
 
 A sensitivity tag — a stable, lowercase label (e.g. `pii`<!-- -->, `outbound`<!-- -->).
+
+</td></tr>
+<tr><td>
+
+[SerializedAuditRecord](./core.serializedauditrecord.md)
+
+</td><td>
+
+The JSON-serializable form of an [AuditRecord](./core.auditrecord.md)<!-- -->, discriminated by `decision` as the record is.
+
+</td></tr>
+<tr><td>
+
+[SkipReason](./core.skipreason.md)
+
+</td><td>
+
+Why the probe did not read a property:
+
+- `file`<!-- -->: a file or data property, whose read can load or download content. - `references`<!-- -->: a list of references to app objects, whose read builds a reference to every object in the list (all of a folder's notes, say). A single reference is read: it is one cheap specifier. - `heavy`<!-- -->: named in [HEAVY_PROPERTY_NAMES](./core.heavy_property_names.md)<!-- -->. - `excluded`<!-- -->: the caller asked to skip it. - `unsupported`<!-- -->: the manifest marks it unsupported, with evidence that the app cannot provide it, so reading it again would only fail.
 
 </td></tr>
 <tr><td>
@@ -2728,6 +5598,65 @@ Special coarse operations beyond standard CRUD. These are defined per-app in the
 [TccEntitlement](./core.tccentitlement.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+[UnmappedPermissionPolicy](./core.unmappedpermissionpolicy.md)
+
+</td><td>
+
+How expansion treats a non-wildcard permission that the permissions map neither groups under an operation key nor lists as a value.
+
+- `reject` (the default) throws [PermissionExpansionError](./core.permissionexpansionerror.md)<!-- -->. It suits callers that are asking what a permission expands to, where an unmapped permission is a question with no answer. - `keep` returns the permission unchanged, as the one fine-grained permission it already is. It suits key creation: a permission map lists only permissions some route requires, so a well-formed fine-grained permission it does not list is still a grant of exactly itself.
+
+Either way a grouping-only coarse operation (`read`<!-- -->, `write`<!-- -->) that is not a key of its resource throws, because granting it as written would authorize nothing, and wildcard expansion is the same.
+
+</td></tr>
+<tr><td>
+
+[Unsupported](./core.unsupported.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[UnsupportedEvidence](./core.unsupportedevidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[UnsupportedKindEvidence](./core.unsupportedkindevidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[UnsupportedReadFailureEvidence](./core.unsupportedreadfailureevidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[ValueKind](./core.valuekind.md)
+
+</td><td>
+
+The kind of one non-null value: a label from [VALUE_KINDS](./core.value_kinds.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[ValueKindCounts](./core.valuekindcounts.md)
+
+</td><td>
+
+How many values had each kind; absent kinds were not seen.
 
 </td></tr>
 </tbody></table>

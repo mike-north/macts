@@ -113,7 +113,7 @@ describe('entry points: built import graph', () => {
   it('the remote entry reaches only @macts/contracts, never the runtime or core', () => {
     const reachable = packagesReachableFrom('index.js')
 
-    expect([...reachable].sort()).toEqual(['@macts/contracts'])
+    expect([...reachable].sort()).toEqual(['@macts/contracts', '@macts/contracts/client'])
   })
 
   it('the local entry reaches the runtime and core', () => {

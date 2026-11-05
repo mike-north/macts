@@ -4,10 +4,10 @@
 
 ## AudioCDPlaylist.compilation property
 
-is this CD a compilation album?
+is this CD a compilation album? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-compilation: boolean
+compilation: boolean | null
 ```

@@ -4,10 +4,10 @@
 
 ## Process.creatorType property
 
-the OSType of the creator of the process (the signature)
+the OSType of the creator of the process (the signature). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-creatorType: string
+readonly creatorType: string | null;
 ```

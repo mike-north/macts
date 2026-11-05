@@ -4,7 +4,7 @@
 
 ## ExportSettingsCreateInput interface
 
-Input for creating a ExportSettings
+Input for creating an ExportSettings.
 
 **Signature:**
 

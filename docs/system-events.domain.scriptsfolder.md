@@ -4,10 +4,10 @@
 
 ## Domain.scriptsFolder property
 
-The Scripts folder
+The Scripts folder. Nullable. The app reported no value in 2 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 **Signature:**
 
 ```typescript
-scriptsFolder: Folder
+readonly scriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

@@ -39,11 +39,13 @@
 
 import { execFile } from 'node:child_process'
 import type { IssuePath, WireValue } from '@macts/contracts'
+import { NATIVE_POSITION_FUNCTION, NATIVE_POSITION_READER } from './native-position.js'
 import {
   NATIVE_CODEC_ERROR_NAME,
   NATIVE_COLLECTION_CHANGED_ERROR_NAME,
   NATIVE_DECODE_FUNCTION,
   NATIVE_ENCODE_FUNCTION,
+  NATIVE_READING_KEY,
   type NativeCodec,
   type NativeFailure,
   type NativeOutcome,
@@ -298,11 +300,12 @@ function embedJson(value: unknown): string {
 /**
  * The catch clause of a native script: describes what was thrown as a
  * {@link NativeFailure}. A codec error, recognized by its marker name, keeps its
- * direction, path, message, and its unsupported kind or missing resource if it
- * has one; a changed collection, recognized by its marker name, keeps its
+ * direction, path, message, and its unsupported kind, missing resource or
+ * out-of-range resource if it has one; a changed collection, recognized by its marker name, keeps its
  * message; anything else
  * is an app or bridge failure that keeps its message and, when it carries one,
- * its numeric error code and the resource of the object found missing.
+ * its numeric error code, the resource of the object found missing, and what
+ * was being read when the app failed ({@link NATIVE_READING_KEY}).
  */
 const DESCRIBE_THROWN = [
   `    if (e !== null && typeof e === 'object' && e.name === ${JSON.stringify(NATIVE_CODEC_ERROR_NAME)}) {`,
@@ -312,6 +315,9 @@ const DESCRIBE_THROWN = [
   '      }',
   "      if (typeof e.missingResource === 'string') {",
   '        codecFailure.missingResource = e.missingResource;',
+  '      }',
+  "      if (typeof e.outOfRangeResource === 'string') {",
+  '        codecFailure.outOfRangeResource = e.outOfRangeResource;',
   '      }',
   '      return { ok: false, failure: codecFailure };',
   '    }',
@@ -324,6 +330,9 @@ const DESCRIBE_THROWN = [
   '    }',
   "    if (e !== null && e !== undefined && typeof e.missingResource === 'string') {",
   '      failure.missingResource = e.missingResource;',
+  '    }',
+  `    if (e !== null && e !== undefined && typeof e[${JSON.stringify(NATIVE_READING_KEY)}] === 'string') {`,
+  `      failure.reading = e[${JSON.stringify(NATIVE_READING_KEY)}];`,
   '    }',
   '    return { ok: false, failure: failure };',
 ].join('\n')
@@ -340,7 +349,8 @@ const DESCRIBE_THROWN = [
  * page window (or `null`) embedded the same way.
  *
  * The application object comes first, because finding a referenced object
- * needs it: the codec functions receive `{ app, references }`. Nothing else
+ * needs it: the codec functions receive `{ app, references, positionOf }`,
+ * where `positionOf` is the position reader of `NATIVE_POSITION_READER`. Nothing else
  * reaches the app until the whole input has converted: decoding converts every
  * value before it uses the app to find referenced objects, and the body runs
  * after that. So an input value that cannot convert fails before the app
@@ -354,11 +364,12 @@ export function composeNativeScript(script: NativeScript, codec: NativeCodec): s
   return [
     "ObjC.import('stdlib');",
     codec.prelude,
+    NATIVE_POSITION_READER.prelude,
     'var __mactsOutcome = (function () {',
     '  try {',
     `    var app = Application(${JSON.stringify(script.bundleId)});`,
     '    app.includeStandardAdditions = true;',
-    `    var env = { app: app, references: ${embedJson(script.references)} };`,
+    `    var env = { app: app, references: ${embedJson(script.references)}, positionOf: ${NATIVE_POSITION_FUNCTION} };`,
     `    var args = ${NATIVE_DECODE_FUNCTION}(${embedJson(script.input)}, ${embedJson(script.inputPlan)}, env);`,
     '    var value = (function (app, args, page) {',
     script.body,
@@ -421,17 +432,22 @@ function parseNativeFailure(value: unknown): NativeFailure | string {
     case 'app': {
       const errorNumber = value['errorNumber']
       const missingResource = value['missingResource']
+      const reading = value['reading']
       if (errorNumber !== undefined && typeof errorNumber !== 'number') {
         return 'the app failure has a non-numeric error number'
       }
       if (missingResource !== undefined && typeof missingResource !== 'string') {
         return 'the app failure has a non-text missing resource'
       }
+      if (reading !== undefined && typeof reading !== 'string') {
+        return 'the app failure has a non-text reading'
+      }
       return {
         source: 'app',
         message,
         ...(errorNumber === undefined ? {} : { errorNumber }),
         ...(missingResource === undefined ? {} : { missingResource }),
+        ...(reading === undefined ? {} : { reading }),
       }
     }
     case 'collection':
@@ -445,14 +461,24 @@ function parseNativeFailure(value: unknown): NativeFailure | string {
       if (!isIssuePath(path)) return 'the codec failure has no path'
       const unsupportedKind = value['unsupportedKind']
       const missingResource = value['missingResource']
+      const outOfRangeResource = value['outOfRangeResource']
       if (unsupportedKind !== undefined && typeof unsupportedKind !== 'string') {
         return 'the codec failure has a non-text unsupported kind'
       }
       if (missingResource !== undefined && typeof missingResource !== 'string') {
         return 'the codec failure has a non-text missing resource'
       }
+      if (outOfRangeResource !== undefined && typeof outOfRangeResource !== 'string') {
+        return 'the codec failure has a non-text out-of-range resource'
+      }
       if (unsupportedKind !== undefined && missingResource !== undefined) {
         return 'the codec failure is both unsupported and missing'
+      }
+      if (
+        outOfRangeResource !== undefined &&
+        (unsupportedKind !== undefined || missingResource !== undefined)
+      ) {
+        return 'the codec failure is out of range and has another cause'
       }
       return {
         source: 'codec',
@@ -461,6 +487,7 @@ function parseNativeFailure(value: unknown): NativeFailure | string {
         message,
         ...(unsupportedKind === undefined ? {} : { unsupportedKind }),
         ...(missingResource === undefined ? {} : { missingResource }),
+        ...(outOfRangeResource === undefined ? {} : { outOfRangeResource }),
       }
     }
     default:

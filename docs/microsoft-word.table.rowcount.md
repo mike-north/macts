@@ -4,10 +4,10 @@
 
 ## Table.rowCount property
 
-The number of rows in the table
+The number of rows in the table. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-rowCount: number
+readonly rowCount: Integer | null;
 ```

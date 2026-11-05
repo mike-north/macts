@@ -4,10 +4,10 @@
 
 ## Document.showRevisions property
 
-Whether tracked changes are shown
+Whether tracked changes are shown. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-showRevisions: boolean
+showRevisions: boolean | null
 ```

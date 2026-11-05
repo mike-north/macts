@@ -4,7 +4,7 @@
 
 ## File_2.stationery property
 
-Is the file a stationery pad?
+Is the file a stationery pad? Never null: observed in all 60 items (Finder 27.2, macOS 27.2, 2026-11-01).
 
 **Signature:**
 

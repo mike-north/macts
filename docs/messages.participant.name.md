@@ -4,10 +4,10 @@
 
 ## Participant.name property
 
-The participant's name as it appears in the participant list.
+The participant's name as it appears in the participant list. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

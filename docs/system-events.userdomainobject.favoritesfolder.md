@@ -4,10 +4,10 @@
 
 ## UserDomainObject.favoritesFolder property
 
-The user's Favorites folder
+The user's Favorites folder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-favoritesFolder: Folder
+readonly favoritesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

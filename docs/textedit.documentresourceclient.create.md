@@ -9,7 +9,7 @@ Create a new document.
 **Signature:**
 
 ```typescript
-create(input: DocumentCreateInput): Promise<Document>;
+create(input: DocumentCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Document>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [DocumentCreateInput](./textedit.documentcreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

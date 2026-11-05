@@ -4,10 +4,10 @@
 
 ## Tab.title property
 
-The title property
+The title property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-title: string
+title: string | null
 ```

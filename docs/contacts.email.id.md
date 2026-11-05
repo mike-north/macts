@@ -4,10 +4,10 @@
 
 ## Email.id property
 
-Unique identifier for this email
+Unique identifier for this email. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

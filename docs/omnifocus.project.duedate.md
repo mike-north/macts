@@ -4,10 +4,10 @@
 
 ## Project.dueDate property
 
-When the project must be finished
+When the project must be finished. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-dueDate: Date
+dueDate: Date | null
 ```

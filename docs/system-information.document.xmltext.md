@@ -4,10 +4,10 @@
 
 ## Document.xmlText property
 
-XML representation of the system profile document
+XML representation of the system profile document. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-xmlText: string
+readonly xmlText: string | null;
 ```

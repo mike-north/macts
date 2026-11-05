@@ -4,10 +4,10 @@
 
 ## AutomatorAction.inputTypes property
 
-The input types accepted by the action
+The input types accepted by the action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-inputTypes: string[];
+readonly inputTypes: readonly string[] | null;
 ```

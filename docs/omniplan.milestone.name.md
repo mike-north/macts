@@ -4,10 +4,10 @@
 
 ## Milestone.name property
 
-The name of the milestone
+The name of the milestone. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

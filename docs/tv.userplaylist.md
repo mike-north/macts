@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Unique identifier for this playlist
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+Unique identifier for this playlist. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ Unique identifier for this playlist
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-is this playlist shared?
+is this playlist shared? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +69,15 @@ is this playlist shared?
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-is this a Smart Playlist?
+boolean \| null
+
+</td><td>
+
+is this a Smart Playlist? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

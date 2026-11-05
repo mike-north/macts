@@ -4,10 +4,10 @@
 
 ## TestFailure.filePath property
 
-The file path where the issue occurred
+The file path where the issue occurred. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-filePath: string
+filePath: string | null
 ```

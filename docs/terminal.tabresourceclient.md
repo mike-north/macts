@@ -57,24 +57,24 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(name)](./terminal.tabresourceclient.get.md)
+[get(name, \_\_mactsOptions)](./terminal.tabresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a tab by name.
+Get a tab by name. When several tabs share the same tty, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[list()](./terminal.tabresourceclient.list.md)
+[list(\_\_mactsOptions)](./terminal.tabresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all tabs.
+List all tabs, as one page.
 
 </td></tr>
 </tbody></table>

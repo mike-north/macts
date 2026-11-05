@@ -4,10 +4,10 @@
 
 ## Tab.busy property
 
-Whether the tab is busy running a process
+Whether the tab is busy running a process. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-busy: boolean
+readonly busy: boolean | null;
 ```

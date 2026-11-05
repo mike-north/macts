@@ -4,10 +4,10 @@
 
 ## Person.lastName property
 
-The Last name of this person.
+The Last name of this person. Nullable. Observed missing in 6 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-lastName: string
+lastName: string | null
 ```

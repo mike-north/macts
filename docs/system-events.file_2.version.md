@@ -4,10 +4,10 @@
 
 ## File_2.version property
 
-the version of the file (visible at the bottom of the "Get Info" window)
+the version of the file (visible at the bottom of the "Get Info" window). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-version: string
+readonly version: string | null;
 ```

@@ -4,10 +4,10 @@
 
 ## MediaItem.id property
 
-The unique ID of the media item
+The unique ID of the media item. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

@@ -4,14 +4,10 @@
 
 ## Session.selectionColor property
 
-The selectionColor property
+The selectionColor property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-selectionColor: {
-  r: number
-  g: number
-  b: number
-}
+selectionColor: Rgb | null
 ```

@@ -4,10 +4,10 @@
 
 ## SettingsSet.fontName property
 
-The name of the font
+The name of the font. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fontName: string
+fontName: string | null
 ```

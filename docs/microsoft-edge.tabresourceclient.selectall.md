@@ -9,7 +9,7 @@ Select all
 **Signature:**
 
 ```typescript
-selectAll(tabId: string): Promise<void>;
+selectAll(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -29,13 +29,37 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-tabId
+windowId
 
 </td><td>
 
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+id
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

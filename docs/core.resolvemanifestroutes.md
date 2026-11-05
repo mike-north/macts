@@ -46,4 +46,4 @@ The app manifest.
 
 [ManifestRoute](./core.manifestroute.md)<!-- -->\[\]
 
-Every route the manifest exposes, in command-declaration order.
+Every route the manifest exposes, in command-declaration order; none for a command or a resource marked unsupported.

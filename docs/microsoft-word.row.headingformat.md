@@ -4,10 +4,10 @@
 
 ## Row.headingFormat property
 
-Whether the row is formatted as a heading
+Whether the row is formatted as a heading. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-headingFormat: boolean
+headingFormat: boolean | null
 ```

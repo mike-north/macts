@@ -4,7 +4,7 @@
 
 ## URLTrackCreateInput interface
 
-Input for creating a URLTrack
+Input for creating an URLTrack.
 
 **Signature:**
 

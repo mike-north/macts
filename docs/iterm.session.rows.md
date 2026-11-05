@@ -4,10 +4,10 @@
 
 ## Session.rows property
 
-The rows property
+The rows property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-rows: number
+rows: Integer | null
 ```

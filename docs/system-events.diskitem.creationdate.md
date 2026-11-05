@@ -4,10 +4,10 @@
 
 ## DiskItem.creationDate property
 
-the date on which the disk item was created
+the date on which the disk item was created. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-creationDate: Date
+readonly creationDate: Date | null;
 ```

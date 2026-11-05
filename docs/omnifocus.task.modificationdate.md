@@ -4,10 +4,10 @@
 
 ## Task.modificationDate property
 
-When the task was last modified
+When the task was last modified. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-modificationDate: Date
+readonly modificationDate: Date | null;
 ```

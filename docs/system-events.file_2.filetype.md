@@ -4,10 +4,10 @@
 
 ## File_2.fileType property
 
-the OSType identifying the type of data contained in the file
+the OSType identifying the type of data contained in the file. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fileType: string
+fileType: string | null
 ```

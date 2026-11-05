@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The directory where the account stores things on disk
+[FileValue](./contracts.filevalue.md) \| null
+
+</td><td>
+
+The directory where the account stores things on disk. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The directory where the account stores things on disk
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The type of an account
+string \| null
+
+</td><td>
+
+The type of an account. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +73,11 @@ The type of an account
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Preferred authentication scheme for account
+Preferred authentication scheme for account. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +88,11 @@ Preferred authentication scheme for account
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The delivery account used when sending mail from this account
+The delivery account used when sending mail from this account. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +103,11 @@ The delivery account used when sending mail from this account
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The list of email addresses configured for an account
+The list of email addresses configured for an account. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +118,11 @@ The list of email addresses configured for an account
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete)
+Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +133,11 @@ Number of days before junk messages are deleted (0 = delete on quit, -1 = never 
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Indicates whether the messages in the junk messages mailboxes will be deleted on quit
+Indicates whether the messages in the junk messages mailboxes will be deleted on quit. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +148,11 @@ Indicates whether the messages in the junk messages mailboxes will be deleted on
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-Does nothing at all (deprecated)
+Does nothing at all (deprecated). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +163,11 @@ Does nothing at all (deprecated)
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Does nothing at all (deprecated)
+Does nothing at all (deprecated). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -174,11 +178,11 @@ Does nothing at all (deprecated)
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete)
+Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -189,11 +193,11 @@ Number of days before messages in the trash are permanently deleted (0 = delete 
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Indicates whether the messages in deleted messages mailboxes will be permanently deleted on quit
+Indicates whether the messages in deleted messages mailboxes will be permanently deleted on quit. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -204,11 +208,11 @@ Indicates whether the messages in deleted messages mailboxes will be permanently
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Indicates whether the account is enabled or not
+Indicates whether the account is enabled or not. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -219,11 +223,11 @@ Indicates whether the account is enabled or not
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The users full name configured for an account
+The users full name configured for an account. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -232,13 +236,15 @@ The users full name configured for an account
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the account
+The unique identifier of the account. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -249,11 +255,11 @@ The unique identifier of the account
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Does nothing at all (deprecated)
+Does nothing at all (deprecated). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -264,11 +270,11 @@ Does nothing at all (deprecated)
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Indicates whether messages that are deleted will be moved to the trash mailbox
+Indicates whether messages that are deleted will be moved to the trash mailbox. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -279,11 +285,11 @@ Indicates whether messages that are deleted will be moved to the trash mailbox
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of an account
+The name of an account. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -294,11 +300,11 @@ The name of an account
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Password for this account. Can be set, but not read via scripting
+Password for this account. Can be set, but not read via scripting. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -309,11 +315,11 @@ Password for this account. Can be set, but not read via scripting
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The port used to connect to an account
+The port used to connect to an account. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -324,11 +330,11 @@ The port used to connect to an account
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The host name used to connect to an account
+The host name used to connect to an account. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -339,11 +345,11 @@ The host name used to connect to an account
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The user name used to connect to an account
+The user name used to connect to an account. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -354,11 +360,11 @@ The user name used to connect to an account
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Indicates whether SSL is enabled for this receiving account
+Indicates whether SSL is enabled for this receiving account. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

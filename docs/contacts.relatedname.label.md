@@ -4,10 +4,10 @@
 
 ## RelatedName.label property
 
-Label for this name
+Label for this name. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-label: string
+label: string | null
 ```

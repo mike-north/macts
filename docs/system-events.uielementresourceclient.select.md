@@ -4,13 +4,43 @@
 
 ## UIElementResourceClient.select() method
 
-set the selected property of the UI element
+set the selected property of the UI element. macts does not yet send the UI element to the app, so the app acts on whatever it chooses.
 
 **Signature:**
 
 ```typescript
-select(): Promise<void>;
+select(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 

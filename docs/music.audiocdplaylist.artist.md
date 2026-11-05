@@ -4,10 +4,10 @@
 
 ## AudioCDPlaylist.artist property
 
-the artist of the CD
+the artist of the CD. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-artist: string
+artist: string | null
 ```

@@ -24,22 +24,43 @@ export class LayerResourceClient {
   /**
    * List the layers of one canvas, as one page.
    */
-  async list(canvasId: string): Promise<Page<Layer>> {
-    return this.#http.rpc<Page<Layer>>(`${this.#app}.${this.#resource}.list`, { canvasId })
+  async list(
+    canvasId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<Layer>> {
+    return this.#http.invoke<Page<Layer>>(
+      `${this.#app}.${this.#resource}.list`,
+      { canvasId },
+      __mactsOptions,
+      'Layer'
+    )
   }
 
   /**
    * Get a layer by name.
    * When several layers share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async get(name: string): Promise<Layer> {
-    return this.#http.rpc<Layer>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(name: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Layer> {
+    return this.#http.invoke<Layer>(
+      `${this.#app}.${this.#resource}.get`,
+      { name },
+      __mactsOptions,
+      'Layer'
+    )
   }
 
   /**
    * Create a new layer.
    */
-  async create(input: LayerCreateInput): Promise<Layer> {
-    return this.#http.rpc<Layer>(`${this.#app}.${this.#resource}.create`, input)
+  async create(
+    input: LayerCreateInput,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Layer> {
+    return this.#http.invoke<Layer>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'Layer'
+    )
   }
 }

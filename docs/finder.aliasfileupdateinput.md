@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [AliasFileUpdateInput](./finder.aliasfileupdateinput.md)
 
-## AliasFileUpdateInput type
+## AliasFileUpdateInput interface
 
-Input for updating a AliasFile
+Input for updating an AliasFile. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type AliasFileUpdateInput = Partial<AliasFileCreateInput>
+interface AliasFileUpdateInput
 ```
 
-**References:** [AliasFileCreateInput](./finder.aliasfilecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[originalItem?](./finder.aliasfileupdateinput.originalitem.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the original item pointed to by the alias. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

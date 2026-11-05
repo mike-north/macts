@@ -4,10 +4,10 @@
 
 ## DiskItem.container property
 
-the folder or disk which has this disk item as an element
+the folder or disk which has this disk item as an element. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-container: unknown
+readonly container: ObjectReferenceVariant<DiskItem, string, 'DiskItem'> | null;
 ```

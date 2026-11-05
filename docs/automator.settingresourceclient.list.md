@@ -4,14 +4,55 @@
 
 ## SettingResourceClient.list() method
 
-List all settings.
+List the settings of one automator action, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Setting[]>;
+list(actionId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Setting>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+actionId
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Setting](./automator.setting.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Setting](./automator.setting.md)<!-- -->&gt;&gt;

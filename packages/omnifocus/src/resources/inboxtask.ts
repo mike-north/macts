@@ -24,21 +24,42 @@ export class InboxTaskResourceClient {
   /**
    * List all inbox tasks, as one page.
    */
-  async list(): Promise<Page<InboxTask>> {
-    return this.#http.rpc<Page<InboxTask>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<InboxTask>> {
+    return this.#http.invoke<Page<InboxTask>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'InboxTask'
+    )
   }
 
   /**
    * Get a inbox task by id.
    */
-  async get(id: string): Promise<InboxTask> {
-    return this.#http.rpc<InboxTask>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<InboxTask> {
+    return this.#http.invoke<InboxTask>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'InboxTask'
+    )
   }
 
   /**
    * Create a new inbox task.
    */
-  async create(input: InboxTaskCreateInput): Promise<InboxTask> {
-    return this.#http.rpc<InboxTask>(`${this.#app}.${this.#resource}.create`, input)
+  async create(
+    input: InboxTaskCreateInput,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<InboxTask> {
+    return this.#http.invoke<InboxTask>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'InboxTask'
+    )
   }
 }

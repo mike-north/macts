@@ -4,12 +4,12 @@
 
 ## BookmarkFolderResourceClient.get() method
 
-Get a bookmarkfolder by id.
+Get a bookmark folder by id.
 
 **Signature:**
 
 ```typescript
-get(id: string): Promise<BookmarkFolder>;
+get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<BookmarkFolder>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ id
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

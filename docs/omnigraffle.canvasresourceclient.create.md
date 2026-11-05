@@ -9,7 +9,7 @@ Create a new canvas.
 **Signature:**
 
 ```typescript
-create(input: CanvasCreateInput): Promise<Canvas>;
+create(input: CanvasCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Canvas>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [CanvasCreateInput](./omnigraffle.canvascreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

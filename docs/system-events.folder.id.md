@@ -4,10 +4,10 @@
 
 ## Folder.id property
 
-Unique identifier for this folder
+the unique ID of the disk item. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

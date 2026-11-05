@@ -4,7 +4,7 @@
 
 ## ProgressIndicatorCreateInput type
 
-Input for creating a ProgressIndicator
+Input for creating a ProgressIndicator.
 
 **Signature:**
 

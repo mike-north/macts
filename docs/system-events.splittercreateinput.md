@@ -4,7 +4,7 @@
 
 ## SplitterCreateInput type
 
-Input for creating a Splitter
+Input for creating a Splitter.
 
 **Signature:**
 

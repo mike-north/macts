@@ -4,10 +4,10 @@
 
 ## Disk.freeSpace property
 
-the number of free bytes left on the disk
+the number of free bytes left on the disk. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-freeSpace: number
+readonly freeSpace: number | null;
 ```

@@ -263,6 +263,7 @@ resources:
 | `unsupported` | object | No       | Marks a resource the app cannot provide (no collection in its dictionary, or every read fails), with evidence (see [Unsupported resources](#unsupported-resources))                                                                                                             |
 | `rangeRead`   | object | No       | Whether the running app reads a range of the resource's collection, with live evidence; a list pages only when it is `supported: true`, and reads its pages as its `read` says (see [Range reads](#range-reads))                                                                |
 | `roots`       | object | No       | Marks a singleton root: the app holds the resource's objects as its own properties, one per kind (`<kind>: { property, evidence }`, with dictionary evidence per kind). Validation derives the kind enum, a `kind` property and the identifier; see [Identifiers](#identifiers) |
+| `positional`  | object | No       | Marks a resource whose objects have no identifier and are found only by their zero-based position within their parent, with curated evidence (see [Positional resources](#positional-resources))                                                                                |
 
 #### Properties
 
@@ -657,6 +658,50 @@ its whole collection as one page. A resource marked `unsupported` records no
 range read.
 
 **Schemas:** [`ResourceRangeReadSchema`](../packages/core/src/manifest/schemas/resource.ts), [`RangeReadEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts)
+
+##### Positional resources
+
+Some apps give an object no identifier and address it only by its position
+within its container: an iTerm tab is the tab at a position within its
+window. Such a resource is marked `positional`, with curated evidence of what
+was observed. Nothing is inferred from a missing identifier: an unmarked
+resource with no identifier stays out of output.
+
+```yaml
+Tab:
+  name: Tab
+  plural: Tabs
+  description: A tab of a window
+  positional:
+    evidence:
+      source: curated
+      note: A tab has no id property; the app addresses a tab only by its position within its window.
+      observedAt: '2026-11-04T00:00:00.000Z'
+      appVersion: '3.7.6'
+```
+
+A positional resource's get, update and delete take the parent's identifier
+and the item's zero-based position within it, an `integer` parameter. A
+position past the parent's last item is an invalid selection, and a missing
+parent is a target that was not found. A field holding one, read through its
+parent's own record, is returned as a selector for that position within the
+parent. A position drifts as objects open, close or move, so it is not a
+lasting name for an object.
+
+The manifest is refused when a positional resource:
+
+- has a primary identifier, which it would be found by instead;
+- has no get, or a get that records no parent;
+- sits under a parent that the app does not find at the application by its
+  identifier (a parent found within another is not supported yet);
+- has an item command (get, update or delete) that does not record the
+  get's parent, declares no required item parameter, or takes one of a type other
+  than `integer`.
+
+A command that records a positional resource as its parent is refused too:
+a parent is found by its identifier, which a positional resource lacks.
+
+**Schemas:** [`ResourcePositionalSchema`](../packages/core/src/manifest/schemas/resource.ts), [`PositionalEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts); the rule is [`positional.ts`](../packages/core/src/manifest/positional.ts)
 
 #### Identifiers
 

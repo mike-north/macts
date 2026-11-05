@@ -4,12 +4,10 @@
 
 ## ColorWellUpdateInput type
 
-Input for updating a ColorWell
+Input for updating a ColorWell. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ColorWellUpdateInput = Partial<ColorWellCreateInput>
+type ColorWellUpdateInput = Record<string, never>
 ```
-
-**References:** [ColorWellCreateInput](./system-events.colorwellcreateinput.md)

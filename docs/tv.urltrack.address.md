@@ -4,10 +4,10 @@
 
 ## URLTrack.address property
 
-the URL for this track
+the URL for this track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-address: string
+address: string | null
 ```

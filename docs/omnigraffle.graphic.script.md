@@ -4,10 +4,10 @@
 
 ## Graphic.script property
 
-Source of attached AppleScript
+Source of attached AppleScript. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-script: string
+script: string | null
 ```

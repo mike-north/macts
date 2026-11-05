@@ -4,10 +4,10 @@
 
 ## BookmarkFolder.index property
 
-Returns the index with respect to its parent bookmark folder.
+Returns the index with respect to its parent bookmark folder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-index: number
+readonly index: number | null;
 ```

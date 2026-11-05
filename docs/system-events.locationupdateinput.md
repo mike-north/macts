@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [LocationUpdateInput](./system-events.locationupdateinput.md)
 
-## LocationUpdateInput type
+## LocationUpdateInput interface
 
-Input for updating a Location
+Input for updating a Location. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type LocationUpdateInput = Partial<LocationCreateInput>
+interface LocationUpdateInput
 ```
 
-**References:** [LocationCreateInput](./system-events.locationcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[name?](./system-events.locationupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the name of the location. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

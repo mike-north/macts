@@ -4,10 +4,10 @@
 
 ## Account.emptyTrashOnQuit property
 
-Indicates whether the messages in deleted messages mailboxes will be permanently deleted on quit
+Indicates whether the messages in deleted messages mailboxes will be permanently deleted on quit. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-emptyTrashOnQuit: boolean
+emptyTrashOnQuit: boolean | null
 ```

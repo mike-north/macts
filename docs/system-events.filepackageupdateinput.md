@@ -4,12 +4,10 @@
 
 ## FilePackageUpdateInput type
 
-Input for updating a FilePackage
+Input for updating a FilePackage. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type FilePackageUpdateInput = Partial<FilePackageCreateInput>
+type FilePackageUpdateInput = Record<string, never>
 ```
-
-**References:** [FilePackageCreateInput](./system-events.filepackagecreateinput.md)

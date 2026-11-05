@@ -9,7 +9,7 @@ Reveal Workflow with given UID (folder name) or Bundle ID
 **Signature:**
 
 ```typescript
-revealWorkflow(workflow: string, configuration?: boolean, details?: boolean): Promise<void>;
+revealWorkflow(workflow: string, configuration?: boolean, details?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -58,6 +58,19 @@ details
 </td><td>
 
 boolean
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

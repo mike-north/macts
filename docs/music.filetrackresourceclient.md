@@ -57,13 +57,13 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[refresh()](./music.filetrackresourceclient.refresh.md)
+[refresh(\_\_mactsOptions)](./music.filetrackresourceclient.refresh.md)
 
 </td><td>
 
 </td><td>
 
-update file track information from the current information in the track’s file
+update file track information from the current information in the track’s file. macts does not yet send the file track to the app, so the app acts on whatever it chooses.
 
 </td></tr>
 </tbody></table>

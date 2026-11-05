@@ -4,10 +4,10 @@
 
 ## Track.albumArtist property
 
-The album artist of the track
+The album artist of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-albumArtist: string
+readonly albumArtist: string | null;
 ```

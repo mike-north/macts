@@ -4,14 +4,21 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { Rgb } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Bookmark {
-    end: number;
-    name: string;
-    start: number;
+    readonly end: Integer | null;
+    name: string | null;
+    readonly start: Integer | null;
 }
 
 // @public
@@ -19,7 +26,7 @@ export interface BookmarkCreateInput {
     name?: string;
 }
 
-// @public (undocumented)
+// @public
 export const BookmarkSchema: z.ZodObject<{
     name: z.ZodString;
     start: z.ZodNumber;
@@ -27,7 +34,9 @@ export const BookmarkSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type BookmarkUpdateInput = Partial<BookmarkCreateInput>;
+export interface BookmarkUpdateInput {
+    name?: string;
+}
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -50,12 +59,12 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Cell {
-    columnIndex: number;
-    content: string;
-    height: number;
-    rowIndex: number;
-    verticalAlignment: string;
-    width: number;
+    readonly columnIndex: Integer | null;
+    content: string | null;
+    height: number | null;
+    readonly rowIndex: Integer | null;
+    verticalAlignment: string | null;
+    width: number | null;
 }
 
 // @public
@@ -66,7 +75,7 @@ export interface CellCreateInput {
     width?: number;
 }
 
-// @public (undocumented)
+// @public
 export const CellSchema: z.ZodObject<{
     content: z.ZodString;
     width: z.ZodNumber;
@@ -77,12 +86,17 @@ export const CellSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type CellUpdateInput = Partial<CellCreateInput>;
+export interface CellUpdateInput {
+    content?: string;
+    height?: number;
+    verticalAlignment?: string;
+    width?: number;
+}
 
 // @public
 export interface Column {
-    preferredWidth: number;
-    width: number;
+    preferredWidth: number | null;
+    width: number | null;
 }
 
 // @public
@@ -91,29 +105,31 @@ export interface ColumnCreateInput {
     width?: number;
 }
 
-// @public (undocumented)
+// @public
 export const ColumnSchema: z.ZodObject<{
     width: z.ZodNumber;
     preferredWidth: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type ColumnUpdateInput = Partial<ColumnCreateInput>;
+export interface ColumnUpdateInput {
+    preferredWidth?: number;
+    width?: number;
+}
 
 // @public
 export interface Document {
-    active: boolean;
-    content: string;
-    defaultTabStop: number;
-    fullName: string;
-    id?: string;
-    name: string;
-    path: string;
-    posixFullName: string;
-    readOnly: boolean;
-    saved: boolean;
-    showRevisions: boolean;
-    trackRevisions: boolean;
+    readonly active: boolean | null;
+    readonly content: string | null;
+    defaultTabStop: number | null;
+    readonly fullName: string | null;
+    readonly name: string;
+    readonly path: string | null;
+    readonly posixFullName: string | null;
+    readonly readOnly: boolean | null;
+    saved: boolean | null;
+    showRevisions: boolean | null;
+    trackRevisions: boolean | null;
 }
 
 // @public
@@ -127,17 +143,18 @@ export interface DocumentCreateInput {
 // @public
 export class DocumentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    activate(id: string): Promise<void>;
-    close(id: string, saving?: boolean): Promise<void>;
-    createRange(id: string, start?: number, end?: number): Promise<void>;
-    get(id: string): Promise<Document>;
-    list(): Promise<Page<Document>>;
-    print(id: string): Promise<void>;
-    save(id: string): Promise<void>;
-    saveAs(id: string, fileName: string, fileFormat?: SaveFormat): Promise<void>;
+    activate(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    close(id: string, saving?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    createRange(id: string, start?: number, end?: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Document>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Document>>;
+    print(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    save(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "DocumentResourceClient_2" needs to be exported by the entry point index.d.ts
+    saveAs(id: string, fileName: string, fileFormat?: Parameters<DocumentResourceClient_2['saveAs']>[2], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const DocumentSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -154,15 +171,20 @@ export const DocumentSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type DocumentUpdateInput = Partial<DocumentCreateInput>;
+export interface DocumentUpdateInput {
+    defaultTabStop?: number;
+    saved?: boolean;
+    showRevisions?: boolean;
+    trackRevisions?: boolean;
+}
 
 // @public
 export interface Field {
-    fieldCode: string;
-    fieldText: string;
-    fieldType: FieldType;
-    locked: boolean;
-    showCodes: boolean;
+    fieldCode: string | null;
+    fieldText: string | null;
+    readonly fieldType: FieldType | null;
+    locked: boolean | null;
+    showCodes: boolean | null;
 }
 
 // @public
@@ -173,7 +195,7 @@ export interface FieldCreateInput {
     showCodes?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const FieldSchema: z.ZodObject<{
     fieldType: z.ZodString;
     fieldCode: z.ZodString;
@@ -186,35 +208,32 @@ export const FieldSchema: z.ZodObject<{
 export type FieldType = 'fieldAddin' | 'fieldDate' | 'fieldHyperlink' | 'fieldPageNumber' | 'fieldRef';
 
 // @public
-export type FieldUpdateInput = Partial<FieldCreateInput>;
+export interface FieldUpdateInput {
+    fieldCode?: string;
+    fieldText?: string;
+    locked?: boolean;
+    showCodes?: boolean;
+}
 
 // @public
 export interface Font {
-    allCaps: boolean;
-    bold: boolean;
-    color: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    italic: boolean;
-    name: string;
-    size: number;
-    strikethrough: boolean;
-    subscript: boolean;
-    superscript: boolean;
-    underline: UnderlineType;
+    allCaps: boolean | null;
+    bold: boolean | null;
+    color: Rgb | null;
+    italic: boolean | null;
+    name: string | null;
+    size: number | null;
+    strikethrough: boolean | null;
+    subscript: boolean | null;
+    superscript: boolean | null;
+    underline: UnderlineType | null;
 }
 
 // @public
 export interface FontCreateInput {
     allCaps?: boolean;
     bold?: boolean;
-    color?: {
-        r: number;
-        g: number;
-        b: number;
-    };
+    color?: Rgb;
     italic?: boolean;
     name?: string;
     size?: number;
@@ -224,7 +243,7 @@ export interface FontCreateInput {
     underline?: UnderlineType;
 }
 
-// @public (undocumented)
+// @public
 export const FontSchema: z.ZodObject<{
     bold: z.ZodBoolean;
     italic: z.ZodBoolean;
@@ -243,29 +262,48 @@ export const FontSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type FontUpdateInput = Partial<FontCreateInput>;
+export interface FontUpdateInput {
+    allCaps?: boolean;
+    bold?: boolean;
+    color?: Rgb;
+    italic?: boolean;
+    name?: string;
+    size?: number;
+    strikethrough?: boolean;
+    subscript?: boolean;
+    superscript?: boolean;
+    underline?: UnderlineType;
+}
 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
+}
+
+// @public
+export interface MicrosoftWordClient extends ClientBrand<MicrosoftWordResources> {
 }
 
 // @public
 export class MicrosoftWordClient {
     constructor(options: MicrosoftWordClientOptions);
-    copyObject(): Promise<void>;
-    createNewDocument(attachedTemplate?: string): Promise<void>;
-    cutObject(): Promise<void>;
+    copyObject(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    createNewDocument(attachedTemplate?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    cutObject(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly documents: DocumentResourceClient;
-    find(findText: string, matchCase?: boolean, matchWholeWord?: boolean): Promise<void>;
+    find(findText: string, matchCase?: boolean, matchWholeWord?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
-    insertText(text: string, at?: number): Promise<void>;
-    pasteObject(): Promise<void>;
-    redo(): Promise<void>;
-    replace(findText: string, replaceWith: string, replaceAll?: boolean): Promise<void>;
-    selectAll(): Promise<void>;
-    undo(): Promise<void>;
+    insertText(text: string, at?: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    pasteObject(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    redo(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    replace(findText: string, replaceWith: string, replaceAll?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    selectAll(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    undo(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -282,15 +320,24 @@ export class MicrosoftWordError extends Error {
 }
 
 // @public
+export type MicrosoftWordResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'microsoft-word.documents.get';
+        readonly list: 'microsoft-word.documents.list';
+    };
+}>;
+
+// @public
 export interface PageSetup {
-    bottomMargin: number;
-    leftMargin: number;
-    orientation: string;
-    pageHeight: number;
-    pageWidth: number;
-    paperSize: string;
-    rightMargin: number;
-    topMargin: number;
+    bottomMargin: number | null;
+    leftMargin: number | null;
+    orientation: string | null;
+    pageHeight: number | null;
+    pageWidth: number | null;
+    paperSize: string | null;
+    rightMargin: number | null;
+    topMargin: number | null;
 }
 
 // @public
@@ -305,7 +352,7 @@ export interface PageSetupCreateInput {
     topMargin?: number;
 }
 
-// @public (undocumented)
+// @public
 export const PageSetupSchema: z.ZodObject<{
     topMargin: z.ZodNumber;
     bottomMargin: z.ZodNumber;
@@ -318,23 +365,31 @@ export const PageSetupSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type PageSetupUpdateInput = Partial<PageSetupCreateInput>;
+export interface PageSetupUpdateInput {
+    bottomMargin?: number;
+    leftMargin?: number;
+    orientation?: string;
+    pageHeight?: number;
+    pageWidth?: number;
+    paperSize?: string;
+    rightMargin?: number;
+    topMargin?: number;
+}
 
 // @public
 export interface Paragraph {
-    alignment: ParagraphAlignment;
-    content: string;
-    firstLineIndent: number;
-    id?: string;
-    keepTogether: boolean;
-    keepWithNext: boolean;
-    leftIndent: number;
-    lineSpacing: number;
-    pageBreakBefore: boolean;
-    paragraphId: number;
-    rightIndent: number;
-    spaceAfter: number;
-    spaceBefore: number;
+    alignment: ParagraphAlignment | null;
+    readonly content: string | null;
+    firstLineIndent: number | null;
+    keepTogether: boolean | null;
+    keepWithNext: boolean | null;
+    leftIndent: number | null;
+    lineSpacing: number | null;
+    pageBreakBefore: boolean | null;
+    readonly paragraphId: Integer;
+    rightIndent: number | null;
+    spaceAfter: number | null;
+    spaceBefore: number | null;
 }
 
 // @public
@@ -354,7 +409,7 @@ export interface ParagraphCreateInput {
     spaceBefore?: number;
 }
 
-// @public (undocumented)
+// @public
 export const ParagraphSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     alignment: z.ZodString;
@@ -372,13 +427,24 @@ export const ParagraphSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ParagraphUpdateInput = Partial<ParagraphCreateInput>;
+export interface ParagraphUpdateInput {
+    alignment?: ParagraphAlignment;
+    firstLineIndent?: number;
+    keepTogether?: boolean;
+    keepWithNext?: boolean;
+    leftIndent?: number;
+    lineSpacing?: number;
+    pageBreakBefore?: boolean;
+    rightIndent?: number;
+    spaceAfter?: number;
+    spaceBefore?: number;
+}
 
 // @public
 export interface Row {
-    allowBreakAcrossPages: boolean;
-    headingFormat: boolean;
-    height: number;
+    allowBreakAcrossPages: boolean | null;
+    headingFormat: boolean | null;
+    height: number | null;
 }
 
 // @public
@@ -388,7 +454,7 @@ export interface RowCreateInput {
     height?: number;
 }
 
-// @public (undocumented)
+// @public
 export const RowSchema: z.ZodObject<{
     height: z.ZodNumber;
     allowBreakAcrossPages: z.ZodBoolean;
@@ -396,15 +462,19 @@ export const RowSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type RowUpdateInput = Partial<RowCreateInput>;
+export interface RowUpdateInput {
+    allowBreakAcrossPages?: boolean;
+    headingFormat?: boolean;
+    height?: number;
+}
 
 // @public
 export type SaveFormat = 'document' | 'documentFormat97' | 'template' | 'rtf' | 'text' | 'html' | 'pdf';
 
 // @public
 export interface Section {
-    protectedForForms: boolean;
-    sectionIndex: number;
+    protectedForForms: boolean | null;
+    readonly sectionIndex: Integer | null;
 }
 
 // @public
@@ -412,25 +482,27 @@ export interface SectionCreateInput {
     protectedForForms?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const SectionSchema: z.ZodObject<{
     sectionIndex: z.ZodNumber;
     protectedForForms: z.ZodBoolean;
 }, z.core.$strip>;
 
 // @public
-export type SectionUpdateInput = Partial<SectionCreateInput>;
+export interface SectionUpdateInput {
+    protectedForForms?: boolean;
+}
 
 // @public
 export interface Selection {
-    bold: boolean;
-    content: string;
-    end: number;
-    fontName: string;
-    fontSize: number;
-    italic: boolean;
-    selectionType: string;
-    start: number;
+    bold: boolean | null;
+    content: string | null;
+    readonly end: Integer | null;
+    fontName: string | null;
+    fontSize: number | null;
+    italic: boolean | null;
+    readonly selectionType: string | null;
+    readonly start: Integer | null;
 }
 
 // @public
@@ -442,7 +514,7 @@ export interface SelectionCreateInput {
     italic?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const SelectionSchema: z.ZodObject<{
     content: z.ZodString;
     bold: z.ZodBoolean;
@@ -455,14 +527,20 @@ export const SelectionSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type SelectionUpdateInput = Partial<SelectionCreateInput>;
+export interface SelectionUpdateInput {
+    bold?: boolean;
+    content?: string;
+    fontName?: string;
+    fontSize?: number;
+    italic?: boolean;
+}
 
 // @public
 export interface Table {
-    allowAutoFit: boolean;
-    borders: boolean;
-    columnCount: number;
-    rowCount: number;
+    allowAutoFit: boolean | null;
+    borders: boolean | null;
+    readonly columnCount: Integer | null;
+    readonly rowCount: Integer | null;
 }
 
 // @public
@@ -471,7 +549,7 @@ export interface TableCreateInput {
     borders?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const TableSchema: z.ZodObject<{
     rowCount: z.ZodNumber;
     columnCount: z.ZodNumber;
@@ -480,33 +558,32 @@ export const TableSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type TableUpdateInput = Partial<TableCreateInput>;
+export interface TableUpdateInput {
+    allowAutoFit?: boolean;
+    borders?: boolean;
+}
 
 // @public
 export interface TextRange {
-    bold: boolean;
-    content: string;
-    end: number;
-    fontName: string;
-    fontSize: number;
-    italic: boolean;
-    start: number;
-    underline: UnderlineType;
+    bold: boolean | null;
+    content: string | null;
+    end: Integer | null;
+    fontName: string | null;
+    fontSize: number | null;
+    italic: boolean | null;
+    start: Integer | null;
+    underline: UnderlineType | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "TextRangeCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type TextRangeCreateInput = Omit<TextRangeCreateInput_2, 'start' | 'end'> & {
+    start?: null extends TextRangeCreateInput_2['start'] ? number | null : number;
+    end?: null extends TextRangeCreateInput_2['end'] ? number | null : number;
+};
 
 // @public
-export interface TextRangeCreateInput {
-    bold?: boolean;
-    content?: string;
-    end?: number;
-    fontName?: string;
-    fontSize?: number;
-    italic?: boolean;
-    start?: number;
-    underline?: UnderlineType;
-}
-
-// @public (undocumented)
 export const TextRangeSchema: z.ZodObject<{
     content: z.ZodString;
     bold: z.ZodBoolean;
@@ -518,8 +595,13 @@ export const TextRangeSchema: z.ZodObject<{
     end: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "TextRangeUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type TextRangeUpdateInput = Partial<TextRangeCreateInput>;
+export type TextRangeUpdateInput = Omit<TextRangeUpdateInput_2, 'start' | 'end'> & {
+    start?: null extends TextRangeUpdateInput_2['start'] ? number | null : number;
+    end?: null extends TextRangeUpdateInput_2['end'] ? number | null : number;
+};
 
 // @public
 export type UnderlineType = 'none' | 'single' | 'double' | 'dotted' | 'dashed';

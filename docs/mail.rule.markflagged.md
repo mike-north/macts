@@ -4,10 +4,10 @@
 
 ## Rule.markFlagged property
 
-If rule matches, mark message as flagged
+If rule matches, mark message as flagged. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-markFlagged: boolean
+markFlagged: boolean | null
 ```

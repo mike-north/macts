@@ -4,10 +4,10 @@
 
 ## Rule.allConditionsMustBeMet property
 
-Indicates whether all conditions must be met for rule to execute
+Indicates whether all conditions must be met for rule to execute. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-allConditionsMustBeMet: boolean
+allConditionsMustBeMet: boolean | null
 ```

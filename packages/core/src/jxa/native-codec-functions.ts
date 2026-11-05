@@ -40,6 +40,7 @@ import type { FieldPlan, IssuePath, ValuePlan } from '@macts/contracts'
 import type {
   NativeAddressing,
   NativeCodecEnvironment,
+  NativePositionalAddressing,
   NativeRootAddressing,
 } from './native-codec.js'
 
@@ -57,21 +58,26 @@ export type NativeCodecDirection = 'decode' | 'encode'
  * content, a record's path steps are the user's keys; the envelope is not a
  * step. `message` is user-facing.
  *
- * There are three causes, told apart by `unsupportedKind` and
- * `missingResource`:
+ * There are four causes, told apart by `unsupportedKind`, `missingResource`
+ * and `outOfRangeResource`:
  *
  * - The value violates its plan (a fractional value at an integer position).
  *   Neither is present: the fault is the value's.
  * - The plan has a kind the codec has no conversion for (`file`,
  *   `file-source`, or a kind it does not recognize), or a reference the codec
- *   cannot convert: a selector, a collection, one located through a container
- *   its resource is not found within, one to a resource the app does not find
- *   by its identifier, or, on encode, an object of a resource found within a
- *   container that came without the record it was read through.
+ *   cannot convert: a selector other than an index selector to a positional
+ *   resource, a collection, one located through a container its resource is
+ *   not found within, one to a resource the app does not find by its
+ *   identifier or its position, or, on encode, an object of a resource found
+ *   within a container that came without the record it was read through, or
+ *   an object of a positional resource whose specifier gives no position.
  *   `unsupportedKind` holds the kind: the fault is the codec's, whatever the
  *   value is.
  * - A reference being decoded names an object the app does not have.
  *   `missingResource` holds the reference's resource: the target is missing.
+ * - An index selector being decoded names a position its container's
+ *   collection does not reach. `outOfRangeResource` holds the reference's
+ *   resource: the selection is invalid.
  */
 export interface NativeCodecError {
   readonly name: string
@@ -82,6 +88,8 @@ export interface NativeCodecError {
   readonly unsupportedKind?: string
   /** The resource of a referenced object the app does not have, when that is why it failed. */
   readonly missingResource?: string
+  /** The resource of a referenced position its collection does not reach, when that is why it failed. */
+  readonly outOfRangeResource?: string
 }
 
 /**
@@ -103,8 +111,14 @@ export interface NativeCodecLiterals {
     readonly record: string
     readonly reference: string
   }
-  /** Mirrors `NATIVE_CONTAINED_REFERENCE_KEY`. */
+  /** Mirrors `NATIVE_CONTAINED_REFERENCE_KEY`: the marker symbol's registry key. */
   readonly containedReference: string
+  /** Mirrors `NATIVE_ABSENT_AS_NULL_KEY`: the marker symbol's registry key. */
+  readonly absentAsNull: string
+  /** Mirrors `ABSENT_VALUE_ERROR_NUMBER`: the app's "no such object". */
+  readonly noSuchObject: number
+  /** Mirrors `NATIVE_READING_KEY`. */
+  readonly reading: string
   /** Mirrors `SPECIAL_DOUBLE_STATES`, in the same order. */
   readonly specialDoubleStates: readonly string[]
 }
@@ -124,7 +138,9 @@ export interface NativeCodecFunctions {
    * passthrough plan the argument is returned unchanged, so the result is
    * typed `unknown` rather than as a wire value. An app object at a reference
    * position becomes an identity reference, its identifier read as `env`
-   * describes; without `env`, no reference converts.
+   * describes, or, where the plan records the index form, an index selector
+   * within its container, its position read by `env.positionOf`; without
+   * `env`, no reference converts.
    */
   readonly encode: (native: unknown, plan: ValuePlan, env?: NativeCodecEnvironment) => unknown
   /** The literal constants the functions use. */
@@ -173,8 +189,32 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   const KEY_DATE = 'date'
   const KEY_RECORD = 'record'
   const KEY_REFERENCE = 'reference'
-  /** Sole key of a value a body hands over with the record it was read through. */
-  const KEY_CONTAINED = '__mactsContainedReference'
+  /**
+   * Registry key of the symbol that marks a value a body hands over with the
+   * record it was read through. A symbol, because no app record or JSON value
+   * can carry one, so no app data is taken for the marker.
+   */
+  const KEY_CONTAINED = 'macts.containedReference'
+  /** The contained-reference marker symbol: the sole own property of such a value. */
+  const CONTAINED: unique symbol = Symbol.for(KEY_CONTAINED)
+  /**
+   * Registry key of the symbol that marks a value whose evidence makes the
+   * app's "no such object" its empty value. A symbol, for the same reason.
+   */
+  const KEY_ABSENT_AS_NULL = 'macts.absentAsNull'
+  /** The absent-as-null marker symbol: the sole own property of a marked value. */
+  const ABSENT_AS_NULL: unique symbol = Symbol.for(KEY_ABSENT_AS_NULL)
+  /**
+   * Thrown, never returned, when the app reports no such object (-1728) as
+   * the codec reads the identity of a value marked absent-as-null. Only
+   * {@link encodeAbsentAsNull} catches it, so it never leaves the codec. Being
+   * this one object, it cannot be confused with any error the app raises.
+   */
+  const ABSENT_READ: { readonly absentRead: true } = { absentRead: true }
+  /** The app's "no such object" error number. */
+  const NO_SUCH_OBJECT = -1728
+  /** Property of an app error that says what was being read when the app failed. */
+  const KEY_READING = '__mactsReading'
 
   const STATE_NAN = 'NaN'
   const STATE_INFINITY = 'Infinity'
@@ -231,13 +271,19 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
    * without naming `Object.prototype` so that records from another realm
    * qualify too. Maps, sets, regular expressions, and class instances are
    * excluded as well.
+   *
+   * An object with a symbol key is never a record either. Neither the app nor
+   * JSON produces one, so it is a marker a body made ({@link isMarked}) at a
+   * position that does not consume it, which must fail rather than encode
+   * silently as a record of its string keys, often an empty one.
    */
   function isPlainObject(value: unknown): value is Readonly<Record<string, unknown>> {
     if (!isKeyed(value) || Object.prototype.toString.call(value) !== '[object Object]') {
       return false
     }
     const proto: unknown = Object.getPrototypeOf(value)
-    return proto === null || Object.getPrototypeOf(proto) === null
+    if (proto !== null && Object.getPrototypeOf(proto) !== null) return false
+    return Object.getOwnPropertySymbols(value).length === 0
   }
 
   /** The own value of `key`, or `undefined` when it is absent or inherited. */
@@ -257,6 +303,19 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       writable: true,
       configurable: true,
     })
+  }
+
+  /**
+   * Whether `native` is a value a body marked with `marker` ({@link CONTAINED},
+   * {@link ABSENT_AS_NULL}): an object whose only own property is that symbol.
+   * String keys never match, so an app record of any shape is not one.
+   */
+  function isMarked(native: unknown, marker: symbol): native is Readonly<Record<symbol, unknown>> {
+    return (
+      isKeyed(native) &&
+      Object.prototype.hasOwnProperty.call(native, marker) &&
+      Reflect.ownKeys(native).length === 1
+    )
   }
 
   /** The key of a single-key keyed object, or `undefined` for anything else. */
@@ -294,7 +353,11 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     if (isDate(value)) return 'a date'
     if (isKeyed(value)) {
       const keys = Object.keys(value)
-      if (keys.length === 0) return 'an empty object'
+      if (keys.length === 0) {
+        return Object.getOwnPropertySymbols(value).length === 0
+          ? 'an empty object'
+          : 'an object with symbol keys only'
+      }
       const shown = keys.slice(0, 5).map(quote).join(', ')
       return 'an object with keys ' + shown + (keys.length > 5 ? ', ...' : '')
     }
@@ -344,6 +407,23 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       path: path.slice(),
       message: 'The app has no ' + quote(resource) + ' with this identifier',
       missingResource: resource,
+    }
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
+    throw error
+  }
+
+  /**
+   * Throws the decode failure for a referenced position its container's
+   * collection does not reach, marked with the reference's resource so it is
+   * reported as an invalid selection rather than as invalid input.
+   */
+  function failOutOfRange(path: Path, resource: string): never {
+    const error: NativeCodecError = {
+      name: ERROR_NAME,
+      direction: 'decode',
+      path: path.slice(),
+      message: 'The container holds no ' + quote(resource) + ' at this position',
+      outOfRangeResource: resource,
     }
     // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw error
@@ -573,6 +653,13 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
    * fails anywhere else, because absence is never materialized as `null`.
    *
    * No own property ever holds `undefined`.
+   *
+   * A field's value is the one position a body's absent-as-null marker is
+   * honoured ({@link ABSENT_AS_NULL}): bodies mark the values of a record's
+   * fields, the get record's and each list row's. The marked value follows
+   * the same presence rules, and is then encoded by
+   * {@link encodeAbsentAsNull}. A marker anywhere else is ordinary data, which
+   * fails by its plan.
    */
   function encodeRecord(
     native: unknown,
@@ -588,7 +675,9 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       const field = fields[key]
       if (field === undefined) continue
       const fieldPath = path.concat([key])
-      const value = ownValue(native, key)
+      const read = ownValue(native, key)
+      const marked = isMarked(read, ABSENT_AS_NULL)
+      const value = marked ? read[ABSENT_AS_NULL] : read
       const isNullable = field.value.kind === 'nullable'
       if (value === undefined) {
         if (field.presence !== 'optional') {
@@ -610,9 +699,45 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         // Otherwise omitted: missing value at an optional non-nullable field.
         continue
       }
-      setOwn(out, key, encodeValue(value, field.value, fieldPath, env))
+      try {
+        setOwn(
+          out,
+          key,
+          marked
+            ? encodeAbsentAsNull(value, field.value, fieldPath, env)
+            : encodeValue(value, field.value, fieldPath, env)
+        )
+      } catch (error) {
+        noteReading(error, fieldPath)
+        throw error
+      }
     }
     return out
+  }
+
+  /**
+   * Notes on `error`, an app failure the codec lets through while it encodes
+   * the record field at `path`, which field was being read
+   * (`NATIVE_READING_KEY`): `the property "holder" at [2]`. The path's
+   * steps are plan field names and indices, never values. A codec failure is
+   * left alone, as is an error that already says what was read (a field
+   * nested deeper). An error that cannot be changed is let through as it is.
+   */
+  function noteReading(error: unknown, path: Path): void {
+    if (typeof error !== 'object' || error === null) return
+    if ('name' in error && error.name === ERROR_NAME) return
+    if (KEY_READING in error && typeof error[KEY_READING] === 'string') return
+    const field = path[path.length - 1]
+    let at = ''
+    for (const step of path.slice(0, -1)) {
+      at += typeof step === 'number' ? '[' + String(step) + ']' : (at === '' ? '' : '.') + step
+    }
+    const reading = 'the property ' + JSON.stringify(String(field)) + (at === '' ? '' : ' at ' + at)
+    try {
+      setOwn(error, KEY_READING, reading)
+    } catch {
+      // A frozen error keeps only its own description.
+    }
   }
 
   /**
@@ -769,7 +894,23 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       )
     }
     let object: unknown
-    if (addressing.lookup === 'byProperty') {
+    if (addressing.lookup === 'byIndex') {
+      // The app's element addressing by zero-based position; a position the
+      // collection does not reach is an invalid selection, never a guess.
+      const length = collection['length']
+      if (typeof length !== 'number') {
+        return fail(
+          'decode',
+          path,
+          'Expected the length of ' +
+            quote(addressing.collection) +
+            ', received ' +
+            describeValue(length)
+        )
+      }
+      if (typeof id !== 'number' || !(id >= 0 && id < length)) return failOutOfRange(path, resource)
+      object = callMember('decode', collection, 'at', [id], path, expected)
+    } else if (addressing.lookup === 'byProperty') {
       const match: Record<string, unknown> = {}
       setOwn(match, addressing.property, id)
       const matches = callMember('decode', collection, 'whose', [match], path, expected)
@@ -851,12 +992,16 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   /**
    * {@link decodeReference} of a reference's payload: what a `reference`
    * control record holds, and what a reference's `container` holds directly.
+   * A container (`asContainer`) converts in identity form only, at every
+   * level of the chain: a selector never appears inside a container (D7), and
+   * resolution refuses one there too.
    */
   function decodeReferencePayload(
     payload: unknown,
     plan: ReferencePlan,
     env: Env,
-    path: Path
+    path: Path,
+    asContainer = false
   ): PendingAddress {
     if (!isKeyed(payload)) {
       return fail('decode', path, 'Expected a reference, received ' + describeValue(payload))
@@ -884,12 +1029,15 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       )
     }
     if (form === 'selector') {
-      return failUnsupported(
-        'decode',
-        path,
-        'reference',
-        'Selector references have no conversion in this codec'
-      )
+      if (asContainer) {
+        return failUnsupported(
+          'decode',
+          path,
+          'reference',
+          'A container converts only as an identity reference, never as a selector'
+        )
+      }
+      return decodeIndexSelector(payload, plan, env, path)
     }
     for (const key of Object.keys(payload)) {
       if (
@@ -927,7 +1075,8 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
             payload['container'],
             { kind: 'reference', resource: within, cardinality: 'one' },
             env,
-            path.concat(['container'])
+            path.concat(['container']),
+            true
           )
     if (env === undefined || !isHostObject(env.app)) {
       return failUnsupported(
@@ -945,6 +1094,105 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     }
     if (container !== undefined) setOwn(pending, 'container', container)
     return pending
+  }
+
+  /**
+   * {@link decodeReferencePayload} of a single selector reference. Only an
+   * index selector to a positional resource converts (`addressing.lookup` is
+   * `byIndex`), with its required identity container of the parent it is
+   * found within: its position is its pending address's identifier. Every
+   * other selector fails as unsupported.
+   */
+  function decodeIndexSelector(
+    payload: Readonly<Record<string, unknown>>,
+    plan: ReferencePlan,
+    env: Env,
+    path: Path
+  ): PendingAddress {
+    const addressing = positionalAddressingOf(env, plan.resource)
+    if (addressing === undefined) {
+      return failUnsupported(
+        'decode',
+        path,
+        'reference',
+        'Selector references have no conversion in this codec'
+      )
+    }
+    for (const key of Object.keys(payload)) {
+      if (
+        key !== 'resource' &&
+        key !== 'form' &&
+        key !== 'cardinality' &&
+        key !== 'selector' &&
+        key !== 'container'
+      ) {
+        fail('decode', path.concat([key]), 'Unexpected field ' + quote(key))
+      }
+    }
+    const selector = ownValue(payload, 'selector')
+    const selectorPath = path.concat(['selector'])
+    if (!isKeyed(selector) || ownValue(selector, 'by') !== 'index') {
+      return failUnsupported(
+        'decode',
+        selectorPath,
+        'reference',
+        'References to ' +
+          quote(plan.resource) +
+          ' convert only by index: the app finds its objects by their position'
+      )
+    }
+    for (const key of Object.keys(selector)) {
+      if (key !== 'by' && key !== 'index') {
+        fail('decode', selectorPath.concat([key]), 'Unexpected field ' + quote(key))
+      }
+    }
+    const index = decodeInteger(ownValue(selector, 'index'), selectorPath.concat(['index']))
+    if (index < 0) {
+      fail('decode', selectorPath.concat(['index']), 'Expected a non-negative position')
+    }
+    if (!hasOwn(payload, 'container')) {
+      fail('decode', path, 'Missing required field "container": a ' + quote(addressing.within))
+    }
+    const container = decodeReferencePayload(
+      payload['container'],
+      { kind: 'reference', resource: addressing.within, cardinality: 'one' },
+      env,
+      path.concat(['container']),
+      true
+    )
+    if (env === undefined || !isHostObject(env.app)) {
+      return failUnsupported(
+        'decode',
+        path,
+        'reference',
+        'References have no conversion without an application to address'
+      )
+    }
+    return {
+      pendingAddress: true,
+      resource: plan.resource,
+      addressing,
+      id: index,
+      container,
+    }
+  }
+
+  /** The addressing the script's reference table gives `resource`, if any. */
+  function addressingOf(env: Env, resource: string): NativeAddressing | undefined {
+    if (env === undefined) return undefined
+    const references = env.references
+    const entry = hasOwn(references, resource) ? references[resource] : undefined
+    return entry === undefined ? undefined : entry.addressing
+  }
+
+  /** The addressing of `resource` when its objects are found by position, else `undefined`. */
+  function positionalAddressingOf(
+    env: Env,
+    resource: string
+  ): NativePositionalAddressing | undefined {
+    const addressing = addressingOf(env, resource)
+    if (addressing === undefined) return undefined
+    return addressing.lookup === 'byIndex' ? addressing : undefined
   }
 
   /**
@@ -1019,8 +1267,20 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
    * Only a top-level container is emitted: a parent that is itself found
    * within a container fails as unsupported, as do collections and resources
    * the app does not find by their identifier.
+   *
+   * `absent` says the reference is a value marked absent-as-null, or an
+   * element of one ({@link encodeAbsentAsNull}). Then, and only for the read
+   * of the target's own identity, the app reporting no such object throws
+   * {@link ABSENT_READ}. The container's identity read is the item's own, so
+   * its failure is let through as it is.
    */
-  function encodeReference(native: unknown, plan: ReferencePlan, env: Env, path: Path): unknown {
+  function encodeReference(
+    native: unknown,
+    plan: ReferencePlan,
+    env: Env,
+    path: Path,
+    absent: boolean
+  ): unknown {
     if (plan.cardinality !== 'one') {
       return failUnsupported(
         'encode',
@@ -1029,33 +1289,14 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         'Collection references have no conversion in this codec'
       )
     }
+    if (plan.form === 'index') return encodeIndexSelector(native, plan, env, path)
     const plans = referencePlansOf('encode', env, plan.resource, path)
     const within = containerOf(plans.addressing)
     const held = within === undefined ? undefined : containedValue(native, plan.resource, path)
     const target = held === undefined ? native : held.value
-    const payload = identityPayload(plan.resource, target, plans, env, path)
+    const payload = identityPayload(plan.resource, target, plans, env, path, absent)
     if (within !== undefined && held !== undefined) {
-      const containerPath = path.concat(['container'])
-      const parentPlans = referencePlansOf('encode', env, within, containerPath)
-      if (containerOf(parentPlans.addressing) !== undefined) {
-        return failUnsupported(
-          'encode',
-          containerPath,
-          'reference',
-          'References to ' +
-            quote(plan.resource) +
-            ' within a ' +
-            quote(within) +
-            ' have no conversion in this codec: the ' +
-            quote(within) +
-            ' is itself found within a container'
-        )
-      }
-      const containerPayload =
-        held.containerId === undefined
-          ? identityPayload(within, held.container, parentPlans, env, containerPath)
-          : identityFromId(within, held.containerId, parentPlans, env, containerPath)
-      setOwn(payload, 'container', containerPayload)
+      setOwn(payload, 'container', containerPayload(plan.resource, within, held, env, path))
     }
     const out: Record<string, unknown> = {}
     setOwn(out, KEY_REFERENCE, payload)
@@ -1063,8 +1304,111 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   }
 
   /**
-   * What a body handed over at a position whose resource is found within a
-   * container: the value the app returned there, and the record it was read
+   * Encodes an object of a positional resource at a position whose plan
+   * records the index form, as the index selector within its container that
+   * finds it again: its zero-based position is the one its own specifier
+   * gives within the resource's collection of its container
+   * (`env.positionOf`), never a dictionary `index` property, and its
+   * container is the record it was read through ({@link containedValue}),
+   * encoded as {@link containerPayload} does. A specifier that gives no
+   * position fails as unsupported, as does a resource that is not
+   * positional.
+   */
+  function encodeIndexSelector(
+    native: unknown,
+    plan: ReferencePlan,
+    env: Env,
+    path: Path
+  ): unknown {
+    const addressing = positionalAddressingOf(env, plan.resource)
+    if (env === undefined || addressing === undefined) {
+      return failUnsupported(
+        'encode',
+        path,
+        'reference',
+        'References to ' +
+          quote(plan.resource) +
+          ' have no index selector in this codec: the app does not find its objects by their position'
+      )
+    }
+    const held = containedValue(native, plan.resource, path)
+    if (!isHostObject(held.value)) {
+      return fail(
+        'encode',
+        path,
+        'Expected an object of ' + quote(plan.resource) + ', received ' + describeValue(held.value)
+      )
+    }
+    const reader = env.positionOf
+    const position: unknown =
+      typeof reader === 'function' ? reader(held.value, addressing.collection) : undefined
+    if (typeof position !== 'number' || !Number.isSafeInteger(position) || position < 0) {
+      return failUnsupported(
+        'encode',
+        path,
+        'reference',
+        'The specifier the app returned for an object of ' +
+          quote(plan.resource) +
+          ' does not give its position within its container'
+      )
+    }
+    const selector: Record<string, unknown> = {}
+    setOwn(selector, 'by', 'index')
+    setOwn(selector, 'index', encodeInteger(position, path.concat(['selector', 'index'])))
+    const payload: Record<string, unknown> = {}
+    setOwn(payload, 'resource', plan.resource)
+    setOwn(payload, 'form', 'selector')
+    setOwn(payload, 'cardinality', 'one')
+    setOwn(payload, 'selector', selector)
+    setOwn(
+      payload,
+      'container',
+      containerPayload(plan.resource, addressing.within, held, env, path)
+    )
+    const out: Record<string, unknown> = {}
+    setOwn(out, KEY_REFERENCE, payload)
+    return out
+  }
+
+  /**
+   * The identity payload of the container a body handed over with an object
+   * of `resource`, which is found within a `within`: encoded by the parent's
+   * own addressing and identifier plan, from the record's item or its
+   * identifier already read. Only a top-level container is emitted: a parent
+   * that is itself found within a container fails as unsupported.
+   */
+  function containerPayload(
+    resource: string,
+    within: string,
+    held: { readonly container: unknown; readonly containerId: unknown },
+    env: Env,
+    path: Path
+  ): Record<string, unknown> {
+    const containerPath = path.concat(['container'])
+    const parentPlans = referencePlansOf('encode', env, within, containerPath)
+    if (containerOf(parentPlans.addressing) !== undefined) {
+      return failUnsupported(
+        'encode',
+        containerPath,
+        'reference',
+        'References to ' +
+          quote(resource) +
+          ' within a ' +
+          quote(within) +
+          ' have no conversion in this codec: the ' +
+          quote(within) +
+          ' is itself found within a container'
+      )
+    }
+    return held.containerId === undefined
+      ? identityPayload(within, held.container, parentPlans, env, containerPath, false)
+      : identityFromId(within, held.containerId, parentPlans, env, containerPath)
+  }
+
+  /**
+   * What a body handed over, marked ({@link CONTAINED}), at a position whose
+   * resource is found within a container, the one position that marker is
+   * honoured: the value the app returned there, and the record it was read
    * through, as the record's item (`container`) or its identifier already
    * read (`containerId`). A value with no record is a body that did not hand
    * over its container, a macts defect, so it fails as unsupported rather
@@ -1076,8 +1420,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     resource: string,
     path: Path
   ): { readonly value: unknown; readonly container: unknown; readonly containerId: unknown } {
-    const inner =
-      soleKey(native) === KEY_CONTAINED && isKeyed(native) ? native[KEY_CONTAINED] : null
+    const inner = isMarked(native, CONTAINED) ? native[CONTAINED] : null
     if (!isPlainObject(inner) || !hasOwn(inner, 'value')) {
       return failUnsupported(
         'encode',
@@ -1097,14 +1440,17 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
 
   /**
    * The identity payload of an app object of `resource`: its identifier read
-   * as `plans.addressing` says, encoded by `plans.id`.
+   * as `plans.addressing` says, encoded by `plans.id`. When `absent` is set,
+   * the app reporting no such object as the identifier is read throws
+   * {@link ABSENT_READ} instead of the app's error.
    */
   function identityPayload(
     resource: string,
     native: unknown,
     plans: { readonly id: ValuePlan; readonly addressing: NativeAddressing },
     env: Env,
-    path: Path
+    path: Path,
+    absent: boolean
   ): Record<string, unknown> {
     const expected = 'an object of ' + quote(resource)
     if (!isHostObject(native)) {
@@ -1120,7 +1466,24 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
           ' have no conversion from the app: its objects do not say which kind they are'
       )
     }
-    const id = callMember('encode', native, plans.addressing.property, [], path, expected)
+    if (plans.addressing.lookup === 'byIndex') {
+      return failUnsupported(
+        'encode',
+        path,
+        'reference',
+        'References to ' +
+          quote(resource) +
+          ' have no identity form: its objects have no identifier'
+      )
+    }
+    let id: unknown
+    try {
+      id = callMember('encode', native, plans.addressing.property, [], path, expected)
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
+      if (absent && reportsNoSuchObject(error)) throw ABSENT_READ
+      throw error
+    }
     return identityFromId(resource, id, plans, env, path)
   }
 
@@ -1140,12 +1503,64 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     return payload
   }
 
+  /**
+   * Whether `error` is the app reporting no such object: an app failure, not
+   * a codec one, carrying the "no such object" error number.
+   */
+  function reportsNoSuchObject(error: unknown): boolean {
+    if (typeof error !== 'object' || error === null) return false
+    if (!('errorNumber' in error) || error.errorNumber !== NO_SUCH_OBJECT) return false
+    return !('name' in error && error.name === ERROR_NAME)
+  }
+
+  /**
+   * Encodes `native`, the value a marker held at a record field
+   * ({@link encodeRecord}), which a body handed over as one its property's
+   * evidence lets read as absent. At a nullable position, the app reporting
+   * no such object as the codec reads the identity of the value's object
+   * ({@link ABSENT_READ}), or of any one element's when the value is a list,
+   * is the field's empty value, `null`: one element the app reports missing
+   * nulls the whole field (phases/13 D10). Every other failure is let through
+   * as it is, including the same failure reading a container's identity. At
+   * any other position the value encodes as if it were not marked.
+   */
+  function encodeAbsentAsNull(native: unknown, plan: ValuePlan, path: Path, env: Env): unknown {
+    if (plan.kind !== 'nullable') return encodeValue(native, plan, path, env)
+    try {
+      return encodeAbsentValue(native, plan.value, path, env)
+    } catch (error) {
+      if (error === ABSENT_READ) return null
+      throw error
+    }
+  }
+
+  /**
+   * Encodes a marked value ({@link encodeAbsentAsNull}) by its plan, reading
+   * the identity of its object, or of each element's object in a list, as
+   * one the app may report missing. Every other position, a record's fields
+   * included, encodes as if unmarked.
+   */
+  function encodeAbsentValue(native: unknown, plan: ValuePlan, path: Path, env: Env): unknown {
+    if (plan.kind === 'reference') return encodeReference(native, plan, env, path, true)
+    if (plan.kind === 'nullable' && native !== null && native !== undefined) {
+      return encodeAbsentValue(native, plan.value, path, env)
+    }
+    if (plan.kind === 'array' && isList(native)) {
+      const items: unknown[] = []
+      for (let i = 0; i < native.length; i++) {
+        items.push(encodeAbsentValue(native[i], plan.items, path.concat([i]), env))
+      }
+      return items
+    }
+    return encodeValue(native, plan, path, env)
+  }
+
   /** Encodes a native value by its plan. */
   function encodeValue(native: unknown, plan: ValuePlan, path: Path, env: Env): unknown {
+    // A passthrough result is returned as it is, never inspected.
+    if (plan.kind === 'passthrough') return native
     const kind: string = plan.kind
     switch (plan.kind) {
-      case 'passthrough':
-        return native
       case 'none':
         return null
       case 'string':
@@ -1195,7 +1610,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       case 'unknown':
         return encodeDynamic(native, path)
       case 'reference':
-        return encodeReference(native, plan, env, path)
+        return encodeReference(native, plan, env, path, false)
       case 'file':
       case 'file-source':
         return failUnsupported(
@@ -1560,6 +1975,9 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         reference: KEY_REFERENCE,
       },
       containedReference: KEY_CONTAINED,
+      absentAsNull: KEY_ABSENT_AS_NULL,
+      noSuchObject: NO_SUCH_OBJECT,
+      reading: KEY_READING,
       specialDoubleStates: [
         STATE_NAN,
         STATE_INFINITY,

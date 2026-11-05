@@ -57,7 +57,29 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[move(to)](./tv.playlistresourceclient.move.md)
+[get(sourceId, persistentID, \_\_mactsOptions)](./tv.playlistresourceclient.get.md)
+
+</td><td>
+
+</td><td>
+
+Get a playlist by persistentID within a parent scope.
+
+</td></tr>
+<tr><td>
+
+[list(sourceId, \_\_mactsOptions)](./tv.playlistresourceclient.list.md)
+
+</td><td>
+
+</td><td>
+
+List the playlists of one source, as one page.
+
+</td></tr>
+<tr><td>
+
+[move(sourceId, persistentID, to, \_\_mactsOptions)](./tv.playlistresourceclient.move.md)
 
 </td><td>
 
@@ -68,7 +90,7 @@ Move playlist(s) to a new location
 </td></tr>
 <tr><td>
 
-[search(\_for, only)](./tv.playlistresourceclient.search.md)
+[search(sourceId, persistentID, \_for, only, \_\_mactsOptions)](./tv.playlistresourceclient.search.md)
 
 </td><td>
 

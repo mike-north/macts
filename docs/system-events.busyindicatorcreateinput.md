@@ -4,7 +4,7 @@
 
 ## BusyIndicatorCreateInput type
 
-Input for creating a BusyIndicator
+Input for creating a BusyIndicator.
 
 **Signature:**
 

@@ -4,12 +4,13 @@
 
 ## CanvasUpdateInput type
 
-Input for updating a Canvas
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type CanvasUpdateInput = Partial<CanvasCreateInput>
+type CanvasUpdateInput = Omit<CanvasUpdateInput$1, 'horizontalPages' | 'verticalPages'> & {
+  horizontalPages?: null extends CanvasUpdateInput$1['horizontalPages'] ? number | null : number
+  verticalPages?: null extends CanvasUpdateInput$1['verticalPages'] ? number | null : number
+}
 ```
-
-**References:** [CanvasCreateInput](./omnigraffle.canvascreateinput.md)

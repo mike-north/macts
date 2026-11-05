@@ -2,63 +2,14 @@
 
 [Home](./index.md) &gt; [@macts/calendar](./calendar.md) &gt; [MailAlarmCreateInput](./calendar.mailalarmcreateinput.md)
 
-## MailAlarmCreateInput interface
+## MailAlarmCreateInput type
 
-Input for creating a MailAlarm
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface MailAlarmCreateInput
+type MailAlarmCreateInput = Omit<MailAlarmCreateInput$1, 'triggerInterval'> & {
+  triggerInterval?: null extends MailAlarmCreateInput$1['triggerInterval'] ? number | null : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[triggerDate?](./calendar.mailalarmcreateinput.triggerdate.md)
-
-</td><td>
-
-</td><td>
-
-Date
-
-</td><td>
-
-_(Optional)_ An absolute alarm date
-
-</td></tr>
-<tr><td>
-
-[triggerInterval?](./calendar.mailalarmcreateinput.triggerinterval.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The interval in minutes between the event and the alarm (positive for after, negative for before)
-
-</td></tr>
-</tbody></table>

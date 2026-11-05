@@ -4,12 +4,12 @@
 
 ## UIElementResourceClient.click() method
 
-cause the target process to behave as if the UI element were clicked
+cause the target process to behave as if the UI element were clicked. macts does not yet send the UI element to the app, so the app acts on whatever it chooses.
 
 **Signature:**
 
 ```typescript
-click(at?: string): Promise<void>;
+click(at?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -34,6 +34,19 @@ at
 </td><td>
 
 string
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

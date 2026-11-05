@@ -9,7 +9,7 @@ export a source or playlist
 **Signature:**
 
 ```typescript
-_export(as?: string, to?: string): Promise<void>;
+_export(as?: string, to?: Parameters<MusicClient$1['_export']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -46,7 +46,20 @@ to
 
 </td><td>
 
-string
+Parameters&lt;MusicClient$1\['\_export'\]&gt;\[1\]
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

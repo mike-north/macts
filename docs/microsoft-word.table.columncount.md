@@ -4,10 +4,10 @@
 
 ## Table.columnCount property
 
-The number of columns in the table
+The number of columns in the table. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-columnCount: number
+readonly columnCount: Integer | null;
 ```

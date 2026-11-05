@@ -9,7 +9,7 @@ Modify workflow configuration value, or set environment variable
 **Signature:**
 
 ```typescript
-setConfiguration(variable: string, toValue: string, inWorkflow: string, exportable?: boolean): Promise<void>;
+setConfiguration(variable: string, toValue: string, inWorkflow: string, exportable?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -67,6 +67,19 @@ exportable
 </td><td>
 
 boolean
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

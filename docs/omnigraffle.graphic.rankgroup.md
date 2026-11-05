@@ -4,10 +4,10 @@
 
 ## Graphic.rankGroup property
 
-Rank group assigned to this graphic for hierarchical layout
+Rank group assigned to this graphic for hierarchical layout. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-rankGroup: number
+rankGroup: Integer | null
 ```

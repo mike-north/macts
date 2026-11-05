@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./omniplan.milestoneresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./omniplan.milestoneresourceclient.create.md)
 
 </td><td>
 
@@ -68,7 +68,7 @@ Create a new milestone.
 </td></tr>
 <tr><td>
 
-[get(id)](./omniplan.milestoneresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./omniplan.milestoneresourceclient.get.md)
 
 </td><td>
 
@@ -79,13 +79,13 @@ Get a milestone by id.
 </td></tr>
 <tr><td>
 
-[list()](./omniplan.milestoneresourceclient.list.md)
+[list(\_\_mactsOptions)](./omniplan.milestoneresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all milestones.
+List all milestones, as one page.
 
 </td></tr>
 </tbody></table>

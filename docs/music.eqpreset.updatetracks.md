@@ -4,10 +4,10 @@
 
 ## EQPreset.updateTracks property
 
-should tracks which refer to this preset be updated when the preset is renamed or deleted?
+should tracks which refer to this preset be updated when the preset is renamed or deleted? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-updateTracks: boolean
+updateTracks: boolean | null
 ```

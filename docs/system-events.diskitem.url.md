@@ -4,10 +4,10 @@
 
 ## DiskItem.uRL property
 
-the URL of the disk item
+the URL of the disk item. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-uRL: string
+readonly uRL: string | null;
 ```

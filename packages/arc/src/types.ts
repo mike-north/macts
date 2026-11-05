@@ -5,94 +5,46 @@
 
 import { z } from 'zod'
 
-/** An application's window */
-export interface Window {
-  /** The unique identifier of the window. */
-  id: string
-  /** The full title of the window. */
-  name: string
-  /** The index of the window, ordered front to back. */
-  index: number
-  /** Whether the window has a close box. */
-  closeable: boolean
-  /** Whether the window can be minimized. */
-  minimizable: boolean
-  /** Whether the window is currently minimized. */
-  minimized: boolean
-  /** Whether the window can be resized. */
-  resizable: boolean
-  /** Whether the window is currently visible. */
-  visible: boolean
-  /** Whether the window can be zoomed. */
-  zoomable: boolean
-  /** Whether the window is currently zoomed. */
-  zoomed: boolean
-  /** Whether the window is an incognito window. */
-  incognito: boolean
-  /** Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window. */
-  mode: string
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Window } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type WindowCreateInput = Omit<import('./contract/index.js').WindowCreateInput, 'index'> & {
+  /** The index of the window, ordered front to back. Numeric values are validated by the contract before dispatch. */
+  index?: null extends import('./contract/index.js').WindowCreateInput['index']
+    ? number | null
+    : number
 }
 
-/** Input for creating a Window */
-export interface WindowCreateInput {
-  /** The index of the window, ordered front to back. */
-  index?: number
-  /** Whether the window is currently minimized. */
-  minimized?: boolean
-  /** Whether the window is currently visible. */
-  visible?: boolean
-  /** Whether the window is currently zoomed. */
-  zoomed?: boolean
-  /** Whether the window is an incognito window. */
-  incognito?: boolean
-  /** Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window. */
-  mode?: string
+/** Canonical update input, retaining checked numeric conveniences. */
+export type WindowUpdateInput = Omit<import('./contract/index.js').WindowUpdateInput, 'index'> & {
+  /** The index of the window, ordered front to back. Numeric values are validated by the contract before dispatch. */
+  index?: null extends import('./contract/index.js').WindowUpdateInput['index']
+    ? number | null
+    : number
 }
 
-/** Input for updating a Window */
-export type WindowUpdateInput = Partial<WindowCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Tab } from './contract/index.js'
 
-/** A window's tab */
-export interface Tab {
-  /** The unique identifier of the tab. */
-  id: string
-  /** The full title of the tab. */
-  title: string
-  /** The url of the tab. */
-  uRL: string
-  /** Is loading? */
-  loading: boolean
-  /** Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'. */
-  location: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { TabCreateInput } from './contract/index.js'
 
-/** Input for creating a Tab */
-export interface TabCreateInput {
-  /** The url of the tab. */
-  uRL?: string
-  /** Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'. */
-  location?: string
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { TabUpdateInput } from './contract/index.js'
 
-/** Input for updating a Tab */
-export type TabUpdateInput = Partial<TabCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Space } from './contract/index.js'
 
-/** A space */
-export interface Space {
-  /** The unique identifier of the space. */
-  id: string
-  /** The full title of the space. */
-  title: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { SpaceCreateInput } from './contract/index.js'
 
-/** Input for creating a Space */
-export type SpaceCreateInput = Record<string, never>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { SpaceUpdateInput } from './contract/index.js'
 
-/** Input for updating a Space */
-export type SpaceUpdateInput = Partial<SpaceCreateInput>
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
-// Zod schemas for runtime validation
-
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const WindowSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -108,6 +60,7 @@ export const WindowSchema = z.object({
   mode: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const TabSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -116,6 +69,7 @@ export const TabSchema = z.object({
   location: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const SpaceSchema = z.object({
   id: z.string(),
   title: z.string(),

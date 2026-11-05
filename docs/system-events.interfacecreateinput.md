@@ -2,93 +2,15 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [InterfaceCreateInput](./system-events.interfacecreateinput.md)
 
-## InterfaceCreateInput interface
+## InterfaceCreateInput type
 
-Input for creating a Interface
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface InterfaceCreateInput
+type InterfaceCreateInput = Omit<InterfaceCreateInput$1, 'mtu' | 'speed'> & {
+  mtu?: null extends InterfaceCreateInput$1['mtu'] ? number | null : number
+  speed?: null extends InterfaceCreateInput$1['speed'] ? number | null : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[automatic?](./system-events.interfacecreateinput.automatic.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ configure the interface speed, duplex, and mtu automatically?
-
-</td></tr>
-<tr><td>
-
-[duplex?](./system-events.interfacecreateinput.duplex.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ the duplex setting half \| full \| full with flow control
-
-</td></tr>
-<tr><td>
-
-[mtu?](./system-events.interfacecreateinput.mtu.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ the packet size
-
-</td></tr>
-<tr><td>
-
-[speed?](./system-events.interfacecreateinput.speed.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ ethernet speed 10 \| 100 \| 1000
-
-</td></tr>
-</tbody></table>

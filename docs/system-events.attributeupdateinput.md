@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [AttributeUpdateInput](./system-events.attributeupdateinput.md)
 
-## AttributeUpdateInput type
+## AttributeUpdateInput interface
 
-Input for updating a Attribute
+Input for updating an Attribute. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type AttributeUpdateInput = Partial<AttributeCreateInput>
+interface AttributeUpdateInput
 ```
 
-**References:** [AttributeCreateInput](./system-events.attributecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[value?](./system-events.attributeupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the current value of the attribute. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

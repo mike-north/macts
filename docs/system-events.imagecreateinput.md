@@ -4,7 +4,7 @@
 
 ## ImageCreateInput type
 
-Input for creating a Image
+Input for creating an Image.
 
 **Signature:**
 

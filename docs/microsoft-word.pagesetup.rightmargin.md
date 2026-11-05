@@ -4,10 +4,10 @@
 
 ## PageSetup.rightMargin property
 
-The right margin in points
+The right margin in points. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-rightMargin: number
+rightMargin: number | null
 ```

@@ -4,10 +4,10 @@
 
 ## MediaItem.size property
 
-The selected media item file size
+The selected media item file size. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-size: number
+size: Integer | null
 ```

@@ -4,10 +4,10 @@
 
 ## Track.releaseDate property
 
-the release date of this track
+the release date of this track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-releaseDate: Date
+readonly releaseDate: Date | null;
 ```

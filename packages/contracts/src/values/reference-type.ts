@@ -77,6 +77,7 @@ import type { IssuePath } from '../issues.js'
 import {
   resolvingOperationKey,
   type CollectionReferenceVariant,
+  type IndexSelectorReference,
   type ObjectReferenceVariant,
   type ReferenceCardinality,
   type ReferenceData,
@@ -978,6 +979,12 @@ interface ObjectSchemas {
   identity(resource: string, id: ValueType<unknown>): ZodType
   /** A selector reference to `resource`. */
   selector(resource: string): ZodType
+  /**
+   * An index selector reference to `resource`, with the identity container of
+   * the parent its `get` finds it within, required; nothing when its `get`
+   * records no parent.
+   */
+  indexSelector(resource: string): ZodType
 }
 
 /** How one form spells the three object shapes; the rest of the construction is shared. */
@@ -988,6 +995,8 @@ interface SchemaForm {
   object(fields: Readonly<Record<string, ZodType>>): ZodType
   /** The selector of a single-object reference. */
   readonly objectSelector: ZodType
+  /** The selector of a single-object reference by position only. */
+  readonly indexSelector: ZodType
   /** A field that may be absent. */
   optional(schema: ZodType): ZodType
 }
@@ -1059,6 +1068,45 @@ function objectSchemas(registry: ReferenceRegistry, form: SchemaForm): ObjectSch
         container: containerField(form, self.slot(resource, 'get')),
       })
     },
+    indexSelector(resource) {
+      const parent = Object.hasOwn(registry, resource)
+        ? registry[resource]?.parents?.get
+        : undefined
+      if (parent === undefined) return z.never({ error: noPositionalParentMessage(resource) })
+      return form.object({
+        resource: z.literal(resource),
+        form: z.literal('selector'),
+        cardinality: z.literal('one'),
+        selector: form.indexSelector,
+        container: identityChain(parent),
+      })
+    },
+  }
+
+  /**
+   * The container chain of an index selector within `parent`: an identity
+   * reference to `parent`, whose container is required and is the same chain
+   * of the parent its `get` records, and absent at a `parent` the app finds
+   * at the application. Native resolution walks exactly that chain, so no
+   * selector, and nothing above the top, is admitted.
+   */
+  function identityChain(parent: string): ZodType {
+    return z.lazy(() => {
+      const id = Object.hasOwn(containers, parent) ? containers[parent]?.id : undefined
+      if (id === undefined) {
+        return z.never({
+          error: `The app cannot resolve an identity reference to ${quote(parent)}.`,
+        })
+      }
+      const above = containers[parent]?.parents?.get
+      return form.object({
+        resource: z.literal(parent),
+        form: z.literal('identity'),
+        cardinality: z.literal('one'),
+        id: form.id(id),
+        ...(above === undefined ? {} : { container: identityChain(above) }),
+      })
+    })
   }
 
   /**
@@ -1083,6 +1131,7 @@ const WIRE_FORM: SchemaForm = {
   id: (type) => type.wire,
   object: (fields) => z.strictObject(fields),
   objectSelector: WIRE_OBJECT_SELECTOR_SCHEMA,
+  indexSelector: z.strictObject({ by: z.literal('index'), index: WIRE_POSITION_SCHEMA }),
   optional: (schema) => schema.exactOptional(),
 }
 
@@ -1190,6 +1239,9 @@ const SDK_OBJECT_SELECTOR_SCHEMA = z.discriminatedUnion('by', [
   sdkObject({ by: z.literal('index'), index: SDK_POSITION_SCHEMA }),
 ])
 
+/** SDK schema of a single-object selector by position only. */
+const SDK_INDEX_SELECTOR_SCHEMA = sdkObject({ by: z.literal('index'), index: SDK_POSITION_SCHEMA })
+
 /** SDK schema of a collection selector; a range must have `start <= end`. */
 const SDK_COLLECTION_SELECTOR_SCHEMA = z.discriminatedUnion('by', [
   sdkObject({ by: z.literal('every') }),
@@ -1208,6 +1260,7 @@ function sdkForm(app: string): SchemaForm {
     id: (type) => type.sdk,
     object: (fields) => sdkObject({ app: z.literal(app), ...fields }),
     objectSelector: SDK_OBJECT_SELECTOR_SCHEMA,
+    indexSelector: SDK_INDEX_SELECTOR_SCHEMA,
     optional: (schema) => schema.optional(),
   }
 }
@@ -1351,6 +1404,168 @@ export function referenceType(
           reference: wirePayload(readScope(scope).resources, resource, cardinality),
         })
       ),
+      codec,
+    },
+    options?.description
+  )
+}
+
+/**
+ * Why `resource` has no index selector form within a container: its `get`
+ * finds it at the application, so there is no container to count within.
+ */
+function noPositionalParentMessage(resource: string): string {
+  return (
+    `The app gets one ${quote(resource)} without a container, so no reference can denote one ` +
+    'by its position within a container.'
+  )
+}
+
+/**
+ * The issue, if any, that keeps a converted reference from being an index
+ * selector within its container ({@link indexSelectorReferenceType}): its
+ * form and its selector. The container is checked while it is read, as the
+ * parent of the resource's `get` (`readContainer`).
+ */
+function indexSelectorIssue(
+  shape: ObjectShape<unknown, unknown, unknown>,
+  path: IssuePath,
+  registry: ReferenceRegistry,
+  issues: Issues
+): boolean {
+  const { resource } = shape
+  const position = `${quote(resource)} at this position is denoted by its zero-based position within its container`
+  if (shape.form !== 'selector' || shape.selector.by !== 'index') {
+    const received = shape.form === 'identity' ? 'an identity reference' : 'a selector by name'
+    issues.push(
+      issue(
+        path,
+        'invalid-type',
+        `Expected an index selector: a reference to ${position}; received ${received}.`
+      )
+    )
+    return true
+  }
+  if (registry[resource]?.parents?.get === undefined) {
+    issues.push(issue(path, 'unsupported', noPositionalParentMessage(resource)))
+    return true
+  }
+  return containerChainIssue(shape.container, [...path, 'container'], registry, issues)
+}
+
+/**
+ * The issue, if any, with the container chain of an index selector. Each
+ * level was checked, while it was read, to be the identity of the parent its
+ * resource's `get` records; the chain must end at a level the app finds at
+ * the application, with no container, where native resolution starts.
+ */
+function containerChainIssue(
+  container: ObjectShape<unknown, unknown, unknown> | undefined,
+  path: IssuePath,
+  registry: ReferenceRegistry,
+  issues: Issues
+): boolean {
+  let level = container
+  let at = path
+  while (level !== undefined && registry[level.resource]?.parents?.get !== undefined) {
+    level = level.container
+    at = [...at, 'container']
+  }
+  if (level?.container === undefined) return false
+  issues.push(
+    issue(
+      [...at, 'container'],
+      'unsupported',
+      `The app finds ${quote(level.resource)} at the application, so the container chain of an index selector ends at it: it cannot have a container of its own.`
+    )
+  )
+  return true
+}
+
+/**
+ * Build `t.indexSelectorReference(scope, resource)`; see
+ * `ValueTypeConstructors.indexSelectorReference`.
+ *
+ * @remarks
+ * It reads a reference as `t.reference(scope, resource, 'one')` does, by the
+ * same walker and with the same rules, and admits only the index selector
+ * form within the identity container of the parent the resource's `get`
+ * finds it within. Its plan records the form (`form: 'index'`), which the
+ * native codec emits at the position.
+ */
+export function indexSelectorReferenceType<T = unknown, R extends string = string>(
+  scope: ReferenceScopeThunk,
+  resource: R,
+  options?: ValueTypeOptions
+): ValueType<IndexSelectorReference<T, R>> {
+  if (typeof scope !== 'function') {
+    throw new TypeError(
+      `t.indexSelectorReference(…) needs a function returning the app contract; received ${describeReceived(scope)}.`
+    )
+  }
+  if (typeof resource !== 'string' || resource === '') {
+    throw new TypeError(
+      `t.indexSelectorReference(…) needs a resource key; received ${describeReceived(resource)}.`
+    )
+  }
+
+  const want: Want = { resource, cardinality: 'one', form: undefined, role: 'reference' }
+  const convert = <Id, Pos, Tag>(
+    value: unknown,
+    path: IssuePath,
+    walk: Walk<Id, Pos, Tag>,
+    issues: Issues
+  ): ObjectShape<Id, Pos, Tag> | Invalid => {
+    const shape = convertObject(value, path, want, walk, issues)
+    if (shape === INVALID) return INVALID
+    return indexSelectorIssue(shape, path, walk.scope.resources, issues) ? INVALID : shape
+  }
+
+  const codec: Codec<IndexSelectorReference<T, R>> = {
+    encode(value, path, issues) {
+      const shape = convert(value, path, { scope: readScope(scope), direction: ENCODING }, issues)
+      return shape === INVALID ? INVALID : { reference: shape }
+    },
+    decode(wire, path, context, issues) {
+      const payload = controlPayload(wire, 'reference', path, issues, REFERENCE_EXAMPLE)
+      if (payload === INVALID) return INVALID
+      const data = convert(
+        payload,
+        path,
+        { scope: readScope(scope), direction: decoding(context) },
+        issues
+      )
+      // The checks above admit only an index selector within an identity
+      // container, which is what the binder returns bound.
+      return data === INVALID
+        ? INVALID
+        : (context.bindReference(data) as IndexSelectorReference<T, R>)
+    },
+  }
+
+  return defineValueType(
+    {
+      plan: { kind: 'reference', resource, cardinality: 'one', form: 'index' },
+      sdk: z.lazy(() => {
+        const { app, resources } = readScope(scope)
+        return Object.hasOwn(resources, resource) &&
+          resolvable(resources[resource], 'reference', 'one')
+          ? objectSchemas(resources, sdkForm(app)).indexSelector(resource)
+          : z.never()
+      }) as ZodType<IndexSelectorReference<T, R>>,
+      wire: z.lazy(() => {
+        const { resources } = readScope(scope)
+        // The schemas of `ObjectSchemas` admit exactly the wire forms of
+        // references, as the walker reads them.
+        const payload = (
+          Object.hasOwn(resources, resource) && resolvable(resources[resource], 'reference', 'one')
+            ? objectSchemas(resources, WIRE_FORM).indexSelector(resource)
+            : z.never({
+                error: unresolvableMessage(resource, unresolvableWant(resource, 'one')),
+              })
+        ) as ZodType<ReferenceWire>
+        return z.strictObject({ reference: payload })
+      }),
       codec,
     },
     options?.description

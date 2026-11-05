@@ -4,7 +4,7 @@
 
 ## MomentCreateInput type
 
-Input for creating a Moment
+Input for creating a Moment.
 
 **Signature:**
 

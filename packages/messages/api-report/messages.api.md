@@ -4,15 +4,18 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Account {
-    connectionStatus: string;
-    description: string;
-    enabled: boolean;
-    id: string;
-    serviceType: string;
+    readonly connectionStatus: string | null;
+    readonly description: string | null;
+    enabled: boolean | null;
+    readonly id: string;
+    readonly serviceType: string | null;
 }
 
 // @public
@@ -20,7 +23,7 @@ export interface AccountCreateInput {
     enabled?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const AccountSchema: z.ZodObject<{
     id: z.ZodString;
     description: z.ZodString;
@@ -30,7 +33,9 @@ export const AccountSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type AccountUpdateInput = Partial<AccountCreateInput>;
+export interface AccountUpdateInput {
+    enabled?: boolean;
+}
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -53,21 +58,21 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Chat {
-    id: string;
-    name: string;
+    readonly id: string;
+    readonly name: string | null;
 }
 
 // @public
 export type ChatCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ChatSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ChatUpdateInput = Partial<ChatCreateInput>;
+export type ChatUpdateInput = Record<string, never>;
 
 // @public
 export type ConnectionStatus = 'disconnecting' | 'connected' | 'connecting' | 'disconnected';
@@ -78,16 +83,24 @@ export type Direction = 'incoming' | 'outgoing';
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
+}
+
+// @public
+export interface MessagesClient extends ClientBrand<MessagesResources> {
 }
 
 // @public
 export class MessagesClient {
     constructor(options: MessagesClientOptions);
     get http(): HttpClient;
-    login(): Promise<void>;
-    logout(): Promise<void>;
-    send(to: string): Promise<void>;
+    login(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    logout(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    send(to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -104,19 +117,22 @@ export class MessagesError extends Error {
 }
 
 // @public
+export type MessagesResources = Readonly<Record<never, never>>;
+
+// @public
 export interface Participant {
-    firstName: string;
-    fullName: string;
-    handle: string;
-    id: string;
-    lastName: string;
-    name: string;
+    readonly firstName: string | null;
+    readonly fullName: string | null;
+    readonly handle: string | null;
+    readonly id: string;
+    readonly lastName: string | null;
+    readonly name: string | null;
 }
 
 // @public
 export type ParticipantCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ParticipantSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -127,7 +143,7 @@ export const ParticipantSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ParticipantUpdateInput = Partial<ParticipantCreateInput>;
+export type ParticipantUpdateInput = Record<string, never>;
 
 // @public
 export type ServiceType = 'sMS' | 'iMessage' | 'rCS';

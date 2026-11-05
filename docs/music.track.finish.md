@@ -4,10 +4,10 @@
 
 ## Track.finish property
 
-the stop time of the track in seconds
+the stop time of the track in seconds. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-finish: number
+finish: number | null
 ```

@@ -9,7 +9,7 @@ Add media items to an album
 **Signature:**
 
 ```typescript
-add(mediaItems: string, to: string): Promise<void>;
+add(mediaItems: Parameters<PhotosClient$1['add']>[0], to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -33,7 +33,7 @@ mediaItems
 
 </td><td>
 
-string
+Parameters&lt;PhotosClient$1\['add'\]&gt;\[0\]
 
 </td><td>
 
@@ -47,6 +47,19 @@ to
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

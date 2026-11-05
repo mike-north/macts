@@ -4,10 +4,10 @@
 
 ## File_2.creatorType property
 
-the OSType identifying the application that created the item
+the OSType identifying the application that created the item. Nullable. Observed missing in 58 of 60 items (Finder 27.2, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-creatorType: string
+creatorType: string | null
 ```

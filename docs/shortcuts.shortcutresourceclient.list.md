@@ -4,14 +4,44 @@
 
 ## ShortcutResourceClient.list() method
 
-List all shortcuts.
+List all shortcuts, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Shortcut[]>;
+list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Shortcut>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Shortcut](./shortcuts.shortcut.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Shortcut](./shortcuts.shortcut.md)<!-- -->&gt;&gt;

@@ -4,12 +4,10 @@
 
 ## ProgressIndicatorUpdateInput type
 
-Input for updating a ProgressIndicator
+Input for updating a ProgressIndicator. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ProgressIndicatorUpdateInput = Partial<ProgressIndicatorCreateInput>
+type ProgressIndicatorUpdateInput = Record<string, never>
 ```
-
-**References:** [ProgressIndicatorCreateInput](./system-events.progressindicatorcreateinput.md)

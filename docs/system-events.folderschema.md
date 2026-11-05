@@ -4,12 +4,29 @@
 
 ## FolderSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
 FolderSchema: z.ZodObject<
   {
+    busyStatus: z.ZodBoolean
+    container: z.ZodString
+    creationDate: z.ZodString
+    displayedName: z.ZodString
     id: z.ZodString
+    modificationDate: z.ZodString
+    name: z.ZodString
+    nameExtension: z.ZodString
+    packageFolder: z.ZodBoolean
+    path: z.ZodString
+    physicalSize: z.ZodNumber
+    posixPath: z.ZodString
+    size: z.ZodNumber
+    uRL: z.ZodString
+    visible: z.ZodBoolean
+    volume: z.ZodString
   },
   z.core.$strip
 >

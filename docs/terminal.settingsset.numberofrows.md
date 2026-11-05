@@ -4,10 +4,10 @@
 
 ## SettingsSet.numberOfRows property
 
-The number of rows
+The number of rows. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-numberOfRows: number
+numberOfRows: number | null
 ```

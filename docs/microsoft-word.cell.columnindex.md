@@ -4,10 +4,10 @@
 
 ## Cell.columnIndex property
 
-The column index of the cell
+The column index of the cell. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-columnIndex: number
+readonly columnIndex: Integer | null;
 ```

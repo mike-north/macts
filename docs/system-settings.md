@@ -21,7 +21,7 @@ Description
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -84,6 +84,15 @@ A settings pane.
 </td></tr>
 <tr><td>
 
+[SystemSettingsClient](./system-settings.systemsettingsclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+
+</td></tr>
+<tr><td>
+
 [SystemSettingsClientOptions](./system-settings.systemsettingsclientoptions.md)
 
 </td><td>
@@ -110,6 +119,8 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -125,6 +136,8 @@ Every capability exposed by System Settings, with risk metadata.
 [PaneSchema](./system-settings.paneschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -146,7 +159,7 @@ Description
 
 </td><td>
 
-Input for creating a Anchor
+Input for creating an Anchor.
 
 </td></tr>
 <tr><td>
@@ -155,7 +168,7 @@ Input for creating a Anchor
 
 </td><td>
 
-Input for updating a Anchor
+Input for updating an Anchor. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -173,7 +186,7 @@ Risk classification for a capability.
 
 </td><td>
 
-Input for creating a Pane
+Input for creating a Pane.
 
 </td></tr>
 <tr><td>
@@ -182,7 +195,16 @@ Input for creating a Pane
 
 </td><td>
 
-Input for updating a Pane
+Input for updating a Pane. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[SystemSettingsResources](./system-settings.systemsettingsresources.md)
+
+</td><td>
+
+The type of the resource table in `systemSettingsContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 </tbody></table>

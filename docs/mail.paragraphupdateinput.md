@@ -2,14 +2,78 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [ParagraphUpdateInput](./mail.paragraphupdateinput.md)
 
-## ParagraphUpdateInput type
+## ParagraphUpdateInput interface
 
-Input for updating a Paragraph
+Input for updating a Paragraph. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ParagraphUpdateInput = Partial<ParagraphCreateInput>
+interface ParagraphUpdateInput
 ```
 
-**References:** [ParagraphCreateInput](./mail.paragraphcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[color?](./mail.paragraphupdateinput.color.md)
+
+</td><td>
+
+</td><td>
+
+[Rgb](./contracts.rgb.md)
+
+</td><td>
+
+_(Optional)_ The color of the first character. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[font?](./mail.paragraphupdateinput.font.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of the font of the first character. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[size?](./mail.paragraphupdateinput.size.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The size in points of the first character. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

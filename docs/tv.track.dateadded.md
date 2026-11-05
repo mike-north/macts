@@ -4,10 +4,10 @@
 
 ## Track.dateAdded property
 
-the date the track was added to the playlist
+the date the track was added to the playlist. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-dateAdded: Date
+readonly dateAdded: Date | null;
 ```

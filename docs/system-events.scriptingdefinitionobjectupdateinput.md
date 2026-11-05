@@ -4,12 +4,10 @@
 
 ## ScriptingDefinitionObjectUpdateInput type
 
-Input for updating a ScriptingDefinitionObject
+Input for updating a ScriptingDefinitionObject. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ScriptingDefinitionObjectUpdateInput = Partial<ScriptingDefinitionObjectCreateInput>
+type ScriptingDefinitionObjectUpdateInput = Record<string, never>
 ```
-
-**References:** [ScriptingDefinitionObjectCreateInput](./system-events.scriptingdefinitionobjectcreateinput.md)

@@ -9,7 +9,7 @@ Reload Workflow with given UID (folder name) or Bundle ID
 **Signature:**
 
 ```typescript
-reloadWorkflow(workflow: string): Promise<void>;
+reloadWorkflow(workflow: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ workflow
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

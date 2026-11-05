@@ -4,10 +4,10 @@
 
 ## AutomatorAction.ignoresInput property
 
-Shall the action ignore its input when it is run?
+Shall the action ignore its input when it is run? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-ignoresInput: boolean
+ignoresInput: boolean | null
 ```

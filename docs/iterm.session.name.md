@@ -4,10 +4,10 @@
 
 ## Session.name property
 
-The name property
+The name property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

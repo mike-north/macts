@@ -4,12 +4,10 @@
 
 ## ScriptingElementUpdateInput type
 
-Input for updating a ScriptingElement
+Input for updating a ScriptingElement. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ScriptingElementUpdateInput = Partial<ScriptingElementCreateInput>
+type ScriptingElementUpdateInput = Record<string, never>
 ```
-
-**References:** [ScriptingElementCreateInput](./system-events.scriptingelementcreateinput.md)

@@ -4,10 +4,10 @@
 
 ## Domain.preferencesFolder property
 
-The Preferences folder
+The Preferences folder. Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 **Signature:**
 
 ```typescript
-preferencesFolder: Folder
+readonly preferencesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

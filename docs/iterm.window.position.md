@@ -4,13 +4,10 @@
 
 ## Window.position property
 
-The position of the window, relative to the upper left corner of the screen.
+The position of the window, relative to the upper left corner of the screen. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-position: {
-  x: number
-  y: number
-}
+position: Point | null
 ```

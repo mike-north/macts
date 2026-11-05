@@ -4,7 +4,7 @@
 
 ## AccountCreateInput interface
 
-Input for creating a Account
+Input for creating an Account.
 
 **Signature:**
 

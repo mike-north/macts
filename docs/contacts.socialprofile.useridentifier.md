@@ -4,10 +4,10 @@
 
 ## SocialProfile.userIdentifier property
 
-A service-specific identifier used with this social profile.
+A service-specific identifier used with this social profile. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-userIdentifier: string
+userIdentifier: string | null
 ```

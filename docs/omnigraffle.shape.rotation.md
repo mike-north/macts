@@ -4,10 +4,10 @@
 
 ## Shape.rotation property
 
-Rotation of the graphic in degrees
+Rotation of the graphic in degrees. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-rotation: number
+rotation: number | null
 ```

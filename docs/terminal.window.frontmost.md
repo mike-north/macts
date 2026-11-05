@@ -4,10 +4,10 @@
 
 ## Window.frontmost property
 
-Whether the window is the frontmost window
+Whether the window is the frontmost window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-frontmost: boolean
+readonly frontmost: boolean | null;
 ```

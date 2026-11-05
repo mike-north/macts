@@ -4,12 +4,12 @@
 
 ## WorkflowResourceClient.get() method
 
-Get a workflow by name.
+Get a workflow by name. When several workflows share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 **Signature:**
 
 ```typescript
-get(name: string): Promise<Workflow>;
+get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Workflow>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ name
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

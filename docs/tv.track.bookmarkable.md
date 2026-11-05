@@ -4,10 +4,10 @@
 
 ## Track.bookmarkable property
 
-is the playback position for this track remembered?
+is the playback position for this track remembered? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-bookmarkable: boolean
+bookmarkable: boolean | null
 ```

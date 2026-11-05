@@ -4,10 +4,10 @@
 
 ## Task.effectivePlannedDate property
 
-The date at which work for this task is intended (including inherited)
+The date at which work for this task is intended (including inherited). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-effectivePlannedDate: Date
+readonly effectivePlannedDate: Date | null;
 ```

@@ -4,10 +4,10 @@
 
 ## Line.tailMagnet property
 
-Which magnet of the source graphic the line attaches to
+Which magnet of the source graphic the line attaches to. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-tailMagnet: number
+tailMagnet: Integer | null
 ```

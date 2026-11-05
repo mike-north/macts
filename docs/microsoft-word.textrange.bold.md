@@ -4,10 +4,10 @@
 
 ## TextRange.bold property
 
-Whether the text is formatted as bold
+Whether the text is formatted as bold. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-bold: boolean
+bold: boolean | null
 ```

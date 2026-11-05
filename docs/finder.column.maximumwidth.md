@@ -4,10 +4,10 @@
 
 ## Column.maximumWidth property
 
-the maximum allowed width of this column
+the maximum allowed width of this column. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-maximumWidth: number
+readonly maximumWidth: Integer | null;
 ```

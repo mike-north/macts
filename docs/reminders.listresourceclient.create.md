@@ -9,7 +9,7 @@ Create a new list.
 **Signature:**
 
 ```typescript
-create(input: ListCreateInput): Promise<List>;
+create(input: ListCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<List>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [ListCreateInput](./reminders.listcreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

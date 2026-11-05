@@ -4,10 +4,10 @@
 
 ## DiskItem.busyStatus property
 
-Is the disk item busy?
+Is the disk item busy? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-busyStatus: boolean
+readonly busyStatus: boolean | null;
 ```

@@ -4,12 +4,13 @@
 
 ## InterfaceUpdateInput type
 
-Input for updating a Interface
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type InterfaceUpdateInput = Partial<InterfaceCreateInput>
+type InterfaceUpdateInput = Omit<InterfaceUpdateInput$1, 'mtu' | 'speed'> & {
+  mtu?: null extends InterfaceUpdateInput$1['mtu'] ? number | null : number
+  speed?: null extends InterfaceUpdateInput$1['speed'] ? number | null : number
+}
 ```
-
-**References:** [InterfaceCreateInput](./system-events.interfacecreateinput.md)

@@ -4,10 +4,10 @@
 
 ## Process.architecture property
 
-the architecture in which the process is running
+the architecture in which the process is running. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-architecture: string
+readonly architecture: string | null;
 ```

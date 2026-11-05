@@ -4,10 +4,10 @@
 
 ## Rule.markFlagIndex property
 
-If rule matches, mark message with the specified flag. Set to -1 to disable this action
+If rule matches, mark message with the specified flag. Set to -1 to disable this action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-markFlagIndex: number
+markFlagIndex: Integer | null
 ```

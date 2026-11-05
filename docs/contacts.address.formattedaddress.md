@@ -4,10 +4,10 @@
 
 ## Address.formattedAddress property
 
-properly formatted string for this address.
+properly formatted string for this address. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-formattedAddress: string
+readonly formattedAddress: string | null;
 ```

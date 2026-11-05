@@ -4,10 +4,10 @@
 
 ## Header.name property
 
-Name of the header value
+Name of the header value. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

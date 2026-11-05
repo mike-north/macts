@@ -57,24 +57,24 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[click(at)](./system-events.uielementresourceclient.click.md)
+[click(at, \_\_mactsOptions)](./system-events.uielementresourceclient.click.md)
 
 </td><td>
 
 </td><td>
 
-cause the target process to behave as if the UI element were clicked
+cause the target process to behave as if the UI element were clicked. macts does not yet send the UI element to the app, so the app acts on whatever it chooses.
 
 </td></tr>
 <tr><td>
 
-[select()](./system-events.uielementresourceclient.select.md)
+[select(\_\_mactsOptions)](./system-events.uielementresourceclient.select.md)
 
 </td><td>
 
 </td><td>
 
-set the selected property of the UI element
+set the selected property of the UI element. macts does not yet send the UI element to the app, so the app acts on whatever it chooses.
 
 </td></tr>
 </tbody></table>

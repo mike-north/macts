@@ -4,7 +4,7 @@
 
 ## WordCreateInput interface
 
-Input for creating a Word
+Input for creating a Word.
 
 **Signature:**
 
@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md)
 
 </td><td>
 

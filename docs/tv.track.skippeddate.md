@@ -4,10 +4,10 @@
 
 ## Track.skippedDate property
 
-the date and time this track was last skipped
+the date and time this track was last skipped. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-skippedDate: Date
+skippedDate: Date | null
 ```

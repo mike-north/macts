@@ -4,10 +4,10 @@
 
 ## UserDomainObject.desktopFolder property
 
-The user's Desktop folder
+The user's Desktop folder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-desktopFolder: Folder
+readonly desktopFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

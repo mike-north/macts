@@ -33,17 +33,17 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[allDayDueDate](./reminders.reminder.alldayduedate.md)
+[alldayDueDate](./reminders.reminder.alldayduedate.md)
 
 </td><td>
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The all-day due date of the reminder
+The all-day due date of the reminder. Nullable. Observed missing in 15 of 412 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ The all-day due date of the reminder
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The notes attached to the reminder
+The notes attached to the reminder. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -73,7 +73,7 @@ boolean
 
 </td><td>
 
-Whether the reminder is completed
+Whether the reminder is completed. Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -82,13 +82,15 @@ Whether the reminder is completed
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-The completion date of the reminder
+Date \| null
+
+</td><td>
+
+The completion date of the reminder. Nullable: Set only when a reminder is completed; an open reminder has no completion date. Not observable on the probed library, where all 412 reminders were completed (Reminders 7.0).
 
 </td></tr>
 <tr><td>
@@ -97,13 +99,15 @@ The completion date of the reminder
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 Date
 
 </td><td>
 
-The creation date of the reminder
+The creation date of the reminder. Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -114,11 +118,11 @@ The creation date of the reminder
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The due date of the reminder
+The due date of the reminder. Nullable. Observed missing in 15 of 412 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -133,7 +137,7 @@ boolean
 
 </td><td>
 
-Whether the reminder is flagged
+Whether the reminder is flagged. Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -142,13 +146,15 @@ Whether the reminder is flagged
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the reminder
+The unique identifier of the reminder. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -157,13 +163,15 @@ The unique identifier of the reminder
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 Date
 
 </td><td>
 
-The modification date of the reminder
+The modification date of the reminder. Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -178,7 +186,7 @@ string
 
 </td><td>
 
-The name of the reminder
+The name of the reminder. Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -189,11 +197,11 @@ The name of the reminder
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md)
 
 </td><td>
 
-The priority of the reminder (0=none, 1=high, 5=medium, 9=low)
+The priority of the reminder (0=none, 1=high, 5=medium, 9=low). Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -204,11 +212,11 @@ The priority of the reminder (0=none, 1=high, 5=medium, 9=low)
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The remind date of the reminder
+The remind date of the reminder. Nullable. Observed missing in 15 of 412 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 </tbody></table>

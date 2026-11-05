@@ -4,10 +4,10 @@
 
 ## Domain.fontsFolder property
 
-The Fonts folder
+The Fonts folder. Nullable. The app reported no value in 2 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 **Signature:**
 
 ```typescript
-fontsFolder: Folder
+readonly fontsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

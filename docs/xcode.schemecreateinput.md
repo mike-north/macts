@@ -4,7 +4,7 @@
 
 ## SchemeCreateInput type
 
-Input for creating a Scheme
+Input for creating a Scheme.
 
 **Signature:**
 

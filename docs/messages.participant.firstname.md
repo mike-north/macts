@@ -4,10 +4,10 @@
 
 ## Participant.firstName property
 
-The first name from this participan's Contacts card, if available
+The first name from this participan's Contacts card, if available. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-firstName: string
+readonly firstName: string | null;
 ```

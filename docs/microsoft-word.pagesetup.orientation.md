@@ -4,10 +4,10 @@
 
 ## PageSetup.orientation property
 
-The page orientation (portrait or landscape)
+The page orientation (portrait or landscape). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-orientation: string
+orientation: string | null
 ```

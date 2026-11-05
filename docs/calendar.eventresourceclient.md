@@ -57,46 +57,68 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./calendar.eventresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./calendar.eventresourceclient.create.md)
 
 </td><td>
 
 </td><td>
 
-Create a new event.
+Create a new event. When several calendars share the same name, the first match in the app's order is used as the calendar.
 
 </td></tr>
 <tr><td>
 
-[get(id)](./calendar.eventresourceclient.get.md)
+[delete(calendarId, id, \_\_mactsOptions)](./calendar.eventresourceclient.delete.md)
 
 </td><td>
 
 </td><td>
 
-Get a event by id.
+Delete an event within a parent scope. When several calendars share the same name, the first match in the app's order is used as the calendar.
 
 </td></tr>
 <tr><td>
 
-[list(calendarId)](./calendar.eventresourceclient.list.md)
+[get(calendarId, id, \_\_mactsOptions)](./calendar.eventresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-List all events.
+Get a event by id within a parent scope. When several calendars share the same name, the first match in the app's order is used as the calendar.
 
 </td></tr>
 <tr><td>
 
-[show()](./calendar.eventresourceclient.show.md)
+[list(calendarId, \_\_mactsOptions)](./calendar.eventresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-Show the event or to-do in the calendar window
+List the events of one calendar, as one page. When several calendars share the same name, the first match in the app's order is used as the calendar.
+
+</td></tr>
+<tr><td>
+
+[show(calendarId, id, \_\_mactsOptions)](./calendar.eventresourceclient.show.md)
+
+</td><td>
+
+</td><td>
+
+Show the event or to-do in the calendar window. When several calendars share the same name, the first match in the app's order is used as the calendar.
+
+</td></tr>
+<tr><td>
+
+[update(calendarId, id, input, \_\_mactsOptions)](./calendar.eventresourceclient.update.md)
+
+</td><td>
+
+</td><td>
+
+Update an existing event within a parent scope. When several calendars share the same name, the first match in the app's order is used as the calendar.
 
 </td></tr>
 </tbody></table>

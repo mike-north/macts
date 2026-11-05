@@ -21,6 +21,7 @@
 export { SystemSettingsClient, SystemSettingsError, HttpClient } from './client.js'
 export type { SystemSettingsClientOptions } from './client.js'
 export * from './types.js'
+export type { SystemSettingsResources } from './contract/index.js'
 
 export { capabilities } from './capabilities.js'
 export type { CapabilityMetadata, CapabilityRisk } from './capabilities.js'

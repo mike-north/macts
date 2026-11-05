@@ -4,10 +4,10 @@
 
 ## Track.unplayed property
 
-is this track unplayed?
+is this track unplayed? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-unplayed: boolean
+unplayed: boolean | null
 ```

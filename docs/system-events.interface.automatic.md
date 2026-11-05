@@ -4,10 +4,10 @@
 
 ## Interface.automatic property
 
-configure the interface speed, duplex, and mtu automatically?
+configure the interface speed, duplex, and mtu automatically? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-automatic: boolean
+automatic: boolean | null
 ```

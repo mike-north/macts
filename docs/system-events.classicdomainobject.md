@@ -33,107 +33,104 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[appleMenuFolder](./system-events.classicdomainobject.applemenufolder.md)
+[applicationsFolder](./system-events.classicdomainobject.applicationsfolder.md)
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Apple Menu Items folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Applications folder. Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-05).
 
 </td></tr>
 <tr><td>
 
-[controlPanelsFolder](./system-events.classicdomainobject.controlpanelsfolder.md)
+[applicationSupportFolder](./system-events.classicdomainobject.applicationsupportfolder.md)
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Control Panels folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Application Support folder. Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-05).
 
 </td></tr>
 <tr><td>
 
-[controlStripModulesFolder](./system-events.classicdomainobject.controlstripmodulesfolder.md)
+[id](./system-events.classicdomainobject.id.md)
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Control Strip Modules folder
+string \| null
+
+</td><td>
+
+the unique identifier of the domain. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
 
-[desktopFolder](./system-events.classicdomainobject.desktopfolder.md)
+[kind](./system-events.classicdomainobject.kind.md)
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Classic Desktop folder
+[ClassicDomainObjectKind](./system-events.classicdomainobjectkind.md)
+
+</td><td>
+
+Which ClassicDomainObject this is: the kind naming the application property that holds it. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
 
-[extensionsFolder](./system-events.classicdomainobject.extensionsfolder.md)
+[libraryFolder](./system-events.classicdomainobject.libraryfolder.md)
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Extensions folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Library folder. Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-05).
 
 </td></tr>
 <tr><td>
 
-[fontsFolder](./system-events.classicdomainobject.fontsfolder.md)
+[name](./system-events.classicdomainobject.name.md)
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Fonts folder
-
-</td></tr>
-<tr><td>
-
-[launcherItemsFolder](./system-events.classicdomainobject.launcheritemsfolder.md)
+string \| null
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The Launcher Items folder
+the name of the domain. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,58 +139,49 @@ The Launcher Items folder
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Classic Preferences folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Classic Preferences folder. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
 
-[shutdownFolder](./system-events.classicdomainobject.shutdownfolder.md)
+[scriptsFolder](./system-events.classicdomainobject.scriptsfolder.md)
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Shutdown Items folder
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Scripts folder. Nullable. The app reported no value in 2 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 </td></tr>
 <tr><td>
 
-[startupItemsFolder](./system-events.classicdomainobject.startupitemsfolder.md)
+[workflowsFolder](./system-events.classicdomainobject.workflowsfolder.md)
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The StartupItems folder
-
-</td></tr>
-<tr><td>
-
-[systemFolder](./system-events.classicdomainobject.systemfolder.md)
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The System folder
+The Automator Workflows folder. Nullable. The app reported no value in 3 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 </td></tr>
 </tbody></table>

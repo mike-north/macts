@@ -4,10 +4,10 @@
 
 ## Project.effectiveStatus property
 
-The effective status of the project
+The effective status of the project. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-effectiveStatus: ProjectStatus
+readonly effectiveStatus: ProjectStatus | null;
 ```

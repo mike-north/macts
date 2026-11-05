@@ -4,37 +4,6 @@
 
 ## api package
 
-## Classes
-
-<table><thead><tr><th>
-
-Class
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[TtlCache](./api.ttlcache.md)
-
-</td><td>
-
-A generic in-memory cache where each entry expires after a configurable TTL.
-
-</td></tr>
-<tr><td>
-
-[UnexpandableCoarsePermissionError](./api.unexpandablecoarsepermissionerror.md)
-
-</td><td>
-
-Error thrown when a coarse permission is requested without a manifest to expand it against. Coarse operations (read/create/write/delete) are sugar that must be resolved into fine-grained operations at creation time; storing one unexpanded would silently authorize nothing, so we reject it instead.
-
-</td></tr>
-</tbody></table>
-
 ## Functions
 
 <table><thead><tr><th>
@@ -48,86 +17,13 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[addKeyMetadata(metadata)](./api.addkeymetadata.md)
-
-</td><td>
-
-Add key metadata to storage.
-
-</td></tr>
-<tr><td>
-
-[authMiddleware()](./api.authmiddleware.md)
-
-</td><td>
-
-Authentication middleware for macts API.
-
-Expects `Authorization: Bearer macts_sk_...` header. On success, sets `apiKeyPayload` variable in context.
-
-</td></tr>
-<tr><td>
-
-[calculateExpiration(expires)](./api.calculateexpiration.md)
-
-</td><td>
-
-Calculate expiration timestamp from various input formats.
-
-</td></tr>
-<tr><td>
-
-[checkPayloadPermission(payload, requiredPermission, permissionHistory)](./api.checkpayloadpermission.md)
-
-</td><td>
-
-Check if a validated payload has a specific permission.
-
-Use this when you've already validated the token and have the payload.
-
-</td></tr>
-<tr><td>
-
-[checkPayloadPermissions(payload, requiredPermissions)](./api.checkpayloadpermissions.md)
-
-</td><td>
-
-Check multiple permissions against a validated payload.
-
-</td></tr>
-<tr><td>
-
 [configureTelemetry(\_options)](./api.configuretelemetry.md)
 
 </td><td>
 
 Configure OpenTelemetry tracing.
 
-This is a placeholder for future integration with `@opentelemetry/sdk-node`<!-- -->. When the SDK packages are available, this function will initialize the trace provider and configure the OTLP exporter.
-
-Currently a no-op that logs a message indicating telemetry is not configured.
-
-</td></tr>
-<tr><td>
-
-[createApiKey(options, permissionsSection)](./api.createapikey.md)
-
-</td><td>
-
-Create a new API key with the specified permissions.
-
-Permissions are expanded at creation time: - Coarse permissions (calendar:events:read) expand to their fine-grained equivalents - Wildcard permissions (calendar:\*:read) expand to all matching permissions - Fine-grained permissions are included as-is
-
-</td></tr>
-<tr><td>
-
-[createApiKeySimple(options)](./api.createapikeysimple.md)
-
-</td><td>
-
-Create an API key without expansion (all permissions treated as fine-grained).
-
-Use this when you don't have access to the manifest or when permissions are already fine-grained.
+This is currently a no-op stub. Tracing is not yet implemented: calling this function has no effect, does not install or require any `@opentelemetry/*` package, and does not change what [getTracer()](./api.gettracer.md) returns. It exists only to reserve the public API shape for a future tracing implementation.
 
 </td></tr>
 <tr><td>
@@ -138,16 +34,16 @@ Use this when you don't have access to the manifest or when permissions are alre
 
 Create just the Hono app without server lifecycle.
 
-Useful for testing or custom server setups.
+Useful for testing (with an injected `executor` and `verifier`<!-- -->) or custom server setups. Apps are registered as for [createMultiServer()](./api.createmultiserver.md)<!-- -->: the `manifests` as passthrough, and contracts through `options.register`<!-- -->.
 
 </td></tr>
 <tr><td>
 
-[createFullAccessKey(appName, name, expires)](./api.createfullaccesskey.md)
+[createHttpAdapter(runtime, options)](./api.createhttpadapter.md)
 
 </td><td>
 
-Create an API key with full access to a specific app.
+Build the HTTP transport for a runtime.
 
 </td></tr>
 <tr><td>
@@ -163,26 +59,6 @@ Use this to implement graceful shutdown by waiting for all active requests to co
 </td></tr>
 <tr><td>
 
-[createLogger(options)](./api.createlogger.md)
-
-</td><td>
-
-Create a new Pino logger instance.
-
-In development (NODE_ENV !== 'production'), uses pino-pretty for human-readable output. In production, outputs structured JSON.
-
-</td></tr>
-<tr><td>
-
-[createMultiAppRpcRouter(manifests)](./api.createmultiapprpcrouter.md)
-
-</td><td>
-
-Create an RPC router for multiple manifests (multi-app support).
-
-</td></tr>
-<tr><td>
-
 [createMultiServer(manifests, options)](./api.createmultiserver.md)
 
 </td><td>
@@ -192,20 +68,11 @@ Create a macts API server for multiple apps.
 </td></tr>
 <tr><td>
 
-[createReadOnlyKey(appName, name, permissionsSection, expires)](./api.createreadonlykey.md)
+[createReferencesAdapter(runtime, options)](./api.createreferencesadapter.md)
 
 </td><td>
 
-Create a read-only API key for a specific app.
-
-</td></tr>
-<tr><td>
-
-[createRpcRouter(manifest)](./api.createrpcrouter.md)
-
-</td><td>
-
-Create a Hono router with RPC endpoints from a manifest.
+Build the reference-resolution transport for a runtime.
 
 </td></tr>
 <tr><td>
@@ -214,116 +81,16 @@ Create a Hono router with RPC endpoints from a manifest.
 
 </td><td>
 
-Create a macts API server for a single app.
+Create a macts API server for a single app, registered from its manifest.
 
 </td></tr>
 <tr><td>
 
-[decrypt(ciphertext, key)](./api.decrypt.md)
+[defaultClientAddress(c)](./api.defaultclientaddress.md)
 
 </td><td>
 
-Decrypt an AES-256-GCM encrypted payload.
-
-</td></tr>
-<tr><td>
-
-[deleteKeyMetadata(keyId)](./api.deletekeymetadata.md)
-
-</td><td>
-
-Delete key metadata by ID.
-
-</td></tr>
-<tr><td>
-
-[deriveEncryptionKey(signingSecret)](./api.deriveencryptionkey.md)
-
-</td><td>
-
-Derive a 256-bit encryption key from the signing secret using HKDF.
-
-HKDF (HMAC-based Key Derivation Function) is used to derive a separate encryption key from the signing secret, ensuring key separation between JWT signing and data encryption.
-
-</td></tr>
-<tr><td>
-
-[encrypt(plaintext, key)](./api.encrypt.md)
-
-</td><td>
-
-Encrypt plaintext using AES-256-GCM.
-
-Output format: base64(IV \|\| authTag \|\| ciphertext) - IV: 12 bytes (randomly generated) - authTag: 16 bytes - ciphertext: variable length
-
-</td></tr>
-<tr><td>
-
-[extractKeyIdFromToken(token)](./api.extractkeyidfromtoken.md)
-
-</td><td>
-
-Get the key ID from a token without validation.
-
-</td></tr>
-<tr><td>
-
-[extractPermissionsFromToken(token)](./api.extractpermissionsfromtoken.md)
-
-</td><td>
-
-Extract permissions from a token without full validation.
-
-Useful for debugging and inspection. Does NOT verify signature.
-
-</td></tr>
-<tr><td>
-
-[generateKeyId()](./api.generatekeyid.md)
-
-</td><td>
-
-Generate a unique key ID.
-
-</td></tr>
-<tr><td>
-
-[generateSecret()](./api.generatesecret.md)
-
-</td><td>
-
-Generate a new cryptographically secure signing secret.
-
-</td></tr>
-<tr><td>
-
-[getKeyMetadata(keyId)](./api.getkeymetadata.md)
-
-</td><td>
-
-Get key metadata by ID.
-
-</td></tr>
-<tr><td>
-
-[getLogger()](./api.getlogger.md)
-
-</td><td>
-
-Get the singleton logger instance.
-
-Creates a default logger on first call. Use [setLogger()](./api.setlogger.md) to replace the singleton with a custom instance.
-
-</td></tr>
-<tr><td>
-
-[getSigningSecret()](./api.getsigningsecret.md)
-
-</td><td>
-
-Get the signing secret, generating one if it doesn't exist.
-
-Priority: 1. Environment variable MACTS_API_KEY_SECRET 2. File at \~/.macts/secrets/api-key-secret 3. Generate new secret and store in file
+The default client address: the socket's remote address under `@hono/node-server`<!-- -->, or the server's `requestIP` under Bun.
 
 </td></tr>
 <tr><td>
@@ -334,125 +101,16 @@ Priority: 1. Environment variable MACTS_API_KEY_SECRET 2. File at \~/.macts/secr
 
 Get a tracer instance.
 
-Returns a no-op tracer by default. When an OpenTelemetry SDK is configured via [configureTelemetry()](./api.configuretelemetry.md)<!-- -->, returns an instrumented tracer.
+Always returns a no-op tracer. Tracing is not yet implemented, and calling [configureTelemetry()](./api.configuretelemetry.md) does not change this.
 
 </td></tr>
 <tr><td>
 
-[isKeyRevoked(keyId)](./api.iskeyrevoked.md)
+[httpStatusForError(error)](./api.httpstatusforerror.md)
 
 </td><td>
 
-Check if a key ID has been revoked.
-
-This is an optimized query that only checks revocation status.
-
-</td></tr>
-<tr><td>
-
-[loadKeyMetadata()](./api.loadkeymetadata.md)
-
-</td><td>
-
-Load all key metadata from storage.
-
-</td></tr>
-<tr><td>
-
-[parseDuration(duration)](./api.parseduration.md)
-
-</td><td>
-
-Parse a duration string into milliseconds.
-
-</td></tr>
-<tr><td>
-
-[requirePermission(requiredPermission, options)](./api.requirepermission.md)
-
-</td><td>
-
-Permission middleware factory.
-
-Creates middleware that checks if the authenticated user has a specific permission. Must be used after auth middleware.
-
-</td></tr>
-<tr><td>
-
-[revokeKey(keyId)](./api.revokekey.md)
-
-</td><td>
-
-Revoke a key by ID.
-
-</td></tr>
-<tr><td>
-
-[rpcPathToPermission(path)](./api.rpcpathtopermission.md)
-
-</td><td>
-
-Extract required permission from RPC path.
-
-Converts RPC path format to permission string. Example: '/rpc/calendar.events.list' -<!-- -->&gt; 'calendar:events:list'
-
-</td></tr>
-<tr><td>
-
-[saveKeyMetadata(keys)](./api.savekeymetadata.md)
-
-</td><td>
-
-Save key metadata to storage (replaces all keys).
-
-Note: This is provided for API compatibility but is less efficient than individual operations. Prefer addKeyMetadata, updateKeyMetadata, etc.
-
-</td></tr>
-<tr><td>
-
-[setLogger(newLogger)](./api.setlogger.md)
-
-</td><td>
-
-Replace the singleton logger instance.
-
-</td></tr>
-<tr><td>
-
-[setSigningSecret(secret)](./api.setsigningsecret.md)
-
-</td><td>
-
-Set a custom signing secret.
-
-</td></tr>
-<tr><td>
-
-[updateKeyMetadata(keyId, updates)](./api.updatekeymetadata.md)
-
-</td><td>
-
-Update key metadata by ID.
-
-</td></tr>
-<tr><td>
-
-[validateAndCheckPermission(token, requiredPermission, permissionHistory)](./api.validateandcheckpermission.md)
-
-</td><td>
-
-Validate a token and check if it has a required permission.
-
-</td></tr>
-<tr><td>
-
-[validateApiKey(token)](./api.validateapikey.md)
-
-</td><td>
-
-Validate an API key token.
-
-Checks: 1. Token format (must start with macts_sk\_) 2. JWT signature 3. Expiration (if set) 4. Revocation status
+The HTTP status for a canonical structured error, per the phases/13 D6 table.
 
 </td></tr>
 <tr><td>
@@ -481,38 +139,20 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[AuthErrorResponse](./api.autherrorresponse.md)
+[AppRegistrar](./api.appregistrar.md)
 
 </td><td>
 
-Authentication error response structure.
+Registers apps on the runtime a server is constructed with.
 
 </td></tr>
 <tr><td>
 
-[AuthVariables](./api.authvariables.md)
+[HttpAdapterOptions](./api.httpadapteroptions.md)
 
 </td><td>
 
-Context variables added by auth middleware.
-
-</td></tr>
-<tr><td>
-
-[CreateApiKeyOptions](./api.createapikeyoptions.md)
-
-</td><td>
-
-Options for creating an API key.
-
-</td></tr>
-<tr><td>
-
-[CreateApiKeyResult](./api.createapikeyresult.md)
-
-</td><td>
-
-Result of creating an API key.
+Configuration shared by the HTTP adapters that serve runtime calls ([createHttpAdapter()](./api.createhttpadapter.md) and [createReferencesAdapter()](./api.createreferencesadapter.md)<!-- -->).
 
 </td></tr>
 <tr><td>
@@ -526,15 +166,6 @@ In-flight request tracker for graceful shutdown.
 </td></tr>
 <tr><td>
 
-[ListApiKeysOptions](./api.listapikeysoptions.md)
-
-</td><td>
-
-Options for listing API keys.
-
-</td></tr>
-<tr><td>
-
 [LoadedTlsOptions](./api.loadedtlsoptions.md)
 
 </td><td>
@@ -544,47 +175,20 @@ Loaded TLS certificate and key buffers ready for use with HTTPS server.
 </td></tr>
 <tr><td>
 
-[PermissionErrorResponse](./api.permissionerrorresponse.md)
+[RateLimitOptions](./api.ratelimitoptions.md)
 
 </td><td>
 
-Error response structure for permission failures.
+Rate limiting for the HTTP server.
 
 </td></tr>
 <tr><td>
 
-[PermissionMiddlewareOptions](./api.permissionmiddlewareoptions.md)
+[ResolveReferenceRequest](./api.resolvereferencerequest.md)
 
 </td><td>
 
-Options for the permission middleware.
-
-</td></tr>
-<tr><td>
-
-[RpcEndpointInfo](./api.rpcendpointinfo.md)
-
-</td><td>
-
-Registered RPC endpoint info.
-
-</td></tr>
-<tr><td>
-
-[RpcErrorResponse](./api.rpcerrorresponse.md)
-
-</td><td>
-
-RPC error response structure.
-
-</td></tr>
-<tr><td>
-
-[RpcHandlerContext](./api.rpchandlercontext.md)
-
-</td><td>
-
-Context for RPC handler execution.
+The body of `POST /references/v1/resolve`<!-- -->.
 
 </td></tr>
 <tr><td>
@@ -593,7 +197,7 @@ Context for RPC handler execution.
 
 </td><td>
 
-RPC success response structure.
+The body of a successful runtime call: an operation result or a resolved reference.
 
 </td></tr>
 <tr><td>
@@ -665,6 +269,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[DEFAULT_ADDRESS_RATE_LIMIT](./api.default_address_rate_limit.md)
+
+</td><td>
+
+Requests per minute admitted from one client address when no limit is configured.
+
+</td></tr>
+<tr><td>
+
 [DEFAULT_HOST](./api.default_host.md)
 
 </td><td>
@@ -679,6 +292,15 @@ Default host for macts API.
 </td><td>
 
 Default server port for macts API.
+
+</td></tr>
+<tr><td>
+
+[DEFAULT_SUBJECT_RATE_LIMIT](./api.default_subject_rate_limit.md)
+
+</td><td>
+
+Calls per minute admitted per verified subject when no limit is configured.
 
 </td></tr>
 <tr><td>
@@ -705,6 +327,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[AppOptions](./api.appoptions.md)
+
+</td><td>
+
+The server options that shape the app itself, as opposed to its listener.
+
+</td></tr>
+<tr><td>
+
 [AttributeValue](./api.attributevalue.md)
 
 </td><td>
@@ -714,38 +345,11 @@ Span attribute value types.
 </td></tr>
 <tr><td>
 
-[AuthErrorCode](./api.autherrorcode.md)
+[ClientAddressResolver](./api.clientaddressresolver.md)
 
 </td><td>
 
-Error codes for authentication failures.
-
-</td></tr>
-<tr><td>
-
-[DurationString](./api.durationstring.md)
-
-</td><td>
-
-Duration string format for expiration. Examples: "30d", "1h", "2w", "6m"
-
-</td></tr>
-<tr><td>
-
-[RpcHandler](./api.rpchandler.md)
-
-</td><td>
-
-RPC handler function type.
-
-</td></tr>
-<tr><td>
-
-[RpcRequest](./api.rpcrequest.md)
-
-</td><td>
-
-RPC request body structure.
+Resolves the network address of the client that sent a request, or `undefined` when the request has no network peer.
 
 </td></tr>
 <tr><td>

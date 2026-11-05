@@ -4,10 +4,10 @@
 
 ## AutomatorAction.comment property
 
-The comment for the name of the action
+The comment for the name of the action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-comment: string
+comment: string | null
 ```

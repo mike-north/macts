@@ -4,13 +4,43 @@
 
 ## FileTrackResourceClient.refresh() method
 
-update file track information from the current information in the track’s file
+update file track information from the current information in the track’s file. macts does not yet send the file track to the app, so the app acts on whatever it chooses.
 
 **Signature:**
 
 ```typescript
-refresh(): Promise<void>;
+refresh(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 

@@ -4,10 +4,10 @@
 
 ## Track.bpm property
 
-the tempo of this track in beats per minute
+the tempo of this track in beats per minute. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-bpm: number
+bpm: Integer | null
 ```

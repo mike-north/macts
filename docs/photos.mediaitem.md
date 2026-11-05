@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The GPS altitude in meters
+number \| null
+
+</td><td>
+
+The GPS altitude in meters. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ The GPS altitude in meters
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The date of the media item
+The date of the media item. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +71,11 @@ The date of the media item
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-A description of the media item
+A description of the media item. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +86,11 @@ A description of the media item
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the media item has been favorited
+Whether the media item has been favorited. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +99,15 @@ Whether the media item has been favorited
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the file on disk
+string \| null
+
+</td><td>
+
+The name of the file on disk. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,13 +116,15 @@ The name of the file on disk
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The height of the media item in pixels
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The height of the media item in pixels. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +133,15 @@ The height of the media item in pixels
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique ID of the media item
+The unique ID of the media item. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -144,11 +152,11 @@ The unique ID of the media item
 
 </td><td>
 
-string\[\]
+readonly string\[\] \| null
 
 </td><td>
 
-A list of keywords to associate with a media item
+A list of keywords to associate with a media item. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -163,7 +171,7 @@ unknown
 
 </td><td>
 
-The GPS latitude and longitude, in an ordered list of 2 numbers or missing values
+The GPS latitude and longitude, in an ordered list of 2 numbers or missing values. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -174,11 +182,11 @@ The GPS latitude and longitude, in an ordered list of 2 numbers or missing value
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name (title) of the media item
+The name (title) of the media item. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -189,11 +197,11 @@ The name (title) of the media item
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The selected media item file size
+The selected media item file size. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -202,13 +210,15 @@ The selected media item file size
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The width of the media item in pixels
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The width of the media item in pixels. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

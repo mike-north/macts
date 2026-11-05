@@ -4,10 +4,10 @@
 
 ## OutgoingMessage.messageSignature property
 
-The signature of the message
+The signature of the message. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-messageSignature: string
+messageSignature: string | null
 ```

@@ -4,10 +4,10 @@
 
 ## UserDomainObject.temporaryItemsFolder property
 
-The Temporary Items folder
+The Temporary Items folder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-temporaryItemsFolder: Folder
+readonly temporaryItemsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

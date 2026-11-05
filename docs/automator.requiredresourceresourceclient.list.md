@@ -4,14 +4,55 @@
 
 ## RequiredResourceResourceClient.list() method
 
-List all requiredresources.
+List the required resources of one automator action, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<RequiredResource[]>;
+list(actionId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<RequiredResource>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+actionId
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[RequiredResource](./automator.requiredresource.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[RequiredResource](./automator.requiredresource.md)<!-- -->&gt;&gt;

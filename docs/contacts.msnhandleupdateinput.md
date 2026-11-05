@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/contacts](./contacts.md) &gt; [MSNHandleUpdateInput](./contacts.msnhandleupdateinput.md)
 
-## MSNHandleUpdateInput type
+## MSNHandleUpdateInput interface
 
-Input for updating a MSNHandle
+Input for updating a MSNHandle. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type MSNHandleUpdateInput = Partial<MSNHandleCreateInput>
+interface MSNHandleUpdateInput
 ```
 
-**References:** [MSNHandleCreateInput](./contacts.msnhandlecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[label?](./contacts.msnhandleupdateinput.label.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Label for this handle. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[value?](./contacts.msnhandleupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The MSN handle value. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

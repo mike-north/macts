@@ -4,10 +4,10 @@
 
 ## MailAlarm.triggerInterval property
 
-The interval in minutes between the event and the alarm (positive for after, negative for before)
+The interval in minutes between the event and the alarm (positive for after, negative for before). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-triggerInterval: number
+triggerInterval: Integer | null
 ```

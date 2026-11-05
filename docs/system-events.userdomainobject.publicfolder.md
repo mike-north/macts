@@ -4,10 +4,10 @@
 
 ## UserDomainObject.publicFolder property
 
-The user's Public folder
+The user's Public folder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-publicFolder: Folder
+readonly publicFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

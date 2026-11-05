@@ -89,6 +89,18 @@ const event = await client.events.create({
 console.log(event.uid)
 ```
 
+Generated constructors use the same value codecs and error classes as the contract client factories.
+Typed methods target a contract-registered service: dates are `Date` instances, integers are checked
+numbers, and returned references hydrate through the client that received them. Catch structured
+errors such as `TargetNotFoundError` from `@macts/contracts`.
+
+`client.http.rpc(...)` remains an explicit raw wire call, with the app-specific error class.
+The exported `*Schema` validators describe raw passthrough responses; typed SDK values use the
+contract codecs. Existing `HttpClient.rpc` overrides still receive typed methods' encoded requests.
+Overrides that forward to `super.rpc` should forward the optional call options to retain cancellation
+only. Canonical HTTP response handling is shared even when an override forwards only two arguments.
+Malformed JSON or a missing success result throws `TransportError` for both raw and typed calls.
+
 **MCP tools (for AI assistants):**
 
 macts serves each installed app's operations as MCP tools. Install an app's server package (e.g.

@@ -4,10 +4,10 @@
 
 ## Task.startingDate property
 
-The date on which work begins
+The date on which work begins. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-startingDate: Date
+startingDate: Date | null
 ```

@@ -4,10 +4,10 @@
 
 ## Field.fieldType property
 
-The field type
+The field type. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fieldType: FieldType
+readonly fieldType: FieldType | null;
 ```

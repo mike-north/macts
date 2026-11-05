@@ -4,14 +4,44 @@
 
 ## SettingsSetResourceClient.list() method
 
-List all settingssets.
+List all settings sets, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<SettingsSet[]>;
+list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<SettingsSet>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[SettingsSet](./terminal.settingsset.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[SettingsSet](./terminal.settingsset.md)<!-- -->&gt;&gt;

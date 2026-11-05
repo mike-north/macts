@@ -57,7 +57,29 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[move(to)](./music.playlistresourceclient.move.md)
+[get(persistentID, \_\_mactsOptions)](./music.playlistresourceclient.get.md)
+
+</td><td>
+
+</td><td>
+
+Get a playlist by persistentID.
+
+</td></tr>
+<tr><td>
+
+[list(\_\_mactsOptions)](./music.playlistresourceclient.list.md)
+
+</td><td>
+
+</td><td>
+
+List all playlists, as one page.
+
+</td></tr>
+<tr><td>
+
+[move(persistentID, to, \_\_mactsOptions)](./music.playlistresourceclient.move.md)
 
 </td><td>
 
@@ -68,7 +90,7 @@ Move playlist(s) to a new location
 </td></tr>
 <tr><td>
 
-[search(\_for, only)](./music.playlistresourceclient.search.md)
+[search(persistentID, \_for, only, \_\_mactsOptions)](./music.playlistresourceclient.search.md)
 
 </td><td>
 

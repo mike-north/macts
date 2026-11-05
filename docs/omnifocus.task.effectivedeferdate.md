@@ -4,10 +4,10 @@
 
 ## Task.effectiveDeferDate property
 
-When the task should become available for action (including inherited)
+When the task should become available for action (including inherited). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-effectiveDeferDate: Date
+readonly effectiveDeferDate: Date | null;
 ```

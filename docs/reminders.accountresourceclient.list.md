@@ -4,14 +4,60 @@
 
 ## AccountResourceClient.list() method
 
-List all accounts.
+List accounts, one page at a time. When the result has a `nextCursor`<!-- -->, more remain: call again with the same arguments and `{ cursor: nextCursor }`<!-- -->.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Account[]>;
+list(page?: {
+        pageSize?: number;
+        cursor?: string;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Account>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+page
+
+</td><td>
+
+{ pageSize?: number; cursor?: string; }
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Account](./reminders.account.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Account](./reminders.account.md)<!-- -->&gt;&gt;

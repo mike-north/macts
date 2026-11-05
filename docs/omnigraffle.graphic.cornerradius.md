@@ -4,10 +4,10 @@
 
 ## Graphic.cornerRadius property
 
-Curvature of corners in the stroke path
+Curvature of corners in the stroke path. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-cornerRadius: number
+cornerRadius: number | null
 ```

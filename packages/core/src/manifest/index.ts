@@ -45,6 +45,10 @@ export {
   type KnownItemSelectionGap,
 } from './item-selection-gaps.js'
 
+// The rule of the `positional` marker (shared by the manifest schema, the
+// generators and operation registration, so each refuses the same manifests)
+export { isPositional, positionalProblems } from './positional.js'
+
 // When a primary identifier may rely on the default byId targeting: only when
 // it is the class's dictionary id (single source of truth shared by the
 // generators and operation registration, so each refuses the same resources)

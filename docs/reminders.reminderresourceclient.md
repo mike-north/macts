@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[complete(id)](./reminders.reminderresourceclient.complete.md)
+[complete(id, \_\_mactsOptions)](./reminders.reminderresourceclient.complete.md)
 
 </td><td>
 
@@ -68,7 +68,7 @@ Mark a reminder as complete
 </td></tr>
 <tr><td>
 
-[create(input)](./reminders.reminderresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./reminders.reminderresourceclient.create.md)
 
 </td><td>
 
@@ -79,18 +79,18 @@ Create a new reminder.
 </td></tr>
 <tr><td>
 
-[delete(id)](./reminders.reminderresourceclient.delete.md)
+[delete(id, \_\_mactsOptions)](./reminders.reminderresourceclient.delete.md)
 
 </td><td>
 
 </td><td>
 
-Delete a reminder.
+Delete an reminder.
 
 </td></tr>
 <tr><td>
 
-[get(id)](./reminders.reminderresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./reminders.reminderresourceclient.get.md)
 
 </td><td>
 
@@ -101,18 +101,18 @@ Get a reminder by id.
 </td></tr>
 <tr><td>
 
-[list(listId)](./reminders.reminderresourceclient.list.md)
+[list(listId, page, \_\_mactsOptions)](./reminders.reminderresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all reminders.
+List the reminders of one list, one page at a time. When the result has a `nextCursor`<!-- -->, more remain: call again with the same arguments and `{ cursor: nextCursor }`<!-- -->.
 
 </td></tr>
 <tr><td>
 
-[show()](./reminders.reminderresourceclient.show.md)
+[show(id, \_\_mactsOptions)](./reminders.reminderresourceclient.show.md)
 
 </td><td>
 

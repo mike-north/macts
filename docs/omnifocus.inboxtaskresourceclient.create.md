@@ -4,12 +4,12 @@
 
 ## InboxTaskResourceClient.create() method
 
-Create a new inboxtask.
+Create a new inbox task.
 
 **Signature:**
 
 ```typescript
-create(input: InboxTaskCreateInput): Promise<InboxTask>;
+create(input: InboxTaskCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<InboxTask>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [InboxTaskCreateInput](./omnifocus.inboxtaskcreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

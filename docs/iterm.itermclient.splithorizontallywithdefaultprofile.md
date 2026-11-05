@@ -9,7 +9,7 @@ Split a session horizontally, using the default profile for the new session
 **Signature:**
 
 ```typescript
-splitHorizontallyWithDefaultProfile(command?: string): Promise<void>;
+splitHorizontallyWithDefaultProfile(command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -34,6 +34,19 @@ command
 </td><td>
 
 string
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

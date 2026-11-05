@@ -4,10 +4,10 @@
 
 ## Message.deletedStatus property
 
-Indicates whether the message is deleted or not
+Indicates whether the message is deleted or not. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-deletedStatus: boolean
+deletedStatus: boolean | null
 ```

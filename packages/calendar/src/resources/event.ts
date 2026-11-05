@@ -25,56 +25,105 @@ export class EventResourceClient {
    * List the events of one calendar, as one page.
    * When several calendars share the same name, the first match in the app's order is used as the calendar.
    */
-  async list(calendarId: string): Promise<Page<Event>> {
-    return this.#http.rpc<Page<Event>>(`${this.#app}.${this.#resource}.list`, { calendarId })
+  async list(
+    calendarId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<Event>> {
+    return this.#http.invoke<Page<Event>>(
+      `${this.#app}.${this.#resource}.list`,
+      { calendarId },
+      __mactsOptions,
+      'Event'
+    )
   }
 
   /**
    * Get a event by id within a parent scope.
    * When several calendars share the same name, the first match in the app's order is used as the calendar.
    */
-  async get(calendarId: string, id: string): Promise<Event> {
-    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.get`, { calendarId, id })
+  async get(
+    calendarId: string,
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Event> {
+    return this.#http.invoke<Event>(
+      `${this.#app}.${this.#resource}.get`,
+      { calendarId, id },
+      __mactsOptions,
+      'Event'
+    )
   }
 
   /**
    * Create a new event.
    * When several calendars share the same name, the first match in the app's order is used as the calendar.
    */
-  async create(input: EventCreateInput): Promise<Event> {
-    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.create`, input)
+  async create(
+    input: EventCreateInput,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Event> {
+    return this.#http.invoke<Event>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'Event'
+    )
   }
 
   /**
    * Update an existing event within a parent scope.
    * When several calendars share the same name, the first match in the app's order is used as the calendar.
    */
-  async update(calendarId: string, id: string, input: EventUpdateInput): Promise<Event> {
+  async update(
+    calendarId: string,
+    id: string,
+    input: EventUpdateInput,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Event> {
     const { calendarId: _p, ...updateFields } = input as EventUpdateInput & { calendarId?: string }
     void _p
     const defined = Object.fromEntries(
       Object.entries(updateFields as Record<string, unknown>).filter(([, v]) => v !== undefined)
     )
-    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.update`, {
-      calendarId,
-      id,
-      ...defined,
-    })
+    return this.#http.invoke<Event>(
+      `${this.#app}.${this.#resource}.update`,
+      { calendarId, id, ...defined },
+      __mactsOptions,
+      'Event'
+    )
   }
 
   /**
    * Delete an event within a parent scope.
    * When several calendars share the same name, the first match in the app's order is used as the calendar.
    */
-  async delete(calendarId: string, id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { calendarId, id })
+  async delete(
+    calendarId: string,
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.delete`,
+      { calendarId, id },
+      __mactsOptions,
+      'Event'
+    )
   }
 
   /**
    * Show the event or to-do in the calendar window.
    * When several calendars share the same name, the first match in the app's order is used as the calendar.
    */
-  async show(calendarId: string, id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.show`, { calendarId, id })
+  async show(
+    calendarId: string,
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.show`,
+      { calendarId, id },
+      __mactsOptions,
+      'Event'
+    )
   }
 }

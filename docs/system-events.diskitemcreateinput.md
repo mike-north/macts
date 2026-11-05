@@ -4,7 +4,7 @@
 
 ## DiskItemCreateInput interface
 
-Input for creating a DiskItem
+Input for creating a DiskItem.
 
 **Signature:**
 

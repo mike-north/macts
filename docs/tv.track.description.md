@@ -4,10 +4,10 @@
 
 ## Track.description property
 
-the description of the track
+the description of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-description: string
+description: string | null
 ```

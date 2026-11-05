@@ -4,10 +4,10 @@
 
 ## Resource.costPerUse property
 
-The fixed cost per use of this resource
+The fixed cost per use of this resource. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-costPerUse: number
+costPerUse: number | null
 ```

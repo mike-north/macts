@@ -4,12 +4,12 @@
 
 ## MessageResourceClient.redirect() method
 
-Creates a redirected message.
+Creates a redirected message. macts does not yet send the message to the app, so the app acts on whatever it chooses.
 
 **Signature:**
 
 ```typescript
-redirect(openingWindow?: boolean): Promise<void>;
+redirect(openingWindow?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -34,6 +34,19 @@ openingWindow
 </td><td>
 
 boolean
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

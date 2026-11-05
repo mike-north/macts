@@ -4,13 +4,19 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Account {
-    id: string;
-    name: string;
+    readonly id: string;
+    readonly name: string | null;
 }
 
 // @public
@@ -22,17 +28,17 @@ export class AccountResourceClient {
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<Page<Account>>;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Account>>;
 }
 
-// @public (undocumented)
+// @public
 export const AccountSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type AccountUpdateInput = Partial<AccountCreateInput>;
+export type AccountUpdateInput = Record<string, never>;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -56,15 +62,19 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface List {
-    color: string;
-    emblem: string;
-    id: string;
-    name: string;
+    color: string | null;
+    emblem: string | null;
+    readonly id: string;
+    name: string | null;
 }
 
 // @public
@@ -77,15 +87,15 @@ export interface ListCreateInput {
 // @public
 export class ListResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: ListCreateInput): Promise<List>;
-    get(id: string): Promise<List>;
+    create(input: ListCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<List>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<List>;
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<Page<List>>;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<List>>;
 }
 
-// @public (undocumented)
+// @public
 export const ListSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -94,36 +104,34 @@ export const ListSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ListUpdateInput = Partial<ListCreateInput>;
+export interface ListUpdateInput {
+    color?: string;
+    emblem?: string;
+    name?: string;
+}
 
 // @public
 export interface Reminder {
-    alldayDueDate: Date;
-    body: string;
+    alldayDueDate: Date | null;
+    body: string | null;
     completed: boolean;
-    completionDate: Date;
-    creationDate: Date;
-    dueDate: Date;
+    readonly completionDate: Date | null;
+    readonly creationDate: Date;
+    dueDate: Date | null;
     flagged: boolean;
-    id: string;
-    modificationDate: Date;
+    readonly id: string;
+    readonly modificationDate: Date;
     name: string;
-    priority: number;
-    remindMeDate: Date;
+    priority: Integer;
+    remindMeDate: Date | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "ReminderCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface ReminderCreateInput {
-    alldayDueDate?: Date;
-    body?: string;
-    completed?: boolean;
-    dueDate?: Date;
-    flagged?: boolean;
-    listId: string;
-    name: string;
-    priority?: number;
-    remindMeDate?: Date;
-}
+export type ReminderCreateInput = Omit<ReminderCreateInput_2, 'priority'> & {
+    priority?: null extends ReminderCreateInput_2['priority'] ? number | null : number;
+};
 
 // @public
 export type ReminderPriority = '0' | '9' | '5' | '1';
@@ -131,18 +139,18 @@ export type ReminderPriority = '0' | '9' | '5' | '1';
 // @public
 export class ReminderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    complete(id: string): Promise<void>;
-    create(input: ReminderCreateInput): Promise<Reminder>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Reminder>;
+    complete(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    create(input: ReminderCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Reminder>;
+    delete(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Reminder>;
     list(listId: string, page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<Page<Reminder>>;
-    show(id: string): Promise<void>;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Reminder>>;
+    show(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const ReminderSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -157,6 +165,10 @@ export const ReminderSchema: z.ZodObject<{
     modificationDate: z.ZodString;
     alldayDueDate: z.ZodString;
 }, z.core.$strip>;
+
+// @public
+export interface RemindersClient extends ClientBrand<RemindersResources> {
+}
 
 // @public
 export class RemindersClient {
@@ -181,7 +193,32 @@ export class RemindersError extends Error {
 }
 
 // @public
-export type ReminderUpdateInput = Partial<ReminderCreateInput>;
+export type RemindersResources = Readonly<{
+    Account: ResourceDescriptor<Account, string> & {
+        readonly id: ValueType<string>;
+        readonly list: 'reminders.accounts.list';
+    };
+    List: ResourceDescriptor<List, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'reminders.lists.get';
+        readonly list: 'reminders.lists.list';
+    };
+    Reminder: ResourceDescriptor<Reminder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'reminders.reminders.get';
+        readonly list: 'reminders.reminders.list';
+        readonly parents: {
+            readonly list: 'List';
+        };
+    };
+}>;
+
+// Warning: (ae-forgotten-export) The symbol "ReminderUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type ReminderUpdateInput = Omit<ReminderUpdateInput_2, 'priority'> & {
+    priority?: null extends ReminderUpdateInput_2['priority'] ? number | null : number;
+};
 
 // (No @packageDocumentation comment for this package)
 

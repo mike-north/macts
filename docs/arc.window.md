@@ -33,47 +33,19 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[activeSpace](./arc.window.activespace.md)
-
-</td><td>
-
-</td><td>
-
-[Space](./arc.space.md)
-
-</td><td>
-
-Returns the currently active space
-
-</td></tr>
-<tr><td>
-
-[activeTab](./arc.window.activetab.md)
-
-</td><td>
-
-</td><td>
-
-[Tab](./arc.tab.md)
-
-</td><td>
-
-Returns the currently selected tab
-
-</td></tr>
-<tr><td>
-
 [closeable](./arc.window.closeable.md)
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the window has a close box.
+boolean \| null
+
+</td><td>
+
+Whether the window has a close box. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +54,15 @@ Whether the window has a close box.
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the window.
+The unique identifier of the window. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -99,11 +73,11 @@ The unique identifier of the window.
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the window is an incognito window.
+Whether the window is an incognito window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +88,11 @@ Whether the window is an incognito window.
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The index of the window, ordered front to back.
+The index of the window, ordered front to back. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +101,15 @@ The index of the window, ordered front to back.
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the window can be minimized.
+boolean \| null
+
+</td><td>
+
+Whether the window can be minimized. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +120,11 @@ Whether the window can be minimized.
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the window is currently minimized.
+Whether the window is currently minimized. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +135,11 @@ Whether the window is currently minimized.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window.
+Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -172,13 +148,15 @@ Represents the mode of the window which can be 'normal' or 'incognito', can be s
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The full title of the window.
+string \| null
+
+</td><td>
+
+The full title of the window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -187,13 +165,15 @@ The full title of the window.
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the window can be resized.
+boolean \| null
+
+</td><td>
+
+Whether the window can be resized. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -204,11 +184,11 @@ Whether the window can be resized.
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the window is currently visible.
+Whether the window is currently visible. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -217,13 +197,15 @@ Whether the window is currently visible.
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the window can be zoomed.
+boolean \| null
+
+</td><td>
+
+Whether the window can be zoomed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -234,11 +216,11 @@ Whether the window can be zoomed.
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the window is currently zoomed.
+Whether the window is currently zoomed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

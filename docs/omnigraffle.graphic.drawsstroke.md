@@ -4,10 +4,10 @@
 
 ## Graphic.drawsStroke property
 
-Does this graphic draw its stroke?
+Does this graphic draw its stroke? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-drawsStroke: boolean
+drawsStroke: boolean | null
 ```

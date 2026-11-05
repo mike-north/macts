@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(id)](./shortcuts.shortcutresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./shortcuts.shortcutresourceclient.get.md)
 
 </td><td>
 
@@ -68,18 +68,18 @@ Get a shortcut by id.
 </td></tr>
 <tr><td>
 
-[list()](./shortcuts.shortcutresourceclient.list.md)
+[list(\_\_mactsOptions)](./shortcuts.shortcutresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all shortcuts.
+List all shortcuts, as one page.
 
 </td></tr>
 <tr><td>
 
-[run(id, withInput)](./shortcuts.shortcutresourceclient.run.md)
+[run(id, withInput, \_\_mactsOptions)](./shortcuts.shortcutresourceclient.run.md)
 
 </td><td>
 

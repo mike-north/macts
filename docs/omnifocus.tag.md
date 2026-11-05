@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-If false, tasks associated with this tag will be skipped when determining the next action for a project
+If false, tasks associated with this tag will be skipped when determining the next action for a project. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +52,15 @@ If false, tasks associated with this tag will be skipped when determining the ne
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The number of available tasks
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The number of available tasks. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +69,15 @@ The number of available tasks
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Set if the tag is currently hidden or any of its container tags are hidden
+boolean \| null
+
+</td><td>
+
+Set if the tag is currently hidden or any of its container tags are hidden. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +88,11 @@ Set if the tag is currently hidden or any of its container tags are hidden
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Set if the tag is currently hidden
+Set if the tag is currently hidden. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +101,15 @@ Set if the tag is currently hidden
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the tag
+The unique identifier of the tag. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -114,11 +120,11 @@ The unique identifier of the tag
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the tag
+The name of the tag. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +135,11 @@ The name of the tag
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The note of the tag
+The note of the tag. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +148,15 @@ The note of the tag
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The number of remaining tasks
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The number of remaining tasks. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>
