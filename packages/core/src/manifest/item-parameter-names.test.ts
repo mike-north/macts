@@ -114,7 +114,7 @@ describe('the shipped resource commands', () => {
   // the item by it. Here Music's `move` would look the playlist up by `to`.
   it('fail when a command lists a dictionary parameter before its identifier', () => {
     const music = shipped('com.apple.Music')
-    const move = music.commands.move
+    const move = music.commands['move']
     if (move === undefined) throw new Error('Music declares no move')
     const reordered: AppManifest = {
       ...music,
