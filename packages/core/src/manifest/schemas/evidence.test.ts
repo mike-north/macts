@@ -44,6 +44,9 @@ function probe(overrides: Partial<ProbeNullabilityEvidence> = {}): ProbeNullabil
   }
 }
 
+/** A resource reached through a collection: it may have many instances. */
+const COLLECTION = {}
+
 /** The issue paths a failed parse reports, or `[]` when it succeeds. */
 function issuePaths(result: {
   success: boolean
@@ -138,9 +141,9 @@ describe('property nullability claims', () => {
     const evidence = { nullable: probe({ sampleSize: 3, failedReads: 2, errorNumbers: [-1728] }) }
     const parsed = PropertySchema.safeParse({ ...BASE, nullable: true, evidence })
     expect(issuePaths(parsed)).toEqual([])
-    expect(readsAbsentAsNull(PropertySchema.parse({ ...BASE, nullable: true, evidence }))).toBe(
-      true
-    )
+    expect(
+      readsAbsentAsNull(PropertySchema.parse({ ...BASE, nullable: true, evidence }), COLLECTION)
+    ).toBe(true)
   })
 
   it('rejects a probe nullable claim from failed reads that raised anything but -1728', () => {
@@ -158,7 +161,7 @@ describe('property nullability claims', () => {
     expect(issuePaths(PropertySchema.safeParse(claim))).toEqual([
       ['evidence', 'nullable', 'sampleSize'],
     ])
-    expect(readsAbsentAsNull({ nullable: true, evidence })).toBe(false)
+    expect(readsAbsentAsNull({ nullable: true, evidence }, COLLECTION)).toBe(false)
   })
 
   it('rejects a probe nullable claim from failed reads whose error numbers were not recorded', () => {
@@ -192,16 +195,16 @@ describe('property nullability claims', () => {
 
   it('takes a failed read as the empty value only on evidence that every failure reported no value', () => {
     const nullable = (evidence: ProbeNullabilityEvidence): boolean =>
-      readsAbsentAsNull({ nullable: true, evidence: { nullable: evidence } })
+      readsAbsentAsNull({ nullable: true, evidence: { nullable: evidence } }, COLLECTION)
     expect(nullable(probe({ failedReads: 1, errorNumbers: [-1728] }))).toBe(true)
     expect(nullable(probe({ nullCount: 2, failedReads: 1, errorNumbers: [-1728] }))).toBe(true)
     expect(nullable(probe({ nullCount: 2 }))).toBe(false)
     expect(nullable(probe({ nullCount: 2, failedReads: 1 }))).toBe(false)
     expect(nullable(probe({ nullCount: 2, failedReads: 1, errorNumbers: [-1700] }))).toBe(false)
-    expect(readsAbsentAsNull({ nullable: true, evidence: { nullable: { source: 'sdef' } } })).toBe(
-      false
-    )
-    expect(readsAbsentAsNull({})).toBe(false)
+    expect(
+      readsAbsentAsNull({ nullable: true, evidence: { nullable: { source: 'sdef' } } }, COLLECTION)
+    ).toBe(false)
+    expect(readsAbsentAsNull({}, COLLECTION)).toBe(false)
   })
 
   it('requires the probe provenance fields', () => {
@@ -224,6 +227,164 @@ describe('property nullability claims', () => {
       evidence: { nullable: { source: 'guess' } },
     })
     expect(result.success).toBe(false)
+  })
+})
+
+describe('curated absence claims on a resource with a single instance', () => {
+  /** Reads a probe observed failing with -1728 on the one instance there is. */
+  const ABSENT_READS = {
+    observedAt: '2026-10-31T12:00:00Z',
+    bundleId: 'com.example.archive',
+    appVersion: '1.0',
+    osVersion: '27.2',
+    failedReads: 1,
+    errorNumbers: [-1728],
+    reason: 'The annex exists only once the user builds one',
+  }
+  const CURATED = {
+    source: 'curated',
+    note: 'The front desk is the only one, so one read cannot show whether the annex is structural',
+    absentReads: ABSENT_READS,
+  } as const
+  const FOLDER = { access: 'r', type: 'string', description: 'The annex' } as const
+  const ROOT_EVIDENCE = {
+    source: 'dictionary',
+    bundleId: 'com.example.archive',
+    appVersion: '1.0',
+    osVersion: '27.2',
+  } as const
+  const FRONT = { property: 'frontDesk', evidence: { ...ROOT_EVIDENCE, term: 'front desk' } }
+  const BACK = { property: 'backDesk', evidence: { ...ROOT_EVIDENCE, term: 'back desk' } }
+
+  /** A desk resource holding the annex claim, with the given singleton root kinds. */
+  function desk(roots: Record<string, typeof FRONT> | undefined, evidence: object = CURATED) {
+    return {
+      name: 'Desk',
+      plural: 'Desks',
+      description: 'A desk',
+      ...(roots === undefined ? {} : { roots }),
+      properties: { annex: { ...FOLDER, nullable: true, evidence: { nullable: evidence } } },
+    }
+  }
+
+  it('accepts the claim on a singleton root with one kind', () => {
+    const parsed = ResourceSchema.safeParse(desk({ front: FRONT }))
+    expect(issuePaths(parsed)).toEqual([])
+  })
+
+  it('accepts it as a claim about an inherited property of a singleton root', () => {
+    const { properties: _properties, ...rest } = desk({ front: FRONT })
+    const resource = {
+      ...rest,
+      inherits: { resource: 'Room', evidence: { ...ROOT_EVIDENCE, term: 'room' } },
+      properties: {},
+      inheritedClaims: { annex: { nullable: true, evidence: { nullable: CURATED } } },
+    }
+    expect(issuePaths(ResourceSchema.safeParse(resource))).toEqual([])
+  })
+
+  it('rejects the claim without a reason, pointing to probe evidence or unsupported', () => {
+    const { reason: _reason, ...withoutReason } = ABSENT_READS
+    const result = ResourceSchema.safeParse(
+      desk({ front: FRONT }, { ...CURATED, absentReads: withoutReason })
+    )
+    expect(issuePaths(result)).toEqual([
+      ['properties', 'annex', 'evidence', 'nullable', 'absentReads', 'reason'],
+    ])
+    expect(result.error?.issues[0]?.message).toContain('needs a reason')
+    expect(result.error?.issues[0]?.message).toContain('probe evidence')
+    expect(result.error?.issues[0]?.message).toContain('mark the property unsupported')
+    const blank = { ...CURATED, absentReads: { ...ABSENT_READS, reason: '  ' } }
+    expect(issuePaths(ResourceSchema.safeParse(desk({ front: FRONT }, blank)))).toEqual([
+      ['properties', 'annex', 'evidence', 'nullable', 'absentReads', 'reason'],
+    ])
+  })
+
+  it('rejects the claim on a resource with several instances, pointing to probe evidence or unsupported', () => {
+    // A resource reached through a collection, and a root with two kinds:
+    // each has several instances, so a probe tells the kinds of absence apart.
+    for (const roots of [undefined, { front: FRONT, back: BACK }]) {
+      const result = ResourceSchema.safeParse(desk(roots))
+      expect(issuePaths(result)).toEqual([
+        ['properties', 'annex', 'evidence', 'nullable', 'absentReads'],
+      ])
+      expect(result.error?.issues[0]?.message).toContain('single instance')
+      expect(result.error?.issues[0]?.message).toContain('probe evidence')
+      expect(result.error?.issues[0]?.message).toContain('mark the property unsupported')
+    }
+  })
+
+  it('rejects it as a claim about an inherited property of a resource with several instances', () => {
+    const resource = {
+      name: 'Room',
+      plural: 'Rooms',
+      description: 'A room',
+      inherits: { resource: 'Space', evidence: { ...ROOT_EVIDENCE, term: 'space' } },
+      properties: {},
+      inheritedClaims: { annex: { nullable: true, evidence: { nullable: CURATED } } },
+    }
+    expect(issuePaths(ResourceSchema.safeParse(resource))).toEqual([
+      ['inheritedClaims', 'annex', 'evidence', 'nullable', 'absentReads'],
+    ])
+  })
+
+  it('rejects recorded failures other than -1728, and a non-null claim', () => {
+    for (const errorNumbers of [[-1700], [-1728, -1700], [-1728, -1728]]) {
+      const evidence = { ...CURATED, absentReads: { ...ABSENT_READS, errorNumbers } }
+      expect(issuePaths(ResourceSchema.safeParse(desk({ front: FRONT }, evidence)))).toEqual([
+        ['properties', 'annex', 'evidence', 'nullable', 'absentReads', 'errorNumbers'],
+      ])
+    }
+    const nonNull = {
+      ...desk({ front: FRONT }),
+      properties: { annex: { ...FOLDER, nullable: false, evidence: { nullable: CURATED } } },
+    }
+    expect(issuePaths(ResourceSchema.safeParse(nonNull))).toEqual([
+      ['properties', 'annex', 'nullable'],
+    ])
+  })
+
+  it('rejects absent reads on a command parameter, which is never read', () => {
+    const parameter = {
+      name: 'annex',
+      type: 'string',
+      description: 'An annex',
+      nullable: true,
+      evidence: { nullable: CURATED },
+    }
+    expect(issuePaths(CommandParameterSchema.safeParse(parameter))).toEqual([
+      ['evidence', 'nullable', 'absentReads'],
+    ])
+  })
+
+  it('takes a failed read as the empty value only for the accepted claim on a single instance', () => {
+    const claim = { nullable: true, evidence: { nullable: CURATED } }
+    expect(readsAbsentAsNull(claim, { roots: { front: FRONT } })).toBe(true)
+    expect(readsAbsentAsNull(claim, COLLECTION)).toBe(false)
+    expect(readsAbsentAsNull(claim, { roots: { front: FRONT, back: BACK } })).toBe(false)
+    expect(readsAbsentAsNull(claim, { roots: {} })).toBe(false)
+    expect(
+      readsAbsentAsNull(
+        { nullable: false, evidence: { nullable: CURATED } },
+        { roots: { front: FRONT } }
+      )
+    ).toBe(false)
+    // A curated claim without absent reads names its evidence but records no
+    // failed read, so a failure is still a failure.
+    const { absentReads: _absentReads, ...plain } = CURATED
+    expect(
+      readsAbsentAsNull(
+        { nullable: true, evidence: { nullable: plain } },
+        { roots: { front: FRONT } }
+      )
+    ).toBe(false)
+    const other = { ...CURATED, absentReads: { ...ABSENT_READS, errorNumbers: [-1700] } }
+    expect(
+      readsAbsentAsNull(
+        { nullable: true, evidence: { nullable: other } },
+        { roots: { front: FRONT } }
+      )
+    ).toBe(false)
   })
 })
 

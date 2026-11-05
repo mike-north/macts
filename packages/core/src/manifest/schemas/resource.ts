@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { PropertyClaimsSchema, PropertySchema } from './property.js'
 import {
+  checkCuratedAbsence,
   DictionaryTermEvidenceSchema,
   IdentifierUniquenessEvidenceSchema,
   ObservedAtSchema,
@@ -518,6 +519,7 @@ export const ResourceSchema = z
     checkNativeSpellings(resource, ctx)
     checkRoots(resource, ctx)
     checkKeyTargeting(resource.identifiers ?? [], ctx)
+    checkCuratedAbsence(resource, ctx)
     if (resource.rangeRead !== undefined && resource.unsupported !== undefined) {
       ctx.addIssue({
         code: 'custom',
