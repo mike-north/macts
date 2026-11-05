@@ -168,7 +168,10 @@ export class MicrosoftWordClient {
    * Insert text at the specified location
    */
   async insertText(text: string, at?: number): Promise<void> {
-    await this.#httpClient.rpc<undefined>('microsoft-word.app.insertText', { text, at })
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.insertText', {
+      text,
+      ...(at === undefined ? {} : { at: { integer: String(at) } }),
+    })
   }
 
   /**

@@ -140,14 +140,18 @@ export class QuickTimePlayerClient {
    * Step the movie backward the specified number of steps (default is 1).
    */
   async stepBackward(by?: number): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.stepBackward', { by })
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.stepBackward', {
+      ...(by === undefined ? {} : { by: { integer: String(by) } }),
+    })
   }
 
   /**
    * Step the movie forward the specified number of steps (default is 1).
    */
   async stepForward(by?: number): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.stepForward', { by })
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.stepForward', {
+      ...(by === undefined ? {} : { by: { integer: String(by) } }),
+    })
   }
 
   /**

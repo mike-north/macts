@@ -12,6 +12,10 @@
  * - the CLI `get` command from the package's CLI plugin, run with the
  *   positional a user types, through the client it calls.
  *
+ * A command's optional integer parameter takes the same path through the
+ * HTTP client: it is sent in the wire form when supplied, and not at all
+ * when omitted.
+ *
  * Both send their request through `fetch`, which records the body. The body
  * must equal the hand-written wire value and must be admitted by the
  * operation's own `input.wire` from the package's built contract.
@@ -25,6 +29,8 @@ import type { OperationId } from '@macts/contracts'
 import { OmniPlanClient } from '@macts/omniplan'
 import { plugin as omniPlanCli } from '@macts/omniplan/cli'
 import { omniPlanContract } from '@macts/omniplan/contract'
+import { QuickTimePlayerClient } from '@macts/quicktime-player'
+import { quickTimePlayerContract } from '@macts/quicktime-player/contract'
 import { TVClient } from '@macts/tv'
 import { plugin as tvCli } from '@macts/tv/cli'
 import { tvContract } from '@macts/tv/contract'
@@ -211,4 +217,28 @@ describe('a get by an integer id sends the id in the contract wire form (#207)',
       expect(get.wire().safeParse(body).success).toBe(true)
     }
   )
+})
+
+describe("a command's optional integer parameter is sent in the contract wire form (#207)", () => {
+  const client = (): QuickTimePlayerClient =>
+    new QuickTimePlayerClient({ apiKey: 'k', baseUrl: BASE_URL })
+  const wire = (): ReturnType<typeof inputWire> =>
+    inputWire(quickTimePlayerContract, 'quicktime-player.app.stepForward')
+
+  // QuickTime's `step forward` takes `by`, an optional integer. The HTTP
+  // client sent it as a bare number, which the input rejects.
+  it('QuickTime stepForward: sends `by` as an integer wire value its input admits (bug #207)', async () => {
+    await client().stepForward(2)
+    const body = onlyRequest('quicktime-player.app.stepForward')
+    expect(body).toEqual({ by: { integer: '2' } })
+    expect(wire().safeParse(body).success).toBe(true)
+    expect(wire().safeParse({ by: 2 }).success).toBe(false)
+  })
+
+  it('QuickTime stepForward: sends no `by` when it is omitted', async () => {
+    await client().stepForward()
+    const body = onlyRequest('quicktime-player.app.stepForward')
+    expect(body).toEqual({})
+    expect(wire().safeParse(body).success).toBe(true)
+  })
 })

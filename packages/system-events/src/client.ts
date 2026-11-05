@@ -266,7 +266,9 @@ export class SystemEventsClient {
   async editActionOf(usingActionName?: string, usingActionNumber?: number): Promise<void> {
     await this.#httpClient.rpc<undefined>('system-events.app.editActionOf', {
       usingActionName,
-      usingActionNumber,
+      ...(usingActionNumber === undefined
+        ? {}
+        : { usingActionNumber: { integer: String(usingActionNumber) } }),
     })
   }
 
@@ -304,7 +306,9 @@ export class SystemEventsClient {
   async removeActionFrom(usingActionName?: string, usingActionNumber?: number): Promise<void> {
     await this.#httpClient.rpc<undefined>('system-events.app.removeActionFrom', {
       usingActionName,
-      usingActionNumber,
+      ...(usingActionNumber === undefined
+        ? {}
+        : { usingActionNumber: { integer: String(usingActionNumber) } }),
     })
   }
 }

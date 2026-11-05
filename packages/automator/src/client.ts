@@ -132,7 +132,11 @@ export class AutomatorClient {
    * Add an Automator action or variable to a workflow
    */
   async add(object: unknown, to: unknown, atIndex?: number): Promise<void> {
-    await this.#httpClient.rpc<undefined>('automator.app.add', { object, to, atIndex })
+    await this.#httpClient.rpc<undefined>('automator.app.add', {
+      object,
+      to,
+      ...(atIndex === undefined ? {} : { atIndex: { integer: String(atIndex) } }),
+    })
   }
 
   /**

@@ -97,7 +97,7 @@ export class WorkspaceDocumentResourceClient {
   ): Promise<void> {
     await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.attach`, {
       workspaceName,
-      toProcessIdentifier,
+      toProcessIdentifier: { integer: String(toProcessIdentifier) },
       suspended,
     })
   }

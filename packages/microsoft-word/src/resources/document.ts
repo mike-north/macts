@@ -78,6 +78,9 @@ export class DocumentResourceClient {
    * Create a text range by character positions
    */
   async createRange(start?: number, end?: number): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.createRange`, { start, end })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.createRange`, {
+      ...(start === undefined ? {} : { start: { integer: String(start) } }),
+      ...(end === undefined ? {} : { end: { integer: String(end) } }),
+    })
   }
 }
