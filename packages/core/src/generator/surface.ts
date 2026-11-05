@@ -362,7 +362,7 @@ export function commandMethodParameters(command: Command): {
     item === undefined
       ? undefined
       : command.parameters.find((p) => p.name === command.parent?.parameter)
-  const leading = [parent, item].filter((p) => p !== undefined)
+  const leading = [parent, item].filter((p): p is Command['parameters'][number] => p !== undefined)
   const rest = command.parameters
     .filter((p) => !leading.includes(p))
     .sort((a, b) => {
