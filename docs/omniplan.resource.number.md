@@ -4,10 +4,10 @@
 
 ## Resource.number property
 
-The total number of units for this resource (1.0 = 100%)
+The total number of units for this resource (1.0 = 100%). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-number: number
+number: number | null
 ```

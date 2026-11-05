@@ -2,134 +2,14 @@
 
 [Home](./index.md) &gt; [@macts/system-settings](./system-settings.md) &gt; [SystemSettingsClient](./system-settings.systemsettingsclient.md)
 
-## SystemSettingsClient class
+## SystemSettingsClient interface
 
-SystemSettings client for HTTP-based macOS automation.
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 **Signature:**
 
 ```typescript
-declare class SystemSettingsClient
+interface SystemSettingsClient extends ClientBrand<SystemSettingsResources>
 ```
 
-## Example
-
-```typescript
-const client = new SystemSettingsClient({
-  apiKey: process.env.MACTS_API_KEY!,
-})
-
-// List calendars
-const calendars = await client.calendars.list()
-```
-
-## Constructors
-
-<table><thead><tr><th>
-
-Constructor
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[(constructor)(options)](./system-settings.systemsettingsclient._constructor_.md)
-
-</td><td>
-
-</td><td>
-
-Constructs a new instance of the `SystemSettingsClient` class
-
-</td></tr>
-</tbody></table>
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[http](./system-settings.systemsettingsclient.http.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[HttpClient](./system-settings.httpclient.md)
-
-</td><td>
-
-Get the HTTP client for making custom requests.
-
-</td></tr>
-<tr><td>
-
-[panes](./system-settings.systemsettingsclient.panes.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[PaneResourceClient](./system-settings.paneresourceclient.md)
-
-</td><td>
-
-A settings pane.
-
-</td></tr>
-</tbody></table>
-
-## Methods
-
-<table><thead><tr><th>
-
-Method
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[reveal()](./system-settings.systemsettingsclient.reveal.md)
-
-</td><td>
-
-</td><td>
-
-Reveals a settings pane or an anchor within a pane.
-
-</td></tr>
-</tbody></table>
+**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[SystemSettingsResources](./system-settings.systemsettingsresources.md)<!-- -->&gt;

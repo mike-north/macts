@@ -4,10 +4,10 @@
 
 ## Selection.fontName property
 
-The font name of the selection
+The font name of the selection. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fontName: string
+fontName: string | null
 ```

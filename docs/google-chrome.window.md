@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-[Tab](./google-chrome.tab.md)
+`readonly`
 
 </td><td>
 
-Returns the currently selected tab
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Tab](./google-chrome.tab.md)<!-- -->, string, 'Tab'&gt; \| null
+
+</td><td>
+
+Returns the currently selected tab, as a reference that carries this window as its container. Window and tab ids start over each time the browser is relaunched, so this reference, kept across a relaunch, may resolve to a different tab or window, not merely fail, and an action through it, such as closing the tab, would act on that other tab. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ Returns the currently selected tab
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The index of the active tab.
+The index of the active tab. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +71,11 @@ The index of the active tab.
 
 </td><td>
 
-{ x: number; y: number; width: number; height: number; }
+[Rectangle](./contracts.rectangle.md) \| null
 
 </td><td>
 
-The bounding rectangle of the window.
+The bounding rectangle of the window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +84,15 @@ The bounding rectangle of the window.
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the window has a close box.
+boolean \| null
+
+</td><td>
+
+Whether the window has a close box. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +103,11 @@ Whether the window has a close box.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The given name of the window.
+The given name of the window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,13 +116,15 @@ The given name of the window.
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the window.
+The unique identifier of the window, within one browser session: ids start over each time the browser is relaunched, so an id kept across a relaunch may find a different window, not merely none. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -129,11 +135,11 @@ The unique identifier of the window.
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The index of the window, ordered front to back.
+The index of the window, ordered front to back. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +148,15 @@ The index of the window, ordered front to back.
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the window can be minimized.
+boolean \| null
+
+</td><td>
+
+Whether the window can be minimized. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +167,11 @@ Whether the window can be minimized.
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the window is currently minimized.
+Whether the window is currently minimized. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -174,11 +182,11 @@ Whether the window is currently minimized.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window.
+Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -187,13 +195,15 @@ Represents the mode of the window which can be 'normal' or 'incognito', can be s
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The full title of the window.
+string \| null
+
+</td><td>
+
+The full title of the window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -202,13 +212,15 @@ The full title of the window.
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the window can be resized.
+boolean \| null
+
+</td><td>
+
+Whether the window can be resized. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -219,11 +231,11 @@ Whether the window can be resized.
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the window is currently visible.
+Whether the window is currently visible. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -232,13 +244,15 @@ Whether the window is currently visible.
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the window can be zoomed.
+boolean \| null
+
+</td><td>
+
+Whether the window can be zoomed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -249,11 +263,11 @@ Whether the window can be zoomed.
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the window is currently zoomed.
+Whether the window is currently zoomed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

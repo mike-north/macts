@@ -4,10 +4,10 @@
 
 ## Grid.major property
 
-Does the grid have 'major' lines?
+Does the grid have 'major' lines? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-major: boolean
+major: boolean | null
 ```

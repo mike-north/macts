@@ -4,10 +4,10 @@
 
 ## Alias.typeIdentifier property
 
-The type identifier of the alias
+The type identifier of the alias. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-typeIdentifier: string
+readonly typeIdentifier: string | null;
 ```

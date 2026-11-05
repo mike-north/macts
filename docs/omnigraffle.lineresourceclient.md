@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(id)](./omnigraffle.lineresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./omnigraffle.lineresourceclient.get.md)
 
 </td><td>
 
@@ -68,13 +68,13 @@ Get a line by id.
 </td></tr>
 <tr><td>
 
-[list()](./omnigraffle.lineresourceclient.list.md)
+[list(canvasId, \_\_mactsOptions)](./omnigraffle.lineresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all lines.
+List the lines of one canvas, as one page.
 
 </td></tr>
 </tbody></table>

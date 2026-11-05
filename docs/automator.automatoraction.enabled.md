@@ -4,10 +4,10 @@
 
 ## AutomatorAction.enabled property
 
-Is the action enabled?
+Is the action enabled? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-enabled: boolean
+enabled: boolean | null
 ```

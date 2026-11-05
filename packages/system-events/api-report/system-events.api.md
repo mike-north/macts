@@ -4,6 +4,11 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
+import { Rectangle } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -11,8 +16,8 @@ export type Accs = 'none' | 'readOnly' | 'readWrite' | 'writeOnly';
 
 // @public
 export interface Action {
-    description: string;
-    name: string;
+    readonly description: string | null;
+    readonly name: string | null;
 }
 
 // @public
@@ -21,32 +26,32 @@ export type ActionCreateInput = Record<string, never>;
 // @public
 export class ActionResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    perform(): Promise<void>;
+    perform(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const ActionSchema: z.ZodObject<{
     description: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ActionUpdateInput = Partial<ActionCreateInput>;
+export type ActionUpdateInput = Record<string, never>;
 
 // @public
 export type Actn = 'itemsAdded' | 'itemsRemoved' | 'windowClosed' | 'windowMoved' | 'windowOpened';
 
 // @public
 export interface Alias {
-    creatorType: string;
-    defaultApplication: string;
-    fileType: string;
-    kind: string;
-    productVersion: string;
-    shortVersion: string;
-    stationery: boolean;
-    typeIdentifier: string;
-    version: string;
+    creatorType: string | null;
+    defaultApplication: string | null;
+    fileType: string | null;
+    readonly kind: string | null;
+    readonly productVersion: string | null;
+    readonly shortVersion: string | null;
+    stationery: boolean | null;
+    readonly typeIdentifier: string | null;
+    readonly version: string | null;
 }
 
 // @public
@@ -57,7 +62,7 @@ export interface AliasCreateInput {
     stationery?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const AliasSchema: z.ZodObject<{
     creatorType: z.ZodString;
     defaultApplication: z.ZodString;
@@ -71,16 +76,21 @@ export const AliasSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type AliasUpdateInput = Partial<AliasCreateInput>;
+export interface AliasUpdateInput {
+    creatorType?: string;
+    defaultApplication?: string;
+    fileType?: string;
+    stationery?: boolean;
+}
 
 // @public
 export type Appearances = 'blue' | 'graphite';
 
 // @public
 export interface Attribute {
-    name: string;
-    settable: boolean;
-    value: string;
+    readonly name: string | null;
+    readonly settable: boolean | null;
+    value: string | null;
 }
 
 // @public
@@ -88,7 +98,7 @@ export interface AttributeCreateInput {
     value?: string;
 }
 
-// @public (undocumented)
+// @public
 export const AttributeSchema: z.ZodObject<{
     name: z.ZodString;
     settable: z.ZodBoolean;
@@ -96,55 +106,57 @@ export const AttributeSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type AttributeUpdateInput = Partial<AttributeCreateInput>;
+export interface AttributeUpdateInput {
+    value?: string;
+}
 
 // @public
 export interface Browser {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type BrowserCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const BrowserSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type BrowserUpdateInput = Partial<BrowserCreateInput>;
+export type BrowserUpdateInput = Record<string, never>;
 
 // @public
 export interface BusyIndicator {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type BusyIndicatorCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const BusyIndicatorSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type BusyIndicatorUpdateInput = Partial<BusyIndicatorCreateInput>;
+export type BusyIndicatorUpdateInput = Record<string, never>;
 
 // @public
 export interface Button {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type ButtonCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ButtonSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ButtonUpdateInput = Partial<ButtonCreateInput>;
+export type ButtonUpdateInput = Record<string, never>;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -167,92 +179,92 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Checkbox {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type CheckboxCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const CheckboxSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type CheckboxUpdateInput = Partial<CheckboxCreateInput>;
+export type CheckboxUpdateInput = Record<string, never>;
 
 // @public
 export interface ClassicDomainObject {
-    id: string;
-    name: string;
+    readonly id: string;
+    readonly name: string | null;
 }
 
 // @public
 export type ClassicDomainObjectCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ClassicDomainObjectSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ClassicDomainObjectUpdateInput = Partial<ClassicDomainObjectCreateInput>;
+export type ClassicDomainObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface ColorWell {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type ColorWellCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ColorWellSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ColorWellUpdateInput = Partial<ColorWellCreateInput>;
+export type ColorWellUpdateInput = Record<string, never>;
 
 // @public
 export interface Column {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type ColumnCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ColumnSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ColumnUpdateInput = Partial<ColumnCreateInput>;
+export type ColumnUpdateInput = Record<string, never>;
 
 // @public
 export interface ComboBox {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type ComboBoxCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ComboBoxSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ComboBoxUpdateInput = Partial<ComboBoxCreateInput>;
+export type ComboBoxUpdateInput = Record<string, never>;
 
 // @public
 export interface Configuration {
-    accountName: string;
-    connected: boolean;
-    id: string;
-    name: string;
+    accountName: string | null;
+    readonly connected: boolean | null;
+    readonly id: string;
+    readonly name: string | null;
 }
 
 // @public
@@ -260,7 +272,7 @@ export interface ConfigurationCreateInput {
     accountName?: string;
 }
 
-// @public (undocumented)
+// @public
 export const ConfigurationSchema: z.ZodObject<{
     accountName: z.ZodString;
     connected: z.ZodBoolean;
@@ -269,22 +281,24 @@ export const ConfigurationSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ConfigurationUpdateInput = Partial<ConfigurationCreateInput>;
+export interface ConfigurationUpdateInput {
+    accountName?: string;
+}
 
 // @public
 export type Dhac = 'askWhatToDo' | 'ignore' | 'openApplication' | 'runAScript';
 
 // @public
 export interface Disk {
-    capacity: number;
-    ejectable: boolean;
-    format: string;
-    freeSpace: number;
-    ignorePrivileges: boolean;
-    localVolume: boolean;
-    server: string;
-    startup: boolean;
-    zone: string;
+    readonly capacity: number | null;
+    readonly ejectable: boolean | null;
+    readonly format: string | null;
+    readonly freeSpace: number | null;
+    ignorePrivileges: boolean | null;
+    readonly localVolume: boolean | null;
+    readonly server: string | null;
+    readonly startup: boolean | null;
+    readonly zone: string | null;
 }
 
 // @public
@@ -294,21 +308,21 @@ export interface DiskCreateInput {
 
 // @public
 export interface DiskItem {
-    busyStatus: boolean;
-    creationDate: Date;
-    displayedName: string;
-    id: string;
-    modificationDate: Date;
-    name: string;
-    nameExtension: string;
-    packageFolder: boolean;
-    path: string;
-    physicalSize: number;
-    pOSIXPath: string;
-    size: number;
-    uRL: string;
-    visible: boolean;
-    volume: string;
+    readonly busyStatus: boolean | null;
+    readonly creationDate: Date | null;
+    readonly displayedName: string | null;
+    readonly id: string;
+    modificationDate: Date | null;
+    name: string | null;
+    readonly nameExtension: string | null;
+    readonly packageFolder: boolean | null;
+    readonly path: string | null;
+    readonly physicalSize: Integer | null;
+    readonly pOSIXPath: string | null;
+    readonly size: Integer | null;
+    readonly uRL: string | null;
+    visible: boolean | null;
+    readonly volume: string | null;
 }
 
 // @public
@@ -318,7 +332,7 @@ export interface DiskItemCreateInput {
     visible?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const DiskItemSchema: z.ZodObject<{
     busyStatus: z.ZodBoolean;
     creationDate: z.ZodString;
@@ -338,9 +352,13 @@ export const DiskItemSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type DiskItemUpdateInput = Partial<DiskItemCreateInput>;
+export interface DiskItemUpdateInput {
+    modificationDate?: Date;
+    name?: string;
+    visible?: boolean;
+}
 
-// @public (undocumented)
+// @public
 export const DiskSchema: z.ZodObject<{
     capacity: z.ZodNumber;
     ejectable: z.ZodBoolean;
@@ -354,25 +372,27 @@ export const DiskSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type DiskUpdateInput = Partial<DiskCreateInput>;
+export interface DiskUpdateInput {
+    ignorePrivileges?: boolean;
+}
 
 // @public
 export interface Domain {
-    id: string;
-    name: string;
+    readonly id: string;
+    readonly name: string | null;
 }
 
 // @public
 export type DomainCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const DomainSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type DomainUpdateInput = Partial<DomainCreateInput>;
+export type DomainUpdateInput = Record<string, never>;
 
 // @public
 export type Dpbh = 'minimize' | 'off' | 'zoom';
@@ -385,19 +405,19 @@ export type Dpls = 'bottom' | 'left' | 'right';
 
 // @public
 export interface Drawer {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type DrawerCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const DrawerSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type DrawerUpdateInput = Partial<DrawerCreateInput>;
+export type DrawerUpdateInput = Record<string, never>;
 
 // @public
 export type DynamicStyle = 'auto' | 'dynamic' | 'light' | 'dark' | 'unknown';
@@ -416,15 +436,15 @@ export type Enum = 'standard' | 'detailed';
 
 // @public
 interface File_2 {
-    creatorType: string;
-    defaultApplication: string;
-    fileType: string;
-    kind: string;
-    productVersion: string;
-    shortVersion: string;
-    stationery: boolean;
-    typeIdentifier: string;
-    version: string;
+    creatorType: string | null;
+    defaultApplication: string | null;
+    fileType: string | null;
+    readonly kind: string | null;
+    readonly productVersion: string | null;
+    readonly shortVersion: string | null;
+    stationery: boolean | null;
+    readonly typeIdentifier: string | null;
+    readonly version: string | null;
 }
 export { File_2 as File }
 
@@ -438,21 +458,21 @@ export interface FileCreateInput {
 
 // @public
 export interface FilePackage {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type FilePackageCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const FilePackageSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type FilePackageUpdateInput = Partial<FilePackageCreateInput>;
+export type FilePackageUpdateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const FileSchema: z.ZodObject<{
     creatorType: z.ZodString;
     defaultApplication: z.ZodString;
@@ -466,25 +486,30 @@ export const FileSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type FileUpdateInput = Partial<FileCreateInput>;
+export interface FileUpdateInput {
+    creatorType?: string;
+    defaultApplication?: string;
+    fileType?: string;
+    stationery?: boolean;
+}
 
 // @public
 export interface Folder {
-    busyStatus: boolean;
-    creationDate: Date;
-    displayedName: string;
-    id: string;
-    modificationDate: Date;
-    name: string;
-    nameExtension: string;
-    packageFolder: boolean;
-    path: string;
-    physicalSize: number;
-    pOSIXPath: string;
-    size: number;
-    uRL: string;
-    visible: boolean;
-    volume: string;
+    readonly busyStatus: boolean | null;
+    readonly creationDate: Date | null;
+    readonly displayedName: string | null;
+    readonly id: string;
+    modificationDate: Date | null;
+    name: string | null;
+    readonly nameExtension: string | null;
+    readonly packageFolder: boolean | null;
+    readonly path: string | null;
+    readonly physicalSize: Integer | null;
+    readonly pOSIXPath: string | null;
+    readonly size: Integer | null;
+    readonly uRL: string | null;
+    visible: boolean | null;
+    readonly volume: string | null;
 }
 
 // @public
@@ -494,7 +519,7 @@ export interface FolderCreateInput {
     visible?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const FolderSchema: z.ZodObject<{
     busyStatus: z.ZodBoolean;
     creationDate: z.ZodString;
@@ -514,42 +539,46 @@ export const FolderSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type FolderUpdateInput = Partial<FolderCreateInput>;
+export interface FolderUpdateInput {
+    modificationDate?: Date;
+    name?: string;
+    visible?: boolean;
+}
 
 // @public
 export type FontSmoothingStyles = 'automatic' | 'light' | 'medium' | 'standard' | 'strong';
 
 // @public
 export interface Group {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type GroupCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const GroupSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type GroupUpdateInput = Partial<GroupCreateInput>;
+export type GroupUpdateInput = Record<string, never>;
 
 // @public
 export interface GrowArea {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type GrowAreaCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const GrowAreaSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type GrowAreaUpdateInput = Partial<GrowAreaCreateInput>;
+export type GrowAreaUpdateInput = Record<string, never>;
 
 // @public
 export type HighlightColors = 'blue' | 'gold' | 'graphite' | 'green' | 'orange' | 'purple' | 'red' | 'silver';
@@ -557,62 +586,66 @@ export type HighlightColors = 'blue' | 'gold' | 'graphite' | 'green' | 'orange' 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface Image {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type ImageCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ImageSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ImageUpdateInput = Partial<ImageCreateInput>;
+export type ImageUpdateInput = Record<string, never>;
 
 // @public
 export interface Incrementor {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type IncrementorCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const IncrementorSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type IncrementorUpdateInput = Partial<IncrementorCreateInput>;
+export type IncrementorUpdateInput = Record<string, never>;
 
 // @public
 export interface Interface {
-    automatic: boolean;
-    duplex: string;
-    id: string;
-    kind: string;
-    mACAddress: string;
-    mtu: number;
-    name: string;
-    speed: number;
+    automatic: boolean | null;
+    duplex: string | null;
+    readonly id: string;
+    readonly kind: string | null;
+    readonly mACAddress: string | null;
+    mtu: Integer | null;
+    readonly name: string | null;
+    speed: Integer | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "InterfaceCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type InterfaceCreateInput = Omit<InterfaceCreateInput_2, 'mtu' | 'speed'> & {
+    mtu?: null extends InterfaceCreateInput_2['mtu'] ? number | null : number;
+    speed?: null extends InterfaceCreateInput_2['speed'] ? number | null : number;
+};
 
 // @public
-export interface InterfaceCreateInput {
-    automatic?: boolean;
-    duplex?: string;
-    mtu?: number;
-    speed?: number;
-}
-
-// @public (undocumented)
 export const InterfaceSchema: z.ZodObject<{
     automatic: z.ZodBoolean;
     duplex: z.ZodString;
@@ -624,45 +657,50 @@ export const InterfaceSchema: z.ZodObject<{
     speed: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "InterfaceUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type InterfaceUpdateInput = Partial<InterfaceCreateInput>;
+export type InterfaceUpdateInput = Omit<InterfaceUpdateInput_2, 'mtu' | 'speed'> & {
+    mtu?: null extends InterfaceUpdateInput_2['mtu'] ? number | null : number;
+    speed?: null extends InterfaceUpdateInput_2['speed'] ? number | null : number;
+};
 
 // @public
 export interface List {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type ListCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ListSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ListUpdateInput = Partial<ListCreateInput>;
+export type ListUpdateInput = Record<string, never>;
 
 // @public
 export interface LocalDomainObject {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type LocalDomainObjectCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const LocalDomainObjectSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type LocalDomainObjectUpdateInput = Partial<LocalDomainObjectCreateInput>;
+export type LocalDomainObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface Location {
-    id: string;
-    name: string;
+    readonly id: string;
+    name: string | null;
 }
 
 // @public
@@ -670,23 +708,25 @@ export interface LocationCreateInput {
     name?: string;
 }
 
-// @public (undocumented)
+// @public
 export const LocationSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type LocationUpdateInput = Partial<LocationCreateInput>;
+export interface LocationUpdateInput {
+    name?: string;
+}
 
 // @public
 export interface Menu {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export interface MenuBar {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -694,86 +734,86 @@ export type MenuBarCreateInput = Record<string, never>;
 
 // @public
 export interface MenuBarItem {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type MenuBarItemCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const MenuBarItemSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type MenuBarItemUpdateInput = Partial<MenuBarItemCreateInput>;
+export type MenuBarItemUpdateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const MenuBarSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type MenuBarUpdateInput = Partial<MenuBarCreateInput>;
+export type MenuBarUpdateInput = Record<string, never>;
 
 // @public
 export interface MenuButton {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type MenuButtonCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const MenuButtonSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type MenuButtonUpdateInput = Partial<MenuButtonCreateInput>;
+export type MenuButtonUpdateInput = Record<string, never>;
 
 // @public
 export type MenuCreateInput = Record<string, never>;
 
 // @public
 export interface MenuItem {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type MenuItemCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const MenuItemSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type MenuItemUpdateInput = Partial<MenuItemCreateInput>;
+export type MenuItemUpdateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const MenuSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type MenuUpdateInput = Partial<MenuCreateInput>;
+export type MenuUpdateInput = Record<string, never>;
 
 // @public
 export interface NetworkDomainObject {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type NetworkDomainObjectCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const NetworkDomainObjectSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type NetworkDomainObjectUpdateInput = Partial<NetworkDomainObjectCreateInput>;
+export type NetworkDomainObjectUpdateInput = Record<string, never>;
 
 // @public
 export type NetworkPreferencesObject = Record<string, never>;
@@ -781,81 +821,81 @@ export type NetworkPreferencesObject = Record<string, never>;
 // @public
 export type NetworkPreferencesObjectCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const NetworkPreferencesObjectSchema: z.ZodObject<{}, z.core.$strip>;
 
 // @public
-export type NetworkPreferencesObjectUpdateInput = Partial<NetworkPreferencesObjectCreateInput>;
+export type NetworkPreferencesObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface Outline {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type OutlineCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const OutlineSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type OutlineUpdateInput = Partial<OutlineCreateInput>;
+export type OutlineUpdateInput = Record<string, never>;
 
 // @public
 export interface PopOver {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type PopOverCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const PopOverSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type PopOverUpdateInput = Partial<PopOverCreateInput>;
+export type PopOverUpdateInput = Record<string, never>;
 
 // @public
 export interface PopUpButton {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type PopUpButtonCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const PopUpButtonSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type PopUpButtonUpdateInput = Partial<PopUpButtonCreateInput>;
+export type PopUpButtonUpdateInput = Record<string, never>;
 
 // @public
 export interface Process {
-    acceptsHighLevelEvents: boolean;
-    acceptsRemoteEvents: boolean;
-    architecture: string;
-    backgroundOnly: boolean;
-    bundleIdentifier: string;
-    classic: boolean;
-    creatorType: string;
-    displayedName: string;
-    file: string;
-    fileType: string;
-    frontmost: boolean;
-    hasScriptingTerminology: boolean;
-    id: number;
-    name: string;
-    partitionSpaceUsed: number;
-    shortName: string;
-    totalPartitionSize: number;
-    unixId: number;
-    visible: string;
+    readonly acceptsHighLevelEvents: boolean | null;
+    readonly acceptsRemoteEvents: boolean | null;
+    readonly architecture: string | null;
+    readonly backgroundOnly: boolean | null;
+    readonly bundleIdentifier: string | null;
+    readonly classic: boolean | null;
+    readonly creatorType: string | null;
+    readonly displayedName: string | null;
+    readonly file: string | null;
+    readonly fileType: string | null;
+    frontmost: boolean | null;
+    readonly hasScriptingTerminology: boolean | null;
+    readonly id: Integer;
+    readonly name: string | null;
+    readonly partitionSpaceUsed: Integer | null;
+    readonly shortName: string | null;
+    readonly totalPartitionSize: Integer | null;
+    readonly unixId: Integer | null;
+    visible: string | null;
 }
 
 // @public
@@ -864,7 +904,7 @@ export interface ProcessCreateInput {
     visible?: string;
 }
 
-// @public (undocumented)
+// @public
 export const ProcessSchema: z.ZodObject<{
     acceptsHighLevelEvents: z.ZodBoolean;
     acceptsRemoteEvents: z.ZodBoolean;
@@ -888,30 +928,33 @@ export const ProcessSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ProcessUpdateInput = Partial<ProcessCreateInput>;
+export interface ProcessUpdateInput {
+    frontmost?: boolean;
+    visible?: string;
+}
 
 // @public
 export interface ProgressIndicator {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type ProgressIndicatorCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ProgressIndicatorSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ProgressIndicatorUpdateInput = Partial<ProgressIndicatorCreateInput>;
+export type ProgressIndicatorUpdateInput = Record<string, never>;
 
 // @public
 export interface PropertyListItem {
-    kind: string;
-    name: string;
-    text: string;
-    value: string;
+    readonly kind: string | null;
+    readonly name: string | null;
+    text: string | null;
+    value: string | null;
 }
 
 // @public
@@ -920,7 +963,7 @@ export interface PropertyListItemCreateInput {
     value?: string;
 }
 
-// @public (undocumented)
+// @public
 export const PropertyListItemSchema: z.ZodObject<{
     kind: z.ZodString;
     name: z.ZodString;
@@ -929,89 +972,92 @@ export const PropertyListItemSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type PropertyListItemUpdateInput = Partial<PropertyListItemCreateInput>;
+export interface PropertyListItemUpdateInput {
+    text?: string;
+    value?: string;
+}
 
 // @public
 export interface RadioButton {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type RadioButtonCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const RadioButtonSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type RadioButtonUpdateInput = Partial<RadioButtonCreateInput>;
+export type RadioButtonUpdateInput = Record<string, never>;
 
 // @public
 export interface RadioGroup {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type RadioGroupCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const RadioGroupSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type RadioGroupUpdateInput = Partial<RadioGroupCreateInput>;
+export type RadioGroupUpdateInput = Record<string, never>;
 
 // @public
 export interface RelevanceIndicator {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type RelevanceIndicatorCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const RelevanceIndicatorSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type RelevanceIndicatorUpdateInput = Partial<RelevanceIndicatorCreateInput>;
+export type RelevanceIndicatorUpdateInput = Record<string, never>;
 
 // @public
 export interface Row {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type RowCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const RowSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type RowUpdateInput = Partial<RowCreateInput>;
+export type RowUpdateInput = Record<string, never>;
 
 // @public
 export type SaveableFileFormat = 'text';
 
 // @public
 export interface ScriptingClass {
-    description: string;
-    hidden: boolean;
-    id: string;
-    name: string;
-    pluralName: string;
-    suiteName: string;
+    readonly description: string | null;
+    readonly hidden: boolean | null;
+    readonly id: string;
+    readonly name: string | null;
+    readonly pluralName: string | null;
+    readonly suiteName: string | null;
 }
 
 // @public
 export type ScriptingClassCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ScriptingClassSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -1022,22 +1068,22 @@ export const ScriptingClassSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ScriptingClassUpdateInput = Partial<ScriptingClassCreateInput>;
+export type ScriptingClassUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingCommand {
-    description: string;
-    hidden: boolean;
-    id: string;
-    name: string;
-    scriptingResult: unknown;
-    suiteName: string;
+    readonly description: string | null;
+    readonly hidden: boolean | null;
+    readonly id: string;
+    readonly name: string | null;
+    readonly scriptingResult: unknown;
+    readonly suiteName: string | null;
 }
 
 // @public
 export type ScriptingCommandCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ScriptingCommandSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -1048,51 +1094,51 @@ export const ScriptingCommandSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ScriptingCommandUpdateInput = Partial<ScriptingCommandCreateInput>;
+export type ScriptingCommandUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingDefinitionObject {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type ScriptingDefinitionObjectCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ScriptingDefinitionObjectSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ScriptingDefinitionObjectUpdateInput = Partial<ScriptingDefinitionObjectCreateInput>;
+export type ScriptingDefinitionObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingElement {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type ScriptingElementCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ScriptingElementSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ScriptingElementUpdateInput = Partial<ScriptingElementCreateInput>;
+export type ScriptingElementUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingEnumeration {
-    hidden: boolean;
-    id: string;
-    name: string;
+    readonly hidden: boolean | null;
+    readonly id: string;
+    readonly name: string | null;
 }
 
 // @public
 export type ScriptingEnumerationCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ScriptingEnumerationSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -1100,20 +1146,20 @@ export const ScriptingEnumerationSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ScriptingEnumerationUpdateInput = Partial<ScriptingEnumerationCreateInput>;
+export type ScriptingEnumerationUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingEnumerator {
-    description: string;
-    hidden: boolean;
-    id: string;
-    name: string;
+    readonly description: string | null;
+    readonly hidden: boolean | null;
+    readonly id: string;
+    readonly name: string | null;
 }
 
 // @public
 export type ScriptingEnumeratorCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ScriptingEnumeratorSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -1122,22 +1168,22 @@ export const ScriptingEnumeratorSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ScriptingEnumeratorUpdateInput = Partial<ScriptingEnumeratorCreateInput>;
+export type ScriptingEnumeratorUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingParameter {
-    description: string;
-    hidden: boolean;
-    id: string;
-    kind: string;
-    name: string;
-    optional: boolean;
+    readonly description: string | null;
+    readonly hidden: boolean | null;
+    readonly id: string;
+    readonly kind: string | null;
+    readonly name: string | null;
+    readonly optional: boolean | null;
 }
 
 // @public
 export type ScriptingParameterCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ScriptingParameterSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -1148,24 +1194,24 @@ export const ScriptingParameterSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ScriptingParameterUpdateInput = Partial<ScriptingParameterCreateInput>;
+export type ScriptingParameterUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingProperty {
-    access: string;
-    description: string;
-    enumerated: boolean;
-    hidden: boolean;
-    id: string;
-    kind: string;
-    listed: boolean;
-    name: string;
+    readonly access: string | null;
+    readonly description: string | null;
+    readonly enumerated: boolean | null;
+    readonly hidden: boolean | null;
+    readonly id: string;
+    readonly kind: string | null;
+    readonly listed: boolean | null;
+    readonly name: string | null;
 }
 
 // @public
 export type ScriptingPropertyCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ScriptingPropertySchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -1178,20 +1224,20 @@ export const ScriptingPropertySchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ScriptingPropertyUpdateInput = Partial<ScriptingPropertyCreateInput>;
+export type ScriptingPropertyUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingSuite {
-    description: string;
-    hidden: boolean;
-    id: string;
-    name: string;
+    readonly description: string | null;
+    readonly hidden: boolean | null;
+    readonly id: string;
+    readonly name: string | null;
 }
 
 // @public
 export type ScriptingSuiteCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ScriptingSuiteSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -1200,49 +1246,49 @@ export const ScriptingSuiteSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ScriptingSuiteUpdateInput = Partial<ScriptingSuiteCreateInput>;
+export type ScriptingSuiteUpdateInput = Record<string, never>;
 
 // @public
 export interface ScrollArea {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type ScrollAreaCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ScrollAreaSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ScrollAreaUpdateInput = Partial<ScrollAreaCreateInput>;
+export type ScrollAreaUpdateInput = Record<string, never>;
 
 // @public
 export interface ScrollBar {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type ScrollBarCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ScrollBarSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ScrollBarUpdateInput = Partial<ScrollBarCreateInput>;
+export type ScrollBarUpdateInput = Record<string, never>;
 
 // @public
 export type ScrollPageBehaviors = 'jumpToHere' | 'jumpToNextPage';
 
 // @public
 export interface Service {
-    active: boolean;
-    id: string;
-    kind: number;
-    name: string;
+    readonly active: boolean | null;
+    readonly id: string;
+    readonly kind: Integer | null;
+    name: string | null;
 }
 
 // @public
@@ -1250,7 +1296,7 @@ export interface ServiceCreateInput {
     name?: string;
 }
 
-// @public (undocumented)
+// @public
 export const ServiceSchema: z.ZodObject<{
     active: z.ZodBoolean;
     id: z.ZodString;
@@ -1259,43 +1305,45 @@ export const ServiceSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ServiceUpdateInput = Partial<ServiceCreateInput>;
+export interface ServiceUpdateInput {
+    name?: string;
+}
 
 // @public
 export interface Sheet {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type SheetCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const SheetSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type SheetUpdateInput = Partial<SheetCreateInput>;
+export type SheetUpdateInput = Record<string, never>;
 
 // @public
 export interface Slider {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type SliderCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const SliderSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type SliderUpdateInput = Partial<SliderCreateInput>;
+export type SliderUpdateInput = Record<string, never>;
 
 // @public
 export interface Splitter {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -1303,97 +1351,97 @@ export type SplitterCreateInput = Record<string, never>;
 
 // @public
 export interface SplitterGroup {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type SplitterGroupCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const SplitterGroupSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type SplitterGroupUpdateInput = Partial<SplitterGroupCreateInput>;
+export type SplitterGroupUpdateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const SplitterSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type SplitterUpdateInput = Partial<SplitterCreateInput>;
+export type SplitterUpdateInput = Record<string, never>;
 
 // @public
 export interface StaticText {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type StaticTextCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const StaticTextSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type StaticTextUpdateInput = Partial<StaticTextCreateInput>;
+export type StaticTextUpdateInput = Record<string, never>;
 
 // @public
 export interface SystemDomainObject {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type SystemDomainObjectCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const SystemDomainObjectSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type SystemDomainObjectUpdateInput = Partial<SystemDomainObjectCreateInput>;
+export type SystemDomainObjectUpdateInput = Record<string, never>;
+
+// @public
+export interface SystemEventsClient extends ClientBrand<SystemEventsResources> {
+}
 
 // @public
 export class SystemEventsClient {
     constructor(options: SystemEventsClientOptions);
-    abortTransaction(): Promise<void>;
+    abortTransaction(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly actions: ActionResourceClient;
-    attachActionTo(using: string): Promise<void>;
-    attachedScripts(): Promise<void>;
-    beginTransaction(): Promise<void>;
-    cancel(): Promise<void>;
-    confirm(): Promise<void>;
-    connect(): Promise<void>;
-    decrement(): Promise<void>;
-    disconnect(): Promise<void>;
-    doFolderAction(folderActionCode: string, withItemList?: unknown, withWindowSize?: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    }): Promise<void>;
-    editActionOf(usingActionName?: string, usingActionNumber?: number): Promise<void>;
-    endTransaction(): Promise<void>;
+    attachActionTo(using: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    attachedScripts(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    beginTransaction(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    cancel(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    confirm(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    connect(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    decrement(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    disconnect(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "SystemEventsClient_2" needs to be exported by the entry point index.d.ts
+    doFolderAction(folderActionCode: string, withItemList?: unknown, withWindowSize?: Parameters<SystemEventsClient_2['doFolderAction']>[2], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    editActionOf(usingActionName?: string, usingActionNumber?: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    endTransaction(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
-    increment(): Promise<void>;
-    keyCode(using?: string): Promise<void>;
-    keyDown(): Promise<void>;
-    keystroke(using?: string): Promise<void>;
-    keyUp(): Promise<void>;
-    logOut(): Promise<void>;
-    move(to: string): Promise<void>;
-    open(): Promise<void>;
-    pick(): Promise<void>;
-    removeActionFrom(usingActionName?: string, usingActionNumber?: number): Promise<void>;
-    restart(stateSavingPreference?: boolean): Promise<void>;
-    shutDown(stateSavingPreference?: boolean): Promise<void>;
-    sleep(): Promise<void>;
-    start(): Promise<void>;
-    stop(): Promise<void>;
+    increment(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    keyCode(using?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    keyDown(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    keystroke(using?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    keyUp(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    logOut(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    move(to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    open(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    pick(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    removeActionFrom(usingActionName?: string, usingActionNumber?: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    restart(stateSavingPreference?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    shutDown(stateSavingPreference?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    sleep(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    start(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    stop(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly uiElements: UIElementResourceClient;
 }
 
@@ -1411,106 +1459,109 @@ export class SystemEventsError extends Error {
 }
 
 // @public
+export type SystemEventsResources = Readonly<Record<never, never>>;
+
+// @public
 export interface TabGroup {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type TabGroupCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const TabGroupSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type TabGroupUpdateInput = Partial<TabGroupCreateInput>;
+export type TabGroupUpdateInput = Record<string, never>;
 
 // @public
 export interface Table {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type TableCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const TableSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type TableUpdateInput = Partial<TableCreateInput>;
+export type TableUpdateInput = Record<string, never>;
 
 // @public
 export interface TextArea {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type TextAreaCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const TextAreaSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type TextAreaUpdateInput = Partial<TextAreaCreateInput>;
+export type TextAreaUpdateInput = Record<string, never>;
 
 // @public
 export interface TextField {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type TextFieldCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const TextFieldSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type TextFieldUpdateInput = Partial<TextFieldCreateInput>;
+export type TextFieldUpdateInput = Record<string, never>;
 
 // @public
 export interface Toolbar {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type ToolbarCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ToolbarSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ToolbarUpdateInput = Partial<ToolbarCreateInput>;
+export type ToolbarUpdateInput = Record<string, never>;
 
 // @public
 export interface UIElement {
-    accessibilityDescription: string;
-    class: string;
-    description: string;
-    enabled: string;
-    entireContents: string;
-    focused: string;
-    help: string;
-    maximumValue: string;
-    minimumValue: string;
-    name: string;
-    orientation: string;
-    position: string;
-    role: string;
-    roleDescription: string;
-    selected: string;
-    size: string;
-    subrole: string;
-    title: string;
-    value: string;
+    readonly accessibilityDescription: string | null;
+    readonly class: string | null;
+    readonly description: string | null;
+    readonly enabled: string | null;
+    readonly entireContents: string | null;
+    focused: string | null;
+    readonly help: string | null;
+    readonly maximumValue: string | null;
+    readonly minimumValue: string | null;
+    readonly name: string | null;
+    readonly orientation: string | null;
+    position: string | null;
+    readonly role: string | null;
+    readonly roleDescription: string | null;
+    selected: string | null;
+    size: string | null;
+    readonly subrole: string | null;
+    readonly title: string | null;
+    value: string | null;
 }
 
 // @public
@@ -1525,11 +1576,11 @@ export interface UIElementCreateInput {
 // @public
 export class UIElementResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    click(at?: string): Promise<void>;
-    select(): Promise<void>;
+    click(at?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    select(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const UIElementSchema: z.ZodObject<{
     accessibilityDescription: z.ZodString;
     class: z.ZodString;
@@ -1553,46 +1604,52 @@ export const UIElementSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type UIElementUpdateInput = Partial<UIElementCreateInput>;
+export interface UIElementUpdateInput {
+    focused?: string;
+    position?: string;
+    selected?: string;
+    size?: string;
+    value?: string;
+}
 
 // @public
 export interface UserDomainObject {
-    id: string;
-    name: string;
+    readonly id: string;
+    readonly name: string | null;
 }
 
 // @public
 export type UserDomainObjectCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const UserDomainObjectSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type UserDomainObjectUpdateInput = Partial<UserDomainObjectCreateInput>;
+export type UserDomainObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface ValueIndicator {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type ValueIndicatorCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ValueIndicatorSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ValueIndicatorUpdateInput = Partial<ValueIndicatorCreateInput>;
+export type ValueIndicatorUpdateInput = Record<string, never>;
 
 // @public
 export interface XMLAttribute {
-    name: string;
-    value: string;
+    readonly name: string | null;
+    value: string | null;
 }
 
 // @public
@@ -1600,20 +1657,22 @@ export interface XMLAttributeCreateInput {
     value?: string;
 }
 
-// @public (undocumented)
+// @public
 export const XMLAttributeSchema: z.ZodObject<{
     name: z.ZodString;
     value: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type XMLAttributeUpdateInput = Partial<XMLAttributeCreateInput>;
+export interface XMLAttributeUpdateInput {
+    value?: string;
+}
 
 // @public
 export interface XMLData {
-    id: string;
-    name: string;
-    text: string;
+    readonly id: string;
+    name: string | null;
+    text: string | null;
 }
 
 // @public
@@ -1622,7 +1681,7 @@ export interface XMLDataCreateInput {
     text?: string;
 }
 
-// @public (undocumented)
+// @public
 export const XMLDataSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -1630,13 +1689,16 @@ export const XMLDataSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type XMLDataUpdateInput = Partial<XMLDataCreateInput>;
+export interface XMLDataUpdateInput {
+    name?: string;
+    text?: string;
+}
 
 // @public
 export interface XMLElement {
-    id: string;
-    name: string;
-    value: string;
+    readonly id: string;
+    readonly name: string | null;
+    value: string | null;
 }
 
 // @public
@@ -1644,7 +1706,7 @@ export interface XMLElementCreateInput {
     value?: string;
 }
 
-// @public (undocumented)
+// @public
 export const XMLElementSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -1652,7 +1714,9 @@ export const XMLElementSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type XMLElementUpdateInput = Partial<XMLElementCreateInput>;
+export interface XMLElementUpdateInput {
+    value?: string;
+}
 
 // (No @packageDocumentation comment for this package)
 

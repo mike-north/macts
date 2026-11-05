@@ -4,10 +4,10 @@
 
 ## Account.emptyTrashFrequency property
 
-Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete)
+Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-emptyTrashFrequency: number
+emptyTrashFrequency: Integer | null
 ```

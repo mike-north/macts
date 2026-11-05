@@ -4,10 +4,10 @@
 
 ## Account.connectionStatus property
 
-The connection status for this account.
+The connection status for this account. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-connectionStatus: string
+readonly connectionStatus: string | null;
 ```

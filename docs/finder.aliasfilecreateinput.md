@@ -4,7 +4,7 @@
 
 ## AliasFileCreateInput interface
 
-Input for creating a AliasFile
+Input for creating an AliasFile.
 
 **Signature:**
 

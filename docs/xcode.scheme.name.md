@@ -4,10 +4,10 @@
 
 ## Scheme.name property
 
-The name of the scheme
+The name of the scheme. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

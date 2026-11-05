@@ -4,10 +4,10 @@
 
 ## Playlist.description property
 
-the description of the playlist
+the description of the playlist. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-description: string
+description: string | null
 ```

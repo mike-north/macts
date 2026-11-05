@@ -4,10 +4,10 @@
 
 ## Encoder.format property
 
-the data format created by the encoder
+the data format created by the encoder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-format: string
+readonly format: string | null;
 ```

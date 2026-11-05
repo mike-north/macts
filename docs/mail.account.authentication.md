@@ -4,10 +4,10 @@
 
 ## Account.authentication property
 
-Preferred authentication scheme for account
+Preferred authentication scheme for account. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-authentication: string
+authentication: string | null
 ```

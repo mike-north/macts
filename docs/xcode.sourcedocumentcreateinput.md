@@ -4,7 +4,7 @@
 
 ## SourceDocumentCreateInput interface
 
-Input for creating a SourceDocument
+Input for creating a SourceDocument.
 
 **Signature:**
 

@@ -4,10 +4,10 @@
 
 ## Note.plaintext property
 
-The plaintext content of the note
+The plaintext content of the note. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-plaintext: string
+readonly plaintext: string | null;
 ```

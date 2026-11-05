@@ -4,10 +4,10 @@
 
 ## Graphic.alignsEdgesToGrid property
 
-When snapped to the grid does this graphic align its edges to the grid?
+When snapped to the grid does this graphic align its edges to the grid? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-alignsEdgesToGrid: boolean
+alignsEdgesToGrid: boolean | null
 ```

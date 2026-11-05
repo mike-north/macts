@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The description of the suite
+string \| null
+
+</td><td>
+
+The description of the suite. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The description of the suite
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the suite hidden?
+boolean \| null
+
+</td><td>
+
+Is the suite hidden? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ Is the suite hidden?
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the suite
+The unique identifier of the suite. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ The unique identifier of the suite
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the suite
+string \| null
+
+</td><td>
+
+The name of the suite. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

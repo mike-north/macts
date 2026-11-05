@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [MailboxUpdateInput](./mail.mailboxupdateinput.md)
 
-## MailboxUpdateInput type
+## MailboxUpdateInput interface
 
-Input for updating a Mailbox
+Input for updating a Mailbox. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type MailboxUpdateInput = Partial<MailboxCreateInput>
+interface MailboxUpdateInput
 ```
 
-**References:** [MailboxCreateInput](./mail.mailboxcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[name?](./mail.mailboxupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of a mailbox. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

@@ -4,12 +4,10 @@
 
 ## ClippingUpdateInput type
 
-Input for updating a Clipping
+Input for updating a Clipping. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ClippingUpdateInput = Partial<ClippingCreateInput>
+type ClippingUpdateInput = Record<string, never>
 ```
-
-**References:** [ClippingCreateInput](./finder.clippingcreateinput.md)

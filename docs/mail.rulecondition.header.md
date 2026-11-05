@@ -4,10 +4,10 @@
 
 ## RuleCondition.header property
 
-Rule header key
+Rule header key. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-header: string
+header: string | null
 ```

@@ -4,10 +4,10 @@
 
 ## Participant.fullName property
 
-The full name from this participant's Contacts card, if available
+The full name from this participant's Contacts card, if available. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fullName: string
+readonly fullName: string | null;
 ```

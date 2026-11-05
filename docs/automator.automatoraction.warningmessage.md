@@ -4,10 +4,10 @@
 
 ## AutomatorAction.warningMessage property
 
-The message that accompanies the warning, if any
+The message that accompanies the warning, if any. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-warningMessage: string
+readonly warningMessage: string | null;
 ```

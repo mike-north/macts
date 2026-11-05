@@ -6,6 +6,8 @@
 
 Resolve every canonical RPC route for a single manifest command.
 
+A command marked unsupported has no route, and a resource marked unsupported contributes none, so every surface built from these routes (the server router, the runtime's operation registry, the contract, capabilities, derived permissions) omits them.
+
 **Signature:**
 
 ```typescript
@@ -76,4 +78,4 @@ The command definition.
 
 [ManifestRoute](./core.manifestroute.md)<!-- -->\[\]
 
-One route for application commands; one route per targeted resource type for resource commands.
+One route for application commands; one route per targeted resource type for resource commands; none for a command marked unsupported.

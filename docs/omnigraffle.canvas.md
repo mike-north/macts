@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Adjust number of pages on the canvas automatically?
+Adjust number of pages on the canvas automatically? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ Adjust number of pages on the canvas automatically?
 
 </td><td>
 
-{ x: number; y: number; }
+[Point](./contracts.point.md) \| null
 
 </td><td>
 
-Size of the canvas (page size multiplied by number of pages)
+Size of the canvas (page size multiplied by number of pages). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ Size of the canvas (page size multiplied by number of pages)
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether canvas size is reported as multiples of page size
+Whether canvas size is reported as multiples of page size. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ Whether canvas size is reported as multiples of page size
 
 </td><td>
 
-[HorizontalAlignment](./omnigraffle.horizontalalignment.md)
+[HorizontalAlignment](./omnigraffle.horizontalalignment.md) \| null
 
 </td><td>
 
-Column alignment
+Column alignment. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +99,11 @@ Column alignment
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Spacing between graphics in a column
+Spacing between graphics in a column. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +114,11 @@ Spacing between graphics in a column
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-Horizontal pages
+Horizontal pages. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -133,7 +133,7 @@ string
 
 </td><td>
 
-Unique identifier
+Unique identifier. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -144,11 +144,11 @@ Unique identifier
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Name of this canvas
+Name of this canvas. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +157,15 @@ Name of this canvas
 
 </td><td>
 
-</td><td>
-
-{ x: number; y: number; }
+`readonly`
 
 </td><td>
 
-Size of each page
+[Point](./contracts.point.md) \| null
+
+</td><td>
+
+Size of each page. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -174,11 +176,11 @@ Size of each page
 
 </td><td>
 
-[VerticalAlignment](./omnigraffle.verticalalignment.md)
+[VerticalAlignment](./omnigraffle.verticalalignment.md) \| null
 
 </td><td>
 
-Row alignment
+Row alignment. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -189,11 +191,11 @@ Row alignment
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Spacing between graphics in a row
+Spacing between graphics in a row. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -204,11 +206,11 @@ Spacing between graphics in a row
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-Vertical pages
+Vertical pages. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

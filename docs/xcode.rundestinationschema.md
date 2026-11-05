@@ -4,6 +4,8 @@
 
 ## RunDestinationSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -13,8 +15,6 @@ RunDestinationSchema: z.ZodObject<
     name: z.ZodString
     architecture: z.ZodString
     platform: z.ZodString
-    device: z.ZodString
-    companionDevice: z.ZodString
   },
   z.core.$strip
 >

@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the anchor.
+string \| null
+
+</td><td>
+
+The name of the anchor. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -9,7 +9,7 @@ Show calendar on the given date
 **Signature:**
 
 ```typescript
-viewCalendar(at: Date): Promise<void>;
+viewCalendar(at: Date, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ at
 Date
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

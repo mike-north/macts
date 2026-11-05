@@ -4,12 +4,10 @@
 
 ## NetworkDomainObjectUpdateInput type
 
-Input for updating a NetworkDomainObject
+Input for updating a NetworkDomainObject. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type NetworkDomainObjectUpdateInput = Partial<NetworkDomainObjectCreateInput>
+type NetworkDomainObjectUpdateInput = Record<string, never>
 ```
-
-**References:** [NetworkDomainObjectCreateInput](./system-events.networkdomainobjectcreateinput.md)

@@ -25,14 +25,30 @@ export class VariableResourceClient {
    * List the variables of one workflow, as one page.
    * When several workflows share the same name, the first match in the app's order is used as the workflow.
    */
-  async list(workflowName: string): Promise<Page<Variable>> {
-    return this.#http.rpc<Page<Variable>>(`${this.#app}.${this.#resource}.list`, { workflowName })
+  async list(
+    workflowName: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<Variable>> {
+    return this.#http.invoke<Page<Variable>>(
+      `${this.#app}.${this.#resource}.list`,
+      { workflowName },
+      __mactsOptions,
+      'Variable'
+    )
   }
 
   /**
    * Get a variable by id.
    */
-  async get(id: string): Promise<Variable> {
-    return this.#http.rpc<Variable>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Variable> {
+    return this.#http.invoke<Variable>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Variable'
+    )
   }
 }

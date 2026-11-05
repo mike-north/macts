@@ -4,10 +4,10 @@
 
 ## DiskItem.path property
 
-the file system path of the disk item
+the file system path of the disk item. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-path: string
+readonly path: string | null;
 ```

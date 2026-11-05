@@ -9,7 +9,7 @@ Execute a shell command in a Terminal window or tab
 **Signature:**
 
 ```typescript
-doScript(command: string, _in?: string): Promise<void>;
+doScript(command: string, _in?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -45,6 +45,19 @@ string
 </td><td>
 
 string
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

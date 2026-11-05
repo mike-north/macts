@@ -4,13 +4,10 @@
 
 ## Graphic.origin property
 
-Origin of the graphic (position of the upper-left corner of the bounding rectangle)
+Origin of the graphic (position of the upper-left corner of the bounding rectangle). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-origin: {
-  x: number
-  y: number
-}
+origin: Point | null
 ```

@@ -4,14 +4,44 @@
 
 ## WorkflowResourceClient.list() method
 
-List all workflows.
+List all workflows, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Workflow[]>;
+list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Workflow>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Workflow](./automator.workflow.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Workflow](./automator.workflow.md)<!-- -->&gt;&gt;

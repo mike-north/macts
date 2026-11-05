@@ -4,10 +4,10 @@
 
 ## Project.effectiveDueDate property
 
-When the project must be finished (including inherited)
+When the project must be finished (including inherited). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-effectiveDueDate: Date
+readonly effectiveDueDate: Date | null;
 ```

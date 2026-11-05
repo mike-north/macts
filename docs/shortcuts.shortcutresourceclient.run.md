@@ -9,7 +9,7 @@ Run a shortcut. To run a shortcut in the background, without opening the Shortcu
 **Signature:**
 
 ```typescript
-run(id: string, withInput?: unknown): Promise<void>;
+run(id: string, withInput?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -45,6 +45,19 @@ withInput
 </td><td>
 
 unknown
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

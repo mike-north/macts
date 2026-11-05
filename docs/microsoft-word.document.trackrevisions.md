@@ -4,10 +4,10 @@
 
 ## Document.trackRevisions property
 
-Whether changes are tracked in the document
+Whether changes are tracked in the document. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-trackRevisions: boolean
+trackRevisions: boolean | null
 ```

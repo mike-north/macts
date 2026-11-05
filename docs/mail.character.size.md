@@ -4,10 +4,10 @@
 
 ## Character.size property
 
-The size in points of the character.
+The size in points of the character. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-size: number
+size: number | null
 ```

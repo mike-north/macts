@@ -4,12 +4,14 @@
 
 ## DisplayAlarmUpdateInput type
 
-Input for updating a DisplayAlarm
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type DisplayAlarmUpdateInput = Partial<DisplayAlarmCreateInput>
+type DisplayAlarmUpdateInput = Omit<DisplayAlarmUpdateInput$1, 'triggerInterval'> & {
+  triggerInterval?: null extends DisplayAlarmUpdateInput$1['triggerInterval']
+    ? number | null
+    : number
+}
 ```
-
-**References:** [DisplayAlarmCreateInput](./calendar.displayalarmcreateinput.md)

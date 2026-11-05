@@ -4,10 +4,10 @@
 
 ## Session.backgroundImage property
 
-The backgroundImage property
+The backgroundImage property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-backgroundImage: string
+backgroundImage: string | null
 ```

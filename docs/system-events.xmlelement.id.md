@@ -4,10 +4,10 @@
 
 ## XMLElement.id property
 
-the unique identifier of the XML element
+the unique identifier of the XML element. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

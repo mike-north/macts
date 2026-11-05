@@ -4,10 +4,10 @@
 
 ## Event_2.description property
 
-The event notes
+The event notes. Nullable. Observed missing in 31 of 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-description: string
+description: string | null
 ```

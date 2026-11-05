@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The recipients email address
+The recipients email address. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ The recipients email address
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name used for display
+The name used for display. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

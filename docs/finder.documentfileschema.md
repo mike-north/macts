@@ -4,13 +4,10 @@
 
 ## DocumentFileSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
-DocumentFileSchema: z.ZodObject<
-  {
-    id: z.ZodNumber
-  },
-  z.core.$strip
->
+DocumentFileSchema: z.ZodObject<{}, z.core.$strip>
 ```

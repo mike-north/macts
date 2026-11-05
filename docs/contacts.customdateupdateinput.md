@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/contacts](./contacts.md) &gt; [CustomDateUpdateInput](./contacts.customdateupdateinput.md)
 
-## CustomDateUpdateInput type
+## CustomDateUpdateInput interface
 
-Input for updating a CustomDate
+Input for updating a CustomDate. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type CustomDateUpdateInput = Partial<CustomDateCreateInput>
+interface CustomDateUpdateInput
 ```
 
-**References:** [CustomDateCreateInput](./contacts.customdatecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[label?](./contacts.customdateupdateinput.label.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Label for this date. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[value?](./contacts.customdateupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+Date
+
+</td><td>
+
+_(Optional)_ The date value. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

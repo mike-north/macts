@@ -177,6 +177,21 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
+    name: 'iterm.app.currentWindow',
+    app: 'iterm',
+    appBundleId: 'com.googlecode.iterm2',
+    resource: 'app',
+    operation: 'currentWindow',
+    description: 'Get a reference to the currently selected window.',
+    permission: 'iterm:app:currentWindow',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'iterm.app.duplicate',
     app: 'iterm',
     appBundleId: 'com.googlecode.iterm2',

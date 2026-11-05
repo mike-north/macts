@@ -4,10 +4,10 @@
 
 ## Tab.location property
 
-Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'.
+Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-location: string
+location: string | null
 ```

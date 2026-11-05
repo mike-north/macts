@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the kind of data stored in the property list item: boolean/data/date/list/number/record/string
+string \| null
+
+</td><td>
+
+the kind of data stored in the property list item: boolean/data/date/list/number/record/string. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ the kind of data stored in the property list item: boolean/data/date/list/number
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the name of the property list item ( if any )
+string \| null
+
+</td><td>
+
+the name of the property list item ( if any ). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +73,11 @@ the name of the property list item ( if any )
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the text representation of the property list data
+the text representation of the property list data. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +88,11 @@ the text representation of the property list data
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the value of the property list item
+the value of the property list item. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

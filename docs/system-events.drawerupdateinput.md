@@ -4,12 +4,10 @@
 
 ## DrawerUpdateInput type
 
-Input for updating a Drawer
+Input for updating a Drawer. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type DrawerUpdateInput = Partial<DrawerCreateInput>
+type DrawerUpdateInput = Record<string, never>
 ```
-
-**References:** [DrawerCreateInput](./system-events.drawercreateinput.md)

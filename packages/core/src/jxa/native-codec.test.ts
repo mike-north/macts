@@ -27,13 +27,16 @@ import {
   type ValuePlan,
 } from '@macts/contracts'
 import { describe, expect, it } from 'vitest'
+import { ABSENT_VALUE_ERROR_NUMBER } from '../manifest/schemas/evidence.js'
 import { createNativeCodecFunctions } from './native-codec-functions.js'
 import {
   NATIVE_CODEC,
+  NATIVE_ABSENT_AS_NULL_KEY,
   NATIVE_CODEC_ERROR_NAME,
   NATIVE_CONTAINED_REFERENCE_KEY,
   NATIVE_DECODE_FUNCTION,
   NATIVE_ENCODE_FUNCTION,
+  NATIVE_READING_KEY,
   type NativeCodecEnvironment,
   type NativeReferenceTable,
 } from './native-codec.js'
@@ -1653,6 +1656,258 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
       })
     })
 
+    /** An app object whose identifier read fails with the app's error `errorNumber`. */
+    const unreadable = (errorNumber: number) => ({
+      id: () => {
+        throw Object.assign(new Error("Can't get object."), { errorNumber })
+      },
+    })
+
+    describe('a record field whose evidence makes "no such object" its empty value', () => {
+      /** A record whose `owner` may be null, as a get's record or a list row is planned. */
+      const OWNER = recordOf({ owner: required(nullable(PERSON_REF)) })
+      const owner = (value: unknown) => ({ owner: value })
+
+      it('encodes as null when reading its identifier reports no such object (-1728)', () => {
+        const app = standInApp()
+        expect(encode(owner(absentAsNull(unreadable(-1728))), OWNER, environment(app))).toEqual({
+          owner: null,
+        })
+      })
+
+      it('encodes an object that reads as it would unmarked, and null as null', () => {
+        const app = standInApp()
+        expect(encode(owner(absentAsNull(app.people.objects[1])), OWNER, environment(app))).toEqual(
+          { owner: identity('Person', 'p-2') }
+        )
+        expect(encode(owner(absentAsNull(null)), OWNER, environment(app))).toEqual({ owner: null })
+      })
+
+      it('still fails any other app failure, and the same failure on an unmarked value', () => {
+        const app = standInApp()
+        expect(
+          thrownBy(() => encode(owner(absentAsNull(unreadable(-1700))), OWNER, environment(app)))
+        ).toMatchObject({ errorNumber: -1700, [NATIVE_READING_KEY]: 'the property "owner"' })
+        expect(
+          thrownBy(() => encode(owner(unreadable(-1728)), OWNER, environment(app)))
+        ).toMatchObject({ errorNumber: -1728, [NATIVE_READING_KEY]: 'the property "owner"' })
+      })
+
+      it('encodes as an unmarked value at a field that cannot be null', () => {
+        const app = standInApp()
+        const REQUIRED_OWNER = recordOf({ owner: required(PERSON_REF) })
+        expect(
+          encode(owner(absentAsNull(app.people.objects[1])), REQUIRED_OWNER, environment(app))
+        ).toEqual({ owner: identity('Person', 'p-2') })
+        expect(
+          thrownBy(() =>
+            encode(owner(absentAsNull(unreadable(-1728))), REQUIRED_OWNER, environment(app))
+          )
+        ).toMatchObject({ errorNumber: -1728 })
+      })
+
+      it('never takes a codec failure as the empty value', () => {
+        const app = standInApp()
+        expectCodecError(
+          () => encode(owner(absentAsNull('not an object')), OWNER, environment(app)),
+          { direction: 'encode', path: ['owner'], includes: ['Person'] }
+        )
+      })
+
+      // The D10 list rule: the empty value is the field's, so one element the
+      // app reports missing makes the whole list field null.
+      it('encodes a whole list field as null when one of its references is reported missing', () => {
+        const app = standInApp()
+        const OWNERS = recordOf({ owners: required(nullable(arrayOf(PERSON_REF))) })
+        expect(
+          encode(
+            { owners: absentAsNull([app.people.objects[0], unreadable(-1728)]) },
+            OWNERS,
+            environment(app)
+          )
+        ).toEqual({ owners: null })
+        expect(
+          encode({ owners: absentAsNull([app.people.objects[0]]) }, OWNERS, environment(app))
+        ).toEqual({ owners: [identity('Person', 'p-1')] })
+      })
+
+      it('encodes a marked field of a list row, and of a record nested in the result', () => {
+        const app = standInApp()
+        // A list's rows are records, and a page's rows sit in its `items`.
+        const PAGE = recordOf({ items: required(arrayOf(OWNER)) })
+        expect(
+          encode(
+            {
+              items: [
+                owner(absentAsNull(app.people.objects[0])),
+                owner(absentAsNull(unreadable(-1728))),
+              ],
+            },
+            PAGE,
+            environment(app)
+          )
+        ).toEqual({ items: [{ owner: identity('Person', 'p-1') }, { owner: null }] })
+      })
+
+      // Regression: the marker was once a string key that every position
+      // checked, so app data with that key was taken for it. A string key of
+      // any name is ordinary data, and a passthrough value is never inspected.
+      describe('app data that looks like a marker', () => {
+        const lookalikes = [
+          { __mactsAbsentAsNull: 'text' },
+          { [NATIVE_ABSENT_AS_NULL_KEY]: 'text' },
+        ]
+
+        it('encodes an app record with the marker name as a key as an ordinary record under unknown', () => {
+          // D3: a user record travels inside a record envelope.
+          expect(encode({ __mactsAbsentAsNull: 'text' }, UNKNOWN)).toEqual({
+            record: { __mactsAbsentAsNull: 'text' },
+          })
+          expect(encode({ [NATIVE_ABSENT_AS_NULL_KEY]: 'text' }, UNKNOWN)).toEqual({
+            record: { 'macts.absentAsNull': 'text' },
+          })
+        })
+
+        it('returns such a record, and a marked value, unchanged under passthrough', () => {
+          for (const value of [...lookalikes, absentAsNull('text')]) {
+            expect(encode(value, PASSTHROUGH_PLAN)).toBe(value)
+          }
+        })
+
+        it('fails such a record at a string position, where it once encoded as its text', () => {
+          expectCodecError(() => encode({ __mactsAbsentAsNull: 'x' }, STRING), {
+            direction: 'encode',
+            path: [],
+            includes: ['Expected a string', '"__mactsAbsentAsNull"'],
+          })
+          expectCodecError(
+            () =>
+              encode(
+                { title: { __mactsAbsentAsNull: 'x' } },
+                recordOf({ title: required(STRING) })
+              ),
+            { direction: 'encode', path: ['title'], includes: ['Expected a string'] }
+          )
+        })
+
+        it('does not take a string-keyed lookalike at a nullable reference field as marked', () => {
+          const app = standInApp()
+          for (const key of ['__mactsAbsentAsNull', NATIVE_ABSENT_AS_NULL_KEY]) {
+            expectCodecError(
+              () => encode(owner({ [key]: unreadable(-1728) }), OWNER, environment(app)),
+              { direction: 'encode', path: ['owner'], includes: ['Person'] }
+            )
+          }
+        })
+      })
+
+      // Regression: the marker was once honoured at every position. Bodies
+      // mark only a record field's value, so a marker anywhere else is a
+      // value that fails by its plan, never an empty value or an empty record.
+      describe('a marker where it is not honoured', () => {
+        it('fails a marker at the top level, even at a nullable reference whose read reports no such object', () => {
+          const app = standInApp()
+          expectCodecError(
+            () => encode(absentAsNull(unreadable(-1728)), nullable(PERSON_REF), environment(app)),
+            {
+              direction: 'encode',
+              path: [],
+              includes: ['"Person"', 'an object with symbol keys only'],
+            }
+          )
+          expectCodecError(() => encode(absentAsNull('x'), STRING), {
+            direction: 'encode',
+            path: [],
+            message: 'Expected a string, received an object with symbol keys only',
+          })
+        })
+
+        it('fails a marker at a nullable reference in a list, or inside another marker', () => {
+          const app = standInApp()
+          const OWNERS = recordOf({ owners: required(arrayOf(nullable(PERSON_REF))) })
+          expectCodecError(
+            () => encode({ owners: [absentAsNull(unreadable(-1728))] }, OWNERS, environment(app)),
+            { direction: 'encode', path: ['owners', 0], includes: ['"Person"'] }
+          )
+          expectCodecError(
+            () =>
+              encode(owner(absentAsNull(absentAsNull(unreadable(-1728)))), OWNER, environment(app)),
+            { direction: 'encode', path: ['owner'], includes: ['"Person"'] }
+          )
+        })
+
+        it('fails a marker under unknown and at a record whose fields may all be absent, rather than encoding {}', () => {
+          expectCodecError(() => encode(absentAsNull('x'), UNKNOWN), {
+            direction: 'encode',
+            path: [],
+            includes: ['dynamic content', 'an object with symbol keys only'],
+          })
+          expectCodecError(() => encode({ a: absentAsNull('x') }, UNKNOWN), {
+            direction: 'encode',
+            path: ['a'],
+            includes: ['dynamic content'],
+          })
+          expectCodecError(() => encode(absentAsNull({}), recordOf({ note: optional(STRING) })), {
+            direction: 'encode',
+            path: [],
+            includes: ['Expected an object'],
+          })
+        })
+      })
+    })
+
+    describe('an app failure while a record field is read', () => {
+      it('lets the app error through, naming the field and its position in the result', () => {
+        const app = standInApp()
+        const plan = arrayOf(recordOf({ owner: required(nullable(PERSON_REF)) }))
+        const error = thrownBy(() =>
+          encode(
+            [{ owner: app.people.objects[0] }, { owner: unreadable(-1728) }],
+            plan,
+            environment(app)
+          )
+        )
+        expect(error).toBeInstanceOf(Error)
+        expect(error).toMatchObject({
+          message: "Can't get object.",
+          errorNumber: -1728,
+          [NATIVE_READING_KEY]: 'the property "owner" at [1]',
+        })
+      })
+
+      it('names the innermost field the failure came from', () => {
+        const app = standInApp()
+        const plan = recordOf({ manager: required(recordOf({ owner: required(PERSON_REF) })) })
+        const error = thrownBy(() =>
+          encode({ manager: { owner: unreadable(-1728) } }, plan, environment(app))
+        )
+        expect(error).toMatchObject({ [NATIVE_READING_KEY]: 'the property "owner" at manager' })
+      })
+
+      it('lets an error it cannot change through unchanged', () => {
+        const app = standInApp()
+        const frozen: Error = Object.freeze(
+          Object.assign(new Error("Can't get object."), { errorNumber: -1728 })
+        )
+        const owner = {
+          id: () => {
+            throw frozen
+          },
+        }
+        const plan = recordOf({ owner: required(PERSON_REF) })
+        const error = thrownBy(() => encode({ owner }, plan, environment(app)))
+        expect(error).toBe(frozen)
+        expect(Object.hasOwn(frozen, NATIVE_READING_KEY)).toBe(false)
+      })
+
+      it('leaves a codec failure in a field as it is', () => {
+        expectCodecError(() => encode({ count: 1.5 }, recordOf({ count: required(INTEGER) })), {
+          direction: 'encode',
+          path: ['count'],
+        })
+      })
+    })
+
     it.each([
       ['a collection', PEOPLE_REF],
       ['a resource found only within its container', EMAIL_REF],
@@ -1862,9 +2117,21 @@ function within(resource: string, id: unknown, container?: Record<string, unknow
   }
 }
 
-/** The value a body hands over with the record it was read through. */
+/**
+ * The value a body hands over with the record it was read through: an object
+ * whose only own property is the contained-reference registry symbol.
+ */
 function contained(value: unknown, how: { container: unknown } | { containerId: unknown }) {
-  return { [NATIVE_CONTAINED_REFERENCE_KEY]: { value, ...how } }
+  return { [Symbol.for(NATIVE_CONTAINED_REFERENCE_KEY)]: { value, ...how } }
+}
+
+/**
+ * The value a body hands over as one its property's evidence lets read as
+ * absent: an object whose only own property is the absent-as-null registry
+ * symbol.
+ */
+function absentAsNull(value: unknown) {
+  return { [Symbol.for(NATIVE_ABSENT_AS_NULL_KEY)]: value }
 }
 
 describe.each(IMPLEMENTATIONS)(
@@ -1938,6 +2205,85 @@ describe.each(IMPLEMENTATIONS)(
             }),
           { direction: 'encode', path: ['container'], unsupportedKind: 'reference' }
         )
+      })
+
+      // Regression: the marker was once a string key. A record with a key of
+      // that name, or of the registry key's name, is ordinary data.
+      it('does not take a string-keyed lookalike for a value handed over with its record', () => {
+        const { app, windows, tab, calls } = standInBrowser()
+        const env = { app, references: CONTAINED_REFERENCES }
+        for (const key of ['__mactsContainedReference', NATIVE_CONTAINED_REFERENCE_KEY]) {
+          expectCodecError(
+            () =>
+              encode({ [key]: { value: tab(8, 't-3'), container: windows['8'] } }, TAB_REF, env),
+            {
+              direction: 'encode',
+              path: [],
+              includes: ['without the record it was read through'],
+              unsupportedKind: 'reference',
+            }
+          )
+          // D3: under unknown it is a user record, in a record envelope.
+          expect(encode({ [key]: { value: 'x', containerId: 'w' } }, UNKNOWN)).toEqual({
+            record: { [key]: { record: { value: 'x', containerId: 'w' } } },
+          })
+        }
+        expect(calls).toEqual([])
+      })
+
+      it('fails the marker at a position that does not consume it', () => {
+        const { app, windows, tab } = standInBrowser()
+        const env = { app, references: CONTAINED_REFERENCES }
+        const held = contained(tab(8, 't-3'), { container: windows['8'] })
+        expectCodecError(() => encode(held, STRING, env), {
+          direction: 'encode',
+          path: [],
+          message: 'Expected a string, received an object with symbol keys only',
+        })
+        expectCodecError(() => encode(held, UNKNOWN, env), {
+          direction: 'encode',
+          path: [],
+          includes: ['dynamic content'],
+        })
+      })
+
+      describe('marked absent-as-null at a record field', () => {
+        const TAB_FIELD = recordOf({ tab: required(nullable(TAB_REF)) })
+        /** An object of a tab whose identifier read reports no such object. */
+        const missingTab = () => ({
+          id: () => {
+            throw Object.assign(new Error("Can't get object."), { errorNumber: -1728 })
+          },
+        })
+
+        it('encodes as null when the tab, the value itself, is reported missing', () => {
+          const { app, windows } = standInBrowser()
+          const env = { app, references: CONTAINED_REFERENCES }
+          expect(
+            encode(
+              { tab: absentAsNull(contained(missingTab(), { container: windows['8'] })) },
+              TAB_FIELD,
+              env
+            )
+          ).toEqual({ tab: null })
+        })
+
+        it('still fails when the record the tab was read through is reported missing', () => {
+          const { app, tab } = standInBrowser()
+          const env = { app, references: CONTAINED_REFERENCES }
+          // The container is the item being read, not the field's value: its
+          // absence is the item's, which is never the field's empty value.
+          const gone = { id: missingTab().id }
+          expect(
+            thrownBy(() =>
+              encode(
+                { tab: absentAsNull(contained(tab(8, 't-3'), { container: gone })) },
+                TAB_FIELD,
+                env
+              )
+            )
+          ).toMatchObject({ errorNumber: -1728, [NATIVE_READING_KEY]: 'the property "tab"' })
+        })
       })
 
       it('rejects a container identifier that violates its plan, at the container id', () => {
@@ -2118,5 +2464,8 @@ describe('codec literals', () => {
       reference: WIRE_KEYS.reference,
     })
     expect(literals.containedReference).toBe(NATIVE_CONTAINED_REFERENCE_KEY)
+    expect(literals.absentAsNull).toBe(NATIVE_ABSENT_AS_NULL_KEY)
+    expect(literals.noSuchObject).toBe(ABSENT_VALUE_ERROR_NUMBER)
+    expect(literals.reading).toBe(NATIVE_READING_KEY)
   })
 })

@@ -119,7 +119,7 @@ Get all enums
 
 </td><td>
 
-Get the hierarchy as a flat list of paths
+Get the hierarchy as a flat list of paths, followed by one path per singleton root resource, at its public segment.
 
 </td></tr>
 <tr><td>
@@ -128,7 +128,7 @@ Get the hierarchy as a flat list of paths
 
 </td><td>
 
-Get a resource by name
+Get a usable resource (one not marked unsupported) by name
 
 </td></tr>
 <tr><td>
@@ -147,6 +147,24 @@ Get commands for a resource
 </td><td>
 
 Get all resources
+
+</td></tr>
+<tr><td>
+
+[isOperationAvailable(cmd, resourceName)](./core.cligeneratorcontext.isoperationavailable.md)
+
+</td><td>
+
+Whether the operation `cmd` performs on `resourceName` (`undefined` for an application command) can be called. One that cannot gets no CLI command (see `../input-satisfiability.ts`<!-- -->).
+
+</td></tr>
+<tr><td>
+
+[omittedInputs(cmd, resourceName)](./core.cligeneratorcontext.omittedinputs.md)
+
+</td><td>
+
+The input fields of that operation that are left out because they admit no value, so their flags are not generated.
 
 </td></tr>
 </tbody></table>

@@ -4,10 +4,10 @@
 
 ## Tab.contents property
 
-The visible contents of the tab
+The visible contents of the tab. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-contents: string
+readonly contents: string | null;
 ```

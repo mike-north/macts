@@ -4,7 +4,7 @@
 
 ## SelectionCreateInput interface
 
-Input for creating a Selection
+Input for creating a Selection.
 
 **Signature:**
 

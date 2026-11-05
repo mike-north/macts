@@ -119,9 +119,9 @@ describe('a positional resource', () => {
     })
 
     expect(issues(unidentifiedParent)).toContainEqual({
-      path: ['resources', 'Tab', 'positional'],
+      path: ['commands', 'getTab', 'parent'],
       message:
-        'A positional resource is counted within a parent the app finds at the application by its identifier, but "Window", the parent the get "getTab" of "Tab" records, is not: it needs a primary identifier and a get.',
+        'The get command "getTab" records parent "Window", which needs an ordinary collection parent with a primary identifier and a usable get.',
     })
   })
 
@@ -154,9 +154,9 @@ describe('a positional resource', () => {
     })
 
     expect(issues(nested)).toContainEqual({
-      path: ['resources', 'Tab', 'positional'],
+      path: ['commands', 'getTab', 'parent'],
       message:
-        'A positional resource is counted within a parent the app finds at the application by its identifier, but "Window", the parent the get "getTab" of "Tab" records, is found within "Group". Nested parents are not supported yet.',
+        'The get command "getTab" records parent "Window", which is found within "Group"; nested parents are not supported yet.',
     })
   })
 
@@ -215,6 +215,21 @@ describe('a positional resource', () => {
           'The get command "getTab" selects an item of the positional resource "Tab" by its zero-based position, so its item parameter "index" must be of type integer.',
       },
     ])
+  })
+
+  it('refuses an explicitly nullable position even with supporting evidence', () => {
+    const nullable = panes((raw) => {
+      const parameters = command(raw, 'getTab')['parameters'] as Record<string, unknown>[]
+      const position = parameters[1]
+      if (position === undefined) throw new Error('getTab has no position parameter')
+      position['nullable'] = true
+      position['evidence'] = { nullable: { source: 'curated', note: 'The app accepts null.' } }
+    })
+    expect(issues(nullable)).toContainEqual({
+      path: ['commands', 'getTab', 'parameters', 1, 'nullable'],
+      message:
+        'The get command "getTab" selects an item of the positional resource "Tab" by its zero-based position, so its item parameter "index" cannot be nullable.',
+    })
   })
 
   it.each<[string, Record<string, unknown>]>([

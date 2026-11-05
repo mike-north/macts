@@ -4,10 +4,10 @@
 
 ## Track.albumDisliked property
 
-is the album for this track disliked?
+is the album for this track disliked? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-albumDisliked: boolean
+albumDisliked: boolean | null
 ```

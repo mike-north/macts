@@ -4,10 +4,10 @@
 
 ## RuleCondition.expression property
 
-Rule expression field
+Rule expression field. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-expression: string
+expression: string | null
 ```

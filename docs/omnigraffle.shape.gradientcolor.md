@@ -4,14 +4,10 @@
 
 ## Shape.gradientColor property
 
-For linear and radial fills, this is the ending color
+For linear and radial fills, this is the ending color. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-gradientColor: {
-  r: number
-  g: number
-  b: number
-}
+gradientColor: Rgb | null
 ```

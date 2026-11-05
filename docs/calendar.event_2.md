@@ -43,7 +43,7 @@ boolean
 
 </td><td>
 
-True if the event is an all-day event
+True if the event is an all-day event. Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ True if the event is an all-day event
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The event notes
+The event notes. Nullable. Observed missing in 31 of 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -73,7 +73,7 @@ Date
 
 </td><td>
 
-The event end date
+The event end date. Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -84,26 +84,11 @@ The event end date
 
 </td><td>
 
-Date\[\]
+readonly Date\[\]
 
 </td><td>
 
-The exception dates for recurring events
-
-</td></tr>
-<tr><td>
-
-[id?](./calendar.event_2.id.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `uid`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
+The exception dates for recurring events. Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -114,11 +99,11 @@ _(Optional)_ Canonical identifier (mirrors `uid`<!-- -->); populated by list, pa
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The event location
+The event location. Nullable. Observed missing in 35 of 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -129,11 +114,11 @@ The event location
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The iCalendar (RFC 2445) string describing the event recurrence, if defined
+The iCalendar (RFC 2445) string describing the event recurrence, if defined. Nullable. Observed missing in 27 of 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -142,13 +127,15 @@ The iCalendar (RFC 2445) string describing the event recurrence, if defined
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The event version
+[Integer](./contracts.integer.md)
+
+</td><td>
+
+The event version. Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -159,11 +146,11 @@ The event version
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The event modification date
+The event modification date. Nullable. Observed missing in 4 of 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -178,7 +165,7 @@ Date
 
 </td><td>
 
-The event start date
+The event start date. Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -193,7 +180,7 @@ The event start date
 
 </td><td>
 
-The event status
+The event status. Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -208,7 +195,7 @@ string
 
 </td><td>
 
-The event summary/title
+The event summary/title. Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -217,13 +204,15 @@ The event summary/title
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-A unique event key
+A unique event key. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -234,11 +223,11 @@ A unique event key
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The URL associated with the event
+The URL associated with the event. Nullable. Observed missing in 32 of 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 </tbody></table>

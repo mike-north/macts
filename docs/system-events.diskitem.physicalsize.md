@@ -4,10 +4,10 @@
 
 ## DiskItem.physicalSize property
 
-the actual space used by the disk item on disk
+the actual space used by the disk item on disk. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-physicalSize: number
+readonly physicalSize: Integer | null;
 ```

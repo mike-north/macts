@@ -775,6 +775,16 @@ export const manifest: unknown = {
   },
   relationships: [],
   commands: {
+    currentWindow: {
+      name: 'currentWindow',
+      description: 'Get a reference to the currently selected window.',
+      scope: 'application',
+      parameters: [],
+      returns: 'Window',
+      routeName: 'currentWindow',
+      permission: 'iterm:app:currentWindow',
+      risk: 'read',
+    },
     listWindows: {
       name: 'list',
       description: 'List the windows',

@@ -39,7 +39,7 @@ Error class for Console API errors.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 </tbody></table>
@@ -66,20 +66,20 @@ Machine-readable description of a single capability.
 </td></tr>
 <tr><td>
 
+[ConsoleClient](./console.consoleclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+
+</td></tr>
+<tr><td>
+
 [ConsoleClientOptions](./console.consoleclientoptions.md)
 
 </td><td>
 
 Client configuration options.
-
-</td></tr>
-<tr><td>
-
-[Device](./console.device.md)
-
-</td><td>
-
-A device in Console
 
 </td></tr>
 </tbody></table>
@@ -102,13 +102,6 @@ Description
 </td><td>
 
 Every capability exposed by Console, with risk metadata.
-
-</td></tr>
-<tr><td>
-
-[DeviceSchema](./console.deviceschema.md)
-
-</td><td>
 
 </td></tr>
 </tbody></table>
@@ -135,20 +128,11 @@ Risk classification for a capability.
 </td></tr>
 <tr><td>
 
-[DeviceCreateInput](./console.devicecreateinput.md)
+[ConsoleResources](./console.consoleresources.md)
 
 </td><td>
 
-Input for creating a Device
-
-</td></tr>
-<tr><td>
-
-[DeviceUpdateInput](./console.deviceupdateinput.md)
-
-</td><td>
-
-Input for updating a Device
+The type of the resource table in `consoleContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 </tbody></table>

@@ -4,10 +4,10 @@
 
 ## Playlist.favorited property
 
-is this playlist favorited?
+is this playlist favorited? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-favorited: boolean
+favorited: boolean | null
 ```

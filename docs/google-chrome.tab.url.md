@@ -4,10 +4,10 @@
 
 ## Tab.uRL property
 
-The url visible to the user.
+The url visible to the user. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-uRL: string
+uRL: string | null
 ```

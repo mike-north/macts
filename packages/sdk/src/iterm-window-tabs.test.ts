@@ -39,7 +39,12 @@ import {
   standInTransport,
   type StandInPaneWindow,
 } from '@macts/core/testing'
-import { Integer, InvalidSelectionError, TargetNotFoundError } from '@macts/contracts'
+import {
+  Integer,
+  InternalError,
+  InvalidSelectionError,
+  TargetNotFoundError,
+} from '@macts/contracts'
 import { iTermContract, type iTermClient } from '@macts/iterm/contract'
 import {
   ALLOW_ALL_POLICY,
@@ -48,6 +53,7 @@ import {
   createLogger,
   setLogger,
 } from '@macts/runtime'
+import { bindReference } from './local.js'
 import { createClient as createLocalClient } from './local-client.js'
 import { createClient as createRemoteClient } from './remote.js'
 
@@ -88,18 +94,33 @@ function nullFields(keys: readonly string[], known: readonly string[]): Record<s
 }
 
 /** A native executor against a stand-in iTerm holding {@link WINDOWS}. */
-async function standInExecutor(lookups: string[]) {
+async function standInExecutor(
+  lookups: string[],
+  current: { id: number | null; windows?: readonly StandInPaneWindow[] } = { id: 8 }
+) {
   const manifest = await itermManifest()
   const windowKeys = nativeReadKeys(manifest, 'Window', manifest.resources['Window'])
   const tabKeys = nativeReadKeys(manifest, 'Tab', manifest.resources['Tab'])
-  const { app, automation } = standInPanes(WINDOWS, {
-    lookups,
-    display: (windowId, position) =>
-      `Application("iTerm").windows.byId(${String(windowId)}).tabs.at(${String(position)})`,
-    windowFields: nullFields(windowKeys.get, ['id', 'name', 'currentTab']),
-    tabFields: nullFields(tabKeys.get, ['index', 'title']),
+  return createNativeExecutor({
+    transport: {
+      run(script, options) {
+        // Each request observes the current collection membership. Saved positional
+        // references therefore follow positions, while Window identities persist.
+        const { app, automation } = standInPanes(current.windows ?? WINDOWS, {
+          lookups,
+          display: (windowId, position) =>
+            `Application("iTerm").windows.byId(${String(windowId)}).tabs.at(${String(position)})`,
+          windowFields: nullFields(windowKeys.get, ['id', 'name', 'currentTab']),
+          tabFields: nullFields(tabKeys.get, ['index', 'title']),
+        })
+        return standInTransport(
+          { ...app, currentWindow: () => (current.id === null ? null : { id: () => current.id }) },
+          [],
+          automation
+        ).run(script, options)
+      },
+    },
   })
-  return createNativeExecutor({ transport: standInTransport(app, [], automation) })
 }
 
 /** The permissions of every window and tab read. */
@@ -108,33 +129,37 @@ const PERMISSIONS = [
   'iterm:windows:get',
   'iterm:tabs:list',
   'iterm:tabs:get',
+  'iterm:app:currentWindow',
 ] as const
 
 /** A client of each locality, both over a stand-in iTerm that records its lookups. */
 const FACTORIES: readonly {
   readonly name: string
-  readonly build: (lookups: string[]) => Promise<iTermClient>
+  readonly build: (
+    lookups: string[],
+    current?: { id: number | null; windows?: readonly StandInPaneWindow[] }
+  ) => Promise<iTermClient>
 }[] = [
   {
     name: 'the local client',
-    async build(lookups) {
+    async build(lookups, current) {
       const key = await createApiKey({ name: 'iTerm stub test', permissions: [...PERMISSIONS] })
       return createLocalClient(iTermContract, {
         token: key.token,
-        executor: await standInExecutor(lookups),
+        executor: await standInExecutor(lookups, current),
         governance: { policy: ALLOW_ALL_POLICY },
       })
     },
   },
   {
     name: 'the remote client',
-    async build(lookups) {
+    async build(lookups, current) {
       const key = await createApiKey({ name: 'iTerm stub test', permissions: [...PERMISSIONS] })
       const manifest = await itermManifest()
       const app = createApp([], {
         cors: false,
         prettyJson: false,
-        executor: await standInExecutor(lookups),
+        executor: await standInExecutor(lookups, current),
         governance: { policy: ALLOW_ALL_POLICY },
         register: (registrar) => {
           registrar.registerContract(iTermContract, manifest)
@@ -209,6 +234,26 @@ describe('the generated iTerm contract', () => {
     })
     // A tab has no identifier.
     expect('id' in Tab).toBe(false)
+  })
+
+  it('accepts only a nullable single Window identity as the current-window wire result', () => {
+    const output = iTermContract.operations['iterm.app.currentWindow']?.output
+    const reference = {
+      resource: 'Window',
+      form: 'identity',
+      cardinality: 'one',
+      id: { integer: '8' },
+    }
+    expect(output?.wire.safeParse(null).success).toBe(true)
+    expect(output?.wire.safeParse({ reference }).success).toBe(true)
+    for (const invalid of [
+      { ...reference, resource: 'Tab' },
+      { ...reference, cardinality: 'many', entries: [{ integer: '8' }] },
+      { ...reference, id: '8' },
+    ])
+      expect(output?.wire.safeParse({ reference: invalid }).success, JSON.stringify(invalid)).toBe(
+        false
+      )
   })
 
   it('gets a tab by its window and its position', () => {
@@ -292,3 +337,118 @@ describe.each(FACTORIES)('a tab get by position, through $name', ({ build }) => 
     expect(lookups).toEqual(['windows.byId(9)'])
   })
 })
+
+/** Application properties use the ordinary command-result reference path, with no synthetic root identity. */
+describe.each(FACTORIES)('the application current window, through $name', ({ build }) => {
+  it('returns a lazy single Window identity in the originating app, without a container', async () => {
+    const lookups: string[] = []
+    const client = await build(lookups)
+    const reference = await client.currentWindow()
+    expect(reference).toMatchObject({
+      app: 'iterm',
+      resource: 'Window',
+      form: 'identity',
+      cardinality: 'one',
+      id: 8,
+    })
+    expect(reference).not.toHaveProperty('container')
+    expect(lookups).toEqual([])
+    const window = await reference?.resolve()
+    expect(window?.id).toBe(8)
+    expect(window?.currentTab).toMatchObject(tabAt(8, 1))
+    expect(await window?.currentTab?.resolve()).toMatchObject({ title: 'Tests', index: 2 })
+    expect(lookups).toEqual(['windows.byId(8)', 'windows.byId(8)', 'windows.byId(8).tabs.at(1)'])
+  })
+
+  it('rejects a reference bound to another app before dispatch', async () => {
+    const lookups: string[] = []
+    const client = await build(lookups)
+    expect(() =>
+      bindReference(client, {
+        app: 'another-app',
+        resource: 'Window',
+        form: 'identity',
+        cardinality: 'one',
+        id: int(8),
+      })
+    ).toThrow()
+    expect(lookups).toEqual([])
+  })
+
+  it('rejects a forged container on an application Window identity before native dispatch', async () => {
+    const lookups: string[] = []
+    const client = await build(lookups)
+    const forged = bindReference(client, {
+      app: 'iterm',
+      resource: 'Window',
+      form: 'identity',
+      cardinality: 'one',
+      id: int(8),
+      container: {
+        app: 'iterm',
+        resource: 'Window',
+        form: 'identity',
+        cardinality: 'one',
+        id: int(7),
+      },
+    })
+    await expect(forged.resolve()).rejects.toBeInstanceOf(InternalError)
+    expect(lookups).toEqual([])
+  })
+
+  it('returns null when the application holds no current window', async () => {
+    const client = await build([], { id: null })
+    await expect(client.currentWindow()).resolves.toBeNull()
+  })
+
+  it('captures Window identity rather than following a later change of current window', async () => {
+    const current = { id: 8 }
+    const client = await build([], current)
+    const reference = await client.currentWindow()
+    current.id = 7
+    expect(await client.currentWindow()).toMatchObject({ id: 7 })
+    expect((await reference?.resolve())?.id).toBe(8)
+  })
+
+  it('reports a disappeared current Window as TargetNotFound when hydrated', async () => {
+    const client = await build([], { id: 9 })
+    const reference = await client.currentWindow()
+    if (reference === null) throw new Error('Expected a current-window reference')
+    expect(detailsOf(await rejectionOf(reference.resolve()), TargetNotFoundError)).toEqual({
+      resource: 'Window',
+    })
+  })
+})
+
+/** A position tracks collection membership independently of the dictionary index or tab identity. */
+describe.each(FACTORIES)(
+  'saved tab positions after collection changes, through $name',
+  ({ build }) => {
+    it('follows the new occupant after an earlier tab closes, then fails when beyond the end', async () => {
+      const current = {
+        id: 8,
+        windows: [
+          {
+            id: 8,
+            name: 'Owned fixture',
+            currentTab: 1,
+            tabs: [{ title: 'A' }, { title: 'B' }, { title: 'C' }],
+          },
+        ],
+      }
+      const client = await build([], current)
+      const saved = (await client.windows.get(int(8))).currentTab
+      if (saved === null) throw new Error('Expected a second-tab reference')
+      expect((await saved.resolve()).title).toBe('B')
+      current.windows = [
+        { id: 8, name: 'Owned fixture', currentTab: 0, tabs: [{ title: 'B' }, { title: 'C' }] },
+      ]
+      expect((await saved.resolve()).title).toBe('C')
+      expect((await client.tabs.get(int(8), int(1))).title).toBe('C')
+      current.windows = [{ id: 8, name: 'Owned fixture', currentTab: 0, tabs: [{ title: 'B' }] }]
+      expect(detailsOf(await rejectionOf(saved.resolve()), InvalidSelectionError)).toEqual({
+        resource: 'Tab',
+      })
+    })
+  }
+)

@@ -6,7 +6,9 @@
 
 Generate consolidated packages (client + server) from a manifest.
 
-The client package combines SDK + CLI into `@macts/{app}`<!-- -->. The server package combines API + MCP into `@macts/{app}-server`<!-- -->.
+The client package combines the SDK, the CLI and the contract into `@macts/{app}`<!-- -->. The server package, `@macts/{app}-server`<!-- -->, re-exports that contract.
+
+A manifest with a command that must select one item and declares no identifier parameter, or a resource whose identifier declares no targeting and is not the class's dictionary id, is refused before either package is built (`generationRefusals`<!-- -->): the result holds the errors naming each such command or resource, once, and no files.
 
 **Signature:**
 

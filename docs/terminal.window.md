@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the window is the frontmost window
+boolean \| null
+
+</td><td>
+
+Whether the window is the frontmost window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ Whether the window is the frontmost window
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The unique identifier of the window
+number \| null
+
+</td><td>
+
+The unique identifier of the window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ The unique identifier of the window
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The title of the window
+The title of the window. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -84,11 +90,11 @@ The title of the window
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The position of the window
+The position of the window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +105,11 @@ The position of the window
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the window is visible
+Whether the window is visible. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

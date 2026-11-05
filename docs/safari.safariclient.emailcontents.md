@@ -9,7 +9,7 @@ Emails the contents of a tab.
 **Signature:**
 
 ```typescript
-emailContents(_of?: string): Promise<void>;
+emailContents(_of?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -34,6 +34,19 @@ Description
 </td><td>
 
 string
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

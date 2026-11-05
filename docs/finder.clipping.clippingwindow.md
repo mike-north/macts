@@ -4,10 +4,10 @@
 
 ## Clipping.clippingWindow property
 
-(NOT AVAILABLE YET) the clipping window for this clipping
+(NOT AVAILABLE YET) the clipping window for this clipping. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-clippingWindow: string
+readonly clippingWindow: string | null;
 ```

@@ -4,7 +4,7 @@
 
 ## MessageViewerCreateInput interface
 
-Input for creating a MessageViewer
+Input for creating a MessageViewer.
 
 **Signature:**
 

@@ -4,10 +4,10 @@
 
 ## AutomatorAction.warningLevel property
 
-The level of the warning, increasing in likelihood of data loss
+The level of the warning, increasing in likelihood of data loss. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-warningLevel: WarningLevel
+readonly warningLevel: WarningLevel | null;
 ```

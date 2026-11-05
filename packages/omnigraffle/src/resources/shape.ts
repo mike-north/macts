@@ -24,21 +24,42 @@ export class ShapeResourceClient {
   /**
    * List the shapes of one canvas, as one page.
    */
-  async list(canvasId: string): Promise<Page<Shape>> {
-    return this.#http.rpc<Page<Shape>>(`${this.#app}.${this.#resource}.list`, { canvasId })
+  async list(
+    canvasId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<Shape>> {
+    return this.#http.invoke<Page<Shape>>(
+      `${this.#app}.${this.#resource}.list`,
+      { canvasId },
+      __mactsOptions,
+      'Shape'
+    )
   }
 
   /**
    * Get a shape by id.
    */
-  async get(id: string): Promise<Shape> {
-    return this.#http.rpc<Shape>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Shape> {
+    return this.#http.invoke<Shape>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Shape'
+    )
   }
 
   /**
    * Create a new shape.
    */
-  async create(input: ShapeCreateInput): Promise<Shape> {
-    return this.#http.rpc<Shape>(`${this.#app}.${this.#resource}.create`, input)
+  async create(
+    input: ShapeCreateInput,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Shape> {
+    return this.#http.invoke<Shape>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'Shape'
+    )
   }
 }

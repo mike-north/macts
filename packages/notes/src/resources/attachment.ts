@@ -7,6 +7,27 @@ import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Attachment } from '../types.js'
 
+import {
+  Integer as __mactsInteger,
+  ValueTypes as __mactsValueTypes,
+  ValidationError as __mactsValidationError,
+} from '@macts/contracts'
+
+/** Integer wire policy shared with the operation contracts, built once per module. */
+const __mactsIntegerWire = __mactsValueTypes.integer().wire
+
+/** Validate CLI text or an SDK number before dispatch, without implicit rounding. */
+function __mactsIntegerInput(value: unknown): __mactsInteger {
+  const integer = typeof value === 'number' || typeof value === 'string' ? String(value) : undefined
+  const candidate = { integer }
+  if (!__mactsIntegerWire.safeParse(candidate).success || integer === undefined) {
+    const message =
+      'Expected a canonical decimal integer from -9007199254740991 to 9007199254740991.'
+    throw new __mactsValidationError(message, { issues: [{ path: [], message }] })
+  }
+  return __mactsInteger.validate(Number(integer))
+}
+
 /**
  * Client for a note attachment.
  */
@@ -25,17 +46,33 @@ export class AttachmentResourceClient {
    * List attachments, one page at a time. When the result has a `nextCursor`,
    * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
-  async list(page: { pageSize?: number; cursor?: string } = {}): Promise<Page<Attachment>> {
-    return this.#http.rpc<Page<Attachment>>(`${this.#app}.${this.#resource}.list`, {
-      ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-      ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-    })
+  async list(
+    page: { pageSize?: number; cursor?: string } = {},
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<Attachment>> {
+    return this.#http.invoke<Page<Attachment>>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: __mactsIntegerInput(page.pageSize) }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+      },
+      __mactsOptions,
+      'Attachment'
+    )
   }
 
   /**
    * Get a attachment by id.
    */
-  async get(id: string): Promise<Attachment> {
-    return this.#http.rpc<Attachment>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Attachment> {
+    return this.#http.invoke<Attachment>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Attachment'
+    )
   }
 }

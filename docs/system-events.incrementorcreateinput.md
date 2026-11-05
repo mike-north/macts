@@ -4,7 +4,7 @@
 
 ## IncrementorCreateInput type
 
-Input for creating a Incrementor
+Input for creating an Incrementor.
 
 **Signature:**
 

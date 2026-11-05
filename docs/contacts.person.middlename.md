@@ -4,10 +4,10 @@
 
 ## Person.middleName property
 
-The Middle name of this person.
+The Middle name of this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-middleName: string
+middleName: string | null
 ```

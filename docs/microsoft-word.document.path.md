@@ -4,10 +4,10 @@
 
 ## Document.path property
 
-The path to the document (HFS format)
+The path to the document (HFS format). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-path: string
+readonly path: string | null;
 ```

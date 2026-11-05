@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-[TextAutosizing](./omnigraffle.textautosizing.md)
+[TextAutosizing](./omnigraffle.textautosizing.md) \| null
 
 </td><td>
 
-Autosizing behavior of the shape around the text
+Autosizing behavior of the shape around the text. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ Autosizing behavior of the shape around the text
 
 </td><td>
 
-[FillType](./omnigraffle.filltype.md)
+[FillType](./omnigraffle.filltype.md) \| null
 
 </td><td>
 
-The type of fill for this shape
+The type of fill for this shape. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ The type of fill for this shape
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The fill color
+The fill color. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ The fill color
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Angle of a linear gradient fill
+Angle of a linear gradient fill. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +99,11 @@ Angle of a linear gradient fill
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-For linear and radial fills, this is the ending color
+For linear and radial fills, this is the ending color. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,13 +112,15 @@ For linear and radial fills, this is the ending color
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-Unique identifier
+Unique identifier. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -129,11 +131,11 @@ Unique identifier
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Name of the shape
+Name of the shape. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +146,11 @@ Name of the shape
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Rotation of the graphic in degrees
+Rotation of the graphic in degrees. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +161,11 @@ Rotation of the graphic in degrees
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-Padding at the left and right of the text space
+Padding at the left and right of the text space. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -174,11 +176,11 @@ Padding at the left and right of the text space
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The text inside the shape
+The text inside the shape. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -189,11 +191,11 @@ The text inside the shape
 
 </td><td>
 
-[VerticalAlignment](./omnigraffle.verticalalignment.md)
+[VerticalAlignment](./omnigraffle.verticalalignment.md) \| null
 
 </td><td>
 
-Placement of the text inside the shape
+Placement of the text inside the shape. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -204,11 +206,11 @@ Placement of the text inside the shape
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-Padding at the top and bottom of the text space
+Padding at the top and bottom of the text space. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

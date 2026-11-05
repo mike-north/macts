@@ -176,6 +176,9 @@ importers:
       '@macts/omnigraffle-server':
         specifier: workspace:*
         version: link:../../packages/omnigraffle-server
+      '@macts/omniplan':
+        specifier: workspace:*
+        version: link:../../packages/omniplan
       '@macts/omniplan-server':
         specifier: workspace:*
         version: link:../../packages/omniplan-server
@@ -392,6 +395,9 @@ importers:
       '@macts/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
+      '@macts/system-events':
+        specifier: workspace:*
+        version: link:../../packages/system-events
       '@types/node':
         specifier: ^26.0.0
         version: 26.2.0
@@ -852,6 +858,9 @@ importers:
       '@types/pluralize':
         specifier: ^0.0.33
         version: 0.0.33
+      clipanion:
+        specifier: 'catalog:'
+        version: 4.0.0-rc.4(typanion@3.14.0)
       tsd:
         specifier: 'catalog:'
         version: 0.31.2

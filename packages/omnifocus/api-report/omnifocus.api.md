@@ -4,7 +4,13 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -28,13 +34,13 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Folder {
-    creationDate: Date;
-    effectivelyHidden: boolean;
-    hidden: boolean;
-    id: string;
-    modificationDate: Date;
-    name: string;
-    note: string;
+    readonly creationDate: Date | null;
+    readonly effectivelyHidden: boolean | null;
+    hidden: boolean | null;
+    readonly id: string;
+    readonly modificationDate: Date | null;
+    name: string | null;
+    note: string | null;
 }
 
 // @public
@@ -47,12 +53,12 @@ export interface FolderCreateInput {
 // @public
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: FolderCreateInput): Promise<Folder>;
-    get(id: string): Promise<Folder>;
-    list(): Promise<Page<Folder>>;
+    create(input: FolderCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Folder>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Folder>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Folder>>;
 }
 
-// @public (undocumented)
+// @public
 export const FolderSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -64,23 +70,31 @@ export const FolderSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type FolderUpdateInput = Partial<FolderCreateInput>;
+export interface FolderUpdateInput {
+    hidden?: boolean;
+    name?: string;
+    note?: string;
+}
 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface InboxTask {
-    creationDate: Date;
-    deferDate: Date;
-    dueDate: Date;
-    flagged: boolean;
-    id: string;
-    name: string;
-    note: string;
+    creationDate: Date | null;
+    deferDate: Date | null;
+    dueDate: Date | null;
+    flagged: boolean | null;
+    readonly id: string;
+    name: string | null;
+    note: string | null;
 }
 
 // @public
@@ -96,12 +110,12 @@ export interface InboxTaskCreateInput {
 // @public
 export class InboxTaskResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: InboxTaskCreateInput): Promise<InboxTask>;
-    get(id: string): Promise<InboxTask>;
-    list(): Promise<Page<InboxTask>>;
+    create(input: InboxTaskCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<InboxTask>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<InboxTask>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<InboxTask>>;
 }
 
-// @public (undocumented)
+// @public
 export const InboxTaskSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -113,32 +127,43 @@ export const InboxTaskSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type InboxTaskUpdateInput = Partial<InboxTaskCreateInput>;
+export interface InboxTaskUpdateInput {
+    creationDate?: Date;
+    deferDate?: Date;
+    dueDate?: Date;
+    flagged?: boolean;
+    name?: string;
+    note?: string;
+}
 
 // @public
 export type IntervalUnit = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
 
 // @public
+export interface OmniFocusClient extends ClientBrand<OmniFocusResources> {
+}
+
+// @public
 export class OmniFocusClient {
     constructor(options: OmniFocusClientOptions);
-    archive(_in: string, compression?: boolean): Promise<void>;
-    compact(): Promise<void>;
-    complete(text: string): Promise<void>;
+    archive(_in: string, compression?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    compact(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    complete(text: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly folders: FolderResourceClient;
     get http(): HttpClient;
-    importInto(file: string): Promise<void>;
+    importInto(file: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly inboxTasks: InboxTaskResourceClient;
-    markComplete(targets: string): Promise<void>;
-    markDropped(targets: string): Promise<void>;
-    markIncomplete(targets: string): Promise<void>;
-    parseTasksInto(text: string, into: string): Promise<void>;
+    markComplete(targets: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    markDropped(targets: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    markIncomplete(targets: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    parseTasksInto(text: string, into: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly perspectives: PerspectiveResourceClient;
     readonly projects: ProjectResourceClient;
-    redo(): Promise<void>;
-    synchronize(): Promise<void>;
+    redo(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    synchronize(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly tags: TagResourceClient;
     readonly tasks: TaskResourceClient;
-    undo(): Promise<void>;
+    undo(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -155,9 +180,43 @@ export class OmniFocusError extends Error {
 }
 
 // @public
+export type OmniFocusResources = Readonly<{
+    Task: ResourceDescriptor<Task, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.tasks.get';
+        readonly list: 'omnifocus.tasks.list';
+    };
+    Project: ResourceDescriptor<Project, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.projects.get';
+        readonly list: 'omnifocus.projects.list';
+    };
+    Folder: ResourceDescriptor<Folder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.folders.get';
+        readonly list: 'omnifocus.folders.list';
+    };
+    Tag: ResourceDescriptor<Tag, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.tags.get';
+        readonly list: 'omnifocus.tags.list';
+    };
+    InboxTask: ResourceDescriptor<InboxTask, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.inboxTasks.get';
+        readonly list: 'omnifocus.inboxTasks.list';
+    };
+    Perspective: ResourceDescriptor<Perspective, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.perspectives.get';
+        readonly list: 'omnifocus.perspectives.list';
+    };
+}>;
+
+// @public
 export interface Perspective {
-    id: string;
-    name: string;
+    readonly id: string;
+    readonly name: string | null;
 }
 
 // @public
@@ -166,84 +225,70 @@ export type PerspectiveCreateInput = Record<string, never>;
 // @public
 export class PerspectiveResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Perspective>;
-    list(): Promise<Page<Perspective>>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Perspective>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Perspective>>;
 }
 
-// @public (undocumented)
+// @public
 export const PerspectiveSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type PerspectiveUpdateInput = Partial<PerspectiveCreateInput>;
+export type PerspectiveUpdateInput = Record<string, never>;
 
 // @public
 export interface Project {
-    blocked: boolean;
-    completed: boolean;
-    completedByChildren: boolean;
-    completionDate: Date;
-    creationDate: Date;
-    defaultSingletonActionHolder: boolean;
-    deferDate: Date;
-    dropped: boolean;
-    droppedDate: Date;
-    dueDate: Date;
-    effectiveDeferDate: Date;
-    effectiveDueDate: Date;
-    effectivelyCompleted: boolean;
-    effectivelyDropped: boolean;
-    effectivePlannedDate: Date;
-    effectiveStatus: ProjectStatus;
-    estimatedMinutes: number;
-    flagged: boolean;
-    id: string;
-    lastReviewDate: Date;
-    modificationDate: Date;
-    name: string;
-    nextReviewDate: Date;
-    note: string;
-    numberOfAvailableTasks: number;
-    numberOfCompletedTasks: number;
-    numberOfTasks: number;
-    plannedDate: Date;
-    sequential: boolean;
-    singletonActionHolder: boolean;
-    status: ProjectStatus;
+    readonly blocked: boolean | null;
+    readonly completed: boolean | null;
+    completedByChildren: boolean | null;
+    completionDate: Date | null;
+    creationDate: Date | null;
+    defaultSingletonActionHolder: boolean | null;
+    deferDate: Date | null;
+    readonly dropped: boolean | null;
+    droppedDate: Date | null;
+    dueDate: Date | null;
+    readonly effectiveDeferDate: Date | null;
+    readonly effectiveDueDate: Date | null;
+    readonly effectivelyCompleted: boolean | null;
+    readonly effectivelyDropped: boolean | null;
+    readonly effectivePlannedDate: Date | null;
+    readonly effectiveStatus: ProjectStatus | null;
+    estimatedMinutes: Integer | null;
+    flagged: boolean | null;
+    readonly id: string;
+    lastReviewDate: Date | null;
+    readonly modificationDate: Date | null;
+    name: string | null;
+    nextReviewDate: Date | null;
+    note: string | null;
+    readonly numberOfAvailableTasks: Integer | null;
+    readonly numberOfCompletedTasks: Integer | null;
+    readonly numberOfTasks: Integer | null;
+    plannedDate: Date | null;
+    sequential: boolean | null;
+    singletonActionHolder: boolean | null;
+    status: ProjectStatus | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "ProjectCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface ProjectCreateInput {
-    completedByChildren?: boolean;
-    completionDate?: Date;
-    creationDate?: Date;
-    defaultSingletonActionHolder?: boolean;
-    deferDate?: Date;
-    droppedDate?: Date;
-    dueDate?: Date;
-    estimatedMinutes?: number;
-    flagged?: boolean;
-    lastReviewDate?: Date;
-    name: string;
-    nextReviewDate?: Date;
-    note?: string;
-    plannedDate?: Date;
-    sequential?: boolean;
-    singletonActionHolder?: boolean;
-    status?: ProjectStatus;
-}
+export type ProjectCreateInput = Omit<ProjectCreateInput_2, 'estimatedMinutes'> & {
+    estimatedMinutes?: null extends ProjectCreateInput_2['estimatedMinutes'] ? number | null : number;
+};
 
 // @public
 export class ProjectResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: ProjectCreateInput): Promise<Project>;
-    get(id: string): Promise<Project>;
-    list(): Promise<Page<Project>>;
+    create(input: ProjectCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Project>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Project>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Project>>;
 }
 
-// @public (undocumented)
+// @public
 export const ProjectSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -281,8 +326,12 @@ export const ProjectSchema: z.ZodObject<{
 // @public
 export type ProjectStatus = 'active' | 'onHold' | 'done' | 'dropped';
 
+// Warning: (ae-forgotten-export) The symbol "ProjectUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ProjectUpdateInput = Partial<ProjectCreateInput>;
+export type ProjectUpdateInput = Omit<ProjectUpdateInput_2, 'estimatedMinutes'> & {
+    estimatedMinutes?: null extends ProjectUpdateInput_2['estimatedMinutes'] ? number | null : number;
+};
 
 // @public
 export type RepetitionBasedOn = 'basedOnDue' | 'basedOnPlanned' | 'basedOnDefer';
@@ -295,14 +344,14 @@ export type RepetitionSchedule = 'regularly' | 'fromCompletion';
 
 // @public
 export interface Tag {
-    allowsNextAction: boolean;
-    availableTaskCount: number;
-    effectivelyHidden: boolean;
-    hidden: boolean;
-    id: string;
-    name: string;
-    note: string;
-    remainingTaskCount: number;
+    allowsNextAction: boolean | null;
+    readonly availableTaskCount: Integer | null;
+    readonly effectivelyHidden: boolean | null;
+    hidden: boolean | null;
+    readonly id: string;
+    name: string | null;
+    note: string | null;
+    readonly remainingTaskCount: Integer | null;
 }
 
 // @public
@@ -316,12 +365,12 @@ export interface TagCreateInput {
 // @public
 export class TagResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: TagCreateInput): Promise<Tag>;
-    get(id: string): Promise<Tag>;
-    list(): Promise<Page<Tag>>;
+    create(input: TagCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Tag>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Tag>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Tag>>;
 }
 
-// @public (undocumented)
+// @public
 export const TagSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -334,64 +383,60 @@ export const TagSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type TagUpdateInput = Partial<TagCreateInput>;
+export interface TagUpdateInput {
+    allowsNextAction?: boolean;
+    hidden?: boolean;
+    name?: string;
+    note?: string;
+}
 
 // @public
 export interface Task {
-    blocked: boolean;
-    completed: boolean;
-    completedByChildren: boolean;
-    completionDate: Date;
-    creationDate: Date;
-    deferDate: Date;
-    dropped: boolean;
-    droppedDate: Date;
-    dueDate: Date;
-    effectiveDeferDate: Date;
-    effectiveDueDate: Date;
-    effectivelyCompleted: boolean;
-    effectivelyDropped: boolean;
-    effectivePlannedDate: Date;
-    estimatedMinutes: number;
-    flagged: boolean;
-    id: string;
-    inInbox: boolean;
-    modificationDate: Date;
-    name: string;
-    next: boolean;
-    note: string;
-    numberOfAvailableTasks: number;
-    numberOfCompletedTasks: number;
-    numberOfTasks: number;
-    plannedDate: Date;
-    sequential: boolean;
+    readonly blocked: boolean | null;
+    readonly completed: boolean | null;
+    completedByChildren: boolean | null;
+    completionDate: Date | null;
+    creationDate: Date | null;
+    deferDate: Date | null;
+    readonly dropped: boolean | null;
+    droppedDate: Date | null;
+    dueDate: Date | null;
+    readonly effectiveDeferDate: Date | null;
+    readonly effectiveDueDate: Date | null;
+    readonly effectivelyCompleted: boolean | null;
+    readonly effectivelyDropped: boolean | null;
+    readonly effectivePlannedDate: Date | null;
+    estimatedMinutes: Integer | null;
+    flagged: boolean | null;
+    readonly id: string;
+    readonly inInbox: boolean | null;
+    readonly modificationDate: Date | null;
+    name: string | null;
+    readonly next: boolean | null;
+    note: string | null;
+    readonly numberOfAvailableTasks: Integer | null;
+    readonly numberOfCompletedTasks: Integer | null;
+    readonly numberOfTasks: Integer | null;
+    plannedDate: Date | null;
+    sequential: boolean | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "TaskCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface TaskCreateInput {
-    completedByChildren?: boolean;
-    completionDate?: Date;
-    creationDate?: Date;
-    deferDate?: Date;
-    droppedDate?: Date;
-    dueDate?: Date;
-    estimatedMinutes?: number;
-    flagged?: boolean;
-    name: string;
-    note?: string;
-    plannedDate?: Date;
-    sequential?: boolean;
-}
+export type TaskCreateInput = Omit<TaskCreateInput_2, 'estimatedMinutes'> & {
+    estimatedMinutes?: null extends TaskCreateInput_2['estimatedMinutes'] ? number | null : number;
+};
 
 // @public
 export class TaskResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: TaskCreateInput): Promise<Task>;
-    get(id: string): Promise<Task>;
-    list(): Promise<Page<Task>>;
+    create(input: TaskCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Task>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Task>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Task>>;
 }
 
-// @public (undocumented)
+// @public
 export const TaskSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -422,8 +467,12 @@ export const TaskSchema: z.ZodObject<{
     numberOfCompletedTasks: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "TaskUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type TaskUpdateInput = Partial<TaskCreateInput>;
+export type TaskUpdateInput = Omit<TaskUpdateInput_2, 'estimatedMinutes'> & {
+    estimatedMinutes?: null extends TaskUpdateInput_2['estimatedMinutes'] ? number | null : number;
+};
 
 // (No @packageDocumentation comment for this package)
 

@@ -2,14 +2,108 @@
 
 [Home](./index.md) &gt; [@macts/omnigraffle](./omnigraffle.md) &gt; [LayerUpdateInput](./omnigraffle.layerupdateinput.md)
 
-## LayerUpdateInput type
+## LayerUpdateInput interface
 
-Input for updating a Layer
+Input for updating a Layer. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type LayerUpdateInput = Partial<LayerCreateInput>
+interface LayerUpdateInput
 ```
 
-**References:** [LayerCreateInput](./omnigraffle.layercreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[canvasId?](./omnigraffle.layerupdateinput.canvasid.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Canvas identifier for the layer. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[locked?](./omnigraffle.layerupdateinput.locked.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Are the layer's graphics locked? Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[name?](./omnigraffle.layerupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Layer name. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[prints?](./omnigraffle.layerupdateinput.prints.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Do the layer's graphics print? Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[visible?](./omnigraffle.layerupdateinput.visible.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Are the layer's graphics visible? Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

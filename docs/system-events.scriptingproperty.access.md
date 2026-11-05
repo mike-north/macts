@@ -4,10 +4,10 @@
 
 ## ScriptingProperty.access property
 
-The type of access to this property
+The type of access to this property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-access: string
+readonly access: string | null;
 ```

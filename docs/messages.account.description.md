@@ -4,10 +4,10 @@
 
 ## Account.description property
 
-The name of this account as defined in Account preferences description field
+The name of this account as defined in Account preferences description field. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-description: string
+readonly description: string | null;
 ```

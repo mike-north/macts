@@ -2,14 +2,123 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [OutgoingMessageUpdateInput](./mail.outgoingmessageupdateinput.md)
 
-## OutgoingMessageUpdateInput type
+## OutgoingMessageUpdateInput interface
 
-Input for updating a OutgoingMessage
+Input for updating an OutgoingMessage. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type OutgoingMessageUpdateInput = Partial<OutgoingMessageCreateInput>
+interface OutgoingMessageUpdateInput
 ```
 
-**References:** [OutgoingMessageCreateInput](./mail.outgoingmessagecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[htmlContent?](./mail.outgoingmessageupdateinput.htmlcontent.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Does nothing at all (deprecated). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[messageSignature?](./mail.outgoingmessageupdateinput.messagesignature.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The signature of the message. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[sender?](./mail.outgoingmessageupdateinput.sender.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The sender of the message. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[subject?](./mail.outgoingmessageupdateinput.subject.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The subject of the message. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[vcardPath?](./mail.outgoingmessageupdateinput.vcardpath.md)
+
+</td><td>
+
+</td><td>
+
+[FileSource](./contracts.filesource.md)
+
+</td><td>
+
+_(Optional)_ Does nothing at all (deprecated). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[visible?](./mail.outgoingmessageupdateinput.visible.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Controls whether the message window is shown on the screen. The default is false. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

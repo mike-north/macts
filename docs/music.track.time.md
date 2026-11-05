@@ -4,10 +4,10 @@
 
 ## Track.time property
 
-the length of the track in MM:SS format
+the length of the track in MM:SS format. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-time: string
+readonly time: string | null;
 ```

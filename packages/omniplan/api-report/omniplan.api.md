@@ -4,12 +4,18 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Assignment {
-    units: number;
+    units: number | null;
 }
 
 // @public
@@ -20,16 +26,18 @@ export interface AssignmentCreateInput {
 // @public
 export class AssignmentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    list(): Promise<Page<Assignment>>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Assignment>>;
 }
 
-// @public (undocumented)
+// @public
 export const AssignmentSchema: z.ZodObject<{
     units: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type AssignmentUpdateInput = Partial<AssignmentCreateInput>;
+export interface AssignmentUpdateInput {
+    units?: number;
+}
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -52,15 +60,15 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Currency {
-    code: string;
-    name: string;
-    symbol: string;
+    readonly code: string | null;
+    readonly name: string | null;
+    readonly symbol: string | null;
 }
 
 // @public
 export type CurrencyCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const CurrencySchema: z.ZodObject<{
     code: z.ZodString;
     name: z.ZodString;
@@ -68,13 +76,13 @@ export const CurrencySchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type CurrencyUpdateInput = Partial<CurrencyCreateInput>;
+export type CurrencyUpdateInput = Record<string, never>;
 
 // @public
 export interface Dependency {
-    dependencyType: DependencyType;
-    leadPercentage: number;
-    leadTime: number;
+    dependencyType: DependencyType | null;
+    leadPercentage: number | null;
+    leadTime: number | null;
 }
 
 // @public
@@ -87,10 +95,10 @@ export interface DependencyCreateInput {
 // @public
 export class DependencyResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    list(): Promise<Page<Dependency>>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Dependency>>;
 }
 
-// @public (undocumented)
+// @public
 export const DependencySchema: z.ZodObject<{
     dependencyType: z.ZodString;
     leadTime: z.ZodNumber;
@@ -101,20 +109,28 @@ export const DependencySchema: z.ZodObject<{
 export type DependencyType = 'startstart' | 'startfinish' | 'finishstart' | 'finishfinish';
 
 // @public
-export type DependencyUpdateInput = Partial<DependencyCreateInput>;
+export interface DependencyUpdateInput {
+    dependencyType?: DependencyType;
+    leadPercentage?: number;
+    leadTime?: number;
+}
 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface Milestone {
-    id: number;
-    name: string;
-    note: string;
-    startingDate: Date;
+    readonly id: Integer;
+    name: string | null;
+    note: string | null;
+    startingDate: Date | null;
 }
 
 // @public
@@ -127,12 +143,12 @@ export interface MilestoneCreateInput {
 // @public
 export class MilestoneResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: MilestoneCreateInput): Promise<Milestone>;
-    get(id: string): Promise<Milestone>;
-    list(): Promise<Page<Milestone>>;
+    create(input: MilestoneCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Milestone>;
+    get(id: string | number, __mactsOptions?: _macts_contracts.CallOptions): Promise<Milestone>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Milestone>>;
 }
 
-// @public (undocumented)
+// @public
 export const MilestoneSchema: z.ZodObject<{
     id: z.ZodNumber;
     name: z.ZodString;
@@ -141,30 +157,38 @@ export const MilestoneSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type MilestoneUpdateInput = Partial<MilestoneCreateInput>;
+export interface MilestoneUpdateInput {
+    name?: string;
+    note?: string;
+    startingDate?: Date;
+}
+
+// @public
+export interface OmniPlanClient extends ClientBrand<OmniPlanResources> {
+}
 
 // @public
 export class OmniPlanClient {
     constructor(options: OmniPlanClientOptions);
-    addWorkTime(schedule: string): Promise<void>;
-    assign(resource: string, task: string): Promise<void>;
+    addWorkTime(schedule: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    assign(resource: string, task: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly assignments: AssignmentResourceClient;
-    baseline(): Promise<void>;
-    changeMark(): Promise<void>;
-    depend(prerequisite: string, dependent: string): Promise<void>;
+    baseline(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    changeMark(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    depend(prerequisite: string, dependent: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly dependencies: DependencyResourceClient;
-    _export(to: string): Promise<void>;
+    _export(to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
-    level(): Promise<void>;
-    lookup(key: string): Promise<void>;
+    level(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    lookup(key: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly milestones: MilestoneResourceClient;
     readonly projects: ProjectResourceClient;
-    redo(): Promise<void>;
+    redo(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly resources: ResourceResourceClient;
     readonly scenarios: ScenarioResourceClient;
-    subtractWorkTime(schedule: string): Promise<void>;
+    subtractWorkTime(schedule: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly tasks: TaskResourceClient;
-    undo(): Promise<void>;
+    undo(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly violations: ViolationResourceClient;
 }
 
@@ -182,15 +206,53 @@ export class OmniPlanError extends Error {
 }
 
 // @public
+export type OmniPlanResources = Readonly<{
+    Project: ResourceDescriptor<Project, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omniplan.projects.get';
+        readonly list: 'omniplan.projects.list';
+    };
+    Task: ResourceDescriptor<Task, Integer> & {
+        readonly id: ValueType<Integer>;
+        readonly get: 'omniplan.tasks.get';
+        readonly list: 'omniplan.tasks.list';
+    };
+    Milestone: ResourceDescriptor<Milestone, Integer> & {
+        readonly id: ValueType<Integer>;
+        readonly get: 'omniplan.milestones.get';
+        readonly list: 'omniplan.milestones.list';
+    };
+    Resource: ResourceDescriptor<Resource, Integer> & {
+        readonly id: ValueType<Integer>;
+        readonly get: 'omniplan.resources.get';
+        readonly list: 'omniplan.resources.list';
+    };
+    Assignment: ResourceDescriptor<Assignment> & {
+        readonly list: 'omniplan.assignments.list';
+    };
+    Dependency: ResourceDescriptor<Dependency> & {
+        readonly list: 'omniplan.dependencies.list';
+    };
+    Violation: ResourceDescriptor<Violation> & {
+        readonly list: 'omniplan.violations.list';
+    };
+    Scenario: ResourceDescriptor<Scenario, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omniplan.scenarios.get';
+        readonly list: 'omniplan.scenarios.list';
+    };
+}>;
+
+// @public
 export interface Project {
-    completed: number;
-    duration: number;
-    effort: number;
-    endingDate: Date;
-    id: string;
-    name: string;
-    startingDate: Date;
-    totalCost: number;
+    readonly completed: number | null;
+    readonly duration: number | null;
+    readonly effort: number | null;
+    readonly endingDate: Date | null;
+    readonly id: string;
+    readonly name: string | null;
+    startingDate: Date | null;
+    readonly totalCost: number | null;
 }
 
 // @public
@@ -201,11 +263,11 @@ export interface ProjectCreateInput {
 // @public
 export class ProjectResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Project>;
-    list(): Promise<Page<Project>>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Project>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Project>>;
 }
 
-// @public (undocumented)
+// @public
 export const ProjectSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -218,23 +280,25 @@ export const ProjectSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ProjectUpdateInput = Partial<ProjectCreateInput>;
+export interface ProjectUpdateInput {
+    startingDate?: Date;
+}
 
 // @public
 export interface Resource {
-    costPerHour: number;
-    costPerUse: number;
-    efficiency: number;
-    emailAddress: string;
-    id: number;
-    name: string;
-    note: string;
-    number: number;
-    outlineDepth: number;
-    resourceType: ResourceType;
-    totalCost: number;
-    totalSeconds: number;
-    totalUses: number;
+    costPerHour: number | null;
+    costPerUse: number | null;
+    efficiency: number | null;
+    emailAddress: string | null;
+    readonly id: Integer;
+    name: string | null;
+    note: string | null;
+    number: number | null;
+    readonly outlineDepth: Integer | null;
+    resourceType: ResourceType | null;
+    readonly totalCost: number | null;
+    readonly totalSeconds: number | null;
+    readonly totalUses: Integer | null;
 }
 
 // @public
@@ -252,12 +316,12 @@ export interface ResourceCreateInput {
 // @public
 export class ResourceResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: ResourceCreateInput): Promise<Resource>;
-    get(id: string): Promise<Resource>;
-    list(): Promise<Page<Resource>>;
+    create(input: ResourceCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Resource>;
+    get(id: string | number, __mactsOptions?: _macts_contracts.CallOptions): Promise<Resource>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Resource>>;
 }
 
-// @public (undocumented)
+// @public
 export const ResourceSchema: z.ZodObject<{
     id: z.ZodNumber;
     name: z.ZodString;
@@ -278,20 +342,29 @@ export const ResourceSchema: z.ZodObject<{
 export type ResourceType = 'person' | 'equipment' | 'material' | 'resourceGroup';
 
 // @public
-export type ResourceUpdateInput = Partial<ResourceCreateInput>;
+export interface ResourceUpdateInput {
+    costPerHour?: number;
+    costPerUse?: number;
+    efficiency?: number;
+    emailAddress?: string;
+    name?: string;
+    note?: string;
+    number?: number;
+    resourceType?: ResourceType;
+}
 
 // @public
 export interface Scenario {
-    completed: number;
-    duration: number;
-    effort: number;
-    endingDate: Date;
-    id: string;
-    name: string;
-    schedulingGranularity: SchedulingGranularity;
-    startingDate: Date;
-    totalCost: number;
-    violationCount: number;
+    readonly completed: number | null;
+    readonly duration: number | null;
+    readonly effort: number | null;
+    readonly endingDate: Date | null;
+    readonly id: string;
+    name: string | null;
+    schedulingGranularity: SchedulingGranularity | null;
+    startingDate: Date | null;
+    readonly totalCost: number | null;
+    readonly violationCount: Integer | null;
 }
 
 // @public
@@ -304,11 +377,11 @@ export interface ScenarioCreateInput {
 // @public
 export class ScenarioResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Scenario>;
-    list(): Promise<Page<Scenario>>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Scenario>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Scenario>>;
 }
 
-// @public (undocumented)
+// @public
 export const ScenarioSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -323,7 +396,11 @@ export const ScenarioSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ScenarioUpdateInput = Partial<ScenarioCreateInput>;
+export interface ScenarioUpdateInput {
+    name?: string;
+    schedulingGranularity?: SchedulingGranularity;
+    startingDate?: Date;
+}
 
 // @public
 export type Schedule = Record<string, never>;
@@ -331,69 +408,57 @@ export type Schedule = Record<string, never>;
 // @public
 export type ScheduleCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ScheduleSchema: z.ZodObject<{}, z.core.$strip>;
 
 // @public
-export type ScheduleUpdateInput = Partial<ScheduleCreateInput>;
+export type ScheduleUpdateInput = Record<string, never>;
 
 // @public
 export type SchedulingGranularity = 'exactScheduling' | 'hourlyScheduling' | 'dailyScheduling';
 
 // @public
 export interface Task {
-    completed: number;
-    completedEffort: number;
-    duration: number;
-    effort: number;
-    endingConstraintDate: Date;
-    endingDate: Date;
-    endingDateLocked: boolean;
-    id: number;
-    name: string;
-    note: string;
-    outlineDepth: number;
-    outlineNumber: string;
-    priority: number;
-    remainingEffort: number;
-    resourceCost: number;
-    startingConstraintDate: Date;
-    startingDate: Date;
-    startingDateLocked: boolean;
-    staticCost: number;
-    taskStatus: TaskStatus;
-    taskType: TaskType;
-    totalCost: number;
+    completed: number | null;
+    completedEffort: number | null;
+    duration: number | null;
+    effort: number | null;
+    endingConstraintDate: Date | null;
+    endingDate: Date | null;
+    endingDateLocked: boolean | null;
+    readonly id: Integer;
+    name: string | null;
+    note: string | null;
+    readonly outlineDepth: Integer | null;
+    readonly outlineNumber: string | null;
+    priority: Integer | null;
+    readonly remainingEffort: number | null;
+    readonly resourceCost: number | null;
+    startingConstraintDate: Date | null;
+    startingDate: Date | null;
+    startingDateLocked: boolean | null;
+    staticCost: number | null;
+    readonly taskStatus: TaskStatus | null;
+    taskType: TaskType | null;
+    readonly totalCost: number | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "TaskCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface TaskCreateInput {
-    completed?: number;
-    completedEffort?: number;
-    duration?: number;
-    effort?: number;
-    endingConstraintDate?: Date;
-    endingDate?: Date;
-    endingDateLocked?: boolean;
-    name: string;
-    note?: string;
-    priority?: number;
-    startingConstraintDate?: Date;
-    startingDate?: Date;
-    startingDateLocked?: boolean;
-    staticCost?: number;
-    taskType?: TaskType;
-}
+export type TaskCreateInput = Omit<TaskCreateInput_2, 'priority'> & {
+    priority?: null extends TaskCreateInput_2['priority'] ? number | null : number;
+};
 
 // @public
 export class TaskResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: TaskCreateInput): Promise<Task>;
-    get(id: string): Promise<Task>;
-    list(): Promise<Page<Task>>;
+    create(input: TaskCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Task>;
+    get(id: string | number, __mactsOptions?: _macts_contracts.CallOptions): Promise<Task>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Task>>;
 }
 
-// @public (undocumented)
+// @public
 export const TaskSchema: z.ZodObject<{
     id: z.ZodNumber;
     name: z.ZodString;
@@ -425,14 +490,18 @@ export type TaskStatus = 'ok' | 'closeToDueDate' | 'dueNow' | 'pastDue' | 'finis
 // @public
 export type TaskType = 'standardTask' | 'milestoneTask' | 'groupTask' | 'hammockTask';
 
+// Warning: (ae-forgotten-export) The symbol "TaskUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type TaskUpdateInput = Partial<TaskCreateInput>;
+export type TaskUpdateInput = Omit<TaskUpdateInput_2, 'priority'> & {
+    priority?: null extends TaskUpdateInput_2['priority'] ? number | null : number;
+};
 
 // @public
 export interface Violation {
-    html: string;
-    shortDescription: string;
-    violationType: string;
+    readonly html: string | null;
+    readonly shortDescription: string | null;
+    readonly violationType: string | null;
 }
 
 // @public
@@ -441,11 +510,11 @@ export type ViolationCreateInput = Record<string, never>;
 // @public
 export class ViolationResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    fix(): Promise<void>;
-    list(): Promise<Page<Violation>>;
+    fix(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Violation>>;
 }
 
-// @public (undocumented)
+// @public
 export const ViolationSchema: z.ZodObject<{
     violationType: z.ZodString;
     shortDescription: z.ZodString;
@@ -453,7 +522,7 @@ export const ViolationSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ViolationUpdateInput = Partial<ViolationCreateInput>;
+export type ViolationUpdateInput = Record<string, never>;
 
 // (No @packageDocumentation comment for this package)
 

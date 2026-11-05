@@ -4,7 +4,7 @@
 
 ## AttributeCreateInput interface
 
-Input for creating a Attribute
+Input for creating an Attribute.
 
 **Signature:**
 

@@ -4,10 +4,10 @@
 
 ## Column.width property
 
-the width of this column
+the width of this column. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-width: number
+width: Integer | null
 ```

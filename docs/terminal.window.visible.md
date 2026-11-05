@@ -4,10 +4,10 @@
 
 ## Window.visible property
 
-Whether the window is visible
+Whether the window is visible. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-visible: boolean
+visible: boolean | null
 ```

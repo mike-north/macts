@@ -4,7 +4,7 @@
 
 ## TextAreaCreateInput type
 
-Input for creating a TextArea
+Input for creating a TextArea.
 
 **Signature:**
 

@@ -57,24 +57,24 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(id)](./microsoft-edge.bookmarkfolderresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./microsoft-edge.bookmarkfolderresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a bookmarkfolder by id.
+Get a bookmark folder by id.
 
 </td></tr>
 <tr><td>
 
-[list()](./microsoft-edge.bookmarkfolderresourceclient.list.md)
+[list(\_\_mactsOptions)](./microsoft-edge.bookmarkfolderresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all bookmarkfolders.
+List all bookmark folders, as one page.
 
 </td></tr>
 </tbody></table>

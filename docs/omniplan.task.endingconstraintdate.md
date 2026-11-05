@@ -4,10 +4,10 @@
 
 ## Task.endingConstraintDate property
 
-The latest date this task may end
+The latest date this task may end. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-endingConstraintDate: Date
+endingConstraintDate: Date | null
 ```

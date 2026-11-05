@@ -4,7 +4,7 @@
 
 ## AttributeRunCreateInput interface
 
-Input for creating a AttributeRun
+Input for creating an AttributeRun.
 
 **Signature:**
 
@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md)
 
 </td><td>
 

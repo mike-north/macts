@@ -4,7 +4,7 @@
 
 ## TabGroupCreateInput type
 
-Input for creating a TabGroup
+Input for creating a TabGroup.
 
 **Signature:**
 

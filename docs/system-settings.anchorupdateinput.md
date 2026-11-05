@@ -4,12 +4,10 @@
 
 ## AnchorUpdateInput type
 
-Input for updating a Anchor
+Input for updating an Anchor. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type AnchorUpdateInput = Partial<AnchorCreateInput>
+type AnchorUpdateInput = Record<string, never>
 ```
-
-**References:** [AnchorCreateInput](./system-settings.anchorcreateinput.md)

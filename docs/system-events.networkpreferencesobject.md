@@ -2,48 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [NetworkPreferencesObject](./system-events.networkpreferencesobject.md)
 
-## NetworkPreferencesObject interface
+## NetworkPreferencesObject type
 
 the preferences for the current user's network
 
 **Signature:**
 
 ```typescript
-interface NetworkPreferencesObject
+type NetworkPreferencesObject = Record<string, never>
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[currentLocation](./system-events.networkpreferencesobject.currentlocation.md)
-
-</td><td>
-
-</td><td>
-
-[Location](./system-events.location.md)
-
-</td><td>
-
-the current location
-
-</td></tr>
-</tbody></table>

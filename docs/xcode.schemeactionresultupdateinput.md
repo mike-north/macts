@@ -2,14 +2,78 @@
 
 [Home](./index.md) &gt; [@macts/xcode](./xcode.md) &gt; [SchemeActionResultUpdateInput](./xcode.schemeactionresultupdateinput.md)
 
-## SchemeActionResultUpdateInput type
+## SchemeActionResultUpdateInput interface
 
-Input for updating a SchemeActionResult
+Input for updating a SchemeActionResult. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SchemeActionResultUpdateInput = Partial<SchemeActionResultCreateInput>
+interface SchemeActionResultUpdateInput
 ```
 
-**References:** [SchemeActionResultCreateInput](./xcode.schemeactionresultcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[buildLog?](./xcode.schemeactionresultupdateinput.buildlog.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ If this scheme action performed a build, this will be the text of the build log. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[errorMessage?](./xcode.schemeactionresultupdateinput.errormessage.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ If the result's status is "error occurred", this will be the error message. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[status?](./xcode.schemeactionresultupdateinput.status.md)
+
+</td><td>
+
+</td><td>
+
+[SchemeActionResultStatus](./xcode.schemeactionresultstatus.md)
+
+</td><td>
+
+_(Optional)_ Indicates the status of the scheme action. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

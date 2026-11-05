@@ -4,10 +4,10 @@
 
 ## PropertyListItem.name property
 
-the name of the property list item ( if any )
+the name of the property list item ( if any ). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

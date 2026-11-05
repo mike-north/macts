@@ -4,7 +4,7 @@
 
 ## FieldCreateInput interface
 
-Input for creating a Field
+Input for creating a Field.
 
 **Signature:**
 

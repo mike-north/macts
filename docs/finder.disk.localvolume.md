@@ -4,10 +4,10 @@
 
 ## Disk.localVolume property
 
-Is the media a local volume (as opposed to a file server)?
+Is the media a local volume (as opposed to a file server)? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-localVolume: boolean
+readonly localVolume: boolean | null;
 ```

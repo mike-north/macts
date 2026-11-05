@@ -4,10 +4,10 @@
 
 ## Track.sortShow property
 
-override string to use for the track when sorting by show name
+override string to use for the track when sorting by show name. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-sortShow: string
+sortShow: string | null
 ```

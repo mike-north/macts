@@ -4,7 +4,7 @@
 
 ## ColumnCreateInput interface
 
-Input for creating a Column
+Input for creating a Column.
 
 **Signature:**
 

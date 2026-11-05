@@ -4,10 +4,10 @@
 
 ## Session.tty property
 
-The tty property
+The tty property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-tty: string
+readonly tty: string | null;
 ```

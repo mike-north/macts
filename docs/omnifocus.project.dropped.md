@@ -4,10 +4,10 @@
 
 ## Project.dropped property
 
-True if the project is dropped
+True if the project is dropped. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-dropped: boolean
+readonly dropped: boolean | null;
 ```

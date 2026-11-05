@@ -4,10 +4,10 @@
 
 ## Project.id property
 
-The unique identifier of the project
+The unique identifier of the project. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

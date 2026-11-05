@@ -4,10 +4,10 @@
 
 ## Selection.selectionType property
 
-The type of selection (e.g., text, table, graphic)
+The type of selection (e.g., text, table, graphic). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-selectionType: string
+readonly selectionType: string | null;
 ```

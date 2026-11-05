@@ -6,7 +6,7 @@
 
 Get a tracer instance.
 
-Returns a no-op tracer by default. When an OpenTelemetry SDK is configured via [configureTelemetry()](./api.configuretelemetry.md)<!-- -->, returns an instrumented tracer.
+Always returns a no-op tracer. Tracing is not yet implemented, and calling [configureTelemetry()](./api.configuretelemetry.md) does not change this.
 
 **Signature:**
 

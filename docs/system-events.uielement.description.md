@@ -4,10 +4,10 @@
 
 ## UIElement.description property
 
-the accessibility description, if available; otherwise, the role description
+the accessibility description, if available; otherwise, the role description. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-description: string
+readonly description: string | null;
 ```

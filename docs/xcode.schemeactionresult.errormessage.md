@@ -4,10 +4,10 @@
 
 ## SchemeActionResult.errorMessage property
 
-If the result's status is "error occurred", this will be the error message
+If the result's status is "error occurred", this will be the error message. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-errorMessage: string
+errorMessage: string | null
 ```

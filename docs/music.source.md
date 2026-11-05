@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the total size of the source if it has a fixed size
+number \| null
+
+</td><td>
+
+the total size of the source if it has a fixed size. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ the total size of the source if it has a fixed size
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the free space on the source if it has a fixed size
+number \| null
+
+</td><td>
+
+the free space on the source if it has a fixed size. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ the free space on the source if it has a fixed size
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The kind property
+string \| null
+
+</td><td>
+
+The kind property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

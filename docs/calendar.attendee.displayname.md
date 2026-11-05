@@ -4,10 +4,10 @@
 
 ## Attendee.displayName property
 
-The first and last name of the attendee
+The first and last name of the attendee. Nullable. Observed missing in 32 of 41 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-displayName: string
+readonly displayName: string | null;
 ```

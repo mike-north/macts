@@ -4,6 +4,8 @@
 
 ## JxaExecutionError class
 
+A failure at the automation-host process boundary: the process could not be started, exited with an error, was stopped, or produced output that could not be read.
+
 **Signature:**
 
 ```typescript
@@ -29,7 +31,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[(constructor)(message, code, stderr, cause)](./core.jxaexecutionerror._constructor_.md)
+[(constructor)(message, code, stderr, cause, options)](./core.jxaexecutionerror._constructor_.md)
 
 </td><td>
 
@@ -73,6 +75,25 @@ string
 
 </td><td>
 
+The child-process error code or exit code, as text; `'UNKNOWN'` when absent.
+
+</td></tr>
+<tr><td>
+
+[kind](./core.jxaexecutionerror.kind.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[JxaFailureKind](./core.jxafailurekind.md)
+
+</td><td>
+
+What happened; see [JxaFailureKind](./core.jxafailurekind.md)<!-- -->.
+
 </td></tr>
 <tr><td>
 
@@ -87,6 +108,25 @@ string
 string
 
 </td><td>
+
+What the process wrote to standard error, possibly empty.
+
+</td></tr>
+<tr><td>
+
+[timedOut](./core.jxaexecutionerror.timedout.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+boolean
+
+</td><td>
+
+`true` only when the transport itself stopped the process because the time limit it was given elapsed. A process killed by any other signal (an out-of-memory kill, an external `kill`<!-- -->, the output limit) is not a timeout.
 
 </td></tr>
 </tbody></table>

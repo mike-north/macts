@@ -4,10 +4,10 @@
 
 ## Label.labelPosition property
 
-The position along the line
+The position along the line. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-labelPosition: number
+labelPosition: number | null
 ```

@@ -2,134 +2,14 @@
 
 [Home](./index.md) &gt; [@macts/system-information](./system-information.md) &gt; [SystemInformationClient](./system-information.systeminformationclient.md)
 
-## SystemInformationClient class
+## SystemInformationClient interface
 
-SystemInformation client for HTTP-based macOS automation.
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 **Signature:**
 
 ```typescript
-declare class SystemInformationClient
+interface SystemInformationClient extends ClientBrand<SystemInformationResources>
 ```
 
-## Example
-
-```typescript
-const client = new SystemInformationClient({
-  apiKey: process.env.MACTS_API_KEY!,
-})
-
-// List calendars
-const calendars = await client.calendars.list()
-```
-
-## Constructors
-
-<table><thead><tr><th>
-
-Constructor
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[(constructor)(options)](./system-information.systeminformationclient._constructor_.md)
-
-</td><td>
-
-</td><td>
-
-Constructs a new instance of the `SystemInformationClient` class
-
-</td></tr>
-</tbody></table>
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[documents](./system-information.systeminformationclient.documents.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[DocumentResourceClient](./system-information.documentresourceclient.md)
-
-</td><td>
-
-A system profile document
-
-</td></tr>
-<tr><td>
-
-[http](./system-information.systeminformationclient.http.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[HttpClient](./system-information.httpclient.md)
-
-</td><td>
-
-Get the HTTP client for making custom requests.
-
-</td></tr>
-</tbody></table>
-
-## Methods
-
-<table><thead><tr><th>
-
-Method
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[send()](./system-information.systeminformationclient.send.md)
-
-</td><td>
-
-</td><td>
-
-Send system information to AppleCare
-
-</td></tr>
-</tbody></table>
+**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[SystemInformationResources](./system-information.systeminformationresources.md)<!-- -->&gt;

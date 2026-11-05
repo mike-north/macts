@@ -4,7 +4,7 @@
 
 ## ButtonCreateInput type
 
-Input for creating a Button
+Input for creating a Button.
 
 **Signature:**
 

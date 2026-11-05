@@ -9,7 +9,7 @@ Show Alfred file system navigation for given path
 **Signature:**
 
 ```typescript
-browse(path: string): Promise<void>;
+browse(path: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ path
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

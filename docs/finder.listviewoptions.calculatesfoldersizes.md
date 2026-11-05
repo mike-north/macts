@@ -4,10 +4,10 @@
 
 ## ListViewOptions.calculatesFolderSizes property
 
-Are folder sizes calculated and displayed in the window?
+Are folder sizes calculated and displayed in the window? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-calculatesFolderSizes: boolean
+calculatesFolderSizes: boolean | null
 ```

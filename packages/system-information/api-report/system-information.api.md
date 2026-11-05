@@ -4,7 +4,12 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -31,11 +36,10 @@ export type DetailLevel = 'mini' | 'basic' | 'full';
 
 // @public
 export interface Document {
-    detailLevel: DetailLevel;
-    id?: string;
-    name: string;
-    plainText: string;
-    xmlText: string;
+    detailLevel: DetailLevel | null;
+    readonly name: string;
+    readonly plainText: string | null;
+    readonly xmlText: string | null;
 }
 
 // @public
@@ -46,11 +50,11 @@ export interface DocumentCreateInput {
 // @public
 export class DocumentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<Document>;
-    list(): Promise<Page<Document>>;
+    get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Document>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Document>>;
 }
 
-// @public (undocumented)
+// @public
 export const DocumentSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -60,12 +64,22 @@ export const DocumentSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type DocumentUpdateInput = Partial<DocumentCreateInput>;
+export interface DocumentUpdateInput {
+    detailLevel?: DetailLevel;
+}
 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
+}
+
+// @public
+export interface SystemInformationClient extends ClientBrand<SystemInformationResources> {
 }
 
 // @public
@@ -73,7 +87,7 @@ export class SystemInformationClient {
     constructor(options: SystemInformationClientOptions);
     readonly documents: DocumentResourceClient;
     get http(): HttpClient;
-    send(): Promise<void>;
+    send(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -88,6 +102,15 @@ export class SystemInformationError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type SystemInformationResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'system-information.documents.get';
+        readonly list: 'system-information.documents.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

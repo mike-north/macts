@@ -4,15 +4,10 @@
 
 ## Window.frame property
 
-The bounding rectangle, relative to the lower left corner of the screen.
+The bounding rectangle, relative to the lower left corner of the screen. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-frame: {
-  x: number
-  y: number
-  width: number
-  height: number
-}
+frame: Rectangle | null
 ```

@@ -9,7 +9,7 @@ Show calendar on the given view
 **Signature:**
 
 ```typescript
-switchView(to: ViewType): Promise<void>;
+switchView(to: Parameters<CalendarClient$1['switchView']>[0], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -33,9 +33,22 @@ to
 
 </td><td>
 
-[ViewType](./calendar.viewtype.md)
+Parameters&lt;CalendarClient$1\['switchView'\]&gt;\[0\]
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/contacts](./contacts.md) &gt; [UrlUpdateInput](./contacts.urlupdateinput.md)
 
-## UrlUpdateInput type
+## UrlUpdateInput interface
 
-Input for updating a Url
+Input for updating an Url. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type UrlUpdateInput = Partial<UrlCreateInput>
+interface UrlUpdateInput
 ```
 
-**References:** [UrlCreateInput](./contacts.urlcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[label?](./contacts.urlupdateinput.label.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Label for this URL. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[value?](./contacts.urlupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The URL value. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

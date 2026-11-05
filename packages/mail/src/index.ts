@@ -21,6 +21,7 @@
 export { MailClient, MailError, HttpClient } from './client.js'
 export type { MailClientOptions } from './client.js'
 export * from './types.js'
+export type { MailResources } from './contract/index.js'
 export { OutgoingMessageResourceClient } from './resources/outgoingmessage.js'
 export { MessageResourceClient } from './resources/message.js'
 export { capabilities } from './capabilities.js'

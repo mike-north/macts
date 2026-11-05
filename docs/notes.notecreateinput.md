@@ -4,7 +4,7 @@
 
 ## NoteCreateInput interface
 
-Input for creating a Note
+Input for creating a Note.
 
 **Signature:**
 

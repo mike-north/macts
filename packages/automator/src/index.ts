@@ -21,6 +21,7 @@
 export { AutomatorClient, AutomatorError, HttpClient } from './client.js'
 export type { AutomatorClientOptions } from './client.js'
 export * from './types.js'
+export type { AutomatorResources } from './contract/index.js'
 export { WorkflowResourceClient } from './resources/workflow.js'
 export { AutomatorActionResourceClient } from './resources/automatoraction.js'
 export { VariableResourceClient } from './resources/variable.js'

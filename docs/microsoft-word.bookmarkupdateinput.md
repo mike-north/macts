@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-word](./microsoft-word.md) &gt; [BookmarkUpdateInput](./microsoft-word.bookmarkupdateinput.md)
 
-## BookmarkUpdateInput type
+## BookmarkUpdateInput interface
 
-Input for updating a Bookmark
+Input for updating a Bookmark. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type BookmarkUpdateInput = Partial<BookmarkCreateInput>
+interface BookmarkUpdateInput
 ```
 
-**References:** [BookmarkCreateInput](./microsoft-word.bookmarkcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[name?](./microsoft-word.bookmarkupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of the bookmark. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

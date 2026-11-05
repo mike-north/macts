@@ -4,10 +4,10 @@
 
 ## EQPreset.preamp property
 
-the equalizer preamp level (-12.0 dB to +12.0 dB)
+the equalizer preamp level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-preamp: number
+preamp: number | null
 ```

@@ -4,10 +4,10 @@
 
 ## Currency.name property
 
-Name for this currency
+Name for this currency. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

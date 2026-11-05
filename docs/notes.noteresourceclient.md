@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./notes.noteresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./notes.noteresourceclient.create.md)
 
 </td><td>
 
@@ -68,29 +68,29 @@ Create a new note.
 </td></tr>
 <tr><td>
 
-[get(name)](./notes.noteresourceclient.get.md)
+[get(name, \_\_mactsOptions)](./notes.noteresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a note by name.
+Get a note by name. When several notes share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[list()](./notes.noteresourceclient.list.md)
+[list(\_\_mactsOptions)](./notes.noteresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all notes.
+List all notes, as one page.
 
 </td></tr>
 <tr><td>
 
-[show(name)](./notes.noteresourceclient.show.md)
+[show(name, \_\_mactsOptions)](./notes.noteresourceclient.show.md)
 
 </td><td>
 

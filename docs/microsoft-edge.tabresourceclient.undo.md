@@ -9,7 +9,7 @@ Undo the last change
 **Signature:**
 
 ```typescript
-undo(tabId: string): Promise<void>;
+undo(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ tabId
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

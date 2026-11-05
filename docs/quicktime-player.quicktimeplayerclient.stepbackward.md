@@ -9,7 +9,7 @@ Step the movie backward the specified number of steps (default is 1).
 **Signature:**
 
 ```typescript
-stepBackward(by?: number): Promise<void>;
+stepBackward(by?: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -34,6 +34,19 @@ by
 </td><td>
 
 number
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

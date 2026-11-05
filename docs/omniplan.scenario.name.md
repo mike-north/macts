@@ -4,10 +4,10 @@
 
 ## Scenario.name property
 
-The name of the scenario
+The name of the scenario. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

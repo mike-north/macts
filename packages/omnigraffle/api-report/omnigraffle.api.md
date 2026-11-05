@@ -4,58 +4,50 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { Point } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { Rgb } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Canvas {
-    adjustsPages: boolean;
-    canvasSize: {
-        x: number;
-        y: number;
-    };
-    canvasSizeIsMeasuredInPages: boolean;
-    columnAlignment: HorizontalAlignment;
-    columnSpacing: number;
-    horizontalPages: number;
+    adjustsPages: boolean | null;
+    canvasSize: Point | null;
+    canvasSizeIsMeasuredInPages: boolean | null;
+    columnAlignment: HorizontalAlignment | null;
+    columnSpacing: number | null;
+    horizontalPages: Integer | null;
     id: string;
-    name: string;
-    pageSize: {
-        x: number;
-        y: number;
-    };
-    rowAlignment: VerticalAlignment;
-    rowSpacing: number;
-    verticalPages: number;
+    name: string | null;
+    readonly pageSize: Point | null;
+    rowAlignment: VerticalAlignment | null;
+    rowSpacing: number | null;
+    verticalPages: Integer | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "CanvasCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface CanvasCreateInput {
-    adjustsPages?: boolean;
-    canvasSize?: {
-        x: number;
-        y: number;
-    };
-    canvasSizeIsMeasuredInPages?: boolean;
-    columnAlignment?: HorizontalAlignment;
-    columnSpacing?: number;
-    horizontalPages?: number;
-    id?: string;
-    name: string;
-    rowAlignment?: VerticalAlignment;
-    rowSpacing?: number;
-    verticalPages?: number;
-}
+export type CanvasCreateInput = Omit<CanvasCreateInput_2, 'horizontalPages' | 'verticalPages'> & {
+    horizontalPages?: null extends CanvasCreateInput_2['horizontalPages'] ? number | null : number;
+    verticalPages?: null extends CanvasCreateInput_2['verticalPages'] ? number | null : number;
+};
 
 // @public
 export class CanvasResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: CanvasCreateInput): Promise<Canvas>;
-    get(id: string): Promise<Canvas>;
-    list(): Promise<Page<Canvas>>;
+    create(input: CanvasCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Canvas>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Canvas>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Canvas>>;
 }
 
-// @public (undocumented)
+// @public
 export const CanvasSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -77,8 +69,13 @@ export const CanvasSchema: z.ZodObject<{
     rowSpacing: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "CanvasUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type CanvasUpdateInput = Partial<CanvasCreateInput>;
+export type CanvasUpdateInput = Omit<CanvasUpdateInput_2, 'horizontalPages' | 'verticalPages'> & {
+    horizontalPages?: null extends CanvasUpdateInput_2['horizontalPages'] ? number | null : number;
+    verticalPages?: null extends CanvasUpdateInput_2['verticalPages'] ? number | null : number;
+};
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -104,14 +101,14 @@ export type ExportAreaType = 'selectedGraphics' | 'allGraphics' | 'currentCanvas
 
 // @public
 export interface ExportSettings {
-    areaType: ExportAreaType;
-    borderAmount: number;
-    drawsBackground: boolean;
-    exportScale: number;
-    includeBorder: boolean;
-    includeNonprintingLayers: boolean;
-    resolution: number;
-    useArtboards: boolean;
+    areaType: ExportAreaType | null;
+    borderAmount: number | null;
+    drawsBackground: boolean | null;
+    exportScale: number | null;
+    includeBorder: boolean | null;
+    includeNonprintingLayers: boolean | null;
+    resolution: number | null;
+    useArtboards: boolean | null;
 }
 
 // @public
@@ -126,7 +123,7 @@ export interface ExportSettingsCreateInput {
     useArtboards?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const ExportSettingsSchema: z.ZodObject<{
     areaType: z.ZodString;
     exportScale: z.ZodNumber;
@@ -139,114 +136,67 @@ export const ExportSettingsSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ExportSettingsUpdateInput = Partial<ExportSettingsCreateInput>;
+export interface ExportSettingsUpdateInput {
+    areaType?: ExportAreaType;
+    borderAmount?: number;
+    drawsBackground?: boolean;
+    exportScale?: number;
+    includeBorder?: boolean;
+    includeNonprintingLayers?: boolean;
+    resolution?: number;
+    useArtboards?: boolean;
+}
 
 // @public
 export type FillType = 'noFill' | 'solidFill' | 'linearFill' | 'radialFill';
 
 // @public
 export interface Graphic {
-    alignsEdgesToGrid: boolean;
-    allowsConnections: boolean;
-    cornerRadius: number;
-    doubleStroke: boolean;
-    drawsShadow: boolean;
-    drawsStroke: boolean;
-    flippedHorizontally: boolean;
-    flippedVertically: boolean;
-    id: string;
-    locked: boolean;
-    notes: string;
-    origin: {
-        x: number;
-        y: number;
-    };
-    rankGroup: number;
-    script: string;
-    shadowBeneath: boolean;
-    shadowColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    shadowFuzziness: number;
-    shadowVector: {
-        x: number;
-        y: number;
-    };
-    size: {
-        x: number;
-        y: number;
-    };
-    strokeCap: StrokeCap;
-    strokeColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    strokeJoin: StrokeJoin;
-    strokePattern: number;
-    tag: string;
-    thickness: number;
-    url: string;
-    userName: string;
+    alignsEdgesToGrid: boolean | null;
+    allowsConnections: boolean | null;
+    cornerRadius: number | null;
+    doubleStroke: boolean | null;
+    drawsShadow: boolean | null;
+    drawsStroke: boolean | null;
+    flippedHorizontally: boolean | null;
+    flippedVertically: boolean | null;
+    readonly id: string;
+    locked: boolean | null;
+    notes: string | null;
+    origin: Point | null;
+    rankGroup: Integer | null;
+    script: string | null;
+    shadowBeneath: boolean | null;
+    shadowColor: Rgb | null;
+    shadowFuzziness: number | null;
+    shadowVector: Point | null;
+    size: Point | null;
+    strokeCap: StrokeCap | null;
+    strokeColor: Rgb | null;
+    strokeJoin: StrokeJoin | null;
+    strokePattern: Integer | null;
+    tag: string | null;
+    thickness: number | null;
+    url: string | null;
+    userName: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "GraphicCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface GraphicCreateInput {
-    alignsEdgesToGrid?: boolean;
-    allowsConnections?: boolean;
-    cornerRadius?: number;
-    doubleStroke?: boolean;
-    drawsShadow?: boolean;
-    drawsStroke?: boolean;
-    flippedHorizontally?: boolean;
-    flippedVertically?: boolean;
-    locked?: boolean;
-    notes?: string;
-    origin?: {
-        x: number;
-        y: number;
-    };
-    rankGroup?: number;
-    script?: string;
-    shadowBeneath?: boolean;
-    shadowColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    shadowFuzziness?: number;
-    shadowVector?: {
-        x: number;
-        y: number;
-    };
-    size?: {
-        x: number;
-        y: number;
-    };
-    strokeCap?: StrokeCap;
-    strokeColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    strokeJoin?: StrokeJoin;
-    strokePattern?: number;
-    tag?: string;
-    thickness?: number;
-    url?: string;
-    userName?: string;
-}
+export type GraphicCreateInput = Omit<GraphicCreateInput_2, 'strokePattern' | 'rankGroup'> & {
+    strokePattern?: null extends GraphicCreateInput_2['strokePattern'] ? number | null : number;
+    rankGroup?: null extends GraphicCreateInput_2['rankGroup'] ? number | null : number;
+};
 
 // @public
 export class GraphicResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Graphic>;
-    list(canvasId: string): Promise<Page<Graphic>>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Graphic>;
+    list(canvasId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Graphic>>;
 }
 
-// @public (undocumented)
+// @public
 export const GraphicSchema: z.ZodObject<{
     id: z.ZodString;
     origin: z.ZodObject<{
@@ -294,50 +244,34 @@ export const GraphicSchema: z.ZodObject<{
     rankGroup: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "GraphicUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type GraphicUpdateInput = Partial<GraphicCreateInput>;
+export type GraphicUpdateInput = Omit<GraphicUpdateInput_2, 'strokePattern' | 'rankGroup'> & {
+    strokePattern?: null extends GraphicUpdateInput_2['strokePattern'] ? number | null : number;
+    rankGroup?: null extends GraphicUpdateInput_2['rankGroup'] ? number | null : number;
+};
 
 // @public
 export interface Grid {
-    drawsInFront: boolean;
-    major: boolean;
-    majorSpacing: number;
-    scriptGridColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    scriptMajorGridColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    snaps: boolean;
-    spacing: number;
-    visible: boolean;
+    drawsInFront: boolean | null;
+    major: boolean | null;
+    majorSpacing: Integer | null;
+    scriptGridColor: Rgb | null;
+    scriptMajorGridColor: Rgb | null;
+    snaps: boolean | null;
+    spacing: number | null;
+    visible: boolean | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "GridCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type GridCreateInput = Omit<GridCreateInput_2, 'majorSpacing'> & {
+    majorSpacing?: null extends GridCreateInput_2['majorSpacing'] ? number | null : number;
+};
 
 // @public
-export interface GridCreateInput {
-    drawsInFront?: boolean;
-    major?: boolean;
-    majorSpacing?: number;
-    scriptGridColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    scriptMajorGridColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    snaps?: boolean;
-    spacing?: number;
-    visible?: boolean;
-}
-
-// @public (undocumented)
 export const GridSchema: z.ZodObject<{
     visible: z.ZodBoolean;
     snaps: z.ZodBoolean;
@@ -357,14 +291,18 @@ export const GridSchema: z.ZodObject<{
     }, z.core.$strip>;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "GridUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type GridUpdateInput = Partial<GridCreateInput>;
+export type GridUpdateInput = Omit<GridUpdateInput_2, 'majorSpacing'> & {
+    majorSpacing?: null extends GridUpdateInput_2['majorSpacing'] ? number | null : number;
+};
 
 // @public
 export interface Group {
-    connectToGroupOnly: boolean;
-    id: string;
-    rotation: number;
+    connectToGroupOnly: boolean | null;
+    readonly id: string;
+    rotation: number | null;
 }
 
 // @public
@@ -373,7 +311,7 @@ export interface GroupCreateInput {
     rotation?: number;
 }
 
-// @public (undocumented)
+// @public
 export const GroupSchema: z.ZodObject<{
     id: z.ZodString;
     rotation: z.ZodNumber;
@@ -381,7 +319,10 @@ export const GroupSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type GroupUpdateInput = Partial<GroupCreateInput>;
+export interface GroupUpdateInput {
+    connectToGroupOnly?: boolean;
+    rotation?: number;
+}
 
 // @public
 export type HopType = 'noHop' | 'roundHop' | 'squareHop' | 'twoSideHop' | 'threeSideHop' | 'ignoreHop' | 'gapHop' | 'bridgeHop';
@@ -392,7 +333,11 @@ export type HorizontalAlignment = 'left' | 'center' | 'right';
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
@@ -400,11 +345,11 @@ export type ImageSizing = 'manual' | 'stretched' | 'tiled';
 
 // @public
 export interface Label {
-    id: string;
-    labelOffset: number;
-    labelPosition: number;
-    labelRotation: LabelOrientation;
-    text: string;
+    readonly id: string;
+    labelOffset: number | null;
+    labelPosition: number | null;
+    labelRotation: LabelOrientation | null;
+    text: string | null;
 }
 
 // @public
@@ -418,7 +363,7 @@ export interface LabelCreateInput {
 // @public
 export type LabelOrientation = 'horizontal' | 'vertical' | 'parallel' | 'perpendicular' | 'custom';
 
-// @public (undocumented)
+// @public
 export const LabelSchema: z.ZodObject<{
     id: z.ZodString;
     text: z.ZodString;
@@ -428,15 +373,19 @@ export const LabelSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type LabelUpdateInput = Partial<LabelCreateInput>;
+export interface LabelUpdateInput {
+    labelOffset?: number;
+    labelPosition?: number;
+    labelRotation?: LabelOrientation;
+    text?: string;
+}
 
 // @public
 export interface Layer {
-    id?: string;
-    locked: boolean;
+    locked: boolean | null;
     name: string;
-    prints: boolean;
-    visible: boolean;
+    prints: boolean | null;
+    visible: boolean | null;
 }
 
 // @public
@@ -451,12 +400,12 @@ export interface LayerCreateInput {
 // @public
 export class LayerResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: LayerCreateInput): Promise<Layer>;
-    get(name: string): Promise<Layer>;
-    list(canvasId: string): Promise<Page<Layer>>;
+    create(input: LayerCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Layer>;
+    get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Layer>;
+    list(canvasId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Layer>>;
 }
 
-// @public (undocumented)
+// @public
 export const LayerSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -466,7 +415,13 @@ export const LayerSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type LayerUpdateInput = Partial<LayerCreateInput>;
+export interface LayerUpdateInput {
+    canvasId?: string;
+    locked?: boolean;
+    name?: string;
+    prints?: boolean;
+    visible?: boolean;
+}
 
 // @public
 export type LayoutDirection = 'topToBottom' | 'leftToRight' | 'bottomToTop' | 'rightToLeft';
@@ -476,37 +431,33 @@ export type LayoutType = 'hierarchical' | 'forceDirected' | 'radial' | 'circular
 
 // @public
 export interface Line {
-    headMagnet: number;
-    headScale: number;
-    headType: string;
-    hopType: HopType;
-    id: string;
-    lineType: LineType;
-    tailMagnet: number;
-    tailScale: number;
-    tailType: string;
+    headMagnet: Integer | null;
+    headScale: number | null;
+    headType: string | null;
+    hopType: HopType | null;
+    readonly id: string;
+    lineType: LineType | null;
+    tailMagnet: Integer | null;
+    tailScale: number | null;
+    tailType: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "LineCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface LineCreateInput {
-    headMagnet?: number;
-    headScale?: number;
-    headType?: string;
-    hopType?: HopType;
-    lineType?: LineType;
-    tailMagnet?: number;
-    tailScale?: number;
-    tailType?: string;
-}
+export type LineCreateInput = Omit<LineCreateInput_2, 'headMagnet' | 'tailMagnet'> & {
+    headMagnet?: null extends LineCreateInput_2['headMagnet'] ? number | null : number;
+    tailMagnet?: null extends LineCreateInput_2['tailMagnet'] ? number | null : number;
+};
 
 // @public
 export class LineResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Line>;
-    list(canvasId: string): Promise<Page<Line>>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Line>;
+    list(canvasId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Line>>;
 }
 
-// @public (undocumented)
+// @public
 export const LineSchema: z.ZodObject<{
     id: z.ZodString;
     lineType: z.ZodString;
@@ -522,13 +473,18 @@ export const LineSchema: z.ZodObject<{
 // @public
 export type LineType = 'straight' | 'curved' | 'orthogonal' | 'bezier';
 
+// Warning: (ae-forgotten-export) The symbol "LineUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type LineUpdateInput = Partial<LineCreateInput>;
+export type LineUpdateInput = Omit<LineUpdateInput_2, 'headMagnet' | 'tailMagnet'> & {
+    headMagnet?: null extends LineUpdateInput_2['headMagnet'] ? number | null : number;
+    tailMagnet?: null extends LineUpdateInput_2['tailMagnet'] ? number | null : number;
+};
 
 // @public
 export interface Master {
     id: string;
-    name: string;
+    name: string | null;
 }
 
 // @public
@@ -537,35 +493,40 @@ export interface MasterCreateInput {
     name?: string;
 }
 
-// @public (undocumented)
+// @public
 export const MasterSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type MasterUpdateInput = Partial<MasterCreateInput>;
+export interface MasterUpdateInput {
+    id?: string;
+    name?: string;
+}
+
+// @public
+export interface OmniGraffleClient extends ClientBrand<OmniGraffleResources> {
+}
 
 // @public
 export class OmniGraffleClient {
     constructor(options: OmniGraffleClientOptions);
-    assemble(subgraph?: boolean): Promise<void>;
+    assemble(subgraph?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly canvases: CanvasResourceClient;
-    connect(from: string, to: string): Promise<void>;
-    evaluateJavascript(script: string): Promise<void>;
-    _export(as: string, scope: ExportAreaType, to: string): Promise<void>;
-    flip(over: Orientation): Promise<void>;
+    connect(from: string, to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    evaluateJavascript(script: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "OmniGraffleClient_2" needs to be exported by the entry point index.d.ts
+    _export(as: string, scope: Parameters<OmniGraffleClient_2['_export']>[1], to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    flip(over: Parameters<OmniGraffleClient_2['flip']>[0], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly graphics: GraphicResourceClient;
     get http(): HttpClient;
     readonly layers: LayerResourceClient;
-    layout(): Promise<void>;
+    layout(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly lines: LineResourceClient;
-    pageAdjust(): Promise<void>;
+    pageAdjust(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly shapes: ShapeResourceClient;
-    slide(by: {
-        x: number;
-        y: number;
-    }): Promise<void>;
+    slide(by: Parameters<OmniGraffleClient_2['slide']>[0], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -582,73 +543,83 @@ export class OmniGraffleError extends Error {
 }
 
 // @public
+export type OmniGraffleResources = Readonly<{
+    Canvas: ResourceDescriptor<Canvas, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnigraffle.canvases.get';
+        readonly list: 'omnigraffle.canvases.list';
+    };
+    Graphic: ResourceDescriptor<Graphic, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnigraffle.graphics.get';
+        readonly list: 'omnigraffle.graphics.list';
+        readonly parents: {
+            readonly list: 'Canvas';
+        };
+    };
+    Shape: ResourceDescriptor<Shape, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnigraffle.shapes.get';
+        readonly list: 'omnigraffle.shapes.list';
+        readonly parents: {
+            readonly list: 'Canvas';
+        };
+    };
+    Line: ResourceDescriptor<Line, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnigraffle.lines.get';
+        readonly list: 'omnigraffle.lines.list';
+        readonly parents: {
+            readonly list: 'Canvas';
+        };
+    };
+    Layer: ResourceDescriptor<Layer, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnigraffle.layers.get';
+        readonly list: 'omnigraffle.layers.list';
+        readonly parents: {
+            readonly list: 'Canvas';
+        };
+    };
+}>;
+
+// @public
 export type Orientation = 'horizontally' | 'vertically';
 
 // @public
 export interface Shape {
-    autosizing: TextAutosizing;
-    fill: FillType;
-    fillColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    gradientAngle: number;
-    gradientColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    id: string;
-    name: string;
-    rotation: number;
-    sidePadding: number;
-    text: string;
-    textPlacement: VerticalAlignment;
-    verticalPadding: number;
+    autosizing: TextAutosizing | null;
+    fill: FillType | null;
+    fillColor: Rgb | null;
+    gradientAngle: number | null;
+    gradientColor: Rgb | null;
+    readonly id: string;
+    name: string | null;
+    rotation: number | null;
+    sidePadding: Integer | null;
+    text: string | null;
+    textPlacement: VerticalAlignment | null;
+    verticalPadding: Integer | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "ShapeCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface ShapeCreateInput {
-    autosizing?: TextAutosizing;
-    canvasId: number;
-    fill?: FillType;
-    fillColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    gradientAngle?: number;
-    gradientColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    name?: string;
-    origin: {
-        x: number;
-        y: number;
-    };
-    rotation?: number;
-    sidePadding?: number;
-    size: {
-        x: number;
-        y: number;
-    };
-    text?: string;
-    textPlacement?: VerticalAlignment;
-    verticalPadding?: number;
-}
+export type ShapeCreateInput = Omit<ShapeCreateInput_2, 'sidePadding' | 'verticalPadding' | 'canvasId'> & {
+    sidePadding?: null extends ShapeCreateInput_2['sidePadding'] ? number | null : number;
+    verticalPadding?: null extends ShapeCreateInput_2['verticalPadding'] ? number | null : number;
+    canvasId: null extends ShapeCreateInput_2['canvasId'] ? number | null : number;
+};
 
 // @public
 export class ShapeResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: ShapeCreateInput): Promise<Shape>;
-    get(id: string): Promise<Shape>;
-    list(canvasId: string): Promise<Page<Shape>>;
+    create(input: ShapeCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Shape>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Shape>;
+    list(canvasId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Shape>>;
 }
 
-// @public (undocumented)
+// @public
 export const ShapeSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -672,8 +643,14 @@ export const ShapeSchema: z.ZodObject<{
     verticalPadding: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "ShapeUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ShapeUpdateInput = Partial<ShapeCreateInput>;
+export type ShapeUpdateInput = Omit<ShapeUpdateInput_2, 'sidePadding' | 'verticalPadding' | 'canvasId'> & {
+    sidePadding?: null extends ShapeUpdateInput_2['sidePadding'] ? number | null : number;
+    verticalPadding?: null extends ShapeUpdateInput_2['verticalPadding'] ? number | null : number;
+    canvasId?: null extends ShapeUpdateInput_2['canvasId'] ? number | null : number;
+};
 
 // @public
 export type StrokeCap = 'butt' | 'round' | 'square';
@@ -683,12 +660,12 @@ export type StrokeJoin = 'miter' | 'round' | 'bevel';
 
 // @public
 export interface Subgraph {
-    bottomMargin: number;
-    collapsed: boolean;
-    id: string;
-    leftMargin: number;
-    rightMargin: number;
-    topMargin: number;
+    bottomMargin: number | null;
+    collapsed: boolean | null;
+    readonly id: string;
+    leftMargin: number | null;
+    rightMargin: number | null;
+    topMargin: number | null;
 }
 
 // @public
@@ -700,7 +677,7 @@ export interface SubgraphCreateInput {
     topMargin?: number;
 }
 
-// @public (undocumented)
+// @public
 export const SubgraphSchema: z.ZodObject<{
     id: z.ZodString;
     collapsed: z.ZodBoolean;
@@ -711,7 +688,13 @@ export const SubgraphSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type SubgraphUpdateInput = Partial<SubgraphCreateInput>;
+export interface SubgraphUpdateInput {
+    bottomMargin?: number;
+    collapsed?: boolean;
+    leftMargin?: number;
+    rightMargin?: number;
+    topMargin?: number;
+}
 
 // @public
 export type TextAutosizing = 'overflow' | 'full' | 'verticallyOnly' | 'clip';

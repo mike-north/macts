@@ -4,10 +4,10 @@
 
 ## Attribute.name property
 
-the name of the attribute
+the name of the attribute. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import type { AppManifest } from '../../manifest/index.js'
+import { positionalOperationSource } from './test-support/operation-source.js'
 import { generateHttpClientSdk } from './http-client.js'
 import { RANGE_READ_SUPPORTED, UNIQUE_CLAIM } from '../../manifest/test-support/unique-claim.js'
 
@@ -11,7 +12,7 @@ function findFile(
   if (!file) {
     throw new Error(`Expected file at path "${path}" to exist`)
   }
-  return file
+  return { ...file, content: positionalOperationSource(file.content) }
 }
 
 // Minimal test manifest
@@ -137,6 +138,8 @@ describe('generateHttpClientSdk', () => {
     expect(filePaths).toContain('src/index.ts')
     expect(filePaths).toContain('src/client.ts')
     expect(filePaths).toContain('src/types.ts')
+    expect(filePaths).toContain('src/contract/index.ts')
+    expect(filePaths).toContain('src/contract/manifest.ts')
     expect(filePaths).toContain('src/resources/item.ts')
     expect(filePaths).toContain('package.json')
     expect(filePaths).toContain('tsconfig.json')
@@ -163,7 +166,7 @@ describe('generateHttpClientSdk', () => {
 
     // Check app-level command method
     expect(content).toContain('async refresh()')
-    expect(content).toContain("await this.#httpClient.rpc<undefined>('testapp.app.refresh'")
+    expect(content).toContain("await this.#httpClient.invoke<undefined>('testapp.app.refresh'")
 
     // Check error class
     expect(content).toContain('export class TestAppError extends Error')
@@ -182,16 +185,14 @@ describe('generateHttpClientSdk', () => {
     const content = typesFile.content
 
     // Check enum type
-    expect(content).toContain("export type Status = 'active' | 'inactive'")
+    expect(content).toContain("export type { Status } from './contract/index.js';")
 
     // Check resource type
-    expect(content).toContain('export interface Item')
-    expect(content).toContain('id: string')
-    expect(content).toContain('name: string')
-    expect(content).toContain('count?: number')
+    expect(content).toContain("export type { Item } from './contract/index.js';")
+    expect(content).toContain('null extends import(')
 
     // Check create input type
-    expect(content).toContain('export interface ItemCreateInput')
+    expect(content).toContain('export type ItemCreateInput = Omit<')
 
     // Check Zod schema
     expect(content).toContain('export const ItemSchema = z.object({')
@@ -234,7 +235,7 @@ describe('generateHttpClientSdk', () => {
     const result = generateHttpClientSdk(testManifest, { packageName: '@macts/sdk-testapp' })
     const content = findFile(result.files, 'src/resources/item.ts').content
     expect(content).toContain("import type { Page } from '@macts/contracts';\n")
-    expect(content).toContain('return this.#http.rpc<Page<Item>>(')
+    expect(content).toContain('return this.#http.invoke<Page<Item>>(')
     expect(content).not.toContain('items:')
   })
 
@@ -257,7 +258,7 @@ describe('generateHttpClientSdk', () => {
     const result = generateHttpClientSdk(testManifest, { packageName: '@macts/sdk-testapp' })
     const content = findFile(result.files, 'src/resources/item.ts').content
     expect(content).toContain(
-      '...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } })'
+      '...(page.pageSize === undefined ? {} : { pageSize: __mactsIntegerInput(page.pageSize) })'
     )
     expect(content).toContain('...(page.cursor === undefined ? {} : { cursor: page.cursor })')
   })
@@ -432,11 +433,12 @@ describe('generateHttpClientSdk', () => {
 
     const content = findFile(result.files, 'src/resources/item.ts').content
 
-    // The method signature references the enum...
-    expect(content).toContain('async setStatus(status: Status)')
-    // ...and the enum is imported alongside the resource's own types.
+    // The canonical method owns its enum input, so no independent type map can drift.
     expect(content).toContain(
-      "import type { Item, ItemCreateInput, ItemUpdateInput, Status } from '../types.js';"
+      "async setStatus(status: Parameters<import('../contract/index.js').ItemResourceClient['setStatus']>[0])"
+    )
+    expect(content).toContain(
+      "import type { Item, ItemCreateInput, ItemUpdateInput } from '../types.js';"
     )
   })
 

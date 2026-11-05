@@ -4,10 +4,10 @@
 
 ## Playlist.visible property
 
-is this playlist visible in the Source list?
+is this playlist visible in the Source list? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-visible: boolean
+readonly visible: boolean | null;
 ```

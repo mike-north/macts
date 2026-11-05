@@ -4,7 +4,7 @@
 
 ## Event_2.endDate property
 
-The event end date
+The event end date. Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 

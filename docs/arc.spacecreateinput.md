@@ -4,7 +4,7 @@
 
 ## SpaceCreateInput type
 
-Input for creating a Space
+Input for creating a Space.
 
 **Signature:**
 

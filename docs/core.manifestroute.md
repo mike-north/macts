@@ -60,7 +60,24 @@ string
 
 </td><td>
 
-The command key in `manifest.commands` (the route's operation segment).
+The command key in `manifest.commands`<!-- -->, by which executors find the command. The route's operation segment is the command's `routeName` when it declares one, else this key.
+
+</td></tr>
+<tr><td>
+
+[permission](./core.manifestroute.permission.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+The permission the operation requires (`app:scope:segment`<!-- -->).
+
+The command's explicit `permission` wins. Otherwise it is derived from the app route segment, the scope (`app` for application commands, else the resource route segment), and the command's route segment ([commandRouteSegment()](./core.commandroutesegment.md)<!-- -->), which is the rule the server enforces. Deriving it here, once, lets every surface that declares or checks an operation's permission (generated contracts, the runtime's registration check, the server) agree by construction.
 
 </td></tr>
 <tr><td>

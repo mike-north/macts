@@ -4,10 +4,10 @@
 
 ## Resource.totalCost property
 
-Total cost of all assignments for this resource
+Total cost of all assignments for this resource. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-totalCost: number
+readonly totalCost: number | null;
 ```

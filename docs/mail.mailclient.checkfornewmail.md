@@ -9,7 +9,7 @@ Triggers a check for email.
 **Signature:**
 
 ```typescript
-checkForNewMail(_for?: string): Promise<void>;
+checkForNewMail(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -29,11 +29,11 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-\_for
+\_\_mactsOptions
 
 </td><td>
 
-string
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

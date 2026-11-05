@@ -4,10 +4,10 @@
 
 ## Graphic.notes property
 
-Notes for this graphic
+Notes for this graphic. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-notes: string
+notes: string | null
 ```

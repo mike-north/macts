@@ -4,10 +4,10 @@
 
 ## Track.episodeID property
 
-the episode ID of the track
+the episode ID of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-episodeID: string
+episodeID: string | null
 ```

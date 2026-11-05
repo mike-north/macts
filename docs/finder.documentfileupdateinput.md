@@ -4,12 +4,10 @@
 
 ## DocumentFileUpdateInput type
 
-Input for updating a DocumentFile
+Input for updating a DocumentFile. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type DocumentFileUpdateInput = Partial<DocumentFileCreateInput>
+type DocumentFileUpdateInput = Record<string, never>
 ```
-
-**References:** [DocumentFileCreateInput](./finder.documentfilecreateinput.md)

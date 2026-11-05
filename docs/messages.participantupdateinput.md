@@ -4,12 +4,10 @@
 
 ## ParticipantUpdateInput type
 
-Input for updating a Participant
+Input for updating a Participant. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ParticipantUpdateInput = Partial<ParticipantCreateInput>
+type ParticipantUpdateInput = Record<string, never>
 ```
-
-**References:** [ParticipantCreateInput](./messages.participantcreateinput.md)

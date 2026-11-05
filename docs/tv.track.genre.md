@@ -4,10 +4,10 @@
 
 ## Track.genre property
 
-the genre (category) of the track
+the genre (category) of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-genre: string
+genre: string | null
 ```

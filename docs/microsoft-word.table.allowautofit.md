@@ -4,10 +4,10 @@
 
 ## Table.allowAutoFit property
 
-Whether the table is allowed to autofit
+Whether the table is allowed to autofit. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-allowAutoFit: boolean
+allowAutoFit: boolean | null
 ```

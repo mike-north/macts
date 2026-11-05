@@ -4,12 +4,10 @@
 
 ## SystemDomainObjectUpdateInput type
 
-Input for updating a SystemDomainObject
+Input for updating a SystemDomainObject. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SystemDomainObjectUpdateInput = Partial<SystemDomainObjectCreateInput>
+type SystemDomainObjectUpdateInput = Record<string, never>
 ```
-
-**References:** [SystemDomainObjectCreateInput](./system-events.systemdomainobjectcreateinput.md)

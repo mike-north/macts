@@ -4,14 +4,10 @@
 
 ## Session.underlineColor property
 
-The underlineColor property
+The underlineColor property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-underlineColor: {
-  r: number
-  g: number
-  b: number
-}
+underlineColor: Rgb | null
 ```

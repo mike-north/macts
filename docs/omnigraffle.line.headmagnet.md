@@ -4,10 +4,10 @@
 
 ## Line.headMagnet property
 
-Which magnet of the destination graphic the line attaches to
+Which magnet of the destination graphic the line attaches to. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-headMagnet: number
+headMagnet: Integer | null
 ```

@@ -4,12 +4,10 @@
 
 ## EncoderUpdateInput type
 
-Input for updating a Encoder
+Input for updating an Encoder. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type EncoderUpdateInput = Partial<EncoderCreateInput>
+type EncoderUpdateInput = Record<string, never>
 ```
-
-**References:** [EncoderCreateInput](./music.encodercreateinput.md)

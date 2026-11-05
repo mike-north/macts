@@ -9,7 +9,7 @@ Imports a mailbox created by Mail.
 **Signature:**
 
 ```typescript
-importMailMailbox(at: string): Promise<void>;
+importMailMailbox(at: Parameters<MailClient$1['importMailMailbox']>[0], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -33,9 +33,22 @@ at
 
 </td><td>
 
-string
+Parameters&lt;MailClient$1\['importMailMailbox'\]&gt;\[0\]
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

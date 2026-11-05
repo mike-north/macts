@@ -4,12 +4,12 @@
 
 ## TabUpdateInput type
 
-Input for updating a Tab
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type TabUpdateInput = Partial<TabCreateInput>
+type TabUpdateInput = Omit<TabUpdateInput$1, 'index'> & {
+  index?: null extends TabUpdateInput$1['index'] ? number | null : number
+}
 ```
-
-**References:** [TabCreateInput](./iterm.tabcreateinput.md)

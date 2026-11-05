@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the URL for this track
+the URL for this track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +52,15 @@ the URL for this track
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Unique identifier for this track
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+Unique identifier for this track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

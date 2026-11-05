@@ -4,7 +4,7 @@
 
 ## WorkspaceDocumentCreateInput interface
 
-Input for creating a WorkspaceDocument
+Input for creating a WorkspaceDocument.
 
 **Signature:**
 
@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-[RunDestination](./xcode.rundestination.md)
+[ObjectReferenceData](./contracts.objectreferencedata.md)<!-- -->&lt;string, 'RunDestination'&gt;
 
 </td><td>
 
@@ -54,7 +54,7 @@ _(Optional)_ The workspace's run destination that will be used for scheme action
 
 </td><td>
 
-[Scheme](./xcode.scheme.md)
+[ObjectReferenceData](./contracts.objectreferencedata.md)<!-- -->&lt;string, 'Scheme'&gt;
 
 </td><td>
 

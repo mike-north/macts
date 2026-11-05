@@ -57,24 +57,24 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(id)](./xcode.schemeresourceclient.get.md)
+[get(workspaceName, id, \_\_mactsOptions)](./xcode.schemeresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a scheme by id.
+Get a scheme by id within a parent scope. When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
 
 </td></tr>
 <tr><td>
 
-[list()](./xcode.schemeresourceclient.list.md)
+[list(workspaceName, \_\_mactsOptions)](./xcode.schemeresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all schemes.
+List the schemes of one workspace document, as one page. When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
 
 </td></tr>
 </tbody></table>

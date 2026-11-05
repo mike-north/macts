@@ -4,10 +4,10 @@
 
 ## Window.miniaturizable property
 
-Whether the window can be minimized.
+Whether the window can be minimized. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-miniaturizable: boolean
+readonly miniaturizable: boolean | null;
 ```

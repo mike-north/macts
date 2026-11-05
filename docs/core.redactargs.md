@@ -4,7 +4,7 @@
 
 ## redactArgs() function
 
-Redact sensitive values from a capability-call argument map and return a human-readable summary string suitable for [AuditRecordInput.argsSummary](./core.auditrecordinput.argssummary.md)<!-- -->.
+Redact sensitive values from a capability-call argument map and return a human-readable summary string suitable for [GovernedAuditRecordInput.argsSummary](./core.governedauditrecordinput.argssummary.md)<!-- -->.
 
 Sensitive key names (matched case-insensitively against [DEFAULT_SENSITIVE_KEYS](./core.default_sensitive_keys.md) plus any `extraSensitiveKeys`<!-- -->) have their values replaced with [REDACTED_PLACEHOLDER](./core.redacted_placeholder.md)<!-- -->. All other values are summarised safely (scalars inline, large objects/arrays collapsed to a size hint) so the record never contains raw bulk data.
 

@@ -4,10 +4,10 @@
 
 ## Track.artist property
 
-the artist/source of the track
+the artist/source of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-artist: string
+artist: string | null
 ```

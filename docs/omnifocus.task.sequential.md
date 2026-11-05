@@ -4,10 +4,10 @@
 
 ## Task.sequential property
 
-If true, any children are sequentially dependent
+If true, any children are sequentially dependent. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-sequential: boolean
+sequential: boolean | null
 ```

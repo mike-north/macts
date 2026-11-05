@@ -4,10 +4,10 @@
 
 ## UIElement.maximumValue property
 
-the maximum value that the UI element can take on
+the maximum value that the UI element can take on. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-maximumValue: string
+readonly maximumValue: string | null;
 ```

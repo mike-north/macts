@@ -4,10 +4,10 @@
 
 ## AirPlayDevice.supportsVideo property
 
-does the device support video playback?
+does the device support video playback? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-supportsVideo: boolean
+readonly supportsVideo: boolean | null;
 ```

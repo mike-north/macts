@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ServiceUpdateInput](./system-events.serviceupdateinput.md)
 
-## ServiceUpdateInput type
+## ServiceUpdateInput interface
 
-Input for updating a Service
+Input for updating a Service. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ServiceUpdateInput = Partial<ServiceCreateInput>
+interface ServiceUpdateInput
 ```
 
-**References:** [ServiceCreateInput](./system-events.servicecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[name?](./system-events.serviceupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the name of the service. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

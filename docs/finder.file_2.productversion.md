@@ -4,10 +4,10 @@
 
 ## File_2.productVersion property
 
-the version of the product (visible at the top of the “Get Info” window)
+the version of the product (visible at the top of the “Get Info” window). Never null: observed in all 60 items (Finder 27.2, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-productVersion: string
+readonly productVersion: string;
 ```

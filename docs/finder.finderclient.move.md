@@ -9,7 +9,7 @@ Move object(s) to a new location
 **Signature:**
 
 ```typescript
-move(to: string, replacing?: boolean, positionedAt?: string, routingSuppressed?: boolean): Promise<void>;
+move(to: string, replacing?: boolean, positionedAt?: string, routingSuppressed?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -71,6 +71,19 @@ routingSuppressed
 </td><td>
 
 boolean
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

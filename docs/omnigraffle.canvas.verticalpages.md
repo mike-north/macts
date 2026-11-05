@@ -4,10 +4,10 @@
 
 ## Canvas.verticalPages property
 
-Vertical pages
+Vertical pages. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-verticalPages: number
+verticalPages: Integer | null
 ```

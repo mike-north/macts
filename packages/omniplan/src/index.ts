@@ -21,6 +21,7 @@
 export { OmniPlanClient, OmniPlanError, HttpClient } from './client.js'
 export type { OmniPlanClientOptions } from './client.js'
 export * from './types.js'
+export type { OmniPlanResources } from './contract/index.js'
 export { ProjectResourceClient } from './resources/project.js'
 export { TaskResourceClient } from './resources/task.js'
 export { MilestoneResourceClient } from './resources/milestone.js'

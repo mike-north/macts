@@ -4,10 +4,10 @@
 
 ## Task.taskStatus property
 
-The status of the current task
+The status of the current task. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-taskStatus: TaskStatus
+readonly taskStatus: TaskStatus | null;
 ```

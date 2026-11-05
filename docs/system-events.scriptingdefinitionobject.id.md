@@ -4,10 +4,10 @@
 
 ## ScriptingDefinitionObject.id property
 
-Unique identifier for this scripting definition object
+Unique identifier for this scripting definition object. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

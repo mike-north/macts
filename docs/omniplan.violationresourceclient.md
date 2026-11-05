@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[fix()](./omniplan.violationresourceclient.fix.md)
+[fix(\_\_mactsOptions)](./omniplan.violationresourceclient.fix.md)
 
 </td><td>
 
@@ -68,13 +68,13 @@ Fix a violation
 </td></tr>
 <tr><td>
 
-[list()](./omniplan.violationresourceclient.list.md)
+[list(\_\_mactsOptions)](./omniplan.violationresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all violations.
+List all violations, as one page.
 
 </td></tr>
 </tbody></table>

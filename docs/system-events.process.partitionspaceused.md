@@ -4,10 +4,10 @@
 
 ## Process.partitionSpaceUsed property
 
-the number of bytes currently used in the process' partition
+the number of bytes currently used in the process' partition. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-partitionSpaceUsed: number
+readonly partitionSpaceUsed: Integer | null;
 ```

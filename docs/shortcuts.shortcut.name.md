@@ -4,10 +4,10 @@
 
 ## Shortcut.name property
 
-The name of the shortcut
+The name of the shortcut. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

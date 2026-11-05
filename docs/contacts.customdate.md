@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-Unique identifier for this date
+string \| null
+
+</td><td>
+
+Unique identifier for this date. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ Unique identifier for this date
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Label for this date
+Label for this date. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +71,11 @@ Label for this date
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The date value
+The date value. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

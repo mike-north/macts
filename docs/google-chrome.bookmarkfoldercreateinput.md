@@ -4,7 +4,7 @@
 
 ## BookmarkFolderCreateInput interface
 
-Input for creating a BookmarkFolder
+Input for creating a BookmarkFolder.
 
 **Signature:**
 

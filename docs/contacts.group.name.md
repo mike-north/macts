@@ -4,10 +4,10 @@
 
 ## Group.name property
 
-The name of this group.
+The name of this group. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

@@ -4,10 +4,10 @@
 
 ## Graphic.locked property
 
-Is this graphic locked?
+Is this graphic locked? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-locked: boolean
+locked: boolean | null
 ```

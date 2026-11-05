@@ -48,7 +48,7 @@ Client for a notes folder.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -133,7 +133,16 @@ A Notes folder
 
 </td><td>
 
-Input for creating a Folder
+Input for creating a Folder.
+
+</td></tr>
+<tr><td>
+
+[FolderUpdateInput](./notes.folderupdateinput.md)
+
+</td><td>
+
+Input for updating a Folder. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -151,7 +160,16 @@ A note
 
 </td><td>
 
-Input for creating a Note
+Input for creating a Note.
+
+</td></tr>
+<tr><td>
+
+[NotesClient](./notes.notesclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -161,6 +179,15 @@ Input for creating a Note
 </td><td>
 
 Client configuration options.
+
+</td></tr>
+<tr><td>
+
+[NoteUpdateInput](./notes.noteupdateinput.md)
+
+</td><td>
+
+Input for updating a Note. Omitted fields are left unchanged.
 
 </td></tr>
 </tbody></table>
@@ -182,12 +209,16 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [AttachmentSchema](./notes.attachmentschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -205,12 +236,16 @@ Every capability exposed by Notes, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [NoteSchema](./notes.noteschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -232,7 +267,7 @@ Description
 
 </td><td>
 
-Input for creating a Account
+Input for creating an Account.
 
 </td></tr>
 <tr><td>
@@ -241,7 +276,7 @@ Input for creating a Account
 
 </td><td>
 
-Input for updating a Account
+Input for updating an Account. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -250,7 +285,7 @@ Input for updating a Account
 
 </td><td>
 
-Input for creating a Attachment
+Input for creating an Attachment.
 
 </td></tr>
 <tr><td>
@@ -259,7 +294,7 @@ Input for creating a Attachment
 
 </td><td>
 
-Input for updating a Attachment
+Input for updating an Attachment. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -273,20 +308,11 @@ Risk classification for a capability.
 </td></tr>
 <tr><td>
 
-[FolderUpdateInput](./notes.folderupdateinput.md)
+[NotesResources](./notes.notesresources.md)
 
 </td><td>
 
-Input for updating a Folder
-
-</td></tr>
-<tr><td>
-
-[NoteUpdateInput](./notes.noteupdateinput.md)
-
-</td><td>
-
-Input for updating a Note
+The type of the resource table in `notesContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 </tbody></table>

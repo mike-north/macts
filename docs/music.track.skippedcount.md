@@ -4,10 +4,10 @@
 
 ## Track.skippedCount property
 
-number of times this track has been skipped
+number of times this track has been skipped. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-skippedCount: number
+skippedCount: Integer | null
 ```

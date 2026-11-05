@@ -4,7 +4,7 @@
 
 ## RecipientCreateInput interface
 
-Input for creating a Recipient
+Input for creating a Recipient.
 
 **Signature:**
 

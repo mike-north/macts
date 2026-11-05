@@ -4,10 +4,10 @@
 
 ## MailAttachment.mIMEType property
 
-MIME type of the attachment E.g. text/plain.
+MIME type of the attachment E.g. text/plain. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-mIMEType: string
+readonly mIMEType: string | null;
 ```

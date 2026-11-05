@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the application high-level event aware? (OBSOLETE: always returns true)
+boolean \| null
+
+</td><td>
+
+Is the application high-level event aware? (OBSOLETE: always returns true). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ Is the application high-level event aware? (OBSOLETE: always returns true)
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Does the process have a scripting terminology, i.e., can it be scripted?
+boolean \| null
+
+</td><td>
+
+Does the process have a scripting terminology, i.e., can it be scripted? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,73 +71,15 @@ Does the process have a scripting terminology, i.e., can it be scripted?
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-the bundle identifier or creator type of the application
-
-</td></tr>
-<tr><td>
-
-[minimumSize](./finder.applicationfile.minimumsize.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-(AVAILABLE IN 10.1 TO 10.4) the smallest memory size with which the application can be launched
-
-</td></tr>
-<tr><td>
-
-[opensInClassic](./finder.applicationfile.opensinclassic.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-(AVAILABLE IN 10.1 TO 10.4) Should the application launch in the Classic environment?
-
-</td></tr>
-<tr><td>
-
-[preferredSize](./finder.applicationfile.preferredsize.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-(AVAILABLE IN 10.1 TO 10.4) the memory size with which the application will be launched
-
-</td></tr>
-<tr><td>
-
-[suggestedSize](./finder.applicationfile.suggestedsize.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-(AVAILABLE IN 10.1 TO 10.4) the memory size with which the developer recommends the application be launched
+the bundle identifier or creator type of the application. Never null: the primary identifier.
 
 </td></tr>
 </tbody></table>

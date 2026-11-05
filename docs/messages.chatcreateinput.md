@@ -4,7 +4,7 @@
 
 ## ChatCreateInput type
 
-Input for creating a Chat
+Input for creating a Chat.
 
 **Signature:**
 

@@ -4,10 +4,10 @@
 
 ## Album.id property
 
-The unique ID of this album
+The unique ID of this album. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

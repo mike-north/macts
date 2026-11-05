@@ -4,10 +4,10 @@
 
 ## Playlist.duration property
 
-the total length of all tracks (in seconds)
+the total length of all tracks (in seconds). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-duration: number
+readonly duration: Integer | null;
 ```

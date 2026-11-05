@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(id)](./photos.folderresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./photos.folderresourceclient.get.md)
 
 </td><td>
 
@@ -68,13 +68,13 @@ Get a folder by id.
 </td></tr>
 <tr><td>
 
-[list()](./photos.folderresourceclient.list.md)
+[list(page, \_\_mactsOptions)](./photos.folderresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all folders.
+List folders, one page at a time. When the result has a `nextCursor`<!-- -->, more remain: call again with the same arguments and `{ cursor: nextCursor }`<!-- -->.
 
 </td></tr>
 </tbody></table>

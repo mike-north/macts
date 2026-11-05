@@ -4,12 +4,10 @@
 
 ## ScriptingPropertyUpdateInput type
 
-Input for updating a ScriptingProperty
+Input for updating a ScriptingProperty. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ScriptingPropertyUpdateInput = Partial<ScriptingPropertyCreateInput>
+type ScriptingPropertyUpdateInput = Record<string, never>
 ```
-
-**References:** [ScriptingPropertyCreateInput](./system-events.scriptingpropertycreateinput.md)

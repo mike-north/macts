@@ -4,10 +4,10 @@
 
 ## UIElement.value property
 
-the current value of the UI element
+the current value of the UI element. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-value: string
+value: string | null
 ```

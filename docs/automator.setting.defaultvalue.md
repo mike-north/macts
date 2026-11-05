@@ -4,10 +4,10 @@
 
 ## Setting.defaultValue property
 
-The default value of the setting
+The default value of the setting. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-defaultValue: unknown
+readonly defaultValue: unknown;
 ```

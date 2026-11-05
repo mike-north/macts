@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The ending column number in the file where the issue occurred
+The ending column number in the file where the issue occurred. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ The ending column number in the file where the issue occurred
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The ending line number in the file where the issue occurred
+The ending line number in the file where the issue occurred. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,26 +69,11 @@ The ending line number in the file where the issue occurred
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The file path where the issue occurred
-
-</td></tr>
-<tr><td>
-
-[id?](./xcode.analyzerissue.id.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `message`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
+The file path where the issue occurred. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -103,7 +88,7 @@ string
 
 </td><td>
 
-The text of the issue
+The text of the issue. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -114,11 +99,11 @@ The text of the issue
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The starting column number in the file where the issue occurred
+The starting column number in the file where the issue occurred. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +114,11 @@ The starting column number in the file where the issue occurred
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The starting line number in the file where the issue occurred
+The starting line number in the file where the issue occurred. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

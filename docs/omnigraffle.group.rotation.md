@@ -4,10 +4,10 @@
 
 ## Group.rotation property
 
-Rotation of the group in degrees
+Rotation of the group in degrees. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-rotation: number
+rotation: number | null
 ```

@@ -9,7 +9,7 @@ Show the image at path in the application
 **Signature:**
 
 ```typescript
-spotlight(target: string): Promise<void>;
+spotlight(target: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ target
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

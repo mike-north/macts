@@ -4,12 +4,10 @@
 
 ## NetworkPreferencesObjectUpdateInput type
 
-Input for updating a NetworkPreferencesObject
+Input for updating a NetworkPreferencesObject. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type NetworkPreferencesObjectUpdateInput = Partial<NetworkPreferencesObjectCreateInput>
+type NetworkPreferencesObjectUpdateInput = Record<string, never>
 ```
-
-**References:** [NetworkPreferencesObjectCreateInput](./system-events.networkpreferencesobjectcreateinput.md)

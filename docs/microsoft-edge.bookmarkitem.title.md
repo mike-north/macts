@@ -4,10 +4,10 @@
 
 ## BookmarkItem.title property
 
-The title of the bookmark item.
+The title of the bookmark item. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-title: string
+title: string | null
 ```

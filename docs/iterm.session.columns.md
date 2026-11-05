@@ -4,10 +4,10 @@
 
 ## Session.columns property
 
-The columns property
+The columns property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-columns: number
+columns: Integer | null
 ```

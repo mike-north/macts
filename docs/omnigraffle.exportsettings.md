@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-[ExportAreaType](./omnigraffle.exportareatype.md)
+[ExportAreaType](./omnigraffle.exportareatype.md) \| null
 
 </td><td>
 
-The type of area to be exported
+The type of area to be exported. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ The type of area to be exported
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The number of pixels of border area to include
+The number of pixels of border area to include. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ The number of pixels of border area to include
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Draw the background canvas color
+Draw the background canvas color. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ Draw the background canvas color
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The scale to use during export
+The scale to use during export. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +99,11 @@ The scale to use during export
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether or not to include a border area
+Whether or not to include a border area. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +114,11 @@ Whether or not to include a border area
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether to export with non printing layers
+Whether to export with non printing layers. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +129,11 @@ Whether to export with non printing layers
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The number of pixels per point in the resulting exported image
+The number of pixels per point in the resulting exported image. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +144,11 @@ The number of pixels per point in the resulting exported image
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether to export with artboards
+Whether to export with artboards. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

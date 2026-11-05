@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+Date \| null
 
 </td><td>
 
-The birth date of this person.
+The birth date of this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,28 @@ The birth date of this person.
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Is the current record a company or a person.
+Is the current record a company or a person. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[creationDate](./contacts.person.creationdate.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+Date \| null
+
+</td><td>
+
+When the contact was created. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +86,11 @@ Is the current record a company or a person.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Department that this person works for.
+Department that this person works for. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -84,11 +101,11 @@ Department that this person works for.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The First name of this person.
+The First name of this person. Nullable. Observed missing in 1 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -99,18 +116,20 @@ The First name of this person.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The home page of this person.
+The home page of this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
 
-[image](./contacts.person.image.md)
+[id](./contacts.person.id.md)
 
 </td><td>
+
+`readonly`
 
 </td><td>
 
@@ -118,7 +137,7 @@ string
 
 </td><td>
 
-Image for person.
+Unique and persistent identifier for this record. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -129,11 +148,11 @@ Image for person.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The job title of this person.
+The job title of this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -144,11 +163,11 @@ The job title of this person.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The Last name of this person.
+The Last name of this person. Nullable. Observed missing in 6 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -159,11 +178,11 @@ The Last name of this person.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The Maiden name of this person.
+The Maiden name of this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -174,11 +193,28 @@ The Maiden name of this person.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The Middle name of this person.
+The Middle name of this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
+
+</td></tr>
+<tr><td>
+
+[modificationDate](./contacts.person.modificationdate.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+Date \| null
+
+</td><td>
+
+When the contact was last modified. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -187,13 +223,15 @@ The Middle name of this person.
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-First/Last name of the person, uses the name display order preference setting in Contacts.
+string \| null
+
+</td><td>
+
+First/Last name of the person, uses the name display order preference setting in Contacts. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -204,11 +242,11 @@ First/Last name of the person, uses the name display order preference setting in
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The Nickname of this person.
+The Nickname of this person. Nullable. Observed missing in 22 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -219,11 +257,11 @@ The Nickname of this person.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Notes for this person.
+Notes for this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -234,11 +272,11 @@ Notes for this person.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Organization that employs this person.
+Organization that employs this person. Nullable. Observed missing in 17 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -249,11 +287,11 @@ Organization that employs this person.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The phonetic version of the First name of this person.
+The phonetic version of the First name of this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -264,11 +302,11 @@ The phonetic version of the First name of this person.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The phonetic version of the Last name of this person.
+The phonetic version of the Last name of this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -279,11 +317,11 @@ The phonetic version of the Last name of this person.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The Phonetic version of the Middle name of this person.
+The Phonetic version of the Middle name of this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -294,11 +332,11 @@ The Phonetic version of the Middle name of this person.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The Suffix of this person.
+The Suffix of this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -309,26 +347,11 @@ The Suffix of this person.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The title of this person.
-
-</td></tr>
-<tr><td>
-
-[vcard](./contacts.person.vcard.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-Person information in vCard format, this always returns a card in version 3.0 format.
+The title of this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 </tbody></table>

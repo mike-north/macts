@@ -4,10 +4,10 @@
 
 ## Document.name property
 
-The document name
+The document name. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string;
 ```

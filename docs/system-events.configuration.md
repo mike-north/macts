@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the name used to authenticate
+the name used to authenticate. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +52,15 @@ the name used to authenticate
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the configuration connected?
+boolean \| null
+
+</td><td>
+
+Is the configuration connected? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +69,15 @@ Is the configuration connected?
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-the unique identifier for the configuration
+the unique identifier for the configuration. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -82,13 +86,15 @@ the unique identifier for the configuration
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the name of the configuration
+string \| null
+
+</td><td>
+
+the name of the configuration. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

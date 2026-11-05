@@ -4,12 +4,13 @@
 
 ## TextRangeUpdateInput type
 
-Input for updating a TextRange
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type TextRangeUpdateInput = Partial<TextRangeCreateInput>
+type TextRangeUpdateInput = Omit<TextRangeUpdateInput$1, 'start' | 'end'> & {
+  start?: null extends TextRangeUpdateInput$1['start'] ? number | null : number
+  end?: null extends TextRangeUpdateInput$1['end'] ? number | null : number
+}
 ```
-
-**References:** [TextRangeCreateInput](./microsoft-word.textrangecreateinput.md)

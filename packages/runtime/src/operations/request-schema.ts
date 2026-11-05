@@ -18,6 +18,15 @@
  * operation's wire schema comes from its descriptor and this independent
  * mapping is retired.
  *
+ * Integer inputs deliberately differ between registration paths: manifest-only
+ * embedders (`registerManifest` or `createMultiServer`'s `manifests` option)
+ * take bare JSON numbers unchanged, while generated contracts take tagged
+ * integers (`{ integer: "7" }`). The served host registers contracts, so its
+ * generated HTTP clients and CLI use the tagged form. Capability schemas still
+ * describe the manifest-only numeric form. Do not add an integer codec here:
+ * passthrough registration is to be retired alongside the thin adapters, leaving
+ * contract registration as the sole input authority.
+ *
  * Schemas are built once at registration or startup, not per request.
  *
  * @packageDocumentation

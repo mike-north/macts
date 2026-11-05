@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/xcode](./xcode.md) &gt; [WorkspaceDocumentUpdateInput](./xcode.workspacedocumentupdateinput.md)
 
-## WorkspaceDocumentUpdateInput type
+## WorkspaceDocumentUpdateInput interface
 
-Input for updating a WorkspaceDocument
+Input for updating a WorkspaceDocument. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type WorkspaceDocumentUpdateInput = Partial<WorkspaceDocumentCreateInput>
+interface WorkspaceDocumentUpdateInput
 ```
 
-**References:** [WorkspaceDocumentCreateInput](./xcode.workspacedocumentcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[activeRunDestination?](./xcode.workspacedocumentupdateinput.activerundestination.md)
+
+</td><td>
+
+</td><td>
+
+[ObjectReferenceData](./contracts.objectreferencedata.md)<!-- -->&lt;string, 'RunDestination'&gt;
+
+</td><td>
+
+_(Optional)_ The workspace's run destination that will be used for scheme actions. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[activeScheme?](./xcode.workspacedocumentupdateinput.activescheme.md)
+
+</td><td>
+
+</td><td>
+
+[ObjectReferenceData](./contracts.objectreferencedata.md)<!-- -->&lt;string, 'Scheme'&gt;
+
+</td><td>
+
+_(Optional)_ The workspace's scheme that will be used for scheme actions. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

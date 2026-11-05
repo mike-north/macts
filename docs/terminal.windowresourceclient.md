@@ -57,24 +57,24 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(name)](./terminal.windowresourceclient.get.md)
+[get(name, \_\_mactsOptions)](./terminal.windowresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a window by name.
+Get a window by name. When several windows share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[list()](./terminal.windowresourceclient.list.md)
+[list(\_\_mactsOptions)](./terminal.windowresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all windows.
+List all windows, as one page.
 
 </td></tr>
 </tbody></table>

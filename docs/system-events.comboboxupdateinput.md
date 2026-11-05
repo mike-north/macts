@@ -4,12 +4,10 @@
 
 ## ComboBoxUpdateInput type
 
-Input for updating a ComboBox
+Input for updating a ComboBox. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ComboBoxUpdateInput = Partial<ComboBoxCreateInput>
+type ComboBoxUpdateInput = Record<string, never>
 ```
-
-**References:** [ComboBoxCreateInput](./system-events.comboboxcreateinput.md)

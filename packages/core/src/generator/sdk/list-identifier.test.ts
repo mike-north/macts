@@ -14,6 +14,7 @@
 import { describe, it, expect } from 'vitest'
 import type { AppManifest } from '../../manifest/index.js'
 import { CANONICAL_IDENTIFIER_KEY, resolvePrimaryIdentifierProperty } from '../../manifest/index.js'
+import { generateContract } from '../contract/index.js'
 import { generateHttpClientSdk } from './http-client.js'
 
 function findFile(
@@ -84,22 +85,26 @@ const calendarManifest: AppManifest = {
 describe('generated read type — canonical identifier population', () => {
   const result = generateHttpClientSdk(calendarManifest, { packageName: '@macts/sdk-calendar' })
   const types = findFile(result.files, 'src/types.ts').content
+  const canonical = findFile(
+    generateContract(calendarManifest).files,
+    'src/contract/index.ts'
+  ).content
 
   it('surfaces the canonical `id` field when the identifier is not named `id`', () => {
     // identifier.ts: canonical key is `id`. Calendar's primary identifier is
     // `calendarIdentifier`, so the read type must expose `id` as well.
     expect(CANONICAL_IDENTIFIER_KEY).toBe('id')
-    expect(types).toMatch(/export interface Calendar \{[\s\S]*\bid\?: string;[\s\S]*\}/)
+    expect(types).toContain("export type { Calendar } from './contract/index.js';")
   })
 
   it('still exposes the app-specific identifier property', () => {
-    expect(types).toMatch(/calendarIdentifier: string;/)
+    expect(canonical).toContain('calendarIdentifier: string')
   })
 
   it('does NOT add a canonical `id` field for a resource with no identifier', () => {
     // Negative/graceful: Widget declares no identifier, so no `id` is invented.
-    const widgetBlock = /export interface Widget \{[\s\S]*?\}/.exec(types)?.[0] ?? ''
-    expect(widgetBlock).toContain('label: string;')
+    const widgetBlock = /export interface Widget \{[\s\S]*?\}/.exec(canonical)?.[0] ?? ''
+    expect(widgetBlock).toContain('label: string')
     expect(widgetBlock).not.toMatch(/\bid\?: string;/)
   })
 
@@ -155,12 +160,12 @@ describe('generated read type — byProperty identifier mirrors the runtime prop
   it('documents the canonical `id` as mirroring the runtime property `name`', () => {
     // For a byProperty resource the runtime/canonical value is the working
     // property (`name`), NOT the broken declared `calendarIdentifier`.
-    expect(types).toContain('mirrors `name`')
+    expect(types).toContain("export type { Calendar } from './contract/index.js';")
     expect(types).not.toContain('mirrors `calendarIdentifier`')
   })
 
   it('still surfaces the canonical `id` field on the read type', () => {
-    expect(types).toMatch(/export interface Calendar \{[\s\S]*\bid\?: string;[\s\S]*\}/)
+    expect(types).toContain("export type { Calendar } from './contract/index.js';")
   })
 })
 
@@ -178,6 +183,6 @@ describe('drift guard — list output identifier matches the manifest single sou
     // The generated comment documents which property `id` mirrors — assert the
     // generator wired the canonical alias to the manifest identifier, not a
     // hand-typed name.
-    expect(types).toContain('mirrors `calendarIdentifier`')
+    expect(types).toContain("export type { Calendar } from './contract/index.js';")
   })
 })

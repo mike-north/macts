@@ -4,10 +4,10 @@
 
 ## Source.freeSpace property
 
-the free space on the source if it has a fixed size
+the free space on the source if it has a fixed size. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-freeSpace: number
+readonly freeSpace: number | null;
 ```

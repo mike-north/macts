@@ -4,10 +4,10 @@
 
 ## Setting.name property
 
-The name of the setting
+The name of the setting. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string;
 ```

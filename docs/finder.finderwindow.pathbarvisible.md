@@ -4,10 +4,10 @@
 
 ## FinderWindow.pathbarVisible property
 
-Is the window's path bar visible?
+Is the window's path bar visible? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-pathbarVisible: boolean
+pathbarVisible: boolean | null
 ```

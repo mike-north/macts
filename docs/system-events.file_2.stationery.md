@@ -4,10 +4,10 @@
 
 ## File_2.stationery property
 
-Is the file a stationery pad?
+Is the file a stationery pad? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-stationery: boolean
+stationery: boolean | null
 ```

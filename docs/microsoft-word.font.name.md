@@ -4,10 +4,10 @@
 
 ## Font.name property
 
-The font name
+The font name. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

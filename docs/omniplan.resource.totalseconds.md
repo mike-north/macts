@@ -4,10 +4,10 @@
 
 ## Resource.totalSeconds property
 
-Total seconds worked by this resource
+Total seconds worked by this resource. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-totalSeconds: number
+readonly totalSeconds: number | null;
 ```

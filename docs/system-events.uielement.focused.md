@@ -4,10 +4,10 @@
 
 ## UIElement.focused property
 
-Is the focus on this UI element?
+Is the focus on this UI element? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-focused: string
+focused: string | null
 ```

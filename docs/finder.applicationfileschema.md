@@ -4,18 +4,16 @@
 
 ## ApplicationFileSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
 ApplicationFileSchema: z.ZodObject<
   {
     id: z.ZodString
-    suggestedSize: z.ZodNumber
-    minimumSize: z.ZodNumber
-    preferredSize: z.ZodNumber
     acceptsHighLevelEvents: z.ZodBoolean
     hasScriptingTerminology: z.ZodBoolean
-    opensInClassic: z.ZodBoolean
   },
   z.core.$strip
 >

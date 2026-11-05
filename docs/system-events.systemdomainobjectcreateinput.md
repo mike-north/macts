@@ -4,7 +4,7 @@
 
 ## SystemDomainObjectCreateInput type
 
-Input for creating a SystemDomainObject
+Input for creating a SystemDomainObject.
 
 **Signature:**
 

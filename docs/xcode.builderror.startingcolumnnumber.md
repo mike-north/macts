@@ -4,10 +4,10 @@
 
 ## BuildError.startingColumnNumber property
 
-The starting column number in the file where the issue occurred
+The starting column number in the file where the issue occurred. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-startingColumnNumber: number
+startingColumnNumber: Integer | null
 ```

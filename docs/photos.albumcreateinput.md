@@ -4,7 +4,7 @@
 
 ## AlbumCreateInput interface
 
-Input for creating a Album
+Input for creating an Album.
 
 **Signature:**
 

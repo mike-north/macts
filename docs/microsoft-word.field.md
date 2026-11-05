@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The field code
+The field code. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ The field code
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The field text
+The field text. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +67,15 @@ The field text
 
 </td><td>
 
-</td><td>
-
-[FieldType](./microsoft-word.fieldtype.md)
+`readonly`
 
 </td><td>
 
-The field type
+[FieldType](./microsoft-word.fieldtype.md) \| null
+
+</td><td>
+
+The field type. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +86,11 @@ The field type
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the field is locked
+Whether the field is locked. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +101,11 @@ Whether the field is locked
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether field codes are displayed
+Whether field codes are displayed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

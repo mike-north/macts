@@ -4,10 +4,10 @@
 
 ## Process.id property
 
-The unique identifier of the process
+The unique identifier of the process. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: Integer;
 ```

@@ -4,10 +4,10 @@
 
 ## Subgraph.rightMargin property
 
-Right margin
+Right margin. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-rightMargin: number
+rightMargin: number | null
 ```

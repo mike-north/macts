@@ -7,6 +7,27 @@ import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Address } from '../types.js'
 
+import {
+  Integer as __mactsInteger,
+  ValueTypes as __mactsValueTypes,
+  ValidationError as __mactsValidationError,
+} from '@macts/contracts'
+
+/** Integer wire policy shared with the operation contracts, built once per module. */
+const __mactsIntegerWire = __mactsValueTypes.integer().wire
+
+/** Validate CLI text or an SDK number before dispatch, without implicit rounding. */
+function __mactsIntegerInput(value: unknown): __mactsInteger {
+  const integer = typeof value === 'number' || typeof value === 'string' ? String(value) : undefined
+  const candidate = { integer }
+  if (!__mactsIntegerWire.safeParse(candidate).success || integer === undefined) {
+    const message =
+      'Expected a canonical decimal integer from -9007199254740991 to 9007199254740991.'
+    throw new __mactsValidationError(message, { issues: [{ path: [], message }] })
+  }
+  return __mactsInteger.validate(Number(integer))
+}
+
 /**
  * Client for address for the given record..
  */
@@ -27,19 +48,34 @@ export class AddressResourceClient {
    */
   async list(
     personId: string,
-    page: { pageSize?: number; cursor?: string } = {}
+    page: { pageSize?: number; cursor?: string } = {},
+    __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Page<Address>> {
-    return this.#http.rpc<Page<Address>>(`${this.#app}.${this.#resource}.list`, {
-      ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-      ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-      personId,
-    })
+    return this.#http.invoke<Page<Address>>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: __mactsIntegerInput(page.pageSize) }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+        personId,
+      },
+      __mactsOptions,
+      'Address'
+    )
   }
 
   /**
    * Get a address by id within a parent scope.
    */
-  async get(personId: string, id: string): Promise<Address> {
-    return this.#http.rpc<Address>(`${this.#app}.${this.#resource}.get`, { personId, id })
+  async get(
+    personId: string,
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Address> {
+    return this.#http.invoke<Address>(
+      `${this.#app}.${this.#resource}.get`,
+      { personId, id },
+      __mactsOptions,
+      'Address'
+    )
   }
 }

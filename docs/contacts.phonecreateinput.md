@@ -4,7 +4,7 @@
 
 ## PhoneCreateInput interface
 
-Input for creating a Phone
+Input for creating a Phone.
 
 **Signature:**
 

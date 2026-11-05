@@ -4,6 +4,10 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
+
 // @public
 export const capabilities: readonly CapabilityMetadata[];
 
@@ -26,13 +30,21 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
+}
+
+// @public
+export interface ScreenSharingClient extends ClientBrand<ScreenSharingResources> {
 }
 
 // @public
 export class ScreenSharingClient {
     constructor(options: ScreenSharingClientOptions);
-    getURL(url: string): Promise<void>;
+    getURL(url: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
 }
 
@@ -48,5 +60,10 @@ export class ScreenSharingError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type ScreenSharingResources = Readonly<Record<never, never>>;
+
+// (No @packageDocumentation comment for this package)
 
 ```

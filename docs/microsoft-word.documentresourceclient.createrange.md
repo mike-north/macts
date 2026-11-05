@@ -9,7 +9,7 @@ Create a text range by character positions
 **Signature:**
 
 ```typescript
-createRange(start?: number, end?: number): Promise<void>;
+createRange(start?: number, end?: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -47,6 +47,19 @@ end
 </td><td>
 
 number
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

@@ -4,10 +4,10 @@
 
 ## Track.playerState property
 
-The current player state
+The current player state. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-playerState: PlayerState
+readonly playerState: PlayerState | null;
 ```

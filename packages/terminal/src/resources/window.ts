@@ -24,15 +24,28 @@ export class WindowResourceClient {
   /**
    * List all windows, as one page.
    */
-  async list(): Promise<Page<Window>> {
-    return this.#http.rpc<Page<Window>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Window>> {
+    return this.#http.invoke<Page<Window>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'Window'
+    )
   }
 
   /**
    * Get a window by name.
    * When several windows share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async get(name: string): Promise<Window> {
-    return this.#http.rpc<Window>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(
+    name: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Window> {
+    return this.#http.invoke<Window>(
+      `${this.#app}.${this.#resource}.get`,
+      { name },
+      __mactsOptions,
+      'Window'
+    )
   }
 }

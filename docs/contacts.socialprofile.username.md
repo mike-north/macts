@@ -4,10 +4,10 @@
 
 ## SocialProfile.userName property
 
-The username used with this social profile.
+The username used with this social profile. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-userName: string
+userName: string | null
 ```

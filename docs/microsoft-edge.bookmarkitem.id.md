@@ -4,10 +4,10 @@
 
 ## BookmarkItem.id property
 
-Unique ID of the bookmark item.
+Unique ID of the bookmark item. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

@@ -33,6 +33,21 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[diagnostics?](./core.generateclientpackageresult.diagnostics.md)
+
+</td><td>
+
+</td><td>
+
+string\[\]
+
+</td><td>
+
+_(Optional)_ Non-fatal findings, such as manifest types the contract could not resolve and describes as `unknown`<!-- -->. Present only when there are any.
+
+</td></tr>
+<tr><td>
+
 [dir](./core.generateclientpackageresult.dir.md)
 
 </td><td>

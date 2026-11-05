@@ -24,7 +24,15 @@ export class SettingResourceClient {
   /**
    * List the settings of one automator action, as one page.
    */
-  async list(actionId: string): Promise<Page<Setting>> {
-    return this.#http.rpc<Page<Setting>>(`${this.#app}.${this.#resource}.list`, { actionId })
+  async list(
+    actionId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<Setting>> {
+    return this.#http.invoke<Page<Setting>>(
+      `${this.#app}.${this.#resource}.list`,
+      { actionId },
+      __mactsOptions,
+      'Setting'
+    )
   }
 }

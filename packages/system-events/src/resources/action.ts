@@ -22,7 +22,12 @@ export class ActionResourceClient {
   /**
    * cause the target process to behave as if the action were applied to its UI element
    */
-  async perform(): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.perform`, {})
+  async perform(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.perform`,
+      {},
+      __mactsOptions,
+      'Action'
+    )
   }
 }

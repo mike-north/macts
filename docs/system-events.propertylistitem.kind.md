@@ -4,10 +4,10 @@
 
 ## PropertyListItem.kind property
 
-the kind of data stored in the property list item: boolean/data/date/list/number/record/string
+the kind of data stored in the property list item: boolean/data/date/list/number/record/string. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-kind: string
+readonly kind: string | null;
 ```

@@ -4,10 +4,10 @@
 
 ## Track.databaseID property
 
-the common, unique ID for this track. If two tracks in different playlists have the same database ID, they are sharing the same data.
+the common, unique ID for this track. If two tracks in different playlists have the same database ID, they are sharing the same data. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-databaseID: number
+readonly databaseID: Integer | null;
 ```

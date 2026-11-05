@@ -4,10 +4,10 @@
 
 ## AutomatorAction.bundleId property
 
-The bundle identifier for the action
+The bundle identifier for the action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-bundleId: string
+readonly bundleId: string | null;
 ```

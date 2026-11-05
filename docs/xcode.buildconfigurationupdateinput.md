@@ -4,12 +4,10 @@
 
 ## BuildConfigurationUpdateInput type
 
-Input for updating a BuildConfiguration
+Input for updating a BuildConfiguration. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type BuildConfigurationUpdateInput = Partial<BuildConfigurationCreateInput>
+type BuildConfigurationUpdateInput = Record<string, never>
 ```
-
-**References:** [BuildConfigurationCreateInput](./xcode.buildconfigurationcreateinput.md)

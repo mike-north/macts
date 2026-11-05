@@ -4,10 +4,10 @@
 
 ## ScriptingSuite.description property
 
-The description of the suite
+The description of the suite. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-description: string
+readonly description: string | null;
 ```

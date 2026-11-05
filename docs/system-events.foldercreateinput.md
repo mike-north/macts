@@ -2,12 +2,78 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [FolderCreateInput](./system-events.foldercreateinput.md)
 
-## FolderCreateInput type
+## FolderCreateInput interface
 
-Input for creating a Folder
+Input for creating a Folder.
 
 **Signature:**
 
 ```typescript
-type FolderCreateInput = Record<string, never>
+interface FolderCreateInput
 ```
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[modificationDate?](./system-events.foldercreateinput.modificationdate.md)
+
+</td><td>
+
+</td><td>
+
+Date
+
+</td><td>
+
+_(Optional)_ the date on which the disk item was last modified
+
+</td></tr>
+<tr><td>
+
+[name?](./system-events.foldercreateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the name of the disk item
+
+</td></tr>
+<tr><td>
+
+[visible?](./system-events.foldercreateinput.visible.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Is the disk item visible?
+
+</td></tr>
+</tbody></table>

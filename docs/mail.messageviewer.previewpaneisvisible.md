@@ -4,10 +4,10 @@
 
 ## MessageViewer.previewPaneIsVisible property
 
-Controls whether the preview pane of the message viewer window is visible or not
+Controls whether the preview pane of the message viewer window is visible or not. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-previewPaneIsVisible: boolean
+previewPaneIsVisible: boolean | null
 ```

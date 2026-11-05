@@ -4,7 +4,7 @@
 
 ## RunDestinationCreateInput type
 
-Input for creating a RunDestination
+Input for creating a RunDestination.
 
 **Signature:**
 

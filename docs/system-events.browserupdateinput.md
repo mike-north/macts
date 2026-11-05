@@ -4,12 +4,10 @@
 
 ## BrowserUpdateInput type
 
-Input for updating a Browser
+Input for updating a Browser. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type BrowserUpdateInput = Partial<BrowserCreateInput>
+type BrowserUpdateInput = Record<string, never>
 ```
-
-**References:** [BrowserCreateInput](./system-events.browsercreateinput.md)

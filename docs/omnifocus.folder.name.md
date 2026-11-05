@@ -4,10 +4,10 @@
 
 ## Folder.name property
 
-The name of the folder
+The name of the folder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

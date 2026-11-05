@@ -30,6 +30,7 @@
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md (D7, D9)
  */
 
+import { runInNewContext } from 'node:vm'
 import { describe, expect, it, vi } from 'vitest'
 import {
   InternalError,
@@ -44,7 +45,7 @@ import { parseManifestYaml } from '../manifest/loader.js'
 import type { AppManifest } from '../manifest/schemas/index.js'
 import { PANES_MANIFEST_YAML, panesManifest } from '../manifest/test-support/panes-positional.js'
 import { createNativeExecutor, type NativeTransport } from './native-executor.js'
-import { specifierPosition } from './native-position.js'
+import { NATIVE_POSITION_READER, specifierPosition } from './native-position.js'
 import { referenceAddressing } from './native-scripts.js'
 import { standInTransport } from './test-support/stand-in-app.js'
 import {
@@ -185,6 +186,24 @@ function internalMessage(error: unknown): string | undefined {
 }
 
 describe('the position a specifier gives within a tab collection', () => {
+  it.each(['Panes (Beta)', 'Panes ("quoted" \\ path)', 'Panes ).windows.byId(7) ('])(
+    'distinguishes an application named %s from a real nested specifier in source and embedded readers',
+    (name) => {
+      const application = `Application(${JSON.stringify(name)})`
+      for (const [display, expected] of [
+        [`${application}.tabs.at(7)`, undefined],
+        [`${application}.windows.byId(1).tabs.at(2)`, 2],
+      ] as const) {
+        expect(specifierPosition(display, 'tabs')).toBe(expected)
+        expect(
+          runInNewContext(`${NATIVE_POSITION_READER.prelude}\n__mactsPositionOf({}, 'tabs')`, {
+            Automation: { getDisplayString: () => display },
+          })
+        ).toBe(expected)
+      }
+    }
+  )
+
   it.each<[string, number]>([
     ['Application("iTerm2").windows.byId(7).tabs.at(0)', 0],
     ['Application("Panes").windows.byId(1).tabs.at(12)', 12],
@@ -335,6 +354,42 @@ describe('getting a tab by its position within its window', () => {
 
     expect(result).toEqual({ index: integer(2), title: 'Tests' })
     expect(lookups).toEqual(['windows.byId(2)', 'windows.byId(2).tabs.at(1)'])
+  })
+
+  it('refuses a null position before constructing a tab specifier', async () => {
+    const lookups: string[] = []
+    const request = operation('getTab', 'Tab', TAB_PLAN, { windowId: 2, index: 0 })
+    const error = await rejectionOf(
+      panesExecutor({ lookups }).execute({
+        ...request,
+        input: { windowId: integer(2), index: null },
+        inputPlan: {
+          kind: 'record',
+          fields: {
+            windowId: { presence: 'required', value: { kind: 'integer' } },
+            index: {
+              presence: 'required',
+              value: { kind: 'nullable', value: { kind: 'integer' } },
+            },
+          },
+        },
+      })
+    )
+    expect(error).toBeInstanceOf(InvalidSelectionError)
+    expect(lookups).not.toContain('windows.byId(2).tabs.at(null)')
+    expect(lookups.some((lookup) => lookup.includes('.tabs.at('))).toBe(false)
+  })
+
+  it('rejects null against the integer wire plan before any application lookup', async () => {
+    const lookups: string[] = []
+    const request = operation('getTab', 'Tab', TAB_PLAN, { windowId: 2, index: 0 })
+    await rejectionOf(
+      panesExecutor({ lookups }).execute({
+        ...request,
+        input: { windowId: integer(2), index: null },
+      })
+    )
+    expect(lookups).toEqual([])
   })
 
   it('fails with InvalidSelectionError naming Tab for a position past the window’s tabs, looking up no tab', async () => {

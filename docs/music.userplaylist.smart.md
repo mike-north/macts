@@ -4,10 +4,10 @@
 
 ## UserPlaylist.smart property
 
-is this a Smart Playlist?
+is this a Smart Playlist? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-smart: boolean
+readonly smart: boolean | null;
 ```

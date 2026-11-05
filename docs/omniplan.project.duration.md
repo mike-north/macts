@@ -4,10 +4,10 @@
 
 ## Project.duration property
 
-The total duration of the project in seconds
+The total duration of the project in seconds. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-duration: number
+readonly duration: number | null;
 ```

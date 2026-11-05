@@ -4,10 +4,10 @@
 
 ## AutomatorAction.executionResult property
 
-The result of the action, passed as input to the next action
+The result of the action, passed as input to the next action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-executionResult: unknown
+readonly executionResult: unknown;
 ```

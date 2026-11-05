@@ -4,10 +4,10 @@
 
 ## Artwork.format property
 
-the data format for this piece of artwork
+the data format for this piece of artwork. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-format: string
+readonly format: string | null;
 ```

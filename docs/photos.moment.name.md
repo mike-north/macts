@@ -4,10 +4,10 @@
 
 ## Moment.name property
 
-The name of the Moment
+The name of the Moment. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

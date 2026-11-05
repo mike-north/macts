@@ -4,7 +4,7 @@
 
 ## ParticipantCreateInput type
 
-Input for creating a Participant
+Input for creating a Participant.
 
 **Signature:**
 

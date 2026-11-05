@@ -4,12 +4,10 @@
 
 ## ContainerUpdateInput type
 
-Input for updating a Container
+Input for updating a Container. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ContainerUpdateInput = Partial<ContainerCreateInput>
+type ContainerUpdateInput = Record<string, never>
 ```
-
-**References:** [ContainerCreateInput](./finder.containercreateinput.md)

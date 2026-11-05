@@ -4,10 +4,10 @@
 
 ## ScriptingProperty.enumerated property
 
-Is the property's value an enumerator?
+Is the property's value an enumerator? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-enumerated: boolean
+readonly enumerated: boolean | null;
 ```

@@ -3,6 +3,7 @@ import { ListWindowsCommand } from './commands/windows/list.js'
 import { GetWindowCommand } from './commands/windows/get.js'
 import { ListTabsCommand } from './commands/windows/tabs/list.js'
 import { GetTabCommand } from './commands/windows/tabs/get.js'
+import { CurrentWindowCommand } from './commands/current-window.js'
 import { CountCommand } from './commands/count.js'
 import { DuplicateCommand } from './commands/duplicate.js'
 import { ExistsCommand } from './commands/exists.js'
@@ -42,6 +43,7 @@ export const plugin: CliPlugin = {
     GetWindowCommand,
     ListTabsCommand,
     GetTabCommand,
+    CurrentWindowCommand,
     CountCommand,
     DuplicateCommand,
     ExistsCommand,

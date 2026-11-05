@@ -4,10 +4,10 @@
 
 ## TextRange.underline property
 
-The underline type
+The underline type. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-underline: UnderlineType
+underline: UnderlineType | null
 ```

@@ -4,7 +4,7 @@
 
 ## ClippingCreateInput type
 
-Input for creating a Clipping
+Input for creating a Clipping.
 
 **Signature:**
 

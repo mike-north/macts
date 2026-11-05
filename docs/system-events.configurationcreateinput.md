@@ -4,7 +4,7 @@
 
 ## ConfigurationCreateInput interface
 
-Input for creating a Configuration
+Input for creating a Configuration.
 
 **Signature:**
 

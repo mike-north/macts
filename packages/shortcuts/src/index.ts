@@ -21,6 +21,7 @@
 export { ShortcutsClient, ShortcutsError, HttpClient } from './client.js'
 export type { ShortcutsClientOptions } from './client.js'
 export * from './types.js'
+export type { ShortcutsResources } from './contract/index.js'
 export { ShortcutResourceClient } from './resources/shortcut.js'
 export { FolderResourceClient } from './resources/folder.js'
 export { capabilities } from './capabilities.js'

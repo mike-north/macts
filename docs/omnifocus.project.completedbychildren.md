@@ -4,10 +4,10 @@
 
 ## Project.completedByChildren property
 
-If true, complete when children are completed
+If true, complete when children are completed. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-completedByChildren: boolean
+completedByChildren: boolean | null
 ```

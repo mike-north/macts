@@ -4,10 +4,10 @@
 
 ## Folder.shared property
 
-Whether the folder is shared
+Whether the folder is shared. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-shared: boolean
+readonly shared: boolean | null;
 ```

@@ -4,14 +4,55 @@
 
 ## AutomatorActionResourceClient.list() method
 
-List all automatoractions.
+List the automator actions of one workflow, as one page. When several workflows share the same name, the first match in the app's order is used as the workflow.
 
 **Signature:**
 
 ```typescript
-list(): Promise<AutomatorAction[]>;
+list(workflowName: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<AutomatorAction>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+workflowName
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[AutomatorAction](./automator.automatoraction.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[AutomatorAction](./automator.automatoraction.md)<!-- -->&gt;&gt;

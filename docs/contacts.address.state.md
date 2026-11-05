@@ -4,10 +4,10 @@
 
 ## Address.state property
 
-State, Province, or Region part of the address.
+State, Province, or Region part of the address. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-state: string
+state: string | null
 ```

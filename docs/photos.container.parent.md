@@ -4,10 +4,10 @@
 
 ## Container.parent property
 
-This container's parent folder, if any
+This container's parent folder, if any. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-parent: Folder
+readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 ```

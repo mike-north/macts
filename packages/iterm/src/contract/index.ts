@@ -28,6 +28,7 @@ import {
   type IndexSelectorReference,
   type Integer,
   type ObjectReferenceData,
+  type ObjectReferenceVariant,
   type OperationDescriptor,
   type Page,
   type Point,
@@ -777,15 +778,23 @@ export interface TabResourceClient {
 
 /**
  * The iTerm client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link iTermContract}. Its type carries the contract's resource
- * table, {@link iTermResources}, so references can be bound to it by resource; the brand has no
- * runtime member.
+ * client factory creates one from `iTermContract` in the app's `/contract` entry. Its type carries
+ * the contract's resource table, {@link iTermResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
 export interface iTermClient extends ClientBrand<iTermResources> {
   /** A window. */
   readonly windows: WindowResourceClient
   /** A terminal tab */
   readonly tabs: TabResourceClient
+  /**
+   * Get a reference to the currently selected window.
+   *
+   * @returns Nullable. No evidence that the app always returns a value.
+   */
+  currentWindow(
+    options?: CallOptions
+  ): Promise<ObjectReferenceVariant<Window, Integer, 'Window'> | null>
   /**
    * Return the number of elements of a particular class within an object.
    *
@@ -1007,7 +1016,7 @@ const tabRecordType: ValueType<Tab> = t.record(
 )
 
 /**
- * The type of the resource table of {@link iTermContract}: every resource a
+ * The type of the resource table in `iTermContract` (the app's `/contract` entry): every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
  * references to it, and, for each of those operations that finds the
@@ -1052,6 +1061,24 @@ const resources = {
     parents: { get: 'Window', list: 'Window' },
   },
 } satisfies iTermResources
+
+const appCurrentWindowOperation: OperationDescriptor<
+  Record<string, never>,
+  ObjectReferenceVariant<Window, Integer, 'Window'> | null
+> = {
+  id: 'iterm.app.currentWindow',
+  permission: 'iterm:app:currentWindow',
+  target: { command: 'currentWindow' },
+  description: 'Get a reference to the currently selected window.',
+  input: t.record({}),
+  output: t.nullable(t.reference<Window, Integer, 'Window'>(() => iTermContract, 'Window', 'one')),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
+}
 
 const windowListWindowsOperation: OperationDescriptor<Record<string, never>, Page<Window>> = {
   id: 'iterm.windows.list',
@@ -1916,6 +1943,7 @@ const appToggleHotkeyWindowOperation: OperationDescriptor<Record<string, never>,
 
 /** Every operation, keyed by its identity. */
 const operations: AppContract<iTermClient>['operations'] = {
+  'iterm.app.currentWindow': appCurrentWindowOperation,
   'iterm.windows.list': windowListWindowsOperation,
   'iterm.windows.get': windowGetWindowOperation,
   'iterm.tabs.list': tabListTabsOperation,
@@ -1961,6 +1989,7 @@ function bind(runtime: ClientRuntime): iTermClient {
       get: (windowId, index, options) =>
         runtime.invoke(tabGetTabOperation, { windowId, index }, options),
     },
+    currentWindow: (options) => runtime.invoke(appCurrentWindowOperation, {}, options),
     count: (each, options) => runtime.invoke(appCountOperation, { each }, options),
     duplicate: (to, withProperties, options) =>
       runtime.invoke(appDuplicateOperation, { to, withProperties }, options),

@@ -6,6 +6,47 @@
  */
 
 import { DocumentResourceClient } from './resources/document.js'
+import { microsoftWordContract as appContract } from './contract/index.js'
+import {
+  createCodecClient,
+  createRemoteTransport,
+  type RemoteTransport,
+} from '@macts/contracts/client'
+import {
+  MactsError,
+  OperationCancelledError,
+  TransportError,
+  ValidationError,
+  fromWireErrorEnvelope,
+  type AppContract,
+  type CallOptions,
+  type ClientBrand,
+  type ClientRuntime,
+  type OperationId,
+  type WireValue,
+} from '@macts/contracts'
+import type { MicrosoftWordResources } from './contract/index.js'
+
+import {
+  Integer as __mactsInteger,
+  ValueTypes as __mactsValueTypes,
+  ValidationError as __mactsValidationError,
+} from '@macts/contracts'
+
+/** Integer wire policy shared with the operation contracts, built once per module. */
+const __mactsIntegerWire = __mactsValueTypes.integer().wire
+
+/** Validate CLI text or an SDK number before dispatch, without implicit rounding. */
+function __mactsIntegerInput(value: unknown): __mactsInteger {
+  const integer = typeof value === 'number' || typeof value === 'string' ? String(value) : undefined
+  const candidate = { integer }
+  if (!__mactsIntegerWire.safeParse(candidate).success || integer === undefined) {
+    const message =
+      'Expected a canonical decimal integer from -9007199254740991 to 9007199254740991.'
+    throw new __mactsValidationError(message, { issues: [{ path: [], message }] })
+  }
+  return __mactsInteger.validate(Number(integer))
+}
 
 /**
  * Client configuration options.
@@ -17,41 +58,96 @@ export interface MicrosoftWordClientOptions {
   baseUrl?: string
 }
 
-/**
- * HTTP client wrapper for making authenticated requests.
- */
+/** Canonical failures retained privately while raw RPC preserves the legacy error class. */
+const canonicalFailures = new WeakMap<Error, MactsError>()
+
+/** Raw RPC compatibility and canonical typed invocation for this app and credential. */
 export class HttpClient {
-  readonly #baseUrl: string
-  readonly #apiKey: string
+  readonly #transport: RemoteTransport
+  #runtime: ClientRuntime | undefined
 
   constructor(baseUrl: string, apiKey: string) {
-    this.#baseUrl = baseUrl
-    this.#apiKey = apiKey
+    this.#transport = createRemoteTransport(appContract, { url: baseUrl, token: apiKey })
   }
 
   /**
-   * Make an authenticated POST request to an RPC endpoint.
+   * Bind the actual public facade in the shared reference registry. Standalone
+   * resource clients lazily bind an ordinary contract client instead. A copied
+   * contract changes only construction; its descriptors and codecs are shared.
+   * @internal
    */
-  async rpc<T>(path: string, body: object = {}): Promise<T> {
-    const url = `${this.#baseUrl}/api/v1/rpc/${path}`
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${this.#apiKey}`,
-        'Content-Type': 'application/json',
+  bind(client?: object): void {
+    const contract: AppContract<object, MicrosoftWordResources> = {
+      ...appContract,
+      bind: (runtime) => {
+        this.#runtime = runtime
+        return client ?? appContract.bind(runtime)
       },
-      body: JSON.stringify(body),
-    })
-
-    if (!response.ok) {
-      const error = (await response.json()) as { error?: { code?: string; message?: string } }
-      const code = error.error?.code ?? 'UNKNOWN_ERROR'
-      const message = error.error?.message ?? `HTTP ${String(response.status)}`
-      throw new MicrosoftWordError(code, message)
     }
+    createCodecClient(contract, {
+      invoke: async (operation, input, options) => {
+        try {
+          return await this.rpc(operation, input as object, options)
+        } catch (error) {
+          if (error instanceof MactsError) throw error
+          if (error instanceof Error) {
+            const canonical = canonicalFailures.get(error)
+            if (canonical !== undefined) throw canonical
+          }
+          if (options?.signal?.aborted === true)
+            throw new OperationCancelledError('The operation was cancelled.', {})
+          throw new TransportError('The custom RPC transport failed.', { reason: 'unreachable' })
+        }
+      },
+      resolve: this.#transport.resolve,
+    })
+  }
 
-    const result = (await response.json()) as { result: T }
-    return result.result
+  /** Invoke a descriptor with SDK input; generated return types come from that contract and its output codec validates the result. @internal */
+  async invoke<T>(
+    path: string,
+    input: object = {},
+    options?: CallOptions,
+    expectedResource?: string
+  ): Promise<T> {
+    const operation = Object.values(appContract.operations).find(
+      (candidate) => candidate.id === path
+    )
+    if (
+      operation === undefined ||
+      operation.unavailable !== undefined ||
+      (expectedResource !== undefined && operation.target.resource !== expectedResource)
+    ) {
+      throw new ValidationError('The operation is not registered in this app contract.', {
+        issues: [{ path: [], message: 'Unknown or mismatched operation route.' }],
+      })
+    }
+    if (this.#runtime === undefined) this.bind()
+    if (this.#runtime === undefined) throw new Error('Client runtime was not initialized.')
+    return this.#runtime.invoke(operation, input, options) as Promise<T>
+  }
+
+  /** Raw wire RPC for explicit passthrough consumers; typed methods use invoke. */
+  async rpc<T>(path: string, body: object = {}, options?: CallOptions): Promise<T> {
+    // Typed wrappers dispatch through this public hook, including overrides
+    // that forward only two arguments. Shared protocol handling needs no hidden
+    // request metadata; forwarding options preserves cancellation only.
+    const outcome = await this.#transport.requestRpc(
+      path as OperationId,
+      body as WireValue,
+      options
+    )
+    if (outcome.ok) return outcome.result as T
+    const error = outcome.envelope as { error?: { code?: string; message?: string } } | null
+    const legacy = new MicrosoftWordError(
+      error?.error?.code ?? 'UNKNOWN_ERROR',
+      error?.error?.message ?? `HTTP ${String(outcome.status)}`
+    )
+    canonicalFailures.set(
+      legacy,
+      fromWireErrorEnvelope(outcome.envelope, { status: outcome.status })
+    )
+    throw legacy
   }
 }
 
@@ -69,6 +165,14 @@ export class MicrosoftWordError extends Error {
 }
 
 /**
+ * The shared type-only resource brand lets caller-built references target this facade.
+ * It adds no runtime fields; construction registers the actual instance.
+ * @public
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-declaration-merging -- Only the non-runtime brand is merged into the retained class constructor.
+export interface MicrosoftWordClient extends ClientBrand<MicrosoftWordResources> {}
+
+/**
  * MicrosoftWord client for HTTP-based macOS automation.
  *
  * @example
@@ -81,6 +185,7 @@ export class MicrosoftWordError extends Error {
  * const calendars = await client.calendars.list();
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging -- The merged interface contributes only the shared phantom brand, never runtime members.
 export class MicrosoftWordClient {
   readonly #httpClient: HttpClient
 
@@ -91,6 +196,7 @@ export class MicrosoftWordClient {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
     this.documents = new DocumentResourceClient(this.#httpClient, 'microsoft-word', 'documents')
+    this.#httpClient.bind(this)
   }
 
   /**
@@ -103,80 +209,103 @@ export class MicrosoftWordClient {
   /**
    * Undo the last action
    */
-  async undo(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('microsoft-word.app.undo', {})
+  async undo(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('microsoft-word.app.undo', {}, __mactsOptions)
   }
 
   /**
    * Redo the last undone action
    */
-  async redo(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('microsoft-word.app.redo', {})
+  async redo(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('microsoft-word.app.redo', {}, __mactsOptions)
   }
 
   /**
    * Copy the selected content to the clipboard
    */
-  async copyObject(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('microsoft-word.app.copyObject', {})
+  async copyObject(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('microsoft-word.app.copyObject', {}, __mactsOptions)
   }
 
   /**
    * Cut the selected content to the clipboard
    */
-  async cutObject(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('microsoft-word.app.cutObject', {})
+  async cutObject(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('microsoft-word.app.cutObject', {}, __mactsOptions)
   }
 
   /**
    * Paste content from the clipboard
    */
-  async pasteObject(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('microsoft-word.app.pasteObject', {})
+  async pasteObject(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('microsoft-word.app.pasteObject', {}, __mactsOptions)
   }
 
   /**
    * Select all content in the document
    */
-  async selectAll(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('microsoft-word.app.selectAll', {})
+  async selectAll(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('microsoft-word.app.selectAll', {}, __mactsOptions)
   }
 
   /**
    * Find text in the document
    */
-  async find(findText: string, matchCase?: boolean, matchWholeWord?: boolean): Promise<void> {
-    await this.#httpClient.rpc<undefined>('microsoft-word.app.find', {
-      findText,
-      matchCase,
-      matchWholeWord,
-    })
+  async find(
+    findText: string,
+    matchCase?: boolean,
+    matchWholeWord?: boolean,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'microsoft-word.app.find',
+      { findText, matchCase, matchWholeWord },
+      __mactsOptions
+    )
   }
 
   /**
    * Replace text in the document
    */
-  async replace(findText: string, replaceWith: string, replaceAll?: boolean): Promise<void> {
-    await this.#httpClient.rpc<undefined>('microsoft-word.app.replace', {
-      findText,
-      replaceWith,
-      replaceAll,
-    })
+  async replace(
+    findText: string,
+    replaceWith: string,
+    replaceAll?: boolean,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'microsoft-word.app.replace',
+      { findText, replaceWith, replaceAll },
+      __mactsOptions
+    )
   }
 
   /**
    * Insert text at the specified location
    */
-  async insertText(text: string, at?: number): Promise<void> {
-    await this.#httpClient.rpc<undefined>('microsoft-word.app.insertText', { text, at })
+  async insertText(
+    text: string,
+    at?: number,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'microsoft-word.app.insertText',
+      { text, ...(at === undefined ? {} : { at: __mactsIntegerInput(at) }) },
+      __mactsOptions
+    )
   }
 
   /**
    * Create a new document
    */
-  async createNewDocument(attachedTemplate?: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('microsoft-word.app.createNewDocument', {
-      attachedTemplate,
-    })
+  async createNewDocument(
+    attachedTemplate?: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'microsoft-word.app.createNewDocument',
+      { attachedTemplate },
+      __mactsOptions
+    )
   }
 }

@@ -4,7 +4,7 @@
 
 ## SocialProfileCreateInput interface
 
-Input for creating a SocialProfile
+Input for creating a SocialProfile.
 
 **Signature:**
 

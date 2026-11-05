@@ -18,7 +18,8 @@
     "@macts/sdk": "workspace:*",
     "@types/node": "^26.0.0",
     "typescript": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "@macts/system-events": "workspace:*"
   },
   "nx": {
     "targets": {

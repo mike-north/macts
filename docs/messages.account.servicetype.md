@@ -4,10 +4,10 @@
 
 ## Account.serviceType property
 
-The type of service for this account
+The type of service for this account. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-serviceType: string
+readonly serviceType: string | null;
 ```

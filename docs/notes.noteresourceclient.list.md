@@ -4,14 +4,44 @@
 
 ## NoteResourceClient.list() method
 
-List all notes.
+List all notes, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Note[]>;
+list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Note>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Note](./notes.note.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Note](./notes.note.md)<!-- -->&gt;&gt;

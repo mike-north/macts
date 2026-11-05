@@ -4,7 +4,7 @@
 
 ## RuleConditionCreateInput interface
 
-Input for creating a RuleCondition
+Input for creating a RuleCondition.
 
 **Signature:**
 

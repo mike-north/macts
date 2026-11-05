@@ -4,10 +4,10 @@
 
 ## Rule.deleteMessage property
 
-If rule matches, delete message
+If rule matches, delete message. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-deleteMessage: boolean
+deleteMessage: boolean | null
 ```

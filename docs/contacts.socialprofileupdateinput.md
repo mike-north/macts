@@ -2,14 +2,93 @@
 
 [Home](./index.md) &gt; [@macts/contacts](./contacts.md) &gt; [SocialProfileUpdateInput](./contacts.socialprofileupdateinput.md)
 
-## SocialProfileUpdateInput type
+## SocialProfileUpdateInput interface
 
-Input for updating a SocialProfile
+Input for updating a SocialProfile. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SocialProfileUpdateInput = Partial<SocialProfileCreateInput>
+interface SocialProfileUpdateInput
 ```
 
-**References:** [SocialProfileCreateInput](./contacts.socialprofilecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[serviceName?](./contacts.socialprofileupdateinput.servicename.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The service name of this social profile. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[url?](./contacts.socialprofileupdateinput.url.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The URL of this social profile. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[userIdentifier?](./contacts.socialprofileupdateinput.useridentifier.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ A service-specific identifier used with this social profile. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[userName?](./contacts.socialprofileupdateinput.username.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The username used with this social profile. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

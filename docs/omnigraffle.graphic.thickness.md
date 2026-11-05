@@ -4,10 +4,10 @@
 
 ## Graphic.thickness property
 
-Thickness of the stroke
+Thickness of the stroke. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-thickness: number
+thickness: number | null
 ```

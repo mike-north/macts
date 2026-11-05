@@ -4,7 +4,7 @@
 
 ## TextDocument.selectedParagraphRange property
 
-The first and last paragraph positions that contain the selection
+The first and last paragraph positions that contain the selection. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 

@@ -4,17 +4,13 @@
 
 ## MessageViewerSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
 MessageViewerSchema: z.ZodObject<
   {
-    draftsMailbox: z.ZodString
-    inbox: z.ZodString
-    junkMailbox: z.ZodString
-    outbox: z.ZodString
-    sentMailbox: z.ZodString
-    trashMailbox: z.ZodString
     sortColumn: z.ZodString
     sortedAscending: z.ZodBoolean
     mailboxListVisible: z.ZodBoolean

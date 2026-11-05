@@ -4,7 +4,7 @@
 
 ## EventCreateInput.url property
 
-The URL associated with the event
+URL associated with the event
 
 **Signature:**
 

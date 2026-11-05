@@ -4,12 +4,10 @@
 
 ## SplitterUpdateInput type
 
-Input for updating a Splitter
+Input for updating a Splitter. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SplitterUpdateInput = Partial<SplitterCreateInput>
+type SplitterUpdateInput = Record<string, never>
 ```
-
-**References:** [SplitterCreateInput](./system-events.splittercreateinput.md)

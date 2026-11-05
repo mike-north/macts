@@ -4,10 +4,10 @@
 
 ## UIElement.position property
 
-the position of the UI element
+the position of the UI element. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-position: string
+position: string | null
 ```

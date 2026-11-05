@@ -4,12 +4,10 @@
 
 ## SharedTrackUpdateInput type
 
-Input for updating a SharedTrack
+Input for updating a SharedTrack. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SharedTrackUpdateInput = Partial<SharedTrackCreateInput>
+type SharedTrackUpdateInput = Record<string, never>
 ```
-
-**References:** [SharedTrackCreateInput](./tv.sharedtrackcreateinput.md)

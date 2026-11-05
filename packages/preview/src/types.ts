@@ -5,29 +5,18 @@
 
 import { z } from 'zod'
 
-/** A Preview document */
-export interface Document {
-  /** Canonical identifier (mirrors `name`); populated by list, pass to get/delete and to write operations that reference this resource. */
-  id?: string
-  /** The name of the document */
-  name: string
-  /** The file path of the document */
-  path?: string
-  /** Whether the document has been modified since last save */
-  modified: boolean
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Document } from './contract/index.js'
 
-/** Input for creating a Document */
-export interface DocumentCreateInput {
-  /** The name of the document */
-  name?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { DocumentCreateInput } from './contract/index.js'
 
-/** Input for updating a Document */
-export type DocumentUpdateInput = Partial<DocumentCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { DocumentUpdateInput } from './contract/index.js'
 
-// Zod schemas for runtime validation
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const DocumentSchema = z.object({
   id: z.string().optional(),
   name: z.string(),

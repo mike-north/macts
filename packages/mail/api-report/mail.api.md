@@ -4,58 +4,52 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { FileSource } from '@macts/contracts';
+import { FileValue } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
+import { Rgb } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Account {
-    accountDirectory: string;
-    accountType: string;
-    authentication: string;
-    deliveryAccount: string;
-    emailAddresses: string;
-    emptyJunkMessagesFrequency: number;
-    emptyJunkMessagesOnQuit: boolean;
-    emptySentMessagesFrequency: number;
-    emptySentMessagesOnQuit: boolean;
-    emptyTrashFrequency: number;
-    emptyTrashOnQuit: boolean;
-    enabled: boolean;
-    fullName: string;
-    id: string;
-    includeWhenGettingNewMail: boolean;
-    moveDeletedMessagesToTrash: boolean;
-    name: string;
-    password: string;
-    port: number;
-    serverName: string;
-    userName: string;
-    usesSsl: boolean;
+    readonly accountDirectory: FileValue | null;
+    readonly accountType: string | null;
+    authentication: string | null;
+    deliveryAccount: string | null;
+    emailAddresses: string | null;
+    emptyJunkMessagesFrequency: Integer | null;
+    emptyJunkMessagesOnQuit: boolean | null;
+    emptySentMessagesFrequency: Integer | null;
+    emptySentMessagesOnQuit: boolean | null;
+    emptyTrashFrequency: Integer | null;
+    emptyTrashOnQuit: boolean | null;
+    enabled: boolean | null;
+    fullName: string | null;
+    readonly id: string;
+    includeWhenGettingNewMail: boolean | null;
+    moveDeletedMessagesToTrash: boolean | null;
+    name: string | null;
+    password: string | null;
+    port: Integer | null;
+    serverName: string | null;
+    userName: string | null;
+    usesSsl: boolean | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "AccountCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type AccountCreateInput = Omit<AccountCreateInput_2, 'emptyJunkMessagesFrequency' | 'emptySentMessagesFrequency' | 'emptyTrashFrequency' | 'port'> & {
+    emptyJunkMessagesFrequency?: null extends AccountCreateInput_2['emptyJunkMessagesFrequency'] ? number | null : number;
+    emptySentMessagesFrequency?: null extends AccountCreateInput_2['emptySentMessagesFrequency'] ? number | null : number;
+    emptyTrashFrequency?: null extends AccountCreateInput_2['emptyTrashFrequency'] ? number | null : number;
+    port?: null extends AccountCreateInput_2['port'] ? number | null : number;
+};
 
 // @public
-export interface AccountCreateInput {
-    authentication?: string;
-    deliveryAccount?: string;
-    emailAddresses?: string;
-    emptyJunkMessagesFrequency?: number;
-    emptyJunkMessagesOnQuit?: boolean;
-    emptySentMessagesFrequency?: number;
-    emptySentMessagesOnQuit?: boolean;
-    emptyTrashFrequency?: number;
-    emptyTrashOnQuit?: boolean;
-    enabled?: boolean;
-    fullName?: string;
-    includeWhenGettingNewMail?: boolean;
-    moveDeletedMessagesToTrash?: boolean;
-    name?: string;
-    password?: string;
-    port?: number;
-    serverName?: string;
-    userName?: string;
-    usesSsl?: boolean;
-}
-
-// @public (undocumented)
 export const AccountSchema: z.ZodObject<{
     deliveryAccount: z.ZodString;
     name: z.ZodString;
@@ -81,50 +75,51 @@ export const AccountSchema: z.ZodObject<{
     usesSsl: z.ZodBoolean;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "AccountUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AccountUpdateInput = Partial<AccountCreateInput>;
+export type AccountUpdateInput = Omit<AccountUpdateInput_2, 'emptyJunkMessagesFrequency' | 'emptySentMessagesFrequency' | 'emptyTrashFrequency' | 'port'> & {
+    emptyJunkMessagesFrequency?: null extends AccountUpdateInput_2['emptyJunkMessagesFrequency'] ? number | null : number;
+    emptySentMessagesFrequency?: null extends AccountUpdateInput_2['emptySentMessagesFrequency'] ? number | null : number;
+    emptyTrashFrequency?: null extends AccountUpdateInput_2['emptyTrashFrequency'] ? number | null : number;
+    port?: null extends AccountUpdateInput_2['port'] ? number | null : number;
+};
 
 // @public
 export interface Attachment {
-    fileName: string;
+    fileName: FileValue | null;
 }
 
 // @public
 export interface AttachmentCreateInput {
-    fileName?: string;
+    fileName?: FileSource;
 }
 
-// @public (undocumented)
+// @public
 export const AttachmentSchema: z.ZodObject<{
     fileName: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type AttachmentUpdateInput = Partial<AttachmentCreateInput>;
+export interface AttachmentUpdateInput {
+    fileName?: FileSource;
+}
 
 // @public
 export interface AttributeRun {
-    color: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    font: string;
-    size: number;
+    color: Rgb | null;
+    font: string | null;
+    size: number | null;
 }
 
 // @public
 export interface AttributeRunCreateInput {
-    color?: {
-        r: number;
-        g: number;
-        b: number;
-    };
+    color?: Rgb;
     font?: string;
     size?: number;
 }
 
-// @public (undocumented)
+// @public
 export const AttributeRunSchema: z.ZodObject<{
     color: z.ZodObject<{
         red: z.ZodNumber;
@@ -136,26 +131,30 @@ export const AttributeRunSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type AttributeRunUpdateInput = Partial<AttributeRunCreateInput>;
+export interface AttributeRunUpdateInput {
+    color?: Rgb;
+    font?: string;
+    size?: number;
+}
 
 // @public
 export type Authentication = 'password' | 'apop' | 'kerberos5' | 'ntlm' | 'md5' | 'external' | 'appleToken' | 'none';
 
 // @public
 export interface BccRecipient {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type BccRecipientCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const BccRecipientSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type BccRecipientUpdateInput = Partial<BccRecipientCreateInput>;
+export type BccRecipientUpdateInput = Record<string, never>;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -178,43 +177,35 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface CcRecipient {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type CcRecipientCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const CcRecipientSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type CcRecipientUpdateInput = Partial<CcRecipientCreateInput>;
+export type CcRecipientUpdateInput = Record<string, never>;
 
 // @public
 export interface Character {
-    color: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    font: string;
-    size: number;
+    color: Rgb | null;
+    font: string | null;
+    size: number | null;
 }
 
 // @public
 export interface CharacterCreateInput {
-    color?: {
-        r: number;
-        g: number;
-        b: number;
-    };
+    color?: Rgb;
     font?: string;
     size?: number;
 }
 
-// @public (undocumented)
+// @public
 export const CharacterSchema: z.ZodObject<{
     color: z.ZodObject<{
         red: z.ZodNumber;
@@ -226,15 +217,19 @@ export const CharacterSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type CharacterUpdateInput = Partial<CharacterCreateInput>;
+export interface CharacterUpdateInput {
+    color?: Rgb;
+    font?: string;
+    size?: number;
+}
 
 // @public
 export type DefaultMessageFormat = 'plainFormat' | 'richFormat';
 
 // @public
 export interface Header {
-    content: string;
-    name: string;
+    content: string | null;
+    name: string | null;
 }
 
 // @public
@@ -246,14 +241,17 @@ export interface HeaderCreateInput {
 // @public
 export type HeaderDetail = 'all' | 'custom' | 'default' | 'noHeaders';
 
-// @public (undocumented)
+// @public
 export const HeaderSchema: z.ZodObject<{
     content: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type HeaderUpdateInput = Partial<HeaderCreateInput>;
+export interface HeaderUpdateInput {
+    content?: string;
+    name?: string;
+}
 
 // @public
 export type HighlightColors = 'blue' | 'gray' | 'green' | 'none' | 'orange' | 'other' | 'purple' | 'red' | 'yellow';
@@ -261,7 +259,11 @@ export type HighlightColors = 'blue' | 'gray' | 'green' | 'none' | 'orange' | 'o
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
@@ -269,17 +271,17 @@ export type LdapScope = 'base' | 'oneLevel' | 'subtree';
 
 // @public
 export interface MailAttachment {
-    downloaded: boolean;
-    fileSize: number;
-    id: string;
-    mIMEType: string;
-    name: string;
+    readonly downloaded: boolean | null;
+    readonly fileSize: Integer | null;
+    readonly id: string;
+    readonly mIMEType: string | null;
+    readonly name: string | null;
 }
 
 // @public
 export type MailAttachmentCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const MailAttachmentSchema: z.ZodObject<{
     name: z.ZodString;
     mIMEType: z.ZodString;
@@ -289,12 +291,12 @@ export const MailAttachmentSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type MailAttachmentUpdateInput = Partial<MailAttachmentCreateInput>;
+export type MailAttachmentUpdateInput = Record<string, never>;
 
 // @public
 export interface Mailbox {
-    name: string;
-    unreadCount: number;
+    name: string | null;
+    readonly unreadCount: Integer | null;
 }
 
 // @public
@@ -302,30 +304,37 @@ export interface MailboxCreateInput {
     name?: string;
 }
 
-// @public (undocumented)
+// @public
 export const MailboxSchema: z.ZodObject<{
     name: z.ZodString;
     unreadCount: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type MailboxUpdateInput = Partial<MailboxCreateInput>;
+export interface MailboxUpdateInput {
+    name?: string;
+}
+
+// @public
+export interface MailClient extends ClientBrand<MailResources> {
+}
 
 // @public
 export class MailClient {
     constructor(options: MailClientOptions);
-    checkForNewMail(): Promise<void>;
-    duplicate(to?: string, withProperties?: unknown): Promise<void>;
-    extractAddressFrom(): Promise<void>;
-    extractNameFrom(): Promise<void>;
-    getURL(): Promise<void>;
+    checkForNewMail(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    duplicate(to?: string, withProperties?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    extractAddressFrom(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    extractNameFrom(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    getURL(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
-    importMailMailbox(at: string): Promise<void>;
-    mailto(): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "MailClient_2" needs to be exported by the entry point index.d.ts
+    importMailMailbox(at: Parameters<MailClient_2['importMailMailbox']>[0], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    mailto(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly messages: MessageResourceClient;
-    move(to: string): Promise<void>;
+    move(to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly outgoingMessages: OutgoingMessageResourceClient;
-    performMailActionWithMessages(): Promise<void>;
+    performMailActionWithMessages(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -342,51 +351,51 @@ export class MailError extends Error {
 }
 
 // @public
+export type MailResources = Readonly<Record<never, never>>;
+
+// @public
 export interface Message {
-    allHeaders: string;
-    backgroundColor: string;
-    dateReceived: Date;
-    dateSent: Date;
-    deletedStatus: boolean;
-    flaggedStatus: boolean;
-    flagIndex: number;
-    id: number;
-    junkMailStatus: boolean;
-    messageId: string;
-    messageSize: number;
-    readStatus: boolean;
-    replyTo: string;
-    sender: string;
-    source: string;
-    subject: string;
-    wasForwarded: boolean;
-    wasRedirected: boolean;
-    wasRepliedTo: boolean;
+    readonly allHeaders: string | null;
+    backgroundColor: string | null;
+    readonly dateReceived: Date | null;
+    readonly dateSent: Date | null;
+    deletedStatus: boolean | null;
+    flaggedStatus: boolean | null;
+    flagIndex: Integer | null;
+    readonly id: Integer;
+    junkMailStatus: boolean | null;
+    readonly messageId: string | null;
+    readonly messageSize: Integer | null;
+    readStatus: boolean | null;
+    readonly replyTo: string | null;
+    readonly sender: string | null;
+    readonly source: string | null;
+    readonly subject: string | null;
+    readonly wasForwarded: boolean | null;
+    readonly wasRedirected: boolean | null;
+    readonly wasRepliedTo: boolean | null;
 }
 
 // @public
 export type MessageCachingPolicy = 'doNotKeepCopiesOfAnyMessages' | 'onlyMessagesIHaveRead' | 'allMessagesButOmitAttachments' | 'allMessagesAndTheirAttachments';
 
+// Warning: (ae-forgotten-export) The symbol "MessageCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface MessageCreateInput {
-    backgroundColor?: string;
-    deletedStatus?: boolean;
-    flaggedStatus?: boolean;
-    flagIndex?: number;
-    junkMailStatus?: boolean;
-    readStatus?: boolean;
-}
+export type MessageCreateInput = Omit<MessageCreateInput_2, 'flagIndex'> & {
+    flagIndex?: null extends MessageCreateInput_2['flagIndex'] ? number | null : number;
+};
 
 // @public
 export class MessageResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    bounce(): Promise<void>;
-    forward(openingWindow?: boolean): Promise<void>;
-    redirect(openingWindow?: boolean): Promise<void>;
-    reply(openingWindow?: boolean, replyToAll?: boolean): Promise<void>;
+    bounce(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    forward(openingWindow?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    redirect(openingWindow?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    reply(openingWindow?: boolean, replyToAll?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const MessageSchema: z.ZodObject<{
     id: z.ZodNumber;
     allHeaders: z.ZodString;
@@ -409,20 +418,24 @@ export const MessageSchema: z.ZodObject<{
     wasRepliedTo: z.ZodBoolean;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "MessageUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type MessageUpdateInput = Partial<MessageCreateInput>;
+export type MessageUpdateInput = Omit<MessageUpdateInput_2, 'flagIndex'> & {
+    flagIndex?: null extends MessageUpdateInput_2['flagIndex'] ? number | null : number;
+};
 
 // @public
 export interface MessageViewer {
-    id: number;
-    mailboxListVisible: boolean;
-    previewPaneIsVisible: boolean;
-    selectedMailboxes: string;
-    selectedMessages: string;
-    sortColumn: string;
-    sortedAscending: boolean;
-    visibleColumns: string;
-    visibleMessages: string;
+    readonly id: Integer;
+    mailboxListVisible: boolean | null;
+    previewPaneIsVisible: boolean | null;
+    selectedMailboxes: string | null;
+    selectedMessages: string | null;
+    sortColumn: string | null;
+    sortedAscending: boolean | null;
+    visibleColumns: string | null;
+    visibleMessages: string | null;
 }
 
 // @public
@@ -437,7 +450,7 @@ export interface MessageViewerCreateInput {
     visibleMessages?: string;
 }
 
-// @public (undocumented)
+// @public
 export const MessageViewerSchema: z.ZodObject<{
     sortColumn: z.ZodString;
     sortedAscending: z.ZodBoolean;
@@ -451,17 +464,26 @@ export const MessageViewerSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type MessageViewerUpdateInput = Partial<MessageViewerCreateInput>;
+export interface MessageViewerUpdateInput {
+    mailboxListVisible?: boolean;
+    previewPaneIsVisible?: boolean;
+    selectedMailboxes?: string;
+    selectedMessages?: string;
+    sortColumn?: string;
+    sortedAscending?: boolean;
+    visibleColumns?: string;
+    visibleMessages?: string;
+}
 
 // @public
 export interface OutgoingMessage {
-    htmlContent: string;
-    id: number;
-    messageSignature: string;
-    sender: string;
-    subject: string;
-    vcardPath: string;
-    visible: boolean;
+    htmlContent: string | null;
+    readonly id: Integer;
+    messageSignature: string | null;
+    sender: string | null;
+    subject: string | null;
+    vcardPath: FileValue | null;
+    visible: boolean | null;
 }
 
 // @public
@@ -470,17 +492,17 @@ export interface OutgoingMessageCreateInput {
     messageSignature?: string;
     sender?: string;
     subject?: string;
-    vcardPath?: string;
+    vcardPath?: FileSource;
     visible?: boolean;
 }
 
 // @public
 export class OutgoingMessageResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    send(): Promise<void>;
+    send(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const OutgoingMessageSchema: z.ZodObject<{
     sender: z.ZodString;
     subject: z.ZodString;
@@ -492,31 +514,30 @@ export const OutgoingMessageSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type OutgoingMessageUpdateInput = Partial<OutgoingMessageCreateInput>;
+export interface OutgoingMessageUpdateInput {
+    htmlContent?: string;
+    messageSignature?: string;
+    sender?: string;
+    subject?: string;
+    vcardPath?: FileSource;
+    visible?: boolean;
+}
 
 // @public
 export interface Paragraph {
-    color: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    font: string;
-    size: number;
+    color: Rgb | null;
+    font: string | null;
+    size: number | null;
 }
 
 // @public
 export interface ParagraphCreateInput {
-    color?: {
-        r: number;
-        g: number;
-        b: number;
-    };
+    color?: Rgb;
     font?: string;
     size?: number;
 }
 
-// @public (undocumented)
+// @public
 export const ParagraphSchema: z.ZodObject<{
     color: z.ZodObject<{
         red: z.ZodNumber;
@@ -528,15 +549,19 @@ export const ParagraphSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ParagraphUpdateInput = Partial<ParagraphCreateInput>;
+export interface ParagraphUpdateInput {
+    color?: Rgb;
+    font?: string;
+    size?: number;
+}
 
 // @public
 export type QuotingColor = 'blue' | 'green' | 'orange' | 'other' | 'purple' | 'red' | 'yellow';
 
 // @public
 export interface Recipient {
-    address: string;
-    name: string;
+    address: string | null;
+    name: string | null;
 }
 
 // @public
@@ -545,38 +570,33 @@ export interface RecipientCreateInput {
     name?: string;
 }
 
-// @public (undocumented)
+// @public
 export const RecipientSchema: z.ZodObject<{
     address: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type RecipientUpdateInput = Partial<RecipientCreateInput>;
+export interface RecipientUpdateInput {
+    address?: string;
+    name?: string;
+}
 
 // @public
 export interface RichText {
-    color: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    font: string;
-    size: number;
+    color: Rgb | null;
+    font: string | null;
+    size: number | null;
 }
 
 // @public
 export interface RichTextCreateInput {
-    color?: {
-        r: number;
-        g: number;
-        b: number;
-    };
+    color?: Rgb;
     font?: string;
     size?: number;
 }
 
-// @public (undocumented)
+// @public
 export const RichTextSchema: z.ZodObject<{
     color: z.ZodObject<{
         red: z.ZodNumber;
@@ -588,36 +608,40 @@ export const RichTextSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type RichTextUpdateInput = Partial<RichTextCreateInput>;
+export interface RichTextUpdateInput {
+    color?: Rgb;
+    font?: string;
+    size?: number;
+}
 
 // @public
 export interface Rule {
-    allConditionsMustBeMet: boolean;
-    colorMessage: string;
-    deleteMessage: boolean;
-    enabled: boolean;
-    forwardMessage: string;
-    forwardText: string;
-    highlightTextUsingColor: boolean;
-    markFlagged: boolean;
-    markFlagIndex: number;
-    markRead: boolean;
-    name: string;
-    playSound: string;
-    redirectMessage: string;
-    replyText: string;
-    runScript: string;
-    shouldCopyMessage: boolean;
-    shouldMoveMessage: boolean;
-    stopEvaluatingRules: boolean;
+    allConditionsMustBeMet: boolean | null;
+    colorMessage: string | null;
+    deleteMessage: boolean | null;
+    enabled: boolean | null;
+    forwardMessage: string | null;
+    forwardText: string | null;
+    highlightTextUsingColor: boolean | null;
+    markFlagged: boolean | null;
+    markFlagIndex: Integer | null;
+    markRead: boolean | null;
+    name: string | null;
+    playSound: string | null;
+    redirectMessage: string | null;
+    replyText: string | null;
+    runScript: string | null;
+    shouldCopyMessage: boolean | null;
+    shouldMoveMessage: boolean | null;
+    stopEvaluatingRules: boolean | null;
 }
 
 // @public
 export interface RuleCondition {
-    expression: string;
-    header: string;
-    qualifier: string;
-    ruleType: string;
+    expression: string | null;
+    header: string | null;
+    qualifier: string | null;
+    ruleType: string | null;
 }
 
 // @public
@@ -628,7 +652,7 @@ export interface RuleConditionCreateInput {
     ruleType?: string;
 }
 
-// @public (undocumented)
+// @public
 export const RuleConditionSchema: z.ZodObject<{
     expression: z.ZodString;
     header: z.ZodString;
@@ -637,34 +661,24 @@ export const RuleConditionSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type RuleConditionUpdateInput = Partial<RuleConditionCreateInput>;
-
-// @public
-export interface RuleCreateInput {
-    allConditionsMustBeMet?: boolean;
-    colorMessage?: string;
-    deleteMessage?: boolean;
-    enabled?: boolean;
-    forwardMessage?: string;
-    forwardText?: string;
-    highlightTextUsingColor?: boolean;
-    markFlagged?: boolean;
-    markFlagIndex?: number;
-    markRead?: boolean;
-    name?: string;
-    playSound?: string;
-    redirectMessage?: string;
-    replyText?: string;
-    runScript?: string;
-    shouldCopyMessage?: boolean;
-    shouldMoveMessage?: boolean;
-    stopEvaluatingRules?: boolean;
+export interface RuleConditionUpdateInput {
+    expression?: string;
+    header?: string;
+    qualifier?: string;
+    ruleType?: string;
 }
+
+// Warning: (ae-forgotten-export) The symbol "RuleCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type RuleCreateInput = Omit<RuleCreateInput_2, 'markFlagIndex'> & {
+    markFlagIndex?: null extends RuleCreateInput_2['markFlagIndex'] ? number | null : number;
+};
 
 // @public
 export type RuleQualifier = 'beginsWithValue' | 'doesContainValue' | 'doesNotContainValue' | 'endsWithValue' | 'equalToValue' | 'lessThanValue' | 'greaterThanValue' | 'none';
 
-// @public (undocumented)
+// @public
 export const RuleSchema: z.ZodObject<{
     colorMessage: z.ZodString;
     deleteMessage: z.ZodBoolean;
@@ -689,27 +703,31 @@ export const RuleSchema: z.ZodObject<{
 // @public
 export type RuleType = 'account' | 'anyRecipient' | 'ccHeader' | 'matchesEveryMessage' | 'fromHeader' | 'headerKey' | 'messageContent' | 'messageIsJunkMail' | 'senderIsInMyContacts' | 'senderIsInMyPreviousRecipients' | 'senderIsMemberOfGroup' | 'senderIsNotInMyContacts' | 'senderIsNotInMyPreviousRecipients' | 'senderIsNotMemberOfGroup' | 'senderIsVIP' | 'subjectHeader' | 'toHeader' | 'toOrCcHeader' | 'attachmentType';
 
+// Warning: (ae-forgotten-export) The symbol "RuleUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type RuleUpdateInput = Partial<RuleCreateInput>;
+export type RuleUpdateInput = Omit<RuleUpdateInput_2, 'markFlagIndex'> & {
+    markFlagIndex?: null extends RuleUpdateInput_2['markFlagIndex'] ? number | null : number;
+};
 
 // @public
 export type SaveableFileFormat = 'nativeFormat';
 
 // @public
 export interface ToRecipient {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type ToRecipientCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ToRecipientSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ToRecipientUpdateInput = Partial<ToRecipientCreateInput>;
+export type ToRecipientUpdateInput = Record<string, never>;
 
 // @public
 export type TypeOfAccount = 'pop' | 'smtp' | 'imap' | 'iCloud' | 'unknown';
@@ -719,27 +737,19 @@ export type ViewerColumns = 'attachmentsColumn' | 'messageColor' | 'dateReceived
 
 // @public
 export interface Word {
-    color: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    font: string;
-    size: number;
+    color: Rgb | null;
+    font: string | null;
+    size: number | null;
 }
 
 // @public
 export interface WordCreateInput {
-    color?: {
-        r: number;
-        g: number;
-        b: number;
-    };
+    color?: Rgb;
     font?: string;
     size?: number;
 }
 
-// @public (undocumented)
+// @public
 export const WordSchema: z.ZodObject<{
     color: z.ZodObject<{
         red: z.ZodNumber;
@@ -751,7 +761,11 @@ export const WordSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type WordUpdateInput = Partial<WordCreateInput>;
+export interface WordUpdateInput {
+    color?: Rgb;
+    font?: string;
+    size?: number;
+}
 
 // (No @packageDocumentation comment for this package)
 

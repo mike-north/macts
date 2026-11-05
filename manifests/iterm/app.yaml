@@ -576,6 +576,19 @@ hierarchy:
               access: r
               description: A terminal session
 commands:
+  # The dictionary's application property "current window" (Crwn) is read
+  # through its parameterless getter. The ordinary operation result is a
+  # Window identity reference, so selecting another window later does not
+  # change the object a previously returned reference denotes.
+  currentWindow:
+    name: currentWindow
+    routeName: currentWindow
+    description: Get a reference to the currently selected window.
+    scope: application
+    parameters: []
+    returns: Window
+    permission: iterm:app:currentWindow
+    risk: read
   listWindows:
     name: list
     routeName: list

@@ -4,10 +4,10 @@
 
 ## Document.language property
 
-The scripting language (AppleScript or JavaScript)
+The scripting language (AppleScript or JavaScript). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-language: string
+language: string | null
 ```

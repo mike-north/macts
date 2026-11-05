@@ -4,10 +4,10 @@
 
 ## Project.completed property
 
-True if the project is completed
+True if the project is completed. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-completed: boolean
+readonly completed: boolean | null;
 ```

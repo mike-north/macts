@@ -4,12 +4,10 @@
 
 ## GroupUpdateInput type
 
-Input for updating a Group
+Input for updating a Group. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type GroupUpdateInput = Partial<GroupCreateInput>
+type GroupUpdateInput = Record<string, never>
 ```
-
-**References:** [GroupCreateInput](./system-events.groupcreateinput.md)

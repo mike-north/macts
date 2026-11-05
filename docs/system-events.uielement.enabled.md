@@ -4,10 +4,10 @@
 
 ## UIElement.enabled property
 
-Is the UI element enabled? ( Does it accept clicks? )
+Is the UI element enabled? ( Does it accept clicks? ). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-enabled: string
+readonly enabled: string | null;
 ```

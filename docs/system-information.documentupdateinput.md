@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/system-information](./system-information.md) &gt; [DocumentUpdateInput](./system-information.documentupdateinput.md)
 
-## DocumentUpdateInput type
+## DocumentUpdateInput interface
 
-Input for updating a Document
+Input for updating a Document. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type DocumentUpdateInput = Partial<DocumentCreateInput>
+interface DocumentUpdateInput
 ```
 
-**References:** [DocumentCreateInput](./system-information.documentcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[detailLevel?](./system-information.documentupdateinput.detaillevel.md)
+
+</td><td>
+
+</td><td>
+
+[DetailLevel](./system-information.detaillevel.md)
+
+</td><td>
+
+_(Optional)_ The desired level of detail for the system profile document. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

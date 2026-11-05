@@ -37,6 +37,7 @@
 import { describe, it, expect } from 'vitest'
 import type { AppManifest, Command, Resource } from '../../manifest/index.js'
 import { RANGE_READ_SUPPORTED } from '../../manifest/test-support/unique-claim.js'
+import { positionalOperationSource } from './test-support/operation-source.js'
 import { generateHttpClientSdk } from './http-client.js'
 
 // ---------------------------------------------------------------------------
@@ -51,7 +52,7 @@ function findFile(
   if (!file) {
     throw new Error(`Expected file at path "${path}" to exist`)
   }
-  return file
+  return { ...file, content: positionalOperationSource(file.content) }
 }
 
 /**
@@ -484,7 +485,7 @@ describe('cross-surface body-coherence: SDK vs. server required params', () => {
   describe('create-within-parent non-calendar (Reminders: createReminder requires listId)', () => {
     const result = generateHttpClientSdk(remindersManifest, { packageName: '@macts/sdk-reminders' })
     const reminderClient = findFile(result.files, 'src/resources/reminder.ts').content
-    const reminderTypes = findFile(result.files, 'src/types.ts').content
+    const reminderTypes = findFile(result.files, 'src/contract/index.ts').content
 
     it('ReminderCreateInput includes the required parent param listId', () => {
       // The server's create branch requires listId to scope the make() call;
@@ -492,7 +493,7 @@ describe('cross-surface body-coherence: SDK vs. server required params', () => {
       // union of writable properties and command params, so listId (required in
       // the command) must be present as a required field.
       expect(reminderTypes).toMatch(
-        /export interface ReminderCreateInput \{[\s\S]*listId:\s*string;/
+        /export interface ReminderCreateInput \{[\s\S]*listId:\s*string/
       )
     })
 
@@ -517,7 +518,7 @@ describe('cross-surface body-coherence: SDK vs. server required params', () => {
       expect(parentParam?.name).toBe('listId')
       // The SDK's input type must include this field (already asserted above,
       // this assertion documents the contract explicitly).
-      expect(reminderTypes).toContain('listId: string;')
+      expect(reminderTypes).toContain('listId: string')
     })
   })
 

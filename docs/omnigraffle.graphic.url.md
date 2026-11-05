@@ -4,10 +4,10 @@
 
 ## Graphic.url property
 
-Web link for this graphic
+Web link for this graphic. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-url: string
+url: string | null
 ```

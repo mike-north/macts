@@ -4,10 +4,10 @@
 
 ## SourceDocument.notifiesWhenClosing property
 
-Should Xcode notify other apps when this document is closed?
+Should Xcode notify other apps when this document is closed? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-notifiesWhenClosing: boolean
+notifiesWhenClosing: boolean | null
 ```

@@ -4,12 +4,10 @@
 
 ## ViolationUpdateInput type
 
-Input for updating a Violation
+Input for updating a Violation. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ViolationUpdateInput = Partial<ViolationCreateInput>
+type ViolationUpdateInput = Record<string, never>
 ```
-
-**References:** [ViolationCreateInput](./omniplan.violationcreateinput.md)

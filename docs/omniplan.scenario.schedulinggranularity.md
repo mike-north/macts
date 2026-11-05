@@ -4,10 +4,10 @@
 
 ## Scenario.schedulingGranularity property
 
-Scheduling granularity for this scenario
+Scheduling granularity for this scenario. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-schedulingGranularity: SchedulingGranularity
+schedulingGranularity: SchedulingGranularity | null
 ```

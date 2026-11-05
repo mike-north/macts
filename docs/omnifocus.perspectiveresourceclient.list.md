@@ -4,14 +4,44 @@
 
 ## PerspectiveResourceClient.list() method
 
-List all perspectives.
+List all perspectives, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Perspective[]>;
+list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Perspective>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Perspective](./omnifocus.perspective.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Perspective](./omnifocus.perspective.md)<!-- -->&gt;&gt;

@@ -4,10 +4,10 @@
 
 ## Track.downloaderName property
 
-the name of the person who downloaded this track
+the name of the person who downloaded this track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-downloaderName: string
+readonly downloaderName: string | null;
 ```

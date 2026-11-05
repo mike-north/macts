@@ -27,7 +27,10 @@ import {
   type Resource,
 } from '../../manifest/index.js'
 import { loadManifest } from '../../manifest/loader.js'
-import type { ProbeNullabilityEvidence } from '../../manifest/schemas/evidence.js'
+import type {
+  CuratedNullabilityEvidence,
+  ProbeNullabilityEvidence,
+} from '../../manifest/schemas/evidence.js'
 import {
   CONTRACT_MANIFEST_MODULE_PATH,
   CONTRACT_MODULE_PATH,
@@ -1373,6 +1376,28 @@ describe('generateContract: nullability notes for reported absences', () => {
     } satisfies ProbeNullabilityEvidence
     expect(readNullabilityNote({ nullable: true, basis: evidence }, 'Archive')).toBe(
       'Nullable. Observed missing in 1 of 3 items, and the app reported no value in 2 of 5 reads (Archive 1.0, macOS 27.2, 2026-11-01).'
+    )
+  })
+
+  // A single instance's absence curated as depending on the data: the
+  // reason, without its closing stop, then the failed reads (phases/13 D10,
+  // "One instance cannot show structure").
+  it('gives the curated reason, then the reads, for a single instance curated as absent', () => {
+    const evidence = {
+      source: 'curated',
+      note: 'The front desk has a bell only once one is fitted.',
+      absentReads: {
+        observedAt: '2026-11-01T12:00:00.000Z',
+        bundleId: 'com.example.archive',
+        appVersion: '1.0',
+        osVersion: '27.2',
+        failedReads: 1,
+        errorNumbers: [-1728],
+        reason: 'A desk has a bell only once one is fitted.',
+      },
+    } satisfies CuratedNullabilityEvidence
+    expect(readNullabilityNote({ nullable: true, basis: evidence }, 'Archive')).toBe(
+      'Nullable: A desk has a bell only once one is fitted. The app reported no value in 1 of 1 reads (Archive 1.0, macOS 27.2, 2026-11-01).'
     )
   })
 })

@@ -2,14 +2,93 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [RuleConditionUpdateInput](./mail.ruleconditionupdateinput.md)
 
-## RuleConditionUpdateInput type
+## RuleConditionUpdateInput interface
 
-Input for updating a RuleCondition
+Input for updating a RuleCondition. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type RuleConditionUpdateInput = Partial<RuleConditionCreateInput>
+interface RuleConditionUpdateInput
 ```
 
-**References:** [RuleConditionCreateInput](./mail.ruleconditioncreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[expression?](./mail.ruleconditionupdateinput.expression.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Rule expression field. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[header?](./mail.ruleconditionupdateinput.header.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Rule header key. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[qualifier?](./mail.ruleconditionupdateinput.qualifier.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Rule qualifier. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[ruleType?](./mail.ruleconditionupdateinput.ruletype.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Rule type. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

@@ -4,10 +4,10 @@
 
 ## Attachment.creationDate property
 
-The creation date of the attachment
+The creation date of the attachment. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-creationDate: string
+readonly creationDate: Date | null;
 ```

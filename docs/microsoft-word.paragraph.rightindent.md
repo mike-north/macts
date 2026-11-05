@@ -4,10 +4,10 @@
 
 ## Paragraph.rightIndent property
 
-The right indent in points
+The right indent in points. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-rightIndent: number
+rightIndent: number | null
 ```

@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 unknown
 
 </td><td>
 
-the column view options for the container window
+the column view options for the container window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ the column view options for the container window
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the current view for the container window
+the current view for the container window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,20 +69,7 @@ the current view for the container window
 
 </td><td>
 
-</td><td>
-
-unknown
-
-</td><td>
-
-the icon view options for the container window
-
-</td></tr>
-<tr><td>
-
-[listViewOptions](./finder.finderwindow.listviewoptions.md)
-
-</td><td>
+`readonly`
 
 </td><td>
 
@@ -88,7 +77,7 @@ unknown
 
 </td><td>
 
-the list view options for the container window
+the icon view options for the container window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +88,11 @@ the list view options for the container window
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Is the window's path bar visible?
+Is the window's path bar visible? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +103,11 @@ Is the window's path bar visible?
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the width of the sidebar for the container window
+the width of the sidebar for the container window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +118,11 @@ the width of the sidebar for the container window
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Is the window's status bar visible?
+Is the window's status bar visible? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +133,11 @@ Is the window's status bar visible?
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the container at which this file viewer is targeted
+the container at which this file viewer is targeted. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +148,11 @@ the container at which this file viewer is targeted
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Is the window's toolbar visible?
+Is the window's toolbar visible? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

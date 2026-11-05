@@ -6,9 +6,7 @@
 
 Configure OpenTelemetry tracing.
 
-This is a placeholder for future integration with `@opentelemetry/sdk-node`<!-- -->. When the SDK packages are available, this function will initialize the trace provider and configure the OTLP exporter.
-
-Currently a no-op that logs a message indicating telemetry is not configured.
+This is currently a no-op stub. Tracing is not yet implemented: calling this function has no effect, does not install or require any `@opentelemetry/*` package, and does not change what [getTracer()](./api.gettracer.md) returns. It exists only to reserve the public API shape for a future tracing implementation.
 
 **Signature:**
 
@@ -41,7 +39,7 @@ Description
 
 </td><td>
 
-_(Optional)_ Telemetry configuration
+_(Optional)_ Telemetry configuration (currently unused)
 
 </td></tr>
 </tbody></table>
@@ -49,15 +47,3 @@ _(Optional)_ Telemetry configuration
 **Returns:**
 
 void
-
-## Example
-
-```typescript
-import { configureTelemetry } from '@macts/api/telemetry'
-
-// When @opentelemetry/sdk-node is installed:
-await configureTelemetry({
-  serviceName: 'macts-api',
-  endpoint: 'http://localhost:4318',
-})
-```

@@ -4,10 +4,10 @@
 
 ## Column.name property
 
-the column name
+the column name. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

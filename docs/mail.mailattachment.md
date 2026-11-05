@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Indicates whether the attachment has been downloaded.
+boolean \| null
+
+</td><td>
+
+Indicates whether the attachment has been downloaded. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ Indicates whether the attachment has been downloaded.
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Approximate size in bytes.
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+Approximate size in bytes. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ Approximate size in bytes.
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the attachment.
+The unique identifier of the attachment. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ The unique identifier of the attachment.
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-MIME type of the attachment E.g. text/plain.
+string \| null
+
+</td><td>
+
+MIME type of the attachment E.g. text/plain. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +105,15 @@ MIME type of the attachment E.g. text/plain.
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-Name of the attachment
+string \| null
+
+</td><td>
+
+Name of the attachment. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

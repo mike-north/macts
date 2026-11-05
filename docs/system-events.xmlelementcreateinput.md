@@ -4,7 +4,7 @@
 
 ## XMLElementCreateInput interface
 
-Input for creating a XMLElement
+Input for creating a XMLElement.
 
 **Signature:**
 

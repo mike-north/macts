@@ -4,10 +4,10 @@
 
 ## Location.id property
 
-the unique identifier for the location
+the unique identifier for the location. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

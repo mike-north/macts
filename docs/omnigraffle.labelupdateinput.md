@@ -2,14 +2,93 @@
 
 [Home](./index.md) &gt; [@macts/omnigraffle](./omnigraffle.md) &gt; [LabelUpdateInput](./omnigraffle.labelupdateinput.md)
 
-## LabelUpdateInput type
+## LabelUpdateInput interface
 
-Input for updating a Label
+Input for updating a Label. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type LabelUpdateInput = Partial<LabelCreateInput>
+interface LabelUpdateInput
 ```
 
-**References:** [LabelCreateInput](./omnigraffle.labelcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[labelOffset?](./omnigraffle.labelupdateinput.labeloffset.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The offset from the line. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[labelPosition?](./omnigraffle.labelupdateinput.labelposition.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The position along the line. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[labelRotation?](./omnigraffle.labelupdateinput.labelrotation.md)
+
+</td><td>
+
+</td><td>
+
+[LabelOrientation](./omnigraffle.labelorientation.md)
+
+</td><td>
+
+_(Optional)_ The type of rotation around the line. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[text?](./omnigraffle.labelupdateinput.text.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The text inside the label. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

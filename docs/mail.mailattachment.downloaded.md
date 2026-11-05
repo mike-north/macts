@@ -4,10 +4,10 @@
 
 ## MailAttachment.downloaded property
 
-Indicates whether the attachment has been downloaded.
+Indicates whether the attachment has been downloaded. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-downloaded: boolean
+readonly downloaded: boolean | null;
 ```

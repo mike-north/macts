@@ -4,10 +4,10 @@
 
 ## Task.name property
 
-The name of the task
+The name of the task. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

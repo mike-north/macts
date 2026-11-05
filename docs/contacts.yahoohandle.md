@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-Unique identifier for this handle
+string \| null
+
+</td><td>
+
+Unique identifier for this handle. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ Unique identifier for this handle
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Label for this handle
+Label for this handle. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +71,11 @@ Label for this handle
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The Yahoo handle value
+The Yahoo handle value. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -4,10 +4,10 @@
 
 ## RuleCondition.ruleType property
 
-Rule type
+Rule type. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-ruleType: string
+ruleType: string | null
 ```

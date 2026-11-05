@@ -4,10 +4,10 @@
 
 ## Note.id property
 
-The unique identifier of the note
+The unique identifier of the note. Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

@@ -4,10 +4,10 @@
 
 ## Playlist.size property
 
-the total size of all tracks (in bytes)
+the total size of all tracks (in bytes). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-size: number
+readonly size: Integer | null;
 ```

@@ -4,10 +4,10 @@
 
 ## Document.readOnly property
 
-Whether the document is read-only
+Whether the document is read-only. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-readOnly: boolean
+readonly readOnly: boolean | null;
 ```

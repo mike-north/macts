@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/notes](./notes.md) &gt; [FolderUpdateInput](./notes.folderupdateinput.md)
 
-## FolderUpdateInput type
+## FolderUpdateInput interface
 
-Input for updating a Folder
+Input for updating a Folder. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type FolderUpdateInput = Partial<FolderCreateInput>
+interface FolderUpdateInput
 ```
 
-**References:** [FolderCreateInput](./notes.foldercreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[name?](./notes.folderupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of the folder. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

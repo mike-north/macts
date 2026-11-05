@@ -4,10 +4,10 @@
 
 ## RelatedName.value property
 
-The related name value
+The related name value. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-value: string
+value: string | null
 ```

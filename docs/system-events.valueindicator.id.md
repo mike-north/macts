@@ -4,10 +4,10 @@
 
 ## ValueIndicator.id property
 
-Unique identifier for this value indicator
+Unique identifier for this value indicator. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

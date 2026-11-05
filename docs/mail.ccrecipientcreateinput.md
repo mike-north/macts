@@ -4,7 +4,7 @@
 
 ## CcRecipientCreateInput type
 
-Input for creating a CcRecipient
+Input for creating a CcRecipient.
 
 **Signature:**
 

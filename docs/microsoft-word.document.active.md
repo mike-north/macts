@@ -4,10 +4,10 @@
 
 ## Document.active property
 
-Whether this is the active document
+Whether this is the active document. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-active: boolean
+readonly active: boolean | null;
 ```

@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/contacts](./contacts.md) &gt; [ICQHandleUpdateInput](./contacts.icqhandleupdateinput.md)
 
-## ICQHandleUpdateInput type
+## ICQHandleUpdateInput interface
 
-Input for updating a ICQHandle
+Input for updating an ICQHandle. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ICQHandleUpdateInput = Partial<ICQHandleCreateInput>
+interface ICQHandleUpdateInput
 ```
 
-**References:** [ICQHandleCreateInput](./contacts.icqhandlecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[label?](./contacts.icqhandleupdateinput.label.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Label for this handle. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[value?](./contacts.icqhandleupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The ICQ handle value. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

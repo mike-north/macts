@@ -37,28 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 unknown
 
 </td><td>
 
-The default value of the setting
-
-</td></tr>
-<tr><td>
-
-[id?](./automator.setting.id.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
+The default value of the setting. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +54,15 @@ _(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, p
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The name of the setting
+The name of the setting. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -88,7 +77,7 @@ unknown
 
 </td><td>
 
-The value of the setting
+The value of the setting. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

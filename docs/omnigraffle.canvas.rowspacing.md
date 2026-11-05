@@ -4,10 +4,10 @@
 
 ## Canvas.rowSpacing property
 
-Spacing between graphics in a row
+Spacing between graphics in a row. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-rowSpacing: number
+rowSpacing: number | null
 ```

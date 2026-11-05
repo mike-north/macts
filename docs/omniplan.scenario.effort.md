@@ -4,10 +4,10 @@
 
 ## Scenario.effort property
 
-The number of person-seconds required
+The number of person-seconds required. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-effort: number
+readonly effort: number | null;
 ```

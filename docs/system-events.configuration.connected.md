@@ -4,10 +4,10 @@
 
 ## Configuration.connected property
 
-Is the configuration connected?
+Is the configuration connected? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-connected: boolean
+readonly connected: boolean | null;
 ```

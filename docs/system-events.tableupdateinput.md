@@ -4,12 +4,10 @@
 
 ## TableUpdateInput type
 
-Input for updating a Table
+Input for updating a Table. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type TableUpdateInput = Partial<TableCreateInput>
+type TableUpdateInput = Record<string, never>
 ```
-
-**References:** [TableCreateInput](./system-events.tablecreateinput.md)

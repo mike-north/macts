@@ -4,10 +4,10 @@
 
 ## Alias.creatorType property
 
-the OSType identifying the application that created the alias
+the OSType identifying the application that created the alias. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-creatorType: string
+creatorType: string | null
 ```

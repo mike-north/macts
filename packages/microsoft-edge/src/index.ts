@@ -21,6 +21,7 @@
 export { MicrosoftEdgeClient, MicrosoftEdgeError, HttpClient } from './client.js'
 export type { MicrosoftEdgeClientOptions } from './client.js'
 export * from './types.js'
+export type { MicrosoftEdgeResources } from './contract/index.js'
 export { WindowResourceClient } from './resources/window.js'
 export { TabResourceClient } from './resources/tab.js'
 export { BookmarkFolderResourceClient } from './resources/bookmarkfolder.js'

@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-Unique ID of the bookmark item.
+Unique ID of the bookmark item. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ Unique ID of the bookmark item.
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Returns the index with respect to its parent bookmark folder.
+number \| null
+
+</td><td>
+
+Returns the index with respect to its parent bookmark folder. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +73,11 @@ Returns the index with respect to its parent bookmark folder.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The title of the bookmark item.
+The title of the bookmark item. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +88,11 @@ The title of the bookmark item.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The URL of the bookmark.
+The URL of the bookmark. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -4,10 +4,10 @@
 
 ## Note.passwordProtected property
 
-Whether the note is password protected
+Whether the note is password protected. Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-passwordProtected: boolean
+readonly passwordProtected: boolean;
 ```

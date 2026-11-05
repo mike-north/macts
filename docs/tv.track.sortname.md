@@ -4,10 +4,10 @@
 
 ## Track.sortName property
 
-override string to use for the track when sorting by name
+override string to use for the track when sorting by name. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-sortName: string
+sortName: string | null
 ```

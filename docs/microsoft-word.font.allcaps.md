@@ -4,10 +4,10 @@
 
 ## Font.allCaps property
 
-Whether the font is all caps
+Whether the font is all caps. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-allCaps: boolean
+allCaps: boolean | null
 ```

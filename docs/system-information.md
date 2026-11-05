@@ -30,7 +30,7 @@ Client for a system profile document.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -88,7 +88,25 @@ A system profile document
 
 </td><td>
 
-Input for creating a Document
+Input for creating a Document.
+
+</td></tr>
+<tr><td>
+
+[DocumentUpdateInput](./system-information.documentupdateinput.md)
+
+</td><td>
+
+Input for updating a Document. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[SystemInformationClient](./system-information.systeminformationclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -128,6 +146,8 @@ Every capability exposed by System Information, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 </tbody></table>
 
@@ -162,11 +182,11 @@ Level of detail for system profile information
 </td></tr>
 <tr><td>
 
-[DocumentUpdateInput](./system-information.documentupdateinput.md)
+[SystemInformationResources](./system-information.systeminformationresources.md)
 
 </td><td>
 
-Input for updating a Document
+The type of the resource table in `systemInformationContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 </tbody></table>

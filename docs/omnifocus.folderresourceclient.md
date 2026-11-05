@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./omnifocus.folderresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./omnifocus.folderresourceclient.create.md)
 
 </td><td>
 
@@ -68,7 +68,7 @@ Create a new folder.
 </td></tr>
 <tr><td>
 
-[get(id)](./omnifocus.folderresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./omnifocus.folderresourceclient.get.md)
 
 </td><td>
 
@@ -79,13 +79,13 @@ Get a folder by id.
 </td></tr>
 <tr><td>
 
-[list()](./omnifocus.folderresourceclient.list.md)
+[list(\_\_mactsOptions)](./omnifocus.folderresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all folders.
+List all folders, as one page.
 
 </td></tr>
 </tbody></table>

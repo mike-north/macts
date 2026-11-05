@@ -4,7 +4,7 @@
 
 ## VisualCreateInput type
 
-Input for creating a Visual
+Input for creating a Visual.
 
 **Signature:**
 

@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the name of the XML attribute
+string \| null
+
+</td><td>
+
+the name of the XML attribute. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ the name of the XML attribute
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the value of the XML attribute
+the value of the XML attribute. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

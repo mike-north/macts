@@ -4,7 +4,7 @@
 
 ## MSNHandleCreateInput interface
 
-Input for creating a MSNHandle
+Input for creating a MSNHandle.
 
 **Signature:**
 

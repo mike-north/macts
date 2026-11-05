@@ -4,10 +4,10 @@
 
 ## Tab.name property
 
-The tab name
+The tab name. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

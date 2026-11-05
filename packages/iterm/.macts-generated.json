@@ -16,6 +16,7 @@
     "src/cli/commands/create-tab.ts",
     "src/cli/commands/create-window-with-default-profile.ts",
     "src/cli/commands/create-window-with-profile.ts",
+    "src/cli/commands/current-window.ts",
     "src/cli/commands/duplicate.ts",
     "src/cli/commands/exists.ts",
     "src/cli/commands/hide-hotkey-window.ts",

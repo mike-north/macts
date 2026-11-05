@@ -4,10 +4,10 @@
 
 ## MessageViewer.visibleColumns property
 
-List of columns that are visible. The subject column and the message status column will always be visible
+List of columns that are visible. The subject column and the message status column will always be visible. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-visibleColumns: string
+visibleColumns: string | null
 ```

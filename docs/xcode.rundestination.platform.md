@@ -4,10 +4,10 @@
 
 ## RunDestination.platform property
 
-The identifier of the platform which this run destination targets
+The identifier of the platform which this run destination targets. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-platform: string
+readonly platform: string | null;
 ```

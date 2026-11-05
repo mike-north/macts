@@ -4,7 +4,7 @@
 
 ## DrawerCreateInput type
 
-Input for creating a Drawer
+Input for creating a Drawer.
 
 **Signature:**
 

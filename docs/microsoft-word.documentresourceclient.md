@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[activate()](./microsoft-word.documentresourceclient.activate.md)
+[activate(\_\_mactsOptions)](./microsoft-word.documentresourceclient.activate.md)
 
 </td><td>
 
@@ -68,7 +68,7 @@ Activate the specified document window
 </td></tr>
 <tr><td>
 
-[close(saving)](./microsoft-word.documentresourceclient.close.md)
+[close(saving, \_\_mactsOptions)](./microsoft-word.documentresourceclient.close.md)
 
 </td><td>
 
@@ -79,7 +79,7 @@ Close the specified document
 </td></tr>
 <tr><td>
 
-[createRange(start, end)](./microsoft-word.documentresourceclient.createrange.md)
+[createRange(start, end, \_\_mactsOptions)](./microsoft-word.documentresourceclient.createrange.md)
 
 </td><td>
 
@@ -90,29 +90,29 @@ Create a text range by character positions
 </td></tr>
 <tr><td>
 
-[get(id)](./microsoft-word.documentresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./microsoft-word.documentresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a document by id.
+Get a document by id. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[list()](./microsoft-word.documentresourceclient.list.md)
+[list(\_\_mactsOptions)](./microsoft-word.documentresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all documents.
+List all documents, as one page.
 
 </td></tr>
 <tr><td>
 
-[print()](./microsoft-word.documentresourceclient.print.md)
+[print(\_\_mactsOptions)](./microsoft-word.documentresourceclient.print.md)
 
 </td><td>
 
@@ -123,7 +123,7 @@ Print the specified document
 </td></tr>
 <tr><td>
 
-[save()](./microsoft-word.documentresourceclient.save.md)
+[save(\_\_mactsOptions)](./microsoft-word.documentresourceclient.save.md)
 
 </td><td>
 
@@ -134,7 +134,7 @@ Save the specified document
 </td></tr>
 <tr><td>
 
-[saveAs(fileName, fileFormat)](./microsoft-word.documentresourceclient.saveas.md)
+[saveAs(fileName, fileFormat, \_\_mactsOptions)](./microsoft-word.documentresourceclient.saveas.md)
 
 </td><td>
 

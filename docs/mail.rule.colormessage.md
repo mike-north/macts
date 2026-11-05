@@ -4,10 +4,10 @@
 
 ## Rule.colorMessage property
 
-If rule matches, apply this color
+If rule matches, apply this color. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-colorMessage: string
+colorMessage: string | null
 ```

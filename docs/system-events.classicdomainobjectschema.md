@@ -4,22 +4,15 @@
 
 ## ClassicDomainObjectSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
 ClassicDomainObjectSchema: z.ZodObject<
   {
-    appleMenuFolder: z.ZodString
-    controlPanelsFolder: z.ZodString
-    controlStripModulesFolder: z.ZodString
-    desktopFolder: z.ZodString
-    extensionsFolder: z.ZodString
-    fontsFolder: z.ZodString
-    launcherItemsFolder: z.ZodString
-    preferencesFolder: z.ZodString
-    shutdownFolder: z.ZodString
-    startupItemsFolder: z.ZodString
-    systemFolder: z.ZodString
+    id: z.ZodString
+    name: z.ZodString
   },
   z.core.$strip
 >

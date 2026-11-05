@@ -4,10 +4,10 @@
 
 ## Account.moveDeletedMessagesToTrash property
 
-Indicates whether messages that are deleted will be moved to the trash mailbox
+Indicates whether messages that are deleted will be moved to the trash mailbox. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-moveDeletedMessagesToTrash: boolean
+moveDeletedMessagesToTrash: boolean | null
 ```

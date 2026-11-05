@@ -4,10 +4,10 @@
 
 ## Configuration.name property
 
-the name of the configuration
+the name of the configuration. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

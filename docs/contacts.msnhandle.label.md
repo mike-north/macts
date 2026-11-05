@@ -4,10 +4,10 @@
 
 ## MSNHandle.label property
 
-Label for this handle
+Label for this handle. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-label: string
+label: string | null
 ```

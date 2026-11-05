@@ -4,10 +4,10 @@
 
 ## Message.junkMailStatus property
 
-Indicates whether the message has been marked junk or evaluated to be junk by the junk mail filter.
+Indicates whether the message has been marked junk or evaluated to be junk by the junk mail filter. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-junkMailStatus: boolean
+junkMailStatus: boolean | null
 ```

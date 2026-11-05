@@ -2,14 +2,78 @@
 
 [Home](./index.md) &gt; [@macts/omnifocus](./omnifocus.md) &gt; [FolderUpdateInput](./omnifocus.folderupdateinput.md)
 
-## FolderUpdateInput type
+## FolderUpdateInput interface
 
-Input for updating a Folder
+Input for updating a Folder. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type FolderUpdateInput = Partial<FolderCreateInput>
+interface FolderUpdateInput
 ```
 
-**References:** [FolderCreateInput](./omnifocus.foldercreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[hidden?](./omnifocus.folderupdateinput.hidden.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Set if the folder is currently hidden. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[name?](./omnifocus.folderupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Folder name. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[note?](./omnifocus.folderupdateinput.note.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Folder note. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

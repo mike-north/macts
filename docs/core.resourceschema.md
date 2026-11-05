@@ -31,8 +31,8 @@ ResourceSchema: z.ZodObject<
                 | 'string'
                 | 'number'
                 | 'boolean'
-                | 'integer'
                 | 'date'
+                | 'integer'
                 | 'data'
                 | 'any'
                 | 'file'
@@ -53,8 +53,8 @@ ResourceSchema: z.ZodObject<
                   | 'string'
                   | 'number'
                   | 'boolean'
-                  | 'integer'
                   | 'date'
+                  | 'integer'
                   | 'data'
                   | 'any'
                   | 'file'
@@ -87,6 +87,148 @@ ResourceSchema: z.ZodObject<
                 z.core.$strip
               >
             >
+            nullable: z.ZodOptional<z.ZodBoolean>
+            resettable: z.ZodOptional<z.ZodBoolean>
+            evidence: z.ZodOptional<
+              z.ZodObject<
+                {
+                  nullable: z.ZodOptional<
+                    z.ZodDiscriminatedUnion<
+                      [
+                        z.ZodObject<
+                          {
+                            source: z.ZodLiteral<'probe'>
+                            observedAt: z.ZodISODateTime
+                            bundleId: z.ZodString
+                            appVersion: z.ZodString
+                            osVersion: z.ZodString
+                            sampleSize: z.ZodNumber
+                            nullCount: z.ZodNumber
+                            failedReads: z.ZodNumber
+                            errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>
+                            note: z.ZodOptional<z.ZodString>
+                          },
+                          z.core.$strip
+                        >,
+                        z.ZodObject<
+                          {
+                            source: z.ZodLiteral<'curated'>
+                            note: z.ZodString
+                            observedAt: z.ZodOptional<z.ZodISODateTime>
+                            appVersion: z.ZodOptional<z.ZodString>
+                            absentReads: z.ZodOptional<
+                              z.ZodObject<
+                                {
+                                  observedAt: z.ZodISODateTime
+                                  bundleId: z.ZodString
+                                  appVersion: z.ZodString
+                                  osVersion: z.ZodString
+                                  failedReads: z.ZodNumber
+                                  errorNumbers: z.ZodArray<z.ZodNumber>
+                                  reason: z.ZodString
+                                },
+                                z.core.$strict
+                              >
+                            >
+                          },
+                          z.core.$strip
+                        >,
+                        z.ZodObject<
+                          {
+                            source: z.ZodLiteral<'sdef'>
+                            note: z.ZodOptional<z.ZodString>
+                          },
+                          z.core.$strip
+                        >,
+                      ],
+                      'source'
+                    >
+                  >
+                  resettable: z.ZodOptional<
+                    z.ZodObject<
+                      {
+                        source: z.ZodLiteral<'curated'>
+                        note: z.ZodString
+                        observedAt: z.ZodOptional<z.ZodISODateTime>
+                        appVersion: z.ZodOptional<z.ZodString>
+                      },
+                      z.core.$strip
+                    >
+                  >
+                },
+                z.core.$strip
+              >
+            >
+            unsupported: z.ZodOptional<
+              z.ZodObject<
+                {
+                  reason: z.ZodString
+                  dictionaryNote: z.ZodOptional<z.ZodString>
+                  trackingIssue: z.ZodOptional<z.ZodNumber>
+                  evidence: z.ZodUnion<
+                    readonly [
+                      z.ZodObject<
+                        {
+                          source: z.ZodLiteral<'probe'>
+                          observedAt: z.ZodISODateTime
+                          bundleId: z.ZodString
+                          appVersion: z.ZodString
+                          osVersion: z.ZodString
+                          sampleSize: z.ZodNumber
+                          failedReads: z.ZodNumber
+                          errorNumbers: z.ZodArray<z.ZodNumber>
+                        },
+                        z.core.$strict
+                      >,
+                      z.ZodObject<
+                        {
+                          source: z.ZodLiteral<'probe'>
+                          observedAt: z.ZodISODateTime
+                          bundleId: z.ZodString
+                          appVersion: z.ZodString
+                          osVersion: z.ZodString
+                          sampleSize: z.ZodNumber
+                          observedKinds: z.ZodRecord<
+                            z.ZodEnum<{
+                              string: 'string'
+                              number: 'number'
+                              boolean: 'boolean'
+                              date: 'date'
+                              record: 'record'
+                              list: 'list'
+                              reference: 'reference'
+                              other: 'other'
+                            }> &
+                              z.core.$partial,
+                            z.ZodNumber
+                          >
+                        },
+                        z.core.$strict
+                      >,
+                    ]
+                  >
+                },
+                z.core.$strip
+              >
+            >
+            native: z.ZodOptional<
+              z.ZodObject<
+                {
+                  name: z.ZodString
+                  evidence: z.ZodObject<
+                    {
+                      source: z.ZodLiteral<'dictionary'>
+                      bundleId: z.ZodString
+                      appVersion: z.ZodString
+                      osVersion: z.ZodString
+                      term: z.ZodString
+                    },
+                    z.core.$strict
+                  >
+                },
+                z.core.$strict
+              >
+            >
           },
           z.core.$strip
         >
@@ -98,9 +240,398 @@ ResourceSchema: z.ZodObject<
           {
             property: z.ZodString
             primary: z.ZodDefault<z.ZodBoolean>
+            targeting: z.ZodOptional<
+              z.ZodEnum<{
+                byId: 'byId'
+                byProperty: 'byProperty'
+                byKey: 'byKey'
+                byRoot: 'byRoot'
+              }>
+            >
+            runtimeProperty: z.ZodOptional<z.ZodString>
+            unique: z.ZodOptional<z.ZodBoolean>
+            evidence: z.ZodOptional<
+              z.ZodObject<
+                {
+                  unique: z.ZodOptional<
+                    z.ZodObject<
+                      {
+                        source: z.ZodEnum<{
+                          curated: 'curated'
+                          sdef: 'sdef'
+                        }>
+                        note: z.ZodString
+                        observedAt: z.ZodOptional<z.ZodISODateTime>
+                        appVersion: z.ZodOptional<z.ZodString>
+                      },
+                      z.core.$strict
+                    >
+                  >
+                },
+                z.core.$strict
+              >
+            >
           },
           z.core.$strip
         >
+      >
+    >
+    probe: z.ZodOptional<
+      z.ZodObject<
+        {
+          runtimeIdentifier: z.ZodOptional<z.ZodString>
+          status: z.ZodEnum<{
+            error: 'error'
+            probed: 'probed'
+            'no-items': 'no-items'
+            failed: 'failed'
+          }>
+          probedAt: z.ZodOptional<z.ZodString>
+          note: z.ZodOptional<z.ZodString>
+        },
+        z.core.$strip
+      >
+    >
+    nullabilityProbe: z.ZodOptional<
+      z.ZodObject<
+        {
+          observedAt: z.ZodISODateTime
+          bundleId: z.ZodString
+          appVersion: z.ZodString
+          osVersion: z.ZodString
+          accessPath: z.ZodString
+          itemsRead: z.ZodNumber
+          sampledParents: z.ZodOptional<z.ZodNumber>
+          parentsScanned: z.ZodOptional<z.ZodNumber>
+          status: z.ZodEnum<{
+            error: 'error'
+            probed: 'probed'
+            'no-items': 'no-items'
+            unreachable: 'unreachable'
+            budget: 'budget'
+          }>
+          skipped: z.ZodArray<z.ZodString>
+          note: z.ZodOptional<z.ZodString>
+        },
+        z.core.$strip
+      >
+    >
+    native: z.ZodOptional<
+      z.ZodObject<
+        {
+          collection: z.ZodString
+          evidence: z.ZodObject<
+            {
+              source: z.ZodLiteral<'dictionary'>
+              bundleId: z.ZodString
+              appVersion: z.ZodString
+              osVersion: z.ZodString
+              term: z.ZodString
+            },
+            z.core.$strict
+          >
+        },
+        z.core.$strict
+      >
+    >
+    inherits: z.ZodOptional<
+      z.ZodObject<
+        {
+          resource: z.ZodString
+          evidence: z.ZodObject<
+            {
+              source: z.ZodLiteral<'dictionary'>
+              bundleId: z.ZodString
+              appVersion: z.ZodString
+              osVersion: z.ZodString
+              term: z.ZodString
+            },
+            z.core.$strict
+          >
+        },
+        z.core.$strict
+      >
+    >
+    inheritedClaims: z.ZodOptional<
+      z.ZodRecord<
+        z.ZodString,
+        z.ZodObject<
+          {
+            nullable: z.ZodOptional<z.ZodBoolean>
+            resettable: z.ZodOptional<z.ZodBoolean>
+            evidence: z.ZodOptional<
+              z.ZodObject<
+                {
+                  nullable: z.ZodOptional<
+                    z.ZodDiscriminatedUnion<
+                      [
+                        z.ZodObject<
+                          {
+                            source: z.ZodLiteral<'probe'>
+                            observedAt: z.ZodISODateTime
+                            bundleId: z.ZodString
+                            appVersion: z.ZodString
+                            osVersion: z.ZodString
+                            sampleSize: z.ZodNumber
+                            nullCount: z.ZodNumber
+                            failedReads: z.ZodNumber
+                            errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>
+                            note: z.ZodOptional<z.ZodString>
+                          },
+                          z.core.$strip
+                        >,
+                        z.ZodObject<
+                          {
+                            source: z.ZodLiteral<'curated'>
+                            note: z.ZodString
+                            observedAt: z.ZodOptional<z.ZodISODateTime>
+                            appVersion: z.ZodOptional<z.ZodString>
+                            absentReads: z.ZodOptional<
+                              z.ZodObject<
+                                {
+                                  observedAt: z.ZodISODateTime
+                                  bundleId: z.ZodString
+                                  appVersion: z.ZodString
+                                  osVersion: z.ZodString
+                                  failedReads: z.ZodNumber
+                                  errorNumbers: z.ZodArray<z.ZodNumber>
+                                  reason: z.ZodString
+                                },
+                                z.core.$strict
+                              >
+                            >
+                          },
+                          z.core.$strip
+                        >,
+                        z.ZodObject<
+                          {
+                            source: z.ZodLiteral<'sdef'>
+                            note: z.ZodOptional<z.ZodString>
+                          },
+                          z.core.$strip
+                        >,
+                      ],
+                      'source'
+                    >
+                  >
+                  resettable: z.ZodOptional<
+                    z.ZodObject<
+                      {
+                        source: z.ZodLiteral<'curated'>
+                        note: z.ZodString
+                        observedAt: z.ZodOptional<z.ZodISODateTime>
+                        appVersion: z.ZodOptional<z.ZodString>
+                      },
+                      z.core.$strip
+                    >
+                  >
+                },
+                z.core.$strip
+              >
+            >
+            unsupported: z.ZodOptional<
+              z.ZodObject<
+                {
+                  reason: z.ZodString
+                  dictionaryNote: z.ZodOptional<z.ZodString>
+                  trackingIssue: z.ZodOptional<z.ZodNumber>
+                  evidence: z.ZodUnion<
+                    readonly [
+                      z.ZodObject<
+                        {
+                          source: z.ZodLiteral<'probe'>
+                          observedAt: z.ZodISODateTime
+                          bundleId: z.ZodString
+                          appVersion: z.ZodString
+                          osVersion: z.ZodString
+                          sampleSize: z.ZodNumber
+                          failedReads: z.ZodNumber
+                          errorNumbers: z.ZodArray<z.ZodNumber>
+                        },
+                        z.core.$strict
+                      >,
+                      z.ZodObject<
+                        {
+                          source: z.ZodLiteral<'probe'>
+                          observedAt: z.ZodISODateTime
+                          bundleId: z.ZodString
+                          appVersion: z.ZodString
+                          osVersion: z.ZodString
+                          sampleSize: z.ZodNumber
+                          observedKinds: z.ZodRecord<
+                            z.ZodEnum<{
+                              string: 'string'
+                              number: 'number'
+                              boolean: 'boolean'
+                              date: 'date'
+                              record: 'record'
+                              list: 'list'
+                              reference: 'reference'
+                              other: 'other'
+                            }> &
+                              z.core.$partial,
+                            z.ZodNumber
+                          >
+                        },
+                        z.core.$strict
+                      >,
+                    ]
+                  >
+                },
+                z.core.$strip
+              >
+            >
+          },
+          z.core.$strict
+        >
+      >
+    >
+    unsupported: z.ZodOptional<
+      z.ZodObject<
+        {
+          evidence: z.ZodDiscriminatedUnion<
+            [
+              z.ZodObject<
+                {
+                  source: z.ZodLiteral<'dictionary'>
+                  bundleId: z.ZodString
+                  appVersion: z.ZodString
+                  osVersion: z.ZodString
+                  term: z.ZodString
+                  finding: z.ZodEnum<{
+                    'no-class': 'no-class'
+                    'not-an-element': 'not-an-element'
+                  }>
+                },
+                z.core.$strict
+              >,
+              z.ZodObject<
+                {
+                  source: z.ZodLiteral<'live'>
+                  observedAt: z.ZodISODateTime
+                  bundleId: z.ZodString
+                  appVersion: z.ZodString
+                  osVersion: z.ZodString
+                  expression: z.ZodString
+                  errorNumber: z.ZodNumber
+                },
+                z.core.$strict
+              >,
+            ],
+            'source'
+          >
+        },
+        z.core.$strict
+      >
+    >
+    rangeRead: z.ZodOptional<
+      z.ZodDiscriminatedUnion<
+        [
+          z.ZodObject<
+            {
+              supported: z.ZodLiteral<true>
+              read: z.ZodEnum<{
+                range: 'range'
+                column: 'column'
+              }>
+              evidence: z.ZodObject<
+                {
+                  source: z.ZodLiteral<'probe'>
+                  observedAt: z.ZodISODateTime
+                  bundleId: z.ZodString
+                  appVersion: z.ZodString
+                  osVersion: z.ZodString
+                  errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>
+                  cost: z.ZodOptional<
+                    z.ZodObject<
+                      {
+                        observedAt: z.ZodISODateTime
+                        pageMs: z.ZodNumber
+                        columnMs: z.ZodNumber
+                        items: z.ZodNumber
+                        runs: z.ZodNumber
+                        pageSize: z.ZodNumber
+                      },
+                      z.core.$strict
+                    >
+                  >
+                  note: z.ZodOptional<z.ZodString>
+                },
+                z.core.$strict
+              >
+            },
+            z.core.$strict
+          >,
+          z.ZodObject<
+            {
+              supported: z.ZodLiteral<false>
+              evidence: z.ZodObject<
+                {
+                  source: z.ZodLiteral<'probe'>
+                  observedAt: z.ZodISODateTime
+                  bundleId: z.ZodString
+                  appVersion: z.ZodString
+                  osVersion: z.ZodString
+                  errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>
+                  cost: z.ZodOptional<
+                    z.ZodObject<
+                      {
+                        observedAt: z.ZodISODateTime
+                        pageMs: z.ZodNumber
+                        columnMs: z.ZodNumber
+                        items: z.ZodNumber
+                        runs: z.ZodNumber
+                        pageSize: z.ZodNumber
+                      },
+                      z.core.$strict
+                    >
+                  >
+                  note: z.ZodOptional<z.ZodString>
+                },
+                z.core.$strict
+              >
+            },
+            z.core.$strict
+          >,
+        ],
+        'supported'
+      >
+    >
+    roots: z.ZodOptional<
+      z.ZodRecord<
+        z.ZodString,
+        z.ZodObject<
+          {
+            property: z.ZodString
+            evidence: z.ZodObject<
+              {
+                source: z.ZodLiteral<'dictionary'>
+                bundleId: z.ZodString
+                appVersion: z.ZodString
+                osVersion: z.ZodString
+                term: z.ZodString
+              },
+              z.core.$strict
+            >
+          },
+          z.core.$strict
+        >
+      >
+    >
+    positional: z.ZodOptional<
+      z.ZodObject<
+        {
+          evidence: z.ZodObject<
+            {
+              source: z.ZodLiteral<'curated'>
+              note: z.ZodString
+              observedAt: z.ZodISODateTime
+              appVersion: z.ZodString
+            },
+            z.core.$strict
+          >
+        },
+        z.core.$strict
       >
     >
   },

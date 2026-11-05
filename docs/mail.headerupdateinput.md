@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [HeaderUpdateInput](./mail.headerupdateinput.md)
 
-## HeaderUpdateInput type
+## HeaderUpdateInput interface
 
-Input for updating a Header
+Input for updating a Header. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type HeaderUpdateInput = Partial<HeaderCreateInput>
+interface HeaderUpdateInput
 ```
 
-**References:** [HeaderCreateInput](./mail.headercreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[content?](./mail.headerupdateinput.content.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Contents of the header. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[name?](./mail.headerupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Name of the header value. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

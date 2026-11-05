@@ -25,15 +25,32 @@ export class SchemeResourceClient {
    * List the schemes of one workspace document, as one page.
    * When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
    */
-  async list(workspaceName: string): Promise<Page<Scheme>> {
-    return this.#http.rpc<Page<Scheme>>(`${this.#app}.${this.#resource}.list`, { workspaceName })
+  async list(
+    workspaceName: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<Scheme>> {
+    return this.#http.invoke<Page<Scheme>>(
+      `${this.#app}.${this.#resource}.list`,
+      { workspaceName },
+      __mactsOptions,
+      'Scheme'
+    )
   }
 
   /**
    * Get a scheme by id within a parent scope.
    * When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
    */
-  async get(workspaceName: string, id: string): Promise<Scheme> {
-    return this.#http.rpc<Scheme>(`${this.#app}.${this.#resource}.get`, { workspaceName, id })
+  async get(
+    workspaceName: string,
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Scheme> {
+    return this.#http.invoke<Scheme>(
+      `${this.#app}.${this.#resource}.get`,
+      { workspaceName, id },
+      __mactsOptions,
+      'Scheme'
+    )
   }
 }

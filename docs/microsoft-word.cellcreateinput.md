@@ -4,7 +4,7 @@
 
 ## CellCreateInput interface
 
-Input for creating a Cell
+Input for creating a Cell.
 
 **Signature:**
 

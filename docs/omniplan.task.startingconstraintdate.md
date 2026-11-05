@@ -4,10 +4,10 @@
 
 ## Task.startingConstraintDate property
 
-The earliest date this task may start
+The earliest date this task may start. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-startingConstraintDate: Date
+startingConstraintDate: Date | null
 ```

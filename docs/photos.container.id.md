@@ -4,10 +4,10 @@
 
 ## Container.id property
 
-The unique ID of this container
+The unique ID of this container. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

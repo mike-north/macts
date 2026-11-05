@@ -4,10 +4,10 @@
 
 ## Process.classic property
 
-Is the process running in the Classic environment?
+Is the process running in the Classic environment? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-classic: boolean
+readonly classic: boolean | null;
 ```

@@ -4,10 +4,10 @@
 
 ## Workflow.executionId property
 
-The identifier of the current or most recent execution
+The identifier of the current or most recent execution. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-executionId: string
+readonly executionId: string | null;
 ```

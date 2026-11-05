@@ -4,6 +4,8 @@
 
 ## JxaExecutorOptions.timeout property
 
+Time limit in milliseconds. Defaults to 30000; `0` disables the limit.
+
 **Signature:**
 
 ```typescript

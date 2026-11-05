@@ -4,10 +4,10 @@
 
 ## Process.acceptsHighLevelEvents property
 
-Is the process high-level event aware (accepts open application, open document, print document, and quit)?
+Is the process high-level event aware (accepts open application, open document, print document, and quit)? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-acceptsHighLevelEvents: boolean
+readonly acceptsHighLevelEvents: boolean | null;
 ```

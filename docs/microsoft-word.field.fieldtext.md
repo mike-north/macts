@@ -4,10 +4,10 @@
 
 ## Field.fieldText property
 
-The field text
+The field text. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fieldText: string
+fieldText: string | null
 ```

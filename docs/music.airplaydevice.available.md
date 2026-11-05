@@ -4,10 +4,10 @@
 
 ## AirPlayDevice.available property
 
-is the device currently available?
+is the device currently available? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-available: boolean
+readonly available: boolean | null;
 ```

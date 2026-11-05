@@ -4,12 +4,12 @@
 
 ## WorkspaceDocumentResourceClient.get() method
 
-Get a workspacedocument by name.
+Get a workspace document by name. When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 **Signature:**
 
 ```typescript
-get(name: string): Promise<WorkspaceDocument>;
+get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<WorkspaceDocument>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ name
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

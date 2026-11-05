@@ -4,10 +4,10 @@
 
 ## Dependency.dependencyType property
 
-Type of dependency
+Type of dependency. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-dependencyType: DependencyType
+dependencyType: DependencyType | null
 ```

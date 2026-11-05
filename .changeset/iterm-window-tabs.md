@@ -4,6 +4,7 @@
 
 iTerm windows and tabs can now be read:
 
+- `currentWindow()` returns a reference to the currently selected window. The reference keeps that window’s identity when selection changes and resolves lazily.
 - `windows.list` and `windows.get(id)`.
 - `tabs.list(windowId)` and `tabs.get(windowId, index)`.
 

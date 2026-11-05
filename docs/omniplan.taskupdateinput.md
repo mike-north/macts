@@ -4,12 +4,12 @@
 
 ## TaskUpdateInput type
 
-Input for updating a Task
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type TaskUpdateInput = Partial<TaskCreateInput>
+type TaskUpdateInput = Omit<TaskUpdateInput$1, 'priority'> & {
+  priority?: null extends TaskUpdateInput$1['priority'] ? number | null : number
+}
 ```
-
-**References:** [TaskCreateInput](./omniplan.taskcreateinput.md)

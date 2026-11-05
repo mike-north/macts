@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/tv](./tv.md) &gt; [UserPlaylistUpdateInput](./tv.userplaylistupdateinput.md)
 
-## UserPlaylistUpdateInput type
+## UserPlaylistUpdateInput interface
 
-Input for updating a UserPlaylist
+Input for updating an UserPlaylist. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type UserPlaylistUpdateInput = Partial<UserPlaylistCreateInput>
+interface UserPlaylistUpdateInput
 ```
 
-**References:** [UserPlaylistCreateInput](./tv.userplaylistcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[shared?](./tv.userplaylistupdateinput.shared.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ is this playlist shared? Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

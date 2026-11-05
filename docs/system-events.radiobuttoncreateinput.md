@@ -4,7 +4,7 @@
 
 ## RadioButtonCreateInput type
 
-Input for creating a RadioButton
+Input for creating a RadioButton.
 
 **Signature:**
 

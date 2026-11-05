@@ -4,10 +4,10 @@
 
 ## Track.bitRate property
 
-the bit rate of the track (in kbps)
+the bit rate of the track (in kbps). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-bitRate: number
+readonly bitRate: Integer | null;
 ```
