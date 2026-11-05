@@ -37,7 +37,7 @@ export class DocumentResourceClient {
   }
 
   /**
-   * Save the specified document
+   * Save the specified document.
    * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async save(id: string): Promise<void> {
@@ -45,7 +45,7 @@ export class DocumentResourceClient {
   }
 
   /**
-   * Save the document with a new name or format
+   * Save the document with a new name or format.
    * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async saveAs(id: string, fileName: string, fileFormat?: SaveFormat): Promise<void> {
@@ -57,7 +57,7 @@ export class DocumentResourceClient {
   }
 
   /**
-   * Close the specified document
+   * Close the specified document.
    * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async close(id: string, saving?: boolean): Promise<void> {
@@ -65,7 +65,7 @@ export class DocumentResourceClient {
   }
 
   /**
-   * Print the specified document
+   * Print the specified document.
    * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async print(id: string): Promise<void> {
@@ -73,7 +73,7 @@ export class DocumentResourceClient {
   }
 
   /**
-   * Activate the specified document window
+   * Activate the specified document window.
    * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async activate(id: string): Promise<void> {
@@ -81,7 +81,7 @@ export class DocumentResourceClient {
   }
 
   /**
-   * Create a text range by character positions
+   * Create a text range by character positions.
    * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async createRange(id: string, start?: number, end?: number): Promise<void> {

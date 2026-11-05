@@ -1673,7 +1673,7 @@ export type VisualUpdateInput = Record<string, never>
 /** a track representing an audio file (MP3, AIFF, etc.) */
 export interface FileTrackResourceClient {
   /**
-   * update file track information from the current information in the track’s file macts does not
+   * update file track information from the current information in the track’s file. macts does not
    * yet send the file track to the app, so the app acts on whatever it chooses.
    */
   refresh(options?: CallOptions): Promise<void>

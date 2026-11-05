@@ -956,7 +956,7 @@ export interface BrowserWindowResourceClient {
 /** a track representing a video file */
 export interface FileTrackResourceClient {
   /**
-   * update file track information from the current information in the track’s file macts does not
+   * update file track information from the current information in the track’s file. macts does not
    * yet send the file track to the app, so the app acts on whatever it chooses.
    */
   refresh(options?: CallOptions): Promise<void>

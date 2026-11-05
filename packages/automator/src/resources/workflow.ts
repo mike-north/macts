@@ -37,7 +37,7 @@ export class WorkflowResourceClient {
   }
 
   /**
-   * Execute a workflow
+   * Execute a workflow.
    * When several workflows share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async execute(name: string): Promise<void> {

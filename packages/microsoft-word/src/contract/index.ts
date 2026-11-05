@@ -1073,14 +1073,14 @@ export interface DocumentResourceClient {
    */
   get(id: string, options?: CallOptions): Promise<Document>
   /**
-   * Save the specified document When several documents share the same name, the first match in the
+   * Save the specified document. When several documents share the same name, the first match in the
    * app's order is used, and the operation does not fail as ambiguous.
    *
    * @param id - Document name. Does not accept null.
    */
   save(id: string, options?: CallOptions): Promise<void>
   /**
-   * Save the document with a new name or format When several documents share the same name, the
+   * Save the document with a new name or format. When several documents share the same name, the
    * first match in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param id - Document name. Does not accept null.
@@ -1094,29 +1094,29 @@ export interface DocumentResourceClient {
     options?: CallOptions
   ): Promise<void>
   /**
-   * Close the specified document When several documents share the same name, the first match in the
-   * app's order is used, and the operation does not fail as ambiguous.
+   * Close the specified document. When several documents share the same name, the first match in
+   * the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param id - Document name. Does not accept null.
    * @param saving - Whether to save changes before closing. Does not accept null.
    */
   close(id: string, saving?: boolean, options?: CallOptions): Promise<void>
   /**
-   * Print the specified document When several documents share the same name, the first match in the
-   * app's order is used, and the operation does not fail as ambiguous.
+   * Print the specified document. When several documents share the same name, the first match in
+   * the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param id - Document name. Does not accept null.
    */
   print(id: string, options?: CallOptions): Promise<void>
   /**
-   * Activate the specified document window When several documents share the same name, the first
+   * Activate the specified document window. When several documents share the same name, the first
    * match in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param id - Document name. Does not accept null.
    */
   activate(id: string, options?: CallOptions): Promise<void>
   /**
-   * Create a text range by character positions When several documents share the same name, the
+   * Create a text range by character positions. When several documents share the same name, the
    * first match in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param id - Document name. Does not accept null.

@@ -77,6 +77,7 @@ import {
   firstMatchNote,
   parentFirstMatchNote,
   resourceCommandNotes,
+  describeWithNotes,
   identifierWords,
   isCrudName,
   listMethodParameters,
@@ -1358,10 +1359,10 @@ class ContractBuilder {
     const output = operation.output
     return {
       name: safeIdentifier(command.name),
-      doc: [
+      doc: describeWithNotes(
         command.description,
-        ...(resource === undefined ? [] : resourceCommandNotes(command, resource, this.#manifest)),
-      ].join(' '),
+        resource === undefined ? [] : resourceCommandNotes(command, resource, this.#manifest)
+      ),
       params: signature.map(({ parameter, bindingName, optional }) => {
         const field = this.#parameterField(parameter)
         return {

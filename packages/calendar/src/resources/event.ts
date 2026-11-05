@@ -71,7 +71,7 @@ export class EventResourceClient {
   }
 
   /**
-   * Show the event or to-do in the calendar window
+   * Show the event or to-do in the calendar window.
    * When several calendars share the same name, the first match in the app's order is used as the calendar.
    */
   async show(calendarId: string, id: string): Promise<void> {

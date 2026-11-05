@@ -360,7 +360,7 @@ export interface WorkflowResourceClient {
    */
   get(name: string, options?: CallOptions): Promise<Workflow>
   /**
-   * Execute a workflow When several workflows share the same name, the first match in the app's
+   * Execute a workflow. When several workflows share the same name, the first match in the app's
    * order is used, and the operation does not fail as ambiguous.
    *
    * @param name - Workflow name. Does not accept null.

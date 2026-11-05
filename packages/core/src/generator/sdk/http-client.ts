@@ -29,6 +29,7 @@ import {
   generationRefusals,
   firstMatchNote,
   resourceCommandNotes,
+  describedSentences,
   identifierWords,
   isCrudName,
   listMethodParameters,
@@ -1143,7 +1144,7 @@ function generateResourceCommandMethod(
 
   return `
   /**
-   * ${cmd.description}${docNoteLines(notes)}
+   * ${describedSentences(cmd.description, notes).join('\n   * ')}
    */
   async ${safeIdentifier(cmd.name)}(${signature}): Promise<${returnType}> {
     ${rpcCall}

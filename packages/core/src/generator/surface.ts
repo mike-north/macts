@@ -254,6 +254,35 @@ export function itemNotSentNote(command: Command, resource: Resource): string | 
 }
 
 /**
+ * `description` followed by the sentences `notes`, as one paragraph of
+ * generated doc or help text: the description alone when there is no note,
+ * or else the description ending in one full stop (any trailing whitespace or
+ * full stops replaced), then each note.
+ *
+ * A manifest description need not end in a full stop ("Fix a violation"),
+ * so appending a note to it directly would run the two sentences together.
+ * Every surface that appends notes to a command's description (the HTTP
+ * client, the contract client and the CLI) ends it this way.
+ *
+ * @param description - The command's description, as the manifest has it.
+ * @param notes - The sentences to append, in order.
+ * @returns The paragraph.
+ */
+export function describeWithNotes(description: string, notes: readonly string[]): string {
+  return describedSentences(description, notes).join(' ')
+}
+
+/**
+ * {@link describeWithNotes} as separate sentences, for a surface that sets
+ * each on its own line: the description, ending in a full stop when notes
+ * follow, then each note.
+ */
+export function describedSentences(description: string, notes: readonly string[]): string[] {
+  if (notes.length === 0) return [description]
+  return [`${description.replace(/[\s.]+$/, '')}.`, ...notes]
+}
+
+/**
  * The sentences a generated doc adds about how a resource command selects
  * the item it acts on, in order: that macts does not yet send it
  * ({@link itemNotSentNote}) alone, or else the first-match sentences a get's

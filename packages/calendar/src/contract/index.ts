@@ -557,7 +557,7 @@ export interface EventResourceClient {
    */
   delete(calendarId: string, id: string, options?: CallOptions): Promise<void>
   /**
-   * Show the event or to-do in the calendar window When several calendars share the same name, the
+   * Show the event or to-do in the calendar window. When several calendars share the same name, the
    * first match in the app's order is used as the calendar.
    *
    * @param calendarId - Calendar identifier (the calendar containing the event). Does not accept

@@ -805,7 +805,7 @@ export interface ViolationResourceClient {
   /** List violations, as one page holding all of them. */
   list(options?: CallOptions): Promise<Page<Violation>>
   /**
-   * Fix a violation macts does not yet send the violation to the app, so the app acts on whatever
+   * Fix a violation. macts does not yet send the violation to the app, so the app acts on whatever
    * it chooses.
    */
   fix(options?: CallOptions): Promise<void>

@@ -37,7 +37,7 @@ export class WorkspaceDocumentResourceClient {
   }
 
   /**
-   * Invoke the "build" scheme action
+   * Invoke the "build" scheme action.
    * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async build(name: string): Promise<void> {
@@ -45,7 +45,7 @@ export class WorkspaceDocumentResourceClient {
   }
 
   /**
-   * Invoke the "clean" scheme action
+   * Invoke the "clean" scheme action.
    * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async clean(name: string): Promise<void> {
@@ -53,7 +53,7 @@ export class WorkspaceDocumentResourceClient {
   }
 
   /**
-   * Stop the active scheme action, if one is running
+   * Stop the active scheme action, if one is running.
    * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async stop(name: string): Promise<void> {
@@ -61,7 +61,7 @@ export class WorkspaceDocumentResourceClient {
   }
 
   /**
-   * Invoke the "run" scheme action
+   * Invoke the "run" scheme action.
    * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async run(
@@ -77,7 +77,7 @@ export class WorkspaceDocumentResourceClient {
   }
 
   /**
-   * Invoke the "test" scheme action
+   * Invoke the "test" scheme action.
    * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async test(
@@ -93,7 +93,7 @@ export class WorkspaceDocumentResourceClient {
   }
 
   /**
-   * Start a new debugging session in the workspace
+   * Start a new debugging session in the workspace.
    * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async attach(name: string, toProcessIdentifier: number, suspended: boolean): Promise<void> {
@@ -105,7 +105,7 @@ export class WorkspaceDocumentResourceClient {
   }
 
   /**
-   * Start a debugging session using the "run" or "run without building" scheme action
+   * Start a debugging session using the "run" or "run without building" scheme action.
    * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async debug(

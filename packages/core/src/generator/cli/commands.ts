@@ -21,6 +21,7 @@ import {
   parentFirstMatchNote,
   resolveIdParams,
   resourceCommandNotes,
+  describeWithNotes,
   resourceNamespace,
   safeIdentifier,
   withArticle,
@@ -562,10 +563,7 @@ export function generateResourceCommand(
     ? itemlessCommandInputs(cmd, hierarchyPath, resource, methodRef, ctx)
     : itemCommandInputs(cmd, hierarchyPath, resource, methodRef, ctx)
   const notes = resourceCommandNotes(cmd, resource, ctx.manifest)
-  const description =
-    notes.length === 0
-      ? cmd.description
-      : [`${cmd.description.replace(/[\s.]+$/, '')}.`, ...notes].join(' ')
+  const description = describeWithNotes(cmd.description, notes)
 
   const needsTypanion = inputs.includes('t.isEnum')
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}

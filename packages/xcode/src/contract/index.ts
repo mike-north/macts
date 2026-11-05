@@ -933,21 +933,21 @@ export interface WorkspaceDocumentResourceClient {
    */
   get(name: string, options?: CallOptions): Promise<WorkspaceDocument>
   /**
-   * Invoke the "build" scheme action When several workspace documents share the same name, the
+   * Invoke the "build" scheme action. When several workspace documents share the same name, the
    * first match in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param name - Workspace document name. Does not accept null.
    */
   build(name: string, options?: CallOptions): Promise<void>
   /**
-   * Invoke the "clean" scheme action When several workspace documents share the same name, the
+   * Invoke the "clean" scheme action. When several workspace documents share the same name, the
    * first match in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param name - Workspace document name. Does not accept null.
    */
   clean(name: string, options?: CallOptions): Promise<void>
   /**
-   * Stop the active scheme action, if one is running When several workspace documents share the
+   * Stop the active scheme action, if one is running. When several workspace documents share the
    * same name, the first match in the app's order is used, and the operation does not fail as
    * ambiguous.
    *
@@ -955,7 +955,7 @@ export interface WorkspaceDocumentResourceClient {
    */
   stop(name: string, options?: CallOptions): Promise<void>
   /**
-   * Invoke the "run" scheme action When several workspace documents share the same name, the first
+   * Invoke the "run" scheme action. When several workspace documents share the same name, the first
    * match in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param name - Workspace document name. Does not accept null.
@@ -971,8 +971,8 @@ export interface WorkspaceDocumentResourceClient {
     options?: CallOptions
   ): Promise<void>
   /**
-   * Invoke the "test" scheme action When several workspace documents share the same name, the first
-   * match in the app's order is used, and the operation does not fail as ambiguous.
+   * Invoke the "test" scheme action. When several workspace documents share the same name, the
+   * first match in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param name - Workspace document name. Does not accept null.
    * @param withCommandLineArguments - Additional command line arguments to pass to the action. Does
@@ -987,7 +987,7 @@ export interface WorkspaceDocumentResourceClient {
     options?: CallOptions
   ): Promise<void>
   /**
-   * Start a new debugging session in the workspace When several workspace documents share the same
+   * Start a new debugging session in the workspace. When several workspace documents share the same
    * name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param name - Workspace document name. Does not accept null.
@@ -1002,7 +1002,7 @@ export interface WorkspaceDocumentResourceClient {
     options?: CallOptions
   ): Promise<void>
   /**
-   * Start a debugging session using the "run" or "run without building" scheme action When several
+   * Start a debugging session using the "run" or "run without building" scheme action. When several
    * workspace documents share the same name, the first match in the app's order is used, and the
    * operation does not fail as ambiguous.
    *
