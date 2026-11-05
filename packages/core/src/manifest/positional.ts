@@ -51,36 +51,35 @@ export interface PositionalIssue {
 }
 
 /**
- * Whether the app finds an object of `resourceKey` by its identifier, level by
- * level: it has a primary identifier, is not positional, has a usable `get`,
- * and, when that `get` records a parent, the parent is found the same way. A
- * chain of parents that comes back to a resource already in it has no
- * top-level container to start from.
+ * How the app finds an object of `resourceKey`, as the parent of a positional
+ * resource: `'application'` when it has a primary identifier, is not
+ * positional, and has a usable `get` that records no parent; `'nested'`, with
+ * the parent, when that `get` records one; `undefined` otherwise. A
+ * positional item's get, update and delete bodies bind its parent at the
+ * application by the parent's identifier (`app.windows.byId(id)`), so only
+ * `'application'` can hold positional items until those bodies bind a whole
+ * chain of parents.
  */
-function foundByIdentifier(
+function parentLookup(
   manifest: AppManifest,
-  resourceKey: string,
-  seen: ReadonlySet<string> = new Set()
-): boolean {
+  resourceKey: string
+): 'application' | { readonly nested: string } | undefined {
   const resource = Object.hasOwn(manifest.resources, resourceKey)
     ? manifest.resources[resourceKey]
     : undefined
-  if (resource === undefined || seen.has(resourceKey) || isPositional(manifest, resourceKey)) {
-    return false
-  }
-  if (resolvePrimaryIdentifierProperty(resource) === undefined) return false
+  if (resource === undefined || isPositional(manifest, resourceKey)) return undefined
+  if (resolvePrimaryIdentifierProperty(resource) === undefined) return undefined
   const get = resolvingCommand(manifest, resourceKey, 'get')
-  if (get === undefined) return false
-  const parent = get[1].parent?.resource
-  return (
-    parent === undefined || foundByIdentifier(manifest, parent, new Set([...seen, resourceKey]))
-  )
+  if (get === undefined) return undefined
+  const above = get[1].parent?.resource
+  return above === undefined ? 'application' : { nested: above }
 }
 
 /**
  * What is wrong with one positional resource's commands: its `get` must exist
- * and record a parent the app finds by its identifier, and every command that
- * selects one of its items must select it by an integer position.
+ * and record a parent the app finds at the application by its identifier, and
+ * every command that selects one of its items must record that same parent and
+ * select the item by an integer position.
  */
 function commandIssues(manifest: AppManifest, resourceKey: string): PositionalIssue[] {
   const at = ['resources', resourceKey, 'positional']
@@ -101,13 +100,30 @@ function commandIssues(manifest: AppManifest, resourceKey: string): PositionalIs
       message: `A positional resource is found by its position within its parent, so the get "${getKey}" of "${resourceKey}" must record that parent.`,
       path: at,
     })
-  } else if (!foundByIdentifier(manifest, parent)) {
-    issues.push({
-      message: `A positional resource is counted within a parent the app finds by its identifier, but "${parent}", the parent the get "${getKey}" of "${resourceKey}" records, is not: it needs a primary identifier and a get, and so does each parent above it.`,
-      path: at,
-    })
+  } else {
+    const lookup = parentLookup(manifest, parent)
+    const counted = `A positional resource is counted within a parent the app finds at the application by its identifier, but "${parent}", the parent the get "${getKey}" of "${resourceKey}" records,`
+    if (lookup === undefined) {
+      issues.push({
+        message: `${counted} is not: it needs a primary identifier and a get.`,
+        path: at,
+      })
+    } else if (lookup !== 'application') {
+      issues.push({
+        message: `${counted} is found within "${lookup.nested}". Nested parents are not supported yet.`,
+        path: at,
+      })
+    }
   }
   for (const [commandKey, command] of resourceCommandEntries(manifest, resourceKey)) {
+    if (parent !== undefined && selectsOneItem(command) && command.parent?.resource !== parent) {
+      // Its body finds the item within the parent the command records, so a
+      // command recording none, or another, could not find it.
+      issues.push({
+        message: `The ${command.name} command "${commandKey}" selects an item of the positional resource "${resourceKey}" within its parent, so it must record the parent "${parent}", as the get "${getKey}" does.`,
+        path: ['commands', commandKey, 'parent'],
+      })
+    }
     const position = positionParameterIssue(commandKey, command, resourceKey)
     if (position !== undefined) issues.push(position)
   }

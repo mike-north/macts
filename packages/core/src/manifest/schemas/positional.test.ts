@@ -121,7 +121,67 @@ describe('a positional resource', () => {
     expect(issues(unidentifiedParent)).toContainEqual({
       path: ['resources', 'Tab', 'positional'],
       message:
-        'A positional resource is counted within a parent the app finds by its identifier, but "Window", the parent the get "getTab" of "Tab" records, is not: it needs a primary identifier and a get, and so does each parent above it.',
+        'A positional resource is counted within a parent the app finds at the application by its identifier, but "Window", the parent the get "getTab" of "Tab" records, is not: it needs a primary identifier and a get.',
+    })
+  })
+
+  // The get, update and delete bodies find the parent at the application
+  // (\`app.windows.byId(id)\`), so a window held in a group is out of reach.
+  it('is refused within a parent that is itself found within another', () => {
+    const nested = panes((raw) => {
+      raw.resources['Group'] = {
+        name: 'Group',
+        plural: 'Groups',
+        description: 'A group of windows',
+        properties: {
+          id: { access: 'r', type: 'integer', description: "The group's id", code: 'ID  ' },
+        },
+        identifiers: [{ property: 'id', primary: true }],
+      }
+      raw.commands['getGroup'] = {
+        name: 'get',
+        description: 'Get a group',
+        scope: 'resource',
+        resourceType: 'Group',
+        parameters: [{ name: 'id', type: 'integer', description: 'The group', required: true }],
+      }
+      const getWindow = command(raw, 'getWindow')
+      getWindow['parent'] = { resource: 'Group', parameter: 'groupId' }
+      getWindow['parameters'] = [
+        { name: 'groupId', type: 'integer', description: 'The group', required: true },
+        ...(getWindow['parameters'] as object[]),
+      ]
+    })
+
+    expect(issues(nested)).toContainEqual({
+      path: ['resources', 'Tab', 'positional'],
+      message:
+        'A positional resource is counted within a parent the app finds at the application by its identifier, but "Window", the parent the get "getTab" of "Tab" records, is found within "Group". Nested parents are not supported yet.',
+    })
+  })
+
+  it.each<[string, Record<string, unknown> | undefined]>([
+    ['records no parent', undefined],
+    ['records a parent other than its get’s', { resource: 'Tab', parameter: 'windowId' }],
+  ])('is refused when an item command %s', (_label, parent) => {
+    const parentless = panes((raw) => {
+      raw.commands['deleteTab'] = {
+        name: 'delete',
+        description: 'Close a tab',
+        scope: 'resource',
+        resourceType: 'Tab',
+        ...(parent === undefined ? {} : { parent }),
+        parameters: [
+          { name: 'windowId', type: 'integer', description: 'The window', required: true },
+          { name: 'index', type: 'integer', description: 'The tab', required: true },
+        ],
+      }
+    })
+
+    expect(issues(parentless)).toContainEqual({
+      path: ['commands', 'deleteTab', 'parent'],
+      message:
+        'The delete command "deleteTab" selects an item of the positional resource "Tab" within its parent, so it must record the parent "Window", as the get "getTab" does.',
     })
   })
 
