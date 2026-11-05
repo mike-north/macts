@@ -868,7 +868,9 @@ ${methodBody}
  * imports under the local name `pagingNames.page`. A list that pages (see
  * `listOperationPages`) takes a trailing `page` argument whose `pageSize` is
  * sent in its integer wire form and whose `cursor` is sent as given. Any
- * other list takes no paging argument and its page holds every item.
+ * other list takes no paging argument and its page holds every item. A
+ * required `integer` parameter is taken as a number and sent in the same
+ * integer wire form.
  */
 function generateListMethod(
   routeSegment: string,
@@ -888,9 +890,13 @@ function generateListMethod(
   })
   if (paged) params.push(`${page}: { pageSize?: number; cursor?: string } = {}`)
 
+  // An `integer` parameter is sent in its integer wire form, as the page size
+  // is; the operation's input rejects a bare JSON number.
   const bodyProps = requiredParams.map((p) => {
     const safeName = safeIdentifier(p.name)
-    return safeName === p.name ? safeName : `'${p.name}': ${safeName}`
+    const key = safeName === p.name ? p.name : `'${p.name}'`
+    if (p.type === 'integer') return `${key}: { integer: String(${safeName}) }`
+    return safeName === p.name ? safeName : `${key}: ${safeName}`
   })
   if (paged) {
     bodyProps.unshift(
