@@ -1,5 +1,19 @@
 # @macts/messages-server
 
+## 0.3.0
+
+### Minor Changes
+
+- 2a00978: Server packages are now contract-only. Each re-exports its app's generated contract from `@macts/<app>/contract` as `contract`, and depends only on `@macts/<app>`. The `./mcp` export (the generated MCP plugin) and the `plugin` export (the HTTP API plugin with its embedded manifest) are removed, along with the dependencies on `@macts/api`, `@macts/core` and `@macts/types`. A macts host serves the app from the contract and the app's manifest. The package's `types` entry now points at the declarations the build emits.
+
+### Patch Changes
+
+- Updated dependencies [c5a4690]
+- Updated dependencies [e2c7efc]
+- Updated dependencies [36942f9]
+- Updated dependencies [a746285]
+  - @macts/messages@0.3.0
+
 ## 0.2.0
 
 ### Patch Changes
