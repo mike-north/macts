@@ -257,7 +257,7 @@ describe('generateHttpClientSdk', () => {
     const result = generateHttpClientSdk(testManifest, { packageName: '@macts/sdk-testapp' })
     const content = findFile(result.files, 'src/resources/item.ts').content
     expect(content).toContain(
-      '...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } })'
+      '...(page.pageSize === undefined ? {} : { pageSize: __mactsIntegerInput(page.pageSize) })'
     )
     expect(content).toContain('...(page.cursor === undefined ? {} : { cursor: page.cursor })')
   })

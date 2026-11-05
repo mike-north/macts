@@ -54,7 +54,7 @@ export interface BrowserWindowCreateInput {
 // @public
 export class BrowserWindowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<BrowserWindow>;
+    get(id: string | number): Promise<BrowserWindow>;
     list(): Promise<Page<BrowserWindow>>;
 }
 
@@ -208,7 +208,7 @@ export type PlaylistWindowCreateInput = Record<string, never>;
 // @public
 export class PlaylistWindowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<PlaylistWindow>;
+    get(id: string | number): Promise<PlaylistWindow>;
     list(): Promise<Page<PlaylistWindow>>;
 }
 

@@ -8,6 +8,26 @@
 import { ActionResourceClient } from './resources/action.js'
 import { UIElementResourceClient } from './resources/uielement.js'
 
+import {
+  ValueTypes as __mactsValueTypes,
+  ValidationError as __mactsValidationError,
+} from '@macts/contracts'
+
+/** Integer wire policy shared with the operation contracts, built once per module. */
+const __mactsIntegerWire = __mactsValueTypes.integer().wire
+
+/** Validate CLI text or an SDK number before dispatch, without implicit rounding. */
+function __mactsIntegerInput(value: unknown): { integer: string } {
+  const integer = typeof value === 'number' || typeof value === 'string' ? String(value) : undefined
+  const candidate = { integer }
+  if (!__mactsIntegerWire.safeParse(candidate).success || integer === undefined) {
+    const message =
+      'Expected a canonical decimal integer from -9007199254740991 to 9007199254740991.'
+    throw new __mactsValidationError(message, { issues: [{ path: [], message }] })
+  }
+  return { integer }
+}
+
 /**
  * Client configuration options.
  */
@@ -266,7 +286,9 @@ export class SystemEventsClient {
   async editActionOf(usingActionName?: string, usingActionNumber?: number): Promise<void> {
     await this.#httpClient.rpc<undefined>('system-events.app.editActionOf', {
       usingActionName,
-      usingActionNumber,
+      ...(usingActionNumber === undefined
+        ? {}
+        : { usingActionNumber: __mactsIntegerInput(usingActionNumber) }),
     })
   }
 
@@ -304,7 +326,9 @@ export class SystemEventsClient {
   async removeActionFrom(usingActionName?: string, usingActionNumber?: number): Promise<void> {
     await this.#httpClient.rpc<undefined>('system-events.app.removeActionFrom', {
       usingActionName,
-      usingActionNumber,
+      ...(usingActionNumber === undefined
+        ? {}
+        : { usingActionNumber: __mactsIntegerInput(usingActionNumber) }),
     })
   }
 }

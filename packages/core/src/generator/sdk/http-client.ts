@@ -493,6 +493,7 @@ function generateClientFile(
 
 ${resourceImports}
 ${enumImports}
+${integerInputSupport(appCommands)}
 
 /**
  * Client configuration options.
@@ -830,6 +831,7 @@ export class ${resourceName}ResourceClient {
  */
 
 ${contractsImportLine}import type { HttpClient } from '../client.js';${typesImportLine}
+${integerInputSupport(methodBody)}
 
 /**
  * Client for ${resource.description.toLowerCase()}.
@@ -868,7 +870,9 @@ ${methodBody}
  * imports under the local name `pagingNames.page`. A list that pages (see
  * `listOperationPages`) takes a trailing `page` argument whose `pageSize` is
  * sent in its integer wire form and whose `cursor` is sent as given. Any
- * other list takes no paging argument and its page holds every item.
+ * other list takes no paging argument and its page holds every item. A
+ * required `integer` parameter is taken as a number and sent in the same
+ * integer wire form.
  */
 function generateListMethod(
   routeSegment: string,
@@ -888,13 +892,14 @@ function generateListMethod(
   })
   if (paged) params.push(`${page}: { pageSize?: number; cursor?: string } = {}`)
 
-  const bodyProps = requiredParams.map((p) => {
-    const safeName = safeIdentifier(p.name)
-    return safeName === p.name ? safeName : `'${p.name}': ${safeName}`
-  })
+  // An `integer` parameter is sent in its integer wire form, as the page size
+  // is; the operation's input rejects a bare JSON number.
+  const bodyProps = requiredParams.map((p) =>
+    bodyField({ name: p.name, binding: safeIdentifier(p.name), integer: p.type === 'integer' })
+  )
   if (paged) {
     bodyProps.unshift(
-      `...(${page}.pageSize === undefined ? {} : { pageSize: { integer: String(${page}.pageSize) } })`,
+      `...(${page}.pageSize === undefined ? {} : { pageSize: ${integerWire(`${page}.pageSize`)} })`,
       `...(${page}.cursor === undefined ? {} : { cursor: ${page}.cursor })`
     )
   }
@@ -949,6 +954,9 @@ function docNoteLines(notes: readonly string[]): string {
  * it is included as the first argument so the server can scope the JXA query to
  * the correct parent collection — e.g. `app.calendars.whose({name:calendarId})[0]
  * .events.byId(id)` instead of the broken `app.events.byId(id)`.
+ *
+ * An identifier declared `integer` is sent in its integer wire form
+ * ({@link bodyField}), the only form the operation's input admits.
  */
 function generateGetMethod(
   routeSegment: string,
@@ -959,13 +967,14 @@ function generateGetMethod(
 ): string {
   const { parentParam, childParam } = resolveIdParams(command)
   const noteLine = docNoteLines(notes)
+  const field = (name: string): string => identifierField(command, name)
   if (parentParam !== undefined) {
     return `
   /**
    * Get a ${nameWords} by ${childParam} within a parent scope.${noteLine}
    */
-  async get(${parentParam}: string, ${childParam}: string): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${parentParam}, ${childParam} });
+  async get(${parentParam}: ${identifierType(command, parentParam)}, ${childParam}: ${identifierType(command, childParam)}): Promise<${resourceName}> {
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${field(parentParam)}, ${field(childParam)} });
   }
 `
   }
@@ -973,10 +982,100 @@ function generateGetMethod(
   /**
    * Get a ${nameWords} by ${childParam}.${noteLine}
    */
-  async get(${childParam}: string): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${childParam} });
+  async get(${childParam}: ${identifierType(command, childParam)}): Promise<${resourceName}> {
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${field(childParam)} });
   }
 `
+}
+
+/**
+ * The generated expression for the contract's wire form of the integer
+ * `value` (phases/13 D3: an integer travels as canonical decimal text,
+ * `{ integer: "<digits>" }`), the only form an operation's input admits for
+ * an `integer`. The emitted helper validates both SDK numbers and CLI text
+ * against that policy before any request is dispatched.
+ */
+function integerWire(value: string): string {
+  return `__mactsIntegerInput(${value})`
+}
+
+/**
+ * Emit validation only in modules that send integer inputs. The shared value
+ * contract owns canonical decimal syntax and safe bounds; this compatibility
+ * client accepts CLI text without rounding it or widening that domain.
+ * Failures use the canonical SDK error before the HTTP layer sees a body.
+ */
+function integerInputSupport(methods: string): string {
+  if (!methods.includes('__mactsIntegerInput(')) return ''
+  return `
+import { ValueTypes as __mactsValueTypes, ValidationError as __mactsValidationError } from '@macts/contracts';
+
+/** Integer wire policy shared with the operation contracts, built once per module. */
+const __mactsIntegerWire = __mactsValueTypes.integer().wire;
+
+/** Validate CLI text or an SDK number before dispatch, without implicit rounding. */
+function __mactsIntegerInput(value: unknown): { integer: string } {
+  const integer = typeof value === 'number' || typeof value === 'string' ? String(value) : undefined;
+  const candidate = { integer };
+  if (!__mactsIntegerWire.safeParse(candidate).success || integer === undefined) {
+    const message = 'Expected a canonical decimal integer from -9007199254740991 to 9007199254740991.';
+    throw new __mactsValidationError(message, { issues: [{ path: [], message }] });
+  }
+  return { integer };
+}
+`
+}
+
+/** What {@link bodyField} needs to know about one request-body field. */
+interface BodyFieldSpec {
+  /** The field's key in the request body: the parameter's manifest name. */
+  readonly name: string
+  /** The generated local holding the field's value. */
+  readonly binding: string
+  /** Whether the parameter is declared `integer`. */
+  readonly integer: boolean
+  /** Whether the value may be absent; an absent value sends no field. */
+  readonly optional?: boolean
+}
+
+/**
+ * One request-body field of a generated client method, as object-literal
+ * text. Every input the generated client sends goes through it: a get's,
+ * update's or delete's identifiers, a list's parameters, and a command's
+ * parameters, a resource command's item included.
+ *
+ * An `integer` is sent in its integer wire form ({@link integerWire}), the
+ * only form the operation's input admits; an optional one is sent only when
+ * it is supplied, since the wire form of an absent value is not absence. Any
+ * other value is sent as given, and JSON leaves an absent one out.
+ */
+function bodyField({ name, binding, integer, optional = false }: BodyFieldSpec): string {
+  const key = binding === name ? name : `'${name}'`
+  if (!integer) return binding === name ? binding : `${key}: ${binding}`
+  const field = `${key}: ${integerWire(binding)}`
+  return optional ? `...(${binding} === undefined ? {} : { ${field} })` : field
+}
+
+/**
+ * The request-body field of the identifier parameter `name` of `command`, a
+ * get, update or delete, bound to a local of the same name.
+ */
+function identifierField(command: Command, name: string): string {
+  return bodyField({ name, binding: name, integer: isIntegerParameter(command, name) })
+}
+
+/**
+ * The TypeScript type of a get's, update's or delete's identifier argument. An `integer` identifier
+ * is taken as the number it is or as the text a CLI passes, and sent in its
+ * integer wire form; any other identifier is a string.
+ */
+function identifierType(command: Command, name: string): string {
+  return isIntegerParameter(command, name) ? 'string | number' : 'string'
+}
+
+/** Whether `command` declares the parameter `name` as an `integer`. */
+function isIntegerParameter(command: Command, name: string): boolean {
+  return command.parameters.find((p) => p.name === name)?.type === 'integer'
 }
 
 /**
@@ -1028,11 +1127,11 @@ function generateUpdateMethod(
   /**
    * Update an existing ${nameWords} within a parent scope.${noteLine}
    */
-  async update(${parentParam}: string, ${childParam}: string, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
+  async update(${parentParam}: ${identifierType(command, parentParam)}, ${childParam}: ${identifierType(command, childParam)}, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
     const { ${parentParam}: _p, ...updateFields } = input as ${resourceName}UpdateInput & { ${parentParam}?: string };
     void _p;
     const defined = Object.fromEntries(Object.entries(updateFields as Record<string, unknown>).filter(([, v]) => v !== undefined));
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${parentParam}, ${childParam}, ...defined });
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, parentParam)}, ${identifierField(command, childParam)}, ...defined });
   }
 `
   }
@@ -1040,9 +1139,9 @@ function generateUpdateMethod(
   /**
    * Update an existing ${nameWords}.${noteLine}
    */
-  async update(${childParam}: string, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
+  async update(${childParam}: ${identifierType(command, childParam)}, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
     const defined = Object.fromEntries(Object.entries(input as Record<string, unknown>).filter(([, v]) => v !== undefined));
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${childParam}, ...defined });
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, childParam)}, ...defined });
   }
 `
 }
@@ -1067,8 +1166,8 @@ function generateDeleteMethod(
   /**
    * Delete an ${nameWords} within a parent scope.${noteLine}
    */
-  async delete(${parentParam}: string, ${childParam}: string): Promise<void> {
-    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${parentParam}, ${childParam} });
+  async delete(${parentParam}: ${identifierType(command, parentParam)}, ${childParam}: ${identifierType(command, childParam)}): Promise<void> {
+    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, parentParam)}, ${identifierField(command, childParam)} });
   }
 `
   }
@@ -1076,15 +1175,16 @@ function generateDeleteMethod(
   /**
    * Delete an ${nameWords}.${noteLine}
    */
-  async delete(${childParam}: string): Promise<void> {
-    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${childParam} });
+  async delete(${childParam}: ${identifierType(command, childParam)}): Promise<void> {
+    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, childParam)} });
   }
 `
 }
 
 /**
  * Render a command method's signature and request-body argument from the shared
- * surface derivation (`commandMethodParameters`).
+ * surface derivation (`commandMethodParameters`). Each parameter, a resource
+ * command's item identifier included, is sent through {@link bodyField}.
  */
 function buildParamsAndBody(command: Command): { signature: string; bodyArg: string } {
   const { signature: signatureParams, body } = commandMethodParameters(command)
@@ -1095,10 +1195,17 @@ function buildParamsAndBody(command: Command): { signature: string; bodyArg: str
     })
     .join(', ')
 
+  const declared = new Map(command.parameters.map((parameter) => [parameter.name, parameter]))
   const bodyProps = body
-    .map(({ fieldName, bindingName }) =>
-      bindingName === fieldName ? bindingName : `'${fieldName}': ${bindingName}`
-    )
+    .map(({ fieldName, bindingName }) => {
+      const parameter = declared.get(fieldName)
+      return bodyField({
+        name: fieldName,
+        binding: bindingName,
+        integer: parameter?.type === 'integer',
+        optional: parameter?.required !== true,
+      })
+    })
     .join(', ')
   const bodyArg = bodyProps ? `{ ${bodyProps} }` : '{}'
 
