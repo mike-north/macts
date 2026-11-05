@@ -4,10 +4,10 @@
 
 ## PageSetup.pageWidth property
 
-The page width in points
+The page width in points. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-pageWidth: number
+pageWidth: number | null
 ```

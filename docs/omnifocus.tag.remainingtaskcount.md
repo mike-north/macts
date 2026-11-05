@@ -4,10 +4,10 @@
 
 ## Tag.remainingTaskCount property
 
-The number of remaining tasks
+The number of remaining tasks. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-remainingTaskCount: number
+readonly remainingTaskCount: Integer | null;
 ```

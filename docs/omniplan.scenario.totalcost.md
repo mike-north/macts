@@ -4,10 +4,10 @@
 
 ## Scenario.totalCost property
 
-The cost of the entire project
+The cost of the entire project. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-totalCost: number
+readonly totalCost: number | null;
 ```

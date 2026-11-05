@@ -4,7 +4,7 @@
 
 ## CalendarCreateInput interface
 
-Input for creating a Calendar
+Input for creating a Calendar.
 
 **Signature:**
 
@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md)
 
 </td><td>
 

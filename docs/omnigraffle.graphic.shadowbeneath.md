@@ -4,10 +4,10 @@
 
 ## Graphic.shadowBeneath property
 
-Does this graphic draw its shadow immediately beneath itself?
+Does this graphic draw its shadow immediately beneath itself? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-shadowBeneath: boolean
+shadowBeneath: boolean | null
 ```

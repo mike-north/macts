@@ -2,14 +2,93 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-word](./microsoft-word.md) &gt; [FieldUpdateInput](./microsoft-word.fieldupdateinput.md)
 
-## FieldUpdateInput type
+## FieldUpdateInput interface
 
-Input for updating a Field
+Input for updating a Field. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type FieldUpdateInput = Partial<FieldCreateInput>
+interface FieldUpdateInput
 ```
 
-**References:** [FieldCreateInput](./microsoft-word.fieldcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[fieldCode?](./microsoft-word.fieldupdateinput.fieldcode.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The field code. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[fieldText?](./microsoft-word.fieldupdateinput.fieldtext.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The field text. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[locked?](./microsoft-word.fieldupdateinput.locked.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether the field is locked. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[showCodes?](./microsoft-word.fieldupdateinput.showcodes.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether field codes are displayed. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

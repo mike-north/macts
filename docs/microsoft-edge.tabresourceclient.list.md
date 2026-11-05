@@ -4,14 +4,55 @@
 
 ## TabResourceClient.list() method
 
-List all tabs.
+List the tabs of one window, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Tab[]>;
+list(windowId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Tab>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+windowId
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Tab](./microsoft-edge.tab.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Tab](./microsoft-edge.tab.md)<!-- -->&gt;&gt;

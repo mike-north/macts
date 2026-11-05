@@ -4,10 +4,10 @@
 
 ## Track.trackCount property
 
-the total number of tracks on the source album
+the total number of tracks on the source album. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-trackCount: number
+trackCount: Integer | null
 ```

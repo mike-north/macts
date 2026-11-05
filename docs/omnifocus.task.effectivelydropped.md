@@ -4,10 +4,10 @@
 
 ## Task.effectivelyDropped property
 
-True if the task is dropped, or any of its containing tasks or project are dropped
+True if the task is dropped, or any of its containing tasks or project are dropped. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-effectivelyDropped: boolean
+readonly effectivelyDropped: boolean | null;
 ```

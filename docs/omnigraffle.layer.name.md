@@ -4,7 +4,7 @@
 
 ## Layer.name property
 
-Name of the layer
+Name of the layer. Never null: the primary identifier.
 
 **Signature:**
 

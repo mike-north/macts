@@ -4,10 +4,10 @@
 
 ## AIMHandle.value property
 
-The AIM handle value
+The AIM handle value. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-value: string
+value: string | null
 ```

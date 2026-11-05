@@ -24,31 +24,59 @@ export class PlaylistResourceClient {
   /**
    * List the playlists of one source, as one page.
    */
-  async list(sourceId: string): Promise<Page<Playlist>> {
-    return this.#http.rpc<Page<Playlist>>(`${this.#app}.${this.#resource}.list`, { sourceId })
+  async list(
+    sourceId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<Playlist>> {
+    return this.#http.invoke<Page<Playlist>>(
+      `${this.#app}.${this.#resource}.list`,
+      { sourceId },
+      __mactsOptions,
+      'Playlist'
+    )
   }
 
   /**
    * Get a playlist by persistentID within a parent scope.
    */
-  async get(sourceId: string, persistentID: string): Promise<Playlist> {
-    return this.#http.rpc<Playlist>(`${this.#app}.${this.#resource}.get`, {
-      sourceId,
-      persistentID,
-    })
+  async get(
+    sourceId: string,
+    persistentID: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Playlist> {
+    return this.#http.invoke<Playlist>(
+      `${this.#app}.${this.#resource}.get`,
+      { sourceId, persistentID },
+      __mactsOptions,
+      'Playlist'
+    )
   }
 
   /**
    * Move playlist(s) to a new location
    */
-  async move(to: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.move`, { to })
+  async move(to: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.move`,
+      { to },
+      __mactsOptions,
+      'Playlist'
+    )
   }
 
   /**
    * search a playlist for tracks matching the search string. Identical to entering search text in the Search field.
    */
-  async search(_for: string, only?: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.search`, { for: _for, only })
+  async search(
+    _for: string,
+    only?: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.search`,
+      { for: _for, only },
+      __mactsOptions,
+      'Playlist'
+    )
   }
 }

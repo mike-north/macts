@@ -4,10 +4,10 @@
 
 ## Scenario.violationCount property
 
-Number of violations in the scenario
+Number of violations in the scenario. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-violationCount: number
+readonly violationCount: Integer | null;
 ```

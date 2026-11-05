@@ -2,123 +2,28 @@
 
 [Home](./index.md) &gt; [@macts/xcode](./xcode.md) &gt; [TestFailureCreateInput](./xcode.testfailurecreateinput.md)
 
-## TestFailureCreateInput interface
+## TestFailureCreateInput type
 
-Input for creating a TestFailure
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface TestFailureCreateInput
+type TestFailureCreateInput = Omit<
+  TestFailureCreateInput$1,
+  'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'
+> & {
+  startingLineNumber?: null extends TestFailureCreateInput$1['startingLineNumber']
+    ? number | null
+    : number
+  endingLineNumber?: null extends TestFailureCreateInput$1['endingLineNumber']
+    ? number | null
+    : number
+  startingColumnNumber?: null extends TestFailureCreateInput$1['startingColumnNumber']
+    ? number | null
+    : number
+  endingColumnNumber?: null extends TestFailureCreateInput$1['endingColumnNumber']
+    ? number | null
+    : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[endingColumnNumber?](./xcode.testfailurecreateinput.endingcolumnnumber.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The ending column number in the file where the issue occurred
-
-</td></tr>
-<tr><td>
-
-[endingLineNumber?](./xcode.testfailurecreateinput.endinglinenumber.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The ending line number in the file where the issue occurred
-
-</td></tr>
-<tr><td>
-
-[filePath?](./xcode.testfailurecreateinput.filepath.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ The file path where the issue occurred
-
-</td></tr>
-<tr><td>
-
-[message?](./xcode.testfailurecreateinput.message.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ The text of the issue
-
-</td></tr>
-<tr><td>
-
-[startingColumnNumber?](./xcode.testfailurecreateinput.startingcolumnnumber.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The starting column number in the file where the issue occurred
-
-</td></tr>
-<tr><td>
-
-[startingLineNumber?](./xcode.testfailurecreateinput.startinglinenumber.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The starting line number in the file where the issue occurred
-
-</td></tr>
-</tbody></table>

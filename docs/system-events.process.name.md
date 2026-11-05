@@ -4,10 +4,10 @@
 
 ## Process.name property
 
-the name of the process
+the name of the process. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

@@ -156,6 +156,9 @@ function sdkFieldLists(manifest: AppManifest): FieldList[] {
   const types = sdk.files.find((file) => file.path === 'src/types.ts')?.content
   if (types === undefined) throw new Error('the generated SDK has no src/types.ts')
   const source = parse('src/types.ts', types)
+  const contractText = sdk.files.find((file) => file.path === CONTRACT_MODULE_PATH)?.content
+  if (contractText === undefined) throw new Error('the facade has no canonical contract')
+  const canonical = parse(CONTRACT_MODULE_PATH, contractText)
   const lists: FieldList[] = []
   for (const [resourceKey, resource] of Object.entries(manifest.resources)) {
     const read = new Set<string>()
@@ -164,11 +167,16 @@ function sdkFieldLists(manifest: AppManifest): FieldList[] {
     }
     const parameters = commandParameterNames(manifest, resourceKey)
     const entries: [string, string[] | undefined, Set<string>][] = [
-      [`SDK interface ${resourceKey}`, interfaceMembers(source, resourceKey), read],
+      [
+        `SDK interface ${resourceKey}`,
+        interfaceMembers(source, resourceKey) ?? interfaceMembers(canonical, resourceKey),
+        read,
+      ],
       [`SDK ${resourceKey}Schema`, factoryKeys(source, `${resourceKey}Schema`), read],
       [
         `SDK interface ${resourceKey}CreateInput`,
-        interfaceMembers(source, `${resourceKey}CreateInput`),
+        interfaceMembers(source, `${resourceKey}CreateInput`) ??
+          interfaceMembers(canonical, `${resourceKey}CreateInput`),
         parameters,
       ],
     ]

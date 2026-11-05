@@ -4,10 +4,10 @@
 
 ## Window.name property
 
-The title of the window
+The title of the window. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string;
 ```

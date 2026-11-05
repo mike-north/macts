@@ -30,7 +30,7 @@ Client for a folder containing shortcuts.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -97,7 +97,16 @@ A folder containing shortcuts
 
 </td><td>
 
-Input for creating a Folder
+Input for creating a Folder.
+
+</td></tr>
+<tr><td>
+
+[FolderUpdateInput](./shortcuts.folderupdateinput.md)
+
+</td><td>
+
+Input for updating a Folder. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -115,7 +124,16 @@ A shortcut in the Shortcuts application
 
 </td><td>
 
-Input for creating a Shortcut
+Input for creating a Shortcut.
+
+</td></tr>
+<tr><td>
+
+[ShortcutsClient](./shortcuts.shortcutsclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -125,6 +143,15 @@ Input for creating a Shortcut
 </td><td>
 
 Client configuration options.
+
+</td></tr>
+<tr><td>
+
+[ShortcutUpdateInput](./shortcuts.shortcutupdateinput.md)
+
+</td><td>
+
+Input for updating a Shortcut. Omitted fields are left unchanged.
 
 </td></tr>
 </tbody></table>
@@ -155,12 +182,16 @@ Every capability exposed by Shortcuts, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ShortcutSchema](./shortcuts.shortcutschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -187,20 +218,11 @@ Risk classification for a capability.
 </td></tr>
 <tr><td>
 
-[FolderUpdateInput](./shortcuts.folderupdateinput.md)
+[ShortcutsResources](./shortcuts.shortcutsresources.md)
 
 </td><td>
 
-Input for updating a Folder
-
-</td></tr>
-<tr><td>
-
-[ShortcutUpdateInput](./shortcuts.shortcutupdateinput.md)
-
-</td><td>
-
-Input for updating a Shortcut
+The type of the resource table in `shortcutsContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 </tbody></table>

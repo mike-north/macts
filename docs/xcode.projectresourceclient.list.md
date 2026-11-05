@@ -4,14 +4,55 @@
 
 ## ProjectResourceClient.list() method
 
-List all projects.
+List the projects of one workspace document, as one page. When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Project[]>;
+list(workspaceName: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Project>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+workspaceName
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Project](./xcode.project.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Project](./xcode.project.md)<!-- -->&gt;&gt;

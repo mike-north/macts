@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-word](./microsoft-word.md) &gt; [SectionUpdateInput](./microsoft-word.sectionupdateinput.md)
 
-## SectionUpdateInput type
+## SectionUpdateInput interface
 
-Input for updating a Section
+Input for updating a Section. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SectionUpdateInput = Partial<SectionCreateInput>
+interface SectionUpdateInput
 ```
 
-**References:** [SectionCreateInput](./microsoft-word.sectioncreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[protectedForForms?](./microsoft-word.sectionupdateinput.protectedforforms.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether the section is protected for forms. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

@@ -4,14 +4,55 @@
 
 ## GraphicResourceClient.list() method
 
-List all graphics.
+List the graphics of one canvas, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Graphic[]>;
+list(canvasId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Graphic>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+canvasId
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Graphic](./omnigraffle.graphic.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Graphic](./omnigraffle.graphic.md)<!-- -->&gt;&gt;

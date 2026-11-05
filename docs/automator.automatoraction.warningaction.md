@@ -4,10 +4,10 @@
 
 ## AutomatorAction.warningAction property
 
-The action suggested by the warning, if any
+The action suggested by the warning, if any. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-warningAction: string
+readonly warningAction: string | null;
 ```

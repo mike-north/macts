@@ -4,7 +4,7 @@
 
 ## VideoWindowCreateInput type
 
-Input for creating a VideoWindow
+Input for creating a VideoWindow.
 
 **Signature:**
 

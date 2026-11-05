@@ -4,12 +4,10 @@
 
 ## RadioButtonUpdateInput type
 
-Input for updating a RadioButton
+Input for updating a RadioButton. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type RadioButtonUpdateInput = Partial<RadioButtonCreateInput>
+type RadioButtonUpdateInput = Record<string, never>
 ```
-
-**References:** [RadioButtonCreateInput](./system-events.radiobuttoncreateinput.md)

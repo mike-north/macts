@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./omnigraffle.layerresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./omnigraffle.layerresourceclient.create.md)
 
 </td><td>
 
@@ -68,24 +68,24 @@ Create a new layer.
 </td></tr>
 <tr><td>
 
-[get(name)](./omnigraffle.layerresourceclient.get.md)
+[get(name, \_\_mactsOptions)](./omnigraffle.layerresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a layer by name.
+Get a layer by name. When several layers share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[list()](./omnigraffle.layerresourceclient.list.md)
+[list(canvasId, \_\_mactsOptions)](./omnigraffle.layerresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all layers.
+List the layers of one canvas, as one page.
 
 </td></tr>
 </tbody></table>

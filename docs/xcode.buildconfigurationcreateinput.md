@@ -4,7 +4,7 @@
 
 ## BuildConfigurationCreateInput type
 
-Input for creating a BuildConfiguration
+Input for creating a BuildConfiguration.
 
 **Signature:**
 

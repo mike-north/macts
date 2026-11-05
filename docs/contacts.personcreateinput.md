@@ -4,7 +4,7 @@
 
 ## PersonCreateInput interface
 
-Input for creating a Person
+Input for creating a Person.
 
 **Signature:**
 
@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-string
+Date
 
 </td><td>
 
@@ -104,21 +104,6 @@ string
 </td><td>
 
 _(Optional)_ The home page of this person.
-
-</td></tr>
-<tr><td>
-
-[image?](./contacts.personcreateinput.image.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Image for person.
 
 </td></tr>
 <tr><td>

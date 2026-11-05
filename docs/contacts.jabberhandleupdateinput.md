@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/contacts](./contacts.md) &gt; [JabberHandleUpdateInput](./contacts.jabberhandleupdateinput.md)
 
-## JabberHandleUpdateInput type
+## JabberHandleUpdateInput interface
 
-Input for updating a JabberHandle
+Input for updating a JabberHandle. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type JabberHandleUpdateInput = Partial<JabberHandleCreateInput>
+interface JabberHandleUpdateInput
 ```
 
-**References:** [JabberHandleCreateInput](./contacts.jabberhandlecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[label?](./contacts.jabberhandleupdateinput.label.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Label for this handle. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[value?](./contacts.jabberhandleupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The Jabber handle value. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

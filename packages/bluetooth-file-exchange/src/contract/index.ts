@@ -47,9 +47,10 @@ export type ApplicationUpdateInput = Record<string, never>
 
 /**
  * The Bluetooth File Exchange client: one namespace per resource that has operations, plus the
- * app's own commands. A client factory creates one from {@link bluetoothFileExchangeContract}. Its
- * type carries the contract's resource table, {@link BluetoothFileExchangeResources}, so references
- * can be bound to it by resource; the brand has no runtime member.
+ * app's own commands. A client factory creates one from `bluetoothFileExchangeContract` in the
+ * app's `/contract` entry. Its type carries the contract's resource table, {@link
+ * BluetoothFileExchangeResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
 export interface BluetoothFileExchangeClient extends ClientBrand<BluetoothFileExchangeResources> {
   /**
@@ -68,7 +69,7 @@ export interface BluetoothFileExchangeClient extends ClientBrand<BluetoothFileEx
 }
 
 /**
- * The type of the resource table of {@link bluetoothFileExchangeContract}: every resource a
+ * The type of the resource table in `bluetoothFileExchangeContract` (the app's `/contract` entry): every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
  * references to it, and, for each of those operations that finds the

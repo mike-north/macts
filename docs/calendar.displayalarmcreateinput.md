@@ -2,63 +2,16 @@
 
 [Home](./index.md) &gt; [@macts/calendar](./calendar.md) &gt; [DisplayAlarmCreateInput](./calendar.displayalarmcreateinput.md)
 
-## DisplayAlarmCreateInput interface
+## DisplayAlarmCreateInput type
 
-Input for creating a DisplayAlarm
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface DisplayAlarmCreateInput
+type DisplayAlarmCreateInput = Omit<DisplayAlarmCreateInput$1, 'triggerInterval'> & {
+  triggerInterval?: null extends DisplayAlarmCreateInput$1['triggerInterval']
+    ? number | null
+    : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[triggerDate?](./calendar.displayalarmcreateinput.triggerdate.md)
-
-</td><td>
-
-</td><td>
-
-Date
-
-</td><td>
-
-_(Optional)_ An absolute alarm date
-
-</td></tr>
-<tr><td>
-
-[triggerInterval?](./calendar.displayalarmcreateinput.triggerinterval.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The interval in minutes between the event and the alarm (positive for after, negative for before)
-
-</td></tr>
-</tbody></table>

@@ -9,7 +9,7 @@ Invoke the "test" scheme action
 **Signature:**
 
 ```typescript
-test(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void>;
+test(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -58,6 +58,19 @@ withEnvironmentVariables
 </td><td>
 
 unknown
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

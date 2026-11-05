@@ -4,7 +4,7 @@
 
 ## WindowCreateInput interface
 
-Input for creating a Window
+Input for creating a Window.
 
 **Signature:**
 

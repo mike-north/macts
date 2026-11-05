@@ -24,14 +24,27 @@ export class ScenarioResourceClient {
   /**
    * List all scenarios, as one page.
    */
-  async list(): Promise<Page<Scenario>> {
-    return this.#http.rpc<Page<Scenario>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Scenario>> {
+    return this.#http.invoke<Page<Scenario>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'Scenario'
+    )
   }
 
   /**
    * Get a scenario by id.
    */
-  async get(id: string): Promise<Scenario> {
-    return this.#http.rpc<Scenario>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Scenario> {
+    return this.#http.invoke<Scenario>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Scenario'
+    )
   }
 }

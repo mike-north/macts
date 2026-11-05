@@ -21,6 +21,7 @@
 export { XcodeClient, XcodeError, HttpClient } from './client.js'
 export type { XcodeClientOptions } from './client.js'
 export * from './types.js'
+export type { XcodeResources } from './contract/index.js'
 export { WorkspaceDocumentResourceClient } from './resources/workspacedocument.js'
 export { ProjectResourceClient } from './resources/project.js'
 export { SchemeResourceClient } from './resources/scheme.js'

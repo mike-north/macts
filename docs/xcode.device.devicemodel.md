@@ -4,10 +4,10 @@
 
 ## Device.deviceModel property
 
-The model of device
+The model of device. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-deviceModel: string
+readonly deviceModel: string | null;
 ```

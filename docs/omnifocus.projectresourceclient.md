@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./omnifocus.projectresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./omnifocus.projectresourceclient.create.md)
 
 </td><td>
 
@@ -68,7 +68,7 @@ Create a new project.
 </td></tr>
 <tr><td>
 
-[get(id)](./omnifocus.projectresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./omnifocus.projectresourceclient.get.md)
 
 </td><td>
 
@@ -79,13 +79,13 @@ Get a project by id.
 </td></tr>
 <tr><td>
 
-[list()](./omnifocus.projectresourceclient.list.md)
+[list(\_\_mactsOptions)](./omnifocus.projectresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all projects.
+List all projects, as one page.
 
 </td></tr>
 </tbody></table>

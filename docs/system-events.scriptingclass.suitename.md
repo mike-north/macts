@@ -4,10 +4,10 @@
 
 ## ScriptingClass.suiteName property
 
-The name of the suite to which this class belongs
+The name of the suite to which this class belongs. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-suiteName: string
+readonly suiteName: string | null;
 ```

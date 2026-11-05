@@ -4,10 +4,10 @@
 
 ## Disk.ejectable property
 
-Can the media be ejected (floppies, CDs, and so on)?
+Can the media be ejected (floppies, CDs, and so on)? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-ejectable: boolean
+readonly ejectable: boolean | null;
 ```

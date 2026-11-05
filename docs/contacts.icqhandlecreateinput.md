@@ -4,7 +4,7 @@
 
 ## ICQHandleCreateInput interface
 
-Input for creating a ICQHandle
+Input for creating an ICQHandle.
 
 **Signature:**
 

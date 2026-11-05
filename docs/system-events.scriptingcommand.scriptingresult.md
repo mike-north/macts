@@ -4,10 +4,10 @@
 
 ## ScriptingCommand.scriptingResult property
 
-The object or data returned by this command
+The object or data returned by this command. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-scriptingResult: unknown
+readonly scriptingResult: unknown;
 ```

@@ -4,10 +4,10 @@
 
 ## Track.albumRating property
 
-the rating of the album for this track (0 to 100)
+the rating of the album for this track (0 to 100). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-albumRating: number
+albumRating: Integer | null
 ```

@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The persistent unique identifier for this profile.
+The persistent unique identifier for this profile. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ The persistent unique identifier for this profile.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The service name of this social profile.
+The service name of this social profile. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +71,11 @@ The service name of this social profile.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The URL of this social profile.
+The URL of this social profile. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +86,11 @@ The URL of this social profile.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-A service-specific identifier used with this social profile.
+A service-specific identifier used with this social profile. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +101,11 @@ A service-specific identifier used with this social profile.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The username used with this social profile.
+The username used with this social profile. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

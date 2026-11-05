@@ -4,7 +4,7 @@
 
 ## PackageCreateInput type
 
-Input for creating a Package
+Input for creating a Package.
 
 **Signature:**
 

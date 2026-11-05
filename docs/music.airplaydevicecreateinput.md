@@ -2,63 +2,14 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [AirPlayDeviceCreateInput](./music.airplaydevicecreateinput.md)
 
-## AirPlayDeviceCreateInput interface
+## AirPlayDeviceCreateInput type
 
-Input for creating a AirPlayDevice
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface AirPlayDeviceCreateInput
+type AirPlayDeviceCreateInput = Omit<AirPlayDeviceCreateInput$1, 'soundVolume'> & {
+  soundVolume?: null extends AirPlayDeviceCreateInput$1['soundVolume'] ? number | null : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[selected?](./music.airplaydevicecreateinput.selected.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ is the device currently selected?
-
-</td></tr>
-<tr><td>
-
-[soundVolume?](./music.airplaydevicecreateinput.soundvolume.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ the output volume for the device (0 = minimum, 100 = maximum)
-
-</td></tr>
-</tbody></table>

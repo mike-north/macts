@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [RecipientUpdateInput](./mail.recipientupdateinput.md)
 
-## RecipientUpdateInput type
+## RecipientUpdateInput interface
 
-Input for updating a Recipient
+Input for updating a Recipient. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type RecipientUpdateInput = Partial<RecipientCreateInput>
+interface RecipientUpdateInput
 ```
 
-**References:** [RecipientCreateInput](./mail.recipientcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[address?](./mail.recipientupdateinput.address.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The recipients email address. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[name?](./mail.recipientupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name used for display. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

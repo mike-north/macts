@@ -4,10 +4,10 @@
 
 ## Account.emptySentMessagesOnQuit property
 
-Does nothing at all (deprecated)
+Does nothing at all (deprecated). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-emptySentMessagesOnQuit: boolean
+emptySentMessagesOnQuit: boolean | null
 ```

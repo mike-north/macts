@@ -4,10 +4,10 @@
 
 ## Process.acceptsRemoteEvents property
 
-Does the process accept remote events?
+Does the process accept remote events? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-acceptsRemoteEvents: boolean
+readonly acceptsRemoteEvents: boolean | null;
 ```

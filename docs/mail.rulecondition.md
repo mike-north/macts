@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Rule expression field
+Rule expression field. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ Rule expression field
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Rule header key
+Rule header key. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ Rule header key
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Rule qualifier
+Rule qualifier. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ Rule qualifier
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Rule type
+Rule type. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -4,12 +4,15 @@
 
 ## ReminderResourceClient.list() method
 
-List all reminders.
+List the reminders of one list, one page at a time. When the result has a `nextCursor`<!-- -->, more remain: call again with the same arguments and `{ cursor: nextCursor }`<!-- -->.
 
 **Signature:**
 
 ```typescript
-list(listId: string): Promise<Reminder[]>;
+list(listId: string, page?: {
+        pageSize?: number;
+        cursor?: string;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Reminder>>;
 ```
 
 ## Parameters
@@ -38,8 +41,34 @@ string
 </td><td>
 
 </td></tr>
+<tr><td>
+
+page
+
+</td><td>
+
+{ pageSize?: number; cursor?: string; }
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
 </tbody></table>
 
 **Returns:**
 
-Promise&lt;[Reminder](./reminders.reminder.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Reminder](./reminders.reminder.md)<!-- -->&gt;&gt;

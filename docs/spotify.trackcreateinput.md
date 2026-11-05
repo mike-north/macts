@@ -4,7 +4,7 @@
 
 ## TrackCreateInput type
 
-Input for creating a Track
+Input for creating a Track.
 
 **Signature:**
 

@@ -4,10 +4,10 @@
 
 ## Task.endingDateLocked property
 
-Whether the end date is locked or not
+Whether the end date is locked or not. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-endingDateLocked: boolean
+endingDateLocked: boolean | null
 ```

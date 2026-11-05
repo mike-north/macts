@@ -4,7 +4,7 @@
 
 ## PopOverCreateInput type
 
-Input for creating a PopOver
+Input for creating a PopOver.
 
 **Signature:**
 

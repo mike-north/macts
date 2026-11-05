@@ -4,10 +4,10 @@
 
 ## Cell.rowIndex property
 
-The row index of the cell
+The row index of the cell. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-rowIndex: number
+readonly rowIndex: Integer | null;
 ```

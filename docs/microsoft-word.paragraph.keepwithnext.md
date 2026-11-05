@@ -4,10 +4,10 @@
 
 ## Paragraph.keepWithNext property
 
-Whether paragraph stays with next paragraph
+Whether paragraph stays with next paragraph. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-keepWithNext: boolean
+keepWithNext: boolean | null
 ```

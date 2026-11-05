@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-word](./microsoft-word.md) &gt; [ColumnUpdateInput](./microsoft-word.columnupdateinput.md)
 
-## ColumnUpdateInput type
+## ColumnUpdateInput interface
 
-Input for updating a Column
+Input for updating a Column. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ColumnUpdateInput = Partial<ColumnCreateInput>
+interface ColumnUpdateInput
 ```
 
-**References:** [ColumnCreateInput](./microsoft-word.columncreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[preferredWidth?](./microsoft-word.columnupdateinput.preferredwidth.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The preferred width of the column. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[width?](./microsoft-word.columnupdateinput.width.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The width of the column in points. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

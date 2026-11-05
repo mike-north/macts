@@ -4,10 +4,10 @@
 
 ## AutomatorAction.showActionWhenRun property
 
-Shall the action show its user interface when it is run?
+Shall the action show its user interface when it is run? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-showActionWhenRun: boolean
+showActionWhenRun: boolean | null
 ```

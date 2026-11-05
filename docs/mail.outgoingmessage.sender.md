@@ -4,10 +4,10 @@
 
 ## OutgoingMessage.sender property
 
-The sender of the message
+The sender of the message. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-sender: string
+sender: string | null
 ```

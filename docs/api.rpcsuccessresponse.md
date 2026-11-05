@@ -4,7 +4,7 @@
 
 ## RpcSuccessResponse interface
 
-RPC success response structure.
+The body of a successful runtime call: an operation result or a resolved reference.
 
 **Signature:**
 
@@ -42,6 +42,8 @@ Description
 T
 
 </td><td>
+
+The call's result in wire form.
 
 </td></tr>
 </tbody></table>

@@ -4,6 +4,8 @@
 
 ## ReminderSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -20,7 +22,7 @@ ReminderSchema: z.ZodObject<
     flagged: z.ZodBoolean
     creationDate: z.ZodString
     modificationDate: z.ZodString
-    allDayDueDate: z.ZodString
+    alldayDueDate: z.ZodString
   },
   z.core.$strip
 >

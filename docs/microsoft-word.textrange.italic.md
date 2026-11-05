@@ -4,10 +4,10 @@
 
 ## TextRange.italic property
 
-Whether the text is formatted as italic
+Whether the text is formatted as italic. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-italic: boolean
+italic: boolean | null
 ```

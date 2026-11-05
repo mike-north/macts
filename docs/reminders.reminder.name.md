@@ -4,7 +4,7 @@
 
 ## Reminder.name property
 
-The name of the reminder
+The name of the reminder. Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 

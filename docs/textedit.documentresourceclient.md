@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./textedit.documentresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./textedit.documentresourceclient.create.md)
 
 </td><td>
 
@@ -68,24 +68,24 @@ Create a new document.
 </td></tr>
 <tr><td>
 
-[get(name)](./textedit.documentresourceclient.get.md)
+[get(name, \_\_mactsOptions)](./textedit.documentresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a document by name.
+Get a document by name. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[list()](./textedit.documentresourceclient.list.md)
+[list(\_\_mactsOptions)](./textedit.documentresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all documents.
+List all documents, as one page.
 
 </td></tr>
 </tbody></table>

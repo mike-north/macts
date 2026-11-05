@@ -37,28 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The description of the command
-
-</td></tr>
-<tr><td>
-
-[directParameter](./system-events.scriptingcommand.directparameter.md)
+string \| null
 
 </td><td>
 
-</td><td>
-
-unknown
-
-</td><td>
-
-The direct parameter of the command
+The description of the command. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +54,15 @@ The direct parameter of the command
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the command hidden?
+boolean \| null
+
+</td><td>
+
+Is the command hidden? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +71,15 @@ Is the command hidden?
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the command
+The unique identifier of the command. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -97,13 +88,15 @@ The unique identifier of the command
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the command
+string \| null
+
+</td><td>
+
+The name of the command. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,13 +105,15 @@ The name of the command
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 unknown
 
 </td><td>
 
-The object or data returned by this command
+The object or data returned by this command. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +122,15 @@ The object or data returned by this command
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the suite to which this command belongs
+string \| null
+
+</td><td>
+
+The name of the suite to which this command belongs. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -4,7 +4,7 @@
 
 ## BuildSettingCreateInput interface
 
-Input for creating a BuildSetting
+Input for creating a BuildSetting.
 
 **Signature:**
 

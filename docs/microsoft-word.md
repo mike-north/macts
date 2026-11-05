@@ -30,7 +30,7 @@ Client for a microsoft word document.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -79,7 +79,16 @@ A bookmark in a document
 
 </td><td>
 
-Input for creating a Bookmark
+Input for creating a Bookmark.
+
+</td></tr>
+<tr><td>
+
+[BookmarkUpdateInput](./microsoft-word.bookmarkupdateinput.md)
+
+</td><td>
+
+Input for updating a Bookmark. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -106,7 +115,16 @@ A cell in a table
 
 </td><td>
 
-Input for creating a Cell
+Input for creating a Cell.
+
+</td></tr>
+<tr><td>
+
+[CellUpdateInput](./microsoft-word.cellupdateinput.md)
+
+</td><td>
+
+Input for updating a Cell. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -124,7 +142,16 @@ A column in a table
 
 </td><td>
 
-Input for creating a Column
+Input for creating a Column.
+
+</td></tr>
+<tr><td>
+
+[ColumnUpdateInput](./microsoft-word.columnupdateinput.md)
+
+</td><td>
+
+Input for updating a Column. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -142,7 +169,16 @@ A Microsoft Word document
 
 </td><td>
 
-Input for creating a Document
+Input for creating a Document.
+
+</td></tr>
+<tr><td>
+
+[DocumentUpdateInput](./microsoft-word.documentupdateinput.md)
+
+</td><td>
+
+Input for updating a Document. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -160,7 +196,16 @@ A field in a document
 
 </td><td>
 
-Input for creating a Field
+Input for creating a Field.
+
+</td></tr>
+<tr><td>
+
+[FieldUpdateInput](./microsoft-word.fieldupdateinput.md)
+
+</td><td>
+
+Input for updating a Field. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -178,7 +223,25 @@ Font formatting properties
 
 </td><td>
 
-Input for creating a Font
+Input for creating a Font.
+
+</td></tr>
+<tr><td>
+
+[FontUpdateInput](./microsoft-word.fontupdateinput.md)
+
+</td><td>
+
+Input for updating a Font. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[MicrosoftWordClient](./microsoft-word.microsoftwordclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -205,7 +268,16 @@ Page setup properties for a document or section
 
 </td><td>
 
-Input for creating a PageSetup
+Input for creating a PageSetup.
+
+</td></tr>
+<tr><td>
+
+[PageSetupUpdateInput](./microsoft-word.pagesetupupdateinput.md)
+
+</td><td>
+
+Input for updating a PageSetup. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -223,7 +295,16 @@ A single paragraph in a document
 
 </td><td>
 
-Input for creating a Paragraph
+Input for creating a Paragraph.
+
+</td></tr>
+<tr><td>
+
+[ParagraphUpdateInput](./microsoft-word.paragraphupdateinput.md)
+
+</td><td>
+
+Input for updating a Paragraph. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -241,7 +322,16 @@ A row in a table
 
 </td><td>
 
-Input for creating a Row
+Input for creating a Row.
+
+</td></tr>
+<tr><td>
+
+[RowUpdateInput](./microsoft-word.rowupdateinput.md)
+
+</td><td>
+
+Input for updating a Row. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -259,7 +349,16 @@ A section in a document
 
 </td><td>
 
-Input for creating a Section
+Input for creating a Section.
+
+</td></tr>
+<tr><td>
+
+[SectionUpdateInput](./microsoft-word.sectionupdateinput.md)
+
+</td><td>
+
+Input for updating a Section. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -277,7 +376,16 @@ The current selection in a document
 
 </td><td>
 
-Input for creating a Selection
+Input for creating a Selection.
+
+</td></tr>
+<tr><td>
+
+[SelectionUpdateInput](./microsoft-word.selectionupdateinput.md)
+
+</td><td>
+
+Input for updating a Selection. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -295,7 +403,16 @@ A table in a document
 
 </td><td>
 
-Input for creating a Table
+Input for creating a Table.
+
+</td></tr>
+<tr><td>
+
+[TableUpdateInput](./microsoft-word.tableupdateinput.md)
+
+</td><td>
+
+Input for updating a Table. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -305,15 +422,6 @@ Input for creating a Table
 </td><td>
 
 A contiguous area in a document
-
-</td></tr>
-<tr><td>
-
-[TextRangeCreateInput](./microsoft-word.textrangecreateinput.md)
-
-</td><td>
-
-Input for creating a TextRange
 
 </td></tr>
 </tbody></table>
@@ -335,6 +443,8 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -351,12 +461,16 @@ Every capability exposed by Microsoft Word, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ColumnSchema](./microsoft-word.columnschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -365,12 +479,16 @@ Every capability exposed by Microsoft Word, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [FieldSchema](./microsoft-word.fieldschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -379,12 +497,16 @@ Every capability exposed by Microsoft Word, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [PageSetupSchema](./microsoft-word.pagesetupschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -393,12 +515,16 @@ Every capability exposed by Microsoft Word, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [RowSchema](./microsoft-word.rowschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -407,12 +533,16 @@ Every capability exposed by Microsoft Word, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [SelectionSchema](./microsoft-word.selectionschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -421,12 +551,16 @@ Every capability exposed by Microsoft Word, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [TextRangeSchema](./microsoft-word.textrangeschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -444,47 +578,11 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[BookmarkUpdateInput](./microsoft-word.bookmarkupdateinput.md)
-
-</td><td>
-
-Input for updating a Bookmark
-
-</td></tr>
-<tr><td>
-
 [CapabilityRisk](./microsoft-word.capabilityrisk.md)
 
 </td><td>
 
 Risk classification for a capability.
-
-</td></tr>
-<tr><td>
-
-[CellUpdateInput](./microsoft-word.cellupdateinput.md)
-
-</td><td>
-
-Input for updating a Cell
-
-</td></tr>
-<tr><td>
-
-[ColumnUpdateInput](./microsoft-word.columnupdateinput.md)
-
-</td><td>
-
-Input for updating a Column
-
-</td></tr>
-<tr><td>
-
-[DocumentUpdateInput](./microsoft-word.documentupdateinput.md)
-
-</td><td>
-
-Input for updating a Document
 
 </td></tr>
 <tr><td>
@@ -498,29 +596,11 @@ Field type
 </td></tr>
 <tr><td>
 
-[FieldUpdateInput](./microsoft-word.fieldupdateinput.md)
+[MicrosoftWordResources](./microsoft-word.microsoftwordresources.md)
 
 </td><td>
 
-Input for updating a Field
-
-</td></tr>
-<tr><td>
-
-[FontUpdateInput](./microsoft-word.fontupdateinput.md)
-
-</td><td>
-
-Input for updating a Font
-
-</td></tr>
-<tr><td>
-
-[PageSetupUpdateInput](./microsoft-word.pagesetupupdateinput.md)
-
-</td><td>
-
-Input for updating a PageSetup
+The type of the resource table in `microsoftWordContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 <tr><td>
@@ -534,24 +614,6 @@ Paragraph alignment
 </td></tr>
 <tr><td>
 
-[ParagraphUpdateInput](./microsoft-word.paragraphupdateinput.md)
-
-</td><td>
-
-Input for updating a Paragraph
-
-</td></tr>
-<tr><td>
-
-[RowUpdateInput](./microsoft-word.rowupdateinput.md)
-
-</td><td>
-
-Input for updating a Row
-
-</td></tr>
-<tr><td>
-
 [SaveFormat](./microsoft-word.saveformat.md)
 
 </td><td>
@@ -561,29 +623,11 @@ Document save format
 </td></tr>
 <tr><td>
 
-[SectionUpdateInput](./microsoft-word.sectionupdateinput.md)
+[TextRangeCreateInput](./microsoft-word.textrangecreateinput.md)
 
 </td><td>
 
-Input for updating a Section
-
-</td></tr>
-<tr><td>
-
-[SelectionUpdateInput](./microsoft-word.selectionupdateinput.md)
-
-</td><td>
-
-Input for updating a Selection
-
-</td></tr>
-<tr><td>
-
-[TableUpdateInput](./microsoft-word.tableupdateinput.md)
-
-</td><td>
-
-Input for updating a Table
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -592,7 +636,7 @@ Input for updating a Table
 
 </td><td>
 
-Input for updating a TextRange
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>

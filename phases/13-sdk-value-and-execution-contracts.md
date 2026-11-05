@@ -659,6 +659,20 @@ existing generated client until that client is retired, and the contract's
 names then move to the root. The contract depends only on `@macts/contracts`,
 and its manifest module is imported only by `loadManifest`.
 
+The retained root constructor is a facade over the same `contracts/client`
+composition. It registers the actual public client through an instance-local
+`AppContract.bind` adapter, reuses canonical record/input/enum types, and
+validates numeric convenience arguments before the shared codec encodes them.
+Resource constructors, `.http`, raw `HttpClient.rpc`, app-specific errors and
+raw response validators remain available. Typed methods use canonical SDK
+values and errors against contract registration; raw calls explicitly retain
+wire/passthrough semantics. A typed invocation still passes through the public
+`rpc` hook. Both paths share one HTTP wire-outcome boundary; raw calls preserve
+valid results and arbitrary server app-error codes, while typed calls map server
+errors through the canonical registry. Malformed JSON or missing success results
+raise `TransportError` on either path. Forwarding optional call options preserves
+cancellation; protocol handling does not depend on forwarding hidden metadata.
+
 Manifest types map to value types as follows:
 
 - Resource-typed properties and parameters are references (D7). A `get`

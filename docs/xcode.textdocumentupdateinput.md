@@ -2,14 +2,93 @@
 
 [Home](./index.md) &gt; [@macts/xcode](./xcode.md) &gt; [TextDocumentUpdateInput](./xcode.textdocumentupdateinput.md)
 
-## TextDocumentUpdateInput type
+## TextDocumentUpdateInput interface
 
-Input for updating a TextDocument
+Input for updating a TextDocument. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type TextDocumentUpdateInput = Partial<TextDocumentCreateInput>
+interface TextDocumentUpdateInput
 ```
 
-**References:** [TextDocumentCreateInput](./xcode.textdocumentcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[notifiesWhenClosing?](./xcode.textdocumentupdateinput.notifieswhenclosing.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Should Xcode notify other apps when this document is closed? Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[selectedCharacterRange?](./xcode.textdocumentupdateinput.selectedcharacterrange.md)
+
+</td><td>
+
+</td><td>
+
+unknown
+
+</td><td>
+
+_(Optional)_ The first and last character positions in the selection. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[selectedParagraphRange?](./xcode.textdocumentupdateinput.selectedparagraphrange.md)
+
+</td><td>
+
+</td><td>
+
+unknown
+
+</td><td>
+
+_(Optional)_ The first and last paragraph positions that contain the selection. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[text?](./xcode.textdocumentupdateinput.text.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The text of the text file referenced. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

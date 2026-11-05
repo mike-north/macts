@@ -17,6 +17,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[AddressResourceClient](./contacts.addressresourceclient.md)
+
+</td><td>
+
+Client for address for the given record..
+
+</td></tr>
+<tr><td>
+
 [ContactsClient](./contacts.contactsclient.md)
 
 </td><td>
@@ -35,11 +44,47 @@ Error class for Contacts API errors.
 </td></tr>
 <tr><td>
 
+[EmailResourceClient](./contacts.emailresourceclient.md)
+
+</td><td>
+
+Client for email address for a person..
+
+</td></tr>
+<tr><td>
+
+[GroupResourceClient](./contacts.groupresourceclient.md)
+
+</td><td>
+
+Client for a group record in the address book database.
+
+</td></tr>
+<tr><td>
+
 [HttpClient](./contacts.httpclient.md)
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
+
+</td></tr>
+<tr><td>
+
+[PersonResourceClient](./contacts.personresourceclient.md)
+
+</td><td>
+
+Client for a person in the address book database..
+
+</td></tr>
+<tr><td>
+
+[PhoneResourceClient](./contacts.phoneresourceclient.md)
+
+</td><td>
+
+Client for phone number for a person..
 
 </td></tr>
 </tbody></table>
@@ -70,7 +115,16 @@ Address for the given record.
 
 </td><td>
 
-Input for creating a Address
+Input for creating an Address.
+
+</td></tr>
+<tr><td>
+
+[AddressUpdateInput](./contacts.addressupdateinput.md)
+
+</td><td>
+
+Input for updating an Address. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -88,7 +142,16 @@ User name for America Online (AOL) instant messaging.
 
 </td><td>
 
-Input for creating a AIMHandle
+Input for creating an AIMHandle.
+
+</td></tr>
+<tr><td>
+
+[AIMHandleUpdateInput](./contacts.aimhandleupdateinput.md)
+
+</td><td>
+
+Input for updating an AIMHandle. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -98,6 +161,15 @@ Input for creating a AIMHandle
 </td><td>
 
 Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
+
+[ContactsClient](./contacts.contactsclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -124,7 +196,16 @@ Arbitrary date associated with this person.
 
 </td><td>
 
-Input for creating a CustomDate
+Input for creating a CustomDate.
+
+</td></tr>
+<tr><td>
+
+[CustomDateUpdateInput](./contacts.customdateupdateinput.md)
+
+</td><td>
+
+Input for updating a CustomDate. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -142,7 +223,16 @@ Email address for a person.
 
 </td><td>
 
-Input for creating a Email
+Input for creating an Email.
+
+</td></tr>
+<tr><td>
+
+[EmailUpdateInput](./contacts.emailupdateinput.md)
+
+</td><td>
+
+Input for updating an Email. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -160,7 +250,16 @@ A Group Record in the address book database
 
 </td><td>
 
-Input for creating a Group
+Input for creating a Group.
+
+</td></tr>
+<tr><td>
+
+[GroupUpdateInput](./contacts.groupupdateinput.md)
+
+</td><td>
+
+Input for updating a Group. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -178,25 +277,16 @@ User name for ICQ instant messaging.
 
 </td><td>
 
-Input for creating a ICQHandle
+Input for creating an ICQHandle.
 
 </td></tr>
 <tr><td>
 
-[InstantMessage](./contacts.instantmessage.md)
+[ICQHandleUpdateInput](./contacts.icqhandleupdateinput.md)
 
 </td><td>
 
-Address for instant messaging.
-
-</td></tr>
-<tr><td>
-
-[InstantMessageCreateInput](./contacts.instantmessagecreateinput.md)
-
-</td><td>
-
-Input for creating a InstantMessage
+Input for updating an ICQHandle. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -214,7 +304,16 @@ User name for Jabber instant messaging.
 
 </td><td>
 
-Input for creating a JabberHandle
+Input for creating a JabberHandle.
+
+</td></tr>
+<tr><td>
+
+[JabberHandleUpdateInput](./contacts.jabberhandleupdateinput.md)
+
+</td><td>
+
+Input for updating a JabberHandle. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -232,7 +331,16 @@ User name for Microsoft Network (MSN) instant messaging.
 
 </td><td>
 
-Input for creating a MSNHandle
+Input for creating a MSNHandle.
+
+</td></tr>
+<tr><td>
+
+[MSNHandleUpdateInput](./contacts.msnhandleupdateinput.md)
+
+</td><td>
+
+Input for updating a MSNHandle. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -250,7 +358,16 @@ A person in the address book database.
 
 </td><td>
 
-Input for creating a Person
+Input for creating a Person.
+
+</td></tr>
+<tr><td>
+
+[PersonUpdateInput](./contacts.personupdateinput.md)
+
+</td><td>
+
+Input for updating a Person. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -268,7 +385,16 @@ Phone number for a person.
 
 </td><td>
 
-Input for creating a Phone
+Input for creating a Phone.
+
+</td></tr>
+<tr><td>
+
+[PhoneUpdateInput](./contacts.phoneupdateinput.md)
+
+</td><td>
+
+Input for updating a Phone. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -286,7 +412,16 @@ Other names related to this person.
 
 </td><td>
 
-Input for creating a RelatedName
+Input for creating a RelatedName.
+
+</td></tr>
+<tr><td>
+
+[RelatedNameUpdateInput](./contacts.relatednameupdateinput.md)
+
+</td><td>
+
+Input for updating a RelatedName. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -304,7 +439,16 @@ Profile for social networks.
 
 </td><td>
 
-Input for creating a SocialProfile
+Input for creating a SocialProfile.
+
+</td></tr>
+<tr><td>
+
+[SocialProfileUpdateInput](./contacts.socialprofileupdateinput.md)
+
+</td><td>
+
+Input for updating a SocialProfile. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -322,7 +466,16 @@ URLs for this person.
 
 </td><td>
 
-Input for creating a Url
+Input for creating an Url.
+
+</td></tr>
+<tr><td>
+
+[UrlUpdateInput](./contacts.urlupdateinput.md)
+
+</td><td>
+
+Input for updating an Url. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -340,7 +493,16 @@ User name for Yahoo instant messaging.
 
 </td><td>
 
-Input for creating a YahooHandle
+Input for creating a YahooHandle.
+
+</td></tr>
+<tr><td>
+
+[YahooHandleUpdateInput](./contacts.yahoohandleupdateinput.md)
+
+</td><td>
+
+Input for updating a YahooHandle. Omitted fields are left unchanged.
 
 </td></tr>
 </tbody></table>
@@ -362,12 +524,16 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [AIMHandleSchema](./contacts.aimhandleschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -385,12 +551,16 @@ Every capability exposed by Contacts, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [EmailSchema](./contacts.emailschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -399,6 +569,8 @@ Every capability exposed by Contacts, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -406,12 +578,7 @@ Every capability exposed by Contacts, with risk metadata.
 
 </td><td>
 
-</td></tr>
-<tr><td>
-
-[InstantMessageSchema](./contacts.instantmessageschema.md)
-
-</td><td>
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -420,12 +587,16 @@ Every capability exposed by Contacts, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [MSNHandleSchema](./contacts.msnhandleschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -434,12 +605,16 @@ Every capability exposed by Contacts, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [PhoneSchema](./contacts.phoneschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -448,12 +623,16 @@ Every capability exposed by Contacts, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [SocialProfileSchema](./contacts.socialprofileschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -462,12 +641,16 @@ Every capability exposed by Contacts, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [YahooHandleSchema](./contacts.yahoohandleschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -485,24 +668,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[AddressUpdateInput](./contacts.addressupdateinput.md)
-
-</td><td>
-
-Input for updating a Address
-
-</td></tr>
-<tr><td>
-
-[AIMHandleUpdateInput](./contacts.aimhandleupdateinput.md)
-
-</td><td>
-
-Input for updating a AIMHandle
-
-</td></tr>
-<tr><td>
-
 [CapabilityRisk](./contacts.capabilityrisk.md)
 
 </td><td>
@@ -512,38 +677,11 @@ Risk classification for a capability.
 </td></tr>
 <tr><td>
 
-[CustomDateUpdateInput](./contacts.customdateupdateinput.md)
+[ContactsResources](./contacts.contactsresources.md)
 
 </td><td>
 
-Input for updating a CustomDate
-
-</td></tr>
-<tr><td>
-
-[EmailUpdateInput](./contacts.emailupdateinput.md)
-
-</td><td>
-
-Input for updating a Email
-
-</td></tr>
-<tr><td>
-
-[GroupUpdateInput](./contacts.groupupdateinput.md)
-
-</td><td>
-
-Input for updating a Group
-
-</td></tr>
-<tr><td>
-
-[ICQHandleUpdateInput](./contacts.icqhandleupdateinput.md)
-
-</td><td>
-
-Input for updating a ICQHandle
+The type of the resource table in `contactsContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 <tr><td>
@@ -557,92 +695,11 @@ InstantMessageServiceType
 </td></tr>
 <tr><td>
 
-[InstantMessageUpdateInput](./contacts.instantmessageupdateinput.md)
-
-</td><td>
-
-Input for updating a InstantMessage
-
-</td></tr>
-<tr><td>
-
-[JabberHandleUpdateInput](./contacts.jabberhandleupdateinput.md)
-
-</td><td>
-
-Input for updating a JabberHandle
-
-</td></tr>
-<tr><td>
-
-[MSNHandleUpdateInput](./contacts.msnhandleupdateinput.md)
-
-</td><td>
-
-Input for updating a MSNHandle
-
-</td></tr>
-<tr><td>
-
-[PersonUpdateInput](./contacts.personupdateinput.md)
-
-</td><td>
-
-Input for updating a Person
-
-</td></tr>
-<tr><td>
-
-[PhoneUpdateInput](./contacts.phoneupdateinput.md)
-
-</td><td>
-
-Input for updating a Phone
-
-</td></tr>
-<tr><td>
-
-[RelatedNameUpdateInput](./contacts.relatednameupdateinput.md)
-
-</td><td>
-
-Input for updating a RelatedName
-
-</td></tr>
-<tr><td>
-
 [SaveableFileFormat](./contacts.saveablefileformat.md)
 
 </td><td>
 
 SaveableFileFormat
-
-</td></tr>
-<tr><td>
-
-[SocialProfileUpdateInput](./contacts.socialprofileupdateinput.md)
-
-</td><td>
-
-Input for updating a SocialProfile
-
-</td></tr>
-<tr><td>
-
-[UrlUpdateInput](./contacts.urlupdateinput.md)
-
-</td><td>
-
-Input for updating a Url
-
-</td></tr>
-<tr><td>
-
-[YahooHandleUpdateInput](./contacts.yahoohandleupdateinput.md)
-
-</td><td>
-
-Input for updating a YahooHandle
 
 </td></tr>
 </tbody></table>

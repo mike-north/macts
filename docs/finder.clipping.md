@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-(NOT AVAILABLE YET) the clipping window for this clipping
+string \| null
+
+</td><td>
+
+(NOT AVAILABLE YET) the clipping window for this clipping. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

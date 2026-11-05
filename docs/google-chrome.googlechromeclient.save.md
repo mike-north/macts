@@ -9,7 +9,7 @@ Save an object.
 **Signature:**
 
 ```typescript
-save(_in?: string, as?: string): Promise<void>;
+save(_in?: Parameters<GoogleChromeClient$1['save']>[0], as?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -33,7 +33,7 @@ Description
 
 </td><td>
 
-string
+Parameters&lt;GoogleChromeClient$1\['save'\]&gt;\[0\]
 
 </td><td>
 
@@ -47,6 +47,19 @@ as
 </td><td>
 
 string
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

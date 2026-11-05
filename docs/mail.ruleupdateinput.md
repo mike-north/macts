@@ -4,12 +4,12 @@
 
 ## RuleUpdateInput type
 
-Input for updating a Rule
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type RuleUpdateInput = Partial<RuleCreateInput>
+type RuleUpdateInput = Omit<RuleUpdateInput$1, 'markFlagIndex'> & {
+  markFlagIndex?: null extends RuleUpdateInput$1['markFlagIndex'] ? number | null : number
+}
 ```
-
-**References:** [RuleCreateInput](./mail.rulecreateinput.md)

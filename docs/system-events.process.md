@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the process high-level event aware (accepts open application, open document, print document, and quit)?
+boolean \| null
+
+</td><td>
+
+Is the process high-level event aware (accepts open application, open document, print document, and quit)? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ Is the process high-level event aware (accepts open application, open document, 
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Does the process accept remote events?
+boolean \| null
+
+</td><td>
+
+Does the process accept remote events? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ Does the process accept remote events?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the architecture in which the process is running
+string \| null
+
+</td><td>
+
+the architecture in which the process is running. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ the architecture in which the process is running
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Does the process run exclusively in the background?
+boolean \| null
+
+</td><td>
+
+Does the process run exclusively in the background? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +105,15 @@ Does the process run exclusively in the background?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the bundle identifier of the process' application file
+string \| null
+
+</td><td>
+
+the bundle identifier of the process' application file. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,13 +122,15 @@ the bundle identifier of the process' application file
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the process running in the Classic environment?
+boolean \| null
+
+</td><td>
+
+Is the process running in the Classic environment? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +139,15 @@ Is the process running in the Classic environment?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the OSType of the creator of the process (the signature)
+string \| null
+
+</td><td>
+
+the OSType of the creator of the process (the signature). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +156,15 @@ the OSType of the creator of the process (the signature)
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the name of the file from which the process was launched, as displayed in the User Interface
+string \| null
+
+</td><td>
+
+the name of the file from which the process was launched, as displayed in the User Interface. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +173,15 @@ the name of the file from which the process was launched, as displayed in the Us
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the file from which the process was launched
+string \| null
+
+</td><td>
+
+the file from which the process was launched. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -172,13 +190,15 @@ the file from which the process was launched
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the OSType of the file type of the process
+string \| null
+
+</td><td>
+
+the OSType of the file type of the process. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -189,11 +209,11 @@ the OSType of the file type of the process
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Is the process the frontmost process
+Is the process the frontmost process. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -202,13 +222,15 @@ Is the process the frontmost process
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Does the process have a scripting terminology, i.e., can it be scripted?
+boolean \| null
+
+</td><td>
+
+Does the process have a scripting terminology, i.e., can it be scripted? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -217,13 +239,15 @@ Does the process have a scripting terminology, i.e., can it be scripted?
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The unique identifier of the process
+[Integer](./contracts.integer.md)
+
+</td><td>
+
+The unique identifier of the process. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -232,13 +256,15 @@ The unique identifier of the process
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the name of the process
+string \| null
+
+</td><td>
+
+the name of the process. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -247,13 +273,15 @@ the name of the process
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the number of bytes currently used in the process' partition
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the number of bytes currently used in the process' partition. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -262,13 +290,15 @@ the number of bytes currently used in the process' partition
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the short name of the file from which the process was launched
+string \| null
+
+</td><td>
+
+the short name of the file from which the process was launched. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -277,13 +307,15 @@ the short name of the file from which the process was launched
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the size of the partition with which the process was launched
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the size of the partition with which the process was launched. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -292,13 +324,15 @@ the size of the partition with which the process was launched
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The Unix process identifier of a process running in the native environment, or -1 for a process running in the Classic environment
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The Unix process identifier of a process running in the native environment, or -1 for a process running in the Classic environment. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -309,11 +343,11 @@ The Unix process identifier of a process running in the native environment, or -
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Is the process' layer visible?
+Is the process' layer visible? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

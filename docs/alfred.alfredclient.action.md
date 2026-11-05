@@ -9,7 +9,7 @@ Show Alfred actions for the given file
 **Signature:**
 
 ```typescript
-action(items: string, asType?: string): Promise<void>;
+action(items: Parameters<AlfredClient$1['action']>[0], asType?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -33,7 +33,7 @@ items
 
 </td><td>
 
-string
+Parameters&lt;AlfredClient$1\['action'\]&gt;\[0\]
 
 </td><td>
 
@@ -45,6 +45,19 @@ asType
 </td><td>
 
 string
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

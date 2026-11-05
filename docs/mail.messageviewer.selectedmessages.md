@@ -4,10 +4,10 @@
 
 ## MessageViewer.selectedMessages property
 
-List of messages currently selected
+List of messages currently selected. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-selectedMessages: string
+selectedMessages: string | null
 ```

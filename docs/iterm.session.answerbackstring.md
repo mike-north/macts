@@ -4,10 +4,10 @@
 
 ## Session.answerbackString property
 
-ENQ Answerback string
+ENQ Answerback string. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-answerbackString: string
+answerbackString: string | null
 ```

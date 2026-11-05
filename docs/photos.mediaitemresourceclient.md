@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[duplicate(id)](./photos.mediaitemresourceclient.duplicate.md)
+[duplicate(id, \_\_mactsOptions)](./photos.mediaitemresourceclient.duplicate.md)
 
 </td><td>
 
@@ -68,24 +68,24 @@ Duplicate a media item
 </td></tr>
 <tr><td>
 
-[get(id)](./photos.mediaitemresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./photos.mediaitemresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a mediaitem by id.
+Get a media item by id.
 
 </td></tr>
 <tr><td>
 
-[list()](./photos.mediaitemresourceclient.list.md)
+[list(\_\_mactsOptions)](./photos.mediaitemresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all mediaitems.
+List all media items, as one page.
 
 </td></tr>
 </tbody></table>

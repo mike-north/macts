@@ -4,6 +4,8 @@
 
 ## ScriptingCommandSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -12,7 +14,6 @@ ScriptingCommandSchema: z.ZodObject<
     name: z.ZodString
     id: z.ZodString
     description: z.ZodString
-    directParameter: z.ZodString
     hidden: z.ZodBoolean
     scriptingResult: z.ZodString
     suiteName: z.ZodString

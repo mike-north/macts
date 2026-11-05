@@ -9,7 +9,7 @@ Create a new note.
 **Signature:**
 
 ```typescript
-create(input: NoteCreateInput): Promise<Note>;
+create(input: NoteCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Note>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [NoteCreateInput](./notes.notecreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

@@ -4,12 +4,10 @@
 
 ## SliderUpdateInput type
 
-Input for updating a Slider
+Input for updating a Slider. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SliderUpdateInput = Partial<SliderCreateInput>
+type SliderUpdateInput = Record<string, never>
 ```
-
-**References:** [SliderCreateInput](./system-events.slidercreateinput.md)

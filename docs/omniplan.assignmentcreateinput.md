@@ -4,7 +4,7 @@
 
 ## AssignmentCreateInput interface
 
-Input for creating a Assignment
+Input for creating an Assignment.
 
 **Signature:**
 

@@ -4,14 +4,10 @@
 
 ## Font.color property
 
-The font color
+The font color. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-color: {
-  r: number
-  g: number
-  b: number
-}
+color: Rgb | null
 ```

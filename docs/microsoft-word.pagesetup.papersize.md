@@ -4,10 +4,10 @@
 
 ## PageSetup.paperSize property
 
-The paper size
+The paper size. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-paperSize: string
+paperSize: string | null
 ```

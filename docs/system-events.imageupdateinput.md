@@ -4,12 +4,10 @@
 
 ## ImageUpdateInput type
 
-Input for updating a Image
+Input for updating an Image. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ImageUpdateInput = Partial<ImageCreateInput>
+type ImageUpdateInput = Record<string, never>
 ```
-
-**References:** [ImageCreateInput](./system-events.imagecreateinput.md)

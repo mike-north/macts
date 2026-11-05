@@ -4,10 +4,10 @@
 
 ## TextRange.fontSize property
 
-The font size in points
+The font size in points. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fontSize: number
+fontSize: number | null
 ```

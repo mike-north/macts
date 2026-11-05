@@ -4,10 +4,10 @@
 
 ## MediaItem.keywords property
 
-A list of keywords to associate with a media item
+A list of keywords to associate with a media item. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-keywords: string[];
+keywords: readonly string[] | null;
 ```

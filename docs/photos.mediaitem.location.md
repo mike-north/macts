@@ -4,7 +4,7 @@
 
 ## MediaItem.location property
 
-The GPS latitude and longitude, in an ordered list of 2 numbers or missing values
+The GPS latitude and longitude, in an ordered list of 2 numbers or missing values. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 

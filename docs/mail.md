@@ -21,7 +21,7 @@ Description
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -84,15 +84,6 @@ A Mail account for receiving messages (POP/IMAP). To create a new receiving acco
 </td></tr>
 <tr><td>
 
-[AccountCreateInput](./mail.accountcreateinput.md)
-
-</td><td>
-
-Input for creating a Account
-
-</td></tr>
-<tr><td>
-
 [Attachment](./mail.attachment.md)
 
 </td><td>
@@ -106,7 +97,16 @@ Represents an inline text attachment. This class is used mainly for make command
 
 </td><td>
 
-Input for creating a Attachment
+Input for creating an Attachment.
+
+</td></tr>
+<tr><td>
+
+[AttachmentUpdateInput](./mail.attachmentupdateinput.md)
+
+</td><td>
+
+Input for updating an Attachment. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -124,7 +124,16 @@ This subdivides the text into chunks that all have the same attributes.
 
 </td><td>
 
-Input for creating a AttributeRun
+Input for creating an AttributeRun.
+
+</td></tr>
+<tr><td>
+
+[AttributeRunUpdateInput](./mail.attributerunupdateinput.md)
+
+</td><td>
+
+Input for updating an AttributeRun. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -169,7 +178,16 @@ This subdivides the text into characters.
 
 </td><td>
 
-Input for creating a Character
+Input for creating a Character.
+
+</td></tr>
+<tr><td>
+
+[CharacterUpdateInput](./mail.characterupdateinput.md)
+
+</td><td>
+
+Input for updating a Character. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -187,7 +205,16 @@ A header value for a message. E.g. To, Subject, From.
 
 </td><td>
 
-Input for creating a Header
+Input for creating a Header.
+
+</td></tr>
+<tr><td>
+
+[HeaderUpdateInput](./mail.headerupdateinput.md)
+
+</td><td>
+
+Input for updating a Header. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -214,7 +241,25 @@ A mailbox that holds messages
 
 </td><td>
 
-Input for creating a Mailbox
+Input for creating a Mailbox.
+
+</td></tr>
+<tr><td>
+
+[MailboxUpdateInput](./mail.mailboxupdateinput.md)
+
+</td><td>
+
+Input for updating a Mailbox. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[MailClient](./mail.mailclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -237,15 +282,6 @@ An email message
 </td></tr>
 <tr><td>
 
-[MessageCreateInput](./mail.messagecreateinput.md)
-
-</td><td>
-
-Input for creating a Message
-
-</td></tr>
-<tr><td>
-
 [MessageViewer](./mail.messageviewer.md)
 
 </td><td>
@@ -259,7 +295,16 @@ Represents the object responsible for managing a viewer window
 
 </td><td>
 
-Input for creating a MessageViewer
+Input for creating a MessageViewer.
+
+</td></tr>
+<tr><td>
+
+[MessageViewerUpdateInput](./mail.messageviewerupdateinput.md)
+
+</td><td>
+
+Input for updating a MessageViewer. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -277,7 +322,16 @@ A new email message
 
 </td><td>
 
-Input for creating a OutgoingMessage
+Input for creating an OutgoingMessage.
+
+</td></tr>
+<tr><td>
+
+[OutgoingMessageUpdateInput](./mail.outgoingmessageupdateinput.md)
+
+</td><td>
+
+Input for updating an OutgoingMessage. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -295,7 +349,16 @@ This subdivides the text into paragraphs.
 
 </td><td>
 
-Input for creating a Paragraph
+Input for creating a Paragraph.
+
+</td></tr>
+<tr><td>
+
+[ParagraphUpdateInput](./mail.paragraphupdateinput.md)
+
+</td><td>
+
+Input for updating a Paragraph. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -313,7 +376,16 @@ An email recipient
 
 </td><td>
 
-Input for creating a Recipient
+Input for creating a Recipient.
+
+</td></tr>
+<tr><td>
+
+[RecipientUpdateInput](./mail.recipientupdateinput.md)
+
+</td><td>
+
+Input for updating a Recipient. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -331,7 +403,16 @@ Rich (styled) text
 
 </td><td>
 
-Input for creating a RichText
+Input for creating a RichText.
+
+</td></tr>
+<tr><td>
+
+[RichTextUpdateInput](./mail.richtextupdateinput.md)
+
+</td><td>
+
+Input for updating a RichText. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -358,16 +439,16 @@ Class for conditions that can be attached to a single rule
 
 </td><td>
 
-Input for creating a RuleCondition
+Input for creating a RuleCondition.
 
 </td></tr>
 <tr><td>
 
-[RuleCreateInput](./mail.rulecreateinput.md)
+[RuleConditionUpdateInput](./mail.ruleconditionupdateinput.md)
 
 </td><td>
 
-Input for creating a Rule
+Input for updating a RuleCondition. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -394,7 +475,16 @@ This subdivides the text into words.
 
 </td><td>
 
-Input for creating a Word
+Input for creating a Word.
+
+</td></tr>
+<tr><td>
+
+[WordUpdateInput](./mail.wordupdateinput.md)
+
+</td><td>
+
+Input for updating a Word. Omitted fields are left unchanged.
 
 </td></tr>
 </tbody></table>
@@ -416,12 +506,16 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [AttachmentSchema](./mail.attachmentschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -430,12 +524,16 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [BccRecipientSchema](./mail.bccrecipientschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -453,12 +551,16 @@ Every capability exposed by Mail, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [CharacterSchema](./mail.characterschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -467,12 +569,16 @@ Every capability exposed by Mail, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [MailAttachmentSchema](./mail.mailattachmentschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -481,12 +587,16 @@ Every capability exposed by Mail, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [MessageSchema](./mail.messageschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -495,12 +605,16 @@ Every capability exposed by Mail, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [OutgoingMessageSchema](./mail.outgoingmessageschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -509,12 +623,16 @@ Every capability exposed by Mail, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [RecipientSchema](./mail.recipientschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -523,12 +641,16 @@ Every capability exposed by Mail, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [RuleConditionSchema](./mail.ruleconditionschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -537,6 +659,8 @@ Every capability exposed by Mail, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -544,12 +668,16 @@ Every capability exposed by Mail, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [WordSchema](./mail.wordschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -567,29 +695,20 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[AccountCreateInput](./mail.accountcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
 [AccountUpdateInput](./mail.accountupdateinput.md)
 
 </td><td>
 
-Input for updating a Account
-
-</td></tr>
-<tr><td>
-
-[AttachmentUpdateInput](./mail.attachmentupdateinput.md)
-
-</td><td>
-
-Input for updating a Attachment
-
-</td></tr>
-<tr><td>
-
-[AttributeRunUpdateInput](./mail.attributerunupdateinput.md)
-
-</td><td>
-
-Input for updating a AttributeRun
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -607,7 +726,7 @@ Authentication
 
 </td><td>
 
-Input for creating a BccRecipient
+Input for creating a BccRecipient.
 
 </td></tr>
 <tr><td>
@@ -616,7 +735,7 @@ Input for creating a BccRecipient
 
 </td><td>
 
-Input for updating a BccRecipient
+Input for updating a BccRecipient. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -634,7 +753,7 @@ Risk classification for a capability.
 
 </td><td>
 
-Input for creating a CcRecipient
+Input for creating a CcRecipient.
 
 </td></tr>
 <tr><td>
@@ -643,16 +762,7 @@ Input for creating a CcRecipient
 
 </td><td>
 
-Input for updating a CcRecipient
-
-</td></tr>
-<tr><td>
-
-[CharacterUpdateInput](./mail.characterupdateinput.md)
-
-</td><td>
-
-Input for updating a Character
+Input for updating a CcRecipient. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -671,15 +781,6 @@ DefaultMessageFormat
 </td><td>
 
 HeaderDetail
-
-</td></tr>
-<tr><td>
-
-[HeaderUpdateInput](./mail.headerupdateinput.md)
-
-</td><td>
-
-Input for updating a Header
 
 </td></tr>
 <tr><td>
@@ -706,7 +807,7 @@ LdapScope
 
 </td><td>
 
-Input for creating a MailAttachment
+Input for creating a MailAttachment.
 
 </td></tr>
 <tr><td>
@@ -715,16 +816,16 @@ Input for creating a MailAttachment
 
 </td><td>
 
-Input for updating a MailAttachment
+Input for updating a MailAttachment. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
 
-[MailboxUpdateInput](./mail.mailboxupdateinput.md)
+[MailResources](./mail.mailresources.md)
 
 </td><td>
 
-Input for updating a Mailbox
+The type of the resource table in `mailContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 <tr><td>
@@ -738,38 +839,20 @@ MessageCachingPolicy
 </td></tr>
 <tr><td>
 
+[MessageCreateInput](./mail.messagecreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
 [MessageUpdateInput](./mail.messageupdateinput.md)
 
 </td><td>
 
-Input for updating a Message
-
-</td></tr>
-<tr><td>
-
-[MessageViewerUpdateInput](./mail.messageviewerupdateinput.md)
-
-</td><td>
-
-Input for updating a MessageViewer
-
-</td></tr>
-<tr><td>
-
-[OutgoingMessageUpdateInput](./mail.outgoingmessageupdateinput.md)
-
-</td><td>
-
-Input for updating a OutgoingMessage
-
-</td></tr>
-<tr><td>
-
-[ParagraphUpdateInput](./mail.paragraphupdateinput.md)
-
-</td><td>
-
-Input for updating a Paragraph
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -783,29 +866,11 @@ QuotingColor
 </td></tr>
 <tr><td>
 
-[RecipientUpdateInput](./mail.recipientupdateinput.md)
+[RuleCreateInput](./mail.rulecreateinput.md)
 
 </td><td>
 
-Input for updating a Recipient
-
-</td></tr>
-<tr><td>
-
-[RichTextUpdateInput](./mail.richtextupdateinput.md)
-
-</td><td>
-
-Input for updating a RichText
-
-</td></tr>
-<tr><td>
-
-[RuleConditionUpdateInput](./mail.ruleconditionupdateinput.md)
-
-</td><td>
-
-Input for updating a RuleCondition
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -832,7 +897,7 @@ RuleType
 
 </td><td>
 
-Input for updating a Rule
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -850,7 +915,7 @@ SaveableFileFormat
 
 </td><td>
 
-Input for creating a ToRecipient
+Input for creating a ToRecipient.
 
 </td></tr>
 <tr><td>
@@ -859,7 +924,7 @@ Input for creating a ToRecipient
 
 </td><td>
 
-Input for updating a ToRecipient
+Input for updating a ToRecipient. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -878,15 +943,6 @@ TypeOfAccount
 </td><td>
 
 ViewerColumns
-
-</td></tr>
-<tr><td>
-
-[WordUpdateInput](./mail.wordupdateinput.md)
-
-</td><td>
-
-Input for updating a Word
 
 </td></tr>
 </tbody></table>

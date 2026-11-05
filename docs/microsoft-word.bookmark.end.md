@@ -4,10 +4,10 @@
 
 ## Bookmark.end property
 
-The ending character position
+The ending character position. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-end: number
+readonly end: Integer | null;
 ```

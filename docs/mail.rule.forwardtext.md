@@ -4,10 +4,10 @@
 
 ## Rule.forwardText property
 
-If rule matches, prepend this text to the forwarded message. Set to empty string to include no prepended text
+If rule matches, prepend this text to the forwarded message. Set to empty string to include no prepended text. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-forwardText: string
+forwardText: string | null
 ```

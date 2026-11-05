@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./omnigraffle.shaperesourceclient.create.md)
+[create(input, \_\_mactsOptions)](./omnigraffle.shaperesourceclient.create.md)
 
 </td><td>
 
@@ -68,7 +68,7 @@ Create a new shape.
 </td></tr>
 <tr><td>
 
-[get(id)](./omnigraffle.shaperesourceclient.get.md)
+[get(id, \_\_mactsOptions)](./omnigraffle.shaperesourceclient.get.md)
 
 </td><td>
 
@@ -79,13 +79,13 @@ Get a shape by id.
 </td></tr>
 <tr><td>
 
-[list()](./omnigraffle.shaperesourceclient.list.md)
+[list(canvasId, \_\_mactsOptions)](./omnigraffle.shaperesourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all shapes.
+List the shapes of one canvas, as one page.
 
 </td></tr>
 </tbody></table>

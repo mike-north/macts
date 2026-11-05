@@ -4,10 +4,10 @@
 
 ## Task.droppedDate property
 
-The date the task was dropped
+The date the task was dropped. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-droppedDate: Date
+droppedDate: Date | null
 ```

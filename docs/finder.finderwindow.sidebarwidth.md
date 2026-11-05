@@ -4,10 +4,10 @@
 
 ## FinderWindow.sidebarWidth property
 
-the width of the sidebar for the container window
+the width of the sidebar for the container window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-sidebarWidth: number
+sidebarWidth: Integer | null
 ```

@@ -4,10 +4,10 @@
 
 ## UIElement.selected property
 
-Is the UI element selected?
+Is the UI element selected? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-selected: string
+selected: string | null
 ```

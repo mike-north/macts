@@ -4,10 +4,10 @@
 
 ## Browser.id property
 
-Unique identifier for this browser
+Unique identifier for this browser. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

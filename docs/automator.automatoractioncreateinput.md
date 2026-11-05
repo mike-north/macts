@@ -2,108 +2,14 @@
 
 [Home](./index.md) &gt; [@macts/automator](./automator.md) &gt; [AutomatorActionCreateInput](./automator.automatoractioncreateinput.md)
 
-## AutomatorActionCreateInput interface
+## AutomatorActionCreateInput type
 
-Input for creating a AutomatorAction
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface AutomatorActionCreateInput
+type AutomatorActionCreateInput = Omit<AutomatorActionCreateInput$1, 'index'> & {
+  index?: null extends AutomatorActionCreateInput$1['index'] ? number | null : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[comment?](./automator.automatoractioncreateinput.comment.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ The comment for the name of the action
-
-</td></tr>
-<tr><td>
-
-[enabled?](./automator.automatoractioncreateinput.enabled.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ Is the action enabled?
-
-</td></tr>
-<tr><td>
-
-[ignoresInput?](./automator.automatoractioncreateinput.ignoresinput.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ Shall the action ignore its input when it is run?
-
-</td></tr>
-<tr><td>
-
-[index?](./automator.automatoractioncreateinput.index.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The index of the action
-
-</td></tr>
-<tr><td>
-
-[showActionWhenRun?](./automator.automatoractioncreateinput.showactionwhenrun.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ Shall the action show its user interface when it is run?
-
-</td></tr>
-</tbody></table>

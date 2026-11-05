@@ -4,10 +4,10 @@
 
 ## AudioCDTrack.location property
 
-the location of the file represented by this track
+the location of the file represented by this track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-location: string
+readonly location: FileValue | null;
 ```

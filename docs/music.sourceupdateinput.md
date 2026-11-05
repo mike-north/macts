@@ -4,12 +4,10 @@
 
 ## SourceUpdateInput type
 
-Input for updating a Source
+Input for updating a Source. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SourceUpdateInput = Partial<SourceCreateInput>
+type SourceUpdateInput = Record<string, never>
 ```
-
-**References:** [SourceCreateInput](./music.sourcecreateinput.md)

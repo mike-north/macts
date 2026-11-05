@@ -4,10 +4,10 @@
 
 ## PlaylistWindow.selection property
 
-the selected tracks
+the selected tracks. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-selection: string
+readonly selection: string | null;
 ```

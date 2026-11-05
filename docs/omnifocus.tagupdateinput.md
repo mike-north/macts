@@ -2,14 +2,93 @@
 
 [Home](./index.md) &gt; [@macts/omnifocus](./omnifocus.md) &gt; [TagUpdateInput](./omnifocus.tagupdateinput.md)
 
-## TagUpdateInput type
+## TagUpdateInput interface
 
-Input for updating a Tag
+Input for updating a Tag. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type TagUpdateInput = Partial<TagCreateInput>
+interface TagUpdateInput
 ```
 
-**References:** [TagCreateInput](./omnifocus.tagcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[allowsNextAction?](./omnifocus.tagupdateinput.allowsnextaction.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ If false, tasks associated with this tag will be skipped when determining the next action for a project. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[hidden?](./omnifocus.tagupdateinput.hidden.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Set if the tag is currently hidden. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[name?](./omnifocus.tagupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Tag name. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[note?](./omnifocus.tagupdateinput.note.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The note of the tag. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

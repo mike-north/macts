@@ -57,13 +57,13 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[list()](./reminders.accountresourceclient.list.md)
+[list(page, \_\_mactsOptions)](./reminders.accountresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all accounts.
+List accounts, one page at a time. When the result has a `nextCursor`<!-- -->, more remain: call again with the same arguments and `{ cursor: nextCursor }`<!-- -->.
 
 </td></tr>
 </tbody></table>

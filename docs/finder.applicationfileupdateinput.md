@@ -4,12 +4,10 @@
 
 ## ApplicationFileUpdateInput type
 
-Input for updating a ApplicationFile
+Input for updating an ApplicationFile. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ApplicationFileUpdateInput = Partial<ApplicationFileCreateInput>
+type ApplicationFileUpdateInput = Record<string, never>
 ```
-
-**References:** [ApplicationFileCreateInput](./finder.applicationfilecreateinput.md)

@@ -4,10 +4,10 @@
 
 ## Column.minimumWidth property
 
-the minimum allowed width of this column
+the minimum allowed width of this column. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-minimumWidth: number
+readonly minimumWidth: Integer | null;
 ```

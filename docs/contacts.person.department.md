@@ -4,10 +4,10 @@
 
 ## Person.department property
 
-Department that this person works for.
+Department that this person works for. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-department: string
+department: string | null
 ```

@@ -21,6 +21,7 @@
 export { OmniFocusClient, OmniFocusError, HttpClient } from './client.js'
 export type { OmniFocusClientOptions } from './client.js'
 export * from './types.js'
+export type { OmniFocusResources } from './contract/index.js'
 export { TaskResourceClient } from './resources/task.js'
 export { ProjectResourceClient } from './resources/project.js'
 export { FolderResourceClient } from './resources/folder.js'

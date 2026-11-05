@@ -4,14 +4,10 @@
 
 ## Session.aNSIRedColor property
 
-The aNSIRedColor property
+The aNSIRedColor property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-aNSIRedColor: {
-  r: number
-  g: number
-  b: number
-}
+aNSIRedColor: Rgb | null
 ```

@@ -9,7 +9,7 @@ Split a session vertically.
 **Signature:**
 
 ```typescript
-splitVertically(withProfile: string, command?: string): Promise<void>;
+splitVertically(withProfile: string, command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -45,6 +45,19 @@ command
 </td><td>
 
 string
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

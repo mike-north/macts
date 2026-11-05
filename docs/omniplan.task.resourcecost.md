@@ -4,10 +4,10 @@
 
 ## Task.resourceCost property
 
-Cost for paying resources assigned to this task
+Cost for paying resources assigned to this task. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-resourceCost: number
+readonly resourceCost: number | null;
 ```

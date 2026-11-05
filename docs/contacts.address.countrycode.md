@@ -4,10 +4,10 @@
 
 ## Address.countryCode property
 
-Country code part of the address (should be a two character iso country code).
+Country code part of the address (should be a two character iso country code). Nullable. Observed missing in 6 of 12 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-countryCode: string
+countryCode: string | null
 ```

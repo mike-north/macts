@@ -9,7 +9,7 @@ Export media items to the specified location as files
 **Signature:**
 
 ```typescript
-_export(mediaItems: string, to: string, usingOriginals?: boolean): Promise<void>;
+_export(mediaItems: Parameters<PhotosClient$1['_export']>[0], to: string, usingOriginals?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -33,7 +33,7 @@ mediaItems
 
 </td><td>
 
-string
+Parameters&lt;PhotosClient$1\['\_export'\]&gt;\[0\]
 
 </td><td>
 
@@ -56,6 +56,19 @@ usingOriginals
 </td><td>
 
 boolean
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

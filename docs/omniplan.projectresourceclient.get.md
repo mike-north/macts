@@ -9,7 +9,7 @@ Get a project by id.
 **Signature:**
 
 ```typescript
-get(id: string): Promise<Project>;
+get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Project>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ id
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

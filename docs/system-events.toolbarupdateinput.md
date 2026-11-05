@@ -4,12 +4,10 @@
 
 ## ToolbarUpdateInput type
 
-Input for updating a Toolbar
+Input for updating a Toolbar. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ToolbarUpdateInput = Partial<ToolbarCreateInput>
+type ToolbarUpdateInput = Record<string, never>
 ```
-
-**References:** [ToolbarCreateInput](./system-events.toolbarcreateinput.md)

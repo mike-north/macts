@@ -4,14 +4,10 @@
 
 ## Session.boldColor property
 
-The boldColor property
+The boldColor property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-boldColor: {
-  r: number
-  g: number
-  b: number
-}
+boldColor: Rgb | null
 ```

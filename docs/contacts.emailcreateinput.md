@@ -4,7 +4,7 @@
 
 ## EmailCreateInput interface
 
-Input for creating a Email
+Input for creating an Email.
 
 **Signature:**
 

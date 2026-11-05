@@ -73,6 +73,13 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/contracts](./contracts.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/core](./core.md)
 
 </td><td>
@@ -192,6 +199,13 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/runtime](./runtime.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/safari](./safari.md)
 
 </td><td>
@@ -207,6 +221,13 @@ Description
 <tr><td>
 
 [@macts/script-editor](./script-editor.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/sdk](./sdk.md)
 
 </td><td>
 

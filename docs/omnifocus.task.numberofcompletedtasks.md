@@ -4,10 +4,10 @@
 
 ## Task.numberOfCompletedTasks property
 
-The number of completed direct children of this task
+The number of completed direct children of this task. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-numberOfCompletedTasks: number
+readonly numberOfCompletedTasks: Integer | null;
 ```

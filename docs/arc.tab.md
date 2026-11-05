@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the tab.
+The unique identifier of the tab. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The unique identifier of the tab.
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is loading?
+boolean \| null
+
+</td><td>
+
+Is loading? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +73,11 @@ Is loading?
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'.
+Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +86,15 @@ Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The full title of the tab.
+string \| null
+
+</td><td>
+
+The full title of the tab. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +105,11 @@ The full title of the tab.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The url of the tab.
+The url of the tab. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

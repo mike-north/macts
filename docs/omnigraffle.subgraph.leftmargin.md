@@ -4,10 +4,10 @@
 
 ## Subgraph.leftMargin property
 
-Left margin
+Left margin. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-leftMargin: number
+leftMargin: number | null
 ```

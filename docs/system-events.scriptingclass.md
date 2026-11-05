@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The description of the class
+string \| null
+
+</td><td>
+
+The description of the class. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The description of the class
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the class hidden?
+boolean \| null
+
+</td><td>
+
+Is the class hidden? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ Is the class hidden?
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the class
+The unique identifier of the class. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ The unique identifier of the class
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the class
+string \| null
+
+</td><td>
+
+The name of the class. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +105,15 @@ The name of the class
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The plural name of the class
+string \| null
+
+</td><td>
+
+The plural name of the class. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,28 +122,15 @@ The plural name of the class
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the suite to which this class belongs
-
-</td></tr>
-<tr><td>
-
-[superclass](./system-events.scriptingclass.superclass.md)
+string \| null
 
 </td><td>
 
-</td><td>
-
-unknown
-
-</td><td>
-
-The class from which this class inherits
+The name of the suite to which this class belongs. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

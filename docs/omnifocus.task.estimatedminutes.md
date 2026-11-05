@@ -4,10 +4,10 @@
 
 ## Task.estimatedMinutes property
 
-The estimated time, in whole minutes, that this task will take to finish
+The estimated time, in whole minutes, that this task will take to finish. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-estimatedMinutes: number
+estimatedMinutes: Integer | null
 ```

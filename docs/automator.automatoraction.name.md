@@ -4,10 +4,10 @@
 
 ## AutomatorAction.name property
 
-The localized name of the action
+The localized name of the action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

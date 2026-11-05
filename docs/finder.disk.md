@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the total number of bytes (free or used) on the disk
+number \| null
+
+</td><td>
+
+the total number of bytes (free or used) on the disk. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ the total number of bytes (free or used) on the disk
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Can the media be ejected (floppies, CDs, and so on)?
+boolean \| null
+
+</td><td>
+
+Can the media be ejected (floppies, CDs, and so on)? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ Can the media be ejected (floppies, CDs, and so on)?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the filesystem format of this disk
+string \| null
+
+</td><td>
+
+the filesystem format of this disk. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ the filesystem format of this disk
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the number of free bytes left on the disk
+number \| null
+
+</td><td>
+
+the number of free bytes left on the disk. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +105,15 @@ the number of free bytes left on the disk
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the unique id for this disk (unchanged while disk remains connected and Finder remains running)
+[Integer](./contracts.integer.md)
+
+</td><td>
+
+the unique id for this disk (unchanged while disk remains connected and Finder remains running). Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -114,11 +124,11 @@ the unique id for this disk (unchanged while disk remains connected and Finder r
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Ignore permissions on this disk?
+Ignore permissions on this disk? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +137,15 @@ Ignore permissions on this disk?
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Does this disk do file system journaling?
+boolean \| null
+
+</td><td>
+
+Does this disk do file system journaling? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +154,15 @@ Does this disk do file system journaling?
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the media a local volume (as opposed to a file server)?
+boolean \| null
+
+</td><td>
+
+Is the media a local volume (as opposed to a file server)? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +171,15 @@ Is the media a local volume (as opposed to a file server)?
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is this disk the boot disk?
+boolean \| null
+
+</td><td>
+
+Is this disk the boot disk? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

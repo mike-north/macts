@@ -4,14 +4,10 @@
 
 ## Shortcut.color property
 
-The shortcut's color
+The shortcut's color. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-color: {
-  r: number
-  g: number
-  b: number
-}
+readonly color: Rgb | null;
 ```

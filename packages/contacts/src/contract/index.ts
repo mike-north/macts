@@ -1011,9 +1011,9 @@ export interface PhoneResourceClient {
 
 /**
  * The Contacts client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link contactsContract}. Its type carries the contract's
- * resource table, {@link ContactsResources}, so references can be bound to it by resource; the
- * brand has no runtime member.
+ * A client factory creates one from `contactsContract` in the app's `/contract` entry. Its type
+ * carries the contract's resource table, {@link ContactsResources}, so references can be bound to
+ * it by resource; the brand has no runtime member.
  */
 export interface ContactsClient extends ClientBrand<ContactsResources> {
   /** Address for the given record. */
@@ -1189,7 +1189,7 @@ const phoneRecordType: ValueType<Phone> = t.record(
 )
 
 /**
- * The type of the resource table of {@link contactsContract}: every resource a
+ * The type of the resource table in `contactsContract` (the app's `/contract` entry): every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
  * references to it, and, for each of those operations that finds the

@@ -4,10 +4,10 @@
 
 ## Url.label property
 
-Label for this URL
+Label for this URL. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-label: string
+label: string | null
 ```

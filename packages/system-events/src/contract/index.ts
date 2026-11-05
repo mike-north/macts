@@ -2230,9 +2230,9 @@ export interface UIElementResourceClient {
 
 /**
  * The System Events client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link systemEventsContract}. Its type carries the
- * contract's resource table, {@link SystemEventsResources}, so references can be bound to it by
- * resource; the brand has no runtime member.
+ * commands. A client factory creates one from `systemEventsContract` in the app's `/contract`
+ * entry. Its type carries the contract's resource table, {@link SystemEventsResources}, so
+ * references can be bound to it by resource; the brand has no runtime member.
  */
 export interface SystemEventsClient extends ClientBrand<SystemEventsResources> {
   /** An action that can be performed on the UI element */
@@ -2353,7 +2353,7 @@ export interface SystemEventsClient extends ClientBrand<SystemEventsResources> {
 }
 
 /**
- * The type of the resource table of {@link systemEventsContract}: every resource a
+ * The type of the resource table in `systemEventsContract` (the app's `/contract` entry): every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
  * references to it, and, for each of those operations that finds the

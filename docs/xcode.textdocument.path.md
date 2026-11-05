@@ -4,10 +4,10 @@
 
 ## TextDocument.path property
 
-The document's path
+The document's path. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-path: string
+readonly path: string | null;
 ```

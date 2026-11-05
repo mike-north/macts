@@ -4,10 +4,10 @@
 
 ## DiskItem.packageFolder property
 
-Is the disk item a package?
+Is the disk item a package? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-packageFolder: boolean
+readonly packageFolder: boolean | null;
 ```

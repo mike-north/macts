@@ -4,10 +4,10 @@
 
 ## Process.visible property
 
-Is the process' layer visible?
+Is the process' layer visible? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-visible: string
+visible: string | null
 ```

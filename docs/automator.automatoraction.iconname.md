@@ -4,10 +4,10 @@
 
 ## AutomatorAction.iconName property
 
-The icon name of the action
+The icon name of the action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-iconName: string
+readonly iconName: string | null;
 ```

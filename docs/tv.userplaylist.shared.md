@@ -4,10 +4,10 @@
 
 ## UserPlaylist.shared property
 
-is this playlist shared?
+is this playlist shared? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-shared: boolean
+shared: boolean | null
 ```

@@ -4,10 +4,10 @@
 
 ## ScriptingParameter.description property
 
-The description of the parameter
+The description of the parameter. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-description: string
+readonly description: string | null;
 ```

@@ -4,16 +4,14 @@
 
 ## ContainerSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
 ContainerSchema: z.ZodObject<
   {
     entireContents: z.ZodString
-    expandable: z.ZodBoolean
-    expanded: z.ZodBoolean
-    completelyExpanded: z.ZodBoolean
-    containerWindow: z.ZodString
   },
   z.core.$strip
 >

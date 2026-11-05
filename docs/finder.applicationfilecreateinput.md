@@ -2,78 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [ApplicationFileCreateInput](./finder.applicationfilecreateinput.md)
 
-## ApplicationFileCreateInput interface
+## ApplicationFileCreateInput type
 
-Input for creating a ApplicationFile
+Input for creating an ApplicationFile.
 
 **Signature:**
 
 ```typescript
-interface ApplicationFileCreateInput
+type ApplicationFileCreateInput = Record<string, never>
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[minimumSize?](./finder.applicationfilecreateinput.minimumsize.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ (AVAILABLE IN 10.1 TO 10.4) the smallest memory size with which the application can be launched
-
-</td></tr>
-<tr><td>
-
-[opensInClassic?](./finder.applicationfilecreateinput.opensinclassic.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ (AVAILABLE IN 10.1 TO 10.4) Should the application launch in the Classic environment?
-
-</td></tr>
-<tr><td>
-
-[preferredSize?](./finder.applicationfilecreateinput.preferredsize.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ (AVAILABLE IN 10.1 TO 10.4) the memory size with which the application will be launched
-
-</td></tr>
-</tbody></table>

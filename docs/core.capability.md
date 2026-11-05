@@ -223,7 +223,7 @@ string \| undefined
 
 Fine-grained permission required to invoke this capability, in `app:resource:operation` form (e.g. `calendar:events:create`<!-- -->).
 
-`undefined` when the manifest command declares no permission — surfaced so callers can flag ungoverned capabilities rather than silently treating them as unrestricted.
+This is the permission the server router and the runtime operation registry enforce for the same operation: the command's explicit `permission`<!-- -->, else the one derived from its resolved route (`ManifestRoute.permission`<!-- -->). Every capability derived from a manifest carries one. `undefined` stays in the type so callers can still flag a capability with no permission as ungoverned rather than treat it as unrestricted.
 
 </td></tr>
 <tr><td>

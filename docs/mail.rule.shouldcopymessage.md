@@ -4,10 +4,10 @@
 
 ## Rule.shouldCopyMessage property
 
-Indicates whether the rule has a copy action
+Indicates whether the rule has a copy action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-shouldCopyMessage: boolean
+shouldCopyMessage: boolean | null
 ```

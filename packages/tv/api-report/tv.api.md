@@ -4,29 +4,37 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { FileSource } from '@macts/contracts';
+import { FileValue } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
+import { ObjectReferenceData } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Artwork {
-    data: string;
-    description: string;
-    downloaded: boolean;
-    format: string;
-    id: number;
-    kind: number;
+    data: string | null;
+    description: string | null;
+    readonly downloaded: boolean | null;
+    readonly format: string | null;
+    readonly id: Integer | null;
+    kind: Integer | null;
     rawData: unknown;
 }
 
+// Warning: (ae-forgotten-export) The symbol "ArtworkCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface ArtworkCreateInput {
-    data?: string;
-    description?: string;
-    kind?: number;
-    rawData?: unknown;
-}
+export type ArtworkCreateInput = Omit<ArtworkCreateInput_2, 'kind'> & {
+    kind?: null extends ArtworkCreateInput_2['kind'] ? number | null : number;
+};
 
-// @public (undocumented)
+// @public
 export const ArtworkSchema: z.ZodObject<{
     id: z.ZodNumber;
     data: z.ZodString;
@@ -37,35 +45,41 @@ export const ArtworkSchema: z.ZodObject<{
     rawData: z.ZodUnknown;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "ArtworkUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ArtworkUpdateInput = Partial<ArtworkCreateInput>;
+export type ArtworkUpdateInput = Omit<ArtworkUpdateInput_2, 'kind'> & {
+    kind?: null extends ArtworkUpdateInput_2['kind'] ? number | null : number;
+};
 
 // @public
 export interface BrowserWindow {
-    id: number;
-    selection: string;
+    readonly id: Integer;
+    readonly selection: string | null;
 }
 
 // @public
 export interface BrowserWindowCreateInput {
-    view?: Playlist;
+    view?: ObjectReferenceData<string, 'Playlist'>;
 }
 
 // @public
 export class BrowserWindowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string | number): Promise<BrowserWindow>;
-    list(): Promise<Page<BrowserWindow>>;
+    get(id: string | number, __mactsOptions?: _macts_contracts.CallOptions): Promise<BrowserWindow>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<BrowserWindow>>;
 }
 
-// @public (undocumented)
+// @public
 export const BrowserWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
     selection: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type BrowserWindowUpdateInput = Partial<BrowserWindowCreateInput>;
+export interface BrowserWindowUpdateInput {
+    view?: ObjectReferenceData<string, 'Playlist'>;
+}
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -106,63 +120,69 @@ export type ESrc = 'library' | 'sharedLibrary' | 'iTunesStore' | 'unknown';
 
 // @public
 export interface FileTrack {
-    id: number;
-    location: string;
+    readonly id: Integer | null;
+    location: FileValue | null;
 }
 
 // @public
 export interface FileTrackCreateInput {
-    location?: string;
+    location?: FileSource;
 }
 
 // @public
 export class FileTrackResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    refresh(): Promise<void>;
+    refresh(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const FileTrackSchema: z.ZodObject<{
     id: z.ZodNumber;
     location: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type FileTrackUpdateInput = Partial<FileTrackCreateInput>;
+export interface FileTrackUpdateInput {
+    location?: FileSource;
+}
 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface LibraryPlaylist {
-    id: number;
+    readonly id: Integer | null;
 }
 
 // @public
 export type LibraryPlaylistCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const LibraryPlaylistSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type LibraryPlaylistUpdateInput = Partial<LibraryPlaylistCreateInput>;
+export type LibraryPlaylistUpdateInput = Record<string, never>;
 
 // @public
 export interface Playlist {
-    description: string;
-    duration: number;
-    id: number;
-    name: string;
-    persistentID: string;
-    size: number;
-    specialKind: string;
-    time: string;
-    visible: boolean;
+    description: string | null;
+    readonly duration: Integer | null;
+    readonly id: Integer | null;
+    name: string | null;
+    readonly persistentID: string;
+    readonly size: Integer | null;
+    readonly specialKind: string | null;
+    readonly time: string | null;
+    readonly visible: boolean | null;
 }
 
 // @public
@@ -174,13 +194,13 @@ export interface PlaylistCreateInput {
 // @public
 export class PlaylistResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(sourceId: string, persistentID: string): Promise<Playlist>;
-    list(sourceId: string): Promise<Page<Playlist>>;
-    move(to: string): Promise<void>;
-    search(_for: string, only?: string): Promise<void>;
+    get(sourceId: string, persistentID: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Playlist>;
+    list(sourceId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Playlist>>;
+    move(to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    search(_for: string, only?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const PlaylistSchema: z.ZodObject<{
     id: z.ZodNumber;
     persistentID: z.ZodString;
@@ -194,12 +214,15 @@ export const PlaylistSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type PlaylistUpdateInput = Partial<PlaylistCreateInput>;
+export interface PlaylistUpdateInput {
+    description?: string;
+    name?: string;
+}
 
 // @public
 export interface PlaylistWindow {
-    id: number;
-    selection: string;
+    readonly id: Integer;
+    readonly selection: string | null;
 }
 
 // @public
@@ -208,42 +231,42 @@ export type PlaylistWindowCreateInput = Record<string, never>;
 // @public
 export class PlaylistWindowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string | number): Promise<PlaylistWindow>;
-    list(): Promise<Page<PlaylistWindow>>;
+    get(id: string | number, __mactsOptions?: _macts_contracts.CallOptions): Promise<PlaylistWindow>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<PlaylistWindow>>;
 }
 
-// @public (undocumented)
+// @public
 export const PlaylistWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
     selection: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type PlaylistWindowUpdateInput = Partial<PlaylistWindowCreateInput>;
+export type PlaylistWindowUpdateInput = Record<string, never>;
 
 // @public
 export interface SharedTrack {
-    id: number;
+    readonly id: Integer | null;
 }
 
 // @public
 export type SharedTrackCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const SharedTrackSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type SharedTrackUpdateInput = Partial<SharedTrackCreateInput>;
+export type SharedTrackUpdateInput = Record<string, never>;
 
 // @public
 export interface Source {
-    capacity: number;
-    freeSpace: number;
-    id: number;
-    kind: string;
-    persistentID: string;
+    readonly capacity: number | null;
+    readonly freeSpace: number | null;
+    readonly id: Integer | null;
+    readonly kind: string | null;
+    readonly persistentID: string;
 }
 
 // @public
@@ -252,11 +275,11 @@ export type SourceCreateInput = Record<string, never>;
 // @public
 export class SourceResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(persistentID: string): Promise<Source>;
-    list(): Promise<Page<Source>>;
+    get(persistentID: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Source>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Source>>;
 }
 
-// @public (undocumented)
+// @public
 export const SourceSchema: z.ZodObject<{
     id: z.ZodNumber;
     persistentID: z.ZodString;
@@ -266,104 +289,83 @@ export const SourceSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type SourceUpdateInput = Partial<SourceCreateInput>;
+export type SourceUpdateInput = Record<string, never>;
 
 // @public
 export interface Track {
-    album: string;
-    albumRating: number;
-    albumRatingKind: string;
-    bitRate: number;
-    bookmark: number;
-    bookmarkable: boolean;
-    category: string;
-    comment: string;
-    databaseID: number;
-    dateAdded: Date;
-    description: string;
-    director: string;
-    discCount: number;
-    discNumber: number;
-    downloaderAccount: string;
-    downloaderName: string;
-    duration: number;
-    enabled: boolean;
-    episodeID: string;
-    episodeNumber: number;
-    finish: number;
-    genre: string;
-    grouping: string;
-    id: number;
-    kind: string;
-    longDescription: string;
-    mediaKind: string;
-    modificationDate: Date;
-    playedCount: number;
-    playedDate: Date;
-    purchaserAccount: string;
-    purchaserName: string;
-    rating: number;
-    ratingKind: string;
-    releaseDate: Date;
-    sampleRate: number;
-    seasonNumber: number;
-    show: string;
-    size: number;
-    skippedCount: number;
-    skippedDate: Date;
-    sortAlbum: string;
-    sortDirector: string;
-    sortName: string;
-    sortShow: string;
-    start: number;
-    time: string;
-    trackCount: number;
-    trackNumber: number;
-    unplayed: boolean;
-    volumeAdjustment: number;
-    year: number;
+    album: string | null;
+    albumRating: Integer | null;
+    readonly albumRatingKind: string | null;
+    readonly bitRate: Integer | null;
+    bookmark: number | null;
+    bookmarkable: boolean | null;
+    category: string | null;
+    comment: string | null;
+    readonly databaseID: Integer | null;
+    readonly dateAdded: Date | null;
+    description: string | null;
+    director: string | null;
+    discCount: Integer | null;
+    discNumber: Integer | null;
+    readonly downloaderAccount: string | null;
+    readonly downloaderName: string | null;
+    readonly duration: number | null;
+    enabled: boolean | null;
+    episodeID: string | null;
+    episodeNumber: Integer | null;
+    finish: number | null;
+    genre: string | null;
+    grouping: string | null;
+    readonly id: Integer | null;
+    readonly kind: string | null;
+    longDescription: string | null;
+    mediaKind: string | null;
+    readonly modificationDate: Date | null;
+    playedCount: Integer | null;
+    playedDate: Date | null;
+    readonly purchaserAccount: string | null;
+    readonly purchaserName: string | null;
+    rating: Integer | null;
+    readonly ratingKind: string | null;
+    readonly releaseDate: Date | null;
+    readonly sampleRate: Integer | null;
+    seasonNumber: Integer | null;
+    show: string | null;
+    readonly size: number | null;
+    skippedCount: Integer | null;
+    skippedDate: Date | null;
+    sortAlbum: string | null;
+    sortDirector: string | null;
+    sortName: string | null;
+    sortShow: string | null;
+    start: number | null;
+    readonly time: string | null;
+    trackCount: Integer | null;
+    trackNumber: Integer | null;
+    unplayed: boolean | null;
+    volumeAdjustment: Integer | null;
+    year: Integer | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "TrackCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type TrackCreateInput = Omit<TrackCreateInput_2, 'albumRating' | 'discCount' | 'discNumber' | 'episodeNumber' | 'playedCount' | 'rating' | 'seasonNumber' | 'skippedCount' | 'trackCount' | 'trackNumber' | 'volumeAdjustment' | 'year'> & {
+    albumRating?: null extends TrackCreateInput_2['albumRating'] ? number | null : number;
+    discCount?: null extends TrackCreateInput_2['discCount'] ? number | null : number;
+    discNumber?: null extends TrackCreateInput_2['discNumber'] ? number | null : number;
+    episodeNumber?: null extends TrackCreateInput_2['episodeNumber'] ? number | null : number;
+    playedCount?: null extends TrackCreateInput_2['playedCount'] ? number | null : number;
+    rating?: null extends TrackCreateInput_2['rating'] ? number | null : number;
+    seasonNumber?: null extends TrackCreateInput_2['seasonNumber'] ? number | null : number;
+    skippedCount?: null extends TrackCreateInput_2['skippedCount'] ? number | null : number;
+    trackCount?: null extends TrackCreateInput_2['trackCount'] ? number | null : number;
+    trackNumber?: null extends TrackCreateInput_2['trackNumber'] ? number | null : number;
+    volumeAdjustment?: null extends TrackCreateInput_2['volumeAdjustment'] ? number | null : number;
+    year?: null extends TrackCreateInput_2['year'] ? number | null : number;
+};
 
 // @public
-export interface TrackCreateInput {
-    album?: string;
-    albumRating?: number;
-    bookmark?: number;
-    bookmarkable?: boolean;
-    category?: string;
-    comment?: string;
-    description?: string;
-    director?: string;
-    discCount?: number;
-    discNumber?: number;
-    enabled?: boolean;
-    episodeID?: string;
-    episodeNumber?: number;
-    finish?: number;
-    genre?: string;
-    grouping?: string;
-    longDescription?: string;
-    mediaKind?: string;
-    playedCount?: number;
-    playedDate?: Date;
-    rating?: number;
-    seasonNumber?: number;
-    show?: string;
-    skippedCount?: number;
-    skippedDate?: Date;
-    sortAlbum?: string;
-    sortDirector?: string;
-    sortName?: string;
-    sortShow?: string;
-    start?: number;
-    trackCount?: number;
-    trackNumber?: number;
-    unplayed?: boolean;
-    volumeAdjustment?: number;
-    year?: number;
-}
-
-// @public (undocumented)
 export const TrackSchema: z.ZodObject<{
     id: z.ZodNumber;
     album: z.ZodString;
@@ -419,43 +421,62 @@ export const TrackSchema: z.ZodObject<{
     year: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "TrackUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type TrackUpdateInput = Partial<TrackCreateInput>;
+export type TrackUpdateInput = Omit<TrackUpdateInput_2, 'albumRating' | 'discCount' | 'discNumber' | 'episodeNumber' | 'playedCount' | 'rating' | 'seasonNumber' | 'skippedCount' | 'trackCount' | 'trackNumber' | 'volumeAdjustment' | 'year'> & {
+    albumRating?: null extends TrackUpdateInput_2['albumRating'] ? number | null : number;
+    discCount?: null extends TrackUpdateInput_2['discCount'] ? number | null : number;
+    discNumber?: null extends TrackUpdateInput_2['discNumber'] ? number | null : number;
+    episodeNumber?: null extends TrackUpdateInput_2['episodeNumber'] ? number | null : number;
+    playedCount?: null extends TrackUpdateInput_2['playedCount'] ? number | null : number;
+    rating?: null extends TrackUpdateInput_2['rating'] ? number | null : number;
+    seasonNumber?: null extends TrackUpdateInput_2['seasonNumber'] ? number | null : number;
+    skippedCount?: null extends TrackUpdateInput_2['skippedCount'] ? number | null : number;
+    trackCount?: null extends TrackUpdateInput_2['trackCount'] ? number | null : number;
+    trackNumber?: null extends TrackUpdateInput_2['trackNumber'] ? number | null : number;
+    volumeAdjustment?: null extends TrackUpdateInput_2['volumeAdjustment'] ? number | null : number;
+    year?: null extends TrackUpdateInput_2['year'] ? number | null : number;
+};
+
+// @public
+export interface TVClient extends ClientBrand<TVResources> {
+}
 
 // @public
 export class TVClient {
     constructor(options: TVClientOptions);
-    add(to?: string): Promise<void>;
-    backTrack(): Promise<void>;
+    add(to?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    backTrack(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly browserWindows: BrowserWindowResourceClient;
-    close(): Promise<void>;
-    convert(): Promise<void>;
-    count(each: string): Promise<void>;
-    download(): Promise<void>;
-    duplicate(to?: string): Promise<void>;
-    exists(): Promise<void>;
-    fastForward(): Promise<void>;
+    close(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    convert(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    count(each: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    download(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    duplicate(to?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    exists(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    fastForward(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly fileTracks: FileTrackResourceClient;
     get http(): HttpClient;
-    make(_new: string, at?: string, withProperties?: unknown): Promise<void>;
-    nextTrack(): Promise<void>;
-    open(): Promise<void>;
-    openLocation(): Promise<void>;
-    pause(): Promise<void>;
-    play(once?: boolean): Promise<void>;
+    make(_new: string, at?: string, withProperties?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    nextTrack(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    open(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    openLocation(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    pause(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    play(once?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly playlists: PlaylistResourceClient;
     readonly playlistWindows: PlaylistWindowResourceClient;
-    playpause(): Promise<void>;
-    previousTrack(): Promise<void>;
-    quit(): Promise<void>;
-    resume(): Promise<void>;
-    reveal(): Promise<void>;
-    rewind(): Promise<void>;
-    run(): Promise<void>;
-    save(): Promise<void>;
-    select(): Promise<void>;
+    playpause(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    previousTrack(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    quit(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    resume(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    reveal(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    rewind(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    run(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    save(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    select(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly sources: SourceResourceClient;
-    stop(): Promise<void>;
+    stop(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -472,9 +493,37 @@ export class TVError extends Error {
 }
 
 // @public
+export type TVResources = Readonly<{
+    BrowserWindow: ResourceDescriptor<BrowserWindow, Integer> & {
+        readonly id: ValueType<Integer>;
+        readonly get: 'tv.browserWindows.get';
+        readonly list: 'tv.browserWindows.list';
+    };
+    Playlist: ResourceDescriptor<Playlist, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'tv.playlists.get';
+        readonly list: 'tv.playlists.list';
+        readonly parents: {
+            readonly get: 'Source';
+            readonly list: 'Source';
+        };
+    };
+    PlaylistWindow: ResourceDescriptor<PlaylistWindow, Integer> & {
+        readonly id: ValueType<Integer>;
+        readonly get: 'tv.playlistWindows.get';
+        readonly list: 'tv.playlistWindows.list';
+    };
+    Source: ResourceDescriptor<Source, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'tv.sources.get';
+        readonly list: 'tv.sources.list';
+    };
+}>;
+
+// @public
 export interface URLTrack {
-    address: string;
-    id: number;
+    address: string | null;
+    readonly id: Integer | null;
 }
 
 // @public
@@ -482,20 +531,22 @@ export interface URLTrackCreateInput {
     address?: string;
 }
 
-// @public (undocumented)
+// @public
 export const URLTrackSchema: z.ZodObject<{
     id: z.ZodNumber;
     address: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type URLTrackUpdateInput = Partial<URLTrackCreateInput>;
+export interface URLTrackUpdateInput {
+    address?: string;
+}
 
 // @public
 export interface UserPlaylist {
-    id: number;
-    shared: boolean;
-    smart: boolean;
+    readonly id: Integer | null;
+    shared: boolean | null;
+    readonly smart: boolean | null;
 }
 
 // @public
@@ -503,7 +554,7 @@ export interface UserPlaylistCreateInput {
     shared?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const UserPlaylistSchema: z.ZodObject<{
     id: z.ZodNumber;
     shared: z.ZodBoolean;
@@ -511,23 +562,25 @@ export const UserPlaylistSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type UserPlaylistUpdateInput = Partial<UserPlaylistCreateInput>;
+export interface UserPlaylistUpdateInput {
+    shared?: boolean;
+}
 
 // @public
 export interface VideoWindow {
-    id: number;
+    readonly id: Integer | null;
 }
 
 // @public
 export type VideoWindowCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const VideoWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type VideoWindowUpdateInput = Partial<VideoWindowCreateInput>;
+export type VideoWindowUpdateInput = Record<string, never>;
 
 // (No @packageDocumentation comment for this package)
 

@@ -4,6 +4,8 @@
 
 ## WorkspaceDocumentSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -15,9 +17,6 @@ WorkspaceDocumentSchema: z.ZodObject<
     file: z.ZodString
     path: z.ZodString
     loaded: z.ZodBoolean
-    activeScheme: z.ZodString
-    activeRunDestination: z.ZodString
-    lastSchemeActionResult: z.ZodString
   },
   z.core.$strip
 >

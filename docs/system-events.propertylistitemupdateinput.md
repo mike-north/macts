@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [PropertyListItemUpdateInput](./system-events.propertylistitemupdateinput.md)
 
-## PropertyListItemUpdateInput type
+## PropertyListItemUpdateInput interface
 
-Input for updating a PropertyListItem
+Input for updating a PropertyListItem. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type PropertyListItemUpdateInput = Partial<PropertyListItemCreateInput>
+interface PropertyListItemUpdateInput
 ```
 
-**References:** [PropertyListItemCreateInput](./system-events.propertylistitemcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[text?](./system-events.propertylistitemupdateinput.text.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the text representation of the property list data. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[value?](./system-events.propertylistitemupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the value of the property list item. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

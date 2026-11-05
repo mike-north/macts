@@ -4,10 +4,10 @@
 
 ## Track.trackNumber property
 
-the index of the track on the source album
+the index of the track on the source album. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-trackNumber: number
+trackNumber: Integer | null
 ```

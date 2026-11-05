@@ -4,10 +4,10 @@
 
 ## Row.allowBreakAcrossPages property
 
-Whether the row can break across pages
+Whether the row can break across pages. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-allowBreakAcrossPages: boolean
+allowBreakAcrossPages: boolean | null
 ```

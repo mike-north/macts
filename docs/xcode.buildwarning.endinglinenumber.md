@@ -4,10 +4,10 @@
 
 ## BuildWarning.endingLineNumber property
 
-The ending line number in the file where the issue occurred
+The ending line number in the file where the issue occurred. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-endingLineNumber: number
+endingLineNumber: Integer | null
 ```

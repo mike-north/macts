@@ -33,32 +33,17 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[id?](./omnigraffle.layer.id.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
-
-</td></tr>
-<tr><td>
-
 [locked](./omnigraffle.layer.locked.md)
 
 </td><td>
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Are the layer's graphics locked?
+Are the layer's graphics locked? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -73,7 +58,7 @@ string
 
 </td><td>
 
-Name of the layer
+Name of the layer. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -84,11 +69,11 @@ Name of the layer
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Do the layer's graphics print?
+Do the layer's graphics print? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +84,11 @@ Do the layer's graphics print?
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Are the layer's graphics visible?
+Are the layer's graphics visible? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

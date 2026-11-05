@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The ending character position
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The ending character position. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ The ending character position
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the bookmark
+The name of the bookmark. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +69,15 @@ The name of the bookmark
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The starting character position
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The starting character position. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

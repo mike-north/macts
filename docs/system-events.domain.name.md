@@ -4,10 +4,10 @@
 
 ## Domain.name property
 
-the name of the domain
+the name of the domain. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

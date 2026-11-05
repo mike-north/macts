@@ -2,14 +2,213 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [EQPresetUpdateInput](./music.eqpresetupdateinput.md)
 
-## EQPresetUpdateInput type
+## EQPresetUpdateInput interface
 
-Input for updating a EQPreset
+Input for updating an EQPreset. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type EQPresetUpdateInput = Partial<EQPresetCreateInput>
+interface EQPresetUpdateInput
 ```
 
-**References:** [EQPresetCreateInput](./music.eqpresetcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[band1?](./music.eqpresetupdateinput.band1.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ the equalizer 32 Hz band level (-12.0 dB to +12.0 dB). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[band10?](./music.eqpresetupdateinput.band10.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ the equalizer 16 kHz band level (-12.0 dB to +12.0 dB). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[band2?](./music.eqpresetupdateinput.band2.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ the equalizer 64 Hz band level (-12.0 dB to +12.0 dB). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[band3?](./music.eqpresetupdateinput.band3.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ the equalizer 125 Hz band level (-12.0 dB to +12.0 dB). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[band4?](./music.eqpresetupdateinput.band4.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ the equalizer 250 Hz band level (-12.0 dB to +12.0 dB). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[band5?](./music.eqpresetupdateinput.band5.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ the equalizer 500 Hz band level (-12.0 dB to +12.0 dB). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[band6?](./music.eqpresetupdateinput.band6.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ the equalizer 1 kHz band level (-12.0 dB to +12.0 dB). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[band7?](./music.eqpresetupdateinput.band7.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ the equalizer 2 kHz band level (-12.0 dB to +12.0 dB). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[band8?](./music.eqpresetupdateinput.band8.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ the equalizer 4 kHz band level (-12.0 dB to +12.0 dB). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[band9?](./music.eqpresetupdateinput.band9.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ the equalizer 8 kHz band level (-12.0 dB to +12.0 dB). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[preamp?](./music.eqpresetupdateinput.preamp.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ the equalizer preamp level (-12.0 dB to +12.0 dB). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[updateTracks?](./music.eqpresetupdateinput.updatetracks.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ should tracks which refer to this preset be updated when the preset is renamed or deleted? Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

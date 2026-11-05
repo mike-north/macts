@@ -4,7 +4,7 @@
 
 ## BookmarkCreateInput interface
 
-Input for creating a Bookmark
+Input for creating a Bookmark.
 
 **Signature:**
 

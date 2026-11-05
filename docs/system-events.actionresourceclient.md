@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[perform()](./system-events.actionresourceclient.perform.md)
+[perform(\_\_mactsOptions)](./system-events.actionresourceclient.perform.md)
 
 </td><td>
 

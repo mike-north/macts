@@ -39,7 +39,7 @@ Client for a dependency of one task upon another task.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -142,7 +142,16 @@ An assignment of a resource to a task
 
 </td><td>
 
-Input for creating a Assignment
+Input for creating an Assignment.
+
+</td></tr>
+<tr><td>
+
+[AssignmentUpdateInput](./omniplan.assignmentupdateinput.md)
+
+</td><td>
+
+Input for updating an Assignment. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -178,7 +187,16 @@ A dependency of one task upon another task
 
 </td><td>
 
-Input for creating a Dependency
+Input for creating a Dependency.
+
+</td></tr>
+<tr><td>
+
+[DependencyUpdateInput](./omniplan.dependencyupdateinput.md)
+
+</td><td>
+
+Input for updating a Dependency. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -196,7 +214,25 @@ A milestone (zero-duration marker task)
 
 </td><td>
 
-Input for creating a Milestone
+Input for creating a Milestone.
+
+</td></tr>
+<tr><td>
+
+[MilestoneUpdateInput](./omniplan.milestoneupdateinput.md)
+
+</td><td>
+
+Input for updating a Milestone. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[OmniPlanClient](./omniplan.omniplanclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -223,7 +259,16 @@ An OmniPlan project
 
 </td><td>
 
-Input for creating a Project
+Input for creating a Project.
+
+</td></tr>
+<tr><td>
+
+[ProjectUpdateInput](./omniplan.projectupdateinput.md)
+
+</td><td>
+
+Input for updating a Project. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -241,7 +286,16 @@ A resource (person, equipment, or material)
 
 </td><td>
 
-Input for creating a Resource
+Input for creating a Resource.
+
+</td></tr>
+<tr><td>
+
+[ResourceUpdateInput](./omniplan.resourceupdateinput.md)
+
+</td><td>
+
+Input for updating a Resource. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -259,7 +313,16 @@ An alternative project plan
 
 </td><td>
 
-Input for creating a Scenario
+Input for creating a Scenario.
+
+</td></tr>
+<tr><td>
+
+[ScenarioUpdateInput](./omniplan.scenarioupdateinput.md)
+
+</td><td>
+
+Input for updating a Scenario. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -269,15 +332,6 @@ Input for creating a Scenario
 </td><td>
 
 A task within an OmniPlan project
-
-</td></tr>
-<tr><td>
-
-[TaskCreateInput](./omniplan.taskcreateinput.md)
-
-</td><td>
-
-Input for creating a Task
 
 </td></tr>
 <tr><td>
@@ -308,6 +362,8 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -324,12 +380,16 @@ Every capability exposed by OmniPlan, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [DependencySchema](./omniplan.dependencyschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -338,12 +398,16 @@ Every capability exposed by OmniPlan, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ProjectSchema](./omniplan.projectschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -352,12 +416,16 @@ Every capability exposed by OmniPlan, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ScenarioSchema](./omniplan.scenarioschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -366,6 +434,8 @@ Every capability exposed by OmniPlan, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -373,12 +443,16 @@ Every capability exposed by OmniPlan, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ViolationSchema](./omniplan.violationschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -396,15 +470,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[AssignmentUpdateInput](./omniplan.assignmentupdateinput.md)
-
-</td><td>
-
-Input for updating a Assignment
-
-</td></tr>
-<tr><td>
-
 [CapabilityRisk](./omniplan.capabilityrisk.md)
 
 </td><td>
@@ -418,7 +483,7 @@ Risk classification for a capability.
 
 </td><td>
 
-Input for creating a Currency
+Input for creating a Currency.
 
 </td></tr>
 <tr><td>
@@ -427,7 +492,7 @@ Input for creating a Currency
 
 </td><td>
 
-Input for updating a Currency
+Input for updating a Currency. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -441,29 +506,11 @@ Type of dependency between tasks
 </td></tr>
 <tr><td>
 
-[DependencyUpdateInput](./omniplan.dependencyupdateinput.md)
+[OmniPlanResources](./omniplan.omniplanresources.md)
 
 </td><td>
 
-Input for updating a Dependency
-
-</td></tr>
-<tr><td>
-
-[MilestoneUpdateInput](./omniplan.milestoneupdateinput.md)
-
-</td><td>
-
-Input for updating a Milestone
-
-</td></tr>
-<tr><td>
-
-[ProjectUpdateInput](./omniplan.projectupdateinput.md)
-
-</td><td>
-
-Input for updating a Project
+The type of the resource table in `omniPlanContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 <tr><td>
@@ -473,24 +520,6 @@ Input for updating a Project
 </td><td>
 
 Type of resource
-
-</td></tr>
-<tr><td>
-
-[ResourceUpdateInput](./omniplan.resourceupdateinput.md)
-
-</td><td>
-
-Input for updating a Resource
-
-</td></tr>
-<tr><td>
-
-[ScenarioUpdateInput](./omniplan.scenarioupdateinput.md)
-
-</td><td>
-
-Input for updating a Scenario
 
 </td></tr>
 <tr><td>
@@ -508,7 +537,7 @@ A schedule of working time
 
 </td><td>
 
-Input for creating a Schedule
+Input for creating a Schedule.
 
 </td></tr>
 <tr><td>
@@ -517,7 +546,7 @@ Input for creating a Schedule
 
 </td><td>
 
-Input for updating a Schedule
+Input for updating a Schedule. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -527,6 +556,15 @@ Input for updating a Schedule
 </td><td>
 
 Granularity for task scheduling
+
+</td></tr>
+<tr><td>
+
+[TaskCreateInput](./omniplan.taskcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -553,7 +591,7 @@ Type of task
 
 </td><td>
 
-Input for updating a Task
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -562,7 +600,7 @@ Input for updating a Task
 
 </td><td>
 
-Input for creating a Violation
+Input for creating a Violation.
 
 </td></tr>
 <tr><td>
@@ -571,7 +609,7 @@ Input for creating a Violation
 
 </td><td>
 
-Input for updating a Violation
+Input for updating a Violation. Omitted fields are left unchanged.
 
 </td></tr>
 </tbody></table>

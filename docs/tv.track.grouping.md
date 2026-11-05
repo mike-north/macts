@@ -4,10 +4,10 @@
 
 ## Track.grouping property
 
-the grouping (piece) of the track. Generally used to denote movements within a classical work.
+the grouping (piece) of the track. Generally used to denote movements within a classical work. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-grouping: string
+grouping: string | null
 ```

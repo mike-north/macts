@@ -4,6 +4,8 @@
 
 ## ScriptingClassSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -15,7 +17,6 @@ ScriptingClassSchema: z.ZodObject<
     hidden: z.ZodBoolean
     pluralName: z.ZodString
     suiteName: z.ZodString
-    superclass: z.ZodString
   },
   z.core.$strip
 >

@@ -4,10 +4,10 @@
 
 ## Paragraph.keepTogether property
 
-Whether all lines remain on the same page
+Whether all lines remain on the same page. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-keepTogether: boolean
+keepTogether: boolean | null
 ```

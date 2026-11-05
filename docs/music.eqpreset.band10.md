@@ -4,10 +4,10 @@
 
 ## EQPreset.band10 property
 
-the equalizer 16 kHz band level (-12.0 dB to +12.0 dB)
+the equalizer 16 kHz band level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-band10: number
+band10: number | null
 ```

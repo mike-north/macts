@@ -4,12 +4,10 @@
 
 ## SpaceUpdateInput type
 
-Input for updating a Space
+Input for updating a Space. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SpaceUpdateInput = Partial<SpaceCreateInput>
+type SpaceUpdateInput = Record<string, never>
 ```
-
-**References:** [SpaceCreateInput](./arc.spacecreateinput.md)

@@ -17,20 +17,11 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[ConnectionResourceClient](./screen-sharing.connectionresourceclient.md)
-
-</td><td>
-
-Client for a screen sharing connection.
-
-</td></tr>
-<tr><td>
-
 [HttpClient](./screen-sharing.httpclient.md)
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -75,11 +66,11 @@ Machine-readable description of a single capability.
 </td></tr>
 <tr><td>
 
-[Connection](./screen-sharing.connection.md)
+[ScreenSharingClient](./screen-sharing.screensharingclient.md)
 
 </td><td>
 
-A screen sharing connection
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -113,13 +104,6 @@ Description
 Every capability exposed by Screen Sharing, with risk metadata.
 
 </td></tr>
-<tr><td>
-
-[ConnectionSchema](./screen-sharing.connectionschema.md)
-
-</td><td>
-
-</td></tr>
 </tbody></table>
 
 ## Type Aliases
@@ -144,20 +128,11 @@ Risk classification for a capability.
 </td></tr>
 <tr><td>
 
-[ConnectionCreateInput](./screen-sharing.connectioncreateinput.md)
+[ScreenSharingResources](./screen-sharing.screensharingresources.md)
 
 </td><td>
 
-Input for creating a Connection
-
-</td></tr>
-<tr><td>
-
-[ConnectionUpdateInput](./screen-sharing.connectionupdateinput.md)
-
-</td><td>
-
-Input for updating a Connection
+The type of the resource table in `screenSharingContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 </tbody></table>

@@ -4,10 +4,10 @@
 
 ## Reminder.dueDate property
 
-The due date of the reminder
+The due date of the reminder. Nullable. Observed missing in 15 of 412 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-dueDate: Date
+dueDate: Date | null
 ```

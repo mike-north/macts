@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ProcessUpdateInput](./system-events.processupdateinput.md)
 
-## ProcessUpdateInput type
+## ProcessUpdateInput interface
 
-Input for updating a Process
+Input for updating a Process. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ProcessUpdateInput = Partial<ProcessCreateInput>
+interface ProcessUpdateInput
 ```
 
-**References:** [ProcessCreateInput](./system-events.processcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[frontmost?](./system-events.processupdateinput.frontmost.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Is the process the frontmost process. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[visible?](./system-events.processupdateinput.visible.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Is the process' layer visible? Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

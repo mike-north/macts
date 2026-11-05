@@ -4,7 +4,7 @@
 
 ## DiskCreateInput interface
 
-Input for creating a Disk
+Input for creating a Disk.
 
 **Signature:**
 

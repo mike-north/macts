@@ -4,10 +4,10 @@
 
 ## Character.font property
 
-The name of the font of the character.
+The name of the font of the character. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-font: string
+font: string | null
 ```

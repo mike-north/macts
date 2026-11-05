@@ -4,12 +4,10 @@
 
 ## VideoWindowUpdateInput type
 
-Input for updating a VideoWindow
+Input for updating a VideoWindow. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type VideoWindowUpdateInput = Partial<VideoWindowCreateInput>
+type VideoWindowUpdateInput = Record<string, never>
 ```
-
-**References:** [VideoWindowCreateInput](./tv.videowindowcreateinput.md)

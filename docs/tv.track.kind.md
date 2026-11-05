@@ -4,10 +4,10 @@
 
 ## Track.kind property
 
-a text description of the track
+a text description of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-kind: string
+readonly kind: string | null;
 ```

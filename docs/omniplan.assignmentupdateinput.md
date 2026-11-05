@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/omniplan](./omniplan.md) &gt; [AssignmentUpdateInput](./omniplan.assignmentupdateinput.md)
 
-## AssignmentUpdateInput type
+## AssignmentUpdateInput interface
 
-Input for updating a Assignment
+Input for updating an Assignment. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type AssignmentUpdateInput = Partial<AssignmentCreateInput>
+interface AssignmentUpdateInput
 ```
 
-**References:** [AssignmentCreateInput](./omniplan.assignmentcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[units?](./omniplan.assignmentupdateinput.units.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ Units of the resource required for this task (1.0 = 100%). Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

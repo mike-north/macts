@@ -4,10 +4,10 @@
 
 ## Window.id property
 
-The unique identifier of the window.
+The unique identifier of the window, within one browser session: ids start over each time the browser is relaunched, so an id kept across a relaunch may find a different window, not merely none. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

@@ -4,12 +4,10 @@
 
 ## ScrollBarUpdateInput type
 
-Input for updating a ScrollBar
+Input for updating a ScrollBar. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ScrollBarUpdateInput = Partial<ScrollBarCreateInput>
+type ScrollBarUpdateInput = Record<string, never>
 ```
-
-**References:** [ScrollBarCreateInput](./system-events.scrollbarcreateinput.md)

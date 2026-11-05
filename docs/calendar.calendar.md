@@ -33,32 +33,17 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[calendarIdentifier](./calendar.calendar.calendaridentifier.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-A unique calendar key
-
-</td></tr>
-<tr><td>
-
 [color](./calendar.calendar.color.md)
 
 </td><td>
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The calendar color
+The calendar color. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,26 +54,11 @@ The calendar color
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The calendar description
-
-</td></tr>
-<tr><td>
-
-[id?](./calendar.calendar.id.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `calendarIdentifier`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
+The calendar description. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -103,7 +73,7 @@ string
 
 </td><td>
 
-The calendar title
+The calendar title. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -114,11 +84,11 @@ The calendar title
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The calendar title (synonym for name)
+The calendar title (synonym for name). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +97,15 @@ The calendar title (synonym for name)
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the calendar can be modified
+boolean \| null
+
+</td><td>
+
+Whether the calendar can be modified. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

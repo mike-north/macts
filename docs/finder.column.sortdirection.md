@@ -4,10 +4,10 @@
 
 ## Column.sortDirection property
 
-The direction in which the window is sorted
+The direction in which the window is sorted. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-sortDirection: string
+sortDirection: string | null
 ```

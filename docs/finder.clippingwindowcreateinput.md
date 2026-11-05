@@ -4,7 +4,7 @@
 
 ## ClippingWindowCreateInput type
 
-Input for creating a ClippingWindow
+Input for creating a ClippingWindow.
 
 **Signature:**
 

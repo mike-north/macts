@@ -4,10 +4,10 @@
 
 ## Outline.id property
 
-Unique identifier for this outline
+Unique identifier for this outline. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

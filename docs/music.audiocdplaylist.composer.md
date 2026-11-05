@@ -4,10 +4,10 @@
 
 ## AudioCDPlaylist.composer property
 
-the composer of the CD
+the composer of the CD. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-composer: string
+composer: string | null
 ```

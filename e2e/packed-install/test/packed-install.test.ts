@@ -37,6 +37,7 @@ import {
   findNativeAddons,
   installConsumer,
   installContractsConsumer,
+  installFacadeConsumer,
   installedMactsPackages,
   isInstalled,
   packAll,
@@ -50,6 +51,7 @@ const SETUP_TIMEOUT_MS = 240_000
 let root: string
 let consumer: string
 let contractsConsumer: string
+let facadeConsumer: string
 
 beforeAll(async () => {
   root = mkdtempSync(join(tmpdir(), 'macts-packed-install-'))
@@ -58,6 +60,8 @@ beforeAll(async () => {
   await installConsumer(consumer, tarballs)
   contractsConsumer = join(root, 'contracts-consumer')
   await installContractsConsumer(contractsConsumer, tarballs.contracts)
+  facadeConsumer = join(root, 'facade-consumer')
+  await installFacadeConsumer(facadeConsumer, tarballs)
 }, SETUP_TIMEOUT_MS)
 
 afterAll(() => {
@@ -79,6 +83,7 @@ describe('packed install: installed tree', () => {
       '@macts/notes',
       '@macts/runtime',
       '@macts/sdk',
+      '@macts/system-events',
     ])
   })
 
@@ -187,6 +192,34 @@ describe('packed install: shared client alone', () => {
       codec: 'function',
       remote: 'function',
       binder: 'function',
+    })
+  })
+})
+
+/** The published constructor facade is usable without loading any execution dependency. */
+describe('packed install: generated constructor facade', () => {
+  it('installs the real System Events app with contracts and Zod only', async () => {
+    expect(installedMactsPackages(facadeConsumer)).toEqual([
+      '@macts/contracts',
+      '@macts/system-events',
+    ])
+    expect(findNativeAddons(facadeConsumer)).toEqual([])
+    expect(findInstalledCopies(facadeConsumer, '@macts/contracts')).toHaveLength(1)
+    expect(await runConsumer(facadeConsumer, 'facade-app-only.mjs')).toEqual({
+      input: { usingActionNumber: { integer: '7' } },
+      canonicalError: true,
+      rawError: true,
+      boundFacade: true,
+      validationBeforeDispatch: true,
+    })
+  })
+
+  it('shares root record types, reference authority and errors with both SDK entries', async () => {
+    expect(await runConsumer(consumer, 'notes-root.mjs')).toEqual({
+      sameBinder: true,
+      hydrated: true,
+      sdkError: true,
+      localError: true,
     })
   })
 })

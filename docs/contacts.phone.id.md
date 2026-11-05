@@ -4,10 +4,10 @@
 
 ## Phone.id property
 
-Unique identifier for this phone
+Unique identifier for this phone. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

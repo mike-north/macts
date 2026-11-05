@@ -2,153 +2,15 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-word](./microsoft-word.md) &gt; [TextRangeCreateInput](./microsoft-word.textrangecreateinput.md)
 
-## TextRangeCreateInput interface
+## TextRangeCreateInput type
 
-Input for creating a TextRange
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface TextRangeCreateInput
+type TextRangeCreateInput = Omit<TextRangeCreateInput$1, 'start' | 'end'> & {
+  start?: null extends TextRangeCreateInput$1['start'] ? number | null : number
+  end?: null extends TextRangeCreateInput$1['end'] ? number | null : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[bold?](./microsoft-word.textrangecreateinput.bold.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ Whether the text is formatted as bold
-
-</td></tr>
-<tr><td>
-
-[content?](./microsoft-word.textrangecreateinput.content.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ The text in the range
-
-</td></tr>
-<tr><td>
-
-[end?](./microsoft-word.textrangecreateinput.end.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The ending character position
-
-</td></tr>
-<tr><td>
-
-[fontName?](./microsoft-word.textrangecreateinput.fontname.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ The font name
-
-</td></tr>
-<tr><td>
-
-[fontSize?](./microsoft-word.textrangecreateinput.fontsize.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The font size in points
-
-</td></tr>
-<tr><td>
-
-[italic?](./microsoft-word.textrangecreateinput.italic.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ Whether the text is formatted as italic
-
-</td></tr>
-<tr><td>
-
-[start?](./microsoft-word.textrangecreateinput.start.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The starting character position
-
-</td></tr>
-<tr><td>
-
-[underline?](./microsoft-word.textrangecreateinput.underline.md)
-
-</td><td>
-
-</td><td>
-
-[UnderlineType](./microsoft-word.underlinetype.md)
-
-</td><td>
-
-_(Optional)_ The underline type
-
-</td></tr>
-</tbody></table>

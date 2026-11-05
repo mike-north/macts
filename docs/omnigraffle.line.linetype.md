@@ -4,10 +4,10 @@
 
 ## Line.lineType property
 
-Type of the line
+Type of the line. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-lineType: LineType
+lineType: LineType | null
 ```

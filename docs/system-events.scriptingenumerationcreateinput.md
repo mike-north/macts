@@ -4,7 +4,7 @@
 
 ## ScriptingEnumerationCreateInput type
 
-Input for creating a ScriptingEnumeration
+Input for creating a ScriptingEnumeration.
 
 **Signature:**
 

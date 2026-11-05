@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(id)](./omnigraffle.graphicresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./omnigraffle.graphicresourceclient.get.md)
 
 </td><td>
 
@@ -68,13 +68,13 @@ Get a graphic by id.
 </td></tr>
 <tr><td>
 
-[list()](./omnigraffle.graphicresourceclient.list.md)
+[list(canvasId, \_\_mactsOptions)](./omnigraffle.graphicresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all graphics.
+List the graphics of one canvas, as one page.
 
 </td></tr>
 </tbody></table>

@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The long description HTML for this violation
+string \| null
+
+</td><td>
+
+The long description HTML for this violation. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The long description HTML for this violation
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The short description of this violation
+string \| null
+
+</td><td>
+
+The short description of this violation. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ The short description of this violation
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The type of violation
+string \| null
+
+</td><td>
+
+The type of violation. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

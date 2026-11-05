@@ -4,10 +4,10 @@
 
 ## BrowserWindow.view property
 
-the playlist currently displayed in the window
+the playlist currently displayed in the window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-view: Playlist
+view: ObjectReferenceVariant<Playlist, string, 'Playlist'> | null
 ```

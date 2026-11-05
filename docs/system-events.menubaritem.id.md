@@ -4,10 +4,10 @@
 
 ## MenuBarItem.id property
 
-Unique identifier for this menu bar item
+Unique identifier for this menu bar item. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

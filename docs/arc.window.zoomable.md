@@ -4,10 +4,10 @@
 
 ## Window.zoomable property
 
-Whether the window can be zoomed.
+Whether the window can be zoomed. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-zoomable: boolean
+readonly zoomable: boolean | null;
 ```

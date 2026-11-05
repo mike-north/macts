@@ -4,10 +4,10 @@
 
 ## ScriptingProperty.listed property
 
-Is the property's value a list?
+Is the property's value a list? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-listed: boolean
+readonly listed: boolean | null;
 ```

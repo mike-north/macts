@@ -4,10 +4,10 @@
 
 ## Space.id property
 
-The unique identifier of the space.
+The unique identifier of the space. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

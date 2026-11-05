@@ -4,15 +4,15 @@
 
 ## ServiceSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
 ServiceSchema: z.ZodObject<
   {
     active: z.ZodBoolean
-    currentConfiguration: z.ZodString
     id: z.ZodString
-    interface: z.ZodString
     kind: z.ZodNumber
     name: z.ZodString
   },

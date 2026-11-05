@@ -4,7 +4,7 @@
 
 ## ManifestRoute.commandKey property
 
-The command key in `manifest.commands` (the route's operation segment).
+The command key in `manifest.commands`<!-- -->, by which executors find the command. The route's operation segment is the command's `routeName` when it declares one, else this key.
 
 **Signature:**
 

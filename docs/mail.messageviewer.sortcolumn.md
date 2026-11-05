@@ -4,10 +4,10 @@
 
 ## MessageViewer.sortColumn property
 
-The column that is currently sorted in the viewer
+The column that is currently sorted in the viewer. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-sortColumn: string
+sortColumn: string | null
 ```

@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-is this a Genius Playlist?
+boolean \| null
+
+</td><td>
+
+is this a Genius Playlist? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ is this a Genius Playlist?
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-is this playlist shared?
+is this playlist shared? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +69,15 @@ is this playlist shared?
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-is this a Smart Playlist?
+boolean \| null
+
+</td><td>
+
+is this a Smart Playlist? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

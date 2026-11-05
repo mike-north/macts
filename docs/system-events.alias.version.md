@@ -4,10 +4,10 @@
 
 ## Alias.version property
 
-the version of the application bundle referenced by the alias (visible at the bottom of the "Get Info" window)
+the version of the application bundle referenced by the alias (visible at the bottom of the "Get Info" window). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-version: string
+readonly version: string | null;
 ```

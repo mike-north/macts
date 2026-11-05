@@ -4,10 +4,10 @@
 
 ## Calendar.writable property
 
-Whether the calendar can be modified
+Whether the calendar can be modified. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-writable: boolean
+readonly writable: boolean | null;
 ```

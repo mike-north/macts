@@ -4,10 +4,10 @@
 
 ## Reminder.modificationDate property
 
-The modification date of the reminder
+The modification date of the reminder. Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-modificationDate: Date
+readonly modificationDate: Date;
 ```

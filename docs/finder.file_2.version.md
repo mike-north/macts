@@ -4,10 +4,10 @@
 
 ## File_2.version property
 
-the version of the file (visible at the bottom of the “Get Info” window)
+the version of the file (visible at the bottom of the “Get Info” window). Never null: observed in all 60 items (Finder 27.2, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-version: string
+readonly version: string;
 ```

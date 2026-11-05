@@ -4,10 +4,10 @@
 
 ## Track.id property
 
-The unique identifier of the track
+The unique identifier of the track. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

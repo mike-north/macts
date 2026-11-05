@@ -4,10 +4,10 @@
 
 ## Window.givenName property
 
-The given name of the window.
+The given name of the window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-givenName: string
+givenName: string | null
 ```

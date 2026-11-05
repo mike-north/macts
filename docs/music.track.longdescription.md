@@ -4,10 +4,10 @@
 
 ## Track.longDescription property
 
-the long description of the track
+the long description of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-longDescription: string
+longDescription: string | null
 ```

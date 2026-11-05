@@ -4,14 +4,10 @@
 
 ## Character.color property
 
-The color of the character.
+The color of the character. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-color: {
-  r: number
-  g: number
-  b: number
-}
+color: Rgb | null
 ```

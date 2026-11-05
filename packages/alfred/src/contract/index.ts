@@ -46,9 +46,9 @@ export type ApplicationUpdateInput = Record<string, never>
 
 /**
  * The Alfred client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link alfredContract}. Its type carries the contract's resource
- * table, {@link AlfredResources}, so references can be bound to it by resource; the brand has no
- * runtime member.
+ * client factory creates one from `alfredContract` in the app's `/contract` entry. Its type carries
+ * the contract's resource table, {@link AlfredResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
 export interface AlfredClient extends ClientBrand<AlfredResources> {
   /**
@@ -138,7 +138,7 @@ export interface AlfredClient extends ClientBrand<AlfredResources> {
 }
 
 /**
- * The type of the resource table of {@link alfredContract}: every resource a
+ * The type of the resource table in `alfredContract` (the app's `/contract` entry): every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
  * references to it, and, for each of those operations that finds the

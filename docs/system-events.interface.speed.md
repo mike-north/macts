@@ -4,10 +4,10 @@
 
 ## Interface.speed property
 
-ethernet speed 10 \| 100 \| 1000
+ethernet speed 10 \| 100 \| 1000. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-speed: number
+speed: Integer | null
 ```

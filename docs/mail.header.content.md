@@ -4,10 +4,10 @@
 
 ## Header.content property
 
-Contents of the header
+Contents of the header. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-content: string
+content: string | null
 ```

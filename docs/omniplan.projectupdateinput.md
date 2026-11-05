@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/omniplan](./omniplan.md) &gt; [ProjectUpdateInput](./omniplan.projectupdateinput.md)
 
-## ProjectUpdateInput type
+## ProjectUpdateInput interface
 
-Input for updating a Project
+Input for updating a Project. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ProjectUpdateInput = Partial<ProjectCreateInput>
+interface ProjectUpdateInput
 ```
 
-**References:** [ProjectCreateInput](./omniplan.projectcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[startingDate?](./omniplan.projectupdateinput.startingdate.md)
+
+</td><td>
+
+</td><td>
+
+Date
+
+</td><td>
+
+_(Optional)_ The date on which work can begin. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[bounce()](./mail.messageresourceclient.bounce.md)
+[bounce(\_\_mactsOptions)](./mail.messageresourceclient.bounce.md)
 
 </td><td>
 
@@ -68,7 +68,7 @@ Does nothing at all (deprecated)
 </td></tr>
 <tr><td>
 
-[forward(openingWindow)](./mail.messageresourceclient.forward.md)
+[forward(openingWindow, \_\_mactsOptions)](./mail.messageresourceclient.forward.md)
 
 </td><td>
 
@@ -79,7 +79,7 @@ Creates a forwarded message.
 </td></tr>
 <tr><td>
 
-[redirect(openingWindow)](./mail.messageresourceclient.redirect.md)
+[redirect(openingWindow, \_\_mactsOptions)](./mail.messageresourceclient.redirect.md)
 
 </td><td>
 
@@ -90,7 +90,7 @@ Creates a redirected message.
 </td></tr>
 <tr><td>
 
-[reply(openingWindow, replyToAll)](./mail.messageresourceclient.reply.md)
+[reply(openingWindow, replyToAll, \_\_mactsOptions)](./mail.messageresourceclient.reply.md)
 
 </td><td>
 

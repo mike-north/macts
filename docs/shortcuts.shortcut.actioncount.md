@@ -4,10 +4,10 @@
 
 ## Shortcut.actionCount property
 
-The number of actions in the shortcut
+The number of actions in the shortcut. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-actionCount: number
+readonly actionCount: Integer | null;
 ```

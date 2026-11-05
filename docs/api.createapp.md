@@ -6,17 +6,12 @@
 
 Create just the Hono app without server lifecycle.
 
-Useful for testing or custom server setups.
+Useful for testing (with an injected `executor` and `verifier`<!-- -->) or custom server setups. Apps are registered as for [createMultiServer()](./api.createmultiserver.md)<!-- -->: the `manifests` as passthrough, and contracts through `options.register`<!-- -->.
 
 **Signature:**
 
 ```typescript
-declare function createApp(
-  manifests: AppManifest[],
-  options?: Pick<ServerOptions, 'cors' | 'logging' | 'prettyJson'>
-): Hono<{
-  Variables: AuthVariables
-}>
+declare function createApp(manifests: AppManifest[], options?: AppOptions): Hono
 ```
 
 ## Parameters
@@ -44,7 +39,7 @@ manifests
 
 </td><td>
 
-Array of app manifests
+App manifests to serve as passthrough
 
 </td></tr>
 <tr><td>
@@ -53,17 +48,17 @@ options
 
 </td><td>
 
-Pick&lt;[ServerOptions](./api.serveroptions.md)<!-- -->, 'cors' \| 'logging' \| 'prettyJson'&gt;
+[AppOptions](./api.appoptions.md)
 
 </td><td>
 
-_(Optional)_ Server configuration (only middleware options used)
+_(Optional)_ Server configuration, excluding listener options
 
 </td></tr>
 </tbody></table>
 
 **Returns:**
 
-Hono&lt;{ Variables: [AuthVariables](./api.authvariables.md)<!-- -->; }&gt;
+Hono
 
 Configured Hono app

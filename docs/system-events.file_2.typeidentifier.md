@@ -4,10 +4,10 @@
 
 ## File_2.typeIdentifier property
 
-The type identifier of the file
+The type identifier of the file. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-typeIdentifier: string
+readonly typeIdentifier: string | null;
 ```

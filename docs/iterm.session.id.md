@@ -4,10 +4,10 @@
 
 ## Session.id property
 
-The unique identifier of the session.
+The unique identifier of the session. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

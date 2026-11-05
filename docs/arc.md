@@ -39,7 +39,7 @@ Error class for Arc API errors.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 </tbody></table>
@@ -56,6 +56,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[ArcClient](./arc.arcclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+
+</td></tr>
+<tr><td>
 
 [ArcClientOptions](./arc.arcclientoptions.md)
 
@@ -97,7 +106,16 @@ A window's tab
 
 </td><td>
 
-Input for creating a Tab
+Input for creating a Tab.
+
+</td></tr>
+<tr><td>
+
+[TabUpdateInput](./arc.tabupdateinput.md)
+
+</td><td>
+
+Input for updating a Tab. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -107,15 +125,6 @@ Input for creating a Tab
 </td><td>
 
 An application's window
-
-</td></tr>
-<tr><td>
-
-[WindowCreateInput](./arc.windowcreateinput.md)
-
-</td><td>
-
-Input for creating a Window
 
 </td></tr>
 </tbody></table>
@@ -146,6 +155,8 @@ Every capability exposed by Arc, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -153,12 +164,16 @@ Every capability exposed by Arc, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [WindowSchema](./arc.windowschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -176,6 +191,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[ArcResources](./arc.arcresources.md)
+
+</td><td>
+
+The type of the resource table in `arcContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
+
+</td></tr>
+<tr><td>
+
 [CapabilityRisk](./arc.capabilityrisk.md)
 
 </td><td>
@@ -189,7 +213,7 @@ Risk classification for a capability.
 
 </td><td>
 
-Input for creating a Space
+Input for creating a Space.
 
 </td></tr>
 <tr><td>
@@ -198,16 +222,16 @@ Input for creating a Space
 
 </td><td>
 
-Input for updating a Space
+Input for updating a Space. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
 
-[TabUpdateInput](./arc.tabupdateinput.md)
+[WindowCreateInput](./arc.windowcreateinput.md)
 
 </td><td>
 
-Input for updating a Tab
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -216,7 +240,7 @@ Input for updating a Tab
 
 </td><td>
 
-Input for updating a Window
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 </tbody></table>

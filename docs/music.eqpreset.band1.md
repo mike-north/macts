@@ -4,10 +4,10 @@
 
 ## EQPreset.band1 property
 
-the equalizer 32 Hz band level (-12.0 dB to +12.0 dB)
+the equalizer 32 Hz band level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-band1: number
+band1: number | null
 ```

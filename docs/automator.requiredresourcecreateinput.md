@@ -4,7 +4,7 @@
 
 ## RequiredResourceCreateInput type
 
-Input for creating a RequiredResource
+Input for creating a RequiredResource.
 
 **Signature:**
 

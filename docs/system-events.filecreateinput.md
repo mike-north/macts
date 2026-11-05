@@ -4,7 +4,7 @@
 
 ## FileCreateInput interface
 
-Input for creating a File
+Input for creating a File.
 
 **Signature:**
 

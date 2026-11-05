@@ -4,10 +4,10 @@
 
 ## XMLData.text property
 
-the text representation of the XML data
+the text representation of the XML data. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-text: string
+text: string | null
 ```

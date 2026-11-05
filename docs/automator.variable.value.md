@@ -4,7 +4,7 @@
 
 ## Variable.value property
 
-The value of the variable
+The value of the variable. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 

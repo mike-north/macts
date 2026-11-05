@@ -4,7 +4,7 @@
 
 ## BuildWarning.message property
 
-The text of the issue
+The text of the issue. Never null: the primary identifier.
 
 **Signature:**
 

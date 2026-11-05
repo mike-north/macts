@@ -4,13 +4,14 @@
 
 ## DiskItemSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
 DiskItemSchema: z.ZodObject<
   {
     busyStatus: z.ZodBoolean
-    container: z.ZodString
     creationDate: z.ZodString
     displayedName: z.ZodString
     id: z.ZodString

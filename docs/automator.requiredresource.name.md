@@ -4,10 +4,10 @@
 
 ## RequiredResource.name property
 
-The name of the required resource
+The name of the required resource. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string;
 ```

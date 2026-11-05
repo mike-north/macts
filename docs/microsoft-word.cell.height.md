@@ -4,10 +4,10 @@
 
 ## Cell.height property
 
-The height of the cell in points
+The height of the cell in points. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-height: number
+height: number | null
 ```

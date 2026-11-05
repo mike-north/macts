@@ -30,7 +30,7 @@ Client for a track representing an audio file (mp3, aiff, etc.).
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -60,6 +60,15 @@ Error class for Music API errors.
 Client for a list of tracks/streams.
 
 </td></tr>
+<tr><td>
+
+[TrackResourceClient](./music.trackresourceclient.md)
+
+</td><td>
+
+Client for playable audio source.
+
+</td></tr>
 </tbody></table>
 
 ## Interfaces
@@ -84,15 +93,6 @@ an AirPlay device
 </td></tr>
 <tr><td>
 
-[AirPlayDeviceCreateInput](./music.airplaydevicecreateinput.md)
-
-</td><td>
-
-Input for creating a AirPlayDevice
-
-</td></tr>
-<tr><td>
-
 [Artwork](./music.artwork.md)
 
 </td><td>
@@ -102,29 +102,11 @@ a piece of art within a track or playlist
 </td></tr>
 <tr><td>
 
-[ArtworkCreateInput](./music.artworkcreateinput.md)
-
-</td><td>
-
-Input for creating a Artwork
-
-</td></tr>
-<tr><td>
-
 [AudioCDPlaylist](./music.audiocdplaylist.md)
 
 </td><td>
 
 a playlist representing an audio CD
-
-</td></tr>
-<tr><td>
-
-[AudioCDPlaylistCreateInput](./music.audiocdplaylistcreateinput.md)
-
-</td><td>
-
-Input for creating a AudioCDPlaylist
 
 </td></tr>
 <tr><td>
@@ -151,7 +133,16 @@ the main window
 
 </td><td>
 
-Input for creating a BrowserWindow
+Input for creating a BrowserWindow.
+
+</td></tr>
+<tr><td>
+
+[BrowserWindowUpdateInput](./music.browserwindowupdateinput.md)
+
+</td><td>
+
+Input for updating a BrowserWindow. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -187,7 +178,16 @@ equalizer preset configuration
 
 </td><td>
 
-Input for creating a EQPreset
+Input for creating an EQPreset.
+
+</td></tr>
+<tr><td>
+
+[EQPresetUpdateInput](./music.eqpresetupdateinput.md)
+
+</td><td>
+
+Input for updating an EQPreset. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -214,7 +214,16 @@ a track representing an audio file (MP3, AIFF, etc.)
 
 </td><td>
 
-Input for creating a FileTrack
+Input for creating a FileTrack.
+
+</td></tr>
+<tr><td>
+
+[FileTrackUpdateInput](./music.filetrackupdateinput.md)
+
+</td><td>
+
+Input for updating a FileTrack. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -233,6 +242,15 @@ the main library playlist
 </td><td>
 
 the miniplayer window
+
+</td></tr>
+<tr><td>
+
+[MusicClient](./music.musicclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -259,7 +277,16 @@ a list of tracks/streams
 
 </td><td>
 
-Input for creating a Playlist
+Input for creating a Playlist.
+
+</td></tr>
+<tr><td>
+
+[PlaylistUpdateInput](./music.playlistupdateinput.md)
+
+</td><td>
+
+Input for updating a Playlist. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -318,15 +345,6 @@ playable audio source
 </td></tr>
 <tr><td>
 
-[TrackCreateInput](./music.trackcreateinput.md)
-
-</td><td>
-
-Input for creating a Track
-
-</td></tr>
-<tr><td>
-
 [URLTrack](./music.urltrack.md)
 
 </td><td>
@@ -340,7 +358,16 @@ a track representing a network stream
 
 </td><td>
 
-Input for creating a URLTrack
+Input for creating an URLTrack.
+
+</td></tr>
+<tr><td>
+
+[URLTrackUpdateInput](./music.urltrackupdateinput.md)
+
+</td><td>
+
+Input for updating an URLTrack. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -358,7 +385,16 @@ custom playlists created by the user
 
 </td><td>
 
-Input for creating a UserPlaylist
+Input for creating an UserPlaylist.
+
+</td></tr>
+<tr><td>
+
+[UserPlaylistUpdateInput](./music.userplaylistupdateinput.md)
+
+</td><td>
+
+Input for updating an UserPlaylist. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -398,12 +434,16 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ArtworkSchema](./music.artworkschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -412,6 +452,8 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -419,12 +461,16 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [BrowserWindowSchema](./music.browserwindowschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -442,12 +488,16 @@ Every capability exposed by Music, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [EQPresetSchema](./music.eqpresetschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -456,12 +506,16 @@ Every capability exposed by Music, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [FileTrackSchema](./music.filetrackschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -470,12 +524,16 @@ Every capability exposed by Music, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [MiniplayerWindowSchema](./music.miniplayerwindowschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -484,12 +542,16 @@ Every capability exposed by Music, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [PlaylistWindowSchema](./music.playlistwindowschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -498,12 +560,16 @@ Every capability exposed by Music, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [SharedTrackSchema](./music.sharedtrackschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -512,12 +578,16 @@ Every capability exposed by Music, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [SubscriptionPlaylistSchema](./music.subscriptionplaylistschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -526,12 +596,16 @@ Every capability exposed by Music, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [URLTrackSchema](./music.urltrackschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -540,6 +614,8 @@ Every capability exposed by Music, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -547,12 +623,16 @@ Every capability exposed by Music, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [VisualSchema](./music.visualschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -570,11 +650,29 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[AirPlayDeviceCreateInput](./music.airplaydevicecreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
 [AirPlayDeviceUpdateInput](./music.airplaydeviceupdateinput.md)
 
 </td><td>
 
-Input for updating a AirPlayDevice
+Canonical update input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
+[ArtworkCreateInput](./music.artworkcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -583,7 +681,16 @@ Input for updating a AirPlayDevice
 
 </td><td>
 
-Input for updating a Artwork
+Canonical update input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
+[AudioCDPlaylistCreateInput](./music.audiocdplaylistcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -592,7 +699,7 @@ Input for updating a Artwork
 
 </td><td>
 
-Input for updating a AudioCDPlaylist
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -601,7 +708,7 @@ Input for updating a AudioCDPlaylist
 
 </td><td>
 
-Input for creating a AudioCDTrack
+Input for creating an AudioCDTrack.
 
 </td></tr>
 <tr><td>
@@ -610,16 +717,7 @@ Input for creating a AudioCDTrack
 
 </td><td>
 
-Input for updating a AudioCDTrack
-
-</td></tr>
-<tr><td>
-
-[BrowserWindowUpdateInput](./music.browserwindowupdateinput.md)
-
-</td><td>
-
-Input for updating a BrowserWindow
+Input for updating an AudioCDTrack. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -682,7 +780,7 @@ EMdK
 
 </td><td>
 
-Input for creating a Encoder
+Input for creating an Encoder.
 
 </td></tr>
 <tr><td>
@@ -691,7 +789,7 @@ Input for creating a Encoder
 
 </td><td>
 
-Input for updating a Encoder
+Input for updating an Encoder. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -714,20 +812,11 @@ EPlS
 </td></tr>
 <tr><td>
 
-[EQPresetUpdateInput](./music.eqpresetupdateinput.md)
-
-</td><td>
-
-Input for updating a EQPreset
-
-</td></tr>
-<tr><td>
-
 [EQWindowCreateInput](./music.eqwindowcreateinput.md)
 
 </td><td>
 
-Input for creating a EQWindow
+Input for creating an EQWindow.
 
 </td></tr>
 <tr><td>
@@ -736,7 +825,7 @@ Input for creating a EQWindow
 
 </td><td>
 
-Input for updating a EQWindow
+Input for updating an EQWindow. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -795,20 +884,11 @@ ESrc
 </td></tr>
 <tr><td>
 
-[FileTrackUpdateInput](./music.filetrackupdateinput.md)
-
-</td><td>
-
-Input for updating a FileTrack
-
-</td></tr>
-<tr><td>
-
 [LibraryPlaylistCreateInput](./music.libraryplaylistcreateinput.md)
 
 </td><td>
 
-Input for creating a LibraryPlaylist
+Input for creating a LibraryPlaylist.
 
 </td></tr>
 <tr><td>
@@ -817,7 +897,7 @@ Input for creating a LibraryPlaylist
 
 </td><td>
 
-Input for updating a LibraryPlaylist
+Input for updating a LibraryPlaylist. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -826,7 +906,7 @@ Input for updating a LibraryPlaylist
 
 </td><td>
 
-Input for creating a MiniplayerWindow
+Input for creating a MiniplayerWindow.
 
 </td></tr>
 <tr><td>
@@ -835,16 +915,16 @@ Input for creating a MiniplayerWindow
 
 </td><td>
 
-Input for updating a MiniplayerWindow
+Input for updating a MiniplayerWindow. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
 
-[PlaylistUpdateInput](./music.playlistupdateinput.md)
+[MusicResources](./music.musicresources.md)
 
 </td><td>
 
-Input for updating a Playlist
+The type of the resource table in `musicContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 <tr><td>
@@ -853,7 +933,7 @@ Input for updating a Playlist
 
 </td><td>
 
-Input for creating a PlaylistWindow
+Input for creating a PlaylistWindow.
 
 </td></tr>
 <tr><td>
@@ -862,7 +942,7 @@ Input for creating a PlaylistWindow
 
 </td><td>
 
-Input for updating a PlaylistWindow
+Input for updating a PlaylistWindow. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -871,7 +951,7 @@ Input for updating a PlaylistWindow
 
 </td><td>
 
-Input for creating a RadioTunerPlaylist
+Input for creating a RadioTunerPlaylist.
 
 </td></tr>
 <tr><td>
@@ -880,7 +960,7 @@ Input for creating a RadioTunerPlaylist
 
 </td><td>
 
-Input for updating a RadioTunerPlaylist
+Input for updating a RadioTunerPlaylist. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -889,7 +969,7 @@ Input for updating a RadioTunerPlaylist
 
 </td><td>
 
-Input for creating a SharedTrack
+Input for creating a SharedTrack.
 
 </td></tr>
 <tr><td>
@@ -898,7 +978,7 @@ Input for creating a SharedTrack
 
 </td><td>
 
-Input for updating a SharedTrack
+Input for updating a SharedTrack. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -907,7 +987,7 @@ Input for updating a SharedTrack
 
 </td><td>
 
-Input for creating a Source
+Input for creating a Source.
 
 </td></tr>
 <tr><td>
@@ -916,7 +996,7 @@ Input for creating a Source
 
 </td><td>
 
-Input for updating a Source
+Input for updating a Source. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -925,7 +1005,7 @@ Input for updating a Source
 
 </td><td>
 
-Input for creating a SubscriptionPlaylist
+Input for creating a SubscriptionPlaylist.
 
 </td></tr>
 <tr><td>
@@ -934,7 +1014,16 @@ Input for creating a SubscriptionPlaylist
 
 </td><td>
 
-Input for updating a SubscriptionPlaylist
+Input for updating a SubscriptionPlaylist. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[TrackCreateInput](./music.trackcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -943,25 +1032,7 @@ Input for updating a SubscriptionPlaylist
 
 </td><td>
 
-Input for updating a Track
-
-</td></tr>
-<tr><td>
-
-[URLTrackUpdateInput](./music.urltrackupdateinput.md)
-
-</td><td>
-
-Input for updating a URLTrack
-
-</td></tr>
-<tr><td>
-
-[UserPlaylistUpdateInput](./music.userplaylistupdateinput.md)
-
-</td><td>
-
-Input for updating a UserPlaylist
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -970,7 +1041,7 @@ Input for updating a UserPlaylist
 
 </td><td>
 
-Input for creating a VideoWindow
+Input for creating a VideoWindow.
 
 </td></tr>
 <tr><td>
@@ -979,7 +1050,7 @@ Input for creating a VideoWindow
 
 </td><td>
 
-Input for updating a VideoWindow
+Input for updating a VideoWindow. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -988,7 +1059,7 @@ Input for updating a VideoWindow
 
 </td><td>
 
-Input for creating a Visual
+Input for creating a Visual.
 
 </td></tr>
 <tr><td>
@@ -997,7 +1068,7 @@ Input for creating a Visual
 
 </td><td>
 
-Input for updating a Visual
+Input for updating a Visual. Omitted fields are left unchanged.
 
 </td></tr>
 </tbody></table>

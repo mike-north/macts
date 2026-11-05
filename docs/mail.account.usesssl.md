@@ -4,10 +4,10 @@
 
 ## Account.usesSsl property
 
-Indicates whether SSL is enabled for this receiving account
+Indicates whether SSL is enabled for this receiving account. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-usesSsl: boolean
+usesSsl: boolean | null
 ```

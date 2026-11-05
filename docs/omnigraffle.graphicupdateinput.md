@@ -4,12 +4,13 @@
 
 ## GraphicUpdateInput type
 
-Input for updating a Graphic
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type GraphicUpdateInput = Partial<GraphicCreateInput>
+type GraphicUpdateInput = Omit<GraphicUpdateInput$1, 'strokePattern' | 'rankGroup'> & {
+  strokePattern?: null extends GraphicUpdateInput$1['strokePattern'] ? number | null : number
+  rankGroup?: null extends GraphicUpdateInput$1['rankGroup'] ? number | null : number
+}
 ```
-
-**References:** [GraphicCreateInput](./omnigraffle.graphiccreateinput.md)

@@ -4,10 +4,10 @@
 
 ## ListViewOptions.textSize property
 
-the size of the text displayed in the list view
+the size of the text displayed in the list view. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-textSize: number
+textSize: Integer | null
 ```

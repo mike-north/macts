@@ -4,10 +4,10 @@
 
 ## Resource.name property
 
-The name of the resource
+The name of the resource. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

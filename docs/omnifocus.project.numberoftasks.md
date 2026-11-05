@@ -4,10 +4,10 @@
 
 ## Project.numberOfTasks property
 
-The number of direct children of this project
+The number of direct children of this project. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-numberOfTasks: number
+readonly numberOfTasks: Integer | null;
 ```

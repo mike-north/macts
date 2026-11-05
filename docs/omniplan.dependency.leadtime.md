@@ -4,10 +4,10 @@
 
 ## Dependency.leadTime property
 
-The number of seconds of lead time required between the tasks
+The number of seconds of lead time required between the tasks. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-leadTime: number
+leadTime: number | null
 ```

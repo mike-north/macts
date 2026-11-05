@@ -9,7 +9,7 @@ Draw a line between graphics
 **Signature:**
 
 ```typescript
-connect(from: string, to: string): Promise<void>;
+connect(from: string, to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -47,6 +47,19 @@ to
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

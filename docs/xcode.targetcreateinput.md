@@ -4,7 +4,7 @@
 
 ## TargetCreateInput interface
 
-Input for creating a Target
+Input for creating a Target.
 
 **Signature:**
 

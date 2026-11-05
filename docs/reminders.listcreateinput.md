@@ -4,7 +4,7 @@
 
 ## ListCreateInput interface
 
-Input for creating a List
+Input for creating a List.
 
 **Signature:**
 
@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+string
 
 </td><td>
 

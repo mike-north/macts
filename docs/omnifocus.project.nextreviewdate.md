@@ -4,10 +4,10 @@
 
 ## Project.nextReviewDate property
 
-When the project should next be reviewed
+When the project should next be reviewed. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-nextReviewDate: Date
+nextReviewDate: Date | null
 ```

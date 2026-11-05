@@ -4,10 +4,10 @@
 
 ## AirPlayDevice.soundVolume property
 
-the output volume for the device (0 = minimum, 100 = maximum)
+the output volume for the device (0 = minimum, 100 = maximum). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-soundVolume: number
+soundVolume: Integer | null
 ```

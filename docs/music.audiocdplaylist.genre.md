@@ -4,10 +4,10 @@
 
 ## AudioCDPlaylist.genre property
 
-the genre of the CD
+the genre of the CD. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-genre: string
+genre: string | null
 ```

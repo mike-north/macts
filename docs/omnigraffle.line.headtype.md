@@ -4,10 +4,10 @@
 
 ## Line.headType property
 
-Type of line ending on the head of the line
+Type of line ending on the head of the line. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-headType: string
+headType: string | null
 ```

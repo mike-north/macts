@@ -4,10 +4,10 @@
 
 ## Rule.markRead property
 
-If rule matches, mark message as read
+If rule matches, mark message as read. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-markRead: boolean
+markRead: boolean | null
 ```

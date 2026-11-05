@@ -4,7 +4,7 @@
 
 ## CliGeneratorContext.getHierarchyPaths() method
 
-Get the hierarchy as a flat list of paths
+Get the hierarchy as a flat list of paths, followed by one path per singleton root resource, at its public segment.
 
 **Signature:**
 

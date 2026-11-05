@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-is the device currently being played to?
+boolean \| null
+
+</td><td>
+
+is the device currently being played to? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ is the device currently being played to?
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-is the device currently available?
+boolean \| null
+
+</td><td>
+
+is the device currently available? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ is the device currently available?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the kind of the device
+string \| null
+
+</td><td>
+
+the kind of the device. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ the kind of the device
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the network (MAC) address of the device
+string \| null
+
+</td><td>
+
+the network (MAC) address of the device. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +105,15 @@ the network (MAC) address of the device
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-is the device password- or passcode-protected?
+boolean \| null
+
+</td><td>
+
+is the device password- or passcode-protected? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +124,11 @@ is the device password- or passcode-protected?
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-is the device currently selected?
+is the device currently selected? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +139,11 @@ is the device currently selected?
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the output volume for the device (0 = minimum, 100 = maximum)
+the output volume for the device (0 = minimum, 100 = maximum). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +152,15 @@ the output volume for the device (0 = minimum, 100 = maximum)
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-does the device support audio playback?
+boolean \| null
+
+</td><td>
+
+does the device support audio playback? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +169,15 @@ does the device support audio playback?
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-does the device support video playback?
+boolean \| null
+
+</td><td>
+
+does the device support video playback? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

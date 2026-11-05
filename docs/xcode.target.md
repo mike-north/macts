@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier for the target
+The unique identifier for the target. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -54,26 +56,11 @@ The unique identifier for the target
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of this target
-
-</td></tr>
-<tr><td>
-
-[project](./xcode.target.project.md)
-
-</td><td>
-
-</td><td>
-
-[Project](./xcode.project.md)
-
-</td><td>
-
-The project that contains this target
+The name of this target. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

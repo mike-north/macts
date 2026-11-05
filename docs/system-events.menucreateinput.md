@@ -4,7 +4,7 @@
 
 ## MenuCreateInput type
 
-Input for creating a Menu
+Input for creating a Menu.
 
 **Signature:**
 

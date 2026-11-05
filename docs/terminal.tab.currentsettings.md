@@ -4,10 +4,10 @@
 
 ## Tab.currentSettings property
 
-The name of the current settings set
+The name of the current settings set. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-currentSettings: string
+currentSettings: string | null
 ```

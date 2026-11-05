@@ -4,10 +4,10 @@
 
 ## Track.downloaderAccount property
 
-the account of the person who downloaded this track
+the account of the person who downloaded this track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-downloaderAccount: string
+readonly downloaderAccount: string | null;
 ```

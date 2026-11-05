@@ -9,7 +9,7 @@ Create a new shape.
 **Signature:**
 
 ```typescript
-create(input: ShapeCreateInput): Promise<Shape>;
+create(input: ShapeCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Shape>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [ShapeCreateInput](./omnigraffle.shapecreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

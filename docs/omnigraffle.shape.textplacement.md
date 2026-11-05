@@ -4,10 +4,10 @@
 
 ## Shape.textPlacement property
 
-Placement of the text inside the shape
+Placement of the text inside the shape. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-textPlacement: VerticalAlignment
+textPlacement: VerticalAlignment | null
 ```

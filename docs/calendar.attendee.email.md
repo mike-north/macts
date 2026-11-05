@@ -4,10 +4,10 @@
 
 ## Attendee.email property
 
-Email address of the attendee
+Email address of the attendee. Never null: observed in all 41 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-email: string
+readonly email: string;
 ```

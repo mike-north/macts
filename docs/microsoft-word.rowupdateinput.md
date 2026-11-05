@@ -2,14 +2,78 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-word](./microsoft-word.md) &gt; [RowUpdateInput](./microsoft-word.rowupdateinput.md)
 
-## RowUpdateInput type
+## RowUpdateInput interface
 
-Input for updating a Row
+Input for updating a Row. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type RowUpdateInput = Partial<RowCreateInput>
+interface RowUpdateInput
 ```
 
-**References:** [RowCreateInput](./microsoft-word.rowcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[allowBreakAcrossPages?](./microsoft-word.rowupdateinput.allowbreakacrosspages.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether the row can break across pages. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[headingFormat?](./microsoft-word.rowupdateinput.headingformat.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether the row is formatted as a heading. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[height?](./microsoft-word.rowupdateinput.height.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The height of the row in points. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

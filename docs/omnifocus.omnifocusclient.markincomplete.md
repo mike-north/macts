@@ -9,7 +9,7 @@ Mark one or more projects or tasks incomplete
 **Signature:**
 
 ```typescript
-markIncomplete(targets: string): Promise<void>;
+markIncomplete(targets: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ targets
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

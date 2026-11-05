@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique ID of the Moment
+The unique ID of the Moment. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The unique ID of the Moment
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the Moment
+string \| null
+
+</td><td>
+
+The name of the Moment. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

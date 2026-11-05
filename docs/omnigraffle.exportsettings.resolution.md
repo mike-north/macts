@@ -4,10 +4,10 @@
 
 ## ExportSettings.resolution property
 
-The number of pixels per point in the resulting exported image
+The number of pixels per point in the resulting exported image. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-resolution: number
+resolution: number | null
 ```

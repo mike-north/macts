@@ -4,12 +4,10 @@
 
 ## ScheduleUpdateInput type
 
-Input for updating a Schedule
+Input for updating a Schedule. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ScheduleUpdateInput = Partial<ScheduleCreateInput>
+type ScheduleUpdateInput = Record<string, never>
 ```
-
-**References:** [ScheduleCreateInput](./omniplan.schedulecreateinput.md)

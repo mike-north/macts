@@ -4,20 +4,27 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { Rgb } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Attendee {
-    displayName: string;
-    email: string;
-    participationStatus: ParticipationStatus;
+    readonly displayName: string | null;
+    readonly email: string;
+    readonly participationStatus: ParticipationStatus;
 }
 
 // @public
 export type AttendeeCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const AttendeeSchema: z.ZodObject<{
     displayName: z.ZodString;
     email: z.ZodString;
@@ -25,20 +32,19 @@ export const AttendeeSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type AttendeeUpdateInput = Partial<AttendeeCreateInput>;
+export type AttendeeUpdateInput = Record<string, never>;
 
 // @public
 export interface Calendar {
-    color: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    description: string;
-    id?: string;
+    color: Rgb | null;
+    description: string | null;
     name: string;
-    title: string;
-    writable: boolean;
+    title: string | null;
+    readonly writable: boolean | null;
+}
+
+// @public
+export interface CalendarClient extends ClientBrand<CalendarResources> {
 }
 
 // @public
@@ -47,9 +53,10 @@ export class CalendarClient {
     readonly calendars: CalendarResourceClient;
     readonly events: EventResourceClient;
     get http(): HttpClient;
-    reloadCalendars(): Promise<void>;
-    switchView(to: ViewType): Promise<void>;
-    viewCalendar(at: Date): Promise<void>;
+    reloadCalendars(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "CalendarClient_2" needs to be exported by the entry point index.d.ts
+    switchView(to: Parameters<CalendarClient_2['switchView']>[0], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    viewCalendar(at: Date, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -60,11 +67,7 @@ export interface CalendarClientOptions {
 
 // @public
 export interface CalendarCreateInput {
-    color?: {
-        r: number;
-        g: number;
-        b: number;
-    };
+    color?: Rgb;
     description?: string;
     name: string;
     title?: string;
@@ -83,12 +86,30 @@ export type CalendarPriority = '0' | '9' | '5' | '1';
 // @public
 export class CalendarResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: CalendarCreateInput): Promise<Calendar>;
-    get(id: string): Promise<Calendar>;
-    list(): Promise<Page<Calendar>>;
+    create(input: CalendarCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Calendar>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Calendar>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Calendar>>;
 }
 
-// @public (undocumented)
+// @public
+export type CalendarResources = Readonly<{
+    Calendar: ResourceDescriptor<Calendar, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'calendar.calendars.get';
+        readonly list: 'calendar.calendars.list';
+    };
+    Event: ResourceDescriptor<Event_2, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'calendar.events.get';
+        readonly list: 'calendar.events.list';
+        readonly parents: {
+            readonly get: 'Calendar';
+            readonly list: 'Calendar';
+        };
+    };
+}>;
+
+// @public
 export const CalendarSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -103,7 +124,12 @@ export const CalendarSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type CalendarUpdateInput = Partial<CalendarCreateInput>;
+export interface CalendarUpdateInput {
+    color?: Rgb;
+    description?: string;
+    name?: string;
+    title?: string;
+}
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -126,41 +152,45 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface DisplayAlarm {
-    triggerDate: Date;
-    triggerInterval: number;
+    triggerDate: Date | null;
+    triggerInterval: Integer | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "DisplayAlarmCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type DisplayAlarmCreateInput = Omit<DisplayAlarmCreateInput_2, 'triggerInterval'> & {
+    triggerInterval?: null extends DisplayAlarmCreateInput_2['triggerInterval'] ? number | null : number;
+};
 
 // @public
-export interface DisplayAlarmCreateInput {
-    triggerDate?: Date;
-    triggerInterval?: number;
-}
-
-// @public (undocumented)
 export const DisplayAlarmSchema: z.ZodObject<{
     triggerInterval: z.ZodNumber;
     triggerDate: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "DisplayAlarmUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type DisplayAlarmUpdateInput = Partial<DisplayAlarmCreateInput>;
+export type DisplayAlarmUpdateInput = Omit<DisplayAlarmUpdateInput_2, 'triggerInterval'> & {
+    triggerInterval?: null extends DisplayAlarmUpdateInput_2['triggerInterval'] ? number | null : number;
+};
 
 // @public
 interface Event_2 {
     alldayEvent: boolean;
-    description: string;
+    description: string | null;
     endDate: Date;
-    excludedDates: Date[];
-    id?: string;
-    location: string;
-    recurrence: string;
-    sequence: number;
-    stampDate: Date;
+    excludedDates: readonly Date[];
+    location: string | null;
+    recurrence: string | null;
+    readonly sequence: Integer;
+    stampDate: Date | null;
     startDate: Date;
     status: EventStatus;
     summary: string;
-    uid: string;
-    url: string;
+    readonly uid: string;
+    url: string | null;
 }
 export { Event_2 as Event }
 
@@ -170,7 +200,7 @@ export interface EventCreateInput {
     calendarId: string;
     description?: string;
     endDate: Date;
-    excludedDates?: Date[];
+    excludedDates?: readonly Date[];
     location?: string;
     recurrence?: string;
     stampDate?: Date;
@@ -183,15 +213,15 @@ export interface EventCreateInput {
 // @public
 export class EventResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: EventCreateInput): Promise<Event_2>;
-    delete(calendarId: string, id: string): Promise<void>;
-    get(calendarId: string, id: string): Promise<Event_2>;
-    list(calendarId: string): Promise<Page<Event_2>>;
-    show(): Promise<void>;
-    update(calendarId: string, id: string, input: EventUpdateInput): Promise<Event_2>;
+    create(input: EventCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Event_2>;
+    delete(calendarId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    get(calendarId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Event_2>;
+    list(calendarId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Event_2>>;
+    show(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    update(calendarId: string, id: string, input: EventUpdateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Event_2>;
 }
 
-// @public (undocumented)
+// @public
 export const EventSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     summary: z.ZodString;
@@ -212,80 +242,96 @@ export const EventSchema: z.ZodObject<{
 // @public
 export type EventStatus = 'cancelled' | 'confirmed' | 'none' | 'tentative';
 
+// Warning: (ae-forgotten-export) The symbol "EventUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type EventUpdateInput = Partial<EventCreateInput>;
+export type EventUpdateInput = EventUpdateInput_2 & {
+    calendarId?: string;
+};
 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface MailAlarm {
-    triggerDate: Date;
-    triggerInterval: number;
+    triggerDate: Date | null;
+    triggerInterval: Integer | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "MailAlarmCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type MailAlarmCreateInput = Omit<MailAlarmCreateInput_2, 'triggerInterval'> & {
+    triggerInterval?: null extends MailAlarmCreateInput_2['triggerInterval'] ? number | null : number;
+};
 
 // @public
-export interface MailAlarmCreateInput {
-    triggerDate?: Date;
-    triggerInterval?: number;
-}
-
-// @public (undocumented)
 export const MailAlarmSchema: z.ZodObject<{
     triggerInterval: z.ZodNumber;
     triggerDate: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "MailAlarmUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type MailAlarmUpdateInput = Partial<MailAlarmCreateInput>;
+export type MailAlarmUpdateInput = Omit<MailAlarmUpdateInput_2, 'triggerInterval'> & {
+    triggerInterval?: null extends MailAlarmUpdateInput_2['triggerInterval'] ? number | null : number;
+};
 
 // @public
 export interface OpenFileAlarm {
-    filepath: string;
-    triggerDate: Date;
-    triggerInterval: number;
+    filepath: string | null;
+    triggerDate: Date | null;
+    triggerInterval: Integer | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "OpenFileAlarmCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type OpenFileAlarmCreateInput = Omit<OpenFileAlarmCreateInput_2, 'triggerInterval'> & {
+    triggerInterval?: null extends OpenFileAlarmCreateInput_2['triggerInterval'] ? number | null : number;
+};
 
 // @public
-export interface OpenFileAlarmCreateInput {
-    filepath?: string;
-    triggerDate?: Date;
-    triggerInterval?: number;
-}
-
-// @public (undocumented)
 export const OpenFileAlarmSchema: z.ZodObject<{
     triggerInterval: z.ZodNumber;
     triggerDate: z.ZodString;
     filepath: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "OpenFileAlarmUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type OpenFileAlarmUpdateInput = Partial<OpenFileAlarmCreateInput>;
+export type OpenFileAlarmUpdateInput = Omit<OpenFileAlarmUpdateInput_2, 'triggerInterval'> & {
+    triggerInterval?: null extends OpenFileAlarmUpdateInput_2['triggerInterval'] ? number | null : number;
+};
 
 // @public
 export type ParticipationStatus = 'unknown' | 'accepted' | 'declined' | 'tentative';
 
 // @public
 export interface SoundAlarm {
-    soundFile: string;
-    soundName: string;
-    triggerDate: Date;
-    triggerInterval: number;
+    soundFile: string | null;
+    soundName: string | null;
+    triggerDate: Date | null;
+    triggerInterval: Integer | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "SoundAlarmCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type SoundAlarmCreateInput = Omit<SoundAlarmCreateInput_2, 'triggerInterval'> & {
+    triggerInterval?: null extends SoundAlarmCreateInput_2['triggerInterval'] ? number | null : number;
+};
 
 // @public
-export interface SoundAlarmCreateInput {
-    soundFile?: string;
-    soundName?: string;
-    triggerDate?: Date;
-    triggerInterval?: number;
-}
-
-// @public (undocumented)
 export const SoundAlarmSchema: z.ZodObject<{
     triggerInterval: z.ZodNumber;
     triggerDate: z.ZodString;
@@ -293,8 +339,12 @@ export const SoundAlarmSchema: z.ZodObject<{
     soundFile: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "SoundAlarmUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type SoundAlarmUpdateInput = Partial<SoundAlarmCreateInput>;
+export type SoundAlarmUpdateInput = Omit<SoundAlarmUpdateInput_2, 'triggerInterval'> & {
+    triggerInterval?: null extends SoundAlarmUpdateInput_2['triggerInterval'] ? number | null : number;
+};
 
 // @public
 export type ViewType = 'dayView' | 'weekView' | 'monthView';

@@ -9,7 +9,7 @@ search a playlist for tracks matching the search string. Identical to entering s
 **Signature:**
 
 ```typescript
-search(_for: string, only?: string): Promise<void>;
+search(_for: string, only?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -45,6 +45,19 @@ only
 </td><td>
 
 string
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

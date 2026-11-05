@@ -4,12 +4,10 @@
 
 ## PopOverUpdateInput type
 
-Input for updating a PopOver
+Input for updating a PopOver. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type PopOverUpdateInput = Partial<PopOverCreateInput>
+type PopOverUpdateInput = Record<string, never>
 ```
-
-**References:** [PopOverCreateInput](./system-events.popovercreateinput.md)

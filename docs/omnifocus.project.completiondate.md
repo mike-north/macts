@@ -4,10 +4,10 @@
 
 ## Project.completionDate property
 
-The project's date of completion
+The project's date of completion. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-completionDate: Date
+completionDate: Date | null
 ```

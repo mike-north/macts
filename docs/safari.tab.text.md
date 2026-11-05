@@ -4,10 +4,10 @@
 
 ## Tab.text property
 
-The text of the web page currently loaded in the tab
+The text of the web page currently loaded in the tab. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-text: string
+readonly text: string | null;
 ```

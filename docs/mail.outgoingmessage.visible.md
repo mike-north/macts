@@ -4,10 +4,10 @@
 
 ## OutgoingMessage.visible property
 
-Controls whether the message window is shown on the screen. The default is false
+Controls whether the message window is shown on the screen. The default is false. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-visible: boolean
+visible: boolean | null
 ```

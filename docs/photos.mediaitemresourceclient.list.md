@@ -4,14 +4,44 @@
 
 ## MediaItemResourceClient.list() method
 
-List all mediaitems.
+List all media items, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<MediaItem[]>;
+list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<MediaItem>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[MediaItem](./photos.mediaitem.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[MediaItem](./photos.mediaitem.md)<!-- -->&gt;&gt;

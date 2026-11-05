@@ -4,10 +4,10 @@
 
 ## Window.zoomed property
 
-Whether the window is currently zoomed.
+Whether the window is currently zoomed. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-zoomed: boolean
+zoomed: boolean | null
 ```

@@ -4,10 +4,10 @@
 
 ## MailAttachment.fileSize property
 
-Approximate size in bytes.
+Approximate size in bytes. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fileSize: number
+readonly fileSize: Integer | null;
 ```

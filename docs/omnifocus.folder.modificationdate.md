@@ -4,10 +4,10 @@
 
 ## Folder.modificationDate property
 
-When the folder was last modified
+When the folder was last modified. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-modificationDate: Date
+readonly modificationDate: Date | null;
 ```

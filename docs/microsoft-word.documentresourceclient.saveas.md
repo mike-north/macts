@@ -9,7 +9,7 @@ Save the document with a new name or format
 **Signature:**
 
 ```typescript
-saveAs(fileName: string, fileFormat?: SaveFormat): Promise<void>;
+saveAs(fileName: string, fileFormat?: Parameters<DocumentResourceClient$1['saveAs']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -44,7 +44,20 @@ fileFormat
 
 </td><td>
 
-[SaveFormat](./microsoft-word.saveformat.md)
+Parameters&lt;DocumentResourceClient$1\['saveAs'\]&gt;\[1\]
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

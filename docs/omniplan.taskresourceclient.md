@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./omniplan.taskresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./omniplan.taskresourceclient.create.md)
 
 </td><td>
 
@@ -68,7 +68,7 @@ Create a new task.
 </td></tr>
 <tr><td>
 
-[get(id)](./omniplan.taskresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./omniplan.taskresourceclient.get.md)
 
 </td><td>
 
@@ -79,13 +79,13 @@ Get a task by id.
 </td></tr>
 <tr><td>
 
-[list()](./omniplan.taskresourceclient.list.md)
+[list(\_\_mactsOptions)](./omniplan.taskresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all tasks.
+List all tasks, as one page.
 
 </td></tr>
 </tbody></table>

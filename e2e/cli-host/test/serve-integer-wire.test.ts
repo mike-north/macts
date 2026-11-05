@@ -20,7 +20,7 @@
  *   `{ id }`, an integer (`packages/omniplan/src/contract/index.ts`).
  * - A body the contract admits reaches the executor, which fails the get with
  *   `TargetNotFoundError`: 404 `TARGET_NOT_FOUND` (phases/13 D6). The client
- *   raises it as an `OmniPlanError` with that code.
+ *   raises the canonical `TargetNotFoundError`; explicit raw RPC retains `OmniPlanError`.
  * - A body it does not admit fails before the executor with 400
  *   `VALIDATION_FAILED`, whose issue is at `id`.
  *
@@ -29,6 +29,7 @@
  */
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { TargetNotFoundError } from '@macts/contracts'
 import { OmniPlanClient, OmniPlanError } from '@macts/omniplan'
 import {
   createKey,
@@ -77,8 +78,15 @@ describe('macts --serve (UAT): an integer id from the legacy HTTP client (#207)'
       () => undefined,
       (error: unknown) => error
     )
-    expect(failure).toBeInstanceOf(OmniPlanError)
+    expect(failure).toBeInstanceOf(TargetNotFoundError)
     expect(failure).toMatchObject({ code: 'TARGET_NOT_FOUND' })
+  })
+
+  it('preserves the app-specific error for explicit raw wire RPC', async () => {
+    const client = new OmniPlanClient({ apiKey: token, baseUrl: server.url })
+    await expect(
+      client.http.rpc('omniplan.tasks.get', { id: { integer: '42' } })
+    ).rejects.toBeInstanceOf(OmniPlanError)
   })
 
   // The tagged body the client sends reaches the executor, as above.

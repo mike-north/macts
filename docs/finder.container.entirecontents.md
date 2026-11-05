@@ -4,10 +4,10 @@
 
 ## Container.entireContents property
 
-the entire contents of the container, including the contents of its children
+the entire contents of the container, including the contents of its children. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-entireContents: string
+readonly entireContents: string | null;
 ```

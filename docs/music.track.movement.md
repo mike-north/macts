@@ -4,10 +4,10 @@
 
 ## Track.movement property
 
-the movement name of the track
+the movement name of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-movement: string
+movement: string | null
 ```

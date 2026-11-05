@@ -4,10 +4,10 @@
 
 ## Label.labelOffset property
 
-The offset from the line
+The offset from the line. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-labelOffset: number
+labelOffset: number | null
 ```

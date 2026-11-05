@@ -4,10 +4,10 @@
 
 ## Address.zip property
 
-Zip or postal code of the address.
+Zip or postal code of the address. Nullable. Observed missing in 1 of 12 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-zip: string
+zip: string | null
 ```

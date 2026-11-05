@@ -4,10 +4,10 @@
 
 ## File_2.kind property
 
-The kind of file, as shown in Finder
+The kind of file, as shown in Finder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-kind: string
+readonly kind: string | null;
 ```

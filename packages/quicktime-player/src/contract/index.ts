@@ -89,9 +89,9 @@ export interface DocumentUpdateInput {
 
 /**
  * The QuickTime Player client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link quickTimePlayerContract}. Its type carries the
- * contract's resource table, {@link QuickTimePlayerResources}, so references can be bound to it by
- * resource; the brand has no runtime member.
+ * commands. A client factory creates one from `quickTimePlayerContract` in the app's `/contract`
+ * entry. Its type carries the contract's resource table, {@link QuickTimePlayerResources}, so
+ * references can be bound to it by resource; the brand has no runtime member.
  */
 export interface QuickTimePlayerClient extends ClientBrand<QuickTimePlayerResources> {
   /** Open a URL. */
@@ -146,7 +146,7 @@ export interface QuickTimePlayerClient extends ClientBrand<QuickTimePlayerResour
 }
 
 /**
- * The type of the resource table of {@link quickTimePlayerContract}: every resource a
+ * The type of the resource table in `quickTimePlayerContract` (the app's `/contract` entry): every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
  * references to it, and, for each of those operations that finds the

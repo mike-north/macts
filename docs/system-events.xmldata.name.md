@@ -4,10 +4,10 @@
 
 ## XMLData.name property
 
-the name of the XML data
+the name of the XML data. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

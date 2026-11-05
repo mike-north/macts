@@ -4,7 +4,7 @@
 
 ## ListCreateInput type
 
-Input for creating a List
+Input for creating a List.
 
 **Signature:**
 

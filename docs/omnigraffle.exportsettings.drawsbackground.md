@@ -4,10 +4,10 @@
 
 ## ExportSettings.drawsBackground property
 
-Draw the background canvas color
+Draw the background canvas color. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-drawsBackground: boolean
+drawsBackground: boolean | null
 ```

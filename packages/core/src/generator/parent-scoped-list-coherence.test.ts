@@ -38,6 +38,7 @@ import * as ts from 'typescript'
 import { describe, it, expect } from 'vitest'
 import { generateContract } from './contract/index.js'
 import type { AppManifest } from '../manifest/index.js'
+import { positionalOperationSource } from './sdk/test-support/operation-source.js'
 import { generateHttpClientSdk } from './sdk/http-client.js'
 import { generateCliPlugin } from './cli/index.js'
 import { generateResourceOperationSchema } from '../capabilities/operation-schema.js'
@@ -54,7 +55,7 @@ function fileContent(files: { path: string; content: string }[], path: string): 
       `Expected generated file "${path}". Got: ${files.map((f) => f.path).join(', ')}`
     )
   }
-  return file.content
+  return positionalOperationSource(file.content)
 }
 
 /**
@@ -362,14 +363,14 @@ function integerListBoundary(): {
   const Client = evaluateListModule(fileContent(sdkOutput.files, 'src/resources/tab.ts'))[
     'TabResourceClient'
   ] as new (
-    http: { rpc: (operation: string, body: unknown) => Promise<{ items: readonly unknown[] }> },
+    http: { invoke: (operation: string, body: unknown) => Promise<{ items: readonly unknown[] }> },
     app: string,
     resource: string
   ) => IListClient
   const sent: unknown[] = []
   const client = new Client(
     {
-      rpc: (operation, body) => {
+      invoke: (operation, body) => {
         expect(operation).toBe('test-browser.tabs.listTabs')
         sent.push(body)
         return Promise.resolve({ items: [] })
@@ -452,15 +453,16 @@ describe('CLI required-list and page integer validation before conversion', () =
       command.windowId = text
       command.pageSize = '25'
       expect(await command.execute()).toBe(0)
-      const expected = { windowId: { integer: text }, pageSize: { integer: '25' } }
+      const expected = { windowId: Number(text), pageSize: 25 }
+      const expectedWire = { windowId: { integer: text }, pageSize: { integer: '25' } }
       expect(sent).toEqual([expected])
-      expect(wire.safeParse(expected).success).toBe(true)
+      expect(wire.safeParse(expectedWire).success).toBe(true)
     }
   )
   it('preserves accepted numeric negative zero for direct SDK callers', async () => {
     const { client, sent, wire } = integerListBoundary()
     await client.list(-0)
-    expect(sent).toEqual([{ windowId: { integer: '0' } }])
-    expect(wire.safeParse(sent[0]).success).toBe(true)
+    expect(sent).toEqual([{ windowId: 0 }])
+    expect(wire.safeParse({ windowId: { integer: '0' } }).success).toBe(true)
   })
 })

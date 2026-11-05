@@ -4,7 +4,7 @@
 
 ## TextDocument.selectedCharacterRange property
 
-The first and last character positions in the selection
+The first and last character positions in the selection. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 

@@ -4,7 +4,7 @@
 
 ## AttachmentCreateInput type
 
-Input for creating a Attachment
+Input for creating an Attachment.
 
 **Signature:**
 

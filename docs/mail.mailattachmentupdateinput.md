@@ -4,12 +4,10 @@
 
 ## MailAttachmentUpdateInput type
 
-Input for updating a MailAttachment
+Input for updating a MailAttachment. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type MailAttachmentUpdateInput = Partial<MailAttachmentCreateInput>
+type MailAttachmentUpdateInput = Record<string, never>
 ```
-
-**References:** [MailAttachmentCreateInput](./mail.mailattachmentcreateinput.md)

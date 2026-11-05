@@ -4,10 +4,10 @@
 
 ## ApplicationFile.acceptsHighLevelEvents property
 
-Is the application high-level event aware? (OBSOLETE: always returns true)
+Is the application high-level event aware? (OBSOLETE: always returns true). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-acceptsHighLevelEvents: boolean
+readonly acceptsHighLevelEvents: boolean | null;
 ```

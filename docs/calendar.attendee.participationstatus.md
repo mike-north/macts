@@ -4,10 +4,10 @@
 
 ## Attendee.participationStatus property
 
-The invitation status for the attendee
+The invitation status for the attendee. Never null: observed in all 41 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-participationStatus: ParticipationStatus
+readonly participationStatus: ParticipationStatus;
 ```

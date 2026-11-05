@@ -4,12 +4,17 @@
 
 ## AudioCDPlaylistUpdateInput type
 
-Input for updating a AudioCDPlaylist
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type AudioCDPlaylistUpdateInput = Partial<AudioCDPlaylistCreateInput>
+type AudioCDPlaylistUpdateInput = Omit<
+  AudioCDPlaylistUpdateInput$1,
+  'discCount' | 'discNumber' | 'year'
+> & {
+  discCount?: null extends AudioCDPlaylistUpdateInput$1['discCount'] ? number | null : number
+  discNumber?: null extends AudioCDPlaylistUpdateInput$1['discNumber'] ? number | null : number
+  year?: null extends AudioCDPlaylistUpdateInput$1['year'] ? number | null : number
+}
 ```
-
-**References:** [AudioCDPlaylistCreateInput](./music.audiocdplaylistcreateinput.md)

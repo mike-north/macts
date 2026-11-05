@@ -4,12 +4,14 @@
 
 ## ShapeUpdateInput type
 
-Input for updating a Shape
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type ShapeUpdateInput = Partial<ShapeCreateInput>
+type ShapeUpdateInput = Omit<ShapeUpdateInput$1, 'sidePadding' | 'verticalPadding' | 'canvasId'> & {
+  sidePadding?: null extends ShapeUpdateInput$1['sidePadding'] ? number | null : number
+  verticalPadding?: null extends ShapeUpdateInput$1['verticalPadding'] ? number | null : number
+  canvasId?: null extends ShapeUpdateInput$1['canvasId'] ? number | null : number
+}
 ```
-
-**References:** [ShapeCreateInput](./omnigraffle.shapecreateinput.md)

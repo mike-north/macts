@@ -4,10 +4,10 @@
 
 ## Account.accountDirectory property
 
-The directory where the account stores things on disk
+The directory where the account stores things on disk. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-accountDirectory: string
+readonly accountDirectory: FileValue | null;
 ```

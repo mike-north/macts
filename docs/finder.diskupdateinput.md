@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [DiskUpdateInput](./finder.diskupdateinput.md)
 
-## DiskUpdateInput type
+## DiskUpdateInput interface
 
-Input for updating a Disk
+Input for updating a Disk. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type DiskUpdateInput = Partial<DiskCreateInput>
+interface DiskUpdateInput
 ```
 
-**References:** [DiskCreateInput](./finder.diskcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[ignorePrivileges?](./finder.diskupdateinput.ignoreprivileges.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Ignore permissions on this disk? Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

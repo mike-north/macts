@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./omnifocus.tagresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./omnifocus.tagresourceclient.create.md)
 
 </td><td>
 
@@ -68,7 +68,7 @@ Create a new tag.
 </td></tr>
 <tr><td>
 
-[get(id)](./omnifocus.tagresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./omnifocus.tagresourceclient.get.md)
 
 </td><td>
 
@@ -79,13 +79,13 @@ Get a tag by id.
 </td></tr>
 <tr><td>
 
-[list()](./omnifocus.tagresourceclient.list.md)
+[list(\_\_mactsOptions)](./omnifocus.tagresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all tags.
+List all tags, as one page.
 
 </td></tr>
 </tbody></table>

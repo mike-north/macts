@@ -2,14 +2,78 @@
 
 [Home](./index.md) &gt; [@macts/reminders](./reminders.md) &gt; [ListUpdateInput](./reminders.listupdateinput.md)
 
-## ListUpdateInput type
+## ListUpdateInput interface
 
-Input for updating a List
+Input for updating a List. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ListUpdateInput = Partial<ListCreateInput>
+interface ListUpdateInput
 ```
 
-**References:** [ListCreateInput](./reminders.listcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[color?](./reminders.listupdateinput.color.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ List color. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[emblem?](./reminders.listupdateinput.emblem.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The emblem icon name of the list. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[name?](./reminders.listupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ List name. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

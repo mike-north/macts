@@ -4,10 +4,10 @@
 
 ## DiskItem.size property
 
-the logical size of the disk item
+the logical size of the disk item. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-size: number
+readonly size: Integer | null;
 ```

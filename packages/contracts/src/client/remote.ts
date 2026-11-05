@@ -35,6 +35,7 @@ import {
   type ClientBrand,
   type OperationId,
   type ResourceTable,
+  type WireValue,
 } from '@macts/contracts'
 import { createCodecClient, type ClientTransport } from './codec-runtime.js'
 
@@ -55,6 +56,31 @@ export interface RemoteClientOptions {
    * @defaultValue `globalThis.fetch`
    */
   readonly fetch?: typeof globalThis.fetch
+}
+
+/**
+ * A decoded HTTP RPC envelope before application-error policy is selected.
+ * Successful wire values remain untouched; failures retain their full server
+ * envelope so compatibility facades can preserve arbitrary app error codes.
+ * @public
+ */
+export type RemoteRpcOutcome =
+  | { readonly ok: true; readonly result: unknown }
+  | { readonly ok: false; readonly envelope: unknown; readonly status: number }
+
+/**
+ * Shared HTTP boundary for canonical clients and raw RPC compatibility hooks.
+ * Protocol, credential and cancellation handling are identical for both paths;
+ * only the consumer's treatment of a valid server error envelope differs.
+ * @public
+ */
+export interface RemoteTransport extends ClientTransport {
+  /** Post an encoded operation without selecting its application error class. */
+  requestRpc(
+    operation: OperationId,
+    input: WireValue,
+    options?: CallOptions
+  ): Promise<RemoteRpcOutcome>
 }
 
 /** Path, under the service root, that operations are posted beneath. */
@@ -182,6 +208,18 @@ export function createClient<Client, Resources extends ResourceTable>(
   app: AppContract<Client, Resources>,
   options: RemoteClientOptions
 ): Client & ClientBrand<Resources> {
+  return createCodecClient(app, createRemoteTransport(app, options))
+}
+
+/**
+ * Create the HTTP wire transport shared by public client facades and factories.
+ * This owns credentials and canonical HTTP failures; callers own SDK codecs.
+ * @public
+ */
+export function createRemoteTransport(
+  app: Pick<AppContract<unknown>, 'app'>,
+  options: RemoteClientOptions
+): RemoteTransport {
   const { token } = options
   if (!HEADER_SAFE_TOKEN.test(token)) {
     throw new TypeError('The token contains characters that cannot be sent in a request header.')
@@ -215,7 +253,7 @@ export function createClient<Client, Resources extends ResourceTable>(
 
   /**
    * POST `body` to `endpoint` with the client's bearer credential and return
-   * the `result` of the success envelope.
+   * its decoded outcome without selecting an application error class.
    *
    * @remarks
    * Every request the client makes goes through here, so operation calls and
@@ -226,7 +264,7 @@ export function createClient<Client, Resources extends ResourceTable>(
     endpoint: URL,
     body: unknown,
     callOptions: CallOptions | undefined
-  ): Promise<unknown> {
+  ): Promise<RemoteRpcOutcome> {
     const signal = callOptions?.signal
     let response: Response
     try {
@@ -267,22 +305,30 @@ export function createClient<Client, Resources extends ResourceTable>(
     }
 
     if (!response.ok) {
-      throw fromWireErrorEnvelope(parsed, { status: response.status })
+      return { ok: false, envelope: parsed, status: response.status }
     }
     if (!isRecord(parsed) || !Object.hasOwn(parsed, 'result')) {
       throw invalidResponse('The macts service sent a response without a result.', response.status)
     }
-    return parsed['result']
+    return { ok: true, result: parsed['result'] }
   }
 
-  const transport: ClientTransport = {
-    invoke: (operation, input, callOptions) =>
+  /** Apply canonical app-error mapping after shared protocol handling. */
+  function canonicalResult(outcome: RemoteRpcOutcome): unknown {
+    if (!outcome.ok) throw fromWireErrorEnvelope(outcome.envelope, { status: outcome.status })
+    return outcome.result
+  }
+
+  const transport: RemoteTransport = {
+    requestRpc: (operation, input, callOptions) =>
       post(rpcEndpoint(root, operation), input, callOptions),
+    invoke: async (operation, input, callOptions) =>
+      canonicalResult(await transport.requestRpc(operation, input, callOptions)),
     // The body is exactly `app` and `reference`; the service refuses any
     // other field (phases/13 D7, "Remote route").
-    resolve: (reference, callOptions) =>
-      post(resolveEndpoint(root), { app: app.app, reference }, callOptions),
+    resolve: async (reference, callOptions) =>
+      canonicalResult(await post(resolveEndpoint(root), { app: app.app, reference }, callOptions)),
   }
 
-  return createCodecClient(app, transport)
+  return transport
 }

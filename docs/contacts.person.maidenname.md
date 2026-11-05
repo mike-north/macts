@@ -4,10 +4,10 @@
 
 ## Person.maidenName property
 
-The Maiden name of this person.
+The Maiden name of this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-maidenName: string
+maidenName: string | null
 ```

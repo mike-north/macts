@@ -4,12 +4,12 @@
 
 ## EventUpdateInput type
 
-Input for updating a Event
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type EventUpdateInput = Partial<EventCreateInput>
+type EventUpdateInput = EventUpdateInput$1 & {
+  calendarId?: string
+}
 ```
-
-**References:** [EventCreateInput](./calendar.eventcreateinput.md)

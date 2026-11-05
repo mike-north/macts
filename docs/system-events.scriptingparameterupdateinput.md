@@ -4,12 +4,10 @@
 
 ## ScriptingParameterUpdateInput type
 
-Input for updating a ScriptingParameter
+Input for updating a ScriptingParameter. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ScriptingParameterUpdateInput = Partial<ScriptingParameterCreateInput>
+type ScriptingParameterUpdateInput = Record<string, never>
 ```
-
-**References:** [ScriptingParameterCreateInput](./system-events.scriptingparametercreateinput.md)

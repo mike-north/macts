@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the internet location
+string \| null
+
+</td><td>
+
+the internet location. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

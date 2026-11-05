@@ -30,7 +30,7 @@ Client for a script editor document.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -88,7 +88,25 @@ A Script Editor document
 
 </td><td>
 
-Input for creating a Document
+Input for creating a Document.
+
+</td></tr>
+<tr><td>
+
+[DocumentUpdateInput](./script-editor.documentupdateinput.md)
+
+</td><td>
+
+Input for updating a Document. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[ScriptEditorClient](./script-editor.scripteditorclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -128,6 +146,8 @@ Every capability exposed by Script Editor, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 </tbody></table>
 
@@ -153,11 +173,11 @@ Risk classification for a capability.
 </td></tr>
 <tr><td>
 
-[DocumentUpdateInput](./script-editor.documentupdateinput.md)
+[ScriptEditorResources](./script-editor.scripteditorresources.md)
 
 </td><td>
 
-Input for updating a Document
+The type of the resource table in `scriptEditorContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 </tbody></table>

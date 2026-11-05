@@ -4,7 +4,7 @@
 
 ## PropertyListItemCreateInput interface
 
-Input for creating a PropertyListItem
+Input for creating a PropertyListItem.
 
 **Signature:**
 

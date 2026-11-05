@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/photos](./photos.md) &gt; [AlbumUpdateInput](./photos.albumupdateinput.md)
 
-## AlbumUpdateInput type
+## AlbumUpdateInput interface
 
-Input for updating a Album
+Input for updating an Album. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type AlbumUpdateInput = Partial<AlbumCreateInput>
+interface AlbumUpdateInput
 ```
 
-**References:** [AlbumCreateInput](./photos.albumcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[name?](./photos.albumupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of this album. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

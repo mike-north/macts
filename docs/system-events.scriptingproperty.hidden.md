@@ -4,10 +4,10 @@
 
 ## ScriptingProperty.hidden property
 
-Is the property hidden?
+Is the property hidden? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-hidden: boolean
+readonly hidden: boolean | null;
 ```

@@ -4,10 +4,10 @@
 
 ## Document.currentTime property
 
-The current playback time in seconds
+The current playback time in seconds. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-currentTime: number
+currentTime: number | null
 ```

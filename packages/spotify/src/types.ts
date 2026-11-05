@@ -5,47 +5,20 @@
 
 import { z } from 'zod'
 
-/** PlayerState */
-export type PlayerState = 'stopped' | 'playing' | 'paused'
+export type { PlayerState } from './contract/index.js'
 
-/** The currently playing track */
-export interface Track {
-  /** The name of the track */
-  name: string
-  /** The artist of the track */
-  artist: string
-  /** The album of the track */
-  album: string
-  /** The album artist of the track */
-  albumArtist: string
-  /** The disc number of the track */
-  discNumber: number
-  /** The duration of the track in milliseconds */
-  duration: number
-  /** Number of times this track has been played */
-  playedCount: number
-  /** The track number */
-  trackNumber: number
-  /** The Spotify URL for the track */
-  spotifyUrl: string
-  /** The unique identifier of the track */
-  id: string
-  /** The URL of the track artwork */
-  artworkUrl: string
-  /** The track artwork */
-  artwork: string
-  /** The current player state */
-  playerState: PlayerState
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Track } from './contract/index.js'
 
-/** Input for creating a Track */
-export type TrackCreateInput = Record<string, never>
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { TrackCreateInput } from './contract/index.js'
 
-/** Input for updating a Track */
-export type TrackUpdateInput = Partial<TrackCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { TrackUpdateInput } from './contract/index.js'
 
-// Zod schemas for runtime validation
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const TrackSchema = z.object({
   name: z.string(),
   artist: z.string(),

@@ -4,14 +4,10 @@
 
 ## Session.aNSIMagentaColor property
 
-The aNSIMagentaColor property
+The aNSIMagentaColor property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-aNSIMagentaColor: {
-  r: number
-  g: number
-  b: number
-}
+aNSIMagentaColor: Rgb | null
 ```

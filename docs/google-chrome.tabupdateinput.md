@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/google-chrome](./google-chrome.md) &gt; [TabUpdateInput](./google-chrome.tabupdateinput.md)
 
-## TabUpdateInput type
+## TabUpdateInput interface
 
-Input for updating a Tab
+Input for updating a Tab. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type TabUpdateInput = Partial<TabCreateInput>
+interface TabUpdateInput
 ```
 
-**References:** [TabCreateInput](./google-chrome.tabcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[uRL?](./google-chrome.tabupdateinput.url.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The url visible to the user. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

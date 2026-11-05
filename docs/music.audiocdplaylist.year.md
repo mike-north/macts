@@ -4,10 +4,10 @@
 
 ## AudioCDPlaylist.year property
 
-the year the album was recorded/released
+the year the album was recorded/released. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-year: number
+year: Integer | null
 ```

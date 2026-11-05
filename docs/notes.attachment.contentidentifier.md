@@ -4,10 +4,10 @@
 
 ## Attachment.contentIdentifier property
 
-The content identifier of the attachment
+The content identifier of the attachment. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-contentIdentifier?: string;
+readonly contentIdentifier?: string | null;
 ```

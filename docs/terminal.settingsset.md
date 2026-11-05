@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the font
+The name of the font. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ The name of the font
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The size of the font
+The size of the font. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +67,15 @@ The size of the font
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The unique identifier of the settings set
+number \| null
+
+</td><td>
+
+The unique identifier of the settings set. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -88,7 +90,7 @@ string
 
 </td><td>
 
-The name of the settings set
+The name of the settings set. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -99,11 +101,11 @@ The name of the settings set
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The number of columns
+The number of columns. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +116,11 @@ The number of columns
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The number of rows
+The number of rows. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

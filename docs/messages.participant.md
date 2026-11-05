@@ -33,32 +33,19 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[account](./messages.participant.account.md)
-
-</td><td>
-
-</td><td>
-
-[Account](./messages.account.md)
-
-</td><td>
-
-The account for this participant.
-
-</td></tr>
-<tr><td>
-
 [firstName](./messages.participant.firstname.md)
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The first name from this participan's Contacts card, if available
+string \| null
+
+</td><td>
+
+The first name from this participan's Contacts card, if available. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +54,15 @@ The first name from this participan's Contacts card, if available
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The full name from this participant's Contacts card, if available
+string \| null
+
+</td><td>
+
+The full name from this participant's Contacts card, if available. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +71,15 @@ The full name from this participant's Contacts card, if available
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The participant's handle.
+string \| null
+
+</td><td>
+
+The participant's handle. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +88,15 @@ The participant's handle.
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The participant's unique identifier. For example: 01234567-89AB-CDEF-0123-456789ABCDEF:+11234567890
+The participant's unique identifier. For example: 01234567-89AB-CDEF-0123-456789ABCDEF:+11234567890. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -112,13 +105,15 @@ The participant's unique identifier. For example: 01234567-89AB-CDEF-0123-456789
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The last name from this participant's Contacts card, if available
+string \| null
+
+</td><td>
+
+The last name from this participant's Contacts card, if available. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +122,15 @@ The last name from this participant's Contacts card, if available
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The participant's name as it appears in the participant list.
+string \| null
+
+</td><td>
+
+The participant's name as it appears in the participant list. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

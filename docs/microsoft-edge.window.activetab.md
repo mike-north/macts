@@ -4,10 +4,10 @@
 
 ## Window.activeTab property
 
-Returns the currently selected tab
+Returns the currently selected tab, as a reference that carries this window as its container. Window and tab ids start over each time the browser is relaunched, so this reference, kept across a relaunch, may resolve to a different tab or window, not merely fail, and an action through it, such as closing the tab, would act on that other tab. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-activeTab: Tab
+readonly activeTab: ObjectReferenceVariant<Tab, string, 'Tab'> | null;
 ```

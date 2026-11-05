@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Indicates whether or not the shortcut accepts input data
+boolean \| null
+
+</td><td>
+
+Indicates whether or not the shortcut accepts input data. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ Indicates whether or not the shortcut accepts input data
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The number of actions in the shortcut
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The number of actions in the shortcut. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ The number of actions in the shortcut
 
 </td><td>
 
-</td><td>
-
-{ r: number; g: number; b: number; }
+`readonly`
 
 </td><td>
 
-The shortcut's color
+[Rgb](./contracts.rgb.md) \| null
+
+</td><td>
+
+The shortcut's color. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +90,11 @@ The shortcut's color
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The folder containing this shortcut (folder ID)
+The folder containing this shortcut (folder ID). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +103,15 @@ The folder containing this shortcut (folder ID)
 
 </td><td>
 
-</td><td>
-
-ArrayBuffer
+`readonly`
 
 </td><td>
 
-The shortcut's icon (TIFF image data)
+[FileValue](./contracts.filevalue.md) \| null
+
+</td><td>
+
+The shortcut's icon (TIFF image data). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,13 +120,15 @@ The shortcut's icon (TIFF image data)
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the shortcut
+The unique identifier of the shortcut. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -127,13 +137,15 @@ The unique identifier of the shortcut
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the shortcut
+string \| null
+
+</td><td>
+
+The name of the shortcut. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +154,15 @@ The name of the shortcut
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The shortcut's subtitle
+string \| null
+
+</td><td>
+
+The shortcut's subtitle. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

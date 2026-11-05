@@ -4,10 +4,10 @@
 
 ## Font.superscript property
 
-Whether the font is superscript
+Whether the font is superscript. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-superscript: boolean
+superscript: boolean | null
 ```
