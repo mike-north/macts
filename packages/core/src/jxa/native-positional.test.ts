@@ -322,6 +322,42 @@ describe('getting a tab by its position within its window', () => {
     expect(lookups).toEqual(['windows.byId(2)', 'windows.byId(2).tabs.at(1)'])
   })
 
+  it('refuses a null position before constructing a tab specifier', async () => {
+    const lookups: string[] = []
+    const request = operation('getTab', 'Tab', TAB_PLAN, { windowId: 2, index: 0 })
+    const error = await rejectionOf(
+      panesExecutor({ lookups }).execute({
+        ...request,
+        input: { windowId: integer(2), index: null },
+        inputPlan: {
+          kind: 'record',
+          fields: {
+            windowId: { presence: 'required', value: { kind: 'integer' } },
+            index: {
+              presence: 'required',
+              value: { kind: 'nullable', value: { kind: 'integer' } },
+            },
+          },
+        },
+      })
+    )
+    expect(error).toBeInstanceOf(InvalidSelectionError)
+    expect(lookups).not.toContain('windows.byId(2).tabs.at(null)')
+    expect(lookups.some((lookup) => lookup.includes('.tabs.at('))).toBe(false)
+  })
+
+  it('rejects null against the integer wire plan before any application lookup', async () => {
+    const lookups: string[] = []
+    const request = operation('getTab', 'Tab', TAB_PLAN, { windowId: 2, index: 0 })
+    await rejectionOf(
+      panesExecutor({ lookups }).execute({
+        ...request,
+        input: { windowId: integer(2), index: null },
+      })
+    )
+    expect(lookups).toEqual([])
+  })
+
   it('fails with InvalidSelectionError naming Tab for a position past the window’s tabs, looking up no tab', async () => {
     const lookups: string[] = []
 

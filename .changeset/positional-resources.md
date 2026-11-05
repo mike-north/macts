@@ -6,7 +6,7 @@
 
 A manifest can now declare a positional resource: one whose objects have no identifier and are found only by their zero-based position within their parent. The resource records `positional: { evidence }`, with curated evidence (`source: curated`, a `note`, `observedAt` and `appVersion`). Nothing is inferred from a missing identifier.
 
-The manifest schema, every generator and both operation registrations refuse the marker on a resource that has a primary identifier, has no get, has a get that records no parent, has a parent the app does not find by its identifier, or has a command that selects one of its items by anything but an `integer` parameter. `@macts/core` exports the rule as `positionalProblems()`, and `isPositional()`.
+The manifest schema, every generator and both operation registrations refuse the marker on a resource that has a primary identifier, has no get, has a get that records no parent, has a parent the app does not find by its identifier, or has a command that selects one of its items by anything but a non-null `integer` parameter. `@macts/core` exports the rule as `positionalProblems()`, and `isPositional()`.
 
 For a positional resource:
 

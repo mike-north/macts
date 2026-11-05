@@ -114,7 +114,7 @@ function commandIssues(manifest: AppManifest, resourceKey: string): PositionalIs
   return issues
 }
 
-/** The issue of an item command of a positional resource whose item parameter is not an integer. */
+/** A positional item requires a concrete integer; null cannot identify an item. */
 function positionParameterIssue(
   commandKey: string,
   command: Command,
@@ -123,8 +123,15 @@ function positionParameterIssue(
   if (!selectsOneItem(command)) return undefined
   const parameter = itemIdentifierParameter(command)
   // A command that declares no item parameter is refused by item selection.
-  if (parameter === undefined || parameter.type === 'integer') return undefined
+  if (parameter === undefined) return undefined
   const index = command.parameters.indexOf(parameter)
+  if (parameter.type === 'integer' && parameter.nullable === true) {
+    return {
+      message: `The ${command.name} command "${commandKey}" selects an item of the positional resource "${resourceKey}" by its zero-based position, so its item parameter "${parameter.name}" cannot be nullable.`,
+      path: ['commands', commandKey, 'parameters', index, 'nullable'],
+    }
+  }
+  if (parameter.type === 'integer') return undefined
   return {
     message: `The ${command.name} command "${commandKey}" selects an item of the positional resource "${resourceKey}" by its zero-based position, so its item parameter "${parameter.name}" must be of type integer.`,
     path: ['commands', commandKey, 'parameters', index, 'type'],

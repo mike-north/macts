@@ -1015,15 +1015,20 @@ function bindTarget(
 /**
  * Statements binding `item` to the item at the zero-based position
  * {@link ITEM_ID_LOCAL} holds in `collection`, the app's element addressing
- * (`collection.at(position)`). A position the collection does not reach,
- * negative or past its end, raises the native invalid-index number, so it is
- * classified as an invalid selection, never as a missing object; nothing
- * else is guessed from it.
+ * (`collection.at(position)`). A position must be a non-negative safe integer
+ * before the collection is constructed, and must be within its length. A
+ * violation raises the native invalid-index number, so it is classified as
+ * an invalid selection, never as a missing object.
  */
 function bindPosition(collection: string): string {
   return lines(
+    `if (!Number.isSafeInteger(${ITEM_ID_LOCAL}) || ${ITEM_ID_LOCAL} < 0) {`,
+    "  var invalidPosition = new Error('Invalid item position.');",
+    `  invalidPosition.errorNumber = ${String(INVALID_RANGE_ERROR_NUMBER)};`,
+    '  throw invalidPosition;',
+    '}',
     `var positions = ${collection};`,
-    `if (!(${ITEM_ID_LOCAL} >= 0 && ${ITEM_ID_LOCAL} < positions.length)) {`,
+    `if (!(${ITEM_ID_LOCAL} < positions.length)) {`,
     "  var outOfRange = new Error('No item at this position.');",
     `  outOfRange.errorNumber = ${String(INVALID_RANGE_ERROR_NUMBER)};`,
     '  throw outOfRange;',

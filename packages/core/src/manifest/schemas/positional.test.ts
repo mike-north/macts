@@ -142,6 +142,21 @@ describe('a positional resource', () => {
     ])
   })
 
+  it('refuses an explicitly nullable position even with supporting evidence', () => {
+    const nullable = panes((raw) => {
+      const parameters = command(raw, 'getTab')['parameters'] as Record<string, unknown>[]
+      const position = parameters[1]
+      if (position === undefined) throw new Error('getTab has no position parameter')
+      position['nullable'] = true
+      position['evidence'] = { nullable: { source: 'curated', note: 'The app accepts null.' } }
+    })
+    expect(issues(nullable)).toContainEqual({
+      path: ['commands', 'getTab', 'parameters', 1, 'nullable'],
+      message:
+        'The get command "getTab" selects an item of the positional resource "Tab" by its zero-based position, so its item parameter "index" cannot be nullable.',
+    })
+  })
+
   it.each<[string, Record<string, unknown>]>([
     ['with no evidence', {}],
     [
