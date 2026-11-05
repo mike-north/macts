@@ -8,7 +8,11 @@ import { CallOptions } from '@macts/contracts';
 import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import * as _macts_contracts from '@macts/contracts';
+import { ObjectReferenceVariant } from '@macts/contracts';
+import { Page } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -195,17 +199,41 @@ export type CheckboxUpdateInput = Record<string, never>;
 
 // @public
 export interface ClassicDomainObject {
-    readonly id: string;
+    readonly applicationsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly applicationSupportFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly id: string | null;
+    readonly kind: ClassicDomainObjectKind;
+    readonly libraryFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
     readonly name: string | null;
+    readonly preferencesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly scriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly workflowsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
 // @public
 export type ClassicDomainObjectCreateInput = Record<string, never>;
 
 // @public
+export type ClassicDomainObjectKind = 'classic';
+
+// @public
+export class ClassicDomainObjectResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(kind: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<ClassicDomainObject>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<ClassicDomainObject>>;
+}
+
+// @public
 export const ClassicDomainObjectSchema: z.ZodObject<{
+    preferencesFolder: z.ZodString;
+    kind: z.ZodString;
+    applicationSupportFolder: z.ZodString;
+    applicationsFolder: z.ZodString;
     id: z.ZodString;
+    libraryFolder: z.ZodString;
     name: z.ZodString;
+    scriptsFolder: z.ZodString;
+    workflowsFolder: z.ZodString;
 }, z.core.$strip>;
 
 // @public
@@ -309,16 +337,17 @@ export interface DiskCreateInput {
 // @public
 export interface DiskItem {
     readonly busyStatus: boolean | null;
+    readonly container: ObjectReferenceVariant<DiskItem, string, 'DiskItem'> | null;
     readonly creationDate: Date | null;
     readonly displayedName: string | null;
-    readonly id: string;
+    readonly id: string | null;
     modificationDate: Date | null;
     name: string | null;
     readonly nameExtension: string | null;
     readonly packageFolder: boolean | null;
     readonly path: string | null;
     readonly physicalSize: Integer | null;
-    readonly pOSIXPath: string | null;
+    readonly posixPath: string;
     readonly size: Integer | null;
     readonly uRL: string | null;
     visible: boolean | null;
@@ -333,8 +362,15 @@ export interface DiskItemCreateInput {
 }
 
 // @public
+export class DiskItemResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(posixPath: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<DiskItem>;
+}
+
+// @public
 export const DiskItemSchema: z.ZodObject<{
     busyStatus: z.ZodBoolean;
+    container: z.ZodString;
     creationDate: z.ZodString;
     displayedName: z.ZodString;
     id: z.ZodString;
@@ -344,7 +380,7 @@ export const DiskItemSchema: z.ZodObject<{
     packageFolder: z.ZodBoolean;
     path: z.ZodString;
     physicalSize: z.ZodNumber;
-    pOSIXPath: z.ZodString;
+    posixPath: z.ZodString;
     size: z.ZodNumber;
     uRL: z.ZodString;
     visible: z.ZodBoolean;
@@ -378,17 +414,50 @@ export interface DiskUpdateInput {
 
 // @public
 export interface Domain {
+    readonly applicationsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly applicationSupportFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly desktopPicturesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly folderActionScriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly fontsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
     readonly id: string;
+    readonly libraryFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
     readonly name: string | null;
+    readonly preferencesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly scriptingAdditionsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly scriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly sharedDocumentsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly speakableItemsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly utilitiesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly workflowsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
 // @public
 export type DomainCreateInput = Record<string, never>;
 
 // @public
+export class DomainResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Domain>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Domain>>;
+}
+
+// @public
 export const DomainSchema: z.ZodObject<{
+    applicationSupportFolder: z.ZodString;
+    applicationsFolder: z.ZodString;
+    desktopPicturesFolder: z.ZodString;
+    folderActionScriptsFolder: z.ZodString;
+    fontsFolder: z.ZodString;
     id: z.ZodString;
+    libraryFolder: z.ZodString;
     name: z.ZodString;
+    preferencesFolder: z.ZodString;
+    scriptingAdditionsFolder: z.ZodString;
+    scriptsFolder: z.ZodString;
+    sharedDocumentsFolder: z.ZodString;
+    speakableItemsFolder: z.ZodString;
+    utilitiesFolder: z.ZodString;
+    workflowsFolder: z.ZodString;
 }, z.core.$strip>;
 
 // @public
@@ -496,16 +565,17 @@ export interface FileUpdateInput {
 // @public
 export interface Folder {
     readonly busyStatus: boolean | null;
+    readonly container: ObjectReferenceVariant<DiskItem, string, 'DiskItem'> | null;
     readonly creationDate: Date | null;
     readonly displayedName: string | null;
-    readonly id: string;
+    readonly id: string | null;
     modificationDate: Date | null;
     name: string | null;
     readonly nameExtension: string | null;
     readonly packageFolder: boolean | null;
     readonly path: string | null;
     readonly physicalSize: Integer | null;
-    readonly pOSIXPath: string | null;
+    readonly posixPath: string;
     readonly size: Integer | null;
     readonly uRL: string | null;
     visible: boolean | null;
@@ -520,8 +590,15 @@ export interface FolderCreateInput {
 }
 
 // @public
+export class FolderResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(posixPath: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Folder>;
+}
+
+// @public
 export const FolderSchema: z.ZodObject<{
     busyStatus: z.ZodBoolean;
+    container: z.ZodString;
     creationDate: z.ZodString;
     displayedName: z.ZodString;
     id: z.ZodString;
@@ -531,7 +608,7 @@ export const FolderSchema: z.ZodObject<{
     packageFolder: z.ZodBoolean;
     path: z.ZodString;
     physicalSize: z.ZodNumber;
-    pOSIXPath: z.ZodString;
+    posixPath: z.ZodString;
     size: z.ZodNumber;
     uRL: z.ZodString;
     visible: z.ZodBoolean;
@@ -1418,14 +1495,18 @@ export class SystemEventsClient {
     attachedScripts(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     beginTransaction(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     cancel(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    readonly classicDomainObjects: ClassicDomainObjectResourceClient;
     confirm(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     connect(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     decrement(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     disconnect(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    readonly diskItems: DiskItemResourceClient;
     // Warning: (ae-forgotten-export) The symbol "SystemEventsClient_2" needs to be exported by the entry point index.d.ts
     doFolderAction(folderActionCode: string, withItemList?: unknown, withWindowSize?: Parameters<SystemEventsClient_2['doFolderAction']>[2], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    readonly domains: DomainResourceClient;
     editActionOf(usingActionName?: string, usingActionNumber?: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     endTransaction(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    readonly folders: FolderResourceClient;
     get http(): HttpClient;
     increment(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     keyCode(using?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -1443,6 +1524,7 @@ export class SystemEventsClient {
     start(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     stop(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly uiElements: UIElementResourceClient;
+    readonly userDomainObjects: UserDomainObjectResourceClient;
 }
 
 // @public
@@ -1459,7 +1541,31 @@ export class SystemEventsError extends Error {
 }
 
 // @public
-export type SystemEventsResources = Readonly<Record<never, never>>;
+export type SystemEventsResources = Readonly<{
+    ClassicDomainObject: ResourceDescriptor<ClassicDomainObject, ClassicDomainObjectKind> & {
+        readonly id: ValueType<ClassicDomainObjectKind>;
+        readonly get: 'system-events.classicDomainObjects.get';
+        readonly list: 'system-events.classicDomainObjects.list';
+    };
+    DiskItem: ResourceDescriptor<DiskItem, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'system-events.diskItems.get';
+    };
+    Domain: ResourceDescriptor<Domain, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'system-events.domains.get';
+        readonly list: 'system-events.domains.list';
+    };
+    Folder: ResourceDescriptor<Folder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'system-events.folders.get';
+    };
+    UserDomainObject: ResourceDescriptor<UserDomainObject, UserDomainObjectKind> & {
+        readonly id: ValueType<UserDomainObjectKind>;
+        readonly get: 'system-events.userDomainObjects.get';
+        readonly list: 'system-events.userDomainObjects.list';
+    };
+}>;
 
 // @public
 export interface TabGroup {
@@ -1614,17 +1720,77 @@ export interface UIElementUpdateInput {
 
 // @public
 export interface UserDomainObject {
-    readonly id: string;
+    readonly applicationsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly applicationSupportFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly desktopFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly desktopPicturesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly documentsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly downloadsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly favoritesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly folderActionScriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly fontsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly homeFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly id: string | null;
+    readonly kind: UserDomainObjectKind;
+    readonly libraryFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly moviesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly musicFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
     readonly name: string | null;
+    readonly picturesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly preferencesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly publicFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly scriptingAdditionsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly scriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly sharedDocumentsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly sitesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly speakableItemsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly temporaryItemsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly utilitiesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly workflowsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
 // @public
 export type UserDomainObjectCreateInput = Record<string, never>;
 
 // @public
+export type UserDomainObjectKind = 'user';
+
+// @public
+export class UserDomainObjectResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(kind: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<UserDomainObject>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<UserDomainObject>>;
+}
+
+// @public
 export const UserDomainObjectSchema: z.ZodObject<{
+    desktopFolder: z.ZodString;
+    documentsFolder: z.ZodString;
+    downloadsFolder: z.ZodString;
+    favoritesFolder: z.ZodString;
+    homeFolder: z.ZodString;
+    moviesFolder: z.ZodString;
+    musicFolder: z.ZodString;
+    picturesFolder: z.ZodString;
+    publicFolder: z.ZodString;
+    sitesFolder: z.ZodString;
+    temporaryItemsFolder: z.ZodString;
+    kind: z.ZodString;
+    applicationSupportFolder: z.ZodString;
+    applicationsFolder: z.ZodString;
+    desktopPicturesFolder: z.ZodString;
+    folderActionScriptsFolder: z.ZodString;
+    fontsFolder: z.ZodString;
     id: z.ZodString;
+    libraryFolder: z.ZodString;
     name: z.ZodString;
+    preferencesFolder: z.ZodString;
+    scriptingAdditionsFolder: z.ZodString;
+    scriptsFolder: z.ZodString;
+    sharedDocumentsFolder: z.ZodString;
+    speakableItemsFolder: z.ZodString;
+    utilitiesFolder: z.ZodString;
+    workflowsFolder: z.ZodString;
 }, z.core.$strip>;
 
 // @public

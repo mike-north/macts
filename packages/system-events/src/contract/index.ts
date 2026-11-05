@@ -25,8 +25,12 @@ import {
   type ClientBrand,
   type ClientRuntime,
   type Integer,
+  type ObjectReferenceVariant,
   type OperationDescriptor,
+  type Page,
   type Rectangle,
+  type ResourceDescriptor,
+  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -101,6 +105,12 @@ export type Actn = 'itemsAdded' | 'itemsRemoved' | 'windowClosed' | 'windowMoved
 
 /** Accs */
 export type Accs = 'none' | 'readOnly' | 'readWrite' | 'writeOnly'
+
+/** The kinds of ClassicDomainObject: each names the application property that holds one. */
+export type ClassicDomainObjectKind = 'classic'
+
+/** The kinds of UserDomainObject: each names the application property that holds one. */
+export type UserDomainObjectKind = 'user'
 
 /** A collection of settings for configuring a connection */
 export interface Configuration {
@@ -264,15 +274,55 @@ export interface Alias {
 /** The Classic domain in the file system */
 export interface ClassicDomainObject {
   /**
-   * the unique identifier of the domain.
+   * The Classic Preferences folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly preferencesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * Which ClassicDomainObject this is: the kind naming the application property that holds it.
    * Never null: the primary identifier.
    */
-  readonly id: string
+  readonly kind: ClassicDomainObjectKind
+  /**
+   * The Application Support folder.
+   * Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-05).
+   */
+  readonly applicationSupportFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Applications folder.
+   * Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-05).
+   */
+  readonly applicationsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * the unique identifier of the domain.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
+  /**
+   * The Library folder.
+   * Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-05).
+   */
+  readonly libraryFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
   /**
    * the name of the domain.
    * Nullable. No evidence that the app always sets it.
    */
   readonly name: string | null
+  /**
+   * The Scripts folder.
+   * Nullable. The app reported no value in 2 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly scriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Automator Workflows folder.
+   * Nullable. The app reported no value in 3 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly workflowsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
 }
 
 /** A disk in the file system */
@@ -332,6 +382,11 @@ export interface DiskItem {
    */
   readonly busyStatus: boolean | null
   /**
+   * the folder or disk which has this disk item as an element.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly container: ObjectReferenceVariant<DiskItem, string, 'DiskItem'> | null
+  /**
    * the date on which the disk item was created.
    * Nullable. No evidence that the app always sets it.
    */
@@ -343,9 +398,9 @@ export interface DiskItem {
   readonly displayedName: string | null
   /**
    * the unique ID of the disk item.
-   * Never null: the primary identifier.
+   * Nullable. No evidence that the app always sets it.
    */
-  readonly id: string
+  readonly id: string | null
   /**
    * the date on which the disk item was last modified.
    * Nullable. No evidence that the app always sets it.
@@ -378,9 +433,9 @@ export interface DiskItem {
   readonly physicalSize: Integer | null
   /**
    * the POSIX file system path of the disk item.
-   * Nullable. No evidence that the app always sets it.
+   * Never null: the primary identifier.
    */
-  readonly pOSIXPath: string | null
+  readonly posixPath: string
   /**
    * the logical size of the disk item.
    * Nullable. No evidence that the app always sets it.
@@ -406,15 +461,93 @@ export interface DiskItem {
 /** A domain in the file system */
 export interface Domain {
   /**
+   * The Application Support folder.
+   * Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-05).
+   */
+  readonly applicationSupportFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Applications folder.
+   * Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-05).
+   */
+  readonly applicationsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Desktop Pictures folder.
+   * Nullable. The app reported no value in 4 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly desktopPicturesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Folder Action Scripts folder.
+   * Nullable. The app reported no value in 4 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly folderActionScriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Fonts folder.
+   * Nullable. The app reported no value in 2 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly fontsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
    * the unique identifier of the domain.
    * Never null: the primary identifier.
    */
   readonly id: string
   /**
+   * The Library folder.
+   * Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-05).
+   */
+  readonly libraryFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
    * the name of the domain.
    * Nullable. No evidence that the app always sets it.
    */
   readonly name: string | null
+  /**
+   * The Preferences folder.
+   * Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly preferencesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Scripting Additions folder.
+   * Nullable. The app reported no value in 3 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly scriptingAdditionsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Scripts folder.
+   * Nullable. The app reported no value in 2 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly scriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Shared Documents folder.
+   * Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly sharedDocumentsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Speakable Items folder.
+   * Nullable. The app reported no value in 4 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly speakableItemsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Utilities folder.
+   * Nullable. The app reported no value in 3 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly utilitiesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Automator Workflows folder.
+   * Nullable. The app reported no value in 3 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly workflowsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
 }
 
 /** A file in the file system */
@@ -483,6 +616,11 @@ export interface Folder {
    */
   readonly busyStatus: boolean | null
   /**
+   * the folder or disk which has this disk item as an element.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly container: ObjectReferenceVariant<DiskItem, string, 'DiskItem'> | null
+  /**
    * the date on which the disk item was created.
    * Nullable. No evidence that the app always sets it.
    */
@@ -494,9 +632,9 @@ export interface Folder {
   readonly displayedName: string | null
   /**
    * the unique ID of the disk item.
-   * Never null: the primary identifier.
+   * Nullable. No evidence that the app always sets it.
    */
-  readonly id: string
+  readonly id: string | null
   /**
    * the date on which the disk item was last modified.
    * Nullable. No evidence that the app always sets it.
@@ -529,9 +667,9 @@ export interface Folder {
   readonly physicalSize: Integer | null
   /**
    * the POSIX file system path of the disk item.
-   * Nullable. No evidence that the app always sets it.
+   * Never null: the primary identifier.
    */
-  readonly pOSIXPath: string | null
+  readonly posixPath: string
   /**
    * the logical size of the disk item.
    * Nullable. No evidence that the app always sets it.
@@ -584,15 +722,154 @@ export interface SystemDomainObject {
 /** The user domain in the file system */
 export interface UserDomainObject {
   /**
-   * the unique identifier of the domain.
+   * The user's Desktop folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly desktopFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The user's Documents folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly documentsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The user's Downloads folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly downloadsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The user's Favorites folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly favoritesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The user's Home folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly homeFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The user's Movies folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly moviesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The user's Music folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly musicFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The user's Pictures folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly picturesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The user's Public folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly publicFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The user's Sites folder.
+   * Nullable: The Sites folder exists only once the user creates one. The app reported no value in
+   * 1 of 1 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
+   */
+  readonly sitesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Temporary Items folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly temporaryItemsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * Which UserDomainObject this is: the kind naming the application property that holds it.
    * Never null: the primary identifier.
    */
-  readonly id: string
+  readonly kind: UserDomainObjectKind
+  /**
+   * The Application Support folder.
+   * Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-05).
+   */
+  readonly applicationSupportFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Applications folder.
+   * Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-05).
+   */
+  readonly applicationsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Desktop Pictures folder.
+   * Nullable. The app reported no value in 4 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly desktopPicturesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Folder Action Scripts folder.
+   * Nullable. The app reported no value in 4 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly folderActionScriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Fonts folder.
+   * Nullable. The app reported no value in 2 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly fontsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * the unique identifier of the domain.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
+  /**
+   * The Library folder.
+   * Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-05).
+   */
+  readonly libraryFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
   /**
    * the name of the domain.
    * Nullable. No evidence that the app always sets it.
    */
   readonly name: string | null
+  /**
+   * The Preferences folder.
+   * Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly preferencesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Scripting Additions folder.
+   * Nullable. The app reported no value in 3 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly scriptingAdditionsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Scripts folder.
+   * Nullable. The app reported no value in 2 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly scriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Shared Documents folder.
+   * Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly sharedDocumentsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Speakable Items folder.
+   * Nullable. The app reported no value in 4 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly speakableItemsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Utilities folder.
+   * Nullable. The app reported no value in 3 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly utilitiesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
+  /**
+   * The Automator Workflows folder.
+   * Nullable. The app reported no value in 3 of 5 reads (System Events 1.3.6, macOS 27.2,
+   * 2026-11-04).
+   */
+  readonly workflowsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null
 }
 
 /** An action that can be performed on the UI element */
@@ -2209,6 +2486,64 @@ export type ScriptingSuiteCreateInput = Record<string, never>
 /** Input for updating a ScriptingSuite. Omitted fields are left unchanged. */
 export type ScriptingSuiteUpdateInput = Record<string, never>
 
+/** The Classic domain in the file system */
+export interface ClassicDomainObjectResourceClient {
+  /** List classic domain objects, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<ClassicDomainObject>>
+  /**
+   * Read the classic domain object identified by `kind`.
+   *
+   * @param kind - Which Classic domain. Does not accept null.
+   */
+  get(kind: ClassicDomainObjectKind, options?: CallOptions): Promise<ClassicDomainObject>
+}
+
+/** An item stored in the file system */
+export interface DiskItemResourceClient {
+  /**
+   * Read the disk item identified by `posixPath`.
+   *
+   * @param posixPath - The POSIX path of the disk item. It names a location, so it finds whatever
+   * is at that path now. Does not accept null.
+   */
+  get(posixPath: string, options?: CallOptions): Promise<DiskItem>
+}
+
+/** A domain in the file system */
+export interface DomainResourceClient {
+  /** List domains, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Domain>>
+  /**
+   * Read the domain identified by `id`.
+   *
+   * @param id - The id of the domain. Does not accept null.
+   */
+  get(id: string, options?: CallOptions): Promise<Domain>
+}
+
+/** A folder in the file system */
+export interface FolderResourceClient {
+  /**
+   * Read the folder identified by `posixPath`.
+   *
+   * @param posixPath - The POSIX path of the folder. It names a location, so it finds whatever
+   * folder is at that path now. Does not accept null.
+   */
+  get(posixPath: string, options?: CallOptions): Promise<Folder>
+}
+
+/** The user domain in the file system */
+export interface UserDomainObjectResourceClient {
+  /** List user domain objects, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<UserDomainObject>>
+  /**
+   * Read the user domain object identified by `kind`.
+   *
+   * @param kind - Which user domain. Does not accept null.
+   */
+  get(kind: UserDomainObjectKind, options?: CallOptions): Promise<UserDomainObject>
+}
+
 /** An action that can be performed on the UI element */
 export interface ActionResourceClient {
   /** cause the target process to behave as if the action were applied to its UI element */
@@ -2235,6 +2570,16 @@ export interface UIElementResourceClient {
  * references can be bound to it by resource; the brand has no runtime member.
  */
 export interface SystemEventsClient extends ClientBrand<SystemEventsResources> {
+  /** The Classic domain in the file system */
+  readonly classicDomainObjects: ClassicDomainObjectResourceClient
+  /** An item stored in the file system */
+  readonly diskItems: DiskItemResourceClient
+  /** A domain in the file system */
+  readonly domains: DomainResourceClient
+  /** A folder in the file system */
+  readonly folders: FolderResourceClient
+  /** The user domain in the file system */
+  readonly userDomainObjects: UserDomainObjectResourceClient
   /** An action that can be performed on the UI element */
   readonly actions: ActionResourceClient
   /** A piece of the user interface of a process */
@@ -2352,6 +2697,282 @@ export interface SystemEventsClient extends ClientBrand<SystemEventsResources> {
   ): Promise<void>
 }
 
+/** The members of {@link ClassicDomainObjectKind}, for its value type. */
+const classicDomainObjectKindMembers = ['classic'] as const
+
+/** The members of {@link UserDomainObjectKind}, for its value type. */
+const userDomainObjectKindMembers = ['user'] as const
+
+const classicDomainObjectRecordType: ValueType<ClassicDomainObject> = t.record(
+  {
+    preferencesFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Classic Preferences folder' }
+    ),
+    kind: t.enumeration(classicDomainObjectKindMembers, {
+      description:
+        'Which ClassicDomainObject this is: the kind naming the application property that holds it',
+    }),
+    applicationSupportFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Application Support folder' }
+    ),
+    applicationsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Applications folder' }
+    ),
+    id: t.nullable(t.string(), { description: 'the unique identifier of the domain' }),
+    libraryFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Library folder' }
+    ),
+    name: t.nullable(t.string(), { description: 'the name of the domain' }),
+    scriptsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Scripts folder' }
+    ),
+    workflowsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Automator Workflows folder' }
+    ),
+  },
+  { description: 'The Classic domain in the file system' }
+)
+
+const diskItemRecordType: ValueType<DiskItem> = t.record(
+  {
+    busyStatus: t.nullable(t.boolean(), { description: 'Is the disk item busy?' }),
+    container: t.nullable(
+      t.reference<DiskItem, string, 'DiskItem'>(() => systemEventsContract, 'DiskItem', 'one'),
+      { description: 'the folder or disk which has this disk item as an element' }
+    ),
+    creationDate: t.nullable(t.date(), {
+      description: 'the date on which the disk item was created',
+    }),
+    displayedName: t.nullable(t.string(), {
+      description: 'the name of the disk item as displayed in the User Interface',
+    }),
+    id: t.nullable(t.string(), { description: 'the unique ID of the disk item' }),
+    modificationDate: t.nullable(t.date(), {
+      description: 'the date on which the disk item was last modified',
+    }),
+    name: t.nullable(t.string(), { description: 'the name of the disk item' }),
+    nameExtension: t.nullable(t.string(), { description: 'the extension portion of the name' }),
+    packageFolder: t.nullable(t.boolean(), { description: 'Is the disk item a package?' }),
+    path: t.nullable(t.string(), { description: 'the file system path of the disk item' }),
+    physicalSize: t.nullable(t.integer(), {
+      description: 'the actual space used by the disk item on disk',
+    }),
+    posixPath: t.string({ description: 'the POSIX file system path of the disk item' }),
+    size: t.nullable(t.integer(), { description: 'the logical size of the disk item' }),
+    uRL: t.nullable(t.string(), { description: 'the URL of the disk item' }),
+    visible: t.nullable(t.boolean(), { description: 'Is the disk item visible?' }),
+    volume: t.nullable(t.string(), { description: 'the volume on which the disk item resides' }),
+  },
+  { description: 'An item stored in the file system' }
+)
+
+const domainRecordType: ValueType<Domain> = t.record(
+  {
+    applicationSupportFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Application Support folder' }
+    ),
+    applicationsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Applications folder' }
+    ),
+    desktopPicturesFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Desktop Pictures folder' }
+    ),
+    folderActionScriptsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Folder Action Scripts folder' }
+    ),
+    fontsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Fonts folder' }
+    ),
+    id: t.string({ description: 'the unique identifier of the domain' }),
+    libraryFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Library folder' }
+    ),
+    name: t.nullable(t.string(), { description: 'the name of the domain' }),
+    preferencesFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Preferences folder' }
+    ),
+    scriptingAdditionsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Scripting Additions folder' }
+    ),
+    scriptsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Scripts folder' }
+    ),
+    sharedDocumentsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Shared Documents folder' }
+    ),
+    speakableItemsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Speakable Items folder' }
+    ),
+    utilitiesFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Utilities folder' }
+    ),
+    workflowsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Automator Workflows folder' }
+    ),
+  },
+  { description: 'A domain in the file system' }
+)
+
+const folderRecordType: ValueType<Folder> = t.record(
+  {
+    busyStatus: t.nullable(t.boolean(), { description: 'Is the disk item busy?' }),
+    container: t.nullable(
+      t.reference<DiskItem, string, 'DiskItem'>(() => systemEventsContract, 'DiskItem', 'one'),
+      { description: 'the folder or disk which has this disk item as an element' }
+    ),
+    creationDate: t.nullable(t.date(), {
+      description: 'the date on which the disk item was created',
+    }),
+    displayedName: t.nullable(t.string(), {
+      description: 'the name of the disk item as displayed in the User Interface',
+    }),
+    id: t.nullable(t.string(), { description: 'the unique ID of the disk item' }),
+    modificationDate: t.nullable(t.date(), {
+      description: 'the date on which the disk item was last modified',
+    }),
+    name: t.nullable(t.string(), { description: 'the name of the disk item' }),
+    nameExtension: t.nullable(t.string(), { description: 'the extension portion of the name' }),
+    packageFolder: t.nullable(t.boolean(), { description: 'Is the disk item a package?' }),
+    path: t.nullable(t.string(), { description: 'the file system path of the disk item' }),
+    physicalSize: t.nullable(t.integer(), {
+      description: 'the actual space used by the disk item on disk',
+    }),
+    posixPath: t.string({ description: 'the POSIX file system path of the disk item' }),
+    size: t.nullable(t.integer(), { description: 'the logical size of the disk item' }),
+    uRL: t.nullable(t.string(), { description: 'the URL of the disk item' }),
+    visible: t.nullable(t.boolean(), { description: 'Is the disk item visible?' }),
+    volume: t.nullable(t.string(), { description: 'the volume on which the disk item resides' }),
+  },
+  { description: 'A folder in the file system' }
+)
+
+const userDomainObjectRecordType: ValueType<UserDomainObject> = t.record(
+  {
+    desktopFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: "The user's Desktop folder" }
+    ),
+    documentsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: "The user's Documents folder" }
+    ),
+    downloadsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: "The user's Downloads folder" }
+    ),
+    favoritesFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: "The user's Favorites folder" }
+    ),
+    homeFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: "The user's Home folder" }
+    ),
+    moviesFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: "The user's Movies folder" }
+    ),
+    musicFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: "The user's Music folder" }
+    ),
+    picturesFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: "The user's Pictures folder" }
+    ),
+    publicFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: "The user's Public folder" }
+    ),
+    sitesFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: "The user's Sites folder" }
+    ),
+    temporaryItemsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Temporary Items folder' }
+    ),
+    kind: t.enumeration(userDomainObjectKindMembers, {
+      description:
+        'Which UserDomainObject this is: the kind naming the application property that holds it',
+    }),
+    applicationSupportFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Application Support folder' }
+    ),
+    applicationsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Applications folder' }
+    ),
+    desktopPicturesFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Desktop Pictures folder' }
+    ),
+    folderActionScriptsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Folder Action Scripts folder' }
+    ),
+    fontsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Fonts folder' }
+    ),
+    id: t.nullable(t.string(), { description: 'the unique identifier of the domain' }),
+    libraryFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Library folder' }
+    ),
+    name: t.nullable(t.string(), { description: 'the name of the domain' }),
+    preferencesFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Preferences folder' }
+    ),
+    scriptingAdditionsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Scripting Additions folder' }
+    ),
+    scriptsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Scripts folder' }
+    ),
+    sharedDocumentsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Shared Documents folder' }
+    ),
+    speakableItemsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Speakable Items folder' }
+    ),
+    utilitiesFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Utilities folder' }
+    ),
+    workflowsFolder: t.nullable(
+      t.reference<Folder, string, 'Folder'>(() => systemEventsContract, 'Folder', 'one'),
+      { description: 'The Automator Workflows folder' }
+    ),
+  },
+  { description: 'The user domain in the file system' }
+)
+
 /**
  * The type of the resource table in `systemEventsContract` (the app's `/contract` entry): every resource a
  * reference can name, keyed by manifest resource key, with its record type,
@@ -2361,7 +2982,31 @@ export interface SystemEventsClient extends ClientBrand<SystemEventsResources> {
  * the contract carries it, so `bindReference` admits only references the
  * contract can resolve.
  */
-export type SystemEventsResources = Readonly<Record<never, never>>
+export type SystemEventsResources = Readonly<{
+  ClassicDomainObject: ResourceDescriptor<ClassicDomainObject, ClassicDomainObjectKind> & {
+    readonly id: ValueType<ClassicDomainObjectKind>
+    readonly get: 'system-events.classicDomainObjects.get'
+    readonly list: 'system-events.classicDomainObjects.list'
+  }
+  DiskItem: ResourceDescriptor<DiskItem, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'system-events.diskItems.get'
+  }
+  Domain: ResourceDescriptor<Domain, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'system-events.domains.get'
+    readonly list: 'system-events.domains.list'
+  }
+  Folder: ResourceDescriptor<Folder, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'system-events.folders.get'
+  }
+  UserDomainObject: ResourceDescriptor<UserDomainObject, UserDomainObjectKind> & {
+    readonly id: ValueType<UserDomainObjectKind>
+    readonly get: 'system-events.userDomainObjects.get'
+    readonly list: 'system-events.userDomainObjects.list'
+  }
+}>
 
 /**
  * The resource table: the implementation of {@link SystemEventsResources}, which
@@ -2371,7 +3016,47 @@ export type SystemEventsResources = Readonly<Record<never, never>>
  * D7, "Resolvable targets"). This table is also the registry that reference
  * value types read, lazily.
  */
-const resources = {} satisfies SystemEventsResources
+const resources = {
+  ClassicDomainObject: {
+    name: 'ClassicDomainObject',
+    record: classicDomainObjectRecordType,
+    id: t.enumeration(classicDomainObjectKindMembers, {
+      description:
+        'Which ClassicDomainObject this is: the kind naming the application property that holds it',
+    }),
+    get: 'system-events.classicDomainObjects.get',
+    list: 'system-events.classicDomainObjects.list',
+  },
+  DiskItem: {
+    name: 'DiskItem',
+    record: diskItemRecordType,
+    id: t.string({ description: 'the POSIX file system path of the disk item' }),
+    get: 'system-events.diskItems.get',
+  },
+  Domain: {
+    name: 'Domain',
+    record: domainRecordType,
+    id: t.string({ description: 'the unique identifier of the domain' }),
+    get: 'system-events.domains.get',
+    list: 'system-events.domains.list',
+  },
+  Folder: {
+    name: 'Folder',
+    record: folderRecordType,
+    id: t.string({ description: 'the POSIX file system path of the disk item' }),
+    get: 'system-events.folders.get',
+  },
+  UserDomainObject: {
+    name: 'UserDomainObject',
+    record: userDomainObjectRecordType,
+    id: t.enumeration(userDomainObjectKindMembers, {
+      description:
+        'Which UserDomainObject this is: the kind naming the application property that holds it',
+    }),
+    get: 'system-events.userDomainObjects.get',
+    list: 'system-events.userDomainObjects.list',
+  },
+} satisfies SystemEventsResources
 
 const appAbortTransactionOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'system-events.app.abortTransaction',
@@ -3092,6 +3777,174 @@ const appRemoveActionFromOperation: OperationDescriptor<
   },
 }
 
+const diskItemGetDiskItemOperation: OperationDescriptor<{ readonly posixPath: string }, DiskItem> =
+  {
+    id: 'system-events.diskItems.get',
+    permission: 'system-events:diskItems:get',
+    target: { command: 'getDiskItem', resource: 'DiskItem' },
+    description: 'Get the disk item at a POSIX path',
+    input: t.record({
+      posixPath: t.string({
+        description:
+          'The POSIX path of the disk item. It names a location, so it finds whatever is at that path now.',
+      }),
+    }),
+    output: diskItemRecordType,
+    inputJsonSchema: {
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      type: 'object',
+      properties: {
+        posixPath: {
+          type: 'string',
+          description:
+            'The POSIX path of the disk item. It names a location, so it finds whatever is at that path now.',
+        },
+      },
+      required: ['posixPath'],
+      additionalProperties: false,
+    },
+  }
+
+const folderGetFolderOperation: OperationDescriptor<{ readonly posixPath: string }, Folder> = {
+  id: 'system-events.folders.get',
+  permission: 'system-events:folders:get',
+  target: { command: 'getFolder', resource: 'Folder' },
+  description: 'Get the folder at a POSIX path',
+  input: t.record({
+    posixPath: t.string({
+      description:
+        'The POSIX path of the folder. It names a location, so it finds whatever folder is at that path now.',
+    }),
+  }),
+  output: folderRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      posixPath: {
+        type: 'string',
+        description:
+          'The POSIX path of the folder. It names a location, so it finds whatever folder is at that path now.',
+      },
+    },
+    required: ['posixPath'],
+    additionalProperties: false,
+  },
+}
+
+const domainListDomainsOperation: OperationDescriptor<Record<string, never>, Page<Domain>> = {
+  id: 'system-events.domains.list',
+  permission: 'system-events:domains:list',
+  target: { command: 'listDomains', resource: 'Domain' },
+  description: 'List the domains of the file system',
+  input: t.record({}),
+  output: t.page(domainRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
+}
+
+const domainGetDomainOperation: OperationDescriptor<{ readonly id: string }, Domain> = {
+  id: 'system-events.domains.get',
+  permission: 'system-events:domains:get',
+  target: { command: 'getDomain', resource: 'Domain' },
+  description: 'Get a domain by its id',
+  input: t.record({
+    id: t.string({ description: 'The id of the domain' }),
+  }),
+  output: domainRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'The id of the domain' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
+}
+
+const userDomainObjectListUserDomainObjectsOperation: OperationDescriptor<
+  Record<string, never>,
+  Page<UserDomainObject>
+> = {
+  id: 'system-events.userDomainObjects.list',
+  permission: 'system-events:userDomainObjects:list',
+  target: { command: 'listUserDomainObjects', resource: 'UserDomainObject' },
+  description: 'List the user domain',
+  input: t.record({}),
+  output: t.page(userDomainObjectRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
+}
+
+const userDomainObjectGetUserDomainObjectOperation: OperationDescriptor<
+  { readonly kind: UserDomainObjectKind },
+  UserDomainObject
+> = {
+  id: 'system-events.userDomainObjects.get',
+  permission: 'system-events:userDomainObjects:get',
+  target: { command: 'getUserDomainObject', resource: 'UserDomainObject' },
+  description: 'Get the user domain by its kind',
+  input: t.record({
+    kind: t.enumeration(userDomainObjectKindMembers, { description: 'Which user domain' }),
+  }),
+  output: userDomainObjectRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { kind: { type: 'string', enum: ['user'], description: 'Which user domain' } },
+    required: ['kind'],
+    additionalProperties: false,
+  },
+}
+
+const classicDomainObjectListClassicDomainObjectsOperation: OperationDescriptor<
+  Record<string, never>,
+  Page<ClassicDomainObject>
+> = {
+  id: 'system-events.classicDomainObjects.list',
+  permission: 'system-events:classicDomainObjects:list',
+  target: { command: 'listClassicDomainObjects', resource: 'ClassicDomainObject' },
+  description: 'List the Classic domain',
+  input: t.record({}),
+  output: t.page(classicDomainObjectRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
+}
+
+const classicDomainObjectGetClassicDomainObjectOperation: OperationDescriptor<
+  { readonly kind: ClassicDomainObjectKind },
+  ClassicDomainObject
+> = {
+  id: 'system-events.classicDomainObjects.get',
+  permission: 'system-events:classicDomainObjects:get',
+  target: { command: 'getClassicDomainObject', resource: 'ClassicDomainObject' },
+  description: 'Get the Classic domain by its kind',
+  input: t.record({
+    kind: t.enumeration(classicDomainObjectKindMembers, { description: 'Which Classic domain' }),
+  }),
+  output: classicDomainObjectRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      kind: { type: 'string', enum: ['classic'], description: 'Which Classic domain' },
+    },
+    required: ['kind'],
+    additionalProperties: false,
+  },
+}
+
 /** Every operation, keyed by its identity. */
 const operations: AppContract<SystemEventsClient>['operations'] = {
   'system-events.app.abortTransaction': appAbortTransactionOperation,
@@ -3124,11 +3977,42 @@ const operations: AppContract<SystemEventsClient>['operations'] = {
   'system-events.app.keyUp': appKeyUpOperation,
   'system-events.app.pick': appPickOperation,
   'system-events.app.removeActionFrom': appRemoveActionFromOperation,
+  'system-events.diskItems.get': diskItemGetDiskItemOperation,
+  'system-events.folders.get': folderGetFolderOperation,
+  'system-events.domains.list': domainListDomainsOperation,
+  'system-events.domains.get': domainGetDomainOperation,
+  'system-events.userDomainObjects.list': userDomainObjectListUserDomainObjectsOperation,
+  'system-events.userDomainObjects.get': userDomainObjectGetUserDomainObjectOperation,
+  'system-events.classicDomainObjects.list': classicDomainObjectListClassicDomainObjectsOperation,
+  'system-events.classicDomainObjects.get': classicDomainObjectGetClassicDomainObjectOperation,
 }
 
 /** Build the client on top of a factory-supplied runtime. */
 function bind(runtime: ClientRuntime): SystemEventsClient {
   return {
+    classicDomainObjects: {
+      list: (options) =>
+        runtime.invoke(classicDomainObjectListClassicDomainObjectsOperation, {}, options),
+      get: (kind, options) =>
+        runtime.invoke(classicDomainObjectGetClassicDomainObjectOperation, { kind }, options),
+    },
+    diskItems: {
+      get: (posixPath, options) =>
+        runtime.invoke(diskItemGetDiskItemOperation, { posixPath }, options),
+    },
+    domains: {
+      list: (options) => runtime.invoke(domainListDomainsOperation, {}, options),
+      get: (id, options) => runtime.invoke(domainGetDomainOperation, { id }, options),
+    },
+    folders: {
+      get: (posixPath, options) => runtime.invoke(folderGetFolderOperation, { posixPath }, options),
+    },
+    userDomainObjects: {
+      list: (options) =>
+        runtime.invoke(userDomainObjectListUserDomainObjectsOperation, {}, options),
+      get: (kind, options) =>
+        runtime.invoke(userDomainObjectGetUserDomainObjectOperation, { kind }, options),
+    },
     actions: {
       perform: (options) => runtime.invoke(actionPerformOperation, {}, options),
     },

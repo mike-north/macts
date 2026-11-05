@@ -210,6 +210,7 @@ describe('packed install: generated constructor facade', () => {
       canonicalError: true,
       rawError: true,
       boundFacade: true,
+      boundReferenceCanonicalError: true,
       validationBeforeDispatch: true,
     })
   })

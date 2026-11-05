@@ -1736,7 +1736,12 @@ The coverage ledger is the exact set of output positions the shipped
 contracts leave out, each with its reason, pinned by hand in
 `packages/core/src/generator/contract/index.test.ts`. A new omission fails
 CI until it is reviewed and added. A removed row means coverage was restored,
-and the field is back in output.
+and the field is back in output, or that the manifest now marks the field
+unsupported (D10), which only a structural absence justifies: every observed
+instance fails to read it, for a reason of the platform, such as the System
+Events Classic domain's folders on a macOS with no Classic environment. A field
+that fails on some instances and reads on others is not unsupported; it is
+nullable, with the probe that observed it as evidence, and stays in output.
 `e2e/mcp-contracts/test/output-references.integration.test.ts` checks that no
 output reference left in a shipped contract is one macts cannot yet resolve,
 and pins those that remain.
