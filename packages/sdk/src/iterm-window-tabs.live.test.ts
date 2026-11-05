@@ -190,17 +190,17 @@ async function holdsCurrentSessions(
 }
 
 /**
- * The structure of the value iTerm gives for the window field `field`, read
- * from the window at `position` in its list: the JS type, an array's length
- * and its elements' structures, an object's keys and their values'
- * structures, to two levels. No value is returned. Only a field the manifest
- * declares, with a type other than text, is read.
+ * The structure of the value iTerm gives for each declared Window field of
+ * the window at `position` in its list, one line per field: the JS type, an
+ * array's length and its elements' types, or an object's keys and their
+ * values' types; or, when the read fails, its error number alone. Each read
+ * runs in its own `try`, inside the automation process, which returns only
+ * these descriptions: no value, text included, ever leaves it.
  */
-async function fieldStructure(position: number, field: string): Promise<string> {
+async function windowFieldStructures(position: number): Promise<string[]> {
   const manifest = AppManifestSchema.parse(await iTermContract.loadManifest())
-  const declared = manifest.resources['Window']?.properties[field]
-  if (declared === undefined || declared.type === 'string') return 'not read'
-  return runJxa<string>(
+  const fields = Object.keys(manifest.resources['Window']?.properties ?? {})
+  return runJxa<string[]>(
     `function shape(v, depth) {
       if (v === null || v === undefined) return String(v);
       var inner = function (e) { return depth > 0 ? shape(e, depth - 1) : typeof e; };
@@ -211,33 +211,35 @@ async function fieldStructure(position: number, field: string): Promise<string> 
       return typeof v;
     }
     var window = Application(${JSON.stringify(ITERM)}).windows[${String(position)}];
-    return shape(window[${JSON.stringify(field)}](), 1);`,
+    return ${JSON.stringify(fields)}.map(function (field) {
+      try { return field + ': ' + shape(window[field](), 1); }
+      catch (e) { return field + ': read failed (' + String(e && e.errorNumber) + ')'; }
+    });`,
     { timeout: 30_000 }
   )
 }
 
 /**
- * Runs `read`; when iTerm's value does not match the contract, logs where,
- * by the issues' paths alone, and the structure iTerm gives at each
- * ({@link fieldStructure}), then rethrows. A path names fields and list
- * positions only; an issue's message can quote the app's value, so it is
- * never logged.
+ * Runs `read`; when iTerm's value does not match the contract, logs where, by
+ * the issues' paths alone, then the structure of every field of the window
+ * at that position ({@link windowFieldStructures}), then rethrows the
+ * mismatch. A path names fields and list positions only; an issue's message
+ * can quote the app's value, so it is never logged. A failure of the
+ * structure read is logged as such and never replaces the mismatch.
  */
 async function reportingContractPaths<T>(read: () => Promise<T>): Promise<T> {
   try {
     return await read()
   } catch (error) {
     if (error instanceof UnexpectedValueError) {
-      for (const { path } of error.details.issues) {
-        const position = path.find((segment): segment is number => typeof segment === 'number')
-        const field = path.find(
-          (segment): segment is string => typeof segment === 'string' && segment !== 'items'
-        )
-        const structure =
-          field === undefined ? 'no field' : await fieldStructure(position ?? 0, field)
-        console.info(
-          `contract mismatch at: ${path.map(String).join('.')}; iTerm gives ${structure}`
-        )
+      const paths = error.details.issues.map(({ path }) => path)
+      console.info(`contract mismatch at: ${paths.map((path) => path.join('.')).join(', ')}`)
+      const position = paths[0]?.find((segment): segment is number => typeof segment === 'number')
+      try {
+        const structures = await windowFieldStructures(position ?? 0)
+        console.info(`window ${String(position ?? 0)} fields:\n  ${structures.join('\n  ')}`)
+      } catch {
+        console.info('the window field structures could not be read')
       }
     }
     throw error
