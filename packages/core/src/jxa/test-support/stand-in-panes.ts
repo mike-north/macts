@@ -12,7 +12,10 @@
  * displays as the app's own specifier for it, `….tabs.at(N)`.
  *
  * Every lookup it serves is recorded in `lookups`, labelled by the path that
- * reached it (`windows.byId(1)`, `windows.byId(1).tabs.at(0)`).
+ * reached it (`windows.byId(1)`, `windows.byId(1).tabs.at(0)`), and so is
+ * every change made to a tab: a title set
+ * (`windows.byId(1).tabs.at(0).title = Logs`) or a delete
+ * (`windows.byId(1).tabs.at(0).delete()`).
  *
  * An app of the same shape, such as iTerm, is stood in for by adding the
  * further record fields its manifest declares ({@link StandInPanesOptions})
@@ -109,12 +112,21 @@ export function standInPanes(
       title: tab.title,
     }))
     const tabItems = tabRecords.map((record, position) => {
+      const at = `${label}.at(${String(position)})`
       const specifier = {
         exists: () => true,
         index: () => record.index,
-        title: () => record.title,
         properties: () => record,
+        delete: () => lookups.push(`${at}.delete()`),
       }
+      // Read by calling it, and set by assignment, as the bridge does.
+      Object.defineProperty(specifier, 'title', {
+        get: () => () => record.title,
+        set: (title: string) => {
+          lookups.push(`${at}.title = ${title}`)
+          record.title = title
+        },
+      })
       displays.set(specifier, display(row.id, position))
       return specifier
     })

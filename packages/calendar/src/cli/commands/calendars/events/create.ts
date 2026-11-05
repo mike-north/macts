@@ -10,7 +10,8 @@ export class CreateEventCommand extends Command {
   static override paths = [['calendar', 'calendars', 'events', 'create']]
 
   static override usage = Command.Usage({
-    description: 'Create a new event',
+    description:
+      "Create a new event. When several calendars share the same name, the first match in the app's order is used as the calendar.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

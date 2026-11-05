@@ -23,6 +23,7 @@ export class VariableResourceClient {
 
   /**
    * List the variables of one workflow, as one page.
+   * When several workflows share the same name, the first match in the app's order is used as the workflow.
    */
   async list(workflowName: string): Promise<Page<Variable>> {
     return this.#http.rpc<Page<Variable>>(`${this.#app}.${this.#resource}.list`, { workflowName })

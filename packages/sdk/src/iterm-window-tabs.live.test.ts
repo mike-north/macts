@@ -155,15 +155,15 @@ const launchRefusal = (() => {
 if (launchRefusal !== undefined) console.warn(launchRefusal)
 
 /**
- * For each window id, whether the position reader gives a position for the
- * specifier iTerm returns for that window's current tab.
+ * For each window id, whether the position reader gives a position within
+ * the window's `tabs` for the specifier iTerm returns for its current tab.
  */
 async function currentTabsParse(windowIds: readonly number[]): Promise<boolean[]> {
   return runJxa<boolean[]>(
     `${NATIVE_POSITION_READER.prelude}
     var app = Application(${JSON.stringify(ITERM)});
     return ${JSON.stringify(windowIds)}.map(function (id) {
-      var position = __mactsPositionOf(app.windows.byId(id).currentTab());
+      var position = __mactsPositionOf(app.windows.byId(id).currentTab(), 'tabs');
       return typeof position === 'number';
     });`,
     { timeout: 30_000 }

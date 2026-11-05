@@ -10,8 +10,8 @@ The manifest schema, every generator and both operation registrations refuse the
 
 For a positional resource:
 
-- Its native get, update and delete find the item at `parent[collection].at(index)`, after a bounds check. A position past the end is `InvalidSelectionError`; a missing parent is `TargetNotFoundError` naming the parent.
-- An output field holding one, read through its parent's own record, is emitted as an index selector within that parent: `{form: 'selector', cardinality: 'one', selector: {by: 'index', index}, container}`. The index is the position the app's own specifier gives (its final `.at(N)`), never a dictionary `index` property; any other specifier fails as `InternalError`. A command result holding one stays out of output.
+- Its native get, update and delete find the item at the given zero-based position within its parent, after checking that the parent holds that many. A position past the end is `InvalidSelectionError`; a missing parent is `TargetNotFoundError` naming the parent.
+- An output field holding one, read through its parent's own record, is emitted as an index selector within that parent: `{form: 'selector', cardinality: 'one', selector: {by: 'index', index}, container}`. The index is the position the app itself reports for the object within that parent, never a dictionary `index` property; an object whose position the app does not report fails as `InternalError`. A command result holding one stays out of output.
 - The native executor resolves, and converts at input positions, an index selector to it within its parent's identity container, with the same errors.
 - Generated docs say the object has no id, is selected by its zero-based position, and that the position drifts when objects open, close or move.
 

@@ -370,7 +370,8 @@ export interface WorkflowResourceClient {
 /** A single step in a workflow */
 export interface AutomatorActionResourceClient {
   /**
-   * List automator actions, as one page holding all of them.
+   * List automator actions, as one page holding all of them. When several workflows share the same
+   * name, the first match in the app's order is used as the workflow.
    *
    * @param workflowName - Workflow name. Does not accept null.
    */
@@ -386,7 +387,8 @@ export interface AutomatorActionResourceClient {
 /** A variable used by the workflow */
 export interface VariableResourceClient {
   /**
-   * List variables, as one page holding all of them.
+   * List variables, as one page holding all of them. When several workflows share the same name,
+   * the first match in the app's order is used as the workflow.
    *
    * @param workflowName - Workflow name. Does not accept null.
    */

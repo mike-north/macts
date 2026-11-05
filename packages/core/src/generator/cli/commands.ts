@@ -12,6 +12,7 @@ import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.
 import {
   firstMatchNote,
   identifierWords,
+  parentFirstMatchNote,
   resolveIdParams,
   resourceNamespace,
   safeIdentifier,
@@ -82,6 +83,19 @@ function identifierPositional(property: string, identifier: string | undefined):
   return identifier === undefined
     ? `  ${property} = Option.String({ required: true });`
     : `  ${property} = Option.String({ name: '${toKebabCase(identifier)}', required: true });`
+}
+
+/**
+ * The `description` value of a generated command's usage: the summary, then
+ * any first-match sentences ({@link firstMatchNote},
+ * {@link parentFirstMatchNote}) for a lookup that can reach several items.
+ * With no sentence it stays the single-quoted summary.
+ */
+function usageDescription(summary: string, notes: readonly (string | undefined)[]): string {
+  const present = notes.filter((note): note is string => note !== undefined)
+  return present.length === 0
+    ? `'${summary}'`
+    : JSON.stringify([`${summary}.`, ...present].join(' '))
 }
 
 /**
@@ -189,6 +203,9 @@ export function generateListCommand(
     : ''
   const format = paged ? 'formatPage' : 'formatList'
   const formatTail = paged ? ', page.nextCursor' : ''
+  const description = usageDescription(`List ${identifierWords(resource.plural)}`, [
+    listCommand === undefined ? undefined : parentFirstMatchNote(listCommand, ctx.manifest),
+  ])
 
   const content = `import { Command, Option } from 'clipanion';
 import { getClient } from '${sdkImportPath}';
@@ -201,7 +218,7 @@ export class List${resource.plural}Command extends Command {
   static override paths = [[${cliPath.map((p) => JSON.stringify(p)).join(', ')}]];
 
   static override usage = Command.Usage({
-    description: 'List ${identifierWords(resource.plural)}',
+    description: ${description},
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
@@ -275,6 +292,10 @@ export function generateCreateCommand(
   // Build create input object
   const createInput = generateCreateInput(resource, omitted)
 
+  const description = usageDescription(`Create a new ${identifierWords(resource.name)}`, [
+    createCommand === undefined ? undefined : parentFirstMatchNote(createCommand, ctx.manifest),
+  ])
+
   const needsTypanion = propertyFlags.includes('t.isEnum')
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
 import { getClient } from '${sdkImportPath}';
@@ -287,7 +308,7 @@ export class Create${resource.name}Command extends Command {
   static override paths = [[${cliPath.map((p) => JSON.stringify(p)).join(', ')}]];
 
   static override usage = Command.Usage({
-    description: 'Create a new ${identifierWords(resource.name)}',
+    description: ${description},
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
@@ -366,10 +387,12 @@ export function generateGetCommand(
   const parentOptions = generateListParamOptions(parentScopeParams)
   const identifier = addressingIdentifier(resource, getCommand)
   const summary = `Get ${withArticle(identifierWords(resource.name))} by ${identifierProse(identifier)}`
-  // The usage description adds the first-match sentence for a resource
-  // matched on a property that is not claimed unique.
-  const note = firstMatchNote(resource)
-  const description = note === undefined ? summary : `${summary}. ${note}`
+  // The usage description adds the first-match sentences for an item, and a
+  // parent, matched on a property that is not claimed unique.
+  const description = usageDescription(summary, [
+    firstMatchNote(resource),
+    parentFirstMatchNote(getCommand, ctx.manifest),
+  ])
 
   const content = `import { Command, Option } from 'clipanion';
 import { getClient } from '${sdkImportPath}';
@@ -382,7 +405,7 @@ export class Get${resource.name}Command extends Command {
   static override paths = [[${cliPath.map((p) => JSON.stringify(p)).join(', ')}]];
 
   static override usage = Command.Usage({
-    description: ${note === undefined ? `'${summary}'` : JSON.stringify(description)},
+    description: ${description},
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
