@@ -14,13 +14,14 @@ export class SendOutgoingMessageCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   outgoingMessageId = Option.String({ name: 'id', required: true })
-
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      await client.outgoingMessages.send()
+      await client.outgoingMessages.send(
+        this.outgoingMessageId as unknown as Parameters<typeof client.outgoingMessages.send>[0]
+      )
 
       const output = formatter.formatSuccess('send completed successfully')
       this.context.stdout.write(output + '\n')

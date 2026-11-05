@@ -548,8 +548,14 @@ export interface EventResourceClient {
    * @param id - Event identifier (uid). Does not accept null.
    */
   delete(calendarId: string, id: string, options?: CallOptions): Promise<void>
-  /** Show the event or to-do in the calendar window */
-  show(options?: CallOptions): Promise<void>
+  /**
+   * Show the event or to-do in the calendar window
+   *
+   * @param calendarId - Calendar identifier (the calendar containing the event). Does not accept
+   * null.
+   * @param id - Event identifier (uid). Does not accept null.
+   */
+  show(calendarId: string, id: string, options?: CallOptions): Promise<void>
 }
 
 /**
@@ -1119,17 +1125,32 @@ const appViewCalendarOperation: OperationDescriptor<{ readonly at: Date }, undef
   },
 }
 
-const eventShowOperation: OperationDescriptor<Record<string, never>, undefined> = {
+const eventShowOperation: OperationDescriptor<
+  { readonly calendarId: string; readonly id: string },
+  undefined
+> = {
   id: 'calendar.events.show',
   permission: 'calendar:events:show',
   target: { command: 'show', resource: 'Event' },
   description: 'Show the event or to-do in the calendar window',
-  input: t.record({}),
+  input: t.record({
+    calendarId: t.string({
+      description: 'Calendar identifier (the calendar containing the event)',
+    }),
+    id: t.string({ description: 'Event identifier (uid)' }),
+  }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      calendarId: {
+        type: 'string',
+        description: 'Calendar identifier (the calendar containing the event)',
+      },
+      id: { type: 'string', description: 'Event identifier (uid)' },
+    },
+    required: ['calendarId', 'id'],
     additionalProperties: false,
   },
 }
@@ -1168,7 +1189,8 @@ function bind(runtime: ClientRuntime): CalendarClient {
         runtime.invoke(eventUpdateEventOperation, { ...input, calendarId, id }, options),
       delete: (calendarId, id, options) =>
         runtime.invoke(eventDeleteEventOperation, { calendarId, id }, options),
-      show: (options) => runtime.invoke(eventShowOperation, {}, options),
+      show: (calendarId, id, options) =>
+        runtime.invoke(eventShowOperation, { calendarId, id }, options),
     },
     reloadCalendars: (options) => runtime.invoke(appReloadCalendarsOperation, {}, options),
     switchView: (to, options) => runtime.invoke(appSwitchViewOperation, { to }, options),

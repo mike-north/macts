@@ -22,7 +22,7 @@ export class OutgoingMessageResourceClient {
   /**
    * Sends a message.
    */
-  async send(): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.send`, {})
+  async send(id: number): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.send`, { id })
   }
 }

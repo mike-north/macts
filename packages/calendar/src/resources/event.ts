@@ -68,7 +68,7 @@ export class EventResourceClient {
   /**
    * Show the event or to-do in the calendar window
    */
-  async show(): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.show`, {})
+  async show(calendarId: string, id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.show`, { calendarId, id })
   }
 }

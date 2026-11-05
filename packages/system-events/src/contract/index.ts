@@ -2211,20 +2211,27 @@ export type ScriptingSuiteUpdateInput = Record<string, never>
 
 /** An action that can be performed on the UI element */
 export interface ActionResourceClient {
-  /** cause the target process to behave as if the action were applied to its UI element */
+  /**
+   * cause the target process to behave as if the action were applied to its UI element macts does
+   * not yet send the action to the app, so the app acts on whatever it chooses.
+   */
   perform(options?: CallOptions): Promise<void>
 }
 
 /** A piece of the user interface of a process */
 export interface UIElementResourceClient {
   /**
-   * cause the target process to behave as if the UI element were clicked
+   * cause the target process to behave as if the UI element were clicked macts does not yet send
+   * the UI element to the app, so the app acts on whatever it chooses.
    *
    * @param at - when sent to a "process" object, the { x, y } location at which to click, in global
    * coordinates. Does not accept null.
    */
   click(at?: string, options?: CallOptions): Promise<void>
-  /** set the selected property of the UI element */
+  /**
+   * set the selected property of the UI element macts does not yet send the UI element to the app,
+   * so the app acts on whatever it chooses.
+   */
   select(options?: CallOptions): Promise<void>
 }
 

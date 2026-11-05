@@ -26,8 +26,9 @@ export class SearchPlaylistCommand extends Command {
     try {
       const client = getClient()
       await client.playlists.search(
-        this.for as unknown as Parameters<typeof client.playlists.search>[0],
-        this.only as unknown as Parameters<typeof client.playlists.search>[1]
+        this.playlistId as unknown as Parameters<typeof client.playlists.search>[0],
+        this.for as unknown as Parameters<typeof client.playlists.search>[1],
+        this.only as unknown as Parameters<typeof client.playlists.search>[2]
       )
 
       const output = formatter.formatSuccess('search completed successfully')

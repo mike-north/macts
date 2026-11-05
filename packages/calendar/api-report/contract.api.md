@@ -149,7 +149,7 @@ export interface EventResourceClient {
     delete(calendarId: string, id: string, options?: CallOptions): Promise<void>;
     get(calendarId: string, id: string, options?: CallOptions): Promise<Event_2>;
     list(calendarId: string, options?: CallOptions): Promise<Page<Event_2>>;
-    show(options?: CallOptions): Promise<void>;
+    show(calendarId: string, id: string, options?: CallOptions): Promise<void>;
     update(calendarId: string, id: string, input: EventUpdateInput, options?: CallOptions): Promise<Event_2>;
 }
 

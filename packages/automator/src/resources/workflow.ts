@@ -38,8 +38,9 @@ export class WorkflowResourceClient {
 
   /**
    * Execute a workflow
+   * When several workflows share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async execute(workflow: unknown): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.execute`, { workflow })
+  async execute(name: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.execute`, { name })
   }
 }

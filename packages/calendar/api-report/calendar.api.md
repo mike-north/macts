@@ -187,7 +187,7 @@ export class EventResourceClient {
     delete(calendarId: string, id: string): Promise<void>;
     get(calendarId: string, id: string): Promise<Event_2>;
     list(calendarId: string): Promise<Page<Event_2>>;
-    show(): Promise<void>;
+    show(calendarId: string, id: string): Promise<void>;
     update(calendarId: string, id: string, input: EventUpdateInput): Promise<Event_2>;
 }
 

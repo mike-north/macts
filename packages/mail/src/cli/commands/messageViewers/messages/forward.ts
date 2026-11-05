@@ -3,21 +3,17 @@ import { getClient } from '../../../sdk.js'
 import { createFormatter } from '../../../output/index.js'
 
 /**
- * Creates a forwarded message.
+ * Creates a forwarded message. macts does not yet send the message to the app, so the app acts on whatever it chooses.
  */
 export class ForwardMessageCommand extends Command {
   static override paths = [['mail', 'messageViewers', 'messages', 'forward']]
 
   static override usage = Command.Usage({
-    description: 'Creates a forwarded message.',
+    description:
+      'Creates a forwarded message. macts does not yet send the message to the app, so the app acts on whatever it chooses.',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  messageViewerId = Option.String('--message-viewer-id', {
-    required: true,
-    description: 'MessageViewer ID',
-  })
-  messageId = Option.String({ name: 'id', required: true })
   openingWindow = Option.Boolean('--opening-window', {
     description:
       'Whether the window for the forwarded message is shown. Default is to not show the window.',

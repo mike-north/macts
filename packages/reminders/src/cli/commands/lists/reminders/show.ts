@@ -13,15 +13,15 @@ export class ShowReminderCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  listId = Option.String('--list-id', { required: true, description: 'List ID' })
   reminderId = Option.String({ name: 'id', required: true })
-
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      await client.reminders.show()
+      await client.reminders.show(
+        this.reminderId as unknown as Parameters<typeof client.reminders.show>[0]
+      )
 
       const output = formatter.formatSuccess('show completed successfully')
       this.context.stdout.write(output + '\n')

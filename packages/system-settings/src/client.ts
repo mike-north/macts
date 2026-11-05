@@ -5,8 +5,6 @@
  * @packageDocumentation
  */
 
-import { PaneResourceClient } from './resources/pane.js'
-
 /**
  * Client configuration options.
  */
@@ -84,13 +82,9 @@ export class SystemSettingsError extends Error {
 export class SystemSettingsClient {
   readonly #httpClient: HttpClient
 
-  /** A settings pane. */
-  readonly panes: PaneResourceClient
-
   constructor(options: SystemSettingsClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.panes = new PaneResourceClient(this.#httpClient, 'system-settings', 'panes')
   }
 
   /**

@@ -3,21 +3,17 @@ import { getClient } from '../../../sdk.js'
 import { createFormatter } from '../../../output/index.js'
 
 /**
- * Creates a reply message.
+ * Creates a reply message. macts does not yet send the message to the app, so the app acts on whatever it chooses.
  */
 export class ReplyMessageCommand extends Command {
   static override paths = [['mail', 'messageViewers', 'messages', 'reply']]
 
   static override usage = Command.Usage({
-    description: 'Creates a reply message.',
+    description:
+      'Creates a reply message. macts does not yet send the message to the app, so the app acts on whatever it chooses.',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  messageViewerId = Option.String('--message-viewer-id', {
-    required: true,
-    description: 'MessageViewer ID',
-  })
-  messageId = Option.String({ name: 'id', required: true })
   openingWindow = Option.Boolean('--opening-window', {
     description:
       'Whether the window for the reply message is shown. Default is to not show the window.',

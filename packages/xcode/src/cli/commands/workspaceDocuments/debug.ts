@@ -3,22 +3,18 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Start a debugging session using the "run" or "run without building" scheme action
+ * Start a debugging session using the "run" or "run without building" scheme action. When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
  */
 export class DebugWorkspaceDocumentCommand extends Command {
   static override paths = [['xcode', 'workspaceDocuments', 'debug']]
 
   static override usage = Command.Usage({
     description:
-      'Start a debugging session using the "run" or "run without building" scheme action',
+      'Start a debugging session using the "run" or "run without building" scheme action. When several workspace documents share the same name, the first match in the app\'s order is used, and the operation does not fail as ambiguous.',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   workspaceDocumentId = Option.String({ name: 'name', required: true })
-  workspaceName = Option.String('--workspace-name', {
-    required: true,
-    description: 'Workspace document name',
-  })
   scheme = Option.String('--scheme', { required: false, description: 'Scheme name' })
   runDestinationSpecifier = Option.String('--run-destination-specifier', {
     required: false,
@@ -41,7 +37,9 @@ export class DebugWorkspaceDocumentCommand extends Command {
     try {
       const client = getClient()
       await client.workspaceDocuments.debug(
-        this.workspaceName as unknown as Parameters<typeof client.workspaceDocuments.debug>[0],
+        this.workspaceDocumentId as unknown as Parameters<
+          typeof client.workspaceDocuments.debug
+        >[0],
         this.scheme as unknown as Parameters<typeof client.workspaceDocuments.debug>[1],
         this.runDestinationSpecifier as unknown as Parameters<
           typeof client.workspaceDocuments.debug

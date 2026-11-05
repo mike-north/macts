@@ -957,7 +957,22 @@ commands:
     scope: resource
     resourceType: Event
     code: aec3
-    parameters: []
+    # The dictionary's `show` takes the event as its direct parameter
+    # (Calendar.sdef:260), and an event exists only within its calendar.
+    # `calendarId` and `id` select it as `getEvent` does, and neither is sent as
+    # a named parameter.
+    parent:
+      resource: Calendar
+      parameter: calendarId
+    parameters:
+      - name: calendarId
+        type: string
+        description: Calendar identifier (the calendar containing the event)
+        required: true
+      - name: id
+        type: string
+        description: Event identifier (uid)
+        required: true
 
 # Permissions mapping - defines coarse→fine permission relationships
 permissions:

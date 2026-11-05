@@ -45,84 +45,94 @@ export class TabResourceClient {
   /**
    * Reload a tab
    */
-  async reload(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.reload`, { tabId })
+  async reload(windowId: string, id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.reload`, { windowId, id })
   }
 
   /**
    * Go Back (If Possible)
    */
-  async goBack(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.goBack`, { tabId })
+  async goBack(windowId: string, id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.goBack`, { windowId, id })
   }
 
   /**
    * Go Forward (If Possible)
    */
-  async goForward(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.goForward`, { tabId })
+  async goForward(windowId: string, id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.goForward`, { windowId, id })
   }
 
   /**
    * Select all
    */
-  async selectAll(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.selectAll`, { tabId })
+  async selectAll(windowId: string, id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.selectAll`, { windowId, id })
   }
 
   /**
    * Cut selected text (If Possible)
    */
-  async cutSelection(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.cutSelection`, { tabId })
+  async cutSelection(windowId: string, id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.cutSelection`, { windowId, id })
   }
 
   /**
    * Copy text
    */
-  async copySelection(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.copySelection`, { tabId })
+  async copySelection(windowId: string, id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.copySelection`, {
+      windowId,
+      id,
+    })
   }
 
   /**
    * Paste text (If Possible)
    */
-  async pasteSelection(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.pasteSelection`, { tabId })
+  async pasteSelection(windowId: string, id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.pasteSelection`, {
+      windowId,
+      id,
+    })
   }
 
   /**
    * Undo the last change
    */
-  async undo(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.undo`, { tabId })
+  async undo(windowId: string, id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.undo`, { windowId, id })
   }
 
   /**
    * Redo the last change
    */
-  async redo(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.redo`, { tabId })
+  async redo(windowId: string, id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.redo`, { windowId, id })
   }
 
   /**
    * Stop the current tab from loading
    */
-  async stop(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.stop`, { tabId })
+  async stop(windowId: string, id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.stop`, { windowId, id })
   }
 
   /**
    * View the HTML source of the tab
    */
-  async viewSource(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.viewSource`, { tabId })
+  async viewSource(windowId: string, id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.viewSource`, { windowId, id })
   }
 
   /**
    * Execute a piece of javascript
    */
-  async execute(tabId: string, javascript: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.execute`, { tabId, javascript })
+  async execute(windowId: string, id: string, javascript: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.execute`, {
+      windowId,
+      id,
+      javascript,
+    })
   }
 }

@@ -38,16 +38,19 @@ export class DocumentResourceClient {
 
   /**
    * Save the specified document
+   * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async save(): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.save`, {})
+  async save(id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.save`, { id })
   }
 
   /**
    * Save the document with a new name or format
+   * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async saveAs(fileName: string, fileFormat?: SaveFormat): Promise<void> {
+  async saveAs(id: string, fileName: string, fileFormat?: SaveFormat): Promise<void> {
     await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.saveAs`, {
+      id,
       fileName,
       fileFormat,
     })
@@ -55,29 +58,37 @@ export class DocumentResourceClient {
 
   /**
    * Close the specified document
+   * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async close(saving?: boolean): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.close`, { saving })
+  async close(id: string, saving?: boolean): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.close`, { id, saving })
   }
 
   /**
    * Print the specified document
+   * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async print(): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.print`, {})
+  async print(id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.print`, { id })
   }
 
   /**
    * Activate the specified document window
+   * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async activate(): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.activate`, {})
+  async activate(id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.activate`, { id })
   }
 
   /**
    * Create a text range by character positions
+   * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async createRange(start?: number, end?: number): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.createRange`, { start, end })
+  async createRange(id: string, start?: number, end?: number): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.createRange`, {
+      id,
+      start,
+      end,
+    })
   }
 }

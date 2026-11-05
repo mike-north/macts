@@ -1,6 +1,4 @@
 import type { CliPlugin } from '@macts/cli'
-import { AuthorizePaneCommand } from './commands/panes/authorize.js'
-import { TimedLoadPaneCommand } from './commands/panes/timed-load.js'
 import { RevealCommand } from './commands/reveal.js'
 
 /**
@@ -9,5 +7,5 @@ import { RevealCommand } from './commands/reveal.js'
 export const plugin: CliPlugin = {
   name: 'system-settings',
   description: 'Commands for System Settings',
-  commands: [AuthorizePaneCommand, TimedLoadPaneCommand, RevealCommand],
+  commands: [RevealCommand],
 }

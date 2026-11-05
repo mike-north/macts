@@ -245,8 +245,14 @@ export const capabilities: readonly CapabilityMetadata[] = [
     risk: 'system-change',
     inputSchema: {
       type: 'object',
-      properties: {},
+      properties: {
+        id: {
+          description: 'Document name',
+          type: 'string',
+        },
+      },
       additionalProperties: false,
+      required: ['id'],
     },
   },
   {
@@ -261,12 +267,17 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
+        id: {
+          description: 'Document name',
+          type: 'string',
+        },
         saving: {
           description: 'Whether to save changes before closing',
           type: 'boolean',
         },
       },
       additionalProperties: false,
+      required: ['id'],
     },
   },
   {
@@ -281,6 +292,10 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
+        id: {
+          description: 'Document name',
+          type: 'string',
+        },
         start: {
           description: 'The starting character position',
           type: 'number',
@@ -291,6 +306,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
         },
       },
       additionalProperties: false,
+      required: ['id'],
     },
   },
   {
@@ -344,8 +360,14 @@ export const capabilities: readonly CapabilityMetadata[] = [
     risk: 'execute',
     inputSchema: {
       type: 'object',
-      properties: {},
+      properties: {
+        id: {
+          description: 'Document name',
+          type: 'string',
+        },
+      },
       additionalProperties: false,
+      required: ['id'],
     },
   },
   {
@@ -359,8 +381,14 @@ export const capabilities: readonly CapabilityMetadata[] = [
     risk: 'write',
     inputSchema: {
       type: 'object',
-      properties: {},
+      properties: {
+        id: {
+          description: 'Document name',
+          type: 'string',
+        },
+      },
       additionalProperties: false,
+      required: ['id'],
     },
   },
   {
@@ -375,6 +403,10 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
+        id: {
+          description: 'Document name',
+          type: 'string',
+        },
         fileName: {
           description: 'The file name for the document',
           type: 'string',
@@ -385,7 +417,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
         },
       },
       additionalProperties: false,
-      required: ['fileName'],
+      required: ['id', 'fileName'],
     },
   },
 ]

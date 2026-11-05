@@ -21,6 +21,7 @@ export class UIElementResourceClient {
 
   /**
    * cause the target process to behave as if the UI element were clicked
+   * macts does not yet send the UI element to the app, so the app acts on whatever it chooses.
    */
   async click(at?: string): Promise<void> {
     await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.click`, { at })
@@ -28,6 +29,7 @@ export class UIElementResourceClient {
 
   /**
    * set the selected property of the UI element
+   * macts does not yet send the UI element to the app, so the app acts on whatever it chooses.
    */
   async select(): Promise<void> {
     await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.select`, {})

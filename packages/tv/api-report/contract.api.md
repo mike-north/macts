@@ -137,8 +137,8 @@ export interface PlaylistCreateInput {
 export interface PlaylistResourceClient {
     get(sourceId: string, persistentID: string, options?: CallOptions): Promise<Playlist>;
     list(sourceId: string, options?: CallOptions): Promise<Page<Playlist>>;
-    move(to: string, options?: CallOptions): Promise<void>;
-    search(_for: string, only?: string, options?: CallOptions): Promise<void>;
+    move(sourceId: string, persistentID: string, to: string, options?: CallOptions): Promise<void>;
+    search(sourceId: string, persistentID: string, _for: string, only?: string, options?: CallOptions): Promise<void>;
 }
 
 // @public

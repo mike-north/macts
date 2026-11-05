@@ -1043,7 +1043,14 @@ export const manifest: unknown = {
       description: 'Save the specified document',
       scope: 'resource',
       resourceType: 'Document',
-      parameters: [],
+      parameters: [
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Document name',
+          required: true,
+        },
+      ],
       code: 'save',
     },
     saveAs: {
@@ -1052,6 +1059,12 @@ export const manifest: unknown = {
       scope: 'resource',
       resourceType: 'Document',
       parameters: [
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Document name',
+          required: true,
+        },
         {
           name: 'fileName',
           type: 'string',
@@ -1077,6 +1090,12 @@ export const manifest: unknown = {
       resourceType: 'Document',
       parameters: [
         {
+          name: 'id',
+          type: 'string',
+          description: 'Document name',
+          required: true,
+        },
+        {
           name: 'saving',
           type: 'boolean',
           description: 'Whether to save changes before closing',
@@ -1091,7 +1110,14 @@ export const manifest: unknown = {
       description: 'Print the specified document',
       scope: 'resource',
       resourceType: 'Document',
-      parameters: [],
+      parameters: [
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Document name',
+          required: true,
+        },
+      ],
       code: 'aevt',
     },
     activate: {
@@ -1099,7 +1125,14 @@ export const manifest: unknown = {
       description: 'Activate the specified document window',
       scope: 'resource',
       resourceType: 'Document',
-      parameters: [],
+      parameters: [
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Document name',
+          required: true,
+        },
+      ],
       code: 'misc',
     },
     undo: {
@@ -1250,6 +1283,12 @@ export const manifest: unknown = {
       scope: 'resource',
       resourceType: 'Document',
       parameters: [
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Document name',
+          required: true,
+        },
         {
           name: 'start',
           type: 'integer',

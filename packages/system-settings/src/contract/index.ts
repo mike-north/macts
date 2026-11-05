@@ -64,16 +64,6 @@ export type AnchorCreateInput = Record<string, never>
 /** Input for updating an Anchor. Omitted fields are left unchanged. */
 export type AnchorUpdateInput = Record<string, never>
 
-/** A settings pane. */
-export interface PaneResourceClient {
-  /** Prompt for authorization for a settings pane. Deprecated: no longer does anything. */
-  authorize(options?: CallOptions): Promise<void>
-  /**
-   * Times and loads given settings pane and returns load time. Deprecated: no longer does anything.
-   */
-  timedLoad(options?: CallOptions): Promise<void>
-}
-
 /**
  * The System Settings client: one namespace per resource that has operations, plus the app's own
  * commands. A client factory creates one from {@link systemSettingsContract}. Its type carries the
@@ -81,8 +71,6 @@ export interface PaneResourceClient {
  * resource; the brand has no runtime member.
  */
 export interface SystemSettingsClient extends ClientBrand<SystemSettingsResources> {
-  /** A settings pane. */
-  readonly panes: PaneResourceClient
   /** Reveals a settings pane or an anchor within a pane. */
   reveal(options?: CallOptions): Promise<void>
 }
@@ -123,51 +111,14 @@ const appRevealOperation: OperationDescriptor<Record<string, never>, undefined> 
   },
 }
 
-const paneAuthorizeOperation: OperationDescriptor<Record<string, never>, undefined> = {
-  id: 'system-settings.panes.authorize',
-  permission: 'system-settings:panes:authorize',
-  target: { command: 'authorize', resource: 'Pane' },
-  description: 'Prompt for authorization for a settings pane. Deprecated: no longer does anything.',
-  input: t.record({}),
-  output: t.none(),
-  inputJsonSchema: {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: {},
-    additionalProperties: false,
-  },
-}
-
-const paneTimedLoadOperation: OperationDescriptor<Record<string, never>, undefined> = {
-  id: 'system-settings.panes.timedLoad',
-  permission: 'system-settings:panes:timedLoad',
-  target: { command: 'timedLoad', resource: 'Pane' },
-  description:
-    'Times and loads given settings pane and returns load time. Deprecated: no longer does anything.',
-  input: t.record({}),
-  output: t.none(),
-  inputJsonSchema: {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: {},
-    additionalProperties: false,
-  },
-}
-
 /** Every operation, keyed by its identity. */
 const operations: AppContract<SystemSettingsClient>['operations'] = {
   'system-settings.app.reveal': appRevealOperation,
-  'system-settings.panes.authorize': paneAuthorizeOperation,
-  'system-settings.panes.timedLoad': paneTimedLoadOperation,
 }
 
 /** Build the client on top of a factory-supplied runtime. */
 function bind(runtime: ClientRuntime): SystemSettingsClient {
   return {
-    panes: {
-      authorize: (options) => runtime.invoke(paneAuthorizeOperation, {}, options),
-      timedLoad: (options) => runtime.invoke(paneTimedLoadOperation, {}, options),
-    },
     reveal: (options) => runtime.invoke(appRevealOperation, {}, options),
   }
 }

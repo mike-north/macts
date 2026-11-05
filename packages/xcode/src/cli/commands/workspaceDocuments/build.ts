@@ -3,28 +3,25 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Invoke the "build" scheme action
+ * Invoke the "build" scheme action. When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
  */
 export class BuildWorkspaceDocumentCommand extends Command {
   static override paths = [['xcode', 'workspaceDocuments', 'build']]
 
   static override usage = Command.Usage({
-    description: 'Invoke the "build" scheme action',
+    description:
+      'Invoke the "build" scheme action. When several workspace documents share the same name, the first match in the app\'s order is used, and the operation does not fail as ambiguous.',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   workspaceDocumentId = Option.String({ name: 'name', required: true })
-  workspaceName = Option.String('--workspace-name', {
-    required: true,
-    description: 'Workspace document name',
-  })
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
       await client.workspaceDocuments.build(
-        this.workspaceName as unknown as Parameters<typeof client.workspaceDocuments.build>[0]
+        this.workspaceDocumentId as unknown as Parameters<typeof client.workspaceDocuments.build>[0]
       )
 
       const output = formatter.formatSuccess('build completed successfully')

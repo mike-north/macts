@@ -772,7 +772,15 @@ commands:
     scope: resource
     resourceType: Document
     code: save
-    parameters: []
+    # The command acts on the specified document, its direct parameter. Word is
+    # not installed, so its dictionary could not be checked; this follows the
+    # command's description. `id` selects the document as `get` does, and is not
+    # sent as a named parameter.
+    parameters:
+      - name: id
+        type: string
+        description: Document name
+        required: true
 
   saveAs:
     name: saveAs
@@ -780,7 +788,15 @@ commands:
     scope: resource
     resourceType: Document
     code: sWRD
+    # The command acts on the specified document, its direct parameter. Word is
+    # not installed, so its dictionary could not be checked; this follows the
+    # command's description. `id` selects the document as `get` does, and is not
+    # sent as a named parameter.
     parameters:
+      - name: id
+        type: string
+        description: Document name
+        required: true
       - name: fileName
         type: string
         description: The file name for the document
@@ -799,7 +815,15 @@ commands:
     scope: resource
     resourceType: Document
     code: clos
+    # The command acts on the specified document, its direct parameter. Word is
+    # not installed, so its dictionary could not be checked; this follows the
+    # command's description. `id` selects the document as `get` does, and is not
+    # sent as a named parameter.
     parameters:
+      - name: id
+        type: string
+        description: Document name
+        required: true
       - name: saving
         type: boolean
         description: Whether to save changes before closing
@@ -812,7 +836,15 @@ commands:
     scope: resource
     resourceType: Document
     code: aevt
-    parameters: []
+    # The command acts on the specified document, its direct parameter. Word is
+    # not installed, so its dictionary could not be checked; this follows the
+    # command's description. `id` selects the document as `get` does, and is not
+    # sent as a named parameter.
+    parameters:
+      - name: id
+        type: string
+        description: Document name
+        required: true
 
   activate:
     name: activate
@@ -820,7 +852,15 @@ commands:
     scope: resource
     resourceType: Document
     code: misc
-    parameters: []
+    # The command acts on the specified document, its direct parameter. Word is
+    # not installed, so its dictionary could not be checked; this follows the
+    # command's description. `id` selects the document as `get` does, and is not
+    # sent as a named parameter.
+    parameters:
+      - name: id
+        type: string
+        description: Document name
+        required: true
 
   undo:
     name: undo
@@ -948,7 +988,15 @@ commands:
     scope: resource
     resourceType: Document
     code: sWRD
+    # The command acts on the specified document, its direct parameter. Word is
+    # not installed, so its dictionary could not be checked; this follows the
+    # command's description. `id` selects the document as `get` does, and is not
+    # sent as a named parameter.
     parameters:
+      - name: id
+        type: string
+        description: Document name
+        required: true
       - name: start
         type: integer
         description: The starting character position

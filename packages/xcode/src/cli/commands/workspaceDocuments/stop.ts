@@ -3,28 +3,25 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Stop the active scheme action, if one is running
+ * Stop the active scheme action, if one is running. When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
  */
 export class StopWorkspaceDocumentCommand extends Command {
   static override paths = [['xcode', 'workspaceDocuments', 'stop']]
 
   static override usage = Command.Usage({
-    description: 'Stop the active scheme action, if one is running',
+    description:
+      "Stop the active scheme action, if one is running. When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   workspaceDocumentId = Option.String({ name: 'name', required: true })
-  workspaceName = Option.String('--workspace-name', {
-    required: true,
-    description: 'Workspace document name',
-  })
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
       await client.workspaceDocuments.stop(
-        this.workspaceName as unknown as Parameters<typeof client.workspaceDocuments.stop>[0]
+        this.workspaceDocumentId as unknown as Parameters<typeof client.workspaceDocuments.stop>[0]
       )
 
       const output = formatter.formatSuccess('stop completed successfully')

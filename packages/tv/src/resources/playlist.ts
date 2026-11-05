@@ -41,14 +41,23 @@ export class PlaylistResourceClient {
   /**
    * Move playlist(s) to a new location
    */
-  async move(to: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.move`, { to })
+  async move(sourceId: string, persistentID: string, to: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.move`, {
+      sourceId,
+      persistentID,
+      to,
+    })
   }
 
   /**
    * search a playlist for tracks matching the search string. Identical to entering search text in the Search field.
    */
-  async search(_for: string, only?: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.search`, { for: _for, only })
+  async search(sourceId: string, persistentID: string, _for: string, only?: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.search`, {
+      sourceId,
+      persistentID,
+      for: _for,
+      only,
+    })
   }
 }

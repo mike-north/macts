@@ -380,7 +380,6 @@ export interface MessageCreateInput {
 // @public
 export class MessageResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    bounce(): Promise<void>;
     forward(openingWindow?: boolean): Promise<void>;
     redirect(openingWindow?: boolean): Promise<void>;
     reply(openingWindow?: boolean, replyToAll?: boolean): Promise<void>;
@@ -477,7 +476,7 @@ export interface OutgoingMessageCreateInput {
 // @public
 export class OutgoingMessageResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    send(): Promise<void>;
+    send(id: number): Promise<void>;
 }
 
 // @public (undocumented)

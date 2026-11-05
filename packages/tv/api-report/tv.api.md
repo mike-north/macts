@@ -176,8 +176,8 @@ export class PlaylistResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(sourceId: string, persistentID: string): Promise<Playlist>;
     list(sourceId: string): Promise<Page<Playlist>>;
-    move(to: string): Promise<void>;
-    search(_for: string, only?: string): Promise<void>;
+    move(sourceId: string, persistentID: string, to: string): Promise<void>;
+    search(sourceId: string, persistentID: string, _for: string, only?: string): Promise<void>;
 }
 
 // @public (undocumented)

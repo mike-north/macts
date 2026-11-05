@@ -360,11 +360,12 @@ export interface WorkflowResourceClient {
    */
   get(name: string, options?: CallOptions): Promise<Workflow>
   /**
-   * Execute a workflow
+   * Execute a workflow When several workflows share the same name, the first match in the app's
+   * order is used, and the operation does not fail as ambiguous.
    *
-   * @param workflow - The workflow to execute. Does not accept null.
+   * @param name - Workflow name. Does not accept null.
    */
-  execute(workflow: unknown, options?: CallOptions): Promise<void>
+  execute(name: string, options?: CallOptions): Promise<void>
 }
 
 /** A single step in a workflow */
@@ -685,94 +686,21 @@ const workflowGetOperation: OperationDescriptor<{ readonly name: string }, Workf
   },
 }
 
-const workflowExecuteOperation: OperationDescriptor<{ readonly workflow: unknown }, undefined> = {
+const workflowExecuteOperation: OperationDescriptor<{ readonly name: string }, undefined> = {
   id: 'automator.workflows.execute',
   permission: 'automator:workflows:execute',
   target: { command: 'execute', resource: 'Workflow' },
   description: 'Execute a workflow',
   input: t.record({
-    workflow: t.unknown({ description: 'The workflow to execute' }),
+    name: t.string({ description: 'Workflow name' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      workflow: { description: 'The workflow to execute', $ref: '#/definitions/__schema0' },
-    },
-    required: ['workflow'],
+    properties: { name: { type: 'string', description: 'Workflow name' } },
+    required: ['name'],
     additionalProperties: false,
-    definitions: {
-      __schema0: {
-        anyOf: [
-          { type: 'string' },
-          { type: 'boolean' },
-          { type: 'null' },
-          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
-          {
-            type: 'object',
-            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-            required: ['integer'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              double: {
-                anyOf: [
-                  { type: 'number' },
-                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
-                ],
-              },
-            },
-            required: ['double'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              date: {
-                type: 'string',
-                pattern:
-                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
-              },
-            },
-            required: ['date'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: {
-              record: {
-                type: 'object',
-                propertyNames: { type: 'string' },
-                additionalProperties: { $ref: '#/definitions/__schema0' },
-              },
-            },
-            required: ['record'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: { reference: { not: {} } },
-            required: ['reference'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: { file: { not: {} } },
-            required: ['file'],
-            additionalProperties: false,
-          },
-          {
-            type: 'object',
-            properties: { fileSource: { not: {} } },
-            required: ['fileSource'],
-            additionalProperties: false,
-          },
-        ],
-      },
-    },
   },
 }
 
@@ -1126,8 +1054,7 @@ function bind(runtime: ClientRuntime): AutomatorClient {
     workflows: {
       list: (options) => runtime.invoke(workflowListOperation, {}, options),
       get: (name, options) => runtime.invoke(workflowGetOperation, { name }, options),
-      execute: (workflow, options) =>
-        runtime.invoke(workflowExecuteOperation, { workflow }, options),
+      execute: (name, options) => runtime.invoke(workflowExecuteOperation, { name }, options),
     },
     automatorActions: {
       list: (workflowName, options) =>

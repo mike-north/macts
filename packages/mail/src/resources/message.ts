@@ -20,14 +20,8 @@ export class MessageResourceClient {
   }
 
   /**
-   * Does nothing at all (deprecated)
-   */
-  async bounce(): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.bounce`, {})
-  }
-
-  /**
    * Creates a forwarded message.
+   * macts does not yet send the message to the app, so the app acts on whatever it chooses.
    */
   async forward(openingWindow?: boolean): Promise<void> {
     await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.forward`, { openingWindow })
@@ -35,6 +29,7 @@ export class MessageResourceClient {
 
   /**
    * Creates a redirected message.
+   * macts does not yet send the message to the app, so the app acts on whatever it chooses.
    */
   async redirect(openingWindow?: boolean): Promise<void> {
     await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.redirect`, { openingWindow })
@@ -42,6 +37,7 @@ export class MessageResourceClient {
 
   /**
    * Creates a reply message.
+   * macts does not yet send the message to the app, so the app acts on whatever it chooses.
    */
   async reply(openingWindow?: boolean, replyToAll?: boolean): Promise<void> {
     await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.reply`, {

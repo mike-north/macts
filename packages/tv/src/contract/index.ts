@@ -955,7 +955,10 @@ export interface BrowserWindowResourceClient {
 
 /** a track representing a video file */
 export interface FileTrackResourceClient {
-  /** update file track information from the current information in the track’s file */
+  /**
+   * update file track information from the current information in the track’s file macts does not
+   * yet send the file track to the app, so the app acts on whatever it chooses.
+   */
   refresh(options?: CallOptions): Promise<void>
 }
 
@@ -977,17 +980,27 @@ export interface PlaylistResourceClient {
   /**
    * Move playlist(s) to a new location
    *
+   * @param sourceId - Persistent ID of the source. Does not accept null.
+   * @param persistentID - Persistent ID of the playlist. Does not accept null.
    * @param to - the new location for the playlist(s). Does not accept null.
    */
-  move(to: string, options?: CallOptions): Promise<void>
+  move(sourceId: string, persistentID: string, to: string, options?: CallOptions): Promise<void>
   /**
    * search a playlist for tracks matching the search string. Identical to entering search text in
    * the Search field.
    *
+   * @param sourceId - Persistent ID of the source. Does not accept null.
+   * @param persistentID - Persistent ID of the playlist. Does not accept null.
    * @param _for - the search text. Does not accept null.
    * @param only - area to search (default is all). Does not accept null.
    */
-  search(_for: string, only?: string, options?: CallOptions): Promise<void>
+  search(
+    sourceId: string,
+    persistentID: string,
+    _for: string,
+    only?: string,
+    options?: CallOptions
+  ): Promise<void>
 }
 
 /** a sub-window showing a single playlist */
@@ -1602,20 +1615,29 @@ const appMakeOperation: OperationDescriptor<
   },
 }
 
-const playlistMoveOperation: OperationDescriptor<{ readonly to: string }, undefined> = {
+const playlistMoveOperation: OperationDescriptor<
+  { readonly sourceId: string; readonly persistentID: string; readonly to: string },
+  undefined
+> = {
   id: 'tv.playlists.move',
   permission: 'tv:playlists:move',
   target: { command: 'move', resource: 'Playlist' },
   description: 'Move playlist(s) to a new location',
   input: t.record({
+    sourceId: t.string({ description: 'Persistent ID of the source' }),
+    persistentID: t.string({ description: 'Persistent ID of the playlist' }),
     to: t.string({ description: 'the new location for the playlist(s)' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { to: { type: 'string', description: 'the new location for the playlist(s)' } },
-    required: ['to'],
+    properties: {
+      sourceId: { type: 'string', description: 'Persistent ID of the source' },
+      persistentID: { type: 'string', description: 'Persistent ID of the playlist' },
+      to: { type: 'string', description: 'the new location for the playlist(s)' },
+    },
+    required: ['sourceId', 'persistentID', 'to'],
     additionalProperties: false,
   },
 }
@@ -1898,7 +1920,12 @@ const appRewindOperation: OperationDescriptor<Record<string, never>, undefined> 
 }
 
 const playlistSearchOperation: OperationDescriptor<
-  { readonly for: string; readonly only?: string | undefined },
+  {
+    readonly sourceId: string
+    readonly persistentID: string
+    readonly for: string
+    readonly only?: string | undefined
+  },
   undefined
 > = {
   id: 'tv.playlists.search',
@@ -1907,6 +1934,8 @@ const playlistSearchOperation: OperationDescriptor<
   description:
     'search a playlist for tracks matching the search string. Identical to entering search text in the Search field.',
   input: t.record({
+    sourceId: t.string({ description: 'Persistent ID of the source' }),
+    persistentID: t.string({ description: 'Persistent ID of the playlist' }),
     for: t.string({ description: 'the search text' }),
     only: t.optional(t.string({ description: 'area to search (default is all)' })),
   }),
@@ -1915,10 +1944,12 @@ const playlistSearchOperation: OperationDescriptor<
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: {
+      sourceId: { type: 'string', description: 'Persistent ID of the source' },
+      persistentID: { type: 'string', description: 'Persistent ID of the playlist' },
       for: { type: 'string', description: 'the search text' },
       only: { type: 'string', description: 'area to search (default is all)' },
     },
-    required: ['for'],
+    required: ['sourceId', 'persistentID', 'for'],
     additionalProperties: false,
   },
 }
@@ -2023,9 +2054,14 @@ function bind(runtime: ClientRuntime): TVClient {
         runtime.invoke(playlistListPlaylistsOperation, { sourceId }, options),
       get: (sourceId, persistentID, options) =>
         runtime.invoke(playlistGetPlaylistOperation, { sourceId, persistentID }, options),
-      move: (to, options) => runtime.invoke(playlistMoveOperation, { to }, options),
-      search: (_for, only, options) =>
-        runtime.invoke(playlistSearchOperation, { for: _for, only }, options),
+      move: (sourceId, persistentID, to, options) =>
+        runtime.invoke(playlistMoveOperation, { sourceId, persistentID, to }, options),
+      search: (sourceId, persistentID, _for, only, options) =>
+        runtime.invoke(
+          playlistSearchOperation,
+          { sourceId, persistentID, for: _for, only },
+          options
+        ),
     },
     playlistWindows: {
       list: (options) => runtime.invoke(playlistWindowListPlaylistWindowsOperation, {}, options),

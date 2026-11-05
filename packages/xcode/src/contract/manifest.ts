@@ -1230,7 +1230,7 @@ export const manifest: unknown = {
       resourceType: 'WorkspaceDocument',
       parameters: [
         {
-          name: 'workspaceName',
+          name: 'name',
           type: 'string',
           description: 'Workspace document name',
           required: true,
@@ -1246,7 +1246,7 @@ export const manifest: unknown = {
       resourceType: 'WorkspaceDocument',
       parameters: [
         {
-          name: 'workspaceName',
+          name: 'name',
           type: 'string',
           description: 'Workspace document name',
           required: true,
@@ -1262,7 +1262,7 @@ export const manifest: unknown = {
       resourceType: 'WorkspaceDocument',
       parameters: [
         {
-          name: 'workspaceName',
+          name: 'name',
           type: 'string',
           description: 'Workspace document name',
           required: true,
@@ -1278,7 +1278,7 @@ export const manifest: unknown = {
       resourceType: 'WorkspaceDocument',
       parameters: [
         {
-          name: 'workspaceName',
+          name: 'name',
           type: 'string',
           description: 'Workspace document name',
           required: true,
@@ -1306,7 +1306,7 @@ export const manifest: unknown = {
       resourceType: 'WorkspaceDocument',
       parameters: [
         {
-          name: 'workspaceName',
+          name: 'name',
           type: 'string',
           description: 'Workspace document name',
           required: true,
@@ -1334,7 +1334,7 @@ export const manifest: unknown = {
       resourceType: 'WorkspaceDocument',
       parameters: [
         {
-          name: 'workspaceName',
+          name: 'name',
           type: 'string',
           description: 'Workspace document name',
           required: true,
@@ -1363,7 +1363,7 @@ export const manifest: unknown = {
       resourceType: 'WorkspaceDocument',
       parameters: [
         {
-          name: 'workspaceName',
+          name: 'name',
           type: 'string',
           description: 'Workspace document name',
           required: true,

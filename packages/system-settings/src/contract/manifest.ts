@@ -33,7 +33,7 @@ export const manifest: unknown = {
       description: 'Classes and Commands specific to System Settings',
       code: 'xpsp',
       resources: ['Pane', 'Anchor'],
-      commands: ['reveal', 'authorize', 'timedLoad'],
+      commands: ['reveal'],
       enums: [],
     },
   ],
@@ -107,24 +107,6 @@ export const manifest: unknown = {
       scope: 'application',
       parameters: [],
       code: 'mvis',
-    },
-    authorize: {
-      name: 'authorize',
-      description:
-        'Prompt for authorization for a settings pane. Deprecated: no longer does anything.',
-      scope: 'resource',
-      resourceType: 'Pane',
-      parameters: [],
-      code: 'maut',
-    },
-    timedLoad: {
-      name: 'timedLoad',
-      description:
-        'Times and loads given settings pane and returns load time. Deprecated: no longer does anything.',
-      scope: 'resource',
-      resourceType: 'Pane',
-      parameters: [],
-      code: 'mtml',
     },
   },
 }

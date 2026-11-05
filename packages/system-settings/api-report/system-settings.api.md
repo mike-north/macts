@@ -56,13 +56,6 @@ export interface Pane {
 // @public
 export type PaneCreateInput = Record<string, never>;
 
-// @public
-export class PaneResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    authorize(): Promise<void>;
-    timedLoad(): Promise<void>;
-}
-
 // @public (undocumented)
 export const PaneSchema: z.ZodObject<{
     id: z.ZodString;
@@ -76,7 +69,6 @@ export type PaneUpdateInput = Partial<PaneCreateInput>;
 export class SystemSettingsClient {
     constructor(options: SystemSettingsClientOptions);
     get http(): HttpClient;
-    readonly panes: PaneResourceClient;
     reveal(): Promise<void>;
 }
 

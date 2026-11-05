@@ -13,15 +13,20 @@ export class ShowEventCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  calendarId = Option.String('--calendar-id', { required: true, description: 'Calendar ID' })
+  calendarId = Option.String('--calendar-id', {
+    required: true,
+    description: 'Calendar identifier (the calendar containing the event)',
+  })
   eventId = Option.String({ name: 'uid', required: true })
-
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      await client.events.show()
+      await client.events.show(
+        this.calendarId as unknown as Parameters<typeof client.events.show>[0],
+        this.eventId as unknown as Parameters<typeof client.events.show>[1]
+      )
 
       const output = formatter.formatSuccess('show completed successfully')
       this.context.stdout.write(output + '\n')

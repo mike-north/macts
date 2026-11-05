@@ -3,21 +3,18 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Start a new debugging session in the workspace
+ * Start a new debugging session in the workspace. When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
  */
 export class AttachWorkspaceDocumentCommand extends Command {
   static override paths = [['xcode', 'workspaceDocuments', 'attach']]
 
   static override usage = Command.Usage({
-    description: 'Start a new debugging session in the workspace',
+    description:
+      "Start a new debugging session in the workspace. When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   workspaceDocumentId = Option.String({ name: 'name', required: true })
-  workspaceName = Option.String('--workspace-name', {
-    required: true,
-    description: 'Workspace document name',
-  })
   toProcessIdentifier = Option.String('--to-process-identifier', {
     required: true,
     description: 'The process identifier (pid) to which to attach',
@@ -31,7 +28,9 @@ export class AttachWorkspaceDocumentCommand extends Command {
     try {
       const client = getClient()
       await client.workspaceDocuments.attach(
-        this.workspaceName as unknown as Parameters<typeof client.workspaceDocuments.attach>[0],
+        this.workspaceDocumentId as unknown as Parameters<
+          typeof client.workspaceDocuments.attach
+        >[0],
         this.toProcessIdentifier as unknown as Parameters<
           typeof client.workspaceDocuments.attach
         >[1],

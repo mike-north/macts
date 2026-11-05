@@ -428,8 +428,8 @@ export class PlaylistResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(persistentID: string): Promise<Playlist>;
     list(): Promise<Page<Playlist>>;
-    move(to: string): Promise<void>;
-    search(_for: string, only?: string): Promise<void>;
+    move(persistentID: string, to: string): Promise<void>;
+    search(persistentID: string, _for: string, only?: string): Promise<void>;
 }
 
 // @public (undocumented)

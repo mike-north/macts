@@ -1629,7 +1629,14 @@ commands:
     scope: resource
     resourceType: Playlist
     code: move
+    # The dictionary's `move` takes the playlist as its direct parameter
+    # (Music.sdef:39). `persistentID` selects it as `getPlaylist` does, and is
+    # not sent as a named parameter.
     parameters:
+      - name: persistentID
+        type: string
+        description: Persistent ID of the playlist
+        required: true
       - name: to
         type: string
         description: the new location for the playlist(s)
@@ -1776,7 +1783,14 @@ commands:
     scope: resource
     resourceType: Playlist
     code: 'hSrc'
+    # The dictionary's `search` takes the playlist as its direct parameter
+    # (Music.sdef:140). `persistentID` selects it as `getPlaylist` does, and is
+    # not sent as a named parameter.
     parameters:
+      - name: persistentID
+        type: string
+        description: Persistent ID of the playlist
+        required: true
       - name: for
         type: string
         description: the search text

@@ -139,7 +139,7 @@ export class ReminderResourceClient {
         pageSize?: number;
         cursor?: string;
     }): Promise<Page<Reminder>>;
-    show(): Promise<void>;
+    show(id: string): Promise<void>;
 }
 
 // @public (undocumented)

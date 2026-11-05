@@ -56,36 +56,4 @@ export const capabilities: readonly CapabilityMetadata[] = [
       additionalProperties: false,
     },
   },
-  {
-    name: 'system-settings.panes.authorize',
-    app: 'system-settings',
-    appBundleId: 'com.apple.systempreferences',
-    resource: 'panes',
-    operation: 'authorize',
-    description:
-      'Prompt for authorization for a settings pane. Deprecated: no longer does anything.',
-    permission: 'system-settings:panes:authorize',
-    risk: 'execute',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-      additionalProperties: false,
-    },
-  },
-  {
-    name: 'system-settings.panes.timedLoad',
-    app: 'system-settings',
-    appBundleId: 'com.apple.systempreferences',
-    resource: 'panes',
-    operation: 'timedLoad',
-    description:
-      'Times and loads given settings pane and returns load time. Deprecated: no longer does anything.',
-    permission: 'system-settings:panes:timedLoad',
-    risk: 'execute',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-      additionalProperties: false,
-    },
-  },
 ]

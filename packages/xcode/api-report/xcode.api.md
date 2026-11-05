@@ -509,15 +509,15 @@ export interface WorkspaceDocumentCreateInput {
 // @public
 export class WorkspaceDocumentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    attach(workspaceName: string, toProcessIdentifier: number, suspended: boolean): Promise<void>;
-    build(workspaceName: string): Promise<void>;
-    clean(workspaceName: string): Promise<void>;
-    debug(workspaceName: string, scheme?: string, runDestinationSpecifier?: string, skipBuilding?: boolean, commandLineArguments?: unknown, environmentVariables?: unknown): Promise<void>;
+    attach(name: string, toProcessIdentifier: number, suspended: boolean): Promise<void>;
+    build(name: string): Promise<void>;
+    clean(name: string): Promise<void>;
+    debug(name: string, scheme?: string, runDestinationSpecifier?: string, skipBuilding?: boolean, commandLineArguments?: unknown, environmentVariables?: unknown): Promise<void>;
     get(name: string): Promise<WorkspaceDocument>;
     list(): Promise<Page<WorkspaceDocument>>;
-    run(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void>;
-    stop(workspaceName: string): Promise<void>;
-    test(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void>;
+    run(name: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void>;
+    stop(name: string): Promise<void>;
+    test(name: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void>;
 }
 
 // @public (undocumented)

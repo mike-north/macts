@@ -3,13 +3,14 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Close the specified document
+ * Close the specified document. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
  */
 export class CloseDocumentCommand extends Command {
   static override paths = [['microsoft-word', 'documents', 'close']]
 
   static override usage = Command.Usage({
-    description: 'Close the specified document',
+    description:
+      "Close the specified document. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -21,7 +22,8 @@ export class CloseDocumentCommand extends Command {
     try {
       const client = getClient()
       await client.documents.close(
-        this.saving as unknown as Parameters<typeof client.documents.close>[0]
+        this.documentId as unknown as Parameters<typeof client.documents.close>[0],
+        this.saving as unknown as Parameters<typeof client.documents.close>[1]
       )
 
       const output = formatter.formatSuccess('close completed successfully')

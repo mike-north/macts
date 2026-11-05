@@ -38,35 +38,39 @@ export class WorkspaceDocumentResourceClient {
 
   /**
    * Invoke the "build" scheme action
+   * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async build(workspaceName: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.build`, { workspaceName })
+  async build(name: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.build`, { name })
   }
 
   /**
    * Invoke the "clean" scheme action
+   * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async clean(workspaceName: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.clean`, { workspaceName })
+  async clean(name: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.clean`, { name })
   }
 
   /**
    * Stop the active scheme action, if one is running
+   * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async stop(workspaceName: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.stop`, { workspaceName })
+  async stop(name: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.stop`, { name })
   }
 
   /**
    * Invoke the "run" scheme action
+   * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async run(
-    workspaceName: string,
+    name: string,
     withCommandLineArguments?: unknown,
     withEnvironmentVariables?: unknown
   ): Promise<void> {
     await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.run`, {
-      workspaceName,
+      name,
       withCommandLineArguments,
       withEnvironmentVariables,
     })
@@ -74,14 +78,15 @@ export class WorkspaceDocumentResourceClient {
 
   /**
    * Invoke the "test" scheme action
+   * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async test(
-    workspaceName: string,
+    name: string,
     withCommandLineArguments?: unknown,
     withEnvironmentVariables?: unknown
   ): Promise<void> {
     await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.test`, {
-      workspaceName,
+      name,
       withCommandLineArguments,
       withEnvironmentVariables,
     })
@@ -89,14 +94,11 @@ export class WorkspaceDocumentResourceClient {
 
   /**
    * Start a new debugging session in the workspace
+   * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async attach(
-    workspaceName: string,
-    toProcessIdentifier: number,
-    suspended: boolean
-  ): Promise<void> {
+  async attach(name: string, toProcessIdentifier: number, suspended: boolean): Promise<void> {
     await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.attach`, {
-      workspaceName,
+      name,
       toProcessIdentifier,
       suspended,
     })
@@ -104,9 +106,10 @@ export class WorkspaceDocumentResourceClient {
 
   /**
    * Start a debugging session using the "run" or "run without building" scheme action
+   * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async debug(
-    workspaceName: string,
+    name: string,
     scheme?: string,
     runDestinationSpecifier?: string,
     skipBuilding?: boolean,
@@ -114,7 +117,7 @@ export class WorkspaceDocumentResourceClient {
     environmentVariables?: unknown
   ): Promise<void> {
     await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.debug`, {
-      workspaceName,
+      name,
       scheme,
       runDestinationSpecifier,
       skipBuilding,

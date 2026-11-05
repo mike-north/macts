@@ -201,7 +201,7 @@ export type WorkflowCreateInput = Record<string, never>;
 
 // @public
 export interface WorkflowResourceClient {
-    execute(workflow: unknown, options?: CallOptions): Promise<void>;
+    execute(name: string, options?: CallOptions): Promise<void>;
     get(name: string, options?: CallOptions): Promise<Workflow>;
     list(options?: CallOptions): Promise<Page<Workflow>>;
 }

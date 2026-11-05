@@ -243,7 +243,7 @@ export type WorkflowCreateInput = Record<string, never>;
 // @public
 export class WorkflowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    execute(workflow: unknown): Promise<void>;
+    execute(name: string): Promise<void>;
     get(name: string): Promise<Workflow>;
     list(): Promise<Page<Workflow>>;
 }

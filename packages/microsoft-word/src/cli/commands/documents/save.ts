@@ -3,24 +3,26 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Save the specified document
+ * Save the specified document. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
  */
 export class SaveDocumentCommand extends Command {
   static override paths = [['microsoft-word', 'documents', 'save']]
 
   static override usage = Command.Usage({
-    description: 'Save the specified document',
+    description:
+      "Save the specified document. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   documentId = Option.String({ name: 'name', required: true })
-
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      await client.documents.save()
+      await client.documents.save(
+        this.documentId as unknown as Parameters<typeof client.documents.save>[0]
+      )
 
       const output = formatter.formatSuccess('save completed successfully')
       this.context.stdout.write(output + '\n')

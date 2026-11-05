@@ -15,7 +15,6 @@ export class RunShortcutCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   shortcutId = Option.String({ name: 'id', required: true })
-  id = Option.String('--id', { required: true, description: 'The shortcut to run' })
   withInput = Option.String('--with-input', {
     required: false,
     description: 'The input to provide to the shortcut',
@@ -26,7 +25,7 @@ export class RunShortcutCommand extends Command {
     try {
       const client = getClient()
       await client.shortcuts.run(
-        this.id as unknown as Parameters<typeof client.shortcuts.run>[0],
+        this.shortcutId as unknown as Parameters<typeof client.shortcuts.run>[0],
         this.withInput as unknown as Parameters<typeof client.shortcuts.run>[1]
       )
 

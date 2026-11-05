@@ -67,7 +67,7 @@ export class ReminderResourceClient {
   /**
    * Show the reminder in Reminders.app UI
    */
-  async show(): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.show`, {})
+  async show(id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.show`, { id })
   }
 }

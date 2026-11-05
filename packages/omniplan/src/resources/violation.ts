@@ -30,6 +30,7 @@ export class ViolationResourceClient {
 
   /**
    * Fix a violation
+   * macts does not yet send the violation to the app, so the app acts on whatever it chooses.
    */
   async fix(): Promise<void> {
     await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.fix`, {})

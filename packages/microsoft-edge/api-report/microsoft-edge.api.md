@@ -133,21 +133,21 @@ export interface TabCreateInput {
 // @public
 export class TabResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    copySelection(tabId: string): Promise<void>;
+    copySelection(windowId: string, id: string): Promise<void>;
     create(input: TabCreateInput): Promise<Tab>;
-    cutSelection(tabId: string): Promise<void>;
-    execute(tabId: string, javascript: string): Promise<void>;
+    cutSelection(windowId: string, id: string): Promise<void>;
+    execute(windowId: string, id: string, javascript: string): Promise<void>;
     get(windowId: string, id: string): Promise<Tab>;
-    goBack(tabId: string): Promise<void>;
-    goForward(tabId: string): Promise<void>;
+    goBack(windowId: string, id: string): Promise<void>;
+    goForward(windowId: string, id: string): Promise<void>;
     list(windowId: string): Promise<Page<Tab>>;
-    pasteSelection(tabId: string): Promise<void>;
-    redo(tabId: string): Promise<void>;
-    reload(tabId: string): Promise<void>;
-    selectAll(tabId: string): Promise<void>;
-    stop(tabId: string): Promise<void>;
-    undo(tabId: string): Promise<void>;
-    viewSource(tabId: string): Promise<void>;
+    pasteSelection(windowId: string, id: string): Promise<void>;
+    redo(windowId: string, id: string): Promise<void>;
+    reload(windowId: string, id: string): Promise<void>;
+    selectAll(windowId: string, id: string): Promise<void>;
+    stop(windowId: string, id: string): Promise<void>;
+    undo(windowId: string, id: string): Promise<void>;
+    viewSource(windowId: string, id: string): Promise<void>;
 }
 
 // @public (undocumented)

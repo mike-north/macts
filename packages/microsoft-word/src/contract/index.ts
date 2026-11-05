@@ -1072,32 +1072,58 @@ export interface DocumentResourceClient {
    * @param id - Document name. Does not accept null.
    */
   get(id: string, options?: CallOptions): Promise<Document>
-  /** Save the specified document */
-  save(options?: CallOptions): Promise<void>
   /**
-   * Save the document with a new name or format
+   * Save the specified document When several documents share the same name, the first match in the
+   * app's order is used, and the operation does not fail as ambiguous.
    *
+   * @param id - Document name. Does not accept null.
+   */
+  save(id: string, options?: CallOptions): Promise<void>
+  /**
+   * Save the document with a new name or format When several documents share the same name, the
+   * first match in the app's order is used, and the operation does not fail as ambiguous.
+   *
+   * @param id - Document name. Does not accept null.
    * @param fileName - The file name for the document. Does not accept null.
    * @param fileFormat - The file format for saving. Does not accept null.
    */
-  saveAs(fileName: string, fileFormat?: SaveFormat, options?: CallOptions): Promise<void>
+  saveAs(
+    id: string,
+    fileName: string,
+    fileFormat?: SaveFormat,
+    options?: CallOptions
+  ): Promise<void>
   /**
-   * Close the specified document
+   * Close the specified document When several documents share the same name, the first match in the
+   * app's order is used, and the operation does not fail as ambiguous.
    *
+   * @param id - Document name. Does not accept null.
    * @param saving - Whether to save changes before closing. Does not accept null.
    */
-  close(saving?: boolean, options?: CallOptions): Promise<void>
-  /** Print the specified document */
-  print(options?: CallOptions): Promise<void>
-  /** Activate the specified document window */
-  activate(options?: CallOptions): Promise<void>
+  close(id: string, saving?: boolean, options?: CallOptions): Promise<void>
   /**
-   * Create a text range by character positions
+   * Print the specified document When several documents share the same name, the first match in the
+   * app's order is used, and the operation does not fail as ambiguous.
    *
+   * @param id - Document name. Does not accept null.
+   */
+  print(id: string, options?: CallOptions): Promise<void>
+  /**
+   * Activate the specified document window When several documents share the same name, the first
+   * match in the app's order is used, and the operation does not fail as ambiguous.
+   *
+   * @param id - Document name. Does not accept null.
+   */
+  activate(id: string, options?: CallOptions): Promise<void>
+  /**
+   * Create a text range by character positions When several documents share the same name, the
+   * first match in the app's order is used, and the operation does not fail as ambiguous.
+   *
+   * @param id - Document name. Does not accept null.
    * @param start - The starting character position. Does not accept null.
    * @param end - The ending character position. Does not accept null.
    */
-  createRange(start?: Integer, end?: Integer, options?: CallOptions): Promise<void>
+  createRange(id: string, start?: Integer, end?: Integer, options?: CallOptions): Promise<void>
 }
 
 /**
@@ -1266,23 +1292,26 @@ const documentGetOperation: OperationDescriptor<{ readonly id: string }, Documen
   },
 }
 
-const documentSaveOperation: OperationDescriptor<Record<string, never>, undefined> = {
+const documentSaveOperation: OperationDescriptor<{ readonly id: string }, undefined> = {
   id: 'microsoft-word.documents.save',
   permission: 'microsoft-word:documents:save',
   target: { command: 'save', resource: 'Document' },
   description: 'Save the specified document',
-  input: t.record({}),
+  input: t.record({
+    id: t.string({ description: 'Document name' }),
+  }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: { id: { type: 'string', description: 'Document name' } },
+    required: ['id'],
     additionalProperties: false,
   },
 }
 
 const documentSaveAsOperation: OperationDescriptor<
-  { readonly fileName: string; readonly fileFormat?: SaveFormat | undefined },
+  { readonly id: string; readonly fileName: string; readonly fileFormat?: SaveFormat | undefined },
   undefined
 > = {
   id: 'microsoft-word.documents.saveAs',
@@ -1290,6 +1319,7 @@ const documentSaveAsOperation: OperationDescriptor<
   target: { command: 'saveAs', resource: 'Document' },
   description: 'Save the document with a new name or format',
   input: t.record({
+    id: t.string({ description: 'Document name' }),
     fileName: t.string({ description: 'The file name for the document' }),
     fileFormat: t.optional(
       t.enumeration(saveFormatMembers, { description: 'The file format for saving' })
@@ -1300,6 +1330,7 @@ const documentSaveAsOperation: OperationDescriptor<
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: {
+      id: { type: 'string', description: 'Document name' },
       fileName: { type: 'string', description: 'The file name for the document' },
       fileFormat: {
         type: 'string',
@@ -1307,13 +1338,13 @@ const documentSaveAsOperation: OperationDescriptor<
         description: 'The file format for saving',
       },
     },
-    required: ['fileName'],
+    required: ['id', 'fileName'],
     additionalProperties: false,
   },
 }
 
 const documentCloseOperation: OperationDescriptor<
-  { readonly saving?: boolean | undefined },
+  { readonly id: string; readonly saving?: boolean | undefined },
   undefined
 > = {
   id: 'microsoft-word.documents.close',
@@ -1321,6 +1352,7 @@ const documentCloseOperation: OperationDescriptor<
   target: { command: 'close', resource: 'Document' },
   description: 'Close the specified document',
   input: t.record({
+    id: t.string({ description: 'Document name' }),
     saving: t.optional(t.boolean({ description: 'Whether to save changes before closing' })),
   }),
   output: t.none(),
@@ -1328,38 +1360,46 @@ const documentCloseOperation: OperationDescriptor<
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: {
+      id: { type: 'string', description: 'Document name' },
       saving: { type: 'boolean', description: 'Whether to save changes before closing' },
     },
+    required: ['id'],
     additionalProperties: false,
   },
 }
 
-const documentPrintOperation: OperationDescriptor<Record<string, never>, undefined> = {
+const documentPrintOperation: OperationDescriptor<{ readonly id: string }, undefined> = {
   id: 'microsoft-word.documents.print',
   permission: 'microsoft-word:documents:print',
   target: { command: 'print', resource: 'Document' },
   description: 'Print the specified document',
-  input: t.record({}),
+  input: t.record({
+    id: t.string({ description: 'Document name' }),
+  }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: { id: { type: 'string', description: 'Document name' } },
+    required: ['id'],
     additionalProperties: false,
   },
 }
 
-const documentActivateOperation: OperationDescriptor<Record<string, never>, undefined> = {
+const documentActivateOperation: OperationDescriptor<{ readonly id: string }, undefined> = {
   id: 'microsoft-word.documents.activate',
   permission: 'microsoft-word:documents:activate',
   target: { command: 'activate', resource: 'Document' },
   description: 'Activate the specified document window',
-  input: t.record({}),
+  input: t.record({
+    id: t.string({ description: 'Document name' }),
+  }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: { id: { type: 'string', description: 'Document name' } },
+    required: ['id'],
     additionalProperties: false,
   },
 }
@@ -1572,7 +1612,7 @@ const appCreateNewDocumentOperation: OperationDescriptor<
 }
 
 const documentCreateRangeOperation: OperationDescriptor<
-  { readonly start?: Integer | undefined; readonly end?: Integer | undefined },
+  { readonly id: string; readonly start?: Integer | undefined; readonly end?: Integer | undefined },
   undefined
 > = {
   id: 'microsoft-word.documents.createRange',
@@ -1580,6 +1620,7 @@ const documentCreateRangeOperation: OperationDescriptor<
   target: { command: 'createRange', resource: 'Document' },
   description: 'Create a text range by character positions',
   input: t.record({
+    id: t.string({ description: 'Document name' }),
     start: t.optional(t.integer({ description: 'The starting character position' })),
     end: t.optional(t.integer({ description: 'The ending character position' })),
   }),
@@ -1588,6 +1629,7 @@ const documentCreateRangeOperation: OperationDescriptor<
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: {
+      id: { type: 'string', description: 'Document name' },
       start: {
         type: 'object',
         properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
@@ -1603,6 +1645,7 @@ const documentCreateRangeOperation: OperationDescriptor<
         description: 'The ending character position',
       },
     },
+    required: ['id'],
     additionalProperties: false,
   },
 }
@@ -1635,14 +1678,15 @@ function bind(runtime: ClientRuntime): MicrosoftWordClient {
     documents: {
       list: (options) => runtime.invoke(documentListOperation, {}, options),
       get: (id, options) => runtime.invoke(documentGetOperation, { id }, options),
-      save: (options) => runtime.invoke(documentSaveOperation, {}, options),
-      saveAs: (fileName, fileFormat, options) =>
-        runtime.invoke(documentSaveAsOperation, { fileName, fileFormat }, options),
-      close: (saving, options) => runtime.invoke(documentCloseOperation, { saving }, options),
-      print: (options) => runtime.invoke(documentPrintOperation, {}, options),
-      activate: (options) => runtime.invoke(documentActivateOperation, {}, options),
-      createRange: (start, end, options) =>
-        runtime.invoke(documentCreateRangeOperation, { start, end }, options),
+      save: (id, options) => runtime.invoke(documentSaveOperation, { id }, options),
+      saveAs: (id, fileName, fileFormat, options) =>
+        runtime.invoke(documentSaveAsOperation, { id, fileName, fileFormat }, options),
+      close: (id, saving, options) =>
+        runtime.invoke(documentCloseOperation, { id, saving }, options),
+      print: (id, options) => runtime.invoke(documentPrintOperation, { id }, options),
+      activate: (id, options) => runtime.invoke(documentActivateOperation, { id }, options),
+      createRange: (id, start, end, options) =>
+        runtime.invoke(documentCreateRangeOperation, { id, start, end }, options),
     },
     undo: (options) => runtime.invoke(appUndoOperation, {}, options),
     redo: (options) => runtime.invoke(appRedoOperation, {}, options),

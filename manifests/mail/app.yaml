@@ -37,7 +37,6 @@ suites:
       - QuotingColor
       - ViewerColumns
     commands:
-      - bounce
       - checkForNewMail
       - extractNameFrom
       - extractAddressFrom
@@ -1383,13 +1382,9 @@ commands:
         description: The new location for the object(s).
         required: true
         code: insh
-  bounce:
-    name: bounce
-    description: Does nothing at all (deprecated)
-    scope: resource
-    resourceType: Message
-    code: bcms
-    parameters: []
+  # `bounce` is not declared, so no operation is offered for it. The
+  # dictionary marks it hidden and describes it (Mail.sdef:151) as:
+  # "Does nothing at all (deprecated)"
   checkForNewMail:
     name: checkForNewMail
     description: Triggers a check for email.
@@ -1502,7 +1497,15 @@ commands:
     scope: resource
     resourceType: OutgoingMessage
     code: send
-    parameters: []
+    # The dictionary's `send` takes the outgoing message as its direct parameter
+    # (Mail.sdef:258), and the application holds outgoing messages as elements
+    # (Mail.sdef:331). `id`, the message's dictionary id, selects it, and is not
+    # sent as a named parameter.
+    parameters:
+      - name: id
+        type: integer
+        description: The unique identifier of the outgoing message
+        required: true
   synchronize:
     name: synchronize
     description: Command to trigger synchronizing of an IMAP account with the server.

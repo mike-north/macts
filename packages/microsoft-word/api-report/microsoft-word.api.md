@@ -127,14 +127,14 @@ export interface DocumentCreateInput {
 // @public
 export class DocumentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    activate(): Promise<void>;
-    close(saving?: boolean): Promise<void>;
-    createRange(start?: number, end?: number): Promise<void>;
+    activate(id: string): Promise<void>;
+    close(id: string, saving?: boolean): Promise<void>;
+    createRange(id: string, start?: number, end?: number): Promise<void>;
     get(id: string): Promise<Document>;
     list(): Promise<Page<Document>>;
-    print(): Promise<void>;
-    save(): Promise<void>;
-    saveAs(fileName: string, fileFormat?: SaveFormat): Promise<void>;
+    print(id: string): Promise<void>;
+    save(id: string): Promise<void>;
+    saveAs(id: string, fileName: string, fileFormat?: SaveFormat): Promise<void>;
 }
 
 // @public (undocumented)
