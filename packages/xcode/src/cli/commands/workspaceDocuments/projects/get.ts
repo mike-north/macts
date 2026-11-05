@@ -9,7 +9,8 @@ export class GetProjectCommand extends Command {
   static override paths = [['xcode', 'workspaceDocuments', 'projects', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a project by ID',
+    description:
+      "Get a project by ID. When several workspace documents share the same name, the first match in the app's order is used as the workspace document.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

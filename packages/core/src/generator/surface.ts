@@ -178,10 +178,53 @@ export function identifierWords(identifier: string): string {
  *   property in prose.
  */
 export function firstMatchNote(resource: Resource | undefined): string | undefined {
+  const property = firstMatchProperty(resource)
+  if (resource === undefined || property === undefined) return undefined
+  return `When several ${identifierWords(resource.plural)} share the same ${identifierWords(property)}, the first match in the app's order is used, and the operation does not fail as ambiguous.`
+}
+
+/**
+ * The sentence a generated doc adds about parents that share the value an
+ * operation looks its parent up by, or `undefined` when none can.
+ *
+ * A resource-scoped list, get, create, update or delete that records a
+ * parent (`command.parent`) looks the parent up in its collection by the
+ * parent resource's identifier targeting (phases/13 D10, command parents).
+ * When that lookup is a first match ({@link firstMatchNote}'s rule, applied
+ * to the parent resource), several parents can share the value and the
+ * operation uses the first of them. Any other command is called on the app
+ * with its parameters and looks no parent up, so it gets no sentence.
+ *
+ * @param command - The operation's command.
+ * @param manifest - The app manifest declaring the parent resource.
+ * @returns One sentence, naming the parent's plural, the matched property and
+ *   the parent in prose.
+ */
+export function parentFirstMatchNote(command: Command, manifest: AppManifest): string | undefined {
+  const parent = command.parent
+  if (parent === undefined || command.scope !== 'resource' || !isCrudName(command.name)) {
+    return undefined
+  }
+  const resource = Object.hasOwn(manifest.resources, parent.resource)
+    ? manifest.resources[parent.resource]
+    : undefined
+  const property = firstMatchProperty(resource)
+  if (resource === undefined || property === undefined) return undefined
+  return `When several ${identifierWords(resource.plural)} share the same ${identifierWords(property)}, the first match in the app's order is used as the ${identifierWords(resource.name)}.`
+}
+
+/**
+ * The property a resource's items are looked up on as the first match of
+ * several, or `undefined` when the lookup cannot reach more than one: its
+ * primary identifier is matched with `byProperty` and makes no uniqueness
+ * claim. An identifier claimed unique, or looked up by the app's id or key
+ * specifier or as a root, matches no shared property.
+ */
+function firstMatchProperty(resource: Resource | undefined): string | undefined {
   const targeting = resolveIdentifierTargeting(resource)
   if (resource === undefined || targeting?.strategy !== 'byProperty') return undefined
   if (resolvePrimaryIdentifier(resource)?.unique === true) return undefined
-  return `When several ${identifierWords(resource.plural)} share the same ${identifierWords(targeting.property)}, the first match in the app's order is used, and the operation does not fail as ambiguous.`
+  return targeting.property
 }
 
 /**

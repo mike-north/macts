@@ -23,6 +23,7 @@ export class SchemeResourceClient {
 
   /**
    * List the schemes of one workspace document, as one page.
+   * When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
    */
   async list(workspaceName: string): Promise<Page<Scheme>> {
     return this.#http.rpc<Page<Scheme>>(`${this.#app}.${this.#resource}.list`, { workspaceName })
@@ -30,6 +31,7 @@ export class SchemeResourceClient {
 
   /**
    * Get a scheme by id within a parent scope.
+   * When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
    */
   async get(workspaceName: string, id: string): Promise<Scheme> {
     return this.#http.rpc<Scheme>(`${this.#app}.${this.#resource}.get`, { workspaceName, id })
