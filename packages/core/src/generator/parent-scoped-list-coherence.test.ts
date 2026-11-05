@@ -255,7 +255,7 @@ describe('parent-scoped list by an integer param: Tab.list(windowId: number)', (
       `async list(${PARENT_SCOPE_PARAM}: number, page: { pageSize?: number; cursor?: string } = {}): Promise<Page<Tab>>`
     )
     expect(tabClient).toContain(
-      `, ${PARENT_SCOPE_PARAM}: { integer: String(${PARENT_SCOPE_PARAM}) } }`
+      `, ${PARENT_SCOPE_PARAM}: __mactsIntegerInput(${PARENT_SCOPE_PARAM}) }`
     )
   })
 
