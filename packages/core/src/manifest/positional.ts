@@ -28,8 +28,9 @@ import type { Command } from './schemas/command.js'
 import { placedEntries, type PlacedEntry } from './hierarchy-placement.js'
 import { resolvePrimaryIdentifierProperty } from './identifier.js'
 import { itemIdentifierParameter, selectsOneItem } from './item-selection.js'
-import { resourceCommandEntries, resolvingCommand } from './resource-commands.js'
-import { isUnsupportedResourceKey, usableCommands } from './unsupported.js'
+import { CRUD_OPERATIONS, resourceCommandEntries, resolvingCommand } from './resource-commands.js'
+import { isUnsupportedResourceKey } from './unsupported.js'
+import { resolveManifestRoutes } from './route.js'
 
 /**
  * Whether the objects of `resourceKey` are found by their position within
@@ -52,35 +53,72 @@ export interface PositionalIssue {
 }
 
 /**
- * How the app finds an object of `resourceKey`, as the parent of a positional
- * resource: `'application'` when it has a primary identifier, is not
- * positional, and has a usable `get` that records no parent; `'nested'`, with
- * the parent, when that `get` records one; `undefined` otherwise. A
- * positional item's get, update and delete bodies bind its parent at the
- * application by the parent's identifier (`app.windows.byId(id)`), so only
- * `'application'` can hold positional items until those bodies bind a whole
- * chain of parents.
+ * A recorded parent supplies one identity, with no ancestor arguments. It must
+ * therefore be an ordinary identified collection item resolved at application
+ * scope. Sparse placement is unknown; known nested-only placement contradicts
+ * that address even when its get omits the missing ancestor. Conversely, an
+ * explicit get ancestor cannot be discarded merely because a top-level entry
+ * also exists: metadata does not establish globally equivalent identities.
  */
-function parentLookup(
+function parentProblem(
   manifest: AppManifest,
-  resourceKey: string
-): 'application' | { readonly nested: string } | undefined {
+  resourceKey: string,
+  placements: readonly PlacedEntry[]
+): string | undefined {
   const resource = Object.hasOwn(manifest.resources, resourceKey)
     ? manifest.resources[resourceKey]
     : undefined
-  if (resource === undefined || isPositional(manifest, resourceKey)) return undefined
-  if (resolvePrimaryIdentifierProperty(resource) === undefined) return undefined
+  if (
+    resource === undefined ||
+    isUnsupportedResourceKey(manifest, resourceKey) ||
+    isPositional(manifest, resourceKey) ||
+    resource.roots !== undefined ||
+    resolvePrimaryIdentifierProperty(resource) === undefined
+  ) {
+    return 'needs an ordinary collection parent with a primary identifier and a usable get'
+  }
   const get = resolvingCommand(manifest, resourceKey, 'get')
-  if (get === undefined) return undefined
-  const above = get[1].parent?.resource
-  return above === undefined ? 'application' : { nested: above }
+  if (get === undefined) return 'needs a primary identifier and a usable get'
+  if (get[1].parent !== undefined) {
+    return `is found within "${get[1].parent.resource}"; nested parents are not supported yet`
+  }
+  const holders = placements.filter(({ child }) => child.resource === resourceKey)
+  if (holders.length > 0 && !holders.some(({ holder }) => holder === undefined)) {
+    return 'has a hierarchy placing its collection only within a parent; missing ancestor context is not supported'
+  }
+  return undefined
+}
+
+/**
+ * Validate the supplied parent identity as well as the parent's address. Raw
+ * generation/registration callers must meet the same data contract as parsed
+ * manifests; hierarchy never supplies a missing command argument.
+ */
+function recordedParentIssue(
+  manifest: AppManifest,
+  commandKey: string,
+  command: Command,
+  placements: readonly PlacedEntry[]
+): PositionalIssue | undefined {
+  if (command.parent === undefined) return undefined
+  const parameter = command.parameters.find(({ name }) => name === command.parent?.parameter)
+  const problem =
+    parameter === undefined || parameter.required !== true
+      ? 'needs its declared required parent parameter'
+      : parentProblem(manifest, command.parent.resource, placements)
+  if (problem === undefined) return undefined
+  return {
+    message: `The ${command.name} command "${commandKey}" records parent "${command.parent.resource}", which ${problem}.`,
+    path: ['commands', commandKey, 'parent'],
+  }
 }
 
 /**
  * What is wrong with one positional resource's commands: its `get` must exist
  * and record a parent the app finds at the application by its identifier, and
- * every command that selects one of its items must record that same parent and
- * select the item by an integer position.
+ * every CRUD address must agree with known containment and supply a qualified
+ * parent identity. Item commands additionally record the resolving get's parent
+ * and select the item by an integer position.
  */
 function commandIssues(
   manifest: AppManifest,
@@ -105,22 +143,11 @@ function commandIssues(
       message: `A positional resource is found by its position within its parent, so the get "${getKey}" of "${resourceKey}" must record that parent.`,
       path: at,
     })
-  } else {
-    const lookup = parentLookup(manifest, parent)
-    const counted = `A positional resource is counted within a parent the app finds at the application by its identifier, but "${parent}", the parent the get "${getKey}" of "${resourceKey}" records,`
-    if (lookup === undefined) {
-      issues.push({
-        message: `${counted} is not: it needs a primary identifier and a get.`,
-        path: at,
-      })
-    } else if (lookup !== 'application') {
-      issues.push({
-        message: `${counted} is found within "${lookup.nested}". Nested parents are not supported yet.`,
-        path: at,
-      })
-    }
   }
   for (const [commandKey, command] of resourceCommandEntries(manifest, resourceKey)) {
+    if (!CRUD_OPERATIONS.some((operation) => operation === command.name)) continue
+    const qualification = recordedParentIssue(manifest, commandKey, command, placements)
+    if (qualification !== undefined) issues.push(qualification)
     const containment = collectionPlacementIssue(commandKey, command, resourceKey, placements)
     if (containment !== undefined) issues.push(containment)
     if (parent !== undefined && selectsOneItem(command) && command.parent?.resource !== parent) {
@@ -138,7 +165,7 @@ function commandIssues(
 }
 
 /**
- * A positional list or create addresses the collection at its recorded
+ * Every positional CRUD route addresses the collection at its recorded
  * parent, or at the application when it records none. A usable hierarchy
  * placement is evidence of where that collection exists; no placement leaves
  * existing sparse-manifest behavior unchanged.
@@ -149,7 +176,6 @@ function collectionPlacementIssue(
   resourceKey: string,
   placements: readonly PlacedEntry[]
 ): PositionalIssue | undefined {
-  if (command.name !== 'list' && command.name !== 'create') return undefined
   const holders = placements
     .filter(({ child }) => child.resource === resourceKey)
     .map(({ holder }) => holder)
@@ -206,7 +232,7 @@ function positionParameterIssue(
  * Every issue with the `positional` markers of a manifest read flattened, in
  * declaration order: a marked resource with a primary identifier, which is
  * found by that identifier instead, the issues of its commands
- * ({@link commandIssues}), and any usable command that records a positional
+ * ({@link commandIssues}), and any executable command that records a positional
  * resource as its parent. A body binds its parent by the parent's identifier
  * (`recordedParentScope`), and a positional resource has none, so such a
  * command is refused until native binding supports positional parents. The
@@ -230,7 +256,12 @@ export function findPositionalIssues(manifest: AppManifest): PositionalIssue[] {
     }
     issues.push(...commandIssues(manifest, resourceKey, placements))
   }
-  for (const [commandKey, command] of usableCommands(manifest)) {
+  // Route expansion owns executable target semantics, including app scope and
+  // scalar, array and omitted resource targets. Check each command only once.
+  const commands = new Map(
+    resolveManifestRoutes(manifest).map(({ commandKey, command }) => [commandKey, command])
+  )
+  for (const [commandKey, command] of commands) {
     const parent = command.parent?.resource
     if (parent === undefined || !isPositional(manifest, parent)) continue
     issues.push({

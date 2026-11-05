@@ -119,9 +119,9 @@ describe('a positional resource', () => {
     })
 
     expect(issues(unidentifiedParent)).toContainEqual({
-      path: ['resources', 'Tab', 'positional'],
+      path: ['commands', 'getTab', 'parent'],
       message:
-        'A positional resource is counted within a parent the app finds at the application by its identifier, but "Window", the parent the get "getTab" of "Tab" records, is not: it needs a primary identifier and a get.',
+        'The get command "getTab" records parent "Window", which needs an ordinary collection parent with a primary identifier and a usable get.',
     })
   })
 
@@ -154,9 +154,9 @@ describe('a positional resource', () => {
     })
 
     expect(issues(nested)).toContainEqual({
-      path: ['resources', 'Tab', 'positional'],
+      path: ['commands', 'getTab', 'parent'],
       message:
-        'A positional resource is counted within a parent the app finds at the application by its identifier, but "Window", the parent the get "getTab" of "Tab" records, is found within "Group". Nested parents are not supported yet.',
+        'The get command "getTab" records parent "Window", which is found within "Group"; nested parents are not supported yet.',
     })
   })
 
