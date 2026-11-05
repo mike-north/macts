@@ -21,4 +21,6 @@ A few shipped commands cannot select their item yet, because their resource has 
 
 Generation and registration now refuse a resource command that declares no identifier parameter, as they already refused such a get, update or delete. Each refusal names the app and the command key and says to declare the item's identifier as a required parameter. If a manifest of yours is refused, declare it, together with the command's `parent` where the resource's get records one.
 
+Update the app packages together with `@macts/runtime` and `@macts/core`. A runtime from this release refuses an earlier Calendar, Mail, Microsoft Word, Reminders or System Settings package. It runs an earlier Music or TV playlist `move` or `search` against the playlist named by its `to` or `for` value, and an earlier Microsoft Edge tab command against the application, which has no tabs, so those fail.
+
 Refs #287

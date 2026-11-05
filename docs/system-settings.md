@@ -26,15 +26,6 @@ HTTP client wrapper for making authenticated requests.
 </td></tr>
 <tr><td>
 
-[PaneResourceClient](./system-settings.paneresourceclient.md)
-
-</td><td>
-
-Client for a settings pane..
-
-</td></tr>
-<tr><td>
-
 [SystemSettingsClient](./system-settings.systemsettingsclient.md)
 
 </td><td>

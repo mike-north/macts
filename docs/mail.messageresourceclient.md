@@ -57,17 +57,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[bounce()](./mail.messageresourceclient.bounce.md)
-
-</td><td>
-
-</td><td>
-
-Does nothing at all (deprecated)
-
-</td></tr>
-<tr><td>
-
 [forward(openingWindow)](./mail.messageresourceclient.forward.md)
 
 </td><td>

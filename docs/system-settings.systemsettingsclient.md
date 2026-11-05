@@ -87,23 +87,6 @@ Description
 Get the HTTP client for making custom requests.
 
 </td></tr>
-<tr><td>
-
-[panes](./system-settings.systemsettingsclient.panes.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[PaneResourceClient](./system-settings.paneresourceclient.md)
-
-</td><td>
-
-A settings pane.
-
-</td></tr>
 </tbody></table>
 
 ## Methods
