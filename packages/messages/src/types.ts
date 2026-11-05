@@ -5,85 +5,44 @@
 
 import { z } from 'zod'
 
-/** ServiceType */
-export type ServiceType = 'sMS' | 'iMessage' | 'rCS'
+export type { ServiceType } from './contract/index.js'
 
-/** Direction */
-export type Direction = 'incoming' | 'outgoing'
+export type { Direction } from './contract/index.js'
 
-/** TransferStatus */
-export type TransferStatus =
-  | 'preparing'
-  | 'waiting'
-  | 'transferring'
-  | 'finalizing'
-  | 'finished'
-  | 'failed'
+export type { TransferStatus } from './contract/index.js'
 
-/** ConnectionStatus */
-export type ConnectionStatus = 'disconnecting' | 'connected' | 'connecting' | 'disconnected'
+export type { ConnectionStatus } from './contract/index.js'
 
-/** A participant for an account. */
-export interface Participant {
-  /** The participant's unique identifier. For example: 01234567-89AB-CDEF-0123-456789ABCDEF:+11234567890 */
-  id: string
-  /** The participant's name as it appears in the participant list. */
-  name: string
-  /** The participant's handle. */
-  handle: string
-  /** The first name from this participan's Contacts card, if available */
-  firstName: string
-  /** The last name from this participant's Contacts card, if available */
-  lastName: string
-  /** The full name from this participant's Contacts card, if available */
-  fullName: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Participant } from './contract/index.js'
 
-/** Input for creating a Participant */
-export type ParticipantCreateInput = Record<string, never>
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ParticipantCreateInput = import('./contract/index.js').ParticipantCreateInput
 
-/** Input for updating a Participant */
-export type ParticipantUpdateInput = Partial<ParticipantCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ParticipantUpdateInput = import('./contract/index.js').ParticipantUpdateInput
 
-/** An account that can be logged in to from this system */
-export interface Account {
-  /** A unique identifier for this account. */
-  id: string
-  /** The name of this account as defined in Account preferences description field */
-  description: string
-  /** Is the account enabled? */
-  enabled: boolean
-  /** The connection status for this account. */
-  connectionStatus: string
-  /** The type of service for this account */
-  serviceType: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Account } from './contract/index.js'
 
-/** Input for creating a Account */
-export interface AccountCreateInput {
-  /** Is the account enabled? */
-  enabled?: boolean
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type AccountCreateInput = import('./contract/index.js').AccountCreateInput
 
-/** Input for updating a Account */
-export type AccountUpdateInput = Partial<AccountCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type AccountUpdateInput = import('./contract/index.js').AccountUpdateInput
 
-/** An SMS or iMessage chat. */
-export interface Chat {
-  /** A guid identifier for this chat. */
-  id: string
-  /** The chat's name as it appears in the chat list. */
-  name: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Chat } from './contract/index.js'
 
-/** Input for creating a Chat */
-export type ChatCreateInput = Record<string, never>
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ChatCreateInput = import('./contract/index.js').ChatCreateInput
 
-/** Input for updating a Chat */
-export type ChatUpdateInput = Partial<ChatCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ChatUpdateInput = import('./contract/index.js').ChatUpdateInput
 
-// Zod schemas for runtime validation
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ParticipantSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -93,6 +52,7 @@ export const ParticipantSchema = z.object({
   fullName: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AccountSchema = z.object({
   id: z.string(),
   description: z.string(),
@@ -101,6 +61,7 @@ export const AccountSchema = z.object({
   serviceType: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ChatSchema = z.object({
   id: z.string(),
   name: z.string(),

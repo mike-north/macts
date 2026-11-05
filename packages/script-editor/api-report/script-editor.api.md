@@ -4,7 +4,12 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -28,30 +33,27 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Document {
-    contents: string;
-    id?: string;
-    language: string;
-    modified: boolean;
+    contents: string | null;
+    language: string | null;
+    readonly modified: boolean | null;
     name: string;
-    path?: string;
+    readonly path?: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "DocumentCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface DocumentCreateInput {
-    contents?: string;
-    language?: string;
-    name?: string;
-}
+export type DocumentCreateInput = DocumentCreateInput_2;
 
 // @public
 export class DocumentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: DocumentCreateInput): Promise<Document>;
-    get(name: string): Promise<Document>;
-    list(): Promise<Page<Document>>;
+    create(input: DocumentCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Document>;
+    get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Document>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Document>>;
 }
 
-// @public (undocumented)
+// @public
 export const DocumentSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -61,16 +63,28 @@ export const DocumentSchema: z.ZodObject<{
     modified: z.ZodBoolean;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "DocumentUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type DocumentUpdateInput = Partial<DocumentCreateInput>;
+export type DocumentUpdateInput = DocumentUpdateInput_2;
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // Warning: (ae-forgotten-export) The symbol "ScriptEditorResources" needs to be exported by the entry point index.d.ts
+    //
+    // @internal
+    bind<Client extends ClientBrand<ScriptEditorResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
+export interface ScriptEditorClient extends ClientBrand<ScriptEditorResources> {
+}
+
+// @public (undocumented)
 export class ScriptEditorClient {
     constructor(options: ScriptEditorClientOptions);
     readonly documents: DocumentResourceClient;

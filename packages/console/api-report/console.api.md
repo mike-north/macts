@@ -4,6 +4,10 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
+
 // @public
 export const capabilities: readonly CapabilityMetadata[];
 
@@ -23,11 +27,17 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
+// Warning: (ae-forgotten-export) The symbol "ConsoleResources" needs to be exported by the entry point index.d.ts
+//
 // @public
+export interface ConsoleClient extends ClientBrand<ConsoleResources> {
+}
+
+// @public (undocumented)
 export class ConsoleClient {
     constructor(options: ConsoleClientOptions);
     get http(): HttpClient;
-    selectDevice(): Promise<void>;
+    selectDevice(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -43,10 +53,16 @@ export class ConsoleError extends Error {
     readonly code: string;
 }
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind<Client extends ClientBrand<ConsoleResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
+
+// (No @packageDocumentation comment for this package)
 
 ```

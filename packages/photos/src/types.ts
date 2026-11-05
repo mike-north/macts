@@ -5,128 +5,66 @@
 
 import { z } from 'zod'
 
-/** A media item, such as a photo or video */
-export interface MediaItem {
-  /** The unique ID of the media item */
-  id: string
-  /** The name (title) of the media item */
-  name: string
-  /** A description of the media item */
-  description: string
-  /** The name of the file on disk */
-  filename: string
-  /** The date of the media item */
-  date: Date
-  /** The height of the media item in pixels */
-  height: number
-  /** The width of the media item in pixels */
-  width: number
-  /** The GPS altitude in meters */
-  altitude: number
-  /** The GPS latitude and longitude, in an ordered list of 2 numbers or missing values */
-  location: unknown
-  /** Whether the media item has been favorited */
-  favorite: boolean
-  /** A list of keywords to associate with a media item */
-  keywords: string[]
-  /** The selected media item file size */
-  size: number
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { MediaItem } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type MediaItemCreateInput = Omit<
+  import('./contract/index.js').MediaItemCreateInput,
+  'size'
+> & {
+  /** The selected media item file size Numeric values are validated by the contract before dispatch. */
+  size?: number | Extract<import('./contract/index.js').MediaItemCreateInput['size'], null>
 }
 
-/** Input for creating a MediaItem */
-export interface MediaItemCreateInput {
-  /** The name (title) of the media item */
-  name?: string
-  /** A description of the media item */
-  description?: string
-  /** The date of the media item */
-  date?: Date
-  /** The GPS latitude and longitude, in an ordered list of 2 numbers or missing values */
-  location?: unknown
-  /** Whether the media item has been favorited */
-  favorite?: boolean
-  /** A list of keywords to associate with a media item */
-  keywords?: string[]
-  /** The selected media item file size */
-  size?: number
+/** Canonical update input, retaining checked numeric conveniences. */
+export type MediaItemUpdateInput = Omit<
+  import('./contract/index.js').MediaItemUpdateInput,
+  'size'
+> & {
+  /** The selected media item file size Numeric values are validated by the contract before dispatch. */
+  size?: number | Extract<import('./contract/index.js').MediaItemUpdateInput['size'], null>
 }
 
-/** Input for updating a MediaItem */
-export type MediaItemUpdateInput = Partial<MediaItemCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Container } from './contract/index.js'
 
-/** Base class for collections that contains other items, such as albums and folders */
-export interface Container {
-  /** The unique ID of this container */
-  id: string
-  /** The name of this container */
-  name: string
-  /** This container's parent folder, if any */
-  parent: Folder
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ContainerCreateInput = import('./contract/index.js').ContainerCreateInput
 
-/** Input for creating a Container */
-export interface ContainerCreateInput {
-  /** The name of this container */
-  name?: string
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ContainerUpdateInput = import('./contract/index.js').ContainerUpdateInput
 
-/** Input for updating a Container */
-export type ContainerUpdateInput = Partial<ContainerCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Album } from './contract/index.js'
 
-/** An album. A container that holds media items */
-export interface Album {
-  /** The unique ID of this album */
-  id: string
-  /** The name of this album */
-  name: string
-  /** This album's parent folder, if any */
-  parent: Folder
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type AlbumCreateInput = import('./contract/index.js').AlbumCreateInput
 
-/** Input for creating a Album */
-export interface AlbumCreateInput {
-  /** The name of this album */
-  name?: string
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type AlbumUpdateInput = import('./contract/index.js').AlbumUpdateInput
 
-/** Input for updating a Album */
-export type AlbumUpdateInput = Partial<AlbumCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Folder } from './contract/index.js'
 
-/** A folder. A container that holds albums and other folders, but not media items */
-export interface Folder {
-  /** The unique ID of this folder */
-  id: string
-  /** The name of this folder */
-  name: string
-  /** This folder's parent folder, if any */
-  parent: Folder
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type FolderCreateInput = import('./contract/index.js').FolderCreateInput
 
-/** Input for creating a Folder */
-export interface FolderCreateInput {
-  /** The name of this folder */
-  name?: string
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type FolderUpdateInput = import('./contract/index.js').FolderUpdateInput
 
-/** Input for updating a Folder */
-export type FolderUpdateInput = Partial<FolderCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Moment } from './contract/index.js'
 
-/** A set of media items that represents a Moment */
-export interface Moment {
-  /** The unique ID of the Moment */
-  id: string
-  /** The name of the Moment */
-  name: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type MomentCreateInput = import('./contract/index.js').MomentCreateInput
 
-/** Input for creating a Moment */
-export type MomentCreateInput = Record<string, never>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type MomentUpdateInput = import('./contract/index.js').MomentUpdateInput
 
-/** Input for updating a Moment */
-export type MomentUpdateInput = Partial<MomentCreateInput>
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
-// Zod schemas for runtime validation
-
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const MediaItemSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -142,24 +80,28 @@ export const MediaItemSchema = z.object({
   size: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ContainerSchema = z.object({
   id: z.string(),
   name: z.string(),
   parent: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AlbumSchema = z.object({
   id: z.string(),
   name: z.string(),
   parent: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const FolderSchema = z.object({
   id: z.string(),
   name: z.string(),
   parent: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const MomentSchema = z.object({
   id: z.string(),
   name: z.string(),

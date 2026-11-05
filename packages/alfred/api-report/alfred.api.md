@@ -4,21 +4,30 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { z } from 'zod';
 
+// Warning: (ae-forgotten-export) The symbol "AlfredResources" needs to be exported by the entry point index.d.ts
+//
 // @public
+export interface AlfredClient extends ClientBrand<AlfredResources> {
+}
+
+// @public (undocumented)
 export class AlfredClient {
     constructor(options: AlfredClientOptions);
-    action(items: string[], asType?: string): Promise<void>;
-    browse(path: string): Promise<void>;
+    action(items: string[], asType?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    browse(path: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
-    reloadWorkflow(workflow: string): Promise<void>;
-    removeConfiguration(variable: string, inWorkflow: string): Promise<void>;
-    revealWorkflow(workflow: string, configuration?: boolean, details?: boolean): Promise<void>;
-    runTrigger(trigger: string, inWorkflow: string, withArgument?: string): Promise<void>;
-    search(query?: string): Promise<void>;
-    setConfiguration(variable: string, toValue: string, inWorkflow: string, exportable?: boolean): Promise<void>;
-    setTheme(theme: string): Promise<void>;
+    reloadWorkflow(workflow: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    removeConfiguration(variable: string, inWorkflow: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    revealWorkflow(workflow: string, configuration?: boolean, details?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    runTrigger(trigger: string, inWorkflow: string, withArgument?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    search(query?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    setConfiguration(variable: string, toValue: string, inWorkflow: string, exportable?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    setTheme(theme: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -36,21 +45,24 @@ export class AlfredError extends Error {
 
 // @public
 export interface Application {
-    id?: string;
-    name: string;
+    readonly name: string;
 }
 
+// Warning: (ae-forgotten-export) The symbol "ApplicationCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ApplicationCreateInput = Record<string, never>;
+export type ApplicationCreateInput = ApplicationCreateInput_2;
 
-// @public (undocumented)
+// @public
 export const ApplicationSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "ApplicationUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ApplicationUpdateInput = Partial<ApplicationCreateInput>;
+export type ApplicationUpdateInput = ApplicationUpdateInput_2;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -71,10 +83,14 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind<Client extends ClientBrand<AlfredResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // (No @packageDocumentation comment for this package)

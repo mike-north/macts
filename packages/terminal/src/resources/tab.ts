@@ -24,15 +24,15 @@ export class TabResourceClient {
   /**
    * List all tabs, as one page.
    */
-  async list(): Promise<Page<Tab>> {
-    return this.#http.rpc<Page<Tab>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Tab>> {
+    return this.#http.invoke<Page<Tab>>(`${this.#app}.${this.#resource}.list`, {}, __mactsOptions)
   }
 
   /**
    * Get a tab by name.
    * When several tabs share the same tty, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async get(name: string): Promise<Tab> {
-    return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(name: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Tab> {
+    return this.#http.invoke<Tab>(`${this.#app}.${this.#resource}.get`, { name }, __mactsOptions)
   }
 }

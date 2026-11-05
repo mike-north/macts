@@ -4,6 +4,9 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -27,21 +30,20 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Document {
-    currentTime: number;
-    duration: number;
-    id: string;
-    name: string;
-    path: string;
-    playing: boolean;
+    currentTime: number | null;
+    readonly duration: number | null;
+    readonly id: string;
+    readonly name: string | null;
+    readonly path: string | null;
+    playing: boolean | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "DocumentCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type DocumentCreateInput = DocumentCreateInput_2;
 
 // @public
-export interface DocumentCreateInput {
-    currentTime?: number;
-    playing?: boolean;
-}
-
-// @public (undocumented)
 export const DocumentSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -51,34 +53,46 @@ export const DocumentSchema: z.ZodObject<{
     currentTime: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "DocumentUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type DocumentUpdateInput = Partial<DocumentCreateInput>;
+export type DocumentUpdateInput = DocumentUpdateInput_2;
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // Warning: (ae-forgotten-export) The symbol "QuickTimePlayerResources" needs to be exported by the entry point index.d.ts
+    //
+    // @internal
+    bind<Client extends ClientBrand<QuickTimePlayerResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
+export interface QuickTimePlayerClient extends ClientBrand<QuickTimePlayerResources> {
+}
+
+// @public (undocumented)
 export class QuickTimePlayerClient {
     constructor(options: QuickTimePlayerClientOptions);
-    _export(_in: string, usingSettingsPreset: string): Promise<void>;
+    _export(_in: string, usingSettingsPreset: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
-    newAudioRecording(): Promise<void>;
-    newMovieRecording(): Promise<void>;
-    newScreenRecording(): Promise<void>;
-    openURL(): Promise<void>;
-    pause(): Promise<void>;
-    play(): Promise<void>;
-    present(): Promise<void>;
-    resume(): Promise<void>;
-    showRemoteHud(): Promise<void>;
-    start(): Promise<void>;
-    stepBackward(by?: number): Promise<void>;
-    stepForward(by?: number): Promise<void>;
-    stop(): Promise<void>;
-    trim(from: number, to: number): Promise<void>;
+    newAudioRecording(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    newMovieRecording(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    newScreenRecording(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    openURL(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    pause(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    play(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    present(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    resume(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    showRemoteHud(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    start(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    stepBackward(by?: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    stepForward(by?: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    stop(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    trim(from: number, to: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public

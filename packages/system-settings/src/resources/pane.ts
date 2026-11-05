@@ -22,14 +22,22 @@ export class PaneResourceClient {
   /**
    * Prompt for authorization for a settings pane. Deprecated: no longer does anything.
    */
-  async authorize(): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.authorize`, {})
+  async authorize(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.authorize`,
+      {},
+      __mactsOptions
+    )
   }
 
   /**
    * Times and loads given settings pane and returns load time. Deprecated: no longer does anything.
    */
-  async timedLoad(): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.timedLoad`, {})
+  async timedLoad(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.timedLoad`,
+      {},
+      __mactsOptions
+    )
   }
 }

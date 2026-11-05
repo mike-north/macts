@@ -24,14 +24,29 @@ export class TabResourceClient {
   /**
    * List the tabs of one window, as one page.
    */
-  async list(windowId: string): Promise<Page<Tab>> {
-    return this.#http.rpc<Page<Tab>>(`${this.#app}.${this.#resource}.list`, { windowId })
+  async list(
+    windowId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<Tab>> {
+    return this.#http.invoke<Page<Tab>>(
+      `${this.#app}.${this.#resource}.list`,
+      { windowId },
+      __mactsOptions
+    )
   }
 
   /**
    * Get a tab by id within a parent scope.
    */
-  async get(windowId: string, id: string): Promise<Tab> {
-    return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.get`, { windowId, id })
+  async get(
+    windowId: string,
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Tab> {
+    return this.#http.invoke<Tab>(
+      `${this.#app}.${this.#resource}.get`,
+      { windowId, id },
+      __mactsOptions
+    )
   }
 }

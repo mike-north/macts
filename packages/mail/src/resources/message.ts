@@ -22,31 +22,50 @@ export class MessageResourceClient {
   /**
    * Does nothing at all (deprecated)
    */
-  async bounce(): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.bounce`, {})
+  async bounce(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#http.invoke<undefined>(`${this.#app}.${this.#resource}.bounce`, {}, __mactsOptions)
   }
 
   /**
    * Creates a forwarded message.
    */
-  async forward(openingWindow?: boolean): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.forward`, { openingWindow })
+  async forward(
+    openingWindow?: boolean,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.forward`,
+      { openingWindow },
+      __mactsOptions
+    )
   }
 
   /**
    * Creates a redirected message.
    */
-  async redirect(openingWindow?: boolean): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.redirect`, { openingWindow })
+  async redirect(
+    openingWindow?: boolean,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.redirect`,
+      { openingWindow },
+      __mactsOptions
+    )
   }
 
   /**
    * Creates a reply message.
    */
-  async reply(openingWindow?: boolean, replyToAll?: boolean): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.reply`, {
-      openingWindow,
-      replyToAll,
-    })
+  async reply(
+    openingWindow?: boolean,
+    replyToAll?: boolean,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.reply`,
+      { openingWindow, replyToAll },
+      __mactsOptions
+    )
   }
 }

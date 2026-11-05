@@ -24,21 +24,24 @@ export class TaskResourceClient {
   /**
    * List all tasks, as one page.
    */
-  async list(): Promise<Page<Task>> {
-    return this.#http.rpc<Page<Task>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Task>> {
+    return this.#http.invoke<Page<Task>>(`${this.#app}.${this.#resource}.list`, {}, __mactsOptions)
   }
 
   /**
    * Get a task by id.
    */
-  async get(id: string): Promise<Task> {
-    return this.#http.rpc<Task>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Task> {
+    return this.#http.invoke<Task>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
   }
 
   /**
    * Create a new task.
    */
-  async create(input: TaskCreateInput): Promise<Task> {
-    return this.#http.rpc<Task>(`${this.#app}.${this.#resource}.create`, input)
+  async create(
+    input: TaskCreateInput,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Task> {
+    return this.#http.invoke<Task>(`${this.#app}.${this.#resource}.create`, input, __mactsOptions)
   }
 }

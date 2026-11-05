@@ -24,15 +24,26 @@ export class SettingsSetResourceClient {
   /**
    * List all settings sets, as one page.
    */
-  async list(): Promise<Page<SettingsSet>> {
-    return this.#http.rpc<Page<SettingsSet>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<SettingsSet>> {
+    return this.#http.invoke<Page<SettingsSet>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions
+    )
   }
 
   /**
    * Get a settings set by name.
    * When several settings sets share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async get(name: string): Promise<SettingsSet> {
-    return this.#http.rpc<SettingsSet>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(
+    name: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<SettingsSet> {
+    return this.#http.invoke<SettingsSet>(
+      `${this.#app}.${this.#resource}.get`,
+      { name },
+      __mactsOptions
+    )
   }
 }

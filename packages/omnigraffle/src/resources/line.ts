@@ -24,14 +24,21 @@ export class LineResourceClient {
   /**
    * List the lines of one canvas, as one page.
    */
-  async list(canvasId: string): Promise<Page<Line>> {
-    return this.#http.rpc<Page<Line>>(`${this.#app}.${this.#resource}.list`, { canvasId })
+  async list(
+    canvasId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<Line>> {
+    return this.#http.invoke<Page<Line>>(
+      `${this.#app}.${this.#resource}.list`,
+      { canvasId },
+      __mactsOptions
+    )
   }
 
   /**
    * Get a line by id.
    */
-  async get(id: string): Promise<Line> {
-    return this.#http.rpc<Line>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Line> {
+    return this.#http.invoke<Line>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
   }
 }

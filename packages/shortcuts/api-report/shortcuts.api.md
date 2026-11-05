@@ -4,7 +4,15 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { FileValue } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { Rgb } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -28,70 +36,74 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Folder {
-    id: string;
-    name: string;
+    readonly id: string;
+    name: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "FolderCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface FolderCreateInput {
-    name?: string;
-}
+export type FolderCreateInput = FolderCreateInput_2;
 
 // @public
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Folder>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Folder>;
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<Page<Folder>>;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Folder>>;
 }
 
-// @public (undocumented)
+// @public
 export const FolderSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "FolderUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type FolderUpdateInput = Partial<FolderCreateInput>;
+export type FolderUpdateInput = FolderUpdateInput_2;
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // Warning: (ae-forgotten-export) The symbol "ShortcutsResources" needs to be exported by the entry point index.d.ts
+    //
+    // @internal
+    bind<Client extends ClientBrand<ShortcutsResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface Shortcut {
-    acceptsInput: boolean;
-    actionCount: number;
-    color: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    folder: string;
-    icon: ArrayBuffer;
-    id: string;
-    name: string;
-    subtitle: string;
+    readonly acceptsInput: boolean | null;
+    readonly actionCount: Integer | null;
+    readonly color: Rgb | null;
+    folder: string | null;
+    readonly icon: FileValue | null;
+    readonly id: string;
+    readonly name: string | null;
+    readonly subtitle: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "ShortcutCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface ShortcutCreateInput {
-    folder?: string;
-}
+export type ShortcutCreateInput = ShortcutCreateInput_2;
 
 // @public
 export class ShortcutResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Shortcut>;
-    list(): Promise<Page<Shortcut>>;
-    run(id: string, withInput?: unknown): Promise<void>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Shortcut>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Shortcut>>;
+    run(id: string, withInput?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const ShortcutSchema: z.ZodObject<{
     name: z.ZodString;
     subtitle: z.ZodString;
@@ -108,6 +120,10 @@ export const ShortcutSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
+export interface ShortcutsClient extends ClientBrand<ShortcutsResources> {
+}
+
+// @public (undocumented)
 export class ShortcutsClient {
     constructor(options: ShortcutsClientOptions);
     readonly folders: FolderResourceClient;
@@ -128,8 +144,10 @@ export class ShortcutsError extends Error {
     readonly code: string;
 }
 
+// Warning: (ae-forgotten-export) The symbol "ShortcutUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ShortcutUpdateInput = Partial<ShortcutCreateInput>;
+export type ShortcutUpdateInput = ShortcutUpdateInput_2;
 
 // (No @packageDocumentation comment for this package)
 

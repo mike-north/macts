@@ -20,7 +20,7 @@ import { usableResources } from '../../manifest/unsupported.js'
 import { outputProperties } from '../../manifest/output-references.js'
 import { propertyTypeToTs } from '../types.js'
 import { SDK_GENERATED_NOTICE } from '../generated-header.js'
-import { pagingTypeNames } from '../contract/index.js'
+import { contractNames, generateContract, pagingTypeNames } from '../contract/index.js'
 import {
   appCommandEntries,
   commandMethodParameters,
@@ -44,13 +44,6 @@ import {
   omittedInputs,
   omittedResourceInputs,
 } from '../input-satisfiability.js'
-
-/** One field line of a generated input type. */
-interface InputFieldLine {
-  readonly tsType: string
-  readonly required: boolean
-  readonly doc: string
-}
 
 /**
  * Options for HTTP client SDK generation.
@@ -98,6 +91,10 @@ export function generateHttpClientSdk(
   const port = options.defaultPort ?? DEFAULT_PORT
 
   try {
+    const contract = generateContract(manifest)
+    files.push(...contract.files)
+    errors.push(...contract.errors)
+
     // Generate types file
     files.push({
       path: 'src/types.ts',
@@ -215,127 +212,75 @@ function generateTypesFile(manifest: AppManifest): string {
   ]
 
   // Generate enum types
-  for (const [enumName, enumDef] of Object.entries(manifest.enums)) {
-    lines.push(`/** ${enumDef.description ?? enumName} */`)
-    const values = enumDef.values.map((v) => `'${String(v.value)}'`).join(' | ')
-    lines.push(`export type ${enumName} = ${values};`)
+  for (const enumName of Object.keys(manifest.enums)) {
+    lines.push(`export type { ${enumName} } from './contract/index.js';`)
     lines.push('')
   }
 
   // Generate resource types
-  for (const [resourceName, resource] of resources) {
-    // The read type declares the fields the contract's record declares: a
-    // field holding a reference macts cannot yet return in a resolvable form
-    // is left out
-    // (`outputProperties`, the judgment the contract and native reads use).
-    const props = outputProperties(manifest, resourceName, resource)
+  for (const [resourceName] of resources) {
+    lines.push(`/** Canonical SDK record; typed operations decode through the app contract. */`)
+    lines.push(`export type { ${resourceName} } from './contract/index.js';`)
+    lines.push('')
 
-    // List output surfaces the resource's primary identifier under the canonical
-    // `id` key (see the server list executor) so a consumer can always read
-    // `item.id` to obtain the value sibling get/delete/write operations require,
-    // regardless of the app-specific identifier property name. Surface that field
-    // on the read type so it is type-visible — unless the manifest already
-    // declares a usable property literally named `id` (then `id` is a regular
-    // property; one marked unsupported is not a field, so the alias is emitted).
-    //
-    // The value mirrors the RUNTIME targeting property, not necessarily the
-    // declared identifier: a `byProperty` resource (e.g. Calendar, whose declared
-    // `calendarIdentifier` throws via JXA) surfaces its working property (`name`),
-    // since that is the value get/delete/create accept as the lookup. A `byKey`
-    // resource surfaces its key, which is its declared identifier.
-    const idProperty = resolveCanonicalIdentifierSource(resource)
-    const emitCanonicalId = idProperty !== undefined
+    for (const kind of ['create', 'update'] as const) {
+      const inputName = `${resourceName}${kind === 'create' ? 'Create' : 'Update'}Input`
+      const canonical = `import('./contract/index.js').${inputName}`
+      const omitted = omittedResourceInputs(manifest, resourceName)[kind]
+      const fields = createInputFields(manifest, resourceName)
+      const update =
+        kind === 'update'
+          ? findCrudCommand(resourceCommandEntries(manifest, resourceName), 'update')
+          : undefined
+      const addressing = update === undefined ? undefined : resolveIdParams(update[1])
+      const positional = new Set([addressing?.parentParam, addressing?.childParam])
+      const parent = addressing?.parentParam
+      const parentField = parent === undefined ? undefined : fields.get(parent)
+      // Legacy update inputs may repeat the parent, but the positional parent
+      // remains authoritative and the method discards this redundant field.
+      const parentCompatibility =
+        parentField === undefined
+          ? ''
+          : ` & { /** Redundant parent; the positional argument owns scope. */ ${JSON.stringify(parent)}?: ${propertyTypeToTs(parentField.type as PropertyType)}; }`
 
-    lines.push(`/** ${resource.description} */`)
-    if (props.length === 0 && !emitCanonicalId) {
-      // Use Record<string, never> for resources with no properties
-      lines.push(`export type ${resourceName} = Record<string, never>;`)
-    } else {
-      lines.push(`export interface ${resourceName} {`)
-      if (emitCanonicalId) {
-        // Optional on the type: `list` always populates it (the value sibling
-        // operations require), but other read paths (get/create returns) may
-        // surface only the app-specific identifier property.
+      const numbers = [...fields].filter(
+        ([name, field]) =>
+          !omitted.has(name) &&
+          !positional.has(name) &&
+          containsInteger(field.type as PropertyType | undefined)
+      )
+      lines.push(`/** Canonical ${kind} input, retaining checked numeric conveniences. */`)
+      if (numbers.length === 0) {
         lines.push(
-          `  /** Canonical identifier (mirrors \`${idProperty}\`); populated by list, pass to get/delete and to write operations that reference this resource. */`
+          parentCompatibility === ''
+            ? `export type { ${inputName} } from './contract/index.js';`
+            : `export type ${inputName} = ${canonical}${parentCompatibility};`
         )
-        lines.push(`  ${CANONICAL_IDENTIFIER_KEY}?: string;`)
+      } else {
+        const keys = numbers.map(([name]) => JSON.stringify(name)).join(' | ')
+        lines.push(`export type ${inputName} = Omit<${canonical}, ${keys}> & {`)
+        for (const [name, field] of numbers) {
+          const optional = kind === 'update' || !field.required ? '?' : ''
+          lines.push(
+            `  /** ${field.description} Numeric values are validated by the contract before dispatch. */`
+          )
+          // Only numbers and arrays of numbers are widened. Reference identities,
+          // dates, nullability, omission and all other input fields stay canonical.
+          lines.push(
+            `  ${JSON.stringify(name)}${optional}: ${propertyTypeToTs(field.type as PropertyType)} | Extract<${canonical}[${JSON.stringify(name)}], null>;`
+          )
+        }
+        lines.push(`}${parentCompatibility};`)
       }
-      for (const [propName, prop] of props) {
-        const tsType = propertyTypeToTs(prop.type)
-        const optional = prop.optional ? '?' : ''
-        lines.push(`  /** ${prop.description} */`)
-        lines.push(`  ${propName}${optional}: ${tsType};`)
-      }
-      lines.push('}')
+      lines.push('')
     }
-    lines.push('')
-
-    // Generate create input type: the resource's writable properties plus the
-    // backing create command's parameters (see `createInputFields`), less the
-    // fields that admit no value (`omittedResourceInputs`, the judgment the
-    // contract's input types use), whether or not the resource has a create
-    // command.
-    //
-    // A parameter's `type` is `string | Record<string, string>` from the schema.
-    // When it is an object it is structurally compatible with `PropertyType`
-    // (e.g. `{ enum: 'EventStatus' }`, `{ array: 'date' }`), so it is cast
-    // directly rather than falling back to 'string', which would widen enum and
-    // array types unnecessarily.
-    const createFields = new Map<string, InputFieldLine>()
-    const updateFields = new Map<string, InputFieldLine>()
-    const omitted = omittedResourceInputs(manifest, resourceName)
-    for (const [fieldName, field] of createInputFields(manifest, resourceName)) {
-      const line = {
-        tsType: propertyTypeToTs(field.type as PropertyType | undefined),
-        required: field.required,
-        doc: field.description,
-      }
-      if (!omitted.create.has(fieldName)) createFields.set(fieldName, line)
-      if (!omitted.update.has(fieldName)) updateFields.set(fieldName, { ...line, required: false })
-    }
-
-    lines.push(`/** Input for creating a ${resourceName} */`)
-    if (createFields.size === 0) {
-      // Use Record<string, never> for resources with no create fields
-      lines.push(`export type ${resourceName}CreateInput = Record<string, never>;`)
-    } else {
-      lines.push(`export interface ${resourceName}CreateInput {`)
-      for (const [fieldName, field] of createFields) {
-        const optional = field.required ? '' : '?'
-        lines.push(`  /** ${field.doc} */`)
-        lines.push(`  ${fieldName}${optional}: ${field.tsType};`)
-      }
-      lines.push('}')
-    }
-    lines.push('')
-
-    // Generate update input type: every update field is optional, so it is
-    // the partial create input unless the two leave out different fields (a
-    // required create field that admits no value, or a resettable one that
-    // admits only null).
-    lines.push(`/** Input for updating a ${resourceName} */`)
-    const sameFields =
-      updateFields.size === createFields.size &&
-      [...updateFields.keys()].every((name) => createFields.has(name))
-    if (sameFields) {
-      lines.push(`export type ${resourceName}UpdateInput = Partial<${resourceName}CreateInput>;`)
-    } else if (updateFields.size === 0) {
-      lines.push(`export type ${resourceName}UpdateInput = Record<string, never>;`)
-    } else {
-      lines.push(`export interface ${resourceName}UpdateInput {`)
-      for (const [fieldName, field] of updateFields) {
-        lines.push(`  /** ${field.doc} */`)
-        lines.push(`  ${fieldName}?: ${field.tsType};`)
-      }
-      lines.push('}')
-    }
-    lines.push('')
   }
 
   // Generate Zod schemas for runtime validation
   if (resources.length > 0) {
-    lines.push('// Zod schemas for runtime validation')
+    lines.push(
+      '// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.'
+    )
     lines.push('')
   }
   for (const [resourceName, resource] of resources) {
@@ -344,6 +289,9 @@ function generateTypesFile(manifest: AppManifest): string {
     // runtime-targeting-aware resolution as the read type above.
     const emitCanonicalId = resolveCanonicalIdentifierSource(resource) !== undefined
 
+    lines.push(
+      '/** Raw passthrough validator; typed SDK records use the canonical contract codec. */'
+    )
     lines.push(`export const ${resourceName}Schema = z.object({`)
     if (emitCanonicalId) {
       lines.push(`  ${CANONICAL_IDENTIFIER_KEY}: z.string().optional(),`)
@@ -447,10 +395,6 @@ function generateClientFile(
         if ('enum' in paramType) {
           // Enum reference: the type name is the enum's name directly
           typesUsedInAppCommands.add(paramType.enum)
-        } else if ('resource' in paramType) {
-          // Resource reference: capitalise to match the generated interface name
-          const name = paramType.resource.charAt(0).toUpperCase() + paramType.resource.slice(1)
-          typesUsedInAppCommands.add(name)
         }
       } else if (typeof paramType === 'string') {
         if (manifest.enums[paramType]) {
@@ -481,7 +425,14 @@ function generateClientFile(
 
   // Generate app-level command methods
   const appCommands = availableAppCommands(manifest)
-    .map(([key, cmd]) => generateAppCommandMethod(commandRouteSegment(key, cmd), cmd, appNameLower))
+    .map(([key, cmd]) =>
+      generateAppCommandMethod(
+        commandRouteSegment(key, cmd),
+        cmd,
+        appNameLower,
+        contractNames(manifest).client
+      )
+    )
     .join('\n\n')
 
   return `/**
@@ -493,6 +444,10 @@ function generateClientFile(
 
 ${resourceImports}
 ${enumImports}
+import { ${contractNames(manifest).contract} as appContract } from './contract/index.js';
+import { createCodecClient, createRemoteTransport, type ClientTransport } from '@macts/contracts/client';
+import { MactsError, OperationCancelledError, TransportError, ValidationError, fromWireErrorEnvelope, type AppContract, type CallOptions, type ClientBrand, type ClientRuntime, type OperationId, type WireValue } from '@macts/contracts';
+import type { ${contractNames(manifest).resources} } from './contract/index.js';
 ${integerInputSupport(appCommands)}
 
 /**
@@ -508,36 +463,87 @@ export interface ${appName}ClientOptions {
 /**
  * HTTP client wrapper for making authenticated requests.
  */
+/** Canonical failures retained privately while raw RPC preserves the legacy error class. */
+const canonicalFailures = new WeakMap<Error, MactsError>();
+
+/**
+ * Private request metadata selects the canonical POST while retaining the public
+ * raw RPC hook. It never enters the request body or caller-owned options.
+ */
+const canonicalCall = Symbol('canonical contract call');
+
 export class HttpClient {
+  readonly #transport: ClientTransport;
   readonly #baseUrl: string;
   readonly #apiKey: string;
+  #runtime: ClientRuntime | undefined;
 
   constructor(baseUrl: string, apiKey: string) {
     this.#baseUrl = baseUrl;
     this.#apiKey = apiKey;
+    this.#transport = createRemoteTransport(appContract, { url: baseUrl, token: apiKey });
   }
 
   /**
-   * Make an authenticated POST request to an RPC endpoint.
+   * Bind the actual public facade in the shared reference registry. A copied
+   * contract changes only construction; its descriptors and codecs are shared.
+   * @internal
    */
-  async rpc<T>(path: string, body: object = {}): Promise<T> {
-    const url = \`\${this.#baseUrl}/api/v1/rpc/\${path}\`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': \`Bearer \${this.#apiKey}\`,
-        'Content-Type': 'application/json',
+  bind<Client extends ClientBrand<${contractNames(manifest).resources}>>(client: Client): void {
+    const contract: AppContract<Client, ${contractNames(manifest).resources}> = {
+      ...appContract,
+      bind: runtime => { this.#runtime = runtime; return client; },
+    };
+    createCodecClient(contract, {
+      invoke: async (operation, input, options) => {
+        try {
+          const requestOptions: CallOptions & { readonly [canonicalCall]: true } = { ...options, [canonicalCall]: true };
+          return await this.rpc(operation, input as object, requestOptions);
+        } catch (error) {
+          if (error instanceof MactsError) throw error;
+          if (error instanceof Error) {
+            const canonical = canonicalFailures.get(error);
+            if (canonical !== undefined) throw canonical;
+          }
+          if (options?.signal?.aborted === true) throw new OperationCancelledError('The operation was cancelled.', {});
+          throw new TransportError('The custom RPC transport failed.', { reason: 'unreachable' });
+        }
       },
-      body: JSON.stringify(body),
+      resolve: this.#transport.resolve,
     });
+  }
 
-    if (!response.ok) {
-      const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error.error?.message ?? \`HTTP \${String(response.status)}\`;
-      throw new ${appName}Error(code, message);
+  /** Invoke a registered operation with SDK input; raw RPC hooks still see wire input. @internal */
+  async invoke<T>(path: string, input: object = {}, options?: CallOptions): Promise<T> {
+    const operation = Object.values(appContract.operations).find(candidate => candidate.id === path);
+    if (operation === undefined || operation.unavailable !== undefined) {
+      throw new ValidationError('The operation is not registered in this app contract.', { issues: [{ path: [], message: 'Unknown operation route.' }] });
     }
+    if (this.#runtime === undefined) this.bind({});
+    if (this.#runtime === undefined) throw new Error('Client runtime was not initialized.');
+    return this.#runtime.invoke(operation, input, options) as Promise<T>;
+  }
 
+  /** Raw wire RPC for explicit passthrough consumers; typed methods use invoke. */
+  async rpc<T>(path: string, body: object = {}, options?: CallOptions): Promise<T> {
+    // Typed wrappers still dispatch through overrides; an override forwarding to
+    // super retains the shared transport's envelope/cancellation semantics.
+    if (options !== undefined && canonicalCall in options) {
+      return await this.#transport.invoke(path as OperationId, body as WireValue, options) as T;
+    }
+    const response = await fetch(\`\${this.#baseUrl}/api/v1/rpc/\${path}\`, {
+      method: 'POST',
+      headers: { Authorization: \`Bearer \${this.#apiKey}\`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      ...(options?.signal === undefined ? {} : { signal: options.signal }),
+    });
+    if (!response.ok) {
+      const envelope: unknown = await response.json();
+      const error = envelope as { error?: { code?: string; message?: string } };
+      const legacy = new ${appName}Error(error.error?.code ?? 'UNKNOWN_ERROR', error.error?.message ?? \`HTTP \${String(response.status)}\`);
+      canonicalFailures.set(legacy, fromWireErrorEnvelope(envelope, { status: response.status }));
+      throw legacy;
+    }
     const result = await response.json() as { result: T };
     return result.result;
   }
@@ -569,6 +575,9 @@ export class ${appName}Error extends Error {
  * const calendars = await client.calendars.list();
  * \`\`\`
  */
+/** Shared type-only resource brand lets caller-built references target this facade. */
+export interface ${appName}Client extends ClientBrand<${contractNames(manifest).resources}> {}
+
 export class ${appName}Client {
   readonly #httpClient: HttpClient;
 ${resourceProperties}
@@ -577,6 +586,7 @@ ${resourceProperties}
     const baseUrl = options.baseUrl ?? '${baseUrl}:${String(port)}';
     this.#httpClient = new HttpClient(baseUrl, options.apiKey);
 ${resourceInitializers}
+    this.#httpClient.bind(this);
   }
 
   /**
@@ -585,7 +595,7 @@ ${resourceInitializers}
   get http(): HttpClient {
     return this.#httpClient;
   }
-${appCommands}
+${operationCallOptions(appCommands)}
 }
 `
 }
@@ -626,17 +636,23 @@ function availableAppCommands(manifest: AppManifest): [string, Command][] {
 function generateAppCommandMethod(
   routeSegment: string,
   cmd: Command,
-  appNameLower: string
+  appNameLower: string,
+  canonicalClient: string
 ): string {
-  const { signature, bodyArg } = buildParamsAndBody(cmd)
+  const { signature, bodyArg } = buildParamsAndBody(
+    cmd,
+    `import('./contract/index.js').${canonicalClient}['${safeIdentifier(cmd.name)}']`
+  )
 
-  const returnType = cmd.returns ? propertyTypeToTs(cmd.returns as PropertyType) : 'void'
+  const returnType = cmd.returns
+    ? `Awaited<ReturnType<import('./contract/index.js').${canonicalClient}['${safeIdentifier(cmd.name)}']>>`
+    : 'void'
   const rpcReturnType = returnType === 'void' ? 'undefined' : returnType
   const needsAwait = returnType === 'void'
 
   const rpcCall = needsAwait
-    ? `await this.#httpClient.rpc<${rpcReturnType}>('${appNameLower}.app.${routeSegment}', ${bodyArg});`
-    : `return this.#httpClient.rpc<${rpcReturnType}>('${appNameLower}.app.${routeSegment}', ${bodyArg});`
+    ? `await this.#httpClient.invoke<${rpcReturnType}>('${appNameLower}.app.${routeSegment}', ${bodyArg});`
+    : `return this.#httpClient.invoke<${rpcReturnType}>('${appNameLower}.app.${routeSegment}', ${bodyArg});`
 
   return `
   /**
@@ -681,7 +697,9 @@ function generateResourceClient(
   const deleteCmd = crud('delete')
 
   const commandMethods = resourceCommands
-    .map(([key, cmd]) => generateResourceCommandMethod(commandRouteSegment(key, cmd), cmd))
+    .map(([key, cmd]) =>
+      generateResourceCommandMethod(commandRouteSegment(key, cmd), cmd, resourceName)
+    )
     .join('\n')
 
   // The resource's own type is referenced by the CRUD methods' return types
@@ -700,7 +718,6 @@ function generateResourceClient(
       ...cmd.parameters.map((p) =>
         typeof p.type === 'string' ? (p.type as PropertyType) : 'string'
       ),
-      ...(cmd.returns ? [cmd.returns as PropertyType] : []),
     ]
     for (const t of referencedTypes) {
       const tsName = propertyTypeToTs(t)
@@ -846,7 +863,7 @@ export class ${resourceName}ResourceClient {
     this.#app = app;
     this.#resource = resource;
   }
-${methodBody}
+${operationCallOptions(methodBody)}
 }
 `
 }
@@ -921,7 +938,7 @@ function generateListMethod(
 ${doc}${docNoteLines(notes)}
    */
   async list(${params.join(', ')}): Promise<${returnType}> {
-    return this.#http.rpc<${returnType}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`${bodyArg});
+    return this.#http.invoke<${returnType}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`${bodyArg});
   }
 `
 }
@@ -974,7 +991,7 @@ function generateGetMethod(
    * Get a ${nameWords} by ${childParam} within a parent scope.${noteLine}
    */
   async get(${parentParam}: ${identifierType(command, parentParam)}, ${childParam}: ${identifierType(command, childParam)}): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${field(parentParam)}, ${field(childParam)} });
+    return this.#http.invoke<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${field(parentParam)}, ${field(childParam)} });
   }
 `
   }
@@ -983,7 +1000,7 @@ function generateGetMethod(
    * Get a ${nameWords} by ${childParam}.${noteLine}
    */
   async get(${childParam}: ${identifierType(command, childParam)}): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${field(childParam)} });
+    return this.#http.invoke<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${field(childParam)} });
   }
 `
 }
@@ -1008,20 +1025,20 @@ function integerWire(value: string): string {
 function integerInputSupport(methods: string): string {
   if (!methods.includes('__mactsIntegerInput(')) return ''
   return `
-import { ValueTypes as __mactsValueTypes, ValidationError as __mactsValidationError } from '@macts/contracts';
+import { Integer as __mactsInteger, ValueTypes as __mactsValueTypes, ValidationError as __mactsValidationError } from '@macts/contracts';
 
 /** Integer wire policy shared with the operation contracts, built once per module. */
 const __mactsIntegerWire = __mactsValueTypes.integer().wire;
 
 /** Validate CLI text or an SDK number before dispatch, without implicit rounding. */
-function __mactsIntegerInput(value: unknown): { integer: string } {
+function __mactsIntegerInput(value: unknown): __mactsInteger {
   const integer = typeof value === 'number' || typeof value === 'string' ? String(value) : undefined;
   const candidate = { integer };
   if (!__mactsIntegerWire.safeParse(candidate).success || integer === undefined) {
     const message = 'Expected a canonical decimal integer from -9007199254740991 to 9007199254740991.';
     throw new __mactsValidationError(message, { issues: [{ path: [], message }] });
   }
-  return { integer };
+  return __mactsInteger.validate(Number(integer));
 }
 `
 }
@@ -1099,7 +1116,7 @@ function generateCreateMethod(
    * Create a new ${nameWords}.${docNoteLines(notes)}
    */
   async create(input: ${resourceName}CreateInput): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, input);
+    return this.#http.invoke<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, input);
   }
 `
 }
@@ -1131,7 +1148,7 @@ function generateUpdateMethod(
     const { ${parentParam}: _p, ...updateFields } = input as ${resourceName}UpdateInput & { ${parentParam}?: string };
     void _p;
     const defined = Object.fromEntries(Object.entries(updateFields as Record<string, unknown>).filter(([, v]) => v !== undefined));
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, parentParam)}, ${identifierField(command, childParam)}, ...defined });
+    return this.#http.invoke<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, parentParam)}, ${identifierField(command, childParam)}, ...defined });
   }
 `
   }
@@ -1141,7 +1158,7 @@ function generateUpdateMethod(
    */
   async update(${childParam}: ${identifierType(command, childParam)}, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
     const defined = Object.fromEntries(Object.entries(input as Record<string, unknown>).filter(([, v]) => v !== undefined));
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, childParam)}, ...defined });
+    return this.#http.invoke<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, childParam)}, ...defined });
   }
 `
 }
@@ -1167,7 +1184,7 @@ function generateDeleteMethod(
    * Delete an ${nameWords} within a parent scope.${noteLine}
    */
   async delete(${parentParam}: ${identifierType(command, parentParam)}, ${childParam}: ${identifierType(command, childParam)}): Promise<void> {
-    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, parentParam)}, ${identifierField(command, childParam)} });
+    await this.#http.invoke<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, parentParam)}, ${identifierField(command, childParam)} });
   }
 `
   }
@@ -1176,7 +1193,7 @@ function generateDeleteMethod(
    * Delete an ${nameWords}.${noteLine}
    */
   async delete(${childParam}: ${identifierType(command, childParam)}): Promise<void> {
-    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, childParam)} });
+    await this.#http.invoke<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, childParam)} });
   }
 `
 }
@@ -1186,11 +1203,16 @@ function generateDeleteMethod(
  * surface derivation (`commandMethodParameters`). Each parameter, a resource
  * command's item identifier included, is sent through {@link bodyField}.
  */
-function buildParamsAndBody(command: Command): { signature: string; bodyArg: string } {
+function buildParamsAndBody(
+  command: Command,
+  canonicalMethod: string
+): { signature: string; bodyArg: string } {
   const { signature: signatureParams, body } = commandMethodParameters(command)
   const signature = signatureParams
-    .map(({ parameter, bindingName, optional }) => {
-      const tsType = propertyTypeToTs(parameter.type as PropertyType)
+    .map(({ parameter, bindingName, optional }, index) => {
+      const tsType = containsReference(parameter.type as PropertyType)
+        ? `Parameters<${canonicalMethod}>[${String(index)}]`
+        : propertyTypeToTs(parameter.type as PropertyType)
       return `${bindingName}${optional ? '?' : ''}: ${tsType}`
     })
     .join(', ')
@@ -1220,21 +1242,30 @@ function buildParamsAndBody(command: Command): { signature: string; bodyArg: str
  * structured path. CRUD-shaped commands are emitted separately by
  * `generateResourceClient`, so they are skipped here.
  */
-function generateResourceCommandMethod(routeSegment: string, cmd: Command): string {
+function generateResourceCommandMethod(
+  routeSegment: string,
+  cmd: Command,
+  resourceName: string
+): string {
   // Skip standard CRUD commands as they're already generated
   if (isCrudName(cmd.name)) {
     return ''
   }
 
-  const { signature, bodyArg } = buildParamsAndBody(cmd)
+  const { signature, bodyArg } = buildParamsAndBody(
+    cmd,
+    `import('../contract/index.js').${resourceName}ResourceClient['${safeIdentifier(cmd.name)}']`
+  )
 
-  const returnType = cmd.returns ? propertyTypeToTs(cmd.returns as PropertyType) : 'void'
+  const returnType = cmd.returns
+    ? `Awaited<ReturnType<import('../contract/index.js').${resourceName}ResourceClient['${safeIdentifier(cmd.name)}']>>`
+    : 'void'
   const rpcReturnType = returnType === 'void' ? 'undefined' : returnType
   const needsAwait = returnType === 'void'
 
   const rpcCall = needsAwait
-    ? `await this.#http.rpc<${rpcReturnType}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, ${bodyArg});`
-    : `return this.#http.rpc<${rpcReturnType}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, ${bodyArg});`
+    ? `await this.#http.invoke<${rpcReturnType}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, ${bodyArg});`
+    : `return this.#http.invoke<${rpcReturnType}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, ${bodyArg});`
 
   return `
   /**
@@ -1279,6 +1310,7 @@ function generateIndexFile(manifest: AppManifest, appName: string): string {
 export { ${appName}Client, ${appName}Error, HttpClient } from './client.js';
 export type { ${appName}ClientOptions } from './client.js';
 export * from './types.js';
+export type { ${contractNames(manifest).resources} } from './contract/index.js';
 ${resourceExports}
 `
 }
@@ -1325,4 +1357,38 @@ function generatePackageJson(options: HttpClientGeneratorOptions, appName: strin
     },
   }
   return JSON.stringify(pkg, null, 2)
+}
+
+/** Add cancellation options after the retained positional convenience arguments. */
+function operationCallOptions(methods: string): string {
+  let optionsName = '__mactsOptions'
+  while (methods.includes(optionsName)) optionsName = `_${optionsName}`
+  return methods
+    .replace(
+      /async (\w+)\(([^\n]*)\): Promise/g,
+      (_match, name: string, parameters: string) =>
+        `async ${name}(${parameters}${parameters.length === 0 ? '' : ', '}${optionsName}?: import('@macts/contracts').CallOptions): Promise`
+    )
+    .split('\n')
+    .map((line) => {
+      if (!line.includes('.invoke<')) return line
+      // Body-less resource lists end at their route template. Every other
+      // generated method already supplies an explicit SDK input argument.
+      const beforeOptions = line.replace(/\);$/, '')
+      const input = beforeOptions.endsWith('`') ? ', {}' : ''
+      return `${beforeOptions}${input}, ${optionsName});`
+    })
+    .join('\n')
+}
+
+/** Reference inputs are canonical addressing data, distinct from hydrated read records. */
+function containsReference(type: PropertyType | undefined): boolean {
+  if (type === undefined || typeof type === 'string') return false
+  return 'resource' in type || ('array' in type && containsReference(type.array))
+}
+
+/** Numeric convenience types preserve the old number/number-array call shapes. */
+function containsInteger(type: PropertyType | undefined): boolean {
+  if (type === 'integer') return true
+  return typeof type === 'object' && 'array' in type && containsInteger(type.array)
 }

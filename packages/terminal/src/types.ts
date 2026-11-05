@@ -5,105 +5,36 @@
 
 import { z } from 'zod'
 
-/** A Terminal window */
-export interface Window {
-  /** The title of the window */
-  name: string
-  /** The unique identifier of the window */
-  id: number
-  /** The position of the window */
-  position: string
-  /** Whether the window is visible */
-  visible: boolean
-  /** Whether the window is the frontmost window */
-  frontmost: boolean
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Window } from './contract/index.js'
 
-/** Input for creating a Window */
-export interface WindowCreateInput {
-  /** The position of the window */
-  position?: string
-  /** Whether the window is visible */
-  visible?: boolean
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type WindowCreateInput = import('./contract/index.js').WindowCreateInput
 
-/** Input for updating a Window */
-export type WindowUpdateInput = Partial<WindowCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type WindowUpdateInput = import('./contract/index.js').WindowUpdateInput
 
-/** A Terminal tab */
-export interface Tab {
-  /** Canonical identifier (mirrors `tty`); populated by list, pass to get/delete and to write operations that reference this resource. */
-  id?: string
-  /** The visible contents of the tab */
-  contents: string
-  /** The complete history contents of the tab */
-  history: string
-  /** Whether the tab is busy running a process */
-  busy: boolean
-  /** The currently running processes in the tab */
-  processes: string
-  /** Whether the tab is selected */
-  selected: boolean
-  /** Whether the title displays a custom title */
-  titleDisplaysCustomTitle: boolean
-  /** The custom title of the tab */
-  customTitle: string
-  /** The tty device of the tab */
-  tty: string
-  /** The name of the current settings set */
-  currentSettings: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Tab } from './contract/index.js'
 
-/** Input for creating a Tab */
-export interface TabCreateInput {
-  /** Whether the tab is selected */
-  selected?: boolean
-  /** Whether the title displays a custom title */
-  titleDisplaysCustomTitle?: boolean
-  /** The custom title of the tab */
-  customTitle?: string
-  /** The name of the current settings set */
-  currentSettings?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type TabCreateInput = import('./contract/index.js').TabCreateInput
 
-/** Input for updating a Tab */
-export type TabUpdateInput = Partial<TabCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type TabUpdateInput = import('./contract/index.js').TabUpdateInput
 
-/** A Terminal settings set (profile) */
-export interface SettingsSet {
-  /** The name of the settings set */
-  name: string
-  /** The unique identifier of the settings set */
-  id: number
-  /** The number of rows */
-  numberOfRows: number
-  /** The number of columns */
-  numberOfColumns: number
-  /** The name of the font */
-  fontName: string
-  /** The size of the font */
-  fontSize: number
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { SettingsSet } from './contract/index.js'
 
-/** Input for creating a SettingsSet */
-export interface SettingsSetCreateInput {
-  /** The name of the settings set */
-  name?: string
-  /** The number of rows */
-  numberOfRows?: number
-  /** The number of columns */
-  numberOfColumns?: number
-  /** The name of the font */
-  fontName?: string
-  /** The size of the font */
-  fontSize?: number
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type SettingsSetCreateInput = import('./contract/index.js').SettingsSetCreateInput
 
-/** Input for updating a SettingsSet */
-export type SettingsSetUpdateInput = Partial<SettingsSetCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type SettingsSetUpdateInput = import('./contract/index.js').SettingsSetUpdateInput
 
-// Zod schemas for runtime validation
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const WindowSchema = z.object({
   name: z.string(),
   id: z.number(),
@@ -112,6 +43,7 @@ export const WindowSchema = z.object({
   frontmost: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const TabSchema = z.object({
   id: z.string().optional(),
   contents: z.string(),
@@ -125,6 +57,7 @@ export const TabSchema = z.object({
   currentSettings: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const SettingsSetSchema = z.object({
   name: z.string(),
   id: z.number(),

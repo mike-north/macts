@@ -4,45 +4,45 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
+import { ObjectReferenceData } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { PageRequest } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Address {
-    city: string;
-    country: string;
-    countryCode: string;
-    formattedAddress: string;
+    city: string | null;
+    country: string | null;
+    countryCode: string | null;
+    readonly formattedAddress: string | null;
     id: string;
-    label: string;
-    state: string;
-    street: string;
-    zip: string;
+    label: string | null;
+    state: string | null;
+    street: string | null;
+    zip: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "AddressCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface AddressCreateInput {
-    city?: string;
-    country?: string;
-    countryCode?: string;
-    id?: string;
-    label?: string;
-    state?: string;
-    street?: string;
-    zip?: string;
-}
+export type AddressCreateInput = AddressCreateInput_2;
 
 // @public
 export class AddressResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(personId: string, id: string): Promise<Address>;
+    get(personId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Address>;
     list(personId: string, page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<Page<Address>>;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Address>>;
 }
 
-// @public (undocumented)
+// @public
 export const AddressSchema: z.ZodObject<{
     city: z.ZodString;
     formattedAddress: z.ZodString;
@@ -55,31 +55,34 @@ export const AddressSchema: z.ZodObject<{
     state: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "AddressUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AddressUpdateInput = Partial<AddressCreateInput>;
+export type AddressUpdateInput = AddressUpdateInput_2;
 
 // @public
 export interface AIMHandle {
-    id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "AIMHandleCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type AIMHandleCreateInput = AIMHandleCreateInput_2;
 
 // @public
-export interface AIMHandleCreateInput {
-    label?: string;
-    value?: string;
-}
-
-// @public (undocumented)
 export const AIMHandleSchema: z.ZodObject<{
     id: z.ZodString;
     label: z.ZodString;
     value: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "AIMHandleUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AIMHandleUpdateInput = Partial<AIMHandleCreateInput>;
+export type AIMHandleUpdateInput = AIMHandleUpdateInput_2;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -100,23 +103,30 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
+// Warning: (ae-forgotten-export) The symbol "ContactsResources" needs to be exported by the entry point index.d.ts
+//
 // @public
+export interface ContactsClient extends ClientBrand<ContactsResources> {
+}
+
+// @public (undocumented)
 export class ContactsClient {
     constructor(options: ContactsClientOptions);
-    actionProperty(): Promise<void>;
-    actionTitle(_with: unknown, _for: Person): Promise<void>;
-    add(to: string): Promise<void>;
+    actionProperty(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "ContactsClient_2" needs to be exported by the entry point index.d.ts
+    actionTitle(_with: unknown, _for: Parameters<ContactsClient_2['actionTitle']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    add(to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly addresses: AddressResourceClient;
     readonly emails: EmailResourceClient;
     readonly groups: GroupResourceClient;
     get http(): HttpClient;
-    make(_new: string, at?: string, withData?: unknown, withProperties?: unknown): Promise<void>;
+    make(_new: string, at?: string, withData?: unknown, withProperties?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly people: PersonResourceClient;
-    performAction(_with: unknown, _for: Person): Promise<void>;
+    performAction(_with: unknown, _for: Parameters<ContactsClient_2['performAction']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly phones: PhoneResourceClient;
-    remove(from: string): Promise<void>;
-    save(): Promise<void>;
-    shouldEnableAction(_with: unknown, _for: Person): Promise<void>;
+    remove(from: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    save(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    shouldEnableAction(_with: unknown, _for: Parameters<ContactsClient_2['shouldEnableAction']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -134,84 +144,86 @@ export class ContactsError extends Error {
 
 // @public
 export interface CustomDate {
-    id: string;
-    label: string;
-    value: Date;
+    readonly id: string | null;
+    label: string | null;
+    value: Date | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "CustomDateCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type CustomDateCreateInput = CustomDateCreateInput_2;
 
 // @public
-export interface CustomDateCreateInput {
-    label?: string;
-    value?: Date;
-}
-
-// @public (undocumented)
 export const CustomDateSchema: z.ZodObject<{
     id: z.ZodString;
     label: z.ZodString;
     value: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "CustomDateUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type CustomDateUpdateInput = Partial<CustomDateCreateInput>;
+export type CustomDateUpdateInput = CustomDateUpdateInput_2;
 
 // @public
 export interface Email {
-    id: string;
+    readonly id: string;
     label: string;
     value: string;
 }
 
+// Warning: (ae-forgotten-export) The symbol "EmailCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface EmailCreateInput {
-    label?: string;
-    value?: string;
-}
+export type EmailCreateInput = EmailCreateInput_2;
 
 // @public
 export class EmailResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(personId: string, id: string): Promise<Email>;
+    get(personId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Email>;
     list(personId: string, page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<Page<Email>>;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Email>>;
 }
 
-// @public (undocumented)
+// @public
 export const EmailSchema: z.ZodObject<{
     id: z.ZodString;
     label: z.ZodString;
     value: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "EmailUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type EmailUpdateInput = Partial<EmailCreateInput>;
+export type EmailUpdateInput = EmailUpdateInput_2;
 
 // @public
 export interface Group {
-    creationDate: Date;
-    id: string;
-    modificationDate: Date;
-    name: string;
+    readonly creationDate: Date | null;
+    readonly id: string;
+    readonly modificationDate: Date | null;
+    name: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "GroupCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface GroupCreateInput {
-    name?: string;
-}
+export type GroupCreateInput = GroupCreateInput_2;
 
 // @public
 export class GroupResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Group>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Group>;
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<Page<Group>>;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Group>>;
 }
 
-// @public (undocumented)
+// @public
 export const GroupSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -219,144 +231,137 @@ export const GroupSchema: z.ZodObject<{
     modificationDate: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "GroupUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type GroupUpdateInput = Partial<GroupCreateInput>;
+export type GroupUpdateInput = GroupUpdateInput_2;
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind<Client extends ClientBrand<ContactsResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface ICQHandle {
-    id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "ICQHandleCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type ICQHandleCreateInput = ICQHandleCreateInput_2;
 
 // @public
-export interface ICQHandleCreateInput {
-    label?: string;
-    value?: string;
-}
-
-// @public (undocumented)
 export const ICQHandleSchema: z.ZodObject<{
     id: z.ZodString;
     label: z.ZodString;
     value: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "ICQHandleUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ICQHandleUpdateInput = Partial<ICQHandleCreateInput>;
+export type ICQHandleUpdateInput = ICQHandleUpdateInput_2;
 
 // @public
 export type InstantMessageServiceType = 'aIM' | 'facebook' | 'gaduGadu' | 'googleTalk' | 'iCQ' | 'jabber' | 'mSN' | 'qQ' | 'skype' | 'yahoo';
 
 // @public
 export interface JabberHandle {
-    id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "JabberHandleCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type JabberHandleCreateInput = JabberHandleCreateInput_2;
 
 // @public
-export interface JabberHandleCreateInput {
-    label?: string;
-    value?: string;
-}
-
-// @public (undocumented)
 export const JabberHandleSchema: z.ZodObject<{
     id: z.ZodString;
     label: z.ZodString;
     value: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "JabberHandleUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type JabberHandleUpdateInput = Partial<JabberHandleCreateInput>;
+export type JabberHandleUpdateInput = JabberHandleUpdateInput_2;
 
 // @public
 export interface MSNHandle {
-    id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "MSNHandleCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type MSNHandleCreateInput = MSNHandleCreateInput_2;
 
 // @public
-export interface MSNHandleCreateInput {
-    label?: string;
-    value?: string;
-}
-
-// @public (undocumented)
 export const MSNHandleSchema: z.ZodObject<{
     id: z.ZodString;
     label: z.ZodString;
     value: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "MSNHandleUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type MSNHandleUpdateInput = Partial<MSNHandleCreateInput>;
+export type MSNHandleUpdateInput = MSNHandleUpdateInput_2;
 
 // @public
 export interface Person {
-    birthDate: Date;
-    company: boolean;
-    creationDate: Date;
-    department: string;
-    firstName: string;
-    homePage: string;
-    id: string;
-    jobTitle: string;
-    lastName: string;
-    maidenName: string;
-    middleName: string;
-    modificationDate: Date;
-    name: string;
-    nickname: string;
-    note: string;
-    organization: string;
-    phoneticFirstName: string;
-    phoneticLastName: string;
-    phoneticMiddleName: string;
-    suffix: string;
-    title: string;
+    birthDate: Date | null;
+    company: boolean | null;
+    readonly creationDate: Date | null;
+    department: string | null;
+    firstName: string | null;
+    homePage: string | null;
+    readonly id: string;
+    jobTitle: string | null;
+    lastName: string | null;
+    maidenName: string | null;
+    middleName: string | null;
+    readonly modificationDate: Date | null;
+    readonly name: string | null;
+    nickname: string | null;
+    note: string | null;
+    organization: string | null;
+    phoneticFirstName: string | null;
+    phoneticLastName: string | null;
+    phoneticMiddleName: string | null;
+    suffix: string | null;
+    title: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "PersonCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface PersonCreateInput {
-    birthDate?: Date;
-    company?: boolean;
-    department?: string;
-    firstName?: string;
-    homePage?: string;
-    jobTitle?: string;
-    lastName?: string;
-    maidenName?: string;
-    middleName?: string;
-    nickname?: string;
-    note?: string;
-    organization?: string;
-    phoneticFirstName?: string;
-    phoneticLastName?: string;
-    phoneticMiddleName?: string;
-    suffix?: string;
-    title?: string;
-}
+export type PersonCreateInput = PersonCreateInput_2;
 
 // @public
 export class PersonResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Person>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Person>;
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<Page<Person>>;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Person>>;
 }
 
-// @public (undocumented)
+// @public
 export const PersonSchema: z.ZodObject<{
     id: z.ZodString;
     creationDate: z.ZodString;
@@ -381,86 +386,87 @@ export const PersonSchema: z.ZodObject<{
     firstName: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "PersonUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type PersonUpdateInput = Partial<PersonCreateInput>;
+export type PersonUpdateInput = PersonUpdateInput_2;
 
 // @public
 export interface Phone {
-    id: string;
+    readonly id: string;
     label: string;
     value: string;
 }
 
+// Warning: (ae-forgotten-export) The symbol "PhoneCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface PhoneCreateInput {
-    label?: string;
-    value?: string;
-}
+export type PhoneCreateInput = PhoneCreateInput_2;
 
 // @public
 export class PhoneResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(personId: string, id: string): Promise<Phone>;
+    get(personId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Phone>;
     list(personId: string, page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<Page<Phone>>;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Phone>>;
 }
 
-// @public (undocumented)
+// @public
 export const PhoneSchema: z.ZodObject<{
     id: z.ZodString;
     label: z.ZodString;
     value: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "PhoneUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type PhoneUpdateInput = Partial<PhoneCreateInput>;
+export type PhoneUpdateInput = PhoneUpdateInput_2;
 
 // @public
 export interface RelatedName {
-    id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "RelatedNameCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type RelatedNameCreateInput = RelatedNameCreateInput_2;
 
 // @public
-export interface RelatedNameCreateInput {
-    label?: string;
-    value?: string;
-}
-
-// @public (undocumented)
 export const RelatedNameSchema: z.ZodObject<{
     id: z.ZodString;
     label: z.ZodString;
     value: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "RelatedNameUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type RelatedNameUpdateInput = Partial<RelatedNameCreateInput>;
+export type RelatedNameUpdateInput = RelatedNameUpdateInput_2;
 
 // @public
 export type SaveableFileFormat = 'archive';
 
 // @public
 export interface SocialProfile {
-    id: string;
-    serviceName: string;
-    url: string;
-    userIdentifier: string;
-    userName: string;
+    readonly id: string;
+    serviceName: string | null;
+    url: string | null;
+    userIdentifier: string | null;
+    userName: string | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "SocialProfileCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type SocialProfileCreateInput = SocialProfileCreateInput_2;
 
 // @public
-export interface SocialProfileCreateInput {
-    serviceName?: string;
-    url?: string;
-    userIdentifier?: string;
-    userName?: string;
-}
-
-// @public (undocumented)
 export const SocialProfileSchema: z.ZodObject<{
     id: z.ZodString;
     serviceName: z.ZodString;
@@ -469,54 +475,58 @@ export const SocialProfileSchema: z.ZodObject<{
     url: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "SocialProfileUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type SocialProfileUpdateInput = Partial<SocialProfileCreateInput>;
+export type SocialProfileUpdateInput = SocialProfileUpdateInput_2;
 
 // @public
 export interface Url {
-    id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "UrlCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type UrlCreateInput = UrlCreateInput_2;
 
 // @public
-export interface UrlCreateInput {
-    label?: string;
-    value?: string;
-}
-
-// @public (undocumented)
 export const UrlSchema: z.ZodObject<{
     id: z.ZodString;
     label: z.ZodString;
     value: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "UrlUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type UrlUpdateInput = Partial<UrlCreateInput>;
+export type UrlUpdateInput = UrlUpdateInput_2;
 
 // @public
 export interface YahooHandle {
-    id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "YahooHandleCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type YahooHandleCreateInput = YahooHandleCreateInput_2;
 
 // @public
-export interface YahooHandleCreateInput {
-    label?: string;
-    value?: string;
-}
-
-// @public (undocumented)
 export const YahooHandleSchema: z.ZodObject<{
     id: z.ZodString;
     label: z.ZodString;
     value: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "YahooHandleUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type YahooHandleUpdateInput = Partial<YahooHandleCreateInput>;
+export type YahooHandleUpdateInput = YahooHandleUpdateInput_2;
 
 // (No @packageDocumentation comment for this package)
 

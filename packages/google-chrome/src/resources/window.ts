@@ -24,14 +24,18 @@ export class WindowResourceClient {
   /**
    * List all windows, as one page.
    */
-  async list(): Promise<Page<Window>> {
-    return this.#http.rpc<Page<Window>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Window>> {
+    return this.#http.invoke<Page<Window>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions
+    )
   }
 
   /**
    * Get a window by id.
    */
-  async get(id: string): Promise<Window> {
-    return this.#http.rpc<Window>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Window> {
+    return this.#http.invoke<Window>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
   }
 }

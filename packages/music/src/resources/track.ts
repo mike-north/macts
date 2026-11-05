@@ -24,15 +24,30 @@ export class TrackResourceClient {
   /**
    * List the tracks of one playlist, as one page.
    */
-  async list(playlistId: string): Promise<Page<Track>> {
-    return this.#http.rpc<Page<Track>>(`${this.#app}.${this.#resource}.list`, { playlistId })
+  async list(
+    playlistId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<Track>> {
+    return this.#http.invoke<Page<Track>>(
+      `${this.#app}.${this.#resource}.list`,
+      { playlistId },
+      __mactsOptions
+    )
   }
 
   /**
    * Get a track by persistentID within a parent scope.
    * When several tracks share the same persistent ID, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async get(playlistId: string, persistentID: string): Promise<Track> {
-    return this.#http.rpc<Track>(`${this.#app}.${this.#resource}.get`, { playlistId, persistentID })
+  async get(
+    playlistId: string,
+    persistentID: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Track> {
+    return this.#http.invoke<Track>(
+      `${this.#app}.${this.#resource}.get`,
+      { playlistId, persistentID },
+      __mactsOptions
+    )
   }
 }

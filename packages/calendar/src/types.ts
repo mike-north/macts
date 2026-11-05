@@ -5,218 +5,146 @@
 
 import { z } from 'zod'
 
-/** Status of an attendee's response to an invitation */
-export type ParticipationStatus = 'unknown' | 'accepted' | 'declined' | 'tentative'
+export type { ParticipationStatus } from './contract/index.js'
 
-/** Status of a calendar event */
-export type EventStatus = 'cancelled' | 'confirmed' | 'none' | 'tentative'
+export type { EventStatus } from './contract/index.js'
 
-/** Priority level for calendar items */
-export type CalendarPriority = '0' | '9' | '5' | '1'
+export type { CalendarPriority } from './contract/index.js'
 
-/** Calendar view type */
-export type ViewType = 'dayView' | 'weekView' | 'monthView'
+export type { ViewType } from './contract/index.js'
 
-/** A calendar containing events */
-export interface Calendar {
-  /** Canonical identifier (mirrors `name`); populated by list, pass to get/delete and to write operations that reference this resource. */
-  id?: string
-  /** The calendar title */
-  name: string
-  /** The calendar title (synonym for name) */
-  title: string
-  /** The calendar color */
-  color: { r: number; g: number; b: number }
-  /** Whether the calendar can be modified */
-  writable: boolean
-  /** The calendar description */
-  description: string
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Calendar } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type CalendarCreateInput = import('./contract/index.js').CalendarCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type CalendarUpdateInput = import('./contract/index.js').CalendarUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Event } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type EventCreateInput = import('./contract/index.js').EventCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type EventUpdateInput = import('./contract/index.js').EventUpdateInput & {
+  /** Redundant parent; the positional argument owns scope. */ calendarId?: string
 }
 
-/** Input for creating a Calendar */
-export interface CalendarCreateInput {
-  /** Calendar name */
-  name: string
-  /** The calendar title (synonym for name) */
-  title?: string
-  /** Calendar color */
-  color?: { r: number; g: number; b: number }
-  /** The calendar description */
-  description?: string
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Attendee } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type AttendeeCreateInput = import('./contract/index.js').AttendeeCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type AttendeeUpdateInput = import('./contract/index.js').AttendeeUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { DisplayAlarm } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type DisplayAlarmCreateInput = Omit<
+  import('./contract/index.js').DisplayAlarmCreateInput,
+  'triggerInterval'
+> & {
+  /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
+  triggerInterval?:
+    | number
+    | Extract<import('./contract/index.js').DisplayAlarmCreateInput['triggerInterval'], null>
 }
 
-/** Input for updating a Calendar */
-export type CalendarUpdateInput = Partial<CalendarCreateInput>
-
-/** A calendar event */
-export interface Event {
-  /** Canonical identifier (mirrors `uid`); populated by list, pass to get/delete and to write operations that reference this resource. */
-  id?: string
-  /** The event summary/title */
-  summary: string
-  /** The event notes */
-  description: string
-  /** The event location */
-  location: string
-  /** The event start date */
-  startDate: Date
-  /** The event end date */
-  endDate: Date
-  /** True if the event is an all-day event */
-  alldayEvent: boolean
-  /** The iCalendar (RFC 2445) string describing the event recurrence, if defined */
-  recurrence: string
-  /** The event status */
-  status: EventStatus
-  /** The event version */
-  sequence: number
-  /** The event modification date */
-  stampDate: Date
-  /** The exception dates for recurring events */
-  excludedDates: Date[]
-  /** A unique event key */
-  uid: string
-  /** The URL associated with the event */
-  url: string
+/** Canonical update input, retaining checked numeric conveniences. */
+export type DisplayAlarmUpdateInput = Omit<
+  import('./contract/index.js').DisplayAlarmUpdateInput,
+  'triggerInterval'
+> & {
+  /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
+  triggerInterval?:
+    | number
+    | Extract<import('./contract/index.js').DisplayAlarmUpdateInput['triggerInterval'], null>
 }
 
-/** Input for creating a Event */
-export interface EventCreateInput {
-  /** Event title */
-  summary: string
-  /** Event notes */
-  description?: string
-  /** Event location */
-  location?: string
-  /** Event start date */
-  startDate: Date
-  /** Event end date */
-  endDate: Date
-  /** Whether this is an all-day event */
-  alldayEvent?: boolean
-  /** The iCalendar (RFC 2445) recurrence string */
-  recurrence?: string
-  /** Event status */
-  status?: EventStatus
-  /** Event modification date */
-  stampDate?: Date
-  /** Exception dates for recurring events */
-  excludedDates?: Date[]
-  /** URL associated with the event */
-  url?: string
-  /** Calendar identifier for the event */
-  calendarId: string
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { MailAlarm } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type MailAlarmCreateInput = Omit<
+  import('./contract/index.js').MailAlarmCreateInput,
+  'triggerInterval'
+> & {
+  /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
+  triggerInterval?:
+    | number
+    | Extract<import('./contract/index.js').MailAlarmCreateInput['triggerInterval'], null>
 }
 
-/** Input for updating a Event */
-export type EventUpdateInput = Partial<EventCreateInput>
-
-/** An event attendee */
-export interface Attendee {
-  /** The first and last name of the attendee */
-  displayName: string
-  /** Email address of the attendee */
-  email: string
-  /** The invitation status for the attendee */
-  participationStatus: ParticipationStatus
+/** Canonical update input, retaining checked numeric conveniences. */
+export type MailAlarmUpdateInput = Omit<
+  import('./contract/index.js').MailAlarmUpdateInput,
+  'triggerInterval'
+> & {
+  /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
+  triggerInterval?:
+    | number
+    | Extract<import('./contract/index.js').MailAlarmUpdateInput['triggerInterval'], null>
 }
 
-/** Input for creating a Attendee */
-export type AttendeeCreateInput = Record<string, never>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { SoundAlarm } from './contract/index.js'
 
-/** Input for updating a Attendee */
-export type AttendeeUpdateInput = Partial<AttendeeCreateInput>
-
-/** A message/display alarm */
-export interface DisplayAlarm {
-  /** The interval in minutes between the event and the alarm (positive for after, negative for before) */
-  triggerInterval: number
-  /** An absolute alarm date */
-  triggerDate: Date
+/** Canonical create input, retaining checked numeric conveniences. */
+export type SoundAlarmCreateInput = Omit<
+  import('./contract/index.js').SoundAlarmCreateInput,
+  'triggerInterval'
+> & {
+  /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
+  triggerInterval?:
+    | number
+    | Extract<import('./contract/index.js').SoundAlarmCreateInput['triggerInterval'], null>
 }
 
-/** Input for creating a DisplayAlarm */
-export interface DisplayAlarmCreateInput {
-  /** The interval in minutes between the event and the alarm (positive for after, negative for before) */
-  triggerInterval?: number
-  /** An absolute alarm date */
-  triggerDate?: Date
+/** Canonical update input, retaining checked numeric conveniences. */
+export type SoundAlarmUpdateInput = Omit<
+  import('./contract/index.js').SoundAlarmUpdateInput,
+  'triggerInterval'
+> & {
+  /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
+  triggerInterval?:
+    | number
+    | Extract<import('./contract/index.js').SoundAlarmUpdateInput['triggerInterval'], null>
 }
 
-/** Input for updating a DisplayAlarm */
-export type DisplayAlarmUpdateInput = Partial<DisplayAlarmCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { OpenFileAlarm } from './contract/index.js'
 
-/** A mail/email alarm */
-export interface MailAlarm {
-  /** The interval in minutes between the event and the alarm (positive for after, negative for before) */
-  triggerInterval: number
-  /** An absolute alarm date */
-  triggerDate: Date
+/** Canonical create input, retaining checked numeric conveniences. */
+export type OpenFileAlarmCreateInput = Omit<
+  import('./contract/index.js').OpenFileAlarmCreateInput,
+  'triggerInterval'
+> & {
+  /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
+  triggerInterval?:
+    | number
+    | Extract<import('./contract/index.js').OpenFileAlarmCreateInput['triggerInterval'], null>
 }
 
-/** Input for creating a MailAlarm */
-export interface MailAlarmCreateInput {
-  /** The interval in minutes between the event and the alarm (positive for after, negative for before) */
-  triggerInterval?: number
-  /** An absolute alarm date */
-  triggerDate?: Date
+/** Canonical update input, retaining checked numeric conveniences. */
+export type OpenFileAlarmUpdateInput = Omit<
+  import('./contract/index.js').OpenFileAlarmUpdateInput,
+  'triggerInterval'
+> & {
+  /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
+  triggerInterval?:
+    | number
+    | Extract<import('./contract/index.js').OpenFileAlarmUpdateInput['triggerInterval'], null>
 }
 
-/** Input for updating a MailAlarm */
-export type MailAlarmUpdateInput = Partial<MailAlarmCreateInput>
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
-/** A sound alarm */
-export interface SoundAlarm {
-  /** The interval in minutes between the event and the alarm (positive for after, negative for before) */
-  triggerInterval: number
-  /** An absolute alarm date */
-  triggerDate: Date
-  /** The system sound name to be used for the alarm */
-  soundName: string
-  /** The (POSIX) path to the sound file to be used for the alarm */
-  soundFile: string
-}
-
-/** Input for creating a SoundAlarm */
-export interface SoundAlarmCreateInput {
-  /** The interval in minutes between the event and the alarm (positive for after, negative for before) */
-  triggerInterval?: number
-  /** An absolute alarm date */
-  triggerDate?: Date
-  /** The system sound name to be used for the alarm */
-  soundName?: string
-  /** The (POSIX) path to the sound file to be used for the alarm */
-  soundFile?: string
-}
-
-/** Input for updating a SoundAlarm */
-export type SoundAlarmUpdateInput = Partial<SoundAlarmCreateInput>
-
-/** An 'open file' alarm */
-export interface OpenFileAlarm {
-  /** The interval in minutes between the event and the alarm (positive for after, negative for before) */
-  triggerInterval: number
-  /** An absolute alarm date */
-  triggerDate: Date
-  /** The (POSIX) path to be opened by the alarm */
-  filepath: string
-}
-
-/** Input for creating a OpenFileAlarm */
-export interface OpenFileAlarmCreateInput {
-  /** The interval in minutes between the event and the alarm (positive for after, negative for before) */
-  triggerInterval?: number
-  /** An absolute alarm date */
-  triggerDate?: Date
-  /** The (POSIX) path to be opened by the alarm */
-  filepath?: string
-}
-
-/** Input for updating a OpenFileAlarm */
-export type OpenFileAlarmUpdateInput = Partial<OpenFileAlarmCreateInput>
-
-// Zod schemas for runtime validation
-
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const CalendarSchema = z.object({
   id: z.string().optional(),
   name: z.string(),
@@ -226,6 +154,7 @@ export const CalendarSchema = z.object({
   description: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const EventSchema = z.object({
   id: z.string().optional(),
   summary: z.string(),
@@ -243,22 +172,26 @@ export const EventSchema = z.object({
   url: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AttendeeSchema = z.object({
   displayName: z.string(),
   email: z.string(),
   participationStatus: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const DisplayAlarmSchema = z.object({
   triggerInterval: z.number(),
   triggerDate: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const MailAlarmSchema = z.object({
   triggerInterval: z.number(),
   triggerDate: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const SoundAlarmSchema = z.object({
   triggerInterval: z.number(),
   triggerDate: z.string(),
@@ -266,6 +199,7 @@ export const SoundAlarmSchema = z.object({
   soundFile: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const OpenFileAlarmSchema = z.object({
   triggerInterval: z.number(),
   triggerDate: z.string(),

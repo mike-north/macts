@@ -4,23 +4,30 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Anchor {
-    name: string;
+    readonly name: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "AnchorCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AnchorCreateInput = Record<string, never>;
+export type AnchorCreateInput = AnchorCreateInput_2;
 
-// @public (undocumented)
+// @public
 export const AnchorSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "AnchorUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AnchorUpdateInput = Partial<AnchorCreateInput>;
+export type AnchorUpdateInput = AnchorUpdateInput_2;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -41,43 +48,57 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // Warning: (ae-forgotten-export) The symbol "SystemSettingsResources" needs to be exported by the entry point index.d.ts
+    //
+    // @internal
+    bind<Client extends ClientBrand<SystemSettingsResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface Pane {
-    id: string;
-    name: string;
+    readonly id: string;
+    readonly name: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "PaneCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type PaneCreateInput = Record<string, never>;
+export type PaneCreateInput = PaneCreateInput_2;
 
 // @public
 export class PaneResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    authorize(): Promise<void>;
-    timedLoad(): Promise<void>;
+    authorize(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    timedLoad(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const PaneSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "PaneUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type PaneUpdateInput = Partial<PaneCreateInput>;
+export type PaneUpdateInput = PaneUpdateInput_2;
 
 // @public
+export interface SystemSettingsClient extends ClientBrand<SystemSettingsResources> {
+}
+
+// @public (undocumented)
 export class SystemSettingsClient {
     constructor(options: SystemSettingsClientOptions);
     get http(): HttpClient;
     readonly panes: PaneResourceClient;
-    reveal(): Promise<void>;
+    reveal(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public

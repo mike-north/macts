@@ -5,128 +5,65 @@
 
 import { z } from 'zod'
 
-/** A window. */
-export interface Window {
-  /** The given name of the window. */
-  givenName: string
-  /** The full title of the window. */
-  name: string
-  /** The unique identifier of the window, within one browser session: ids start over each time the browser is relaunched, so an id kept across a relaunch may find a different window, not merely none. */
-  id: string
-  /** The index of the window, ordered front to back. */
-  index: number
-  /** The bounding rectangle of the window. */
-  bounds: { x: number; y: number; width: number; height: number }
-  /** Whether the window has a close box. */
-  closeable: boolean
-  /** Whether the window can be minimized. */
-  minimizable: boolean
-  /** Whether the window is currently minimized. */
-  minimized: boolean
-  /** Whether the window can be resized. */
-  resizable: boolean
-  /** Whether the window is currently visible. */
-  visible: boolean
-  /** Whether the window can be zoomed. */
-  zoomable: boolean
-  /** Whether the window is currently zoomed. */
-  zoomed: boolean
-  /** Returns the currently selected tab, as a reference that carries this window as its container. Window and tab ids start over each time the browser is relaunched, so this reference, kept across a relaunch, may resolve to a different tab or window, not merely fail, and an action through it, such as closing the tab, would act on that other tab. */
-  activeTab: Tab
-  /** Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window. */
-  mode: string
-  /** The index of the active tab. */
-  activeTabIndex: number
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Window } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type WindowCreateInput = Omit<
+  import('./contract/index.js').WindowCreateInput,
+  'index' | 'activeTabIndex'
+> & {
+  /** The index of the window, ordered front to back. Numeric values are validated by the contract before dispatch. */
+  index?: number | Extract<import('./contract/index.js').WindowCreateInput['index'], null>
+  /** The index of the active tab. Numeric values are validated by the contract before dispatch. */
+  activeTabIndex?:
+    | number
+    | Extract<import('./contract/index.js').WindowCreateInput['activeTabIndex'], null>
 }
 
-/** Input for creating a Window */
-export interface WindowCreateInput {
-  /** The given name of the window. */
-  givenName?: string
-  /** The index of the window, ordered front to back. */
-  index?: number
-  /** The bounding rectangle of the window. */
-  bounds?: { x: number; y: number; width: number; height: number }
-  /** Whether the window is currently minimized. */
-  minimized?: boolean
-  /** Whether the window is currently visible. */
-  visible?: boolean
-  /** Whether the window is currently zoomed. */
-  zoomed?: boolean
-  /** Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window. */
-  mode?: string
-  /** The index of the active tab. */
-  activeTabIndex?: number
+/** Canonical update input, retaining checked numeric conveniences. */
+export type WindowUpdateInput = Omit<
+  import('./contract/index.js').WindowUpdateInput,
+  'index' | 'activeTabIndex'
+> & {
+  /** The index of the window, ordered front to back. Numeric values are validated by the contract before dispatch. */
+  index?: number | Extract<import('./contract/index.js').WindowUpdateInput['index'], null>
+  /** The index of the active tab. Numeric values are validated by the contract before dispatch. */
+  activeTabIndex?:
+    | number
+    | Extract<import('./contract/index.js').WindowUpdateInput['activeTabIndex'], null>
 }
 
-/** Input for updating a Window */
-export type WindowUpdateInput = Partial<WindowCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Tab } from './contract/index.js'
 
-/** A tab. */
-export interface Tab {
-  /** Unique ID of the tab among the tabs of its window, within one browser session: ids start over each time the browser is relaunched, so an id kept across a relaunch may find a different tab, not merely none, and an action through it, such as closing the tab, would act on that other tab. */
-  id: string
-  /** The title of the tab. */
-  title: string
-  /** The url visible to the user. */
-  uRL: string
-  /** Is loading? */
-  loading: boolean
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type TabCreateInput = import('./contract/index.js').TabCreateInput
 
-/** Input for creating a Tab */
-export interface TabCreateInput {
-  /** The url visible to the user. */
-  uRL?: string
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type TabUpdateInput = import('./contract/index.js').TabUpdateInput
 
-/** Input for updating a Tab */
-export type TabUpdateInput = Partial<TabCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { BookmarkFolder } from './contract/index.js'
 
-/** A bookmarks folder that contains other bookmarks folder and bookmark items. */
-export interface BookmarkFolder {
-  /** Unique ID of the bookmark folder. */
-  id: string
-  /** The title of the folder. */
-  title: string
-  /** Returns the index with respect to its parent bookmark folder. */
-  index: number
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type BookmarkFolderCreateInput = import('./contract/index.js').BookmarkFolderCreateInput
 
-/** Input for creating a BookmarkFolder */
-export interface BookmarkFolderCreateInput {
-  /** The title of the folder. */
-  title?: string
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type BookmarkFolderUpdateInput = import('./contract/index.js').BookmarkFolderUpdateInput
 
-/** Input for updating a BookmarkFolder */
-export type BookmarkFolderUpdateInput = Partial<BookmarkFolderCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { BookmarkItem } from './contract/index.js'
 
-/** An item consists of an URL and the title of a bookmark */
-export interface BookmarkItem {
-  /** Unique ID of the bookmark item. */
-  id: string
-  /** The title of the bookmark item. */
-  title: string
-  /** The URL of the bookmark. */
-  uRL: string
-  /** Returns the index with respect to its parent bookmark folder. */
-  index: number
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type BookmarkItemCreateInput = import('./contract/index.js').BookmarkItemCreateInput
 
-/** Input for creating a BookmarkItem */
-export interface BookmarkItemCreateInput {
-  /** The title of the bookmark item. */
-  title?: string
-  /** The URL of the bookmark. */
-  uRL?: string
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type BookmarkItemUpdateInput = import('./contract/index.js').BookmarkItemUpdateInput
 
-/** Input for updating a BookmarkItem */
-export type BookmarkItemUpdateInput = Partial<BookmarkItemCreateInput>
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
-// Zod schemas for runtime validation
-
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const WindowSchema = z.object({
   givenName: z.string(),
   name: z.string(),
@@ -145,6 +82,7 @@ export const WindowSchema = z.object({
   activeTabIndex: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const TabSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -152,12 +90,14 @@ export const TabSchema = z.object({
   loading: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const BookmarkFolderSchema = z.object({
   id: z.string(),
   title: z.string(),
   index: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const BookmarkItemSchema = z.object({
   id: z.string(),
   title: z.string(),

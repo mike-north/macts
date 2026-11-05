@@ -4,6 +4,10 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
+
 // @public
 export const capabilities: readonly CapabilityMetadata[];
 
@@ -23,16 +27,26 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // Warning: (ae-forgotten-export) The symbol "ScreenSharingResources" needs to be exported by the entry point index.d.ts
+    //
+    // @internal
+    bind<Client extends ClientBrand<ScreenSharingResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
+export interface ScreenSharingClient extends ClientBrand<ScreenSharingResources> {
+}
+
+// @public (undocumented)
 export class ScreenSharingClient {
     constructor(options: ScreenSharingClientOptions);
-    getURL(url: string): Promise<void>;
+    getURL(url: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
 }
 
@@ -48,5 +62,7 @@ export class ScreenSharingError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// (No @packageDocumentation comment for this package)
 
 ```

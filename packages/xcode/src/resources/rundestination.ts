@@ -25,10 +25,15 @@ export class RunDestinationResourceClient {
    * List the run destinations of one workspace document, as one page.
    * When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
    */
-  async list(workspaceName: string): Promise<Page<RunDestination>> {
-    return this.#http.rpc<Page<RunDestination>>(`${this.#app}.${this.#resource}.list`, {
-      workspaceName,
-    })
+  async list(
+    workspaceName: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<RunDestination>> {
+    return this.#http.invoke<Page<RunDestination>>(
+      `${this.#app}.${this.#resource}.list`,
+      { workspaceName },
+      __mactsOptions
+    )
   }
 
   /**
@@ -36,10 +41,15 @@ export class RunDestinationResourceClient {
    * When several run destinations share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    * When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
    */
-  async get(workspaceName: string, name: string): Promise<RunDestination> {
-    return this.#http.rpc<RunDestination>(`${this.#app}.${this.#resource}.get`, {
-      workspaceName,
-      name,
-    })
+  async get(
+    workspaceName: string,
+    name: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<RunDestination> {
+    return this.#http.invoke<RunDestination>(
+      `${this.#app}.${this.#resource}.get`,
+      { workspaceName, name },
+      __mactsOptions
+    )
   }
 }

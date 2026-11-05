@@ -5,726 +5,308 @@
 
 import { z } from 'zod'
 
-/** SaveableFileFormat */
-export type SaveableFileFormat = 'nativeFormat'
+export type { SaveableFileFormat } from './contract/index.js'
 
-/** DefaultMessageFormat */
-export type DefaultMessageFormat = 'plainFormat' | 'richFormat'
+export type { DefaultMessageFormat } from './contract/index.js'
 
-/** HeaderDetail */
-export type HeaderDetail = 'all' | 'custom' | 'default' | 'noHeaders'
+export type { HeaderDetail } from './contract/index.js'
 
-/** LdapScope */
-export type LdapScope = 'base' | 'oneLevel' | 'subtree'
+export type { LdapScope } from './contract/index.js'
 
-/** QuotingColor */
-export type QuotingColor = 'blue' | 'green' | 'orange' | 'other' | 'purple' | 'red' | 'yellow'
+export type { QuotingColor } from './contract/index.js'
 
-/** ViewerColumns */
-export type ViewerColumns =
-  | 'attachmentsColumn'
-  | 'messageColor'
-  | 'dateReceivedColumn'
-  | 'dateSentColumn'
-  | 'flagsColumn'
-  | 'fromColumn'
-  | 'mailboxColumn'
-  | 'messageStatusColumn'
-  | 'numberColumn'
-  | 'sizeColumn'
-  | 'subjectColumn'
-  | 'toColumn'
-  | 'dateLastSavedColumn'
+export type { ViewerColumns } from './contract/index.js'
 
-/** Authentication */
-export type Authentication =
-  | 'password'
-  | 'apop'
-  | 'kerberos5'
-  | 'ntlm'
-  | 'md5'
-  | 'external'
-  | 'appleToken'
-  | 'none'
+export type { Authentication } from './contract/index.js'
 
-/** HighlightColors */
-export type HighlightColors =
-  | 'blue'
-  | 'gray'
-  | 'green'
-  | 'none'
-  | 'orange'
-  | 'other'
-  | 'purple'
-  | 'red'
-  | 'yellow'
+export type { HighlightColors } from './contract/index.js'
 
-/** MessageCachingPolicy */
-export type MessageCachingPolicy =
-  | 'doNotKeepCopiesOfAnyMessages'
-  | 'onlyMessagesIHaveRead'
-  | 'allMessagesButOmitAttachments'
-  | 'allMessagesAndTheirAttachments'
+export type { MessageCachingPolicy } from './contract/index.js'
 
-/** RuleQualifier */
-export type RuleQualifier =
-  | 'beginsWithValue'
-  | 'doesContainValue'
-  | 'doesNotContainValue'
-  | 'endsWithValue'
-  | 'equalToValue'
-  | 'lessThanValue'
-  | 'greaterThanValue'
-  | 'none'
+export type { RuleQualifier } from './contract/index.js'
 
-/** RuleType */
-export type RuleType =
-  | 'account'
-  | 'anyRecipient'
-  | 'ccHeader'
-  | 'matchesEveryMessage'
-  | 'fromHeader'
-  | 'headerKey'
-  | 'messageContent'
-  | 'messageIsJunkMail'
-  | 'senderIsInMyContacts'
-  | 'senderIsInMyPreviousRecipients'
-  | 'senderIsMemberOfGroup'
-  | 'senderIsNotInMyContacts'
-  | 'senderIsNotInMyPreviousRecipients'
-  | 'senderIsNotMemberOfGroup'
-  | 'senderIsVIP'
-  | 'subjectHeader'
-  | 'toHeader'
-  | 'toOrCcHeader'
-  | 'attachmentType'
+export type { RuleType } from './contract/index.js'
 
-/** TypeOfAccount */
-export type TypeOfAccount = 'pop' | 'smtp' | 'imap' | 'iCloud' | 'unknown'
+export type { TypeOfAccount } from './contract/index.js'
 
-/** Rich (styled) text */
-export interface RichText {
-  /** The color of the first character. */
-  color: { r: number; g: number; b: number }
-  /** The name of the font of the first character. */
-  font: string
-  /** The size in points of the first character. */
-  size: number
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { RichText } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type RichTextCreateInput = import('./contract/index.js').RichTextCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type RichTextUpdateInput = import('./contract/index.js').RichTextUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Attachment } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type AttachmentCreateInput = import('./contract/index.js').AttachmentCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type AttachmentUpdateInput = import('./contract/index.js').AttachmentUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Paragraph } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ParagraphCreateInput = import('./contract/index.js').ParagraphCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ParagraphUpdateInput = import('./contract/index.js').ParagraphUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Word } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type WordCreateInput = import('./contract/index.js').WordCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type WordUpdateInput = import('./contract/index.js').WordUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Character } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type CharacterCreateInput = import('./contract/index.js').CharacterCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type CharacterUpdateInput = import('./contract/index.js').CharacterUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { AttributeRun } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type AttributeRunCreateInput = import('./contract/index.js').AttributeRunCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type AttributeRunUpdateInput = import('./contract/index.js').AttributeRunUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { OutgoingMessage } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type OutgoingMessageCreateInput = import('./contract/index.js').OutgoingMessageCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type OutgoingMessageUpdateInput = import('./contract/index.js').OutgoingMessageUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { MessageViewer } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type MessageViewerCreateInput = import('./contract/index.js').MessageViewerCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type MessageViewerUpdateInput = import('./contract/index.js').MessageViewerUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Message } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type MessageCreateInput = Omit<
+  import('./contract/index.js').MessageCreateInput,
+  'flagIndex'
+> & {
+  /** The flag on the message, or -1 if the message is not flagged Numeric values are validated by the contract before dispatch. */
+  flagIndex?: number | Extract<import('./contract/index.js').MessageCreateInput['flagIndex'], null>
 }
 
-/** Input for creating a RichText */
-export interface RichTextCreateInput {
-  /** The color of the first character. */
-  color?: { r: number; g: number; b: number }
-  /** The name of the font of the first character. */
-  font?: string
-  /** The size in points of the first character. */
-  size?: number
+/** Canonical update input, retaining checked numeric conveniences. */
+export type MessageUpdateInput = Omit<
+  import('./contract/index.js').MessageUpdateInput,
+  'flagIndex'
+> & {
+  /** The flag on the message, or -1 if the message is not flagged Numeric values are validated by the contract before dispatch. */
+  flagIndex?: number | Extract<import('./contract/index.js').MessageUpdateInput['flagIndex'], null>
 }
 
-/** Input for updating a RichText */
-export type RichTextUpdateInput = Partial<RichTextCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Account } from './contract/index.js'
 
-/** Represents an inline text attachment. This class is used mainly for make commands. */
-export interface Attachment {
-  /** The file for the attachment */
-  fileName: string
+/** Canonical create input, retaining checked numeric conveniences. */
+export type AccountCreateInput = Omit<
+  import('./contract/index.js').AccountCreateInput,
+  'emptyJunkMessagesFrequency' | 'emptySentMessagesFrequency' | 'emptyTrashFrequency' | 'port'
+> & {
+  /** Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete) Numeric values are validated by the contract before dispatch. */
+  emptyJunkMessagesFrequency?:
+    | number
+    | Extract<import('./contract/index.js').AccountCreateInput['emptyJunkMessagesFrequency'], null>
+  /** Does nothing at all (deprecated) Numeric values are validated by the contract before dispatch. */
+  emptySentMessagesFrequency?:
+    | number
+    | Extract<import('./contract/index.js').AccountCreateInput['emptySentMessagesFrequency'], null>
+  /** Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete) Numeric values are validated by the contract before dispatch. */
+  emptyTrashFrequency?:
+    | number
+    | Extract<import('./contract/index.js').AccountCreateInput['emptyTrashFrequency'], null>
+  /** The port used to connect to an account Numeric values are validated by the contract before dispatch. */
+  port?: number | Extract<import('./contract/index.js').AccountCreateInput['port'], null>
 }
 
-/** Input for creating a Attachment */
-export interface AttachmentCreateInput {
-  /** The file for the attachment */
-  fileName?: string
+/** Canonical update input, retaining checked numeric conveniences. */
+export type AccountUpdateInput = Omit<
+  import('./contract/index.js').AccountUpdateInput,
+  'emptyJunkMessagesFrequency' | 'emptySentMessagesFrequency' | 'emptyTrashFrequency' | 'port'
+> & {
+  /** Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete) Numeric values are validated by the contract before dispatch. */
+  emptyJunkMessagesFrequency?:
+    | number
+    | Extract<import('./contract/index.js').AccountUpdateInput['emptyJunkMessagesFrequency'], null>
+  /** Does nothing at all (deprecated) Numeric values are validated by the contract before dispatch. */
+  emptySentMessagesFrequency?:
+    | number
+    | Extract<import('./contract/index.js').AccountUpdateInput['emptySentMessagesFrequency'], null>
+  /** Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete) Numeric values are validated by the contract before dispatch. */
+  emptyTrashFrequency?:
+    | number
+    | Extract<import('./contract/index.js').AccountUpdateInput['emptyTrashFrequency'], null>
+  /** The port used to connect to an account Numeric values are validated by the contract before dispatch. */
+  port?: number | Extract<import('./contract/index.js').AccountUpdateInput['port'], null>
 }
 
-/** Input for updating a Attachment */
-export type AttachmentUpdateInput = Partial<AttachmentCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Mailbox } from './contract/index.js'
 
-/** This subdivides the text into paragraphs. */
-export interface Paragraph {
-  /** The color of the first character. */
-  color: { r: number; g: number; b: number }
-  /** The name of the font of the first character. */
-  font: string
-  /** The size in points of the first character. */
-  size: number
+/** Canonical create input, retaining checked numeric conveniences. */
+export type MailboxCreateInput = import('./contract/index.js').MailboxCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type MailboxUpdateInput = import('./contract/index.js').MailboxUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Rule } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type RuleCreateInput = Omit<
+  import('./contract/index.js').RuleCreateInput,
+  'markFlagIndex'
+> & {
+  /** If rule matches, mark message with the specified flag. Set to -1 to disable this action Numeric values are validated by the contract before dispatch. */
+  markFlagIndex?:
+    | number
+    | Extract<import('./contract/index.js').RuleCreateInput['markFlagIndex'], null>
 }
 
-/** Input for creating a Paragraph */
-export interface ParagraphCreateInput {
-  /** The color of the first character. */
-  color?: { r: number; g: number; b: number }
-  /** The name of the font of the first character. */
-  font?: string
-  /** The size in points of the first character. */
-  size?: number
+/** Canonical update input, retaining checked numeric conveniences. */
+export type RuleUpdateInput = Omit<
+  import('./contract/index.js').RuleUpdateInput,
+  'markFlagIndex'
+> & {
+  /** If rule matches, mark message with the specified flag. Set to -1 to disable this action Numeric values are validated by the contract before dispatch. */
+  markFlagIndex?:
+    | number
+    | Extract<import('./contract/index.js').RuleUpdateInput['markFlagIndex'], null>
 }
 
-/** Input for updating a Paragraph */
-export type ParagraphUpdateInput = Partial<ParagraphCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { RuleCondition } from './contract/index.js'
 
-/** This subdivides the text into words. */
-export interface Word {
-  /** The color of the first character. */
-  color: { r: number; g: number; b: number }
-  /** The name of the font of the first character. */
-  font: string
-  /** The size in points of the first character. */
-  size: number
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type RuleConditionCreateInput = import('./contract/index.js').RuleConditionCreateInput
 
-/** Input for creating a Word */
-export interface WordCreateInput {
-  /** The color of the first character. */
-  color?: { r: number; g: number; b: number }
-  /** The name of the font of the first character. */
-  font?: string
-  /** The size in points of the first character. */
-  size?: number
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type RuleConditionUpdateInput = import('./contract/index.js').RuleConditionUpdateInput
 
-/** Input for updating a Word */
-export type WordUpdateInput = Partial<WordCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Recipient } from './contract/index.js'
 
-/** This subdivides the text into characters. */
-export interface Character {
-  /** The color of the character. */
-  color: { r: number; g: number; b: number }
-  /** The name of the font of the character. */
-  font: string
-  /** The size in points of the character. */
-  size: number
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type RecipientCreateInput = import('./contract/index.js').RecipientCreateInput
 
-/** Input for creating a Character */
-export interface CharacterCreateInput {
-  /** The color of the character. */
-  color?: { r: number; g: number; b: number }
-  /** The name of the font of the character. */
-  font?: string
-  /** The size in points of the character. */
-  size?: number
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type RecipientUpdateInput = import('./contract/index.js').RecipientUpdateInput
 
-/** Input for updating a Character */
-export type CharacterUpdateInput = Partial<CharacterCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { BccRecipient } from './contract/index.js'
 
-/** This subdivides the text into chunks that all have the same attributes. */
-export interface AttributeRun {
-  /** The color of the first character. */
-  color: { r: number; g: number; b: number }
-  /** The name of the font of the first character. */
-  font: string
-  /** The size in points of the first character. */
-  size: number
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type BccRecipientCreateInput = import('./contract/index.js').BccRecipientCreateInput
 
-/** Input for creating a AttributeRun */
-export interface AttributeRunCreateInput {
-  /** The color of the first character. */
-  color?: { r: number; g: number; b: number }
-  /** The name of the font of the first character. */
-  font?: string
-  /** The size in points of the first character. */
-  size?: number
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type BccRecipientUpdateInput = import('./contract/index.js').BccRecipientUpdateInput
 
-/** Input for updating a AttributeRun */
-export type AttributeRunUpdateInput = Partial<AttributeRunCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { CcRecipient } from './contract/index.js'
 
-/** A new email message */
-export interface OutgoingMessage {
-  /** The sender of the message */
-  sender: string
-  /** The subject of the message */
-  subject: string
-  /** Controls whether the message window is shown on the screen. The default is false */
-  visible: boolean
-  /** The signature of the message */
-  messageSignature: string
-  /** The unique identifier of the message */
-  id: number
-  /** Does nothing at all (deprecated) */
-  htmlContent: string
-  /** Does nothing at all (deprecated) */
-  vcardPath: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type CcRecipientCreateInput = import('./contract/index.js').CcRecipientCreateInput
 
-/** Input for creating a OutgoingMessage */
-export interface OutgoingMessageCreateInput {
-  /** The sender of the message */
-  sender?: string
-  /** The subject of the message */
-  subject?: string
-  /** Controls whether the message window is shown on the screen. The default is false */
-  visible?: boolean
-  /** The signature of the message */
-  messageSignature?: string
-  /** Does nothing at all (deprecated) */
-  htmlContent?: string
-  /** Does nothing at all (deprecated) */
-  vcardPath?: string
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type CcRecipientUpdateInput = import('./contract/index.js').CcRecipientUpdateInput
 
-/** Input for updating a OutgoingMessage */
-export type OutgoingMessageUpdateInput = Partial<OutgoingMessageCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { ToRecipient } from './contract/index.js'
 
-/** Represents the object responsible for managing a viewer window */
-export interface MessageViewer {
-  /** The column that is currently sorted in the viewer */
-  sortColumn: string
-  /** Whether the viewer is sorted ascending or not */
-  sortedAscending: boolean
-  /** Controls whether the list of mailboxes is visible or not */
-  mailboxListVisible: boolean
-  /** Controls whether the preview pane of the message viewer window is visible or not */
-  previewPaneIsVisible: boolean
-  /** List of columns that are visible. The subject column and the message status column will always be visible */
-  visibleColumns: string
-  /** The unique identifier of the message viewer */
-  id: number
-  /** List of messages currently being displayed in the viewer */
-  visibleMessages: string
-  /** List of messages currently selected */
-  selectedMessages: string
-  /** List of mailboxes currently selected in the list of mailboxes */
-  selectedMailboxes: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ToRecipientCreateInput = import('./contract/index.js').ToRecipientCreateInput
 
-/** Input for creating a MessageViewer */
-export interface MessageViewerCreateInput {
-  /** The column that is currently sorted in the viewer */
-  sortColumn?: string
-  /** Whether the viewer is sorted ascending or not */
-  sortedAscending?: boolean
-  /** Controls whether the list of mailboxes is visible or not */
-  mailboxListVisible?: boolean
-  /** Controls whether the preview pane of the message viewer window is visible or not */
-  previewPaneIsVisible?: boolean
-  /** List of columns that are visible. The subject column and the message status column will always be visible */
-  visibleColumns?: string
-  /** List of messages currently being displayed in the viewer */
-  visibleMessages?: string
-  /** List of messages currently selected */
-  selectedMessages?: string
-  /** List of mailboxes currently selected in the list of mailboxes */
-  selectedMailboxes?: string
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ToRecipientUpdateInput = import('./contract/index.js').ToRecipientUpdateInput
 
-/** Input for updating a MessageViewer */
-export type MessageViewerUpdateInput = Partial<MessageViewerCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Header } from './contract/index.js'
 
-/** An email message */
-export interface Message {
-  /** The unique identifier of the message. */
-  id: number
-  /** All the headers of the message */
-  allHeaders: string
-  /** The background color of the message */
-  backgroundColor: string
-  /** The date a message was received */
-  dateReceived: Date
-  /** The date a message was sent */
-  dateSent: Date
-  /** Indicates whether the message is deleted or not */
-  deletedStatus: boolean
-  /** Indicates whether the message is flagged or not */
-  flaggedStatus: boolean
-  /** The flag on the message, or -1 if the message is not flagged */
-  flagIndex: number
-  /** Indicates whether the message has been marked junk or evaluated to be junk by the junk mail filter. */
-  junkMailStatus: boolean
-  /** Indicates whether the message is read or not */
-  readStatus: boolean
-  /** The unique message ID string */
-  messageId: string
-  /** Raw source of the message */
-  source: string
-  /** The address that replies should be sent to */
-  replyTo: string
-  /** The size (in bytes) of a message */
-  messageSize: number
-  /** The sender of the message */
-  sender: string
-  /** The subject of the message */
-  subject: string
-  /** Indicates whether the message was forwarded or not */
-  wasForwarded: boolean
-  /** Indicates whether the message was redirected or not */
-  wasRedirected: boolean
-  /** Indicates whether the message was replied to or not */
-  wasRepliedTo: boolean
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type HeaderCreateInput = import('./contract/index.js').HeaderCreateInput
 
-/** Input for creating a Message */
-export interface MessageCreateInput {
-  /** The background color of the message */
-  backgroundColor?: string
-  /** Indicates whether the message is deleted or not */
-  deletedStatus?: boolean
-  /** Indicates whether the message is flagged or not */
-  flaggedStatus?: boolean
-  /** The flag on the message, or -1 if the message is not flagged */
-  flagIndex?: number
-  /** Indicates whether the message has been marked junk or evaluated to be junk by the junk mail filter. */
-  junkMailStatus?: boolean
-  /** Indicates whether the message is read or not */
-  readStatus?: boolean
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type HeaderUpdateInput = import('./contract/index.js').HeaderUpdateInput
 
-/** Input for updating a Message */
-export type MessageUpdateInput = Partial<MessageCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { MailAttachment } from './contract/index.js'
 
-/** A Mail account for receiving messages (POP/IMAP). To create a new receiving account, use the 'pop account', 'imap account', and 'iCloud account' objects */
-export interface Account {
-  /** The delivery account used when sending mail from this account */
-  deliveryAccount: string
-  /** The name of an account */
-  name: string
-  /** The unique identifier of the account */
-  id: string
-  /** Password for this account. Can be set, but not read via scripting */
-  password: string
-  /** Preferred authentication scheme for account */
-  authentication: string
-  /** The type of an account */
-  accountType: string
-  /** The list of email addresses configured for an account */
-  emailAddresses: string
-  /** The users full name configured for an account */
-  fullName: string
-  /** Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete) */
-  emptyJunkMessagesFrequency: number
-  /** Does nothing at all (deprecated) */
-  emptySentMessagesFrequency: number
-  /** Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete) */
-  emptyTrashFrequency: number
-  /** Indicates whether the messages in the junk messages mailboxes will be deleted on quit */
-  emptyJunkMessagesOnQuit: boolean
-  /** Does nothing at all (deprecated) */
-  emptySentMessagesOnQuit: boolean
-  /** Indicates whether the messages in deleted messages mailboxes will be permanently deleted on quit */
-  emptyTrashOnQuit: boolean
-  /** Indicates whether the account is enabled or not */
-  enabled: boolean
-  /** The user name used to connect to an account */
-  userName: string
-  /** The directory where the account stores things on disk */
-  accountDirectory: string
-  /** The port used to connect to an account */
-  port: number
-  /** The host name used to connect to an account */
-  serverName: string
-  /** Does nothing at all (deprecated) */
-  includeWhenGettingNewMail: boolean
-  /** Indicates whether messages that are deleted will be moved to the trash mailbox */
-  moveDeletedMessagesToTrash: boolean
-  /** Indicates whether SSL is enabled for this receiving account */
-  usesSsl: boolean
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type MailAttachmentCreateInput = import('./contract/index.js').MailAttachmentCreateInput
 
-/** Input for creating a Account */
-export interface AccountCreateInput {
-  /** The delivery account used when sending mail from this account */
-  deliveryAccount?: string
-  /** The name of an account */
-  name?: string
-  /** Password for this account. Can be set, but not read via scripting */
-  password?: string
-  /** Preferred authentication scheme for account */
-  authentication?: string
-  /** The list of email addresses configured for an account */
-  emailAddresses?: string
-  /** The users full name configured for an account */
-  fullName?: string
-  /** Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete) */
-  emptyJunkMessagesFrequency?: number
-  /** Does nothing at all (deprecated) */
-  emptySentMessagesFrequency?: number
-  /** Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete) */
-  emptyTrashFrequency?: number
-  /** Indicates whether the messages in the junk messages mailboxes will be deleted on quit */
-  emptyJunkMessagesOnQuit?: boolean
-  /** Does nothing at all (deprecated) */
-  emptySentMessagesOnQuit?: boolean
-  /** Indicates whether the messages in deleted messages mailboxes will be permanently deleted on quit */
-  emptyTrashOnQuit?: boolean
-  /** Indicates whether the account is enabled or not */
-  enabled?: boolean
-  /** The user name used to connect to an account */
-  userName?: string
-  /** The port used to connect to an account */
-  port?: number
-  /** The host name used to connect to an account */
-  serverName?: string
-  /** Does nothing at all (deprecated) */
-  includeWhenGettingNewMail?: boolean
-  /** Indicates whether messages that are deleted will be moved to the trash mailbox */
-  moveDeletedMessagesToTrash?: boolean
-  /** Indicates whether SSL is enabled for this receiving account */
-  usesSsl?: boolean
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type MailAttachmentUpdateInput = import('./contract/index.js').MailAttachmentUpdateInput
 
-/** Input for updating a Account */
-export type AccountUpdateInput = Partial<AccountCreateInput>
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
-/** A mailbox that holds messages */
-export interface Mailbox {
-  /** The name of a mailbox */
-  name: string
-  /** The number of unread messages in the mailbox */
-  unreadCount: number
-}
-
-/** Input for creating a Mailbox */
-export interface MailboxCreateInput {
-  /** The name of a mailbox */
-  name?: string
-}
-
-/** Input for updating a Mailbox */
-export type MailboxUpdateInput = Partial<MailboxCreateInput>
-
-/** Class for message rules */
-export interface Rule {
-  /** If rule matches, apply this color */
-  colorMessage: string
-  /** If rule matches, delete message */
-  deleteMessage: boolean
-  /** If rule matches, prepend this text to the forwarded message. Set to empty string to include no prepended text */
-  forwardText: string
-  /** If rule matches, forward message to this address, or multiple addresses, separated by commas. Set to empty string to disable this action */
-  forwardMessage: string
-  /** If rule matches, mark message as flagged */
-  markFlagged: boolean
-  /** If rule matches, mark message with the specified flag. Set to -1 to disable this action */
-  markFlagIndex: number
-  /** If rule matches, mark message as read */
-  markRead: boolean
-  /** If rule matches, play this sound (specify name of sound or path to sound) */
-  playSound: string
-  /** If rule matches, redirect message to this address or multiple addresses, separate by commas. Set to empty string to disable this action */
-  redirectMessage: string
-  /** If rule matches, reply to message and prepend with this text. Set to empty string to disable this action */
-  replyText: string
-  /** If rule matches, run this compiled AppleScript file. Set to empty string to disable this action */
-  runScript: string
-  /** Indicates whether all conditions must be met for rule to execute */
-  allConditionsMustBeMet: boolean
-  /** Indicates whether the color will be used to highlight the text or background of a message in the message list */
-  highlightTextUsingColor: boolean
-  /** Indicates whether the rule is enabled */
-  enabled: boolean
-  /** Name of rule */
-  name: string
-  /** Indicates whether the rule has a copy action */
-  shouldCopyMessage: boolean
-  /** Indicates whether the rule has a move action */
-  shouldMoveMessage: boolean
-  /** If rule matches, stop rule evaluation for this message */
-  stopEvaluatingRules: boolean
-}
-
-/** Input for creating a Rule */
-export interface RuleCreateInput {
-  /** If rule matches, apply this color */
-  colorMessage?: string
-  /** If rule matches, delete message */
-  deleteMessage?: boolean
-  /** If rule matches, prepend this text to the forwarded message. Set to empty string to include no prepended text */
-  forwardText?: string
-  /** If rule matches, forward message to this address, or multiple addresses, separated by commas. Set to empty string to disable this action */
-  forwardMessage?: string
-  /** If rule matches, mark message as flagged */
-  markFlagged?: boolean
-  /** If rule matches, mark message with the specified flag. Set to -1 to disable this action */
-  markFlagIndex?: number
-  /** If rule matches, mark message as read */
-  markRead?: boolean
-  /** If rule matches, play this sound (specify name of sound or path to sound) */
-  playSound?: string
-  /** If rule matches, redirect message to this address or multiple addresses, separate by commas. Set to empty string to disable this action */
-  redirectMessage?: string
-  /** If rule matches, reply to message and prepend with this text. Set to empty string to disable this action */
-  replyText?: string
-  /** If rule matches, run this compiled AppleScript file. Set to empty string to disable this action */
-  runScript?: string
-  /** Indicates whether all conditions must be met for rule to execute */
-  allConditionsMustBeMet?: boolean
-  /** Indicates whether the color will be used to highlight the text or background of a message in the message list */
-  highlightTextUsingColor?: boolean
-  /** Indicates whether the rule is enabled */
-  enabled?: boolean
-  /** Name of rule */
-  name?: string
-  /** Indicates whether the rule has a copy action */
-  shouldCopyMessage?: boolean
-  /** Indicates whether the rule has a move action */
-  shouldMoveMessage?: boolean
-  /** If rule matches, stop rule evaluation for this message */
-  stopEvaluatingRules?: boolean
-}
-
-/** Input for updating a Rule */
-export type RuleUpdateInput = Partial<RuleCreateInput>
-
-/** Class for conditions that can be attached to a single rule */
-export interface RuleCondition {
-  /** Rule expression field */
-  expression: string
-  /** Rule header key */
-  header: string
-  /** Rule qualifier */
-  qualifier: string
-  /** Rule type */
-  ruleType: string
-}
-
-/** Input for creating a RuleCondition */
-export interface RuleConditionCreateInput {
-  /** Rule expression field */
-  expression?: string
-  /** Rule header key */
-  header?: string
-  /** Rule qualifier */
-  qualifier?: string
-  /** Rule type */
-  ruleType?: string
-}
-
-/** Input for updating a RuleCondition */
-export type RuleConditionUpdateInput = Partial<RuleConditionCreateInput>
-
-/** An email recipient */
-export interface Recipient {
-  /** The recipients email address */
-  address: string
-  /** The name used for display */
-  name: string
-}
-
-/** Input for creating a Recipient */
-export interface RecipientCreateInput {
-  /** The recipients email address */
-  address?: string
-  /** The name used for display */
-  name?: string
-}
-
-/** Input for updating a Recipient */
-export type RecipientUpdateInput = Partial<RecipientCreateInput>
-
-/** An email recipient in the Bcc: field */
-export interface BccRecipient {
-  /** Unique identifier for this recipient */
-  id: string
-}
-
-/** Input for creating a BccRecipient */
-export type BccRecipientCreateInput = Record<string, never>
-
-/** Input for updating a BccRecipient */
-export type BccRecipientUpdateInput = Partial<BccRecipientCreateInput>
-
-/** An email recipient in the Cc: field */
-export interface CcRecipient {
-  /** Unique identifier for this recipient */
-  id: string
-}
-
-/** Input for creating a CcRecipient */
-export type CcRecipientCreateInput = Record<string, never>
-
-/** Input for updating a CcRecipient */
-export type CcRecipientUpdateInput = Partial<CcRecipientCreateInput>
-
-/** An email recipient in the To: field */
-export interface ToRecipient {
-  /** Unique identifier for this recipient */
-  id: string
-}
-
-/** Input for creating a ToRecipient */
-export type ToRecipientCreateInput = Record<string, never>
-
-/** Input for updating a ToRecipient */
-export type ToRecipientUpdateInput = Partial<ToRecipientCreateInput>
-
-/** A header value for a message. E.g. To, Subject, From. */
-export interface Header {
-  /** Contents of the header */
-  content: string
-  /** Name of the header value */
-  name: string
-}
-
-/** Input for creating a Header */
-export interface HeaderCreateInput {
-  /** Contents of the header */
-  content?: string
-  /** Name of the header value */
-  name?: string
-}
-
-/** Input for updating a Header */
-export type HeaderUpdateInput = Partial<HeaderCreateInput>
-
-/** A file attached to a received message. */
-export interface MailAttachment {
-  /** Name of the attachment */
-  name: string
-  /** MIME type of the attachment E.g. text/plain. */
-  mIMEType: string
-  /** Approximate size in bytes. */
-  fileSize: number
-  /** Indicates whether the attachment has been downloaded. */
-  downloaded: boolean
-  /** The unique identifier of the attachment. */
-  id: string
-}
-
-/** Input for creating a MailAttachment */
-export type MailAttachmentCreateInput = Record<string, never>
-
-/** Input for updating a MailAttachment */
-export type MailAttachmentUpdateInput = Partial<MailAttachmentCreateInput>
-
-// Zod schemas for runtime validation
-
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const RichTextSchema = z.object({
   color: z.object({ red: z.number(), green: z.number(), blue: z.number() }),
   font: z.string(),
   size: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AttachmentSchema = z.object({
   fileName: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ParagraphSchema = z.object({
   color: z.object({ red: z.number(), green: z.number(), blue: z.number() }),
   font: z.string(),
   size: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const WordSchema = z.object({
   color: z.object({ red: z.number(), green: z.number(), blue: z.number() }),
   font: z.string(),
   size: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const CharacterSchema = z.object({
   color: z.object({ red: z.number(), green: z.number(), blue: z.number() }),
   font: z.string(),
   size: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AttributeRunSchema = z.object({
   color: z.object({ red: z.number(), green: z.number(), blue: z.number() }),
   font: z.string(),
   size: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const OutgoingMessageSchema = z.object({
   sender: z.string(),
   subject: z.string(),
@@ -735,6 +317,7 @@ export const OutgoingMessageSchema = z.object({
   vcardPath: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const MessageViewerSchema = z.object({
   sortColumn: z.string(),
   sortedAscending: z.boolean(),
@@ -747,6 +330,7 @@ export const MessageViewerSchema = z.object({
   selectedMailboxes: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const MessageSchema = z.object({
   id: z.number(),
   allHeaders: z.string(),
@@ -769,6 +353,7 @@ export const MessageSchema = z.object({
   wasRepliedTo: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AccountSchema = z.object({
   deliveryAccount: z.string(),
   name: z.string(),
@@ -794,11 +379,13 @@ export const AccountSchema = z.object({
   usesSsl: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const MailboxSchema = z.object({
   name: z.string(),
   unreadCount: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const RuleSchema = z.object({
   colorMessage: z.string(),
   deleteMessage: z.boolean(),
@@ -820,6 +407,7 @@ export const RuleSchema = z.object({
   stopEvaluatingRules: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const RuleConditionSchema = z.object({
   expression: z.string(),
   header: z.string(),
@@ -827,28 +415,34 @@ export const RuleConditionSchema = z.object({
   ruleType: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const RecipientSchema = z.object({
   address: z.string(),
   name: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const BccRecipientSchema = z.object({
   id: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const CcRecipientSchema = z.object({
   id: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ToRecipientSchema = z.object({
   id: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const HeaderSchema = z.object({
   content: z.string(),
   name: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const MailAttachmentSchema = z.object({
   name: z.string(),
   mIMEType: z.string(),

@@ -14,6 +14,27 @@ import { DependencyResourceClient } from './resources/dependency.js'
 import { ViolationResourceClient } from './resources/violation.js'
 import { ScenarioResourceClient } from './resources/scenario.js'
 
+import { omniPlanContract as appContract } from './contract/index.js'
+import {
+  createCodecClient,
+  createRemoteTransport,
+  type ClientTransport,
+} from '@macts/contracts/client'
+import {
+  MactsError,
+  OperationCancelledError,
+  TransportError,
+  ValidationError,
+  fromWireErrorEnvelope,
+  type AppContract,
+  type CallOptions,
+  type ClientBrand,
+  type ClientRuntime,
+  type OperationId,
+  type WireValue,
+} from '@macts/contracts'
+import type { OmniPlanResources } from './contract/index.js'
+
 /**
  * Client configuration options.
  */
@@ -27,36 +48,101 @@ export interface OmniPlanClientOptions {
 /**
  * HTTP client wrapper for making authenticated requests.
  */
+/** Canonical failures retained privately while raw RPC preserves the legacy error class. */
+const canonicalFailures = new WeakMap<Error, MactsError>()
+
+/**
+ * Private request metadata selects the canonical POST while retaining the public
+ * raw RPC hook. It never enters the request body or caller-owned options.
+ */
+const canonicalCall = Symbol('canonical contract call')
+
 export class HttpClient {
+  readonly #transport: ClientTransport
   readonly #baseUrl: string
   readonly #apiKey: string
+  #runtime: ClientRuntime | undefined
 
   constructor(baseUrl: string, apiKey: string) {
     this.#baseUrl = baseUrl
     this.#apiKey = apiKey
+    this.#transport = createRemoteTransport(appContract, { url: baseUrl, token: apiKey })
   }
 
   /**
-   * Make an authenticated POST request to an RPC endpoint.
+   * Bind the actual public facade in the shared reference registry. A copied
+   * contract changes only construction; its descriptors and codecs are shared.
+   * @internal
    */
-  async rpc<T>(path: string, body: object = {}): Promise<T> {
-    const url = `${this.#baseUrl}/api/v1/rpc/${path}`
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${this.#apiKey}`,
-        'Content-Type': 'application/json',
+  bind<Client extends ClientBrand<OmniPlanResources>>(client: Client): void {
+    const contract: AppContract<Client, OmniPlanResources> = {
+      ...appContract,
+      bind: (runtime) => {
+        this.#runtime = runtime
+        return client
       },
-      body: JSON.stringify(body),
-    })
-
-    if (!response.ok) {
-      const error = (await response.json()) as { error?: { code?: string; message?: string } }
-      const code = error.error?.code ?? 'UNKNOWN_ERROR'
-      const message = error.error?.message ?? `HTTP ${String(response.status)}`
-      throw new OmniPlanError(code, message)
     }
+    createCodecClient(contract, {
+      invoke: async (operation, input, options) => {
+        try {
+          const requestOptions: CallOptions & { readonly [canonicalCall]: true } = {
+            ...options,
+            [canonicalCall]: true,
+          }
+          return await this.rpc(operation, input as object, requestOptions)
+        } catch (error) {
+          if (error instanceof MactsError) throw error
+          if (error instanceof Error) {
+            const canonical = canonicalFailures.get(error)
+            if (canonical !== undefined) throw canonical
+          }
+          if (options?.signal?.aborted === true)
+            throw new OperationCancelledError('The operation was cancelled.', {})
+          throw new TransportError('The custom RPC transport failed.', { reason: 'unreachable' })
+        }
+      },
+      resolve: this.#transport.resolve,
+    })
+  }
 
+  /** Invoke a registered operation with SDK input; raw RPC hooks still see wire input. @internal */
+  async invoke<T>(path: string, input: object = {}, options?: CallOptions): Promise<T> {
+    const operation = Object.values(appContract.operations).find(
+      (candidate) => candidate.id === path
+    )
+    if (operation === undefined || operation.unavailable !== undefined) {
+      throw new ValidationError('The operation is not registered in this app contract.', {
+        issues: [{ path: [], message: 'Unknown operation route.' }],
+      })
+    }
+    if (this.#runtime === undefined) this.bind({})
+    if (this.#runtime === undefined) throw new Error('Client runtime was not initialized.')
+    return this.#runtime.invoke(operation, input, options) as Promise<T>
+  }
+
+  /** Raw wire RPC for explicit passthrough consumers; typed methods use invoke. */
+  async rpc<T>(path: string, body: object = {}, options?: CallOptions): Promise<T> {
+    // Typed wrappers still dispatch through overrides; an override forwarding to
+    // super retains the shared transport's envelope/cancellation semantics.
+    if (options !== undefined && canonicalCall in options) {
+      return (await this.#transport.invoke(path as OperationId, body as WireValue, options)) as T
+    }
+    const response = await fetch(`${this.#baseUrl}/api/v1/rpc/${path}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${this.#apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      ...(options?.signal === undefined ? {} : { signal: options.signal }),
+    })
+    if (!response.ok) {
+      const envelope: unknown = await response.json()
+      const error = envelope as { error?: { code?: string; message?: string } }
+      const legacy = new OmniPlanError(
+        error.error?.code ?? 'UNKNOWN_ERROR',
+        error.error?.message ?? `HTTP ${String(response.status)}`
+      )
+      canonicalFailures.set(legacy, fromWireErrorEnvelope(envelope, { status: response.status }))
+      throw legacy
+    }
     const result = (await response.json()) as { result: T }
     return result.result
   }
@@ -88,6 +174,9 @@ export class OmniPlanError extends Error {
  * const calendars = await client.calendars.list();
  * ```
  */
+/** Shared type-only resource brand lets caller-built references target this facade. */
+export interface OmniPlanClient extends ClientBrand<OmniPlanResources> {}
+
 export class OmniPlanClient {
   readonly #httpClient: HttpClient
 
@@ -126,6 +215,7 @@ export class OmniPlanClient {
     this.dependencies = new DependencyResourceClient(this.#httpClient, 'omniplan', 'dependencies')
     this.violations = new ViolationResourceClient(this.#httpClient, 'omniplan', 'violations')
     this.scenarios = new ScenarioResourceClient(this.#httpClient, 'omniplan', 'scenarios')
+    this.#httpClient.bind(this)
   }
 
   /**
@@ -138,77 +228,113 @@ export class OmniPlanClient {
   /**
    * Export a document
    */
-  async _export(to: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('omniplan.app.export', { to })
+  async _export(
+    to: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>('omniplan.app.export', { to }, __mactsOptions)
   }
 
   /**
    * Assign resources to tasks
    */
-  async assign(resource: string, task: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('omniplan.app.assign', { resource, task })
+  async assign(
+    resource: string,
+    task: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'omniplan.app.assign',
+      { resource, task },
+      __mactsOptions
+    )
   }
 
   /**
    * Create a dependency between tasks
    */
-  async depend(prerequisite: string, dependent: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('omniplan.app.depend', { prerequisite, dependent })
+  async depend(
+    prerequisite: string,
+    dependent: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'omniplan.app.depend',
+      { prerequisite, dependent },
+      __mactsOptions
+    )
   }
 
   /**
    * Commit the current schedule as the baseline schedule
    */
-  async baseline(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('omniplan.app.baseline', {})
+  async baseline(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('omniplan.app.baseline', {}, __mactsOptions)
   }
 
   /**
    * Level resources on project
    */
-  async level(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('omniplan.app.level', {})
+  async level(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('omniplan.app.level', {}, __mactsOptions)
   }
 
   /**
    * Look up a task via a custom data key
    */
-  async lookup(key: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('omniplan.app.lookup', { key })
+  async lookup(
+    key: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>('omniplan.app.lookup', { key }, __mactsOptions)
   }
 
   /**
    * Make a change tracking mark on project
    */
-  async changeMark(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('omniplan.app.changeMark', {})
+  async changeMark(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('omniplan.app.changeMark', {}, __mactsOptions)
   }
 
   /**
    * Add working hours to a schedule
    */
-  async addWorkTime(schedule: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('omniplan.app.addWorkTime', { schedule })
+  async addWorkTime(
+    schedule: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'omniplan.app.addWorkTime',
+      { schedule },
+      __mactsOptions
+    )
   }
 
   /**
    * Remove working hours from a schedule
    */
-  async subtractWorkTime(schedule: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('omniplan.app.subtractWorkTime', { schedule })
+  async subtractWorkTime(
+    schedule: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'omniplan.app.subtractWorkTime',
+      { schedule },
+      __mactsOptions
+    )
   }
 
   /**
    * Undo the last command
    */
-  async undo(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('omniplan.app.undo', {})
+  async undo(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('omniplan.app.undo', {}, __mactsOptions)
   }
 
   /**
    * Redo the last undone command
    */
-  async redo(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('omniplan.app.redo', {})
+  async redo(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('omniplan.app.redo', {}, __mactsOptions)
   }
 }

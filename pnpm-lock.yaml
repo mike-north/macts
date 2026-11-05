@@ -395,6 +395,9 @@ importers:
       '@macts/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
+      '@macts/system-events':
+        specifier: workspace:*
+        version: link:../../packages/system-events
       '@types/node':
         specifier: ^26.0.0
         version: 26.2.0

@@ -4,7 +4,11 @@
  * The contracts root never imports this entry, and no native runtime is loaded.
  * @packageDocumentation
  */
-export { createClient as createRemoteClient, type RemoteClientOptions } from './remote.js'
+export {
+  createClient as createRemoteClient,
+  createRemoteTransport,
+  type RemoteClientOptions,
+} from './remote.js'
 export {
   bindReference,
   createCodecClient,

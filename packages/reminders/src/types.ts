@@ -5,108 +5,56 @@
 
 import { z } from 'zod'
 
-/** Priority level for reminders */
-export type ReminderPriority = '0' | '9' | '5' | '1'
+export type { ReminderPriority } from './contract/index.js'
 
-/** An account in the Reminders application */
-export interface Account {
-  /** The name of the account */
-  name: string
-  /** The unique identifier of the account */
-  id: string
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Account } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type AccountCreateInput = import('./contract/index.js').AccountCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type AccountUpdateInput = import('./contract/index.js').AccountUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { List } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ListCreateInput = import('./contract/index.js').ListCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ListUpdateInput = import('./contract/index.js').ListUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Reminder } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ReminderCreateInput = Omit<
+  import('./contract/index.js').ReminderCreateInput,
+  'priority'
+> & {
+  /** Priority (0=none, 1=high, 5=medium, 9=low) Numeric values are validated by the contract before dispatch. */
+  priority?: number | Extract<import('./contract/index.js').ReminderCreateInput['priority'], null>
 }
 
-/** Input for creating a Account */
-export type AccountCreateInput = Record<string, never>
-
-/** Input for updating a Account */
-export type AccountUpdateInput = Partial<AccountCreateInput>
-
-/** A list of reminders */
-export interface List {
-  /** The name of the list */
-  name: string
-  /** The unique identifier of the list */
-  id: string
-  /** The color of the list */
-  color: string
-  /** The emblem icon name of the list */
-  emblem: string
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ReminderUpdateInput = Omit<
+  import('./contract/index.js').ReminderUpdateInput,
+  'priority'
+> & {
+  /** Priority (0=none, 1=high, 5=medium, 9=low) Numeric values are validated by the contract before dispatch. */
+  priority?: number | Extract<import('./contract/index.js').ReminderUpdateInput['priority'], null>
 }
 
-/** Input for creating a List */
-export interface ListCreateInput {
-  /** List name */
-  name: string
-  /** List color */
-  color?: string
-  /** The emblem icon name of the list */
-  emblem?: string
-}
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
-/** Input for updating a List */
-export type ListUpdateInput = Partial<ListCreateInput>
-
-/** A reminder item */
-export interface Reminder {
-  /** The name of the reminder */
-  name: string
-  /** The unique identifier of the reminder */
-  id: string
-  /** The notes attached to the reminder */
-  body: string
-  /** Whether the reminder is completed */
-  completed: boolean
-  /** The completion date of the reminder */
-  completionDate: Date
-  /** The due date of the reminder */
-  dueDate: Date
-  /** The remind date of the reminder */
-  remindMeDate: Date
-  /** The priority of the reminder (0=none, 1=high, 5=medium, 9=low) */
-  priority: number
-  /** Whether the reminder is flagged */
-  flagged: boolean
-  /** The creation date of the reminder */
-  creationDate: Date
-  /** The modification date of the reminder */
-  modificationDate: Date
-  /** The all-day due date of the reminder */
-  alldayDueDate: Date
-}
-
-/** Input for creating a Reminder */
-export interface ReminderCreateInput {
-  /** Reminder name */
-  name: string
-  /** Reminder notes */
-  body?: string
-  /** Whether the reminder is completed */
-  completed?: boolean
-  /** Due date */
-  dueDate?: Date
-  /** Remind me date */
-  remindMeDate?: Date
-  /** Priority (0=none, 1=high, 5=medium, 9=low) */
-  priority?: number
-  /** Whether to flag the reminder */
-  flagged?: boolean
-  /** The all-day due date of the reminder */
-  alldayDueDate?: Date
-  /** List identifier for the reminder */
-  listId: string
-}
-
-/** Input for updating a Reminder */
-export type ReminderUpdateInput = Partial<ReminderCreateInput>
-
-// Zod schemas for runtime validation
-
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AccountSchema = z.object({
   name: z.string(),
   id: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ListSchema = z.object({
   name: z.string(),
   id: z.string(),
@@ -114,6 +62,7 @@ export const ListSchema = z.object({
   emblem: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ReminderSchema = z.object({
   name: z.string(),
   id: z.string(),

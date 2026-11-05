@@ -5,470 +5,152 @@
 
 import { z } from 'zod'
 
-/** Document save format */
-export type SaveFormat =
-  | 'document'
-  | 'documentFormat97'
-  | 'template'
-  | 'rtf'
-  | 'text'
-  | 'html'
-  | 'pdf'
+export type { SaveFormat } from './contract/index.js'
 
-/** Paragraph alignment */
-export type ParagraphAlignment = 'left' | 'center' | 'right' | 'justify'
+export type { ParagraphAlignment } from './contract/index.js'
 
-/** Text underline type */
-export type UnderlineType = 'none' | 'single' | 'double' | 'dotted' | 'dashed'
+export type { UnderlineType } from './contract/index.js'
 
-/** Document view type */
-export type ViewType = 'normalView' | 'outlineView' | 'printView' | 'webView'
+export type { ViewType } from './contract/index.js'
 
-/** Field type */
-export type FieldType =
-  | 'fieldAddin'
-  | 'fieldDate'
-  | 'fieldHyperlink'
-  | 'fieldPageNumber'
-  | 'fieldRef'
+export type { FieldType } from './contract/index.js'
 
-/** A Microsoft Word document */
-export interface Document {
-  /** Canonical identifier (mirrors `name`); populated by list, pass to get/delete and to write operations that reference this resource. */
-  id?: string
-  /** The name of the document */
-  name: string
-  /** The full path of the document in HFS format */
-  fullName: string
-  /** The full path of the document in POSIX format */
-  posixFullName: string
-  /** The path to the document (HFS format) */
-  path: string
-  /** Whether the document has been saved */
-  saved: boolean
-  /** Whether the document is read-only */
-  readOnly: boolean
-  /** Whether this is the active document */
-  active: boolean
-  /** The main document text */
-  content: string
-  /** Whether changes are tracked in the document */
-  trackRevisions: boolean
-  /** Whether tracked changes are shown */
-  showRevisions: boolean
-  /** The interval in points between default tab stops */
-  defaultTabStop: number
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Document } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type DocumentCreateInput = import('./contract/index.js').DocumentCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type DocumentUpdateInput = import('./contract/index.js').DocumentUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Paragraph } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ParagraphCreateInput = import('./contract/index.js').ParagraphCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ParagraphUpdateInput = import('./contract/index.js').ParagraphUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { TextRange } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type TextRangeCreateInput = Omit<
+  import('./contract/index.js').TextRangeCreateInput,
+  'start' | 'end'
+> & {
+  /** The starting character position Numeric values are validated by the contract before dispatch. */
+  start?: number | Extract<import('./contract/index.js').TextRangeCreateInput['start'], null>
+  /** The ending character position Numeric values are validated by the contract before dispatch. */
+  end?: number | Extract<import('./contract/index.js').TextRangeCreateInput['end'], null>
 }
 
-/** Input for creating a Document */
-export interface DocumentCreateInput {
-  /** Whether the document has been saved */
-  saved?: boolean
-  /** Whether changes are tracked in the document */
-  trackRevisions?: boolean
-  /** Whether tracked changes are shown */
-  showRevisions?: boolean
-  /** The interval in points between default tab stops */
-  defaultTabStop?: number
+/** Canonical update input, retaining checked numeric conveniences. */
+export type TextRangeUpdateInput = Omit<
+  import('./contract/index.js').TextRangeUpdateInput,
+  'start' | 'end'
+> & {
+  /** The starting character position Numeric values are validated by the contract before dispatch. */
+  start?: number | Extract<import('./contract/index.js').TextRangeUpdateInput['start'], null>
+  /** The ending character position Numeric values are validated by the contract before dispatch. */
+  end?: number | Extract<import('./contract/index.js').TextRangeUpdateInput['end'], null>
 }
 
-/** Input for updating a Document */
-export type DocumentUpdateInput = Partial<DocumentCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Selection } from './contract/index.js'
 
-/** A single paragraph in a document */
-export interface Paragraph {
-  /** Canonical identifier (mirrors `paragraphId`); populated by list, pass to get/delete and to write operations that reference this resource. */
-  id?: string
-  /** The alignment for the paragraph */
-  alignment: ParagraphAlignment
-  /** The first-line or hanging indent value in points */
-  firstLineIndent: number
-  /** The left indent in points */
-  leftIndent: number
-  /** The right indent in points */
-  rightIndent: number
-  /** The line spacing in points */
-  lineSpacing: number
-  /** The spacing in points after the paragraph */
-  spaceAfter: number
-  /** The spacing in points before the paragraph */
-  spaceBefore: number
-  /** Whether a page break is forced before the paragraph */
-  pageBreakBefore: boolean
-  /** Whether all lines remain on the same page */
-  keepTogether: boolean
-  /** Whether paragraph stays with next paragraph */
-  keepWithNext: boolean
-  /** The paragraph ID */
-  paragraphId: number
-  /** The text content of the paragraph */
-  content: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type SelectionCreateInput = import('./contract/index.js').SelectionCreateInput
 
-/** Input for creating a Paragraph */
-export interface ParagraphCreateInput {
-  /** The alignment for the paragraph */
-  alignment?: ParagraphAlignment
-  /** The first-line or hanging indent value in points */
-  firstLineIndent?: number
-  /** The left indent in points */
-  leftIndent?: number
-  /** The right indent in points */
-  rightIndent?: number
-  /** The line spacing in points */
-  lineSpacing?: number
-  /** The spacing in points after the paragraph */
-  spaceAfter?: number
-  /** The spacing in points before the paragraph */
-  spaceBefore?: number
-  /** Whether a page break is forced before the paragraph */
-  pageBreakBefore?: boolean
-  /** Whether all lines remain on the same page */
-  keepTogether?: boolean
-  /** Whether paragraph stays with next paragraph */
-  keepWithNext?: boolean
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type SelectionUpdateInput = import('./contract/index.js').SelectionUpdateInput
 
-/** Input for updating a Paragraph */
-export type ParagraphUpdateInput = Partial<ParagraphCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Table } from './contract/index.js'
 
-/** A contiguous area in a document */
-export interface TextRange {
-  /** The text in the range */
-  content: string
-  /** Whether the text is formatted as bold */
-  bold: boolean
-  /** Whether the text is formatted as italic */
-  italic: boolean
-  /** The underline type */
-  underline: UnderlineType
-  /** The font size in points */
-  fontSize: number
-  /** The font name */
-  fontName: string
-  /** The starting character position */
-  start: number
-  /** The ending character position */
-  end: number
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type TableCreateInput = import('./contract/index.js').TableCreateInput
 
-/** Input for creating a TextRange */
-export interface TextRangeCreateInput {
-  /** The text in the range */
-  content?: string
-  /** Whether the text is formatted as bold */
-  bold?: boolean
-  /** Whether the text is formatted as italic */
-  italic?: boolean
-  /** The underline type */
-  underline?: UnderlineType
-  /** The font size in points */
-  fontSize?: number
-  /** The font name */
-  fontName?: string
-  /** The starting character position */
-  start?: number
-  /** The ending character position */
-  end?: number
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type TableUpdateInput = import('./contract/index.js').TableUpdateInput
 
-/** Input for updating a TextRange */
-export type TextRangeUpdateInput = Partial<TextRangeCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Row } from './contract/index.js'
 
-/** The current selection in a document */
-export interface Selection {
-  /** The text in the selection */
-  content: string
-  /** Whether the selection is formatted as bold */
-  bold: boolean
-  /** Whether the selection is formatted as italic */
-  italic: boolean
-  /** The font size of the selection in points */
-  fontSize: number
-  /** The font name of the selection */
-  fontName: string
-  /** The starting character position of the selection */
-  start: number
-  /** The ending character position of the selection */
-  end: number
-  /** The type of selection (e.g., text, table, graphic) */
-  selectionType: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type RowCreateInput = import('./contract/index.js').RowCreateInput
 
-/** Input for creating a Selection */
-export interface SelectionCreateInput {
-  /** The text in the selection */
-  content?: string
-  /** Whether the selection is formatted as bold */
-  bold?: boolean
-  /** Whether the selection is formatted as italic */
-  italic?: boolean
-  /** The font size of the selection in points */
-  fontSize?: number
-  /** The font name of the selection */
-  fontName?: string
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type RowUpdateInput = import('./contract/index.js').RowUpdateInput
 
-/** Input for updating a Selection */
-export type SelectionUpdateInput = Partial<SelectionCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Column } from './contract/index.js'
 
-/** A table in a document */
-export interface Table {
-  /** The number of rows in the table */
-  rowCount: number
-  /** The number of columns in the table */
-  columnCount: number
-  /** Whether the table is allowed to autofit */
-  allowAutoFit: boolean
-  /** Whether the table has borders */
-  borders: boolean
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ColumnCreateInput = import('./contract/index.js').ColumnCreateInput
 
-/** Input for creating a Table */
-export interface TableCreateInput {
-  /** Whether the table is allowed to autofit */
-  allowAutoFit?: boolean
-  /** Whether the table has borders */
-  borders?: boolean
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ColumnUpdateInput = import('./contract/index.js').ColumnUpdateInput
 
-/** Input for updating a Table */
-export type TableUpdateInput = Partial<TableCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Cell } from './contract/index.js'
 
-/** A row in a table */
-export interface Row {
-  /** The height of the row in points */
-  height: number
-  /** Whether the row can break across pages */
-  allowBreakAcrossPages: boolean
-  /** Whether the row is formatted as a heading */
-  headingFormat: boolean
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type CellCreateInput = import('./contract/index.js').CellCreateInput
 
-/** Input for creating a Row */
-export interface RowCreateInput {
-  /** The height of the row in points */
-  height?: number
-  /** Whether the row can break across pages */
-  allowBreakAcrossPages?: boolean
-  /** Whether the row is formatted as a heading */
-  headingFormat?: boolean
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type CellUpdateInput = import('./contract/index.js').CellUpdateInput
 
-/** Input for updating a Row */
-export type RowUpdateInput = Partial<RowCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Font } from './contract/index.js'
 
-/** A column in a table */
-export interface Column {
-  /** The width of the column in points */
-  width: number
-  /** The preferred width of the column */
-  preferredWidth: number
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type FontCreateInput = import('./contract/index.js').FontCreateInput
 
-/** Input for creating a Column */
-export interface ColumnCreateInput {
-  /** The width of the column in points */
-  width?: number
-  /** The preferred width of the column */
-  preferredWidth?: number
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type FontUpdateInput = import('./contract/index.js').FontUpdateInput
 
-/** Input for updating a Column */
-export type ColumnUpdateInput = Partial<ColumnCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { PageSetup } from './contract/index.js'
 
-/** A cell in a table */
-export interface Cell {
-  /** The text content of the cell */
-  content: string
-  /** The width of the cell in points */
-  width: number
-  /** The height of the cell in points */
-  height: number
-  /** The vertical alignment of text in the cell */
-  verticalAlignment: string
-  /** The row index of the cell */
-  rowIndex: number
-  /** The column index of the cell */
-  columnIndex: number
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type PageSetupCreateInput = import('./contract/index.js').PageSetupCreateInput
 
-/** Input for creating a Cell */
-export interface CellCreateInput {
-  /** The text content of the cell */
-  content?: string
-  /** The width of the cell in points */
-  width?: number
-  /** The height of the cell in points */
-  height?: number
-  /** The vertical alignment of text in the cell */
-  verticalAlignment?: string
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type PageSetupUpdateInput = import('./contract/index.js').PageSetupUpdateInput
 
-/** Input for updating a Cell */
-export type CellUpdateInput = Partial<CellCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Section } from './contract/index.js'
 
-/** Font formatting properties */
-export interface Font {
-  /** Whether the font is bold */
-  bold: boolean
-  /** Whether the font is italic */
-  italic: boolean
-  /** The underline type */
-  underline: UnderlineType
-  /** The font size in points */
-  size: number
-  /** The font name */
-  name: string
-  /** The font color */
-  color: { r: number; g: number; b: number }
-  /** Whether the font is subscript */
-  subscript: boolean
-  /** Whether the font is superscript */
-  superscript: boolean
-  /** Whether the font has strikethrough */
-  strikethrough: boolean
-  /** Whether the font is all caps */
-  allCaps: boolean
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type SectionCreateInput = import('./contract/index.js').SectionCreateInput
 
-/** Input for creating a Font */
-export interface FontCreateInput {
-  /** Whether the font is bold */
-  bold?: boolean
-  /** Whether the font is italic */
-  italic?: boolean
-  /** The underline type */
-  underline?: UnderlineType
-  /** The font size in points */
-  size?: number
-  /** The font name */
-  name?: string
-  /** The font color */
-  color?: { r: number; g: number; b: number }
-  /** Whether the font is subscript */
-  subscript?: boolean
-  /** Whether the font is superscript */
-  superscript?: boolean
-  /** Whether the font has strikethrough */
-  strikethrough?: boolean
-  /** Whether the font is all caps */
-  allCaps?: boolean
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type SectionUpdateInput = import('./contract/index.js').SectionUpdateInput
 
-/** Input for updating a Font */
-export type FontUpdateInput = Partial<FontCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Bookmark } from './contract/index.js'
 
-/** Page setup properties for a document or section */
-export interface PageSetup {
-  /** The top margin in points */
-  topMargin: number
-  /** The bottom margin in points */
-  bottomMargin: number
-  /** The left margin in points */
-  leftMargin: number
-  /** The right margin in points */
-  rightMargin: number
-  /** The page height in points */
-  pageHeight: number
-  /** The page width in points */
-  pageWidth: number
-  /** The page orientation (portrait or landscape) */
-  orientation: string
-  /** The paper size */
-  paperSize: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type BookmarkCreateInput = import('./contract/index.js').BookmarkCreateInput
 
-/** Input for creating a PageSetup */
-export interface PageSetupCreateInput {
-  /** The top margin in points */
-  topMargin?: number
-  /** The bottom margin in points */
-  bottomMargin?: number
-  /** The left margin in points */
-  leftMargin?: number
-  /** The right margin in points */
-  rightMargin?: number
-  /** The page height in points */
-  pageHeight?: number
-  /** The page width in points */
-  pageWidth?: number
-  /** The page orientation (portrait or landscape) */
-  orientation?: string
-  /** The paper size */
-  paperSize?: string
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type BookmarkUpdateInput = import('./contract/index.js').BookmarkUpdateInput
 
-/** Input for updating a PageSetup */
-export type PageSetupUpdateInput = Partial<PageSetupCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Field } from './contract/index.js'
 
-/** A section in a document */
-export interface Section {
-  /** The index of the section */
-  sectionIndex: number
-  /** Whether the section is protected for forms */
-  protectedForForms: boolean
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type FieldCreateInput = import('./contract/index.js').FieldCreateInput
 
-/** Input for creating a Section */
-export interface SectionCreateInput {
-  /** Whether the section is protected for forms */
-  protectedForForms?: boolean
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type FieldUpdateInput = import('./contract/index.js').FieldUpdateInput
 
-/** Input for updating a Section */
-export type SectionUpdateInput = Partial<SectionCreateInput>
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
-/** A bookmark in a document */
-export interface Bookmark {
-  /** The name of the bookmark */
-  name: string
-  /** The starting character position */
-  start: number
-  /** The ending character position */
-  end: number
-}
-
-/** Input for creating a Bookmark */
-export interface BookmarkCreateInput {
-  /** The name of the bookmark */
-  name?: string
-}
-
-/** Input for updating a Bookmark */
-export type BookmarkUpdateInput = Partial<BookmarkCreateInput>
-
-/** A field in a document */
-export interface Field {
-  /** The field type */
-  fieldType: FieldType
-  /** The field code */
-  fieldCode: string
-  /** The field text */
-  fieldText: string
-  /** Whether the field is locked */
-  locked: boolean
-  /** Whether field codes are displayed */
-  showCodes: boolean
-}
-
-/** Input for creating a Field */
-export interface FieldCreateInput {
-  /** The field code */
-  fieldCode?: string
-  /** The field text */
-  fieldText?: string
-  /** Whether the field is locked */
-  locked?: boolean
-  /** Whether field codes are displayed */
-  showCodes?: boolean
-}
-
-/** Input for updating a Field */
-export type FieldUpdateInput = Partial<FieldCreateInput>
-
-// Zod schemas for runtime validation
-
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const DocumentSchema = z.object({
   id: z.string().optional(),
   name: z.string(),
@@ -484,6 +166,7 @@ export const DocumentSchema = z.object({
   defaultTabStop: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ParagraphSchema = z.object({
   id: z.string().optional(),
   alignment: z.string(),
@@ -500,6 +183,7 @@ export const ParagraphSchema = z.object({
   content: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const TextRangeSchema = z.object({
   content: z.string(),
   bold: z.boolean(),
@@ -511,6 +195,7 @@ export const TextRangeSchema = z.object({
   end: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const SelectionSchema = z.object({
   content: z.string(),
   bold: z.boolean(),
@@ -522,6 +207,7 @@ export const SelectionSchema = z.object({
   selectionType: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const TableSchema = z.object({
   rowCount: z.number(),
   columnCount: z.number(),
@@ -529,17 +215,20 @@ export const TableSchema = z.object({
   borders: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const RowSchema = z.object({
   height: z.number(),
   allowBreakAcrossPages: z.boolean(),
   headingFormat: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ColumnSchema = z.object({
   width: z.number(),
   preferredWidth: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const CellSchema = z.object({
   content: z.string(),
   width: z.number(),
@@ -549,6 +238,7 @@ export const CellSchema = z.object({
   columnIndex: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const FontSchema = z.object({
   bold: z.boolean(),
   italic: z.boolean(),
@@ -562,6 +252,7 @@ export const FontSchema = z.object({
   allCaps: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const PageSetupSchema = z.object({
   topMargin: z.number(),
   bottomMargin: z.number(),
@@ -573,17 +264,20 @@ export const PageSetupSchema = z.object({
   paperSize: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const SectionSchema = z.object({
   sectionIndex: z.number(),
   protectedForForms: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const BookmarkSchema = z.object({
   name: z.string(),
   start: z.number(),
   end: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const FieldSchema = z.object({
   fieldType: z.string(),
   fieldCode: z.string(),

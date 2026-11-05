@@ -21,6 +21,7 @@ import { describe, expect, it } from 'vitest'
 import { deriveCapabilities } from '../capabilities/registry.js'
 import { resolveManifestRoutes, type AppManifest } from '../manifest/index.js'
 import { generateCliPlugin } from './cli/index.js'
+import { positionalOperationSource } from './sdk/test-support/operation-source.js'
 import { generateHttpClientSdk } from './sdk/http-client.js'
 import {
   CONTRACT_MODULE_PATH,
@@ -214,7 +215,7 @@ describe('the generated CLI', () => {
   const fileText = (path: string): string => {
     const found = plugin.files.find((f) => f.path === path)
     if (found === undefined) throw new Error(`no generated ${path}`)
-    return found.content
+    return positionalOperationSource(found.content)
   }
 
   it('has no command for the unavailable operation', () => {
@@ -292,7 +293,7 @@ function typesOf(source: AppManifest): string {
   const generated = generateHttpClientSdk(source, { packageName: '@macts/jotter' })
   const found = generated.files.find((f) => f.path === 'src/types.ts')
   if (found === undefined) throw new Error('no generated src/types.ts')
-  return found.content
+  return positionalOperationSource(found.content)
 }
 
 describe('the generated HTTP client', () => {
@@ -300,7 +301,7 @@ describe('the generated HTTP client', () => {
   const fileText = (path: string): string => {
     const found = sdk.files.find((f) => f.path === path)
     if (found === undefined) throw new Error(`no generated ${path}`)
-    return found.content
+    return positionalOperationSource(found.content)
   }
 
   it('has no method for the unavailable operation', () => {
@@ -314,19 +315,23 @@ describe('the generated HTTP client', () => {
   it('has no parameter for an omitted parameter, and does not send it', () => {
     const client = fileText('src/client.ts')
     expect(client).toContain(
-      '  async exportNotes(format: string, untaggedOr?: Tag): Promise<void> {'
+      "  async exportNotes(format: string, untaggedOr?: Parameters<import('./contract/index.js').JotterClient['exportNotes']>[1]): Promise<void> {"
     )
     expect(client).toContain(
-      "    await this.#httpClient.rpc<undefined>('jotter.app.exportNotes', { format, untaggedOr });"
+      "    await this.#httpClient.invoke<undefined>('jotter.app.exportNotes', { format, untaggedOr });"
     )
     expect(client).not.toContain('tagged?')
   })
 
   it('leaves an omitted property out of the create input, and keeps a list', () => {
     const types = fileText('src/types.ts')
-    const create = /export interface NoteCreateInput \{[\s\S]*?\n\}/.exec(types)?.[0] ?? ''
+    expect(types).toContain("Omit<import('./contract/index.js').NoteCreateInput")
+    const canonical =
+      generateContract(manifest).files.find((file) => file.path === CONTRACT_MODULE_PATH)
+        ?.content ?? ''
+    const create = /export interface NoteCreateInput \{[\s\S]*?\n\}/.exec(canonical)?.[0] ?? ''
     expect(create).not.toContain('primaryTag')
-    expect(create).toContain('  relatedTags?: Tag[];')
+    expect(create).toContain("  relatedTags?: ObjectReferenceData<unknown, 'Tag'>[]")
   })
   it('leaves an omitted property out of both input types of a resource with no create command', () => {
     // Folder has no create or update command. Its `owner`, a tag, is made
@@ -346,11 +351,8 @@ describe('the generated HTTP client', () => {
       },
     }
     const types = typesOf(variant)
-    expect(types).toContain(`export interface FolderCreateInput {
-  /** The folder's title */
-  title?: string;
-}`)
-    expect(types).toContain('export type FolderUpdateInput = Partial<FolderCreateInput>;')
+    expect(types).toContain("export type { FolderCreateInput } from './contract/index.js';")
+    expect(types).toContain("export type { FolderUpdateInput } from './contract/index.js';")
     // The contract's input types leave it out too.
     const contract = generateContract(variant).files.find((f) => f.path === CONTRACT_MODULE_PATH)
     expect(contract?.content).toContain(`export interface FolderCreateInput {
@@ -387,12 +389,16 @@ describe('the generated HTTP client', () => {
       },
     }
     const types = typesOf(variant)
-    const create = /export interface NoteCreateInput \{[\s\S]*?\n\}/.exec(types)?.[0] ?? ''
-    const update = /export interface NoteUpdateInput \{[\s\S]*?\n\}/.exec(types)?.[0] ?? ''
-    expect(create).toContain('  label: Tag;')
+    expect(types).toContain("Omit<import('./contract/index.js').NoteCreateInput")
+    const canonical =
+      generateContract(variant).files.find((file) => file.path === CONTRACT_MODULE_PATH)?.content ??
+      ''
+    const create = /export interface NoteCreateInput \{[\s\S]*?\n\}/.exec(canonical)?.[0] ?? ''
+    const update = /export interface NoteUpdateInput \{[\s\S]*?\n\}/.exec(canonical)?.[0] ?? ''
+    expect(create).toContain("  label: ObjectReferenceData<unknown, 'Tag'>")
     expect(update).not.toContain('label')
     expect(update).not.toContain('primaryTag')
-    expect(update).toContain('  title?: string;')
-    expect(update).toContain('  relatedTags?: Tag[];')
+    expect(update).toContain('  title?: string')
+    expect(update).toContain("  relatedTags?: ObjectReferenceData<unknown, 'Tag'>[]")
   })
 })

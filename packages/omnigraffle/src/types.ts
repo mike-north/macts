@@ -5,559 +5,240 @@
 
 import { z } from 'zod'
 
-/** Horizontal alignment options */
-export type HorizontalAlignment = 'left' | 'center' | 'right'
+export type { HorizontalAlignment } from './contract/index.js'
 
-/** Vertical alignment options */
-export type VerticalAlignment = 'top' | 'center' | 'bottom'
+export type { VerticalAlignment } from './contract/index.js'
 
-/** Hierarchical layout direction */
-export type LayoutDirection = 'topToBottom' | 'leftToRight' | 'bottomToTop' | 'rightToLeft'
+export type { LayoutDirection } from './contract/index.js'
 
-/** Type of automatic layout */
-export type LayoutType = 'hierarchical' | 'forceDirected' | 'radial' | 'circular'
+export type { LayoutType } from './contract/index.js'
 
-/** Type of cap at ends of the stroke */
-export type StrokeCap = 'butt' | 'round' | 'square'
+export type { StrokeCap } from './contract/index.js'
 
-/** Type of join between segments of the stroke */
-export type StrokeJoin = 'miter' | 'round' | 'bevel'
+export type { StrokeJoin } from './contract/index.js'
 
-/** Type of fill for shapes */
-export type FillType = 'noFill' | 'solidFill' | 'linearFill' | 'radialFill'
+export type { FillType } from './contract/index.js'
 
-/** How to size and display image fills */
-export type ImageSizing = 'manual' | 'stretched' | 'tiled'
+export type { ImageSizing } from './contract/index.js'
 
-/** Type of line */
-export type LineType = 'straight' | 'curved' | 'orthogonal' | 'bezier'
+export type { LineType } from './contract/index.js'
 
-/** Behavior when one line crosses another */
-export type HopType =
-  | 'noHop'
-  | 'roundHop'
-  | 'squareHop'
-  | 'twoSideHop'
-  | 'threeSideHop'
-  | 'ignoreHop'
-  | 'gapHop'
-  | 'bridgeHop'
+export type { HopType } from './contract/index.js'
 
-/** Rotation type for labels on lines */
-export type LabelOrientation = 'horizontal' | 'vertical' | 'parallel' | 'perpendicular' | 'custom'
+export type { LabelOrientation } from './contract/index.js'
 
-/** Autosizing behavior for text in shapes */
-export type TextAutosizing = 'overflow' | 'full' | 'verticallyOnly' | 'clip'
+export type { TextAutosizing } from './contract/index.js'
 
-/** Flip orientation */
-export type Orientation = 'horizontally' | 'vertically'
+export type { Orientation } from './contract/index.js'
 
-/** The type of area to be exported */
-export type ExportAreaType = 'selectedGraphics' | 'allGraphics' | 'currentCanvas' | 'entireDocument'
+export type { ExportAreaType } from './contract/index.js'
 
-/** A drawing page/canvas in OmniGraffle */
-export interface Canvas {
-  /** Unique identifier */
-  id: string
-  /** Name of this canvas */
-  name: string
-  /** Adjust number of pages on the canvas automatically? */
-  adjustsPages: boolean
-  /** Whether canvas size is reported as multiples of page size */
-  canvasSizeIsMeasuredInPages: boolean
-  /** Size of the canvas (page size multiplied by number of pages) */
-  canvasSize: { x: number; y: number }
-  /** Size of each page */
-  pageSize: { x: number; y: number }
-  /** Horizontal pages */
-  horizontalPages: number
-  /** Vertical pages */
-  verticalPages: number
-  /** Column alignment */
-  columnAlignment: HorizontalAlignment
-  /** Row alignment */
-  rowAlignment: VerticalAlignment
-  /** Spacing between graphics in a column */
-  columnSpacing: number
-  /** Spacing between graphics in a row */
-  rowSpacing: number
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Canvas } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type CanvasCreateInput = Omit<
+  import('./contract/index.js').CanvasCreateInput,
+  'horizontalPages' | 'verticalPages'
+> & {
+  /** Horizontal pages Numeric values are validated by the contract before dispatch. */
+  horizontalPages?:
+    | number
+    | Extract<import('./contract/index.js').CanvasCreateInput['horizontalPages'], null>
+  /** Vertical pages Numeric values are validated by the contract before dispatch. */
+  verticalPages?:
+    | number
+    | Extract<import('./contract/index.js').CanvasCreateInput['verticalPages'], null>
 }
 
-/** Input for creating a Canvas */
-export interface CanvasCreateInput {
-  /** Unique identifier */
-  id?: string
-  /** Canvas name */
-  name: string
-  /** Adjust number of pages on the canvas automatically? */
-  adjustsPages?: boolean
-  /** Whether canvas size is reported as multiples of page size */
-  canvasSizeIsMeasuredInPages?: boolean
-  /** Size of the canvas (page size multiplied by number of pages) */
-  canvasSize?: { x: number; y: number }
-  /** Horizontal pages */
-  horizontalPages?: number
-  /** Vertical pages */
-  verticalPages?: number
-  /** Column alignment */
-  columnAlignment?: HorizontalAlignment
-  /** Row alignment */
-  rowAlignment?: VerticalAlignment
-  /** Spacing between graphics in a column */
-  columnSpacing?: number
-  /** Spacing between graphics in a row */
-  rowSpacing?: number
+/** Canonical update input, retaining checked numeric conveniences. */
+export type CanvasUpdateInput = Omit<
+  import('./contract/index.js').CanvasUpdateInput,
+  'horizontalPages' | 'verticalPages'
+> & {
+  /** Horizontal pages Numeric values are validated by the contract before dispatch. */
+  horizontalPages?:
+    | number
+    | Extract<import('./contract/index.js').CanvasUpdateInput['horizontalPages'], null>
+  /** Vertical pages Numeric values are validated by the contract before dispatch. */
+  verticalPages?:
+    | number
+    | Extract<import('./contract/index.js').CanvasUpdateInput['verticalPages'], null>
 }
 
-/** Input for updating a Canvas */
-export type CanvasUpdateInput = Partial<CanvasCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Graphic } from './contract/index.js'
 
-/** Base class for visual elements in OmniGraffle */
-export interface Graphic {
-  /** Unique identifier */
-  id: string
-  /** Origin of the graphic (position of the upper-left corner of the bounding rectangle) */
-  origin: { x: number; y: number }
-  /** Size of the graphic (width and height of the bounding rectangle) */
-  size: { x: number; y: number }
-  /** Is this graphic locked? */
-  locked: boolean
-  /** Does this graphic allow connections to it? */
-  allowsConnections: boolean
-  /** When snapped to the grid does this graphic align its edges to the grid? */
-  alignsEdgesToGrid: boolean
-  /** Curvature of corners in the stroke path */
-  cornerRadius: number
-  /** Does this graphic draw its shadow? */
-  drawsShadow: boolean
-  /** Does this graphic draw its stroke? */
-  drawsStroke: boolean
-  /** Does this graphic have a double-lined stroke? */
-  doubleStroke: boolean
-  /** Is this graphic flipped horizontally? */
-  flippedHorizontally: boolean
-  /** Is this graphic flipped vertically? */
-  flippedVertically: boolean
-  /** Color of the shadow */
-  shadowColor: { r: number; g: number; b: number }
-  /** The 'fuzziness' of the graphic's shadow */
-  shadowFuzziness: number
-  /** The direction of the graphic's shadow */
-  shadowVector: { x: number; y: number }
-  /** Does this graphic draw its shadow immediately beneath itself? */
-  shadowBeneath: boolean
-  /** Color of the stroke */
-  strokeColor: { r: number; g: number; b: number }
-  /** Type of cap at ends of the stroke */
-  strokeCap: StrokeCap
-  /** Type of join between segments of the stroke */
-  strokeJoin: StrokeJoin
-  /** Dash pattern of the stroke */
-  strokePattern: number
-  /** Thickness of the stroke */
-  thickness: number
-  /** Notes for this graphic */
-  notes: string
-  /** Name of a graphic */
-  userName: string
-  /** Arbitrary string tag attached to this graphic */
-  tag: string
-  /** Web link for this graphic */
-  url: string
-  /** Source of attached AppleScript */
-  script: string
-  /** Rank group assigned to this graphic for hierarchical layout */
-  rankGroup: number
+/** Canonical create input, retaining checked numeric conveniences. */
+export type GraphicCreateInput = Omit<
+  import('./contract/index.js').GraphicCreateInput,
+  'strokePattern' | 'rankGroup'
+> & {
+  /** Dash pattern of the stroke Numeric values are validated by the contract before dispatch. */
+  strokePattern?:
+    | number
+    | Extract<import('./contract/index.js').GraphicCreateInput['strokePattern'], null>
+  /** Rank group assigned to this graphic for hierarchical layout Numeric values are validated by the contract before dispatch. */
+  rankGroup?: number | Extract<import('./contract/index.js').GraphicCreateInput['rankGroup'], null>
 }
 
-/** Input for creating a Graphic */
-export interface GraphicCreateInput {
-  /** Origin of the graphic (position of the upper-left corner of the bounding rectangle) */
-  origin?: { x: number; y: number }
-  /** Size of the graphic (width and height of the bounding rectangle) */
-  size?: { x: number; y: number }
-  /** Is this graphic locked? */
-  locked?: boolean
-  /** Does this graphic allow connections to it? */
-  allowsConnections?: boolean
-  /** When snapped to the grid does this graphic align its edges to the grid? */
-  alignsEdgesToGrid?: boolean
-  /** Curvature of corners in the stroke path */
-  cornerRadius?: number
-  /** Does this graphic draw its shadow? */
-  drawsShadow?: boolean
-  /** Does this graphic draw its stroke? */
-  drawsStroke?: boolean
-  /** Does this graphic have a double-lined stroke? */
-  doubleStroke?: boolean
-  /** Is this graphic flipped horizontally? */
-  flippedHorizontally?: boolean
-  /** Is this graphic flipped vertically? */
-  flippedVertically?: boolean
-  /** Color of the shadow */
-  shadowColor?: { r: number; g: number; b: number }
-  /** The 'fuzziness' of the graphic's shadow */
-  shadowFuzziness?: number
-  /** The direction of the graphic's shadow */
-  shadowVector?: { x: number; y: number }
-  /** Does this graphic draw its shadow immediately beneath itself? */
-  shadowBeneath?: boolean
-  /** Color of the stroke */
-  strokeColor?: { r: number; g: number; b: number }
-  /** Type of cap at ends of the stroke */
-  strokeCap?: StrokeCap
-  /** Type of join between segments of the stroke */
-  strokeJoin?: StrokeJoin
-  /** Dash pattern of the stroke */
-  strokePattern?: number
-  /** Thickness of the stroke */
-  thickness?: number
-  /** Notes for this graphic */
-  notes?: string
-  /** Name of a graphic */
-  userName?: string
-  /** Arbitrary string tag attached to this graphic */
-  tag?: string
-  /** Web link for this graphic */
-  url?: string
-  /** Source of attached AppleScript */
-  script?: string
-  /** Rank group assigned to this graphic for hierarchical layout */
-  rankGroup?: number
+/** Canonical update input, retaining checked numeric conveniences. */
+export type GraphicUpdateInput = Omit<
+  import('./contract/index.js').GraphicUpdateInput,
+  'strokePattern' | 'rankGroup'
+> & {
+  /** Dash pattern of the stroke Numeric values are validated by the contract before dispatch. */
+  strokePattern?:
+    | number
+    | Extract<import('./contract/index.js').GraphicUpdateInput['strokePattern'], null>
+  /** Rank group assigned to this graphic for hierarchical layout Numeric values are validated by the contract before dispatch. */
+  rankGroup?: number | Extract<import('./contract/index.js').GraphicUpdateInput['rankGroup'], null>
 }
 
-/** Input for updating a Graphic */
-export type GraphicUpdateInput = Partial<GraphicCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Shape } from './contract/index.js'
 
-/** A shape graphic in OmniGraffle */
-export interface Shape {
-  /** Unique identifier */
-  id: string
-  /** Name of the shape */
-  name: string
-  /** The text inside the shape */
-  text: string
-  /** The type of fill for this shape */
-  fill: FillType
-  /** The fill color */
-  fillColor: { r: number; g: number; b: number }
-  /** For linear and radial fills, this is the ending color */
-  gradientColor: { r: number; g: number; b: number }
-  /** Angle of a linear gradient fill */
-  gradientAngle: number
-  /** Rotation of the graphic in degrees */
-  rotation: number
-  /** Placement of the text inside the shape */
-  textPlacement: VerticalAlignment
-  /** Autosizing behavior of the shape around the text */
-  autosizing: TextAutosizing
-  /** Padding at the left and right of the text space */
-  sidePadding: number
-  /** Padding at the top and bottom of the text space */
-  verticalPadding: number
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ShapeCreateInput = Omit<
+  import('./contract/index.js').ShapeCreateInput,
+  'sidePadding' | 'verticalPadding' | 'canvasId'
+> & {
+  /** Padding at the left and right of the text space Numeric values are validated by the contract before dispatch. */
+  sidePadding?:
+    | number
+    | Extract<import('./contract/index.js').ShapeCreateInput['sidePadding'], null>
+  /** Padding at the top and bottom of the text space Numeric values are validated by the contract before dispatch. */
+  verticalPadding?:
+    | number
+    | Extract<import('./contract/index.js').ShapeCreateInput['verticalPadding'], null>
+  /** Canvas identifier for the shape Numeric values are validated by the contract before dispatch. */
+  canvasId: number | Extract<import('./contract/index.js').ShapeCreateInput['canvasId'], null>
 }
 
-/** Input for creating a Shape */
-export interface ShapeCreateInput {
-  /** Name of the shape */
-  name?: string
-  /** Text content */
-  text?: string
-  /** The type of fill for this shape */
-  fill?: FillType
-  /** The fill color */
-  fillColor?: { r: number; g: number; b: number }
-  /** For linear and radial fills, this is the ending color */
-  gradientColor?: { r: number; g: number; b: number }
-  /** Angle of a linear gradient fill */
-  gradientAngle?: number
-  /** Rotation of the graphic in degrees */
-  rotation?: number
-  /** Placement of the text inside the shape */
-  textPlacement?: VerticalAlignment
-  /** Autosizing behavior of the shape around the text */
-  autosizing?: TextAutosizing
-  /** Padding at the left and right of the text space */
-  sidePadding?: number
-  /** Padding at the top and bottom of the text space */
-  verticalPadding?: number
-  /** Canvas identifier for the shape */
-  canvasId: number
-  /** Shape origin */
-  origin: { x: number; y: number }
-  /** Shape size */
-  size: { x: number; y: number }
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ShapeUpdateInput = Omit<
+  import('./contract/index.js').ShapeUpdateInput,
+  'sidePadding' | 'verticalPadding' | 'canvasId'
+> & {
+  /** Padding at the left and right of the text space Numeric values are validated by the contract before dispatch. */
+  sidePadding?:
+    | number
+    | Extract<import('./contract/index.js').ShapeUpdateInput['sidePadding'], null>
+  /** Padding at the top and bottom of the text space Numeric values are validated by the contract before dispatch. */
+  verticalPadding?:
+    | number
+    | Extract<import('./contract/index.js').ShapeUpdateInput['verticalPadding'], null>
+  /** Canvas identifier for the shape Numeric values are validated by the contract before dispatch. */
+  canvasId?: number | Extract<import('./contract/index.js').ShapeUpdateInput['canvasId'], null>
 }
 
-/** Input for updating a Shape */
-export type ShapeUpdateInput = Partial<ShapeCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Line } from './contract/index.js'
 
-/** A line/connector in OmniGraffle */
-export interface Line {
-  /** Unique identifier */
-  id: string
-  /** Type of the line */
-  lineType: LineType
-  /** The behavior when one line crosses over another line */
-  hopType: HopType
-  /** Type of line ending on the head of the line */
-  headType: string
-  /** Type of line ending on the tail of the line */
-  tailType: string
-  /** Scale of line ending on the head of the line */
-  headScale: number
-  /** Scale of line ending on the tail of the line */
-  tailScale: number
-  /** Which magnet of the destination graphic the line attaches to */
-  headMagnet: number
-  /** Which magnet of the source graphic the line attaches to */
-  tailMagnet: number
+/** Canonical create input, retaining checked numeric conveniences. */
+export type LineCreateInput = Omit<
+  import('./contract/index.js').LineCreateInput,
+  'headMagnet' | 'tailMagnet'
+> & {
+  /** Which magnet of the destination graphic the line attaches to Numeric values are validated by the contract before dispatch. */
+  headMagnet?: number | Extract<import('./contract/index.js').LineCreateInput['headMagnet'], null>
+  /** Which magnet of the source graphic the line attaches to Numeric values are validated by the contract before dispatch. */
+  tailMagnet?: number | Extract<import('./contract/index.js').LineCreateInput['tailMagnet'], null>
 }
 
-/** Input for creating a Line */
-export interface LineCreateInput {
-  /** Type of the line */
-  lineType?: LineType
-  /** The behavior when one line crosses over another line */
-  hopType?: HopType
-  /** Type of line ending on the head of the line */
-  headType?: string
-  /** Type of line ending on the tail of the line */
-  tailType?: string
-  /** Scale of line ending on the head of the line */
-  headScale?: number
-  /** Scale of line ending on the tail of the line */
-  tailScale?: number
-  /** Which magnet of the destination graphic the line attaches to */
-  headMagnet?: number
-  /** Which magnet of the source graphic the line attaches to */
-  tailMagnet?: number
+/** Canonical update input, retaining checked numeric conveniences. */
+export type LineUpdateInput = Omit<
+  import('./contract/index.js').LineUpdateInput,
+  'headMagnet' | 'tailMagnet'
+> & {
+  /** Which magnet of the destination graphic the line attaches to Numeric values are validated by the contract before dispatch. */
+  headMagnet?: number | Extract<import('./contract/index.js').LineUpdateInput['headMagnet'], null>
+  /** Which magnet of the source graphic the line attaches to Numeric values are validated by the contract before dispatch. */
+  tailMagnet?: number | Extract<import('./contract/index.js').LineUpdateInput['tailMagnet'], null>
 }
 
-/** Input for updating a Line */
-export type LineUpdateInput = Partial<LineCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Group } from './contract/index.js'
 
-/** A group of graphics in OmniGraffle */
-export interface Group {
-  /** Unique identifier */
-  id: string
-  /** Rotation of the group in degrees */
-  rotation: number
-  /** Only connect to the group? */
-  connectToGroupOnly: boolean
+/** Canonical create input, retaining checked numeric conveniences. */
+export type GroupCreateInput = import('./contract/index.js').GroupCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type GroupUpdateInput = import('./contract/index.js').GroupUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Layer } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type LayerCreateInput = import('./contract/index.js').LayerCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type LayerUpdateInput = import('./contract/index.js').LayerUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Subgraph } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type SubgraphCreateInput = import('./contract/index.js').SubgraphCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type SubgraphUpdateInput = import('./contract/index.js').SubgraphUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Label } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type LabelCreateInput = import('./contract/index.js').LabelCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type LabelUpdateInput = import('./contract/index.js').LabelUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Grid } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type GridCreateInput = Omit<
+  import('./contract/index.js').GridCreateInput,
+  'majorSpacing'
+> & {
+  /** The number of minor grid lines for each major line Numeric values are validated by the contract before dispatch. */
+  majorSpacing?:
+    | number
+    | Extract<import('./contract/index.js').GridCreateInput['majorSpacing'], null>
 }
 
-/** Input for creating a Group */
-export interface GroupCreateInput {
-  /** Rotation of the group in degrees */
-  rotation?: number
-  /** Only connect to the group? */
-  connectToGroupOnly?: boolean
+/** Canonical update input, retaining checked numeric conveniences. */
+export type GridUpdateInput = Omit<
+  import('./contract/index.js').GridUpdateInput,
+  'majorSpacing'
+> & {
+  /** The number of minor grid lines for each major line Numeric values are validated by the contract before dispatch. */
+  majorSpacing?:
+    | number
+    | Extract<import('./contract/index.js').GridUpdateInput['majorSpacing'], null>
 }
 
-/** Input for updating a Group */
-export type GroupUpdateInput = Partial<GroupCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Master } from './contract/index.js'
 
-/** A drawing layer in OmniGraffle */
-export interface Layer {
-  /** Canonical identifier (mirrors `name`); populated by list, pass to get/delete and to write operations that reference this resource. */
-  id?: string
-  /** Name of the layer */
-  name: string
-  /** Are the layer's graphics locked? */
-  locked: boolean
-  /** Are the layer's graphics visible? */
-  visible: boolean
-  /** Do the layer's graphics print? */
-  prints: boolean
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type MasterCreateInput = import('./contract/index.js').MasterCreateInput
 
-/** Input for creating a Layer */
-export interface LayerCreateInput {
-  /** Layer name */
-  name: string
-  /** Are the layer's graphics locked? */
-  locked?: boolean
-  /** Are the layer's graphics visible? */
-  visible?: boolean
-  /** Do the layer's graphics print? */
-  prints?: boolean
-  /** Canvas identifier for the layer */
-  canvasId: string
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type MasterUpdateInput = import('./contract/index.js').MasterUpdateInput
 
-/** Input for updating a Layer */
-export type LayerUpdateInput = Partial<LayerCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { ExportSettings } from './contract/index.js'
 
-/** A subgraph container in OmniGraffle */
-export interface Subgraph {
-  /** Unique identifier */
-  id: string
-  /** Is the subgraph collapsed? */
-  collapsed: boolean
-  /** Top margin */
-  topMargin: number
-  /** Bottom margin */
-  bottomMargin: number
-  /** Left margin */
-  leftMargin: number
-  /** Right margin */
-  rightMargin: number
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ExportSettingsCreateInput = import('./contract/index.js').ExportSettingsCreateInput
 
-/** Input for creating a Subgraph */
-export interface SubgraphCreateInput {
-  /** Is the subgraph collapsed? */
-  collapsed?: boolean
-  /** Top margin */
-  topMargin?: number
-  /** Bottom margin */
-  bottomMargin?: number
-  /** Left margin */
-  leftMargin?: number
-  /** Right margin */
-  rightMargin?: number
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ExportSettingsUpdateInput = import('./contract/index.js').ExportSettingsUpdateInput
 
-/** Input for updating a Subgraph */
-export type SubgraphUpdateInput = Partial<SubgraphCreateInput>
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
-/** A text label on a line */
-export interface Label {
-  /** Unique identifier */
-  id: string
-  /** The text inside the label */
-  text: string
-  /** The position along the line */
-  labelPosition: number
-  /** The offset from the line */
-  labelOffset: number
-  /** The type of rotation around the line */
-  labelRotation: LabelOrientation
-}
-
-/** Input for creating a Label */
-export interface LabelCreateInput {
-  /** The text inside the label */
-  text?: string
-  /** The position along the line */
-  labelPosition?: number
-  /** The offset from the line */
-  labelOffset?: number
-  /** The type of rotation around the line */
-  labelRotation?: LabelOrientation
-}
-
-/** Input for updating a Label */
-export type LabelUpdateInput = Partial<LabelCreateInput>
-
-/** Grid settings for a canvas */
-export interface Grid {
-  /** Is the grid visible? */
-  visible: boolean
-  /** Do points snap to the grid? */
-  snaps: boolean
-  /** Number of pixels between minor grid lines */
-  spacing: number
-  /** Does the grid have 'major' lines? */
-  major: boolean
-  /** The number of minor grid lines for each major line */
-  majorSpacing: number
-  /** Does the grid draw in front of all shapes? */
-  drawsInFront: boolean
-  /** Color of the grid */
-  scriptGridColor: { r: number; g: number; b: number }
-  /** Color of major lines */
-  scriptMajorGridColor: { r: number; g: number; b: number }
-}
-
-/** Input for creating a Grid */
-export interface GridCreateInput {
-  /** Is the grid visible? */
-  visible?: boolean
-  /** Do points snap to the grid? */
-  snaps?: boolean
-  /** Number of pixels between minor grid lines */
-  spacing?: number
-  /** Does the grid have 'major' lines? */
-  major?: boolean
-  /** The number of minor grid lines for each major line */
-  majorSpacing?: number
-  /** Does the grid draw in front of all shapes? */
-  drawsInFront?: boolean
-  /** Color of the grid */
-  scriptGridColor?: { r: number; g: number; b: number }
-  /** Color of major lines */
-  scriptMajorGridColor?: { r: number; g: number; b: number }
-}
-
-/** Input for updating a Grid */
-export type GridUpdateInput = Partial<GridCreateInput>
-
-/** A reusable template/master in OmniGraffle */
-export interface Master {
-  /** Unique identifier */
-  id: string
-  /** Name of this master */
-  name: string
-}
-
-/** Input for creating a Master */
-export interface MasterCreateInput {
-  /** Unique identifier */
-  id?: string
-  /** Name of this master */
-  name?: string
-}
-
-/** Input for updating a Master */
-export type MasterUpdateInput = Partial<MasterCreateInput>
-
-/** Export configuration settings */
-export interface ExportSettings {
-  /** The type of area to be exported */
-  areaType: ExportAreaType
-  /** The scale to use during export */
-  exportScale: number
-  /** The number of pixels per point in the resulting exported image */
-  resolution: number
-  /** Draw the background canvas color */
-  drawsBackground: boolean
-  /** Whether or not to include a border area */
-  includeBorder: boolean
-  /** The number of pixels of border area to include */
-  borderAmount: number
-  /** Whether to export with non printing layers */
-  includeNonprintingLayers: boolean
-  /** Whether to export with artboards */
-  useArtboards: boolean
-}
-
-/** Input for creating a ExportSettings */
-export interface ExportSettingsCreateInput {
-  /** The type of area to be exported */
-  areaType?: ExportAreaType
-  /** The scale to use during export */
-  exportScale?: number
-  /** The number of pixels per point in the resulting exported image */
-  resolution?: number
-  /** Draw the background canvas color */
-  drawsBackground?: boolean
-  /** Whether or not to include a border area */
-  includeBorder?: boolean
-  /** The number of pixels of border area to include */
-  borderAmount?: number
-  /** Whether to export with non printing layers */
-  includeNonprintingLayers?: boolean
-  /** Whether to export with artboards */
-  useArtboards?: boolean
-}
-
-/** Input for updating a ExportSettings */
-export type ExportSettingsUpdateInput = Partial<ExportSettingsCreateInput>
-
-// Zod schemas for runtime validation
-
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const CanvasSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -573,6 +254,7 @@ export const CanvasSchema = z.object({
   rowSpacing: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const GraphicSchema = z.object({
   id: z.string(),
   origin: z.object({ x: z.number(), y: z.number() }),
@@ -603,6 +285,7 @@ export const GraphicSchema = z.object({
   rankGroup: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ShapeSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -618,6 +301,7 @@ export const ShapeSchema = z.object({
   verticalPadding: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const LineSchema = z.object({
   id: z.string(),
   lineType: z.string(),
@@ -630,12 +314,14 @@ export const LineSchema = z.object({
   tailMagnet: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const GroupSchema = z.object({
   id: z.string(),
   rotation: z.number(),
   connectToGroupOnly: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const LayerSchema = z.object({
   id: z.string().optional(),
   name: z.string(),
@@ -644,6 +330,7 @@ export const LayerSchema = z.object({
   prints: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const SubgraphSchema = z.object({
   id: z.string(),
   collapsed: z.boolean(),
@@ -653,6 +340,7 @@ export const SubgraphSchema = z.object({
   rightMargin: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const LabelSchema = z.object({
   id: z.string(),
   text: z.string(),
@@ -661,6 +349,7 @@ export const LabelSchema = z.object({
   labelRotation: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const GridSchema = z.object({
   visible: z.boolean(),
   snaps: z.boolean(),
@@ -672,11 +361,13 @@ export const GridSchema = z.object({
   scriptMajorGridColor: z.object({ red: z.number(), green: z.number(), blue: z.number() }),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const MasterSchema = z.object({
   id: z.string(),
   name: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ExportSettingsSchema = z.object({
   areaType: z.string(),
   exportScale: z.number(),

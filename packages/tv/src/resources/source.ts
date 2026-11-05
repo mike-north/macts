@@ -24,14 +24,25 @@ export class SourceResourceClient {
   /**
    * List all sources, as one page.
    */
-  async list(): Promise<Page<Source>> {
-    return this.#http.rpc<Page<Source>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Source>> {
+    return this.#http.invoke<Page<Source>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions
+    )
   }
 
   /**
    * Get a source by persistentID.
    */
-  async get(persistentID: string): Promise<Source> {
-    return this.#http.rpc<Source>(`${this.#app}.${this.#resource}.get`, { persistentID })
+  async get(
+    persistentID: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Source> {
+    return this.#http.invoke<Source>(
+      `${this.#app}.${this.#resource}.get`,
+      { persistentID },
+      __mactsOptions
+    )
   }
 }

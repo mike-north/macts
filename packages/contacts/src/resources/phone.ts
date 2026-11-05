@@ -8,6 +8,7 @@ import type { HttpClient } from '../client.js'
 import type { Phone } from '../types.js'
 
 import {
+  Integer as __mactsInteger,
   ValueTypes as __mactsValueTypes,
   ValidationError as __mactsValidationError,
 } from '@macts/contracts'
@@ -16,7 +17,7 @@ import {
 const __mactsIntegerWire = __mactsValueTypes.integer().wire
 
 /** Validate CLI text or an SDK number before dispatch, without implicit rounding. */
-function __mactsIntegerInput(value: unknown): { integer: string } {
+function __mactsIntegerInput(value: unknown): __mactsInteger {
   const integer = typeof value === 'number' || typeof value === 'string' ? String(value) : undefined
   const candidate = { integer }
   if (!__mactsIntegerWire.safeParse(candidate).success || integer === undefined) {
@@ -24,7 +25,7 @@ function __mactsIntegerInput(value: unknown): { integer: string } {
       'Expected a canonical decimal integer from -9007199254740991 to 9007199254740991.'
     throw new __mactsValidationError(message, { issues: [{ path: [], message }] })
   }
-  return { integer }
+  return __mactsInteger.validate(Number(integer))
 }
 
 /**
@@ -47,19 +48,32 @@ export class PhoneResourceClient {
    */
   async list(
     personId: string,
-    page: { pageSize?: number; cursor?: string } = {}
+    page: { pageSize?: number; cursor?: string } = {},
+    __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Page<Phone>> {
-    return this.#http.rpc<Page<Phone>>(`${this.#app}.${this.#resource}.list`, {
-      ...(page.pageSize === undefined ? {} : { pageSize: __mactsIntegerInput(page.pageSize) }),
-      ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-      personId,
-    })
+    return this.#http.invoke<Page<Phone>>(
+      `${this.#app}.${this.#resource}.list`,
+      {
+        ...(page.pageSize === undefined ? {} : { pageSize: __mactsIntegerInput(page.pageSize) }),
+        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+        personId,
+      },
+      __mactsOptions
+    )
   }
 
   /**
    * Get a phone by id within a parent scope.
    */
-  async get(personId: string, id: string): Promise<Phone> {
-    return this.#http.rpc<Phone>(`${this.#app}.${this.#resource}.get`, { personId, id })
+  async get(
+    personId: string,
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Phone> {
+    return this.#http.invoke<Phone>(
+      `${this.#app}.${this.#resource}.get`,
+      { personId, id },
+      __mactsOptions
+    )
   }
 }

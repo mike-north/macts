@@ -4,22 +4,32 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { z } from 'zod';
 
+// Warning: (ae-forgotten-export) The symbol "ArcResources" needs to be exported by the entry point index.d.ts
+//
 // @public
+export interface ArcClient extends ClientBrand<ArcResources> {
+}
+
+// @public (undocumented)
 export class ArcClient {
     constructor(options: ArcClientOptions);
-    close(): Promise<void>;
-    count(each?: string): Promise<void>;
-    execute(javascript: string): Promise<void>;
-    focus(): Promise<void>;
-    goBack(): Promise<void>;
-    goForward(): Promise<void>;
+    close(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    count(each?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    execute(javascript: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    focus(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    goBack(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    goForward(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
-    make(_new: string, withProperties?: unknown): Promise<void>;
-    reload(): Promise<void>;
-    select(): Promise<void>;
-    stop(): Promise<void>;
+    make(_new: string, withProperties?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    reload(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    select(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    stop(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -54,46 +64,53 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind<Client extends ClientBrand<ArcResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface Space {
-    id: string;
-    title: string;
+    readonly id: string;
+    readonly title: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "SpaceCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type SpaceCreateInput = Record<string, never>;
+export type SpaceCreateInput = SpaceCreateInput_2;
 
-// @public (undocumented)
+// @public
 export const SpaceSchema: z.ZodObject<{
     id: z.ZodString;
     title: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "SpaceUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type SpaceUpdateInput = Partial<SpaceCreateInput>;
+export type SpaceUpdateInput = SpaceUpdateInput_2;
 
 // @public
 export interface Tab {
-    id: string;
-    loading: boolean;
-    location: string;
-    title: string;
-    uRL: string;
+    readonly id: string;
+    readonly loading: boolean | null;
+    location: string | null;
+    readonly title: string | null;
+    uRL: string | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "TabCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type TabCreateInput = TabCreateInput_2;
 
 // @public
-export interface TabCreateInput {
-    location?: string;
-    uRL?: string;
-}
-
-// @public (undocumented)
 export const TabSchema: z.ZodObject<{
     id: z.ZodString;
     title: z.ZodString;
@@ -102,36 +119,35 @@ export const TabSchema: z.ZodObject<{
     location: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "TabUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type TabUpdateInput = Partial<TabCreateInput>;
+export type TabUpdateInput = TabUpdateInput_2;
 
 // @public
 export interface Window {
-    closeable: boolean;
-    id: string;
-    incognito: boolean;
-    index: number;
-    minimizable: boolean;
-    minimized: boolean;
-    mode: string;
-    name: string;
-    resizable: boolean;
-    visible: boolean;
-    zoomable: boolean;
-    zoomed: boolean;
+    readonly closeable: boolean | null;
+    readonly id: string;
+    incognito: boolean | null;
+    index: Integer | null;
+    readonly minimizable: boolean | null;
+    minimized: boolean | null;
+    mode: string | null;
+    readonly name: string | null;
+    readonly resizable: boolean | null;
+    visible: boolean | null;
+    readonly zoomable: boolean | null;
+    zoomed: boolean | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "WindowCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type WindowCreateInput = Omit<WindowCreateInput_2, 'index'> & {
+    index?: number | Extract<WindowCreateInput_2['index'], null>;
+};
 
 // @public
-export interface WindowCreateInput {
-    incognito?: boolean;
-    index?: number;
-    minimized?: boolean;
-    mode?: string;
-    visible?: boolean;
-    zoomed?: boolean;
-}
-
-// @public (undocumented)
 export const WindowSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -147,8 +163,12 @@ export const WindowSchema: z.ZodObject<{
     mode: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "WindowUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type WindowUpdateInput = Partial<WindowCreateInput>;
+export type WindowUpdateInput = Omit<WindowUpdateInput_2, 'index'> & {
+    index?: number | Extract<WindowUpdateInput_2['index'], null>;
+};
 
 // (No @packageDocumentation comment for this package)
 

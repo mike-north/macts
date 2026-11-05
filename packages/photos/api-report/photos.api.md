@@ -4,40 +4,49 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
+import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Album {
-    id: string;
-    name: string;
-    parent: Folder;
+    readonly id: string;
+    name: string | null;
+    readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "AlbumCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface AlbumCreateInput {
-    name?: string;
-}
+export type AlbumCreateInput = AlbumCreateInput_2;
 
 // @public
 export class AlbumResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Album>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Album>;
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<Page<Album>>;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Album>>;
 }
 
-// @public (undocumented)
+// @public
 export const AlbumSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
     parent: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "AlbumUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AlbumUpdateInput = Partial<AlbumCreateInput>;
+export type AlbumUpdateInput = AlbumUpdateInput_2;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -60,100 +69,106 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Container {
-    id: string;
-    name: string;
-    parent: Folder;
+    readonly id: string;
+    name: string | null;
+    readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "ContainerCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type ContainerCreateInput = ContainerCreateInput_2;
 
 // @public
-export interface ContainerCreateInput {
-    name?: string;
-}
-
-// @public (undocumented)
 export const ContainerSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
     parent: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "ContainerUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ContainerUpdateInput = Partial<ContainerCreateInput>;
+export type ContainerUpdateInput = ContainerUpdateInput_2;
 
 // @public
 export interface Folder {
-    id: string;
-    name: string;
-    parent: Folder;
+    readonly id: string;
+    name: string | null;
+    readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "FolderCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface FolderCreateInput {
-    name?: string;
-}
+export type FolderCreateInput = FolderCreateInput_2;
 
 // @public
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Folder>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Folder>;
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<Page<Folder>>;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Folder>>;
 }
 
-// @public (undocumented)
+// @public
 export const FolderSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
     parent: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "FolderUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type FolderUpdateInput = Partial<FolderCreateInput>;
+export type FolderUpdateInput = FolderUpdateInput_2;
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // Warning: (ae-forgotten-export) The symbol "PhotosResources" needs to be exported by the entry point index.d.ts
+    //
+    // @internal
+    bind<Client extends ClientBrand<PhotosResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface MediaItem {
-    altitude: number;
-    date: Date;
-    description: string;
-    favorite: boolean;
-    filename: string;
-    height: number;
-    id: string;
-    keywords: string[];
+    readonly altitude: number | null;
+    date: Date | null;
+    description: string | null;
+    favorite: boolean | null;
+    readonly filename: string | null;
+    readonly height: Integer | null;
+    readonly id: string;
+    keywords: readonly string[] | null;
     location: unknown;
-    name: string;
-    size: number;
-    width: number;
+    name: string | null;
+    size: Integer | null;
+    readonly width: Integer | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "MediaItemCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface MediaItemCreateInput {
-    date?: Date;
-    description?: string;
-    favorite?: boolean;
-    keywords?: string[];
-    location?: unknown;
-    name?: string;
-    size?: number;
-}
+export type MediaItemCreateInput = Omit<MediaItemCreateInput_2, 'size'> & {
+    size?: number | Extract<MediaItemCreateInput_2['size'], null>;
+};
 
 // @public
 export class MediaItemResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    duplicate(id: string): Promise<void>;
-    get(id: string): Promise<MediaItem>;
-    list(): Promise<Page<MediaItem>>;
+    duplicate(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<MediaItem>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<MediaItem>>;
 }
 
-// @public (undocumented)
+// @public
 export const MediaItemSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -169,47 +184,59 @@ export const MediaItemSchema: z.ZodObject<{
     size: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "MediaItemUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type MediaItemUpdateInput = Partial<MediaItemCreateInput>;
+export type MediaItemUpdateInput = Omit<MediaItemUpdateInput_2, 'size'> & {
+    size?: number | Extract<MediaItemUpdateInput_2['size'], null>;
+};
 
 // @public
 export interface Moment {
-    id: string;
-    name: string;
+    readonly id: string;
+    readonly name: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "MomentCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type MomentCreateInput = Record<string, never>;
+export type MomentCreateInput = MomentCreateInput_2;
 
-// @public (undocumented)
+// @public
 export const MomentSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "MomentUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type MomentUpdateInput = Partial<MomentCreateInput>;
+export type MomentUpdateInput = MomentUpdateInput_2;
 
 // @public
+export interface PhotosClient extends ClientBrand<PhotosResources> {
+}
+
+// @public (undocumented)
 export class PhotosClient {
     constructor(options: PhotosClientOptions);
-    add(mediaItems: string[], to: string): Promise<void>;
+    add(mediaItems: string[], to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly albums: AlbumResourceClient;
-    _delete(target: string): Promise<void>;
-    _export(mediaItems: string[], to: string, usingOriginals?: boolean): Promise<void>;
+    _delete(target: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    _export(mediaItems: string[], to: string, usingOriginals?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly folders: FolderResourceClient;
     get http(): HttpClient;
-    _import(files: string[], into?: string, skipCheckDuplicates?: boolean): Promise<void>;
-    make(_new: string, named?: string, at?: string): Promise<void>;
+    _import(files: string[], into?: string, skipCheckDuplicates?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    make(_new: string, named?: string, at?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly mediaItems: MediaItemResourceClient;
-    nextSlide(): Promise<void>;
-    pauseSlideshow(): Promise<void>;
-    previousSlide(): Promise<void>;
-    resumeSlideshow(): Promise<void>;
-    search(_for: string): Promise<void>;
-    spotlight(target: string): Promise<void>;
-    startSlideshow(using: string[]): Promise<void>;
-    stopSlideshow(): Promise<void>;
+    nextSlide(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    pauseSlideshow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    previousSlide(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    resumeSlideshow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    search(_for: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    spotlight(target: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    startSlideshow(using: string[], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    stopSlideshow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public

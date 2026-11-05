@@ -24,21 +24,36 @@ export class ShortcutResourceClient {
   /**
    * List all shortcuts, as one page.
    */
-  async list(): Promise<Page<Shortcut>> {
-    return this.#http.rpc<Page<Shortcut>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Shortcut>> {
+    return this.#http.invoke<Page<Shortcut>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions
+    )
   }
 
   /**
    * Get a shortcut by id.
    */
-  async get(id: string): Promise<Shortcut> {
-    return this.#http.rpc<Shortcut>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Shortcut> {
+    return this.#http.invoke<Shortcut>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
   }
 
   /**
    * Run a shortcut. To run a shortcut in the background, without opening the Shortcuts app, tell 'Shortcuts Events' instead of 'Shortcuts'.
    */
-  async run(id: string, withInput?: unknown): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.run`, { id, withInput })
+  async run(
+    id: string,
+    withInput?: unknown,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.run`,
+      { id, withInput },
+      __mactsOptions
+    )
   }
 }

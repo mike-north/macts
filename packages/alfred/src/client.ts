@@ -5,6 +5,27 @@
  * @packageDocumentation
  */
 
+import { alfredContract as appContract } from './contract/index.js'
+import {
+  createCodecClient,
+  createRemoteTransport,
+  type ClientTransport,
+} from '@macts/contracts/client'
+import {
+  MactsError,
+  OperationCancelledError,
+  TransportError,
+  ValidationError,
+  fromWireErrorEnvelope,
+  type AppContract,
+  type CallOptions,
+  type ClientBrand,
+  type ClientRuntime,
+  type OperationId,
+  type WireValue,
+} from '@macts/contracts'
+import type { AlfredResources } from './contract/index.js'
+
 /**
  * Client configuration options.
  */
@@ -18,36 +39,101 @@ export interface AlfredClientOptions {
 /**
  * HTTP client wrapper for making authenticated requests.
  */
+/** Canonical failures retained privately while raw RPC preserves the legacy error class. */
+const canonicalFailures = new WeakMap<Error, MactsError>()
+
+/**
+ * Private request metadata selects the canonical POST while retaining the public
+ * raw RPC hook. It never enters the request body or caller-owned options.
+ */
+const canonicalCall = Symbol('canonical contract call')
+
 export class HttpClient {
+  readonly #transport: ClientTransport
   readonly #baseUrl: string
   readonly #apiKey: string
+  #runtime: ClientRuntime | undefined
 
   constructor(baseUrl: string, apiKey: string) {
     this.#baseUrl = baseUrl
     this.#apiKey = apiKey
+    this.#transport = createRemoteTransport(appContract, { url: baseUrl, token: apiKey })
   }
 
   /**
-   * Make an authenticated POST request to an RPC endpoint.
+   * Bind the actual public facade in the shared reference registry. A copied
+   * contract changes only construction; its descriptors and codecs are shared.
+   * @internal
    */
-  async rpc<T>(path: string, body: object = {}): Promise<T> {
-    const url = `${this.#baseUrl}/api/v1/rpc/${path}`
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${this.#apiKey}`,
-        'Content-Type': 'application/json',
+  bind<Client extends ClientBrand<AlfredResources>>(client: Client): void {
+    const contract: AppContract<Client, AlfredResources> = {
+      ...appContract,
+      bind: (runtime) => {
+        this.#runtime = runtime
+        return client
       },
-      body: JSON.stringify(body),
-    })
-
-    if (!response.ok) {
-      const error = (await response.json()) as { error?: { code?: string; message?: string } }
-      const code = error.error?.code ?? 'UNKNOWN_ERROR'
-      const message = error.error?.message ?? `HTTP ${String(response.status)}`
-      throw new AlfredError(code, message)
     }
+    createCodecClient(contract, {
+      invoke: async (operation, input, options) => {
+        try {
+          const requestOptions: CallOptions & { readonly [canonicalCall]: true } = {
+            ...options,
+            [canonicalCall]: true,
+          }
+          return await this.rpc(operation, input as object, requestOptions)
+        } catch (error) {
+          if (error instanceof MactsError) throw error
+          if (error instanceof Error) {
+            const canonical = canonicalFailures.get(error)
+            if (canonical !== undefined) throw canonical
+          }
+          if (options?.signal?.aborted === true)
+            throw new OperationCancelledError('The operation was cancelled.', {})
+          throw new TransportError('The custom RPC transport failed.', { reason: 'unreachable' })
+        }
+      },
+      resolve: this.#transport.resolve,
+    })
+  }
 
+  /** Invoke a registered operation with SDK input; raw RPC hooks still see wire input. @internal */
+  async invoke<T>(path: string, input: object = {}, options?: CallOptions): Promise<T> {
+    const operation = Object.values(appContract.operations).find(
+      (candidate) => candidate.id === path
+    )
+    if (operation === undefined || operation.unavailable !== undefined) {
+      throw new ValidationError('The operation is not registered in this app contract.', {
+        issues: [{ path: [], message: 'Unknown operation route.' }],
+      })
+    }
+    if (this.#runtime === undefined) this.bind({})
+    if (this.#runtime === undefined) throw new Error('Client runtime was not initialized.')
+    return this.#runtime.invoke(operation, input, options) as Promise<T>
+  }
+
+  /** Raw wire RPC for explicit passthrough consumers; typed methods use invoke. */
+  async rpc<T>(path: string, body: object = {}, options?: CallOptions): Promise<T> {
+    // Typed wrappers still dispatch through overrides; an override forwarding to
+    // super retains the shared transport's envelope/cancellation semantics.
+    if (options !== undefined && canonicalCall in options) {
+      return (await this.#transport.invoke(path as OperationId, body as WireValue, options)) as T
+    }
+    const response = await fetch(`${this.#baseUrl}/api/v1/rpc/${path}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${this.#apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      ...(options?.signal === undefined ? {} : { signal: options.signal }),
+    })
+    if (!response.ok) {
+      const envelope: unknown = await response.json()
+      const error = envelope as { error?: { code?: string; message?: string } }
+      const legacy = new AlfredError(
+        error.error?.code ?? 'UNKNOWN_ERROR',
+        error.error?.message ?? `HTTP ${String(response.status)}`
+      )
+      canonicalFailures.set(legacy, fromWireErrorEnvelope(envelope, { status: response.status }))
+      throw legacy
+    }
     const result = (await response.json()) as { result: T }
     return result.result
   }
@@ -79,12 +165,17 @@ export class AlfredError extends Error {
  * const calendars = await client.calendars.list();
  * ```
  */
+/** Shared type-only resource brand lets caller-built references target this facade. */
+export interface AlfredClient extends ClientBrand<AlfredResources> {}
+
 export class AlfredClient {
   readonly #httpClient: HttpClient
 
   constructor(options: AlfredClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
+
+    this.#httpClient.bind(this)
   }
 
   /**
@@ -97,40 +188,62 @@ export class AlfredClient {
   /**
    * Show Alfred with the given text
    */
-  async search(query?: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('alfred.app.search', { query })
+  async search(
+    query?: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>('alfred.app.search', { query }, __mactsOptions)
   }
 
   /**
    * Show Alfred actions for the given file
    */
-  async action(items: string[], asType?: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('alfred.app.action', { items, asType })
+  async action(
+    items: string[],
+    asType?: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>('alfred.app.action', { items, asType }, __mactsOptions)
   }
 
   /**
    * Show Alfred file system navigation for given path
    */
-  async browse(path: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('alfred.app.browse', { path })
+  async browse(
+    path: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>('alfred.app.browse', { path }, __mactsOptions)
   }
 
   /**
    * Run Alfred workflow trigger
    */
-  async runTrigger(trigger: string, inWorkflow: string, withArgument?: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('alfred.app.runTrigger', {
-      trigger,
-      inWorkflow,
-      withArgument,
-    })
+  async runTrigger(
+    trigger: string,
+    inWorkflow: string,
+    withArgument?: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'alfred.app.runTrigger',
+      { trigger, inWorkflow, withArgument },
+      __mactsOptions
+    )
   }
 
   /**
    * Reload Workflow with given UID (folder name) or Bundle ID
    */
-  async reloadWorkflow(workflow: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('alfred.app.reloadWorkflow', { workflow })
+  async reloadWorkflow(
+    workflow: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'alfred.app.reloadWorkflow',
+      { workflow },
+      __mactsOptions
+    )
   }
 
   /**
@@ -139,13 +252,14 @@ export class AlfredClient {
   async revealWorkflow(
     workflow: string,
     configuration?: boolean,
-    details?: boolean
+    details?: boolean,
+    __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
-    await this.#httpClient.rpc<undefined>('alfred.app.revealWorkflow', {
-      workflow,
-      configuration,
-      details,
-    })
+    await this.#httpClient.invoke<undefined>(
+      'alfred.app.revealWorkflow',
+      { workflow, configuration, details },
+      __mactsOptions
+    )
   }
 
   /**
@@ -155,30 +269,38 @@ export class AlfredClient {
     variable: string,
     toValue: string,
     inWorkflow: string,
-    exportable?: boolean
+    exportable?: boolean,
+    __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
-    await this.#httpClient.rpc<undefined>('alfred.app.setConfiguration', {
-      variable,
-      toValue,
-      inWorkflow,
-      exportable,
-    })
+    await this.#httpClient.invoke<undefined>(
+      'alfred.app.setConfiguration',
+      { variable, toValue, inWorkflow, exportable },
+      __mactsOptions
+    )
   }
 
   /**
    * Revert workflow configuration value to default, or delete environment variable
    */
-  async removeConfiguration(variable: string, inWorkflow: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('alfred.app.removeConfiguration', {
-      variable,
-      inWorkflow,
-    })
+  async removeConfiguration(
+    variable: string,
+    inWorkflow: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'alfred.app.removeConfiguration',
+      { variable, inWorkflow },
+      __mactsOptions
+    )
   }
 
   /**
    * Change theme in Alfred
    */
-  async setTheme(theme: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('alfred.app.setTheme', { theme })
+  async setTheme(
+    theme: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>('alfred.app.setTheme', { theme }, __mactsOptions)
   }
 }

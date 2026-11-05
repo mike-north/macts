@@ -5,384 +5,214 @@
 
 import { z } from 'zod'
 
-/** Priv */
-export type Priv = 'readOnly' | 'readWrite' | 'writeOnly' | 'none'
+export type { Priv } from './contract/index.js'
 
-/** Edfm */
-export type Edfm =
-  | 'macOSFormat'
-  | 'macOSExtendedFormat'
-  | 'uFSFormat'
-  | 'nFSFormat'
-  | 'audioFormat'
-  | 'proDOSFormat'
-  | 'mSDOSFormat'
-  | 'nTFSFormat'
-  | '9660'
-  | 'highSierraFormat'
-  | 'quickTakeFormat'
-  | 'applePhotoFormat'
-  | 'appleShareFormat'
-  | 'uDFFormat'
-  | 'webDAVFormat'
-  | 'fTPFormat'
-  | 'packetWrittenUDFFormat'
-  | 'xsanFormat'
-  | 'aPFSFormat'
-  | 'exFATFormat'
-  | 'sMBFormat'
-  | 'unknownFormat'
+export type { Edfm } from './contract/index.js'
 
-/** Ipnl */
-export type Ipnl =
-  | 'generalInformationPanel'
-  | 'sharingPanel'
-  | 'memoryPanel'
-  | 'previewPanel'
-  | 'applicationPanel'
-  | 'languagesPanel'
-  | 'pluginsPanel'
-  | 'nameExtensionPanel'
-  | 'commentsPanel'
-  | 'contentIndexPanel'
-  | 'burningPanel'
-  | 'moreInfoPanel'
-  | 'simpleHeaderPanel'
+export type { Ipnl } from './contract/index.js'
 
-/** Pple */
-export type Pple =
-  | 'generalPreferencesPanel'
-  | 'labelPreferencesPanel'
-  | 'sidebarPreferencesPanel'
-  | 'advancedPreferencesPanel'
+export type { Pple } from './contract/index.js'
 
-/** Ecvw */
-export type Ecvw = 'iconView' | 'listView' | 'columnView' | 'groupView' | 'flowView'
+export type { Ecvw } from './contract/index.js'
 
-/** Earr */
-export type Earr =
-  | 'notArranged'
-  | 'snapToGrid'
-  | 'arrangedByName'
-  | 'arrangedByModificationDate'
-  | 'arrangedByCreationDate'
-  | 'arrangedBySize'
-  | 'arrangedByKind'
-  | 'arrangedByLabel'
+export type { Earr } from './contract/index.js'
 
-/** Epos */
-export type Epos = 'right' | 'bottom'
+export type { Epos } from './contract/index.js'
 
-/** Sodr */
-export type Sodr = 'normal' | 'reversed'
+export type { Sodr } from './contract/index.js'
 
-/** Elsv */
-export type Elsv =
-  | 'nameColumn'
-  | 'modificationDateColumn'
-  | 'creationDateColumn'
-  | 'sizeColumn'
-  | 'kindColumn'
-  | 'labelColumn'
-  | 'versionColumn'
-  | 'commentColumn'
+export type { Elsv } from './contract/index.js'
 
-/** Lvic */
-export type Lvic = 'smallIcon' | 'largeIcon'
+export type { Lvic } from './contract/index.js'
 
-/** Isiz */
-export type Isiz = 'mini' | 'small' | 'large'
+export type { Isiz } from './contract/index.js'
 
-/** Sort */
-export type Sort =
-  | 'name'
-  | 'modificationDate'
-  | 'creationDate'
-  | 'size'
-  | 'kind'
-  | 'labelIndex'
-  | 'comment'
-  | 'version'
+export type { Sort } from './contract/index.js'
 
-/** An item that contains other items */
-export interface Container {
-  /** the entire contents of the container, including the contents of its children */
-  entireContents: string
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Container } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ContainerCreateInput = import('./contract/index.js').ContainerCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ContainerUpdateInput = import('./contract/index.js').ContainerUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Disk } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type DiskCreateInput = import('./contract/index.js').DiskCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type DiskUpdateInput = import('./contract/index.js').DiskUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Folder } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type FolderCreateInput = import('./contract/index.js').FolderCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type FolderUpdateInput = import('./contract/index.js').FolderUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { File } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type FileCreateInput = import('./contract/index.js').FileCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type FileUpdateInput = import('./contract/index.js').FileUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { AliasFile } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type AliasFileCreateInput = import('./contract/index.js').AliasFileCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type AliasFileUpdateInput = import('./contract/index.js').AliasFileUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { ApplicationFile } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ApplicationFileCreateInput = import('./contract/index.js').ApplicationFileCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ApplicationFileUpdateInput = import('./contract/index.js').ApplicationFileUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { DocumentFile } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type DocumentFileCreateInput = import('./contract/index.js').DocumentFileCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type DocumentFileUpdateInput = import('./contract/index.js').DocumentFileUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { InternetLocationFile } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type InternetLocationFileCreateInput =
+  import('./contract/index.js').InternetLocationFileCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type InternetLocationFileUpdateInput =
+  import('./contract/index.js').InternetLocationFileUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Clipping } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ClippingCreateInput = import('./contract/index.js').ClippingCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ClippingUpdateInput = import('./contract/index.js').ClippingUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Package } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type PackageCreateInput = import('./contract/index.js').PackageCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type PackageUpdateInput = import('./contract/index.js').PackageUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { FinderWindow } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type FinderWindowCreateInput = Omit<
+  import('./contract/index.js').FinderWindowCreateInput,
+  'sidebarWidth'
+> & {
+  /** the width of the sidebar for the container window Numeric values are validated by the contract before dispatch. */
+  sidebarWidth?:
+    | number
+    | Extract<import('./contract/index.js').FinderWindowCreateInput['sidebarWidth'], null>
 }
 
-/** Input for creating a Container */
-export type ContainerCreateInput = Record<string, never>
-
-/** Input for updating a Container */
-export type ContainerUpdateInput = Partial<ContainerCreateInput>
-
-/** A disk */
-export interface Disk {
-  /** the unique id for this disk (unchanged while disk remains connected and Finder remains running) */
-  id: number
-  /** the total number of bytes (free or used) on the disk */
-  capacity: number
-  /** the number of free bytes left on the disk */
-  freeSpace: number
-  /** Can the media be ejected (floppies, CDs, and so on)? */
-  ejectable: boolean
-  /** Is the media a local volume (as opposed to a file server)? */
-  localVolume: boolean
-  /** Is this disk the boot disk? */
-  startup: boolean
-  /** the filesystem format of this disk */
-  format: string
-  /** Does this disk do file system journaling? */
-  journalingEnabled: boolean
-  /** Ignore permissions on this disk? */
-  ignorePrivileges: boolean
+/** Canonical update input, retaining checked numeric conveniences. */
+export type FinderWindowUpdateInput = Omit<
+  import('./contract/index.js').FinderWindowUpdateInput,
+  'sidebarWidth'
+> & {
+  /** the width of the sidebar for the container window Numeric values are validated by the contract before dispatch. */
+  sidebarWidth?:
+    | number
+    | Extract<import('./contract/index.js').FinderWindowUpdateInput['sidebarWidth'], null>
 }
 
-/** Input for creating a Disk */
-export interface DiskCreateInput {
-  /** Ignore permissions on this disk? */
-  ignorePrivileges?: boolean
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { ClippingWindow } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ClippingWindowCreateInput = import('./contract/index.js').ClippingWindowCreateInput
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ClippingWindowUpdateInput = import('./contract/index.js').ClippingWindowUpdateInput
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { ListViewOptions } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ListViewOptionsCreateInput = Omit<
+  import('./contract/index.js').ListViewOptionsCreateInput,
+  'textSize'
+> & {
+  /** the size of the text displayed in the list view Numeric values are validated by the contract before dispatch. */
+  textSize?:
+    | number
+    | Extract<import('./contract/index.js').ListViewOptionsCreateInput['textSize'], null>
 }
 
-/** Input for updating a Disk */
-export type DiskUpdateInput = Partial<DiskCreateInput>
-
-/** A folder */
-export interface Folder {
-  /** Unique identifier for this folder */
-  id: number
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ListViewOptionsUpdateInput = Omit<
+  import('./contract/index.js').ListViewOptionsUpdateInput,
+  'textSize'
+> & {
+  /** the size of the text displayed in the list view Numeric values are validated by the contract before dispatch. */
+  textSize?:
+    | number
+    | Extract<import('./contract/index.js').ListViewOptionsUpdateInput['textSize'], null>
 }
 
-/** Input for creating a Folder */
-export type FolderCreateInput = Record<string, never>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Column } from './contract/index.js'
 
-/** Input for updating a Folder */
-export type FolderUpdateInput = Partial<FolderCreateInput>
-
-/** A file */
-export interface File {
-  /** the OSType identifying the type of data contained in the item */
-  fileType: string
-  /** the OSType identifying the application that created the item */
-  creatorType: string
-  /** Is the file a stationery pad? */
-  stationery: boolean
-  /** the version of the product (visible at the top of the “Get Info” window) */
-  productVersion: string
-  /** the version of the file (visible at the bottom of the “Get Info” window) */
-  version: string
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ColumnCreateInput = Omit<
+  import('./contract/index.js').ColumnCreateInput,
+  'index' | 'width'
+> & {
+  /** the index in the front-to-back ordering within its container Numeric values are validated by the contract before dispatch. */
+  index?: number | Extract<import('./contract/index.js').ColumnCreateInput['index'], null>
+  /** the width of this column Numeric values are validated by the contract before dispatch. */
+  width?: number | Extract<import('./contract/index.js').ColumnCreateInput['width'], null>
 }
 
-/** Input for creating a File */
-export interface FileCreateInput {
-  /** the OSType identifying the type of data contained in the item */
-  fileType?: string
-  /** the OSType identifying the application that created the item */
-  creatorType?: string
-  /** Is the file a stationery pad? */
-  stationery?: boolean
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ColumnUpdateInput = Omit<
+  import('./contract/index.js').ColumnUpdateInput,
+  'index' | 'width'
+> & {
+  /** the index in the front-to-back ordering within its container Numeric values are validated by the contract before dispatch. */
+  index?: number | Extract<import('./contract/index.js').ColumnUpdateInput['index'], null>
+  /** the width of this column Numeric values are validated by the contract before dispatch. */
+  width?: number | Extract<import('./contract/index.js').ColumnUpdateInput['width'], null>
 }
 
-/** Input for updating a File */
-export type FileUpdateInput = Partial<FileCreateInput>
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
-/** An alias file (created with “Make Alias”) */
-export interface AliasFile {
-  /** the original item pointed to by the alias */
-  originalItem: string
-}
-
-/** Input for creating a AliasFile */
-export interface AliasFileCreateInput {
-  /** the original item pointed to by the alias */
-  originalItem?: string
-}
-
-/** Input for updating a AliasFile */
-export type AliasFileUpdateInput = Partial<AliasFileCreateInput>
-
-/** An application's file on disk */
-export interface ApplicationFile {
-  /** the bundle identifier or creator type of the application */
-  id: string
-  /** Is the application high-level event aware? (OBSOLETE: always returns true) */
-  acceptsHighLevelEvents: boolean
-  /** Does the process have a scripting terminology, i.e., can it be scripted? */
-  hasScriptingTerminology: boolean
-}
-
-/** Input for creating a ApplicationFile */
-export type ApplicationFileCreateInput = Record<string, never>
-
-/** Input for updating a ApplicationFile */
-export type ApplicationFileUpdateInput = Partial<ApplicationFileCreateInput>
-
-/** A document file */
-export type DocumentFile = Record<string, never>
-
-/** Input for creating a DocumentFile */
-export type DocumentFileCreateInput = Record<string, never>
-
-/** Input for updating a DocumentFile */
-export type DocumentFileUpdateInput = Partial<DocumentFileCreateInput>
-
-/** A file containing an internet location */
-export interface InternetLocationFile {
-  /** the internet location */
-  location: string
-}
-
-/** Input for creating a InternetLocationFile */
-export type InternetLocationFileCreateInput = Record<string, never>
-
-/** Input for updating a InternetLocationFile */
-export type InternetLocationFileUpdateInput = Partial<InternetLocationFileCreateInput>
-
-/** A clipping */
-export interface Clipping {
-  /** (NOT AVAILABLE YET) the clipping window for this clipping */
-  clippingWindow: string
-}
-
-/** Input for creating a Clipping */
-export type ClippingCreateInput = Record<string, never>
-
-/** Input for updating a Clipping */
-export type ClippingUpdateInput = Partial<ClippingCreateInput>
-
-/** A package */
-export interface Package {
-  /** Unique identifier for this package */
-  id: string
-}
-
-/** Input for creating a Package */
-export type PackageCreateInput = Record<string, never>
-
-/** Input for updating a Package */
-export type PackageUpdateInput = Partial<PackageCreateInput>
-
-/** A file viewer window */
-export interface FinderWindow {
-  /** the container at which this file viewer is targeted */
-  target: string
-  /** the current view for the container window */
-  currentView: string
-  /** the icon view options for the container window */
-  iconViewOptions: unknown
-  /** the column view options for the container window */
-  columnViewOptions: unknown
-  /** Is the window's toolbar visible? */
-  toolbarVisible: boolean
-  /** Is the window's status bar visible? */
-  statusbarVisible: boolean
-  /** Is the window's path bar visible? */
-  pathbarVisible: boolean
-  /** the width of the sidebar for the container window */
-  sidebarWidth: number
-}
-
-/** Input for creating a FinderWindow */
-export interface FinderWindowCreateInput {
-  /** the container at which this file viewer is targeted */
-  target?: string
-  /** the current view for the container window */
-  currentView?: string
-  /** Is the window's toolbar visible? */
-  toolbarVisible?: boolean
-  /** Is the window's status bar visible? */
-  statusbarVisible?: boolean
-  /** Is the window's path bar visible? */
-  pathbarVisible?: boolean
-  /** the width of the sidebar for the container window */
-  sidebarWidth?: number
-}
-
-/** Input for updating a FinderWindow */
-export type FinderWindowUpdateInput = Partial<FinderWindowCreateInput>
-
-/** The window containing a clipping */
-export interface ClippingWindow {
-  /** Unique identifier for this window */
-  id: number
-}
-
-/** Input for creating a ClippingWindow */
-export type ClippingWindowCreateInput = Record<string, never>
-
-/** Input for updating a ClippingWindow */
-export type ClippingWindowUpdateInput = Partial<ClippingWindowCreateInput>
-
-/** the list view options */
-export interface ListViewOptions {
-  /** Are folder sizes calculated and displayed in the window? */
-  calculatesFolderSizes: boolean
-  /** displays a preview of the item in list view */
-  showsIconPreview: boolean
-  /** the size of icons displayed in the list view */
-  iconSize: string
-  /** the size of the text displayed in the list view */
-  textSize: number
-  /** Are relative dates (e.g., today, yesterday) shown in the list view? */
-  usesRelativeDates: boolean
-}
-
-/** Input for creating a ListViewOptions */
-export interface ListViewOptionsCreateInput {
-  /** Are folder sizes calculated and displayed in the window? */
-  calculatesFolderSizes?: boolean
-  /** displays a preview of the item in list view */
-  showsIconPreview?: boolean
-  /** the size of icons displayed in the list view */
-  iconSize?: string
-  /** the size of the text displayed in the list view */
-  textSize?: number
-  /** Are relative dates (e.g., today, yesterday) shown in the list view? */
-  usesRelativeDates?: boolean
-}
-
-/** Input for updating a ListViewOptions */
-export type ListViewOptionsUpdateInput = Partial<ListViewOptionsCreateInput>
-
-/** a column of a list view */
-export interface Column {
-  /** the index in the front-to-back ordering within its container */
-  index: number
-  /** the column name */
-  name: string
-  /** The direction in which the window is sorted */
-  sortDirection: string
-  /** the width of this column */
-  width: number
-  /** the minimum allowed width of this column */
-  minimumWidth: number
-  /** the maximum allowed width of this column */
-  maximumWidth: number
-  /** is this column visible */
-  visible: boolean
-}
-
-/** Input for creating a Column */
-export interface ColumnCreateInput {
-  /** the index in the front-to-back ordering within its container */
-  index?: number
-  /** The direction in which the window is sorted */
-  sortDirection?: string
-  /** the width of this column */
-  width?: number
-  /** is this column visible */
-  visible?: boolean
-}
-
-/** Input for updating a Column */
-export type ColumnUpdateInput = Partial<ColumnCreateInput>
-
-// Zod schemas for runtime validation
-
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ContainerSchema = z.object({
   entireContents: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const DiskSchema = z.object({
   id: z.number(),
   capacity: z.number(),
@@ -395,10 +225,12 @@ export const DiskSchema = z.object({
   ignorePrivileges: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const FolderSchema = z.object({
   id: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const FileSchema = z.object({
   fileType: z.string(),
   creatorType: z.string(),
@@ -407,30 +239,37 @@ export const FileSchema = z.object({
   version: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AliasFileSchema = z.object({
   originalItem: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ApplicationFileSchema = z.object({
   id: z.string(),
   acceptsHighLevelEvents: z.boolean(),
   hasScriptingTerminology: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const DocumentFileSchema = z.object({})
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const InternetLocationFileSchema = z.object({
   location: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ClippingSchema = z.object({
   clippingWindow: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const PackageSchema = z.object({
   id: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const FinderWindowSchema = z.object({
   target: z.string(),
   currentView: z.string(),
@@ -442,10 +281,12 @@ export const FinderWindowSchema = z.object({
   sidebarWidth: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ClippingWindowSchema = z.object({
   id: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ListViewOptionsSchema = z.object({
   calculatesFolderSizes: z.boolean(),
   showsIconPreview: z.boolean(),
@@ -454,6 +295,7 @@ export const ListViewOptionsSchema = z.object({
   usesRelativeDates: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ColumnSchema = z.object({
   index: z.number(),
   name: z.string(),

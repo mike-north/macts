@@ -28,6 +28,9 @@ export function createCodecClient<Client, Resources extends ResourceTable>(app: 
 // @public
 export function createRemoteClient<Client, Resources extends ResourceTable>(app: AppContract<Client, Resources>, options: RemoteClientOptions): Client & ClientBrand<Resources>;
 
+// @public
+export function createRemoteTransport(app: Pick<AppContract<unknown>, 'app'>, options: RemoteClientOptions): ClientTransport;
+
 // Warning: (ae-forgotten-export) The symbol "OperationId" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "WireValue" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "CallOptions" needs to be exported by the entry point index.d.ts

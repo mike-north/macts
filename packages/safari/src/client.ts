@@ -5,6 +5,27 @@
  * @packageDocumentation
  */
 
+import { safariContract as appContract } from './contract/index.js'
+import {
+  createCodecClient,
+  createRemoteTransport,
+  type ClientTransport,
+} from '@macts/contracts/client'
+import {
+  MactsError,
+  OperationCancelledError,
+  TransportError,
+  ValidationError,
+  fromWireErrorEnvelope,
+  type AppContract,
+  type CallOptions,
+  type ClientBrand,
+  type ClientRuntime,
+  type OperationId,
+  type WireValue,
+} from '@macts/contracts'
+import type { SafariResources } from './contract/index.js'
+
 /**
  * Client configuration options.
  */
@@ -18,36 +39,101 @@ export interface SafariClientOptions {
 /**
  * HTTP client wrapper for making authenticated requests.
  */
+/** Canonical failures retained privately while raw RPC preserves the legacy error class. */
+const canonicalFailures = new WeakMap<Error, MactsError>()
+
+/**
+ * Private request metadata selects the canonical POST while retaining the public
+ * raw RPC hook. It never enters the request body or caller-owned options.
+ */
+const canonicalCall = Symbol('canonical contract call')
+
 export class HttpClient {
+  readonly #transport: ClientTransport
   readonly #baseUrl: string
   readonly #apiKey: string
+  #runtime: ClientRuntime | undefined
 
   constructor(baseUrl: string, apiKey: string) {
     this.#baseUrl = baseUrl
     this.#apiKey = apiKey
+    this.#transport = createRemoteTransport(appContract, { url: baseUrl, token: apiKey })
   }
 
   /**
-   * Make an authenticated POST request to an RPC endpoint.
+   * Bind the actual public facade in the shared reference registry. A copied
+   * contract changes only construction; its descriptors and codecs are shared.
+   * @internal
    */
-  async rpc<T>(path: string, body: object = {}): Promise<T> {
-    const url = `${this.#baseUrl}/api/v1/rpc/${path}`
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${this.#apiKey}`,
-        'Content-Type': 'application/json',
+  bind<Client extends ClientBrand<SafariResources>>(client: Client): void {
+    const contract: AppContract<Client, SafariResources> = {
+      ...appContract,
+      bind: (runtime) => {
+        this.#runtime = runtime
+        return client
       },
-      body: JSON.stringify(body),
-    })
-
-    if (!response.ok) {
-      const error = (await response.json()) as { error?: { code?: string; message?: string } }
-      const code = error.error?.code ?? 'UNKNOWN_ERROR'
-      const message = error.error?.message ?? `HTTP ${String(response.status)}`
-      throw new SafariError(code, message)
     }
+    createCodecClient(contract, {
+      invoke: async (operation, input, options) => {
+        try {
+          const requestOptions: CallOptions & { readonly [canonicalCall]: true } = {
+            ...options,
+            [canonicalCall]: true,
+          }
+          return await this.rpc(operation, input as object, requestOptions)
+        } catch (error) {
+          if (error instanceof MactsError) throw error
+          if (error instanceof Error) {
+            const canonical = canonicalFailures.get(error)
+            if (canonical !== undefined) throw canonical
+          }
+          if (options?.signal?.aborted === true)
+            throw new OperationCancelledError('The operation was cancelled.', {})
+          throw new TransportError('The custom RPC transport failed.', { reason: 'unreachable' })
+        }
+      },
+      resolve: this.#transport.resolve,
+    })
+  }
 
+  /** Invoke a registered operation with SDK input; raw RPC hooks still see wire input. @internal */
+  async invoke<T>(path: string, input: object = {}, options?: CallOptions): Promise<T> {
+    const operation = Object.values(appContract.operations).find(
+      (candidate) => candidate.id === path
+    )
+    if (operation === undefined || operation.unavailable !== undefined) {
+      throw new ValidationError('The operation is not registered in this app contract.', {
+        issues: [{ path: [], message: 'Unknown operation route.' }],
+      })
+    }
+    if (this.#runtime === undefined) this.bind({})
+    if (this.#runtime === undefined) throw new Error('Client runtime was not initialized.')
+    return this.#runtime.invoke(operation, input, options) as Promise<T>
+  }
+
+  /** Raw wire RPC for explicit passthrough consumers; typed methods use invoke. */
+  async rpc<T>(path: string, body: object = {}, options?: CallOptions): Promise<T> {
+    // Typed wrappers still dispatch through overrides; an override forwarding to
+    // super retains the shared transport's envelope/cancellation semantics.
+    if (options !== undefined && canonicalCall in options) {
+      return (await this.#transport.invoke(path as OperationId, body as WireValue, options)) as T
+    }
+    const response = await fetch(`${this.#baseUrl}/api/v1/rpc/${path}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${this.#apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      ...(options?.signal === undefined ? {} : { signal: options.signal }),
+    })
+    if (!response.ok) {
+      const envelope: unknown = await response.json()
+      const error = envelope as { error?: { code?: string; message?: string } }
+      const legacy = new SafariError(
+        error.error?.code ?? 'UNKNOWN_ERROR',
+        error.error?.message ?? `HTTP ${String(response.status)}`
+      )
+      canonicalFailures.set(legacy, fromWireErrorEnvelope(envelope, { status: response.status }))
+      throw legacy
+    }
     const result = (await response.json()) as { result: T }
     return result.result
   }
@@ -79,12 +165,17 @@ export class SafariError extends Error {
  * const calendars = await client.calendars.list();
  * ```
  */
+/** Shared type-only resource brand lets caller-built references target this facade. */
+export interface SafariClient extends ClientBrand<SafariResources> {}
+
 export class SafariClient {
   readonly #httpClient: HttpClient
 
   constructor(options: SafariClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
+
+    this.#httpClient.bind(this)
   }
 
   /**
@@ -97,73 +188,114 @@ export class SafariClient {
   /**
    * Add a new Reading List item with the given URL. Allows a custom title and preview text to be specified.
    */
-  async addReadingListItem(andPreviewText?: string, withTitle?: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('safari.app.addReadingListItem', {
-      andPreviewText,
-      withTitle,
-    })
+  async addReadingListItem(
+    andPreviewText?: string,
+    withTitle?: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'safari.app.addReadingListItem',
+      { andPreviewText, withTitle },
+      __mactsOptions
+    )
   }
 
   /**
    * Applies a string of JavaScript code to a document.
    */
-  async doJavaScript(_in?: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('safari.app.doJavaScript', { in: _in })
+  async doJavaScript(
+    _in?: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>('safari.app.doJavaScript', { in: _in }, __mactsOptions)
   }
 
   /**
    * Emails the contents of a tab.
    */
-  async emailContents(_of?: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('safari.app.emailContents', { of: _of })
+  async emailContents(
+    _of?: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'safari.app.emailContents',
+      { of: _of },
+      __mactsOptions
+    )
   }
 
   /**
    * Searches the web using Safari's current search provider.
    */
-  async searchTheWeb(_for: string, _in?: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('safari.app.searchTheWeb', { in: _in, for: _for })
+  async searchTheWeb(
+    _for: string,
+    _in?: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'safari.app.searchTheWeb',
+      { in: _in, for: _for },
+      __mactsOptions
+    )
   }
 
   /**
    * Shows Safari's bookmarks.
    */
-  async showBookmarks(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('safari.app.showBookmarks', {})
+  async showBookmarks(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('safari.app.showBookmarks', {}, __mactsOptions)
   }
 
   /**
    * Show Safari Extensions preferences.
    */
-  async showExtensionsPreferences(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('safari.app.showExtensionsPreferences', {})
+  async showExtensionsPreferences(
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'safari.app.showExtensionsPreferences',
+      {},
+      __mactsOptions
+    )
   }
 
   /**
    * Dispatch a message to a Safari Extension.
    */
-  async dispatchMessageToExtension(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('safari.app.dispatchMessageToExtension', {})
+  async dispatchMessageToExtension(
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'safari.app.dispatchMessageToExtension',
+      {},
+      __mactsOptions
+    )
   }
 
   /**
    * Make sure that all in-memory structures are in-sync with their on-disk counterparts.
    */
-  async syncAllPlistToDisk(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('safari.app.syncAllPlistToDisk', {})
+  async syncAllPlistToDisk(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('safari.app.syncAllPlistToDisk', {}, __mactsOptions)
   }
 
   /**
    * Show Safari's Privacy Report
    */
-  async showPrivacyReport(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('safari.app.showPrivacyReport', {})
+  async showPrivacyReport(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#httpClient.invoke<undefined>('safari.app.showPrivacyReport', {}, __mactsOptions)
   }
 
   /**
    * Show Safari Credit Card Settings.
    */
-  async showCreditCardSettings(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('safari.app.showCreditCardSettings', {})
+  async showCreditCardSettings(
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#httpClient.invoke<undefined>(
+      'safari.app.showCreditCardSettings',
+      {},
+      __mactsOptions
+    )
   }
 }

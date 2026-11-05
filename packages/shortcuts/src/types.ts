@@ -5,54 +5,27 @@
 
 import { z } from 'zod'
 
-/** A shortcut in the Shortcuts application */
-export interface Shortcut {
-  /** The name of the shortcut */
-  name: string
-  /** The shortcut's subtitle */
-  subtitle: string
-  /** The unique identifier of the shortcut */
-  id: string
-  /** The folder containing this shortcut (folder ID) */
-  folder: string
-  /** The shortcut's color */
-  color: { r: number; g: number; b: number }
-  /** The shortcut's icon (TIFF image data) */
-  icon: ArrayBuffer
-  /** Indicates whether or not the shortcut accepts input data */
-  acceptsInput: boolean
-  /** The number of actions in the shortcut */
-  actionCount: number
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Shortcut } from './contract/index.js'
 
-/** Input for creating a Shortcut */
-export interface ShortcutCreateInput {
-  /** The folder containing this shortcut (folder ID) */
-  folder?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ShortcutCreateInput = import('./contract/index.js').ShortcutCreateInput
 
-/** Input for updating a Shortcut */
-export type ShortcutUpdateInput = Partial<ShortcutCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ShortcutUpdateInput = import('./contract/index.js').ShortcutUpdateInput
 
-/** A folder containing shortcuts */
-export interface Folder {
-  /** The name of the folder */
-  name: string
-  /** The unique identifier of the folder */
-  id: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Folder } from './contract/index.js'
 
-/** Input for creating a Folder */
-export interface FolderCreateInput {
-  /** The name of the folder */
-  name?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type FolderCreateInput = import('./contract/index.js').FolderCreateInput
 
-/** Input for updating a Folder */
-export type FolderUpdateInput = Partial<FolderCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type FolderUpdateInput = import('./contract/index.js').FolderUpdateInput
 
-// Zod schemas for runtime validation
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ShortcutSchema = z.object({
   name: z.string(),
   subtitle: z.string(),
@@ -64,6 +37,7 @@ export const ShortcutSchema = z.object({
   actionCount: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const FolderSchema = z.object({
   name: z.string(),
   id: z.string(),

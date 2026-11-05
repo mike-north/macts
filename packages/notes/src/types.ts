@@ -5,106 +5,59 @@
 
 import { z } from 'zod'
 
-/** A Notes account */
-export interface Account {
-  /** The name of the account */
-  name: string
-  /** The unique identifier of the account */
-  id: string
-  /** Whether the account has been upgraded */
-  upgraded: boolean
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Account } from './contract/index.js'
 
-/** Input for creating a Account */
-export type AccountCreateInput = Record<string, never>
+/** Canonical create input, retaining checked numeric conveniences. */
+export type AccountCreateInput = import('./contract/index.js').AccountCreateInput
 
-/** Input for updating a Account */
-export type AccountUpdateInput = Partial<AccountCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type AccountUpdateInput = import('./contract/index.js').AccountUpdateInput
 
-/** A Notes folder */
-export interface Folder {
-  /** The name of the folder */
-  name: string
-  /** The unique identifier of the folder */
-  id: string
-  /** Whether the folder is shared */
-  shared: boolean
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Folder } from './contract/index.js'
 
-/** Input for creating a Folder */
-export interface FolderCreateInput {
-  /** The name of the folder */
-  name?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type FolderCreateInput = import('./contract/index.js').FolderCreateInput
 
-/** Input for updating a Folder */
-export type FolderUpdateInput = Partial<FolderCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type FolderUpdateInput = import('./contract/index.js').FolderUpdateInput
 
-/** A note */
-export interface Note {
-  /** The name of the note (first line) */
-  name: string
-  /** The unique identifier of the note */
-  id: string
-  /** The HTML content of the note body */
-  body: string
-  /** The plaintext content of the note */
-  plaintext: string
-  /** The creation date of the note */
-  creationDate: Date
-  /** The modification date of the note */
-  modificationDate: Date
-  /** Whether the note is shared */
-  shared: boolean
-  /** Whether the note is password protected */
-  passwordProtected: boolean
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Note } from './contract/index.js'
 
-/** Input for creating a Note */
-export interface NoteCreateInput {
-  /** The name of the note (first line) */
-  name?: string
-  /** HTML content of the note */
-  body?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type NoteCreateInput = import('./contract/index.js').NoteCreateInput
 
-/** Input for updating a Note */
-export type NoteUpdateInput = Partial<NoteCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type NoteUpdateInput = import('./contract/index.js').NoteUpdateInput
 
-/** A note attachment */
-export interface Attachment {
-  /** The name of the attachment */
-  name: string
-  /** The unique identifier of the attachment */
-  id: string
-  /** The content identifier of the attachment */
-  contentIdentifier?: string
-  /** The creation date of the attachment */
-  creationDate: Date
-  /** The modification date of the attachment */
-  modificationDate: Date
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Attachment } from './contract/index.js'
 
-/** Input for creating a Attachment */
-export type AttachmentCreateInput = Record<string, never>
+/** Canonical create input, retaining checked numeric conveniences. */
+export type AttachmentCreateInput = import('./contract/index.js').AttachmentCreateInput
 
-/** Input for updating a Attachment */
-export type AttachmentUpdateInput = Partial<AttachmentCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type AttachmentUpdateInput = import('./contract/index.js').AttachmentUpdateInput
 
-// Zod schemas for runtime validation
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AccountSchema = z.object({
   name: z.string(),
   id: z.string(),
   upgraded: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const FolderSchema = z.object({
   name: z.string(),
   id: z.string(),
   shared: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const NoteSchema = z.object({
   name: z.string(),
   id: z.string(),
@@ -116,6 +69,7 @@ export const NoteSchema = z.object({
   passwordProtected: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AttachmentSchema = z.object({
   name: z.string(),
   id: z.string(),

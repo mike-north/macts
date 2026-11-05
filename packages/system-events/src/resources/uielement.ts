@@ -22,14 +22,18 @@ export class UIElementResourceClient {
   /**
    * cause the target process to behave as if the UI element were clicked
    */
-  async click(at?: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.click`, { at })
+  async click(at?: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.click`,
+      { at },
+      __mactsOptions
+    )
   }
 
   /**
    * set the selected property of the UI element
    */
-  async select(): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.select`, {})
+  async select(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#http.invoke<undefined>(`${this.#app}.${this.#resource}.select`, {}, __mactsOptions)
   }
 }

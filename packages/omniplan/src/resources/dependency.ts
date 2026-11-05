@@ -24,7 +24,11 @@ export class DependencyResourceClient {
   /**
    * List all dependencies, as one page.
    */
-  async list(): Promise<Page<Dependency>> {
-    return this.#http.rpc<Page<Dependency>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Dependency>> {
+    return this.#http.invoke<Page<Dependency>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions
+    )
   }
 }

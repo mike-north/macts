@@ -24,105 +24,208 @@ export class TabResourceClient {
   /**
    * List the tabs of one window, as one page.
    */
-  async list(windowId: string): Promise<Page<Tab>> {
-    return this.#http.rpc<Page<Tab>>(`${this.#app}.${this.#resource}.list`, { windowId })
+  async list(
+    windowId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<Tab>> {
+    return this.#http.invoke<Page<Tab>>(
+      `${this.#app}.${this.#resource}.list`,
+      { windowId },
+      __mactsOptions
+    )
   }
 
   /**
    * Get a tab by id within a parent scope.
    */
-  async get(windowId: string, id: string): Promise<Tab> {
-    return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.get`, { windowId, id })
+  async get(
+    windowId: string,
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Tab> {
+    return this.#http.invoke<Tab>(
+      `${this.#app}.${this.#resource}.get`,
+      { windowId, id },
+      __mactsOptions
+    )
   }
 
   /**
    * Create a new tab.
    */
-  async create(input: TabCreateInput): Promise<Tab> {
-    return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.create`, input)
+  async create(
+    input: TabCreateInput,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Tab> {
+    return this.#http.invoke<Tab>(`${this.#app}.${this.#resource}.create`, input, __mactsOptions)
   }
 
   /**
    * Reload a tab
    */
-  async reload(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.reload`, { tabId })
+  async reload(
+    tabId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.reload`,
+      { tabId },
+      __mactsOptions
+    )
   }
 
   /**
    * Go Back (If Possible)
    */
-  async goBack(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.goBack`, { tabId })
+  async goBack(
+    tabId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.goBack`,
+      { tabId },
+      __mactsOptions
+    )
   }
 
   /**
    * Go Forward (If Possible)
    */
-  async goForward(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.goForward`, { tabId })
+  async goForward(
+    tabId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.goForward`,
+      { tabId },
+      __mactsOptions
+    )
   }
 
   /**
    * Select all
    */
-  async selectAll(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.selectAll`, { tabId })
+  async selectAll(
+    tabId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.selectAll`,
+      { tabId },
+      __mactsOptions
+    )
   }
 
   /**
    * Cut selected text (If Possible)
    */
-  async cutSelection(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.cutSelection`, { tabId })
+  async cutSelection(
+    tabId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.cutSelection`,
+      { tabId },
+      __mactsOptions
+    )
   }
 
   /**
    * Copy text
    */
-  async copySelection(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.copySelection`, { tabId })
+  async copySelection(
+    tabId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.copySelection`,
+      { tabId },
+      __mactsOptions
+    )
   }
 
   /**
    * Paste text (If Possible)
    */
-  async pasteSelection(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.pasteSelection`, { tabId })
+  async pasteSelection(
+    tabId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.pasteSelection`,
+      { tabId },
+      __mactsOptions
+    )
   }
 
   /**
    * Undo the last change
    */
-  async undo(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.undo`, { tabId })
+  async undo(
+    tabId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.undo`,
+      { tabId },
+      __mactsOptions
+    )
   }
 
   /**
    * Redo the last change
    */
-  async redo(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.redo`, { tabId })
+  async redo(
+    tabId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.redo`,
+      { tabId },
+      __mactsOptions
+    )
   }
 
   /**
    * Stop the current tab from loading
    */
-  async stop(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.stop`, { tabId })
+  async stop(
+    tabId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.stop`,
+      { tabId },
+      __mactsOptions
+    )
   }
 
   /**
    * View the HTML source of the tab
    */
-  async viewSource(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.viewSource`, { tabId })
+  async viewSource(
+    tabId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.viewSource`,
+      { tabId },
+      __mactsOptions
+    )
   }
 
   /**
    * Execute a piece of javascript
    */
-  async execute(tabId: string, javascript: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.execute`, { tabId, javascript })
+  async execute(
+    tabId: string,
+    javascript: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.execute`,
+      { tabId, javascript },
+      __mactsOptions
+    )
   }
 }

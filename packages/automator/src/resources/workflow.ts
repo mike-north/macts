@@ -24,22 +24,40 @@ export class WorkflowResourceClient {
   /**
    * List all workflows, as one page.
    */
-  async list(): Promise<Page<Workflow>> {
-    return this.#http.rpc<Page<Workflow>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Workflow>> {
+    return this.#http.invoke<Page<Workflow>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions
+    )
   }
 
   /**
    * Get a workflow by name.
    * When several workflows share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async get(name: string): Promise<Workflow> {
-    return this.#http.rpc<Workflow>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(
+    name: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Workflow> {
+    return this.#http.invoke<Workflow>(
+      `${this.#app}.${this.#resource}.get`,
+      { name },
+      __mactsOptions
+    )
   }
 
   /**
    * Execute a workflow
    */
-  async execute(workflow: unknown): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.execute`, { workflow })
+  async execute(
+    workflow: unknown,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.execute`,
+      { workflow },
+      __mactsOptions
+    )
   }
 }

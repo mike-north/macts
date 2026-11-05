@@ -4,23 +4,26 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Account {
-    connectionStatus: string;
-    description: string;
-    enabled: boolean;
-    id: string;
-    serviceType: string;
+    readonly connectionStatus: string | null;
+    readonly description: string | null;
+    enabled: boolean | null;
+    readonly id: string;
+    readonly serviceType: string | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "AccountCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type AccountCreateInput = AccountCreateInput_2;
 
 // @public
-export interface AccountCreateInput {
-    enabled?: boolean;
-}
-
-// @public (undocumented)
 export const AccountSchema: z.ZodObject<{
     id: z.ZodString;
     description: z.ZodString;
@@ -29,8 +32,10 @@ export const AccountSchema: z.ZodObject<{
     serviceType: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "AccountUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AccountUpdateInput = Partial<AccountCreateInput>;
+export type AccountUpdateInput = AccountUpdateInput_2;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -53,21 +58,25 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Chat {
-    id: string;
-    name: string;
+    readonly id: string;
+    readonly name: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "ChatCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ChatCreateInput = Record<string, never>;
+export type ChatCreateInput = ChatCreateInput_2;
 
-// @public (undocumented)
+// @public
 export const ChatSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "ChatUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ChatUpdateInput = Partial<ChatCreateInput>;
+export type ChatUpdateInput = ChatUpdateInput_2;
 
 // @public
 export type ConnectionStatus = 'disconnecting' | 'connected' | 'connecting' | 'disconnected';
@@ -75,19 +84,29 @@ export type ConnectionStatus = 'disconnecting' | 'connected' | 'connecting' | 'd
 // @public
 export type Direction = 'incoming' | 'outgoing';
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // Warning: (ae-forgotten-export) The symbol "MessagesResources" needs to be exported by the entry point index.d.ts
+    //
+    // @internal
+    bind<Client extends ClientBrand<MessagesResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
+export interface MessagesClient extends ClientBrand<MessagesResources> {
+}
+
+// @public (undocumented)
 export class MessagesClient {
     constructor(options: MessagesClientOptions);
     get http(): HttpClient;
-    login(): Promise<void>;
-    logout(): Promise<void>;
-    send(to: string): Promise<void>;
+    login(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    logout(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    send(to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -105,18 +124,20 @@ export class MessagesError extends Error {
 
 // @public
 export interface Participant {
-    firstName: string;
-    fullName: string;
-    handle: string;
-    id: string;
-    lastName: string;
-    name: string;
+    readonly firstName: string | null;
+    readonly fullName: string | null;
+    readonly handle: string | null;
+    readonly id: string;
+    readonly lastName: string | null;
+    readonly name: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "ParticipantCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ParticipantCreateInput = Record<string, never>;
+export type ParticipantCreateInput = ParticipantCreateInput_2;
 
-// @public (undocumented)
+// @public
 export const ParticipantSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -126,8 +147,10 @@ export const ParticipantSchema: z.ZodObject<{
     fullName: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "ParticipantUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ParticipantUpdateInput = Partial<ParticipantCreateInput>;
+export type ParticipantUpdateInput = ParticipantUpdateInput_2;
 
 // @public
 export type ServiceType = 'sMS' | 'iMessage' | 'rCS';

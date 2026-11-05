@@ -182,6 +182,18 @@ export function createClient<Client, Resources extends ResourceTable>(
   app: AppContract<Client, Resources>,
   options: RemoteClientOptions
 ): Client & ClientBrand<Resources> {
+  return createCodecClient(app, createRemoteTransport(app, options))
+}
+
+/**
+ * Create the HTTP wire transport shared by public client facades and factories.
+ * This owns credentials and canonical HTTP failures; callers own SDK codecs.
+ * @public
+ */
+export function createRemoteTransport(
+  app: Pick<AppContract<unknown>, 'app'>,
+  options: RemoteClientOptions
+): ClientTransport {
   const { token } = options
   if (!HEADER_SAFE_TOKEN.test(token)) {
     throw new TypeError('The token contains characters that cannot be sent in a request header.')
@@ -284,5 +296,5 @@ export function createClient<Client, Resources extends ResourceTable>(
       post(resolveEndpoint(root), { app: app.app, reference }, callOptions),
   }
 
-  return createCodecClient(app, transport)
+  return transport
 }

@@ -8,6 +8,7 @@ import type { HttpClient } from '../client.js'
 import type { WorkspaceDocument } from '../types.js'
 
 import {
+  Integer as __mactsInteger,
   ValueTypes as __mactsValueTypes,
   ValidationError as __mactsValidationError,
 } from '@macts/contracts'
@@ -16,7 +17,7 @@ import {
 const __mactsIntegerWire = __mactsValueTypes.integer().wire
 
 /** Validate CLI text or an SDK number before dispatch, without implicit rounding. */
-function __mactsIntegerInput(value: unknown): { integer: string } {
+function __mactsIntegerInput(value: unknown): __mactsInteger {
   const integer = typeof value === 'number' || typeof value === 'string' ? String(value) : undefined
   const candidate = { integer }
   if (!__mactsIntegerWire.safeParse(candidate).success || integer === undefined) {
@@ -24,7 +25,7 @@ function __mactsIntegerInput(value: unknown): { integer: string } {
       'Expected a canonical decimal integer from -9007199254740991 to 9007199254740991.'
     throw new __mactsValidationError(message, { issues: [{ path: [], message }] })
   }
-  return { integer }
+  return __mactsInteger.validate(Number(integer))
 }
 
 /**
@@ -44,37 +45,71 @@ export class WorkspaceDocumentResourceClient {
   /**
    * List all workspace documents, as one page.
    */
-  async list(): Promise<Page<WorkspaceDocument>> {
-    return this.#http.rpc<Page<WorkspaceDocument>>(`${this.#app}.${this.#resource}.list`)
+  async list(
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<WorkspaceDocument>> {
+    return this.#http.invoke<Page<WorkspaceDocument>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions
+    )
   }
 
   /**
    * Get a workspace document by name.
    * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async get(name: string): Promise<WorkspaceDocument> {
-    return this.#http.rpc<WorkspaceDocument>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(
+    name: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<WorkspaceDocument> {
+    return this.#http.invoke<WorkspaceDocument>(
+      `${this.#app}.${this.#resource}.get`,
+      { name },
+      __mactsOptions
+    )
   }
 
   /**
    * Invoke the "build" scheme action
    */
-  async build(workspaceName: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.build`, { workspaceName })
+  async build(
+    workspaceName: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.build`,
+      { workspaceName },
+      __mactsOptions
+    )
   }
 
   /**
    * Invoke the "clean" scheme action
    */
-  async clean(workspaceName: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.clean`, { workspaceName })
+  async clean(
+    workspaceName: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.clean`,
+      { workspaceName },
+      __mactsOptions
+    )
   }
 
   /**
    * Stop the active scheme action, if one is running
    */
-  async stop(workspaceName: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.stop`, { workspaceName })
+  async stop(
+    workspaceName: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.stop`,
+      { workspaceName },
+      __mactsOptions
+    )
   }
 
   /**
@@ -83,13 +118,14 @@ export class WorkspaceDocumentResourceClient {
   async run(
     workspaceName: string,
     withCommandLineArguments?: unknown,
-    withEnvironmentVariables?: unknown
+    withEnvironmentVariables?: unknown,
+    __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.run`, {
-      workspaceName,
-      withCommandLineArguments,
-      withEnvironmentVariables,
-    })
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.run`,
+      { workspaceName, withCommandLineArguments, withEnvironmentVariables },
+      __mactsOptions
+    )
   }
 
   /**
@@ -98,13 +134,14 @@ export class WorkspaceDocumentResourceClient {
   async test(
     workspaceName: string,
     withCommandLineArguments?: unknown,
-    withEnvironmentVariables?: unknown
+    withEnvironmentVariables?: unknown,
+    __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.test`, {
-      workspaceName,
-      withCommandLineArguments,
-      withEnvironmentVariables,
-    })
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.test`,
+      { workspaceName, withCommandLineArguments, withEnvironmentVariables },
+      __mactsOptions
+    )
   }
 
   /**
@@ -113,13 +150,14 @@ export class WorkspaceDocumentResourceClient {
   async attach(
     workspaceName: string,
     toProcessIdentifier: number,
-    suspended: boolean
+    suspended: boolean,
+    __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.attach`, {
-      workspaceName,
-      toProcessIdentifier: __mactsIntegerInput(toProcessIdentifier),
-      suspended,
-    })
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.attach`,
+      { workspaceName, toProcessIdentifier: __mactsIntegerInput(toProcessIdentifier), suspended },
+      __mactsOptions
+    )
   }
 
   /**
@@ -131,15 +169,20 @@ export class WorkspaceDocumentResourceClient {
     runDestinationSpecifier?: string,
     skipBuilding?: boolean,
     commandLineArguments?: unknown,
-    environmentVariables?: unknown
+    environmentVariables?: unknown,
+    __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.debug`, {
-      workspaceName,
-      scheme,
-      runDestinationSpecifier,
-      skipBuilding,
-      commandLineArguments,
-      environmentVariables,
-    })
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.debug`,
+      {
+        workspaceName,
+        scheme,
+        runDestinationSpecifier,
+        skipBuilding,
+        commandLineArguments,
+        environmentVariables,
+      },
+      __mactsOptions
+    )
   }
 }

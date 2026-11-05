@@ -4,59 +4,70 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Account {
-    id: string;
-    name: string;
-    upgraded: boolean;
+    readonly id: string | null;
+    readonly name: string;
+    readonly upgraded: boolean | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "AccountCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AccountCreateInput = Record<string, never>;
+export type AccountCreateInput = AccountCreateInput_2;
 
 // @public
 export class AccountResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<Account>;
-    list(): Promise<Page<Account>>;
+    get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Account>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Account>>;
 }
 
-// @public (undocumented)
+// @public
 export const AccountSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
     upgraded: z.ZodBoolean;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "AccountUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AccountUpdateInput = Partial<AccountCreateInput>;
+export type AccountUpdateInput = AccountUpdateInput_2;
 
 // @public
 export interface Attachment {
-    contentIdentifier?: string;
-    creationDate: Date;
-    id: string;
-    modificationDate: Date;
-    name: string;
+    readonly contentIdentifier?: string | null;
+    readonly creationDate: Date | null;
+    readonly id: string;
+    readonly modificationDate: Date | null;
+    readonly name: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "AttachmentCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AttachmentCreateInput = Record<string, never>;
+export type AttachmentCreateInput = AttachmentCreateInput_2;
 
 // @public
 export class AttachmentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Attachment>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Attachment>;
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<Page<Attachment>>;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Attachment>>;
 }
 
-// @public (undocumented)
+// @public
 export const AttachmentSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -65,8 +76,10 @@ export const AttachmentSchema: z.ZodObject<{
     modificationDate: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "AttachmentUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AttachmentUpdateInput = Partial<AttachmentCreateInput>;
+export type AttachmentUpdateInput = AttachmentUpdateInput_2;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -89,67 +102,74 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Folder {
-    id: string;
+    readonly id: string | null;
     name: string;
-    shared: boolean;
+    readonly shared: boolean | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "FolderCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface FolderCreateInput {
-    name?: string;
-}
+export type FolderCreateInput = FolderCreateInput_2;
 
 // @public
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<Folder>;
-    list(): Promise<Page<Folder>>;
+    get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Folder>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Folder>>;
 }
 
-// @public (undocumented)
+// @public
 export const FolderSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
     shared: z.ZodBoolean;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "FolderUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type FolderUpdateInput = Partial<FolderCreateInput>;
+export type FolderUpdateInput = FolderUpdateInput_2;
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // Warning: (ae-forgotten-export) The symbol "NotesResources" needs to be exported by the entry point index.d.ts
+    //
+    // @internal
+    bind<Client extends ClientBrand<NotesResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface Note {
-    body: string;
-    creationDate: Date;
-    id: string;
-    modificationDate: Date;
+    body: string | null;
+    readonly creationDate: Date;
+    readonly id: string;
+    readonly modificationDate: Date;
     name: string;
-    passwordProtected: boolean;
-    plaintext: string;
-    shared: boolean;
+    readonly passwordProtected: boolean;
+    readonly plaintext: string | null;
+    readonly shared: boolean;
 }
 
+// Warning: (ae-forgotten-export) The symbol "NoteCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface NoteCreateInput {
-    body?: string;
-    name?: string;
-}
+export type NoteCreateInput = NoteCreateInput_2;
 
 // @public
 export class NoteResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: NoteCreateInput): Promise<Note>;
-    get(name: string): Promise<Note>;
-    list(): Promise<Page<Note>>;
-    show(name: string): Promise<void>;
+    create(input: NoteCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Note>;
+    get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Note>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Note>>;
+    show(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const NoteSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -162,6 +182,10 @@ export const NoteSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
+export interface NotesClient extends ClientBrand<NotesResources> {
+}
+
+// @public (undocumented)
 export class NotesClient {
     constructor(options: NotesClientOptions);
     readonly accounts: AccountResourceClient;
@@ -184,8 +208,10 @@ export class NotesError extends Error {
     readonly code: string;
 }
 
+// Warning: (ae-forgotten-export) The symbol "NoteUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type NoteUpdateInput = Partial<NoteCreateInput>;
+export type NoteUpdateInput = NoteUpdateInput_2;
 
 // (No @packageDocumentation comment for this package)
 

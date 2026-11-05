@@ -4,32 +4,44 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Application {
-    id?: string;
-    name: string;
+    readonly name: string;
 }
 
+// Warning: (ae-forgotten-export) The symbol "ApplicationCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ApplicationCreateInput = Record<string, never>;
+export type ApplicationCreateInput = ApplicationCreateInput_2;
 
-// @public (undocumented)
+// @public
 export const ApplicationSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "ApplicationUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ApplicationUpdateInput = Partial<ApplicationCreateInput>;
+export type ApplicationUpdateInput = ApplicationUpdateInput_2;
 
+// Warning: (ae-forgotten-export) The symbol "BluetoothFileExchangeResources" needs to be exported by the entry point index.d.ts
+//
 // @public
+export interface BluetoothFileExchangeClient extends ClientBrand<BluetoothFileExchangeResources> {
+}
+
+// @public (undocumented)
 export class BluetoothFileExchangeClient {
     constructor(options: BluetoothFileExchangeClientOptions);
-    browse(device?: string): Promise<void>;
+    browse(device?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
-    send(file?: string[], toDevice?: string): Promise<void>;
+    send(file?: string[], toDevice?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -64,10 +76,14 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind<Client extends ClientBrand<BluetoothFileExchangeResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // (No @packageDocumentation comment for this package)

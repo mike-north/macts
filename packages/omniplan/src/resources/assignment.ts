@@ -24,7 +24,11 @@ export class AssignmentResourceClient {
   /**
    * List all assignments, as one page.
    */
-  async list(): Promise<Page<Assignment>> {
-    return this.#http.rpc<Page<Assignment>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Assignment>> {
+    return this.#http.invoke<Page<Assignment>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions
+    )
   }
 }

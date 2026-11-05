@@ -4,6 +4,13 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
+import { Point } from '@macts/contracts';
+import { Rectangle } from '@macts/contracts';
+import { Rgb } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -25,43 +32,53 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // Warning: (ae-forgotten-export) The symbol "iTermResources" needs to be exported by the entry point index.d.ts
+    //
+    // @internal
+    bind<Client extends ClientBrand<iTermResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
+export interface iTermClient extends ClientBrand<iTermResources> {
+}
+
+// @public (undocumented)
 export class iTermClient {
     constructor(options: iTermClientOptions);
-    close(): Promise<void>;
-    count(each?: string): Promise<void>;
-    createHotkeyWindowWithProfile(): Promise<void>;
-    createTab(withProfile: string, command?: string): Promise<void>;
-    createTabWithDefaultProfile(command?: string): Promise<void>;
-    createWindowWithDefaultProfile(command?: string): Promise<void>;
-    createWindowWithProfile(command?: string): Promise<void>;
-    duplicate(to: string, withProperties?: unknown): Promise<void>;
-    exists(): Promise<void>;
-    hideHotkeyWindow(): Promise<void>;
+    close(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    count(each?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    createHotkeyWindowWithProfile(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    createTab(withProfile: string, command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    createTabWithDefaultProfile(command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    createWindowWithDefaultProfile(command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    createWindowWithProfile(command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    duplicate(to: string, withProperties?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    exists(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    hideHotkeyWindow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
-    invokeAPIExpression(): Promise<void>;
-    launchAPIScriptNamed(_arguments?: string): Promise<void>;
-    make(_new: string, at?: string, withData?: unknown, withProperties?: unknown): Promise<void>;
-    move(to: string): Promise<void>;
-    requestCookie(andKeyForAppNamed?: string): Promise<void>;
-    revealHotkeyWindow(): Promise<void>;
-    select(): Promise<void>;
-    setVariable(named: string, to: string): Promise<void>;
-    splitHorizontally(withProfile: string, command?: string): Promise<void>;
-    splitHorizontallyWithDefaultProfile(command?: string): Promise<void>;
-    splitHorizontallyWithSameProfile(command?: string): Promise<void>;
-    splitVertically(withProfile: string, command?: string): Promise<void>;
-    splitVerticallyWithDefaultProfile(command?: string): Promise<void>;
-    splitVerticallyWithSameProfile(command?: string): Promise<void>;
-    toggleHotkeyWindow(): Promise<void>;
-    variable(named: string): Promise<void>;
-    write(contentsOfFile?: string, text?: string, newline?: boolean): Promise<void>;
+    invokeAPIExpression(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    launchAPIScriptNamed(_arguments?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    make(_new: string, at?: string, withData?: unknown, withProperties?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    move(to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    requestCookie(andKeyForAppNamed?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    revealHotkeyWindow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    select(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    setVariable(named: string, to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    splitHorizontally(withProfile: string, command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    splitHorizontallyWithDefaultProfile(command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    splitHorizontallyWithSameProfile(command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    splitVertically(withProfile: string, command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    splitVerticallyWithDefaultProfile(command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    splitVerticallyWithSameProfile(command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    toggleHotkeyWindow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    variable(named: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    write(contentsOfFile?: string, text?: string, newline?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -82,280 +99,57 @@ export type SaveOptions = 'yes' | 'no' | 'ask';
 
 // @public
 export interface Session {
-    aNSIBlackColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBlueColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightBlackColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightBlueColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightCyanColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightGreenColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightMagentaColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightRedColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightWhiteColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightYellowColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSICyanColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIGreenColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIMagentaColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIRedColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIWhiteColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIYellowColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    answerbackString: string;
-    backgroundColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    backgroundImage: string;
-    boldColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    colorPreset: string;
-    columns: number;
-    contents: string;
-    cursorColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    cursorTextColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    foregroundColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    id: string;
-    isAtShellPrompt: boolean;
-    isProcessing: boolean;
-    name: string;
-    profileName: string;
-    rows: number;
-    selectedTextColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    selectionColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    text: string;
-    transparency: number;
-    tty: string;
-    underlineColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    uniqueID: string;
-    useUnderlineColor: boolean;
+    aNSIBlackColor: Rgb | null;
+    aNSIBlueColor: Rgb | null;
+    aNSIBrightBlackColor: Rgb | null;
+    aNSIBrightBlueColor: Rgb | null;
+    aNSIBrightCyanColor: Rgb | null;
+    aNSIBrightGreenColor: Rgb | null;
+    aNSIBrightMagentaColor: Rgb | null;
+    aNSIBrightRedColor: Rgb | null;
+    aNSIBrightWhiteColor: Rgb | null;
+    aNSIBrightYellowColor: Rgb | null;
+    aNSICyanColor: Rgb | null;
+    aNSIGreenColor: Rgb | null;
+    aNSIMagentaColor: Rgb | null;
+    aNSIRedColor: Rgb | null;
+    aNSIWhiteColor: Rgb | null;
+    aNSIYellowColor: Rgb | null;
+    answerbackString: string | null;
+    backgroundColor: Rgb | null;
+    backgroundImage: string | null;
+    boldColor: Rgb | null;
+    colorPreset: string | null;
+    columns: Integer | null;
+    contents: string | null;
+    cursorColor: Rgb | null;
+    cursorTextColor: Rgb | null;
+    foregroundColor: Rgb | null;
+    readonly id: string;
+    isAtShellPrompt: boolean | null;
+    isProcessing: boolean | null;
+    name: string | null;
+    readonly profileName: string | null;
+    rows: Integer | null;
+    selectedTextColor: Rgb | null;
+    selectionColor: Rgb | null;
+    readonly text: string | null;
+    transparency: number | null;
+    readonly tty: string | null;
+    underlineColor: Rgb | null;
+    readonly uniqueID: string | null;
+    useUnderlineColor: boolean | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "SessionCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type SessionCreateInput = Omit<SessionCreateInput_2, 'columns' | 'rows'> & {
+    columns?: number | Extract<SessionCreateInput_2['columns'], null>;
+    rows?: number | Extract<SessionCreateInput_2['rows'], null>;
+};
 
 // @public
-export interface SessionCreateInput {
-    aNSIBlackColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBlueColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightBlackColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightBlueColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightCyanColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightGreenColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightMagentaColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightRedColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightWhiteColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIBrightYellowColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSICyanColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIGreenColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIMagentaColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIRedColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIWhiteColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    aNSIYellowColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    answerbackString?: string;
-    backgroundColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    backgroundImage?: string;
-    boldColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    colorPreset?: string;
-    columns?: number;
-    contents?: string;
-    cursorColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    cursorTextColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    foregroundColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    isAtShellPrompt?: boolean;
-    isProcessing?: boolean;
-    name?: string;
-    rows?: number;
-    selectedTextColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    selectionColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    transparency?: number;
-    underlineColor?: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    useUnderlineColor?: boolean;
-}
-
-// @public (undocumented)
 export const SessionSchema: z.ZodObject<{
     id: z.ZodString;
     isProcessing: z.ZodBoolean;
@@ -495,108 +289,71 @@ export const SessionSchema: z.ZodObject<{
     answerbackString: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "SessionUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type SessionUpdateInput = Partial<SessionCreateInput>;
+export type SessionUpdateInput = Omit<SessionUpdateInput_2, 'columns' | 'rows'> & {
+    columns?: number | Extract<SessionUpdateInput_2['columns'], null>;
+    rows?: number | Extract<SessionUpdateInput_2['rows'], null>;
+};
 
 // @public
 export interface Tab {
-    index: number;
-    title: string;
+    index: Integer | null;
+    title: string | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "TabCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type TabCreateInput = Omit<TabCreateInput_2, 'index'> & {
+    index?: number | Extract<TabCreateInput_2['index'], null>;
+};
 
 // @public
-export interface TabCreateInput {
-    index?: number;
-    title?: string;
-}
-
-// @public (undocumented)
 export const TabSchema: z.ZodObject<{
     index: z.ZodNumber;
     title: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "TabUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type TabUpdateInput = Partial<TabCreateInput>;
+export type TabUpdateInput = Omit<TabUpdateInput_2, 'index'> & {
+    index?: number | Extract<TabUpdateInput_2['index'], null>;
+};
 
 // @public
 export interface Window {
-    alternateIdentifier: string;
-    bounds: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    };
-    closeable: boolean;
-    frame: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    };
-    frontmost: boolean;
-    hotkeyWindowProfile: string;
-    id: number;
-    index: number;
-    isHotkeyWindow: boolean;
-    miniaturizable: boolean;
-    miniaturized: boolean;
-    name: string;
-    origin: {
-        x: number;
-        y: number;
-    };
-    position: {
-        x: number;
-        y: number;
-    };
-    resizable: boolean;
-    size: {
-        x: number;
-        y: number;
-    };
-    visible: boolean;
-    zoomable: boolean;
-    zoomed: boolean;
+    readonly alternateIdentifier: string | null;
+    bounds: Rectangle | null;
+    readonly closeable: boolean | null;
+    frame: Rectangle | null;
+    frontmost: boolean | null;
+    hotkeyWindowProfile: string | null;
+    readonly id: Integer;
+    index: Integer | null;
+    isHotkeyWindow: boolean | null;
+    readonly miniaturizable: boolean | null;
+    miniaturized: boolean | null;
+    readonly name: string | null;
+    origin: Point | null;
+    position: Point | null;
+    readonly resizable: boolean | null;
+    size: Point | null;
+    visible: boolean | null;
+    readonly zoomable: boolean | null;
+    zoomed: boolean | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "WindowCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type WindowCreateInput = Omit<WindowCreateInput_2, 'index'> & {
+    index?: number | Extract<WindowCreateInput_2['index'], null>;
+};
 
 // @public
-export interface WindowCreateInput {
-    bounds?: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    };
-    frame?: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    };
-    frontmost?: boolean;
-    hotkeyWindowProfile?: string;
-    index?: number;
-    isHotkeyWindow?: boolean;
-    miniaturized?: boolean;
-    origin?: {
-        x: number;
-        y: number;
-    };
-    position?: {
-        x: number;
-        y: number;
-    };
-    size?: {
-        x: number;
-        y: number;
-    };
-    visible?: boolean;
-    zoomed?: boolean;
-}
-
-// @public (undocumented)
 export const WindowSchema: z.ZodObject<{
     id: z.ZodNumber;
     alternateIdentifier: z.ZodString;
@@ -638,8 +395,12 @@ export const WindowSchema: z.ZodObject<{
     }, z.core.$strip>;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "WindowUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type WindowUpdateInput = Partial<WindowCreateInput>;
+export type WindowUpdateInput = Omit<WindowUpdateInput_2, 'index'> & {
+    index?: number | Extract<WindowUpdateInput_2['index'], null>;
+};
 
 // (No @packageDocumentation comment for this package)
 

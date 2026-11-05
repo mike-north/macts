@@ -4,53 +4,57 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface AutomatorAction {
-    bundleId: string;
-    category: string[];
-    comment: string;
-    enabled: boolean;
-    executionErrorMessage: string;
-    executionErrorNumber: number;
-    executionResult: unknown;
-    iconName: string;
-    id: string;
-    ignoresInput: boolean;
-    index: number;
-    inputTypes: string[];
-    keywords: string[];
-    name: string;
-    outputTypes: string[];
-    parentWorkflow: unknown;
-    path: string;
-    showActionWhenRun: boolean;
-    targetApplication: string[];
-    version: string;
-    warningAction: string;
-    warningLevel: WarningLevel;
-    warningMessage: string;
+    readonly bundleId: string | null;
+    readonly category: readonly string[] | null;
+    comment: string | null;
+    enabled: boolean | null;
+    readonly executionErrorMessage: string | null;
+    readonly executionErrorNumber: Integer | null;
+    readonly executionResult: unknown;
+    readonly iconName: string | null;
+    readonly id: string;
+    ignoresInput: boolean | null;
+    index: Integer | null;
+    readonly inputTypes: readonly string[] | null;
+    readonly keywords: readonly string[] | null;
+    readonly name: string | null;
+    readonly outputTypes: readonly string[] | null;
+    readonly parentWorkflow: unknown;
+    readonly path: string | null;
+    showActionWhenRun: boolean | null;
+    readonly targetApplication: readonly string[] | null;
+    readonly version: string | null;
+    readonly warningAction: string | null;
+    readonly warningLevel: WarningLevel | null;
+    readonly warningMessage: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "AutomatorActionCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface AutomatorActionCreateInput {
-    comment?: string;
-    enabled?: boolean;
-    ignoresInput?: boolean;
-    index?: number;
-    showActionWhenRun?: boolean;
-}
+export type AutomatorActionCreateInput = Omit<AutomatorActionCreateInput_2, 'index'> & {
+    index?: number | Extract<AutomatorActionCreateInput_2['index'], null>;
+};
 
 // @public
 export class AutomatorActionResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<AutomatorAction>;
-    list(workflowName: string): Promise<Page<AutomatorAction>>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<AutomatorAction>;
+    list(workflowName: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<AutomatorAction>>;
 }
 
-// @public (undocumented)
+// @public
 export const AutomatorActionSchema: z.ZodObject<{
     name: z.ZodString;
     bundleId: z.ZodString;
@@ -77,16 +81,26 @@ export const AutomatorActionSchema: z.ZodObject<{
     warningMessage: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "AutomatorActionUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AutomatorActionUpdateInput = Partial<AutomatorActionCreateInput>;
+export type AutomatorActionUpdateInput = Omit<AutomatorActionUpdateInput_2, 'index'> & {
+    index?: number | Extract<AutomatorActionUpdateInput_2['index'], null>;
+};
 
+// Warning: (ae-forgotten-export) The symbol "AutomatorResources" needs to be exported by the entry point index.d.ts
+//
 // @public
+export interface AutomatorClient extends ClientBrand<AutomatorResources> {
+}
+
+// @public (undocumented)
 export class AutomatorClient {
     constructor(options: AutomatorClientOptions);
-    add(object: unknown, to: unknown, atIndex?: number): Promise<void>;
+    add(object: unknown, to: unknown, atIndex?: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly automatorActions: AutomatorActionResourceClient;
     get http(): HttpClient;
-    remove(object: unknown): Promise<void>;
+    remove(object: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly requiredResources: RequiredResourceResourceClient;
     readonly settings: SettingResourceClient;
     readonly variables: VariableResourceClient;
@@ -125,31 +139,36 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind<Client extends ClientBrand<AutomatorResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface RequiredResource {
-    id?: string;
-    kind: string;
-    name: string;
-    resource: string;
-    version: number;
+    readonly kind: string | null;
+    readonly name: string;
+    readonly resource: string | null;
+    readonly version: Integer | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "RequiredResourceCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type RequiredResourceCreateInput = Record<string, never>;
+export type RequiredResourceCreateInput = RequiredResourceCreateInput_2;
 
 // @public
 export class RequiredResourceResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    list(actionId: string): Promise<Page<RequiredResource>>;
+    list(actionId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<RequiredResource>>;
 }
 
-// @public (undocumented)
+// @public
 export const RequiredResourceSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     kind: z.ZodString;
@@ -158,29 +177,30 @@ export const RequiredResourceSchema: z.ZodObject<{
     version: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "RequiredResourceUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type RequiredResourceUpdateInput = Partial<RequiredResourceCreateInput>;
+export type RequiredResourceUpdateInput = RequiredResourceUpdateInput_2;
 
 // @public
 export interface Setting {
-    defaultValue: unknown;
-    id?: string;
-    name: string;
+    readonly defaultValue: unknown;
+    readonly name: string;
     value: unknown;
 }
 
+// Warning: (ae-forgotten-export) The symbol "SettingCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface SettingCreateInput {
-    value?: unknown;
-}
+export type SettingCreateInput = SettingCreateInput_2;
 
 // @public
 export class SettingResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    list(actionId: string): Promise<Page<Setting>>;
+    list(actionId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Setting>>;
 }
 
-// @public (undocumented)
+// @public
 export const SettingSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -188,31 +208,32 @@ export const SettingSchema: z.ZodObject<{
     defaultValue: z.ZodUnknown;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "SettingUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type SettingUpdateInput = Partial<SettingCreateInput>;
+export type SettingUpdateInput = SettingUpdateInput_2;
 
 // @public
 export interface Variable {
-    id: string;
-    name: string;
-    settable: boolean;
+    readonly id: string;
+    name: string | null;
+    readonly settable: boolean | null;
     value: unknown;
 }
 
+// Warning: (ae-forgotten-export) The symbol "VariableCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface VariableCreateInput {
-    name?: string;
-    value?: unknown;
-}
+export type VariableCreateInput = VariableCreateInput_2;
 
 // @public
 export class VariableResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Variable>;
-    list(workflowName: string): Promise<Page<Variable>>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Variable>;
+    list(workflowName: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Variable>>;
 }
 
-// @public (undocumented)
+// @public
 export const VariableSchema: z.ZodObject<{
     name: z.ZodString;
     value: z.ZodUnknown;
@@ -220,35 +241,38 @@ export const VariableSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "VariableUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type VariableUpdateInput = Partial<VariableCreateInput>;
+export type VariableUpdateInput = VariableUpdateInput_2;
 
 // @public
 export type WarningLevel = 'none' | 'reversible' | 'irreversible';
 
 // @public
 export interface Workflow {
-    currentAction: unknown;
-    executionErrorMessage: string;
-    executionErrorNumber: number;
-    executionId: string;
-    executionResult: unknown;
-    id?: string;
-    name: string;
+    readonly currentAction: unknown;
+    readonly executionErrorMessage: string | null;
+    readonly executionErrorNumber: Integer | null;
+    readonly executionId: string | null;
+    readonly executionResult: unknown;
+    readonly name: string;
 }
 
+// Warning: (ae-forgotten-export) The symbol "WorkflowCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type WorkflowCreateInput = Record<string, never>;
+export type WorkflowCreateInput = WorkflowCreateInput_2;
 
 // @public
 export class WorkflowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    execute(workflow: unknown): Promise<void>;
-    get(name: string): Promise<Workflow>;
-    list(): Promise<Page<Workflow>>;
+    execute(workflow: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Workflow>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Workflow>>;
 }
 
-// @public (undocumented)
+// @public
 export const WorkflowSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -259,8 +283,10 @@ export const WorkflowSchema: z.ZodObject<{
     executionId: z.ZodString;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "WorkflowUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type WorkflowUpdateInput = Partial<WorkflowCreateInput>;
+export type WorkflowUpdateInput = WorkflowUpdateInput_2;
 
 // (No @packageDocumentation comment for this package)
 

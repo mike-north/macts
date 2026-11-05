@@ -4,60 +4,69 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
+import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { Rectangle } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface BookmarkFolder {
-    id: string;
-    index: number;
-    title: string;
+    readonly id: string;
+    readonly index: number | null;
+    title: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "BookmarkFolderCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface BookmarkFolderCreateInput {
-    title?: string;
-}
+export type BookmarkFolderCreateInput = BookmarkFolderCreateInput_2;
 
 // @public
 export class BookmarkFolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<BookmarkFolder>;
-    list(): Promise<Page<BookmarkFolder>>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<BookmarkFolder>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<BookmarkFolder>>;
 }
 
-// @public (undocumented)
+// @public
 export const BookmarkFolderSchema: z.ZodObject<{
     id: z.ZodString;
     title: z.ZodString;
     index: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "BookmarkFolderUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type BookmarkFolderUpdateInput = Partial<BookmarkFolderCreateInput>;
+export type BookmarkFolderUpdateInput = BookmarkFolderUpdateInput_2;
 
 // @public
 export interface BookmarkItem {
-    id: string;
-    index: number;
-    title: string;
-    uRL: string;
+    readonly id: string;
+    readonly index: number | null;
+    title: string | null;
+    uRL: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "BookmarkItemCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface BookmarkItemCreateInput {
-    title?: string;
-    uRL?: string;
-}
+export type BookmarkItemCreateInput = BookmarkItemCreateInput_2;
 
 // @public
 export class BookmarkItemResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<BookmarkItem>;
-    list(folderId: string): Promise<Page<BookmarkItem>>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<BookmarkItem>;
+    list(folderId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<BookmarkItem>>;
 }
 
-// @public (undocumented)
+// @public
 export const BookmarkItemSchema: z.ZodObject<{
     id: z.ZodString;
     title: z.ZodString;
@@ -65,8 +74,10 @@ export const BookmarkItemSchema: z.ZodObject<{
     index: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "BookmarkItemUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type BookmarkItemUpdateInput = Partial<BookmarkItemCreateInput>;
+export type BookmarkItemUpdateInput = BookmarkItemUpdateInput_2;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -87,13 +98,23 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public
+// @public (undocumented)
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // Warning: (ae-forgotten-export) The symbol "MicrosoftEdgeResources" needs to be exported by the entry point index.d.ts
+    //
+    // @internal
+    bind<Client extends ClientBrand<MicrosoftEdgeResources>>(client: Client): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
+export interface MicrosoftEdgeClient extends ClientBrand<MicrosoftEdgeResources> {
+}
+
+// @public (undocumented)
 export class MicrosoftEdgeClient {
     constructor(options: MicrosoftEdgeClientOptions);
     readonly bookmarkFolders: BookmarkFolderResourceClient;
@@ -118,39 +139,38 @@ export class MicrosoftEdgeError extends Error {
 
 // @public
 export interface Tab {
-    id: string;
-    loading: boolean;
-    title: string;
-    uRL: string;
+    readonly id: string;
+    readonly loading: boolean | null;
+    readonly title: string | null;
+    uRL: string | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "TabCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface TabCreateInput {
-    uRL?: string;
-    windowId: string;
-}
+export type TabCreateInput = TabCreateInput_2;
 
 // @public
 export class TabResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    copySelection(tabId: string): Promise<void>;
-    create(input: TabCreateInput): Promise<Tab>;
-    cutSelection(tabId: string): Promise<void>;
-    execute(tabId: string, javascript: string): Promise<void>;
-    get(windowId: string, id: string): Promise<Tab>;
-    goBack(tabId: string): Promise<void>;
-    goForward(tabId: string): Promise<void>;
-    list(windowId: string): Promise<Page<Tab>>;
-    pasteSelection(tabId: string): Promise<void>;
-    redo(tabId: string): Promise<void>;
-    reload(tabId: string): Promise<void>;
-    selectAll(tabId: string): Promise<void>;
-    stop(tabId: string): Promise<void>;
-    undo(tabId: string): Promise<void>;
-    viewSource(tabId: string): Promise<void>;
+    copySelection(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    create(input: TabCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Tab>;
+    cutSelection(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    execute(tabId: string, javascript: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    get(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Tab>;
+    goBack(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    goForward(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    list(windowId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Tab>>;
+    pasteSelection(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    redo(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    reload(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    selectAll(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    stop(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    undo(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    viewSource(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const TabSchema: z.ZodObject<{
     id: z.ZodString;
     title: z.ZodString;
@@ -158,59 +178,47 @@ export const TabSchema: z.ZodObject<{
     loading: z.ZodBoolean;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "TabUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type TabUpdateInput = Partial<TabCreateInput>;
+export type TabUpdateInput = TabUpdateInput_2;
 
 // @public
 export interface Window {
-    activeTab: Tab;
-    activeTabIndex: number;
-    bounds: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    };
-    closeable: boolean;
-    givenName: string;
-    id: string;
-    index: number;
-    minimizable: boolean;
-    minimized: boolean;
-    mode: string;
-    name: string;
-    resizable: boolean;
-    visible: boolean;
-    zoomable: boolean;
-    zoomed: boolean;
+    readonly activeTab: ObjectReferenceVariant<Tab, string, 'Tab'> | null;
+    activeTabIndex: Integer | null;
+    bounds: Rectangle | null;
+    readonly closeable: boolean | null;
+    givenName: string | null;
+    readonly id: string;
+    index: Integer | null;
+    readonly minimizable: boolean | null;
+    minimized: boolean | null;
+    mode: string | null;
+    readonly name: string | null;
+    readonly resizable: boolean | null;
+    visible: boolean | null;
+    readonly zoomable: boolean | null;
+    zoomed: boolean | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "WindowCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface WindowCreateInput {
-    activeTabIndex?: number;
-    bounds?: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    };
-    givenName?: string;
-    index?: number;
-    minimized?: boolean;
-    mode?: string;
-    visible?: boolean;
-    zoomed?: boolean;
-}
+export type WindowCreateInput = Omit<WindowCreateInput_2, 'index' | 'activeTabIndex'> & {
+    index?: number | Extract<WindowCreateInput_2['index'], null>;
+    activeTabIndex?: number | Extract<WindowCreateInput_2['activeTabIndex'], null>;
+};
 
 // @public
 export class WindowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: WindowCreateInput): Promise<Window>;
-    get(id: string): Promise<Window>;
-    list(): Promise<Page<Window>>;
+    create(input: WindowCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Window>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Window>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Window>>;
 }
 
-// @public (undocumented)
+// @public
 export const WindowSchema: z.ZodObject<{
     givenName: z.ZodString;
     name: z.ZodString;
@@ -234,8 +242,13 @@ export const WindowSchema: z.ZodObject<{
     activeTabIndex: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "WindowUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type WindowUpdateInput = Partial<WindowCreateInput>;
+export type WindowUpdateInput = Omit<WindowUpdateInput_2, 'index' | 'activeTabIndex'> & {
+    index?: number | Extract<WindowUpdateInput_2['index'], null>;
+    activeTabIndex?: number | Extract<WindowUpdateInput_2['activeTabIndex'], null>;
+};
 
 // (No @packageDocumentation comment for this package)
 

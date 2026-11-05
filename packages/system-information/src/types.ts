@@ -5,34 +5,20 @@
 
 import { z } from 'zod'
 
-/** Level of detail for system profile information */
-export type DetailLevel = 'mini' | 'basic' | 'full'
+export type { DetailLevel } from './contract/index.js'
 
-/** A system profile document */
-export interface Document {
-  /** Canonical identifier (mirrors `name`); populated by list, pass to get/delete and to write operations that reference this resource. */
-  id?: string
-  /** The document name */
-  name: string
-  /** Plain text representation of the system profile document */
-  plainText: string
-  /** XML representation of the system profile document */
-  xmlText: string
-  /** The desired level of detail for the system profile document */
-  detailLevel: DetailLevel
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Document } from './contract/index.js'
 
-/** Input for creating a Document */
-export interface DocumentCreateInput {
-  /** The desired level of detail for the system profile document */
-  detailLevel?: DetailLevel
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type DocumentCreateInput = import('./contract/index.js').DocumentCreateInput
 
-/** Input for updating a Document */
-export type DocumentUpdateInput = Partial<DocumentCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type DocumentUpdateInput = import('./contract/index.js').DocumentUpdateInput
 
-// Zod schemas for runtime validation
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const DocumentSchema = z.object({
   id: z.string().optional(),
   name: z.string(),

@@ -24,29 +24,36 @@ export class NoteResourceClient {
   /**
    * List all notes, as one page.
    */
-  async list(): Promise<Page<Note>> {
-    return this.#http.rpc<Page<Note>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Note>> {
+    return this.#http.invoke<Page<Note>>(`${this.#app}.${this.#resource}.list`, {}, __mactsOptions)
   }
 
   /**
    * Get a note by name.
    * When several notes share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async get(name: string): Promise<Note> {
-    return this.#http.rpc<Note>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(name: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Note> {
+    return this.#http.invoke<Note>(`${this.#app}.${this.#resource}.get`, { name }, __mactsOptions)
   }
 
   /**
    * Create a new note.
    */
-  async create(input: NoteCreateInput): Promise<Note> {
-    return this.#http.rpc<Note>(`${this.#app}.${this.#resource}.create`, input)
+  async create(
+    input: NoteCreateInput,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Note> {
+    return this.#http.invoke<Note>(`${this.#app}.${this.#resource}.create`, input, __mactsOptions)
   }
 
   /**
    * Show a note in the Notes app
    */
-  async show(name: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.show`, { name })
+  async show(name: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.show`,
+      { name },
+      __mactsOptions
+    )
   }
 }

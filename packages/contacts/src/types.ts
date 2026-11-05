@@ -5,416 +5,139 @@
 
 import { z } from 'zod'
 
-/** SaveableFileFormat */
-export type SaveableFileFormat = 'archive'
+export type { SaveableFileFormat } from './contract/index.js'
 
-/** InstantMessageServiceType */
-export type InstantMessageServiceType =
-  | 'aIM'
-  | 'facebook'
-  | 'gaduGadu'
-  | 'googleTalk'
-  | 'iCQ'
-  | 'jabber'
-  | 'mSN'
-  | 'qQ'
-  | 'skype'
-  | 'yahoo'
+export type { InstantMessageServiceType } from './contract/index.js'
 
-/** Address for the given record. */
-export interface Address {
-  /** City part of the address. */
-  city: string
-  /** properly formatted string for this address. */
-  formattedAddress: string
-  /** Street part of the address, multiple lines separated by carriage returns. */
-  street: string
-  /** unique identifier for this address. */
-  id: string
-  /** Zip or postal code of the address. */
-  zip: string
-  /** Country part of the address. */
-  country: string
-  /** Label. */
-  label: string
-  /** Country code part of the address (should be a two character iso country code). */
-  countryCode: string
-  /** State, Province, or Region part of the address. */
-  state: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Address } from './contract/index.js'
 
-/** Input for creating a Address */
-export interface AddressCreateInput {
-  /** City part of the address. */
-  city?: string
-  /** Street part of the address, multiple lines separated by carriage returns. */
-  street?: string
-  /** unique identifier for this address. */
-  id?: string
-  /** Zip or postal code of the address. */
-  zip?: string
-  /** Country part of the address. */
-  country?: string
-  /** Label. */
-  label?: string
-  /** Country code part of the address (should be a two character iso country code). */
-  countryCode?: string
-  /** State, Province, or Region part of the address. */
-  state?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type AddressCreateInput = import('./contract/index.js').AddressCreateInput
 
-/** Input for updating a Address */
-export type AddressUpdateInput = Partial<AddressCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type AddressUpdateInput = import('./contract/index.js').AddressUpdateInput
 
-/** User name for America Online (AOL) instant messaging. */
-export interface AIMHandle {
-  /** Unique identifier for this handle */
-  id: string
-  /** Label for this handle */
-  label: string
-  /** The AIM handle value */
-  value: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { AIMHandle } from './contract/index.js'
 
-/** Input for creating a AIMHandle */
-export interface AIMHandleCreateInput {
-  /** Label for this handle */
-  label?: string
-  /** The AIM handle value */
-  value?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type AIMHandleCreateInput = import('./contract/index.js').AIMHandleCreateInput
 
-/** Input for updating a AIMHandle */
-export type AIMHandleUpdateInput = Partial<AIMHandleCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type AIMHandleUpdateInput = import('./contract/index.js').AIMHandleUpdateInput
 
-/** Arbitrary date associated with this person. */
-export interface CustomDate {
-  /** Unique identifier for this date */
-  id: string
-  /** Label for this date */
-  label: string
-  /** The date value */
-  value: Date
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { CustomDate } from './contract/index.js'
 
-/** Input for creating a CustomDate */
-export interface CustomDateCreateInput {
-  /** Label for this date */
-  label?: string
-  /** The date value */
-  value?: Date
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type CustomDateCreateInput = import('./contract/index.js').CustomDateCreateInput
 
-/** Input for updating a CustomDate */
-export type CustomDateUpdateInput = Partial<CustomDateCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type CustomDateUpdateInput = import('./contract/index.js').CustomDateUpdateInput
 
-/** Email address for a person. */
-export interface Email {
-  /** Unique identifier for this email */
-  id: string
-  /** Label for this email */
-  label: string
-  /** The email address */
-  value: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Email } from './contract/index.js'
 
-/** Input for creating a Email */
-export interface EmailCreateInput {
-  /** Label for this email */
-  label?: string
-  /** The email address */
-  value?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type EmailCreateInput = import('./contract/index.js').EmailCreateInput
 
-/** Input for updating a Email */
-export type EmailUpdateInput = Partial<EmailCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type EmailUpdateInput = import('./contract/index.js').EmailUpdateInput
 
-/** A Group Record in the address book database */
-export interface Group {
-  /** Unique and persistent identifier for this record. */
-  id: string
-  /** The name of this group. */
-  name: string
-  /** When the contact was created. */
-  creationDate: Date
-  /** When the contact was last modified. */
-  modificationDate: Date
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Group } from './contract/index.js'
 
-/** Input for creating a Group */
-export interface GroupCreateInput {
-  /** The name of this group. */
-  name?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type GroupCreateInput = import('./contract/index.js').GroupCreateInput
 
-/** Input for updating a Group */
-export type GroupUpdateInput = Partial<GroupCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type GroupUpdateInput = import('./contract/index.js').GroupUpdateInput
 
-/** User name for ICQ instant messaging. */
-export interface ICQHandle {
-  /** Unique identifier for this handle */
-  id: string
-  /** Label for this handle */
-  label: string
-  /** The ICQ handle value */
-  value: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { ICQHandle } from './contract/index.js'
 
-/** Input for creating a ICQHandle */
-export interface ICQHandleCreateInput {
-  /** Label for this handle */
-  label?: string
-  /** The ICQ handle value */
-  value?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ICQHandleCreateInput = import('./contract/index.js').ICQHandleCreateInput
 
-/** Input for updating a ICQHandle */
-export type ICQHandleUpdateInput = Partial<ICQHandleCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ICQHandleUpdateInput = import('./contract/index.js').ICQHandleUpdateInput
 
-/** User name for Jabber instant messaging. */
-export interface JabberHandle {
-  /** Unique identifier for this handle */
-  id: string
-  /** Label for this handle */
-  label: string
-  /** The Jabber handle value */
-  value: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { JabberHandle } from './contract/index.js'
 
-/** Input for creating a JabberHandle */
-export interface JabberHandleCreateInput {
-  /** Label for this handle */
-  label?: string
-  /** The Jabber handle value */
-  value?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type JabberHandleCreateInput = import('./contract/index.js').JabberHandleCreateInput
 
-/** Input for updating a JabberHandle */
-export type JabberHandleUpdateInput = Partial<JabberHandleCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type JabberHandleUpdateInput = import('./contract/index.js').JabberHandleUpdateInput
 
-/** User name for Microsoft Network (MSN) instant messaging. */
-export interface MSNHandle {
-  /** Unique identifier for this handle */
-  id: string
-  /** Label for this handle */
-  label: string
-  /** The MSN handle value */
-  value: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { MSNHandle } from './contract/index.js'
 
-/** Input for creating a MSNHandle */
-export interface MSNHandleCreateInput {
-  /** Label for this handle */
-  label?: string
-  /** The MSN handle value */
-  value?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type MSNHandleCreateInput = import('./contract/index.js').MSNHandleCreateInput
 
-/** Input for updating a MSNHandle */
-export type MSNHandleUpdateInput = Partial<MSNHandleCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type MSNHandleUpdateInput = import('./contract/index.js').MSNHandleUpdateInput
 
-/** A person in the address book database. */
-export interface Person {
-  /** Unique and persistent identifier for this record. */
-  id: string
-  /** When the contact was created. */
-  creationDate: Date
-  /** When the contact was last modified. */
-  modificationDate: Date
-  /** The Nickname of this person. */
-  nickname: string
-  /** Organization that employs this person. */
-  organization: string
-  /** The Maiden name of this person. */
-  maidenName: string
-  /** The Suffix of this person. */
-  suffix: string
-  /** The home page of this person. */
-  homePage: string
-  /** The birth date of this person. */
-  birthDate: Date
-  /** The phonetic version of the Last name of this person. */
-  phoneticLastName: string
-  /** The title of this person. */
-  title: string
-  /** The Phonetic version of the Middle name of this person. */
-  phoneticMiddleName: string
-  /** Department that this person works for. */
-  department: string
-  /** First/Last name of the person, uses the name display order preference setting in Contacts. */
-  name: string
-  /** Notes for this person. */
-  note: string
-  /** Is the current record a company or a person. */
-  company: boolean
-  /** The Middle name of this person. */
-  middleName: string
-  /** The phonetic version of the First name of this person. */
-  phoneticFirstName: string
-  /** The job title of this person. */
-  jobTitle: string
-  /** The Last name of this person. */
-  lastName: string
-  /** The First name of this person. */
-  firstName: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Person } from './contract/index.js'
 
-/** Input for creating a Person */
-export interface PersonCreateInput {
-  /** The Nickname of this person. */
-  nickname?: string
-  /** Organization that employs this person. */
-  organization?: string
-  /** The Maiden name of this person. */
-  maidenName?: string
-  /** The Suffix of this person. */
-  suffix?: string
-  /** The home page of this person. */
-  homePage?: string
-  /** The birth date of this person. */
-  birthDate?: Date
-  /** The phonetic version of the Last name of this person. */
-  phoneticLastName?: string
-  /** The title of this person. */
-  title?: string
-  /** The Phonetic version of the Middle name of this person. */
-  phoneticMiddleName?: string
-  /** Department that this person works for. */
-  department?: string
-  /** Notes for this person. */
-  note?: string
-  /** Is the current record a company or a person. */
-  company?: boolean
-  /** The Middle name of this person. */
-  middleName?: string
-  /** The phonetic version of the First name of this person. */
-  phoneticFirstName?: string
-  /** The job title of this person. */
-  jobTitle?: string
-  /** The Last name of this person. */
-  lastName?: string
-  /** The First name of this person. */
-  firstName?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type PersonCreateInput = import('./contract/index.js').PersonCreateInput
 
-/** Input for updating a Person */
-export type PersonUpdateInput = Partial<PersonCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type PersonUpdateInput = import('./contract/index.js').PersonUpdateInput
 
-/** Phone number for a person. */
-export interface Phone {
-  /** Unique identifier for this phone */
-  id: string
-  /** Label for this phone */
-  label: string
-  /** The phone number */
-  value: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Phone } from './contract/index.js'
 
-/** Input for creating a Phone */
-export interface PhoneCreateInput {
-  /** Label for this phone */
-  label?: string
-  /** The phone number */
-  value?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type PhoneCreateInput = import('./contract/index.js').PhoneCreateInput
 
-/** Input for updating a Phone */
-export type PhoneUpdateInput = Partial<PhoneCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type PhoneUpdateInput = import('./contract/index.js').PhoneUpdateInput
 
-/** Other names related to this person. */
-export interface RelatedName {
-  /** Unique identifier for this name */
-  id: string
-  /** Label for this name */
-  label: string
-  /** The related name value */
-  value: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { RelatedName } from './contract/index.js'
 
-/** Input for creating a RelatedName */
-export interface RelatedNameCreateInput {
-  /** Label for this name */
-  label?: string
-  /** The related name value */
-  value?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type RelatedNameCreateInput = import('./contract/index.js').RelatedNameCreateInput
 
-/** Input for updating a RelatedName */
-export type RelatedNameUpdateInput = Partial<RelatedNameCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type RelatedNameUpdateInput = import('./contract/index.js').RelatedNameUpdateInput
 
-/** Profile for social networks. */
-export interface SocialProfile {
-  /** The persistent unique identifier for this profile. */
-  id: string
-  /** The service name of this social profile. */
-  serviceName: string
-  /** The username used with this social profile. */
-  userName: string
-  /** A service-specific identifier used with this social profile. */
-  userIdentifier: string
-  /** The URL of this social profile. */
-  url: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { SocialProfile } from './contract/index.js'
 
-/** Input for creating a SocialProfile */
-export interface SocialProfileCreateInput {
-  /** The service name of this social profile. */
-  serviceName?: string
-  /** The username used with this social profile. */
-  userName?: string
-  /** A service-specific identifier used with this social profile. */
-  userIdentifier?: string
-  /** The URL of this social profile. */
-  url?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type SocialProfileCreateInput = import('./contract/index.js').SocialProfileCreateInput
 
-/** Input for updating a SocialProfile */
-export type SocialProfileUpdateInput = Partial<SocialProfileCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type SocialProfileUpdateInput = import('./contract/index.js').SocialProfileUpdateInput
 
-/** URLs for this person. */
-export interface Url {
-  /** Unique identifier for this URL */
-  id: string
-  /** Label for this URL */
-  label: string
-  /** The URL value */
-  value: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Url } from './contract/index.js'
 
-/** Input for creating a Url */
-export interface UrlCreateInput {
-  /** Label for this URL */
-  label?: string
-  /** The URL value */
-  value?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type UrlCreateInput = import('./contract/index.js').UrlCreateInput
 
-/** Input for updating a Url */
-export type UrlUpdateInput = Partial<UrlCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type UrlUpdateInput = import('./contract/index.js').UrlUpdateInput
 
-/** User name for Yahoo instant messaging. */
-export interface YahooHandle {
-  /** Unique identifier for this handle */
-  id: string
-  /** Label for this handle */
-  label: string
-  /** The Yahoo handle value */
-  value: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { YahooHandle } from './contract/index.js'
 
-/** Input for creating a YahooHandle */
-export interface YahooHandleCreateInput {
-  /** Label for this handle */
-  label?: string
-  /** The Yahoo handle value */
-  value?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type YahooHandleCreateInput = import('./contract/index.js').YahooHandleCreateInput
 
-/** Input for updating a YahooHandle */
-export type YahooHandleUpdateInput = Partial<YahooHandleCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type YahooHandleUpdateInput = import('./contract/index.js').YahooHandleUpdateInput
 
-// Zod schemas for runtime validation
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AddressSchema = z.object({
   city: z.string(),
   formattedAddress: z.string(),
@@ -427,24 +150,28 @@ export const AddressSchema = z.object({
   state: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AIMHandleSchema = z.object({
   id: z.string(),
   label: z.string(),
   value: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const CustomDateSchema = z.object({
   id: z.string(),
   label: z.string(),
   value: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const EmailSchema = z.object({
   id: z.string(),
   label: z.string(),
   value: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const GroupSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -452,24 +179,28 @@ export const GroupSchema = z.object({
   modificationDate: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ICQHandleSchema = z.object({
   id: z.string(),
   label: z.string(),
   value: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const JabberHandleSchema = z.object({
   id: z.string(),
   label: z.string(),
   value: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const MSNHandleSchema = z.object({
   id: z.string(),
   label: z.string(),
   value: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const PersonSchema = z.object({
   id: z.string(),
   creationDate: z.string(),
@@ -494,18 +225,21 @@ export const PersonSchema = z.object({
   firstName: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const PhoneSchema = z.object({
   id: z.string(),
   label: z.string(),
   value: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const RelatedNameSchema = z.object({
   id: z.string(),
   label: z.string(),
   value: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const SocialProfileSchema = z.object({
   id: z.string(),
   serviceName: z.string(),
@@ -514,12 +248,14 @@ export const SocialProfileSchema = z.object({
   url: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const UrlSchema = z.object({
   id: z.string(),
   label: z.string(),
   value: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const YahooHandleSchema = z.object({
   id: z.string(),
   label: z.string(),

@@ -28,6 +28,7 @@ import {
 } from '../manifest/route.js'
 import { resolvePrimaryIdentifierProperty } from '../manifest/identifier.js'
 import type { AppManifest } from '../manifest/index.js'
+import { positionalOperationSource } from './sdk/test-support/operation-source.js'
 import { generateHttpClientSdk } from './sdk/http-client.js'
 import { generateContract } from './contract/index.js'
 import { findCrudCommand, resolveIdParams, resourceCommandEntries } from './surface.js'
@@ -62,7 +63,7 @@ function extractClientRoutes(files: { path: string; content: string }[]): Set<st
   }
 
   // App-level routes are fully-literal in client.ts.
-  const appRouteRe = /rpc<[^>]*>\('([^']+\.app\.[^']+)'/g
+  const appRouteRe = /invoke<.*>\('([^']+\.app\.[^']+)'/g
   for (const m of clientFile.content.matchAll(appRouteRe)) {
     if (m[1]) routes.add(m[1])
   }
@@ -252,12 +253,16 @@ describe('@macts/calendar events update and delete', () => {
 
     // Events are nested under calendars: the generated method must take both
     // calendarId (parent) and id (child event uid).
-    expect(eventFile.content).toContain(
+    expect(positionalOperationSource(eventFile.content)).toContain(
       'async update(calendarId: string, id: string, input: EventUpdateInput)'
     )
-    expect(eventFile.content).toContain('${this.#app}.${this.#resource}.update`')
+    expect(positionalOperationSource(eventFile.content)).toContain(
+      '${this.#app}.${this.#resource}.update`'
+    )
     // Must NOT emit the key-named route, which the server no longer exposes.
-    expect(eventFile.content).not.toContain('${this.#app}.${this.#resource}.updateEvent`')
+    expect(positionalOperationSource(eventFile.content)).not.toContain(
+      '${this.#app}.${this.#resource}.updateEvent`'
+    )
 
     const clientRoutes = extractClientRoutes(sdk.files)
     expect(clientRoutes).toContain('calendar.events.update')
@@ -276,9 +281,15 @@ describe('@macts/calendar events update and delete', () => {
 
     // Events are nested under calendars: the generated method must take both
     // calendarId (parent) and id (child event uid).
-    expect(eventFile.content).toContain('async delete(calendarId: string, id: string)')
-    expect(eventFile.content).toContain('${this.#app}.${this.#resource}.delete`')
-    expect(eventFile.content).not.toContain('${this.#app}.${this.#resource}.deleteEvent`')
+    expect(positionalOperationSource(eventFile.content)).toContain(
+      'async delete(calendarId: string, id: string)'
+    )
+    expect(positionalOperationSource(eventFile.content)).toContain(
+      '${this.#app}.${this.#resource}.delete`'
+    )
+    expect(positionalOperationSource(eventFile.content)).not.toContain(
+      '${this.#app}.${this.#resource}.deleteEvent`'
+    )
 
     const clientRoutes = extractClientRoutes(sdk.files)
     expect(clientRoutes).toContain('calendar.events.delete')
@@ -291,7 +302,7 @@ describe('@macts/calendar events update and delete', () => {
     // fields as Date (not string) — the RPC executor rehydrates date params
     // before forwarding them to JXA.
     const sdk = generateHttpClientSdk(calendar, { packageName: '@macts/calendar' })
-    const typesFile = sdk.files.find((f) => f.path === 'src/types.ts')
+    const typesFile = sdk.files.find((f) => f.path === 'src/contract/index.ts')
     if (!typesFile) throw new Error('generated calendar SDK missing types')
 
     // EventUpdateInput = Partial<EventCreateInput>, so we check EventCreateInput
@@ -303,11 +314,11 @@ describe('@macts/calendar events update and delete', () => {
     const body = createInputMatch?.[1] ?? ''
     // Must be typed as Date (not string) — the HTTP client serialises dates to
     // ISO strings; the RPC server deserialises them back to Date before JXA.
-    expect(body).toContain('startDate: Date;')
-    expect(body).toContain('endDate: Date;')
-    expect(body).toContain('stampDate?: Date;')
+    expect(body).toContain('startDate: Date')
+    expect(body).toContain('endDate: Date')
+    expect(body).toContain('stampDate?: Date')
     // excludedDates is an array of date, not a comma-separated string.
-    expect(body).toContain('excludedDates?: Date[];')
+    expect(body).toContain('excludedDates?: readonly Date[]')
     // status references the EventStatus enum, not widened to string.
     expect(body).toContain('status?: EventStatus;')
   })
@@ -359,9 +370,15 @@ describe('@macts/calendar events.create regression', () => {
 
     // The generated create() method must target the route the server exposes,
     // never one it does not (which 404'd against the live server).
-    expect(eventFile.content).toContain('async create(input: EventCreateInput)')
-    expect(eventFile.content).toContain('${this.#app}.${this.#resource}.create`')
-    expect(eventFile.content).not.toContain('${this.#app}.${this.#resource}.createEvent`')
+    expect(positionalOperationSource(eventFile.content)).toContain(
+      'async create(input: EventCreateInput)'
+    )
+    expect(positionalOperationSource(eventFile.content)).toContain(
+      '${this.#app}.${this.#resource}.create`'
+    )
+    expect(positionalOperationSource(eventFile.content)).not.toContain(
+      '${this.#app}.${this.#resource}.createEvent`'
+    )
 
     // And the full reconstructed client route matches the server route exactly.
     const clientRoutes = extractClientRoutes(sdk.files)
@@ -373,7 +390,7 @@ describe('@macts/calendar events.create regression', () => {
     // Identifier reconciliation: the server validates `calendarId` (required) on
     // create, so the SDK input type must carry it under that exact name.
     const sdk = generateHttpClientSdk(calendar, { packageName: '@macts/calendar' })
-    const typesFile = sdk.files.find((f) => f.path === 'src/types.ts')
+    const typesFile = sdk.files.find((f) => f.path === 'src/contract/index.ts')
     if (!typesFile) throw new Error('generated calendar SDK missing types')
 
     const createInputMatch = /export interface EventCreateInput \{([\s\S]*?)\n\}/.exec(
@@ -382,7 +399,7 @@ describe('@macts/calendar events.create regression', () => {
     expect(createInputMatch).not.toBeNull()
     const body = createInputMatch?.[1] ?? ''
     // Required (no `?`) calendarId of type string.
-    expect(body).toContain('calendarId: string;')
+    expect(body).toContain('calendarId: string')
   })
 })
 
@@ -443,8 +460,8 @@ describe('@macts/notes attachments addressed by id', () => {
     const sdk = generateHttpClientSdk(notes, { packageName: '@macts/notes' })
     const file = sdk.files.find((f) => f.path === 'src/resources/attachment.ts')
     if (!file) throw new Error('generated notes SDK missing attachment resource')
-    expect(file.content).toContain('async get(id: string)')
-    expect(file.content).toContain('${this.#app}.${this.#resource}.get`')
+    expect(positionalOperationSource(file.content)).toContain('async get(id: string)')
+    expect(positionalOperationSource(file.content)).toContain('${this.#app}.${this.#resource}.get`')
     expect(extractClientRoutes(sdk.files)).toContain('notes.attachments.get')
     expect(extractClientRoutes(sdk.files)).not.toContain('notes.attachments.getAttachment')
   })

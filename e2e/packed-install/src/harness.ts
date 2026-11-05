@@ -48,7 +48,7 @@ export type PackedPackage = (typeof PACKED_PACKAGES)[number]
  * `@macts/cli`, `clipanion`, and `typanion` peers are optional, so an install
  * that wants only the SDK client never receives them.
  */
-export const APP_PACKAGES = ['notes'] as const
+export const APP_PACKAGES = ['notes', 'system-events'] as const
 
 /** One of {@link APP_PACKAGES}. */
 export type AppPackage = (typeof APP_PACKAGES)[number]
@@ -190,6 +190,7 @@ export async function installConsumer(dir: string, tarballs: Tarballs): Promise<
       '@macts/runtime': `file:${tarballs.runtime}`,
       '@macts/sdk': `file:${tarballs.sdk}`,
       '@macts/notes': `file:${tarballs.notes}`,
+      '@macts/system-events': `file:${tarballs['system-events']}`,
       [FIXTURE_APP]: `file:${tarballs.app}`,
     },
   }
@@ -280,6 +281,30 @@ export async function installContractsConsumer(dir: string, tarball: string): Pr
       private: true,
       type: 'module',
       dependencies: { '@macts/contracts': `file:${tarball}` },
+    })
+  )
+  cpSync(join(FIXTURES, 'consumer'), dir, { recursive: true })
+  await run(
+    npmCommand(),
+    ['install', '--no-audit', '--no-fund', '--no-package-lock', '--loglevel=error'],
+    dir
+  )
+}
+
+/** Install the real generated app with contracts only, as a remote-only consumer does. */
+export async function installFacadeConsumer(dir: string, tarballs: Tarballs): Promise<void> {
+  mkdirSync(dir, { recursive: true })
+  writeFileSync(
+    join(dir, 'package.json'),
+    JSON.stringify({
+      name: 'generated-facade-consumer',
+      version: '0.0.0',
+      private: true,
+      type: 'module',
+      dependencies: {
+        '@macts/contracts': `file:${tarballs.contracts}`,
+        '@macts/system-events': `file:${tarballs['system-events']}`,
+      },
     })
   )
   cpSync(join(FIXTURES, 'consumer'), dir, { recursive: true })
