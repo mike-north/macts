@@ -88,7 +88,9 @@ function registerCalendar(registrar: AppRegistrar): void {
 /**
  * The library fixture plus `shelve` on books (`library.books.shelve`,
  * `library:books:shelve`), whose input takes a book (a resource with a get)
- * and a shelf (a resource with no get).
+ * and a shelf (a resource with no get). It selects the book it acts on by
+ * `isbn`, as the book's get does, since a resource command acts on one item
+ * (D5).
  */
 function shelvingLibrary(): { contract: AppContract<unknown>; manifest: AppManifest } {
   const base = libraryContract()
@@ -99,6 +101,7 @@ function shelvingLibrary(): { contract: AppContract<unknown>; manifest: AppManif
     target: { command: 'shelve', resource: 'Book' },
     description: 'Shelve a book',
     input: t.record({
+      isbn: t.string(),
       book: t.optional(t.reference(scope, 'Book', 'one')),
       shelf: t.optional(t.reference(scope, 'Shelf', 'one')),
     }),
@@ -117,7 +120,7 @@ function shelvingLibrary(): { contract: AppContract<unknown>; manifest: AppManif
         description: 'Shelve a book',
         scope: 'resource',
         resourceType: 'Book',
-        parameters: [],
+        parameters: [{ name: 'isbn', type: 'string', description: 'ISBN', required: true }],
       },
     },
   }
@@ -149,7 +152,12 @@ describe('a reference in raw operation input (phases/13 D7, "Resolvable targets"
   it('is accepted when it names a resource the app can get', async () => {
     const { app, executor } = server()
 
-    const res = await post(app, 'library.books.shelve', { book: wire(DUNE) }, LIBRARIAN_TOKEN)
+    const res = await post(
+      app,
+      'library.books.shelve',
+      { isbn: DUNE.id, book: wire(DUNE) },
+      LIBRARIAN_TOKEN
+    )
 
     expect(res.status).toBe(200)
     expect(executor.requests).toHaveLength(1)
@@ -161,7 +169,7 @@ describe('a reference in raw operation input (phases/13 D7, "Resolvable targets"
     const res = await post(
       app,
       'library.books.shelve',
-      { shelf: wire(SCIENCE_FICTION_SHELF) },
+      { isbn: DUNE.id, shelf: wire(SCIENCE_FICTION_SHELF) },
       LIBRARIAN_TOKEN
     )
 
@@ -179,7 +187,7 @@ describe('a reference in raw operation input (phases/13 D7, "Resolvable targets"
     const res = await post(
       app,
       'library.books.shelve',
-      { book: wire({ ...DUNE, container: SCIENCE_FICTION_SHELF }) },
+      { isbn: DUNE.id, book: wire({ ...DUNE, container: SCIENCE_FICTION_SHELF }) },
       LIBRARIAN_TOKEN
     )
 

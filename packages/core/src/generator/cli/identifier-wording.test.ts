@@ -119,7 +119,7 @@ function buildManifest(): AppManifest {
     relationships: [],
     commands: {
       getItem: resourceCommand('get', 'Item', [param('id')]),
-      showItem: resourceCommand('show', 'Item', []),
+      showItem: resourceCommand('show', 'Item', [param('id')]),
       getPlaylist: resourceCommand('get', 'Playlist', [param('persistentID')]),
       getTrack: resourceCommand('get', 'Track', [param('playlistId'), param('persistentID')], {
         resource: 'Playlist',
@@ -128,7 +128,7 @@ function buildManifest(): AppManifest {
       getDocument: resourceCommand('get', 'Document', [param('name')]),
       getCalendar: resourceCommand('get', 'Calendar', [param('id')]),
       getWindow: resourceCommand('get', 'Window', [param('name')]),
-      showVisual: resourceCommand('show', 'Visual', []),
+      showVisual: resourceCommand('show', 'Visual', [param('name')]),
     },
   }
 }

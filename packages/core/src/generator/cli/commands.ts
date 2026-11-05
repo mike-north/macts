@@ -5,14 +5,20 @@ import type {
   CommandParameter,
 } from '../../manifest/index.js'
 import { PAGE_SIZE_LIMITS } from '@macts/contracts'
-import { listOperationPages, resolvePrimaryIdentifierProperty } from '../../manifest/index.js'
+import {
+  itemIdentifierParameter,
+  listOperationPages,
+  resolvePrimaryIdentifierProperty,
+} from '../../manifest/index.js'
 import { usableProperties } from '../../manifest/unsupported.js'
 import { outputProperties } from '../../manifest/output-references.js'
 import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.js'
 import {
+  commandMethodParameters,
   firstMatchNote,
   identifierWords,
   resolveIdParams,
+  resourceCommandNote,
   resourceNamespace,
   safeIdentifier,
   withArticle,
@@ -498,7 +504,17 @@ ${paramFlags}
 }
 
 /**
- * Generate a resource-level command (like "show", "complete", "delete" for resources).
+ * Generate a resource-level command (like "show", "build", "send"): a command
+ * that acts on one item of its resource, selected as a get selects it.
+ *
+ * It asks only for the inputs the operation uses, in the SDK method's order
+ * (`commandMethodParameters`): a flag for the parent's identifier when the
+ * command records a parent, one positional argument for the item's
+ * identifier (the command's identifier parameter, `resolveIdParams`), and a
+ * flag for each other declared parameter. The positional is labelled with
+ * the identifier a get takes, as the get command's is. Nothing comes from the
+ * resource's place in the hierarchy: a parent the command does not record has
+ * no flag.
  */
 export function generateResourceCommand(
   cmd: ManifestCommand,
@@ -519,59 +535,73 @@ export function generateResourceCommand(
   const cmdNameKebab = toKebabCase(cmd.name)
   const cliPath = [appName, ...hierarchyPath.path, cmdNameKebab]
 
-  const idParamName = `${toCamelCase(resource.name)}Id`
-
-  // Names declared by command parameters; used to avoid emitting a duplicate
-  // identifier when a parameter already covers the resource ID or a parent ID
-  // (e.g. a command whose first parameter is literally the resource's own ID).
-  const paramNames = new Set(cmd.parameters.map((p) => p.name))
-
-  // Build parameter options for parent IDs, skipping any that a command parameter
-  // (or the resource ID itself) already declares to prevent duplicate identifiers.
-  const parentOptions = generateParentOptions(
-    hierarchyPath.parentParams.filter((p) => p.name !== idParamName && !paramNames.has(p.name))
-  )
-
-  // Build parameter flags for command parameters, except inputs left out
-  // because they admit no value
+  // Inputs left out because they admit no value have no flag, no positional
+  // and no position in the SDK call.
   const omitted = ctx.omittedInputs(cmd, hierarchyPath.resourceName)
-  const paramFlags = cmd.parameters
-    .filter((p) => !omitted.has(p.name))
-    .map((p) => generateParameterFlag(p, ctx, cmd.name))
-    .join('\n')
-
-  // Only declare the implicit resource-ID option when no command parameter already
-  // declares an identifier of the same name (otherwise we emit a duplicate field).
+  // A known gap declares no item, so it has no positional.
+  const childParam = itemIdentifierParameter(cmd)?.name
+  const flagProperties = new Set(
+    cmd.parameters
+      .filter((p) => p.name !== childParam)
+      .map((p) => safeParamProperty(p.name, cmd.name))
+  )
+  const itemProperty = uniqueProperty(`${toCamelCase(resource.name)}Id`, flagProperties)
+  const signature = commandMethodParameters(cmd).signature.filter(
+    ({ parameter }) => !omitted.has(parameter.name)
+  )
   const getCommand = ctx
     .getResourceCommands(hierarchyPath.resourceName)
     .find((c) => c.name === 'get')
-  const idOption = paramNames.has(idParamName)
-    ? ''
-    : `${identifierPositional(idParamName, addressingIdentifier(resource, getCommand))}\n`
+  const inputs = signature
+    .map(({ parameter }) =>
+      parameter.name === childParam
+        ? identifierPositional(itemProperty, addressingIdentifier(resource, getCommand))
+        : generateParameterFlag(parameter, ctx, cmd.name)
+    )
+    .join('\n')
+  // Each argument is asserted to the SDK method's exact parameter type. CLI
+  // inputs surface values as broad primitives (string/boolean), which may not
+  // structurally overlap the SDK's narrower types (enums, Date, number,
+  // arrays), so the assertion goes via `unknown`; the RPC layer validates and
+  // coerces the value at run time.
+  const methodRef = `client.${resourceAccess}.${safeIdentifier(cmd.name)}`
+  const methodArgs = signature
+    .map(({ parameter }, i) => {
+      const property =
+        parameter.name === childParam ? itemProperty : safeParamProperty(parameter.name, cmd.name)
+      return `this.${property} as unknown as Parameters<typeof ${methodRef}>[${String(i)}]`
+    })
+    .join(', ')
+  // The usage description adds the first-match sentence for a resource
+  // matched on a property that is not claimed unique, as the get's does, or,
+  // for a known gap, the sentence saying the item is not sent.
+  const note = resourceCommandNote(cmd, resource)
+  const description =
+    note === undefined ? cmd.description : `${cmd.description.replace(/[\s.]+$/, '')}. ${note}`
 
-  const needsTypanion = paramFlags.includes('t.isEnum')
+  const needsTypanion = inputs.includes('t.isEnum')
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
 import { getClient } from '${sdkImportPath}';
 import { createFormatter } from '${outputImportPath}';
 
 /**
- * ${cmd.description}
+ * ${description}
  */
 export class ${toPascalCase(cmd.name)}${resource.name}Command extends Command {
   static override paths = [[${cliPath.map((p) => JSON.stringify(p)).join(', ')}]];
 
   static override usage = Command.Usage({
-    description: ${JSON.stringify(cmd.description)},
+    description: ${JSON.stringify(description)},
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
-${parentOptions}${idOption}${paramFlags}
+${inputs}
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false);
 
     try {
       const client = getClient();
-      await client.${resourceAccess}.${safeIdentifier(cmd.name)}(${generateResourceCommandArgs(cmd, omitted, `client.${resourceAccess}.${safeIdentifier(cmd.name)}`)});
+      await ${methodRef}(${methodArgs});
 
       const output = formatter.formatSuccess('${cmd.name} completed successfully');
       this.context.stdout.write(output + '\\n');
@@ -594,33 +624,15 @@ ${parentOptions}${idOption}${paramFlags}
 // Helper functions
 
 /**
- * Generate positional arguments for a resource command call.
- * Matches the SDK method signature: sorted params (required first).
- *
- * Each argument is asserted to the SDK method's exact parameter type via
- * \`unknown as Parameters<typeof methodRef>[i]\`. CLI flags surface values as broad
- * primitives (string/boolean) which may not structurally overlap the SDK's narrower
- * types (enums, Date, number, arrays); the RPC layer validates/coerces at runtime.
+ * `name`, or `name` suffixed with `Item` (then `Item2`, ...) until no other
+ * generated field in `taken` already has it.
  */
-function generateResourceCommandArgs(
-  cmd: ManifestCommand,
-  omitted: ReadonlySet<string>,
-  methodRef: string
-): string {
-  if (cmd.parameters.length === 0) return ''
-
-  const sorted = [...cmd.parameters].sort((a, b) => {
-    if (a.required && !b.required) return -1
-    if (!a.required && b.required) return 1
-    return 0
-  })
-
-  return positionalArgs(
-    sorted,
-    omitted,
-    (p, i) =>
-      `this.${safeParamProperty(p.name, cmd.name)} as unknown as Parameters<typeof ${methodRef}>[${String(i)}]`
-  )
+function uniqueProperty(name: string, taken: ReadonlySet<string>): string {
+  if (!taken.has(name)) return name
+  for (let n = 1; ; n++) {
+    const candidate = `${name}Item${n === 1 ? '' : String(n)}`
+    if (!taken.has(candidate)) return candidate
+  }
 }
 
 /**

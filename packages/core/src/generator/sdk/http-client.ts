@@ -28,6 +28,7 @@ import {
   findCrudCommand,
   generationRefusals,
   firstMatchNote,
+  resourceCommandNote,
   identifierWords,
   isCrudName,
   listMethodParameters,
@@ -679,7 +680,13 @@ function generateResourceClient(
   const deleteCmd = crud('delete')
 
   const commandMethods = resourceCommands
-    .map(([key, cmd]) => generateResourceCommandMethod(commandRouteSegment(key, cmd), cmd))
+    .map(([key, cmd]) =>
+      generateResourceCommandMethod(
+        commandRouteSegment(key, cmd),
+        cmd,
+        resourceCommandNote(cmd, resource)
+      )
+    )
     .join('\n')
 
   // The resource's own type is referenced by the CRUD methods' return types
@@ -923,8 +930,9 @@ function uniquePageBinding(taken: readonly string[]): string {
 }
 
 /**
- * The doc comment line a get, update or delete method adds for `note`
- * ({@link firstMatchNote}), or nothing when there is none.
+ * The doc comment line a method that acts on one item (a get, update or
+ * delete, or a resource command) adds for `note` ({@link firstMatchNote}), or
+ * nothing when there is none.
  */
 function docNoteLine(note: string | undefined): string {
   return note === undefined ? '' : `\n   * ${note}`
@@ -1100,7 +1108,11 @@ function buildParamsAndBody(command: Command): { signature: string; bodyArg: str
  * structured path. CRUD-shaped commands are emitted separately by
  * `generateResourceClient`, so they are skipped here.
  */
-function generateResourceCommandMethod(routeSegment: string, cmd: Command): string {
+function generateResourceCommandMethod(
+  routeSegment: string,
+  cmd: Command,
+  note: string | undefined
+): string {
   // Skip standard CRUD commands as they're already generated
   if (isCrudName(cmd.name)) {
     return ''
@@ -1118,7 +1130,7 @@ function generateResourceCommandMethod(routeSegment: string, cmd: Command): stri
 
   return `
   /**
-   * ${cmd.description}
+   * ${cmd.description}${docNoteLine(note)}
    */
   async ${safeIdentifier(cmd.name)}(${signature}): Promise<${returnType}> {
     ${rpcCall}
