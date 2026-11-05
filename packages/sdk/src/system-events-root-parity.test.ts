@@ -180,11 +180,12 @@ it('preserves System Events values, relationships and failures across all client
       assert.equal(page.items[0]?.id, 'd1')
       const domainGot = await client.domains.get('d1')
       for (const field of folderFields) {
-        assert(domainGot[field])
-        assert.equal(domainGot[field].app, 'system-events')
-        assert.equal(domainGot[field].resource, 'Folder')
-        assert.equal(domainGot[field].cardinality, 'one')
-        assert.equal((await domainGot[field].resolve()).posixPath, PATH)
+        const reference = domainGot[field]
+        assert(reference)
+        assert.equal(reference.app, 'system-events')
+        assert.equal(reference.resource, 'Folder')
+        assert.equal(reference.cardinality, 'one')
+        assert.equal((await reference.resolve()).posixPath, PATH)
       }
       cases++
       assert.equal((await client.diskItems.get(FILE)).posixPath, FILE)
