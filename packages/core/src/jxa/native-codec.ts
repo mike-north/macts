@@ -342,12 +342,12 @@ export interface NativeCodecEnvironment {
   readonly references: NativeReferenceTable
   /**
    * Reads the zero-based position an app object's own specifier gives within
-   * its container, or `undefined` when the specifier is not positional
-   * ({@link NATIVE_POSITION_READER}). The codec calls it to encode an object of
+   * `collection` of its container, or `undefined` when the specifier gives no
+   * position there ({@link NATIVE_POSITION_READER}). The codec calls it to encode an object of
    * a positional resource, and never reads a position any other way. Without
    * it, no such object encodes.
    */
-  readonly positionOf?: (specifier: unknown) => unknown
+  readonly positionOf?: (specifier: unknown, collection: string) => unknown
 }
 
 /**

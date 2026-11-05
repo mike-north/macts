@@ -1078,9 +1078,35 @@ function objectSchemas(registry: ReferenceRegistry, form: SchemaForm): ObjectSch
         form: z.literal('selector'),
         cardinality: z.literal('one'),
         selector: form.indexSelector,
-        container: parentContainer(parent),
+        container: identityChain(parent),
       })
     },
+  }
+
+  /**
+   * The container chain of an index selector within `parent`: an identity
+   * reference to `parent`, whose container is required and is the same chain
+   * of the parent its `get` records, and absent at a `parent` the app finds
+   * at the application. Native resolution walks exactly that chain, so no
+   * selector, and nothing above the top, is admitted.
+   */
+  function identityChain(parent: string): ZodType {
+    return z.lazy(() => {
+      const id = Object.hasOwn(containers, parent) ? containers[parent]?.id : undefined
+      if (id === undefined) {
+        return z.never({
+          error: `The app cannot resolve an identity reference to ${quote(parent)}.`,
+        })
+      }
+      const above = containers[parent]?.parents?.get
+      return form.object({
+        resource: z.literal(parent),
+        form: z.literal('identity'),
+        cardinality: z.literal('one'),
+        id: form.id(id),
+        ...(above === undefined ? {} : { container: identityChain(above) }),
+      })
+    })
   }
 
   /**
@@ -1424,7 +1450,36 @@ function indexSelectorIssue(
     issues.push(issue(path, 'unsupported', noPositionalParentMessage(resource)))
     return true
   }
-  return false
+  return containerChainIssue(shape.container, [...path, 'container'], registry, issues)
+}
+
+/**
+ * The issue, if any, with the container chain of an index selector. Each
+ * level was checked, while it was read, to be the identity of the parent its
+ * resource's `get` records; the chain must end at a level the app finds at
+ * the application, with no container, where native resolution starts.
+ */
+function containerChainIssue(
+  container: ObjectShape<unknown, unknown, unknown> | undefined,
+  path: IssuePath,
+  registry: ReferenceRegistry,
+  issues: Issues
+): boolean {
+  let level = container
+  let at = path
+  while (level !== undefined && registry[level.resource]?.parents?.get !== undefined) {
+    level = level.container
+    at = [...at, 'container']
+  }
+  if (level?.container === undefined) return false
+  issues.push(
+    issue(
+      [...at, 'container'],
+      'unsupported',
+      `The app finds ${quote(level.resource)} at the application, so the container chain of an index selector ends at it: it cannot have a container of its own.`
+    )
+  )
+  return true
 }
 
 /**

@@ -214,3 +214,69 @@ describe('a resource with no container to count within', () => {
     ])
   })
 })
+
+/**
+ * The container chain of an index selector is identity references only, each
+ * the parent its resource's get records, up to one the app finds at the
+ * application, which has no container: the chain native resolution walks. A
+ * container above that, of either form, is rejected wherever the walker or
+ * the wire schema reads the position.
+ */
+describe('the container chain of an index selector position', () => {
+  const profile = {
+    resource: 'Profile',
+    form: 'selector',
+    cardinality: 'one',
+    selector: { by: 'name', name: 'Default' },
+  }
+  const withAncestor = (ancestor: object): object =>
+    wireTab('0', { ...wireWindow('W1'), container: ancestor })
+  const ABOVE_TOP: { path: IssuePath; message: string } = {
+    path: ['container', 'container'],
+    message:
+      'The app finds "Window" at the application, so the container chain of an index selector ' +
+      'ends at it: it cannot have a container of its own.',
+  }
+
+  it.each<[string, object]>([
+    ['a selector ancestor', profile],
+    ['an identity ancestor', wireWindow('W2')],
+  ])('rejects an identity window with %s, on the wire and decoding', (_label, ancestor) => {
+    expect(tab.wire.safeParse({ reference: withAncestor(ancestor) }).success).toBe(false)
+    expect(
+      failures(tab.decode({ reference: withAncestor(ancestor) }, VECTOR_DECODE_CONTEXT))
+    ).toEqual([ABOVE_TOP])
+  })
+
+  it('rejects encoding an identity window with a selector ancestor', () => {
+    const window = { app: APP, resource: 'Window', form: 'identity', cardinality: 'one', id: 'W1' }
+    const data = {
+      app: APP,
+      resource: 'Tab',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'index', index: 0 },
+      container: { ...window, container: { app: APP, ...profile } },
+    }
+    expect(failures(tab.encode(data))).toEqual([ABOVE_TOP])
+  })
+
+  it('admits a chain of identity parents up to one found at the application', () => {
+    const nested: ReferenceScope = {
+      app: APP,
+      resources: {
+        Group: { id: t.string(), get: 'terminal.groups.get' },
+        Window: { id: t.string(), get: 'terminal.windows.get', parents: { get: 'Group' } },
+        Tab: { get: 'terminal.tabs.get', parents: { get: 'Window' } },
+      },
+    }
+    const nestedTab = t.indexSelectorReference(() => nested, 'Tab')
+    const group = { resource: 'Group', form: 'identity', cardinality: 'one', id: 'G1' }
+    const chain = withAncestor(group)
+    expect(nestedTab.wire.safeParse({ reference: chain }).success).toBe(true)
+    expect(nestedTab.decode({ reference: chain }, VECTOR_DECODE_CONTEXT).ok).toBe(true)
+    const above = withAncestor({ ...group, container: { ...group, id: 'G2' } })
+    expect(nestedTab.wire.safeParse({ reference: above }).success).toBe(false)
+    expect(nestedTab.decode({ reference: above }, VECTOR_DECODE_CONTEXT).ok).toBe(false)
+  })
+})

@@ -119,9 +119,84 @@ describe('a positional resource', () => {
     })
 
     expect(issues(unidentifiedParent)).toContainEqual({
-      path: ['resources', 'Tab', 'positional'],
+      path: ['commands', 'getTab', 'parent'],
       message:
-        'A positional resource is counted within a parent the app finds by its identifier, but "Window", the parent the get "getTab" of "Tab" records, is not: it needs a primary identifier and a get, and so does each parent above it.',
+        'The get command "getTab" records parent "Window", which needs an ordinary collection parent with a primary identifier and a usable get.',
+    })
+  })
+
+  // The get, update and delete bodies find the parent at the application
+  // (\`app.windows.byId(id)\`), so a window held in a group is out of reach.
+  it('is refused within a parent that is itself found within another', () => {
+    const nested = panes((raw) => {
+      raw.resources['Group'] = {
+        name: 'Group',
+        plural: 'Groups',
+        description: 'A group of windows',
+        properties: {
+          id: { access: 'r', type: 'integer', description: "The group's id", code: 'ID  ' },
+        },
+        identifiers: [{ property: 'id', primary: true }],
+      }
+      raw.commands['getGroup'] = {
+        name: 'get',
+        description: 'Get a group',
+        scope: 'resource',
+        resourceType: 'Group',
+        parameters: [{ name: 'id', type: 'integer', description: 'The group', required: true }],
+      }
+      const getWindow = command(raw, 'getWindow')
+      getWindow['parent'] = { resource: 'Group', parameter: 'groupId' }
+      getWindow['parameters'] = [
+        { name: 'groupId', type: 'integer', description: 'The group', required: true },
+        ...(getWindow['parameters'] as object[]),
+      ]
+    })
+
+    expect(issues(nested)).toContainEqual({
+      path: ['commands', 'getTab', 'parent'],
+      message:
+        'The get command "getTab" records parent "Window", which is found within "Group"; nested parents are not supported yet.',
+    })
+  })
+
+  it.each<[string, Record<string, unknown> | undefined]>([
+    ['records no parent', undefined],
+    ['records a parent other than its get’s', { resource: 'Tab', parameter: 'windowId' }],
+  ])('is refused when an item command %s', (_label, parent) => {
+    const parentless = panes((raw) => {
+      raw.commands['deleteTab'] = {
+        name: 'delete',
+        description: 'Close a tab',
+        scope: 'resource',
+        resourceType: 'Tab',
+        ...(parent === undefined ? {} : { parent }),
+        parameters: [
+          { name: 'windowId', type: 'integer', description: 'The window', required: true },
+          { name: 'index', type: 'integer', description: 'The tab', required: true },
+        ],
+      }
+    })
+
+    expect(issues(parentless)).toContainEqual({
+      path: ['commands', 'deleteTab', 'parent'],
+      message:
+        'The delete command "deleteTab" selects an item of the positional resource "Tab" within its parent, so it must record the parent "Window", as the get "getTab" does.',
+    })
+  })
+
+  // The schema refuses it, not only generation and registration: a get with
+  // nothing but its parent's identifier names no tab.
+  it('is refused when an item command declares no position besides its parent', () => {
+    const noPosition = panes((raw) => {
+      const get = command(raw, 'getTab')
+      get['parameters'] = (get['parameters'] as Record<string, unknown>[]).slice(0, 1)
+    })
+
+    expect(issues(noPosition)).toContainEqual({
+      path: ['commands', 'getTab', 'parameters'],
+      message:
+        'The get command "getTab" selects an item of the positional resource "Tab" by its zero-based position, so it must declare a required integer item parameter besides its parent\'s "windowId".',
     })
   })
 
@@ -209,5 +284,43 @@ describe('references to a positional resource at outputs (D7)', () => {
 
   it('are left out of a command result, which no window record carries', () => {
     expect(omittedOutputReason(manifest, 'Tab')).toBe('parent-scoped')
+  })
+})
+
+/**
+ * A parent is bound by its identifier (`recordedParentScope`), and a
+ * positional resource has none, so no command may record one as its parent
+ * until native binding supports positional parents.
+ */
+describe('a command under a positional parent', () => {
+  it('is refused, whatever its own resource', () => {
+    const underTab = panes((raw) => {
+      raw.resources['Pane'] = {
+        name: 'Pane',
+        plural: 'Panes',
+        description: 'A split pane of a tab',
+        properties: {
+          id: { access: 'r', type: 'integer', description: "The pane's id", code: 'ID  ' },
+        },
+        identifiers: [{ property: 'id', primary: true }],
+      }
+      raw.commands['getPane'] = {
+        name: 'get',
+        description: 'Get a pane of a tab',
+        scope: 'resource',
+        resourceType: 'Pane',
+        parent: { resource: 'Tab', parameter: 'tabIndex' },
+        parameters: [
+          { name: 'tabIndex', type: 'integer', description: 'The tab', required: true },
+          { name: 'id', type: 'integer', description: 'The pane', required: true },
+        ],
+      }
+    })
+
+    expect(issues(underTab)).toContainEqual({
+      path: ['commands', 'getPane', 'parent'],
+      message:
+        'The command "getPane" records the positional resource "Tab" as its parent, but a parent is found by its identifier and "Tab" has none. Commands under a positional parent are not supported yet.',
+    })
   })
 })

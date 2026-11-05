@@ -52,23 +52,26 @@ function runWithDist(body: string): unknown {
 }
 
 describe.skipIf(process.platform !== 'darwin')('the built position reader', () => {
-  it('reads the final .at(N) of a real specifier, and nothing from any other', () => {
+  it('reads the final .<collection>.at(N) of a real specifier, and nothing from any other', () => {
     const outcome = runWithDist(
       [
-        'var specifiers = [',
-        '  app.windows.at(2),',
-        '  app.disks.at(0).items.at(3),',
-        '  app.windows.byId(7),',
-        '  app.windows.byName("Home"),',
-        '  app.windows.at(0).name,',
+        'var checks = [',
+        '  [app.disks.at(0).items.at(3), "items"],',
+        '  [app.disks.at(0).items.at(3), "windows"],',
+        '  [app.windows.at(2), "windows"],',
+        '  [app.windows.byId(7), "windows"],',
+        '  [app.windows.byName("Home"), "windows"],',
+        '  [app.windows.at(0).name, "windows"],',
         '];',
-        'return specifiers.map(function (s) { return String(__mactsPositionOf(s)); });',
+        'return checks.map(function (c) { return String(__mactsPositionOf(c[0], c[1])); });',
       ].join('\n')
     )
 
+    // Only a position within a collection of a container counts: the second
+    // names another collection, and the third is the application's own.
     expect(outcome).toEqual({
       ok: true,
-      value: ['2', '3', 'undefined', 'undefined', 'undefined'],
+      value: ['3', 'undefined', 'undefined', 'undefined', 'undefined', 'undefined'],
     })
   }, 30000)
 })

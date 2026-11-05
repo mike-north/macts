@@ -30,6 +30,7 @@
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md (D7, D9)
  */
 
+import { runInNewContext } from 'node:vm'
 import { describe, expect, it, vi } from 'vitest'
 import {
   InternalError,
@@ -40,9 +41,11 @@ import {
   type ValuePlan,
 } from '@macts/contracts'
 import type { ExecutionRequest, ResolutionRequest } from '../execution/executor.js'
-import { panesManifest } from '../manifest/test-support/panes-positional.js'
+import { parseManifestYaml } from '../manifest/loader.js'
+import type { AppManifest } from '../manifest/schemas/index.js'
+import { PANES_MANIFEST_YAML, panesManifest } from '../manifest/test-support/panes-positional.js'
 import { createNativeExecutor, type NativeTransport } from './native-executor.js'
-import { specifierPosition } from './native-position.js'
+import { NATIVE_POSITION_READER, specifierPosition } from './native-position.js'
 import { referenceAddressing } from './native-scripts.js'
 import { standInTransport } from './test-support/stand-in-app.js'
 import {
@@ -182,12 +185,30 @@ function internalMessage(error: unknown): string | undefined {
   return error instanceof InternalError ? error.message : undefined
 }
 
-describe('the position a specifier gives', () => {
+describe('the position a specifier gives within a tab collection', () => {
+  it.each(['Panes (Beta)', 'Panes ("quoted" \\ path)', 'Panes ).windows.byId(7) ('])(
+    'distinguishes an application named %s from a real nested specifier in source and embedded readers',
+    (name) => {
+      const application = `Application(${JSON.stringify(name)})`
+      for (const [display, expected] of [
+        [`${application}.tabs.at(7)`, undefined],
+        [`${application}.windows.byId(1).tabs.at(2)`, 2],
+      ] as const) {
+        expect(specifierPosition(display, 'tabs')).toBe(expected)
+        expect(
+          runInNewContext(`${NATIVE_POSITION_READER.prelude}\n__mactsPositionOf({}, 'tabs')`, {
+            Automation: { getDisplayString: () => display },
+          })
+        ).toBe(expected)
+      }
+    }
+  )
+
   it.each<[string, number]>([
     ['Application("iTerm2").windows.byId(7).tabs.at(0)', 0],
     ['Application("Panes").windows.byId(1).tabs.at(12)', 12],
-  ])('reads the final .at(N) of %s', (display, position) => {
-    expect(specifierPosition(display)).toBe(position)
+  ])('reads the final .tabs.at(N) of %s', (display, position) => {
+    expect(specifierPosition(display, 'tabs')).toBe(position)
   })
 
   it.each<[string, unknown]>([
@@ -197,10 +218,19 @@ describe('the position a specifier gives', () => {
     ['a position that is not the final step', 'Application("Panes").windows.at(0).currentTab'],
     ['a non-canonical position', 'Application("Panes").windows.byId(1).tabs.at(01)'],
     ['a negative position', 'Application("Panes").windows.byId(1).tabs.at(-1)'],
-    ['a position past the safe integers', 'Application("Panes").tabs.at(9007199254740993)'],
+    [
+      'a position past the safe integers',
+      'Application("Panes").windows.byId(1).tabs.at(9007199254740993)',
+    ],
+    ['a position in another collection', 'Application("Panes").windows.byId(9).sessions.at(4)'],
+    [
+      'a collection whose name only ends in tabs',
+      'Application("Panes").windows.byId(1).subtabs.at(0)',
+    ],
+    ['a position in the application’s own collection', 'Application("Panes").tabs.at(7)'],
     ['no display form', undefined],
   ])('gives no position for %s', (_label, display) => {
-    expect(specifierPosition(display)).toBeUndefined()
+    expect(specifierPosition(display, 'tabs')).toBeUndefined()
   })
 })
 
@@ -261,6 +291,10 @@ describe('emitting a window’s current tab as an index selector', () => {
       (id) => `Application("Panes").windows.byId(${String(id)}).currentTab`,
     ],
     ['a specifier by name', () => 'Application("Panes").windows.byId(2).tabs.byName("Tests")'],
+    [
+      'a position in another collection',
+      () => 'Application("Panes").windows.byId(9).sessions.at(4)',
+    ],
   ])(
     'fails with InternalError for %s, never falling back to the index property',
     async (_label, display) => {
@@ -486,5 +520,268 @@ describe('references to a positional resource the executor refuses before anythi
 
     expect(internalMessage(error)).toBe(message)
     expect(run).not.toHaveBeenCalled()
+  })
+})
+
+/**
+ * Panes with a tab whose title can be set, and commands that select a tab:
+ * an update and a delete, which find it as the get does, and an application
+ * command that takes a tab, which the codec converts as an input position.
+ */
+const PANES_WITH_TAB_COMMANDS = parseManifestYaml(
+  PANES_MANIFEST_YAML.replace(
+    '      title:\n        access: r\n',
+    '      title:\n        access: rw\n'
+  ) +
+    `  updateTab:
+    name: update
+    description: Rename a tab
+    scope: resource
+    resourceType: Tab
+    parent: { resource: Window, parameter: windowId }
+    parameters:
+      - { name: windowId, type: integer, description: The window, required: true }
+      - { name: index, type: integer, description: The tab, required: true }
+      - { name: title, type: string, description: The new title, required: false }
+  closeTab:
+    name: delete
+    description: Close a tab
+    scope: resource
+    resourceType: Tab
+    parent: { resource: Window, parameter: windowId }
+    parameters:
+      - { name: windowId, type: integer, description: The window, required: true }
+      - { name: index, type: integer, description: The tab, required: true }
+  focusTab:
+    name: focusTab
+    description: Bring a tab to the front
+    scope: application
+    parameters:
+      - { name: tab, type: { resource: Tab }, description: The tab, required: true }
+`
+)
+
+/** A request against {@link PANES_WITH_TAB_COMMANDS}, or `manifest`, with wire inputs. */
+function tabCommand(
+  command: string,
+  resource: string | undefined,
+  input: Readonly<Record<string, unknown>>,
+  inputPlan: Readonly<Record<string, ValuePlan>>,
+  outputPlan: ValuePlan,
+  manifest: AppManifest = PANES_WITH_TAB_COMMANDS
+): ExecutionRequest {
+  return {
+    manifest,
+    target: resource === undefined ? { command } : { command, resource },
+    input: input as ExecutionRequest['input'],
+    inputPlan: {
+      kind: 'record',
+      fields: Object.fromEntries(
+        Object.entries(inputPlan).map(([key, value]) => [key, { presence: 'required', value }])
+      ),
+    },
+    outputPlan,
+    resourcePlans: { ...RESOURCE_PLANS, Session: { id: { kind: 'integer' } } },
+  }
+}
+
+const INTEGER: ValuePlan = { kind: 'integer' }
+
+/** A stand-in Panes app that also brings a tab to the front, reporting the tab's title. */
+function focusingExecutor(lookups: string[]) {
+  const { app, automation } = standInPanes(WINDOWS, { lookups })
+  const focusTab = (params: { readonly tab: { readonly title: () => string } }) =>
+    params.tab.title()
+  return createNativeExecutor({
+    transport: standInTransport({ ...app, focusTab }, [], automation),
+  })
+}
+
+describe('an index selector at an input position', () => {
+  const take = (reference: SelectorWire) =>
+    tabCommand(
+      'focusTab',
+      undefined,
+      { tab: { reference } },
+      { tab: { kind: 'reference', resource: 'Tab', cardinality: 'one' } },
+      { kind: 'string' }
+    )
+
+  it('hands the command the tab at that position within its window', async () => {
+    const lookups: string[] = []
+
+    await expect(focusingExecutor(lookups).execute(take(tabAt(2, 1)))).resolves.toBe('Tests')
+    expect(lookups).toEqual(['windows.byId(2)', 'windows.byId(2).tabs.at(1)'])
+  })
+
+  it('fails with InvalidSelectionError naming Tab for a position past the window’s tabs', async () => {
+    const lookups: string[] = []
+
+    const error = await rejectionOf(focusingExecutor(lookups).execute(take(tabAt(2, 5))))
+
+    expect(detailsOf(error, InvalidSelectionError)).toEqual({ resource: 'Tab' })
+    expect(error instanceof InvalidSelectionError ? error.message : undefined).toBe(
+      'The Tab collection in Panes has no item at the position the reference at `tab` selects.'
+    )
+    expect(lookups).toEqual(['windows.byId(2)'])
+  })
+})
+
+describe('updating and deleting a tab by its position within its window', () => {
+  const position = { windowId: { integer: '2' }, index: { integer: '1' } }
+
+  it('updates the tab at that position, as the get finds it', async () => {
+    const lookups: string[] = []
+
+    const result = await panesExecutor({ lookups }).execute(
+      tabCommand(
+        'updateTab',
+        'Tab',
+        { ...position, title: 'Renamed' },
+        { windowId: INTEGER, index: INTEGER, title: { kind: 'string' } },
+        TAB_PLAN
+      )
+    )
+
+    expect(result).toEqual({ index: integer(2), title: 'Renamed' })
+    expect(lookups).toEqual([
+      'windows.byId(2)',
+      'windows.byId(2).tabs.at(1)',
+      'windows.byId(2).tabs.at(1).title = Renamed',
+    ])
+  })
+
+  it('deletes the tab at that position, as the get finds it', async () => {
+    const lookups: string[] = []
+
+    await panesExecutor({ lookups }).execute(
+      tabCommand(
+        'closeTab',
+        'Tab',
+        position,
+        { windowId: INTEGER, index: INTEGER },
+        {
+          kind: 'none',
+        }
+      )
+    )
+
+    expect(lookups).toEqual([
+      'windows.byId(2)',
+      'windows.byId(2).tabs.at(1)',
+      'windows.byId(2).tabs.at(1).delete()',
+    ])
+  })
+
+  it.each<[string, Readonly<Record<string, ValuePlan>>]>([
+    ['update', { windowId: INTEGER, index: INTEGER, title: { kind: 'string' } }],
+    ['delete', { windowId: INTEGER, index: INTEGER }],
+  ])(
+    'fails the %s with InvalidSelectionError naming Tab past the window’s tabs, changing nothing',
+    async (operationName, plan) => {
+      const lookups: string[] = []
+      const input = { windowId: { integer: '2' }, index: { integer: '2' }, title: 'Renamed' }
+      const command = operationName === 'update' ? 'updateTab' : 'closeTab'
+
+      const error = await rejectionOf(
+        panesExecutor({ lookups }).execute(
+          tabCommand(
+            command,
+            'Tab',
+            Object.fromEntries(
+              Object.keys(plan).map((key) => [key, input[key as keyof typeof input]])
+            ),
+            plan,
+            operationName === 'update' ? TAB_PLAN : { kind: 'none' }
+          )
+        )
+      )
+
+      expect(detailsOf(error, InvalidSelectionError)).toEqual({ resource: 'Tab' })
+      expect(lookups).toEqual(['windows.byId(2)'])
+    }
+  )
+})
+
+/**
+ * Panes with an identified Session found within its Tab, and an application
+ * command that takes a session. The manifest rule refuses a positional
+ * parent, so this is built past the schema, as a caller may hand the
+ * executor a manifest object; the codec must refuse it on its own (D7: a
+ * selector never appears inside a container).
+ */
+function panesWithSessions(): AppManifest {
+  const manifest = panesManifest()
+  manifest.resources['Session'] = {
+    name: 'Session',
+    plural: 'Sessions',
+    description: 'A session of a tab',
+    properties: {
+      id: {
+        access: 'r',
+        type: 'integer',
+        description: "The session's id",
+        code: 'ID  ',
+        optional: false,
+      },
+    },
+    identifiers: [{ property: 'id', primary: true }],
+  }
+  manifest.commands['getSession'] = {
+    name: 'get',
+    description: 'Get a session of a tab',
+    scope: 'resource',
+    resourceType: 'Session',
+    parent: { resource: 'Tab', parameter: 'tab' },
+    parameters: [
+      { name: 'tab', type: 'integer', description: 'The tab', required: true },
+      { name: 'id', type: 'integer', description: 'The session', required: true },
+    ],
+  }
+  manifest.commands['focusSession'] = {
+    name: 'focusSession',
+    description: 'Bring a session to the front',
+    scope: 'application',
+    parameters: [
+      {
+        name: 'session',
+        type: { resource: 'Session' },
+        description: 'The session',
+        required: true,
+      },
+    ],
+  }
+  return manifest
+}
+
+describe('an input reference whose container chain holds an index selector', () => {
+  it('is refused as a reference the provider cannot convert, looking nothing up', async () => {
+    const lookups: string[] = []
+    const session = {
+      resource: 'Session',
+      form: 'identity',
+      cardinality: 'one',
+      id: integer(1),
+      container: tabAt(1, 1),
+    }
+
+    const error = await rejectionOf(
+      panesExecutor({ lookups }).execute(
+        tabCommand(
+          'focusSession',
+          undefined,
+          { session: { reference: session } },
+          { session: { kind: 'reference', resource: 'Session', cardinality: 'one' } },
+          { kind: 'none' },
+          panesWithSessions()
+        )
+      )
+    )
+
+    expect(internalMessage(error)).toBe(
+      // The failure names the level that cannot convert: the session's container.
+      'The Panes operation "focusSession" takes a reference at `session.container` that the macOS provider cannot convert yet.'
+    )
+    expect(lookups).toEqual([])
   })
 })
