@@ -9,7 +9,8 @@ export class ListSchemesCommand extends Command {
   static override paths = [['xcode', 'workspaceDocuments', 'schemes', 'list']]
 
   static override usage = Command.Usage({
-    description: 'List schemes',
+    description:
+      "List schemes. When several workspace documents share the same name, the first match in the app's order is used as the workspace document.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

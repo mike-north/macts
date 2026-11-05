@@ -9,7 +9,8 @@ export class ListAutomatorActionsCommand extends Command {
   static override paths = [['automator', 'workflows', 'actions', 'list']]
 
   static override usage = Command.Usage({
-    description: 'List automator actions',
+    description:
+      "List automator actions. When several workflows share the same name, the first match in the app's order is used as the workflow.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

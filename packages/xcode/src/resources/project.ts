@@ -23,6 +23,7 @@ export class ProjectResourceClient {
 
   /**
    * List the projects of one workspace document, as one page.
+   * When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
    */
   async list(workspaceName: string): Promise<Page<Project>> {
     return this.#http.rpc<Page<Project>>(`${this.#app}.${this.#resource}.list`, { workspaceName })
@@ -30,6 +31,7 @@ export class ProjectResourceClient {
 
   /**
    * Get a project by id within a parent scope.
+   * When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
    */
   async get(workspaceName: string, id: string): Promise<Project> {
     return this.#http.rpc<Project>(`${this.#app}.${this.#resource}.get`, { workspaceName, id })
