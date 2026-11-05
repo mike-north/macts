@@ -36,6 +36,8 @@ export interface Window {
   zoomed: boolean
   /** Whether the window is currently the frontmost window. */
   frontmost: boolean
+  /** The currently selected tab */
+  currentTab: Tab
   /** Whether the window is a hotkey window. */
   isHotkeyWindow: boolean
   /** If the window is a hotkey window, this gives the name of the profile that created the window. */
@@ -64,6 +66,8 @@ export interface WindowCreateInput {
   zoomed?: boolean
   /** Whether the window is currently the frontmost window. */
   frontmost?: boolean
+  /** The currently selected tab */
+  currentTab?: Tab
   /** Whether the window is a hotkey window. */
   isHotkeyWindow?: boolean
   /** If the window is a hotkey window, this gives the name of the profile that created the window. */
@@ -277,6 +281,7 @@ export const WindowSchema = z.object({
   zoomable: z.boolean(),
   zoomed: z.boolean(),
   frontmost: z.boolean(),
+  currentTab: z.string(),
   isHotkeyWindow: z.boolean(),
   hotkeyWindowProfile: z.string(),
   position: z.object({ x: z.number(), y: z.number() }),

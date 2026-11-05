@@ -1793,6 +1793,9 @@ importers:
       '@macts/google-chrome':
         specifier: workspace:*
         version: link:../google-chrome
+      '@macts/iterm':
+        specifier: workspace:*
+        version: link:../iterm
       '@macts/microsoft-edge':
         specifier: workspace:*
         version: link:../microsoft-edge

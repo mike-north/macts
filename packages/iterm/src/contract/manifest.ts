@@ -260,6 +260,14 @@ export const manifest: unknown = {
           optional: false,
         },
       },
+      positional: {
+        evidence: {
+          source: 'curated',
+          note: "Observed on 2026-11-04 on iTerm 3.7.6, macOS 27.2, iTerm launched then quit, read only: 5 windows, 1 tab each. Window ids were integers and distinct, and windows.byId(id) round-tripped 5 of 5. Window index values were 1..5, one-based; tab index was 0, zero-based. currentTab read back as windows.byId(N).tabs.at(N), with N equal to the tab's index. tabs.at(N) gave the same tab (the same session ids) on 5 of 5. 2+ tabs per window were not observed.",
+          observedAt: '2026-11-04T00:00:00.000Z',
+          appVersion: '3.7.6',
+        },
+      },
     },
     Session: {
       name: 'Session',
@@ -767,6 +775,73 @@ export const manifest: unknown = {
   },
   relationships: [],
   commands: {
+    listWindows: {
+      name: 'list',
+      description: 'List the windows',
+      scope: 'resource',
+      resourceType: 'Window',
+      parameters: [],
+      routeName: 'list',
+    },
+    getWindow: {
+      name: 'get',
+      description: 'Get a window by its ID',
+      scope: 'resource',
+      resourceType: 'Window',
+      parameters: [
+        {
+          name: 'id',
+          type: 'integer',
+          description: 'Window identifier',
+          required: true,
+        },
+      ],
+      routeName: 'get',
+    },
+    listTabs: {
+      name: 'list',
+      description: 'List the tabs of a window',
+      scope: 'resource',
+      resourceType: 'Tab',
+      parameters: [
+        {
+          name: 'windowId',
+          type: 'integer',
+          description: 'Window identifier',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
+      routeName: 'list',
+    },
+    getTab: {
+      name: 'get',
+      description: 'Get a tab of a window by its position',
+      scope: 'resource',
+      resourceType: 'Tab',
+      parameters: [
+        {
+          name: 'windowId',
+          type: 'integer',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'index',
+          type: 'integer',
+          description: 'The zero-based position of the tab within its window',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
+      routeName: 'get',
+    },
     count: {
       name: 'count',
       description: 'Return the number of elements of a particular class within an object.',

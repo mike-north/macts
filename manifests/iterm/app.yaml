@@ -171,6 +171,23 @@ resources:
     plural: Tabs
     description: A terminal tab
     code: Trmt
+    # The dictionary gives a tab no id property, and the app's own specifier
+    # for a window's current tab addresses it by position within the window.
+    # A tab's `index` property is not used as that position: its base is the
+    # app's, and the window `index` counts from 1. The probe recorded the date
+    # only, so `observedAt` is that day's start.
+    positional:
+      evidence:
+        source: curated
+        note: >-
+          Observed on 2026-11-04 on iTerm 3.7.6, macOS 27.2, iTerm launched then quit, read
+          only: 5 windows, 1 tab each. Window ids were integers and distinct, and
+          windows.byId(id) round-tripped 5 of 5. Window index values were 1..5, one-based; tab
+          index was 0, zero-based. currentTab read back as windows.byId(N).tabs.at(N), with N
+          equal to the tab's index. tabs.at(N) gave the same tab (the same session ids) on 5 of
+          5. 2+ tabs per window were not observed.
+        observedAt: '2026-11-04T00:00:00.000Z'
+        appVersion: '3.7.6'
     properties:
       currentSession:
         access: rw
@@ -559,6 +576,58 @@ hierarchy:
               access: r
               description: A terminal session
 commands:
+  listWindows:
+    name: list
+    routeName: list
+    description: List the windows
+    scope: resource
+    resourceType: Window
+    parameters: []
+  getWindow:
+    name: get
+    routeName: get
+    description: Get a window by its ID
+    scope: resource
+    resourceType: Window
+    parameters:
+      - name: id
+        type: integer
+        description: Window identifier
+        required: true
+  # A tab is an element of its window only, and has no id, so it is listed
+  # and got within the window, by its zero-based position there.
+  listTabs:
+    name: list
+    routeName: list
+    description: List the tabs of a window
+    scope: resource
+    resourceType: Tab
+    parent:
+      resource: Window
+      parameter: windowId
+    parameters:
+      - name: windowId
+        type: integer
+        description: Window identifier
+        required: true
+  getTab:
+    name: get
+    routeName: get
+    description: Get a tab of a window by its position
+    scope: resource
+    resourceType: Tab
+    parent:
+      resource: Window
+      parameter: windowId
+    parameters:
+      - name: windowId
+        type: integer
+        description: Window identifier
+        required: true
+      - name: index
+        type: integer
+        description: The zero-based position of the tab within its window
+        required: true
   count:
     name: count
     description: Return the number of elements of a particular class within an object.
