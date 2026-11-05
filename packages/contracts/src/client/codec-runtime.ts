@@ -34,7 +34,6 @@
  * It depends only on `@macts/contracts`, because the remote entry point uses it
  * and must never load the Mac-side runtime.
  *
- * @packageDocumentation
  */
 
 import {

@@ -24,7 +24,6 @@
  * This module depends only on `@macts/contracts`, so a remote client never
  * loads the Mac-side runtime or native execution.
  *
- * @packageDocumentation
  */
 
 import {
