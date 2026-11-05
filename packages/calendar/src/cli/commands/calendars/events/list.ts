@@ -9,7 +9,8 @@ export class ListEventsCommand extends Command {
   static override paths = [['calendar', 'calendars', 'events', 'list']]
 
   static override usage = Command.Usage({
-    description: 'List events',
+    description:
+      "List events. When several calendars share the same name, the first match in the app's order is used as the calendar.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

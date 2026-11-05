@@ -9,7 +9,8 @@ export class ListProjectsCommand extends Command {
   static override paths = [['xcode', 'workspaceDocuments', 'projects', 'list']]
 
   static override usage = Command.Usage({
-    description: 'List projects',
+    description:
+      "List projects. When several workspace documents share the same name, the first match in the app's order is used as the workspace document.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

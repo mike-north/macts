@@ -9,7 +9,8 @@ export class GetEventCommand extends Command {
   static override paths = [['calendar', 'calendars', 'events', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get an event by uid',
+    description:
+      "Get an event by uid. When several calendars share the same name, the first match in the app's order is used as the calendar.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
