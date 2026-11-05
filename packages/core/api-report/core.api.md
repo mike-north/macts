@@ -178,6 +178,15 @@ export const AppManifestSchema: z.ZodObject<{
                     note: z.ZodString;
                     observedAt: z.ZodOptional<z.ZodISODateTime>;
                     appVersion: z.ZodOptional<z.ZodString>;
+                    absentReads: z.ZodOptional<z.ZodObject<{
+                        observedAt: z.ZodISODateTime;
+                        bundleId: z.ZodString;
+                        appVersion: z.ZodString;
+                        osVersion: z.ZodString;
+                        failedReads: z.ZodNumber;
+                        errorNumbers: z.ZodArray<z.ZodNumber>;
+                        reason: z.ZodString;
+                    }, z.core.$strict>>;
                 }, z.core.$strip>, z.ZodObject<{
                     source: z.ZodLiteral<"sdef">;
                     note: z.ZodOptional<z.ZodString>;
@@ -325,6 +334,15 @@ export const AppManifestSchema: z.ZodObject<{
                     note: z.ZodString;
                     observedAt: z.ZodOptional<z.ZodISODateTime>;
                     appVersion: z.ZodOptional<z.ZodString>;
+                    absentReads: z.ZodOptional<z.ZodObject<{
+                        observedAt: z.ZodISODateTime;
+                        bundleId: z.ZodString;
+                        appVersion: z.ZodString;
+                        osVersion: z.ZodString;
+                        failedReads: z.ZodNumber;
+                        errorNumbers: z.ZodArray<z.ZodNumber>;
+                        reason: z.ZodString;
+                    }, z.core.$strict>>;
                 }, z.core.$strip>, z.ZodObject<{
                     source: z.ZodLiteral<"sdef">;
                     note: z.ZodOptional<z.ZodString>;
@@ -514,6 +532,15 @@ export const AppManifestSchema: z.ZodObject<{
                     note: z.ZodString;
                     observedAt: z.ZodOptional<z.ZodISODateTime>;
                     appVersion: z.ZodOptional<z.ZodString>;
+                    absentReads: z.ZodOptional<z.ZodObject<{
+                        observedAt: z.ZodISODateTime;
+                        bundleId: z.ZodString;
+                        appVersion: z.ZodString;
+                        osVersion: z.ZodString;
+                        failedReads: z.ZodNumber;
+                        errorNumbers: z.ZodArray<z.ZodNumber>;
+                        reason: z.ZodString;
+                    }, z.core.$strict>>;
                 }, z.core.$strip>, z.ZodObject<{
                     source: z.ZodLiteral<"sdef">;
                     note: z.ZodOptional<z.ZodString>;
@@ -875,6 +902,12 @@ export const CardinalitySchema: z.ZodEnum<{
 }>;
 
 // @public
+export function checkCuratedAbsence(resource: ClaimResource & {
+    readonly properties: Readonly<Record<string, NullabilityClaim>>;
+    readonly inheritedClaims?: Readonly<Record<string, NullabilityClaim>> | undefined;
+}, ctx: z.RefinementCtx): void;
+
+// @public
 export function checkNullabilityClaim(claim: NullabilityClaim, ctx: z.RefinementCtx): void;
 
 // @public
@@ -888,6 +921,11 @@ export function checkPermissions(grantedPermissions: string[], requiredPermissio
 
 // @public
 export type ClaimChange = 'set' | 'refreshed' | 'unchanged';
+
+// @public
+export interface ClaimResource {
+    readonly roots?: Readonly<Record<string, unknown>> | undefined;
+}
 
 // @public
 export function classifyCommandRisk(command: Command): RiskClass;
@@ -993,6 +1031,15 @@ export const CommandParameterSchema: z.ZodObject<{
             note: z.ZodString;
             observedAt: z.ZodOptional<z.ZodISODateTime>;
             appVersion: z.ZodOptional<z.ZodString>;
+            absentReads: z.ZodOptional<z.ZodObject<{
+                observedAt: z.ZodISODateTime;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                failedReads: z.ZodNumber;
+                errorNumbers: z.ZodArray<z.ZodNumber>;
+                reason: z.ZodString;
+            }, z.core.$strict>>;
         }, z.core.$strip>, z.ZodObject<{
             source: z.ZodLiteral<"sdef">;
             note: z.ZodOptional<z.ZodString>;
@@ -1046,6 +1093,15 @@ export const CommandSchema: z.ZodObject<{
                 note: z.ZodString;
                 observedAt: z.ZodOptional<z.ZodISODateTime>;
                 appVersion: z.ZodOptional<z.ZodString>;
+                absentReads: z.ZodOptional<z.ZodObject<{
+                    observedAt: z.ZodISODateTime;
+                    bundleId: z.ZodString;
+                    appVersion: z.ZodString;
+                    osVersion: z.ZodString;
+                    failedReads: z.ZodNumber;
+                    errorNumbers: z.ZodArray<z.ZodNumber>;
+                    reason: z.ZodString;
+                }, z.core.$strict>>;
             }, z.core.$strip>, z.ZodObject<{
                 source: z.ZodLiteral<"sdef">;
                 note: z.ZodOptional<z.ZodString>;
@@ -1190,6 +1246,20 @@ export function createPolicyGovernanceFilter(policy: GovernancePolicy): Governan
 export function createStaticApprovalProvider(options: StaticApprovalProviderOptions): ApprovalProvider;
 
 // @public (undocumented)
+export type CuratedAbsentReads = z.infer<typeof CuratedAbsentReadsSchema>;
+
+// @public
+export const CuratedAbsentReadsSchema: z.ZodObject<{
+    observedAt: z.ZodISODateTime;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    failedReads: z.ZodNumber;
+    errorNumbers: z.ZodArray<z.ZodNumber>;
+    reason: z.ZodString;
+}, z.core.$strict>;
+
+// @public (undocumented)
 export type CuratedNullabilityEvidence = z.infer<typeof CuratedNullabilityEvidenceSchema>;
 
 // @public
@@ -1198,6 +1268,15 @@ export const CuratedNullabilityEvidenceSchema: z.ZodObject<{
     note: z.ZodString;
     observedAt: z.ZodOptional<z.ZodISODateTime>;
     appVersion: z.ZodOptional<z.ZodString>;
+    absentReads: z.ZodOptional<z.ZodObject<{
+        observedAt: z.ZodISODateTime;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        failedReads: z.ZodNumber;
+        errorNumbers: z.ZodArray<z.ZodNumber>;
+        reason: z.ZodString;
+    }, z.core.$strict>>;
 }, z.core.$strip>;
 
 // @public
@@ -1802,6 +1881,9 @@ export function groupPermissionsByResource(permissions: string[]): Map<string, s
 export function hasPermission(grantedPermissions: string[], requiredPermission: string, permissionHistory?: PermissionHistoryEntry[]): PermissionCheckResult;
 
 // @public
+export function hasSingleInstance(resource: ClaimResource): boolean;
+
+// @public
 export const HEAVY_PROPERTY_NAMES: readonly string[];
 
 // @public (undocumented)
@@ -2218,6 +2300,7 @@ export type NativeAddressing = NativeCollectionAddressing | NativeRootAddressing
 
 // @public
 export interface NativeBodyOptions {
+    readonly absentValueMarkers?: boolean;
     readonly containerReferences?: boolean;
     readonly identifierAliases?: boolean;
     readonly paged?: boolean;
@@ -2254,6 +2337,7 @@ export type NativeFailure = {
     readonly message: string;
     readonly errorNumber?: number;
     readonly missingResource?: string;
+    readonly reading?: string;
 } | {
     readonly source: 'collection';
     readonly message: string;
@@ -2359,6 +2443,15 @@ export const NullabilityEvidenceSchema: z.ZodDiscriminatedUnion<[z.ZodObject<{
     note: z.ZodString;
     observedAt: z.ZodOptional<z.ZodISODateTime>;
     appVersion: z.ZodOptional<z.ZodString>;
+    absentReads: z.ZodOptional<z.ZodObject<{
+        observedAt: z.ZodISODateTime;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        failedReads: z.ZodNumber;
+        errorNumbers: z.ZodArray<z.ZodNumber>;
+        reason: z.ZodString;
+    }, z.core.$strict>>;
 }, z.core.$strip>, z.ZodObject<{
     source: z.ZodLiteral<"sdef">;
     note: z.ZodOptional<z.ZodString>;
@@ -2884,6 +2977,15 @@ export const PropertyClaimsSchema: z.ZodObject<{
             note: z.ZodString;
             observedAt: z.ZodOptional<z.ZodISODateTime>;
             appVersion: z.ZodOptional<z.ZodString>;
+            absentReads: z.ZodOptional<z.ZodObject<{
+                observedAt: z.ZodISODateTime;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                failedReads: z.ZodNumber;
+                errorNumbers: z.ZodArray<z.ZodNumber>;
+                reason: z.ZodString;
+            }, z.core.$strict>>;
         }, z.core.$strip>, z.ZodObject<{
             source: z.ZodLiteral<"sdef">;
             note: z.ZodOptional<z.ZodString>;
@@ -2950,6 +3052,15 @@ export const PropertyEvidenceSchema: z.ZodObject<{
         note: z.ZodString;
         observedAt: z.ZodOptional<z.ZodISODateTime>;
         appVersion: z.ZodOptional<z.ZodString>;
+        absentReads: z.ZodOptional<z.ZodObject<{
+            observedAt: z.ZodISODateTime;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            failedReads: z.ZodNumber;
+            errorNumbers: z.ZodArray<z.ZodNumber>;
+            reason: z.ZodString;
+        }, z.core.$strict>>;
     }, z.core.$strip>, z.ZodObject<{
         source: z.ZodLiteral<"sdef">;
         note: z.ZodOptional<z.ZodString>;
@@ -3051,6 +3162,15 @@ export const PropertySchema: z.ZodObject<{
             note: z.ZodString;
             observedAt: z.ZodOptional<z.ZodISODateTime>;
             appVersion: z.ZodOptional<z.ZodString>;
+            absentReads: z.ZodOptional<z.ZodObject<{
+                observedAt: z.ZodISODateTime;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                failedReads: z.ZodNumber;
+                errorNumbers: z.ZodArray<z.ZodNumber>;
+                reason: z.ZodString;
+            }, z.core.$strict>>;
         }, z.core.$strip>, z.ZodObject<{
             source: z.ZodLiteral<"sdef">;
             note: z.ZodOptional<z.ZodString>;
@@ -3250,7 +3370,7 @@ export interface ReadFailureDefect {
 export function readMacosVersion(): Promise<string>;
 
 // @public
-export function readsAbsentAsNull(claim: NullabilityClaim): boolean;
+export function readsAbsentAsNull(claim: NullabilityClaim, resource: ClaimResource): boolean;
 
 // @public
 export function recordApprovalCancellation(options: RecordApprovalCancellationOptions): Promise<AuditDecision>;
@@ -3620,6 +3740,15 @@ export const ResourceSchema: z.ZodObject<{
                 note: z.ZodString;
                 observedAt: z.ZodOptional<z.ZodISODateTime>;
                 appVersion: z.ZodOptional<z.ZodString>;
+                absentReads: z.ZodOptional<z.ZodObject<{
+                    observedAt: z.ZodISODateTime;
+                    bundleId: z.ZodString;
+                    appVersion: z.ZodString;
+                    osVersion: z.ZodString;
+                    failedReads: z.ZodNumber;
+                    errorNumbers: z.ZodArray<z.ZodNumber>;
+                    reason: z.ZodString;
+                }, z.core.$strict>>;
             }, z.core.$strip>, z.ZodObject<{
                 source: z.ZodLiteral<"sdef">;
                 note: z.ZodOptional<z.ZodString>;
@@ -3767,6 +3896,15 @@ export const ResourceSchema: z.ZodObject<{
                 note: z.ZodString;
                 observedAt: z.ZodOptional<z.ZodISODateTime>;
                 appVersion: z.ZodOptional<z.ZodString>;
+                absentReads: z.ZodOptional<z.ZodObject<{
+                    observedAt: z.ZodISODateTime;
+                    bundleId: z.ZodString;
+                    appVersion: z.ZodString;
+                    osVersion: z.ZodString;
+                    failedReads: z.ZodNumber;
+                    errorNumbers: z.ZodArray<z.ZodNumber>;
+                    reason: z.ZodString;
+                }, z.core.$strict>>;
             }, z.core.$strip>, z.ZodObject<{
                 source: z.ZodLiteral<"sdef">;
                 note: z.ZodOptional<z.ZodString>;

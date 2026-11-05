@@ -22,10 +22,13 @@
  * kind no curated mapping names, and the `ring` command's `desk` parameter,
  * an input reference by kind.
  *
- * Absence (phases/13 D10, nullability evidence): `Entry.shelfMark` and
- * `Desk.bell` claim nullable with probe evidence whose failed reads all found
- * no such object, so such a read is an empty value. `Entry.summary` makes no
- * claim, so a failed read of it is not.
+ * Absence (phases/13 D10, nullability evidence): `Entry.shelfMark`,
+ * `Entry.shelf` and `Desk.bell` claim nullable with probe evidence whose
+ * failed reads all found no such object, so such a read is an empty value.
+ * `Entry.shelf` holds a reference, so the app can also report its volume
+ * missing only when the volume's id is read to encode it, which is the empty
+ * value too. `Entry.summary` and `Entry.holder` make no claim, so a failed
+ * read of either, or of the holder's own identity, is not.
  */
 
 import { parseManifestYaml } from '../loader.js'
@@ -96,6 +99,23 @@ resources:
             nullCount: 0
             failedReads: 2
             errorNumbers: [-1728]
+      shelf:
+        access: r
+        type: { resource: Volume }
+        description: The volume the entry is shelved in, on entries that have been shelved
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T12:00:00.000Z'
+            bundleId: com.example.archive
+            appVersion: '1.0'
+            osVersion: '27.2'
+            sampleSize: 2
+            nullCount: 0
+            failedReads: 1
+            errorNumbers: [-1728]
+            note: The probe read each entry's shelf as a generated body does, the shelf and then its id.
       summary:
         access: r
         type: string

@@ -2010,8 +2010,17 @@ export function readNullabilityNote(resolution: NullabilityResolution, appName: 
       }
       return `Nullable. Observed missing in ${String(basis.nullCount)} of ${String(basis.sampleSize)} items (${provenance}).`
     }
-    case 'curated':
+    case 'curated': {
+      const reads = basis.absentReads
+      if (nullable && reads !== undefined) {
+        // A single instance's absence, curated as depending on the data
+        // (phases/13 D10): the reason, then the reads that showed it.
+        const reason = reads.reason.trim().replace(/[.!?]$/, '')
+        const count = String(reads.failedReads)
+        return `Nullable: ${reason}. The app reported no value in ${count} of ${count} reads (${observationProvenance(appName, reads)}).`
+      }
       return `${nullable ? 'Nullable' : 'Never null'}: ${curatedBasis(appName, basis)}`
+    }
     case 'sdef':
       return "Nullable: declared by the app's scripting dictionary."
   }

@@ -24,6 +24,7 @@ import {
 } from './executor.js'
 import {
   NATIVE_CODEC,
+  NATIVE_READING_KEY,
   type NativeCodec,
   type NativeReferenceTable,
   type NativeScript,
@@ -581,6 +582,29 @@ describe('runNativeScript', () => {
   )
 
   it(
+    'keeps what an app failure says was being read, with its number',
+    async () => {
+      // A list body or the codec notes the read an app error escaped from.
+      const outcome = await runNativeScript(
+        nativeScript({
+          body: `var missing = new Error('No such object.'); missing.errorNumber = -1728; missing[${JSON.stringify(NATIVE_READING_KEY)}] = 'the items'; throw missing;`,
+        }),
+        NATIVE_CODEC
+      )
+      expect(outcome).toEqual({
+        ok: false,
+        failure: {
+          source: 'app',
+          message: 'No such object.',
+          errorNumber: -1728,
+          reading: 'the items',
+        },
+      })
+    },
+    HOST_TEST_TIMEOUT_MS
+  )
+
+  it(
     'reports a thrown non-error value as an app failure without a number',
     async () => {
       const outcome = await runNativeScript(
@@ -685,6 +709,10 @@ describe('runNativeScript', () => {
       [
         'an app failure with a non-text missing resource',
         '{"ok":false,"failure":{"source":"app","message":"m","errorNumber":-1728,"missingResource":1}}',
+      ],
+      [
+        'an app failure with a non-text reading',
+        '{"ok":false,"failure":{"source":"app","message":"m","errorNumber":-1728,"reading":1}}',
       ],
       [
         'a codec failure with no direction',

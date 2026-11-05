@@ -44,6 +44,7 @@ import {
   NATIVE_COLLECTION_CHANGED_ERROR_NAME,
   NATIVE_DECODE_FUNCTION,
   NATIVE_ENCODE_FUNCTION,
+  NATIVE_READING_KEY,
   type NativeCodec,
   type NativeFailure,
   type NativeOutcome,
@@ -302,7 +303,8 @@ function embedJson(value: unknown): string {
  * has one; a changed collection, recognized by its marker name, keeps its
  * message; anything else
  * is an app or bridge failure that keeps its message and, when it carries one,
- * its numeric error code and the resource of the object found missing.
+ * its numeric error code, the resource of the object found missing, and what
+ * was being read when the app failed ({@link NATIVE_READING_KEY}).
  */
 const DESCRIBE_THROWN = [
   `    if (e !== null && typeof e === 'object' && e.name === ${JSON.stringify(NATIVE_CODEC_ERROR_NAME)}) {`,
@@ -324,6 +326,9 @@ const DESCRIBE_THROWN = [
   '    }',
   "    if (e !== null && e !== undefined && typeof e.missingResource === 'string') {",
   '      failure.missingResource = e.missingResource;',
+  '    }',
+  `    if (e !== null && e !== undefined && typeof e[${JSON.stringify(NATIVE_READING_KEY)}] === 'string') {`,
+  `      failure.reading = e[${JSON.stringify(NATIVE_READING_KEY)}];`,
   '    }',
   '    return { ok: false, failure: failure };',
 ].join('\n')
@@ -421,17 +426,22 @@ function parseNativeFailure(value: unknown): NativeFailure | string {
     case 'app': {
       const errorNumber = value['errorNumber']
       const missingResource = value['missingResource']
+      const reading = value['reading']
       if (errorNumber !== undefined && typeof errorNumber !== 'number') {
         return 'the app failure has a non-numeric error number'
       }
       if (missingResource !== undefined && typeof missingResource !== 'string') {
         return 'the app failure has a non-text missing resource'
       }
+      if (reading !== undefined && typeof reading !== 'string') {
+        return 'the app failure has a non-text reading'
+      }
       return {
         source: 'app',
         message,
         ...(errorNumber === undefined ? {} : { errorNumber }),
         ...(missingResource === undefined ? {} : { missingResource }),
+        ...(reading === undefined ? {} : { reading }),
       }
     }
     case 'collection':
