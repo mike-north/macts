@@ -17,7 +17,9 @@
  *   app is refused.
  *
  * Its generated docs say the item is not sent, in every place the generator
- * documents the command; the expected sentence is written by hand.
+ * documents the command; the expected sentence is written by hand. Its CLI
+ * command keeps the inputs it had before #287, so its usage changes only
+ * when it can select its item.
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md §D5
  * @see https://github.com/mike-north/macts/issues/287
@@ -220,5 +222,36 @@ describe('the generated docs of a known gap', () => {
       expect(content, path).toContain('async') // the file exists and was generated
       expect(content, path).not.toContain('does not yet send')
     }
+  })
+})
+
+describe('the generated CLI of a known gap', () => {
+  // OmniPlan's `fix` keeps the inputs its CLI command has always asked for:
+  // the hierarchy's project and scenario flags and the violation positional.
+  // None reaches the app, which is what the not-sent sentence says, and the
+  // SDK call passes only the declared parameters, of which there are none.
+  it('keeps its parent flags and positional, and adds the sentence to its help', () => {
+    const result = generateConsolidatedPackages(shipped('com.omnigroup.OmniPlan3.MacAppStore'), {
+      appName: 'omniplan',
+    })
+    expect(result.errors).toEqual([])
+    const cli = result.client.files.find(
+      (file) => file.path === 'src/cli/commands/projects/scenarios/violations/fix.ts'
+    )?.content
+    expect(cli).toContain(
+      [
+        '  static override usage = Command.Usage({',
+        '    description: "Fix a violation. macts does not yet send the violation to the app, so the app acts on whatever it chooses.",',
+        '  });',
+        '',
+        "  json = Option.Boolean('--json', { description: 'Output as JSON' });",
+        "  projectId = Option.String('--project-id', { required: true, description: 'Project ID' });",
+        "  scenarioId = Option.String('--scenario-id', { required: true, description: 'Scenario ID' });",
+        '  violationId = Option.String({ required: true });',
+        '',
+        '  async execute(): Promise<number> {',
+      ].join('\n')
+    )
+    expect(cli).toContain('      await client.violations.fix();\n')
   })
 })

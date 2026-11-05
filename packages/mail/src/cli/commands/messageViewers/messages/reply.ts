@@ -14,6 +14,11 @@ export class ReplyMessageCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
+  messageViewerId = Option.String('--message-viewer-id', {
+    required: true,
+    description: 'MessageViewer ID',
+  })
+  messageId = Option.String({ name: 'id', required: true })
   openingWindow = Option.Boolean('--opening-window', {
     description:
       'Whether the window for the reply message is shown. Default is to not show the window.',

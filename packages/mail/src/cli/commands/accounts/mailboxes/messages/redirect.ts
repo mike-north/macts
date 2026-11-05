@@ -14,6 +14,9 @@ export class RedirectMessageCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
+  accountId = Option.String('--account-id', { required: true, description: 'Account ID' })
+  mailboxId = Option.String('--mailbox-id', { required: true, description: 'Mailbox ID' })
+  messageId = Option.String({ name: 'id', required: true })
   openingWindow = Option.Boolean('--opening-window', {
     description:
       'Whether the window for the redirected message is shown. Default is to not show the window.',

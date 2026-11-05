@@ -10,6 +10,7 @@ import {
   listOperationPages,
   resolvePrimaryIdentifierProperty,
 } from '../../manifest/index.js'
+import { sendsNoItem } from '../../manifest/item-selection.js'
 import { usableProperties } from '../../manifest/unsupported.js'
 import { outputProperties } from '../../manifest/output-references.js'
 import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.js'
@@ -529,7 +530,8 @@ ${paramFlags}
 /**
  * Generate a resource-level command (like "show", "build", "send"): a command
  * that acts on one item of its resource, selected as a get selects it
- * ({@link itemCommandInputs}).
+ * ({@link itemCommandInputs}). A known gap, which cannot select its item yet,
+ * keeps the inputs it has always had ({@link itemlessCommandInputs}).
  *
  * The usage description adds the sentences the SDK and contract docs add
  * (`resourceCommandNotes`): for a resource or parent matched on a property
@@ -556,7 +558,9 @@ export function generateResourceCommand(
   const cliPath = [appName, ...hierarchyPath.path, cmdNameKebab]
 
   const methodRef = `client.${resourceAccess}.${safeIdentifier(cmd.name)}`
-  const { inputs, methodArgs } = itemCommandInputs(cmd, hierarchyPath, resource, methodRef, ctx)
+  const { inputs, methodArgs } = sendsNoItem(cmd)
+    ? itemlessCommandInputs(cmd, hierarchyPath, resource, methodRef, ctx)
+    : itemCommandInputs(cmd, hierarchyPath, resource, methodRef, ctx)
   const notes = resourceCommandNotes(cmd, resource, ctx.manifest)
   const description =
     notes.length === 0
@@ -637,7 +641,6 @@ function itemCommandInputs(
   // Inputs left out because they admit no value have no flag, no positional
   // and no position in the SDK call.
   const omitted = ctx.omittedInputs(cmd, hierarchyPath.resourceName)
-  // A known gap declares no item, so it has no positional.
   const childParam = itemIdentifierParameter(cmd)?.name
   const flagProperties = new Set(
     cmd.parameters
@@ -668,6 +671,53 @@ function itemCommandInputs(
     )
     .join(', ')
   return { inputs, methodArgs }
+}
+
+/**
+ * The inputs of a known gap (`KNOWN_ITEM_SELECTION_GAPS`), which cannot
+ * select its item yet and is called on the app with its declared parameters
+ * alone. It keeps the inputs it has always had, until the item can be
+ * selected:
+ *
+ * - a flag for each parent on the resource's place in the hierarchy;
+ * - a positional for the resource's identifier;
+ * - a flag for each declared parameter.
+ *
+ * Only the declared parameters reach the SDK call.
+ */
+function itemlessCommandInputs(
+  cmd: ManifestCommand,
+  hierarchyPath: HierarchyPath,
+  resource: Resource,
+  methodRef: string,
+  ctx: CliGeneratorContext
+): ResourceCommandInputs {
+  const idParamName = `${toCamelCase(resource.name)}Id`
+  // Names declared by command parameters, so no identifier is emitted twice.
+  const paramNames = new Set(cmd.parameters.map((p) => p.name))
+  const parentOptions = generateParentOptions(
+    hierarchyPath.parentParams.filter((p) => p.name !== idParamName && !paramNames.has(p.name))
+  )
+  const omitted = ctx.omittedInputs(cmd, hierarchyPath.resourceName)
+  const paramFlags = cmd.parameters
+    .filter((p) => !omitted.has(p.name))
+    .map((p) => generateParameterFlag(p, ctx, cmd.name))
+    .join('\n')
+  const getCommand = ctx
+    .getResourceCommands(hierarchyPath.resourceName)
+    .find((c) => c.name === 'get')
+  const idOption = paramNames.has(idParamName)
+    ? ''
+    : `${identifierPositional(idParamName, addressingIdentifier(resource, getCommand))}\n`
+  const signature = commandMethodParameters(cmd).signature.filter(
+    ({ parameter }) => !omitted.has(parameter.name)
+  )
+  const methodArgs = signature
+    .map(({ parameter }, i) =>
+      sdkArgument(safeParamProperty(parameter.name, cmd.name), methodRef, i)
+    )
+    .join(', ')
+  return { inputs: `${parentOptions}${idOption}${paramFlags}`, methodArgs }
 }
 
 /**

@@ -14,6 +14,12 @@ export class RefreshFileTrackCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
+  sourceId = Option.String('--source-id', { required: true, description: 'Source ID' })
+  libraryPlaylistId = Option.String('--library-playlist-id', {
+    required: true,
+    description: 'LibraryPlaylist ID',
+  })
+  fileTrackId = Option.String({ required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

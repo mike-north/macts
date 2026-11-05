@@ -21,7 +21,7 @@ Resource commands now send the app the item you name, and take the same inputs a
 **Breaking changes in the SDK, contract and CLI inputs:**
 
 - **Automator:** `workflows.execute(name)` takes the workflow's name, in place of `workflow`.
-- **Calendar:** `events.show(calendarId, id)`.
+- **Calendar:** `events.show(calendarId, id)`. Its docs say that when several calendars share the name, the first match is used as the calendar.
 - **Mail:** `outgoingMessages.send(id)` takes the outgoing message's integer id.
 - **Microsoft Edge:** the tab commands (`reload`, `goBack`, `goForward`, `selectAll`, `cutSelection`, `copySelection`, `pasteSelection`, `undo`, `redo`, `stop`, `viewSource` and `execute`) take `(windowId, id, ...)` in place of `tabId`.
 - **Microsoft Word:** the document commands (`activate`, `close`, `createRange`, `print`, `save` and `saveAs`) take the document's name first.
@@ -36,6 +36,6 @@ Resource commands now send the app the item you name, and take the same inputs a
 - **Mail:** `messages.bounce`, which Mail's dictionary describes as "Does nothing at all (deprecated)".
 - **System Settings:** `panes.authorize` and `panes.timedLoad`, which its dictionary says no longer do anything. With them, the SDK's `panes` client and `PaneResourceClient` are removed, since panes had no other commands.
 
-OmniPlan `fix`, Music and TV `refresh`, System Events `click`, `perform` and `select`, and Mail `forward`, `redirect` and `reply` cannot select their item yet. They behave as before, and their docs now say that macts does not yet send the item to the app. Their CLI commands no longer ask for a positional or parent flags they never used.
+OmniPlan `fix`, Music and TV `refresh`, System Events `click`, `perform` and `select`, and Mail `forward`, `redirect` and `reply` cannot select their item yet. They behave as before, with the same SDK, contract and CLI inputs, and their docs and CLI help now say that macts does not yet send the item to the app.
 
 Refs #287
