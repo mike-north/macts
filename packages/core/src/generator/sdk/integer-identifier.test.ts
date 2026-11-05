@@ -25,11 +25,13 @@ function identifier(name: string, type: 'integer' | 'string'): CommandParameter 
 }
 
 /**
- * A manifest whose `Gadget` is got by `parameters`. With a `parent`, the
- * gadget is got within its `Rack`, by the parent parameter named there.
+ * A manifest whose `Gadget` is got by `parameters`, the last of which is the
+ * gadget's identifier, of `gadgetType`. With a `parent`, the gadget is got
+ * within its `Rack`, by the parent parameter named there.
  */
 function manifestWithGet(
   parameters: readonly CommandParameter[],
+  gadgetType: 'integer' | 'string',
   parent?: { readonly parameter: string }
 ): AppManifest {
   const gadgetIdentifier = parameters[parameters.length - 1]
@@ -42,7 +44,9 @@ function manifestWithGet(
         name: 'Rack',
         plural: 'Racks',
         description: 'A rack',
-        properties: { id: { access: 'r', type: 'integer', description: 'Id', code: 'ID  ' } },
+        properties: {
+          id: { access: 'r', type: 'integer', description: 'Id', optional: false, code: 'ID  ' },
+        },
         identifiers: [{ property: 'id', primary: true }],
       },
       Gadget: {
@@ -52,8 +56,9 @@ function manifestWithGet(
         properties: {
           [gadgetIdentifier.name]: {
             access: 'r',
-            type: gadgetIdentifier.type,
+            type: gadgetType,
             description: 'Id',
+            optional: false,
             code: 'ID  ',
           },
         },
@@ -101,14 +106,14 @@ describe('legacy resource client get identifier encoding (#207)', () => {
   // Bug #207: the client sent `{ windowId }`, the caller's text, which the
   // contract's input rejects for an integer.
   it('sends an integer identifier in its integer wire form, under the parameter’s own name', () => {
-    const text = gadgetClient(manifestWithGet([identifier('windowId', 'integer')]))
+    const text = gadgetClient(manifestWithGet([identifier('windowId', 'integer')], 'integer'))
     expect(text).toContain('async get(windowId: string | number): Promise<Gadget>')
     expect(text).toContain('{ windowId: { integer: String(windowId) } }')
     expect(text).not.toContain('{ windowId }')
   })
 
   it('sends a string identifier as given', () => {
-    const text = gadgetClient(manifestWithGet([identifier('id', 'string')]))
+    const text = gadgetClient(manifestWithGet([identifier('id', 'string')], 'string'))
     expect(text).toContain('async get(id: string): Promise<Gadget>')
     expect(text).toContain('.get`, { id });')
     expect(text).not.toContain('integer')
@@ -118,7 +123,7 @@ describe('legacy resource client get identifier encoding (#207)', () => {
   // encoded the same way, and a string one beside it is not.
   it('encodes each integer identifier of a get within a parent, and only those', () => {
     const text = gadgetClient(
-      manifestWithGet([identifier('rackId', 'integer'), identifier('name', 'string')], {
+      manifestWithGet([identifier('rackId', 'integer'), identifier('name', 'string')], 'string', {
         parameter: 'rackId',
       })
     )
