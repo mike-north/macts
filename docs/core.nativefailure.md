@@ -28,6 +28,7 @@ type NativeFailure =
       readonly message: string
       readonly unsupportedKind?: string
       readonly missingResource?: string
+      readonly outOfRangeResource?: string
     }
 ```
 
@@ -35,4 +36,4 @@ type NativeFailure =
 
 ## Remarks
 
-- `app`<!-- -->: the application or the automation bridge raised an error. `errorNumber` is the bridge's numeric error code when one was provided; the executor maps it to a canonical structured error. `missingResource` is set when a body found the parent of a scoped operation missing: the failure names that resource rather than the operation's own. - `codec`<!-- -->: the codec could not convert a value. Without `unsupportedKind`<!-- -->, the value violated its plan: on `encode` the app returned something the contract does not allow, and on `decode` a bridge form could not be produced from already-validated input. With `unsupportedKind`<!-- -->, the plan has a kind (or a reference form, or a resource) the codec has no conversion for, so no value at that position could be converted. With `missingResource`<!-- -->, the input names an object of that resource that the app does not have. - `collection`<!-- -->: the collection a list read changed while it was read, so no consistent result exists (raised by list bodies with [NATIVE_COLLECTION_CHANGED_ERROR_NAME](./core.native_collection_changed_error_name.md)<!-- -->).
+- `app`<!-- -->: the application or the automation bridge raised an error. `errorNumber` is the bridge's numeric error code when one was provided; the executor maps it to a canonical structured error. `missingResource` is set when a body found the parent of a scoped operation missing: the failure names that resource rather than the operation's own. - `codec`<!-- -->: the codec could not convert a value. Without `unsupportedKind`<!-- -->, the value violated its plan: on `encode` the app returned something the contract does not allow, and on `decode` a bridge form could not be produced from already-validated input. With `unsupportedKind`<!-- -->, the plan has a kind (or a reference form, or a resource) the codec has no conversion for, so no value at that position could be converted. With `missingResource`<!-- -->, the input names an object of that resource that the app does not have. With `outOfRangeResource`<!-- -->, the input names a position of that resource its container's collection does not reach. - `collection`<!-- -->: the collection a list read changed while it was read, so no consistent result exists (raised by list bodies with [NATIVE_COLLECTION_CHANGED_ERROR_NAME](./core.native_collection_changed_error_name.md)<!-- -->).

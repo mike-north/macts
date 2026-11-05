@@ -9,11 +9,14 @@ How the app finds an object of one resource from its identifier, and where the o
 **Signature:**
 
 ```typescript
-type NativeAddressing = NativeCollectionAddressing | NativeRootAddressing
+type NativeAddressing =
+  | NativeCollectionAddressing
+  | NativePositionalAddressing
+  | NativeRootAddressing
 ```
 
-**References:** [NativeCollectionAddressing](./core.nativecollectionaddressing.md)<!-- -->, [NativeRootAddressing](./core.nativerootaddressing.md)
+**References:** [NativeCollectionAddressing](./core.nativecollectionaddressing.md)<!-- -->, [NativePositionalAddressing](./core.nativepositionaladdressing.md)<!-- -->, [NativeRootAddressing](./core.nativerootaddressing.md)
 
 ## Remarks
 
-It follows the resource's identifier targeting (phases/13 D10), as a generated get does. A resource found in a collection is addressed by [NativeCollectionAddressing](./core.nativecollectionaddressing.md)<!-- -->; a singleton root, which the app holds as its own properties, by [NativeRootAddressing](./core.nativerootaddressing.md)<!-- -->.
+It follows the resource's identifier targeting (phases/13 D10), as a generated get does. A resource found in a collection is addressed by [NativeCollectionAddressing](./core.nativecollectionaddressing.md)<!-- -->; a positional resource, which has no identifier, by its position within its container ([NativePositionalAddressing](./core.nativepositionaladdressing.md)<!-- -->); a singleton root, which the app holds as its own properties, by [NativeRootAddressing](./core.nativerootaddressing.md)<!-- -->.

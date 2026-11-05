@@ -448,6 +448,10 @@ describe('canonical generated facade', () => {
         code: 'TRANSPORT_FAILED',
         details: { reason: 'invalid-response', status: 200 },
       })
+      await expect(facade.http.rpc('fixture.items.get', {})).rejects.toMatchObject({
+        code: 'TRANSPORT_FAILED',
+        details: { reason: 'invalid-response', status: 200 },
+      })
     } finally {
       fetch.mockRestore()
     }

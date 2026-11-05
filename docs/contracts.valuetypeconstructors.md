@@ -92,6 +92,15 @@ A [FileSource](./contracts.filesource.md) an operation consumes: `{"fileSource":
 </td></tr>
 <tr><td>
 
+[indexSelectorReference(scope, resource, options)](./contracts.valuetypeconstructors.indexselectorreference.md)
+
+</td><td>
+
+A reference to one object of `resource` by its zero-based position within its container: an [IndexSelectorReference](./contracts.indexselectorreference.md)<!-- -->, and no other form.
+
+</td></tr>
+<tr><td>
+
 [integer(options)](./contracts.valuetypeconstructors.integer.md)
 
 </td><td>

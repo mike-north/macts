@@ -14,7 +14,7 @@ interface NativeCodecEnvironment
 
 ## Remarks
 
-`app` is the target application object, which addressing a reference calls into; the codec calls no other host object. `references` is the script's [NativeScript.references](./core.nativescript.references.md)<!-- -->.
+`app` is the target application object, which addressing a reference calls into; the codec calls no other host object. `references` is the script's [NativeScript.references](./core.nativescript.references.md)<!-- -->. `positionOf` is the host's position reader, which the script composes from .
 
 ## Properties
 
@@ -50,6 +50,23 @@ unknown
 </td><td>
 
 The target application.
+
+</td></tr>
+<tr><td>
+
+[positionOf?](./core.nativecodecenvironment.positionof.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+(specifier: unknown) =&gt; unknown
+
+</td><td>
+
+_(Optional)_ Reads the zero-based position an app object's own specifier gives within its container, or `undefined` when the specifier is not positional (<!-- -->). The codec calls it to encode an object of a positional resource, and never reads a position any other way. Without it, no such object encodes.
 
 </td></tr>
 <tr><td>

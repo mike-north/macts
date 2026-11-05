@@ -670,6 +670,22 @@ AppManifestSchema: z.ZodObject<
               >
             >
           >
+          positional: z.ZodOptional<
+            z.ZodObject<
+              {
+                evidence: z.ZodObject<
+                  {
+                    source: z.ZodLiteral<'curated'>
+                    note: z.ZodString
+                    observedAt: z.ZodISODateTime
+                    appVersion: z.ZodString
+                  },
+                  z.core.$strict
+                >
+              },
+              z.core.$strict
+            >
+          >
         },
         z.core.$strip
       >

@@ -506,6 +506,15 @@ Select the object at a zero-based position within its container.
 </td></tr>
 <tr><td>
 
+[IndexSelectorReference](./contracts.indexselectorreference.md)
+
+</td><td>
+
+One object denoted by its zero-based position within its container, bound to the client that decoded it: what an output position holds whose target has no identifier and is found by its position within its parent.
+
+</td></tr>
+<tr><td>
+
 [IntegerHelpers](./contracts.integerhelpers.md)
 
 </td><td>

@@ -19,8 +19,10 @@
  * - macts has no usable `get` for the target yet, so no reference to it passes
  *   validation;
  * - macts has no primary identifier for the target yet, so the target has no
- *   identity form: an object of it can be addressed only by a selector, and
- *   native reads emit only identity references;
+ *   identity form, and the manifest does not mark it positional: an object of
+ *   it can be addressed only by a selector, and native reads emit only
+ *   identity references and index selectors within a positional target's
+ *   parent;
  * - the target's `get` records a parent, so the target is identified only
  *   within its container, and the position is not one where a native read
  *   holds that container: a native read hands over, as the container, the
@@ -55,7 +57,9 @@
  * create and update bodies read only the properties it keeps, so none of those
  * surfaces declares or reads a field another leaves out. The native bodies
  * also take from here which fields they hand to the codec together with the
- * record they were read through, as the references' container. The older
+ * record they were read through, as the references' container, and the
+ * generators which form a native read emits at a position
+ * ({@link emittedReferenceForm}). The older
  * `generateSdk` path does not use it yet (#253).
  *
  * Internal to this package: nothing here is part of the public entry.
@@ -70,6 +74,7 @@ import type { Property } from './schemas/property.js'
 import type { Resource } from './schemas/resource.js'
 import { resolveIdentifierTargeting, resolvePrimaryIdentifierProperty } from './identifier.js'
 import { nestedOnlyResources } from './hierarchy-placement.js'
+import { isPositional } from './positional.js'
 import { resolvePrimaryIdentifier } from './primary-identifier.js'
 import { resolveRoots } from './roots.js'
 import { resolvingCommand } from './resource-commands.js'
@@ -91,7 +96,8 @@ import {
  *   which kind the field holds.
  * - `no-get`: macts has no usable `get` command for the target yet.
  * - `no-identifier`: macts has no primary identifier for the target yet, so
- *   no identity reference to one exists.
+ *   no identity reference to one exists, and the target is not marked
+ *   positional, so no index selector to one is emitted either.
  * - `parent-scoped`: the target's `get` records a parent, and the position
  *   holds no container for it: it is not a field of the target's parent, or
  *   that parent is not a valid container ({@link isValidContainer}), or it is
@@ -170,18 +176,22 @@ export function isValidContainer(manifest: AppManifest, containerKey: string): b
  * What macts does not provide yet for a reference read from the app to
  * `resourceKey` to be usable, or `undefined` when it can be used: the
  * resource is not a singleton root; it has a usable `get` and a primary
- * identifier; that `get` records no parent, or it records `sourceKey` and
- * that is a valid container ({@link isValidContainer}); the hierarchy does not
+ * identifier, or it is positional (`../positional.ts`); that `get` records no
+ * parent, or it records `sourceKey` and that is a valid container
+ * ({@link isValidContainer}); the hierarchy does not
  * hold the resource only within another resource while its `get` records no
  * parent ({@link nestedOnlyResources}); and the resource is not name-keyed
  * ({@link isNameKeyed}). The reasons are checked in that order
  * (`root-kind-unmapped`, `no-get`, `no-identifier`, `parent-scoped`,
  * `unrecorded-parent`, `not-unique`), so the first that applies is reported.
  *
- * The judgment is positional for a target whose `get` records a parent: a
- * native read hands the codec, as the reference's container, the record the
- * field was read through, never a container it asks the object for. So such a
- * target is usable only at a field of its parent's own record.
+ * The judgment depends on the position for a target whose `get` records a
+ * parent: a native read hands the codec, as the reference's container, the
+ * record the field was read through, never a container it asks the object
+ * for. So such a target is usable only at a field of its parent's own record.
+ * A positional target's `get` always records its parent, so it is usable
+ * there too, as an index selector within that record
+ * ({@link emittedReferenceForm}).
  *
  * @param manifest - The app manifest.
  * @param resourceKey - The manifest key of the referenced resource.
@@ -197,7 +207,10 @@ export function omittedOutputReason(
   if (resolveRoots(manifest, resourceKey) !== undefined) return 'root-kind-unmapped'
   const get = resolvingCommand(manifest, resourceKey, 'get')
   if (get === undefined) return 'no-get'
-  if (resolvePrimaryIdentifierProperty(manifest.resources[resourceKey]) === undefined) {
+  if (
+    resolvePrimaryIdentifierProperty(manifest.resources[resourceKey]) === undefined &&
+    !isPositional(manifest, resourceKey)
+  ) {
     return 'no-identifier'
   }
   const parent = get[1].parent?.resource
@@ -220,6 +233,47 @@ export function omittedOutputReason(
  */
 export function outputContainer(manifest: AppManifest, resourceKey: string): string | undefined {
   return resolvingCommand(manifest, resourceKey, 'get')?.[1].parent?.resource
+}
+
+/**
+ * Which form a native read emits for a reference to `resourceKey` at an output
+ * position the output rule keeps: `'index'`, an index selector within the
+ * record the field was read through, for a positional target, which has no
+ * identifier (`../positional.ts`); `'identity'` for every other target. The
+ * contract generator types the position by it, and its plan records it, so
+ * the codec never chooses at run time.
+ *
+ * @param manifest - The app manifest.
+ * @param resourceKey - The manifest key of the referenced resource.
+ */
+export function emittedReferenceForm(
+  manifest: AppManifest,
+  resourceKey: string
+): 'identity' | 'index' {
+  return isPositional(manifest, resourceKey) ? 'index' : 'identity'
+}
+
+/**
+ * `shape` with each reference to a positional target marked with the form a
+ * native read emits for it ({@link emittedReferenceForm}), for an output
+ * position. Arrays and nullables are looked through.
+ *
+ * @param manifest - The app manifest.
+ * @param shape - The composition of an output position.
+ */
+export function withEmittedForms(manifest: AppManifest, shape: ValueShape): ValueShape {
+  switch (shape.kind) {
+    case 'reference':
+      return emittedReferenceForm(manifest, shape.resourceKey) === 'index'
+        ? { ...shape, form: 'index' }
+        : shape
+    case 'array':
+      return { ...shape, item: withEmittedForms(manifest, shape.item) }
+    case 'nullable':
+      return { ...shape, inner: withEmittedForms(manifest, shape.inner) }
+    default:
+      return shape
+  }
 }
 
 /** The resource keys a value composition references. */

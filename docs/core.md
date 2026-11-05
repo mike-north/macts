@@ -1010,6 +1010,15 @@ Check whether an operation token is one of the canonical coarse operations.
 </td></tr>
 <tr><td>
 
+[isPositional(manifest, resourceKey)](./core.ispositional.md)
+
+</td><td>
+
+Whether the objects of `resourceKey` are found by their position within their parent: the resource is declared, usable, and marked `positional`<!-- -->.
+
+</td></tr>
+<tr><td>
+
 [isPureCoarseOperation(operation)](./core.ispurecoarseoperation.md)
 
 </td><td>
@@ -1258,6 +1267,15 @@ This function does NOT compile the declaration to enforcement permissions, resol
 Test whether a policy grants a single concrete permission as a standing (non-confirmation-gated) permission.
 
 A thin convenience over [compilePolicyToPermissions()](./core.compilepolicytopermissions.md) for the common "is this one permission in-policy?" question. Returns `true` only when the evaluator's decision is `'allowed'`<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[positionalProblems(manifest)](./core.positionalproblems.md)
+
+</td><td>
+
+Why a manifest's `positional` markers refuse it, one reason per issue (<!-- -->), each naming the resource or command. The generators and operation registration prefix each with the app and what is refused, as they do the item-selection rule's.
 
 </td></tr>
 <tr><td>
@@ -2623,6 +2641,17 @@ When the resource's get records a parent, `within` names that parent: the resour
 </td><td>
 
 Configuration for [createNativeExecutor()](./core.createnativeexecutor.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[NativePositionalAddressing](./core.nativepositionaladdressing.md)
+
+</td><td>
+
+How the app finds an object of a positional resource, which has no identifier: by its zero-based position within its container, as `container[collection].at(index)`<!-- -->, the app's element addressing. A position the collection does not reach is an invalid selection.
+
+A reference to one is an index selector whose container is an identity reference to `within`<!-- -->, found first by the parent's own addressing. An object read from the app is encoded with the position its own specifier gives (`NativeCodecEnvironment.positionOf`<!-- -->), never with a dictionary `index` property.
 
 </td></tr>
 <tr><td>
@@ -4079,6 +4108,17 @@ A declaration is a list of app rules plus a global `defaultDisposition` that app
 </td></tr>
 <tr><td>
 
+[PositionalEvidenceSchema](./core.positionalevidenceschema.md)
+
+</td><td>
+
+The evidence that the objects of a resource are found by their position within their container (`ResourceSchema.positional`<!-- -->): a curated observation, dated and tied to the app version it was made on.
+
+The note says what was observed, in counts and booleans only, never a value: for example that the app's own specifier for each object reads back as a position within its container, and that addressing that position gives the same object.
+
+</td></tr>
+<tr><td>
+
 [PrimitiveTypeSchema](./core.primitivetypeschema.md)
 
 </td><td>
@@ -4259,6 +4299,19 @@ The manifest is read flattened (`../superclasses.ts`<!-- -->, phases/13 D10, "Su
 The app's own spelling of a resource's collection, recorded where it differs from the spelling derived from the plural (`defaultCollectionAccessor` in `../native-accessor.ts`<!-- -->), with the dictionary term that shows it.
 
 The plural stays the source of the resource's public segment on every surface; native bodies address the collection in the app by this accessor instead. Recording the derived spelling is redundant and rejected.
+
+</td></tr>
+<tr><td>
+
+[ResourcePositionalSchema](./core.resourcepositionalschema.md)
+
+</td><td>
+
+The marker of a resource whose objects have no identifier and are found by their zero-based position within their parent: the app's element addressing within that parent, `container[collection].at(index)`<!-- -->. Its `get` (and `update` and `delete`<!-- -->) takes the position as its item parameter, and a reference to one of its objects is an index selector within the object its parent is (phases/13 D7, "Emitted forms").
+
+A position means whatever object holds it when it is used: it drifts as objects are added to, removed from or moved within the container.
+
+It is curated with evidence and never inferred, from a missing identifier or from anything else. A resource with a primary identifier is found by that identifier, so it cannot be positional; and the parent must be one the app finds by its identifier (`findPositionalIssues` in `../positional.ts`<!-- -->).
 
 </td></tr>
 <tr><td>
@@ -5203,6 +5256,13 @@ The source of the disposition that governed an evaluation.
 </td></tr>
 <tr><td>
 
+[PositionalEvidence](./core.positionalevidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [PrimitiveType](./core.primitivetype.md)
 
 </td><td>
@@ -5336,6 +5396,13 @@ A grouping-only coarse operation name (`read` \| `write`<!-- -->).
 <tr><td>
 
 [ResourceNativeSpelling](./core.resourcenativespelling.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[ResourcePositional](./core.resourcepositional.md)
 
 </td><td>
 
