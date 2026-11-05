@@ -46,7 +46,13 @@ import {
   ARCHIVE_MANIFEST_YAML,
   archiveManifest,
 } from '../manifest/test-support/archive-key-and-root.js'
-import type { NativeScript } from './native-codec.js'
+import { composeNativeScript } from './executor.js'
+import {
+  NATIVE_ABSENT_AS_NULL_KEY,
+  NATIVE_CODEC,
+  NATIVE_ENCODE_FUNCTION,
+  type NativeScript,
+} from './native-codec.js'
 import { createNativeExecutor } from './native-executor.js'
 import {
   buildNativeBody,
@@ -758,8 +764,15 @@ describe('references the app reports missing as they are encoded', () => {
     return error.cause.message
   }
 
-  /** A get of entry `/a`, whose property record and direct reads are `record` and `members`. */
-  function getShelved(record: Record<string, unknown>, members: Record<string, unknown> = {}) {
+  /**
+   * A get of entry `/a`, whose property record and direct reads are `record`
+   * and `members`, recording the script it runs in `scripts`.
+   */
+  function getShelved(
+    record: Record<string, unknown>,
+    members: Record<string, unknown> = {},
+    scripts: NativeScript[] = []
+  ) {
     const entry = object({ location: '/a', ...record }, { location: () => '/a', ...members })
     const app = {
       includeStandardAdditions: false,
@@ -770,7 +783,8 @@ describe('references the app reports missing as they are encoded', () => {
       'getEntry',
       'Entry',
       { location: '/a' },
-      { input: inputOf(text(), 'location'), output: SHELVED_ENTRY }
+      { input: inputOf(text(), 'location'), output: SHELVED_ENTRY },
+      scripts
     )
   }
 
@@ -803,6 +817,24 @@ describe('references the app reports missing as they are encoded', () => {
     await expect(
       getShelved({ holder: null, shelf: missingVolume() }, { shelf: () => missingVolume() })
     ).resolves.toEqual({ location: '/a', holder: null, shelf: null })
+  })
+
+  // Guards that nothing serializes the body's result before the codec reads
+  // it. The stand-in runs the composed script whole, body and codec in one
+  // realm, as the automation host does. A JSON round trip in between would
+  // drop the marker's symbol key, so this -1728 would escape and fail the get.
+  it('hands a marked shelf to the codec within the one script that read it', async () => {
+    const scripts: NativeScript[] = []
+    await expect(
+      getShelved({ holder: null, shelf: null }, { shelf: () => missingVolume() }, scripts)
+    ).resolves.toEqual({ location: '/a', holder: null, shelf: null })
+    expect(scripts).toHaveLength(1)
+    const script = scripts[0]
+    if (script === undefined) throw new Error('Expected the get to run one script')
+    expect(script.body).toContain(`Symbol.for(${JSON.stringify(NATIVE_ABSENT_AS_NULL_KEY)})`)
+    const composed = composeNativeScript(script, NATIVE_CODEC)
+    expect(composed).toContain(`var value = (function (app, args, page) {\n${script.body}`)
+    expect(composed).toContain(`value: ${NATIVE_ENCODE_FUNCTION}(value, `)
   })
 
   it('lists as null a shelf the read across the entries returns but the app reports missing', async () => {
@@ -855,10 +887,9 @@ describe('references the app reports missing as they are encoded', () => {
         absentValueMarkers: false,
       }
     )
-    expect(body).not.toContain('Symbol.for')
-    expect(buildNativeBody(manifest, { command: 'getEntry', resource: 'Entry' })).toContain(
-      'Symbol.for'
-    )
+    const marker = `Symbol.for(${JSON.stringify(NATIVE_ABSENT_AS_NULL_KEY)})`
+    expect(body).not.toContain(marker)
+    expect(buildNativeBody(manifest, { command: 'getEntry', resource: 'Entry' })).toContain(marker)
     const { app } = standInArchive()
     await expect(
       execute(

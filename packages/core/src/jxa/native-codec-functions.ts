@@ -103,7 +103,7 @@ export interface NativeCodecLiterals {
     readonly record: string
     readonly reference: string
   }
-  /** Mirrors `NATIVE_CONTAINED_REFERENCE_KEY`. */
+  /** Mirrors `NATIVE_CONTAINED_REFERENCE_KEY`: the marker symbol's registry key. */
   readonly containedReference: string
   /** Mirrors `NATIVE_ABSENT_AS_NULL_KEY`: the marker symbol's registry key. */
   readonly absentAsNull: string
@@ -179,16 +179,28 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   const KEY_DATE = 'date'
   const KEY_RECORD = 'record'
   const KEY_REFERENCE = 'reference'
-  /** Sole key of a value a body hands over with the record it was read through. */
-  const KEY_CONTAINED = '__mactsContainedReference'
+  /**
+   * Registry key of the symbol that marks a value a body hands over with the
+   * record it was read through. A symbol, because no app record or JSON value
+   * can carry one, so no app data is taken for the marker.
+   */
+  const KEY_CONTAINED = 'macts.containedReference'
+  /** The contained-reference marker symbol: the sole own property of such a value. */
+  const CONTAINED: unique symbol = Symbol.for(KEY_CONTAINED)
   /**
    * Registry key of the symbol that marks a value whose evidence makes the
-   * app's "no such object" its empty value. A symbol, because no app record
-   * or JSON value can carry one, so no app data is taken for the marker.
+   * app's "no such object" its empty value. A symbol, for the same reason.
    */
   const KEY_ABSENT_AS_NULL = 'macts.absentAsNull'
-  /** The marker symbol: the sole own property of a marked value. */
+  /** The absent-as-null marker symbol: the sole own property of a marked value. */
   const ABSENT_AS_NULL: unique symbol = Symbol.for(KEY_ABSENT_AS_NULL)
+  /**
+   * Thrown, never returned, when the app reports no such object (-1728) as
+   * the codec reads the identity of a value marked absent-as-null. Only
+   * {@link encodeAbsentAsNull} catches it, so it never leaves the codec. Being
+   * this one object, it cannot be confused with any error the app raises.
+   */
+  const ABSENT_READ: { readonly absentRead: true } = { absentRead: true }
   /** The app's "no such object" error number. */
   const NO_SUCH_OBJECT = -1728
   /** Property of an app error that says what was being read when the app failed. */
@@ -249,13 +261,19 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
    * without naming `Object.prototype` so that records from another realm
    * qualify too. Maps, sets, regular expressions, and class instances are
    * excluded as well.
+   *
+   * An object with a symbol key is never a record either. Neither the app nor
+   * JSON produces one, so it is a marker a body made ({@link isMarked}) at a
+   * position that does not consume it, which must fail rather than encode
+   * silently as a record of its string keys, often an empty one.
    */
   function isPlainObject(value: unknown): value is Readonly<Record<string, unknown>> {
     if (!isKeyed(value) || Object.prototype.toString.call(value) !== '[object Object]') {
       return false
     }
     const proto: unknown = Object.getPrototypeOf(value)
-    return proto === null || Object.getPrototypeOf(proto) === null
+    if (proto !== null && Object.getPrototypeOf(proto) !== null) return false
+    return Object.getOwnPropertySymbols(value).length === 0
   }
 
   /** The own value of `key`, or `undefined` when it is absent or inherited. */
@@ -275,6 +293,19 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       writable: true,
       configurable: true,
     })
+  }
+
+  /**
+   * Whether `native` is a value a body marked with `marker` ({@link CONTAINED},
+   * {@link ABSENT_AS_NULL}): an object whose only own property is that symbol.
+   * String keys never match, so an app record of any shape is not one.
+   */
+  function isMarked(native: unknown, marker: symbol): native is Readonly<Record<symbol, unknown>> {
+    return (
+      isKeyed(native) &&
+      Object.prototype.hasOwnProperty.call(native, marker) &&
+      Reflect.ownKeys(native).length === 1
+    )
   }
 
   /** The key of a single-key keyed object, or `undefined` for anything else. */
@@ -312,7 +343,11 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     if (isDate(value)) return 'a date'
     if (isKeyed(value)) {
       const keys = Object.keys(value)
-      if (keys.length === 0) return 'an empty object'
+      if (keys.length === 0) {
+        return Object.getOwnPropertySymbols(value).length === 0
+          ? 'an empty object'
+          : 'an object with symbol keys only'
+      }
       const shown = keys.slice(0, 5).map(quote).join(', ')
       return 'an object with keys ' + shown + (keys.length > 5 ? ', ...' : '')
     }
@@ -591,6 +626,13 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
    * fails anywhere else, because absence is never materialized as `null`.
    *
    * No own property ever holds `undefined`.
+   *
+   * A field's value is the one position a body's absent-as-null marker is
+   * honoured ({@link ABSENT_AS_NULL}): bodies mark the values of a record's
+   * fields, the get record's and each list row's. The marked value follows
+   * the same presence rules, and is then encoded by
+   * {@link encodeAbsentAsNull}. A marker anywhere else is ordinary data, which
+   * fails by its plan.
    */
   function encodeRecord(
     native: unknown,
@@ -606,7 +648,9 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       const field = fields[key]
       if (field === undefined) continue
       const fieldPath = path.concat([key])
-      const value = ownValue(native, key)
+      const read = ownValue(native, key)
+      const marked = isMarked(read, ABSENT_AS_NULL)
+      const value = marked ? read[ABSENT_AS_NULL] : read
       const isNullable = field.value.kind === 'nullable'
       if (value === undefined) {
         if (field.presence !== 'optional') {
@@ -629,7 +673,13 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         continue
       }
       try {
-        setOwn(out, key, encodeValue(value, field.value, fieldPath, env))
+        setOwn(
+          out,
+          key,
+          marked
+            ? encodeAbsentAsNull(value, field.value, fieldPath, env)
+            : encodeValue(value, field.value, fieldPath, env)
+        )
       } catch (error) {
         noteReading(error, fieldPath)
         throw error
@@ -1067,8 +1117,20 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
    * Only a top-level container is emitted: a parent that is itself found
    * within a container fails as unsupported, as do collections and resources
    * the app does not find by their identifier.
+   *
+   * `absent` says the reference is a value marked absent-as-null, or an
+   * element of one ({@link encodeAbsentAsNull}). Then, and only for the read
+   * of the target's own identity, the app reporting no such object throws
+   * {@link ABSENT_READ}. The container's identity read is the item's own, so
+   * its failure is let through as it is.
    */
-  function encodeReference(native: unknown, plan: ReferencePlan, env: Env, path: Path): unknown {
+  function encodeReference(
+    native: unknown,
+    plan: ReferencePlan,
+    env: Env,
+    path: Path,
+    absent: boolean
+  ): unknown {
     if (plan.cardinality !== 'one') {
       return failUnsupported(
         'encode',
@@ -1081,7 +1143,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     const within = containerOf(plans.addressing)
     const held = within === undefined ? undefined : containedValue(native, plan.resource, path)
     const target = held === undefined ? native : held.value
-    const payload = identityPayload(plan.resource, target, plans, env, path)
+    const payload = identityPayload(plan.resource, target, plans, env, path, absent)
     if (within !== undefined && held !== undefined) {
       const containerPath = path.concat(['container'])
       const parentPlans = referencePlansOf('encode', env, within, containerPath)
@@ -1101,7 +1163,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       }
       const containerPayload =
         held.containerId === undefined
-          ? identityPayload(within, held.container, parentPlans, env, containerPath)
+          ? identityPayload(within, held.container, parentPlans, env, containerPath, false)
           : identityFromId(within, held.containerId, parentPlans, env, containerPath)
       setOwn(payload, 'container', containerPayload)
     }
@@ -1111,8 +1173,9 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   }
 
   /**
-   * What a body handed over at a position whose resource is found within a
-   * container: the value the app returned there, and the record it was read
+   * What a body handed over, marked ({@link CONTAINED}), at a position whose
+   * resource is found within a container, the one position that marker is
+   * honoured: the value the app returned there, and the record it was read
    * through, as the record's item (`container`) or its identifier already
    * read (`containerId`). A value with no record is a body that did not hand
    * over its container, a macts defect, so it fails as unsupported rather
@@ -1124,8 +1187,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     resource: string,
     path: Path
   ): { readonly value: unknown; readonly container: unknown; readonly containerId: unknown } {
-    const inner =
-      soleKey(native) === KEY_CONTAINED && isKeyed(native) ? native[KEY_CONTAINED] : null
+    const inner = isMarked(native, CONTAINED) ? native[CONTAINED] : null
     if (!isPlainObject(inner) || !hasOwn(inner, 'value')) {
       return failUnsupported(
         'encode',
@@ -1145,14 +1207,17 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
 
   /**
    * The identity payload of an app object of `resource`: its identifier read
-   * as `plans.addressing` says, encoded by `plans.id`.
+   * as `plans.addressing` says, encoded by `plans.id`. When `absent` is set,
+   * the app reporting no such object as the identifier is read throws
+   * {@link ABSENT_READ} instead of the app's error.
    */
   function identityPayload(
     resource: string,
     native: unknown,
     plans: { readonly id: ValuePlan; readonly addressing: NativeAddressing },
     env: Env,
-    path: Path
+    path: Path,
+    absent: boolean
   ): Record<string, unknown> {
     const expected = 'an object of ' + quote(resource)
     if (!isHostObject(native)) {
@@ -1168,7 +1233,14 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
           ' have no conversion from the app: its objects do not say which kind they are'
       )
     }
-    const id = callMember('encode', native, plans.addressing.property, [], path, expected)
+    let id: unknown
+    try {
+      id = callMember('encode', native, plans.addressing.property, [], path, expected)
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
+      if (absent && reportsNoSuchObject(error)) throw ABSENT_READ
+      throw error
+    }
     return identityFromId(resource, id, plans, env, path)
   }
 
@@ -1199,43 +1271,51 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   }
 
   /**
-   * Whether `native` is a marked value ({@link ABSENT_AS_NULL}): an object
-   * whose only own property is the marker symbol. String keys never match,
-   * so an app record of any shape is not one.
-   */
-  function isAbsentAsNullMarker(native: unknown): native is { readonly [ABSENT_AS_NULL]: unknown } {
-    return (
-      isKeyed(native) &&
-      Object.prototype.hasOwnProperty.call(native, ABSENT_AS_NULL) &&
-      Reflect.ownKeys(native).length === 1
-    )
-  }
-
-  /**
-   * Encodes `native`, the value a marker held, which a body handed over as
-   * one its property's evidence lets read as absent. At a nullable position the app reporting no
-   * such object while the value is read (as its identifier is, for a
-   * reference) is the empty value, `null`; any other failure is still a
-   * failure. At any other position it encodes as an unmarked value.
+   * Encodes `native`, the value a marker held at a record field
+   * ({@link encodeRecord}), which a body handed over as one its property's
+   * evidence lets read as absent. At a nullable position, the app reporting
+   * no such object as the codec reads the identity of the value's object
+   * ({@link ABSENT_READ}), or of any one element's when the value is a list,
+   * is the field's empty value, `null`: one element the app reports missing
+   * nulls the whole field (phases/13 D10). Every other failure is let through
+   * as it is, including the same failure reading a container's identity. At
+   * any other position the value encodes as if it were not marked.
    */
   function encodeAbsentAsNull(native: unknown, plan: ValuePlan, path: Path, env: Env): unknown {
     if (plan.kind !== 'nullable') return encodeValue(native, plan, path, env)
-    if (native === null) return null
     try {
-      return encodeValue(native, plan.value, path, env)
+      return encodeAbsentValue(native, plan.value, path, env)
     } catch (error) {
-      if (reportsNoSuchObject(error)) return null
+      if (error === ABSENT_READ) return null
       throw error
     }
+  }
+
+  /**
+   * Encodes a marked value ({@link encodeAbsentAsNull}) by its plan, reading
+   * the identity of its object, or of each element's object in a list, as
+   * one the app may report missing. Every other position, a record's fields
+   * included, encodes as if unmarked.
+   */
+  function encodeAbsentValue(native: unknown, plan: ValuePlan, path: Path, env: Env): unknown {
+    if (plan.kind === 'reference') return encodeReference(native, plan, env, path, true)
+    if (plan.kind === 'nullable' && native !== null && native !== undefined) {
+      return encodeAbsentValue(native, plan.value, path, env)
+    }
+    if (plan.kind === 'array' && isList(native)) {
+      const items: unknown[] = []
+      for (let i = 0; i < native.length; i++) {
+        items.push(encodeAbsentValue(native[i], plan.items, path.concat([i]), env))
+      }
+      return items
+    }
+    return encodeValue(native, plan, path, env)
   }
 
   /** Encodes a native value by its plan. */
   function encodeValue(native: unknown, plan: ValuePlan, path: Path, env: Env): unknown {
     // A passthrough result is returned as it is, never inspected.
     if (plan.kind === 'passthrough') return native
-    if (isAbsentAsNullMarker(native)) {
-      return encodeAbsentAsNull(native[ABSENT_AS_NULL], plan, path, env)
-    }
     const kind: string = plan.kind
     switch (plan.kind) {
       case 'none':
@@ -1287,7 +1367,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       case 'unknown':
         return encodeDynamic(native, path)
       case 'reference':
-        return encodeReference(native, plan, env, path)
+        return encodeReference(native, plan, env, path, false)
       case 'file':
       case 'file-source':
         return failUnsupported(

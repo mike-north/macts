@@ -474,7 +474,9 @@ function absentAsNull(resource: Resource | undefined, key: string): boolean {
  * to the codec together with that record as its container: the record's item
  * (`how` is `container`), or its identifier already read (`containerId`).
  * The codec reads the target's id from the value and encodes the container in
- * the same request (`NATIVE_CONTAINED_REFERENCE_KEY` in `native-codec.ts`).
+ * the same request. The value is handed over marked: an object whose only own
+ * property is the registry symbol `NATIVE_CONTAINED_REFERENCE_KEY` (in
+ * `native-codec.ts`), which no app record can carry.
  *
  * `null`, the app's missing value, is left as it is, so a nullable field
  * holds `null`; a list is handed over item by item. The expression uses only
@@ -485,9 +487,8 @@ function wrapContained(
   how: 'container' | 'containerId',
   containerExpression: string
 ): string {
-  const wrap = (value: string): string =>
-    `{ ${literal(NATIVE_CONTAINED_REFERENCE_KEY)}: { value: ${value}, ${how}: ${containerExpression} } }`
-  return `(function (v) { return v === null ? null : Array.isArray(v) ? v.map(function (e) { return e === null ? null : ${wrap('e')}; }) : ${wrap('v')}; })(${valueExpression})`
+  const held = `function held(e) { var m = {}; m[Symbol.for(${literal(NATIVE_CONTAINED_REFERENCE_KEY)})] = { value: e, ${how}: ${containerExpression} }; return m; }`
+  return `(function (v) { ${held} return v === null ? null : Array.isArray(v) ? v.map(function (e) { return e === null ? null : held(e); }) : held(v); })(${valueExpression})`
 }
 
 /**
