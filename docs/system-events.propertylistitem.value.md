@@ -4,10 +4,10 @@
 
 ## PropertyListItem.value property
 
-the value of the property list item
+the value of the property list item. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-value: string
+value: string | null
 ```

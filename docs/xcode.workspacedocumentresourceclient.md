@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[attach(workspaceName, toProcessIdentifier, suspended)](./xcode.workspacedocumentresourceclient.attach.md)
+[attach(workspaceName, toProcessIdentifier, suspended, \_\_mactsOptions)](./xcode.workspacedocumentresourceclient.attach.md)
 
 </td><td>
 
@@ -68,7 +68,7 @@ Start a new debugging session in the workspace
 </td></tr>
 <tr><td>
 
-[build(workspaceName)](./xcode.workspacedocumentresourceclient.build.md)
+[build(workspaceName, \_\_mactsOptions)](./xcode.workspacedocumentresourceclient.build.md)
 
 </td><td>
 
@@ -79,7 +79,7 @@ Invoke the "build" scheme action
 </td></tr>
 <tr><td>
 
-[clean(workspaceName)](./xcode.workspacedocumentresourceclient.clean.md)
+[clean(workspaceName, \_\_mactsOptions)](./xcode.workspacedocumentresourceclient.clean.md)
 
 </td><td>
 
@@ -90,7 +90,7 @@ Invoke the "clean" scheme action
 </td></tr>
 <tr><td>
 
-[debug(workspaceName, scheme, runDestinationSpecifier, skipBuilding, commandLineArguments, environmentVariables)](./xcode.workspacedocumentresourceclient.debug.md)
+[debug(workspaceName, scheme, runDestinationSpecifier, skipBuilding, commandLineArguments, environmentVariables, \_\_mactsOptions)](./xcode.workspacedocumentresourceclient.debug.md)
 
 </td><td>
 
@@ -101,29 +101,29 @@ Start a debugging session using the "run" or "run without building" scheme actio
 </td></tr>
 <tr><td>
 
-[get(name)](./xcode.workspacedocumentresourceclient.get.md)
+[get(name, \_\_mactsOptions)](./xcode.workspacedocumentresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a workspacedocument by name.
+Get a workspace document by name. When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[list()](./xcode.workspacedocumentresourceclient.list.md)
+[list(\_\_mactsOptions)](./xcode.workspacedocumentresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all workspacedocuments.
+List all workspace documents, as one page.
 
 </td></tr>
 <tr><td>
 
-[run(workspaceName, withCommandLineArguments, withEnvironmentVariables)](./xcode.workspacedocumentresourceclient.run.md)
+[run(workspaceName, withCommandLineArguments, withEnvironmentVariables, \_\_mactsOptions)](./xcode.workspacedocumentresourceclient.run.md)
 
 </td><td>
 
@@ -134,7 +134,7 @@ Invoke the "run" scheme action
 </td></tr>
 <tr><td>
 
-[stop(workspaceName)](./xcode.workspacedocumentresourceclient.stop.md)
+[stop(workspaceName, \_\_mactsOptions)](./xcode.workspacedocumentresourceclient.stop.md)
 
 </td><td>
 
@@ -145,7 +145,7 @@ Stop the active scheme action, if one is running
 </td></tr>
 <tr><td>
 
-[test(workspaceName, withCommandLineArguments, withEnvironmentVariables)](./xcode.workspacedocumentresourceclient.test.md)
+[test(workspaceName, withCommandLineArguments, withEnvironmentVariables, \_\_mactsOptions)](./xcode.workspacedocumentresourceclient.test.md)
 
 </td><td>
 

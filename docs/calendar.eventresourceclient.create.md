@@ -4,12 +4,12 @@
 
 ## EventResourceClient.create() method
 
-Create a new event.
+Create a new event. When several calendars share the same name, the first match in the app's order is used as the calendar.
 
 **Signature:**
 
 ```typescript
-create(input: EventCreateInput): Promise<Event>;
+create(input: EventCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Event>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [EventCreateInput](./calendar.eventcreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

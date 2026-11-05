@@ -4,10 +4,10 @@
 
 ## Table.borders property
 
-Whether the table has borders
+Whether the table has borders. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-borders: boolean
+borders: boolean | null
 ```

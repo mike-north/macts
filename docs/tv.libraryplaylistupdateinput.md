@@ -4,12 +4,10 @@
 
 ## LibraryPlaylistUpdateInput type
 
-Input for updating a LibraryPlaylist
+Input for updating a LibraryPlaylist. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type LibraryPlaylistUpdateInput = Partial<LibraryPlaylistCreateInput>
+type LibraryPlaylistUpdateInput = Record<string, never>
 ```
-
-**References:** [LibraryPlaylistCreateInput](./tv.libraryplaylistcreateinput.md)

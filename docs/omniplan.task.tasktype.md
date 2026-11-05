@@ -4,10 +4,10 @@
 
 ## Task.taskType property
 
-Whether this task is a standard task, milestone, group, or hammock
+Whether this task is a standard task, milestone, group, or hammock. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-taskType: TaskType
+taskType: TaskType | null
 ```

@@ -4,10 +4,10 @@
 
 ## Task.outlineNumber property
 
-The hierarchical or WBS number of this task
+The hierarchical or WBS number of this task. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-outlineNumber: string
+readonly outlineNumber: string | null;
 ```

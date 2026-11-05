@@ -4,12 +4,12 @@
 
 ## TaskUpdateInput type
 
-Input for updating a Task
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type TaskUpdateInput = Partial<TaskCreateInput>
+type TaskUpdateInput = Omit<TaskUpdateInput$1, 'estimatedMinutes'> & {
+  estimatedMinutes?: null extends TaskUpdateInput$1['estimatedMinutes'] ? number | null : number
+}
 ```
-
-**References:** [TaskCreateInput](./omnifocus.taskcreateinput.md)

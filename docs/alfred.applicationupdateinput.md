@@ -4,12 +4,10 @@
 
 ## ApplicationUpdateInput type
 
-Input for updating a Application
+Input for updating an Application. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ApplicationUpdateInput = Partial<ApplicationCreateInput>
+type ApplicationUpdateInput = Record<string, never>
 ```
-
-**References:** [ApplicationCreateInput](./alfred.applicationcreateinput.md)

@@ -4,12 +4,10 @@
 
 ## CheckboxUpdateInput type
 
-Input for updating a Checkbox
+Input for updating a Checkbox. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type CheckboxUpdateInput = Partial<CheckboxCreateInput>
+type CheckboxUpdateInput = Record<string, never>
 ```
-
-**References:** [CheckboxCreateInput](./system-events.checkboxcreateinput.md)

@@ -4,7 +4,7 @@
 
 ## ServiceCreateInput interface
 
-Input for creating a Service
+Input for creating a Service.
 
 **Signature:**
 
@@ -32,21 +32,6 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
-
-[currentConfiguration?](./system-events.servicecreateinput.currentconfiguration.md)
-
-</td><td>
-
-</td><td>
-
-[Configuration](./system-events.configuration.md)
-
-</td><td>
-
-_(Optional)_ the currently selected configuration
-
-</td></tr>
-<tr><td>
 
 [name?](./system-events.servicecreateinput.name.md)
 

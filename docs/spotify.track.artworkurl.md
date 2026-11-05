@@ -4,10 +4,10 @@
 
 ## Track.artworkUrl property
 
-The URL of the track artwork
+The URL of the track artwork. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-artworkUrl: string
+readonly artworkUrl: string | null;
 ```

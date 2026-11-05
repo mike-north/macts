@@ -4,12 +4,10 @@
 
 ## ScriptingCommandUpdateInput type
 
-Input for updating a ScriptingCommand
+Input for updating a ScriptingCommand. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ScriptingCommandUpdateInput = Partial<ScriptingCommandCreateInput>
+type ScriptingCommandUpdateInput = Record<string, never>
 ```
-
-**References:** [ScriptingCommandCreateInput](./system-events.scriptingcommandcreateinput.md)

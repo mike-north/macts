@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the document
+The unique identifier of the document. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The unique identifier of the document
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The document name
+string \| null
+
+</td><td>
+
+The document name. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +73,11 @@ The document name
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The current URL
+The current URL. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

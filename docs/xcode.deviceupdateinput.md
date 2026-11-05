@@ -4,12 +4,10 @@
 
 ## DeviceUpdateInput type
 
-Input for updating a Device
+Input for updating a Device. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type DeviceUpdateInput = Partial<DeviceCreateInput>
+type DeviceUpdateInput = Record<string, never>
 ```
-
-**References:** [DeviceCreateInput](./xcode.devicecreateinput.md)

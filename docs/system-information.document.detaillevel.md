@@ -4,10 +4,10 @@
 
 ## Document.detailLevel property
 
-The desired level of detail for the system profile document
+The desired level of detail for the system profile document. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-detailLevel: DetailLevel
+detailLevel: DetailLevel | null
 ```

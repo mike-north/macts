@@ -4,7 +4,7 @@
 
 ## MenuItemCreateInput type
 
-Input for creating a MenuItem
+Input for creating a MenuItem.
 
 **Signature:**
 

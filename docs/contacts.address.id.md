@@ -4,7 +4,7 @@
 
 ## Address.id property
 
-unique identifier for this address.
+unique identifier for this address. Never null: the primary identifier.
 
 **Signature:**
 

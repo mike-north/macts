@@ -4,10 +4,10 @@
 
 ## RunDestination.name property
 
-The name of the run destination, as displayed in Xcode's interface
+The name of the run destination, as displayed in Xcode's interface. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string;
 ```

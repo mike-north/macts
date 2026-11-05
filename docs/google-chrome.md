@@ -39,7 +39,25 @@ Error class for GoogleChrome API errors.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
+
+</td></tr>
+<tr><td>
+
+[TabResourceClient](./google-chrome.tabresourceclient.md)
+
+</td><td>
+
+Client for a tab..
+
+</td></tr>
+<tr><td>
+
+[WindowResourceClient](./google-chrome.windowresourceclient.md)
+
+</td><td>
+
+Client for a window..
 
 </td></tr>
 </tbody></table>
@@ -70,7 +88,16 @@ A bookmarks folder that contains other bookmarks folder and bookmark items.
 
 </td><td>
 
-Input for creating a BookmarkFolder
+Input for creating a BookmarkFolder.
+
+</td></tr>
+<tr><td>
+
+[BookmarkFolderUpdateInput](./google-chrome.bookmarkfolderupdateinput.md)
+
+</td><td>
+
+Input for updating a BookmarkFolder. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -88,7 +115,16 @@ An item consists of an URL and the title of a bookmark
 
 </td><td>
 
-Input for creating a BookmarkItem
+Input for creating a BookmarkItem.
+
+</td></tr>
+<tr><td>
+
+[BookmarkItemUpdateInput](./google-chrome.bookmarkitemupdateinput.md)
+
+</td><td>
+
+Input for updating a BookmarkItem. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -98,6 +134,15 @@ Input for creating a BookmarkItem
 </td><td>
 
 Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
+
+[GoogleChromeClient](./google-chrome.googlechromeclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -124,7 +169,16 @@ A tab.
 
 </td><td>
 
-Input for creating a Tab
+Input for creating a Tab.
+
+</td></tr>
+<tr><td>
+
+[TabUpdateInput](./google-chrome.tabupdateinput.md)
+
+</td><td>
+
+Input for updating a Tab. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -134,15 +188,6 @@ Input for creating a Tab
 </td><td>
 
 A window.
-
-</td></tr>
-<tr><td>
-
-[WindowCreateInput](./google-chrome.windowcreateinput.md)
-
-</td><td>
-
-Input for creating a Window
 
 </td></tr>
 </tbody></table>
@@ -164,12 +209,16 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [BookmarkItemSchema](./google-chrome.bookmarkitemschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -187,12 +236,16 @@ Every capability exposed by Google Chrome, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [WindowSchema](./google-chrome.windowschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -210,24 +263,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[BookmarkFolderUpdateInput](./google-chrome.bookmarkfolderupdateinput.md)
-
-</td><td>
-
-Input for updating a BookmarkFolder
-
-</td></tr>
-<tr><td>
-
-[BookmarkItemUpdateInput](./google-chrome.bookmarkitemupdateinput.md)
-
-</td><td>
-
-Input for updating a BookmarkItem
-
-</td></tr>
-<tr><td>
-
 [CapabilityRisk](./google-chrome.capabilityrisk.md)
 
 </td><td>
@@ -237,11 +272,20 @@ Risk classification for a capability.
 </td></tr>
 <tr><td>
 
-[TabUpdateInput](./google-chrome.tabupdateinput.md)
+[GoogleChromeResources](./google-chrome.googlechromeresources.md)
 
 </td><td>
 
-Input for updating a Tab
+The type of the resource table in `googleChromeContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
+
+</td></tr>
+<tr><td>
+
+[WindowCreateInput](./google-chrome.windowcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -250,7 +294,7 @@ Input for updating a Tab
 
 </td><td>
 
-Input for updating a Window
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 </tbody></table>

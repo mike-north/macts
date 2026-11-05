@@ -4,10 +4,10 @@
 
 ## Address.label property
 
-Label.
+Label. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-label: string
+label: string | null
 ```

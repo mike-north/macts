@@ -24,15 +24,28 @@ export class AccountResourceClient {
   /**
    * List all accounts, as one page.
    */
-  async list(): Promise<Page<Account>> {
-    return this.#http.rpc<Page<Account>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Account>> {
+    return this.#http.invoke<Page<Account>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'Account'
+    )
   }
 
   /**
    * Get a account by name.
    * When several accounts share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async get(name: string): Promise<Account> {
-    return this.#http.rpc<Account>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(
+    name: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Account> {
+    return this.#http.invoke<Account>(
+      `${this.#app}.${this.#resource}.get`,
+      { name },
+      __mactsOptions,
+      'Account'
+    )
   }
 }

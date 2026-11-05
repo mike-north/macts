@@ -9,9 +9,5 @@ The font color
 **Signature:**
 
 ```typescript
-color?: {
-        r: number;
-        g: number;
-        b: number;
-    };
+color?: Rgb;
 ```

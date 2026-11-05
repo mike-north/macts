@@ -4,7 +4,7 @@
 
 ## AttachmentCreateInput interface
 
-Input for creating a Attachment
+Input for creating an Attachment.
 
 **Signature:**
 
@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-string
+[FileSource](./contracts.filesource.md)
 
 </td><td>
 

@@ -4,7 +4,7 @@
 
 ## Folder.name property
 
-The name of the folder
+The name of the folder. Never null: the primary identifier.
 
 **Signature:**
 

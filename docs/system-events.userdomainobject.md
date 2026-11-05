@@ -33,167 +33,36 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[desktopFolder](./system-events.userdomainobject.desktopfolder.md)
+[id](./system-events.userdomainobject.id.md)
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The user's Desktop folder
+string
+
+</td><td>
+
+the unique identifier of the domain. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
 
-[documentsFolder](./system-events.userdomainobject.documentsfolder.md)
+[name](./system-events.userdomainobject.name.md)
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The user's Documents folder
-
-</td></tr>
-<tr><td>
-
-[downloadsFolder](./system-events.userdomainobject.downloadsfolder.md)
+string \| null
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The user's Downloads folder
-
-</td></tr>
-<tr><td>
-
-[favoritesFolder](./system-events.userdomainobject.favoritesfolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The user's Favorites folder
-
-</td></tr>
-<tr><td>
-
-[homeFolder](./system-events.userdomainobject.homefolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The user's Home folder
-
-</td></tr>
-<tr><td>
-
-[moviesFolder](./system-events.userdomainobject.moviesfolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The user's Movies folder
-
-</td></tr>
-<tr><td>
-
-[musicFolder](./system-events.userdomainobject.musicfolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The user's Music folder
-
-</td></tr>
-<tr><td>
-
-[picturesFolder](./system-events.userdomainobject.picturesfolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The user's Pictures folder
-
-</td></tr>
-<tr><td>
-
-[publicFolder](./system-events.userdomainobject.publicfolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The user's Public folder
-
-</td></tr>
-<tr><td>
-
-[sitesFolder](./system-events.userdomainobject.sitesfolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The user's Sites folder
-
-</td></tr>
-<tr><td>
-
-[temporaryItemsFolder](./system-events.userdomainobject.temporaryitemsfolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The Temporary Items folder
+the name of the domain. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

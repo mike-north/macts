@@ -4,10 +4,10 @@
 
 ## Document.content property
 
-The main document text
+The main document text. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-content: string
+readonly content: string | null;
 ```

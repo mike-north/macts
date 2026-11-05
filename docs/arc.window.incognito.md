@@ -4,10 +4,10 @@
 
 ## Window.incognito property
 
-Whether the window is an incognito window.
+Whether the window is an incognito window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-incognito: boolean
+incognito: boolean | null
 ```

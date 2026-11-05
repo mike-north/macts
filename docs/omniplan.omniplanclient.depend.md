@@ -9,7 +9,7 @@ Create a dependency between tasks
 **Signature:**
 
 ```typescript
-depend(prerequisite: string, dependent: string): Promise<void>;
+depend(prerequisite: string, dependent: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -47,6 +47,19 @@ dependent
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

@@ -4,12 +4,26 @@
 
 ## BuildErrorUpdateInput type
 
-Input for updating a BuildError
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type BuildErrorUpdateInput = Partial<BuildErrorCreateInput>
+type BuildErrorUpdateInput = Omit<
+  BuildErrorUpdateInput$1,
+  'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'
+> & {
+  startingLineNumber?: null extends BuildErrorUpdateInput$1['startingLineNumber']
+    ? number | null
+    : number
+  endingLineNumber?: null extends BuildErrorUpdateInput$1['endingLineNumber']
+    ? number | null
+    : number
+  startingColumnNumber?: null extends BuildErrorUpdateInput$1['startingColumnNumber']
+    ? number | null
+    : number
+  endingColumnNumber?: null extends BuildErrorUpdateInput$1['endingColumnNumber']
+    ? number | null
+    : number
+}
 ```
-
-**References:** [BuildErrorCreateInput](./xcode.builderrorcreateinput.md)

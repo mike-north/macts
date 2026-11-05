@@ -4,10 +4,10 @@
 
 ## Track.ratingKind property
 
-the rating kind of this track
+the rating kind of this track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-ratingKind: string
+readonly ratingKind: string | null;
 ```

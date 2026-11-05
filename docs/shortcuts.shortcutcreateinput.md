@@ -4,7 +4,7 @@
 
 ## ShortcutCreateInput interface
 
-Input for creating a Shortcut
+Input for creating a Shortcut.
 
 **Signature:**
 

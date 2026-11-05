@@ -4,10 +4,10 @@
 
 ## Calendar.description property
 
-The calendar description
+The calendar description. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-description: string
+description: string | null
 ```

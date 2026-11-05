@@ -4,10 +4,10 @@
 
 ## File_2.creatorType property
 
-the OSType identifying the application that created the file
+the OSType identifying the application that created the file. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-creatorType: string
+creatorType: string | null
 ```

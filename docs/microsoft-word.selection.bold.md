@@ -4,10 +4,10 @@
 
 ## Selection.bold property
 
-Whether the selection is formatted as bold
+Whether the selection is formatted as bold. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-bold: boolean
+bold: boolean | null
 ```

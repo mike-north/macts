@@ -39,26 +39,11 @@ Description
 
 </td><td>
 
-[DetailLevel](./system-information.detaillevel.md)
+[DetailLevel](./system-information.detaillevel.md) \| null
 
 </td><td>
 
-The desired level of detail for the system profile document
-
-</td></tr>
-<tr><td>
-
-[id?](./system-information.document.id.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
+The desired level of detail for the system profile document. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +52,15 @@ _(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, p
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The document name
+The document name. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -82,13 +69,15 @@ The document name
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-Plain text representation of the system profile document
+string \| null
+
+</td><td>
+
+Plain text representation of the system profile document. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +86,15 @@ Plain text representation of the system profile document
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-XML representation of the system profile document
+string \| null
+
+</td><td>
+
+XML representation of the system profile document. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

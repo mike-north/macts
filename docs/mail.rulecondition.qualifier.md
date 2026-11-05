@@ -4,10 +4,10 @@
 
 ## RuleCondition.qualifier property
 
-Rule qualifier
+Rule qualifier. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-qualifier: string
+qualifier: string | null
 ```

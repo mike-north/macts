@@ -4,10 +4,10 @@
 
 ## List.emblem property
 
-The emblem icon name of the list
+The emblem icon name of the list. Nullable. Observed missing in 3 of 3 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-emblem: string
+emblem: string | null
 ```

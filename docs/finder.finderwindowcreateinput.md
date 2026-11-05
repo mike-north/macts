@@ -2,123 +2,14 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [FinderWindowCreateInput](./finder.finderwindowcreateinput.md)
 
-## FinderWindowCreateInput interface
+## FinderWindowCreateInput type
 
-Input for creating a FinderWindow
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface FinderWindowCreateInput
+type FinderWindowCreateInput = Omit<FinderWindowCreateInput$1, 'sidebarWidth'> & {
+  sidebarWidth?: null extends FinderWindowCreateInput$1['sidebarWidth'] ? number | null : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[currentView?](./finder.finderwindowcreateinput.currentview.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ the current view for the container window
-
-</td></tr>
-<tr><td>
-
-[pathbarVisible?](./finder.finderwindowcreateinput.pathbarvisible.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ Is the window's path bar visible?
-
-</td></tr>
-<tr><td>
-
-[sidebarWidth?](./finder.finderwindowcreateinput.sidebarwidth.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ the width of the sidebar for the container window
-
-</td></tr>
-<tr><td>
-
-[statusbarVisible?](./finder.finderwindowcreateinput.statusbarvisible.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ Is the window's status bar visible?
-
-</td></tr>
-<tr><td>
-
-[target?](./finder.finderwindowcreateinput.target.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ the container at which this file viewer is targeted
-
-</td></tr>
-<tr><td>
-
-[toolbarVisible?](./finder.finderwindowcreateinput.toolbarvisible.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ Is the window's toolbar visible?
-
-</td></tr>
-</tbody></table>

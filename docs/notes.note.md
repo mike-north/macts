@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The HTML content of the note body
+The HTML content of the note body. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +52,15 @@ The HTML content of the note body
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The creation date of the note
+Date
+
+</td><td>
+
+The creation date of the note. Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -67,13 +69,15 @@ The creation date of the note
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the note
+The unique identifier of the note. Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -82,13 +86,15 @@ The unique identifier of the note
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The modification date of the note
+Date
+
+</td><td>
+
+The modification date of the note. Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -103,7 +109,7 @@ string
 
 </td><td>
 
-The name of the note (first line)
+The name of the note (first line). Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -112,13 +118,15 @@ The name of the note (first line)
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 boolean
 
 </td><td>
 
-Whether the note is password protected
+Whether the note is password protected. Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -127,13 +135,15 @@ Whether the note is password protected
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The plaintext content of the note
+string \| null
+
+</td><td>
+
+The plaintext content of the note. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +152,15 @@ The plaintext content of the note
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 boolean
 
 </td><td>
 
-Whether the note is shared
+Whether the note is shared. Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
 
 </td></tr>
 </tbody></table>

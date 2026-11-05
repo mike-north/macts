@@ -4,10 +4,10 @@
 
 ## UIElement.roleDescription property
 
-a more complete description of the UI element's role
+a more complete description of the UI element's role. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-roleDescription: string
+readonly roleDescription: string | null;
 ```

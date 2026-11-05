@@ -4,10 +4,10 @@
 
 ## Shape.gradientAngle property
 
-Angle of a linear gradient fill
+Angle of a linear gradient fill. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-gradientAngle: number
+gradientAngle: number | null
 ```

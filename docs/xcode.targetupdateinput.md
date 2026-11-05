@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/xcode](./xcode.md) &gt; [TargetUpdateInput](./xcode.targetupdateinput.md)
 
-## TargetUpdateInput type
+## TargetUpdateInput interface
 
-Input for updating a Target
+Input for updating a Target. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type TargetUpdateInput = Partial<TargetCreateInput>
+interface TargetUpdateInput
 ```
 
-**References:** [TargetCreateInput](./xcode.targetcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[name?](./xcode.targetupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of this target. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

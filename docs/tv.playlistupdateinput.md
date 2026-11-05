@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/tv](./tv.md) &gt; [PlaylistUpdateInput](./tv.playlistupdateinput.md)
 
-## PlaylistUpdateInput type
+## PlaylistUpdateInput interface
 
-Input for updating a Playlist
+Input for updating a Playlist. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type PlaylistUpdateInput = Partial<PlaylistCreateInput>
+interface PlaylistUpdateInput
 ```
 
-**References:** [PlaylistCreateInput](./tv.playlistcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[description?](./tv.playlistupdateinput.description.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the description of the playlist. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[name?](./tv.playlistupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the name of the playlist. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

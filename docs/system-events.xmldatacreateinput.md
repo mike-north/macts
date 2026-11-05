@@ -4,7 +4,7 @@
 
 ## XMLDataCreateInput interface
 
-Input for creating a XMLData
+Input for creating a XMLData.
 
 **Signature:**
 

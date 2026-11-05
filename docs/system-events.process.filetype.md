@@ -4,10 +4,10 @@
 
 ## Process.fileType property
 
-the OSType of the file type of the process
+the OSType of the file type of the process. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fileType: string
+readonly fileType: string | null;
 ```

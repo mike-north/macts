@@ -4,10 +4,10 @@
 
 ## Canvas.horizontalPages property
 
-Horizontal pages
+Horizontal pages. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-horizontalPages: number
+horizontalPages: Integer | null
 ```

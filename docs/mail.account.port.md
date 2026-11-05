@@ -4,10 +4,10 @@
 
 ## Account.port property
 
-The port used to connect to an account
+The port used to connect to an account. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-port: number
+port: Integer | null
 ```

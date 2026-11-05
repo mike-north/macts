@@ -4,10 +4,10 @@
 
 ## Tab.tty property
 
-The tty device of the tab
+The tty device of the tab. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-tty: string
+readonly tty: string;
 ```

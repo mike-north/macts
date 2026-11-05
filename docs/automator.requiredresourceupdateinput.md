@@ -4,12 +4,10 @@
 
 ## RequiredResourceUpdateInput type
 
-Input for updating a RequiredResource
+Input for updating a RequiredResource. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type RequiredResourceUpdateInput = Partial<RequiredResourceCreateInput>
+type RequiredResourceUpdateInput = Record<string, never>
 ```
-
-**References:** [RequiredResourceCreateInput](./automator.requiredresourcecreateinput.md)

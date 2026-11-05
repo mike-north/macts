@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./omnigraffle.canvasresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./omnigraffle.canvasresourceclient.create.md)
 
 </td><td>
 
@@ -68,7 +68,7 @@ Create a new canvas.
 </td></tr>
 <tr><td>
 
-[get(id)](./omnigraffle.canvasresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./omnigraffle.canvasresourceclient.get.md)
 
 </td><td>
 
@@ -79,13 +79,13 @@ Get a canvas by id.
 </td></tr>
 <tr><td>
 
-[list()](./omnigraffle.canvasresourceclient.list.md)
+[list(\_\_mactsOptions)](./omnigraffle.canvasresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all canvases.
+List all canvases, as one page.
 
 </td></tr>
 </tbody></table>

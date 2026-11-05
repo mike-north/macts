@@ -4,10 +4,10 @@
 
 ## UIElement.orientation property
 
-the orientation of the UI element
+the orientation of the UI element. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-orientation: string
+readonly orientation: string | null;
 ```

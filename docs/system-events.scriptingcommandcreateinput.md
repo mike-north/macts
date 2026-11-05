@@ -4,7 +4,7 @@
 
 ## ScriptingCommandCreateInput type
 
-Input for creating a ScriptingCommand
+Input for creating a ScriptingCommand.
 
 **Signature:**
 

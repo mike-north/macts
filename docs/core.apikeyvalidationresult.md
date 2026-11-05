@@ -2,93 +2,16 @@
 
 [Home](./index.md) &gt; [@macts/core](./core.md) &gt; [ApiKeyValidationResult](./core.apikeyvalidationresult.md)
 
-## ApiKeyValidationResult interface
+## ApiKeyValidationResult type
 
 Result of API key validation.
+
+Discriminated on `valid`<!-- -->: narrowing on `result.valid` gives direct access to `payload` (success) or `error`<!-- -->/`errorCode` (failure) without guards.
 
 **Signature:**
 
 ```typescript
-interface ApiKeyValidationResult
+type ApiKeyValidationResult = ApiKeyValidationSuccess | ApiKeyValidationFailure
 ```
 
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[error?](./core.apikeyvalidationresult.error.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Error message if invalid
-
-</td></tr>
-<tr><td>
-
-[errorCode?](./core.apikeyvalidationresult.errorcode.md)
-
-</td><td>
-
-</td><td>
-
-'INVALID_FORMAT' \| 'INVALID_SIGNATURE' \| 'EXPIRED' \| 'REVOKED' \| 'MALFORMED_PAYLOAD'
-
-</td><td>
-
-_(Optional)_ Error code for programmatic handling
-
-</td></tr>
-<tr><td>
-
-[payload?](./core.apikeyvalidationresult.payload.md)
-
-</td><td>
-
-</td><td>
-
-[ApiKeyPayload](./core.apikeypayload.md)
-
-</td><td>
-
-_(Optional)_ Decoded payload if valid
-
-</td></tr>
-<tr><td>
-
-[valid](./core.apikeyvalidationresult.valid.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-Whether the key is valid
-
-</td></tr>
-</tbody></table>
+**References:** [ApiKeyValidationSuccess](./core.apikeyvalidationsuccess.md)<!-- -->, [ApiKeyValidationFailure](./core.apikeyvalidationfailure.md)

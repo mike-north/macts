@@ -4,10 +4,10 @@
 
 ## MessageViewer.mailboxListVisible property
 
-Controls whether the list of mailboxes is visible or not
+Controls whether the list of mailboxes is visible or not. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-mailboxListVisible: boolean
+mailboxListVisible: boolean | null
 ```

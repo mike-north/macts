@@ -37,58 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The architecture for which this run destination results in execution
-
-</td></tr>
-<tr><td>
-
-[companionDevice](./xcode.rundestination.companiondevice.md)
+string \| null
 
 </td><td>
 
-</td><td>
-
-[Device](./xcode.device.md)
-
-</td><td>
-
-If the run destination's device has a companion, this is that device
-
-</td></tr>
-<tr><td>
-
-[device](./xcode.rundestination.device.md)
-
-</td><td>
-
-</td><td>
-
-[Device](./xcode.device.md)
-
-</td><td>
-
-The physical or virtual device which this run destination targets
-
-</td></tr>
-<tr><td>
-
-[id?](./xcode.rundestination.id.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
+The architecture for which this run destination results in execution. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +54,15 @@ _(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, p
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The name of the run destination, as displayed in Xcode's interface
+The name of the run destination, as displayed in Xcode's interface. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -112,13 +71,15 @@ The name of the run destination, as displayed in Xcode's interface
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The identifier of the platform which this run destination targets
+string \| null
+
+</td><td>
+
+The identifier of the platform which this run destination targets. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

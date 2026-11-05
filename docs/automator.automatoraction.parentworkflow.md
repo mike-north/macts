@@ -4,10 +4,10 @@
 
 ## AutomatorAction.parentWorkflow property
 
-The workflow that contains the action
+The workflow that contains the action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-parentWorkflow: unknown
+readonly parentWorkflow: unknown;
 ```

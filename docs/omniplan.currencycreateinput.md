@@ -4,7 +4,7 @@
 
 ## CurrencyCreateInput type
 
-Input for creating a Currency
+Input for creating a Currency.
 
 **Signature:**
 

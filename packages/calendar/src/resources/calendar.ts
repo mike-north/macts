@@ -24,22 +24,43 @@ export class CalendarResourceClient {
   /**
    * List all calendars, as one page.
    */
-  async list(): Promise<Page<Calendar>> {
-    return this.#http.rpc<Page<Calendar>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Calendar>> {
+    return this.#http.invoke<Page<Calendar>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'Calendar'
+    )
   }
 
   /**
    * Get a calendar by id.
    * When several calendars share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async get(id: string): Promise<Calendar> {
-    return this.#http.rpc<Calendar>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Calendar> {
+    return this.#http.invoke<Calendar>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Calendar'
+    )
   }
 
   /**
    * Create a new calendar.
    */
-  async create(input: CalendarCreateInput): Promise<Calendar> {
-    return this.#http.rpc<Calendar>(`${this.#app}.${this.#resource}.create`, input)
+  async create(
+    input: CalendarCreateInput,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Calendar> {
+    return this.#http.invoke<Calendar>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'Calendar'
+    )
   }
 }

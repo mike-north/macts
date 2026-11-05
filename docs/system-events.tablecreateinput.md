@@ -4,7 +4,7 @@
 
 ## TableCreateInput type
 
-Input for creating a Table
+Input for creating a Table.
 
 **Signature:**
 

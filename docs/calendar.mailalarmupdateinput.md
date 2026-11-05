@@ -4,12 +4,12 @@
 
 ## MailAlarmUpdateInput type
 
-Input for updating a MailAlarm
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type MailAlarmUpdateInput = Partial<MailAlarmCreateInput>
+type MailAlarmUpdateInput = Omit<MailAlarmUpdateInput$1, 'triggerInterval'> & {
+  triggerInterval?: null extends MailAlarmUpdateInput$1['triggerInterval'] ? number | null : number
+}
 ```
-
-**References:** [MailAlarmCreateInput](./calendar.mailalarmcreateinput.md)

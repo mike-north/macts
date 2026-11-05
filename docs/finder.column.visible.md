@@ -4,10 +4,10 @@
 
 ## Column.visible property
 
-is this column visible
+is this column visible. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-visible: boolean
+visible: boolean | null
 ```

@@ -4,10 +4,10 @@
 
 ## Track.discNumber property
 
-the index of the disc containing this track on the source album
+the index of the disc containing this track on the source album. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-discNumber: number
+discNumber: Integer | null
 ```

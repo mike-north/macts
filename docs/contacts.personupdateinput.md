@@ -2,14 +2,288 @@
 
 [Home](./index.md) &gt; [@macts/contacts](./contacts.md) &gt; [PersonUpdateInput](./contacts.personupdateinput.md)
 
-## PersonUpdateInput type
+## PersonUpdateInput interface
 
-Input for updating a Person
+Input for updating a Person. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type PersonUpdateInput = Partial<PersonCreateInput>
+interface PersonUpdateInput
 ```
 
-**References:** [PersonCreateInput](./contacts.personcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[birthDate?](./contacts.personupdateinput.birthdate.md)
+
+</td><td>
+
+</td><td>
+
+Date
+
+</td><td>
+
+_(Optional)_ The birth date of this person. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[company?](./contacts.personupdateinput.company.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Is the current record a company or a person. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[department?](./contacts.personupdateinput.department.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Department that this person works for. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[firstName?](./contacts.personupdateinput.firstname.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The First name of this person. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[homePage?](./contacts.personupdateinput.homepage.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The home page of this person. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[jobTitle?](./contacts.personupdateinput.jobtitle.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The job title of this person. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[lastName?](./contacts.personupdateinput.lastname.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The Last name of this person. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[maidenName?](./contacts.personupdateinput.maidenname.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The Maiden name of this person. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[middleName?](./contacts.personupdateinput.middlename.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The Middle name of this person. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[nickname?](./contacts.personupdateinput.nickname.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The Nickname of this person. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[note?](./contacts.personupdateinput.note.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Notes for this person. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[organization?](./contacts.personupdateinput.organization.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Organization that employs this person. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[phoneticFirstName?](./contacts.personupdateinput.phoneticfirstname.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The phonetic version of the First name of this person. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[phoneticLastName?](./contacts.personupdateinput.phoneticlastname.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The phonetic version of the Last name of this person. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[phoneticMiddleName?](./contacts.personupdateinput.phoneticmiddlename.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The Phonetic version of the Middle name of this person. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[suffix?](./contacts.personupdateinput.suffix.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The Suffix of this person. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[title?](./contacts.personupdateinput.title.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The title of this person. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

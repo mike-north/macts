@@ -4,12 +4,10 @@
 
 ## RadioTunerPlaylistUpdateInput type
 
-Input for updating a RadioTunerPlaylist
+Input for updating a RadioTunerPlaylist. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type RadioTunerPlaylistUpdateInput = Partial<RadioTunerPlaylistCreateInput>
+type RadioTunerPlaylistUpdateInput = Record<string, never>
 ```
-
-**References:** [RadioTunerPlaylistCreateInput](./music.radiotunerplaylistcreateinput.md)

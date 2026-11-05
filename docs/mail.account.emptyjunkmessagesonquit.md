@@ -4,10 +4,10 @@
 
 ## Account.emptyJunkMessagesOnQuit property
 
-Indicates whether the messages in the junk messages mailboxes will be deleted on quit
+Indicates whether the messages in the junk messages mailboxes will be deleted on quit. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-emptyJunkMessagesOnQuit: boolean
+emptyJunkMessagesOnQuit: boolean | null
 ```

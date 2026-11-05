@@ -4,10 +4,10 @@
 
 ## InternetLocationFile.location property
 
-the internet location
+the internet location. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-location: string
+readonly location: string | null;
 ```

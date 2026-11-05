@@ -4,10 +4,10 @@
 
 ## Track.seasonNumber property
 
-the season number of the track
+the season number of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-seasonNumber: number
+seasonNumber: Integer | null
 ```

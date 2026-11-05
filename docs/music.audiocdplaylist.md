@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the artist of the CD
+the artist of the CD. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ the artist of the CD
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-is this CD a compilation album?
+is this CD a compilation album? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ is this CD a compilation album?
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the composer of the CD
+the composer of the CD. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ the composer of the CD
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the total number of discs in this CD’s album
+the total number of discs in this CD’s album. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +99,11 @@ the total number of discs in this CD’s album
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the index of this CD disc in the source album
+the index of this CD disc in the source album. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +114,11 @@ the index of this CD disc in the source album
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the genre of the CD
+the genre of the CD. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +129,11 @@ the genre of the CD
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the year the album was recorded/released
+the year the album was recorded/released. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

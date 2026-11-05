@@ -4,10 +4,10 @@
 
 ## Interface.duplex property
 
-the duplex setting half \| full \| full with flow control
+the duplex setting half \| full \| full with flow control. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-duplex: string
+duplex: string | null
 ```

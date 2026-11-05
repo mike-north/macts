@@ -4,10 +4,10 @@
 
 ## ScriptingCommand.id property
 
-The unique identifier of the command
+The unique identifier of the command. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

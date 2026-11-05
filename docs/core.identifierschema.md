@@ -13,6 +13,37 @@ IdentifierSchema: z.ZodObject<
   {
     property: z.ZodString
     primary: z.ZodDefault<z.ZodBoolean>
+    targeting: z.ZodOptional<
+      z.ZodEnum<{
+        byId: 'byId'
+        byProperty: 'byProperty'
+        byKey: 'byKey'
+        byRoot: 'byRoot'
+      }>
+    >
+    runtimeProperty: z.ZodOptional<z.ZodString>
+    unique: z.ZodOptional<z.ZodBoolean>
+    evidence: z.ZodOptional<
+      z.ZodObject<
+        {
+          unique: z.ZodOptional<
+            z.ZodObject<
+              {
+                source: z.ZodEnum<{
+                  curated: 'curated'
+                  sdef: 'sdef'
+                }>
+                note: z.ZodString
+                observedAt: z.ZodOptional<z.ZodISODateTime>
+                appVersion: z.ZodOptional<z.ZodString>
+              },
+              z.core.$strict
+            >
+          >
+        },
+        z.core.$strict
+      >
+    >
   },
   z.core.$strip
 >

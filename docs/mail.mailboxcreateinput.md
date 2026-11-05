@@ -4,7 +4,7 @@
 
 ## MailboxCreateInput interface
 
-Input for creating a Mailbox
+Input for creating a Mailbox.
 
 **Signature:**
 

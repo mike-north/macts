@@ -6,12 +6,12 @@
 
 Construct an immutable [AuditRecord](./core.auditrecord.md) from its inputs.
 
-Pure and deterministic: given the same input (including the injected `timestamp`<!-- -->) it always produces the same record. The input `timestamp` is defensively copied so the returned record cannot be mutated by later changes to the caller's `Date` instance. The optional `reason` is included only when provided, matching `exactOptionalPropertyTypes` semantics.
+Pure and deterministic: given the same input (including the injected `timestamp`<!-- -->) it always produces the same record. The input `timestamp` is defensively copied so the returned record cannot be mutated by later changes to the caller's `Date` instance. The optional `reason` and `approvalId` of a governed record are included only when provided, matching `exactOptionalPropertyTypes` semantics. Only the fields of the record's kind are copied.
 
 **Signature:**
 
 ```typescript
-declare function createAuditRecord(input: AuditRecordInput): AuditRecord
+declare function createAuditRecord(input: GovernedAuditRecordInput): GovernedAuditRecord
 ```
 
 ## Parameters
@@ -35,7 +35,7 @@ input
 
 </td><td>
 
-[AuditRecordInput](./core.auditrecordinput.md)
+[GovernedAuditRecordInput](./core.governedauditrecordinput.md)
 
 </td><td>
 
@@ -46,6 +46,10 @@ The capability-call details, including an injected timestamp.
 
 **Returns:**
 
-[AuditRecord](./core.auditrecord.md)
+[GovernedAuditRecord](./core.governedauditrecord.md)
 
-A new immutable audit record.
+A new immutable audit record of the same kind as `input`<!-- -->.
+
+## Exceptions
+
+`TypeError` for an `invalid-input` input that carries an argument summary, a reason, or an approval id, or whose issue count is not a non-negative integer; or for a `permission-denied` input that carries any of those fields.

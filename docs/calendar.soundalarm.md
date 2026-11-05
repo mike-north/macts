@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The (POSIX) path to the sound file to be used for the alarm
+The (POSIX) path to the sound file to be used for the alarm. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ The (POSIX) path to the sound file to be used for the alarm
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The system sound name to be used for the alarm
+The system sound name to be used for the alarm. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ The system sound name to be used for the alarm
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-An absolute alarm date
+An absolute alarm date. Nullable. Observed missing in 9 of 9 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ An absolute alarm date
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The interval in minutes between the event and the alarm (positive for after, negative for before)
+The interval in minutes between the event and the alarm (positive for after, negative for before). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

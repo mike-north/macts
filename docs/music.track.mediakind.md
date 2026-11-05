@@ -4,10 +4,10 @@
 
 ## Track.mediaKind property
 
-the media kind of the track
+the media kind of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-mediaKind: string
+mediaKind: string | null
 ```

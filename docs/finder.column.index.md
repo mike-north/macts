@@ -4,10 +4,10 @@
 
 ## Column.index property
 
-the index in the front-to-back ordering within its container
+the index in the front-to-back ordering within its container. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-index: number
+index: Integer | null
 ```

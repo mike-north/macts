@@ -4,10 +4,10 @@
 
 ## Paragraph.paragraphId property
 
-The paragraph ID
+The paragraph ID. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-paragraphId: number
+readonly paragraphId: Integer;
 ```

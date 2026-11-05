@@ -4,10 +4,10 @@
 
 ## Graphic.flippedHorizontally property
 
-Is this graphic flipped horizontally?
+Is this graphic flipped horizontally? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-flippedHorizontally: boolean
+flippedHorizontally: boolean | null
 ```

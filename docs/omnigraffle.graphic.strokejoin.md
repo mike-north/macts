@@ -4,10 +4,10 @@
 
 ## Graphic.strokeJoin property
 
-Type of join between segments of the stroke
+Type of join between segments of the stroke. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-strokeJoin: StrokeJoin
+strokeJoin: StrokeJoin | null
 ```

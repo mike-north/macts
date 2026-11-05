@@ -4,12 +4,10 @@
 
 ## RadioGroupUpdateInput type
 
-Input for updating a RadioGroup
+Input for updating a RadioGroup. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type RadioGroupUpdateInput = Partial<RadioGroupCreateInput>
+type RadioGroupUpdateInput = Record<string, never>
 ```
-
-**References:** [RadioGroupCreateInput](./system-events.radiogroupcreateinput.md)

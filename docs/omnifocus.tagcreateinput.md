@@ -4,7 +4,7 @@
 
 ## TagCreateInput interface
 
-Input for creating a Tag
+Input for creating a Tag.
 
 **Signature:**
 

@@ -4,10 +4,10 @@
 
 ## Incrementor.id property
 
-Unique identifier for this incrementor
+Unique identifier for this incrementor. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

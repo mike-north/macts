@@ -4,10 +4,10 @@
 
 ## BuildConfiguration.name property
 
-The name of the build configuration
+The name of the build configuration. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

@@ -4,10 +4,10 @@
 
 ## Shortcut.subtitle property
 
-The shortcut's subtitle
+The shortcut's subtitle. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-subtitle: string
+readonly subtitle: string | null;
 ```

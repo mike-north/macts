@@ -6,7 +6,7 @@
 
 Derive the list of capabilities from a single manifest.
 
-Mirrors the MCP generator's traversal so the registry and generated tools stay in lock-step: one capability per resource command per matching resource, plus one per application command.
+One capability per operation the manifest exposes: one per resource command per matching resource, plus one per application command. These are the same operations the app's generated contract describes, so every capability has exactly one contract operation and shares its MCP tool name. An operation that cannot be called, because a required input admits no value, has no capability, as it has no MCP tool and no CLI command.
 
 **Signature:**
 

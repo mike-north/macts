@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-When the folder was created
+Date \| null
+
+</td><td>
+
+When the folder was created. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ When the folder was created
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Set if the folder is currently hidden or any of its container folders are hidden
+boolean \| null
+
+</td><td>
+
+Set if the folder is currently hidden or any of its container folders are hidden. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +73,11 @@ Set if the folder is currently hidden or any of its container folders are hidden
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Set if the folder is currently hidden
+Set if the folder is currently hidden. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +86,15 @@ Set if the folder is currently hidden
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the folder
+The unique identifier of the folder. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -97,13 +103,15 @@ The unique identifier of the folder
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-When the folder was last modified
+Date \| null
+
+</td><td>
+
+When the folder was last modified. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +122,11 @@ When the folder was last modified
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the folder
+The name of the folder. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +137,11 @@ The name of the folder
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The note of the folder
+The note of the folder. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

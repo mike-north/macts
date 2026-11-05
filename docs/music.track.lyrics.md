@@ -4,10 +4,10 @@
 
 ## Track.lyrics property
 
-the lyrics of the track
+the lyrics of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-lyrics: string
+lyrics: string | null
 ```

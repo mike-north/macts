@@ -4,10 +4,10 @@
 
 ## Section.protectedForForms property
 
-Whether the section is protected for forms
+Whether the section is protected for forms. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-protectedForForms: boolean
+protectedForForms: boolean | null
 ```

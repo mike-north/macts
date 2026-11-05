@@ -4,10 +4,10 @@
 
 ## Document.fullName property
 
-The full path of the document in HFS format
+The full path of the document in HFS format. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fullName: string
+readonly fullName: string | null;
 ```

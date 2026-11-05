@@ -4,10 +4,10 @@
 
 ## ScriptingEnumeration.hidden property
 
-Is the enumeration hidden?
+Is the enumeration hidden? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-hidden: boolean
+readonly hidden: boolean | null;
 ```

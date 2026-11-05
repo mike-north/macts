@@ -4,10 +4,10 @@
 
 ## Tab.id property
 
-Unique ID of the tab.
+Unique ID of the tab among the tabs of its window, within one browser session: ids start over each time the browser is relaunched, so an id kept across a relaunch may find a different tab, not merely none, and an action through it, such as closing the tab, would act on that other tab. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

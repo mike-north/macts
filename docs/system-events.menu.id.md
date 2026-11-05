@@ -4,10 +4,10 @@
 
 ## Menu.id property
 
-Unique identifier for this menu
+Unique identifier for this menu. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

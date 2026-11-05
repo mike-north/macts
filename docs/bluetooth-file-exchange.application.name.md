@@ -4,10 +4,10 @@
 
 ## Application.name property
 
-The name of the application
+The name of the application. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string;
 ```

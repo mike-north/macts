@@ -4,10 +4,10 @@
 
 ## Track.playedCount property
 
-number of times this track has been played
+number of times this track has been played. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-playedCount: number
+playedCount: Integer | null
 ```

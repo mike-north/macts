@@ -21,6 +21,7 @@
 export { iTermClient, iTermError, HttpClient } from './client.js'
 export type { iTermClientOptions } from './client.js'
 export * from './types.js'
+export type { iTermResources } from './contract/index.js'
 
 export { capabilities } from './capabilities.js'
 export type { CapabilityMetadata, CapabilityRisk } from './capabilities.js'

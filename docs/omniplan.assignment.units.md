@@ -4,10 +4,10 @@
 
 ## Assignment.units property
 
-Units of the resource required for this task (1.0 = 100%)
+Units of the resource required for this task (1.0 = 100%). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-units: number
+units: number | null
 ```

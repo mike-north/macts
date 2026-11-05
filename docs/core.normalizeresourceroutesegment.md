@@ -4,7 +4,9 @@
 
 ## normalizeResourceRouteSegment() function
 
-Normalize a resource's plural name into the canonical route segment.
+A resource's segment: the one spelling of a resource on every public surface.
+
+It is the acronym-aware lower camel case of the resource's plural (`MediaItems` → `mediaItems`<!-- -->, `AIMHandles` → `aimHandles`<!-- -->, `Notes` → `notes`<!-- -->). The route and operation id (`photos.mediaItems.list`<!-- -->), the SDK resource accessor in the HTTP client and the contract (`photos.mediaItems`<!-- -->), the MCP tool name, the capability's resource, and the scope of a derived permission (`photos:mediaItems:list`<!-- -->) all take it from here, so a caller can carry one name from any of them to the others. No surface may derive its own spelling.
 
 **Signature:**
 
@@ -46,4 +48,4 @@ The resource's `plural` name from the manifest.
 
 string
 
-The canonical resource route segment (lowercased).
+The resource segment.

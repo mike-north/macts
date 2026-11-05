@@ -4,10 +4,10 @@
 
 ## Task.effectivelyCompleted property
 
-True if the task is completed, or any of its containing tasks or project are completed
+True if the task is completed, or any of its containing tasks or project are completed. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-effectivelyCompleted: boolean
+readonly effectivelyCompleted: boolean | null;
 ```

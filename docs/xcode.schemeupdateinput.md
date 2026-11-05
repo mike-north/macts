@@ -4,12 +4,10 @@
 
 ## SchemeUpdateInput type
 
-Input for updating a Scheme
+Input for updating a Scheme. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SchemeUpdateInput = Partial<SchemeCreateInput>
+type SchemeUpdateInput = Record<string, never>
 ```
-
-**References:** [SchemeCreateInput](./xcode.schemecreateinput.md)

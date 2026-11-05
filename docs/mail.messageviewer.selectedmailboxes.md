@@ -4,10 +4,10 @@
 
 ## MessageViewer.selectedMailboxes property
 
-List of mailboxes currently selected in the list of mailboxes
+List of mailboxes currently selected in the list of mailboxes. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-selectedMailboxes: string
+selectedMailboxes: string | null
 ```

@@ -4,14 +4,10 @@
 
 ## Graphic.strokeColor property
 
-Color of the stroke
+Color of the stroke. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-strokeColor: {
-  r: number
-  g: number
-  b: number
-}
+strokeColor: Rgb | null
 ```

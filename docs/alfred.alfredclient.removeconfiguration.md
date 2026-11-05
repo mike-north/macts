@@ -9,7 +9,7 @@ Revert workflow configuration value to default, or delete environment variable
 **Signature:**
 
 ```typescript
-removeConfiguration(variable: string, inWorkflow: string): Promise<void>;
+removeConfiguration(variable: string, inWorkflow: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -47,6 +47,19 @@ inWorkflow
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

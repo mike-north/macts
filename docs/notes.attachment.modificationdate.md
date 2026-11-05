@@ -4,10 +4,10 @@
 
 ## Attachment.modificationDate property
 
-The modification date of the attachment
+The modification date of the attachment. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-modificationDate: string
+readonly modificationDate: Date | null;
 ```

@@ -4,10 +4,10 @@
 
 ## Track.purchaserAccount property
 
-the account of the person who purchased this track
+the account of the person who purchased this track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-purchaserAccount: string
+readonly purchaserAccount: string | null;
 ```

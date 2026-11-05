@@ -2,14 +2,153 @@
 
 [Home](./index.md) &gt; [@macts/omnigraffle](./omnigraffle.md) &gt; [ExportSettingsUpdateInput](./omnigraffle.exportsettingsupdateinput.md)
 
-## ExportSettingsUpdateInput type
+## ExportSettingsUpdateInput interface
 
-Input for updating a ExportSettings
+Input for updating an ExportSettings. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ExportSettingsUpdateInput = Partial<ExportSettingsCreateInput>
+interface ExportSettingsUpdateInput
 ```
 
-**References:** [ExportSettingsCreateInput](./omnigraffle.exportsettingscreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[areaType?](./omnigraffle.exportsettingsupdateinput.areatype.md)
+
+</td><td>
+
+</td><td>
+
+[ExportAreaType](./omnigraffle.exportareatype.md)
+
+</td><td>
+
+_(Optional)_ The type of area to be exported. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[borderAmount?](./omnigraffle.exportsettingsupdateinput.borderamount.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The number of pixels of border area to include. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[drawsBackground?](./omnigraffle.exportsettingsupdateinput.drawsbackground.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Draw the background canvas color. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[exportScale?](./omnigraffle.exportsettingsupdateinput.exportscale.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The scale to use during export. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[includeBorder?](./omnigraffle.exportsettingsupdateinput.includeborder.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether or not to include a border area. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[includeNonprintingLayers?](./omnigraffle.exportsettingsupdateinput.includenonprintinglayers.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether to export with non printing layers. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[resolution?](./omnigraffle.exportsettingsupdateinput.resolution.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The number of pixels per point in the resulting exported image. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[useArtboards?](./omnigraffle.exportsettingsupdateinput.useartboards.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether to export with artboards. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

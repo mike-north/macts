@@ -4,12 +4,12 @@
 
 ## AutomatorActionUpdateInput type
 
-Input for updating a AutomatorAction
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type AutomatorActionUpdateInput = Partial<AutomatorActionCreateInput>
+type AutomatorActionUpdateInput = Omit<AutomatorActionUpdateInput$1, 'index'> & {
+  index?: null extends AutomatorActionUpdateInput$1['index'] ? number | null : number
+}
 ```
-
-**References:** [AutomatorActionCreateInput](./automator.automatoractioncreateinput.md)

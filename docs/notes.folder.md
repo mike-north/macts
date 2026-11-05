@@ -33,32 +33,19 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[container?](./notes.folder.container.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ The container of the folder
-
-</td></tr>
-<tr><td>
-
 [id](./notes.folder.id.md)
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The unique identifier of the folder
+string \| null
+
+</td><td>
+
+The unique identifier of the folder. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -73,7 +60,7 @@ string
 
 </td><td>
 
-The name of the folder
+The name of the folder. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -82,13 +69,15 @@ The name of the folder
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the folder is shared
+boolean \| null
+
+</td><td>
+
+Whether the folder is shared. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

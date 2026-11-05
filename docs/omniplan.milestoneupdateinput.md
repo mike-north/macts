@@ -2,14 +2,78 @@
 
 [Home](./index.md) &gt; [@macts/omniplan](./omniplan.md) &gt; [MilestoneUpdateInput](./omniplan.milestoneupdateinput.md)
 
-## MilestoneUpdateInput type
+## MilestoneUpdateInput interface
 
-Input for updating a Milestone
+Input for updating a Milestone. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type MilestoneUpdateInput = Partial<MilestoneCreateInput>
+interface MilestoneUpdateInput
 ```
 
-**References:** [MilestoneCreateInput](./omniplan.milestonecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[name?](./omniplan.milestoneupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Milestone name. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[note?](./omniplan.milestoneupdateinput.note.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Notes. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[startingDate?](./omniplan.milestoneupdateinput.startingdate.md)
+
+</td><td>
+
+</td><td>
+
+Date
+
+</td><td>
+
+_(Optional)_ Milestone date. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

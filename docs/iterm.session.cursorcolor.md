@@ -4,14 +4,10 @@
 
 ## Session.cursorColor property
 
-The cursorColor property
+The cursorColor property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-cursorColor: {
-  r: number
-  g: number
-  b: number
-}
+cursorColor: Rgb | null
 ```

@@ -4,10 +4,10 @@
 
 ## CustomDate.value property
 
-The date value
+The date value. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-value: Date
+value: Date | null
 ```

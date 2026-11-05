@@ -4,14 +4,10 @@
 
 ## Calendar.color property
 
-The calendar color
+The calendar color. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-color: {
-  r: number
-  g: number
-  b: number
-}
+color: Rgb | null
 ```

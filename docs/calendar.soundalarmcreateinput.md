@@ -2,93 +2,14 @@
 
 [Home](./index.md) &gt; [@macts/calendar](./calendar.md) &gt; [SoundAlarmCreateInput](./calendar.soundalarmcreateinput.md)
 
-## SoundAlarmCreateInput interface
+## SoundAlarmCreateInput type
 
-Input for creating a SoundAlarm
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface SoundAlarmCreateInput
+type SoundAlarmCreateInput = Omit<SoundAlarmCreateInput$1, 'triggerInterval'> & {
+  triggerInterval?: null extends SoundAlarmCreateInput$1['triggerInterval'] ? number | null : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[soundFile?](./calendar.soundalarmcreateinput.soundfile.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ The (POSIX) path to the sound file to be used for the alarm
-
-</td></tr>
-<tr><td>
-
-[soundName?](./calendar.soundalarmcreateinput.soundname.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ The system sound name to be used for the alarm
-
-</td></tr>
-<tr><td>
-
-[triggerDate?](./calendar.soundalarmcreateinput.triggerdate.md)
-
-</td><td>
-
-</td><td>
-
-Date
-
-</td><td>
-
-_(Optional)_ An absolute alarm date
-
-</td></tr>
-<tr><td>
-
-[triggerInterval?](./calendar.soundalarmcreateinput.triggerinterval.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The interval in minutes between the event and the alarm (positive for after, negative for before)
-
-</td></tr>
-</tbody></table>

@@ -9,7 +9,7 @@ Create a new folder.
 **Signature:**
 
 ```typescript
-create(input: FolderCreateInput): Promise<Folder>;
+create(input: FolderCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Folder>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [FolderCreateInput](./omnifocus.foldercreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

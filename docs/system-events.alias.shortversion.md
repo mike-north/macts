@@ -4,10 +4,10 @@
 
 ## Alias.shortVersion property
 
-the short version of the application bundle referenced by the alias
+the short version of the application bundle referenced by the alias. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-shortVersion: string
+readonly shortVersion: string | null;
 ```

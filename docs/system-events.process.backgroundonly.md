@@ -4,10 +4,10 @@
 
 ## Process.backgroundOnly property
 
-Does the process run exclusively in the background?
+Does the process run exclusively in the background? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-backgroundOnly: boolean
+readonly backgroundOnly: boolean | null;
 ```

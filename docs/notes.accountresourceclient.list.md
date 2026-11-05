@@ -4,14 +4,44 @@
 
 ## AccountResourceClient.list() method
 
-List all accounts.
+List all accounts, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Account[]>;
+list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Account>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Account](./notes.account.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Account](./notes.account.md)<!-- -->&gt;&gt;

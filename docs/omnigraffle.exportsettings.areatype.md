@@ -4,10 +4,10 @@
 
 ## ExportSettings.areaType property
 
-The type of area to be exported
+The type of area to be exported. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-areaType: ExportAreaType
+areaType: ExportAreaType | null
 ```

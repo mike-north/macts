@@ -4,7 +4,7 @@
 
 ## DomainCreateInput type
 
-Input for creating a Domain
+Input for creating a Domain.
 
 **Signature:**
 

@@ -4,10 +4,10 @@
 
 ## Tag.availableTaskCount property
 
-The number of available tasks
+The number of available tasks. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-availableTaskCount: number
+readonly availableTaskCount: Integer | null;
 ```

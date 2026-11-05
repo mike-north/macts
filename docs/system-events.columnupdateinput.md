@@ -4,12 +4,10 @@
 
 ## ColumnUpdateInput type
 
-Input for updating a Column
+Input for updating a Column. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ColumnUpdateInput = Partial<ColumnCreateInput>
+type ColumnUpdateInput = Record<string, never>
 ```
-
-**References:** [ColumnCreateInput](./system-events.columncreateinput.md)

@@ -4,10 +4,10 @@
 
 ## UserPlaylist.genius property
 
-is this a Genius Playlist?
+is this a Genius Playlist? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-genius: boolean
+readonly genius: boolean | null;
 ```

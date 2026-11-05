@@ -4,10 +4,10 @@
 
 ## WorkspaceDocument.loaded property
 
-Whether the workspace document has finished loading after being opened
+Whether the workspace document has finished loading after being opened. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-loaded: boolean
+readonly loaded: boolean | null;
 ```

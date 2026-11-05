@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-True if the task has a task that must be completed prior to it being actionable
+boolean \| null
+
+</td><td>
+
+True if the task has a task that must be completed prior to it being actionable. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ True if the task has a task that must be completed prior to it being actionable
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-True if the task is completed
+boolean \| null
+
+</td><td>
+
+True if the task is completed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +73,11 @@ True if the task is completed
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-If true, complete when children are completed
+If true, complete when children are completed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +88,11 @@ If true, complete when children are completed
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The task's date of completion
+The task's date of completion. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +103,11 @@ The task's date of completion
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-When the task was created
+When the task was created. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +118,11 @@ When the task was created
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-When the task should become available for action
+When the task should become available for action. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +131,15 @@ When the task should become available for action
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-True if the task is dropped
+boolean \| null
+
+</td><td>
+
+True if the task is dropped. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +150,11 @@ True if the task is dropped
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The date the task was dropped
+The date the task was dropped. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +165,11 @@ The date the task was dropped
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-When the task must be finished
+When the task must be finished. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -172,13 +178,15 @@ When the task must be finished
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-When the task should become available for action (including inherited)
+Date \| null
+
+</td><td>
+
+When the task should become available for action (including inherited). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -187,13 +195,15 @@ When the task should become available for action (including inherited)
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-When the task must be finished (including inherited)
+Date \| null
+
+</td><td>
+
+When the task must be finished (including inherited). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -202,13 +212,15 @@ When the task must be finished (including inherited)
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-True if the task is completed, or any of its containing tasks or project are completed
+boolean \| null
+
+</td><td>
+
+True if the task is completed, or any of its containing tasks or project are completed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -217,13 +229,15 @@ True if the task is completed, or any of its containing tasks or project are com
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-True if the task is dropped, or any of its containing tasks or project are dropped
+boolean \| null
+
+</td><td>
+
+True if the task is dropped, or any of its containing tasks or project are dropped. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -232,13 +246,15 @@ True if the task is dropped, or any of its containing tasks or project are dropp
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-The date at which work for this task is intended (including inherited)
+Date \| null
+
+</td><td>
+
+The date at which work for this task is intended (including inherited). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -249,11 +265,11 @@ The date at which work for this task is intended (including inherited)
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The estimated time, in whole minutes, that this task will take to finish
+The estimated time, in whole minutes, that this task will take to finish. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -264,11 +280,11 @@ The estimated time, in whole minutes, that this task will take to finish
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-True if flagged
+True if flagged. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -277,13 +293,15 @@ True if flagged
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the task
+The unique identifier of the task. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -292,13 +310,15 @@ The unique identifier of the task
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Returns true if the task itself is an inbox task or if the task is contained by an inbox task
+boolean \| null
+
+</td><td>
+
+Returns true if the task itself is an inbox task or if the task is contained by an inbox task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -307,13 +327,15 @@ Returns true if the task itself is an inbox task or if the task is contained by 
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-When the task was last modified
+Date \| null
+
+</td><td>
+
+When the task was last modified. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -324,11 +346,11 @@ When the task was last modified
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the task
+The name of the task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -337,13 +359,15 @@ The name of the task
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-If the task is the next task of its containing project, next is true
+boolean \| null
+
+</td><td>
+
+If the task is the next task of its containing project, next is true. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -354,11 +378,11 @@ If the task is the next task of its containing project, next is true
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The note of the task
+The note of the task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -367,13 +391,15 @@ The note of the task
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The number of available direct children of this task
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The number of available direct children of this task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -382,13 +408,15 @@ The number of available direct children of this task
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The number of completed direct children of this task
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The number of completed direct children of this task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -397,13 +425,15 @@ The number of completed direct children of this task
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The number of direct children of this task
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The number of direct children of this task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -414,11 +444,11 @@ The number of direct children of this task
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The date at which work for this task is intended
+The date at which work for this task is intended. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -429,11 +459,11 @@ The date at which work for this task is intended
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-If true, any children are sequentially dependent
+If true, any children are sequentially dependent. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

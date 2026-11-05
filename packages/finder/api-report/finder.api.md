@@ -4,11 +4,15 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface AliasFile {
-    originalItem: string;
+    originalItem: string | null;
 }
 
 // @public
@@ -16,25 +20,27 @@ export interface AliasFileCreateInput {
     originalItem?: string;
 }
 
-// @public (undocumented)
+// @public
 export const AliasFileSchema: z.ZodObject<{
     originalItem: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type AliasFileUpdateInput = Partial<AliasFileCreateInput>;
+export interface AliasFileUpdateInput {
+    originalItem?: string;
+}
 
 // @public
 export interface ApplicationFile {
-    acceptsHighLevelEvents: boolean;
-    hasScriptingTerminology: boolean;
-    id: string;
+    readonly acceptsHighLevelEvents: boolean | null;
+    readonly hasScriptingTerminology: boolean | null;
+    readonly id: string;
 }
 
 // @public
 export type ApplicationFileCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ApplicationFileSchema: z.ZodObject<{
     id: z.ZodString;
     acceptsHighLevelEvents: z.ZodBoolean;
@@ -42,7 +48,7 @@ export const ApplicationFileSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ApplicationFileUpdateInput = Partial<ApplicationFileCreateInput>;
+export type ApplicationFileUpdateInput = Record<string, never>;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -65,56 +71,56 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Clipping {
-    clippingWindow: string;
+    readonly clippingWindow: string | null;
 }
 
 // @public
 export type ClippingCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ClippingSchema: z.ZodObject<{
     clippingWindow: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ClippingUpdateInput = Partial<ClippingCreateInput>;
+export type ClippingUpdateInput = Record<string, never>;
 
 // @public
 export interface ClippingWindow {
-    id: number;
+    readonly id: Integer | null;
 }
 
 // @public
 export type ClippingWindowCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ClippingWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type ClippingWindowUpdateInput = Partial<ClippingWindowCreateInput>;
+export type ClippingWindowUpdateInput = Record<string, never>;
 
 // @public
 export interface Column {
-    index: number;
-    maximumWidth: number;
-    minimumWidth: number;
-    name: string;
-    sortDirection: string;
-    visible: boolean;
-    width: number;
+    index: Integer | null;
+    readonly maximumWidth: Integer | null;
+    readonly minimumWidth: Integer | null;
+    readonly name: string | null;
+    sortDirection: string | null;
+    visible: boolean | null;
+    width: Integer | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "ColumnCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type ColumnCreateInput = Omit<ColumnCreateInput_2, 'index' | 'width'> & {
+    index?: null extends ColumnCreateInput_2['index'] ? number | null : number;
+    width?: null extends ColumnCreateInput_2['width'] ? number | null : number;
+};
 
 // @public
-export interface ColumnCreateInput {
-    index?: number;
-    sortDirection?: string;
-    visible?: boolean;
-    width?: number;
-}
-
-// @public (undocumented)
 export const ColumnSchema: z.ZodObject<{
     index: z.ZodNumber;
     name: z.ZodString;
@@ -125,36 +131,41 @@ export const ColumnSchema: z.ZodObject<{
     visible: z.ZodBoolean;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "ColumnUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ColumnUpdateInput = Partial<ColumnCreateInput>;
+export type ColumnUpdateInput = Omit<ColumnUpdateInput_2, 'index' | 'width'> & {
+    index?: null extends ColumnUpdateInput_2['index'] ? number | null : number;
+    width?: null extends ColumnUpdateInput_2['width'] ? number | null : number;
+};
 
 // @public
 export interface Container {
-    entireContents: string;
+    readonly entireContents: string | null;
 }
 
 // @public
 export type ContainerCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const ContainerSchema: z.ZodObject<{
     entireContents: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type ContainerUpdateInput = Partial<ContainerCreateInput>;
+export type ContainerUpdateInput = Record<string, never>;
 
 // @public
 export interface Disk {
-    capacity: number;
-    ejectable: boolean;
-    format: string;
-    freeSpace: number;
-    id: number;
-    ignorePrivileges: boolean;
-    journalingEnabled: boolean;
-    localVolume: boolean;
-    startup: boolean;
+    readonly capacity: number | null;
+    readonly ejectable: boolean | null;
+    readonly format: string | null;
+    readonly freeSpace: number | null;
+    readonly id: Integer;
+    ignorePrivileges: boolean | null;
+    readonly journalingEnabled: boolean | null;
+    readonly localVolume: boolean | null;
+    readonly startup: boolean | null;
 }
 
 // @public
@@ -162,7 +173,7 @@ export interface DiskCreateInput {
     ignorePrivileges?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const DiskSchema: z.ZodObject<{
     id: z.ZodNumber;
     capacity: z.ZodNumber;
@@ -176,7 +187,9 @@ export const DiskSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type DiskUpdateInput = Partial<DiskCreateInput>;
+export interface DiskUpdateInput {
+    ignorePrivileges?: boolean;
+}
 
 // @public
 export type DocumentFile = Record<string, never>;
@@ -184,11 +197,11 @@ export type DocumentFile = Record<string, never>;
 // @public
 export type DocumentFileCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const DocumentFileSchema: z.ZodObject<{}, z.core.$strip>;
 
 // @public
-export type DocumentFileUpdateInput = Partial<DocumentFileCreateInput>;
+export type DocumentFileUpdateInput = Record<string, never>;
 
 // @public
 export type Earr = 'notArranged' | 'snapToGrid' | 'arrangedByName' | 'arrangedByModificationDate' | 'arrangedByCreationDate' | 'arrangedBySize' | 'arrangedByKind' | 'arrangedByLabel';
@@ -207,11 +220,11 @@ export type Epos = 'right' | 'bottom';
 
 // @public
 interface File_2 {
-    creatorType: string;
-    fileType: string;
-    productVersion: string;
+    creatorType: string | null;
+    fileType: string | null;
+    readonly productVersion: string;
     stationery: boolean;
-    version: string;
+    readonly version: string;
 }
 export { File_2 as File }
 
@@ -222,7 +235,7 @@ export interface FileCreateInput {
     stationery?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const FileSchema: z.ZodObject<{
     fileType: z.ZodString;
     creatorType: z.ZodString;
@@ -232,36 +245,44 @@ export const FileSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type FileUpdateInput = Partial<FileCreateInput>;
+export interface FileUpdateInput {
+    creatorType?: string;
+    fileType?: string;
+    stationery?: boolean;
+}
+
+// @public
+export interface FinderClient extends ClientBrand<FinderResources> {
+}
 
 // @public
 export class FinderClient {
     constructor(options: FinderClientOptions);
-    activate(): Promise<void>;
-    cleanUp(by?: string): Promise<void>;
-    close(): Promise<void>;
-    copy(): Promise<void>;
-    count(each: string): Promise<void>;
-    dataSize(as?: string): Promise<void>;
-    duplicate(to?: string, replacing?: boolean, routingSuppressed?: boolean, exactCopy?: boolean): Promise<void>;
-    eject(): Promise<void>;
-    empty(security?: boolean): Promise<void>;
-    erase(): Promise<void>;
-    exists(): Promise<void>;
+    activate(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    cleanUp(by?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    close(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    copy(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    count(each: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    dataSize(as?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    duplicate(to?: string, replacing?: boolean, routingSuppressed?: boolean, exactCopy?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    eject(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    empty(security?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    erase(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    exists(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
-    make(_new: string, at: string, to?: string, withProperties?: unknown): Promise<void>;
-    move(to: string, replacing?: boolean, positionedAt?: string, routingSuppressed?: boolean): Promise<void>;
-    open(using?: string, withProperties?: unknown): Promise<void>;
-    openVirtualLocation(): Promise<void>;
-    print(withProperties?: unknown): Promise<void>;
-    quit(): Promise<void>;
-    restart(): Promise<void>;
-    reveal(): Promise<void>;
-    select(): Promise<void>;
-    shutDown(): Promise<void>;
-    sleep(): Promise<void>;
-    sort(by: string): Promise<void>;
-    update(necessity?: boolean, registeringApplications?: boolean): Promise<void>;
+    make(_new: string, at: string, to?: string, withProperties?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    move(to: string, replacing?: boolean, positionedAt?: string, routingSuppressed?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    open(using?: string, withProperties?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    openVirtualLocation(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    print(withProperties?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    quit(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    restart(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    reveal(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    select(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    shutDown(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    sleep(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    sort(by: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    update(necessity?: boolean, registeringApplications?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -278,28 +299,28 @@ export class FinderError extends Error {
 }
 
 // @public
-export interface FinderWindow {
-    columnViewOptions: unknown;
-    currentView: string;
-    iconViewOptions: unknown;
-    pathbarVisible: boolean;
-    sidebarWidth: number;
-    statusbarVisible: boolean;
-    target: string;
-    toolbarVisible: boolean;
-}
+export type FinderResources = Readonly<Record<never, never>>;
 
 // @public
-export interface FinderWindowCreateInput {
-    currentView?: string;
-    pathbarVisible?: boolean;
-    sidebarWidth?: number;
-    statusbarVisible?: boolean;
-    target?: string;
-    toolbarVisible?: boolean;
+export interface FinderWindow {
+    readonly columnViewOptions: unknown;
+    currentView: string | null;
+    readonly iconViewOptions: unknown;
+    pathbarVisible: boolean | null;
+    sidebarWidth: Integer | null;
+    statusbarVisible: boolean | null;
+    target: string | null;
+    toolbarVisible: boolean | null;
 }
 
-// @public (undocumented)
+// Warning: (ae-forgotten-export) The symbol "FinderWindowCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type FinderWindowCreateInput = Omit<FinderWindowCreateInput_2, 'sidebarWidth'> & {
+    sidebarWidth?: null extends FinderWindowCreateInput_2['sidebarWidth'] ? number | null : number;
+};
+
+// @public
 export const FinderWindowSchema: z.ZodObject<{
     target: z.ZodString;
     currentView: z.ZodString;
@@ -311,46 +332,54 @@ export const FinderWindowSchema: z.ZodObject<{
     sidebarWidth: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "FinderWindowUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type FinderWindowUpdateInput = Partial<FinderWindowCreateInput>;
+export type FinderWindowUpdateInput = Omit<FinderWindowUpdateInput_2, 'sidebarWidth'> & {
+    sidebarWidth?: null extends FinderWindowUpdateInput_2['sidebarWidth'] ? number | null : number;
+};
 
 // @public
 export interface Folder {
-    id: number;
+    readonly id: Integer | null;
 }
 
 // @public
 export type FolderCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const FolderSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
 // @public
-export type FolderUpdateInput = Partial<FolderCreateInput>;
+export type FolderUpdateInput = Record<string, never>;
 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface InternetLocationFile {
-    location: string;
+    readonly location: string | null;
 }
 
 // @public
 export type InternetLocationFileCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const InternetLocationFileSchema: z.ZodObject<{
     location: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type InternetLocationFileUpdateInput = Partial<InternetLocationFileCreateInput>;
+export type InternetLocationFileUpdateInput = Record<string, never>;
 
 // @public
 export type Ipnl = 'generalInformationPanel' | 'sharingPanel' | 'memoryPanel' | 'previewPanel' | 'applicationPanel' | 'languagesPanel' | 'pluginsPanel' | 'nameExtensionPanel' | 'commentsPanel' | 'contentIndexPanel' | 'burningPanel' | 'moreInfoPanel' | 'simpleHeaderPanel';
@@ -360,23 +389,21 @@ export type Isiz = 'mini' | 'small' | 'large';
 
 // @public
 export interface ListViewOptions {
-    calculatesFolderSizes: boolean;
-    iconSize: string;
-    showsIconPreview: boolean;
-    textSize: number;
-    usesRelativeDates: boolean;
+    calculatesFolderSizes: boolean | null;
+    iconSize: string | null;
+    showsIconPreview: boolean | null;
+    textSize: Integer | null;
+    usesRelativeDates: boolean | null;
 }
+
+// Warning: (ae-forgotten-export) The symbol "ListViewOptionsCreateInput_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type ListViewOptionsCreateInput = Omit<ListViewOptionsCreateInput_2, 'textSize'> & {
+    textSize?: null extends ListViewOptionsCreateInput_2['textSize'] ? number | null : number;
+};
 
 // @public
-export interface ListViewOptionsCreateInput {
-    calculatesFolderSizes?: boolean;
-    iconSize?: string;
-    showsIconPreview?: boolean;
-    textSize?: number;
-    usesRelativeDates?: boolean;
-}
-
-// @public (undocumented)
 export const ListViewOptionsSchema: z.ZodObject<{
     calculatesFolderSizes: z.ZodBoolean;
     showsIconPreview: z.ZodBoolean;
@@ -385,27 +412,31 @@ export const ListViewOptionsSchema: z.ZodObject<{
     usesRelativeDates: z.ZodBoolean;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "ListViewOptionsUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type ListViewOptionsUpdateInput = Partial<ListViewOptionsCreateInput>;
+export type ListViewOptionsUpdateInput = Omit<ListViewOptionsUpdateInput_2, 'textSize'> & {
+    textSize?: null extends ListViewOptionsUpdateInput_2['textSize'] ? number | null : number;
+};
 
 // @public
 export type Lvic = 'smallIcon' | 'largeIcon';
 
 // @public
 export interface Package {
-    id: string;
+    readonly id: string | null;
 }
 
 // @public
 export type PackageCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const PackageSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type PackageUpdateInput = Partial<PackageCreateInput>;
+export type PackageUpdateInput = Record<string, never>;
 
 // @public
 export type Pple = 'generalPreferencesPanel' | 'labelPreferencesPanel' | 'sidebarPreferencesPanel' | 'advancedPreferencesPanel';

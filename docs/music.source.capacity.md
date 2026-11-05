@@ -4,10 +4,10 @@
 
 ## Source.capacity property
 
-the total size of the source if it has a fixed size
+the total size of the source if it has a fixed size. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-capacity: number
+readonly capacity: number | null;
 ```

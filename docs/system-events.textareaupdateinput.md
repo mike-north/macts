@@ -4,12 +4,10 @@
 
 ## TextAreaUpdateInput type
 
-Input for updating a TextArea
+Input for updating a TextArea. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type TextAreaUpdateInput = Partial<TextAreaCreateInput>
+type TextAreaUpdateInput = Record<string, never>
 ```
-
-**References:** [TextAreaCreateInput](./system-events.textareacreateinput.md)

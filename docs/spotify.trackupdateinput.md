@@ -4,12 +4,10 @@
 
 ## TrackUpdateInput type
 
-Input for updating a Track
+Input for updating a Track. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type TrackUpdateInput = Partial<TrackCreateInput>
+type TrackUpdateInput = Record<string, never>
 ```
-
-**References:** [TrackCreateInput](./spotify.trackcreateinput.md)

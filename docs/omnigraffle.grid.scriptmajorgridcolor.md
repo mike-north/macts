@@ -4,14 +4,10 @@
 
 ## Grid.scriptMajorGridColor property
 
-Color of major lines
+Color of major lines. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-scriptMajorGridColor: {
-  r: number
-  g: number
-  b: number
-}
+scriptMajorGridColor: Rgb | null
 ```

@@ -4,10 +4,10 @@
 
 ## Event_2.recurrence property
 
-The iCalendar (RFC 2445) string describing the event recurrence, if defined
+The iCalendar (RFC 2445) string describing the event recurrence, if defined. Nullable. Observed missing in 27 of 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-recurrence: string
+recurrence: string | null
 ```

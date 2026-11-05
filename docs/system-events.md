@@ -30,7 +30,7 @@ Client for an action that can be performed on the ui element.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -97,7 +97,16 @@ An alias in the file system
 
 </td><td>
 
-Input for creating a Alias
+Input for creating an Alias.
+
+</td></tr>
+<tr><td>
+
+[AliasUpdateInput](./system-events.aliasupdateinput.md)
+
+</td><td>
+
+Input for updating an Alias. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -115,7 +124,16 @@ An named data value associated with the UI element
 
 </td><td>
 
-Input for creating a Attribute
+Input for creating an Attribute.
+
+</td></tr>
+<tr><td>
+
+[AttributeUpdateInput](./system-events.attributeupdateinput.md)
+
+</td><td>
+
+Input for updating an Attribute. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -214,7 +232,16 @@ A collection of settings for configuring a connection
 
 </td><td>
 
-Input for creating a Configuration
+Input for creating a Configuration.
+
+</td></tr>
+<tr><td>
+
+[ConfigurationUpdateInput](./system-events.configurationupdateinput.md)
+
+</td><td>
+
+Input for updating a Configuration. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -232,7 +259,7 @@ A disk in the file system
 
 </td><td>
 
-Input for creating a Disk
+Input for creating a Disk.
 
 </td></tr>
 <tr><td>
@@ -250,7 +277,25 @@ An item stored in the file system
 
 </td><td>
 
-Input for creating a DiskItem
+Input for creating a DiskItem.
+
+</td></tr>
+<tr><td>
+
+[DiskItemUpdateInput](./system-events.diskitemupdateinput.md)
+
+</td><td>
+
+Input for updating a DiskItem. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[DiskUpdateInput](./system-events.diskupdateinput.md)
+
+</td><td>
+
+Input for updating a Disk. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -286,7 +331,7 @@ A file in the file system
 
 </td><td>
 
-Input for creating a File
+Input for creating a File.
 
 </td></tr>
 <tr><td>
@@ -300,11 +345,38 @@ A file package in the file system
 </td></tr>
 <tr><td>
 
+[FileUpdateInput](./system-events.fileupdateinput.md)
+
+</td><td>
+
+Input for updating a File. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
 [Folder](./system-events.folder.md)
 
 </td><td>
 
 A folder in the file system
+
+</td></tr>
+<tr><td>
+
+[FolderCreateInput](./system-events.foldercreateinput.md)
+
+</td><td>
+
+Input for creating a Folder.
+
+</td></tr>
+<tr><td>
+
+[FolderUpdateInput](./system-events.folderupdateinput.md)
+
+</td><td>
+
+Input for updating a Folder. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -354,15 +426,6 @@ A collection of settings for a network interface
 </td></tr>
 <tr><td>
 
-[InterfaceCreateInput](./system-events.interfacecreateinput.md)
-
-</td><td>
-
-Input for creating a Interface
-
-</td></tr>
-<tr><td>
-
 [List](./system-events.list.md)
 
 </td><td>
@@ -394,7 +457,16 @@ A set of services
 
 </td><td>
 
-Input for creating a Location
+Input for creating a Location.
+
+</td></tr>
+<tr><td>
+
+[LocationUpdateInput](./system-events.locationupdateinput.md)
+
+</td><td>
+
+Input for updating a Location. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -453,24 +525,6 @@ The network domain in the file system
 </td></tr>
 <tr><td>
 
-[NetworkPreferencesObject](./system-events.networkpreferencesobject.md)
-
-</td><td>
-
-the preferences for the current user's network
-
-</td></tr>
-<tr><td>
-
-[NetworkPreferencesObjectCreateInput](./system-events.networkpreferencesobjectcreateinput.md)
-
-</td><td>
-
-Input for creating a NetworkPreferencesObject
-
-</td></tr>
-<tr><td>
-
 [Outline](./system-events.outline.md)
 
 </td><td>
@@ -511,7 +565,16 @@ A process running on this computer
 
 </td><td>
 
-Input for creating a Process
+Input for creating a Process.
+
+</td></tr>
+<tr><td>
+
+[ProcessUpdateInput](./system-events.processupdateinput.md)
+
+</td><td>
+
+Input for updating a Process. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -538,7 +601,16 @@ A unit of data in Property List format
 
 </td><td>
 
-Input for creating a PropertyListItem
+Input for creating a PropertyListItem.
+
+</td></tr>
+<tr><td>
+
+[PropertyListItemUpdateInput](./system-events.propertylistitemupdateinput.md)
+
+</td><td>
+
+Input for updating a PropertyListItem. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -691,7 +763,16 @@ A collection of settings for a network service
 
 </td><td>
 
-Input for creating a Service
+Input for creating a Service.
+
+</td></tr>
+<tr><td>
+
+[ServiceUpdateInput](./system-events.serviceupdateinput.md)
+
+</td><td>
+
+Input for updating a Service. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -746,6 +827,15 @@ A static text field belonging to a window
 </td><td>
 
 The system domain in the file system
+
+</td></tr>
+<tr><td>
+
+[SystemEventsClient](./system-events.systemeventsclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -817,7 +907,16 @@ A piece of the user interface of a process
 
 </td><td>
 
-Input for creating a UIElement
+Input for creating an UIElement.
+
+</td></tr>
+<tr><td>
+
+[UIElementUpdateInput](./system-events.uielementupdateinput.md)
+
+</td><td>
+
+Input for updating an UIElement. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -853,7 +952,16 @@ A named value associated with a unit of data in XML format
 
 </td><td>
 
-Input for creating a XMLAttribute
+Input for creating a XMLAttribute.
+
+</td></tr>
+<tr><td>
+
+[XMLAttributeUpdateInput](./system-events.xmlattributeupdateinput.md)
+
+</td><td>
+
+Input for updating a XMLAttribute. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -871,7 +979,16 @@ Data in XML format
 
 </td><td>
 
-Input for creating a XMLData
+Input for creating a XMLData.
+
+</td></tr>
+<tr><td>
+
+[XMLDataUpdateInput](./system-events.xmldataupdateinput.md)
+
+</td><td>
+
+Input for updating a XMLData. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -889,7 +1006,16 @@ A unit of data in XML format
 
 </td><td>
 
-Input for creating a XMLElement
+Input for creating a XMLElement.
+
+</td></tr>
+<tr><td>
+
+[XMLElementUpdateInput](./system-events.xmlelementupdateinput.md)
+
+</td><td>
+
+Input for updating a XMLElement. Omitted fields are left unchanged.
 
 </td></tr>
 </tbody></table>
@@ -911,12 +1037,16 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [AliasSchema](./system-events.aliasschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -925,12 +1055,16 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [BrowserSchema](./system-events.browserschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -939,12 +1073,16 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ButtonSchema](./system-events.buttonschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -962,12 +1100,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ClassicDomainObjectSchema](./system-events.classicdomainobjectschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -976,12 +1118,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ColumnSchema](./system-events.columnschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -990,12 +1136,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ConfigurationSchema](./system-events.configurationschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1004,12 +1154,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [DiskSchema](./system-events.diskschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1018,12 +1172,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [DrawerSchema](./system-events.drawerschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1032,12 +1190,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [FileSchema](./system-events.fileschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1046,12 +1208,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [GroupSchema](./system-events.groupschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1060,12 +1226,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ImageSchema](./system-events.imageschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1074,12 +1244,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [InterfaceSchema](./system-events.interfaceschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1088,12 +1262,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [LocalDomainObjectSchema](./system-events.localdomainobjectschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1102,12 +1280,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [MenuBarItemSchema](./system-events.menubaritemschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1116,12 +1298,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [MenuButtonSchema](./system-events.menubuttonschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1130,12 +1316,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [MenuSchema](./system-events.menuschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1144,12 +1334,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [NetworkPreferencesObjectSchema](./system-events.networkpreferencesobjectschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1158,12 +1352,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [PopOverSchema](./system-events.popoverschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1172,12 +1370,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ProcessSchema](./system-events.processschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1186,12 +1388,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [PropertyListItemSchema](./system-events.propertylistitemschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1200,12 +1406,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [RadioGroupSchema](./system-events.radiogroupschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1214,12 +1424,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [RowSchema](./system-events.rowschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1228,12 +1442,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ScriptingCommandSchema](./system-events.scriptingcommandschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1242,12 +1460,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ScriptingElementSchema](./system-events.scriptingelementschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1256,12 +1478,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ScriptingEnumeratorSchema](./system-events.scriptingenumeratorschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1270,12 +1496,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ScriptingPropertySchema](./system-events.scriptingpropertyschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1284,12 +1514,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ScrollAreaSchema](./system-events.scrollareaschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1298,12 +1532,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ServiceSchema](./system-events.serviceschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1312,12 +1550,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [SliderSchema](./system-events.sliderschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1326,12 +1568,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [SplitterSchema](./system-events.splitterschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1340,12 +1586,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [SystemDomainObjectSchema](./system-events.systemdomainobjectschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1354,12 +1604,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [TableSchema](./system-events.tableschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1368,12 +1622,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [TextFieldSchema](./system-events.textfieldschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1382,12 +1640,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [UIElementSchema](./system-events.uielementschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1396,12 +1658,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ValueIndicatorSchema](./system-events.valueindicatorschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -1410,6 +1676,8 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -1417,12 +1685,16 @@ Every capability exposed by System Events, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [XMLElementSchema](./system-events.xmlelementschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -1453,7 +1725,7 @@ Accs
 
 </td><td>
 
-Input for creating a Action
+Input for creating an Action.
 
 </td></tr>
 <tr><td>
@@ -1462,7 +1734,7 @@ Input for creating a Action
 
 </td><td>
 
-Input for updating a Action
+Input for updating an Action. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1476,15 +1748,6 @@ Actn
 </td></tr>
 <tr><td>
 
-[AliasUpdateInput](./system-events.aliasupdateinput.md)
-
-</td><td>
-
-Input for updating a Alias
-
-</td></tr>
-<tr><td>
-
 [Appearances](./system-events.appearances.md)
 
 </td><td>
@@ -1494,20 +1757,11 @@ Appearances
 </td></tr>
 <tr><td>
 
-[AttributeUpdateInput](./system-events.attributeupdateinput.md)
-
-</td><td>
-
-Input for updating a Attribute
-
-</td></tr>
-<tr><td>
-
 [BrowserCreateInput](./system-events.browsercreateinput.md)
 
 </td><td>
 
-Input for creating a Browser
+Input for creating a Browser.
 
 </td></tr>
 <tr><td>
@@ -1516,7 +1770,7 @@ Input for creating a Browser
 
 </td><td>
 
-Input for updating a Browser
+Input for updating a Browser. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1525,7 +1779,7 @@ Input for updating a Browser
 
 </td><td>
 
-Input for creating a BusyIndicator
+Input for creating a BusyIndicator.
 
 </td></tr>
 <tr><td>
@@ -1534,7 +1788,7 @@ Input for creating a BusyIndicator
 
 </td><td>
 
-Input for updating a BusyIndicator
+Input for updating a BusyIndicator. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1543,7 +1797,7 @@ Input for updating a BusyIndicator
 
 </td><td>
 
-Input for creating a Button
+Input for creating a Button.
 
 </td></tr>
 <tr><td>
@@ -1552,7 +1806,7 @@ Input for creating a Button
 
 </td><td>
 
-Input for updating a Button
+Input for updating a Button. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1570,7 +1824,7 @@ Risk classification for a capability.
 
 </td><td>
 
-Input for creating a Checkbox
+Input for creating a Checkbox.
 
 </td></tr>
 <tr><td>
@@ -1579,7 +1833,7 @@ Input for creating a Checkbox
 
 </td><td>
 
-Input for updating a Checkbox
+Input for updating a Checkbox. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1588,7 +1842,7 @@ Input for updating a Checkbox
 
 </td><td>
 
-Input for creating a ClassicDomainObject
+Input for creating a ClassicDomainObject.
 
 </td></tr>
 <tr><td>
@@ -1597,7 +1851,7 @@ Input for creating a ClassicDomainObject
 
 </td><td>
 
-Input for updating a ClassicDomainObject
+Input for updating a ClassicDomainObject. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1606,7 +1860,7 @@ Input for updating a ClassicDomainObject
 
 </td><td>
 
-Input for creating a ColorWell
+Input for creating a ColorWell.
 
 </td></tr>
 <tr><td>
@@ -1615,7 +1869,7 @@ Input for creating a ColorWell
 
 </td><td>
 
-Input for updating a ColorWell
+Input for updating a ColorWell. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1624,7 +1878,7 @@ Input for updating a ColorWell
 
 </td><td>
 
-Input for creating a Column
+Input for creating a Column.
 
 </td></tr>
 <tr><td>
@@ -1633,7 +1887,7 @@ Input for creating a Column
 
 </td><td>
 
-Input for updating a Column
+Input for updating a Column. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1642,7 +1896,7 @@ Input for updating a Column
 
 </td><td>
 
-Input for creating a ComboBox
+Input for creating a ComboBox.
 
 </td></tr>
 <tr><td>
@@ -1651,16 +1905,7 @@ Input for creating a ComboBox
 
 </td><td>
 
-Input for updating a ComboBox
-
-</td></tr>
-<tr><td>
-
-[ConfigurationUpdateInput](./system-events.configurationupdateinput.md)
-
-</td><td>
-
-Input for updating a Configuration
+Input for updating a ComboBox. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1674,29 +1919,11 @@ Dhac
 </td></tr>
 <tr><td>
 
-[DiskItemUpdateInput](./system-events.diskitemupdateinput.md)
-
-</td><td>
-
-Input for updating a DiskItem
-
-</td></tr>
-<tr><td>
-
-[DiskUpdateInput](./system-events.diskupdateinput.md)
-
-</td><td>
-
-Input for updating a Disk
-
-</td></tr>
-<tr><td>
-
 [DomainCreateInput](./system-events.domaincreateinput.md)
 
 </td><td>
 
-Input for creating a Domain
+Input for creating a Domain.
 
 </td></tr>
 <tr><td>
@@ -1705,7 +1932,7 @@ Input for creating a Domain
 
 </td><td>
 
-Input for updating a Domain
+Input for updating a Domain. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1741,7 +1968,7 @@ Dpls
 
 </td><td>
 
-Input for creating a Drawer
+Input for creating a Drawer.
 
 </td></tr>
 <tr><td>
@@ -1750,7 +1977,7 @@ Input for creating a Drawer
 
 </td><td>
 
-Input for updating a Drawer
+Input for updating a Drawer. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1804,7 +2031,7 @@ Enum
 
 </td><td>
 
-Input for creating a FilePackage
+Input for creating a FilePackage.
 
 </td></tr>
 <tr><td>
@@ -1813,34 +2040,7 @@ Input for creating a FilePackage
 
 </td><td>
 
-Input for updating a FilePackage
-
-</td></tr>
-<tr><td>
-
-[FileUpdateInput](./system-events.fileupdateinput.md)
-
-</td><td>
-
-Input for updating a File
-
-</td></tr>
-<tr><td>
-
-[FolderCreateInput](./system-events.foldercreateinput.md)
-
-</td><td>
-
-Input for creating a Folder
-
-</td></tr>
-<tr><td>
-
-[FolderUpdateInput](./system-events.folderupdateinput.md)
-
-</td><td>
-
-Input for updating a Folder
+Input for updating a FilePackage. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1858,7 +2058,7 @@ FontSmoothingStyles
 
 </td><td>
 
-Input for creating a Group
+Input for creating a Group.
 
 </td></tr>
 <tr><td>
@@ -1867,7 +2067,7 @@ Input for creating a Group
 
 </td><td>
 
-Input for updating a Group
+Input for updating a Group. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1876,7 +2076,7 @@ Input for updating a Group
 
 </td><td>
 
-Input for creating a GrowArea
+Input for creating a GrowArea.
 
 </td></tr>
 <tr><td>
@@ -1885,7 +2085,7 @@ Input for creating a GrowArea
 
 </td><td>
 
-Input for updating a GrowArea
+Input for updating a GrowArea. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1903,7 +2103,7 @@ HighlightColors
 
 </td><td>
 
-Input for creating a Image
+Input for creating an Image.
 
 </td></tr>
 <tr><td>
@@ -1912,7 +2112,7 @@ Input for creating a Image
 
 </td><td>
 
-Input for updating a Image
+Input for updating an Image. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1921,7 +2121,7 @@ Input for updating a Image
 
 </td><td>
 
-Input for creating a Incrementor
+Input for creating an Incrementor.
 
 </td></tr>
 <tr><td>
@@ -1930,7 +2130,16 @@ Input for creating a Incrementor
 
 </td><td>
 
-Input for updating a Incrementor
+Input for updating an Incrementor. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[InterfaceCreateInput](./system-events.interfacecreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -1939,7 +2148,7 @@ Input for updating a Incrementor
 
 </td><td>
 
-Input for updating a Interface
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -1948,7 +2157,7 @@ Input for updating a Interface
 
 </td><td>
 
-Input for creating a List
+Input for creating a List.
 
 </td></tr>
 <tr><td>
@@ -1957,7 +2166,7 @@ Input for creating a List
 
 </td><td>
 
-Input for updating a List
+Input for updating a List. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1966,7 +2175,7 @@ Input for updating a List
 
 </td><td>
 
-Input for creating a LocalDomainObject
+Input for creating a LocalDomainObject.
 
 </td></tr>
 <tr><td>
@@ -1975,16 +2184,7 @@ Input for creating a LocalDomainObject
 
 </td><td>
 
-Input for updating a LocalDomainObject
-
-</td></tr>
-<tr><td>
-
-[LocationUpdateInput](./system-events.locationupdateinput.md)
-
-</td><td>
-
-Input for updating a Location
+Input for updating a LocalDomainObject. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -1993,7 +2193,7 @@ Input for updating a Location
 
 </td><td>
 
-Input for creating a MenuBar
+Input for creating a MenuBar.
 
 </td></tr>
 <tr><td>
@@ -2002,7 +2202,7 @@ Input for creating a MenuBar
 
 </td><td>
 
-Input for creating a MenuBarItem
+Input for creating a MenuBarItem.
 
 </td></tr>
 <tr><td>
@@ -2011,7 +2211,7 @@ Input for creating a MenuBarItem
 
 </td><td>
 
-Input for updating a MenuBarItem
+Input for updating a MenuBarItem. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2020,7 +2220,7 @@ Input for updating a MenuBarItem
 
 </td><td>
 
-Input for updating a MenuBar
+Input for updating a MenuBar. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2029,7 +2229,7 @@ Input for updating a MenuBar
 
 </td><td>
 
-Input for creating a MenuButton
+Input for creating a MenuButton.
 
 </td></tr>
 <tr><td>
@@ -2038,7 +2238,7 @@ Input for creating a MenuButton
 
 </td><td>
 
-Input for updating a MenuButton
+Input for updating a MenuButton. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2047,7 +2247,7 @@ Input for updating a MenuButton
 
 </td><td>
 
-Input for creating a Menu
+Input for creating a Menu.
 
 </td></tr>
 <tr><td>
@@ -2056,7 +2256,7 @@ Input for creating a Menu
 
 </td><td>
 
-Input for creating a MenuItem
+Input for creating a MenuItem.
 
 </td></tr>
 <tr><td>
@@ -2065,7 +2265,7 @@ Input for creating a MenuItem
 
 </td><td>
 
-Input for updating a MenuItem
+Input for updating a MenuItem. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2074,7 +2274,7 @@ Input for updating a MenuItem
 
 </td><td>
 
-Input for updating a Menu
+Input for updating a Menu. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2083,7 +2283,7 @@ Input for updating a Menu
 
 </td><td>
 
-Input for creating a NetworkDomainObject
+Input for creating a NetworkDomainObject.
 
 </td></tr>
 <tr><td>
@@ -2092,7 +2292,25 @@ Input for creating a NetworkDomainObject
 
 </td><td>
 
-Input for updating a NetworkDomainObject
+Input for updating a NetworkDomainObject. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[NetworkPreferencesObject](./system-events.networkpreferencesobject.md)
+
+</td><td>
+
+the preferences for the current user's network
+
+</td></tr>
+<tr><td>
+
+[NetworkPreferencesObjectCreateInput](./system-events.networkpreferencesobjectcreateinput.md)
+
+</td><td>
+
+Input for creating a NetworkPreferencesObject.
 
 </td></tr>
 <tr><td>
@@ -2101,7 +2319,7 @@ Input for updating a NetworkDomainObject
 
 </td><td>
 
-Input for updating a NetworkPreferencesObject
+Input for updating a NetworkPreferencesObject. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2110,7 +2328,7 @@ Input for updating a NetworkPreferencesObject
 
 </td><td>
 
-Input for creating a Outline
+Input for creating an Outline.
 
 </td></tr>
 <tr><td>
@@ -2119,7 +2337,7 @@ Input for creating a Outline
 
 </td><td>
 
-Input for updating a Outline
+Input for updating an Outline. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2128,7 +2346,7 @@ Input for updating a Outline
 
 </td><td>
 
-Input for creating a PopOver
+Input for creating a PopOver.
 
 </td></tr>
 <tr><td>
@@ -2137,7 +2355,7 @@ Input for creating a PopOver
 
 </td><td>
 
-Input for updating a PopOver
+Input for updating a PopOver. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2146,7 +2364,7 @@ Input for updating a PopOver
 
 </td><td>
 
-Input for creating a PopUpButton
+Input for creating a PopUpButton.
 
 </td></tr>
 <tr><td>
@@ -2155,16 +2373,7 @@ Input for creating a PopUpButton
 
 </td><td>
 
-Input for updating a PopUpButton
-
-</td></tr>
-<tr><td>
-
-[ProcessUpdateInput](./system-events.processupdateinput.md)
-
-</td><td>
-
-Input for updating a Process
+Input for updating a PopUpButton. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2173,7 +2382,7 @@ Input for updating a Process
 
 </td><td>
 
-Input for creating a ProgressIndicator
+Input for creating a ProgressIndicator.
 
 </td></tr>
 <tr><td>
@@ -2182,16 +2391,7 @@ Input for creating a ProgressIndicator
 
 </td><td>
 
-Input for updating a ProgressIndicator
-
-</td></tr>
-<tr><td>
-
-[PropertyListItemUpdateInput](./system-events.propertylistitemupdateinput.md)
-
-</td><td>
-
-Input for updating a PropertyListItem
+Input for updating a ProgressIndicator. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2200,7 +2400,7 @@ Input for updating a PropertyListItem
 
 </td><td>
 
-Input for creating a RadioButton
+Input for creating a RadioButton.
 
 </td></tr>
 <tr><td>
@@ -2209,7 +2409,7 @@ Input for creating a RadioButton
 
 </td><td>
 
-Input for updating a RadioButton
+Input for updating a RadioButton. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2218,7 +2418,7 @@ Input for updating a RadioButton
 
 </td><td>
 
-Input for creating a RadioGroup
+Input for creating a RadioGroup.
 
 </td></tr>
 <tr><td>
@@ -2227,7 +2427,7 @@ Input for creating a RadioGroup
 
 </td><td>
 
-Input for updating a RadioGroup
+Input for updating a RadioGroup. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2236,7 +2436,7 @@ Input for updating a RadioGroup
 
 </td><td>
 
-Input for creating a RelevanceIndicator
+Input for creating a RelevanceIndicator.
 
 </td></tr>
 <tr><td>
@@ -2245,7 +2445,7 @@ Input for creating a RelevanceIndicator
 
 </td><td>
 
-Input for updating a RelevanceIndicator
+Input for updating a RelevanceIndicator. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2254,7 +2454,7 @@ Input for updating a RelevanceIndicator
 
 </td><td>
 
-Input for creating a Row
+Input for creating a Row.
 
 </td></tr>
 <tr><td>
@@ -2263,7 +2463,7 @@ Input for creating a Row
 
 </td><td>
 
-Input for updating a Row
+Input for updating a Row. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2281,7 +2481,7 @@ SaveableFileFormat
 
 </td><td>
 
-Input for creating a ScriptingClass
+Input for creating a ScriptingClass.
 
 </td></tr>
 <tr><td>
@@ -2290,7 +2490,7 @@ Input for creating a ScriptingClass
 
 </td><td>
 
-Input for updating a ScriptingClass
+Input for updating a ScriptingClass. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2299,7 +2499,7 @@ Input for updating a ScriptingClass
 
 </td><td>
 
-Input for creating a ScriptingCommand
+Input for creating a ScriptingCommand.
 
 </td></tr>
 <tr><td>
@@ -2308,7 +2508,7 @@ Input for creating a ScriptingCommand
 
 </td><td>
 
-Input for updating a ScriptingCommand
+Input for updating a ScriptingCommand. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2317,7 +2517,7 @@ Input for updating a ScriptingCommand
 
 </td><td>
 
-Input for creating a ScriptingDefinitionObject
+Input for creating a ScriptingDefinitionObject.
 
 </td></tr>
 <tr><td>
@@ -2326,7 +2526,7 @@ Input for creating a ScriptingDefinitionObject
 
 </td><td>
 
-Input for updating a ScriptingDefinitionObject
+Input for updating a ScriptingDefinitionObject. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2335,7 +2535,7 @@ Input for updating a ScriptingDefinitionObject
 
 </td><td>
 
-Input for creating a ScriptingElement
+Input for creating a ScriptingElement.
 
 </td></tr>
 <tr><td>
@@ -2344,7 +2544,7 @@ Input for creating a ScriptingElement
 
 </td><td>
 
-Input for updating a ScriptingElement
+Input for updating a ScriptingElement. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2353,7 +2553,7 @@ Input for updating a ScriptingElement
 
 </td><td>
 
-Input for creating a ScriptingEnumeration
+Input for creating a ScriptingEnumeration.
 
 </td></tr>
 <tr><td>
@@ -2362,7 +2562,7 @@ Input for creating a ScriptingEnumeration
 
 </td><td>
 
-Input for updating a ScriptingEnumeration
+Input for updating a ScriptingEnumeration. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2371,7 +2571,7 @@ Input for updating a ScriptingEnumeration
 
 </td><td>
 
-Input for creating a ScriptingEnumerator
+Input for creating a ScriptingEnumerator.
 
 </td></tr>
 <tr><td>
@@ -2380,7 +2580,7 @@ Input for creating a ScriptingEnumerator
 
 </td><td>
 
-Input for updating a ScriptingEnumerator
+Input for updating a ScriptingEnumerator. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2389,7 +2589,7 @@ Input for updating a ScriptingEnumerator
 
 </td><td>
 
-Input for creating a ScriptingParameter
+Input for creating a ScriptingParameter.
 
 </td></tr>
 <tr><td>
@@ -2398,7 +2598,7 @@ Input for creating a ScriptingParameter
 
 </td><td>
 
-Input for updating a ScriptingParameter
+Input for updating a ScriptingParameter. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2407,7 +2607,7 @@ Input for updating a ScriptingParameter
 
 </td><td>
 
-Input for creating a ScriptingProperty
+Input for creating a ScriptingProperty.
 
 </td></tr>
 <tr><td>
@@ -2416,7 +2616,7 @@ Input for creating a ScriptingProperty
 
 </td><td>
 
-Input for updating a ScriptingProperty
+Input for updating a ScriptingProperty. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2425,7 +2625,7 @@ Input for updating a ScriptingProperty
 
 </td><td>
 
-Input for creating a ScriptingSuite
+Input for creating a ScriptingSuite.
 
 </td></tr>
 <tr><td>
@@ -2434,7 +2634,7 @@ Input for creating a ScriptingSuite
 
 </td><td>
 
-Input for updating a ScriptingSuite
+Input for updating a ScriptingSuite. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2443,7 +2643,7 @@ Input for updating a ScriptingSuite
 
 </td><td>
 
-Input for creating a ScrollArea
+Input for creating a ScrollArea.
 
 </td></tr>
 <tr><td>
@@ -2452,7 +2652,7 @@ Input for creating a ScrollArea
 
 </td><td>
 
-Input for updating a ScrollArea
+Input for updating a ScrollArea. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2461,7 +2661,7 @@ Input for updating a ScrollArea
 
 </td><td>
 
-Input for creating a ScrollBar
+Input for creating a ScrollBar.
 
 </td></tr>
 <tr><td>
@@ -2470,7 +2670,7 @@ Input for creating a ScrollBar
 
 </td><td>
 
-Input for updating a ScrollBar
+Input for updating a ScrollBar. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2484,20 +2684,11 @@ ScrollPageBehaviors
 </td></tr>
 <tr><td>
 
-[ServiceUpdateInput](./system-events.serviceupdateinput.md)
-
-</td><td>
-
-Input for updating a Service
-
-</td></tr>
-<tr><td>
-
 [SheetCreateInput](./system-events.sheetcreateinput.md)
 
 </td><td>
 
-Input for creating a Sheet
+Input for creating a Sheet.
 
 </td></tr>
 <tr><td>
@@ -2506,7 +2697,7 @@ Input for creating a Sheet
 
 </td><td>
 
-Input for updating a Sheet
+Input for updating a Sheet. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2515,7 +2706,7 @@ Input for updating a Sheet
 
 </td><td>
 
-Input for creating a Slider
+Input for creating a Slider.
 
 </td></tr>
 <tr><td>
@@ -2524,7 +2715,7 @@ Input for creating a Slider
 
 </td><td>
 
-Input for updating a Slider
+Input for updating a Slider. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2533,7 +2724,7 @@ Input for updating a Slider
 
 </td><td>
 
-Input for creating a Splitter
+Input for creating a Splitter.
 
 </td></tr>
 <tr><td>
@@ -2542,7 +2733,7 @@ Input for creating a Splitter
 
 </td><td>
 
-Input for creating a SplitterGroup
+Input for creating a SplitterGroup.
 
 </td></tr>
 <tr><td>
@@ -2551,7 +2742,7 @@ Input for creating a SplitterGroup
 
 </td><td>
 
-Input for updating a SplitterGroup
+Input for updating a SplitterGroup. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2560,7 +2751,7 @@ Input for updating a SplitterGroup
 
 </td><td>
 
-Input for updating a Splitter
+Input for updating a Splitter. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2569,7 +2760,7 @@ Input for updating a Splitter
 
 </td><td>
 
-Input for creating a StaticText
+Input for creating a StaticText.
 
 </td></tr>
 <tr><td>
@@ -2578,7 +2769,7 @@ Input for creating a StaticText
 
 </td><td>
 
-Input for updating a StaticText
+Input for updating a StaticText. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2587,7 +2778,7 @@ Input for updating a StaticText
 
 </td><td>
 
-Input for creating a SystemDomainObject
+Input for creating a SystemDomainObject.
 
 </td></tr>
 <tr><td>
@@ -2596,7 +2787,16 @@ Input for creating a SystemDomainObject
 
 </td><td>
 
-Input for updating a SystemDomainObject
+Input for updating a SystemDomainObject. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[SystemEventsResources](./system-events.systemeventsresources.md)
+
+</td><td>
+
+The type of the resource table in `systemEventsContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 <tr><td>
@@ -2605,7 +2805,7 @@ Input for updating a SystemDomainObject
 
 </td><td>
 
-Input for creating a TabGroup
+Input for creating a TabGroup.
 
 </td></tr>
 <tr><td>
@@ -2614,7 +2814,7 @@ Input for creating a TabGroup
 
 </td><td>
 
-Input for updating a TabGroup
+Input for updating a TabGroup. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2623,7 +2823,7 @@ Input for updating a TabGroup
 
 </td><td>
 
-Input for creating a Table
+Input for creating a Table.
 
 </td></tr>
 <tr><td>
@@ -2632,7 +2832,7 @@ Input for creating a Table
 
 </td><td>
 
-Input for updating a Table
+Input for updating a Table. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2641,7 +2841,7 @@ Input for updating a Table
 
 </td><td>
 
-Input for creating a TextArea
+Input for creating a TextArea.
 
 </td></tr>
 <tr><td>
@@ -2650,7 +2850,7 @@ Input for creating a TextArea
 
 </td><td>
 
-Input for updating a TextArea
+Input for updating a TextArea. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2659,7 +2859,7 @@ Input for updating a TextArea
 
 </td><td>
 
-Input for creating a TextField
+Input for creating a TextField.
 
 </td></tr>
 <tr><td>
@@ -2668,7 +2868,7 @@ Input for creating a TextField
 
 </td><td>
 
-Input for updating a TextField
+Input for updating a TextField. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2677,7 +2877,7 @@ Input for updating a TextField
 
 </td><td>
 
-Input for creating a Toolbar
+Input for creating a Toolbar.
 
 </td></tr>
 <tr><td>
@@ -2686,16 +2886,7 @@ Input for creating a Toolbar
 
 </td><td>
 
-Input for updating a Toolbar
-
-</td></tr>
-<tr><td>
-
-[UIElementUpdateInput](./system-events.uielementupdateinput.md)
-
-</td><td>
-
-Input for updating a UIElement
+Input for updating a Toolbar. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2704,7 +2895,7 @@ Input for updating a UIElement
 
 </td><td>
 
-Input for creating a UserDomainObject
+Input for creating an UserDomainObject.
 
 </td></tr>
 <tr><td>
@@ -2713,7 +2904,7 @@ Input for creating a UserDomainObject
 
 </td><td>
 
-Input for updating a UserDomainObject
+Input for updating an UserDomainObject. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -2722,7 +2913,7 @@ Input for updating a UserDomainObject
 
 </td><td>
 
-Input for creating a ValueIndicator
+Input for creating a ValueIndicator.
 
 </td></tr>
 <tr><td>
@@ -2731,34 +2922,7 @@ Input for creating a ValueIndicator
 
 </td><td>
 
-Input for updating a ValueIndicator
-
-</td></tr>
-<tr><td>
-
-[XMLAttributeUpdateInput](./system-events.xmlattributeupdateinput.md)
-
-</td><td>
-
-Input for updating a XMLAttribute
-
-</td></tr>
-<tr><td>
-
-[XMLDataUpdateInput](./system-events.xmldataupdateinput.md)
-
-</td><td>
-
-Input for updating a XMLData
-
-</td></tr>
-<tr><td>
-
-[XMLElementUpdateInput](./system-events.xmlelementupdateinput.md)
-
-</td><td>
-
-Input for updating a XMLElement
+Input for updating a ValueIndicator. Omitted fields are left unchanged.
 
 </td></tr>
 </tbody></table>

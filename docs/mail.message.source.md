@@ -4,10 +4,10 @@
 
 ## Message.source property
 
-Raw source of the message
+Raw source of the message. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-source: string
+readonly source: string | null;
 ```

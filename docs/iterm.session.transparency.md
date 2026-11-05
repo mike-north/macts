@@ -4,10 +4,10 @@
 
 ## Session.transparency property
 
-The transparency property
+The transparency property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-transparency: number
+transparency: number | null
 ```

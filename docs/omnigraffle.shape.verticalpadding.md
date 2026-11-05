@@ -4,10 +4,10 @@
 
 ## Shape.verticalPadding property
 
-Padding at the top and bottom of the text space
+Padding at the top and bottom of the text space. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-verticalPadding: number
+verticalPadding: Integer | null
 ```

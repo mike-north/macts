@@ -4,7 +4,7 @@
 
 ## AIMHandleCreateInput interface
 
-Input for creating a AIMHandle
+Input for creating an AIMHandle.
 
 **Signature:**
 

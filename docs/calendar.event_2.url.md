@@ -4,10 +4,10 @@
 
 ## Event_2.url property
 
-The URL associated with the event
+The URL associated with the event. Nullable. Observed missing in 32 of 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-url: string
+url: string | null
 ```

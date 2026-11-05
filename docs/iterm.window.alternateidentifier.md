@@ -4,10 +4,10 @@
 
 ## Window.alternateIdentifier property
 
-The alternate unique identifier of the session.
+The alternate unique identifier of the session. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-alternateIdentifier: string
+readonly alternateIdentifier: string | null;
 ```

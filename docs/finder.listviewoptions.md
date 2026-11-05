@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Are folder sizes calculated and displayed in the window?
+Are folder sizes calculated and displayed in the window? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ Are folder sizes calculated and displayed in the window?
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the size of icons displayed in the list view
+the size of icons displayed in the list view. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,26 +69,11 @@ the size of icons displayed in the list view
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-displays a preview of the item in list view
-
-</td></tr>
-<tr><td>
-
-[sortColumn](./finder.listviewoptions.sortcolumn.md)
-
-</td><td>
-
-</td><td>
-
-[Column](./finder.column.md)
-
-</td><td>
-
-the column that the list view is sorted on
+displays a preview of the item in list view. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +84,11 @@ the column that the list view is sorted on
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the size of the text displayed in the list view
+the size of the text displayed in the list view. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +99,11 @@ the size of the text displayed in the list view
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Are relative dates (e.g., today, yesterday) shown in the list view?
+Are relative dates (e.g., today, yesterday) shown in the list view? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

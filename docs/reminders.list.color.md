@@ -4,14 +4,10 @@
 
 ## List.color property
 
-The color of the list
+The color of the list. Nullable. Observed missing in 2 of 3 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-color: {
-  r: number
-  g: number
-  b: number
-}
+color: string | null
 ```

@@ -4,10 +4,10 @@
 
 ## Note.body property
 
-The HTML content of the note body
+The HTML content of the note body. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-body: string
+body: string | null
 ```

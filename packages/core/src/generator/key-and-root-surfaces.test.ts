@@ -26,13 +26,14 @@ import { omittedOutputReason } from '../manifest/output-references.js'
 import { generateCliPlugin } from './cli/index.js'
 import { CONTRACT_MODULE_PATH, generateContract } from './contract/index.js'
 import { unsatisfiableInputs } from './input-satisfiability.js'
+import { positionalOperationSource } from './sdk/test-support/operation-source.js'
 import { generateHttpClientSdk } from './sdk/http-client.js'
 
 /** The text of one generated file. */
 function fileOf(files: readonly { path: string; content: string }[], path: string): string {
   const found = files.find((file) => file.path === path)
   if (found === undefined) throw new Error(`no generated ${path}`)
-  return found.content
+  return positionalOperationSource(found.content)
 }
 
 /** The first declaration in `text` that `pattern` matches. */
@@ -138,7 +139,7 @@ describe('the generated HTTP client', () => {
     const desk = fileOf(sdk.files, 'src/resources/desk.ts')
     expect(desk).toContain('  async get(kind: string): Promise<Desk> {')
     expect(desk).toContain(
-      '    return this.#http.rpc<Desk>(`${this.#app}.${this.#resource}.getDesk`, { kind });'
+      '    return this.#http.invoke<Desk>(`${this.#app}.${this.#resource}.getDesk`, { kind });'
     )
     expect(desk).toContain('  async list(): Promise<Page<Desk>> {')
   })

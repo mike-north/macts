@@ -4,10 +4,10 @@
 
 ## Address.country property
 
-Country part of the address.
+Country part of the address. Nullable. Observed missing in 4 of 12 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-country: string
+country: string | null
 ```

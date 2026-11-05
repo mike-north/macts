@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The first and last name of the attendee
+string \| null
+
+</td><td>
+
+The first and last name of the attendee. Nullable. Observed missing in 32 of 41 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The first and last name of the attendee
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-Email address of the attendee
+Email address of the attendee. Never null: observed in all 41 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ Email address of the attendee
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 [ParticipationStatus](./calendar.participationstatus.md)
 
 </td><td>
 
-The invitation status for the attendee
+The invitation status for the attendee. Never null: observed in all 41 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 </tbody></table>

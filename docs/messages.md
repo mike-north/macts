@@ -21,7 +21,7 @@ Description
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -70,7 +70,16 @@ An account that can be logged in to from this system
 
 </td><td>
 
-Input for creating a Account
+Input for creating an Account.
+
+</td></tr>
+<tr><td>
+
+[AccountUpdateInput](./messages.accountupdateinput.md)
+
+</td><td>
+
+Input for updating an Account. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -89,6 +98,15 @@ Machine-readable description of a single capability.
 </td><td>
 
 An SMS or iMessage chat.
+
+</td></tr>
+<tr><td>
+
+[MessagesClient](./messages.messagesclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -128,6 +146,8 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -144,12 +164,16 @@ Every capability exposed by Messages, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ParticipantSchema](./messages.participantschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -167,15 +191,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[AccountUpdateInput](./messages.accountupdateinput.md)
-
-</td><td>
-
-Input for updating a Account
-
-</td></tr>
-<tr><td>
-
 [CapabilityRisk](./messages.capabilityrisk.md)
 
 </td><td>
@@ -189,7 +204,7 @@ Risk classification for a capability.
 
 </td><td>
 
-Input for creating a Chat
+Input for creating a Chat.
 
 </td></tr>
 <tr><td>
@@ -198,7 +213,7 @@ Input for creating a Chat
 
 </td><td>
 
-Input for updating a Chat
+Input for updating a Chat. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -221,11 +236,20 @@ Direction
 </td></tr>
 <tr><td>
 
+[MessagesResources](./messages.messagesresources.md)
+
+</td><td>
+
+The type of the resource table in `messagesContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
+
+</td></tr>
+<tr><td>
+
 [ParticipantCreateInput](./messages.participantcreateinput.md)
 
 </td><td>
 
-Input for creating a Participant
+Input for creating a Participant.
 
 </td></tr>
 <tr><td>
@@ -234,7 +258,7 @@ Input for creating a Participant
 
 </td><td>
 
-Input for updating a Participant
+Input for updating a Participant. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>

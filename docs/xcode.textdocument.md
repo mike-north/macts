@@ -37,28 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-Its location on disk, if it has one
-
-</td></tr>
-<tr><td>
-
-[id?](./xcode.textdocument.id.md)
+[FileValue](./contracts.filevalue.md) \| null
 
 </td><td>
 
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
+Its location on disk, if it has one. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +54,15 @@ _(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, p
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Has it been modified since the last save?
+boolean \| null
+
+</td><td>
+
+Has it been modified since the last save? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +71,15 @@ Has it been modified since the last save?
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The name of the document
+The name of the document. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -99,11 +90,11 @@ The name of the document
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Should Xcode notify other apps when this document is closed?
+Should Xcode notify other apps when this document is closed? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,13 +103,15 @@ Should Xcode notify other apps when this document is closed?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The document's path
+string \| null
+
+</td><td>
+
+The document's path. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -133,7 +126,7 @@ unknown
 
 </td><td>
 
-The first and last character positions in the selection
+The first and last character positions in the selection. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -148,7 +141,7 @@ unknown
 
 </td><td>
 
-The first and last paragraph positions that contain the selection
+The first and last paragraph positions that contain the selection. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +152,11 @@ The first and last paragraph positions that contain the selection
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The text of the text file referenced
+The text of the text file referenced. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

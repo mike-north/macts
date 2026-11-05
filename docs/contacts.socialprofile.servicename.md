@@ -4,10 +4,10 @@
 
 ## SocialProfile.serviceName property
 
-The service name of this social profile.
+The service name of this social profile. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-serviceName: string
+serviceName: string | null
 ```

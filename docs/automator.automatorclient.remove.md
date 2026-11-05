@@ -9,7 +9,7 @@ Remove an Automator action or variable from a workflow
 **Signature:**
 
 ```typescript
-remove(object: unknown): Promise<void>;
+remove(object: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ object
 unknown
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

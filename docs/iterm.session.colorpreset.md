@@ -4,10 +4,10 @@
 
 ## Session.colorPreset property
 
-The colorPreset property
+The colorPreset property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-colorPreset: string
+colorPreset: string | null
 ```

@@ -4,10 +4,10 @@
 
 ## Recipient.name property
 
-The name used for display
+The name used for display. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

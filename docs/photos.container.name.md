@@ -4,10 +4,10 @@
 
 ## Container.name property
 
-The name of this container
+The name of this container. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

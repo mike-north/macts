@@ -21,6 +21,7 @@
 export { TVClient, TVError, HttpClient } from './client.js'
 export type { TVClientOptions } from './client.js'
 export * from './types.js'
+export type { TVResources } from './contract/index.js'
 export { BrowserWindowResourceClient } from './resources/browserwindow.js'
 export { FileTrackResourceClient } from './resources/filetrack.js'
 export { PlaylistResourceClient } from './resources/playlist.js'

@@ -4,10 +4,10 @@
 
 ## Field.showCodes property
 
-Whether field codes are displayed
+Whether field codes are displayed. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-showCodes: boolean
+showCodes: boolean | null
 ```

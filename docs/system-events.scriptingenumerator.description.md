@@ -4,10 +4,10 @@
 
 ## ScriptingEnumerator.description property
 
-The description of the enumerator
+The description of the enumerator. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-description: string
+readonly description: string | null;
 ```

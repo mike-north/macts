@@ -4,7 +4,7 @@
 
 ## SplitterGroupCreateInput type
 
-Input for creating a SplitterGroup
+Input for creating a SplitterGroup.
 
 **Signature:**
 

@@ -57,24 +57,24 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(id)](./xcode.projectresourceclient.get.md)
+[get(workspaceName, id, \_\_mactsOptions)](./xcode.projectresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a project by id.
+Get a project by id within a parent scope. When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
 
 </td></tr>
 <tr><td>
 
-[list()](./xcode.projectresourceclient.list.md)
+[list(workspaceName, \_\_mactsOptions)](./xcode.projectresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all projects.
+List the projects of one workspace document, as one page. When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
 
 </td></tr>
 </tbody></table>

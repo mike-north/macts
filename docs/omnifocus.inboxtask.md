@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-When the task was created
+When the task was created. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ When the task was created
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-When the task should become available for action
+When the task should become available for action. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ When the task should become available for action
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-When the task must be finished
+When the task must be finished. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ When the task must be finished
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-True if flagged
+True if flagged. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +97,15 @@ True if flagged
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the inbox task
+The unique identifier of the inbox task. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -114,11 +116,11 @@ The unique identifier of the inbox task
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the inbox task
+The name of the inbox task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +131,11 @@ The name of the inbox task
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The note of the inbox task
+The note of the inbox task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

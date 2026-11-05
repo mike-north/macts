@@ -21,6 +21,7 @@
 export { SystemEventsClient, SystemEventsError, HttpClient } from './client.js'
 export type { SystemEventsClientOptions } from './client.js'
 export * from './types.js'
+export type { SystemEventsResources } from './contract/index.js'
 export { ActionResourceClient } from './resources/action.js'
 export { UIElementResourceClient } from './resources/uielement.js'
 export { capabilities } from './capabilities.js'

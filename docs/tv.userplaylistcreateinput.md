@@ -4,7 +4,7 @@
 
 ## UserPlaylistCreateInput interface
 
-Input for creating a UserPlaylist
+Input for creating an UserPlaylist.
 
 **Signature:**
 

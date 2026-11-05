@@ -4,10 +4,10 @@
 
 ## Tab.title property
 
-The full title of the tab.
+The full title of the tab. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-title: string
+readonly title: string | null;
 ```

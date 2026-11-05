@@ -5,56 +5,34 @@
 
 import { z } from 'zod'
 
-/** A Safari document (window) */
-export interface Document {
-  /** The document name */
-  name: string
-  /** The unique identifier of the document */
-  id: string
-  /** The current URL */
-  url: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Document } from './contract/index.js'
 
-/** Input for creating a Document */
-export interface DocumentCreateInput {
-  /** The current URL */
-  url?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { DocumentCreateInput } from './contract/index.js'
 
-/** Input for updating a Document */
-export type DocumentUpdateInput = Partial<DocumentCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { DocumentUpdateInput } from './contract/index.js'
 
-/** A Safari tab */
-export interface Tab {
-  /** The tab name */
-  name: string
-  /** The unique identifier of the tab */
-  id: string
-  /** The tab URL */
-  url: string
-  /** The HTML source of the web page currently loaded in the tab */
-  source: string
-  /** The text of the web page currently loaded in the tab */
-  text: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Tab } from './contract/index.js'
 
-/** Input for creating a Tab */
-export interface TabCreateInput {
-  /** The tab URL */
-  url?: string
-}
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { TabCreateInput } from './contract/index.js'
 
-/** Input for updating a Tab */
-export type TabUpdateInput = Partial<TabCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { TabUpdateInput } from './contract/index.js'
 
-// Zod schemas for runtime validation
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const DocumentSchema = z.object({
   name: z.string(),
   id: z.string(),
   url: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const TabSchema = z.object({
   name: z.string(),
   id: z.string(),

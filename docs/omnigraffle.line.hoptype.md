@@ -4,10 +4,10 @@
 
 ## Line.hopType property
 
-The behavior when one line crosses over another line
+The behavior when one line crosses over another line. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-hopType: HopType
+hopType: HopType | null
 ```

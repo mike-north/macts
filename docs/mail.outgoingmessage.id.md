@@ -4,10 +4,10 @@
 
 ## OutgoingMessage.id property
 
-The unique identifier of the message
+The unique identifier of the message. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: Integer;
 ```

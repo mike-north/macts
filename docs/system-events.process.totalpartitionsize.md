@@ -4,10 +4,10 @@
 
 ## Process.totalPartitionSize property
 
-the size of the partition with which the process was launched
+the size of the partition with which the process was launched. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-totalPartitionSize: number
+readonly totalPartitionSize: Integer | null;
 ```

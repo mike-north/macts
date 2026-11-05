@@ -4,10 +4,10 @@
 
 ## Track.artwork property
 
-The track artwork
+The track artwork. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-artwork: string
+readonly artwork: string | null;
 ```

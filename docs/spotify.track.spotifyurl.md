@@ -4,10 +4,10 @@
 
 ## Track.spotifyUrl property
 
-The Spotify URL for the track
+The Spotify URL for the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-spotifyUrl: string
+readonly spotifyUrl: string | null;
 ```

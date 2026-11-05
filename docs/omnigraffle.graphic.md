@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-When snapped to the grid does this graphic align its edges to the grid?
+When snapped to the grid does this graphic align its edges to the grid? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ When snapped to the grid does this graphic align its edges to the grid?
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Does this graphic allow connections to it?
+Does this graphic allow connections to it? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ Does this graphic allow connections to it?
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Curvature of corners in the stroke path
+Curvature of corners in the stroke path. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ Curvature of corners in the stroke path
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Does this graphic have a double-lined stroke?
+Does this graphic have a double-lined stroke? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +99,11 @@ Does this graphic have a double-lined stroke?
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Does this graphic draw its shadow?
+Does this graphic draw its shadow? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +114,11 @@ Does this graphic draw its shadow?
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Does this graphic draw its stroke?
+Does this graphic draw its stroke? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +129,11 @@ Does this graphic draw its stroke?
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Is this graphic flipped horizontally?
+Is this graphic flipped horizontally? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +144,11 @@ Is this graphic flipped horizontally?
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Is this graphic flipped vertically?
+Is this graphic flipped vertically? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +157,15 @@ Is this graphic flipped vertically?
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-Unique identifier
+Unique identifier. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -174,11 +176,11 @@ Unique identifier
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Is this graphic locked?
+Is this graphic locked? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -189,11 +191,11 @@ Is this graphic locked?
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Notes for this graphic
+Notes for this graphic. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -204,11 +206,11 @@ Notes for this graphic
 
 </td><td>
 
-{ x: number; y: number; }
+[Point](./contracts.point.md) \| null
 
 </td><td>
 
-Origin of the graphic (position of the upper-left corner of the bounding rectangle)
+Origin of the graphic (position of the upper-left corner of the bounding rectangle). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -219,11 +221,11 @@ Origin of the graphic (position of the upper-left corner of the bounding rectang
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-Rank group assigned to this graphic for hierarchical layout
+Rank group assigned to this graphic for hierarchical layout. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -234,11 +236,11 @@ Rank group assigned to this graphic for hierarchical layout
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Source of attached AppleScript
+Source of attached AppleScript. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -249,11 +251,11 @@ Source of attached AppleScript
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Does this graphic draw its shadow immediately beneath itself?
+Does this graphic draw its shadow immediately beneath itself? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -264,11 +266,11 @@ Does this graphic draw its shadow immediately beneath itself?
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-Color of the shadow
+Color of the shadow. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -279,11 +281,11 @@ Color of the shadow
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The 'fuzziness' of the graphic's shadow
+The 'fuzziness' of the graphic's shadow. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -294,11 +296,11 @@ The 'fuzziness' of the graphic's shadow
 
 </td><td>
 
-{ x: number; y: number; }
+[Point](./contracts.point.md) \| null
 
 </td><td>
 
-The direction of the graphic's shadow
+The direction of the graphic's shadow. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -309,11 +311,11 @@ The direction of the graphic's shadow
 
 </td><td>
 
-{ x: number; y: number; }
+[Point](./contracts.point.md) \| null
 
 </td><td>
 
-Size of the graphic (width and height of the bounding rectangle)
+Size of the graphic (width and height of the bounding rectangle). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -324,11 +326,11 @@ Size of the graphic (width and height of the bounding rectangle)
 
 </td><td>
 
-[StrokeCap](./omnigraffle.strokecap.md)
+[StrokeCap](./omnigraffle.strokecap.md) \| null
 
 </td><td>
 
-Type of cap at ends of the stroke
+Type of cap at ends of the stroke. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -339,11 +341,11 @@ Type of cap at ends of the stroke
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-Color of the stroke
+Color of the stroke. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -354,11 +356,11 @@ Color of the stroke
 
 </td><td>
 
-[StrokeJoin](./omnigraffle.strokejoin.md)
+[StrokeJoin](./omnigraffle.strokejoin.md) \| null
 
 </td><td>
 
-Type of join between segments of the stroke
+Type of join between segments of the stroke. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -369,11 +371,11 @@ Type of join between segments of the stroke
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-Dash pattern of the stroke
+Dash pattern of the stroke. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -384,11 +386,11 @@ Dash pattern of the stroke
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Arbitrary string tag attached to this graphic
+Arbitrary string tag attached to this graphic. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -399,11 +401,11 @@ Arbitrary string tag attached to this graphic
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Thickness of the stroke
+Thickness of the stroke. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -414,11 +416,11 @@ Thickness of the stroke
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Web link for this graphic
+Web link for this graphic. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -429,11 +431,11 @@ Web link for this graphic
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Name of a graphic
+Name of a graphic. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

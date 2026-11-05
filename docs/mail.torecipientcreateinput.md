@@ -4,7 +4,7 @@
 
 ## ToRecipientCreateInput type
 
-Input for creating a ToRecipient
+Input for creating a ToRecipient.
 
 **Signature:**
 

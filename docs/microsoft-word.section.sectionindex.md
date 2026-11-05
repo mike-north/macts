@@ -4,10 +4,10 @@
 
 ## Section.sectionIndex property
 
-The index of the section
+The index of the section. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-sectionIndex: number
+readonly sectionIndex: Integer | null;
 ```

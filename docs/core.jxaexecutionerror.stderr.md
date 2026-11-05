@@ -4,6 +4,8 @@
 
 ## JxaExecutionError.stderr property
 
+What the process wrote to standard error, possibly empty.
+
 **Signature:**
 
 ```typescript

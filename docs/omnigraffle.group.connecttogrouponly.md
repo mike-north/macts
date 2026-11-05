@@ -4,10 +4,10 @@
 
 ## Group.connectToGroupOnly property
 
-Only connect to the group?
+Only connect to the group? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-connectToGroupOnly: boolean
+connectToGroupOnly: boolean | null
 ```

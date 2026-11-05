@@ -2,14 +2,108 @@
 
 [Home](./index.md) &gt; [@macts/omnigraffle](./omnigraffle.md) &gt; [SubgraphUpdateInput](./omnigraffle.subgraphupdateinput.md)
 
-## SubgraphUpdateInput type
+## SubgraphUpdateInput interface
 
-Input for updating a Subgraph
+Input for updating a Subgraph. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SubgraphUpdateInput = Partial<SubgraphCreateInput>
+interface SubgraphUpdateInput
 ```
 
-**References:** [SubgraphCreateInput](./omnigraffle.subgraphcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[bottomMargin?](./omnigraffle.subgraphupdateinput.bottommargin.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ Bottom margin. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[collapsed?](./omnigraffle.subgraphupdateinput.collapsed.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Is the subgraph collapsed? Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[leftMargin?](./omnigraffle.subgraphupdateinput.leftmargin.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ Left margin. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[rightMargin?](./omnigraffle.subgraphupdateinput.rightmargin.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ Right margin. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[topMargin?](./omnigraffle.subgraphupdateinput.topmargin.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ Top margin. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

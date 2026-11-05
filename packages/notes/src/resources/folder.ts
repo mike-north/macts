@@ -24,15 +24,28 @@ export class FolderResourceClient {
   /**
    * List all folders, as one page.
    */
-  async list(): Promise<Page<Folder>> {
-    return this.#http.rpc<Page<Folder>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Folder>> {
+    return this.#http.invoke<Page<Folder>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'Folder'
+    )
   }
 
   /**
    * Get a folder by name.
    * When several folders share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async get(name: string): Promise<Folder> {
-    return this.#http.rpc<Folder>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(
+    name: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Folder> {
+    return this.#http.invoke<Folder>(
+      `${this.#app}.${this.#resource}.get`,
+      { name },
+      __mactsOptions,
+      'Folder'
+    )
   }
 }

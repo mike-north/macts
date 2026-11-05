@@ -4,10 +4,10 @@
 
 ## Track.movementNumber property
 
-the index of the movement in the work
+the index of the movement in the work. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-movementNumber: number
+movementNumber: Integer | null
 ```

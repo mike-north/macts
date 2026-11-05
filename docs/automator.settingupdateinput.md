@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/automator](./automator.md) &gt; [SettingUpdateInput](./automator.settingupdateinput.md)
 
-## SettingUpdateInput type
+## SettingUpdateInput interface
 
-Input for updating a Setting
+Input for updating a Setting. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SettingUpdateInput = Partial<SettingCreateInput>
+interface SettingUpdateInput
 ```
 
-**References:** [SettingCreateInput](./automator.settingcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[value?](./automator.settingupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+unknown
+
+</td><td>
+
+_(Optional)_ The value of the setting. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

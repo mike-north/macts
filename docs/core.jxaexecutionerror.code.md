@@ -4,6 +4,8 @@
 
 ## JxaExecutionError.code property
 
+The child-process error code or exit code, as text; `'UNKNOWN'` when absent.
+
 **Signature:**
 
 ```typescript

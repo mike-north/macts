@@ -4,10 +4,10 @@
 
 ## Chat.name property
 
-The chat's name as it appears in the chat list.
+The chat's name as it appears in the chat list. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

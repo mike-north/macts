@@ -4,6 +4,8 @@
 
 ## ListSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -11,14 +13,7 @@ ListSchema: z.ZodObject<
   {
     name: z.ZodString
     id: z.ZodString
-    color: z.ZodObject<
-      {
-        red: z.ZodNumber
-        green: z.ZodNumber
-        blue: z.ZodNumber
-      },
-      z.core.$strip
-    >
+    color: z.ZodString
     emblem: z.ZodString
   },
   z.core.$strip

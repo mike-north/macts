@@ -9,7 +9,7 @@ RollOver - Performs the action on the given person and value
 **Signature:**
 
 ```typescript
-performAction(_with: unknown, _for: string): Promise<void>;
+performAction(_with: unknown, _for: Parameters<ContactsClient$1['performAction']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -44,9 +44,22 @@ unknown
 
 </td><td>
 
-string
+Parameters&lt;ContactsClient$1\['performAction'\]&gt;\[1\]
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

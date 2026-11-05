@@ -4,6 +4,8 @@
 
 ## FinderWindowSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -12,7 +14,6 @@ FinderWindowSchema: z.ZodObject<
     target: z.ZodString
     currentView: z.ZodString
     iconViewOptions: z.ZodString
-    listViewOptions: z.ZodString
     columnViewOptions: z.ZodString
     toolbarVisible: z.ZodBoolean
     statusbarVisible: z.ZodBoolean

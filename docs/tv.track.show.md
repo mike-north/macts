@@ -4,10 +4,10 @@
 
 ## Track.show property
 
-the show name of the track
+the show name of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-show: string
+show: string | null
 ```

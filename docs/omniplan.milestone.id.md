@@ -4,10 +4,10 @@
 
 ## Milestone.id property
 
-Internal identifier for this milestone
+Internal identifier for this milestone. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: Integer;
 ```

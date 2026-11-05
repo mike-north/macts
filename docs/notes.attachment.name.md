@@ -4,10 +4,10 @@
 
 ## Attachment.name property
 
-The name of the attachment
+The name of the attachment. Nullable. Observed missing in 10 of 25 items (Notes 4.13, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

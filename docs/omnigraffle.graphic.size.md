@@ -4,13 +4,10 @@
 
 ## Graphic.size property
 
-Size of the graphic (width and height of the bounding rectangle)
+Size of the graphic (width and height of the bounding rectangle). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-size: {
-  x: number
-  y: number
-}
+size: Point | null
 ```

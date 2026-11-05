@@ -4,10 +4,10 @@
 
 ## Tab.index property
 
-Index of tab in parent tab view control
+Index of tab in parent tab view control. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-index: number
+index: Integer | null
 ```

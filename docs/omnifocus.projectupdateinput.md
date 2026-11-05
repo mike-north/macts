@@ -4,12 +4,12 @@
 
 ## ProjectUpdateInput type
 
-Input for updating a Project
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type ProjectUpdateInput = Partial<ProjectCreateInput>
+type ProjectUpdateInput = Omit<ProjectUpdateInput$1, 'estimatedMinutes'> & {
+  estimatedMinutes?: null extends ProjectUpdateInput$1['estimatedMinutes'] ? number | null : number
+}
 ```
-
-**References:** [ProjectCreateInput](./omnifocus.projectcreateinput.md)

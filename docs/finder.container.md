@@ -33,77 +33,19 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[completelyExpanded](./finder.container.completelyexpanded.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-(NOT AVAILABLE YET) Are the container and all of its children opened as outlines? (can only be set for containers viewed as lists)
-
-</td></tr>
-<tr><td>
-
-[containerWindow](./finder.container.containerwindow.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-the container window for this folder
-
-</td></tr>
-<tr><td>
-
 [entireContents](./finder.container.entirecontents.md)
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the entire contents of the container, including the contents of its children
-
-</td></tr>
-<tr><td>
-
-[expandable](./finder.container.expandable.md)
+string \| null
 
 </td><td>
 
-</td><td>
-
-boolean
-
-</td><td>
-
-(NOT AVAILABLE YET) Is the container capable of being expanded as an outline?
-
-</td></tr>
-<tr><td>
-
-[expanded](./finder.container.expanded.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-(NOT AVAILABLE YET) Is the container opened as an outline? (can only be set for containers viewed as lists)
+the entire contents of the container, including the contents of its children. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

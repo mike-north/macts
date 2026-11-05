@@ -4,10 +4,10 @@
 
 ## AttributeRun.size property
 
-The size in points of the first character.
+The size in points of the first character. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-size: number
+size: number | null
 ```

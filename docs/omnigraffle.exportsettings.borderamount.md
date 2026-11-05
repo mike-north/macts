@@ -4,10 +4,10 @@
 
 ## ExportSettings.borderAmount property
 
-The number of pixels of border area to include
+The number of pixels of border area to include. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-borderAmount: number
+borderAmount: number | null
 ```

@@ -4,12 +4,26 @@
 
 ## BuildWarningUpdateInput type
 
-Input for updating a BuildWarning
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type BuildWarningUpdateInput = Partial<BuildWarningCreateInput>
+type BuildWarningUpdateInput = Omit<
+  BuildWarningUpdateInput$1,
+  'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'
+> & {
+  startingLineNumber?: null extends BuildWarningUpdateInput$1['startingLineNumber']
+    ? number | null
+    : number
+  endingLineNumber?: null extends BuildWarningUpdateInput$1['endingLineNumber']
+    ? number | null
+    : number
+  startingColumnNumber?: null extends BuildWarningUpdateInput$1['startingColumnNumber']
+    ? number | null
+    : number
+  endingColumnNumber?: null extends BuildWarningUpdateInput$1['endingColumnNumber']
+    ? number | null
+    : number
+}
 ```
-
-**References:** [BuildWarningCreateInput](./xcode.buildwarningcreateinput.md)

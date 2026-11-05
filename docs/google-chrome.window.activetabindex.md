@@ -4,10 +4,10 @@
 
 ## Window.activeTabIndex property
 
-The index of the active tab.
+The index of the active tab. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-activeTabIndex: number
+activeTabIndex: Integer | null
 ```

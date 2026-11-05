@@ -4,7 +4,7 @@
 
 ## OutlineCreateInput type
 
-Input for creating a Outline
+Input for creating an Outline.
 
 **Signature:**
 

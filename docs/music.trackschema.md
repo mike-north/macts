@@ -4,11 +4,17 @@
 
 ## TrackSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
 TrackSchema: z.ZodObject<
   {
+    id: z.ZodNumber
+    index: z.ZodNumber
+    name: z.ZodString
+    persistentID: z.ZodString
     album: z.ZodString
     albumArtist: z.ZodString
     albumDisliked: z.ZodBoolean

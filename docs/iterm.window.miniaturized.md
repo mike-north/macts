@@ -4,10 +4,10 @@
 
 ## Window.miniaturized property
 
-Whether the window is currently minimized.
+Whether the window is currently minimized. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-miniaturized: boolean
+miniaturized: boolean | null
 ```

@@ -4,7 +4,7 @@
 
 ## OutgoingMessageCreateInput interface
 
-Input for creating a OutgoingMessage
+Input for creating an OutgoingMessage.
 
 **Signature:**
 
@@ -99,7 +99,7 @@ _(Optional)_ The subject of the message
 
 </td><td>
 
-string
+[FileSource](./contracts.filesource.md)
 
 </td><td>
 

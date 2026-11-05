@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-_(Optional)_ The content identifier of the attachment
+string \| null
+
+</td><td>
+
+_(Optional)_ The content identifier of the attachment. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ _(Optional)_ The content identifier of the attachment
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The creation date of the attachment
+Date \| null
+
+</td><td>
+
+The creation date of the attachment. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ The creation date of the attachment
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the attachment
+The unique identifier of the attachment. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ The unique identifier of the attachment
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The modification date of the attachment
+Date \| null
+
+</td><td>
+
+The modification date of the attachment. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +105,15 @@ The modification date of the attachment
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the attachment
+string \| null
+
+</td><td>
+
+The name of the attachment. Nullable. Observed missing in 10 of 25 items (Notes 4.13, macOS 27.2, 2026-11-01).
 
 </td></tr>
 </tbody></table>

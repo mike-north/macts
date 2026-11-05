@@ -4,10 +4,10 @@
 
 ## Font.bold property
 
-Whether the font is bold
+Whether the font is bold. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-bold: boolean
+bold: boolean | null
 ```

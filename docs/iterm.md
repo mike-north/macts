@@ -21,7 +21,7 @@ Description
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -66,6 +66,15 @@ Machine-readable description of a single capability.
 </td></tr>
 <tr><td>
 
+[iTermClient](./iterm.itermclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+
+</td></tr>
+<tr><td>
+
 [iTermClientOptions](./iterm.itermclientoptions.md)
 
 </td><td>
@@ -84,15 +93,6 @@ A terminal session
 </td></tr>
 <tr><td>
 
-[SessionCreateInput](./iterm.sessioncreateinput.md)
-
-</td><td>
-
-Input for creating a Session
-
-</td></tr>
-<tr><td>
-
 [Tab](./iterm.tab.md)
 
 </td><td>
@@ -102,29 +102,11 @@ A terminal tab
 </td></tr>
 <tr><td>
 
-[TabCreateInput](./iterm.tabcreateinput.md)
-
-</td><td>
-
-Input for creating a Tab
-
-</td></tr>
-<tr><td>
-
 [Window](./iterm.window.md)
 
 </td><td>
 
 A window.
-
-</td></tr>
-<tr><td>
-
-[WindowCreateInput](./iterm.windowcreateinput.md)
-
-</td><td>
-
-Input for creating a Window
 
 </td></tr>
 </tbody></table>
@@ -155,6 +137,8 @@ Every capability exposed by iTerm, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -162,12 +146,16 @@ Every capability exposed by iTerm, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [WindowSchema](./iterm.windowschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -194,6 +182,15 @@ Risk classification for a capability.
 </td></tr>
 <tr><td>
 
+[iTermResources](./iterm.itermresources.md)
+
+</td><td>
+
+The type of the resource table in `iTermContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
+
+</td></tr>
+<tr><td>
+
 [SaveOptions](./iterm.saveoptions.md)
 
 </td><td>
@@ -203,11 +200,29 @@ SaveOptions
 </td></tr>
 <tr><td>
 
+[SessionCreateInput](./iterm.sessioncreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
 [SessionUpdateInput](./iterm.sessionupdateinput.md)
 
 </td><td>
 
-Input for updating a Session
+Canonical update input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
+[TabCreateInput](./iterm.tabcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -216,7 +231,16 @@ Input for updating a Session
 
 </td><td>
 
-Input for updating a Tab
+Canonical update input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
+[WindowCreateInput](./iterm.windowcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -225,7 +249,7 @@ Input for updating a Tab
 
 </td><td>
 
-Input for updating a Window
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 </tbody></table>

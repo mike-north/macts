@@ -4,10 +4,10 @@
 
 ## SocialProfile.id property
 
-The persistent unique identifier for this profile.
+The persistent unique identifier for this profile. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

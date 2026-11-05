@@ -4,10 +4,10 @@
 
 ## Message.dateReceived property
 
-The date a message was received
+The date a message was received. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-dateReceived: Date
+readonly dateReceived: Date | null;
 ```

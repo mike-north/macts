@@ -9,7 +9,7 @@ Create a new tag.
 **Signature:**
 
 ```typescript
-create(input: TagCreateInput): Promise<Tag>;
+create(input: TagCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Tag>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [TagCreateInput](./omnifocus.tagcreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

@@ -4,10 +4,10 @@
 
 ## Window.hotkeyWindowProfile property
 
-If the window is a hotkey window, this gives the name of the profile that created the window.
+If the window is a hotkey window, this gives the name of the profile that created the window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-hotkeyWindowProfile: string
+hotkeyWindowProfile: string | null
 ```

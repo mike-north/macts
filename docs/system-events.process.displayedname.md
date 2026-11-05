@@ -4,10 +4,10 @@
 
 ## Process.displayedName property
 
-the name of the file from which the process was launched, as displayed in the User Interface
+the name of the file from which the process was launched, as displayed in the User Interface. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-displayedName: string
+readonly displayedName: string | null;
 ```

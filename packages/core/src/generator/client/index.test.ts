@@ -167,7 +167,7 @@ describe('generateClientPackage: contract subpath', () => {
     expect(paths).toContain('src/contract/manifest.ts')
   })
 
-  it('exports the contract only through ./contract, beside the unchanged root and ./cli', () => {
+  it('exports the contract at ./contract while the root shares canonical resource types', () => {
     const pkg = packageJson(generate())
     expect(pkg.exports).toEqual({
       '.': { types: './dist/calendar.d.ts', import: './dist/index.js' },
@@ -178,7 +178,10 @@ describe('generateClientPackage: contract subpath', () => {
       },
     })
     const index = generate().files.find((f) => f.path === 'src/index.ts')
-    expect(index?.content).not.toContain('contract')
+    expect(index?.content).toContain(
+      "export type { CalendarResources } from './contract/index.js';"
+    )
+    expect(index?.content).not.toContain('calendarContract')
   })
 
   it('builds the contract as its own tsup entry', () => {

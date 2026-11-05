@@ -4,10 +4,10 @@
 
 ## Project.effort property
 
-The number of person-seconds required to complete the project
+The number of person-seconds required to complete the project. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-effort: number
+readonly effort: number | null;
 ```

@@ -4,10 +4,10 @@
 
 ## Selection.content property
 
-The text in the selection
+The text in the selection. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-content: string
+content: string | null
 ```

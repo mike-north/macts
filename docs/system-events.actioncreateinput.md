@@ -4,7 +4,7 @@
 
 ## ActionCreateInput type
 
-Input for creating a Action
+Input for creating an Action.
 
 **Signature:**
 

@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/contacts](./contacts.md) &gt; [PhoneUpdateInput](./contacts.phoneupdateinput.md)
 
-## PhoneUpdateInput type
+## PhoneUpdateInput interface
 
-Input for updating a Phone
+Input for updating a Phone. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type PhoneUpdateInput = Partial<PhoneCreateInput>
+interface PhoneUpdateInput
 ```
 
-**References:** [PhoneCreateInput](./contacts.phonecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[label?](./contacts.phoneupdateinput.label.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Label for this phone. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[value?](./contacts.phoneupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The phone number. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

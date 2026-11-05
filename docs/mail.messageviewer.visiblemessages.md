@@ -4,10 +4,10 @@
 
 ## MessageViewer.visibleMessages property
 
-List of messages currently being displayed in the viewer
+List of messages currently being displayed in the viewer. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-visibleMessages: string
+visibleMessages: string | null
 ```

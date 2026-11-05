@@ -4,10 +4,10 @@
 
 ## Message.messageSize property
 
-The size (in bytes) of a message
+The size (in bytes) of a message. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-messageSize: number
+readonly messageSize: Integer | null;
 ```

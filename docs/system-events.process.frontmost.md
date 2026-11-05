@@ -4,10 +4,10 @@
 
 ## Process.frontmost property
 
-Is the process the frontmost process
+Is the process the frontmost process. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-frontmost: boolean
+frontmost: boolean | null
 ```

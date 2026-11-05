@@ -4,10 +4,10 @@
 
 ## Account.name property
 
-The name of the account
+The name of the account. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string;
 ```

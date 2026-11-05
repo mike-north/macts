@@ -4,10 +4,10 @@
 
 ## Playlist.specialKind property
 
-special playlist kind
+special playlist kind. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-specialKind: string
+readonly specialKind: string | null;
 ```

@@ -4,10 +4,10 @@
 
 ## Reminder.priority property
 
-The priority of the reminder (0=none, 1=high, 5=medium, 9=low)
+The priority of the reminder (0=none, 1=high, 5=medium, 9=low). Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-priority: number
+priority: Integer
 ```

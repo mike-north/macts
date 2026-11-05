@@ -4,10 +4,10 @@
 
 ## Font.size property
 
-The font size in points
+The font size in points. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-size: number
+size: number | null
 ```

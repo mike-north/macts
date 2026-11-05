@@ -4,7 +4,7 @@
 
 ## UIElementCreateInput interface
 
-Input for creating a UIElement
+Input for creating an UIElement.
 
 **Signature:**
 

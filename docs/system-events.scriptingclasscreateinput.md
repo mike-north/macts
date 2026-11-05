@@ -4,7 +4,7 @@
 
 ## ScriptingClassCreateInput type
 
-Input for creating a ScriptingClass
+Input for creating a ScriptingClass.
 
 **Signature:**
 

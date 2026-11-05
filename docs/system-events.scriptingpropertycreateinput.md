@@ -4,7 +4,7 @@
 
 ## ScriptingPropertyCreateInput type
 
-Input for creating a ScriptingProperty
+Input for creating a ScriptingProperty.
 
 **Signature:**
 

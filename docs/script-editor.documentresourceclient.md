@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./script-editor.documentresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./script-editor.documentresourceclient.create.md)
 
 </td><td>
 
@@ -68,24 +68,24 @@ Create a new document.
 </td></tr>
 <tr><td>
 
-[get(name)](./script-editor.documentresourceclient.get.md)
+[get(name, \_\_mactsOptions)](./script-editor.documentresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a document by name.
+Get a document by name. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[list()](./script-editor.documentresourceclient.list.md)
+[list(\_\_mactsOptions)](./script-editor.documentresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all documents.
+List all documents, as one page.
 
 </td></tr>
 </tbody></table>

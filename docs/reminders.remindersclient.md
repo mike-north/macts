@@ -2,140 +2,14 @@
 
 [Home](./index.md) &gt; [@macts/reminders](./reminders.md) &gt; [RemindersClient](./reminders.remindersclient.md)
 
-## RemindersClient class
+## RemindersClient interface
 
-Reminders client for HTTP-based macOS automation.
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 **Signature:**
 
 ```typescript
-declare class RemindersClient
+interface RemindersClient extends ClientBrand<RemindersResources>
 ```
 
-## Example
-
-```typescript
-const client = new RemindersClient({
-  apiKey: process.env.MACTS_API_KEY!,
-})
-
-// List calendars
-const calendars = await client.calendars.list()
-```
-
-## Constructors
-
-<table><thead><tr><th>
-
-Constructor
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[(constructor)(options)](./reminders.remindersclient._constructor_.md)
-
-</td><td>
-
-</td><td>
-
-Constructs a new instance of the `RemindersClient` class
-
-</td></tr>
-</tbody></table>
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[accounts](./reminders.remindersclient.accounts.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[AccountResourceClient](./reminders.accountresourceclient.md)
-
-</td><td>
-
-An account in the Reminders application
-
-</td></tr>
-<tr><td>
-
-[http](./reminders.remindersclient.http.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[HttpClient](./reminders.httpclient.md)
-
-</td><td>
-
-Get the HTTP client for making custom requests.
-
-</td></tr>
-<tr><td>
-
-[lists](./reminders.remindersclient.lists.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[ListResourceClient](./reminders.listresourceclient.md)
-
-</td><td>
-
-A list of reminders
-
-</td></tr>
-<tr><td>
-
-[reminders](./reminders.remindersclient.reminders.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[ReminderResourceClient](./reminders.reminderresourceclient.md)
-
-</td><td>
-
-A reminder item
-
-</td></tr>
-</tbody></table>
+**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[RemindersResources](./reminders.remindersresources.md)<!-- -->&gt;

@@ -4,10 +4,10 @@
 
 ## LibraryPlaylist.id property
 
-Unique identifier for this playlist
+Unique identifier for this playlist. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: Integer | null;
 ```

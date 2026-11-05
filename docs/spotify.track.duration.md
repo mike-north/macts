@@ -4,10 +4,10 @@
 
 ## Track.duration property
 
-The duration of the track in milliseconds
+The duration of the track in milliseconds. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-duration: number
+readonly duration: Integer | null;
 ```

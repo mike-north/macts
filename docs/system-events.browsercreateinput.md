@@ -4,7 +4,7 @@
 
 ## BrowserCreateInput type
 
-Input for creating a Browser
+Input for creating a Browser.
 
 **Signature:**
 

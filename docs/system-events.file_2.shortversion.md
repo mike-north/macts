@@ -4,10 +4,10 @@
 
 ## File_2.shortVersion property
 
-the short version of the file
+the short version of the file. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-shortVersion: string
+readonly shortVersion: string | null;
 ```

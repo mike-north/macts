@@ -9,7 +9,7 @@ Script handler invoked by rules and menus that execute AppleScripts. The direct 
 **Signature:**
 
 ```typescript
-performMailActionWithMessages(inMailboxes?: string, forRule?: string): Promise<void>;
+performMailActionWithMessages(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -29,24 +29,11 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-inMailboxes
+\_\_mactsOptions
 
 </td><td>
 
-string
-
-</td><td>
-
-_(Optional)_
-
-</td></tr>
-<tr><td>
-
-forRule
-
-</td><td>
-
-string
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

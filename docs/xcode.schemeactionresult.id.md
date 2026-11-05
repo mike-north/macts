@@ -4,10 +4,10 @@
 
 ## SchemeActionResult.id property
 
-The unique identifier for the scheme action result
+The unique identifier for the scheme action result. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

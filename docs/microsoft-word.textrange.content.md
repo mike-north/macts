@@ -4,10 +4,10 @@
 
 ## TextRange.content property
 
-The text in the range
+The text in the range. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-content: string
+content: string | null
 ```

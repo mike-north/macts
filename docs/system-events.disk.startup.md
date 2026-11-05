@@ -4,10 +4,10 @@
 
 ## Disk.startup property
 
-Is this disk the boot disk?
+Is this disk the boot disk? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-startup: boolean
+readonly startup: boolean | null;
 ```

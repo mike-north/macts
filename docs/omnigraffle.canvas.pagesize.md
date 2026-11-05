@@ -4,13 +4,10 @@
 
 ## Canvas.pageSize property
 
-Size of each page
+Size of each page. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-pageSize: {
-  x: number
-  y: number
-}
+readonly pageSize: Point | null;
 ```

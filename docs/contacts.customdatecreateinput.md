@@ -4,7 +4,7 @@
 
 ## CustomDateCreateInput interface
 
-Input for creating a CustomDate
+Input for creating a CustomDate.
 
 **Signature:**
 

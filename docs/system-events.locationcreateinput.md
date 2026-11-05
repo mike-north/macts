@@ -4,7 +4,7 @@
 
 ## LocationCreateInput interface
 
-Input for creating a Location
+Input for creating a Location.
 
 **Signature:**
 

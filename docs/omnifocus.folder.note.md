@@ -4,10 +4,10 @@
 
 ## Folder.note property
 
-The note of the folder
+The note of the folder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-note: string
+note: string | null
 ```

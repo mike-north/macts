@@ -4,10 +4,10 @@
 
 ## Account.password property
 
-Password for this account. Can be set, but not read via scripting
+Password for this account. Can be set, but not read via scripting. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-password: string
+password: string | null
 ```

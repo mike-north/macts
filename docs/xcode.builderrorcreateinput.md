@@ -2,123 +2,28 @@
 
 [Home](./index.md) &gt; [@macts/xcode](./xcode.md) &gt; [BuildErrorCreateInput](./xcode.builderrorcreateinput.md)
 
-## BuildErrorCreateInput interface
+## BuildErrorCreateInput type
 
-Input for creating a BuildError
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface BuildErrorCreateInput
+type BuildErrorCreateInput = Omit<
+  BuildErrorCreateInput$1,
+  'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'
+> & {
+  startingLineNumber?: null extends BuildErrorCreateInput$1['startingLineNumber']
+    ? number | null
+    : number
+  endingLineNumber?: null extends BuildErrorCreateInput$1['endingLineNumber']
+    ? number | null
+    : number
+  startingColumnNumber?: null extends BuildErrorCreateInput$1['startingColumnNumber']
+    ? number | null
+    : number
+  endingColumnNumber?: null extends BuildErrorCreateInput$1['endingColumnNumber']
+    ? number | null
+    : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[endingColumnNumber?](./xcode.builderrorcreateinput.endingcolumnnumber.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The ending column number in the file where the issue occurred
-
-</td></tr>
-<tr><td>
-
-[endingLineNumber?](./xcode.builderrorcreateinput.endinglinenumber.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The ending line number in the file where the issue occurred
-
-</td></tr>
-<tr><td>
-
-[filePath?](./xcode.builderrorcreateinput.filepath.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ The file path where the issue occurred
-
-</td></tr>
-<tr><td>
-
-[message?](./xcode.builderrorcreateinput.message.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ The text of the issue
-
-</td></tr>
-<tr><td>
-
-[startingColumnNumber?](./xcode.builderrorcreateinput.startingcolumnnumber.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The starting column number in the file where the issue occurred
-
-</td></tr>
-<tr><td>
-
-[startingLineNumber?](./xcode.builderrorcreateinput.startinglinenumber.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The starting line number in the file where the issue occurred
-
-</td></tr>
-</tbody></table>

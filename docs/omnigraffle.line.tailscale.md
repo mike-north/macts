@@ -4,10 +4,10 @@
 
 ## Line.tailScale property
 
-Scale of line ending on the tail of the line
+Scale of line ending on the tail of the line. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-tailScale: number
+tailScale: number | null
 ```

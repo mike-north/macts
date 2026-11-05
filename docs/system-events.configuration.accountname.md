@@ -4,10 +4,10 @@
 
 ## Configuration.accountName property
 
-the name used to authenticate
+the name used to authenticate. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-accountName: string
+accountName: string | null
 ```

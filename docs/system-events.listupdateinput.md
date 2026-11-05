@@ -4,12 +4,10 @@
 
 ## ListUpdateInput type
 
-Input for updating a List
+Input for updating a List. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ListUpdateInput = Partial<ListCreateInput>
+type ListUpdateInput = Record<string, never>
 ```
-
-**References:** [ListCreateInput](./system-events.listcreateinput.md)

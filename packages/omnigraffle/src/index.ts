@@ -21,6 +21,7 @@
 export { OmniGraffleClient, OmniGraffleError, HttpClient } from './client.js'
 export type { OmniGraffleClientOptions } from './client.js'
 export * from './types.js'
+export type { OmniGraffleResources } from './contract/index.js'
 export { CanvasResourceClient } from './resources/canvas.js'
 export { GraphicResourceClient } from './resources/graphic.js'
 export { ShapeResourceClient } from './resources/shape.js'

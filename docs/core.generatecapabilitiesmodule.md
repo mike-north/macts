@@ -6,6 +6,8 @@
 
 Generate the contents of the `src/capabilities.ts` metadata module for an app.
 
+A manifest the package generators refuse (`generationRefusals`<!-- -->) is refused here too, so no capability is described for a command that must name one item and declares no identifier parameter, or for a resource whose identifier declares no targeting and is not the class's dictionary id.
+
 **Signature:**
 
 ```typescript
@@ -47,3 +49,7 @@ The app manifest
 string
 
 TypeScript source for the capabilities metadata module
+
+## Exceptions
+
+`Error` whose message holds one refusal per such command or resource, each naming the app and the command key, or the resource and its identifier property, and saying what to declare.

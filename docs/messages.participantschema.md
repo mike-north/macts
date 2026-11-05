@@ -4,13 +4,14 @@
 
 ## ParticipantSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
 ParticipantSchema: z.ZodObject<
   {
     id: z.ZodString
-    account: z.ZodString
     name: z.ZodString
     handle: z.ZodString
     firstName: z.ZodString

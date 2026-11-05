@@ -4,12 +4,10 @@
 
 ## ClassicDomainObjectUpdateInput type
 
-Input for updating a ClassicDomainObject
+Input for updating a ClassicDomainObject. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ClassicDomainObjectUpdateInput = Partial<ClassicDomainObjectCreateInput>
+type ClassicDomainObjectUpdateInput = Record<string, never>
 ```
-
-**References:** [ClassicDomainObjectCreateInput](./system-events.classicdomainobjectcreateinput.md)

@@ -2,14 +2,78 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [CharacterUpdateInput](./mail.characterupdateinput.md)
 
-## CharacterUpdateInput type
+## CharacterUpdateInput interface
 
-Input for updating a Character
+Input for updating a Character. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type CharacterUpdateInput = Partial<CharacterCreateInput>
+interface CharacterUpdateInput
 ```
 
-**References:** [CharacterCreateInput](./mail.charactercreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[color?](./mail.characterupdateinput.color.md)
+
+</td><td>
+
+</td><td>
+
+[Rgb](./contracts.rgb.md)
+
+</td><td>
+
+_(Optional)_ The color of the character. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[font?](./mail.characterupdateinput.font.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of the font of the character. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[size?](./mail.characterupdateinput.size.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The size in points of the character. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

@@ -4,12 +4,12 @@
 
 ## EventResourceClient.list() method
 
-List all events.
+List the events of one calendar, as one page. When several calendars share the same name, the first match in the app's order is used as the calendar.
 
 **Signature:**
 
 ```typescript
-list(calendarId: string): Promise<Event[]>;
+list(calendarId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Event>>;
 ```
 
 ## Parameters
@@ -38,8 +38,21 @@ string
 </td><td>
 
 </td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
 </tbody></table>
 
 **Returns:**
 
-Promise&lt;[Event](./calendar.event_2.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Event](./calendar.event_2.md)<!-- -->&gt;&gt;

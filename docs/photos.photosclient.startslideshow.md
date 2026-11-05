@@ -9,7 +9,7 @@ Display an ad-hoc slide show from a list of media items
 **Signature:**
 
 ```typescript
-startSlideshow(using: string): Promise<void>;
+startSlideshow(using: Parameters<PhotosClient$1['startSlideshow']>[0], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -33,9 +33,22 @@ using
 
 </td><td>
 
-string
+Parameters&lt;PhotosClient$1\['startSlideshow'\]&gt;\[0\]
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

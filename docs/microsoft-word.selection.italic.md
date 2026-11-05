@@ -4,10 +4,10 @@
 
 ## Selection.italic property
 
-Whether the selection is formatted as italic
+Whether the selection is formatted as italic. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-italic: boolean
+italic: boolean | null
 ```

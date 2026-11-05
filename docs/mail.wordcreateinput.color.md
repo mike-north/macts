@@ -9,9 +9,5 @@ The color of the first character.
 **Signature:**
 
 ```typescript
-color?: {
-        r: number;
-        g: number;
-        b: number;
-    };
+color?: Rgb;
 ```

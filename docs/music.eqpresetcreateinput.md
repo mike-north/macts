@@ -4,7 +4,7 @@
 
 ## EQPresetCreateInput interface
 
-Input for creating a EQPreset
+Input for creating an EQPreset.
 
 **Signature:**
 

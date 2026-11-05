@@ -4,10 +4,10 @@
 
 ## Message.messageId property
 
-The unique message ID string
+The unique message ID string. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-messageId: string
+readonly messageId: string | null;
 ```

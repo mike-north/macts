@@ -4,10 +4,10 @@
 
 ## Track.sampleRate property
 
-the sample rate of the track (in Hz)
+the sample rate of the track (in Hz). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-sampleRate: number
+readonly sampleRate: Integer | null;
 ```

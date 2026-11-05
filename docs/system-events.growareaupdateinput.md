@@ -4,12 +4,10 @@
 
 ## GrowAreaUpdateInput type
 
-Input for updating a GrowArea
+Input for updating a GrowArea. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type GrowAreaUpdateInput = Partial<GrowAreaCreateInput>
+type GrowAreaUpdateInput = Record<string, never>
 ```
-
-**References:** [GrowAreaCreateInput](./system-events.growareacreateinput.md)

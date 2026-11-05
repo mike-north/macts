@@ -4,10 +4,10 @@
 
 ## Reminder.creationDate property
 
-The creation date of the reminder
+The creation date of the reminder. Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-creationDate: Date
+readonly creationDate: Date;
 ```

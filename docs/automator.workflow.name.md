@@ -4,10 +4,10 @@
 
 ## Workflow.name property
 
-The name of the workflow
+The name of the workflow. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string;
 ```

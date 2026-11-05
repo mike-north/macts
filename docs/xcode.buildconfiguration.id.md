@@ -4,10 +4,10 @@
 
 ## BuildConfiguration.id property
 
-The unique identifier for the build configuration
+The unique identifier for the build configuration. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

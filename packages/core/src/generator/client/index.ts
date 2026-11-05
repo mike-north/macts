@@ -121,7 +121,7 @@ export function generateClientPackage(
   // Append the capability-metadata export to the SDK index so the generated
   // package re-exports its machine-readable risk metadata from its entrypoint.
   for (const file of sdkResult.files) {
-    if (CONFIG_FILE_PATHS.has(file.path)) {
+    if (CONFIG_FILE_PATHS.has(file.path) || file.path.startsWith('src/contract/')) {
       continue
     }
     if (file.path === 'src/index.ts') {

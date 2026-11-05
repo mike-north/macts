@@ -4,10 +4,10 @@
 
 ## Resource.costPerHour property
 
-The cost per hour of this resource
+The cost per hour of this resource. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-costPerHour: number
+costPerHour: number | null
 ```

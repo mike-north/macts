@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/tv](./tv.md) &gt; [BrowserWindowUpdateInput](./tv.browserwindowupdateinput.md)
 
-## BrowserWindowUpdateInput type
+## BrowserWindowUpdateInput interface
 
-Input for updating a BrowserWindow
+Input for updating a BrowserWindow. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type BrowserWindowUpdateInput = Partial<BrowserWindowCreateInput>
+interface BrowserWindowUpdateInput
 ```
 
-**References:** [BrowserWindowCreateInput](./tv.browserwindowcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[view?](./tv.browserwindowupdateinput.view.md)
+
+</td><td>
+
+</td><td>
+
+[ObjectReferenceData](./contracts.objectreferencedata.md)<!-- -->&lt;string, 'Playlist'&gt;
+
+</td><td>
+
+_(Optional)_ the playlist currently displayed in the window. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

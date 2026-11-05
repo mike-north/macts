@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-edge](./microsoft-edge.md) &gt; [BookmarkFolderUpdateInput](./microsoft-edge.bookmarkfolderupdateinput.md)
 
-## BookmarkFolderUpdateInput type
+## BookmarkFolderUpdateInput interface
 
-Input for updating a BookmarkFolder
+Input for updating a BookmarkFolder. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type BookmarkFolderUpdateInput = Partial<BookmarkFolderCreateInput>
+interface BookmarkFolderUpdateInput
 ```
 
-**References:** [BookmarkFolderCreateInput](./microsoft-edge.bookmarkfoldercreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[title?](./microsoft-edge.bookmarkfolderupdateinput.title.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The title of the folder. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

@@ -4,10 +4,10 @@
 
 ## Task.completionDate property
 
-The task's date of completion
+The task's date of completion. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-completionDate: Date
+completionDate: Date | null
 ```

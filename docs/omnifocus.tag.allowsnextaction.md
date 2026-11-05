@@ -4,10 +4,10 @@
 
 ## Tag.allowsNextAction property
 
-If false, tasks associated with this tag will be skipped when determining the next action for a project
+If false, tasks associated with this tag will be skipped when determining the next action for a project. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-allowsNextAction: boolean
+allowsNextAction: boolean | null
 ```

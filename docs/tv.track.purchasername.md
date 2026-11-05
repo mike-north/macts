@@ -4,10 +4,10 @@
 
 ## Track.purchaserName property
 
-the name of the person who purchased this track
+the name of the person who purchased this track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-purchaserName: string
+readonly purchaserName: string | null;
 ```

@@ -4,12 +4,12 @@
 
 ## RunDestinationResourceClient.get() method
 
-Get a rundestination by name.
+Get a run destination by name within a parent scope. When several run destinations share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous. When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
 
 **Signature:**
 
 ```typescript
-get(name: string): Promise<RunDestination>;
+get(workspaceName: string, name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<RunDestination>;
 ```
 
 ## Parameters
@@ -29,6 +29,17 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+workspaceName
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 name
 
 </td><td>
@@ -36,6 +47,19 @@ name
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[refresh()](./tv.filetrackresourceclient.refresh.md)
+[refresh(\_\_mactsOptions)](./tv.filetrackresourceclient.refresh.md)
 
 </td><td>
 

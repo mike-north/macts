@@ -4,10 +4,10 @@
 
 ## MailAlarm.triggerDate property
 
-An absolute alarm date
+An absolute alarm date. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-triggerDate: Date
+triggerDate: Date | null
 ```

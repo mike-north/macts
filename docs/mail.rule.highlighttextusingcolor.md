@@ -4,10 +4,10 @@
 
 ## Rule.highlightTextUsingColor property
 
-Indicates whether the color will be used to highlight the text or background of a message in the message list
+Indicates whether the color will be used to highlight the text or background of a message in the message list. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-highlightTextUsingColor: boolean
+highlightTextUsingColor: boolean | null
 ```

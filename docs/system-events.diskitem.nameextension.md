@@ -4,10 +4,10 @@
 
 ## DiskItem.nameExtension property
 
-the extension portion of the name
+the extension portion of the name. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-nameExtension: string
+readonly nameExtension: string | null;
 ```

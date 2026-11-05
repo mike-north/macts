@@ -69,3 +69,12 @@ sharedBind(annotatedSdk, { ...noteData, resource: 'Notebook' })
 // @ts-expect-error A single note reference does not resolve to a collection.
 const incorrectCardinality: Promise<readonly Note[]> = sdkReference.resolve()
 void incorrectCardinality
+
+// The public constructor retains the exact canonical read and resource-table brands.
+const { NotesClient: RootNotesClient } = await import('@macts/notes')
+const rootClient = new RootNotesClient({ apiKey: 'type-check-only' })
+const rootRecord: Promise<Note> = rootClient.notes.get('Groceries')
+const rootBound: IdentityReference<Note, string, 'Note'> = sharedBind(rootClient, noteData)
+void [rootRecord, rootBound]
+// @ts-expect-error Root construction does not widen the resource table.
+sharedBind(rootClient, { ...noteData, resource: 'Notebook' })

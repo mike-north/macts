@@ -33,6 +33,21 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[clientAddress?](./api.serveroptions.clientaddress.md)
+
+</td><td>
+
+</td><td>
+
+[ClientAddressResolver](./api.clientaddressresolver.md)
+
+</td><td>
+
+_(Optional)_ Resolves the client address the per-address limit is keyed by. A composition point for tests and for deployments behind a trusted proxy.
+
+</td></tr>
+<tr><td>
+
 [cors?](./api.serveroptions.cors.md)
 
 </td><td>
@@ -44,6 +59,40 @@ boolean \| { origin: string \| string\[\]; }
 </td><td>
 
 _(Optional)_ Enable CORS (default: true for localhost)
+
+</td></tr>
+<tr><td>
+
+[executor?](./api.serveroptions.executor.md)
+
+</td><td>
+
+</td><td>
+
+[Executor](./core.executor.md)
+
+</td><td>
+
+_(Optional)_ The executor that carries out authorized operations. A composition point for tests and alternate providers.
+
+</td></tr>
+<tr><td>
+
+[governance?](./api.serveroptions.governance.md)
+
+</td><td>
+
+</td><td>
+
+[GovernanceContext](./runtime.governancecontext.md)
+
+</td><td>
+
+_(Optional)_ Governance enforcement context (active policy, optional audit writer, optional per-key policy resolver, and optional human-in-the-loop approval gate).
+
+When omitted, the server enforces this Mac's governance: `loadHostGovernance` from `@macts/runtime`<!-- -->, loaded on the first call that reaches the governance step or needs its audit log. That is the policy file under `MACTS_HOME` (or the default policy when there is none), the registered approval provider if any, every key's own policy, and an audit log under `MACTS_HOME`<!-- -->. If that configuration is malformed or unreadable, every call that passes the permission check is denied with `INTERNAL`<!-- -->; it never falls back to allowing everything. A caller without the operation's permission is still denied with `PERMISSION_DENIED`<!-- -->; its `permission-denied` record cannot be written without the audit log, so the failure is logged instead.
+
+Supply a context to enforce something else instead, for example in tests or a custom deployment. Build one from `loadActivePolicy`<!-- -->, `loadApprovalGate`<!-- -->, and `createStoredKeyPolicyResolver` in `@macts/runtime` and `createFileAuditWriter` in `@macts/core`<!-- -->.
 
 </td></tr>
 <tr><td>
@@ -144,11 +193,26 @@ _(Optional)_ Pretty print JSON responses (default: true in development)
 
 </td><td>
 
-RateLimitOptions \| false
+[RateLimitOptions](./api.ratelimitoptions.md) \| false
 
 </td><td>
 
-_(Optional)_ Rate limiting configuration, or false to disable (default: enabled with 100 req/min)
+_(Optional)_ Rate limiting, or `false` to disable both the per-subject and the per-address limit.
+
+</td></tr>
+<tr><td>
+
+[register?](./api.serveroptions.register.md)
+
+</td><td>
+
+</td><td>
+
+(registrar: [AppRegistrar](./api.appregistrar.md)<!-- -->) =&gt; void
+
+</td><td>
+
+_(Optional)_ Registers apps from their generated contracts on the server's runtime.
 
 </td></tr>
 <tr><td>
@@ -164,6 +228,21 @@ _(Optional)_ Rate limiting configuration, or false to disable (default: enabled 
 </td><td>
 
 _(Optional)_ TLS configuration for HTTPS support
+
+</td></tr>
+<tr><td>
+
+[verifier?](./api.serveroptions.verifier.md)
+
+</td><td>
+
+</td><td>
+
+[CredentialVerifier](./runtime.credentialverifier.md)
+
+</td><td>
+
+_(Optional)_ Turns presented credentials into authority. A composition point for tests and alternate credential stores.
 
 </td></tr>
 </tbody></table>

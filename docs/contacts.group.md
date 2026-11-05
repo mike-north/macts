@@ -33,9 +33,28 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[name](./contacts.group.name.md)
+[creationDate](./contacts.group.creationdate.md)
 
 </td><td>
+
+`readonly`
+
+</td><td>
+
+Date \| null
+
+</td><td>
+
+When the contact was created. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[id](./contacts.group.id.md)
+
+</td><td>
+
+`readonly`
 
 </td><td>
 
@@ -43,7 +62,39 @@ string
 
 </td><td>
 
-The name of this group.
+Unique and persistent identifier for this record. Never null: the primary identifier.
+
+</td></tr>
+<tr><td>
+
+[modificationDate](./contacts.group.modificationdate.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+Date \| null
+
+</td><td>
+
+When the contact was last modified. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[name](./contacts.group.name.md)
+
+</td><td>
+
+</td><td>
+
+string \| null
+
+</td><td>
+
+The name of this group. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

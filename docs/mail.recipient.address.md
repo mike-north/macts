@@ -4,10 +4,10 @@
 
 ## Recipient.address property
 
-The recipients email address
+The recipients email address. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-address: string
+address: string | null
 ```

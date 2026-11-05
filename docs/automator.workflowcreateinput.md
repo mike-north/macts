@@ -4,7 +4,7 @@
 
 ## WorkflowCreateInput type
 
-Input for creating a Workflow
+Input for creating a Workflow.
 
 **Signature:**
 

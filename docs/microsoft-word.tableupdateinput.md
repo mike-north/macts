@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-word](./microsoft-word.md) &gt; [TableUpdateInput](./microsoft-word.tableupdateinput.md)
 
-## TableUpdateInput type
+## TableUpdateInput interface
 
-Input for updating a Table
+Input for updating a Table. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type TableUpdateInput = Partial<TableCreateInput>
+interface TableUpdateInput
 ```
 
-**References:** [TableCreateInput](./microsoft-word.tablecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[allowAutoFit?](./microsoft-word.tableupdateinput.allowautofit.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether the table is allowed to autofit. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[borders?](./microsoft-word.tableupdateinput.borders.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether the table has borders. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

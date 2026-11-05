@@ -4,10 +4,10 @@
 
 ## Shortcut.folder property
 
-The folder containing this shortcut (folder ID)
+The folder containing this shortcut (folder ID). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-folder: string
+folder: string | null
 ```

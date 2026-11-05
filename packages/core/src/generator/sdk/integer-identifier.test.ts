@@ -24,6 +24,7 @@ import * as contracts from '@macts/contracts'
 import * as ts from 'typescript'
 import { generateContract } from '../contract/index.js'
 import type { AppManifest, CommandParameter } from '../../manifest/index.js'
+import { positionalOperationSource } from './test-support/operation-source.js'
 import { generateHttpClientSdk } from './http-client.js'
 
 /** A required parameter of `type`, as a get declares its identifiers. */
@@ -106,7 +107,7 @@ function gadgetClient(manifest: AppManifest): string {
     (f) => f.path === 'src/resources/gadget.ts'
   )
   if (file === undefined) throw new Error('no gadget client generated')
-  return file.content
+  return positionalOperationSource(file.content)
 }
 
 describe('legacy resource client get identifier encoding (#207)', () => {
@@ -233,7 +234,7 @@ describe('resource command runtime integer input', () => {
     // These assertions describe the known fixture exports at the dynamic
     // compilation boundary; no production runtime input is cast or coerced.
     const Client = evaluateGenerated(gadgetClient(manifest))['GadgetResourceClient'] as new (
-      http: { rpc: (operation: string, body: unknown) => Promise<undefined> },
+      http: { invoke: (operation: string, body: unknown) => Promise<undefined> },
       app: string,
       resource: string
     ) => StampClient
@@ -250,7 +251,7 @@ describe('resource command runtime integer input', () => {
     const sent: unknown[] = []
     const client = new Client(
       {
-        rpc: (operation, body) => {
+        invoke: (operation, body) => {
           expect(operation).toBe('testapp.gadgets.stamp')
           sent.push(body)
           return Promise.resolve(undefined)
@@ -260,10 +261,11 @@ describe('resource command runtime integer input', () => {
       'gadgets'
     )
     await client.stamp(7, 2, 'seal')
-    const expected = { id: { integer: '7' }, copies: { integer: '2' }, note: 'seal' }
+    const expected = { id: 7, copies: 2, note: 'seal' }
+    const wire = { id: { integer: '7' }, copies: { integer: '2' }, note: 'seal' }
     expect(sent).toEqual([expected])
     const descriptor = contract.operations['testapp.gadgets.stamp']
-    expect(descriptor?.input.wire.safeParse(expected).success).toBe(true)
+    expect(descriptor?.input.wire.safeParse(wire).success).toBe(true)
     expect(descriptor?.input.wire.safeParse({ id: 7, copies: 2, note: 'seal' }).success).toBe(false)
     sent.length = 0
     await expect(client.stamp(1.5)).rejects.toBeInstanceOf(contracts.ValidationError)

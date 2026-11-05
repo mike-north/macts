@@ -4,12 +4,14 @@
 
 ## PackageSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
 PackageSchema: z.ZodObject<
   {
-    id: z.ZodNumber
+    id: z.ZodString
   },
   z.core.$strip
 >

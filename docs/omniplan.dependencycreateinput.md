@@ -4,7 +4,7 @@
 
 ## DependencyCreateInput interface
 
-Input for creating a Dependency
+Input for creating a Dependency.
 
 **Signature:**
 

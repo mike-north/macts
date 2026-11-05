@@ -21,6 +21,7 @@
 export { CalendarClient, CalendarError, HttpClient } from './client.js'
 export type { CalendarClientOptions } from './client.js'
 export * from './types.js'
+export type { CalendarResources } from './contract/index.js'
 export { CalendarResourceClient } from './resources/calendar.js'
 export { EventResourceClient } from './resources/event.js'
 export { capabilities } from './capabilities.js'

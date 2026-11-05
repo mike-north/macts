@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-what the action does
+string \| null
+
+</td><td>
+
+what the action does. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ what the action does
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the name of the action
+string \| null
+
+</td><td>
+
+the name of the action. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

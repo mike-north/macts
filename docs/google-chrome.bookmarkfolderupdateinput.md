@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/google-chrome](./google-chrome.md) &gt; [BookmarkFolderUpdateInput](./google-chrome.bookmarkfolderupdateinput.md)
 
-## BookmarkFolderUpdateInput type
+## BookmarkFolderUpdateInput interface
 
-Input for updating a BookmarkFolder
+Input for updating a BookmarkFolder. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type BookmarkFolderUpdateInput = Partial<BookmarkFolderCreateInput>
+interface BookmarkFolderUpdateInput
 ```
 
-**References:** [BookmarkFolderCreateInput](./google-chrome.bookmarkfoldercreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[title?](./google-chrome.bookmarkfolderupdateinput.title.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The title of the folder. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

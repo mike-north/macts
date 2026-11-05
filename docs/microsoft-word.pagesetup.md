@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The bottom margin in points
+The bottom margin in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ The bottom margin in points
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The left margin in points
+The left margin in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ The left margin in points
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The page orientation (portrait or landscape)
+The page orientation (portrait or landscape). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ The page orientation (portrait or landscape)
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The page height in points
+The page height in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +99,11 @@ The page height in points
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The page width in points
+The page width in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +114,11 @@ The page width in points
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The paper size
+The paper size. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +129,11 @@ The paper size
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The right margin in points
+The right margin in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +144,11 @@ The right margin in points
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The top margin in points
+The top margin in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

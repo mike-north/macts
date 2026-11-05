@@ -6,12 +6,12 @@
 
 Serialize an [AuditRecord](./core.auditrecord.md) to its JSON-safe [SerializedAuditRecord](./core.serializedauditrecord.md) form.
 
-Deterministic: the `timestamp` becomes a stable ISO-8601 string and `reason` is included only when present. No storage is performed — the caller decides where the serialized record goes.
+Deterministic: the `timestamp` becomes a stable ISO-8601 string, and only the fields of the record's kind are written, with `reason` and `approvalId` included only when present. No storage is performed — the caller decides where the serialized record goes.
 
 **Signature:**
 
 ```typescript
-declare function serializeAuditRecord(record: AuditRecord): SerializedAuditRecord
+declare function serializeAuditRecord(record: GovernedAuditRecord): SerializedGovernedAuditRecord
 ```
 
 ## Parameters
@@ -35,7 +35,7 @@ record
 
 </td><td>
 
-[AuditRecord](./core.auditrecord.md)
+[GovernedAuditRecord](./core.governedauditrecord.md)
 
 </td><td>
 
@@ -46,6 +46,10 @@ The audit record to serialize.
 
 **Returns:**
 
-[SerializedAuditRecord](./core.serializedauditrecord.md)
+[SerializedGovernedAuditRecord](./core.serializedgovernedauditrecord.md)
 
-The JSON-serializable representation.
+The JSON-serializable representation, of the same kind.
+
+## Exceptions
+
+`TypeError` for an `invalid-input` record that carries an argument summary, a reason, or an approval id, or whose issue count is not a non-negative integer; or for a `permission-denied` record that carries any of those fields.

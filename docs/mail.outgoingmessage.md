@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Does nothing at all (deprecated)
+Does nothing at all (deprecated). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +52,15 @@ Does nothing at all (deprecated)
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The unique identifier of the message
+[Integer](./contracts.integer.md)
+
+</td><td>
+
+The unique identifier of the message. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -69,11 +71,11 @@ The unique identifier of the message
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The signature of the message
+The signature of the message. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +86,11 @@ The signature of the message
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The sender of the message
+The sender of the message. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +101,11 @@ The sender of the message
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The subject of the message
+The subject of the message. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +116,11 @@ The subject of the message
 
 </td><td>
 
-string
+[FileValue](./contracts.filevalue.md) \| null
 
 </td><td>
 
-Does nothing at all (deprecated)
+Does nothing at all (deprecated). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +131,11 @@ Does nothing at all (deprecated)
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Controls whether the message window is shown on the screen. The default is false
+Controls whether the message window is shown on the screen. The default is false. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

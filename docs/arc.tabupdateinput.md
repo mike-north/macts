@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/arc](./arc.md) &gt; [TabUpdateInput](./arc.tabupdateinput.md)
 
-## TabUpdateInput type
+## TabUpdateInput interface
 
-Input for updating a Tab
+Input for updating a Tab. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type TabUpdateInput = Partial<TabCreateInput>
+interface TabUpdateInput
 ```
 
-**References:** [TabCreateInput](./arc.tabcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[location?](./arc.tabupdateinput.location.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[uRL?](./arc.tabupdateinput.url.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The url of the tab. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

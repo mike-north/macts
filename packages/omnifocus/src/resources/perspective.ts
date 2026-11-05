@@ -24,14 +24,27 @@ export class PerspectiveResourceClient {
   /**
    * List all perspectives, as one page.
    */
-  async list(): Promise<Page<Perspective>> {
-    return this.#http.rpc<Page<Perspective>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Perspective>> {
+    return this.#http.invoke<Page<Perspective>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'Perspective'
+    )
   }
 
   /**
    * Get a perspective by id.
    */
-  async get(id: string): Promise<Perspective> {
-    return this.#http.rpc<Perspective>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Perspective> {
+    return this.#http.invoke<Perspective>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Perspective'
+    )
   }
 }

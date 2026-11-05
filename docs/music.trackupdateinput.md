@@ -4,12 +4,43 @@
 
 ## TrackUpdateInput type
 
-Input for updating a Track
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type TrackUpdateInput = Partial<TrackCreateInput>
+type TrackUpdateInput = Omit<
+  TrackUpdateInput$1,
+  | 'albumRating'
+  | 'bpm'
+  | 'discCount'
+  | 'discNumber'
+  | 'episodeNumber'
+  | 'movementCount'
+  | 'movementNumber'
+  | 'playedCount'
+  | 'rating'
+  | 'seasonNumber'
+  | 'skippedCount'
+  | 'trackCount'
+  | 'trackNumber'
+  | 'volumeAdjustment'
+  | 'year'
+> & {
+  albumRating?: null extends TrackUpdateInput$1['albumRating'] ? number | null : number
+  bpm?: null extends TrackUpdateInput$1['bpm'] ? number | null : number
+  discCount?: null extends TrackUpdateInput$1['discCount'] ? number | null : number
+  discNumber?: null extends TrackUpdateInput$1['discNumber'] ? number | null : number
+  episodeNumber?: null extends TrackUpdateInput$1['episodeNumber'] ? number | null : number
+  movementCount?: null extends TrackUpdateInput$1['movementCount'] ? number | null : number
+  movementNumber?: null extends TrackUpdateInput$1['movementNumber'] ? number | null : number
+  playedCount?: null extends TrackUpdateInput$1['playedCount'] ? number | null : number
+  rating?: null extends TrackUpdateInput$1['rating'] ? number | null : number
+  seasonNumber?: null extends TrackUpdateInput$1['seasonNumber'] ? number | null : number
+  skippedCount?: null extends TrackUpdateInput$1['skippedCount'] ? number | null : number
+  trackCount?: null extends TrackUpdateInput$1['trackCount'] ? number | null : number
+  trackNumber?: null extends TrackUpdateInput$1['trackNumber'] ? number | null : number
+  volumeAdjustment?: null extends TrackUpdateInput$1['volumeAdjustment'] ? number | null : number
+  year?: null extends TrackUpdateInput$1['year'] ? number | null : number
+}
 ```
-
-**References:** [TrackCreateInput](./music.trackcreateinput.md)

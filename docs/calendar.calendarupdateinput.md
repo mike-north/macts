@@ -2,14 +2,93 @@
 
 [Home](./index.md) &gt; [@macts/calendar](./calendar.md) &gt; [CalendarUpdateInput](./calendar.calendarupdateinput.md)
 
-## CalendarUpdateInput type
+## CalendarUpdateInput interface
 
-Input for updating a Calendar
+Input for updating a Calendar. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type CalendarUpdateInput = Partial<CalendarCreateInput>
+interface CalendarUpdateInput
 ```
 
-**References:** [CalendarCreateInput](./calendar.calendarcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[color?](./calendar.calendarupdateinput.color.md)
+
+</td><td>
+
+</td><td>
+
+[Rgb](./contracts.rgb.md)
+
+</td><td>
+
+_(Optional)_ Calendar color. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[description?](./calendar.calendarupdateinput.description.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The calendar description. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[name?](./calendar.calendarupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Calendar name. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[title?](./calendar.calendarupdateinput.title.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The calendar title (synonym for name). Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

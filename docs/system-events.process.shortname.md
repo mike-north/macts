@@ -4,10 +4,10 @@
 
 ## Process.shortName property
 
-the short name of the file from which the process was launched
+the short name of the file from which the process was launched. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-shortName: string
+readonly shortName: string | null;
 ```

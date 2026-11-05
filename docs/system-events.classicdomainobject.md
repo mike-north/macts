@@ -33,167 +33,36 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[appleMenuFolder](./system-events.classicdomainobject.applemenufolder.md)
+[id](./system-events.classicdomainobject.id.md)
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Apple Menu Items folder
+string
+
+</td><td>
+
+the unique identifier of the domain. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
 
-[controlPanelsFolder](./system-events.classicdomainobject.controlpanelsfolder.md)
+[name](./system-events.classicdomainobject.name.md)
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
+`readonly`
 
 </td><td>
 
-The Control Panels folder
-
-</td></tr>
-<tr><td>
-
-[controlStripModulesFolder](./system-events.classicdomainobject.controlstripmodulesfolder.md)
+string \| null
 
 </td><td>
 
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The Control Strip Modules folder
-
-</td></tr>
-<tr><td>
-
-[desktopFolder](./system-events.classicdomainobject.desktopfolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The Classic Desktop folder
-
-</td></tr>
-<tr><td>
-
-[extensionsFolder](./system-events.classicdomainobject.extensionsfolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The Extensions folder
-
-</td></tr>
-<tr><td>
-
-[fontsFolder](./system-events.classicdomainobject.fontsfolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The Fonts folder
-
-</td></tr>
-<tr><td>
-
-[launcherItemsFolder](./system-events.classicdomainobject.launcheritemsfolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The Launcher Items folder
-
-</td></tr>
-<tr><td>
-
-[preferencesFolder](./system-events.classicdomainobject.preferencesfolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The Classic Preferences folder
-
-</td></tr>
-<tr><td>
-
-[shutdownFolder](./system-events.classicdomainobject.shutdownfolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The Shutdown Items folder
-
-</td></tr>
-<tr><td>
-
-[startupItemsFolder](./system-events.classicdomainobject.startupitemsfolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The StartupItems folder
-
-</td></tr>
-<tr><td>
-
-[systemFolder](./system-events.classicdomainobject.systemfolder.md)
-
-</td><td>
-
-</td><td>
-
-[Folder](./system-events.folder.md)
-
-</td><td>
-
-The System folder
+the name of the domain. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

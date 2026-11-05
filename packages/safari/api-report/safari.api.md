@@ -4,6 +4,9 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -27,9 +30,9 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Document {
-    id: string;
-    name: string;
-    url: string;
+    readonly id: string;
+    readonly name: string | null;
+    url: string | null;
 }
 
 // @public
@@ -37,7 +40,7 @@ export interface DocumentCreateInput {
     url?: string;
 }
 
-// @public (undocumented)
+// @public
 export const DocumentSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -45,28 +48,38 @@ export const DocumentSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type DocumentUpdateInput = Partial<DocumentCreateInput>;
+export interface DocumentUpdateInput {
+    url?: string;
+}
 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
+}
+
+// @public
+export interface SafariClient extends ClientBrand<SafariResources> {
 }
 
 // @public
 export class SafariClient {
     constructor(options: SafariClientOptions);
-    addReadingListItem(andPreviewText?: string, withTitle?: string): Promise<void>;
-    dispatchMessageToExtension(): Promise<void>;
-    doJavaScript(_in?: string): Promise<void>;
-    emailContents(_of?: string): Promise<void>;
+    addReadingListItem(andPreviewText?: string, withTitle?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    dispatchMessageToExtension(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    doJavaScript(_in?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    emailContents(_of?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
-    searchTheWeb(_for: string, _in?: string): Promise<void>;
-    showBookmarks(): Promise<void>;
-    showCreditCardSettings(): Promise<void>;
-    showExtensionsPreferences(): Promise<void>;
-    showPrivacyReport(): Promise<void>;
-    syncAllPlistToDisk(): Promise<void>;
+    searchTheWeb(_for: string, _in?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    showBookmarks(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    showCreditCardSettings(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    showExtensionsPreferences(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    showPrivacyReport(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    syncAllPlistToDisk(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -83,12 +96,15 @@ export class SafariError extends Error {
 }
 
 // @public
+export type SafariResources = Readonly<Record<never, never>>;
+
+// @public
 export interface Tab {
-    id: string;
-    name: string;
-    source: string;
-    text: string;
-    url: string;
+    readonly id: string;
+    readonly name: string | null;
+    readonly source: string | null;
+    readonly text: string | null;
+    url: string | null;
 }
 
 // @public
@@ -96,7 +112,7 @@ export interface TabCreateInput {
     url?: string;
 }
 
-// @public (undocumented)
+// @public
 export const TabSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -106,7 +122,9 @@ export const TabSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type TabUpdateInput = Partial<TabCreateInput>;
+export interface TabUpdateInput {
+    url?: string;
+}
 
 // (No @packageDocumentation comment for this package)
 

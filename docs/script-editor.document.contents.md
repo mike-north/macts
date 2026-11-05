@@ -4,10 +4,10 @@
 
 ## Document.contents property
 
-The source code of the script
+The source code of the script. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-contents: string
+contents: string | null
 ```

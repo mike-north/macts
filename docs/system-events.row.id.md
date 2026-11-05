@@ -4,10 +4,10 @@
 
 ## Row.id property
 
-Unique identifier for this row
+Unique identifier for this row. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

@@ -4,10 +4,10 @@
 
 ## ScriptingCommand.name property
 
-The name of the command
+The name of the command. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

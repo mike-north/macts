@@ -2,14 +2,93 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [AliasUpdateInput](./system-events.aliasupdateinput.md)
 
-## AliasUpdateInput type
+## AliasUpdateInput interface
 
-Input for updating a Alias
+Input for updating an Alias. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type AliasUpdateInput = Partial<AliasCreateInput>
+interface AliasUpdateInput
 ```
 
-**References:** [AliasCreateInput](./system-events.aliascreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[creatorType?](./system-events.aliasupdateinput.creatortype.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the OSType identifying the application that created the alias. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[defaultApplication?](./system-events.aliasupdateinput.defaultapplication.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the application that will launch if the alias is opened. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[fileType?](./system-events.aliasupdateinput.filetype.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the OSType identifying the type of data contained in the alias. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[stationery?](./system-events.aliasupdateinput.stationery.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Is the alias a stationery pad? Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

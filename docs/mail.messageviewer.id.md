@@ -4,10 +4,10 @@
 
 ## MessageViewer.id property
 
-The unique identifier of the message viewer
+The unique identifier of the message viewer. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: Integer;
 ```

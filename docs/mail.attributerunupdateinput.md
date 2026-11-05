@@ -2,14 +2,78 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [AttributeRunUpdateInput](./mail.attributerunupdateinput.md)
 
-## AttributeRunUpdateInput type
+## AttributeRunUpdateInput interface
 
-Input for updating a AttributeRun
+Input for updating an AttributeRun. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type AttributeRunUpdateInput = Partial<AttributeRunCreateInput>
+interface AttributeRunUpdateInput
 ```
 
-**References:** [AttributeRunCreateInput](./mail.attributeruncreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[color?](./mail.attributerunupdateinput.color.md)
+
+</td><td>
+
+</td><td>
+
+[Rgb](./contracts.rgb.md)
+
+</td><td>
+
+_(Optional)_ The color of the first character. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[font?](./mail.attributerunupdateinput.font.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of the font of the first character. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[size?](./mail.attributerunupdateinput.size.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The size in points of the first character. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

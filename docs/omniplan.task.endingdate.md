@@ -4,10 +4,10 @@
 
 ## Task.endingDate property
 
-The date on which work ends
+The date on which work ends. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-endingDate: Date
+endingDate: Date | null
 ```

@@ -4,10 +4,10 @@
 
 ## AirPlayDevice.kind property
 
-the kind of the device
+the kind of the device. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-kind: string
+readonly kind: string | null;
 ```

@@ -4,10 +4,10 @@
 
 ## Account.deliveryAccount property
 
-The delivery account used when sending mail from this account
+The delivery account used when sending mail from this account. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-deliveryAccount: string
+deliveryAccount: string | null
 ```

@@ -4,10 +4,10 @@
 
 ## MiniplayerWindow.id property
 
-Unique identifier for this window
+Unique identifier for this window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: Integer | null;
 ```

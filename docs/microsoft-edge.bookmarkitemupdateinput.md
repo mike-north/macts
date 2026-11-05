@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-edge](./microsoft-edge.md) &gt; [BookmarkItemUpdateInput](./microsoft-edge.bookmarkitemupdateinput.md)
 
-## BookmarkItemUpdateInput type
+## BookmarkItemUpdateInput interface
 
-Input for updating a BookmarkItem
+Input for updating a BookmarkItem. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type BookmarkItemUpdateInput = Partial<BookmarkItemCreateInput>
+interface BookmarkItemUpdateInput
 ```
 
-**References:** [BookmarkItemCreateInput](./microsoft-edge.bookmarkitemcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[title?](./microsoft-edge.bookmarkitemupdateinput.title.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The title of the bookmark item. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[uRL?](./microsoft-edge.bookmarkitemupdateinput.url.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The URL of the bookmark. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

@@ -4,6 +4,10 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -28,22 +32,30 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export type PlayerState = 'stopped' | 'playing' | 'paused';
 
 // @public
+export interface SpotifyClient extends ClientBrand<SpotifyResources> {
+}
+
+// @public
 export class SpotifyClient {
     constructor(options: SpotifyClientOptions);
     get http(): HttpClient;
-    nextTrack(): Promise<void>;
-    pause(): Promise<void>;
-    play(): Promise<void>;
-    playpause(): Promise<void>;
-    playTrack(inContext?: string): Promise<void>;
-    previousTrack(): Promise<void>;
+    nextTrack(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    pause(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    play(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    playpause(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    playTrack(inContext?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    previousTrack(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -60,26 +72,29 @@ export class SpotifyError extends Error {
 }
 
 // @public
+export type SpotifyResources = Readonly<Record<never, never>>;
+
+// @public
 export interface Track {
-    album: string;
-    albumArtist: string;
-    artist: string;
-    artwork: string;
-    artworkUrl: string;
-    discNumber: number;
-    duration: number;
-    id: string;
-    name: string;
-    playedCount: number;
-    playerState: PlayerState;
-    spotifyUrl: string;
-    trackNumber: number;
+    readonly album: string | null;
+    readonly albumArtist: string | null;
+    readonly artist: string | null;
+    readonly artwork: string | null;
+    readonly artworkUrl: string | null;
+    readonly discNumber: Integer | null;
+    readonly duration: Integer | null;
+    readonly id: string;
+    readonly name: string | null;
+    readonly playedCount: Integer | null;
+    readonly playerState: PlayerState | null;
+    readonly spotifyUrl: string | null;
+    readonly trackNumber: Integer | null;
 }
 
 // @public
 export type TrackCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const TrackSchema: z.ZodObject<{
     name: z.ZodString;
     artist: z.ZodString;
@@ -97,7 +112,7 @@ export const TrackSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type TrackUpdateInput = Partial<TrackCreateInput>;
+export type TrackUpdateInput = Record<string, never>;
 
 // (No @packageDocumentation comment for this package)
 

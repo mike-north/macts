@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-edge](./microsoft-edge.md) &gt; [TabUpdateInput](./microsoft-edge.tabupdateinput.md)
 
-## TabUpdateInput type
+## TabUpdateInput interface
 
-Input for updating a Tab
+Input for updating a Tab. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type TabUpdateInput = Partial<TabCreateInput>
+interface TabUpdateInput
 ```
 
-**References:** [TabCreateInput](./microsoft-edge.tabcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[uRL?](./microsoft-edge.tabupdateinput.url.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ URL to load in the tab. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[windowId?](./microsoft-edge.tabupdateinput.windowid.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Window identifier for the tab. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

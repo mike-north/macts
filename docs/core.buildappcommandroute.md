@@ -6,12 +6,12 @@
 
 Build the canonical route for an application-scoped command.
 
-Application commands are addressed as `{app}.app.{commandKey}`<!-- -->.
+Application commands are addressed as `{app}.app.{segment}`<!-- -->.
 
 **Signature:**
 
 ```typescript
-declare function buildAppCommandRoute(appName: string, commandKey: string): string
+declare function buildAppCommandRoute(appName: string, segment: string): string
 ```
 
 ## Parameters
@@ -44,7 +44,7 @@ The raw `manifest.app.name`<!-- -->.
 </td></tr>
 <tr><td>
 
-commandKey
+segment
 
 </td><td>
 
@@ -52,7 +52,7 @@ string
 
 </td><td>
 
-The command's key in `manifest.commands` (NOT `command.name`<!-- -->). The key is globally unique within the manifest, whereas `name` is shared across resources (e.g. many commands have `name: list`<!-- -->).
+The command's route segment ([commandRouteSegment()](./core.commandroutesegment.md)<!-- -->): its `routeName`<!-- -->, else its key in `manifest.commands` (NOT `command.name`<!-- -->, which is shared across resources, e.g. many commands have `name: list`<!-- -->).
 
 </td></tr>
 </tbody></table>

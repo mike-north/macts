@@ -2,14 +2,78 @@
 
 [Home](./index.md) &gt; [@macts/omniplan](./omniplan.md) &gt; [DependencyUpdateInput](./omniplan.dependencyupdateinput.md)
 
-## DependencyUpdateInput type
+## DependencyUpdateInput interface
 
-Input for updating a Dependency
+Input for updating a Dependency. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type DependencyUpdateInput = Partial<DependencyCreateInput>
+interface DependencyUpdateInput
 ```
 
-**References:** [DependencyCreateInput](./omniplan.dependencycreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[dependencyType?](./omniplan.dependencyupdateinput.dependencytype.md)
+
+</td><td>
+
+</td><td>
+
+[DependencyType](./omniplan.dependencytype.md)
+
+</td><td>
+
+_(Optional)_ Type of dependency. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[leadPercentage?](./omniplan.dependencyupdateinput.leadpercentage.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The lead time, in percentage of the length of the prerequisite. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[leadTime?](./omniplan.dependencyupdateinput.leadtime.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The number of seconds of lead time required between the tasks. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

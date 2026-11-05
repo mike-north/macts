@@ -4,10 +4,10 @@
 
 ## Account.fullName property
 
-The users full name configured for an account
+The users full name configured for an account. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fullName: string
+fullName: string | null
 ```

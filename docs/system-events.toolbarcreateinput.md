@@ -4,7 +4,7 @@
 
 ## ToolbarCreateInput type
 
-Input for creating a Toolbar
+Input for creating a Toolbar.
 
 **Signature:**
 

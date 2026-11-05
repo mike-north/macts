@@ -4,10 +4,10 @@
 
 ## Violation.html property
 
-The long description HTML for this violation
+The long description HTML for this violation. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-html: string
+readonly html: string | null;
 ```

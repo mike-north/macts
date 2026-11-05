@@ -2,154 +2,17 @@
 
 [Home](./index.md) &gt; [@macts/core](./core.md) &gt; [SerializedAuditRecord](./core.serializedauditrecord.md)
 
-## SerializedAuditRecord interface
+## SerializedAuditRecord type
 
-The JSON-serializable form of an [AuditRecord](./core.auditrecord.md)<!-- -->.
-
-Identical to [AuditRecord](./core.auditrecord.md) except `timestamp` is an ISO-8601 string so the record round-trips through JSON without losing precision or type. The `reason` field is omitted entirely when absent (rather than serialized as `null`<!-- -->/`undefined`<!-- -->) to keep records compact and stable.
+The JSON-serializable form of an [AuditRecord](./core.auditrecord.md)<!-- -->, discriminated by `decision` as the record is.
 
 **Signature:**
 
 ```typescript
-interface SerializedAuditRecord
+type SerializedAuditRecord =
+  | SerializedGovernedAuditRecord
+  | SerializedInvalidInputAuditRecord
+  | SerializedPermissionDeniedAuditRecord
 ```
 
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[apiKeyId](./core.serializedauditrecord.apikeyid.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-string
-
-</td><td>
-
-Identifier of the authorizing API key (attribution).
-
-</td></tr>
-<tr><td>
-
-[app](./core.serializedauditrecord.app.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-string
-
-</td><td>
-
-App the capability targeted.
-
-</td></tr>
-<tr><td>
-
-[argsSummary](./core.serializedauditrecord.argssummary.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-string
-
-</td><td>
-
-Redacted, human-readable summary of the call arguments.
-
-</td></tr>
-<tr><td>
-
-[capability](./core.serializedauditrecord.capability.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-string
-
-</td><td>
-
-Capability invoked, in `app:resource:operation` form.
-
-</td></tr>
-<tr><td>
-
-[decision](./core.serializedauditrecord.decision.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[AuditDecision](./core.auditdecision.md)
-
-</td><td>
-
-Governance decision reached for the call.
-
-</td></tr>
-<tr><td>
-
-[reason?](./core.serializedauditrecord.reason.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Optional human-readable reason for the decision (omitted when absent).
-
-</td></tr>
-<tr><td>
-
-[timestamp](./core.serializedauditrecord.timestamp.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-string
-
-</td><td>
-
-When the call occurred, as an ISO-8601 timestamp.
-
-</td></tr>
-</tbody></table>
+**References:** [SerializedGovernedAuditRecord](./core.serializedgovernedauditrecord.md)<!-- -->, [SerializedInvalidInputAuditRecord](./core.serializedinvalidinputauditrecord.md)<!-- -->, [SerializedPermissionDeniedAuditRecord](./core.serializedpermissiondeniedauditrecord.md)

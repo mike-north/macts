@@ -57,24 +57,24 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(name)](./notes.attachmentresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./notes.attachmentresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a attachment by name.
+Get a attachment by id.
 
 </td></tr>
 <tr><td>
 
-[list()](./notes.attachmentresourceclient.list.md)
+[list(page, \_\_mactsOptions)](./notes.attachmentresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all attachments.
+List attachments, one page at a time. When the result has a `nextCursor`<!-- -->, more remain: call again with the same arguments and `{ cursor: nextCursor }`<!-- -->.
 
 </td></tr>
 </tbody></table>

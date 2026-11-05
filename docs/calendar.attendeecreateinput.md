@@ -4,7 +4,7 @@
 
 ## AttendeeCreateInput type
 
-Input for creating a Attendee
+Input for creating an Attendee.
 
 **Signature:**
 

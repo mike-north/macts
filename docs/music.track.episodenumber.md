@@ -4,10 +4,10 @@
 
 ## Track.episodeNumber property
 
-the episode number of the track
+the episode number of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-episodeNumber: number
+episodeNumber: Integer | null
 ```

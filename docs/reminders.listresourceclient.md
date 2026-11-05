@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./reminders.listresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./reminders.listresourceclient.create.md)
 
 </td><td>
 
@@ -68,7 +68,7 @@ Create a new list.
 </td></tr>
 <tr><td>
 
-[get(id)](./reminders.listresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./reminders.listresourceclient.get.md)
 
 </td><td>
 
@@ -79,13 +79,13 @@ Get a list by id.
 </td></tr>
 <tr><td>
 
-[list()](./reminders.listresourceclient.list.md)
+[list(page, \_\_mactsOptions)](./reminders.listresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all lists.
+List lists, one page at a time. When the result has a `nextCursor`<!-- -->, more remain: call again with the same arguments and `{ cursor: nextCursor }`<!-- -->.
 
 </td></tr>
 </tbody></table>

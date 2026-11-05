@@ -4,12 +4,10 @@
 
 ## SubscriptionPlaylistUpdateInput type
 
-Input for updating a SubscriptionPlaylist
+Input for updating a SubscriptionPlaylist. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SubscriptionPlaylistUpdateInput = Partial<SubscriptionPlaylistCreateInput>
+type SubscriptionPlaylistUpdateInput = Record<string, never>
 ```
-
-**References:** [SubscriptionPlaylistCreateInput](./music.subscriptionplaylistcreateinput.md)

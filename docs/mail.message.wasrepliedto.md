@@ -4,10 +4,10 @@
 
 ## Message.wasRepliedTo property
 
-Indicates whether the message was replied to or not
+Indicates whether the message was replied to or not. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-wasRepliedTo: boolean
+readonly wasRepliedTo: boolean | null;
 ```

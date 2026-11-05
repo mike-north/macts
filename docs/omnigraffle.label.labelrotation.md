@@ -4,10 +4,10 @@
 
 ## Label.labelRotation property
 
-The type of rotation around the line
+The type of rotation around the line. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-labelRotation: LabelOrientation
+labelRotation: LabelOrientation | null
 ```

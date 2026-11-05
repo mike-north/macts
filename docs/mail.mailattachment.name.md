@@ -4,10 +4,10 @@
 
 ## MailAttachment.name property
 
-Name of the attachment
+Name of the attachment. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

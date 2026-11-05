@@ -4,7 +4,7 @@
 
 ## ProcessCreateInput interface
 
-Input for creating a Process
+Input for creating a Process.
 
 **Signature:**
 

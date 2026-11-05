@@ -4,7 +4,7 @@
 
 ## SettingsSetCreateInput interface
 
-Input for creating a SettingsSet
+Input for creating a SettingsSet.
 
 **Signature:**
 

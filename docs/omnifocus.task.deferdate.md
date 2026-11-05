@@ -4,10 +4,10 @@
 
 ## Task.deferDate property
 
-When the task should become available for action
+When the task should become available for action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-deferDate: Date
+deferDate: Date | null
 ```

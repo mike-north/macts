@@ -4,10 +4,10 @@
 
 ## Message.dateSent property
 
-The date a message was sent
+The date a message was sent. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-dateSent: Date
+readonly dateSent: Date | null;
 ```

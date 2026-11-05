@@ -4,10 +4,10 @@
 
 ## Location.name property
 
-the name of the location
+the name of the location. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/photos](./photos.md) &gt; [ContainerUpdateInput](./photos.containerupdateinput.md)
 
-## ContainerUpdateInput type
+## ContainerUpdateInput interface
 
-Input for updating a Container
+Input for updating a Container. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ContainerUpdateInput = Partial<ContainerCreateInput>
+interface ContainerUpdateInput
 ```
 
-**References:** [ContainerCreateInput](./photos.containercreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[name?](./photos.containerupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of this container. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

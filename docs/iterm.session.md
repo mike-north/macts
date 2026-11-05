@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSIBlackColor property
+The aNSIBlackColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ The aNSIBlackColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSIBlueColor property
+The aNSIBlueColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ The aNSIBlueColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSIBrightBlackColor property
+The aNSIBrightBlackColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ The aNSIBrightBlackColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSIBrightBlueColor property
+The aNSIBrightBlueColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +99,11 @@ The aNSIBrightBlueColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSIBrightCyanColor property
+The aNSIBrightCyanColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +114,11 @@ The aNSIBrightCyanColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSIBrightGreenColor property
+The aNSIBrightGreenColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +129,11 @@ The aNSIBrightGreenColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSIBrightMagentaColor property
+The aNSIBrightMagentaColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +144,11 @@ The aNSIBrightMagentaColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSIBrightRedColor property
+The aNSIBrightRedColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +159,11 @@ The aNSIBrightRedColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSIBrightWhiteColor property
+The aNSIBrightWhiteColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -174,11 +174,11 @@ The aNSIBrightWhiteColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSIBrightYellowColor property
+The aNSIBrightYellowColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -189,11 +189,11 @@ The aNSIBrightYellowColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSICyanColor property
+The aNSICyanColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -204,11 +204,11 @@ The aNSICyanColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSIGreenColor property
+The aNSIGreenColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -219,11 +219,11 @@ The aNSIGreenColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSIMagentaColor property
+The aNSIMagentaColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -234,11 +234,11 @@ The aNSIMagentaColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSIRedColor property
+The aNSIRedColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -249,11 +249,11 @@ The aNSIRedColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSIWhiteColor property
+The aNSIWhiteColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -264,11 +264,11 @@ The aNSIWhiteColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The aNSIYellowColor property
+The aNSIYellowColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -279,11 +279,11 @@ The aNSIYellowColor property
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-ENQ Answerback string
+ENQ Answerback string. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -294,11 +294,11 @@ ENQ Answerback string
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The backgroundColor property
+The backgroundColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -309,11 +309,11 @@ The backgroundColor property
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The backgroundImage property
+The backgroundImage property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -324,11 +324,11 @@ The backgroundImage property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The boldColor property
+The boldColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -339,11 +339,11 @@ The boldColor property
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The colorPreset property
+The colorPreset property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -354,11 +354,11 @@ The colorPreset property
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The columns property
+The columns property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -369,11 +369,11 @@ The columns property
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The currently visible contents of the session.
+The currently visible contents of the session. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -384,11 +384,11 @@ The currently visible contents of the session.
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The cursorColor property
+The cursorColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -399,11 +399,11 @@ The cursorColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The cursorTextColor property
+The cursorTextColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -414,11 +414,11 @@ The cursorTextColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The foregroundColor property
+The foregroundColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -427,13 +427,15 @@ The foregroundColor property
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the session.
+The unique identifier of the session. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -444,11 +446,11 @@ The unique identifier of the session.
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-The terminal is at the shell prompt. Requires shell integration.
+The terminal is at the shell prompt. Requires shell integration. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -459,11 +461,11 @@ The terminal is at the shell prompt. Requires shell integration.
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-The session has received output recently.
+The session has received output recently. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -474,11 +476,11 @@ The session has received output recently.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name property
+The name property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -487,13 +489,15 @@ The name property
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The session's profile name
+string \| null
+
+</td><td>
+
+The session's profile name. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -504,11 +508,11 @@ The session's profile name
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The rows property
+The rows property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -519,11 +523,11 @@ The rows property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The selectedTextColor property
+The selectedTextColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -534,11 +538,11 @@ The selectedTextColor property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The selectionColor property
+The selectionColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -547,13 +551,15 @@ The selectionColor property
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The currently visible contents of the session.
+string \| null
+
+</td><td>
+
+The currently visible contents of the session. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -564,11 +570,11 @@ The currently visible contents of the session.
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The transparency property
+The transparency property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -577,13 +583,15 @@ The transparency property
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The tty property
+string \| null
+
+</td><td>
+
+The tty property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -594,11 +602,11 @@ The tty property
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The underlineColor property
+The underlineColor property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -607,13 +615,15 @@ The underlineColor property
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The uniqueID property
+string \| null
+
+</td><td>
+
+The uniqueID property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -624,11 +634,11 @@ The uniqueID property
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the use a dedicated color for underlining.
+Whether the use a dedicated color for underlining. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

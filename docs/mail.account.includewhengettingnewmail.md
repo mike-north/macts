@@ -4,10 +4,10 @@
 
 ## Account.includeWhenGettingNewMail property
 
-Does nothing at all (deprecated)
+Does nothing at all (deprecated). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-includeWhenGettingNewMail: boolean
+includeWhenGettingNewMail: boolean | null
 ```

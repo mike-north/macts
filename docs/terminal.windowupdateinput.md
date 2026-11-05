@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/terminal](./terminal.md) &gt; [WindowUpdateInput](./terminal.windowupdateinput.md)
 
-## WindowUpdateInput type
+## WindowUpdateInput interface
 
-Input for updating a Window
+Input for updating a Window. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type WindowUpdateInput = Partial<WindowCreateInput>
+interface WindowUpdateInput
 ```
 
-**References:** [WindowCreateInput](./terminal.windowcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[position?](./terminal.windowupdateinput.position.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The position of the window. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[visible?](./terminal.windowupdateinput.visible.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether the window is visible. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

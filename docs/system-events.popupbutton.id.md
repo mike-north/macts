@@ -4,10 +4,10 @@
 
 ## PopUpButton.id property
 
-Unique identifier for this pop up button
+Unique identifier for this pop up button. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

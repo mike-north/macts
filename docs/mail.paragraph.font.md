@@ -4,10 +4,10 @@
 
 ## Paragraph.font property
 
-The name of the font of the first character.
+The name of the font of the first character. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-font: string
+font: string | null
 ```

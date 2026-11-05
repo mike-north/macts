@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/contacts](./contacts.md) &gt; [GroupUpdateInput](./contacts.groupupdateinput.md)
 
-## GroupUpdateInput type
+## GroupUpdateInput interface
 
-Input for updating a Group
+Input for updating a Group. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type GroupUpdateInput = Partial<GroupCreateInput>
+interface GroupUpdateInput
 ```
 
-**References:** [GroupCreateInput](./contacts.groupcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[name?](./contacts.groupupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of this group. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

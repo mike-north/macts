@@ -4,12 +4,10 @@
 
 ## PackageUpdateInput type
 
-Input for updating a Package
+Input for updating a Package. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type PackageUpdateInput = Partial<PackageCreateInput>
+type PackageUpdateInput = Record<string, never>
 ```
-
-**References:** [PackageCreateInput](./finder.packagecreateinput.md)

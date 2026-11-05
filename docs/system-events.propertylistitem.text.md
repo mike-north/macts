@@ -4,10 +4,10 @@
 
 ## PropertyListItem.text property
 
-the text representation of the property list data
+the text representation of the property list data. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-text: string
+text: string | null
 ```

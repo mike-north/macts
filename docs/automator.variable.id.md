@@ -4,10 +4,10 @@
 
 ## Variable.id property
 
-The unique identifier for the variable
+The unique identifier for the variable. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

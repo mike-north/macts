@@ -4,10 +4,10 @@
 
 ## Tag.id property
 
-The unique identifier of the tag
+The unique identifier of the tag. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

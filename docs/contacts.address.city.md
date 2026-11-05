@@ -4,10 +4,10 @@
 
 ## Address.city property
 
-City part of the address.
+City part of the address. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-city: string
+city: string | null
 ```

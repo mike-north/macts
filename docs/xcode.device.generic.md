@@ -4,10 +4,10 @@
 
 ## Device.generic property
 
-Whether this run destination is generic instead of representing a specific device
+Whether this run destination is generic instead of representing a specific device. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-generic: boolean
+readonly generic: boolean | null;
 ```

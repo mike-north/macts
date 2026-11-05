@@ -33,32 +33,19 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[id?](./bluetooth-file-exchange.application.id.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
-
-</td></tr>
-<tr><td>
-
 [name](./bluetooth-file-exchange.application.name.md)
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The name of the application
+The name of the application. Never null: the primary identifier.
 
 </td></tr>
 </tbody></table>

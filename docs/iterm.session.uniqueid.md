@@ -4,10 +4,10 @@
 
 ## Session.uniqueID property
 
-The uniqueID property
+The uniqueID property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-uniqueID: string
+readonly uniqueID: string | null;
 ```

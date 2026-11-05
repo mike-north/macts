@@ -4,10 +4,10 @@
 
 ## CustomDate.label property
 
-Label for this date
+Label for this date. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-label: string
+label: string | null
 ```

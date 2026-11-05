@@ -4,10 +4,10 @@
 
 ## FinderWindow.iconViewOptions property
 
-the icon view options for the container window
+the icon view options for the container window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-iconViewOptions: unknown
+readonly iconViewOptions: unknown;
 ```

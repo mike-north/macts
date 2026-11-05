@@ -4,7 +4,7 @@
 
 ## SchemeActionResultCreateInput interface
 
-Input for creating a SchemeActionResult
+Input for creating a SchemeActionResult.
 
 **Signature:**
 

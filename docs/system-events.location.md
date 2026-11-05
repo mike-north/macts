@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-the unique identifier for the location
+the unique identifier for the location. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ the unique identifier for the location
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the name of the location
+the name of the location. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

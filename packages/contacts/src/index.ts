@@ -21,6 +21,7 @@
 export { ContactsClient, ContactsError, HttpClient } from './client.js'
 export type { ContactsClientOptions } from './client.js'
 export * from './types.js'
+export type { ContactsResources } from './contract/index.js'
 export { AddressResourceClient } from './resources/address.js'
 export { EmailResourceClient } from './resources/email.js'
 export { GroupResourceClient } from './resources/group.js'

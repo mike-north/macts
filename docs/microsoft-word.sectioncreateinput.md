@@ -4,7 +4,7 @@
 
 ## SectionCreateInput interface
 
-Input for creating a Section
+Input for creating a Section.
 
 **Signature:**
 

@@ -4,10 +4,10 @@
 
 ## Currency.code property
 
-Locale code for this currency
+Locale code for this currency. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-code: string
+readonly code: string | null;
 ```

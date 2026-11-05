@@ -9,7 +9,7 @@ Print the specified object(s)
 **Signature:**
 
 ```typescript
-print(withProperties?: unknown): Promise<void>;
+print(withProperties?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -34,6 +34,19 @@ withProperties
 </td><td>
 
 unknown
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

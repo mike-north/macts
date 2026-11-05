@@ -4,12 +4,12 @@
 
 ## AttachmentResourceClient.get() method
 
-Get a attachment by name.
+Get a attachment by id.
 
 **Signature:**
 
 ```typescript
-get(name: string): Promise<Attachment>;
+get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Attachment>;
 ```
 
 ## Parameters
@@ -29,13 +29,26 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-name
+id
 
 </td><td>
 
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

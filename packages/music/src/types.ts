@@ -5,764 +5,443 @@
 
 import { z } from 'zod'
 
-/** EKnd */
-export type EKnd = 'trackListing' | 'albumListing' | 'cdInsert'
+export type { EKnd } from './contract/index.js'
 
-/** Enum */
-export type Enum = 'standard' | 'detailed'
+export type { Enum } from './contract/index.js'
 
-/** EPlS */
-export type EPlS = 'stopped' | 'playing' | 'paused' | 'fastForwarding' | 'rewinding'
+export type { EPlS } from './contract/index.js'
 
-/** ERpt */
-export type ERpt = 'off' | 'one' | 'all'
+export type { ERpt } from './contract/index.js'
 
-/** EShM */
-export type EShM = 'songs' | 'albums' | 'groupings'
+export type { EShM } from './contract/index.js'
 
-/** ESrc */
-export type ESrc =
-  | 'library'
-  | 'audioCD'
-  | 'mP3CD'
-  | 'radioTuner'
-  | 'sharedLibrary'
-  | 'iTunesStore'
-  | 'unknown'
+export type { ESrc } from './contract/index.js'
 
-/** ESrA */
-export type ESrA = 'albums' | 'all' | 'artists' | 'composers' | 'displayed' | 'names'
+export type { ESrA } from './contract/index.js'
 
-/** ESpK */
-export type ESpK = 'none' | 'folder' | 'genius' | 'library' | 'music' | 'purchasedMusic'
+export type { ESpK } from './contract/index.js'
 
-/** EMdK */
-export type EMdK = 'song' | 'musicVideo' | 'movie' | 'tVShow' | 'unknown'
+export type { EMdK } from './contract/index.js'
 
-/** ERtK */
-export type ERtK = 'user' | 'computed'
+export type { ERtK } from './contract/index.js'
 
-/** EAPD */
-export type EAPD =
-  | 'computer'
-  | 'airPortExpress'
-  | 'appleTV'
-  | 'airPlayDevice'
-  | 'bluetoothDevice'
-  | 'homePod'
-  | 'tV'
-  | 'unknown'
+export type { EAPD } from './contract/index.js'
 
-/** EClS */
-export type EClS =
-  | 'unknown'
-  | 'purchased'
-  | 'matched'
-  | 'uploaded'
-  | 'ineligible'
-  | 'removed'
-  | 'error'
-  | 'duplicate'
-  | 'subscription'
-  | 'prerelease'
-  | 'noLongerAvailable'
-  | 'notUploaded'
+export type { EClS } from './contract/index.js'
 
-/** EExF */
-export type EExF = 'plainText' | 'unicodeText' | 'xML' | 'm3U' | 'm3U8'
+export type { EExF } from './contract/index.js'
 
-/** an AirPlay device */
-export interface AirPlayDevice {
-  /** is the device currently being played to? */
-  active: boolean
-  /** is the device currently available? */
-  available: boolean
-  /** the kind of the device */
-  kind: string
-  /** the network (MAC) address of the device */
-  networkAddress: string
-  /** is the device password- or passcode-protected? */
-  protected: boolean
-  /** is the device currently selected? */
-  selected: boolean
-  /** does the device support audio playback? */
-  supportsAudio: boolean
-  /** does the device support video playback? */
-  supportsVideo: boolean
-  /** the output volume for the device (0 = minimum, 100 = maximum) */
-  soundVolume: number
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { AirPlayDevice } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type AirPlayDeviceCreateInput = Omit<
+  import('./contract/index.js').AirPlayDeviceCreateInput,
+  'soundVolume'
+> & {
+  /** the output volume for the device (0 = minimum, 100 = maximum) Numeric values are validated by the contract before dispatch. */
+  soundVolume?: null extends import('./contract/index.js').AirPlayDeviceCreateInput['soundVolume']
+    ? number | null
+    : number
 }
 
-/** Input for creating a AirPlayDevice */
-export interface AirPlayDeviceCreateInput {
-  /** is the device currently selected? */
-  selected?: boolean
-  /** the output volume for the device (0 = minimum, 100 = maximum) */
-  soundVolume?: number
+/** Canonical update input, retaining checked numeric conveniences. */
+export type AirPlayDeviceUpdateInput = Omit<
+  import('./contract/index.js').AirPlayDeviceUpdateInput,
+  'soundVolume'
+> & {
+  /** the output volume for the device (0 = minimum, 100 = maximum) Numeric values are validated by the contract before dispatch. */
+  soundVolume?: null extends import('./contract/index.js').AirPlayDeviceUpdateInput['soundVolume']
+    ? number | null
+    : number
 }
 
-/** Input for updating a AirPlayDevice */
-export type AirPlayDeviceUpdateInput = Partial<AirPlayDeviceCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Artwork } from './contract/index.js'
 
-/** a piece of art within a track or playlist */
-export interface Artwork {
-  /** data for this artwork, in the form of a picture */
-  data: string
-  /** description of artwork as a string */
-  description: string
-  /** was this artwork downloaded by Music? */
-  downloaded: boolean
-  /** the data format for this piece of artwork */
-  format: string
-  /** kind or purpose of this piece of artwork */
-  kind: number
-  /** data for this artwork, in original format */
-  rawData: unknown
+/** Canonical create input, retaining checked numeric conveniences. */
+export type ArtworkCreateInput = Omit<import('./contract/index.js').ArtworkCreateInput, 'kind'> & {
+  /** kind or purpose of this piece of artwork Numeric values are validated by the contract before dispatch. */
+  kind?: null extends import('./contract/index.js').ArtworkCreateInput['kind']
+    ? number | null
+    : number
 }
 
-/** Input for creating a Artwork */
-export interface ArtworkCreateInput {
-  /** data for this artwork, in the form of a picture */
-  data?: string
-  /** description of artwork as a string */
-  description?: string
-  /** kind or purpose of this piece of artwork */
-  kind?: number
-  /** data for this artwork, in original format */
-  rawData?: unknown
+/** Canonical update input, retaining checked numeric conveniences. */
+export type ArtworkUpdateInput = Omit<import('./contract/index.js').ArtworkUpdateInput, 'kind'> & {
+  /** kind or purpose of this piece of artwork Numeric values are validated by the contract before dispatch. */
+  kind?: null extends import('./contract/index.js').ArtworkUpdateInput['kind']
+    ? number | null
+    : number
 }
 
-/** Input for updating a Artwork */
-export type ArtworkUpdateInput = Partial<ArtworkCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { AudioCDPlaylist } from './contract/index.js'
 
-/** a playlist representing an audio CD */
-export interface AudioCDPlaylist {
-  /** the artist of the CD */
-  artist: string
-  /** is this CD a compilation album? */
-  compilation: boolean
-  /** the composer of the CD */
-  composer: string
-  /** the total number of discs in this CD’s album */
-  discCount: number
-  /** the index of this CD disc in the source album */
-  discNumber: number
-  /** the genre of the CD */
-  genre: string
-  /** the year the album was recorded/released */
-  year: number
+/** Canonical create input, retaining checked numeric conveniences. */
+export type AudioCDPlaylistCreateInput = Omit<
+  import('./contract/index.js').AudioCDPlaylistCreateInput,
+  'discCount' | 'discNumber' | 'year'
+> & {
+  /** the total number of discs in this CD’s album Numeric values are validated by the contract before dispatch. */
+  discCount?: null extends import('./contract/index.js').AudioCDPlaylistCreateInput['discCount']
+    ? number | null
+    : number
+  /** the index of this CD disc in the source album Numeric values are validated by the contract before dispatch. */
+  discNumber?: null extends import('./contract/index.js').AudioCDPlaylistCreateInput['discNumber']
+    ? number | null
+    : number
+  /** the year the album was recorded/released Numeric values are validated by the contract before dispatch. */
+  year?: null extends import('./contract/index.js').AudioCDPlaylistCreateInput['year']
+    ? number | null
+    : number
 }
 
-/** Input for creating a AudioCDPlaylist */
-export interface AudioCDPlaylistCreateInput {
-  /** the artist of the CD */
-  artist?: string
-  /** is this CD a compilation album? */
-  compilation?: boolean
-  /** the composer of the CD */
-  composer?: string
-  /** the total number of discs in this CD’s album */
-  discCount?: number
-  /** the index of this CD disc in the source album */
-  discNumber?: number
-  /** the genre of the CD */
-  genre?: string
-  /** the year the album was recorded/released */
-  year?: number
+/** Canonical update input, retaining checked numeric conveniences. */
+export type AudioCDPlaylistUpdateInput = Omit<
+  import('./contract/index.js').AudioCDPlaylistUpdateInput,
+  'discCount' | 'discNumber' | 'year'
+> & {
+  /** the total number of discs in this CD’s album Numeric values are validated by the contract before dispatch. */
+  discCount?: null extends import('./contract/index.js').AudioCDPlaylistUpdateInput['discCount']
+    ? number | null
+    : number
+  /** the index of this CD disc in the source album Numeric values are validated by the contract before dispatch. */
+  discNumber?: null extends import('./contract/index.js').AudioCDPlaylistUpdateInput['discNumber']
+    ? number | null
+    : number
+  /** the year the album was recorded/released Numeric values are validated by the contract before dispatch. */
+  year?: null extends import('./contract/index.js').AudioCDPlaylistUpdateInput['year']
+    ? number | null
+    : number
 }
 
-/** Input for updating a AudioCDPlaylist */
-export type AudioCDPlaylistUpdateInput = Partial<AudioCDPlaylistCreateInput>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { AudioCDTrack } from './contract/index.js'
 
-/** a track on an audio CD */
-export interface AudioCDTrack {
-  /** the location of the file represented by this track */
-  location: string
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { AudioCDTrackCreateInput } from './contract/index.js'
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { AudioCDTrackUpdateInput } from './contract/index.js'
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { BrowserWindow } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { BrowserWindowCreateInput } from './contract/index.js'
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { BrowserWindowUpdateInput } from './contract/index.js'
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Encoder } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { EncoderCreateInput } from './contract/index.js'
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { EncoderUpdateInput } from './contract/index.js'
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { EQPreset } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { EQPresetCreateInput } from './contract/index.js'
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { EQPresetUpdateInput } from './contract/index.js'
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { EQWindow } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { EQWindowCreateInput } from './contract/index.js'
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { EQWindowUpdateInput } from './contract/index.js'
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { FileTrack } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { FileTrackCreateInput } from './contract/index.js'
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { FileTrackUpdateInput } from './contract/index.js'
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { LibraryPlaylist } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { LibraryPlaylistCreateInput } from './contract/index.js'
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { LibraryPlaylistUpdateInput } from './contract/index.js'
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { MiniplayerWindow } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { MiniplayerWindowCreateInput } from './contract/index.js'
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { MiniplayerWindowUpdateInput } from './contract/index.js'
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Playlist } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { PlaylistCreateInput } from './contract/index.js'
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { PlaylistUpdateInput } from './contract/index.js'
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { PlaylistWindow } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { PlaylistWindowCreateInput } from './contract/index.js'
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { PlaylistWindowUpdateInput } from './contract/index.js'
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { RadioTunerPlaylist } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { RadioTunerPlaylistCreateInput } from './contract/index.js'
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { RadioTunerPlaylistUpdateInput } from './contract/index.js'
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { SharedTrack } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { SharedTrackCreateInput } from './contract/index.js'
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { SharedTrackUpdateInput } from './contract/index.js'
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Source } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { SourceCreateInput } from './contract/index.js'
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { SourceUpdateInput } from './contract/index.js'
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { SubscriptionPlaylist } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { SubscriptionPlaylistCreateInput } from './contract/index.js'
+
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { SubscriptionPlaylistUpdateInput } from './contract/index.js'
+
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Track } from './contract/index.js'
+
+/** Canonical create input, retaining checked numeric conveniences. */
+export type TrackCreateInput = Omit<
+  import('./contract/index.js').TrackCreateInput,
+  | 'albumRating'
+  | 'bpm'
+  | 'discCount'
+  | 'discNumber'
+  | 'episodeNumber'
+  | 'movementCount'
+  | 'movementNumber'
+  | 'playedCount'
+  | 'rating'
+  | 'seasonNumber'
+  | 'skippedCount'
+  | 'trackCount'
+  | 'trackNumber'
+  | 'volumeAdjustment'
+  | 'year'
+> & {
+  /** the rating of the album for this track (0 to 100) Numeric values are validated by the contract before dispatch. */
+  albumRating?: null extends import('./contract/index.js').TrackCreateInput['albumRating']
+    ? number | null
+    : number
+  /** the tempo of this track in beats per minute Numeric values are validated by the contract before dispatch. */
+  bpm?: null extends import('./contract/index.js').TrackCreateInput['bpm'] ? number | null : number
+  /** the total number of discs in the source album Numeric values are validated by the contract before dispatch. */
+  discCount?: null extends import('./contract/index.js').TrackCreateInput['discCount']
+    ? number | null
+    : number
+  /** the index of the disc containing this track on the source album Numeric values are validated by the contract before dispatch. */
+  discNumber?: null extends import('./contract/index.js').TrackCreateInput['discNumber']
+    ? number | null
+    : number
+  /** the episode number of the track Numeric values are validated by the contract before dispatch. */
+  episodeNumber?: null extends import('./contract/index.js').TrackCreateInput['episodeNumber']
+    ? number | null
+    : number
+  /** the total number of movements in the work Numeric values are validated by the contract before dispatch. */
+  movementCount?: null extends import('./contract/index.js').TrackCreateInput['movementCount']
+    ? number | null
+    : number
+  /** the index of the movement in the work Numeric values are validated by the contract before dispatch. */
+  movementNumber?: null extends import('./contract/index.js').TrackCreateInput['movementNumber']
+    ? number | null
+    : number
+  /** number of times this track has been played Numeric values are validated by the contract before dispatch. */
+  playedCount?: null extends import('./contract/index.js').TrackCreateInput['playedCount']
+    ? number | null
+    : number
+  /** the rating of this track (0 to 100) Numeric values are validated by the contract before dispatch. */
+  rating?: null extends import('./contract/index.js').TrackCreateInput['rating']
+    ? number | null
+    : number
+  /** the season number of the track Numeric values are validated by the contract before dispatch. */
+  seasonNumber?: null extends import('./contract/index.js').TrackCreateInput['seasonNumber']
+    ? number | null
+    : number
+  /** number of times this track has been skipped Numeric values are validated by the contract before dispatch. */
+  skippedCount?: null extends import('./contract/index.js').TrackCreateInput['skippedCount']
+    ? number | null
+    : number
+  /** the total number of tracks on the source album Numeric values are validated by the contract before dispatch. */
+  trackCount?: null extends import('./contract/index.js').TrackCreateInput['trackCount']
+    ? number | null
+    : number
+  /** the index of the track on the source album Numeric values are validated by the contract before dispatch. */
+  trackNumber?: null extends import('./contract/index.js').TrackCreateInput['trackNumber']
+    ? number | null
+    : number
+  /** relative volume adjustment of the track (-100% to 100%) Numeric values are validated by the contract before dispatch. */
+  volumeAdjustment?: null extends import('./contract/index.js').TrackCreateInput['volumeAdjustment']
+    ? number | null
+    : number
+  /** the year the track was recorded/released Numeric values are validated by the contract before dispatch. */
+  year?: null extends import('./contract/index.js').TrackCreateInput['year']
+    ? number | null
+    : number
 }
 
-/** Input for creating a AudioCDTrack */
-export type AudioCDTrackCreateInput = Record<string, never>
-
-/** Input for updating a AudioCDTrack */
-export type AudioCDTrackUpdateInput = Partial<AudioCDTrackCreateInput>
-
-/** the main window */
-export interface BrowserWindow {
-  /** the selected tracks */
-  selection: string
-  /** the playlist currently displayed in the window */
-  view: Playlist
+/** Canonical update input, retaining checked numeric conveniences. */
+export type TrackUpdateInput = Omit<
+  import('./contract/index.js').TrackUpdateInput,
+  | 'albumRating'
+  | 'bpm'
+  | 'discCount'
+  | 'discNumber'
+  | 'episodeNumber'
+  | 'movementCount'
+  | 'movementNumber'
+  | 'playedCount'
+  | 'rating'
+  | 'seasonNumber'
+  | 'skippedCount'
+  | 'trackCount'
+  | 'trackNumber'
+  | 'volumeAdjustment'
+  | 'year'
+> & {
+  /** the rating of the album for this track (0 to 100) Numeric values are validated by the contract before dispatch. */
+  albumRating?: null extends import('./contract/index.js').TrackUpdateInput['albumRating']
+    ? number | null
+    : number
+  /** the tempo of this track in beats per minute Numeric values are validated by the contract before dispatch. */
+  bpm?: null extends import('./contract/index.js').TrackUpdateInput['bpm'] ? number | null : number
+  /** the total number of discs in the source album Numeric values are validated by the contract before dispatch. */
+  discCount?: null extends import('./contract/index.js').TrackUpdateInput['discCount']
+    ? number | null
+    : number
+  /** the index of the disc containing this track on the source album Numeric values are validated by the contract before dispatch. */
+  discNumber?: null extends import('./contract/index.js').TrackUpdateInput['discNumber']
+    ? number | null
+    : number
+  /** the episode number of the track Numeric values are validated by the contract before dispatch. */
+  episodeNumber?: null extends import('./contract/index.js').TrackUpdateInput['episodeNumber']
+    ? number | null
+    : number
+  /** the total number of movements in the work Numeric values are validated by the contract before dispatch. */
+  movementCount?: null extends import('./contract/index.js').TrackUpdateInput['movementCount']
+    ? number | null
+    : number
+  /** the index of the movement in the work Numeric values are validated by the contract before dispatch. */
+  movementNumber?: null extends import('./contract/index.js').TrackUpdateInput['movementNumber']
+    ? number | null
+    : number
+  /** number of times this track has been played Numeric values are validated by the contract before dispatch. */
+  playedCount?: null extends import('./contract/index.js').TrackUpdateInput['playedCount']
+    ? number | null
+    : number
+  /** the rating of this track (0 to 100) Numeric values are validated by the contract before dispatch. */
+  rating?: null extends import('./contract/index.js').TrackUpdateInput['rating']
+    ? number | null
+    : number
+  /** the season number of the track Numeric values are validated by the contract before dispatch. */
+  seasonNumber?: null extends import('./contract/index.js').TrackUpdateInput['seasonNumber']
+    ? number | null
+    : number
+  /** number of times this track has been skipped Numeric values are validated by the contract before dispatch. */
+  skippedCount?: null extends import('./contract/index.js').TrackUpdateInput['skippedCount']
+    ? number | null
+    : number
+  /** the total number of tracks on the source album Numeric values are validated by the contract before dispatch. */
+  trackCount?: null extends import('./contract/index.js').TrackUpdateInput['trackCount']
+    ? number | null
+    : number
+  /** the index of the track on the source album Numeric values are validated by the contract before dispatch. */
+  trackNumber?: null extends import('./contract/index.js').TrackUpdateInput['trackNumber']
+    ? number | null
+    : number
+  /** relative volume adjustment of the track (-100% to 100%) Numeric values are validated by the contract before dispatch. */
+  volumeAdjustment?: null extends import('./contract/index.js').TrackUpdateInput['volumeAdjustment']
+    ? number | null
+    : number
+  /** the year the track was recorded/released Numeric values are validated by the contract before dispatch. */
+  year?: null extends import('./contract/index.js').TrackUpdateInput['year']
+    ? number | null
+    : number
 }
 
-/** Input for creating a BrowserWindow */
-export interface BrowserWindowCreateInput {
-  /** the playlist currently displayed in the window */
-  view?: Playlist
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { URLTrack } from './contract/index.js'
 
-/** Input for updating a BrowserWindow */
-export type BrowserWindowUpdateInput = Partial<BrowserWindowCreateInput>
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { URLTrackCreateInput } from './contract/index.js'
 
-/** converts a track to a specific file format */
-export interface Encoder {
-  /** the data format created by the encoder */
-  format: string
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { URLTrackUpdateInput } from './contract/index.js'
 
-/** Input for creating a Encoder */
-export type EncoderCreateInput = Record<string, never>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { UserPlaylist } from './contract/index.js'
 
-/** Input for updating a Encoder */
-export type EncoderUpdateInput = Partial<EncoderCreateInput>
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { UserPlaylistCreateInput } from './contract/index.js'
 
-/** equalizer preset configuration */
-export interface EQPreset {
-  /** the equalizer 32 Hz band level (-12.0 dB to +12.0 dB) */
-  band1: number
-  /** the equalizer 64 Hz band level (-12.0 dB to +12.0 dB) */
-  band2: number
-  /** the equalizer 125 Hz band level (-12.0 dB to +12.0 dB) */
-  band3: number
-  /** the equalizer 250 Hz band level (-12.0 dB to +12.0 dB) */
-  band4: number
-  /** the equalizer 500 Hz band level (-12.0 dB to +12.0 dB) */
-  band5: number
-  /** the equalizer 1 kHz band level (-12.0 dB to +12.0 dB) */
-  band6: number
-  /** the equalizer 2 kHz band level (-12.0 dB to +12.0 dB) */
-  band7: number
-  /** the equalizer 4 kHz band level (-12.0 dB to +12.0 dB) */
-  band8: number
-  /** the equalizer 8 kHz band level (-12.0 dB to +12.0 dB) */
-  band9: number
-  /** the equalizer 16 kHz band level (-12.0 dB to +12.0 dB) */
-  band10: number
-  /** can this preset be modified? */
-  modifiable: boolean
-  /** the equalizer preamp level (-12.0 dB to +12.0 dB) */
-  preamp: number
-  /** should tracks which refer to this preset be updated when the preset is renamed or deleted? */
-  updateTracks: boolean
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { UserPlaylistUpdateInput } from './contract/index.js'
 
-/** Input for creating a EQPreset */
-export interface EQPresetCreateInput {
-  /** the equalizer 32 Hz band level (-12.0 dB to +12.0 dB) */
-  band1?: number
-  /** the equalizer 64 Hz band level (-12.0 dB to +12.0 dB) */
-  band2?: number
-  /** the equalizer 125 Hz band level (-12.0 dB to +12.0 dB) */
-  band3?: number
-  /** the equalizer 250 Hz band level (-12.0 dB to +12.0 dB) */
-  band4?: number
-  /** the equalizer 500 Hz band level (-12.0 dB to +12.0 dB) */
-  band5?: number
-  /** the equalizer 1 kHz band level (-12.0 dB to +12.0 dB) */
-  band6?: number
-  /** the equalizer 2 kHz band level (-12.0 dB to +12.0 dB) */
-  band7?: number
-  /** the equalizer 4 kHz band level (-12.0 dB to +12.0 dB) */
-  band8?: number
-  /** the equalizer 8 kHz band level (-12.0 dB to +12.0 dB) */
-  band9?: number
-  /** the equalizer 16 kHz band level (-12.0 dB to +12.0 dB) */
-  band10?: number
-  /** the equalizer preamp level (-12.0 dB to +12.0 dB) */
-  preamp?: number
-  /** should tracks which refer to this preset be updated when the preset is renamed or deleted? */
-  updateTracks?: boolean
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { VideoWindow } from './contract/index.js'
 
-/** Input for updating a EQPreset */
-export type EQPresetUpdateInput = Partial<EQPresetCreateInput>
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { VideoWindowCreateInput } from './contract/index.js'
 
-/** the equalizer window */
-export interface EQWindow {
-  /** Unique identifier for this window */
-  id: number
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { VideoWindowUpdateInput } from './contract/index.js'
 
-/** Input for creating a EQWindow */
-export type EQWindowCreateInput = Record<string, never>
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Visual } from './contract/index.js'
 
-/** Input for updating a EQWindow */
-export type EQWindowUpdateInput = Partial<EQWindowCreateInput>
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { VisualCreateInput } from './contract/index.js'
 
-/** a track representing an audio file (MP3, AIFF, etc.) */
-export interface FileTrack {
-  /** the location of the file represented by this track */
-  location: string
-}
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { VisualUpdateInput } from './contract/index.js'
 
-/** Input for creating a FileTrack */
-export interface FileTrackCreateInput {
-  /** the location of the file represented by this track */
-  location?: string
-}
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
-/** Input for updating a FileTrack */
-export type FileTrackUpdateInput = Partial<FileTrackCreateInput>
-
-/** the main library playlist */
-export interface LibraryPlaylist {
-  /** Unique identifier for this playlist */
-  id: number
-}
-
-/** Input for creating a LibraryPlaylist */
-export type LibraryPlaylistCreateInput = Record<string, never>
-
-/** Input for updating a LibraryPlaylist */
-export type LibraryPlaylistUpdateInput = Partial<LibraryPlaylistCreateInput>
-
-/** the miniplayer window */
-export interface MiniplayerWindow {
-  /** Unique identifier for this window */
-  id: number
-}
-
-/** Input for creating a MiniplayerWindow */
-export type MiniplayerWindowCreateInput = Record<string, never>
-
-/** Input for updating a MiniplayerWindow */
-export type MiniplayerWindowUpdateInput = Partial<MiniplayerWindowCreateInput>
-
-/** a list of tracks/streams */
-export interface Playlist {
-  /** the id of the item */
-  id: number
-  /** the index of the item in internal application order */
-  index: number
-  /** the id of the item as a hexadecimal string. This id does not change over time. */
-  persistentID: string
-  /** the description of the playlist */
-  description: string
-  /** is this playlist disliked? */
-  disliked: boolean
-  /** the total length of all tracks (in seconds) */
-  duration: number
-  /** the name of the playlist */
-  name: string
-  /** is this playlist favorited? */
-  favorited: boolean
-  /** the total size of all tracks (in bytes) */
-  size: number
-  /** special playlist kind */
-  specialKind: string
-  /** the length of all tracks in MM:SS format */
-  time: string
-  /** is this playlist visible in the Source list? */
-  visible: boolean
-}
-
-/** Input for creating a Playlist */
-export interface PlaylistCreateInput {
-  /** the description of the playlist */
-  description?: string
-  /** is this playlist disliked? */
-  disliked?: boolean
-  /** the name of the playlist */
-  name?: string
-  /** is this playlist favorited? */
-  favorited?: boolean
-}
-
-/** Input for updating a Playlist */
-export type PlaylistUpdateInput = Partial<PlaylistCreateInput>
-
-/** a sub-window showing a single playlist */
-export interface PlaylistWindow {
-  /** the selected tracks */
-  selection: string
-  /** the playlist displayed in the window */
-  view: Playlist
-}
-
-/** Input for creating a PlaylistWindow */
-export type PlaylistWindowCreateInput = Record<string, never>
-
-/** Input for updating a PlaylistWindow */
-export type PlaylistWindowUpdateInput = Partial<PlaylistWindowCreateInput>
-
-/** the radio tuner playlist */
-export interface RadioTunerPlaylist {
-  /** Unique identifier for this playlist */
-  id: number
-}
-
-/** Input for creating a RadioTunerPlaylist */
-export type RadioTunerPlaylistCreateInput = Record<string, never>
-
-/** Input for updating a RadioTunerPlaylist */
-export type RadioTunerPlaylistUpdateInput = Partial<RadioTunerPlaylistCreateInput>
-
-/** a track residing in a shared library */
-export interface SharedTrack {
-  /** Unique identifier for this track */
-  id: number
-}
-
-/** Input for creating a SharedTrack */
-export type SharedTrackCreateInput = Record<string, never>
-
-/** Input for updating a SharedTrack */
-export type SharedTrackUpdateInput = Partial<SharedTrackCreateInput>
-
-/** a media source (library, CD, device, etc.) */
-export interface Source {
-  /** the total size of the source if it has a fixed size */
-  capacity: number
-  /** the free space on the source if it has a fixed size */
-  freeSpace: number
-  /** The kind property */
-  kind: string
-}
-
-/** Input for creating a Source */
-export type SourceCreateInput = Record<string, never>
-
-/** Input for updating a Source */
-export type SourceUpdateInput = Partial<SourceCreateInput>
-
-/** a subscription playlist from Apple Music */
-export interface SubscriptionPlaylist {
-  /** Unique identifier for this playlist */
-  id: number
-}
-
-/** Input for creating a SubscriptionPlaylist */
-export type SubscriptionPlaylistCreateInput = Record<string, never>
-
-/** Input for updating a SubscriptionPlaylist */
-export type SubscriptionPlaylistUpdateInput = Partial<SubscriptionPlaylistCreateInput>
-
-/** playable audio source */
-export interface Track {
-  /** the id of the item */
-  id: number
-  /** the index of the item in internal application order */
-  index: number
-  /** the name of the item */
-  name: string
-  /** the id of the item as a hexadecimal string. This id does not change over time. */
-  persistentID: string
-  /** the album name of the track */
-  album: string
-  /** the album artist of the track */
-  albumArtist: string
-  /** is the album for this track disliked? */
-  albumDisliked: boolean
-  /** is the album for this track favorited? */
-  albumFavorited: boolean
-  /** the rating of the album for this track (0 to 100) */
-  albumRating: number
-  /** the rating kind of the album rating for this track */
-  albumRatingKind: string
-  /** the artist/source of the track */
-  artist: string
-  /** the bit rate of the track (in kbps) */
-  bitRate: number
-  /** the bookmark time of the track in seconds */
-  bookmark: number
-  /** is the playback position for this track remembered? */
-  bookmarkable: boolean
-  /** the tempo of this track in beats per minute */
-  bpm: number
-  /** the category of the track */
-  category: string
-  /** the iCloud status of the track */
-  cloudStatus: string
-  /** freeform notes about the track */
-  comment: string
-  /** is this track from a compilation album? */
-  compilation: boolean
-  /** the composer of the track */
-  composer: string
-  /** the common, unique ID for this track. If two tracks in different playlists have the same database ID, they are sharing the same data. */
-  databaseID: number
-  /** the date the track was added to the playlist */
-  dateAdded: Date
-  /** the description of the track */
-  description: string
-  /** the total number of discs in the source album */
-  discCount: number
-  /** the index of the disc containing this track on the source album */
-  discNumber: number
-  /** is this track disliked? */
-  disliked: boolean
-  /** the account of the person who downloaded this track */
-  downloaderAccount: string
-  /** the name of the person who downloaded this track */
-  downloaderName: string
-  /** the length of the track in seconds */
-  duration: number
-  /** is this track checked for playback? */
-  enabled: boolean
-  /** the episode ID of the track */
-  episodeID: string
-  /** the episode number of the track */
-  episodeNumber: number
-  /** the name of the EQ preset of the track */
-  eQ: string
-  /** the stop time of the track in seconds */
-  finish: number
-  /** is this track from a gapless album? */
-  gapless: boolean
-  /** the music/audio genre (category) of the track */
-  genre: string
-  /** the grouping (piece) of the track. Generally used to denote movements within a classical work. */
-  grouping: string
-  /** a text description of the track */
-  kind: string
-  /** the long description of the track */
-  longDescription: string
-  /** is this track favorited? */
-  favorited: boolean
-  /** the lyrics of the track */
-  lyrics: string
-  /** the media kind of the track */
-  mediaKind: string
-  /** the modification date of the content of this track */
-  modificationDate: Date
-  /** the movement name of the track */
-  movement: string
-  /** the total number of movements in the work */
-  movementCount: number
-  /** the index of the movement in the work */
-  movementNumber: number
-  /** number of times this track has been played */
-  playedCount: number
-  /** the date and time this track was last played */
-  playedDate: Date
-  /** the account of the person who purchased this track */
-  purchaserAccount: string
-  /** the name of the person who purchased this track */
-  purchaserName: string
-  /** the rating of this track (0 to 100) */
-  rating: number
-  /** the rating kind of this track */
-  ratingKind: string
-  /** the release date of this track */
-  releaseDate: Date
-  /** the sample rate of the track (in Hz) */
-  sampleRate: number
-  /** the season number of the track */
-  seasonNumber: number
-  /** is this track included when shuffling? */
-  shufflable: boolean
-  /** number of times this track has been skipped */
-  skippedCount: number
-  /** the date and time this track was last skipped */
-  skippedDate: Date
-  /** the show name of the track */
-  show: string
-  /** override string to use for the track when sorting by album */
-  sortAlbum: string
-  /** override string to use for the track when sorting by artist */
-  sortArtist: string
-  /** override string to use for the track when sorting by album artist */
-  sortAlbumArtist: string
-  /** override string to use for the track when sorting by name */
-  sortName: string
-  /** override string to use for the track when sorting by composer */
-  sortComposer: string
-  /** override string to use for the track when sorting by show name */
-  sortShow: string
-  /** the size of the track (in bytes) */
-  size: number
-  /** the start time of the track in seconds */
-  start: number
-  /** the length of the track in MM:SS format */
-  time: string
-  /** the total number of tracks on the source album */
-  trackCount: number
-  /** the index of the track on the source album */
-  trackNumber: number
-  /** is this track unplayed? */
-  unplayed: boolean
-  /** relative volume adjustment of the track (-100% to 100%) */
-  volumeAdjustment: number
-  /** the work name of the track */
-  work: string
-  /** the year the track was recorded/released */
-  year: number
-}
-
-/** Input for creating a Track */
-export interface TrackCreateInput {
-  /** the name of the item */
-  name?: string
-  /** the album name of the track */
-  album?: string
-  /** the album artist of the track */
-  albumArtist?: string
-  /** is the album for this track disliked? */
-  albumDisliked?: boolean
-  /** is the album for this track favorited? */
-  albumFavorited?: boolean
-  /** the rating of the album for this track (0 to 100) */
-  albumRating?: number
-  /** the artist/source of the track */
-  artist?: string
-  /** the bookmark time of the track in seconds */
-  bookmark?: number
-  /** is the playback position for this track remembered? */
-  bookmarkable?: boolean
-  /** the tempo of this track in beats per minute */
-  bpm?: number
-  /** the category of the track */
-  category?: string
-  /** freeform notes about the track */
-  comment?: string
-  /** is this track from a compilation album? */
-  compilation?: boolean
-  /** the composer of the track */
-  composer?: string
-  /** the description of the track */
-  description?: string
-  /** the total number of discs in the source album */
-  discCount?: number
-  /** the index of the disc containing this track on the source album */
-  discNumber?: number
-  /** is this track disliked? */
-  disliked?: boolean
-  /** is this track checked for playback? */
-  enabled?: boolean
-  /** the episode ID of the track */
-  episodeID?: string
-  /** the episode number of the track */
-  episodeNumber?: number
-  /** the name of the EQ preset of the track */
-  eQ?: string
-  /** the stop time of the track in seconds */
-  finish?: number
-  /** is this track from a gapless album? */
-  gapless?: boolean
-  /** the music/audio genre (category) of the track */
-  genre?: string
-  /** the grouping (piece) of the track. Generally used to denote movements within a classical work. */
-  grouping?: string
-  /** the long description of the track */
-  longDescription?: string
-  /** is this track favorited? */
-  favorited?: boolean
-  /** the lyrics of the track */
-  lyrics?: string
-  /** the media kind of the track */
-  mediaKind?: string
-  /** the movement name of the track */
-  movement?: string
-  /** the total number of movements in the work */
-  movementCount?: number
-  /** the index of the movement in the work */
-  movementNumber?: number
-  /** number of times this track has been played */
-  playedCount?: number
-  /** the date and time this track was last played */
-  playedDate?: Date
-  /** the rating of this track (0 to 100) */
-  rating?: number
-  /** the season number of the track */
-  seasonNumber?: number
-  /** is this track included when shuffling? */
-  shufflable?: boolean
-  /** number of times this track has been skipped */
-  skippedCount?: number
-  /** the date and time this track was last skipped */
-  skippedDate?: Date
-  /** the show name of the track */
-  show?: string
-  /** override string to use for the track when sorting by album */
-  sortAlbum?: string
-  /** override string to use for the track when sorting by artist */
-  sortArtist?: string
-  /** override string to use for the track when sorting by album artist */
-  sortAlbumArtist?: string
-  /** override string to use for the track when sorting by name */
-  sortName?: string
-  /** override string to use for the track when sorting by composer */
-  sortComposer?: string
-  /** override string to use for the track when sorting by show name */
-  sortShow?: string
-  /** the start time of the track in seconds */
-  start?: number
-  /** the total number of tracks on the source album */
-  trackCount?: number
-  /** the index of the track on the source album */
-  trackNumber?: number
-  /** is this track unplayed? */
-  unplayed?: boolean
-  /** relative volume adjustment of the track (-100% to 100%) */
-  volumeAdjustment?: number
-  /** the work name of the track */
-  work?: string
-  /** the year the track was recorded/released */
-  year?: number
-}
-
-/** Input for updating a Track */
-export type TrackUpdateInput = Partial<TrackCreateInput>
-
-/** a track representing a network stream */
-export interface URLTrack {
-  /** the URL for this track */
-  address: string
-}
-
-/** Input for creating a URLTrack */
-export interface URLTrackCreateInput {
-  /** the URL for this track */
-  address?: string
-}
-
-/** Input for updating a URLTrack */
-export type URLTrackUpdateInput = Partial<URLTrackCreateInput>
-
-/** custom playlists created by the user */
-export interface UserPlaylist {
-  /** is this playlist shared? */
-  shared: boolean
-  /** is this a Smart Playlist? */
-  smart: boolean
-  /** is this a Genius Playlist? */
-  genius: boolean
-}
-
-/** Input for creating a UserPlaylist */
-export interface UserPlaylistCreateInput {
-  /** is this playlist shared? */
-  shared?: boolean
-}
-
-/** Input for updating a UserPlaylist */
-export type UserPlaylistUpdateInput = Partial<UserPlaylistCreateInput>
-
-/** the video window */
-export interface VideoWindow {
-  /** Unique identifier for this window */
-  id: number
-}
-
-/** Input for creating a VideoWindow */
-export type VideoWindowCreateInput = Record<string, never>
-
-/** Input for updating a VideoWindow */
-export type VideoWindowUpdateInput = Partial<VideoWindowCreateInput>
-
-/** a visual plug-in */
-export interface Visual {
-  /** Unique identifier for this visual */
-  id: number
-}
-
-/** Input for creating a Visual */
-export type VisualCreateInput = Record<string, never>
-
-/** Input for updating a Visual */
-export type VisualUpdateInput = Partial<VisualCreateInput>
-
-// Zod schemas for runtime validation
-
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AirPlayDeviceSchema = z.object({
   active: z.boolean(),
   available: z.boolean(),
@@ -775,6 +454,7 @@ export const AirPlayDeviceSchema = z.object({
   soundVolume: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ArtworkSchema = z.object({
   data: z.string(),
   description: z.string(),
@@ -784,6 +464,7 @@ export const ArtworkSchema = z.object({
   rawData: z.unknown(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AudioCDPlaylistSchema = z.object({
   artist: z.string(),
   compilation: z.boolean(),
@@ -794,19 +475,23 @@ export const AudioCDPlaylistSchema = z.object({
   year: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AudioCDTrackSchema = z.object({
   location: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const BrowserWindowSchema = z.object({
   selection: z.string(),
   view: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const EncoderSchema = z.object({
   format: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const EQPresetSchema = z.object({
   band1: z.number(),
   band2: z.number(),
@@ -823,22 +508,27 @@ export const EQPresetSchema = z.object({
   updateTracks: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const EQWindowSchema = z.object({
   id: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const FileTrackSchema = z.object({
   location: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const LibraryPlaylistSchema = z.object({
   id: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const MiniplayerWindowSchema = z.object({
   id: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const PlaylistSchema = z.object({
   id: z.number(),
   index: z.number(),
@@ -854,29 +544,35 @@ export const PlaylistSchema = z.object({
   visible: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const PlaylistWindowSchema = z.object({
   selection: z.string(),
   view: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const RadioTunerPlaylistSchema = z.object({
   id: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const SharedTrackSchema = z.object({
   id: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const SourceSchema = z.object({
   capacity: z.number(),
   freeSpace: z.number(),
   kind: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const SubscriptionPlaylistSchema = z.object({
   id: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const TrackSchema = z.object({
   id: z.number(),
   index: z.number(),
@@ -954,20 +650,24 @@ export const TrackSchema = z.object({
   year: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const URLTrackSchema = z.object({
   address: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const UserPlaylistSchema = z.object({
   shared: z.boolean(),
   smart: z.boolean(),
   genius: z.boolean(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const VideoWindowSchema = z.object({
   id: z.number(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const VisualSchema = z.object({
   id: z.number(),
 })

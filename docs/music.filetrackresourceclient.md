@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[refresh()](./music.filetrackresourceclient.refresh.md)
+[refresh(\_\_mactsOptions)](./music.filetrackresourceclient.refresh.md)
 
 </td><td>
 

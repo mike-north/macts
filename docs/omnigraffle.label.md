@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-Unique identifier
+Unique identifier. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ Unique identifier
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The offset from the line
+The offset from the line. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +71,11 @@ The offset from the line
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The position along the line
+The position along the line. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +86,11 @@ The position along the line
 
 </td><td>
 
-[LabelOrientation](./omnigraffle.labelorientation.md)
+[LabelOrientation](./omnigraffle.labelorientation.md) \| null
 
 </td><td>
 
-The type of rotation around the line
+The type of rotation around the line. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +101,11 @@ The type of rotation around the line
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The text inside the label
+The text inside the label. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

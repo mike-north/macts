@@ -24,21 +24,39 @@ export class CanvasResourceClient {
   /**
    * List all canvases, as one page.
    */
-  async list(): Promise<Page<Canvas>> {
-    return this.#http.rpc<Page<Canvas>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Canvas>> {
+    return this.#http.invoke<Page<Canvas>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'Canvas'
+    )
   }
 
   /**
    * Get a canvas by id.
    */
-  async get(id: string): Promise<Canvas> {
-    return this.#http.rpc<Canvas>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Canvas> {
+    return this.#http.invoke<Canvas>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Canvas'
+    )
   }
 
   /**
    * Create a new canvas.
    */
-  async create(input: CanvasCreateInput): Promise<Canvas> {
-    return this.#http.rpc<Canvas>(`${this.#app}.${this.#resource}.create`, input)
+  async create(
+    input: CanvasCreateInput,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Canvas> {
+    return this.#http.invoke<Canvas>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'Canvas'
+    )
   }
 }

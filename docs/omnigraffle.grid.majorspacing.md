@@ -4,10 +4,10 @@
 
 ## Grid.majorSpacing property
 
-The number of minor grid lines for each major line
+The number of minor grid lines for each major line. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-majorSpacing: number
+majorSpacing: Integer | null
 ```

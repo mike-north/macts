@@ -4,10 +4,10 @@
 
 ## Disk.server property
 
-the server on which the disk resides, AFP volumes only
+the server on which the disk resides, AFP volumes only. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-server: string
+readonly server: string | null;
 ```

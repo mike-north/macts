@@ -4,7 +4,7 @@
 
 ## SliderCreateInput type
 
-Input for creating a Slider
+Input for creating a Slider.
 
 **Signature:**
 

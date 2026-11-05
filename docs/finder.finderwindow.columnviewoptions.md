@@ -4,10 +4,10 @@
 
 ## FinderWindow.columnViewOptions property
 
-the column view options for the container window
+the column view options for the container window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-columnViewOptions: unknown
+readonly columnViewOptions: unknown;
 ```

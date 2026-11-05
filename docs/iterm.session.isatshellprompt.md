@@ -4,10 +4,10 @@
 
 ## Session.isAtShellPrompt property
 
-The terminal is at the shell prompt. Requires shell integration.
+The terminal is at the shell prompt. Requires shell integration. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-isAtShellPrompt: boolean
+isAtShellPrompt: boolean | null
 ```

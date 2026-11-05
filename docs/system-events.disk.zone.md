@@ -4,10 +4,10 @@
 
 ## Disk.zone property
 
-the zone in which the disk's server resides, AFP volumes only
+the zone in which the disk's server resides, AFP volumes only. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-zone: string
+readonly zone: string | null;
 ```
