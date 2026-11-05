@@ -102,10 +102,9 @@ function recordedParentIssue(
 ): PositionalIssue | undefined {
   if (command.parent === undefined) return undefined
   const parameter = command.parameters.find(({ name }) => name === command.parent?.parameter)
-  const problem =
-    parameter === undefined || parameter.required !== true
-      ? 'needs its declared required parent parameter'
-      : parentProblem(manifest, command.parent.resource, placements)
+  const problem = !parameter?.required
+    ? 'needs its declared required parent parameter'
+    : parentProblem(manifest, command.parent.resource, placements)
   if (problem === undefined) return undefined
   return {
     message: `The ${command.name} command "${commandKey}" records parent "${command.parent.resource}", which ${problem}.`,
