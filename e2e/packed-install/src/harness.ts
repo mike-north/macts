@@ -268,3 +268,24 @@ export async function typecheckBrandCheck(projectDir: string): Promise<string> {
   writeFileSync(join(projectDir, 'tsconfig.json'), `${JSON.stringify(config, null, 2)}\n`)
   return run(process.execPath, [tsc, '-p', 'tsconfig.json'], projectDir)
 }
+
+/** Install the shared client alone, proving generated facades need no SDK or native closure. */
+export async function installContractsConsumer(dir: string, tarball: string): Promise<void> {
+  mkdirSync(dir, { recursive: true })
+  writeFileSync(
+    join(dir, 'package.json'),
+    JSON.stringify({
+      name: 'shared-client-consumer',
+      version: '0.0.0',
+      private: true,
+      type: 'module',
+      dependencies: { '@macts/contracts': `file:${tarball}` },
+    })
+  )
+  cpSync(join(FIXTURES, 'consumer'), dir, { recursive: true })
+  await run(
+    npmCommand(),
+    ['install', '--no-audit', '--no-fund', '--no-package-lock', '--loglevel=error'],
+    dir
+  )
+}

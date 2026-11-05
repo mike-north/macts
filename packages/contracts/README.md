@@ -33,3 +33,19 @@ in the design document linked below.
 
 The design behind these contracts is in
 [`phases/13-sdk-value-and-execution-contracts.md`](../../phases/13-sdk-value-and-execution-contracts.md).
+
+## Client composition
+
+`@macts/contracts/client` exposes the platform-neutral `createRemoteClient`,
+`createCodecClient`, and `bindReference` composition used by `@macts/sdk`.
+A transport supplies wire operation and reference results; the shared codec
+validates SDK inputs, decodes outputs, and binds references to the creating
+client's authority. The contracts root remains independent of client composition.
+Neither this subpath nor its dependency closure loads the Mac-side runtime.
+Use the SDK's existing factories for ordinary applications; generated facades
+can reuse this seam without depending on the SDK, core, or runtime.
+
+The client entry publishes declarations with imports from the canonical contracts
+root. Its API report is checked separately, but its declarations are not rolled
+up a second time: copying the root's unique-symbol brands would create incompatible
+Integer, reference, and client types between the two entry points.

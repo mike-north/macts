@@ -7,6 +7,7 @@
 import * as sdk from '@macts/sdk'
 import * as local from '@macts/sdk/local'
 import * as contracts from '@macts/contracts'
+import * as shared from '@macts/contracts/client'
 import { widgetsContract } from '@macts-fixture/widgets/contract'
 import { startStubService } from './stub-service.mjs'
 
@@ -50,6 +51,9 @@ try {
       errorClass: sdk.TargetNotFoundError === local.TargetNotFoundError,
       errorClassFromContracts: sdk.TargetNotFoundError === contracts.TargetNotFoundError,
       integerLimits: sdk.INTEGER_LIMITS === local.INTEGER_LIMITS,
+      sharedFactory: sdk.createClient === shared.createRemoteClient,
+      sharedBinder:
+        sdk.bindReference === shared.bindReference && local.bindReference === shared.bindReference,
     },
     localFactory: typeof local.createClient,
     authorizations: service.authorizations,
