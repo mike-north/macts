@@ -25,6 +25,7 @@
 
 import type { AppManifest } from './schemas/app.js'
 import type { Command } from './schemas/command.js'
+import { placedEntries, type PlacedEntry } from './hierarchy-placement.js'
 import { resolvePrimaryIdentifierProperty } from './identifier.js'
 import { itemIdentifierParameter, selectsOneItem } from './item-selection.js'
 import { resourceCommandEntries, resolvingCommand } from './resource-commands.js'
@@ -81,7 +82,11 @@ function parentLookup(
  * every command that selects one of its items must record that same parent and
  * select the item by an integer position.
  */
-function commandIssues(manifest: AppManifest, resourceKey: string): PositionalIssue[] {
+function commandIssues(
+  manifest: AppManifest,
+  resourceKey: string,
+  placements: readonly PlacedEntry[]
+): PositionalIssue[] {
   const at = ['resources', resourceKey, 'positional']
   const get = resolvingCommand(manifest, resourceKey, 'get')
   if (get === undefined) {
@@ -116,6 +121,8 @@ function commandIssues(manifest: AppManifest, resourceKey: string): PositionalIs
     }
   }
   for (const [commandKey, command] of resourceCommandEntries(manifest, resourceKey)) {
+    const containment = collectionPlacementIssue(commandKey, command, resourceKey, placements)
+    if (containment !== undefined) issues.push(containment)
     if (parent !== undefined && selectsOneItem(command) && command.parent?.resource !== parent) {
       // Its body finds the item within the parent the command records, so a
       // command recording none, or another, could not find it.
@@ -128,6 +135,37 @@ function commandIssues(manifest: AppManifest, resourceKey: string): PositionalIs
     if (position !== undefined) issues.push(position)
   }
   return issues
+}
+
+/**
+ * A positional list or create addresses the collection at its recorded
+ * parent, or at the application when it records none. A usable hierarchy
+ * placement is evidence of where that collection exists; no placement leaves
+ * existing sparse-manifest behavior unchanged.
+ */
+function collectionPlacementIssue(
+  commandKey: string,
+  command: Command,
+  resourceKey: string,
+  placements: readonly PlacedEntry[]
+): PositionalIssue | undefined {
+  if (command.name !== 'list' && command.name !== 'create') return undefined
+  const holders = placements
+    .filter(({ child }) => child.resource === resourceKey)
+    .map(({ holder }) => holder)
+  if (holders.length === 0) return undefined
+  const parent = command.parent?.resource
+  if (holders.includes(parent)) return undefined
+  return {
+    message:
+      parent === undefined
+        ? `The ${command.name} command "${commandKey}" addresses the positional resource "${resourceKey}" at the application, but its hierarchy places the collection only within a parent. Record a declared parent.`
+        : `The ${command.name} command "${commandKey}" addresses the positional resource "${resourceKey}" within "${parent}", but its hierarchy does not place the collection there.`,
+    path:
+      parent === undefined
+        ? ['commands', commandKey, 'parent']
+        : ['commands', commandKey, 'parent', 'resource'],
+  }
 }
 
 /**
@@ -179,6 +217,7 @@ function positionParameterIssue(
  */
 export function findPositionalIssues(manifest: AppManifest): PositionalIssue[] {
   const issues: PositionalIssue[] = []
+  const placements = placedEntries(manifest)
   for (const [resourceKey, resource] of Object.entries(manifest.resources)) {
     if (resource.positional === undefined || resource.unsupported !== undefined) continue
     const identifier = resolvePrimaryIdentifierProperty(resource)
@@ -189,7 +228,7 @@ export function findPositionalIssues(manifest: AppManifest): PositionalIssue[] {
       })
       continue
     }
-    issues.push(...commandIssues(manifest, resourceKey))
+    issues.push(...commandIssues(manifest, resourceKey, placements))
   }
   for (const [commandKey, command] of Object.entries(manifest.commands)) {
     const parent = command.parent?.resource
