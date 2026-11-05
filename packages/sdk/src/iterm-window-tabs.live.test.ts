@@ -62,7 +62,7 @@ import { execFileSync } from 'node:child_process'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { runJxa } from '@macts/core'
 import { NATIVE_POSITION_READER } from '@macts/core/testing'
-import { Integer, InvalidSelectionError } from '@macts/contracts'
+import { Integer, InvalidSelectionError, UnexpectedValueError } from '@macts/contracts'
 import { iTermContract, type iTermClient, type Window } from '@macts/iterm/contract'
 import {
   ALLOW_ALL_POLICY,
@@ -148,6 +148,24 @@ async function holdsCurrentSessions(
 }
 
 /**
+ * Runs `read`; when iTerm's value does not match the contract, logs where,
+ * by the issues' paths alone, then rethrows. A path names fields and list
+ * positions only; an issue's message can quote the app's value, so it is
+ * never logged.
+ */
+async function reportingContractPaths<T>(read: () => Promise<T>): Promise<T> {
+  try {
+    return await read()
+  } catch (error) {
+    if (error instanceof UnexpectedValueError) {
+      const paths = error.details.issues.map(({ path }) => path.map(String).join('.'))
+      console.info(`contract mismatch at: ${paths.join(', ')}`)
+    }
+    throw error
+  }
+}
+
+/**
  * Whether `window`'s current tab is an index selector whose container is
  * `window`. Its form was checked when the record decoded (D11); its
  * container's id is the window's own.
@@ -162,6 +180,15 @@ describe.skipIf(!liveAppsEnabled)('iTerm windows and tabs (local only)', () => {
   let windows: readonly Window[] = []
   /** Whether iTerm was running before the suite's first call, so the suite did not launch it. */
   let wasRunning = true
+
+  /**
+   * The windows the first case listed. A later case fails, rather than
+   * passing over no windows, when none were listed.
+   */
+  function listedWindows(): readonly Window[] {
+    if (windows.length === 0) throw new Error('no window was listed')
+    return windows
+  }
 
   beforeAll(async () => {
     wasRunning = itermIsRunning()
@@ -198,12 +225,13 @@ describe.skipIf(!liveAppsEnabled)('iTerm windows and tabs (local only)', () => {
   it(
     'lists the windows and gets each by its id',
     async () => {
-      windows = (await iterm.windows.list()).items
+      windows = (await reportingContractPaths(() => iterm.windows.list())).items
       console.info(`iTerm windows listed: ${String(windows.length)}`)
       expect(windows.length).toBeGreaterThan(0)
       const roundTrips: boolean[] = []
       for (const listed of windows) {
-        roundTrips.push((await iterm.windows.get(listed.id)).id === listed.id)
+        const got = await reportingContractPaths(() => iterm.windows.get(listed.id))
+        roundTrips.push(got.id === listed.id)
       }
       console.info(`window ids that round-trip: ${String(roundTrips.filter(Boolean).length)}`)
       expect(roundTrips.every(Boolean)).toBe(true)
@@ -214,7 +242,7 @@ describe.skipIf(!liveAppsEnabled)('iTerm windows and tabs (local only)', () => {
   it(
     "parses the specifier iTerm returns for each window's current tab",
     async () => {
-      const parsed = await currentTabsParse(windows.map(({ id }) => id))
+      const parsed = await currentTabsParse(listedWindows().map(({ id }) => id))
       console.info(
         `current-tab specifiers parsed: ${String(parsed.filter(Boolean).length)} of ${String(parsed.length)}`
       )
@@ -227,7 +255,7 @@ describe.skipIf(!liveAppsEnabled)('iTerm windows and tabs (local only)', () => {
   it(
     "reads each window's current tab as an index selector within that window, from a get and the list",
     async () => {
-      const fromList = windows.map(isIndexSelectorWithin)
+      const fromList = listedWindows().map(isIndexSelectorWithin)
       const fromGet: boolean[] = []
       for (const { id } of windows) fromGet.push(isIndexSelectorWithin(await iterm.windows.get(id)))
       console.info(
@@ -243,7 +271,7 @@ describe.skipIf(!liveAppsEnabled)('iTerm windows and tabs (local only)', () => {
     "resolves each window's current tab to the tab holding the current tab's sessions",
     async () => {
       const checks: [number, number][] = []
-      for (const window of windows) {
+      for (const window of listedWindows()) {
         const tab = window.currentTab
         if (tab === null) continue
         await tab.resolve()
@@ -262,7 +290,7 @@ describe.skipIf(!liveAppsEnabled)('iTerm windows and tabs (local only)', () => {
   it(
     "fails a tab get just past a window's last tab with InvalidSelectionError naming Tab",
     async () => {
-      const [first] = windows
+      const [first] = listedWindows()
       if (first === undefined) throw new Error('no window was listed')
       const count = (await iterm.tabs.list(first.id)).items.length
       let resource: unknown
@@ -282,7 +310,7 @@ describe.skipIf(!liveAppsEnabled)('iTerm windows and tabs (local only)', () => {
     'gets and resolves a second tab by its position, when a window holds 2 or more',
     async (context) => {
       let holder: Window | undefined
-      for (const window of windows) {
+      for (const window of listedWindows()) {
         if ((await iterm.tabs.list(window.id)).items.length >= 2) {
           holder = window
           break
