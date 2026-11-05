@@ -68,7 +68,6 @@
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md (D10 key targeting, singleton roots)
  */
 
-import { execFileSync } from 'node:child_process'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { TargetNotFoundError } from '@macts/contracts'
 import { systemEventsContract, type SystemEventsClient } from '@macts/system-events/contract'
@@ -82,6 +81,11 @@ import {
 import { createClient } from './local-client.js'
 import { DOMAIN_FOLDERS, directDomainFoldersCheck, macosVersion } from './domain-folders-oracle.js'
 import { directSitesFolderCheck } from './sites-folder-oracle.js'
+import {
+  runLiveCheck,
+  stopSystemEvents,
+  systemEventsIsRunning,
+} from './system-events-live-boundary.js'
 
 const liveAppsEnabled = process.env['MACTS_LIVE_APPS'] === '1'
 
@@ -101,7 +105,12 @@ const { mactsHome } = await vi.hoisted(async () => {
   const fs = await import('node:fs')
   const os = await import('node:os')
   const path = await import('node:path')
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'macts-sdk-system-events-live-'))
+  let home: string
+  try {
+    home = fs.mkdtempSync(path.join(os.tmpdir(), 'macts-sdk-system-events-live-'))
+  } catch {
+    throw new Error('System Events live setup failed')
+  }
   process.env['MACTS_HOME'] = home
   delete process.env['MACTS_API_KEY_SECRET']
   return { mactsHome: home }
@@ -109,21 +118,13 @@ const { mactsHome } = await vi.hoisted(async () => {
 
 setLogger(createLogger({ level: 'silent' }))
 
-afterAll(async () => {
-  closeKeyStore()
-  const { rm } = await import('node:fs/promises')
-  await rm(mactsHome, { recursive: true, force: true })
-})
-
-/** Whether System Events is running now: `pgrep` exits 0 when a process has exactly that name. */
-function systemEventsIsRunning(): boolean {
-  try {
-    execFileSync('pgrep', ['-x', 'System Events'], { stdio: 'ignore' })
-    return true
-  } catch {
-    return false
-  }
-}
+afterAll(() =>
+  runLiveCheck(async () => {
+    closeKeyStore()
+    const { rm } = await import('node:fs/promises')
+    await rm(mactsHome, { recursive: true, force: true })
+  })
+)
 
 /** What a call rejected with; fails if it resolved. */
 async function rejectionOf(promise: Promise<unknown>): Promise<unknown> {
@@ -142,7 +143,8 @@ describe.skipIf(!liveAppsEnabled)(
     /** Whether System Events was running before the suite's first call, so the suite did not launch it. */
     let wasRunning = true
 
-    beforeAll(async () => {
+    // prettier-ignore
+    beforeAll(() => runLiveCheck(async () => {
       wasRunning = systemEventsIsRunning()
       const key = await createApiKey({
         name: 'Live System Events files test',
@@ -161,18 +163,12 @@ describe.skipIf(!liveAppsEnabled)(
         token: key.token,
         governance: { policy: ALLOW_ALL_POLICY },
       })
-    }, LIVE_TEST_TIMEOUT_MS)
+    }), LIVE_TEST_TIMEOUT_MS)
 
     afterAll(() => {
       // Leave System Events as the suite found it: quit it only when the suite launched it.
       if (wasRunning) return
-      try {
-        execFileSync('osascript', ['-e', 'tell application id "com.apple.systemevents" to quit'], {
-          stdio: 'ignore',
-        })
-      } catch {
-        // System Events already quit, or refused; nothing to restore.
-      }
+      stopSystemEvents()
     })
 
     /** The POSIX path of the user's home folder, read through the user domain. */
@@ -186,9 +182,10 @@ describe.skipIf(!liveAppsEnabled)(
     // Evidence for the domain folders that have none yet: before any macts
     // read, so it is recorded even when the domain list fails. Counts, index
     // booleans, the observation time and the app and OS versions only.
+    // prettier-ignore
     it(
       'records how each domain reads the folders with no evidence of absence',
-      () => {
+      () => runLiveCheck(() => {
         const observedAt = new Date().toISOString()
         const check = directDomainFoldersCheck()
         console.info(`System Events domain folder check observed at: ${observedAt}`)
@@ -221,13 +218,14 @@ describe.skipIf(!liveAppsEnabled)(
             )
           }
         })
-      },
+      }),
       LIVE_TEST_TIMEOUT_MS
     )
 
+    // prettier-ignore
     it(
       'lists the domains and gets each by its id',
-      async () => {
+      () => runLiveCheck(async () => {
         const domains = await systemEvents.domains.list()
         console.info(`System Events domains listed: ${String(domains.items.length)}`)
         expect(domains.items.length).toBeGreaterThan(0)
@@ -247,13 +245,14 @@ describe.skipIf(!liveAppsEnabled)(
           `System Events domain ids that round-trip: ${String(roundTrips)}; not found: ${String(notFound)}`
         )
         expect(roundTrips === domains.items.length).toBe(true)
-      },
+      }),
       LIVE_TEST_TIMEOUT_MS
     )
 
+    // prettier-ignore
     it(
       'reads the user domain by its kind, and its home folder by reference and by path',
-      async () => {
+      () => runLiveCheck(async () => {
         const users = await systemEvents.userDomainObjects.list()
         console.info(`System Events user domains listed: ${String(users.items.length)}`)
         expect(users.items.length).toBe(1)
@@ -270,13 +269,14 @@ describe.skipIf(!liveAppsEnabled)(
           true
         )
         expect(got.posixPath === path, 'the home folder path round-trips').toBe(true)
-      },
+      }),
       LIVE_TEST_TIMEOUT_MS
     )
 
+    // prettier-ignore
     it(
       'reads the Sites folder as null exactly when it does not exist',
-      async () => {
+      () => runLiveCheck(async () => {
         const user = await systemEvents.userDomainObjects.get('user')
         expect(user.kind).toBe('user')
         // The check reports only whether the folder exists, or an exit status.
@@ -289,13 +289,14 @@ describe.skipIf(!liveAppsEnabled)(
           user.sitesFolder === null,
           'the Sites folder is null exactly when it does not exist'
         ).toBe(!check.exists)
-      },
+      }),
       LIVE_TEST_TIMEOUT_MS
     )
 
+    // prettier-ignore
     it(
       'gets disk items by path, and a folder container as a disk item',
-      async () => {
+      () => runLiveCheck(async () => {
         const path = await homeFolderPath()
         const home = await systemEvents.diskItems.get(path)
         expect(home.posixPath === path, 'the home folder is a disk item at its path').toBe(true)
@@ -310,33 +311,39 @@ describe.skipIf(!liveAppsEnabled)(
         if (container === null) return
         const parent = await container.resolve()
         expect(parent.posixPath.length > 0, 'the container reads as a disk item').toBe(true)
-      },
+      }),
       LIVE_TEST_TIMEOUT_MS
     )
 
+    // prettier-ignore
     it(
       'finds no folder at a file path',
-      async () => {
+      () => runLiveCheck(async () => {
         const error = await rejectionOf(systemEvents.folders.get(SYSTEM_FILE))
         expect(
           error instanceof TargetNotFoundError,
           'a folder get at a file path is a missing target'
         ).toBe(true)
-      },
+      }),
       LIVE_TEST_TIMEOUT_MS
     )
 
+    // prettier-ignore
     it(
       'reads the Classic domain by its kind when the app has one',
       async (context) => {
+        const hasClassic = await runLiveCheck(async () => {
         const classics = await systemEvents.classicDomainObjects.list()
         console.info(`System Events Classic domains listed: ${String(classics.items.length)}`)
         if (classics.items.length === 0) {
           console.warn('SKIPPING the Classic domain get: this Mac has no Classic domain.')
-          context.skip('this Mac has no Classic domain')
+          return false
         }
         const classic = await systemEvents.classicDomainObjects.get('classic')
         expect(classic.kind).toBe('classic')
+        return true
+        })
+        if (!hasClassic) context.skip('this Mac has no Classic domain')
       },
       LIVE_TEST_TIMEOUT_MS
     )
