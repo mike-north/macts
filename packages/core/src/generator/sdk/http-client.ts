@@ -892,15 +892,12 @@ function generateListMethod(
 
   // An `integer` parameter is sent in its integer wire form, as the page size
   // is; the operation's input rejects a bare JSON number.
-  const bodyProps = requiredParams.map((p) => {
-    const safeName = safeIdentifier(p.name)
-    const key = safeName === p.name ? p.name : `'${p.name}'`
-    if (p.type === 'integer') return `${key}: { integer: String(${safeName}) }`
-    return safeName === p.name ? safeName : `${key}: ${safeName}`
-  })
+  const bodyProps = requiredParams.map((p) =>
+    bodyField(p.name, safeIdentifier(p.name), p.type === 'integer')
+  )
   if (paged) {
     bodyProps.unshift(
-      `...(${page}.pageSize === undefined ? {} : { pageSize: { integer: String(${page}.pageSize) } })`,
+      `...(${page}.pageSize === undefined ? {} : { pageSize: ${integerWire(`${page}.pageSize`)} })`,
       `...(${page}.cursor === undefined ? {} : { cursor: ${page}.cursor })`
     )
   }
@@ -955,6 +952,9 @@ function docNoteLines(notes: readonly string[]): string {
  * it is included as the first argument so the server can scope the JXA query to
  * the correct parent collection — e.g. `app.calendars.whose({name:calendarId})[0]
  * .events.byId(id)` instead of the broken `app.events.byId(id)`.
+ *
+ * An identifier declared `integer` is sent in its integer wire form
+ * ({@link bodyField}), the only form the operation's input admits.
  */
 function generateGetMethod(
   routeSegment: string,
@@ -965,13 +965,14 @@ function generateGetMethod(
 ): string {
   const { parentParam, childParam } = resolveIdParams(command)
   const noteLine = docNoteLines(notes)
+  const field = (name: string): string => bodyField(name, name, isIntegerParameter(command, name))
   if (parentParam !== undefined) {
     return `
   /**
    * Get a ${nameWords} by ${childParam} within a parent scope.${noteLine}
    */
-  async get(${parentParam}: string, ${childParam}: string): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${parentParam}, ${childParam} });
+  async get(${parentParam}: ${identifierType(command, parentParam)}, ${childParam}: ${identifierType(command, childParam)}): Promise<${resourceName}> {
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${field(parentParam)}, ${field(childParam)} });
   }
 `
   }
@@ -979,10 +980,45 @@ function generateGetMethod(
   /**
    * Get a ${nameWords} by ${childParam}.${noteLine}
    */
-  async get(${childParam}: string): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${childParam} });
+  async get(${childParam}: ${identifierType(command, childParam)}): Promise<${resourceName}> {
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${field(childParam)} });
   }
 `
+}
+
+/**
+ * The generated expression for the contract's wire form of the integer
+ * `value` (phases/13 D3: an integer travels as canonical decimal text,
+ * `{ integer: "<digits>" }`), the only form an operation's input admits for
+ * an `integer`. `String()` takes a number and the text a CLI passes alike.
+ */
+function integerWire(value: string): string {
+  return `{ integer: String(${value}) }`
+}
+
+/**
+ * One request-body field of a generated client method: the parameter `name`,
+ * whose value is bound to `binding`, sent in its integer wire form
+ * ({@link integerWire}) when it is an `integer` and as given otherwise.
+ */
+function bodyField(name: string, binding: string, integer: boolean): string {
+  const key = binding === name ? name : `'${name}'`
+  if (integer) return `${key}: ${integerWire(binding)}`
+  return binding === name ? binding : `${key}: ${binding}`
+}
+
+/**
+ * The TypeScript type of a get's identifier argument. An `integer` identifier
+ * is taken as the number it is or as the text a CLI passes, and sent in its
+ * integer wire form; any other identifier is a string.
+ */
+function identifierType(command: Command, name: string): string {
+  return isIntegerParameter(command, name) ? 'string | number' : 'string'
+}
+
+/** Whether `command` declares the parameter `name` as an `integer`. */
+function isIntegerParameter(command: Command, name: string): boolean {
+  return command.parameters.find((p) => p.name === name)?.type === 'integer'
 }
 
 /**
