@@ -7,6 +7,26 @@ import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Resource, ResourceCreateInput } from '../types.js'
 
+import {
+  ValueTypes as __mactsValueTypes,
+  ValidationError as __mactsValidationError,
+} from '@macts/contracts'
+
+/** Integer wire policy shared with the operation contracts, built once per module. */
+const __mactsIntegerWire = __mactsValueTypes.integer().wire
+
+/** Validate CLI text or an SDK number before dispatch, without implicit rounding. */
+function __mactsIntegerInput(value: unknown): { integer: string } {
+  const integer = typeof value === 'number' || typeof value === 'string' ? String(value) : undefined
+  const candidate = { integer }
+  if (!__mactsIntegerWire.safeParse(candidate).success || integer === undefined) {
+    const message =
+      'Expected a canonical decimal integer from -9007199254740991 to 9007199254740991.'
+    throw new __mactsValidationError(message, { issues: [{ path: [], message }] })
+  }
+  return { integer }
+}
+
 /**
  * Client for a resource (person, equipment, or material).
  */
@@ -33,7 +53,7 @@ export class ResourceResourceClient {
    */
   async get(id: string | number): Promise<Resource> {
     return this.#http.rpc<Resource>(`${this.#app}.${this.#resource}.get`, {
-      id: { integer: String(id) },
+      id: __mactsIntegerInput(id),
     })
   }
 

@@ -26,7 +26,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { OperationId } from '@macts/contracts'
+import { ValidationError, type OperationId } from '@macts/contracts'
 import { AutomatorClient } from '@macts/automator'
 import { automatorContract } from '@macts/automator/contract'
 import { MicrosoftWordClient } from '@macts/microsoft-word'
@@ -112,7 +112,8 @@ type CommandClass = (typeof omniPlanCli.commands)[number]
 async function runCli(
   commands: readonly CommandClass[],
   path: readonly string[],
-  positional: string
+  positional: string,
+  value = ID_TEXT
 ): Promise<number> {
   const Command = commands.find((candidate) =>
     candidate.paths?.some((candidatePath) => candidatePath.join(' ') === path.join(' '))
@@ -122,7 +123,7 @@ async function runCli(
   const output: string[] = []
   const stream = { write: (chunk: string) => output.push(chunk) }
   Object.assign(command, {
-    [positional]: ID_TEXT,
+    [positional]: value,
     json: true,
     context: { stdout: stream, stderr: stream },
   })
@@ -350,5 +351,52 @@ describe("a command's integer parameter is sent in the contract wire form (#207)
     expect(
       inputWire(quickTimePlayerContract, 'quicktime-player.app.stepForward').safeParse(body).success
     ).toBe(true)
+  })
+})
+
+/** D3 and D10 require canonical decimal text within the safe-integer domain. */
+describe('integer input validation before HTTP dispatch', () => {
+  it.each(['', ' 7', '+7', '07', '-0', '1e2', '7.5', 'no', '9007199254740992'])(
+    'rejects noncanonical or out-of-range identifier text %j without a request',
+    async (id) => {
+      await expect(omniPlan().tasks.get(id)).rejects.toBeInstanceOf(ValidationError)
+      expect(sent).toEqual([])
+    }
+  )
+
+  it.each([1.5, NaN, Infinity, -Infinity, 9007199254740992, -9007199254740992])(
+    'rejects invalid numeric identifier %s without a request',
+    async (id) => {
+      await expect(omniPlan().tasks.get(id)).rejects.toMatchObject({ code: 'VALIDATION_FAILED' })
+      expect(sent).toEqual([])
+    }
+  )
+
+  it.each([
+    [-9007199254740991, '-9007199254740991'],
+    [9007199254740991, '9007199254740991'],
+    [-0, '0'],
+  ] as const)('encodes valid boundary %s exactly', async (id, text) => {
+    await omniPlan().tasks.get(id)
+    const body = onlyRequest('omniplan.tasks.get')
+    expect(body).toEqual({ id: { integer: text } })
+    expect(inputWire(omniPlanContract, 'omniplan.tasks.get').safeParse(body).success).toBe(true)
+  })
+
+  it('fails a malformed CLI positional locally without a request', async () => {
+    await expect(
+      runCli(
+        omniPlanCli.commands,
+        ['omniplan', 'projects', 'scenarios', 'tasks', 'get'],
+        'taskId',
+        '7.5'
+      )
+    ).rejects.toThrow(/integer/i)
+    expect(sent).toEqual([])
+  })
+
+  it('rejects a fractional command argument without a request', async () => {
+    await expect(quickTime().stepForward(1.5)).rejects.toBeInstanceOf(ValidationError)
+    expect(sent).toEqual([])
   })
 })

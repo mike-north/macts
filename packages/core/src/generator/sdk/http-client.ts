@@ -493,6 +493,7 @@ function generateClientFile(
 
 ${resourceImports}
 ${enumImports}
+${integerInputSupport(appCommands)}
 
 /**
  * Client configuration options.
@@ -830,6 +831,7 @@ export class ${resourceName}ResourceClient {
  */
 
 ${contractsImportLine}import type { HttpClient } from '../client.js';${typesImportLine}
+${integerInputSupport(methodBody)}
 
 /**
  * Client for ${resource.description.toLowerCase()}.
@@ -990,10 +992,38 @@ function generateGetMethod(
  * The generated expression for the contract's wire form of the integer
  * `value` (phases/13 D3: an integer travels as canonical decimal text,
  * `{ integer: "<digits>" }`), the only form an operation's input admits for
- * an `integer`. `String()` takes a number and the text a CLI passes alike.
+ * an `integer`. The emitted helper validates both SDK numbers and CLI text
+ * against that policy before any request is dispatched.
  */
 function integerWire(value: string): string {
-  return `{ integer: String(${value}) }`
+  return `__mactsIntegerInput(${value})`
+}
+
+/**
+ * Emit validation only in modules that send integer inputs. The shared value
+ * contract owns canonical decimal syntax and safe bounds; this compatibility
+ * client accepts CLI text without rounding it or widening that domain.
+ * Failures use the canonical SDK error before the HTTP layer sees a body.
+ */
+function integerInputSupport(methods: string): string {
+  if (!methods.includes('__mactsIntegerInput(')) return ''
+  return `
+import { ValueTypes as __mactsValueTypes, ValidationError as __mactsValidationError } from '@macts/contracts';
+
+/** Integer wire policy shared with the operation contracts, built once per module. */
+const __mactsIntegerWire = __mactsValueTypes.integer().wire;
+
+/** Validate CLI text or an SDK number before dispatch, without implicit rounding. */
+function __mactsIntegerInput(value: unknown): { integer: string } {
+  const integer = typeof value === 'number' || typeof value === 'string' ? String(value) : undefined;
+  const candidate = { integer };
+  if (!__mactsIntegerWire.safeParse(candidate).success || integer === undefined) {
+    const message = 'Expected a canonical decimal integer from -9007199254740991 to 9007199254740991.';
+    throw new __mactsValidationError(message, { issues: [{ path: [], message }] });
+  }
+  return { integer };
+}
+`
 }
 
 /** What {@link bodyField} needs to know about one request-body field. */

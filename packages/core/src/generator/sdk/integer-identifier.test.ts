@@ -18,7 +18,11 @@
  * @see https://github.com/mike-north/macts/issues/207
  */
 
+import { runInThisContext } from 'node:vm'
 import { describe, expect, it } from 'vitest'
+import * as contracts from '@macts/contracts'
+import * as ts from 'typescript'
+import { generateContract } from '../contract/index.js'
 import type { AppManifest, CommandParameter } from '../../manifest/index.js'
 import { generateHttpClientSdk } from './http-client.js'
 
@@ -111,7 +115,7 @@ describe('legacy resource client get identifier encoding (#207)', () => {
   it('sends an integer identifier in its integer wire form, under the parameter’s own name', () => {
     const text = gadgetClient(manifestWithGet([identifier('windowId', 'integer')], 'integer'))
     expect(text).toContain('async get(windowId: string | number): Promise<Gadget>')
-    expect(text).toContain('{ windowId: { integer: String(windowId) } }')
+    expect(text).toContain('{ windowId: __mactsIntegerInput(windowId) }')
     expect(text).not.toContain('{ windowId }')
   })
 
@@ -131,7 +135,7 @@ describe('legacy resource client get identifier encoding (#207)', () => {
       })
     )
     expect(text).toContain('async get(rackId: string | number, name: string): Promise<Gadget>')
-    expect(text).toContain('{ rackId: { integer: String(rackId) }, name });')
+    expect(text).toContain('{ rackId: __mactsIntegerInput(rackId), name });')
   })
 })
 
@@ -176,7 +180,7 @@ describe('legacy resource client command and delete integer encoding (#207)', ()
   // identifier was sent as the caller's text, `{ id }`.
   it("sends a resource command's integer item identifier in its integer wire form", () => {
     expect(text).toContain('async stamp(id: number, copies?: number, note?: string): Promise<void>')
-    expect(text).toContain('.stamp`, { id: { integer: String(id) }, ')
+    expect(text).toContain('.stamp`, { id: __mactsIntegerInput(id), ')
   })
 
   // An absent optional integer must send no field: its wire form would be
@@ -184,12 +188,85 @@ describe('legacy resource client command and delete integer encoding (#207)', ()
   // is sent as given, and JSON leaves it out when absent.
   it('sends an optional integer parameter only when it is supplied, and a string as given', () => {
     expect(text).toContain(
-      '...(copies === undefined ? {} : { copies: { integer: String(copies) } }), note });'
+      '...(copies === undefined ? {} : { copies: __mactsIntegerInput(copies) }), note });'
     )
   })
 
   it("sends a delete's integer identifier in its integer wire form", () => {
     expect(text).toContain('async delete(id: string | number): Promise<void>')
-    expect(text).toContain('.delete`, { id: { integer: String(id) } });')
+    expect(text).toContain('.delete`, { id: __mactsIntegerInput(id) });')
+  })
+})
+
+/**
+ * Execute trusted generator output with the real value library. Transpilation
+ * removes type-only dependencies; runtime imports remain real contracts, so a
+ * generated body must satisfy the generated operation rather than a test schema.
+ */
+function evaluateGenerated(source: string): Record<string, unknown> {
+  const result: Record<string, unknown> = {}
+  const javascript = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+  }).outputText
+  const requireContracts = (name: string): unknown => {
+    if (name !== '@macts/contracts') throw new Error(`Unexpected runtime dependency ${name}`)
+    return contracts
+  }
+  // Keep generated records in this realm: the value contract deliberately
+  // accepts plain objects and rejects objects with foreign prototypes.
+  const execute = runInThisContext(`(function(require, exports) { ${javascript}\n})`) as (
+    require: typeof requireContracts,
+    exports: Record<string, unknown>
+  ) => void
+  execute(requireContracts, result)
+  return result
+}
+
+/** Runtime shape of the fixture's generated resource command. */
+interface StampClient {
+  stamp(id: number, copies?: number, note?: string): Promise<void>
+}
+
+describe('resource command runtime integer input', () => {
+  it('sends a tagged item id and optional integer admitted by its real descriptor', async () => {
+    const manifest = manifestWithCommands()
+    // These assertions describe the known fixture exports at the dynamic
+    // compilation boundary; no production runtime input is cast or coerced.
+    const Client = evaluateGenerated(gadgetClient(manifest))['GadgetResourceClient'] as new (
+      http: { rpc: (operation: string, body: unknown) => Promise<undefined> },
+      app: string,
+      resource: string
+    ) => StampClient
+    const contractModule = generateContract(manifest).files.find(
+      (file) => file.path === 'src/contract/index.ts'
+    )
+    if (contractModule === undefined) throw new Error('No fixture contract')
+    const contract = evaluateGenerated(contractModule.content)['testAppContract'] as {
+      operations: Record<
+        string,
+        { input: { wire: { safeParse: (body: unknown) => { success: boolean } } } }
+      >
+    }
+    const sent: unknown[] = []
+    const client = new Client(
+      {
+        rpc: (operation, body) => {
+          expect(operation).toBe('testapp.gadgets.stamp')
+          sent.push(body)
+          return Promise.resolve(undefined)
+        },
+      },
+      'testapp',
+      'gadgets'
+    )
+    await client.stamp(7, 2, 'seal')
+    const expected = { id: { integer: '7' }, copies: { integer: '2' }, note: 'seal' }
+    expect(sent).toEqual([expected])
+    const descriptor = contract.operations['testapp.gadgets.stamp']
+    expect(descriptor?.input.wire.safeParse(expected).success).toBe(true)
+    expect(descriptor?.input.wire.safeParse({ id: 7, copies: 2, note: 'seal' }).success).toBe(false)
+    sent.length = 0
+    await expect(client.stamp(1.5)).rejects.toBeInstanceOf(contracts.ValidationError)
+    expect(sent).toEqual([])
   })
 })
