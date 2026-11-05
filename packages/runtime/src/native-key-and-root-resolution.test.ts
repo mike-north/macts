@@ -127,11 +127,18 @@ function object(record: Record<string, unknown>, members: Record<string, unknown
 function standInArchive(backDesk?: unknown) {
   const absent = { exists: () => false }
   const root = object(
-    { location: '/root', title: 'Root', holder: null, shelfMark: 'R1', summary: 'Top' },
+    {
+      location: '/root',
+      title: 'Root',
+      holder: null,
+      shelf: null,
+      shelfMark: 'R1',
+      summary: 'Top',
+    },
     { location: () => '/root' }
   )
   const entry = object(
-    { location: '/a', title: 'A', holder: root, shelfMark: 'S1', summary: 'Kept' },
+    { location: '/a', title: 'A', holder: root, shelf: null, shelfMark: 'S1', summary: 'Kept' },
     { location: () => '/a' }
   )
   const entries = new Map<unknown, unknown>([
@@ -236,6 +243,7 @@ describe('reference resolution over the generated Archive contract', () => {
       location: '/a',
       title: 'A',
       holder: wireRef('Entry', '/root'),
+      shelf: null,
       shelfMark: 'S1',
       summary: 'Kept',
     })
@@ -264,6 +272,7 @@ describe('reference resolution over the generated Archive contract', () => {
       location: '/root',
       title: 'Root',
       holder: null,
+      shelf: null,
       shelfMark: 'R1',
       summary: 'Top',
     })
