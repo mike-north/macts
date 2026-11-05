@@ -71,7 +71,8 @@ export interface DocumentResourceClient {
   /** List documents, as one page holding all of them. */
   list(options?: CallOptions): Promise<Page<Document>>
   /**
-   * Read the document identified by `name`.
+   * Read the document identified by `name`. When several documents share the same name, the first
+   * match in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param name - Document name. Does not accept null.
    */

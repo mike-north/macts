@@ -34,7 +34,7 @@ function widgets(commands: AppManifest['commands']): AppManifest {
         properties: {
           name: { access: 'r', type: 'string', description: 'Name', optional: false },
         },
-        identifiers: [{ property: 'name', primary: true }],
+        identifiers: [{ property: 'name', primary: true, targeting: 'byProperty' }],
       },
     },
     enums: {},

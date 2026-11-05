@@ -25,6 +25,7 @@ import {
   normalizeAppRouteSegment,
   resolveCommandRoutes,
   unselectableItemCommands,
+  untargetedIdentifiers,
 } from '@macts/core'
 import {
   EMPTY_RESOURCE_PLAN_TABLE,
@@ -214,14 +215,50 @@ function deriveManifestOperations(manifest: AppManifest): ManifestOperation[] {
  * @throws {@link OperationRegistrationError} naming the app and the command
  *   key, and saying which identifier parameter to declare.
  */
-function assertItemsSelectable(manifest: AppManifest, registration: 'manifest' | 'contract'): void {
+function assertItemsSelectable(manifest: AppManifest, registration: Registration): void {
   const [first] = unselectableItemCommands(manifest)
   if (first === undefined) return
+  throw new OperationRegistrationError(`${refusedApp(manifest, registration)}: ${first.problem}`)
+}
+
+/**
+ * Refuse a manifest with a resource whose primary identifier declares no
+ * targeting and is not the class's dictionary id.
+ *
+ * @remarks
+ * The rule is `untargetedIdentifiers` in `@macts/core`, the one generation
+ * applies too: an identifier with no targeting is looked up with the app's
+ * id specifier (`byId`), which finds an item only by the class's dictionary
+ * id, code `ID  `, whatever the property is named. Any other identifier must
+ * declare its targeting, or every operation that looks one of the
+ * resource's items up would find nothing. The resolved primary identifier is
+ * judged, so a subclass is judged on what it inherits. A resource marked
+ * unsupported has no operation and is never refused.
+ *
+ * Both registrations run it, so a contract cannot register an operation for a
+ * manifest that registration from the manifest alone refuses.
+ *
+ * @param registration - What the caller is registering the app from, which
+ *   the refusal names.
+ * @throws {@link OperationRegistrationError} naming the app, the resource and
+ *   the identifier property, and saying which targeting to declare.
+ */
+function assertIdentifiersTargeted(manifest: AppManifest, registration: Registration): void {
+  const [first] = untargetedIdentifiers(manifest)
+  if (first === undefined) return
+  throw new OperationRegistrationError(`${refusedApp(manifest, registration)}: ${first.problem}`)
+}
+
+/** What a registration is made from: the manifest alone, or a contract checked against it. */
+type Registration = 'manifest' | 'contract'
+
+/** The start of a refusal of the manifest's app, saying which registration refused it. */
+function refusedApp(manifest: AppManifest, registration: Registration): string {
   const refused =
     registration === 'manifest'
       ? 'cannot be registered from its manifest'
       : 'cannot be registered from its contract, because its manifest is refused'
-  throw new OperationRegistrationError(`App "${manifest.app.name}" ${refused}: ${first.problem}`)
+  return `App "${manifest.app.name}" ${refused}`
 }
 
 /** Combine a descriptor with the manifest-side facts for its command. */
@@ -260,7 +297,9 @@ function toRegisteredOperation(
  * manifest-registered list does not page, so its input declares no paging
  * inputs. A resource-scoped get, update or delete, or a delete at application
  * scope, must declare a required identifier parameter, or the
- * manifest is refused (`unselectableItemCommands` in `@macts/core`). They stand in
+ * manifest is refused (`unselectableItemCommands` in `@macts/core`), and so
+ * is a manifest with a resource whose primary identifier declares no targeting
+ * and is not the class's dictionary id (`untargetedIdentifiers`). They stand in
  * for generated descriptors until generated contracts carry value types, and
  * the generator never produces them.
  *
@@ -268,12 +307,14 @@ function toRegisteredOperation(
  * @returns One registered operation per route, in command-declaration order.
  * @throws {@link OperationRegistrationError} when the app's route segment is
  *   reserved ({@link RESERVED_APP_ROUTE_SEGMENTS}), a route or permission is
- *   not in operation form, or a command that must select one item declares no
- *   identifier parameter.
+ *   not in operation form, a command that must select one item declares no
+ *   identifier parameter, or a resource's identifier declares no targeting and
+ *   is not the class's dictionary id.
  */
 export function operationsFromManifest(manifest: AppManifest): RegisteredOperation[] {
   assertAppSegmentNotReserved(manifest)
   assertItemsSelectable(manifest, 'manifest')
+  assertIdentifiersTargeted(manifest, 'manifest')
   const inputTypes = new Map<string, ValueType<unknown>>()
   return deriveManifestOperations(manifest).map(({ id, permission, target, command }) => {
     let input = inputTypes.get(target.command)
@@ -312,11 +353,13 @@ function sameTarget(a: OperationTarget, b: OperationTarget): boolean {
  * so a contract generated before an identifier's uniqueness claim changed is
  * refused rather than paging a list that cannot be anchored reliably.
  *
- * The manifest itself must pass the check registration from the manifest
+ * The manifest itself must pass the checks registration from the manifest
  * alone applies: every command that must select one item declares a required
- * identifier parameter (`unselectableItemCommands` in
- * `@macts/core`). A manifest that check refuses registers nothing through a
- * contract either, whichever operations the contract covers.
+ * identifier parameter (`unselectableItemCommands` in `@macts/core`), and
+ * every resource whose primary identifier declares no targeting is identified
+ * by the class's dictionary id (`untargetedIdentifiers`). A manifest those
+ * checks refuse registers nothing through a contract either, whichever
+ * operations the contract covers.
  *
  * A contract may cover a subset of the manifest's operations. Its resource
  * table must agree with the manifest too: every resource it lists is one the
@@ -332,8 +375,10 @@ function sameTarget(a: OperationTarget, b: OperationTarget): boolean {
  * @returns One registered operation per contract descriptor, using the
  *   contract's descriptors.
  * @throws {@link OperationRegistrationError} on any disagreement, when the
- *   app's route segment is reserved ({@link RESERVED_APP_ROUTE_SEGMENTS}), or
- *   when a command that must select one item declares no identifier parameter.
+ *   app's route segment is reserved ({@link RESERVED_APP_ROUTE_SEGMENTS}),
+ *   when a command that must select one item declares no identifier parameter,
+ *   or when a resource's identifier declares no targeting and is not the
+ *   class's dictionary id.
  */
 export function operationsFromContract(
   contract: AppContract<unknown>,
@@ -341,6 +386,7 @@ export function operationsFromContract(
 ): RegisteredOperation[] {
   assertAppSegmentNotReserved(manifest)
   assertItemsSelectable(manifest, 'contract')
+  assertIdentifiersTargeted(manifest, 'contract')
   const appSegment = normalizeAppRouteSegment(manifest.app.name)
   if (contract.app !== appSegment) {
     throw new OperationRegistrationError(

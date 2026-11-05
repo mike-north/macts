@@ -30,6 +30,7 @@ export class TabResourceClient {
 
   /**
    * Get a tab by name.
+   * When several tabs share the same tty, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async get(name: string): Promise<Tab> {
     return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.get`, { name })

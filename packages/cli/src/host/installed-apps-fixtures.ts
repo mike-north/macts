@@ -107,6 +107,7 @@ function validManifestSource(app: string): string {
           {
             property: 'id',
             primary: true,
+            targeting: 'byId',
             unique: true,
             evidence: {
               unique: { source: 'curated', note: 'Test fixture: no two widgets share an id' },

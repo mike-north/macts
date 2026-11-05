@@ -300,7 +300,7 @@ describe('createNativeExecutor', () => {
         expect(Object.keys(references).sort()).toEqual(['Folder', 'Note'])
         expect(references['Note']).toEqual({
           id: reference('Folder'),
-          addressing: { collection: 'notes', lookup: 'byId', property: 'name' },
+          addressing: { collection: 'notes', lookup: 'byProperty', property: 'name' },
         })
       })
     })

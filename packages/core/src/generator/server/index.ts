@@ -52,9 +52,10 @@ export interface GenerateServerPackageResult {
  * `.gitattributes` marking the files it generates as generated.
  *
  * A manifest with a command that must select one item and declares no
- * identifier parameter is refused (`generationRefusals`), as it is for the
- * client package whose contract this one re-exports: the result holds the
- * errors naming each such command, and no files.
+ * identifier parameter, or a resource whose identifier declares no targeting
+ * and is not the class's dictionary id, is refused (`generationRefusals`), as
+ * it is for the client package whose contract this one re-exports: the result
+ * holds the errors naming each such command or resource, and no files.
  *
  * @param manifest - The app manifest
  * @param options - Generation options

@@ -59,9 +59,12 @@ resources:
     plural: Documents
     description: A Microsoft Word document
     code: docu
+    # Word's dictionary, as this manifest records it, gives a document `name` and
+    # no `id` property, so a document is targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
     properties:
       name:
         access: r
@@ -124,9 +127,13 @@ resources:
     plural: Paragraphs
     description: A single paragraph in a document
     code: cpar
+    # Word's dictionary, as this manifest records it, gives a paragraph
+    # `paragraphId` (code 1453) and no property with the dictionary id's code
+    # `ID  `, so a paragraph is targeted by its paragraph id, never by id.
     identifiers:
       - property: paragraphId
         primary: true
+        targeting: byProperty
     properties:
       alignment:
         access: rw

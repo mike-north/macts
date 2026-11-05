@@ -9,7 +9,8 @@ export class GetTrackCommand extends Command {
   static override paths = [['music', 'tracks', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a track by persistent ID',
+    description:
+      "Get a track by persistent ID. When several tracks share the same persistent ID, the first match in the app's order is used, and the operation does not fail as ambiguous.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

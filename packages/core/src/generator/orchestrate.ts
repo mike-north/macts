@@ -47,9 +47,10 @@ export interface GenerateConsolidatedResult {
  * contract.
  *
  * A manifest with a command that must select one item and declares no
- * identifier parameter is refused before either package is built
- * (`generationRefusals`): the result holds the errors naming each such
- * command, once, and no files.
+ * identifier parameter, or a resource whose identifier declares no targeting
+ * and is not the class's dictionary id, is refused before either package is
+ * built (`generationRefusals`): the result holds the errors naming each such
+ * command or resource, once, and no files.
  *
  * @param manifest - The app manifest
  * @param options - Generation options

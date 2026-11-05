@@ -35,6 +35,15 @@ export {
   type UnselectableItemCommand,
 } from './item-selection.js'
 
+// When a primary identifier may rely on the default byId targeting: only when
+// it is the class's dictionary id (single source of truth shared by the
+// generators and operation registration, so each refuses the same resources)
+export {
+  identifierTargetingProblem,
+  untargetedIdentifiers,
+  type UntargetedIdentifier,
+} from './identifier-targeting.js'
+
 // Nullability and resettability decisions for manifest fields (single source
 // of truth shared by the contract generator and the nullability probe)
 export * from './nullability.js'

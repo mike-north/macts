@@ -30,6 +30,7 @@ export class LayerResourceClient {
 
   /**
    * Get a layer by name.
+   * When several layers share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async get(name: string): Promise<Layer> {
     return this.#http.rpc<Layer>(`${this.#app}.${this.#resource}.get`, { name })

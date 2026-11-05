@@ -30,6 +30,7 @@ export class AccountResourceClient {
 
   /**
    * Get a account by name.
+   * When several accounts share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async get(name: string): Promise<Account> {
     return this.#http.rpc<Account>(`${this.#app}.${this.#resource}.get`, { name })

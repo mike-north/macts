@@ -925,7 +925,9 @@ export interface WorkspaceDocumentResourceClient {
   /** List workspace documents, as one page holding all of them. */
   list(options?: CallOptions): Promise<Page<WorkspaceDocument>>
   /**
-   * Read the workspace document identified by `name`.
+   * Read the workspace document identified by `name`. When several workspace documents share the
+   * same name, the first match in the app's order is used, and the operation does not fail as
+   * ambiguous.
    *
    * @param name - Workspace document name. Does not accept null.
    */
@@ -1067,7 +1069,9 @@ export interface RunDestinationResourceClient {
    */
   list(workspaceName: string, options?: CallOptions): Promise<Page<RunDestination>>
   /**
-   * Read the run destination identified by `name` within `workspaceName`.
+   * Read the run destination identified by `name` within `workspaceName`. When several run
+   * destinations share the same name, the first match in the app's order is used, and the operation
+   * does not fail as ambiguous.
    *
    * @param workspaceName - Workspace document name. Does not accept null.
    * @param name - Run destination name. Does not accept null.

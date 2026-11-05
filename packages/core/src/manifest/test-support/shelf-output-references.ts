@@ -64,6 +64,7 @@ resources:
     identifiers:
       - property: id
         primary: true
+        targeting: byId
   Chapter:
     name: Chapter
     plural: Chapters
@@ -76,6 +77,7 @@ resources:
     identifiers:
       - property: id
         primary: true
+        targeting: byId
   Author:
     name: Author
     plural: Authors
@@ -88,6 +90,7 @@ resources:
     identifiers:
       - property: id
         primary: true
+        targeting: byId
   Series:
     name: Series
     plural: SeriesList
@@ -100,6 +103,7 @@ resources:
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
   Genre:
     name: Genre
     plural: Genres
@@ -175,6 +179,7 @@ resources:
     identifiers:
       - property: id
         primary: true
+        targeting: byId
 enums: {}
 hierarchy:
   children:
@@ -330,6 +335,7 @@ const CONTAINED_RESOURCES_YAML = yaml`
     identifiers:
       - property: id
         primary: true
+        targeting: byId
   Volume:
     name: Volume
     plural: Volumes
@@ -342,6 +348,7 @@ const CONTAINED_RESOURCES_YAML = yaml`
     identifiers:
       - property: id
         primary: true
+        targeting: byId
 `
 
 /** Commands {@link shelfManifestWithContainedFields} adds, as YAML. */

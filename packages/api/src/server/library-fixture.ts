@@ -72,7 +72,7 @@ export const LIBRARY_MANIFEST: AppManifest = {
       plural: 'Shelves',
       description: 'A shelf',
       properties: {},
-      identifiers: [{ property: 'code', primary: true, ...UNIQUE_CLAIM }],
+      identifiers: [{ property: 'code', primary: true, targeting: 'byId', ...UNIQUE_CLAIM }],
       ...RANGE_READ_SUPPORTED,
     },
     Book: {
@@ -80,7 +80,7 @@ export const LIBRARY_MANIFEST: AppManifest = {
       plural: 'Books',
       description: 'A book',
       properties: {},
-      identifiers: [{ property: 'isbn', primary: true, ...UNIQUE_CLAIM }],
+      identifiers: [{ property: 'isbn', primary: true, targeting: 'byId', ...UNIQUE_CLAIM }],
       ...RANGE_READ_SUPPORTED,
     },
   },

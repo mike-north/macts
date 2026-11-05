@@ -1421,7 +1421,8 @@ export interface LayerResourceClient {
    */
   list(canvasId: string, options?: CallOptions): Promise<Page<Layer>>
   /**
-   * Read the layer identified by `name`.
+   * Read the layer identified by `name`. When several layers share the same name, the first match
+   * in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param name - Layer name. Does not accept null.
    */

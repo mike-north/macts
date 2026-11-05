@@ -17,6 +17,9 @@
 
 import type { AppManifest, Command, CommandParameter, Resource } from '../manifest/index.js'
 import { itemIdentifierParameter, unselectableItemCommands } from '../manifest/item-selection.js'
+import { untargetedIdentifiers } from '../manifest/identifier-targeting.js'
+import { resolveIdentifierTargeting } from '../manifest/identifier.js'
+import { resolvePrimaryIdentifier } from '../manifest/primary-identifier.js'
 import { normalizeResourceRouteSegment } from '../manifest/route.js'
 import { splitIdentifierWords } from '../manifest/lower-camel.js'
 import {
@@ -158,6 +161,30 @@ export function identifierWords(identifier: string): string {
 }
 
 /**
+ * The sentence a generated get, update or delete doc adds about items that
+ * share the value the operation looks its item up by, or `undefined` when
+ * none can.
+ *
+ * A resource whose primary identifier is matched with `byProperty` is found
+ * as the first match of `whose` in the app's element order (phases/13 D10,
+ * identifier targeting). With no uniqueness claim (`unique` absent or
+ * false), several items can share the value, and the operation acts on the
+ * first of them rather than failing as ambiguous. An identifier claimed
+ * unique, or looked up by the app's id or key specifier or as a root, matches
+ * no property, so it gets no sentence.
+ *
+ * @param resource - The resource the operation acts on.
+ * @returns One sentence, naming the resource's plural and the matched
+ *   property in prose.
+ */
+export function firstMatchNote(resource: Resource | undefined): string | undefined {
+  const targeting = resolveIdentifierTargeting(resource)
+  if (resource === undefined || targeting?.strategy !== 'byProperty') return undefined
+  if (resolvePrimaryIdentifier(resource)?.unique === true) return undefined
+  return `When several ${identifierWords(resource.plural)} share the same ${identifierWords(targeting.property)}, the first match in the app's order is used, and the operation does not fail as ambiguous.`
+}
+
+/**
  * A noun phrase with its indefinite article, for generated prose: `a note`,
  * `an event`, `an AIM handle`. The article follows the noun's first letter.
  *
@@ -180,20 +207,28 @@ export function findResourceCreateCommand(
 }
 
 /**
- * The errors that refuse generating anything from a manifest: one per command
- * that must select one item and declares no identifier parameter to select it
- * by (`unselectableItemCommands`), each naming the app and the command key and
- * saying what to declare.
+ * The errors that refuse generating anything from a manifest, each naming the
+ * app and saying what to declare:
+ *
+ * - one per command that must select one item and declares no identifier
+ *   parameter to select it by (`unselectableItemCommands`), naming the
+ *   command key;
+ * - one per resource whose primary identifier declares no targeting and is
+ *   not the class's dictionary id, code `ID  ` (`untargetedIdentifiers`),
+ *   naming the resource and the identifier property.
  *
  * Every package and SDK generator checks this before it builds any file and
  * returns these errors with no files, and `generateCapabilitiesModule` throws
  * them, so no generated interface takes an identifier the manifest does not
- * declare. Registration refuses the same commands by the same rule.
+ * declare, and no surface looks an item up by an id specifier that cannot
+ * find it. Registration refuses the same manifests by the same rules.
  */
 export function generationRefusals(manifest: AppManifest): string[] {
-  return unselectableItemCommands(manifest).map(
-    ({ problem }) => `App "${manifest.app.name}" cannot be generated from its manifest: ${problem}`
-  )
+  const refused = `App "${manifest.app.name}" cannot be generated from its manifest`
+  return [
+    ...unselectableItemCommands(manifest).map(({ problem }) => `${refused}: ${problem}`),
+    ...untargetedIdentifiers(manifest).map(({ problem }) => `${refused}: ${problem}`),
+  ]
 }
 
 /**

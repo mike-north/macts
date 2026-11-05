@@ -141,6 +141,7 @@ resources:
     identifiers:
       - property: uid
         primary: true
+        targeting: byId
         unique: true
         evidence:
           unique:
@@ -201,6 +202,7 @@ resources:
     identifiers:
       - property: folderId
         primary: true
+        targeting: byId
   Tag:
     name: Tag
     plural: Tags
