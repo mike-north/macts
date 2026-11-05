@@ -36,6 +36,7 @@ import {
   findInstalledCopies,
   findNativeAddons,
   installConsumer,
+  installContractsConsumer,
   installedMactsPackages,
   isInstalled,
   packAll,
@@ -48,12 +49,15 @@ const SETUP_TIMEOUT_MS = 240_000
 
 let root: string
 let consumer: string
+let contractsConsumer: string
 
 beforeAll(async () => {
   root = mkdtempSync(join(tmpdir(), 'macts-packed-install-'))
   consumer = join(root, 'consumer')
   const tarballs = await packAll(root)
   await installConsumer(consumer, tarballs)
+  contractsConsumer = join(root, 'contracts-consumer')
+  await installContractsConsumer(contractsConsumer, tarballs.contracts)
 }, SETUP_TIMEOUT_MS)
 
 afterAll(() => {
@@ -108,7 +112,13 @@ describe('packed install: identity across entry points', () => {
         sdkMactsError: true,
         localMactsError: true,
       },
-      sameBindings: { errorClass: true, errorClassFromContracts: true, integerLimits: true },
+      sameBindings: {
+        errorClass: true,
+        errorClassFromContracts: true,
+        integerLimits: true,
+        sharedFactory: true,
+        sharedBinder: true,
+      },
       localFactory: 'function',
     })
   })
@@ -146,7 +156,7 @@ describe('packed install: identity across entry points', () => {
     })
   })
 
-  it('type-checks an Integer from @macts/sdk where @macts/sdk/local requires one', async () => {
+  it('type-checks shared client, reference, and value brands through packed exports', async () => {
     expect((await typecheckBrandCheck(consumer)).trim()).toBe('')
   })
 })
@@ -164,6 +174,19 @@ describe('packed install: remote only', () => {
       listed: { items: [{ name: 'Sprocket', count: 7 }] },
       errorIsTargetNotFound: true,
       local: { loaded: false, code: 'ERR_MODULE_NOT_FOUND' },
+    })
+  })
+})
+
+/** A generated facade may depend on the shared client without the SDK closure. */
+describe('packed install: shared client alone', () => {
+  it('loads shared composition with contracts and Zod only', async () => {
+    expect(installedMactsPackages(contractsConsumer)).toEqual(['@macts/contracts'])
+    expect(findNativeAddons(contractsConsumer)).toEqual([])
+    expect(await runConsumer(contractsConsumer, 'shared-only.mjs')).toEqual({
+      codec: 'function',
+      remote: 'function',
+      binder: 'function',
     })
   })
 })
