@@ -27,13 +27,16 @@ import {
   type ValuePlan,
 } from '@macts/contracts'
 import { describe, expect, it } from 'vitest'
+import { ABSENT_VALUE_ERROR_NUMBER } from '../manifest/schemas/evidence.js'
 import { createNativeCodecFunctions } from './native-codec-functions.js'
 import {
   NATIVE_CODEC,
+  NATIVE_ABSENT_AS_NULL_KEY,
   NATIVE_CODEC_ERROR_NAME,
   NATIVE_CONTAINED_REFERENCE_KEY,
   NATIVE_DECODE_FUNCTION,
   NATIVE_ENCODE_FUNCTION,
+  NATIVE_READING_KEY,
   type NativeCodecEnvironment,
   type NativeReferenceTable,
 } from './native-codec.js'
@@ -1653,6 +1656,113 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
       })
     })
 
+    /** An app object whose identifier read fails with the app's error `errorNumber`. */
+    const unreadable = (errorNumber: number) => ({
+      id: () => {
+        throw Object.assign(new Error("Can't get object."), { errorNumber })
+      },
+    })
+
+    describe('a value whose evidence makes "no such object" its empty value', () => {
+      /** The value a body hands over as one its property's evidence lets read as absent. */
+      const absentAsNull = (value: unknown) => ({ [NATIVE_ABSENT_AS_NULL_KEY]: value })
+
+      it('encodes as null at a nullable position when reading its identifier reports no such object (-1728)', () => {
+        const app = standInApp()
+        expect(
+          encode(absentAsNull(unreadable(-1728)), nullable(PERSON_REF), environment(app))
+        ).toBe(null)
+      })
+
+      it('encodes an object that reads as it would unmarked, and null as null', () => {
+        const app = standInApp()
+        expect(
+          encode(absentAsNull(app.people.objects[1]), nullable(PERSON_REF), environment(app))
+        ).toEqual(identity('Person', 'p-2'))
+        expect(encode(absentAsNull(null), nullable(PERSON_REF), environment(app))).toBe(null)
+      })
+
+      it('still fails any other app failure, and the same failure on an unmarked value', () => {
+        const app = standInApp()
+        expect(() =>
+          encode(absentAsNull(unreadable(-1700)), nullable(PERSON_REF), environment(app))
+        ).toThrow("Can't get object.")
+        expect(() => encode(unreadable(-1728), nullable(PERSON_REF), environment(app))).toThrow(
+          "Can't get object."
+        )
+      })
+
+      it('encodes as an unmarked value at a position that cannot be null', () => {
+        const app = standInApp()
+        expect(encode(absentAsNull(app.people.objects[1]), PERSON_REF, environment(app))).toEqual(
+          identity('Person', 'p-2')
+        )
+        expect(() => encode(absentAsNull(unreadable(-1728)), PERSON_REF, environment(app))).toThrow(
+          "Can't get object."
+        )
+      })
+
+      it('never takes a codec failure as the empty value', () => {
+        const app = standInApp()
+        expectCodecError(
+          () => encode(absentAsNull('not an object'), nullable(PERSON_REF), environment(app)),
+          { direction: 'encode', path: [], includes: ['Person'] }
+        )
+      })
+    })
+
+    describe('an app failure while a record field is read', () => {
+      it('lets the app error through, naming the field and its position in the result', () => {
+        const app = standInApp()
+        const plan = arrayOf(recordOf({ owner: required(nullable(PERSON_REF)) }))
+        const error = thrownBy(() =>
+          encode(
+            [{ owner: app.people.objects[0] }, { owner: unreadable(-1728) }],
+            plan,
+            environment(app)
+          )
+        )
+        expect(error).toBeInstanceOf(Error)
+        expect(error).toMatchObject({
+          message: "Can't get object.",
+          errorNumber: -1728,
+          [NATIVE_READING_KEY]: 'the property "owner" at [1]',
+        })
+      })
+
+      it('names the innermost field the failure came from', () => {
+        const app = standInApp()
+        const plan = recordOf({ manager: required(recordOf({ owner: required(PERSON_REF) })) })
+        const error = thrownBy(() =>
+          encode({ manager: { owner: unreadable(-1728) } }, plan, environment(app))
+        )
+        expect(error).toMatchObject({ [NATIVE_READING_KEY]: 'the property "owner" at manager' })
+      })
+
+      it('lets an error it cannot change through unchanged', () => {
+        const app = standInApp()
+        const frozen: Error = Object.freeze(
+          Object.assign(new Error("Can't get object."), { errorNumber: -1728 })
+        )
+        const owner = {
+          id: () => {
+            throw frozen
+          },
+        }
+        const plan = recordOf({ owner: required(PERSON_REF) })
+        const error = thrownBy(() => encode({ owner }, plan, environment(app)))
+        expect(error).toBe(frozen)
+        expect(Object.hasOwn(frozen, NATIVE_READING_KEY)).toBe(false)
+      })
+
+      it('leaves a codec failure in a field as it is', () => {
+        expectCodecError(() => encode({ count: 1.5 }, recordOf({ count: required(INTEGER) })), {
+          direction: 'encode',
+          path: ['count'],
+        })
+      })
+    })
+
     it.each([
       ['a collection', PEOPLE_REF],
       ['a resource found only within its container', EMAIL_REF],
@@ -2118,5 +2228,8 @@ describe('codec literals', () => {
       reference: WIRE_KEYS.reference,
     })
     expect(literals.containedReference).toBe(NATIVE_CONTAINED_REFERENCE_KEY)
+    expect(literals.absentAsNull).toBe(NATIVE_ABSENT_AS_NULL_KEY)
+    expect(literals.noSuchObject).toBe(ABSENT_VALUE_ERROR_NUMBER)
+    expect(literals.reading).toBe(NATIVE_READING_KEY)
   })
 })

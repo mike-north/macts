@@ -105,6 +105,12 @@ export interface NativeCodecLiterals {
   }
   /** Mirrors `NATIVE_CONTAINED_REFERENCE_KEY`. */
   readonly containedReference: string
+  /** Mirrors `NATIVE_ABSENT_AS_NULL_KEY`. */
+  readonly absentAsNull: string
+  /** Mirrors `ABSENT_VALUE_ERROR_NUMBER`: the app's "no such object". */
+  readonly noSuchObject: number
+  /** Mirrors `NATIVE_READING_KEY`. */
+  readonly reading: string
   /** Mirrors `SPECIAL_DOUBLE_STATES`, in the same order. */
   readonly specialDoubleStates: readonly string[]
 }
@@ -175,6 +181,12 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   const KEY_REFERENCE = 'reference'
   /** Sole key of a value a body hands over with the record it was read through. */
   const KEY_CONTAINED = '__mactsContainedReference'
+  /** Sole key of a value whose evidence makes the app's "no such object" its empty value. */
+  const KEY_ABSENT_AS_NULL = '__mactsAbsentAsNull'
+  /** The app's "no such object" error number. */
+  const NO_SUCH_OBJECT = -1728
+  /** Property of an app error that says what was being read when the app failed. */
+  const KEY_READING = '__mactsReading'
 
   const STATE_NAN = 'NaN'
   const STATE_INFINITY = 'Infinity'
@@ -610,9 +622,39 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         // Otherwise omitted: missing value at an optional non-nullable field.
         continue
       }
-      setOwn(out, key, encodeValue(value, field.value, fieldPath, env))
+      try {
+        setOwn(out, key, encodeValue(value, field.value, fieldPath, env))
+      } catch (error) {
+        noteReading(error, fieldPath)
+        throw error
+      }
     }
     return out
+  }
+
+  /**
+   * Notes on `error`, an app failure the codec lets through while it encodes
+   * the record field at `path`, which field was being read
+   * (`NATIVE_READING_KEY`): `the property "holder" at [2]`. The path's
+   * steps are plan field names and indices, never values. A codec failure is
+   * left alone, as is an error that already says what was read (a field
+   * nested deeper). An error that cannot be changed is let through as it is.
+   */
+  function noteReading(error: unknown, path: Path): void {
+    if (typeof error !== 'object' || error === null) return
+    if ('name' in error && error.name === ERROR_NAME) return
+    if (KEY_READING in error && typeof error[KEY_READING] === 'string') return
+    const field = path[path.length - 1]
+    let at = ''
+    for (const step of path.slice(0, -1)) {
+      at += typeof step === 'number' ? '[' + String(step) + ']' : (at === '' ? '' : '.') + step
+    }
+    const reading = 'the property ' + JSON.stringify(String(field)) + (at === '' ? '' : ' at ' + at)
+    try {
+      setOwn(error, KEY_READING, reading)
+    } catch {
+      // A frozen error keeps only its own description.
+    }
   }
 
   /**
@@ -1140,8 +1182,39 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     return payload
   }
 
+  /**
+   * Whether `error` is the app reporting no such object: an app failure, not
+   * a codec one, carrying the "no such object" error number.
+   */
+  function reportsNoSuchObject(error: unknown): boolean {
+    if (typeof error !== 'object' || error === null) return false
+    if (!('errorNumber' in error) || error.errorNumber !== NO_SUCH_OBJECT) return false
+    return !('name' in error && error.name === ERROR_NAME)
+  }
+
+  /**
+   * Encodes `native`, a value a body handed over as one its property's
+   * evidence lets read as absent. At a nullable position the app reporting no
+   * such object while the value is read (as its identifier is, for a
+   * reference) is the empty value, `null`; any other failure is still a
+   * failure. At any other position it encodes as an unmarked value.
+   */
+  function encodeAbsentAsNull(native: unknown, plan: ValuePlan, path: Path, env: Env): unknown {
+    if (plan.kind !== 'nullable') return encodeValue(native, plan, path, env)
+    if (native === null) return null
+    try {
+      return encodeValue(native, plan.value, path, env)
+    } catch (error) {
+      if (reportsNoSuchObject(error)) return null
+      throw error
+    }
+  }
+
   /** Encodes a native value by its plan. */
   function encodeValue(native: unknown, plan: ValuePlan, path: Path, env: Env): unknown {
+    if (soleKey(native) === KEY_ABSENT_AS_NULL && isKeyed(native)) {
+      return encodeAbsentAsNull(native[KEY_ABSENT_AS_NULL], plan, path, env)
+    }
     const kind: string = plan.kind
     switch (plan.kind) {
       case 'passthrough':
@@ -1560,6 +1633,9 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         reference: KEY_REFERENCE,
       },
       containedReference: KEY_CONTAINED,
+      absentAsNull: KEY_ABSENT_AS_NULL,
+      noSuchObject: NO_SUCH_OBJECT,
+      reading: KEY_READING,
       specialDoubleStates: [
         STATE_NAN,
         STATE_INFINITY,

@@ -59,6 +59,10 @@ export const NATIVE_CODEC_ERROR_NAME = 'MactsCodecError'
  *   reference position becomes an identity reference; one whose resource is
  *   found within a container must come with the record it was read through
  *   ({@link NATIVE_CONTAINED_REFERENCE_KEY}), which becomes its container.
+ *   A value a body hands over as one its property's evidence lets read as
+ *   absent ({@link NATIVE_ABSENT_AS_NULL_KEY}) encodes as `null` at a
+ *   nullable position when the app reports its object missing (-1728) as the
+ *   codec reads it.
  * - `env` is `{ app, references }`. Without it, no reference converts.
  * - Under a `passthrough` plan, both functions return their argument
  *   unchanged.
@@ -74,6 +78,9 @@ export const NATIVE_CODEC_ERROR_NAME = 'MactsCodecError'
  * - When `decode` addresses the object a reference names and the app has no
  *   such object, it throws the same object with `missingResource` set to the
  *   reference's resource.
+ * - When the app fails while `encode` reads a record field's value (a
+ *   reference's identifier), the app's error is let through with
+ *   {@link NATIVE_READING_KEY} naming that field and its position.
  */
 export interface NativeCodec {
   /** In-process JavaScript defining the decode and encode functions. */
@@ -99,6 +106,36 @@ export interface NativeCodec {
  * (`containerReferences` in `NativeBodyOptions`).
  */
 export const NATIVE_CONTAINED_REFERENCE_KEY = '__mactsContainedReference'
+
+/**
+ * Sole key of the record a native body hands the codec for a field whose
+ * nullability evidence makes the app's "no such object" failure (-1728) the
+ * field's empty value (`readsAbsentAsNull`, phases/13 D10). Its value is what
+ * the body read for the field, in any form the codec accepts there, including
+ * a {@link NATIVE_CONTAINED_REFERENCE_KEY} record.
+ *
+ * An app can hand back an object it reports missing only when the object is
+ * read, which for a reference is when the codec reads its identifier. At a
+ * nullable position the codec encodes such a value as `null`, wherever the
+ * body read it from: an item's property record, a column read across a
+ * collection, or a read on its own. Any other failure still fails, and at a
+ * position that cannot be `null` the value encodes as if it were not marked.
+ */
+export const NATIVE_ABSENT_AS_NULL_KEY = '__mactsAbsentAsNull'
+
+/**
+ * Property a native body or the codec sets on an app's error, as it lets the
+ * error through, to say what was being read when the app failed: `the items`,
+ * or `the property "holder"`, with the result position for a value the
+ * codec was encoding (`at [2]`). It holds only names from the manifest and
+ * positions in the result, never a value the app returned. The innermost read
+ * that lets the error through sets it; one already set is kept.
+ *
+ * The executor keeps it on the app failure (`reading` in {@link NativeFailure})
+ * and puts it in the message of the error's cause, so a failure such as "no
+ * such object" says which read it came from.
+ */
+export const NATIVE_READING_KEY = '__mactsReading'
 
 /**
  * Marker `name` of the object a list body throws when its collection changed
@@ -321,6 +358,11 @@ export type NativeFailure =
        * operation's own: the parent of a scoped operation.
        */
       readonly missingResource?: string
+      /**
+       * What was being read when the app failed, from
+       * {@link NATIVE_READING_KEY}: names and result positions, never a value.
+       */
+      readonly reading?: string
     }
   | { readonly source: 'collection'; readonly message: string }
   | {

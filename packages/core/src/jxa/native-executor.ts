@@ -851,7 +851,14 @@ function describeReportedFailure(
           issues,
         })
   }
-  const options = { cause: new Error(failure.message) }
+  // The cause says what was being read when the app failed, so a failure
+  // such as "no such object" can be traced to its read. It holds names and
+  // result positions only (NATIVE_READING_KEY), never app data.
+  const cause =
+    failure.reading === undefined
+      ? failure.message
+      : `${failure.message} (while reading ${failure.reading})`
+  const options = { cause: new Error(cause) }
   if (failure.errorNumber === undefined) {
     return new AppOperationError(`${app} could not complete the operation.`, { app }, options)
   }

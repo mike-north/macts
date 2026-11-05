@@ -81,7 +81,9 @@ import { ABSENT_VALUE_ERROR_NUMBER, readsAbsentAsNull } from '../manifest/schema
 import {
   NATIVE_CODEC_ERROR_NAME,
   NATIVE_COLLECTION_CHANGED_ERROR_NAME,
+  NATIVE_ABSENT_AS_NULL_KEY,
   NATIVE_CONTAINED_REFERENCE_KEY,
+  NATIVE_READING_KEY,
   type NativeAddressing,
   type NativeCollectionAddressing,
 } from './native-codec.js'
@@ -350,8 +352,13 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * is omitted rather than failing the operation, and its record then fails
  * the contract unless the field may be absent. A property whose evidence
  * shows the app reporting an absent value by failing the read with "no such
- * object" ({@link absentAsNull}) takes `null` from that failure instead; the
- * item's own existence is checked before this read, so a missing item still
+ * object" ({@link absentAsNull}) takes `null` from that failure instead, and
+ * is always read on its own, never taken from the record, because the
+ * evidence is of what a read of the property reports. The app can still hand
+ * back an object it reports missing only when the codec reads the object's
+ * identifier, so such a property's value goes to the codec marked
+ * ({@link markAbsentAsNull}), which takes that failure as `null` too, as a
+ * list's rows do. The item's own existence is checked before this read, so a missing item still
  * fails as missing. That holds for a get, a resolved reference and an update's
  * read-back (checked before its writes); a create's read-back needs no check,
  * because the item was just made. A body with no resource reads `name`.
@@ -390,9 +397,10 @@ function readOutputProperties(
     'var obj = {};',
     'try {',
     `var props = ${itemLocal}.properties();`,
-    ...keys.map(
-      (key) =>
-        `if (${member('props', native(key))} !== undefined) { ${member('obj', key)} = ${member('props', native(key))}; } else { ${readOnItsOwn(key)} }`
+    ...keys.map((key) =>
+      absentAsNull(resource, key)
+        ? readOnItsOwn(key)
+        : `if (${member('props', native(key))} !== undefined) { ${member('obj', key)} = ${member('props', native(key))}; } else { ${readOnItsOwn(key)} }`
     ),
     '} catch (e) {',
     ...keys.map(readOnItsOwn),
@@ -403,22 +411,39 @@ function readOutputProperties(
     ...containedKeys(manifest, source).map(
       (key) =>
         `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${wrapContained(member('obj', key), 'container', itemLocal)}; }`
-    )
+    ),
+    ...keys
+      .filter((key) => absentAsNull(resource, key))
+      .map(
+        (key) =>
+          `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${markAbsentAsNull(member('obj', key))}; }`
+      )
   )
+}
+
+/**
+ * Expression handing `valueExpression`, read for a property whose evidence
+ * makes the app's "no such object" failure its empty value ({@link
+ * absentAsNull}), to the codec marked as such (`NATIVE_ABSENT_AS_NULL_KEY` in
+ * `native-codec.ts`). The app can report the object missing only when the
+ * codec reads it (a reference's identifier), so the codec, not the read,
+ * takes that failure as `null`. `null` is left as it is.
+ */
+function markAbsentAsNull(valueExpression: string): string {
+  return `(function (v) { return v === null ? null : { ${literal(NATIVE_ABSENT_AS_NULL_KEY)}: v }; })(${valueExpression})`
 }
 
 /**
  * Whether a failed read of `key` with "no such object" is the property's
  * empty value: its nullability evidence shows the app failing that way when
- * an item has no value (`readsAbsentAsNull`). Every other failure, and this
- * one for any other property, is still a failure.
+ * an item has no value, observed across the resource's items or, for a
+ * resource with a single instance, curated (`readsAbsentAsNull`). Every
+ * other failure, and this one for any other property, is still a failure.
  */
 function absentAsNull(resource: Resource | undefined, key: string): boolean {
-  const property =
-    resource !== undefined && Object.hasOwn(resource.properties, key)
-      ? resource.properties[key]
-      : undefined
-  return property !== undefined && readsAbsentAsNull(property)
+  if (resource === undefined || !Object.hasOwn(resource.properties, key)) return false
+  const property = resource.properties[key]
+  return property !== undefined && readsAbsentAsNull(property, resource)
 }
 
 /**
@@ -1035,6 +1060,12 @@ const COLLECTION_CHANGED_MESSAGE =
  * - `aligned(what, values)` returns `values` when it is an array with one
  *   element per item, and otherwise throws a misaligned `Inconsistent`. `what`
  *   names the read in the message.
+ * - `noteReading(e, what)` returns `e`, an app error the body lets through,
+ *   noting `what` was being read when the app failed ({@link
+ *   NATIVE_READING_KEY}): `the items`, or a property by its name. A codec
+ *   failure, or an error that already says what was read, is left alone.
+ * - `listItems()` lists the item specifiers, noting a failure as a read of
+ *   the items.
  * - `itemList()` lists the item specifiers once per attempt, on first use,
  *   checked against the item count. Only reads that fall back to one request
  *   per item need them.
@@ -1047,7 +1078,8 @@ const COLLECTION_CHANGED_MESSAGE =
  *   that property, unless `absentAsNull` is `true` and the read failed with
  *   "no such object": that is the property's empty value (see
  *   {@link absentAsNull}), so `null` is left there. An unguarded failure, or
- *   a communication failure, fails the list. `absentAsNull` may be left out.
+ *   a communication failure, fails the list; an unguarded one notes the
+ *   property it was reading. `absentAsNull` may be left out.
  * - `readColumn(what, name, absentAsNull)` reads one property across the
  *   items in one request. When that request fails other than by a
  *   communication failure, it falls back to `readEach` with every read
@@ -1078,8 +1110,17 @@ function listReadHelpers(): string {
     '  }',
     '  return values;',
     '}',
+    'function noteReading(e, what) {',
+    `  if (e !== null && typeof e === "object" && e.name !== ${literal(NATIVE_CODEC_ERROR_NAME)} && typeof e[${literal(NATIVE_READING_KEY)}] !== "string") {`,
+    `    try { e[${literal(NATIVE_READING_KEY)}] = what; } catch (ignored) {}`,
+    '  }',
+    '  return e;',
+    '}',
+    'function listItems() {',
+    `  try { return ${COLLECTION_LOCAL}(); } catch (e) { throw noteReading(e, "the items"); }`,
+    '}',
     'function itemList() {',
-    `  if (items === null) { items = aligned("the items", ${COLLECTION_LOCAL}()); }`,
+    '  if (items === null) { items = aligned("the items", listItems()); }',
     '  return items;',
     '}',
     'function readEach(list, name, guarded, absentAsNull) {',
@@ -1091,7 +1132,7 @@ function listReadHelpers(): string {
     `        values.push(absentAsNull === true && e && e.errorNumber === ${String(NO_SUCH_OBJECT_ERROR_NUMBER)} ? null : undefined);`,
     '      }',
     '    } else {',
-    '      values.push(list[i][name]());',
+    '      try { values.push(list[i][name]()); } catch (e) { throw noteReading(e, "the property " + JSON.stringify(name)); }',
     '    }',
     '  }',
     '  return values;',
@@ -1125,7 +1166,7 @@ function identifierReader(nativeIdName: string): string {
     '  var values;',
     `  try { values = ${member(COLLECTION_LOCAL, nativeIdName)}(); } catch (e) {`,
     '    if (communicationFailed(e)) { throw e; }',
-    `    var list = ${COLLECTION_LOCAL}();`,
+    '    var list = listItems();',
     '    if (!Array.isArray(list)) { unassemblable("Listing the items gave no list, so the records cannot be assembled."); }',
     '    items = list;',
     `    return readEach(list, ${literal(nativeIdName)}, false);`,
@@ -1563,7 +1604,8 @@ function buildListBody(
   const recordFields = bestEffortProps.map((p, index) => {
     const value = `${columnLocal(index)}[i]`
     const held = contained.has(p) ? wrapContained(value, 'containerId', `${IDS_LOCAL}[i]`) : value
-    return `if (${value} !== undefined) { ${member('obj', p)} = ${held}; }`
+    const marked = absentAsNull(resource, p) ? markAbsentAsNull(held) : held
+    return `if (${value} !== undefined) { ${member('obj', p)} = ${marked}; }`
   })
   const idField =
     runtimeIdProperty !== undefined ? `${member('obj', runtimeIdProperty)} = ${IDS_LOCAL}[i];` : ''
