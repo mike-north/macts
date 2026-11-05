@@ -373,10 +373,11 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * back an object it reports missing only when the codec reads the object's
  * identifier, so such a property's value goes to the codec marked
  * ({@link markAbsentAsNull}), which takes that failure as `null` too, as a
- * list's rows do. The item's own existence is checked before this read, so a missing item still
- * fails as missing. That holds for a get, a resolved reference and an update's
- * read-back (checked before its writes); a create's read-back needs no check,
- * because the item was just made. A body with no resource reads `name`.
+ * list's rows do. The item's own existence is checked before this read, so a
+ * missing item still fails as missing. That holds for a get, a resolved
+ * reference and an update's read-back (checked before its writes); a
+ * create's read-back needs no check, because the item was just made. A body
+ * with no resource reads `name`.
  *
  * A singleton root's object holds nothing that says which kind it is, so its
  * `kind` is not read from the app: it is set from `kindExpression`, the kind
@@ -1096,14 +1097,14 @@ const COLLECTION_CHANGED_MESSAGE =
  * - `communicationFailed(e)` tells whether a thrown error is one of
  *   {@link COMMUNICATION_FAILURE_ERROR_NUMBERS}: the request failed, so no
  *   guard or fallback may absorb it.
- * - `readEach(list, name, guarded, absentAsNull)` reads one property of
- *   every item of `list`, one request per item. A guarded read the item
+ * - `readEach(what, list, name, guarded, absentAsNull)` reads one property
+ *   of every item of `list`, one request per item. A guarded read the item
  *   cannot answer leaves `undefined` at its position, so the record omits
  *   that property, unless `absentAsNull` is `true` and the read failed with
  *   "no such object": that is the property's empty value (see
  *   {@link absentAsNull}), so `null` is left there. An unguarded failure, or
- *   a communication failure, fails the list; an unguarded one notes the
- *   property it was reading. `absentAsNull` may be left out.
+ *   a communication failure, fails the list; an unguarded one notes `what`
+ *   was being read. `absentAsNull` may be left out.
  * - `readColumn(what, name, absentAsNull)` reads one property across the
  *   items in one request. When that request fails other than by a
  *   communication failure, it falls back to `readEach` with every read
@@ -1147,7 +1148,7 @@ function listReadHelpers(): string {
     '  if (items === null) { items = aligned("the items", listItems()); }',
     '  return items;',
     '}',
-    'function readEach(list, name, guarded, absentAsNull) {',
+    'function readEach(what, list, name, guarded, absentAsNull) {',
     '  var values = [];',
     '  for (var i = 0; i < list.length; i++) {',
     '    if (guarded) {',
@@ -1156,7 +1157,7 @@ function listReadHelpers(): string {
     `        values.push(absentAsNull === true && e && e.errorNumber === ${String(NO_SUCH_OBJECT_ERROR_NUMBER)} ? null : undefined);`,
     '      }',
     '    } else {',
-    '      try { values.push(list[i][name]()); } catch (e) { throw noteReading(e, "the property " + JSON.stringify(name)); }',
+    '      try { values.push(list[i][name]()); } catch (e) { throw noteReading(e, what); }',
     '    }',
     '  }',
     '  return values;',
@@ -1165,7 +1166,7 @@ function listReadHelpers(): string {
     '  var values;',
     `  try { values = ${COLLECTION_LOCAL}[name](); } catch (e) {`,
     '    if (communicationFailed(e)) { throw e; }',
-    '    return readEach(itemList(), name, true, absentAsNull);',
+    '    return readEach(what, itemList(), name, true, absentAsNull);',
     '  }',
     '  return aligned(what, values);',
     '}'
@@ -1173,8 +1174,18 @@ function listReadHelpers(): string {
 }
 
 /**
+ * The runtime identifier a list body reads: its manifest name (`name`), by
+ * which a failed read is noted, and the app's name for it (`native`), by
+ * which it is read.
+ */
+interface ListIdentifier {
+  readonly name: string
+  readonly native: string
+}
+
+/**
  * Statements declaring `readIdentifiers()`, which reads the runtime
- * identifier `nativeIdName` of every item {@link COLLECTION_LOCAL} addresses,
+ * identifier `identifier` of every item {@link COLLECTION_LOCAL} addresses,
  * in item order.
  *
  * The identifier read is never guarded. When the read across the items fails
@@ -1184,16 +1195,16 @@ function listReadHelpers(): string {
  * rather than returning records with no usable id. The listed specifiers
  * become the attempt's item list.
  */
-function identifierReader(nativeIdName: string): string {
+function identifierReader(identifier: ListIdentifier): string {
   return lines(
     'function readIdentifiers() {',
     '  var values;',
-    `  try { values = ${member(COLLECTION_LOCAL, nativeIdName)}(); } catch (e) {`,
+    `  try { values = ${member(COLLECTION_LOCAL, identifier.native)}(); } catch (e) {`,
     '    if (communicationFailed(e)) { throw e; }',
     '    var list = listItems();',
     '    if (!Array.isArray(list)) { unassemblable("Listing the items gave no list, so the records cannot be assembled."); }',
     '    items = list;',
-    `    return readEach(list, ${literal(nativeIdName)}, false);`,
+    `    return readEach(${literal(`the property "${identifier.name}"`)}, list, ${literal(identifier.native)}, false);`,
     '  }',
     '  if (!Array.isArray(values)) { unassemblable("Reading the identifiers gave no list, so the records cannot be assembled."); }',
     '  return values;',
@@ -1262,8 +1273,11 @@ function sameIdentifiersHelper(): string {
  * per-item reads lists the items afresh rather than reusing a list from an
  * attempt that saw a different collection.
  */
-function attemptReader(nativeIdName: string | undefined, columnReads: readonly string[]): string {
-  if (nativeIdName === undefined) {
+function attemptReader(
+  identifier: ListIdentifier | undefined,
+  columnReads: readonly string[]
+): string {
+  if (identifier === undefined) {
     return lines(
       'function readAll() {',
       '  items = null;',
@@ -1274,7 +1288,7 @@ function attemptReader(nativeIdName: string | undefined, columnReads: readonly s
     )
   }
   return lines(
-    identifierReader(nativeIdName),
+    identifierReader(identifier),
     sameIdentifiersHelper(),
     'function readAll() {',
     '  items = null;',
@@ -1310,7 +1324,7 @@ function attemptReader(nativeIdName: string | undefined, columnReads: readonly s
  * `0 <= offset < end <= length`.
  */
 function pagedAttemptReader(
-  nativeIdName: string,
+  identifier: ListIdentifier,
   columnLocals: readonly string[],
   columnReads: readonly string[],
   read: PageRead
@@ -1318,10 +1332,10 @@ function pagedAttemptReader(
   const offset = `${PAGE_PARAMETER}.offset`
   const anchorRead =
     read === 'range'
-      ? `${member(`window(${offset} - 1, ${offset})`, nativeIdName)}()`
-      : `within(${member(WHOLE_LOCAL, nativeIdName)}(), ${offset} - 1, ${offset})`
+      ? `${member(`window(${offset} - 1, ${offset})`, identifier.native)}()`
+      : `within(${member(WHOLE_LOCAL, identifier.native)}(), ${offset} - 1, ${offset})`
   return lines(
-    identifierReader(nativeIdName),
+    identifierReader(identifier),
     sameIdentifiersHelper(),
     read === 'range'
       ? rangeWindowReader(columnReads)
@@ -1658,9 +1672,12 @@ function buildListBody(
     collectionExpression = member(PARENT_LOCAL, resourcePlural)
   }
 
-  const nativeIdName = runtimeIdProperty === undefined ? undefined : native(runtimeIdProperty)
-  const pagedIdName = paged ? nativeIdName : undefined
-  const pageRead = pagedIdName === undefined ? undefined : pageReadOf(resource)
+  const identifier: ListIdentifier | undefined =
+    runtimeIdProperty === undefined
+      ? undefined
+      : { name: runtimeIdProperty, native: native(runtimeIdProperty) }
+  const pagedIdentifier = paged ? identifier : undefined
+  const pageRead = pagedIdentifier === undefined ? undefined : pageReadOf(resource)
   const body = lines(
     parentBinding,
     pageRead === undefined
@@ -1676,10 +1693,10 @@ function buildListBody(
       ? ''
       : `var ${bestEffortProps.map((_p, index) => columnLocal(index)).join(', ')};`,
     listReadHelpers(),
-    pagedIdName === undefined || pageRead === undefined
-      ? attemptReader(nativeIdName, columnReads)
+    pagedIdentifier === undefined || pageRead === undefined
+      ? attemptReader(identifier, columnReads)
       : pagedAttemptReader(
-          pagedIdName,
+          pagedIdentifier,
           bestEffortProps.map((_p, index) => columnLocal(index)),
           columnReads,
           pageRead
@@ -1693,7 +1710,7 @@ function buildListBody(
     idAlias,
     'result.push(obj);',
     '}',
-    pagedIdName === undefined
+    pagedIdentifier === undefined
       ? 'return result;'
       : lines(
           `var windowResult = { items: result, length: ${LENGTH_LOCAL} };`,

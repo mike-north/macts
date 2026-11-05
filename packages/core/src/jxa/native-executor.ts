@@ -853,9 +853,10 @@ function describeReportedFailure(
           issues,
         })
   }
-  // The cause says what was being read when the app failed, so a failure
-  // such as "no such object" can be traced to its read. It holds names and
-  // result positions only (NATIVE_READING_KEY), never app data.
+  // The cause is the app's own message, followed by what was being read when
+  // the app failed, so a failure such as "no such object" can be traced to
+  // its read. The added text holds names and result positions only
+  // (NATIVE_READING_KEY), never app data.
   const cause =
     failure.reading === undefined
       ? failure.message
