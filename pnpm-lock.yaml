@@ -855,6 +855,9 @@ importers:
       '@types/pluralize':
         specifier: ^0.0.33
         version: 0.0.33
+      clipanion:
+        specifier: 'catalog:'
+        version: 4.0.0-rc.4(typanion@3.14.0)
       tsd:
         specifier: 'catalog:'
         version: 0.31.2

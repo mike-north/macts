@@ -177,7 +177,7 @@ describe('generateCliPlugin list commands: paging', () => {
       'cursor = Option.String(\'--cursor\', { description: "Continue from the previous page, as its output says" });'
     )
     expect(list).toContain(
-      'client.calendars.list({ ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }), ...(this.cursor === undefined ? {} : { cursor: this.cursor }) })'
+      'client.calendars.list({ ...(this.pageSize === undefined ? {} : { pageSize: __mactsParseIntegerOption(this.pageSize) }), ...(this.cursor === undefined ? {} : { cursor: this.cursor }) })'
     )
     // The output says how to read the next page when more remain.
     expect(list).toContain('formatter.formatPage(page.items.map(')
