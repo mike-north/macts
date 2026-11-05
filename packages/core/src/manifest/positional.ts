@@ -130,7 +130,12 @@ function commandIssues(manifest: AppManifest, resourceKey: string): PositionalIs
   return issues
 }
 
-/** The issue of an item command of a positional resource whose item parameter is not an integer. */
+/**
+ * The issue of an item command of a positional resource whose item parameter
+ * is missing or is not an integer. Item selection refuses a missing one too,
+ * but only at generation and registration; this rule also holds in the
+ * manifest schema.
+ */
 function positionParameterIssue(
   commandKey: string,
   command: Command,
@@ -138,8 +143,15 @@ function positionParameterIssue(
 ): PositionalIssue | undefined {
   if (!selectsOneItem(command)) return undefined
   const parameter = itemIdentifierParameter(command)
-  // A command that declares no item parameter is refused by item selection.
-  if (parameter === undefined || parameter.type === 'integer') return undefined
+  if (parameter === undefined) {
+    const besides =
+      command.parent === undefined ? '' : ` besides its parent's "${command.parent.parameter}"`
+    return {
+      message: `The ${command.name} command "${commandKey}" selects an item of the positional resource "${resourceKey}" by its zero-based position, so it must declare a required integer item parameter${besides}.`,
+      path: ['commands', commandKey, 'parameters'],
+    }
+  }
+  if (parameter.type === 'integer') return undefined
   const index = command.parameters.indexOf(parameter)
   return {
     message: `The ${command.name} command "${commandKey}" selects an item of the positional resource "${resourceKey}" by its zero-based position, so its item parameter "${parameter.name}" must be of type integer.`,
@@ -150,8 +162,12 @@ function positionParameterIssue(
 /**
  * Every issue with the `positional` markers of a manifest read flattened, in
  * declaration order: a marked resource with a primary identifier, which is
- * found by that identifier instead, and the issues of its commands
- * ({@link commandIssues}). The manifest schema reports them at their paths;
+ * found by that identifier instead, the issues of its commands
+ * ({@link commandIssues}), and any command that records a positional
+ * resource as its parent. A body binds its parent by the parent's identifier
+ * (`recordedParentScope`), and a positional resource has none, so such a
+ * command is refused until native binding supports positional parents. The
+ * manifest schema reports them at their paths;
  * generation and registration refuse by them too ({@link positionalProblems}).
  *
  * @param manifest - The manifest, as validation reads it after flattening.
@@ -169,6 +185,14 @@ export function findPositionalIssues(manifest: AppManifest): PositionalIssue[] {
       continue
     }
     issues.push(...commandIssues(manifest, resourceKey))
+  }
+  for (const [commandKey, command] of Object.entries(manifest.commands)) {
+    const parent = command.parent?.resource
+    if (parent === undefined || !isPositional(manifest, parent)) continue
+    issues.push({
+      message: `The command "${commandKey}" records the positional resource "${parent}" as its parent, but a parent is found by its identifier and "${parent}" has none. Commands under a positional parent are not supported yet.`,
+      path: ['commands', commandKey, 'parent'],
+    })
   }
   return issues
 }
