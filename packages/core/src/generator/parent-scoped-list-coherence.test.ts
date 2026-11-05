@@ -214,6 +214,58 @@ describe('parent-scoped list: Tab.list(windowId) coherence across surfaces', () 
   })
 })
 
+/**
+ * The fixture with the parent-scope param declared `integer`, as iTerm's
+ * window ids are. An integer input travels in the wire form of `Integer` from
+ * `@macts/contracts`, `{ integer: "<decimal>" }`, as the page size already
+ * does; a bare JSON number or string fails the operation's input validation.
+ */
+const integerScoped: AppManifest = {
+  ...manifest,
+  commands: {
+    ...manifest.commands,
+    listTabs: {
+      name: 'list',
+      description: 'List all tabs in a window',
+      scope: 'resource',
+      resourceType: 'Tab',
+      parameters: [
+        {
+          name: PARENT_SCOPE_PARAM,
+          type: 'integer',
+          description: 'Window identifier',
+          required: true,
+        },
+      ],
+      permission: 'browser:tabs:list',
+    },
+  },
+}
+
+describe('parent-scoped list by an integer param: Tab.list(windowId: number)', () => {
+  const integerSdk = generateHttpClientSdk(integerScoped, { packageName: '@macts/test-browser' })
+  const integerCli = generateCliPlugin(integerScoped, {
+    packageName: '@macts/test-browser',
+    sdkPackageName: '@macts/test-browser',
+  })
+
+  it('SDK list() takes a number and sends it in the integer wire form', () => {
+    const tabClient = fileContent(integerSdk.files, 'src/resources/tab.ts')
+    expect(tabClient).toContain(
+      `async list(${PARENT_SCOPE_PARAM}: number, page: { pageSize?: number; cursor?: string } = {}): Promise<Page<Tab>>`
+    )
+    expect(tabClient).toContain(
+      `, ${PARENT_SCOPE_PARAM}: { integer: String(${PARENT_SCOPE_PARAM}) } }`
+    )
+  })
+
+  it('CLI list command converts the --window-id text to a number before calling list()', () => {
+    const cliList = fileContent(integerCli.files, 'src/commands/windows/tabs/list.ts')
+    expect(cliList).toContain(`Option.String('--window-id'`)
+    expect(cliList).toContain(`client.tabs.list(Number(this.${PARENT_SCOPE_PARAM}), {`)
+  })
+})
+
 describe('non-parent-scoped list: Window.list() takes no argument (negative)', () => {
   it('SDK list() signature takes only the page', () => {
     const windowClient = fileContent(sdk.files, 'src/resources/window.ts')

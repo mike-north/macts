@@ -173,8 +173,13 @@ export function generateListCommand(
   const paged = listCommand !== undefined && listOperationPages(listCommand, resource)
   const pageArgument =
     '{ ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }), ...(this.cursor === undefined ? {} : { cursor: this.cursor }) }'
+  // A flag's value is text; an `integer` parameter is converted to the number
+  // the SDK's `list()` takes, as the page size is.
   const listArgs = [
-    ...listRequiredParams.map((p) => `this.${safeParamProperty(p.name, 'list')}`),
+    ...listRequiredParams.map((p) => {
+      const property = `this.${safeParamProperty(p.name, 'list')}`
+      return p.type === 'integer' ? `Number(${property})` : property
+    }),
     ...(paged ? [pageArgument] : []),
   ].join(', ')
   const pageOptions = paged
