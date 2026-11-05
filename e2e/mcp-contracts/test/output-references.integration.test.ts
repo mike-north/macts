@@ -155,7 +155,9 @@ describe('output references in every real contract', () => {
     // audited by hand against the manifests: a Photos folder has a get with no
     // parent and is not identified by its name, and a Chrome or Edge tab is
     // got within its window and read through the window's own record, a
-    // top-level window that claims its id unique. Music BrowserWindow and
+    // top-level window that claims its id unique. An iTerm tab has no id and
+    // is got within its window by its position, so a window's current tab is
+    // an index selector within the window it was read through. Music BrowserWindow and
     // PlaylistWindow `view` and Photos Container `parent` also stay in output,
     // but their resources have neither a get nor a list, so the table carries
     // no record for them. Xcode's WorkspaceDocument `activeScheme` is left
@@ -164,6 +166,7 @@ describe('output references in every real contract', () => {
     expect(positions.sort()).toEqual(
       [
         'google-chrome Window.activeTab → Tab',
+        'iterm Window.currentTab → Tab',
         'microsoft-edge Window.activeTab → Tab',
         'photos Album.parent → Folder',
         'photos Folder.parent → Folder',
@@ -186,12 +189,14 @@ describe('output references in every real contract', () => {
     }
     expect(found).toEqual([])
     // Guards against a vacuous pass: the references above, each on a record
-    // that some operation returns. Chrome gets and lists windows; Edge also
-    // creates one, and returns its record.
+    // that some operation returns. Chrome and iTerm get and list windows; Edge
+    // also creates one, and returns its record.
     expect([...checked].sort()).toEqual(
       [
         'google-chrome.windows.get → Tab',
         'google-chrome.windows.list → Tab',
+        'iterm.windows.get → Tab',
+        'iterm.windows.list → Tab',
         'microsoft-edge.windows.create → Tab',
         'microsoft-edge.windows.get → Tab',
         'microsoft-edge.windows.list → Tab',
