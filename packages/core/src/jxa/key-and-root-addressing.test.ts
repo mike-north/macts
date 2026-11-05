@@ -34,6 +34,7 @@ import { describe, expect, it } from 'vitest'
 import {
   AppOperationError,
   InternalError,
+  PASSTHROUGH_PLAN,
   TargetNotFoundError,
   UnexpectedValueError,
   type ResourcePlanTable,
@@ -841,6 +842,33 @@ describe('references the app reports missing as they are encoded', () => {
     const error = await rejectionOf(listShelved({ location: failing(-1728) }, [a, b]))
     expect(error).toBeInstanceOf(TargetNotFoundError)
     expect(causeMessage(error)).toBe('The app failed. (while reading the property "location")')
+  })
+
+  // The codec returns a passthrough result unchanged, so a marked value
+  // would reach the caller as it is: a body under a passthrough plan marks
+  // nothing, and the values it read come back as read.
+  it('marks nothing under a passthrough plan, returning what it read', async () => {
+    const body = buildNativeBody(
+      manifest,
+      { command: 'getEntry', resource: 'Entry' },
+      {
+        absentValueMarkers: false,
+      }
+    )
+    expect(body).not.toContain('Symbol.for')
+    expect(buildNativeBody(manifest, { command: 'getEntry', resource: 'Entry' })).toContain(
+      'Symbol.for'
+    )
+    const { app } = standInArchive()
+    await expect(
+      execute(
+        app,
+        'getEntry',
+        'Entry',
+        { location: '/a' },
+        { input: inputOf(text(), 'location'), output: PASSTHROUGH_PLAN }
+      )
+    ).resolves.toMatchObject({ location: '/a', shelfMark: 'S1' })
   })
 
   it('names the items when listing them fails after the identifier read across them did', async () => {

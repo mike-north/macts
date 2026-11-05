@@ -1664,8 +1664,11 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
     })
 
     describe('a value whose evidence makes "no such object" its empty value', () => {
-      /** The value a body hands over as one its property's evidence lets read as absent. */
-      const absentAsNull = (value: unknown) => ({ [NATIVE_ABSENT_AS_NULL_KEY]: value })
+      /**
+       * The value a body hands over as one its property's evidence lets read
+       * as absent: an object whose only own property is the registry symbol.
+       */
+      const absentAsNull = (value: unknown) => ({ [Symbol.for(NATIVE_ABSENT_AS_NULL_KEY)]: value })
 
       it('encodes as null at a nullable position when reading its identifier reports no such object (-1728)', () => {
         const app = standInApp()
@@ -1708,6 +1711,42 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
           () => encode(absentAsNull('not an object'), nullable(PERSON_REF), environment(app)),
           { direction: 'encode', path: [], includes: ['Person'] }
         )
+      })
+
+      // Regression: the marker was once a string key that every position
+      // checked, so app data with that key was taken for it. A string key of
+      // any name is ordinary data, and a passthrough value is never inspected.
+      describe('app data that looks like a marker', () => {
+        const lookalikes = [
+          { __mactsAbsentAsNull: 'text' },
+          { [NATIVE_ABSENT_AS_NULL_KEY]: 'text' },
+        ]
+
+        it('encodes an app record with the marker name as a key as an ordinary record under unknown', () => {
+          // D3: a user record travels inside a record envelope.
+          expect(encode({ __mactsAbsentAsNull: 'text' }, UNKNOWN)).toEqual({
+            record: { __mactsAbsentAsNull: 'text' },
+          })
+          expect(encode({ [NATIVE_ABSENT_AS_NULL_KEY]: 'text' }, UNKNOWN)).toEqual({
+            record: { 'macts.absentAsNull': 'text' },
+          })
+        })
+
+        it('returns such a record, and a marked value, unchanged under passthrough', () => {
+          for (const value of [...lookalikes, absentAsNull('text')]) {
+            expect(encode(value, PASSTHROUGH_PLAN)).toBe(value)
+          }
+        })
+
+        it('does not take a string-keyed lookalike at a nullable reference as marked', () => {
+          const app = standInApp()
+          for (const key of ['__mactsAbsentAsNull', NATIVE_ABSENT_AS_NULL_KEY]) {
+            expectCodecError(
+              () => encode({ [key]: unreadable(-1728) }, nullable(PERSON_REF), environment(app)),
+              { direction: 'encode', path: [], includes: ['Person'] }
+            )
+          }
+        })
       })
     })
 

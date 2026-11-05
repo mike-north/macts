@@ -105,7 +105,7 @@ export interface NativeCodecLiterals {
   }
   /** Mirrors `NATIVE_CONTAINED_REFERENCE_KEY`. */
   readonly containedReference: string
-  /** Mirrors `NATIVE_ABSENT_AS_NULL_KEY`. */
+  /** Mirrors `NATIVE_ABSENT_AS_NULL_KEY`: the marker symbol's registry key. */
   readonly absentAsNull: string
   /** Mirrors `ABSENT_VALUE_ERROR_NUMBER`: the app's "no such object". */
   readonly noSuchObject: number
@@ -181,8 +181,14 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   const KEY_REFERENCE = 'reference'
   /** Sole key of a value a body hands over with the record it was read through. */
   const KEY_CONTAINED = '__mactsContainedReference'
-  /** Sole key of a value whose evidence makes the app's "no such object" its empty value. */
-  const KEY_ABSENT_AS_NULL = '__mactsAbsentAsNull'
+  /**
+   * Registry key of the symbol that marks a value whose evidence makes the
+   * app's "no such object" its empty value. A symbol, because no app record
+   * or JSON value can carry one, so no app data is taken for the marker.
+   */
+  const KEY_ABSENT_AS_NULL = 'macts.absentAsNull'
+  /** The marker symbol: the sole own property of a marked value. */
+  const ABSENT_AS_NULL: unique symbol = Symbol.for(KEY_ABSENT_AS_NULL)
   /** The app's "no such object" error number. */
   const NO_SUCH_OBJECT = -1728
   /** Property of an app error that says what was being read when the app failed. */
@@ -1193,8 +1199,21 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   }
 
   /**
-   * Encodes `native`, a value a body handed over as one its property's
-   * evidence lets read as absent. At a nullable position the app reporting no
+   * Whether `native` is a marked value ({@link ABSENT_AS_NULL}): an object
+   * whose only own property is the marker symbol. String keys never match,
+   * so an app record of any shape is not one.
+   */
+  function isAbsentAsNullMarker(native: unknown): native is { readonly [ABSENT_AS_NULL]: unknown } {
+    return (
+      isKeyed(native) &&
+      Object.prototype.hasOwnProperty.call(native, ABSENT_AS_NULL) &&
+      Reflect.ownKeys(native).length === 1
+    )
+  }
+
+  /**
+   * Encodes `native`, the value a marker held, which a body handed over as
+   * one its property's evidence lets read as absent. At a nullable position the app reporting no
    * such object while the value is read (as its identifier is, for a
    * reference) is the empty value, `null`; any other failure is still a
    * failure. At any other position it encodes as an unmarked value.
@@ -1212,13 +1231,13 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
 
   /** Encodes a native value by its plan. */
   function encodeValue(native: unknown, plan: ValuePlan, path: Path, env: Env): unknown {
-    if (soleKey(native) === KEY_ABSENT_AS_NULL && isKeyed(native)) {
-      return encodeAbsentAsNull(native[KEY_ABSENT_AS_NULL], plan, path, env)
+    // A passthrough result is returned as it is, never inspected.
+    if (plan.kind === 'passthrough') return native
+    if (isAbsentAsNullMarker(native)) {
+      return encodeAbsentAsNull(native[ABSENT_AS_NULL], plan, path, env)
     }
     const kind: string = plan.kind
     switch (plan.kind) {
-      case 'passthrough':
-        return native
       case 'none':
         return null
       case 'string':

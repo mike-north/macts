@@ -142,6 +142,18 @@ export interface NativeBodyOptions {
    * would reach the caller as it is. Defaults to `true`.
    */
   readonly containerReferences?: boolean
+  /**
+   * Hand the codec the value of each property whose evidence makes the app's
+   * "no such object" failure its empty value marked as such, so the codec
+   * takes that failure, raised while it reads the value's identity, as `null`
+   * ({@link markAbsentAsNull}).
+   *
+   * Only a body whose result the codec encodes by a typed plan wants this.
+   * Under a passthrough plan the codec returns the result unchanged, so a
+   * marker would reach the caller as it is. A failed read of such a property
+   * is `null` either way. Defaults to `true`.
+   */
+  readonly absentValueMarkers?: boolean
 }
 
 /**
@@ -156,6 +168,8 @@ interface RecordSource {
   readonly resource: Resource | undefined
   /** Whether references to targets got within a record carry it as their container. */
   readonly containerReferences: boolean
+  /** Whether values of absent-as-null properties go to the codec marked. */
+  readonly absentValueMarkers: boolean
 }
 
 /**
@@ -220,6 +234,7 @@ export function planNativeInvocation(
     key: resource === undefined ? undefined : target.resource,
     resource,
     containerReferences: options.containerReferences !== false,
+    absentValueMarkers: options.absentValueMarkers !== false,
   }
   const { body, identifierArguments } = buildResourceBody(
     command,
@@ -413,7 +428,7 @@ function readOutputProperties(
         `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${wrapContained(member('obj', key), 'container', itemLocal)}; }`
     ),
     ...keys
-      .filter((key) => absentAsNull(resource, key))
+      .filter((key) => marksAbsentAsNull(source, key))
       .map(
         (key) =>
           `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${markAbsentAsNull(member('obj', key))}; }`
@@ -424,13 +439,21 @@ function readOutputProperties(
 /**
  * Expression handing `valueExpression`, read for a property whose evidence
  * makes the app's "no such object" failure its empty value ({@link
- * absentAsNull}), to the codec marked as such (`NATIVE_ABSENT_AS_NULL_KEY` in
- * `native-codec.ts`). The app can report the object missing only when the
- * codec reads it (a reference's identifier), so the codec, not the read,
- * takes that failure as `null`. `null` is left as it is.
+ * absentAsNull}), to the codec marked as such: an object whose only own
+ * property is the registry symbol `NATIVE_ABSENT_AS_NULL_KEY` (in
+ * `native-codec.ts`), which no app record can carry. The app can report the
+ * object missing only when the codec reads it (a reference's identifier), so
+ * the codec, not the read, takes that failure as `null`. `null` is left as it
+ * is. A body marks values only when the codec encodes its result by a typed
+ * plan ({@link NativeBodyOptions.absentValueMarkers}).
  */
 function markAbsentAsNull(valueExpression: string): string {
-  return `(function (v) { return v === null ? null : { ${literal(NATIVE_ABSENT_AS_NULL_KEY)}: v }; })(${valueExpression})`
+  return `(function (v) { if (v === null) { return null; } var m = {}; m[Symbol.for(${literal(NATIVE_ABSENT_AS_NULL_KEY)})] = v; return m; })(${valueExpression})`
+}
+
+/** Whether `source` marks the values of property `key` for the codec ({@link markAbsentAsNull}). */
+function marksAbsentAsNull(source: RecordSource, key: string): boolean {
+  return source.absentValueMarkers && absentAsNull(source.resource, key)
 }
 
 /**
@@ -1604,7 +1627,7 @@ function buildListBody(
   const recordFields = bestEffortProps.map((p, index) => {
     const value = `${columnLocal(index)}[i]`
     const held = contained.has(p) ? wrapContained(value, 'containerId', `${IDS_LOCAL}[i]`) : value
-    const marked = absentAsNull(resource, p) ? markAbsentAsNull(held) : held
+    const marked = marksAbsentAsNull(source, p) ? markAbsentAsNull(held) : held
     return `if (${value} !== undefined) { ${member('obj', p)} = ${marked}; }`
   })
   const idField =
@@ -1952,14 +1975,15 @@ export const RESOLUTION_KINDS_ARGUMENT = 'kinds'
  * @param resourceKey - The manifest key of the referenced resource.
  * @param cardinality - Whether one object or a list of objects is read.
  * @param options - Whether references in the records carry their container
- *   (`containerReferences`, as for an operation body).
+ *   (`containerReferences`), and whether absent-as-null values go to the
+ *   codec marked (`absentValueMarkers`), as for an operation body.
  * @throws `InternalError` when the manifest does not declare `resourceKey`.
  */
 export function buildResolutionBody(
   manifest: AppManifest,
   resourceKey: string,
   cardinality: 'one' | 'many',
-  options: Pick<NativeBodyOptions, 'containerReferences'> = {}
+  options: Pick<NativeBodyOptions, 'containerReferences' | 'absentValueMarkers'> = {}
 ): string {
   const resource = Object.hasOwn(manifest.resources, resourceKey)
     ? manifest.resources[resourceKey]
@@ -1971,6 +1995,7 @@ export function buildResolutionBody(
     key: resourceKey,
     resource,
     containerReferences: options.containerReferences !== false,
+    absentValueMarkers: options.absentValueMarkers !== false,
   }
   const kinds = argument(RESOLUTION_KINDS_ARGUMENT)
   const rooted = resource.roots !== undefined

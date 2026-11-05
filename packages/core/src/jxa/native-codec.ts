@@ -59,13 +59,14 @@ export const NATIVE_CODEC_ERROR_NAME = 'MactsCodecError'
  *   reference position becomes an identity reference; one whose resource is
  *   found within a container must come with the record it was read through
  *   ({@link NATIVE_CONTAINED_REFERENCE_KEY}), which becomes its container.
- *   A value a body hands over as one its property's evidence lets read as
- *   absent ({@link NATIVE_ABSENT_AS_NULL_KEY}) encodes as `null` at a
- *   nullable position when the app reports its object missing (-1728) as the
- *   codec reads it.
+ *   A value a body hands over marked as one its property's evidence lets
+ *   read as absent (an object whose only own property is the registry symbol
+ *   {@link NATIVE_ABSENT_AS_NULL_KEY}) encodes as `null` at a nullable
+ *   position when the app reports its object missing (-1728) as the codec
+ *   reads it. A string key of the same name is ordinary data.
  * - `env` is `{ app, references }`. Without it, no reference converts.
  * - Under a `passthrough` plan, both functions return their argument
- *   unchanged.
+ *   unchanged, without inspecting it.
  * - Under a `none` plan, `encode` returns `null` whatever the native result
  *   was, and `decode` returns `undefined`.
  * - When a value violates the plan, either function throws an object whose
@@ -108,11 +109,19 @@ export interface NativeCodec {
 export const NATIVE_CONTAINED_REFERENCE_KEY = '__mactsContainedReference'
 
 /**
- * Sole key of the record a native body hands the codec for a field whose
- * nullability evidence makes the app's "no such object" failure (-1728) the
- * field's empty value (`readsAbsentAsNull`, phases/13 D10). Its value is what
- * the body read for the field, in any form the codec accepts there, including
- * a {@link NATIVE_CONTAINED_REFERENCE_KEY} record.
+ * Global symbol registry key (`Symbol.for`) of the marker a native body hands
+ * the codec for a field whose nullability evidence makes the app's "no such
+ * object" failure (-1728) the field's empty value (`readsAbsentAsNull`,
+ * phases/13 D10). The marker is an object whose only own property is that
+ * symbol, holding what the body read for the field, in any form the codec
+ * accepts there, including a {@link NATIVE_CONTAINED_REFERENCE_KEY} record.
+ *
+ * The key is a registry symbol, not a string, because no app record and no
+ * JSON value can carry a symbol key: the app bridge and JSON produce string
+ * keys only. So an app record that happens to have a key of the same name is
+ * never taken for the marker. A body marks values only for a result the
+ * codec encodes by a typed plan; under a `passthrough` plan the codec returns
+ * its argument unchanged, and a marker would reach the caller as it is.
  *
  * An app can hand back an object it reports missing only when the object is
  * read, which for a reference is when the codec reads its identifier. At a
@@ -121,7 +130,7 @@ export const NATIVE_CONTAINED_REFERENCE_KEY = '__mactsContainedReference'
  * collection, or a read on its own. Any other failure still fails, and at a
  * position that cannot be `null` the value encodes as if it were not marked.
  */
-export const NATIVE_ABSENT_AS_NULL_KEY = '__mactsAbsentAsNull'
+export const NATIVE_ABSENT_AS_NULL_KEY = 'macts.absentAsNull'
 
 /**
  * Property a native body or the codec sets on an app's error, as it lets the
