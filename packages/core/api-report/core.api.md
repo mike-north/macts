@@ -2300,6 +2300,7 @@ export type NativeAddressing = NativeCollectionAddressing | NativeRootAddressing
 
 // @public
 export interface NativeBodyOptions {
+    readonly absentValueMarkers?: boolean;
     readonly containerReferences?: boolean;
     readonly identifierAliases?: boolean;
     readonly paged?: boolean;

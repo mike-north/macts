@@ -198,8 +198,9 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
         identifierAliases: outputPlan.kind === 'passthrough',
         paged: page !== undefined,
         // A passthrough result is not encoded, so nothing would unwrap a
-        // reference handed over with its container.
+        // reference handed over with its container, or a marked value.
         containerReferences: outputPlan.kind !== 'passthrough',
+        absentValueMarkers: outputPlan.kind !== 'passthrough',
       })
       assertRequiredArguments(plan.requiredArguments, input)
       const script: NativeScript = {
@@ -251,6 +252,7 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
         bundleId: manifest.app.bundleId,
         body: buildResolutionBody(manifest, reference.resource, reference.cardinality, {
           containerReferences: outputPlan.kind !== 'passthrough',
+          absentValueMarkers: outputPlan.kind !== 'passthrough',
         }),
         input: resolution.input,
         inputPlan: resolution.inputPlan,
@@ -851,9 +853,10 @@ function describeReportedFailure(
           issues,
         })
   }
-  // The cause says what was being read when the app failed, so a failure
-  // such as "no such object" can be traced to its read. It holds names and
-  // result positions only (NATIVE_READING_KEY), never app data.
+  // The cause is the app's own message, followed by what was being read when
+  // the app failed, so a failure such as "no such object" can be traced to
+  // its read. The added text holds names and result positions only
+  // (NATIVE_READING_KEY), never app data.
   const cause =
     failure.reading === undefined
       ? failure.message

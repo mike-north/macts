@@ -328,6 +328,23 @@ describe('curated absence claims on a resource with a single instance', () => {
     ])
   })
 
+  it('rejects reads without their error numbers, without a failed read, or without when they were observed', () => {
+    const { errorNumbers: _errorNumbers, ...withoutErrorNumbers } = ABSENT_READS
+    const { observedAt: _observedAt, ...withoutObservedAt } = ABSENT_READS
+    const cases = [
+      [withoutErrorNumbers, 'errorNumbers'],
+      [{ ...ABSENT_READS, errorNumbers: [] }, 'errorNumbers'],
+      [{ ...ABSENT_READS, failedReads: 0 }, 'failedReads'],
+      [withoutObservedAt, 'observedAt'],
+    ] as const
+    for (const [absentReads, field] of cases) {
+      const evidence = { ...CURATED, absentReads }
+      expect(issuePaths(ResourceSchema.safeParse(desk({ front: FRONT }, evidence))), field).toEqual(
+        [['properties', 'annex', 'evidence', 'nullable', 'absentReads', field]]
+      )
+    }
+  })
+
   it('rejects recorded failures other than -1728, and a non-null claim', () => {
     for (const errorNumbers of [[-1700], [-1728, -1700], [-1728, -1728]]) {
       const evidence = { ...CURATED, absentReads: { ...ABSENT_READS, errorNumbers } }

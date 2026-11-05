@@ -142,6 +142,18 @@ export interface NativeBodyOptions {
    * would reach the caller as it is. Defaults to `true`.
    */
   readonly containerReferences?: boolean
+  /**
+   * Hand the codec the value of each property whose evidence makes the app's
+   * "no such object" failure its empty value marked as such, so the codec
+   * takes that failure, raised while it reads the value's identity, as `null`
+   * ({@link markAbsentAsNull}).
+   *
+   * Only a body whose result the codec encodes by a typed plan wants this.
+   * Under a passthrough plan the codec returns the result unchanged, so a
+   * marker would reach the caller as it is. A failed read of such a property
+   * is `null` either way. Defaults to `true`.
+   */
+  readonly absentValueMarkers?: boolean
 }
 
 /**
@@ -156,6 +168,8 @@ interface RecordSource {
   readonly resource: Resource | undefined
   /** Whether references to targets got within a record carry it as their container. */
   readonly containerReferences: boolean
+  /** Whether values of absent-as-null properties go to the codec marked. */
+  readonly absentValueMarkers: boolean
 }
 
 /**
@@ -220,6 +234,7 @@ export function planNativeInvocation(
     key: resource === undefined ? undefined : target.resource,
     resource,
     containerReferences: options.containerReferences !== false,
+    absentValueMarkers: options.absentValueMarkers !== false,
   }
   const { body, identifierArguments } = buildResourceBody(
     command,
@@ -358,10 +373,11 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * back an object it reports missing only when the codec reads the object's
  * identifier, so such a property's value goes to the codec marked
  * ({@link markAbsentAsNull}), which takes that failure as `null` too, as a
- * list's rows do. The item's own existence is checked before this read, so a missing item still
- * fails as missing. That holds for a get, a resolved reference and an update's
- * read-back (checked before its writes); a create's read-back needs no check,
- * because the item was just made. A body with no resource reads `name`.
+ * list's rows do. The item's own existence is checked before this read, so a
+ * missing item still fails as missing. That holds for a get, a resolved
+ * reference and an update's read-back (checked before its writes); a
+ * create's read-back needs no check, because the item was just made. A body
+ * with no resource reads `name`.
  *
  * A singleton root's object holds nothing that says which kind it is, so its
  * `kind` is not read from the app: it is set from `kindExpression`, the kind
@@ -413,7 +429,7 @@ function readOutputProperties(
         `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${wrapContained(member('obj', key), 'container', itemLocal)}; }`
     ),
     ...keys
-      .filter((key) => absentAsNull(resource, key))
+      .filter((key) => marksAbsentAsNull(source, key))
       .map(
         (key) =>
           `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${markAbsentAsNull(member('obj', key))}; }`
@@ -424,13 +440,21 @@ function readOutputProperties(
 /**
  * Expression handing `valueExpression`, read for a property whose evidence
  * makes the app's "no such object" failure its empty value ({@link
- * absentAsNull}), to the codec marked as such (`NATIVE_ABSENT_AS_NULL_KEY` in
- * `native-codec.ts`). The app can report the object missing only when the
- * codec reads it (a reference's identifier), so the codec, not the read,
- * takes that failure as `null`. `null` is left as it is.
+ * absentAsNull}), to the codec marked as such: an object whose only own
+ * property is the registry symbol `NATIVE_ABSENT_AS_NULL_KEY` (in
+ * `native-codec.ts`), which no app record can carry. The app can report the
+ * object missing only when the codec reads it (a reference's identifier), so
+ * the codec, not the read, takes that failure as `null`. `null` is left as it
+ * is. A body marks values only when the codec encodes its result by a typed
+ * plan ({@link NativeBodyOptions.absentValueMarkers}).
  */
 function markAbsentAsNull(valueExpression: string): string {
-  return `(function (v) { return v === null ? null : { ${literal(NATIVE_ABSENT_AS_NULL_KEY)}: v }; })(${valueExpression})`
+  return `(function (v) { if (v === null) { return null; } var m = {}; m[Symbol.for(${literal(NATIVE_ABSENT_AS_NULL_KEY)})] = v; return m; })(${valueExpression})`
+}
+
+/** Whether `source` marks the values of property `key` for the codec ({@link markAbsentAsNull}). */
+function marksAbsentAsNull(source: RecordSource, key: string): boolean {
+  return source.absentValueMarkers && absentAsNull(source.resource, key)
 }
 
 /**
@@ -451,7 +475,9 @@ function absentAsNull(resource: Resource | undefined, key: string): boolean {
  * to the codec together with that record as its container: the record's item
  * (`how` is `container`), or its identifier already read (`containerId`).
  * The codec reads the target's id from the value and encodes the container in
- * the same request (`NATIVE_CONTAINED_REFERENCE_KEY` in `native-codec.ts`).
+ * the same request. The value is handed over marked: an object whose only own
+ * property is the registry symbol `NATIVE_CONTAINED_REFERENCE_KEY` (in
+ * `native-codec.ts`), which no app record can carry.
  *
  * `null`, the app's missing value, is left as it is, so a nullable field
  * holds `null`; a list is handed over item by item. The expression uses only
@@ -462,9 +488,8 @@ function wrapContained(
   how: 'container' | 'containerId',
   containerExpression: string
 ): string {
-  const wrap = (value: string): string =>
-    `{ ${literal(NATIVE_CONTAINED_REFERENCE_KEY)}: { value: ${value}, ${how}: ${containerExpression} } }`
-  return `(function (v) { return v === null ? null : Array.isArray(v) ? v.map(function (e) { return e === null ? null : ${wrap('e')}; }) : ${wrap('v')}; })(${valueExpression})`
+  const held = `function held(e) { var m = {}; m[Symbol.for(${literal(NATIVE_CONTAINED_REFERENCE_KEY)})] = { value: e, ${how}: ${containerExpression} }; return m; }`
+  return `(function (v) { ${held} return v === null ? null : Array.isArray(v) ? v.map(function (e) { return e === null ? null : held(e); }) : held(v); })(${valueExpression})`
 }
 
 /**
@@ -1072,14 +1097,14 @@ const COLLECTION_CHANGED_MESSAGE =
  * - `communicationFailed(e)` tells whether a thrown error is one of
  *   {@link COMMUNICATION_FAILURE_ERROR_NUMBERS}: the request failed, so no
  *   guard or fallback may absorb it.
- * - `readEach(list, name, guarded, absentAsNull)` reads one property of
- *   every item of `list`, one request per item. A guarded read the item
+ * - `readEach(what, list, name, guarded, absentAsNull)` reads one property
+ *   of every item of `list`, one request per item. A guarded read the item
  *   cannot answer leaves `undefined` at its position, so the record omits
  *   that property, unless `absentAsNull` is `true` and the read failed with
  *   "no such object": that is the property's empty value (see
  *   {@link absentAsNull}), so `null` is left there. An unguarded failure, or
- *   a communication failure, fails the list; an unguarded one notes the
- *   property it was reading. `absentAsNull` may be left out.
+ *   a communication failure, fails the list; an unguarded one notes `what`
+ *   was being read. `absentAsNull` may be left out.
  * - `readColumn(what, name, absentAsNull)` reads one property across the
  *   items in one request. When that request fails other than by a
  *   communication failure, it falls back to `readEach` with every read
@@ -1123,7 +1148,7 @@ function listReadHelpers(): string {
     '  if (items === null) { items = aligned("the items", listItems()); }',
     '  return items;',
     '}',
-    'function readEach(list, name, guarded, absentAsNull) {',
+    'function readEach(what, list, name, guarded, absentAsNull) {',
     '  var values = [];',
     '  for (var i = 0; i < list.length; i++) {',
     '    if (guarded) {',
@@ -1132,7 +1157,7 @@ function listReadHelpers(): string {
     `        values.push(absentAsNull === true && e && e.errorNumber === ${String(NO_SUCH_OBJECT_ERROR_NUMBER)} ? null : undefined);`,
     '      }',
     '    } else {',
-    '      try { values.push(list[i][name]()); } catch (e) { throw noteReading(e, "the property " + JSON.stringify(name)); }',
+    '      try { values.push(list[i][name]()); } catch (e) { throw noteReading(e, what); }',
     '    }',
     '  }',
     '  return values;',
@@ -1141,7 +1166,7 @@ function listReadHelpers(): string {
     '  var values;',
     `  try { values = ${COLLECTION_LOCAL}[name](); } catch (e) {`,
     '    if (communicationFailed(e)) { throw e; }',
-    '    return readEach(itemList(), name, true, absentAsNull);',
+    '    return readEach(what, itemList(), name, true, absentAsNull);',
     '  }',
     '  return aligned(what, values);',
     '}'
@@ -1149,8 +1174,18 @@ function listReadHelpers(): string {
 }
 
 /**
+ * The runtime identifier a list body reads: its manifest name (`name`), by
+ * which a failed read is noted, and the app's name for it (`native`), by
+ * which it is read.
+ */
+interface ListIdentifier {
+  readonly name: string
+  readonly native: string
+}
+
+/**
  * Statements declaring `readIdentifiers()`, which reads the runtime
- * identifier `nativeIdName` of every item {@link COLLECTION_LOCAL} addresses,
+ * identifier `identifier` of every item {@link COLLECTION_LOCAL} addresses,
  * in item order.
  *
  * The identifier read is never guarded. When the read across the items fails
@@ -1160,16 +1195,16 @@ function listReadHelpers(): string {
  * rather than returning records with no usable id. The listed specifiers
  * become the attempt's item list.
  */
-function identifierReader(nativeIdName: string): string {
+function identifierReader(identifier: ListIdentifier): string {
   return lines(
     'function readIdentifiers() {',
     '  var values;',
-    `  try { values = ${member(COLLECTION_LOCAL, nativeIdName)}(); } catch (e) {`,
+    `  try { values = ${member(COLLECTION_LOCAL, identifier.native)}(); } catch (e) {`,
     '    if (communicationFailed(e)) { throw e; }',
     '    var list = listItems();',
     '    if (!Array.isArray(list)) { unassemblable("Listing the items gave no list, so the records cannot be assembled."); }',
     '    items = list;',
-    `    return readEach(list, ${literal(nativeIdName)}, false);`,
+    `    return readEach(${literal(`the property "${identifier.name}"`)}, list, ${literal(identifier.native)}, false);`,
     '  }',
     '  if (!Array.isArray(values)) { unassemblable("Reading the identifiers gave no list, so the records cannot be assembled."); }',
     '  return values;',
@@ -1238,8 +1273,11 @@ function sameIdentifiersHelper(): string {
  * per-item reads lists the items afresh rather than reusing a list from an
  * attempt that saw a different collection.
  */
-function attemptReader(nativeIdName: string | undefined, columnReads: readonly string[]): string {
-  if (nativeIdName === undefined) {
+function attemptReader(
+  identifier: ListIdentifier | undefined,
+  columnReads: readonly string[]
+): string {
+  if (identifier === undefined) {
     return lines(
       'function readAll() {',
       '  items = null;',
@@ -1250,7 +1288,7 @@ function attemptReader(nativeIdName: string | undefined, columnReads: readonly s
     )
   }
   return lines(
-    identifierReader(nativeIdName),
+    identifierReader(identifier),
     sameIdentifiersHelper(),
     'function readAll() {',
     '  items = null;',
@@ -1286,7 +1324,7 @@ function attemptReader(nativeIdName: string | undefined, columnReads: readonly s
  * `0 <= offset < end <= length`.
  */
 function pagedAttemptReader(
-  nativeIdName: string,
+  identifier: ListIdentifier,
   columnLocals: readonly string[],
   columnReads: readonly string[],
   read: PageRead
@@ -1294,10 +1332,10 @@ function pagedAttemptReader(
   const offset = `${PAGE_PARAMETER}.offset`
   const anchorRead =
     read === 'range'
-      ? `${member(`window(${offset} - 1, ${offset})`, nativeIdName)}()`
-      : `within(${member(WHOLE_LOCAL, nativeIdName)}(), ${offset} - 1, ${offset})`
+      ? `${member(`window(${offset} - 1, ${offset})`, identifier.native)}()`
+      : `within(${member(WHOLE_LOCAL, identifier.native)}(), ${offset} - 1, ${offset})`
   return lines(
-    identifierReader(nativeIdName),
+    identifierReader(identifier),
     sameIdentifiersHelper(),
     read === 'range'
       ? rangeWindowReader(columnReads)
@@ -1604,7 +1642,7 @@ function buildListBody(
   const recordFields = bestEffortProps.map((p, index) => {
     const value = `${columnLocal(index)}[i]`
     const held = contained.has(p) ? wrapContained(value, 'containerId', `${IDS_LOCAL}[i]`) : value
-    const marked = absentAsNull(resource, p) ? markAbsentAsNull(held) : held
+    const marked = marksAbsentAsNull(source, p) ? markAbsentAsNull(held) : held
     return `if (${value} !== undefined) { ${member('obj', p)} = ${marked}; }`
   })
   const idField =
@@ -1634,9 +1672,12 @@ function buildListBody(
     collectionExpression = member(PARENT_LOCAL, resourcePlural)
   }
 
-  const nativeIdName = runtimeIdProperty === undefined ? undefined : native(runtimeIdProperty)
-  const pagedIdName = paged ? nativeIdName : undefined
-  const pageRead = pagedIdName === undefined ? undefined : pageReadOf(resource)
+  const identifier: ListIdentifier | undefined =
+    runtimeIdProperty === undefined
+      ? undefined
+      : { name: runtimeIdProperty, native: native(runtimeIdProperty) }
+  const pagedIdentifier = paged ? identifier : undefined
+  const pageRead = pagedIdentifier === undefined ? undefined : pageReadOf(resource)
   const body = lines(
     parentBinding,
     pageRead === undefined
@@ -1652,10 +1693,10 @@ function buildListBody(
       ? ''
       : `var ${bestEffortProps.map((_p, index) => columnLocal(index)).join(', ')};`,
     listReadHelpers(),
-    pagedIdName === undefined || pageRead === undefined
-      ? attemptReader(nativeIdName, columnReads)
+    pagedIdentifier === undefined || pageRead === undefined
+      ? attemptReader(identifier, columnReads)
       : pagedAttemptReader(
-          pagedIdName,
+          pagedIdentifier,
           bestEffortProps.map((_p, index) => columnLocal(index)),
           columnReads,
           pageRead
@@ -1669,7 +1710,7 @@ function buildListBody(
     idAlias,
     'result.push(obj);',
     '}',
-    pagedIdName === undefined
+    pagedIdentifier === undefined
       ? 'return result;'
       : lines(
           `var windowResult = { items: result, length: ${LENGTH_LOCAL} };`,
@@ -1952,14 +1993,15 @@ export const RESOLUTION_KINDS_ARGUMENT = 'kinds'
  * @param resourceKey - The manifest key of the referenced resource.
  * @param cardinality - Whether one object or a list of objects is read.
  * @param options - Whether references in the records carry their container
- *   (`containerReferences`, as for an operation body).
+ *   (`containerReferences`), and whether absent-as-null values go to the
+ *   codec marked (`absentValueMarkers`), as for an operation body.
  * @throws `InternalError` when the manifest does not declare `resourceKey`.
  */
 export function buildResolutionBody(
   manifest: AppManifest,
   resourceKey: string,
   cardinality: 'one' | 'many',
-  options: Pick<NativeBodyOptions, 'containerReferences'> = {}
+  options: Pick<NativeBodyOptions, 'containerReferences' | 'absentValueMarkers'> = {}
 ): string {
   const resource = Object.hasOwn(manifest.resources, resourceKey)
     ? manifest.resources[resourceKey]
@@ -1971,6 +2013,7 @@ export function buildResolutionBody(
     key: resourceKey,
     resource,
     containerReferences: options.containerReferences !== false,
+    absentValueMarkers: options.absentValueMarkers !== false,
   }
   const kinds = argument(RESOLUTION_KINDS_ARGUMENT)
   const rooted = resource.roots !== undefined
