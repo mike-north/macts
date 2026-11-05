@@ -196,10 +196,12 @@ describe('a generated CLI resource command', () => {
   })
 
   // The item is found as the get finds it, matched on a persistent ID nothing
-  // claims unique, so the help says the first match is used.
-  it("adds the resource's first-match sentence to its help", () => {
+  // claims unique, within its playlist, which is matched the same way, so the
+  // help says the first match is used for each: the item's sentence, then the
+  // parent's (phases/13 D10, identifier targeting).
+  it("adds the item's and the parent's first-match sentences to its help", () => {
     expect(command('playlists/tracks/refresh.ts')).toContain(
-      'description: "refresh a track. When several tracks share the same persistent ID, the first match in the app\'s order is used, and the operation does not fail as ambiguous.",'
+      'description: "refresh a track. When several tracks share the same persistent ID, the first match in the app\'s order is used, and the operation does not fail as ambiguous. When several playlists share the same persistent ID, the first match in the app\'s order is used as the playlist.",'
     )
   })
 })

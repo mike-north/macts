@@ -75,7 +75,8 @@ import {
   createInputFields,
   findCrudCommand,
   firstMatchNote,
-  resourceCommandNote,
+  parentFirstMatchNote,
+  resourceCommandNotes,
   identifierWords,
   isCrudName,
   listMethodParameters,
@@ -1173,7 +1174,7 @@ class ContractBuilder {
       const get = crud('get')
       if (get) methods.push(this.#getMethod(resource, ...get))
       const create = crud('create')
-      if (create) methods.push(this.#createMethod(resourceKey, resource, create[1]))
+      if (create) methods.push(this.#createMethod(resourceKey, resource, ...create))
       const update = crud('update')
       if (update) methods.push(this.#updateMethod(resourceKey, resource, ...update))
       const remove = crud('delete')
@@ -1217,7 +1218,10 @@ class ContractBuilder {
     if (!paged) {
       return {
         name: 'list',
-        doc: `List ${identifierWords(resource.plural)}, as one page holding all of them.`,
+        doc: this.#withFirstMatchNotes(
+          `List ${identifierWords(resource.plural)}, as one page holding all of them.`,
+          command
+        ),
         params,
         returnType,
         operation,
@@ -1227,7 +1231,10 @@ class ContractBuilder {
     const page = uniqueName('page', new Set(params.map((param) => param.binding)))
     return {
       name: 'list',
-      doc: `List ${identifierWords(resource.plural)}, one page at a time.`,
+      doc: this.#withFirstMatchNotes(
+        `List ${identifierWords(resource.plural)}, one page at a time.`,
+        command
+      ),
       params: [
         ...params,
         {
@@ -1245,6 +1252,19 @@ class ContractBuilder {
     }
   }
 
+  /**
+   * A CRUD method's doc, followed by its first-match sentences: the item's
+   * ({@link firstMatchNote}), when `item` is the resource the method selects
+   * one item of, then the parent's ({@link parentFirstMatchNote}).
+   */
+  #withFirstMatchNotes(doc: string, command: Command, item?: Resource): string {
+    const notes = [
+      item === undefined ? undefined : firstMatchNote(item),
+      parentFirstMatchNote(command, this.#manifest),
+    ].filter((note): note is string => note !== undefined)
+    return [doc, ...notes].join(' ')
+  }
+
   #identified(resource: Resource, command: Command): { fields: FieldModel[]; phrase: string } {
     const fields = this.#identifierFields(command)
     const { parentParam, childParam } = resolveIdParams(command)
@@ -1259,7 +1279,7 @@ class ContractBuilder {
     const { fields, phrase } = this.#identified(resource, command)
     return {
       name: 'get',
-      doc: withFirstMatchNote(`Read ${phrase}.`, resource),
+      doc: this.#withFirstMatchNotes(`Read ${phrase}.`, command, resource),
       params: this.#positional(fields),
       returnType: resource.name,
       operation,
@@ -1267,10 +1287,18 @@ class ContractBuilder {
     }
   }
 
-  #createMethod(resourceKey: string, resource: Resource, operation: OperationModel): MethodModel {
+  #createMethod(
+    resourceKey: string,
+    resource: Resource,
+    command: Command,
+    operation: OperationModel
+  ): MethodModel {
     return {
       name: 'create',
-      doc: `Create ${withArticle(identifierWords(resource.name))}.`,
+      doc: this.#withFirstMatchNotes(
+        `Create ${withArticle(identifierWords(resource.name))}.`,
+        command
+      ),
       params: [{ binding: 'input', type: `${resourceKey}CreateInput`, optional: false }],
       returnType: resource.name,
       operation,
@@ -1289,7 +1317,11 @@ class ContractBuilder {
     const input = uniqueName('input', new Set(params.map((param) => param.binding)))
     return {
       name: 'update',
-      doc: withFirstMatchNote(`Update ${phrase}. Omitted fields are left unchanged.`, resource),
+      doc: this.#withFirstMatchNotes(
+        `Update ${phrase}. Omitted fields are left unchanged.`,
+        command,
+        resource
+      ),
       params: [...params, { binding: input, type: `${resourceKey}UpdateInput`, optional: false }],
       returnType: resource.name,
       operation,
@@ -1301,7 +1333,7 @@ class ContractBuilder {
     const { fields, phrase } = this.#identified(resource, command)
     return {
       name: 'delete',
-      doc: withFirstMatchNote(`Delete ${phrase}.`, resource),
+      doc: this.#withFirstMatchNotes(`Delete ${phrase}.`, command, resource),
       params: this.#positional(fields),
       returnType: 'void',
       operation,
@@ -1312,8 +1344,8 @@ class ContractBuilder {
   /**
    * A method for an app command or a resource command that is not a CRUD
    * shape. A resource command's item is selected as a get selects it, so its
-   * doc carries the resource's first-match sentence too, or, for a known gap
-   * that sends no item, the sentence saying so (`resourceCommandNote`).
+   * doc carries the first-match sentences a get's does, or, for a known gap
+   * that sends no item, the sentence saying so (`resourceCommandNotes`).
    */
   #commandMethod(command: Command, operation: OperationModel, resource?: Resource): MethodModel {
     // The method takes exactly the fields of its operation's input, so a
@@ -1326,10 +1358,10 @@ class ContractBuilder {
     const output = operation.output
     return {
       name: safeIdentifier(command.name),
-      doc: withNote(
+      doc: [
         command.description,
-        resource === undefined ? undefined : resourceCommandNote(command, resource)
-      ),
+        ...(resource === undefined ? [] : resourceCommandNotes(command, resource, this.#manifest)),
+      ].join(' '),
       params: signature.map(({ parameter, bindingName, optional }) => {
         const field = this.#parameterField(parameter)
         return {
@@ -2065,19 +2097,6 @@ function docComment(text: string, indent: string): string {
   const width = DOC_WIDTH - indent.length - ' * '.length
   const lines = escaped.split(/\r?\n/).flatMap((line) => wrap(line, width))
   return `${indent}/**\n${lines.map((line) => `${indent} * ${line}`.trimEnd()).join('\n')}\n${indent} */\n`
-}
-
-/**
- * The doc of a get, update or delete method, followed by the resource's
- * first-match sentence ({@link firstMatchNote}) when it has one.
- */
-function withFirstMatchNote(doc: string, resource: Resource): string {
-  return withNote(doc, firstMatchNote(resource))
-}
-
-/** A method's doc, followed by `note` when there is one. */
-function withNote(doc: string, note: string | undefined): string {
-  return note === undefined ? doc : `${doc} ${note}`
 }
 
 /** Break `line` into lines of at most `width` characters, at spaces. */

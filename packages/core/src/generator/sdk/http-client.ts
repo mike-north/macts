@@ -28,10 +28,11 @@ import {
   findCrudCommand,
   generationRefusals,
   firstMatchNote,
-  resourceCommandNote,
+  resourceCommandNotes,
   identifierWords,
   isCrudName,
   listMethodParameters,
+  parentFirstMatchNote,
   resolveIdParams,
   resourceCommandEntries,
   resourceHasOperations,
@@ -684,7 +685,7 @@ function generateResourceClient(
       generateResourceCommandMethod(
         commandRouteSegment(key, cmd),
         cmd,
-        resourceCommandNote(cmd, resource)
+        resourceCommandNotes(cmd, resource, manifest)
       )
     )
     .join('\n')
@@ -723,6 +724,13 @@ function generateResourceClient(
   }
 
   const pagingNames = pagingTypeNames(manifest)
+  // The first-match sentences of an operation: the item's, for one that
+  // selects an item, then its parent's.
+  const notesOf = (command: Command, selectsItem: boolean): string[] =>
+    [
+      selectsItem ? firstMatchNote(resource) : undefined,
+      parentFirstMatchNote(command, manifest),
+    ].filter((note): note is string => note !== undefined)
   const crudMethods = [
     listCmd
       ? generateListMethod(
@@ -731,7 +739,8 @@ function generateResourceClient(
           resourceName,
           pluralWords,
           listOperationPages(listCmd[1], resource),
-          pagingNames
+          pagingNames,
+          notesOf(listCmd[1], false)
         )
       : '',
     getCmd
@@ -740,7 +749,7 @@ function generateResourceClient(
           getCmd[1],
           resourceName,
           nameWords,
-          firstMatchNote(resource)
+          notesOf(getCmd[1], true)
         )
       : '',
     createCmd
@@ -748,7 +757,8 @@ function generateResourceClient(
           commandRouteSegment(...createCmd),
           createCmd[1],
           resourceName,
-          nameWords
+          nameWords,
+          notesOf(createCmd[1], false)
         )
       : '',
     updateCmd
@@ -757,7 +767,7 @@ function generateResourceClient(
           updateCmd[1],
           resourceName,
           nameWords,
-          firstMatchNote(resource)
+          notesOf(updateCmd[1], true)
         )
       : '',
     deleteCmd
@@ -765,7 +775,7 @@ function generateResourceClient(
           commandRouteSegment(...deleteCmd),
           deleteCmd[1],
           nameWords,
-          firstMatchNote(resource)
+          notesOf(deleteCmd[1], true)
         )
       : '',
   ]
@@ -873,7 +883,8 @@ function generateListMethod(
   resourceName: string,
   pluralWords: string,
   paged: boolean,
-  pagingNames: { readonly page: string }
+  pagingNames: { readonly page: string },
+  notes: readonly string[]
 ): string {
   const requiredParams = listMethodParameters(command)
   const page = uniquePageBinding(requiredParams.map((p) => safeIdentifier(p.name)))
@@ -909,7 +920,7 @@ function generateListMethod(
 
   return `
   /**
-${doc}
+${doc}${docNoteLines(notes)}
    */
   async list(${params.join(', ')}): Promise<${returnType}> {
     return this.#http.rpc<${returnType}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`${bodyArg});
@@ -930,12 +941,13 @@ function uniquePageBinding(taken: readonly string[]): string {
 }
 
 /**
- * The doc comment line a method that acts on one item (a get, update or
- * delete, or a resource command) adds for `note` ({@link firstMatchNote}), or
- * nothing when there is none.
+ * The doc comment lines a method that acts on one item, or within a parent,
+ * adds for its `notes` ({@link firstMatchNote}, {@link parentFirstMatchNote},
+ * or a resource command's {@link resourceCommandNotes}), one per note, or
+ * nothing when there are none.
  */
-function docNoteLine(note: string | undefined): string {
-  return note === undefined ? '' : `\n   * ${note}`
+function docNoteLines(notes: readonly string[]): string {
+  return notes.map((note) => `\n   * ${note}`).join('')
 }
 
 /**
@@ -951,10 +963,10 @@ function generateGetMethod(
   command: Command,
   resourceName: string,
   nameWords: string,
-  note: string | undefined
+  notes: readonly string[]
 ): string {
   const { parentParam, childParam } = resolveIdParams(command)
-  const noteLine = docNoteLine(note)
+  const noteLine = docNoteLines(notes)
   if (parentParam !== undefined) {
     return `
   /**
@@ -988,11 +1000,12 @@ function generateCreateMethod(
   routeSegment: string,
   _command: Command,
   resourceName: string,
-  nameWords: string
+  nameWords: string,
+  notes: readonly string[]
 ): string {
   return `
   /**
-   * Create a new ${nameWords}.
+   * Create a new ${nameWords}.${docNoteLines(notes)}
    */
   async create(input: ${resourceName}CreateInput): Promise<${resourceName}> {
     return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, input);
@@ -1014,10 +1027,10 @@ function generateUpdateMethod(
   command: Command,
   resourceName: string,
   nameWords: string,
-  note: string | undefined
+  notes: readonly string[]
 ): string {
   const { parentParam, childParam } = resolveIdParams(command)
-  const noteLine = docNoteLine(note)
+  const noteLine = docNoteLines(notes)
   if (parentParam !== undefined) {
     return `
   /**
@@ -1053,10 +1066,10 @@ function generateDeleteMethod(
   routeSegment: string,
   command: Command,
   nameWords: string,
-  note: string | undefined
+  notes: readonly string[]
 ): string {
   const { parentParam, childParam } = resolveIdParams(command)
-  const noteLine = docNoteLine(note)
+  const noteLine = docNoteLines(notes)
   if (parentParam !== undefined) {
     return `
   /**
@@ -1111,7 +1124,7 @@ function buildParamsAndBody(command: Command): { signature: string; bodyArg: str
 function generateResourceCommandMethod(
   routeSegment: string,
   cmd: Command,
-  note: string | undefined
+  notes: readonly string[]
 ): string {
   // Skip standard CRUD commands as they're already generated
   if (isCrudName(cmd.name)) {
@@ -1130,7 +1143,7 @@ function generateResourceCommandMethod(
 
   return `
   /**
-   * ${cmd.description}${docNoteLine(note)}
+   * ${cmd.description}${docNoteLines(notes)}
    */
   async ${safeIdentifier(cmd.name)}(${signature}): Promise<${returnType}> {
     ${rpcCall}

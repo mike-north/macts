@@ -23,6 +23,7 @@ export class RunDestinationResourceClient {
 
   /**
    * List the run destinations of one workspace document, as one page.
+   * When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
    */
   async list(workspaceName: string): Promise<Page<RunDestination>> {
     return this.#http.rpc<Page<RunDestination>>(`${this.#app}.${this.#resource}.list`, {
@@ -33,6 +34,7 @@ export class RunDestinationResourceClient {
   /**
    * Get a run destination by name within a parent scope.
    * When several run destinations share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
+   * When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
    */
   async get(workspaceName: string, name: string): Promise<RunDestination> {
     return this.#http.rpc<RunDestination>(`${this.#app}.${this.#resource}.get`, {

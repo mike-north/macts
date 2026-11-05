@@ -23,6 +23,7 @@ export class AutomatorActionResourceClient {
 
   /**
    * List the automator actions of one workflow, as one page.
+   * When several workflows share the same name, the first match in the app's order is used as the workflow.
    */
   async list(workflowName: string): Promise<Page<AutomatorAction>> {
     return this.#http.rpc<Page<AutomatorAction>>(`${this.#app}.${this.#resource}.list`, {

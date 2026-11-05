@@ -17,8 +17,9 @@ import {
   commandMethodParameters,
   firstMatchNote,
   identifierWords,
+  parentFirstMatchNote,
   resolveIdParams,
-  resourceCommandNote,
+  resourceCommandNotes,
   resourceNamespace,
   safeIdentifier,
   withArticle,
@@ -88,6 +89,19 @@ function identifierPositional(property: string, identifier: string | undefined):
   return identifier === undefined
     ? `  ${property} = Option.String({ required: true });`
     : `  ${property} = Option.String({ name: '${toKebabCase(identifier)}', required: true });`
+}
+
+/**
+ * The `description` value of a generated command's usage: the summary, then
+ * any first-match sentences ({@link firstMatchNote},
+ * {@link parentFirstMatchNote}) for a lookup that can reach several items.
+ * With no sentence it stays the single-quoted summary.
+ */
+function usageDescription(summary: string, notes: readonly (string | undefined)[]): string {
+  const present = notes.filter((note): note is string => note !== undefined)
+  return present.length === 0
+    ? `'${summary}'`
+    : JSON.stringify([`${summary}.`, ...present].join(' '))
 }
 
 /**
@@ -190,6 +204,9 @@ export function generateListCommand(
     : ''
   const format = paged ? 'formatPage' : 'formatList'
   const formatTail = paged ? ', page.nextCursor' : ''
+  const description = usageDescription(`List ${identifierWords(resource.plural)}`, [
+    listCommand === undefined ? undefined : parentFirstMatchNote(listCommand, ctx.manifest),
+  ])
 
   const content = `import { Command, Option } from 'clipanion';
 import { getClient } from '${sdkImportPath}';
@@ -202,7 +219,7 @@ export class List${resource.plural}Command extends Command {
   static override paths = [[${cliPath.map((p) => JSON.stringify(p)).join(', ')}]];
 
   static override usage = Command.Usage({
-    description: 'List ${identifierWords(resource.plural)}',
+    description: ${description},
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
@@ -276,6 +293,10 @@ export function generateCreateCommand(
   // Build create input object
   const createInput = generateCreateInput(resource, omitted)
 
+  const description = usageDescription(`Create a new ${identifierWords(resource.name)}`, [
+    createCommand === undefined ? undefined : parentFirstMatchNote(createCommand, ctx.manifest),
+  ])
+
   const needsTypanion = propertyFlags.includes('t.isEnum')
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
 import { getClient } from '${sdkImportPath}';
@@ -288,7 +309,7 @@ export class Create${resource.name}Command extends Command {
   static override paths = [[${cliPath.map((p) => JSON.stringify(p)).join(', ')}]];
 
   static override usage = Command.Usage({
-    description: 'Create a new ${identifierWords(resource.name)}',
+    description: ${description},
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
@@ -367,10 +388,12 @@ export function generateGetCommand(
   const parentOptions = generateListParamOptions(parentScopeParams)
   const identifier = addressingIdentifier(resource, getCommand)
   const summary = `Get ${withArticle(identifierWords(resource.name))} by ${identifierProse(identifier)}`
-  // The usage description adds the first-match sentence for a resource
-  // matched on a property that is not claimed unique.
-  const note = firstMatchNote(resource)
-  const description = note === undefined ? summary : `${summary}. ${note}`
+  // The usage description adds the first-match sentences for an item, and a
+  // parent, matched on a property that is not claimed unique.
+  const description = usageDescription(summary, [
+    firstMatchNote(resource),
+    parentFirstMatchNote(getCommand, ctx.manifest),
+  ])
 
   const content = `import { Command, Option } from 'clipanion';
 import { getClient } from '${sdkImportPath}';
@@ -383,7 +406,7 @@ export class Get${resource.name}Command extends Command {
   static override paths = [[${cliPath.map((p) => JSON.stringify(p)).join(', ')}]];
 
   static override usage = Command.Usage({
-    description: ${note === undefined ? `'${summary}'` : JSON.stringify(description)},
+    description: ${description},
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
@@ -505,16 +528,13 @@ ${paramFlags}
 
 /**
  * Generate a resource-level command (like "show", "build", "send"): a command
- * that acts on one item of its resource, selected as a get selects it.
+ * that acts on one item of its resource, selected as a get selects it
+ * ({@link itemCommandInputs}).
  *
- * It asks only for the inputs the operation uses, in the SDK method's order
- * (`commandMethodParameters`): a flag for the parent's identifier when the
- * command records a parent, one positional argument for the item's
- * identifier (the command's identifier parameter, `resolveIdParams`), and a
- * flag for each other declared parameter. The positional is labelled with
- * the identifier a get takes, as the get command's is. Nothing comes from the
- * resource's place in the hierarchy: a parent the command does not record has
- * no flag.
+ * The usage description adds the sentences the SDK and contract docs add
+ * (`resourceCommandNotes`): for a resource or parent matched on a property
+ * that is not claimed unique, the first-match sentences a get's has, or, for
+ * a known gap, the sentence saying the item is not sent.
  */
 export function generateResourceCommand(
   cmd: ManifestCommand,
@@ -535,49 +555,13 @@ export function generateResourceCommand(
   const cmdNameKebab = toKebabCase(cmd.name)
   const cliPath = [appName, ...hierarchyPath.path, cmdNameKebab]
 
-  // Inputs left out because they admit no value have no flag, no positional
-  // and no position in the SDK call.
-  const omitted = ctx.omittedInputs(cmd, hierarchyPath.resourceName)
-  // A known gap declares no item, so it has no positional.
-  const childParam = itemIdentifierParameter(cmd)?.name
-  const flagProperties = new Set(
-    cmd.parameters
-      .filter((p) => p.name !== childParam)
-      .map((p) => safeParamProperty(p.name, cmd.name))
-  )
-  const itemProperty = uniqueProperty(`${toCamelCase(resource.name)}Id`, flagProperties)
-  const signature = commandMethodParameters(cmd).signature.filter(
-    ({ parameter }) => !omitted.has(parameter.name)
-  )
-  const getCommand = ctx
-    .getResourceCommands(hierarchyPath.resourceName)
-    .find((c) => c.name === 'get')
-  const inputs = signature
-    .map(({ parameter }) =>
-      parameter.name === childParam
-        ? identifierPositional(itemProperty, addressingIdentifier(resource, getCommand))
-        : generateParameterFlag(parameter, ctx, cmd.name)
-    )
-    .join('\n')
-  // Each argument is asserted to the SDK method's exact parameter type. CLI
-  // inputs surface values as broad primitives (string/boolean), which may not
-  // structurally overlap the SDK's narrower types (enums, Date, number,
-  // arrays), so the assertion goes via `unknown`; the RPC layer validates and
-  // coerces the value at run time.
   const methodRef = `client.${resourceAccess}.${safeIdentifier(cmd.name)}`
-  const methodArgs = signature
-    .map(({ parameter }, i) => {
-      const property =
-        parameter.name === childParam ? itemProperty : safeParamProperty(parameter.name, cmd.name)
-      return `this.${property} as unknown as Parameters<typeof ${methodRef}>[${String(i)}]`
-    })
-    .join(', ')
-  // The usage description adds the first-match sentence for a resource
-  // matched on a property that is not claimed unique, as the get's does, or,
-  // for a known gap, the sentence saying the item is not sent.
-  const note = resourceCommandNote(cmd, resource)
+  const { inputs, methodArgs } = itemCommandInputs(cmd, hierarchyPath, resource, methodRef, ctx)
+  const notes = resourceCommandNotes(cmd, resource, ctx.manifest)
   const description =
-    note === undefined ? cmd.description : `${cmd.description.replace(/[\s.]+$/, '')}. ${note}`
+    notes.length === 0
+      ? cmd.description
+      : [`${cmd.description.replace(/[\s.]+$/, '')}.`, ...notes].join(' ')
 
   const needsTypanion = inputs.includes('t.isEnum')
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
@@ -619,6 +603,82 @@ ${inputs}
     path: buildCommandPath(hierarchyPath.path, cmdNameKebab),
     content,
   }
+}
+
+/**
+ * The inputs a generated resource command declares, as option field lines,
+ * and the arguments its SDK call passes, in the SDK method's order.
+ */
+interface ResourceCommandInputs {
+  readonly inputs: string
+  readonly methodArgs: string
+}
+
+/**
+ * The inputs of a resource command that selects its item: only those the
+ * operation uses, in the SDK method's order (`commandMethodParameters`).
+ *
+ * - a flag for the parent's identifier, when the command records a parent;
+ * - one positional argument for the item's identifier (the command's
+ *   identifier parameter, `resolveIdParams`), labelled with the identifier a
+ *   get takes, as the get command's is;
+ * - a flag for each other declared parameter.
+ *
+ * Nothing comes from the resource's place in the hierarchy: a parent the
+ * command does not record has no flag.
+ */
+function itemCommandInputs(
+  cmd: ManifestCommand,
+  hierarchyPath: HierarchyPath,
+  resource: Resource,
+  methodRef: string,
+  ctx: CliGeneratorContext
+): ResourceCommandInputs {
+  // Inputs left out because they admit no value have no flag, no positional
+  // and no position in the SDK call.
+  const omitted = ctx.omittedInputs(cmd, hierarchyPath.resourceName)
+  // A known gap declares no item, so it has no positional.
+  const childParam = itemIdentifierParameter(cmd)?.name
+  const flagProperties = new Set(
+    cmd.parameters
+      .filter((p) => p.name !== childParam)
+      .map((p) => safeParamProperty(p.name, cmd.name))
+  )
+  const itemProperty = uniqueProperty(`${toCamelCase(resource.name)}Id`, flagProperties)
+  const signature = commandMethodParameters(cmd).signature.filter(
+    ({ parameter }) => !omitted.has(parameter.name)
+  )
+  const getCommand = ctx
+    .getResourceCommands(hierarchyPath.resourceName)
+    .find((c) => c.name === 'get')
+  const inputs = signature
+    .map(({ parameter }) =>
+      parameter.name === childParam
+        ? identifierPositional(itemProperty, addressingIdentifier(resource, getCommand))
+        : generateParameterFlag(parameter, ctx, cmd.name)
+    )
+    .join('\n')
+  const methodArgs = signature
+    .map(({ parameter }, i) =>
+      sdkArgument(
+        parameter.name === childParam ? itemProperty : safeParamProperty(parameter.name, cmd.name),
+        methodRef,
+        i
+      )
+    )
+    .join(', ')
+  return { inputs, methodArgs }
+}
+
+/**
+ * One argument of a generated SDK call: the command's `property`, asserted
+ * to the SDK method's parameter type at `index`. CLI inputs surface values as
+ * broad primitives (string/boolean), which may not structurally overlap the
+ * SDK's narrower types (enums, Date, number, arrays), so the assertion goes
+ * via `unknown`; the RPC layer validates and coerces the value at run time.
+ */
+function sdkArgument(property: string, methodRef: string, index: number): string {
+  return `this.${property} as unknown as Parameters<typeof ${methodRef}>[${String(index)}]`
 }
 
 // Helper functions

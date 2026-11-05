@@ -1033,13 +1033,15 @@ export interface WorkspaceDocumentResourceClient {
  */
 export interface ProjectResourceClient {
   /**
-   * List projects, as one page holding all of them.
+   * List projects, as one page holding all of them. When several workspace documents share the same
+   * name, the first match in the app's order is used as the workspace document.
    *
    * @param workspaceName - Workspace document name. Does not accept null.
    */
   list(workspaceName: string, options?: CallOptions): Promise<Page<Project>>
   /**
-   * Read the project identified by `id` within `workspaceName`.
+   * Read the project identified by `id` within `workspaceName`. When several workspace documents
+   * share the same name, the first match in the app's order is used as the workspace document.
    *
    * @param workspaceName - Workspace document name. Does not accept null.
    * @param id - Project identifier. Does not accept null.
@@ -1052,13 +1054,15 @@ export interface ProjectResourceClient {
  */
 export interface SchemeResourceClient {
   /**
-   * List schemes, as one page holding all of them.
+   * List schemes, as one page holding all of them. When several workspace documents share the same
+   * name, the first match in the app's order is used as the workspace document.
    *
    * @param workspaceName - Workspace document name. Does not accept null.
    */
   list(workspaceName: string, options?: CallOptions): Promise<Page<Scheme>>
   /**
-   * Read the scheme identified by `id` within `workspaceName`.
+   * Read the scheme identified by `id` within `workspaceName`. When several workspace documents
+   * share the same name, the first match in the app's order is used as the workspace document.
    *
    * @param workspaceName - Workspace document name. Does not accept null.
    * @param id - Scheme identifier. Does not accept null.
@@ -1072,7 +1076,8 @@ export interface SchemeResourceClient {
  */
 export interface RunDestinationResourceClient {
   /**
-   * List run destinations, as one page holding all of them.
+   * List run destinations, as one page holding all of them. When several workspace documents share
+   * the same name, the first match in the app's order is used as the workspace document.
    *
    * @param workspaceName - Workspace document name. Does not accept null.
    */
@@ -1080,7 +1085,8 @@ export interface RunDestinationResourceClient {
   /**
    * Read the run destination identified by `name` within `workspaceName`. When several run
    * destinations share the same name, the first match in the app's order is used, and the operation
-   * does not fail as ambiguous.
+   * does not fail as ambiguous. When several workspace documents share the same name, the first
+   * match in the app's order is used as the workspace document.
    *
    * @param workspaceName - Workspace document name. Does not accept null.
    * @param name - Run destination name. Does not accept null.

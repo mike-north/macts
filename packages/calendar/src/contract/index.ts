@@ -512,23 +512,30 @@ export interface CalendarResourceClient {
 /** A calendar event */
 export interface EventResourceClient {
   /**
-   * List events, as one page holding all of them.
+   * List events, as one page holding all of them. When several calendars share the same name, the
+   * first match in the app's order is used as the calendar.
    *
    * @param calendarId - Calendar identifier. Does not accept null.
    */
   list(calendarId: string, options?: CallOptions): Promise<Page<Event>>
   /**
-   * Read the event identified by `id` within `calendarId`.
+   * Read the event identified by `id` within `calendarId`. When several calendars share the same
+   * name, the first match in the app's order is used as the calendar.
    *
    * @param calendarId - Calendar identifier (the calendar containing the event). Does not accept
    * null.
    * @param id - Event identifier (uid). Does not accept null.
    */
   get(calendarId: string, id: string, options?: CallOptions): Promise<Event>
-  /** Create an event. */
+  /**
+   * Create an event. When several calendars share the same name, the first match in the app's order
+   * is used as the calendar.
+   */
   create(input: EventCreateInput, options?: CallOptions): Promise<Event>
   /**
    * Update the event identified by `id` within `calendarId`. Omitted fields are left unchanged.
+   * When several calendars share the same name, the first match in the app's order is used as the
+   * calendar.
    *
    * @param calendarId - Calendar identifier (the calendar containing the event). Does not accept
    * null.
@@ -541,7 +548,8 @@ export interface EventResourceClient {
     options?: CallOptions
   ): Promise<Event>
   /**
-   * Delete the event identified by `id` within `calendarId`.
+   * Delete the event identified by `id` within `calendarId`. When several calendars share the same
+   * name, the first match in the app's order is used as the calendar.
    *
    * @param calendarId - Calendar identifier (the calendar containing the event). Does not accept
    * null.
@@ -549,7 +557,8 @@ export interface EventResourceClient {
    */
   delete(calendarId: string, id: string, options?: CallOptions): Promise<void>
   /**
-   * Show the event or to-do in the calendar window
+   * Show the event or to-do in the calendar window When several calendars share the same name, the
+   * first match in the app's order is used as the calendar.
    *
    * @param calendarId - Calendar identifier (the calendar containing the event). Does not accept
    * null.
