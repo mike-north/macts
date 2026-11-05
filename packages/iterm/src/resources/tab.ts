@@ -32,6 +32,7 @@ export class TabResourceClient {
 
   /**
    * Get a tab by index within a parent scope.
+   * A tab has no id, so it is selected by its zero-based position within its window, which drifts when tabs open, close or move.
    */
   async get(windowId: string, index: string): Promise<Tab> {
     return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.get`, { windowId, index })

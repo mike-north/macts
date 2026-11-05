@@ -9,7 +9,8 @@ export class GetTabCommand extends Command {
   static override paths = [['iterm', 'windows', 'tabs', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a tab by index',
+    description:
+      'Get a tab by index. A tab has no id, so it is selected by its zero-based position within its window, which drifts when tabs open, close or move.',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
