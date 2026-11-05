@@ -229,10 +229,12 @@ async function reportingContractPaths<T>(read: () => Promise<T>): Promise<T> {
   } catch (error) {
     if (error instanceof UnexpectedValueError) {
       for (const { path } of error.details.issues) {
-        const position = path.find((segment) => typeof segment === 'number') ?? 0
-        const field = path.find((segment) => typeof segment === 'string' && segment !== 'items')
+        const position = path.find((segment): segment is number => typeof segment === 'number')
+        const field = path.find(
+          (segment): segment is string => typeof segment === 'string' && segment !== 'items'
+        )
         const structure =
-          typeof field === 'string' ? await fieldStructure(position, field) : 'no field'
+          field === undefined ? 'no field' : await fieldStructure(position ?? 0, field)
         console.info(
           `contract mismatch at: ${path.map(String).join('.')}; iTerm gives ${structure}`
         )
