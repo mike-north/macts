@@ -98,7 +98,7 @@ export interface ReminderResourceClient {
     delete(id: string, options?: CallOptions): Promise<void>;
     get(id: string, options?: CallOptions): Promise<Reminder>;
     list(listId: string, page?: PageRequest, options?: CallOptions): Promise<Page<Reminder>>;
-    show(options?: CallOptions): Promise<void>;
+    show(id: string, options?: CallOptions): Promise<void>;
 }
 
 // @public

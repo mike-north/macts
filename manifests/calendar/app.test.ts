@@ -247,11 +247,21 @@ describe('Calendar manifest', () => {
       expect(manifest.commands.viewCalendar.parameters[0].type).toBe('date')
     })
 
-    it('should define show command for events', () => {
+    // Calendar.sdef:260: `show` takes the event as its direct parameter, and an
+    // event exists only within its calendar, so the command selects it as
+    // `getEvent` does: by its calendar, then its uid.
+    it('should define show command for events, selecting the event within its calendar', () => {
       expect(manifest.commands.show).toBeDefined()
       expect(manifest.commands.show.scope).toBe('resource')
       expect(manifest.commands.show.resourceType).toBe('Event')
-      expect(manifest.commands.show.parameters).toHaveLength(0)
+      expect(manifest.commands.show.parent).toEqual({
+        resource: 'Calendar',
+        parameter: 'calendarId',
+      })
+      expect(manifest.commands.show.parameters.map((p) => [p.name, p.required])).toEqual([
+        ['calendarId', true],
+        ['id', true],
+      ])
     })
   })
 

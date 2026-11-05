@@ -1129,12 +1129,27 @@ guessed one. The body binds the parent item, addressed in the parent
 resource's collection by that resource's identifier targeting with the
 identifier read from the recorded parameter, fails as "no such object" when it
 does not exist, and then addresses the command's resource collection under
-it. A get, update or delete finds its item in that collection by the item
-resource's own identifier targeting, as a top-level lookup does: a Music track
-is matched by its persistent ID under its playlist, since its numeric id
-belongs to its entry in that one playlist. A command that records no parent
-addresses its resource's collection at the application. The rule, the guard,
-and its exceptions are in D10 (command parents).
+it. Every resource-scoped command but a list or create finds its item in
+that collection by the item resource's own identifier targeting, as a
+top-level lookup does: a Music track is matched by its persistent ID under its
+playlist, since its numeric id belongs to its entry in that one playlist. A
+command that records no parent addresses its resource's collection at the
+application. The rule, the guard, and its exceptions are in D10 (command
+parents).
+
+**Resource commands.** A resource-scoped command that is not a CRUD shape
+(Notes' `show`, Xcode's `build`, Mail's `send`) acts on one item, which the
+app's dictionary takes as the command's direct parameter. Its body selects
+the item exactly as a get does, through the same lookup and the same
+existence checks, so a missing parent or item fails as a missing target
+before the command is sent, naming the parent's resource or the item's. It
+then sends the item as the direct parameter, `app[<command>](item, params)`,
+or `app[<command>](item)` when no other parameter is supplied. `params`
+carries only the command's other declared parameters, the ones the
+dictionary declares, as each is supplied; the item's and the parent's
+identifier parameters are lookup keys, never parameters of the app's
+command, so neither is ever sent to it. The app's result is returned as it
+is.
 
 **Worker compatibility.** A later executor may run a long-lived automation
 worker (one process per target app, pooled and restartable) instead of one
@@ -1344,11 +1359,15 @@ startup, with the command that installs it. Manifest registration
 descriptors whose input is each command's declared parameters and nothing
 else, so a key that is not a parameter is a `ValidationError`, as it is under
 a contract registration. A manifest-registered list does not page, so its
-input declares no paging inputs. A resource-scoped get, update or delete
-selects its item by its identifier parameter, the first required parameter
-other than its parent's. The generated contract, HTTP client and CLI take
-exactly that parameter, and the native body addresses the item in its
-resource's collection by it. A delete at application scope must declare a
+input declares no paging inputs. Every resource-scoped command other than a list or create acts
+on one item: a get, update or delete, and any other command the app's
+dictionary defines on the resource's class, which takes the item as its
+direct parameter (D4, resource commands). It selects its item by its
+identifier parameter, the first required parameter other than its parent's.
+The generated contract, HTTP client and CLI take exactly that parameter, a
+resource command's after its parent's and before its other parameters as a
+get's does, and the native body addresses the item in its resource's
+collection by it. A delete at application scope must declare a
 required parameter too; its native body is a call on the app that passes the
 command's declared parameters to the app's delete as declared. No surface
 supplies an identifier name the manifest does not declare. A manifest with a
@@ -1358,6 +1377,21 @@ manifest or from a contract, with `OperationRegistrationError`; both name the
 app and the command and say to declare the item's identifier. An
 application-scoped get or update is a plain command call and selects no item,
 so the rule does not reach it.
+
+A few shipped resource commands cannot select their item yet, because the
+manifest model cannot reach it: their resource declares no identifier and no
+get (OmniPlan's violation, a Music or TV file track, a System Events UI
+element or action), or the item lies more than one parent deep (a Mail
+message, within a mailbox within an account), while a command records one
+parent. They are listed, by bundle identifier and command key with a typed
+reason, in `KNOWN_ITEM_SELECTION_GAPS` (`manifest/item-selection-gaps.ts`),
+and only they are exempt from the refusal. Each stays offered as before: its
+body calls the command on the app with its declared parameters and sends no
+item, and every generated doc of it (the HTTP client's, the contract
+client's and the CLI command's) says that macts does not yet send the item
+to the app, so the app acts on whatever it chooses. The list is a ratchet: a
+test pins its contents, and another fails while an entry's command can
+select its item, so entries are only ever removed.
 
 ## D6. Structured Error Registry, Wire Codec, and Reconstruction
 
@@ -2705,13 +2739,13 @@ A superclass the manifest does not declare, and a chain of superclasses that loo
 
 **A command's parent is recorded, never guessed.** A command on a nested resource records `parent: { resource, parameter }`: `resource` is the key of the resource whose items hold the command's resource as elements, and `parameter` is the command's own required parameter that carries the parent item's identifier. Calendar's `getEvent` records `{ resource: Calendar, parameter: calendarId }`. The parent is a fact the curator records from the app's dictionary (the parent's class has the child as an element); nothing derives it from a parameter's name or position, or from the hierarchy. The manifest schema rejects a parent resource the manifest does not declare, one marked unsupported on a usable command, and a parameter that is not one of the command's required parameters, naming the command, the field and the value.
 
-Every surface takes the parent from the record. Native bodies address the parent resource's collection (`resolveCollectionAccessor`), the parent item in it by that resource's identifier targeting, the command's resource collection under that item, and a get, update or delete's item in it by the command resource's identifier targeting (D4, command parents); a command with no parent addresses its resource at the application. The generated SDKs, the contract and the CLI take a get, update or delete's parent scope from `parent.parameter`, and the child identifier is the first other required parameter (`resolveIdParams` in `generator/surface.ts`).
+Every surface takes the parent from the record. Native bodies address the parent resource's collection (`resolveCollectionAccessor`), the parent item in it by that resource's identifier targeting, the command's resource collection under that item, and the item of any resource-scoped command but a list or create in it by the command resource's identifier targeting (D4, command parents); a command with no parent addresses its resource at the application. A resource command that is not a CRUD shape selects its item this way, as a get does, and sends it to the app as the command's direct parameter (D4, resource commands). The generated SDKs, the contract and the CLI take such a command's parent scope from `parent.parameter`, and the child identifier is the first other required parameter (`resolveIdParams` in `generator/surface.ts`). A resource command's method takes them first, the parent's then the item's, followed by its other parameters, and its CLI command asks for exactly those: the parent flag when the command records a parent, one positional for the item, labelled with the identifier a get takes, and a flag for each other parameter. Nothing about a parent comes from the hierarchy, so a command that records none has no parent flag.
 
-**A guard holds every shipped manifest to the rule** (`manifest/command-parents.test.ts`). Every usable list, get, create, update or delete command on a resource the hierarchy nests under another resource, and does not also place at the application (`nestedOnlyResources` in `manifest/hierarchy-placement.ts`, the same helper the output rule's `unrecorded-parent` case reads), records a parent; only those shapes address a collection. A recorded parent must hold the command's resource in the hierarchy. A resource the hierarchy does not place has no parent to record and is not checked. The only exceptions are the nested commands whose parent awaits a design decision, [#173](https://github.com/mike-north/macts/issues/173): Microsoft Edge's `getBookmarkItem`; OmniGraffle's `getGraphic`, `getShape`, `getLine` and `getLayer`; OmniPlan's task, milestone, resource, assignment, dependency, violation and scenario commands; and OmniFocus's `listTasks`, `getTask` and `createTask`. The list is exact: an entry that records a parent, or whose resource becomes a top-level child, fails the guard until it is removed.
+**A guard holds every shipped manifest to the rule** (`manifest/command-parents.test.ts`). Every usable resource-scoped command on a resource the hierarchy nests under another resource, and does not also place at the application (`nestedOnlyResources` in `manifest/hierarchy-placement.ts`, the same helper the output rule's `unrecorded-parent` case reads), records a parent: every resource-scoped command addresses its resource's collection, a list or create the collection and any other command its item. A known gap (D5, `KNOWN_ITEM_SELECTION_GAPS`) addresses nothing until it can select its item, so it is not checked. A recorded parent must hold the command's resource in the hierarchy. A resource the hierarchy does not place has no parent to record and is not checked. The only exceptions are the nested commands whose parent awaits a design decision, [#173](https://github.com/mike-north/macts/issues/173): Microsoft Edge's `getBookmarkItem`; OmniGraffle's `getGraphic`, `getShape`, `getLine` and `getLayer`; OmniPlan's task, milestone, resource, assignment, dependency, violation and scenario commands; and OmniFocus's `listTasks`, `getTask` and `createTask`. The list is exact: an entry that records a parent, or whose resource becomes a top-level child, fails the guard until it is removed.
 
 ### Identifier targeting
 
-**The default targeting is valid only for the dictionary id.** An identifier with no `targeting` is looked up with the app's `id` specifier (`byId`). That default is valid only when the identifier's property is the class's dictionary id, code ID (`ID  `): the property the app's id lookup resolves against. The property's name does not matter: Calendar's event identifier `uid` carries code `ID  ` and keeps the default. Any other identifier declares its targeting, whether or not the class also has an `id`: a document's `name`, a Terminal tab's `tty`, an Xcode device's `device identifier`, or a note's `name` beside its `id`. A property that declares no code never qualifies. The rule judges the resolved primary identifier, so a subclass is judged on the identifier, targeting and property code it inherits (superclasses, above). A singleton root's `byRoot` is derived, so it is always declared, and a resource with no identifier or marked unsupported is not judged. Every generator entry point refuses such a manifest before it builds any file, and so do registration from a manifest and from a contract (`untargetedIdentifiers` in `manifest/identifier-targeting.ts`), naming the app, the resource and the property. A guard holds every shipped manifest to the rule (`operations/registry.test.ts` in `@macts/runtime`). Documents and the other items an app has no dictionary id for are matched on their name with `byProperty`, as Xcode's workspace documents and Automator's workflows are. Nothing claims such a name unique, and the lookup takes the first match of `whose` in the app's element order, so a get by a name two items share returns the first of them and does not fail as ambiguous. The generated get, update and delete docs of every resource matched with `byProperty` and not claimed unique say so: the HTTP client's, the contract client's and the CLI get's help (`firstMatchNote` in `generator/surface.ts`). A list, get, create, update or delete scoped under a parent looks the parent up by the parent resource's targeting (command parents, above), so a parent matched with `byProperty` and not claimed unique is the first match too: the same surfaces' docs of those operations, and the CLI list, get and create help, say that the first match in the app's order is used as the parent, after the item's sentence when both apply (`parentFirstMatchNote`).
+**The default targeting is valid only for the dictionary id.** An identifier with no `targeting` is looked up with the app's `id` specifier (`byId`). That default is valid only when the identifier's property is the class's dictionary id, code ID (`ID  `): the property the app's id lookup resolves against. The property's name does not matter: Calendar's event identifier `uid` carries code `ID  ` and keeps the default. Any other identifier declares its targeting, whether or not the class also has an `id`: a document's `name`, a Terminal tab's `tty`, an Xcode device's `device identifier`, or a note's `name` beside its `id`. A property that declares no code never qualifies. The rule judges the resolved primary identifier, so a subclass is judged on the identifier, targeting and property code it inherits (superclasses, above). A singleton root's `byRoot` is derived, so it is always declared, and a resource with no identifier or marked unsupported is not judged. Every generator entry point refuses such a manifest before it builds any file, and so do registration from a manifest and from a contract (`untargetedIdentifiers` in `manifest/identifier-targeting.ts`), naming the app, the resource and the property. A guard holds every shipped manifest to the rule (`operations/registry.test.ts` in `@macts/runtime`). Documents and the other items an app has no dictionary id for are matched on their name with `byProperty`, as Xcode's workspace documents and Automator's workflows are. Nothing claims such a name unique, and the lookup takes the first match of `whose` in the app's element order, so a get by a name two items share returns the first of them and does not fail as ambiguous. The generated docs of every operation that looks one item up (a get, update or delete, and any other resource command) on a resource matched with `byProperty` and not claimed unique say so: the HTTP client's, the contract client's, and the CLI help of a get and of a resource command (`firstMatchNote` in `generator/surface.ts`). An operation scoped under a parent looks the parent up by the parent resource's targeting (command parents, above): a list, get, create, update or delete, and any other resource command except a known gap, which sends no item. So a parent matched with `byProperty` and not claimed unique is the first match too: the same surfaces' docs of those operations, and the CLI list, get, create and resource command help, say that the first match in the app's order is used as the parent, after the item's sentence when both apply (`parentFirstMatchNote`).
 
 **Targeting applies at every level of a nested lookup.** A resource's identifier targeting (the app's `id` specifier by default, or `byProperty`, a match on a property) is how every lookup of one of its items is built, wherever the item is: in the application's collection, as the parent of a command, or as the target of a get, update or delete under that parent (`buildTargetExpression` and `buildNestedTargetExpression` in `jxa/native-scripts.ts` share one lookup). Music playlists and tracks are matched on their persistent ID, the dictionary's "id of the item as a hexadecimal string. This id does not change over time", because a track's numeric `id` belongs to its entry in one playlist: on Music 1.7.2, one track was id 2218 in the library playlist and id 2344 in another, while its persistent ID was the same in both, and ids and persistent IDs of 3 playlists and 1220 playlist tracks were unchanged across a relaunch. A get by persistent ID under the 608-track library playlist took a median of 250 ms through the native executor, most of it starting the automation process; the lookup itself took 17 ms, against 18 ms by numeric id.
 

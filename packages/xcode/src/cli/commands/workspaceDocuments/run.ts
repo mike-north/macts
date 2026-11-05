@@ -3,21 +3,18 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Invoke the "run" scheme action
+ * Invoke the "run" scheme action. When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
  */
 export class RunWorkspaceDocumentCommand extends Command {
   static override paths = [['xcode', 'workspaceDocuments', 'run']]
 
   static override usage = Command.Usage({
-    description: 'Invoke the "run" scheme action',
+    description:
+      'Invoke the "run" scheme action. When several workspace documents share the same name, the first match in the app\'s order is used, and the operation does not fail as ambiguous.',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   workspaceDocumentId = Option.String({ name: 'name', required: true })
-  workspaceName = Option.String('--workspace-name', {
-    required: true,
-    description: 'Workspace document name',
-  })
   withCommandLineArguments = Option.String('--with-command-line-arguments', {
     required: false,
     description: 'Additional command line arguments to pass to the action',
@@ -32,7 +29,7 @@ export class RunWorkspaceDocumentCommand extends Command {
     try {
       const client = getClient()
       await client.workspaceDocuments.run(
-        this.workspaceName as unknown as Parameters<typeof client.workspaceDocuments.run>[0],
+        this.workspaceDocumentId as unknown as Parameters<typeof client.workspaceDocuments.run>[0],
         this.withCommandLineArguments as unknown as Parameters<
           typeof client.workspaceDocuments.run
         >[1],

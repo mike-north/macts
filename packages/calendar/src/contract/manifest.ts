@@ -1234,7 +1234,24 @@ export const manifest: unknown = {
       description: 'Show the event or to-do in the calendar window',
       scope: 'resource',
       resourceType: 'Event',
-      parameters: [],
+      parameters: [
+        {
+          name: 'calendarId',
+          type: 'string',
+          description: 'Calendar identifier (the calendar containing the event)',
+          required: true,
+        },
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Event identifier (uid)',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Calendar',
+        parameter: 'calendarId',
+      },
       code: 'aec3',
     },
   },

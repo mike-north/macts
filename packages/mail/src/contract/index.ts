@@ -1524,30 +1524,35 @@ export type MailAttachmentUpdateInput = Record<string, never>
 
 /** A new email message */
 export interface OutgoingMessageResourceClient {
-  /** Sends a message. */
-  send(options?: CallOptions): Promise<void>
+  /**
+   * Sends a message.
+   *
+   * @param id - The unique identifier of the outgoing message. Does not accept null.
+   */
+  send(id: Integer, options?: CallOptions): Promise<void>
 }
 
 /** An email message */
 export interface MessageResourceClient {
-  /** Does nothing at all (deprecated) */
-  bounce(options?: CallOptions): Promise<void>
   /**
-   * Creates a forwarded message.
+   * Creates a forwarded message. macts does not yet send the message to the app, so the app acts on
+   * whatever it chooses.
    *
    * @param openingWindow - Whether the window for the forwarded message is shown. Default is to not
    * show the window. Does not accept null.
    */
   forward(openingWindow?: boolean, options?: CallOptions): Promise<void>
   /**
-   * Creates a redirected message.
+   * Creates a redirected message. macts does not yet send the message to the app, so the app acts
+   * on whatever it chooses.
    *
    * @param openingWindow - Whether the window for the redirected message is shown. Default is to
    * not show the window. Does not accept null.
    */
   redirect(openingWindow?: boolean, options?: CallOptions): Promise<void>
   /**
-   * Creates a reply message.
+   * Creates a reply message. macts does not yet send the message to the app, so the app acts on
+   * whatever it chooses.
    *
    * @param openingWindow - Whether the window for the reply message is shown. Default is to not
    * show the window. Does not accept null.
@@ -1750,21 +1755,6 @@ const appMoveOperation: OperationDescriptor<{ readonly to: string }, undefined> 
     type: 'object',
     properties: { to: { type: 'string', description: 'The new location for the object(s).' } },
     required: ['to'],
-    additionalProperties: false,
-  },
-}
-
-const messageBounceOperation: OperationDescriptor<Record<string, never>, undefined> = {
-  id: 'mail.messages.bounce',
-  permission: 'mail:messages:bounce',
-  target: { command: 'bounce', resource: 'Message' },
-  description: 'Does nothing at all (deprecated)',
-  input: t.record({}),
-  output: t.none(),
-  inputJsonSchema: {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: {},
     additionalProperties: false,
   },
 }
@@ -2016,17 +2006,28 @@ const messageReplyOperation: OperationDescriptor<
   },
 }
 
-const outgoingMessageSendOperation: OperationDescriptor<Record<string, never>, undefined> = {
+const outgoingMessageSendOperation: OperationDescriptor<{ readonly id: Integer }, undefined> = {
   id: 'mail.outgoingMessages.send',
   permission: 'mail:outgoingMessages:send',
   target: { command: 'send', resource: 'OutgoingMessage' },
   description: 'Sends a message.',
-  input: t.record({}),
+  input: t.record({
+    id: t.integer({ description: 'The unique identifier of the outgoing message' }),
+  }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: {
+      id: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The unique identifier of the outgoing message',
+      },
+    },
+    required: ['id'],
     additionalProperties: false,
   },
 }
@@ -2071,7 +2072,6 @@ const appSynchronizeOperation: OperationDescriptor<
 const operations: AppContract<MailClient>['operations'] = {
   'mail.app.duplicate': appDuplicateOperation,
   'mail.app.move': appMoveOperation,
-  'mail.messages.bounce': messageBounceOperation,
   'mail.app.checkForNewMail': appCheckForNewMailOperation,
   'mail.app.extractNameFrom': appExtractNameFromOperation,
   'mail.app.extractAddressFrom': appExtractAddressFromOperation,
@@ -2090,10 +2090,9 @@ const operations: AppContract<MailClient>['operations'] = {
 function bind(runtime: ClientRuntime): MailClient {
   return {
     outgoingMessages: {
-      send: (options) => runtime.invoke(outgoingMessageSendOperation, {}, options),
+      send: (id, options) => runtime.invoke(outgoingMessageSendOperation, { id }, options),
     },
     messages: {
-      bounce: (options) => runtime.invoke(messageBounceOperation, {}, options),
       forward: (openingWindow, options) =>
         runtime.invoke(messageForwardOperation, { openingWindow }, options),
       redirect: (openingWindow, options) =>

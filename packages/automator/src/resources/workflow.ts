@@ -50,15 +50,16 @@ export class WorkflowResourceClient {
   }
 
   /**
-   * Execute a workflow
+   * Execute a workflow.
+   * When several workflows share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async execute(
-    workflow: unknown,
+    name: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.execute`,
-      { workflow },
+      { name },
       __mactsOptions,
       'Workflow'
     )

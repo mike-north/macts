@@ -3,25 +3,25 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Execute a workflow
+ * Execute a workflow. When several workflows share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
  */
 export class ExecuteWorkflowCommand extends Command {
   static override paths = [['automator', 'workflows', 'execute']]
 
   static override usage = Command.Usage({
-    description: 'Execute a workflow',
+    description:
+      "Execute a workflow. When several workflows share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   workflowId = Option.String({ name: 'name', required: true })
-  workflow = Option.String('--workflow', { required: true, description: 'The workflow to execute' })
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
       await client.workflows.execute(
-        this.workflow as unknown as Parameters<typeof client.workflows.execute>[0]
+        this.workflowId as unknown as Parameters<typeof client.workflows.execute>[0]
       )
 
       const output = formatter.formatSuccess('execute completed successfully')

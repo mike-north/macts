@@ -20,19 +20,8 @@ export class MessageResourceClient {
   }
 
   /**
-   * Does nothing at all (deprecated)
-   */
-  async bounce(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
-    await this.#http.invoke<undefined>(
-      `${this.#app}.${this.#resource}.bounce`,
-      {},
-      __mactsOptions,
-      'Message'
-    )
-  }
-
-  /**
    * Creates a forwarded message.
+   * macts does not yet send the message to the app, so the app acts on whatever it chooses.
    */
   async forward(
     openingWindow?: boolean,
@@ -48,6 +37,7 @@ export class MessageResourceClient {
 
   /**
    * Creates a redirected message.
+   * macts does not yet send the message to the app, so the app acts on whatever it chooses.
    */
   async redirect(
     openingWindow?: boolean,
@@ -63,6 +53,7 @@ export class MessageResourceClient {
 
   /**
    * Creates a reply message.
+   * macts does not yet send the message to the app, so the app acts on whatever it chooses.
    */
   async reply(
     openingWindow?: boolean,

@@ -63,7 +63,7 @@ Description
 
 </td><td>
 
-cause the target process to behave as if the UI element were clicked
+cause the target process to behave as if the UI element were clicked. macts does not yet send the UI element to the app, so the app acts on whatever it chooses.
 
 </td></tr>
 <tr><td>
@@ -74,7 +74,7 @@ cause the target process to behave as if the UI element were clicked
 
 </td><td>
 
-set the selected property of the UI element
+set the selected property of the UI element. macts does not yet send the UI element to the app, so the app acts on whatever it chooses.
 
 </td></tr>
 </tbody></table>

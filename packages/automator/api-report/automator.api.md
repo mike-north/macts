@@ -300,7 +300,7 @@ export type WorkflowCreateInput = Record<string, never>;
 // @public
 export class WorkflowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    execute(workflow: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    execute(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Workflow>;
     list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Workflow>>;
 }

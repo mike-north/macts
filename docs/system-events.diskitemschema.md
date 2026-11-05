@@ -12,6 +12,7 @@ Raw passthrough validator; typed SDK records use the canonical contract codec.
 DiskItemSchema: z.ZodObject<
   {
     busyStatus: z.ZodBoolean
+    container: z.ZodString
     creationDate: z.ZodString
     displayedName: z.ZodString
     id: z.ZodString
@@ -21,7 +22,7 @@ DiskItemSchema: z.ZodObject<
     packageFolder: z.ZodBoolean
     path: z.ZodString
     physicalSize: z.ZodNumber
-    pOSIXPath: z.ZodString
+    posixPath: z.ZodString
     size: z.ZodNumber
     uRL: z.ZodString
     visible: z.ZodBoolean

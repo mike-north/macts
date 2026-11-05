@@ -4,7 +4,7 @@
 
 ## UIElementResourceClient.select() method
 
-set the selected property of the UI element
+set the selected property of the UI element. macts does not yet send the UI element to the app, so the app acts on whatever it chooses.
 
 **Signature:**
 

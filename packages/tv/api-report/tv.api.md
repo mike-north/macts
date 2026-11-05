@@ -196,8 +196,8 @@ export class PlaylistResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(sourceId: string, persistentID: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Playlist>;
     list(sourceId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Playlist>>;
-    move(to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    search(_for: string, only?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    move(sourceId: string, persistentID: string, to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    search(sourceId: string, persistentID: string, _for: string, only?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public

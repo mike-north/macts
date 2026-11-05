@@ -307,8 +307,14 @@ export const capabilities: readonly CapabilityMetadata[] = [
     risk: 'read',
     inputSchema: {
       type: 'object',
-      properties: {},
+      properties: {
+        id: {
+          description: 'Reminder identifier',
+          type: 'string',
+        },
+      },
       additionalProperties: false,
+      required: ['id'],
     },
   },
 ]

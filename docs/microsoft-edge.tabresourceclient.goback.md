@@ -9,7 +9,7 @@ Go Back (If Possible)
 **Signature:**
 
 ```typescript
-goBack(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+goBack(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -29,7 +29,18 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-tabId
+windowId
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+id
 
 </td><td>
 

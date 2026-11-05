@@ -2203,6 +2203,12 @@ export const manifest: unknown = {
       resourceType: 'Playlist',
       parameters: [
         {
+          name: 'persistentID',
+          type: 'string',
+          description: 'Persistent ID of the playlist',
+          required: true,
+        },
+        {
           name: 'to',
           type: 'string',
           description: 'the new location for the playlist(s)',
@@ -2385,6 +2391,12 @@ export const manifest: unknown = {
       scope: 'resource',
       resourceType: 'Playlist',
       parameters: [
+        {
+          name: 'persistentID',
+          type: 'string',
+          description: 'Persistent ID of the playlist',
+          required: true,
+        },
         {
           name: 'for',
           type: 'string',

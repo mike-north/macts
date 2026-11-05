@@ -1043,7 +1043,21 @@ commands:
     scope: resource
     resourceType: Playlist
     code: move
+    # The dictionary's `move` takes the playlist as its direct parameter
+    # (TV.sdef:32). `sourceId` and `persistentID` select it as `getPlaylist`
+    # does, within its source, and neither is sent as a named parameter.
+    parent:
+      resource: Source
+      parameter: sourceId
     parameters:
+      - name: sourceId
+        type: string
+        description: Persistent ID of the source
+        required: true
+      - name: persistentID
+        type: string
+        description: Persistent ID of the playlist
+        required: true
       - name: to
         type: string
         description: the new location for the playlist(s)
@@ -1174,7 +1188,21 @@ commands:
     scope: resource
     resourceType: Playlist
     code: Srch
+    # The dictionary's `search` takes the playlist as its direct parameter
+    # (TV.sdef:102). `sourceId` and `persistentID` select it as `getPlaylist`
+    # does, within its source, and neither is sent as a named parameter.
+    parent:
+      resource: Source
+      parameter: sourceId
     parameters:
+      - name: sourceId
+        type: string
+        description: Persistent ID of the source
+        required: true
+      - name: persistentID
+        type: string
+        description: Persistent ID of the playlist
+        required: true
       - name: for
         type: string
         description: the search text

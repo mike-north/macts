@@ -229,13 +229,13 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        workflow: {
-          description: 'The workflow to execute',
+        name: {
+          description: 'Workflow name',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['workflow'],
+      required: ['name'],
     },
   },
   {

@@ -4,7 +4,7 @@
 
 ## MessageResourceClient.reply() method
 
-Creates a reply message.
+Creates a reply message. macts does not yet send the message to the app, so the app acts on whatever it chooses.
 
 **Signature:**
 

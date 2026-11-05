@@ -62,11 +62,11 @@ The target application.
 
 </td><td>
 
-(specifier: unknown) =&gt; unknown
+(specifier: unknown, collection: string) =&gt; unknown
 
 </td><td>
 
-_(Optional)_ Reads the zero-based position an app object's own specifier gives within its container, or `undefined` when the specifier is not positional (<!-- -->). The codec calls it to encode an object of a positional resource, and never reads a position any other way. Without it, no such object encodes.
+_(Optional)_ Reads the zero-based position an app object's own specifier gives within `collection` of its container, or `undefined` when the specifier gives no position there (<!-- -->). The codec calls it to encode an object of a positional resource, and never reads a position any other way. Without it, no such object encodes.
 
 </td></tr>
 <tr><td>

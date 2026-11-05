@@ -24,12 +24,17 @@
  *   against the previous page's last item in the same request;
  * - a child is created inside its parent by appending it to the parent's
  *   collection;
- * - the request parameter that carries a resource-scoped get, update or
- *   delete's identifier is distinct from the resource property that holds it,
- *   and is always one the command declares (`itemIdentifierParameter`). An
- *   application-scoped command, a delete included, is a call on the app with
- *   its declared parameters. No body is built for a command that
- *   `itemSelectionProblem` refuses;
+ * - the request parameter that carries the identifier of the item a
+ *   resource-scoped command acts on (a get, update or delete, or any other
+ *   command but a list or create) is distinct from the resource property that
+ *   holds it, and is always one the command declares
+ *   (`itemIdentifierParameter`). Every such command selects its item as a get
+ *   does; a command that is not a CRUD shape sends it to the app as the
+ *   command's direct parameter, with only its other declared parameters as
+ *   named ones. An application-scoped command, a delete included, is a call
+ *   on the app with its declared parameters, as is a known gap
+ *   (`KNOWN_ITEM_SELECTION_GAPS`), which sends no item. No body is built for
+ *   any other command that `itemSelectionProblem` refuses;
  * - the app is addressed by its own spelling of each collection and property
  *   (`../manifest/native-accessor.ts`), while every record a body returns is
  *   keyed by the manifest's public property names, so no app spelling reaches
@@ -60,7 +65,12 @@ import { InternalError, ValidationError, type OperationTarget } from '@macts/con
 import type { AppManifest } from '../manifest/schemas/app.js'
 import type { Command, CommandParameter } from '../manifest/schemas/command.js'
 import type { PageRead, Resource, ResourceRoots } from '../manifest/schemas/resource.js'
-import { itemIdentifierParameter, itemSelectionProblem } from '../manifest/item-selection.js'
+import {
+  itemIdentifierParameter,
+  itemSelectionProblem,
+  sendsNoItem,
+} from '../manifest/item-selection.js'
+import { knownItemSelectionGap } from '../manifest/item-selection-gaps.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
   listOperationPages,
@@ -194,15 +204,20 @@ export function buildNativeBody(
 /**
  * Derive the native body and the input keys it requires for one operation.
  *
- * A resource-scoped get, update or delete addresses its item by the
- * identifier parameter the command declares (`itemIdentifierParameter`), never
- * by a name of its own. An application-scoped command, a delete included, is
- * called on the app with its declared parameters.
+ * A resource-scoped command other than a list or create addresses its item
+ * by the identifier parameter the command declares
+ * (`itemIdentifierParameter`), never by a name of its own. An
+ * application-scoped command, a delete included, is called on the app with
+ * its declared parameters.
+ *
+ * A known gap (`KNOWN_ITEM_SELECTION_GAPS`), a shipped resource command that
+ * cannot select its item yet, is called on the app with its declared
+ * parameters, and sends no item.
  *
  * @throws `InternalError` when `target` names a command the manifest does not
- *   declare, or a command that must select one item and declares no
- *   identifier parameter (`itemSelectionProblem`): registration and generation
- *   both refuse such a manifest, so either is a macts defect.
+ *   declare, or a command that must select one item, declares no identifier
+ *   parameter (`itemSelectionProblem`) and is not a known gap: registration
+ *   and generation both refuse such a manifest, so either is a macts defect.
  */
 export function planNativeInvocation(
   manifest: AppManifest,
@@ -215,7 +230,10 @@ export function planNativeInvocation(
   if (command === undefined) {
     throw new InternalError('The operation does not match any command of its app.', {})
   }
-  if (itemSelectionProblem(target.command, command) !== undefined) {
+  if (
+    itemSelectionProblem(target.command, command) !== undefined &&
+    knownItemSelectionGap(manifest, target.command) === undefined
+  ) {
     throw new InternalError(
       `The command "${target.command}" declares no identifier parameter, so no item can be selected.`,
       {}
@@ -579,10 +597,12 @@ export function nativeReadKeys(
 
 /**
  * Body that calls `command` on the app with the supplied parameters as its
- * named-parameter record, or with no arguments when none are supplied.
+ * named-parameter record, or with no arguments when none are supplied: an
+ * application-scoped command, or a resource command that cannot select its
+ * item yet (a known gap, `KNOWN_ITEM_SELECTION_GAPS`), which sends no item.
  *
  * @param resultLocal - Whether to bind the result to a local before returning
- *   it, as resource-scoped generic commands always have.
+ *   it, as a known gap's body always has.
  */
 function buildCommandCallBody(command: Command, resultLocal = false): string {
   const call = member('app', command.name)
@@ -616,7 +636,7 @@ function buildCommandCallBody(command: Command, resultLocal = false): string {
  *   whatever file is at that path).
  *
  * A singleton root (`byRoot`) is held by the application, not in a
- * collection, so it has no expression here (see {@link buildRootGetBody}).
+ * collection, so it has no expression here (see {@link bindSelectedItem}).
  *
  * @param resourcePlural - The collection's accessor in the app (see
  *   `resolveCollectionAccessor`).
@@ -1051,7 +1071,10 @@ interface ResourceBody {
 /**
  * Build the body of a resource-scoped command. The command's name selects the
  * pattern: `list`, `get`, `delete`, `create`, and `update` have dedicated
- * bodies; any other command is called on the app with its parameters.
+ * bodies; any other command acts on one item, which it selects as a get does
+ * and sends the app as the command's direct parameter
+ * ({@link buildItemCommandBody}), except a known gap, which declares no item
+ * to select and is called on the app with its parameters.
  */
 function buildResourceBody(
   command: Command,
@@ -1077,15 +1100,19 @@ function buildResourceBody(
     case 'update':
       return buildUpdateBody(command, source, resourcePlural, manifest)
     default:
-      return { body: buildCommandCallBody(command, true), identifierArguments: [] }
+      // Only a known gap reaches here without an item to select: planning
+      // refuses any other such command.
+      return sendsNoItem(command)
+        ? { body: buildCommandCallBody(command, true), identifierArguments: [] }
+        : buildItemCommandBody(command, resource, resourcePlural, manifest)
   }
 }
 
 /**
- * The identifier parameter of a get, update or delete: the parameter the
- * command declares to select its item by (`itemIdentifierParameter`). This is
- * the request key the input schema validates, never the resource's identifier
- * property.
+ * The identifier parameter of a resource-scoped command that acts on one
+ * item: the parameter the command declares to select its item by
+ * (`itemIdentifierParameter`). This is the request key the input schema
+ * validates, never the resource's identifier property.
  *
  * @throws `InternalError` when the command declares none.
  *   {@link planNativeInvocation} refuses such a command first, so reaching
@@ -1793,13 +1820,71 @@ function buildListBody(
   }
 }
 
+/** The selected `item` and the addressing context needed by its command. */
+interface SelectedItem {
+  /** Statements that bind `item`, failing as "no such object" when it is missing. */
+  readonly statements: string
+  /** The input keys the statements read: the parent's identifier (if any), then the item's. */
+  readonly identifierArguments: readonly string[]
+  /** The parameter carrying the parent item's identifier, for a command that records a parent. */
+  readonly parentParameter: string | undefined
+  /** The parameter carrying the item's identifier ({@link resolveIdentifierParam}). */
+  readonly itemParameter: string
+  /** A singleton root's kind local, emitted as record kind; absent for collection items. */
+  readonly kindLocal: string | undefined
+}
+
+/**
+ * Bind the same `item` for every command as a get with that identifier reads.
+ * Collection items use {@link bindTarget}, including recorded parent scope
+ * and positional addressing. A missing parent is checked first and names its
+ * resource; an unscoped collection is addressed at the application.
+ * Singleton roots use the application property named by their kind. Unknown
+ * kinds and missing properties fail as "no such object". Every selected item
+ * must exist ({@link failIfMissing}) before the command uses it.
+ */
+function bindSelectedItem(
+  command: Command,
+  resource: Resource | undefined,
+  resourcePlural: string,
+  manifest: AppManifest
+): SelectedItem {
+  const itemParameter = resolveIdentifierParam(command)
+  if (resource?.roots !== undefined) {
+    return {
+      statements: lines(
+        bindRoots(resource.roots),
+        `var ${KIND_LOCAL} = ${argument(itemParameter)};`,
+        `if (typeof ${KIND_LOCAL} !== "string" || !Object.prototype.hasOwnProperty.call(${ROOTS_LOCAL}, ${KIND_LOCAL})) {`,
+        "  var unknownKind = new Error('No such object.');",
+        `  unknownKind.errorNumber = ${String(NO_SUCH_OBJECT_ERROR_NUMBER)};`,
+        '  throw unknownKind;',
+        '}',
+        `var item = app[${ROOTS_LOCAL}[${KIND_LOCAL}]];`,
+        failIfMissing('item')
+      ),
+      identifierArguments: [itemParameter],
+      parentParameter: undefined,
+      itemParameter,
+      kindLocal: KIND_LOCAL,
+    }
+  }
+  const parentScope = recordedParentScope(command, manifest)
+  return {
+    statements: bindTarget(command, resource, resourcePlural, parentScope, itemParameter),
+    identifierArguments: identifierArgumentsOf(parentScope, itemParameter),
+    parentParameter: parentScope?.parentIdParam,
+    itemParameter,
+    kindLocal: undefined,
+  }
+}
+
 /**
  * Read one item's usable properties into a record keyed by their public names
- * (see {@link readOutputProperties}). A command that records a parent
- * addresses the item under the parent item; any other addresses it at the
- * application. A singleton root is found by its kind
- * ({@link buildRootGetBody}). The item must exist (see
- * {@link failIfMissing}) before any property is read.
+ * (see {@link readOutputProperties}). The item is selected by
+ * {@link bindSelectedItem}: under the parent item for a command that records
+ * a parent, at the application for any other, and by its kind for a
+ * singleton root. The item must exist before any property is read.
  */
 function buildGetBody(
   command: Command,
@@ -1807,21 +1892,44 @@ function buildGetBody(
   resourcePlural: string,
   manifest: AppManifest
 ): ResourceBody {
-  const { resource } = source
-  if (resource?.roots !== undefined) {
-    return buildRootGetBody(command, source, resource.roots, manifest)
-  }
-  const parentScope = recordedParentScope(command, manifest)
-  const identifierParam = resolveIdentifierParam(command)
-  const bindItem = bindTarget(
-    command,
-    source.resource,
-    resourcePlural,
-    parentScope,
-    identifierParam
+  const selected = bindSelectedItem(command, source.resource, resourcePlural, manifest)
+  const body = lines(
+    selected.statements,
+    readOutputProperties(manifest, source, 'item', selected.kindLocal),
+    'return obj;'
   )
-  const body = lines(bindItem, readOutputProperties(manifest, source, 'item'), 'return obj;')
-  return { body, identifierArguments: identifierArgumentsOf(parentScope, identifierParam) }
+  return { body, identifierArguments: selected.identifierArguments }
+}
+
+/**
+ * Send a non-CRUD resource command its selected item as the direct argument,
+ * as the dictionary requires (Notes show, Xcode build, Mail send).
+ * {@link bindSelectedItem} checks item and parent existence before dispatch.
+ * Only supplied dictionary parameters enter the named record; item and parent
+ * identifiers are lookup keys and never enter it. With no named values the
+ * app receives the item alone. The app's result is returned unchanged.
+ */
+function buildItemCommandBody(
+  command: Command,
+  resource: Resource | undefined,
+  resourcePlural: string,
+  manifest: AppManifest
+): ResourceBody {
+  const selected = bindSelectedItem(command, resource, resourcePlural, manifest)
+  const lookupKeys = new Set([selected.itemParameter, selected.parentParameter])
+  const named = command.parameters.filter((p) => !lookupKeys.has(p.name))
+  const call = member('app', command.name)
+  const invocation =
+    named.length === 0
+      ? `${call}(item)`
+      : `Object.keys(params).length > 0 ? ${call}(item, params) : ${call}(item)`
+  const body = lines(
+    selected.statements,
+    named.length === 0 ? '' : collectSuppliedParameters('params', named),
+    `var result = ${invocation};`,
+    'return result;'
+  )
+  return { body, identifierArguments: selected.identifierArguments }
 }
 
 /** Local holding the application property each kind of a singleton root names. */
@@ -1832,35 +1940,6 @@ const KIND_LOCAL = 'itemKind'
 /** Statement binding {@link ROOTS_LOCAL} to each kind's application property. */
 function bindRoots(roots: ResourceRoots): string {
   return `var ${ROOTS_LOCAL} = ${JSON.stringify(rootProperties(roots))};`
-}
-
-/**
- * Read the object of one kind of a singleton root: the application property
- * the kind names. A kind the resource does not have, and a kind whose
- * property holds no object on this Mac, both fail as "no such object", never
- * as an empty record. The record's `kind` is the kind it was found by.
- */
-function buildRootGetBody(
-  command: Command,
-  source: RecordSource,
-  roots: ResourceRoots,
-  manifest: AppManifest
-): ResourceBody {
-  const kindParam = resolveIdentifierParam(command)
-  const body = lines(
-    bindRoots(roots),
-    `var ${KIND_LOCAL} = ${argument(kindParam)};`,
-    `if (typeof ${KIND_LOCAL} !== "string" || !Object.prototype.hasOwnProperty.call(${ROOTS_LOCAL}, ${KIND_LOCAL})) {`,
-    "  var unknownKind = new Error('No such object.');",
-    `  unknownKind.errorNumber = ${String(NO_SUCH_OBJECT_ERROR_NUMBER)};`,
-    '  throw unknownKind;',
-    '}',
-    `var item = app[${ROOTS_LOCAL}[${KIND_LOCAL}]];`,
-    failIfMissing('item'),
-    readOutputProperties(manifest, source, 'item', KIND_LOCAL),
-    'return obj;'
-  )
-  return { body, identifierArguments: [kindParam] }
 }
 
 /**
@@ -1920,11 +1999,9 @@ function buildDeleteBody(
   resourcePlural: string,
   manifest: AppManifest
 ): ResourceBody {
-  const parentScope = recordedParentScope(command, manifest)
-  const identifierParam = resolveIdentifierParam(command)
-  const bindItem = bindTarget(command, resource, resourcePlural, parentScope, identifierParam)
-  const body = lines(bindItem, 'item.delete();', 'return null;')
-  return { body, identifierArguments: identifierArgumentsOf(parentScope, identifierParam) }
+  const selected = bindSelectedItem(command, resource, resourcePlural, manifest)
+  const body = lines(selected.statements, 'item.delete();', 'return null;')
+  return { body, identifierArguments: selected.identifierArguments }
 }
 
 /**
@@ -1996,13 +2073,11 @@ function buildUpdateBody(
   manifest: AppManifest
 ): ResourceBody {
   const { resource } = source
-  const parentScope = recordedParentScope(command, manifest)
-  const identifierParam = resolveIdentifierParam(command)
-  const excluded = new Set([identifierParam, parentScope?.parentIdParam])
+  const selected = bindSelectedItem(command, resource, resourcePlural, manifest)
+  const excluded = new Set([selected.itemParameter, selected.parentParameter])
   const writableFields = command.parameters.filter((p) => !excluded.has(p.name))
-  const bindItem = bindTarget(command, resource, resourcePlural, parentScope, identifierParam)
   const body = lines(
-    bindItem,
+    selected.statements,
     ...writableFields.map(
       (p) =>
         `if (${supplied(p.name)}) { try { ${member('item', nativePropertyName(resource, p.name))} = ${argumentValue(p.name, p)}; } catch (e) {} }`
@@ -2010,7 +2085,7 @@ function buildUpdateBody(
     readOutputProperties(manifest, source, 'item'),
     'return obj;'
   )
-  return { body, identifierArguments: identifierArgumentsOf(parentScope, identifierParam) }
+  return { body, identifierArguments: selected.identifierArguments }
 }
 
 // ---------------------------------------------------------------------------

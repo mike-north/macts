@@ -29,17 +29,10 @@ export interface Pane {
 export type PaneCreateInput = Record<string, never>;
 
 // @public
-export interface PaneResourceClient {
-    authorize(options?: CallOptions): Promise<void>;
-    timedLoad(options?: CallOptions): Promise<void>;
-}
-
-// @public
 export type PaneUpdateInput = Record<string, never>;
 
 // @public
 export interface SystemSettingsClient extends ClientBrand<SystemSettingsResources> {
-    readonly panes: PaneResourceClient;
     reveal(options?: CallOptions): Promise<void>;
 }
 

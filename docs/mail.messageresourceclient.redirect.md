@@ -4,7 +4,7 @@
 
 ## MessageResourceClient.redirect() method
 
-Creates a redirected message.
+Creates a redirected message. macts does not yet send the message to the app, so the app acts on whatever it chooses.
 
 **Signature:**
 

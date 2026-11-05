@@ -3,13 +3,14 @@ import { getClient } from '../../../../sdk.js'
 import { createFormatter } from '../../../../output/index.js'
 
 /**
- * update file track information from the current information in the track’s file
+ * update file track information from the current information in the track’s file. macts does not yet send the file track to the app, so the app acts on whatever it chooses.
  */
 export class RefreshFileTrackCommand extends Command {
   static override paths = [['music', 'sources', 'userPlaylists', 'fileTracks', 'refresh']]
 
   static override usage = Command.Usage({
-    description: 'update file track information from the current information in the track’s file',
+    description:
+      'update file track information from the current information in the track’s file. macts does not yet send the file track to the app, so the app acts on whatever it chooses.',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

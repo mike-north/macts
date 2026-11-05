@@ -4,9 +4,10 @@
  * by.
  *
  * A resource-scoped list, get, create, update or delete that records a
- * parent (`command.parent`) looks the parent up by the parent resource's
- * identifier targeting (phases/13 D10, command parents and identifier
- * targeting). When that targeting is `byProperty` and the identifier makes
+ * parent (`command.parent`), and any other resource command, which selects
+ * its item as a get does (#287), looks the parent up by the parent
+ * resource's identifier targeting (phases/13 D10, command parents and
+ * identifier targeting). When that targeting is `byProperty` and the identifier makes
  * no uniqueness claim, several parents can share the value, and the
  * operation uses the first of them in the app's element order. The HTTP
  * client's docs, the contract client's, and the CLI list, get and create
@@ -99,7 +100,7 @@ const UNIQUE_NAME = `      - property: name
         unique: true
         evidence: { unique: { source: curated, note: 'Library refuses a second vault with a taken name.' } }`
 
-const MANIFEST = parseManifestYaml(`
+const MANIFEST_YAML = `
 version: '1.0'
 app: { name: Library, bundleId: com.example.library, tccEntitlements: [] }
 suites: []
@@ -137,11 +138,13 @@ hierarchy:
       children:
         pens: { resource: Pen, access: rw }
 commands:
-${commandsYaml('Shelf', 'name')}${commandsYaml('Book', 'name', { resource: 'Shelf', parameter: 'shelf' })}${commandsYaml('Vault', 'name')}${commandsYaml('Coin', 'id', { resource: 'Vault', parameter: 'vault' })}${commandsYaml('Box', 'id')}${commandsYaml('Card', 'id', { resource: 'Box', parameter: 'box' })}${commandsYaml('Drawer', 'path')}${commandsYaml('Pen', 'id', { resource: 'Drawer', parameter: 'drawer' })}`)
+${commandsYaml('Shelf', 'name')}${commandsYaml('Book', 'name', { resource: 'Shelf', parameter: 'shelf' })}${commandsYaml('Vault', 'name')}${commandsYaml('Coin', 'id', { resource: 'Vault', parameter: 'vault' })}${commandsYaml('Box', 'id')}${commandsYaml('Card', 'id', { resource: 'Box', parameter: 'box' })}${commandsYaml('Drawer', 'path')}${commandsYaml('Pen', 'id', { resource: 'Drawer', parameter: 'drawer' })}`
+
+const MANIFEST = parseManifestYaml(MANIFEST_YAML)
 
 /** The generated package's files, by path. */
-function generatedFiles(): Map<string, string> {
-  const result = generateClientPackage(MANIFEST, {
+function generatedFiles(manifest = MANIFEST): Map<string, string> {
+  const result = generateClientPackage(manifest, {
     appName: 'library',
     clientPackageName: '@macts/library',
   })
@@ -235,5 +238,33 @@ describe('no parent first-match note', () => {
   // there are the books'.
   it('in the contract, beyond the books', () => {
     expect(occurrences(prose(files.get('src/contract/index.ts')), USED_AS)).toBe(5)
+  })
+})
+
+describe('the first-match notes on a resource command under a parent', () => {
+  // A book's `dust`, a resource command, selects its book within its shelf
+  // as the book's get does, so it reaches a shared shelf name and a shared
+  // book name alike, and its docs carry both sentences, the item's first.
+  const files = generatedFiles(
+    parseManifestYaml(`${MANIFEST_YAML}  dustBook:
+    name: dust
+    description: Dust a book.
+    scope: resource
+    resourceType: Book
+    parent: { resource: Shelf, parameter: shelf }
+    parameters:
+      - { name: shelf, type: string, description: Which shelf, required: true }
+      - { name: name, type: string, description: Which book, required: true }
+`)
+  )
+  const DUST_DOC = `Dust a book. ${BOOK_ITEM_NOTE} ${SHELF_PARENT_NOTE}`
+
+  it('are on the HTTP client and contract client methods', () => {
+    expect(prose(files.get('src/resources/book.ts'))).toContain(DUST_DOC)
+    expect(prose(files.get('src/contract/index.ts'))).toContain(DUST_DOC)
+  })
+
+  it('are in the CLI description', () => {
+    expect(bookCli(files, 'dust')).toContain(`description: "${DUST_DOC}"`)
   })
 })

@@ -20,7 +20,8 @@ export class UIElementResourceClient {
   }
 
   /**
-   * cause the target process to behave as if the UI element were clicked
+   * cause the target process to behave as if the UI element were clicked.
+   * macts does not yet send the UI element to the app, so the app acts on whatever it chooses.
    */
   async click(at?: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
     await this.#http.invoke<undefined>(
@@ -32,7 +33,8 @@ export class UIElementResourceClient {
   }
 
   /**
-   * set the selected property of the UI element
+   * set the selected property of the UI element.
+   * macts does not yet send the UI element to the app, so the app acts on whatever it chooses.
    */
   async select(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
     await this.#http.invoke<undefined>(

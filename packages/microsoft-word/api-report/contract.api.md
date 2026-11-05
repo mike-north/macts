@@ -99,14 +99,14 @@ export interface DocumentCreateInput {
 
 // @public
 export interface DocumentResourceClient {
-    activate(options?: CallOptions): Promise<void>;
-    close(saving?: boolean, options?: CallOptions): Promise<void>;
-    createRange(start?: Integer, end?: Integer, options?: CallOptions): Promise<void>;
+    activate(id: string, options?: CallOptions): Promise<void>;
+    close(id: string, saving?: boolean, options?: CallOptions): Promise<void>;
+    createRange(id: string, start?: Integer, end?: Integer, options?: CallOptions): Promise<void>;
     get(id: string, options?: CallOptions): Promise<Document>;
     list(options?: CallOptions): Promise<Page<Document>>;
-    print(options?: CallOptions): Promise<void>;
-    save(options?: CallOptions): Promise<void>;
-    saveAs(fileName: string, fileFormat?: SaveFormat, options?: CallOptions): Promise<void>;
+    print(id: string, options?: CallOptions): Promise<void>;
+    save(id: string, options?: CallOptions): Promise<void>;
+    saveAs(id: string, fileName: string, fileFormat?: SaveFormat, options?: CallOptions): Promise<void>;
 }
 
 // @public

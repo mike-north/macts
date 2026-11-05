@@ -57,35 +57,35 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[activate(\_\_mactsOptions)](./microsoft-word.documentresourceclient.activate.md)
+[activate(id, \_\_mactsOptions)](./microsoft-word.documentresourceclient.activate.md)
 
 </td><td>
 
 </td><td>
 
-Activate the specified document window
+Activate the specified document window. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[close(saving, \_\_mactsOptions)](./microsoft-word.documentresourceclient.close.md)
+[close(id, saving, \_\_mactsOptions)](./microsoft-word.documentresourceclient.close.md)
 
 </td><td>
 
 </td><td>
 
-Close the specified document
+Close the specified document. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[createRange(start, end, \_\_mactsOptions)](./microsoft-word.documentresourceclient.createrange.md)
+[createRange(id, start, end, \_\_mactsOptions)](./microsoft-word.documentresourceclient.createrange.md)
 
 </td><td>
 
 </td><td>
 
-Create a text range by character positions
+Create a text range by character positions. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
@@ -112,35 +112,35 @@ List all documents, as one page.
 </td></tr>
 <tr><td>
 
-[print(\_\_mactsOptions)](./microsoft-word.documentresourceclient.print.md)
+[print(id, \_\_mactsOptions)](./microsoft-word.documentresourceclient.print.md)
 
 </td><td>
 
 </td><td>
 
-Print the specified document
+Print the specified document. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[save(\_\_mactsOptions)](./microsoft-word.documentresourceclient.save.md)
+[save(id, \_\_mactsOptions)](./microsoft-word.documentresourceclient.save.md)
 
 </td><td>
 
 </td><td>
 
-Save the specified document
+Save the specified document. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[saveAs(fileName, fileFormat, \_\_mactsOptions)](./microsoft-word.documentresourceclient.saveas.md)
+[saveAs(id, fileName, fileFormat, \_\_mactsOptions)](./microsoft-word.documentresourceclient.saveas.md)
 
 </td><td>
 
 </td><td>
 
-Save the document with a new name or format
+Save the document with a new name or format. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 </tbody></table>

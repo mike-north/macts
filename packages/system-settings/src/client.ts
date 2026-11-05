@@ -5,7 +5,6 @@
  * @packageDocumentation
  */
 
-import { PaneResourceClient } from './resources/pane.js'
 import { systemSettingsContract as appContract } from './contract/index.js'
 import {
   createCodecClient,
@@ -168,13 +167,10 @@ export interface SystemSettingsClient extends ClientBrand<SystemSettingsResource
 export class SystemSettingsClient {
   readonly #httpClient: HttpClient
 
-  /** A settings pane. */
-  readonly panes: PaneResourceClient
-
   constructor(options: SystemSettingsClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.panes = new PaneResourceClient(this.#httpClient, 'system-settings', 'panes')
+
     this.#httpClient.bind(this)
   }
 

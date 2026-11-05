@@ -123,10 +123,10 @@ export class ReminderResourceClient {
   /**
    * Show the reminder in Reminders.app UI
    */
-  async show(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+  async show(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.show`,
-      {},
+      { id },
       __mactsOptions,
       'Reminder'
     )

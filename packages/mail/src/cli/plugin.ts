@@ -1,5 +1,4 @@
 import type { CliPlugin } from '@macts/cli'
-import { BounceMessageCommand } from './commands/accounts/mailboxes/messages/bounce.js'
 import { ForwardMessageCommand } from './commands/accounts/mailboxes/messages/forward.js'
 import { RedirectMessageCommand } from './commands/accounts/mailboxes/messages/redirect.js'
 import { ReplyMessageCommand } from './commands/accounts/mailboxes/messages/reply.js'
@@ -21,7 +20,6 @@ export const plugin: CliPlugin = {
   name: 'mail',
   description: 'Commands for Mail',
   commands: [
-    BounceMessageCommand,
     ForwardMessageCommand,
     RedirectMessageCommand,
     ReplyMessageCommand,

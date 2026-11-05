@@ -26,15 +26,6 @@ Raw RPC compatibility and canonical typed invocation for this app and credential
 </td></tr>
 <tr><td>
 
-[PaneResourceClient](./system-settings.paneresourceclient.md)
-
-</td><td>
-
-Client for a settings pane..
-
-</td></tr>
-<tr><td>
-
 [SystemSettingsClient](./system-settings.systemsettingsclient.md)
 
 </td><td>

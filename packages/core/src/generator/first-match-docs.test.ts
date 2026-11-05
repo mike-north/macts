@@ -17,9 +17,11 @@
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md §D10
  */
 
+import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { parseManifestYaml } from '../manifest/loader.js'
+import { loadManifest, parseManifestYaml } from '../manifest/loader.js'
 import { generateClientPackage } from './client/index.js'
+import { generateConsolidatedPackages } from './orchestrate.js'
 
 /** The sentence for a document matched on its name, written by hand. */
 const DOCUMENT_NOTE =
@@ -148,5 +150,32 @@ describe('no first-match note', () => {
   // are the document's.
   it('in the contract, beyond the document', () => {
     expect(occurrences(prose(files.get('src/contract/index.ts')), FIRST_MATCH)).toBe(3)
+  })
+})
+
+describe('the first-match note after a description with no full stop', () => {
+  // Xcode's `build` is described as `Invoke the "build" scheme action`, with
+  // no full stop, and acts on a workspace document matched on its name. The
+  // note must follow it as a new sentence, not run on from it (#287).
+  const BUILD_DOC =
+    'Invoke the "build" scheme action. When several workspace documents share the same name, the first match in the app\'s order is used, and the operation does not fail as ambiguous.'
+
+  it('starts a new sentence in the HTTP client, contract client and CLI docs', async () => {
+    const manifest = await loadManifest(resolve(process.cwd(), '../../manifests/xcode/app.yaml'))
+    const result = generateConsolidatedPackages(manifest, { appName: 'xcode' })
+    expect(result.errors).toEqual([])
+    const files = new Map(
+      [...result.client.files, ...result.server.files].map((file) => [file.path, file.content])
+    )
+    // The HTTP client sets each sentence on its own doc line.
+    expect(files.get('src/resources/workspacedocument.ts')).toContain(
+      `   * ${BUILD_DOC.replace('action. When', 'action.\n   * When')}\n   */\n  async build(`
+    )
+    // The contract client wraps its doc; joined back, it is one paragraph.
+    const contract = (files.get('src/contract/index.ts') ?? '').replace(/\n\s*\* /g, ' ')
+    expect(contract).toContain(BUILD_DOC)
+    expect(files.get('src/cli/commands/workspaceDocuments/build.ts')).toContain(
+      `description: ${JSON.stringify(BUILD_DOC)},`
+    )
   })
 })

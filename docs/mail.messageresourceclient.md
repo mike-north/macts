@@ -57,24 +57,13 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[bounce(\_\_mactsOptions)](./mail.messageresourceclient.bounce.md)
-
-</td><td>
-
-</td><td>
-
-Does nothing at all (deprecated)
-
-</td></tr>
-<tr><td>
-
 [forward(openingWindow, \_\_mactsOptions)](./mail.messageresourceclient.forward.md)
 
 </td><td>
 
 </td><td>
 
-Creates a forwarded message.
+Creates a forwarded message. macts does not yet send the message to the app, so the app acts on whatever it chooses.
 
 </td></tr>
 <tr><td>
@@ -85,7 +74,7 @@ Creates a forwarded message.
 
 </td><td>
 
-Creates a redirected message.
+Creates a redirected message. macts does not yet send the message to the app, so the app acts on whatever it chooses.
 
 </td></tr>
 <tr><td>
@@ -96,7 +85,7 @@ Creates a redirected message.
 
 </td><td>
 
-Creates a reply message.
+Creates a reply message. macts does not yet send the message to the app, so the app acts on whatever it chooses.
 
 </td></tr>
 </tbody></table>

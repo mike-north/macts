@@ -934,7 +934,7 @@ describe('generateContract: errors', () => {
         description: 'Archive again',
         scope: 'resource',
         resourceType: 'Note',
-        parameters: [],
+        parameters: [{ name: 'noteId', type: 'string', description: 'The note', required: true }],
       }
     })
     expect(result.errors).toEqual([

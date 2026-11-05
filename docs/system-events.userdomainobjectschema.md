@@ -11,8 +11,33 @@ Raw passthrough validator; typed SDK records use the canonical contract codec.
 ```typescript
 UserDomainObjectSchema: z.ZodObject<
   {
+    desktopFolder: z.ZodString
+    documentsFolder: z.ZodString
+    downloadsFolder: z.ZodString
+    favoritesFolder: z.ZodString
+    homeFolder: z.ZodString
+    moviesFolder: z.ZodString
+    musicFolder: z.ZodString
+    picturesFolder: z.ZodString
+    publicFolder: z.ZodString
+    sitesFolder: z.ZodString
+    temporaryItemsFolder: z.ZodString
+    kind: z.ZodString
+    applicationSupportFolder: z.ZodString
+    applicationsFolder: z.ZodString
+    desktopPicturesFolder: z.ZodString
+    folderActionScriptsFolder: z.ZodString
+    fontsFolder: z.ZodString
     id: z.ZodString
+    libraryFolder: z.ZodString
     name: z.ZodString
+    preferencesFolder: z.ZodString
+    scriptingAdditionsFolder: z.ZodString
+    scriptsFolder: z.ZodString
+    sharedDocumentsFolder: z.ZodString
+    speakableItemsFolder: z.ZodString
+    utilitiesFolder: z.ZodString
+    workflowsFolder: z.ZodString
   },
   z.core.$strip
 >

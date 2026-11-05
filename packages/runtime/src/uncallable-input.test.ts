@@ -57,6 +57,9 @@ const LIBRARIAN_SECRET = 'macts_sk_librarian-secret-never-logged'
 /** The id, permission and command of the operation whose input takes references. */
 const SHELVE_BOOK: OperationId = 'library.books.shelveBook'
 
+/** The ISBN of the book every `shelveBook` call shelves. */
+const BOOK_ISBN = '978-0-00-000000-0'
+
 /** Holds every permission the fixture's operations require. */
 const LIBRARIAN: Authority = {
   subject: 'key_librarian',
@@ -88,7 +91,11 @@ const CONFIRM_FIRST_LIBRARY: GovernancePolicy = {
   tags: [],
 }
 
-/** {@link LIBRARY_MANIFEST} with a `shelveBook` command on books. */
+/**
+ * {@link LIBRARY_MANIFEST} with a `shelveBook` command on books. It selects the
+ * book it shelves by `isbn`, as the book's get does, since a resource command
+ * acts on one item (D5).
+ */
 const MANIFEST: AppManifest = {
   ...LIBRARY_MANIFEST,
   commands: {
@@ -98,7 +105,7 @@ const MANIFEST: AppManifest = {
       description: 'Shelve a book',
       scope: 'resource',
       resourceType: 'Book',
-      parameters: [],
+      parameters: [{ name: 'isbn', type: 'string', description: 'ISBN', required: true }],
     },
   },
 }
@@ -117,6 +124,7 @@ function contract(unavailable: readonly OperationId[] = []): AppContract<unknown
     target: { command: 'shelveBook', resource: 'Book' },
     description: 'Shelve a book',
     input: t.record({
+      isbn: t.string(),
       shelf: t.optional(t.reference(scope, 'Shelf', 'one')),
       page: t.optional(t.reference(scope, 'Page', 'one')),
     }),
@@ -202,6 +210,7 @@ describe('invoke: a reference in raw input must name a resolvable object (D7)', 
     await runtime.invoke(
       SHELVE_BOOK,
       {
+        isbn: BOOK_ISBN,
         shelf: {
           reference: { resource: 'Shelf', form: 'identity', cardinality: 'one', id: 'SF-1' },
         },
@@ -222,7 +231,7 @@ describe('invoke: a reference in raw input must name a resolvable object (D7)', 
     }
 
     const error = await rejection(
-      runtime.invoke(SHELVE_BOOK, { page: { reference: page } }, librarian())
+      runtime.invoke(SHELVE_BOOK, { isbn: BOOK_ISBN, page: { reference: page } }, librarian())
     )
 
     expect(error).toBeInstanceOf(ValidationError)
@@ -247,7 +256,11 @@ describe('invoke: a reference in raw input must name a resolvable object (D7)', 
     }
 
     const error = await rejection(
-      runtime.invoke(SHELVE_BOOK, { shelf: { reference: shelfOnPage } }, librarian())
+      runtime.invoke(
+        SHELVE_BOOK,
+        { isbn: BOOK_ISBN, shelf: { reference: shelfOnPage } },
+        librarian()
+      )
     )
 
     expect(error).toBeInstanceOf(ValidationError)

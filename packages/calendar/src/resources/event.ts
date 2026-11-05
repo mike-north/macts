@@ -111,12 +111,17 @@ export class EventResourceClient {
   }
 
   /**
-   * Show the event or to-do in the calendar window
+   * Show the event or to-do in the calendar window.
+   * When several calendars share the same name, the first match in the app's order is used as the calendar.
    */
-  async show(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+  async show(
+    calendarId: string,
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.show`,
-      {},
+      { calendarId, id },
       __mactsOptions,
       'Event'
     )

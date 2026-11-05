@@ -14,14 +14,13 @@ export class DuplicateMediaItemCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   mediaItemId = Option.String({ name: 'id', required: true })
-  id = Option.String('--id', { required: true, description: 'The media item to duplicate' })
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
       await client.mediaItems.duplicate(
-        this.id as unknown as Parameters<typeof client.mediaItems.duplicate>[0]
+        this.mediaItemId as unknown as Parameters<typeof client.mediaItems.duplicate>[0]
       )
 
       const output = formatter.formatSuccess('duplicate completed successfully')

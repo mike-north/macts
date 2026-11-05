@@ -16,7 +16,12 @@
  */
 
 import type { AppManifest, Command, CommandParameter, Resource } from '../manifest/index.js'
-import { itemIdentifierParameter, unselectableItemCommands } from '../manifest/item-selection.js'
+import {
+  itemIdentifierParameter,
+  selectsOneItem,
+  sendsNoItem,
+  unselectableItemCommands,
+} from '../manifest/item-selection.js'
 import { untargetedIdentifiers } from '../manifest/identifier-targeting.js'
 import { resolveIdentifierTargeting } from '../manifest/identifier.js'
 import { positionalProblems } from '../manifest/positional.js'
@@ -188,13 +193,15 @@ export function firstMatchNote(resource: Resource | undefined): string | undefin
  * The sentence a generated doc adds about parents that share the value an
  * operation looks its parent up by, or `undefined` when none can.
  *
- * A resource-scoped list, get, create, update or delete that records a
- * parent (`command.parent`) looks the parent up in its collection by the
- * parent resource's identifier targeting (phases/13 D10, command parents).
- * When that lookup is a first match ({@link firstMatchNote}'s rule, applied
- * to the parent resource), several parents can share the value and the
- * operation uses the first of them. Any other command is called on the app
- * with its parameters and looks no parent up, so it gets no sentence.
+ * A resource-scoped command that records a parent (`command.parent`) looks
+ * the parent up in its collection by the parent resource's identifier
+ * targeting (phases/13 D10, command parents): a list, get, create, update or
+ * delete, and any other resource command, which selects its item as a get
+ * does. When that lookup is a first match ({@link firstMatchNote}'s rule,
+ * applied to the parent resource), several parents can share the value and
+ * the operation uses the first of them. An app command, and a known gap that
+ * sends no item ({@link itemNotSentNote}), looks no parent up, so it gets no
+ * sentence.
  *
  * @param command - The operation's command.
  * @param manifest - The app manifest declaring the parent resource.
@@ -203,7 +210,7 @@ export function firstMatchNote(resource: Resource | undefined): string | undefin
  */
 export function parentFirstMatchNote(command: Command, manifest: AppManifest): string | undefined {
   const parent = command.parent
-  if (parent === undefined || command.scope !== 'resource' || !isCrudName(command.name)) {
+  if (parent === undefined || command.scope !== 'resource' || sendsNoItem(command)) {
     return undefined
   }
   const resource = Object.hasOwn(manifest.resources, parent.resource)
@@ -226,6 +233,53 @@ function firstMatchProperty(resource: Resource | undefined): string | undefined 
   if (resource === undefined || targeting?.strategy !== 'byProperty') return undefined
   if (resolvePrimaryIdentifier(resource)?.unique === true) return undefined
   return targeting.property
+}
+
+/**
+ * Explain a known gap's itemless call in generated docs, or return undefined
+ * when the command selects an item. Generation refuses unlisted itemless
+ * commands, so this notice applies only to `KNOWN_ITEM_SELECTION_GAPS`.
+ */
+export function itemNotSentNote(command: Command, resource: Resource): string | undefined {
+  if (!sendsNoItem(command)) return undefined
+  return `macts does not yet send the ${identifierWords(resource.name)} to the app, so the app acts on whatever it chooses.`
+}
+
+/**
+ * Append ordered notes as one paragraph on every generated surface. Preserve
+ * a description without notes; otherwise end it in exactly one full stop so
+ * a manifest description without punctuation cannot run into the first note.
+ */
+export function describeWithNotes(description: string, notes: readonly string[]): string {
+  return describedSentences(description, notes).join(' ')
+}
+
+/**
+ * The same punctuation contract as {@link describeWithNotes}, with separate
+ * sentences for surfaces that put each on its own line.
+ */
+export function describedSentences(description: string, notes: readonly string[]): string[] {
+  if (notes.length === 0) return [description]
+  return [`${description.replace(/[\s.]+$/, '')}.`, ...notes]
+}
+
+/**
+ * The sentences a generated doc adds about how a resource command selects
+ * the item it acts on, in order: that macts does not yet send it
+ * ({@link itemNotSentNote}) alone, or else the first-match sentences a get's
+ * doc has, the item's ({@link firstMatchNote}) then its parent's
+ * ({@link parentFirstMatchNote}). Empty when none applies.
+ */
+export function resourceCommandNotes(
+  command: Command,
+  resource: Resource,
+  manifest: AppManifest
+): string[] {
+  const notSent = itemNotSentNote(command, resource)
+  if (notSent !== undefined) return [notSent]
+  return [firstMatchNote(resource), parentFirstMatchNote(command, manifest)].filter(
+    (note): note is string => note !== undefined
+  )
 }
 
 /**
@@ -279,8 +333,9 @@ export function generationRefusals(manifest: AppManifest): string[] {
 }
 
 /**
- * The request parameter names that identify the target of a get, update, or
- * delete command.
+ * The request parameter names that identify the target of a resource-scoped
+ * command that acts on one item: a get, update or delete, or any other
+ * resource command but a list or create (`selectsOneItem`).
  *
  * A command on a nested resource records its parent (`command.parent`), and
  * the parent scope is the parameter it names (`calendarId` on `getEvent`).
@@ -353,21 +408,36 @@ export interface BodyField {
  * The positional signature and request body of a command method (an app
  * command, or a resource command that is not a CRUD shape).
  *
- * The signature lists required parameters first, then optional ones, each in
- * declaration order, with reserved words escaped. The body forwards every
- * parameter under its manifest name, in declaration order, so the server
- * validates it.
+ * A resource command acts on one item, so its signature starts as a get's
+ * does: the parent's identifier parameter, when the command records a
+ * parent, then the item's ({@link resolveIdParams}). The other parameters
+ * follow, required first, then optional ones, each in declaration order, with
+ * reserved words escaped; an app command has only those, and so has a known
+ * gap, which declares no item ({@link itemNotSentNote}). The body forwards
+ * every parameter under its manifest name, in declaration order, so the
+ * server validates it.
  */
 export function commandMethodParameters(command: Command): {
   signature: SignatureParameter[]
   body: BodyField[]
 } {
-  const sortedParams = [...command.parameters].sort((a, b) => {
-    if (a.required && !b.required) return -1
-    if (!a.required && b.required) return 1
-    return 0
-  })
-  const signature = sortedParams.map((parameter) => ({
+  const item =
+    command.scope === 'resource' && selectsOneItem(command)
+      ? itemIdentifierParameter(command)
+      : undefined
+  const parent =
+    item === undefined
+      ? undefined
+      : command.parameters.find((p) => p.name === command.parent?.parameter)
+  const leading = [parent, item].filter((p): p is Command['parameters'][number] => p !== undefined)
+  const rest = command.parameters
+    .filter((p) => !leading.includes(p))
+    .sort((a, b) => {
+      if (a.required && !b.required) return -1
+      if (!a.required && b.required) return 1
+      return 0
+    })
+  const signature = [...leading, ...rest].map((parameter) => ({
     parameter,
     bindingName: safeIdentifier(parameter.name),
     optional: !parameter.required,

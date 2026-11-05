@@ -23,7 +23,10 @@ export class MovePlaylistCommand extends Command {
 
     try {
       const client = getClient()
-      await client.playlists.move(this.to as unknown as Parameters<typeof client.playlists.move>[0])
+      await client.playlists.move(
+        this.playlistId as unknown as Parameters<typeof client.playlists.move>[0],
+        this.to as unknown as Parameters<typeof client.playlists.move>[1]
+      )
 
       const output = formatter.formatSuccess('move completed successfully')
       this.context.stdout.write(output + '\n')

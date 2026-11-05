@@ -26,6 +26,42 @@ Client for an action that can be performed on the ui element.
 </td></tr>
 <tr><td>
 
+[ClassicDomainObjectResourceClient](./system-events.classicdomainobjectresourceclient.md)
+
+</td><td>
+
+Client for the classic domain in the file system.
+
+</td></tr>
+<tr><td>
+
+[DiskItemResourceClient](./system-events.diskitemresourceclient.md)
+
+</td><td>
+
+Client for an item stored in the file system.
+
+</td></tr>
+<tr><td>
+
+[DomainResourceClient](./system-events.domainresourceclient.md)
+
+</td><td>
+
+Client for a domain in the file system.
+
+</td></tr>
+<tr><td>
+
+[FolderResourceClient](./system-events.folderresourceclient.md)
+
+</td><td>
+
+Client for a folder in the file system.
+
+</td></tr>
+<tr><td>
+
 [HttpClient](./system-events.httpclient.md)
 
 </td><td>
@@ -58,6 +94,15 @@ Error class for SystemEvents API errors.
 </td><td>
 
 Client for a piece of the user interface of a process.
+
+</td></tr>
+<tr><td>
+
+[UserDomainObjectResourceClient](./system-events.userdomainobjectresourceclient.md)
+
+</td><td>
+
+Client for the user domain in the file system.
 
 </td></tr>
 </tbody></table>
@@ -1847,6 +1892,15 @@ Input for creating a ClassicDomainObject.
 </td></tr>
 <tr><td>
 
+[ClassicDomainObjectKind](./system-events.classicdomainobjectkind.md)
+
+</td><td>
+
+The kinds of ClassicDomainObject: each names the application property that holds one.
+
+</td></tr>
+<tr><td>
+
 [ClassicDomainObjectUpdateInput](./system-events.classicdomainobjectupdateinput.md)
 
 </td><td>
@@ -2896,6 +2950,15 @@ Input for updating a Toolbar. Omitted fields are left unchanged.
 </td><td>
 
 Input for creating an UserDomainObject.
+
+</td></tr>
+<tr><td>
+
+[UserDomainObjectKind](./system-events.userdomainobjectkind.md)
+
+</td><td>
+
+The kinds of UserDomainObject: each names the application property that holds one.
 
 </td></tr>
 <tr><td>

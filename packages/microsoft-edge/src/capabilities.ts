@@ -131,13 +131,17 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        tabId: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'string',
+        },
+        id: {
           description: 'Tab identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['tabId'],
+      required: ['windowId', 'id'],
     },
   },
   {
@@ -177,13 +181,17 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        tabId: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'string',
+        },
+        id: {
           description: 'Tab identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['tabId'],
+      required: ['windowId', 'id'],
     },
   },
   {
@@ -198,7 +206,11 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        tabId: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'string',
+        },
+        id: {
           description: 'Tab identifier',
           type: 'string',
         },
@@ -208,7 +220,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
         },
       },
       additionalProperties: false,
-      required: ['tabId', 'javascript'],
+      required: ['windowId', 'id', 'javascript'],
     },
   },
   {
@@ -248,13 +260,17 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        tabId: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'string',
+        },
+        id: {
           description: 'Tab identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['tabId'],
+      required: ['windowId', 'id'],
     },
   },
   {
@@ -269,13 +285,17 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        tabId: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'string',
+        },
+        id: {
           description: 'Tab identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['tabId'],
+      required: ['windowId', 'id'],
     },
   },
   {
@@ -311,13 +331,17 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        tabId: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'string',
+        },
+        id: {
           description: 'Tab identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['tabId'],
+      required: ['windowId', 'id'],
     },
   },
   {
@@ -332,13 +356,17 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        tabId: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'string',
+        },
+        id: {
           description: 'Tab identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['tabId'],
+      required: ['windowId', 'id'],
     },
   },
   {
@@ -353,13 +381,17 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        tabId: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'string',
+        },
+        id: {
           description: 'Tab identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['tabId'],
+      required: ['windowId', 'id'],
     },
   },
   {
@@ -374,13 +406,17 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        tabId: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'string',
+        },
+        id: {
           description: 'Tab identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['tabId'],
+      required: ['windowId', 'id'],
     },
   },
   {
@@ -395,13 +431,17 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        tabId: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'string',
+        },
+        id: {
           description: 'Tab identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['tabId'],
+      required: ['windowId', 'id'],
     },
   },
   {
@@ -416,13 +456,17 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        tabId: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'string',
+        },
+        id: {
           description: 'Tab identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['tabId'],
+      required: ['windowId', 'id'],
     },
   },
   {
@@ -437,13 +481,17 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        tabId: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'string',
+        },
+        id: {
           description: 'Tab identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['tabId'],
+      required: ['windowId', 'id'],
     },
   },
   {

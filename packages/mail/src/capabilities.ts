@@ -201,21 +201,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'mail.messages.bounce',
-    app: 'mail',
-    appBundleId: 'com.apple.mail',
-    resource: 'messages',
-    operation: 'bounce',
-    description: 'Does nothing at all (deprecated)',
-    permission: 'mail:messages:bounce',
-    risk: 'execute',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-      additionalProperties: false,
-    },
-  },
-  {
     name: 'mail.messages.forward',
     app: 'mail',
     appBundleId: 'com.apple.mail',
@@ -294,8 +279,14 @@ export const capabilities: readonly CapabilityMetadata[] = [
     risk: 'send',
     inputSchema: {
       type: 'object',
-      properties: {},
+      properties: {
+        id: {
+          description: 'The unique identifier of the outgoing message',
+          type: 'number',
+        },
+      },
       additionalProperties: false,
+      required: ['id'],
     },
   },
 ]

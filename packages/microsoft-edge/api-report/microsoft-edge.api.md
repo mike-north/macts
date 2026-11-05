@@ -185,21 +185,21 @@ export interface TabCreateInput {
 // @public
 export class TabResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    copySelection(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    copySelection(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     create(input: TabCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Tab>;
-    cutSelection(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    execute(tabId: string, javascript: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    cutSelection(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    execute(windowId: string, id: string, javascript: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Tab>;
-    goBack(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    goForward(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    goBack(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    goForward(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     list(windowId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Tab>>;
-    pasteSelection(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    redo(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    reload(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    selectAll(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    stop(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    undo(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    viewSource(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    pasteSelection(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    redo(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    reload(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    selectAll(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    stop(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    undo(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    viewSource(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public

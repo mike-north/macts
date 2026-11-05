@@ -17,8 +17,6 @@ suites:
       - Anchor
     commands:
       - reveal
-      - authorize
-      - timedLoad
 resources:
   Pane:
     name: Pane
@@ -70,17 +68,9 @@ commands:
     scope: application
     code: mvis
     parameters: []
-  authorize:
-    name: authorize
-    description: 'Prompt for authorization for a settings pane. Deprecated: no longer does anything.'
-    scope: resource
-    resourceType: Pane
-    code: maut
-    parameters: []
-  timedLoad:
-    name: timedLoad
-    description: 'Times and loads given settings pane and returns load time. Deprecated: no longer does anything.'
-    scope: resource
-    resourceType: Pane
-    code: 'mtml'
-    parameters: []
+  # `authorize` is not declared, so no operation is offered for it. Its
+  # dictionary description (System_Settings.sdef:77) ends:
+  # "Deprecated: no longer does anything."
+  # `timedLoad` is not declared, so no operation is offered for it. The
+  # dictionary marks it hidden and describes it (System_Settings.sdef:86) as:
+  # "Times and loads given settings pane and returns load time. Deprecated: no longer does anything."

@@ -191,7 +191,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        workspaceName: {
+        name: {
           description: 'Workspace document name',
           type: 'string',
         },
@@ -205,7 +205,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
         },
       },
       additionalProperties: false,
-      required: ['workspaceName', 'toProcessIdentifier', 'suspended'],
+      required: ['name', 'toProcessIdentifier', 'suspended'],
     },
   },
   {
@@ -220,13 +220,13 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        workspaceName: {
+        name: {
           description: 'Workspace document name',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['workspaceName'],
+      required: ['name'],
     },
   },
   {
@@ -241,13 +241,13 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        workspaceName: {
+        name: {
           description: 'Workspace document name',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['workspaceName'],
+      required: ['name'],
     },
   },
   {
@@ -263,7 +263,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        workspaceName: {
+        name: {
           description: 'Workspace document name',
           type: 'string',
         },
@@ -289,7 +289,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
         },
       },
       additionalProperties: false,
-      required: ['workspaceName'],
+      required: ['name'],
     },
   },
   {
@@ -340,7 +340,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        workspaceName: {
+        name: {
           description: 'Workspace document name',
           type: 'string',
         },
@@ -354,7 +354,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
         },
       },
       additionalProperties: false,
-      required: ['workspaceName'],
+      required: ['name'],
     },
   },
   {
@@ -369,13 +369,13 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        workspaceName: {
+        name: {
           description: 'Workspace document name',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['workspaceName'],
+      required: ['name'],
     },
   },
   {
@@ -390,7 +390,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        workspaceName: {
+        name: {
           description: 'Workspace document name',
           type: 'string',
         },
@@ -404,7 +404,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
         },
       },
       additionalProperties: false,
-      required: ['workspaceName'],
+      required: ['name'],
     },
   },
 ]

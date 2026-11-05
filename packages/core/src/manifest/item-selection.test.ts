@@ -1,11 +1,14 @@
 /**
  * Tests for the one rule that says which declared parameter selects the item
- * a get, update or delete acts on, and which commands are refused because
- * they declare none.
+ * a resource-scoped command acts on (a get, update or delete, or any other
+ * resource command but a list or create), and which commands are refused
+ * because they declare none.
  *
  * Expected values are written by hand from the fixtures: the identifier is the
  * first required parameter, in declaration order, other than the parameter
  * `command.parent` names (phases/13 D5).
+ *
+ * @see https://github.com/mike-north/macts/issues/287
  */
 
 import { describe, expect, it } from 'vitest'
@@ -86,21 +89,24 @@ describe('itemIdentifierParameter', () => {
 })
 
 describe('selectsOneItem', () => {
-  // Guards the rule's reach: resource-scoped get, update and delete, plus a
-  // delete at application scope. An application-scoped get or update is a
-  // plain call on the app (Finder's `update` refreshes item display), and a
-  // command of any other name selects no item.
+  // Guards the rule's reach: every resource-scoped command but a list or
+  // create, plus a delete at application scope. A resource-scoped command
+  // that is not a CRUD shape (Notes' `show`, Xcode's `build`) acts on the
+  // item its dictionary takes as the direct parameter (#287). An
+  // application-scoped get or update is a plain call on the app (Finder's
+  // `update` refreshes item display), as is any other application command.
   it.each<[string, Command['scope'], boolean]>([
     ['get', 'resource', true],
     ['update', 'resource', true],
     ['delete', 'resource', true],
+    ['show', 'resource', true],
+    ['build', 'resource', true],
     ['delete', 'application', true],
     ['get', 'application', false],
     ['update', 'application', false],
     ['duplicate', 'application', false],
     ['list', 'resource', false],
     ['create', 'resource', false],
-    ['show', 'resource', false],
   ])('a %s at %s scope: %s', (name, scope, expected) => {
     expect(selectsOneItem(command({ name, scope }))).toBe(expected)
   })
@@ -123,6 +129,23 @@ describe('itemSelectionProblem', () => {
     )
   })
 
+  // Regression (#287): a resource command that declares no identifier (Mail's
+  // `send` declared no parameters) is refused, saying the app receives the
+  // item as the command's direct parameter, and naming the parent.
+  it('refuses a resource command with no identifier, naming its key and the direct parameter', () => {
+    const problem = itemSelectionProblem(
+      'showWidget',
+      command({
+        name: 'show',
+        parent: { resource: 'Shelf', parameter: 'shelfId' },
+        parameters: [param('shelfId', true), param('verbose', false)],
+      })
+    )
+    expect(problem).toBe(
+      'its resource-scoped command "showWidget" declares no identifier parameter. A resource-scoped command acts on one item, which the app receives as the command\'s direct parameter, selected by a required parameter other than its parent parameter "shelfId", so without one no item can be selected. Declare the item\'s identifier as a required parameter of "showWidget", as the resource\'s get declares it.'
+    )
+  })
+
   // Guards the application-scoped delete with no parameters: it names no item,
   // so it is refused and told to scope itself to its resource.
   it('refuses an application-scoped delete with no parameters', () => {
@@ -141,6 +164,12 @@ describe('itemSelectionProblem', () => {
     ['a get with its identifier', command({ name: 'get', parameters: [param('id', true)] })],
     ['an application-scoped update', command({ name: 'update', scope: 'application' })],
     ['an application-scoped duplicate', command({ name: 'duplicate', scope: 'application' })],
+    [
+      'a resource command with its identifier',
+      command({ name: 'show', parameters: [param('id', true)] }),
+    ],
+    ['a resource-scoped list', command({ name: 'list' })],
+    ['a resource-scoped create', command({ name: 'create' })],
     [
       'an application-scoped delete with its identifier',
       command({ name: 'delete', scope: 'application', parameters: [param('path', true)] }),

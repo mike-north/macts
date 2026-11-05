@@ -4,10 +4,10 @@
 
 ## NativeCodecEnvironment.positionOf property
 
-Reads the zero-based position an app object's own specifier gives within its container, or `undefined` when the specifier is not positional (<!-- -->). The codec calls it to encode an object of a positional resource, and never reads a position any other way. Without it, no such object encodes.
+Reads the zero-based position an app object's own specifier gives within `collection` of its container, or `undefined` when the specifier gives no position there (<!-- -->). The codec calls it to encode an object of a positional resource, and never reads a position any other way. Without it, no such object encodes.
 
 **Signature:**
 
 ```typescript
-readonly positionOf?: (specifier: unknown) => unknown;
+readonly positionOf?: (specifier: unknown, collection: string) => unknown;
 ```

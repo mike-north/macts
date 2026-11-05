@@ -178,3 +178,32 @@ describe('commands under a positional parent', () => {
     )
   })
 })
+
+// Regression (#287): non-CRUD item commands must meet the same position and parent contract as get.
+describe('positional resource commands', () => {
+  it.each(['parent', 'type', 'nullable', 'missing'] as const)(
+    'refuses invalid %s addressing',
+    (shape) => {
+      const manifest = panesManifest()
+      const get = manifest.commands['getTab']
+      if (get === undefined) throw new Error('Panes requires getTab')
+      const subject = structuredClone(get)
+      subject.name = 'activate'
+      manifest.commands['activate'] = subject
+      if (shape === 'parent') delete subject.parent
+      const position = subject.parameters.find(({ name }) => name === 'index')
+      if (position === undefined) throw new Error('Panes requires index')
+      if (shape === 'type') position.type = 'string'
+      if (shape === 'missing')
+        subject.parameters = subject.parameters.filter(({ name }) => name !== 'index')
+      if (shape === 'nullable') {
+        position.nullable = true
+        position.evidence = { nullable: { source: 'curated', note: 'Fixture allows null' } }
+      }
+      expect(AppManifestSchema.safeParse(manifest).success).toBe(false)
+      expect(generateConsolidatedPackages(manifest, { appName: 'panes' }).errors.join(' ')).toMatch(
+        /activate.*(parent|position)|positional.*activate/
+      )
+    }
+  )
+})

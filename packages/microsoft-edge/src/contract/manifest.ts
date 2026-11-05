@@ -554,12 +554,22 @@ export const manifest: unknown = {
       resourceType: 'Tab',
       parameters: [
         {
-          name: 'tabId',
+          name: 'windowId',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'id',
           type: 'string',
           description: 'Tab identifier',
           required: true,
         },
       ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
       code: 'CrSu',
     },
     goBack: {
@@ -569,12 +579,22 @@ export const manifest: unknown = {
       resourceType: 'Tab',
       parameters: [
         {
-          name: 'tabId',
+          name: 'windowId',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'id',
           type: 'string',
           description: 'Tab identifier',
           required: true,
         },
       ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
       code: 'CrSu',
     },
     goForward: {
@@ -584,12 +604,22 @@ export const manifest: unknown = {
       resourceType: 'Tab',
       parameters: [
         {
-          name: 'tabId',
+          name: 'windowId',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'id',
           type: 'string',
           description: 'Tab identifier',
           required: true,
         },
       ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
       code: 'CrSu',
     },
     selectAll: {
@@ -599,12 +629,22 @@ export const manifest: unknown = {
       resourceType: 'Tab',
       parameters: [
         {
-          name: 'tabId',
+          name: 'windowId',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'id',
           type: 'string',
           description: 'Tab identifier',
           required: true,
         },
       ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
       code: 'CrSu',
     },
     cutSelection: {
@@ -614,12 +654,22 @@ export const manifest: unknown = {
       resourceType: 'Tab',
       parameters: [
         {
-          name: 'tabId',
+          name: 'windowId',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'id',
           type: 'string',
           description: 'Tab identifier',
           required: true,
         },
       ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
       code: 'CrSu',
     },
     copySelection: {
@@ -629,12 +679,22 @@ export const manifest: unknown = {
       resourceType: 'Tab',
       parameters: [
         {
-          name: 'tabId',
+          name: 'windowId',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'id',
           type: 'string',
           description: 'Tab identifier',
           required: true,
         },
       ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
       code: 'CrSu',
     },
     pasteSelection: {
@@ -644,12 +704,22 @@ export const manifest: unknown = {
       resourceType: 'Tab',
       parameters: [
         {
-          name: 'tabId',
+          name: 'windowId',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'id',
           type: 'string',
           description: 'Tab identifier',
           required: true,
         },
       ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
       code: 'CrSu',
     },
     undo: {
@@ -659,12 +729,22 @@ export const manifest: unknown = {
       resourceType: 'Tab',
       parameters: [
         {
-          name: 'tabId',
+          name: 'windowId',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'id',
           type: 'string',
           description: 'Tab identifier',
           required: true,
         },
       ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
       code: 'CrSu',
     },
     redo: {
@@ -674,12 +754,22 @@ export const manifest: unknown = {
       resourceType: 'Tab',
       parameters: [
         {
-          name: 'tabId',
+          name: 'windowId',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'id',
           type: 'string',
           description: 'Tab identifier',
           required: true,
         },
       ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
       code: 'CrSu',
     },
     stop: {
@@ -689,12 +779,22 @@ export const manifest: unknown = {
       resourceType: 'Tab',
       parameters: [
         {
-          name: 'tabId',
+          name: 'windowId',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'id',
           type: 'string',
           description: 'Tab identifier',
           required: true,
         },
       ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
       code: 'CrSu',
     },
     viewSource: {
@@ -704,12 +804,22 @@ export const manifest: unknown = {
       resourceType: 'Tab',
       parameters: [
         {
-          name: 'tabId',
+          name: 'windowId',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'id',
           type: 'string',
           description: 'Tab identifier',
           required: true,
         },
       ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
       code: 'CrSu',
     },
     execute: {
@@ -719,7 +829,13 @@ export const manifest: unknown = {
       resourceType: 'Tab',
       parameters: [
         {
-          name: 'tabId',
+          name: 'windowId',
+          type: 'string',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'id',
           type: 'string',
           description: 'Tab identifier',
           required: true,
@@ -731,6 +847,10 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
       code: 'CrSu',
     },
   },

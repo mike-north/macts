@@ -143,15 +143,15 @@ export interface DocumentCreateInput {
 // @public
 export class DocumentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    activate(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    close(saving?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    createRange(start?: number, end?: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    activate(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    close(id: string, saving?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    createRange(id: string, start?: number, end?: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Document>;
     list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Document>>;
-    print(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    save(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    print(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    save(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     // Warning: (ae-forgotten-export) The symbol "DocumentResourceClient_2" needs to be exported by the entry point index.d.ts
-    saveAs(fileName: string, fileFormat?: Parameters<DocumentResourceClient_2['saveAs']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    saveAs(id: string, fileName: string, fileFormat?: Parameters<DocumentResourceClient_2['saveAs']>[2], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public

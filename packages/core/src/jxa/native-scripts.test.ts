@@ -49,6 +49,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import { InternalError, ValidationError, type OperationTarget } from '@macts/contracts'
 import { loadManifest, parseManifestYaml } from '../manifest/loader.js'
 import { resolveManifestRoutes } from '../manifest/route.js'
+import { archiveManifest } from '../manifest/test-support/archive-key-and-root.js'
 import type { AppManifest } from '../manifest/schemas/app.js'
 import type { Command } from '../manifest/schemas/command.js'
 import type { Resource } from '../manifest/schemas/resource.js'
@@ -348,6 +349,8 @@ const calendarByRuntimeProperty: Resource = {
 
 let calendar: AppManifest
 let notes: AppManifest
+/** The Archive fixture, whose `Desk` is a singleton root. */
+const archive = archiveManifest()
 
 beforeAll(async () => {
   calendar = await loadManifest(manifestPath('calendar'))
@@ -2101,11 +2104,37 @@ describe('command calls', () => {
     )
   })
 
-  it('calls any other resource command on the app', () => {
-    const text = buildNativeBody(notes, { command: 'show', resource: 'Note' })
-    expect(text).toContain('params["name"] = args["name"];')
-    expect(text).toContain('var result = Object.keys(params).length > 0 ? app["show"](params)')
-    expect(text).toContain('return result;')
+  // Regression (#287): Notes' `show` was called on the application as
+  // `app.show({ name })`, a named key the dictionary does not declare, and
+  // sent no note. Notes.sdef:18: `show` takes the note as its direct
+  // parameter, so the note is selected as the get selects it, by name, and
+  // sent alone.
+  it('sends a resource command the item it selects as a get does, as its direct parameter', () => {
+    const plan = planNativeInvocation(notes, { command: 'show', resource: 'Note' })
+    const get = buildNativeBody(notes, { command: 'get', resource: 'Note' })
+    expect(plan.body).toContain('var item = app["notes"].whose({ "name": itemId })[0];')
+    expect(get).toContain('var item = app["notes"].whose({ "name": itemId })[0];')
+    expect(plan.body).toContain('var result = app["show"](item);')
+    expect(plan.body).not.toContain('params')
+    expect(plan.requiredArguments).toEqual(['name'])
+  })
+
+  // A singleton root's object is selected by its kind, as the root's get
+  // selects it, and sent as the direct parameter.
+  it('sends a resource command on a singleton root the object its kind names', () => {
+    const manifest: AppManifest = {
+      ...archive,
+      commands: {
+        ...archive.commands,
+        tidy: resourceCommand('tidy', 'Desk', [
+          { name: 'kind', type: { enum: 'DeskKind' }, description: 'Which desk', required: true },
+        ]),
+      },
+    }
+    const plan = planNativeInvocation(manifest, { command: 'tidy', resource: 'Desk' })
+    expect(plan.body).toContain('var item = app[roots[itemKind]];')
+    expect(plan.body).toContain('var result = app["tidy"](item);')
+    expect(plan.requiredArguments).toEqual(['kind'])
   })
 })
 

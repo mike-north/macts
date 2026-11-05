@@ -4,12 +4,12 @@
 
 ## WorkspaceDocumentResourceClient.test() method
 
-Invoke the "test" scheme action
+Invoke the "test" scheme action. When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 **Signature:**
 
 ```typescript
-test(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+test(name: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -29,7 +29,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-workspaceName
+name
 
 </td><td>
 
