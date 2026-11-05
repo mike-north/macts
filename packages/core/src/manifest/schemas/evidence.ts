@@ -530,6 +530,29 @@ export const IdentifierUniquenessEvidenceSchema = z
   .strict()
 export type IdentifierUniquenessEvidence = z.infer<typeof IdentifierUniquenessEvidenceSchema>
 
+/**
+ * The evidence that the objects of a resource are found by their position
+ * within their container (`ResourceSchema.positional`): a curated
+ * observation, dated and tied to the app version it was made on.
+ *
+ * The note says what was observed, in counts and booleans only, never a
+ * value: for example that the app's own specifier for each object reads back
+ * as a position within its container, and that addressing that position gives
+ * the same object.
+ */
+export const PositionalEvidenceSchema = z
+  .object({
+    source: z.literal('curated'),
+    /** What was observed, without any observed value. */
+    note: z.string().min(1),
+    /** When it was observed (an ISO 8601 UTC timestamp). */
+    observedAt: ObservedAtSchema,
+    /** The app version it was observed on. */
+    appVersion: z.string().min(1),
+  })
+  .strict()
+export type PositionalEvidence = z.infer<typeof PositionalEvidenceSchema>
+
 /** A count that is at least one: a page size, a number of runs, a collection size. */
 const PositiveCountSchema = z.number().int().min(1)
 

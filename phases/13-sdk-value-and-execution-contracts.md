@@ -1666,9 +1666,10 @@ curated `get` cannot serve:
   inline in the holding record, not a reference. This is a new output kind,
   with no `get` and no identity.
 - A target with no identifier, only a position within its container (iTerm's
-  window `currentTab`), will be returned as a selector reference by that
-  position within its container, once output references carry containers
-  (#242).
+  window `currentTab`), is returned as an index selector by that position
+  within the record it was read through, once its manifest marks it
+  positional, with evidence (emitted forms, below; D10, positional
+  resources). Until then it stays out as `no-identifier`.
 
 Xcode's workspace document `activeScheme` and `activeRunDestination`, and a
 target's `project`, are left out as container-scoped: Xcode gets a scheme, a
@@ -1749,15 +1750,18 @@ field. A wire reference carrying `app` is an issue, and so is one whose target
 cannot be resolved.
 
 **Native emission.** A native read emits exactly the wire form above, in
-identity form only:
+identity form, with one exception for a positional target (emitted forms,
+below):
 `{"reference":{resource, form: "identity", cardinality: "one", id, container?}}`.
 `id` is encoded through the plan by the resource's identifier value type.
 `container` is present exactly when the resource's get records a parent; it
 is then the identity reference of the record the field was read through,
 with its own `id` encoded by the parent's identifier value type, and carries
 no container of its own, since only top-level containers are emitted.
-Native reads never emit a selector form; selectors are constructed only by
-callers. SDK output types stay `ObjectReference<R>`, with the form left open.
+Apart from that exception, native reads never emit a selector form, and
+selectors are constructed only by callers. SDK output types stay
+`ObjectReference<R>`, with the form left open, except at an index-selector
+position.
 
 - **Container scoping.** A resource's identity is scoped to its container
   exactly when its `get` is parent-scoped, meaning the command records a
@@ -1843,11 +1847,49 @@ callers. SDK output types stay `ObjectReference<R>`, with the form left open.
   and nothing on it says which kind it is, so the reference needs a curated
   mapping from the field to its kind, which no manifest records yet.
 
+**Emitted forms.** A native read emits identity form, with one exception. An
+output position whose target resource is positional (D10, positional
+resources: it has no identifier, and its objects are found by their position
+within their parent) emits an **index selector** within the object it was
+read through:
+`{form: 'selector', cardinality: 'one', selector: {by: 'index', index}, container}`.
+
+- **Container.** `container` is the identity reference of the parent, the
+  record the field was read through, for example the window that holds a
+  tab. Every level of a container chain is in identity form, so a selector
+  never appears inside a container.
+- **Meaning.** The reference means whatever object holds that position when
+  it is resolved (A6), not the object observed at read time. The field's
+  generated documentation says that the object has no id, that it is
+  returned by its zero-based position within this parent, and that the
+  position drifts when objects of its kind open, close or move.
+- **Typing.** The generated output position is typed as the narrow
+  `IndexSelectorReference<Record, 'Key'>`, built by
+  `t.indexSelectorReference`: a `SelectorReference` whose selector is
+  `{ by: 'index' }` and whose container is an identity reference. That type
+  is assignable to `ObjectReference`, so generic hydration accepts it, while
+  typed callers can see that it is positional. An input position to a
+  positional target keeps `t.reference`.
+- **Gate.** A position gets this type only when the target is positional,
+  its parent chain is identifiable, and the field is read through that
+  parent's own record (container scoping, above). The manifest schema
+  refuses the marker otherwise (D10). A command result, read through no
+  record, holding a positional target stays out of output as parent-scoped.
+- **Wire.** Nothing changes: this is the existing selector form.
+
 **Native conversion scope.** The macOS provider converts a reference inside
 the automation process (D4, reference conversion) when it is a single
 identity reference to a resource with an identifier and a `get`: with no
 container when the resource is top-level, and with an identity container of
 its parent, judged the same way level by level, when its `get` records one.
+It also converts a single index selector to a positional resource (D10),
+with an identity container of the parent its `get` records, judged the same
+way: at input and resolution positions the selector becomes the object at
+that zero-based position in the container's collection, found as the
+positional `get` finds it, container first, and a position the collection
+does not reach fails as `InvalidSelectionError` naming the resource; at an
+output position an app object becomes the index selector above (emitted
+forms).
 A resource is top-level when its resolving `get` records no parent (D10,
 command parents); one helper answers it, and gives the parent, for both
 directions and for resolution. In that scope, an input reference becomes the
@@ -1864,13 +1906,15 @@ position whose target has no identifier, no `get`, or a `get` that records a
 parent (resolvable targets, above), so for those targets the failure arises
 only for a reference a caller supplies:
 
-- every selector form, at any position;
+- every selector form, at any position, except an index selector to a
+  positional resource;
 - identity collections;
 - a container on a top-level resource, a container of another resource than
   the one its `get` records, or a selector container: each breaks the
   container rule, so it is a caller error, not a form awaiting support;
-- a resource with no identifier, or with no `get`, or whose parent has no
-  addressing;
+- a resource with no identifier that is not positional, or with no `get`,
+  or whose parent has no addressing; an identity reference to a positional
+  resource, which has no identifier;
 - a resource with no entry in the request's `resourcePlans`, so none in the
   script's reference table.
 
@@ -1922,9 +1966,17 @@ plus identity collections whose entries are in it:
   for it, as for any resolution: the runtime runs them as the resource's
   `list` (resolution, steps 1 to 6, below) before the executor is called, and
   only the automation process is skipped.
+- A single index selector to a positional resource, with an identity
+  container of its parent, resolves the same way: the codec finds the
+  container, then the object at the selected position within it, and the
+  body reads it with the get body's record read. A position the container's
+  collection does not reach is `InvalidSelectionError` naming the resource;
+  a missing container is `TargetNotFoundError` naming the container's
+  resource, and no position is looked up.
 - Every other reference fails as `InternalError` whose message names the form
   the provider does not resolve, before any automation runs: every selector
-  form; a reference, or an identity-collection entry, with a container its
+  form but that one, including an index selector to a resource that is not
+  positional; a reference, or an identity-collection entry, with a container its
   resource is not found within (one on a top-level resource, one of another
   resource, or a selector container); a reference to a resource found within
   its parent that carries no container; and a reference to a resource that
@@ -2055,6 +2107,11 @@ collection resolves its entries in order. When an entry's target no longer
 exists, it raises `TargetNotFoundError` whose `entryIndex` detail is that
 entry's zero-based position; the entry is never silently dropped. An identity
 collection with no entries resolves to `[]`.
+
+An emitted index selector resolves within its container, like a caller-built
+one. An index past the end of the container's collection raises
+`InvalidSelectionError`. A container that no longer exists raises
+`TargetNotFoundError` naming the container's resource.
 
 A reference whose target, container, or entry lacks its resolving operation
 is rejected wherever it appears, so no bound reference to it ever exists:
@@ -2264,8 +2321,10 @@ execute(request), resolve(request) }`.
   scope in D7 (native conversion scope): single identity references to
   resources with an identifier, carrying their parent's identity container
   exactly when the resource's get records one, and identity collections of
-  them. It fails every other reference as `InternalError`, before any
-  automation runs. Its bodies hand the codec the container of every output
+  them, and single index selectors to positional resources within their
+  parent's identity container. It fails every other reference as
+  `InternalError`, before any automation runs. Its bodies hand the codec the
+  container of every output
   reference whose target is got within the record being read: a get,
   create, update or resolution body wraps such a field's value with the item
   it read, and a list body with the row's identifier it already read and
@@ -2276,6 +2335,24 @@ execute(request), resolve(request) }`.
   container's id, and none in a list. Only a body whose result the codec
   encodes by a typed plan wraps; under a `passthrough` plan nothing would
   unwrap it.
+- **Plans record the emitted form.** A reference position's output plan
+  records which form the native codec emits: identity when `form` is absent,
+  or `form: 'index'` for a positional target (D7, emitted forms). It is
+  derived from the same predicate as the position's type, and the codec
+  never chooses at run time.
+- **The index is the specifier's position.** For `index`, the codec reads
+  the target's position and the container's identity in the same native
+  request, and emits the position as the zero-based position in its
+  container, taken from the app's specifier, never from a dictionary `index`
+  property. The script hands the codec a host reader, `positionOf`, which
+  reads the bridge's display form of the specifier the app returned
+  (`Automation.getDisplayString`) and accepts only a final `.at(N)` step; any
+  other specifier is a reference the codec cannot convert, `InternalError`,
+  with no fallback. Dictionary `index` properties differ in base from app to
+  app and from class to class, so none is read.
+- **Output validation.** The runtime's output check (D11) admits only that
+  form at that position: an index selector with an identity container of the
+  target's parent.
 - **Resource plans.** `ResourcePlanTable` is
   `Readonly<Record<string, { readonly id?: ValuePlan }>>`, keyed by manifest
   resource key and declared in `@macts/contracts` next to `ValuePlan`. `id` is
@@ -2631,6 +2708,14 @@ Every surface takes the parent from the record. Native bodies address the parent
 
 **Every surface follows the kind.** The native get looks the kind up in the root's kinds, addresses the application property it names, and fails as a missing target when the kind is not one of them or its property holds no object on this Mac (the app reports it missing, or "no such object"); it never returns an empty record. The native list reads each kind in declaration order, skips a kind whose property holds no object, fails on any other error, and reads each record as the get does. Every record's `kind` is the kind it was found by, since the object does not say. A list of roots reads every kind it has, so it never pages. The contract, the clients and the CLI treat the root as an identified resource whose identifier is its kind: the CLI reaches it at its namespace, as it would a collection. References follow D7 (singleton roots).
 
+### Positional resources
+
+**A resource whose objects have no identifier, and are found only by their position within their parent, is positional.** Some apps address an object only as an element of its container, by position: an iTerm tab has no id, and the app's own specifier for one is `….windows.byId(7).tabs.at(0)`. The resource records `positional: { evidence }`, curated: `source: curated`, a `note` saying what was observed, `observedAt` and the `appVersion` it was observed on. Nothing is inferred from a missing identifier: a resource with no identifier that is not marked stays out of output as `no-identifier` (D7, resolvable targets).
+
+**The marker's rule.** One rule (`manifest/positional.ts`) is applied by the manifest schema, by every generator (`generationRefusals`), and by both operation registrations (`operationsFromManifest` and `operationsFromContract`), so each refuses the same manifests, alongside the identifier-targeting rule (identifier targeting, above), which judges only resources that have an identifier, so the two never apply to one resource. It refuses the marker on a resource that has a primary identifier, which it would be found by instead; on one with no `get`, or whose `get` records no parent; on one whose parent the app does not find by its identifier, level by level; and on one whose item commands (get, update, delete) select an item by anything but a parameter of type `integer`.
+
+**Every surface follows the position.** A positional resource's native get, update and delete find their item at the zero-based position the item parameter carries, within the parent the command records: `parent[collection].at(index)`, after checking that the position is within the collection's length. A position the collection does not reach is `InvalidSelectionError` naming the resource; a missing parent is `TargetNotFoundError` naming the parent's resource. The codec addresses an input or resolved index selector the same way (D7, native conversion scope). The generated get, and its position parameter, say that the object has no id, is selected by its zero-based position within its parent, and that the position drifts when objects of its kind open, close or move. References follow D7 (emitted forms).
+
 ### Unsupported resources
 
 **A manifest never drops a resource it declares; a resource the app cannot provide is marked `unsupported`.** The marker records absence evidence in one of two forms. Dictionary evidence, for a collection the app's dictionary does not have, records the source (`dictionary`), the app's bundle identifier, app version and macOS version, the term the manifest expected, and a finding:
@@ -2673,7 +2758,10 @@ stub. Whether it applies is decided by the operation's output plan, which the
 runtime holds, and never by anything an executor sets or declares about
 itself. A `passthrough` result has no wire encoding, so `output.wire` does not
 describe it and it is not checked (D9). The identity-collection count check
-applies whatever the plan.
+applies whatever the plan. At a positional target's output position,
+`output.wire` admits only the index selector with an identity container of
+the target's parent (D7, emitted forms), so a tab returned in identity form,
+or without its window, is `UnexpectedValueError`.
 
 A result passes these steps in order:
 

@@ -81,7 +81,9 @@ export const NATIVE_CODEC_ERROR_NAME = 'MactsCodecError'
  *   object with `unsupportedKind` set to that kind, whatever the value is.
  * - When `decode` addresses the object a reference names and the app has no
  *   such object, it throws the same object with `missingResource` set to the
- *   reference's resource.
+ *   reference's resource; when the reference names a position its
+ *   container's collection does not reach, with `outOfRangeResource` set
+ *   instead.
  * - When the app fails while `encode` reads a record field's value (a
  *   reference's identifier), the app's error is let through with
  *   {@link NATIVE_READING_KEY} naming that field and its position.
@@ -222,10 +224,15 @@ export const NATIVE_CODEC: NativeCodec = Object.freeze({
  * @remarks
  * It follows the resource's identifier targeting (phases/13 D10), as a
  * generated get does. A resource found in a collection is addressed by
- * {@link NativeCollectionAddressing}; a singleton root, which the app holds
+ * {@link NativeCollectionAddressing}; a positional resource, which has no
+ * identifier, by its position within its container
+ * ({@link NativePositionalAddressing}); a singleton root, which the app holds
  * as its own properties, by {@link NativeRootAddressing}.
  */
-export type NativeAddressing = NativeCollectionAddressing | NativeRootAddressing
+export type NativeAddressing =
+  | NativeCollectionAddressing
+  | NativePositionalAddressing
+  | NativeRootAddressing
 
 /**
  * How a resource's collection finds an object from its identifier: `byId`
@@ -256,6 +263,27 @@ export interface NativeCollectionAddressing {
    * a resource found at the application.
    */
   readonly within?: string
+}
+
+/**
+ * How the app finds an object of a positional resource, which has no
+ * identifier: by its zero-based position within its container, as
+ * `container[collection].at(index)`, the app's element addressing. A position
+ * the collection does not reach is an invalid selection.
+ *
+ * A reference to one is an index selector whose container is an identity
+ * reference to `within`, found first by the parent's own addressing. An
+ * object read from the app is encoded with the position its own specifier
+ * gives (`NativeCodecEnvironment.positionOf`), never with a dictionary
+ * `index` property.
+ */
+export interface NativePositionalAddressing {
+  /** The object is found by its position within its container. */
+  readonly lookup: 'byIndex'
+  /** The app's spelling of the resource's collection within the container. */
+  readonly collection: string
+  /** The manifest key of the parent the resource is found within. */
+  readonly within: string
 }
 
 /**
@@ -304,13 +332,22 @@ export type NativeReferenceTable = Readonly<Record<string, NativeReferencePlans>
  * @remarks
  * `app` is the target application object, which addressing a reference calls
  * into; the codec calls no other host object. `references` is the script's
- * {@link NativeScript.references}.
+ * {@link NativeScript.references}. `positionOf` is the host's position reader,
+ * which the script composes from {@link NATIVE_POSITION_READER}.
  */
 export interface NativeCodecEnvironment {
   /** The target application. */
   readonly app: unknown
   /** The resources whose references convert. */
   readonly references: NativeReferenceTable
+  /**
+   * Reads the zero-based position an app object's own specifier gives within
+   * its container, or `undefined` when the specifier is not positional
+   * ({@link NATIVE_POSITION_READER}). The codec calls it to encode an object of
+   * a positional resource, and never reads a position any other way. Without
+   * it, no such object encodes.
+   */
+  readonly positionOf?: (specifier: unknown) => unknown
 }
 
 /**
@@ -369,7 +406,8 @@ export interface NativeScript {
  *   has a kind (or a reference form, or a resource) the codec has no
  *   conversion for, so no value at that position could be converted. With
  *   `missingResource`, the input names an object of that resource that the
- *   app does not have.
+ *   app does not have. With `outOfRangeResource`, the input names a position
+ *   of that resource its container's collection does not reach.
  * - `collection`: the collection a list read changed while it was read, so no
  *   consistent result exists (raised by list bodies with
  *   {@link NATIVE_COLLECTION_CHANGED_ERROR_NAME}).
@@ -403,6 +441,11 @@ export type NativeFailure =
        * is why decoding failed.
        */
       readonly missingResource?: string
+      /**
+       * The resource of a referenced position its container's collection does
+       * not reach, when that is why decoding failed: an invalid selection.
+       */
+      readonly outOfRangeResource?: string
     }
 
 /** What the automation process reports for one {@link NativeScript}. */

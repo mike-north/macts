@@ -7,8 +7,11 @@
  * script the built-in transport runs, the reading of the outcome it prints,
  * a transport that runs that script against a stand-in application, a
  * stand-in Chromium browser application, the record keys the native get and
- * list bodies read for a resource, and the Archive stand-in manifest that
- * exercises key targeting, singleton roots and reported absences.
+ * list bodies read for a resource, the Archive stand-in manifest that
+ * exercises key targeting, singleton roots and reported absences, the Panes
+ * stand-in manifest whose tabs are positional, and the
+ * reader of an object's position from its specifier, which a live test runs
+ * against a real app to check the display form it parses.
  * Tests in other macts packages use it to drive the real native executor end
  * to end with only the transport replaced.
  *
@@ -21,7 +24,12 @@
  */
 
 export { composeNativeScript, parseNativeOutcome } from './jxa/executor.js'
-export { standInTransport } from './jxa/test-support/stand-in-app.js'
+export {
+  NATIVE_POSITION_FUNCTION,
+  NATIVE_POSITION_READER,
+  specifierPosition,
+} from './jxa/native-position.js'
+export { standInTransport, type StandInAutomation } from './jxa/test-support/stand-in-app.js'
 export {
   standInChromium,
   STAND_IN_NEW_TAB_ID,
@@ -31,3 +39,4 @@ export {
 } from './jxa/test-support/stand-in-chromium.js'
 export { nativeReadKeys, type NativeReadKeys } from './jxa/native-scripts.js'
 export { archiveManifest } from './manifest/test-support/archive-key-and-root.js'
+export { panesManifest } from './manifest/test-support/panes-positional.js'
