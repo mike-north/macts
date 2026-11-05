@@ -819,6 +819,15 @@ describe('references the app reports missing as they are encoded', () => {
     ).resolves.toEqual({ location: '/a', holder: null, shelf: null })
   })
 
+  // D10: such a property's "evidence is of what that read reports", so a get
+  // reads it on its own and never takes it from the item's property record,
+  // even when the record holds a volume the direct read does not report.
+  it('gets as null a shelf the property record holds but its direct read reports missing', async () => {
+    await expect(
+      getShelved({ holder: null, shelf: volume('v1') }, { shelf: failing(-1728) })
+    ).resolves.toEqual({ location: '/a', holder: null, shelf: null })
+  })
+
   // Guards that nothing serializes the body's result before the codec reads
   // it. The stand-in runs the composed script whole, body and codec in one
   // realm, as the automation host does. A JSON round trip in between would

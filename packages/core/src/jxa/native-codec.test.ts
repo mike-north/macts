@@ -1714,6 +1714,23 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
         )
       })
 
+      // The D10 list rule: the empty value is the field's, so one element the
+      // app reports missing makes the whole list field null.
+      it('encodes a whole list field as null when one of its references is reported missing', () => {
+        const app = standInApp()
+        const OWNERS = recordOf({ owners: required(nullable(arrayOf(PERSON_REF))) })
+        expect(
+          encode(
+            { owners: absentAsNull([app.people.objects[0], unreadable(-1728)]) },
+            OWNERS,
+            environment(app)
+          )
+        ).toEqual({ owners: null })
+        expect(
+          encode({ owners: absentAsNull([app.people.objects[0]]) }, OWNERS, environment(app))
+        ).toEqual({ owners: [identity('Person', 'p-1')] })
+      })
+
       it('encodes a marked field of a list row, and of a record nested in the result', () => {
         const app = standInApp()
         // A list's rows are records, and a page's rows sit in its `items`.
