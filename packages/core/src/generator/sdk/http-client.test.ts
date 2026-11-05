@@ -32,7 +32,7 @@ const testManifest: AppManifest = {
         name: { access: 'rw', type: 'string', description: 'Name', optional: false },
         count: { access: 'rw', type: 'integer', description: 'Count', optional: true },
       },
-      identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
+      identifiers: [{ property: 'id', primary: true, targeting: 'byId', ...UNIQUE_CLAIM }],
       ...RANGE_READ_SUPPORTED,
     },
   },
@@ -341,7 +341,7 @@ describe('generateHttpClientSdk', () => {
           properties: {
             id: { access: 'r', type: 'string', description: 'ID', optional: false },
           },
-          identifiers: [{ property: 'id', primary: true }],
+          identifiers: [{ property: 'id', primary: true, targeting: 'byId' }],
         },
       },
       commands: {
@@ -386,7 +386,7 @@ describe('generateHttpClientSdk', () => {
           properties: {
             id: { access: 'r', type: 'string', description: 'ID', optional: false },
           },
-          identifiers: [{ property: 'id', primary: true }],
+          identifiers: [{ property: 'id', primary: true, targeting: 'byId' }],
         },
       },
       commands: {

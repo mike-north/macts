@@ -47,7 +47,7 @@ const calendarManifest: AppManifest = {
           optional: false,
         },
       },
-      identifiers: [{ property: 'calendarIdentifier', primary: true }],
+      identifiers: [{ property: 'calendarIdentifier', primary: true, targeting: 'byId' }],
     },
     // Negative case: a resource with NO declared identifier.
     Widget: {

@@ -62,6 +62,7 @@ resources:
     identifiers:
       - property: id
         primary: true
+        targeting: byId
   Entry:
     name: Entry
     plural: Entries
@@ -132,6 +133,7 @@ resources:
     identifiers:
       - property: id
         primary: true
+        targeting: byId
   Desk:
     name: Desk
     plural: Desks

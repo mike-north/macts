@@ -58,7 +58,7 @@ function buildManifest(): AppManifest {
         plural: 'Items',
         description: 'An item',
         properties: { id: stringProp },
-        identifiers: [{ property: 'id', primary: true }],
+        identifiers: [{ property: 'id', primary: true, targeting: 'byId' }],
       },
       Playlist: {
         name: 'Playlist',
@@ -79,7 +79,7 @@ function buildManifest(): AppManifest {
         plural: 'Documents',
         description: 'A document',
         properties: { name: stringProp },
-        identifiers: [{ property: 'name', primary: true }],
+        identifiers: [{ property: 'name', primary: true, targeting: 'byProperty' }],
       },
       Calendar: {
         name: 'Calendar',
@@ -158,7 +158,9 @@ describe('generated CLI get commands', () => {
     ['windows/get.ts', 'Get a window by name', 'name'],
   ])('%s says "%s" and labels its positional <%s>', (path, description, label) => {
     const content = command(path)
-    expect(content).toContain(`description: '${description}'`)
+    // The description starts with the summary; a property-matched identifier
+    // not claimed unique adds its first-match sentence after it.
+    expect(content).toMatch(new RegExp(`description: ['"]${description}['.]`))
     expect(content).toContain(` * ${description}.`)
     expect(content).toMatch(
       new RegExp(`Option\\.String\\(\\{ name: '${label}', required: true \\}\\)`)

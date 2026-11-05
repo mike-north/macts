@@ -499,7 +499,8 @@ export interface CalendarResourceClient {
   /** List calendars, as one page holding all of them. */
   list(options?: CallOptions): Promise<Page<Calendar>>
   /**
-   * Read the calendar identified by `id`.
+   * Read the calendar identified by `id`. When several calendars share the same name, the first
+   * match in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param id - Calendar identifier. Does not accept null.
    */

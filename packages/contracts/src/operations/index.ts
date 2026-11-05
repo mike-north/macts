@@ -148,11 +148,17 @@ export interface ResourceDescriptor<RecordType, Id = unknown> {
    * referenced only by selector forms (name, index, every, or range); an
    * identity reference to it is rejected when encoding and decoding.
    *
-   * When the identifier is the object's name (a name-keyed resource),
-   * resolving an identity reference has the meaning of a name selector: it
-   * resolves to whatever object has that name when it is resolved. Which
-   * object that is when several share the name is defined by the app, so
-   * such a reference does not pin one particular object.
+   * When the identifier is matched on a property of the object
+   * (`byProperty`), such as its name, resolving an identity reference has the
+   * meaning of a selector on that property: it resolves to whatever object
+   * has that value when it is resolved, and when several share it, to the
+   * first match in the app's order. Such a reference does not pin one
+   * particular object unless the value is claimed unique.
+   *
+   * When the identifier is a key the app's collection finds the object by
+   * (`byKey`), the app interprets the key: a key that names a location, such
+   * as a path, resolves to whatever object is at that location when it is
+   * resolved.
    */
   readonly id?: ValueType<Id>
   /** Operation that reads one object, used to resolve single references. */

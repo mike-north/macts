@@ -63,6 +63,7 @@ export const manifest: unknown = {
         {
           property: 'name',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
       nullabilityProbe: {
@@ -132,6 +133,7 @@ export const manifest: unknown = {
         {
           property: 'name',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
       nullabilityProbe: {
@@ -279,6 +281,7 @@ export const manifest: unknown = {
         {
           property: 'name',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
       nullabilityProbe: {

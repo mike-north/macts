@@ -9,7 +9,8 @@ export class GetLayerCommand extends Command {
   static override paths = [['omnigraffle', 'canvases', 'layers', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a layer by name',
+    description:
+      "Get a layer by name. When several layers share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

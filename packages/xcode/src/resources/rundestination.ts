@@ -32,6 +32,7 @@ export class RunDestinationResourceClient {
 
   /**
    * Get a run destination by name within a parent scope.
+   * When several run destinations share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async get(workspaceName: string, name: string): Promise<RunDestination> {
     return this.#http.rpc<RunDestination>(`${this.#app}.${this.#resource}.get`, {

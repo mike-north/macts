@@ -90,6 +90,7 @@ resources:
     identifiers:
       - property: uid
         primary: true
+        targeting: byId
     properties:
       uid:
         access: r

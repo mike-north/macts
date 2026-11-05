@@ -54,9 +54,13 @@ resources:
         description: Whether the window is the frontmost window
         code: pisf
         optional: false
+    # Terminal.sdef gives a window both `id` (code `ID  `) and `name`. This
+    # manifest identifies a window by `name`, which is not the dictionary id, so
+    # a window is targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
   Tab:
     name: Tab
     plural: Tabs
@@ -117,9 +121,12 @@ resources:
         description: The name of the current settings set
         code: tcst
         optional: false
+    # Terminal.sdef gives a tab `tty` (code ttty) and no `id` property, so a tab
+    # is targeted by its tty, never by id.
     identifiers:
       - property: tty
         primary: true
+        targeting: byProperty
   SettingsSet:
     name: SettingsSet
     plural: SettingsSets
@@ -162,9 +169,13 @@ resources:
         description: The size of the font
         code: ptsz
         optional: false
+    # Terminal.sdef gives a settings set both `id` (code `ID  `) and `name`. This
+    # manifest identifies a settings set by `name`, which is not the dictionary
+    # id, so a settings set is targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
 enums: {}
 hierarchy:
   children:

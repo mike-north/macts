@@ -30,6 +30,7 @@ export class WorkflowResourceClient {
 
   /**
    * Get a workflow by name.
+   * When several workflows share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async get(name: string): Promise<Workflow> {
     return this.#http.rpc<Workflow>(`${this.#app}.${this.#resource}.get`, { name })

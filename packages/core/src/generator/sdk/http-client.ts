@@ -27,6 +27,7 @@ import {
   createInputFields,
   findCrudCommand,
   generationRefusals,
+  firstMatchNote,
   identifierWords,
   isCrudName,
   listMethodParameters,
@@ -727,7 +728,13 @@ function generateResourceClient(
         )
       : '',
     getCmd
-      ? generateGetMethod(commandRouteSegment(...getCmd), getCmd[1], resourceName, nameWords)
+      ? generateGetMethod(
+          commandRouteSegment(...getCmd),
+          getCmd[1],
+          resourceName,
+          nameWords,
+          firstMatchNote(resource)
+        )
       : '',
     createCmd
       ? generateCreateMethod(
@@ -742,11 +749,17 @@ function generateResourceClient(
           commandRouteSegment(...updateCmd),
           updateCmd[1],
           resourceName,
-          nameWords
+          nameWords,
+          firstMatchNote(resource)
         )
       : '',
     deleteCmd
-      ? generateDeleteMethod(commandRouteSegment(...deleteCmd), deleteCmd[1], nameWords)
+      ? generateDeleteMethod(
+          commandRouteSegment(...deleteCmd),
+          deleteCmd[1],
+          nameWords,
+          firstMatchNote(resource)
+        )
       : '',
   ]
     .filter(Boolean)
@@ -910,6 +923,14 @@ function uniquePageBinding(taken: readonly string[]): string {
 }
 
 /**
+ * The doc comment line a get, update or delete method adds for `note`
+ * ({@link firstMatchNote}), or nothing when there is none.
+ */
+function docNoteLine(note: string | undefined): string {
+  return note === undefined ? '' : `\n   * ${note}`
+}
+
+/**
  * Generate the `get` method, routed by the backing command's key.
  *
  * When the command has a parent scope parameter (e.g. `calendarId` on `getEvent`),
@@ -921,13 +942,15 @@ function generateGetMethod(
   routeSegment: string,
   command: Command,
   resourceName: string,
-  nameWords: string
+  nameWords: string,
+  note: string | undefined
 ): string {
   const { parentParam, childParam } = resolveIdParams(command)
+  const noteLine = docNoteLine(note)
   if (parentParam !== undefined) {
     return `
   /**
-   * Get a ${nameWords} by ${childParam} within a parent scope.
+   * Get a ${nameWords} by ${childParam} within a parent scope.${noteLine}
    */
   async get(${parentParam}: string, ${childParam}: string): Promise<${resourceName}> {
     return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${parentParam}, ${childParam} });
@@ -936,7 +959,7 @@ function generateGetMethod(
   }
   return `
   /**
-   * Get a ${nameWords} by ${childParam}.
+   * Get a ${nameWords} by ${childParam}.${noteLine}
    */
   async get(${childParam}: string): Promise<${resourceName}> {
     return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${childParam} });
@@ -982,13 +1005,15 @@ function generateUpdateMethod(
   routeSegment: string,
   command: Command,
   resourceName: string,
-  nameWords: string
+  nameWords: string,
+  note: string | undefined
 ): string {
   const { parentParam, childParam } = resolveIdParams(command)
+  const noteLine = docNoteLine(note)
   if (parentParam !== undefined) {
     return `
   /**
-   * Update an existing ${nameWords} within a parent scope.
+   * Update an existing ${nameWords} within a parent scope.${noteLine}
    */
   async update(${parentParam}: string, ${childParam}: string, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
     const { ${parentParam}: _p, ...updateFields } = input as ${resourceName}UpdateInput & { ${parentParam}?: string };
@@ -1000,7 +1025,7 @@ function generateUpdateMethod(
   }
   return `
   /**
-   * Update an existing ${nameWords}.
+   * Update an existing ${nameWords}.${noteLine}
    */
   async update(${childParam}: string, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
     const defined = Object.fromEntries(Object.entries(input as Record<string, unknown>).filter(([, v]) => v !== undefined));
@@ -1016,12 +1041,18 @@ function generateUpdateMethod(
  * `deleteEvent`), it is the first argument so the server can scope the JXA
  * query to the correct parent collection.
  */
-function generateDeleteMethod(routeSegment: string, command: Command, nameWords: string): string {
+function generateDeleteMethod(
+  routeSegment: string,
+  command: Command,
+  nameWords: string,
+  note: string | undefined
+): string {
   const { parentParam, childParam } = resolveIdParams(command)
+  const noteLine = docNoteLine(note)
   if (parentParam !== undefined) {
     return `
   /**
-   * Delete an ${nameWords} within a parent scope.
+   * Delete an ${nameWords} within a parent scope.${noteLine}
    */
   async delete(${parentParam}: string, ${childParam}: string): Promise<void> {
     await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${parentParam}, ${childParam} });
@@ -1030,7 +1061,7 @@ function generateDeleteMethod(routeSegment: string, command: Command, nameWords:
   }
   return `
   /**
-   * Delete an ${nameWords}.
+   * Delete an ${nameWords}.${noteLine}
    */
   async delete(${childParam}: string): Promise<void> {
     await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${childParam} });

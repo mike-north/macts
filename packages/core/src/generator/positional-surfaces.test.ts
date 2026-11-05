@@ -111,7 +111,8 @@ describe('generation of a manifest whose positional marker does not hold', () =>
     const manifest = panesManifest()
     const tab = manifest.resources['Tab']
     if (tab === undefined) throw new Error('the Panes fixture has no Tab')
-    tab.identifiers = [{ property: 'index', primary: true }]
+    // Targeted explicitly, so only the positional marker's rule refuses it.
+    tab.identifiers = [{ property: 'index', primary: true, targeting: 'byProperty' }]
 
     const result = generateConsolidatedPackages(manifest, { appName: 'panes' })
 

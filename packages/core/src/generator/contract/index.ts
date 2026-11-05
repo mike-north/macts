@@ -77,6 +77,7 @@ import {
   commandMethodParameters,
   createInputFields,
   findCrudCommand,
+  firstMatchNote,
   identifierWords,
   isCrudName,
   listMethodParameters,
@@ -1289,10 +1290,12 @@ class ContractBuilder {
     const positional = this.#positionalResource(command)
     return {
       name: 'get',
-      doc:
+      doc: withFirstMatchNote(
         positional === undefined
           ? `Read ${phrase}.`
           : `Read ${phrase}. ${positionalSelectionNote(this.#manifest, positional)}`,
+        resource
+      ),
       params: this.#positional(fields),
       returnType: resource.name,
       operation,
@@ -1322,7 +1325,7 @@ class ContractBuilder {
     const input = uniqueName('input', new Set(params.map((param) => param.binding)))
     return {
       name: 'update',
-      doc: `Update ${phrase}. Omitted fields are left unchanged.`,
+      doc: withFirstMatchNote(`Update ${phrase}. Omitted fields are left unchanged.`, resource),
       params: [...params, { binding: input, type: `${resourceKey}UpdateInput`, optional: false }],
       returnType: resource.name,
       operation,
@@ -1334,7 +1337,7 @@ class ContractBuilder {
     const { fields, phrase } = this.#identified(resource, command)
     return {
       name: 'delete',
-      doc: `Delete ${phrase}.`,
+      doc: withFirstMatchNote(`Delete ${phrase}.`, resource),
       params: this.#positional(fields),
       returnType: 'void',
       operation,
@@ -2108,6 +2111,15 @@ function docComment(text: string, indent: string): string {
   const width = DOC_WIDTH - indent.length - ' * '.length
   const lines = escaped.split(/\r?\n/).flatMap((line) => wrap(line, width))
   return `${indent}/**\n${lines.map((line) => `${indent} * ${line}`.trimEnd()).join('\n')}\n${indent} */\n`
+}
+
+/**
+ * A get, update or delete method's doc, followed by the resource's
+ * first-match sentence ({@link firstMatchNote}) when it has one.
+ */
+function withFirstMatchNote(doc: string, resource: Resource): string {
+  const note = firstMatchNote(resource)
+  return note === undefined ? doc : `${doc} ${note}`
 }
 
 /** Break `line` into lines of at most `width` characters, at spaces. */

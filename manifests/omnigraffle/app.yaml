@@ -432,9 +432,12 @@ resources:
     plural: Layers
     description: A drawing layer in OmniGraffle
     code: OGLa
+    # OmniGraffle's dictionary, as this manifest records it, gives a layer `name`
+    # and no `id` property, so a layer is targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
     properties:
       name:
         access: rw

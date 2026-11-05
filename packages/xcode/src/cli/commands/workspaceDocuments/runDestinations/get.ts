@@ -9,7 +9,8 @@ export class GetRunDestinationCommand extends Command {
   static override paths = [['xcode', 'workspaceDocuments', 'runDestinations', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a run destination by name',
+    description:
+      "Get a run destination by name. When several run destinations share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

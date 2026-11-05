@@ -30,6 +30,7 @@ export class DocumentResourceClient {
 
   /**
    * Get a document by name.
+   * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async get(name: string): Promise<Document> {
     return this.#http.rpc<Document>(`${this.#app}.${this.#resource}.get`, { name })

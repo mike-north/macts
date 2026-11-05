@@ -1912,6 +1912,9 @@ export const IdentifierSchema: z.ZodObject<{
 export type IdentifierTargeting = z.infer<typeof IdentifierTargetingSchema>;
 
 // @public
+export function identifierTargetingProblem(resourceKey: string, resource: Resource): string | undefined;
+
+// @public
 export interface IdentifierTargetingResolution {
     property: string;
     strategy: IdentifierTargeting;
@@ -4382,6 +4385,16 @@ export const UnsupportedSchema: z.ZodObject<{
         }> & z.core.$partial, z.ZodNumber>;
     }, z.core.$strict>]>;
 }, z.core.$strip>;
+
+// @public
+export interface UntargetedIdentifier {
+    readonly problem: string;
+    readonly property: string;
+    readonly resourceKey: string;
+}
+
+// @public
+export function untargetedIdentifiers(manifest: AppManifest): UntargetedIdentifier[];
 
 // @public
 export function validateCommandPermissions(commandPermissions: Map<string, string>, permissionsSection: PermissionsSection): string[];

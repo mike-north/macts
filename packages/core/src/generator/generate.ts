@@ -19,8 +19,10 @@ export interface GenerateSdkResult {
  * Generate a complete SDK from a manifest.
  *
  * A manifest with a command that must select one item and declares no
- * identifier parameter is refused (`generationRefusals`): the result holds
- * the errors naming each such command, and no files.
+ * identifier parameter, or a resource whose identifier declares no targeting
+ * and is not the class's dictionary id, is refused (`generationRefusals`):
+ * the result holds the errors naming each such command or resource, and no
+ * files.
  */
 export function generateSdk(manifest: AppManifest, options: GeneratorOptions): GenerateSdkResult {
   const refusals = generationRefusals(manifest)

@@ -46,12 +46,14 @@ function toMetadata(capability: Capability): Record<string, unknown> {
  *
  * A manifest the package generators refuse (`generationRefusals`) is refused
  * here too, so no capability is described for a command that must name one
- * item and declares no identifier parameter.
+ * item and declares no identifier parameter, or for a resource whose
+ * identifier declares no targeting and is not the class's dictionary id.
  *
  * @param manifest - The app manifest
  * @returns TypeScript source for the capabilities metadata module
- * @throws `Error` whose message holds one refusal per such command, each
- *   naming the app and the command key and saying what to declare.
+ * @throws `Error` whose message holds one refusal per such command or
+ *   resource, each naming the app and the command key, or the resource and
+ *   its identifier property, and saying what to declare.
  */
 export function generateCapabilitiesModule(manifest: AppManifest): string {
   const refusals = generationRefusals(manifest)

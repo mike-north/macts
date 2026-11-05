@@ -25,6 +25,7 @@ resources:
     identifiers:
       - property: id
         primary: true
+        targeting: byId
     properties:
       id:
         access: r
@@ -222,6 +223,7 @@ resources:
     identifiers:
       - property: id
         primary: true
+        targeting: byId
     properties:
       id:
         access: r

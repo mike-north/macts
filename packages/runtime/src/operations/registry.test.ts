@@ -14,8 +14,11 @@
  * delete with no identifier parameter (no required parameter other than its
  * parent's), or an application-scoped delete with none, selects no item and
  * is refused at registration (D5), from the manifest or from a contract. The
- * refusal names the app and the command and says what to declare. Every
- * shipped manifest still registers, and none declares such a command.
+ * refusal names the app and the command and says what to declare. A
+ * resource whose primary identifier declares no targeting and is not the
+ * class's dictionary id, code ID, is refused too (D10), naming the app, the
+ * resource and the property. Every shipped manifest still registers, and
+ * none declares such a command or resource.
  */
 
 import { readdir } from 'node:fs/promises'
@@ -47,14 +50,16 @@ const CALENDAR: AppManifest = {
       plural: 'Calendars',
       description: 'A calendar',
       properties: {},
-      identifiers: [{ property: 'calendarIdentifier', primary: true }],
+      // Explicit: neither property is declared with the dictionary id's
+      // code, so the default targeting would be refused.
+      identifiers: [{ property: 'calendarIdentifier', primary: true, targeting: 'byId' }],
     },
     Event: {
       name: 'Event',
       plural: 'Events',
       description: 'An event',
       properties: {},
-      identifiers: [{ property: 'uid', primary: true }],
+      identifiers: [{ property: 'uid', primary: true, targeting: 'byId' }],
     },
   },
   enums: {},
@@ -426,6 +431,47 @@ describe('operationsFromManifest', () => {
     }
     expect(() => operationsFromManifest(broken)).toThrow(OperationRegistrationError)
   })
+
+  // Guards that registration never offers a lookup by an id specifier that
+  // cannot find the item: an untargeted identifier that is not the class's
+  // dictionary id, code ID, is refused (phases/13 D10), naming the app, the
+  // resource and the property.
+  it('refuses an untargeted identifier that is not the dictionary id', () => {
+    const refusal = (): unknown => operationsFromManifest(UNTARGETED_EVENT_NAME)
+    expect(refusal).toThrow(OperationRegistrationError)
+    expect(refusal).toThrow(
+      'App "Calendar" cannot be registered from its manifest: its resource "Event" is identified by "summary" (code "wr11"), which is not the class\'s dictionary id, code ID, and declares no targeting.'
+    )
+  })
+
+  // Guards that the dictionary id keeps the default under any name, as
+  // Calendar's event `uid` does.
+  it('registers an untargeted identifier on a code ID property', () => {
+    const manifest = withEvent({
+      properties: {
+        uid: { access: 'r', type: 'string', description: 'Its id', optional: false, code: 'ID  ' },
+      },
+      identifiers: [{ property: 'uid', primary: true }],
+    })
+    expect(operationsFromManifest(manifest).map((op) => op.descriptor.id)).toContain(
+      'calendar.events.deleteEvent'
+    )
+  })
+})
+
+/** {@link CALENDAR} with its Event resource's `properties` and `identifiers` replaced. */
+function withEvent(event: Pick<AppManifest['resources'][string], 'properties' | 'identifiers'>) {
+  const base = CALENDAR.resources['Event']
+  if (base === undefined) throw new Error('fixture has an Event resource')
+  return { ...CALENDAR, resources: { ...CALENDAR.resources, Event: { ...base, ...event } } }
+}
+
+/** {@link CALENDAR} with events identified by their summary and no targeting. */
+const UNTARGETED_EVENT_NAME: AppManifest = withEvent({
+  properties: {
+    summary: { access: 'r', type: 'string', description: 'Title', optional: false, code: 'wr11' },
+  },
+  identifiers: [{ property: 'summary', primary: true }],
 })
 
 /** A hand-written value type standing in for a generated one. */
@@ -619,6 +665,17 @@ describe('operationsFromContract', () => {
       /App "Calendar".*application-scoped delete command "delete" declares no identifier parameter/
     )
   })
+
+  // Guards that a contract cannot register a resource the manifest rule
+  // refuses for its untargeted identifier, whichever operations it covers.
+  it('refuses a contract for a manifest with an untargeted identifier that is not the dictionary id', () => {
+    const refusal = (): unknown =>
+      operationsFromContract(contractWith([descriptor()]), UNTARGETED_EVENT_NAME)
+    expect(refusal).toThrow(OperationRegistrationError)
+    expect(refusal).toThrow(
+      'App "Calendar" cannot be registered from its contract, because its manifest is refused: its resource "Event" is identified by "summary" (code "wr11"), which is not the class\'s dictionary id, code ID, and declares no targeting.'
+    )
+  })
 })
 
 /** A range read marker for a fixture resource whose range reads passed. */
@@ -700,7 +757,7 @@ describe('operationsFromContract: paging agrees with the manifest', () => {
 
   it('refuses a list that takes the paging inputs when its unique identifier has no range read recorded', () => {
     const manifest = calendarWith(
-      { property: 'calendarIdentifier', primary: true, ...UNIQUE },
+      { property: 'calendarIdentifier', primary: true, targeting: 'byId', ...UNIQUE },
       null
     )
 
@@ -711,7 +768,12 @@ describe('operationsFromContract: paging agrees with the manifest', () => {
   })
 
   it('refuses a list without the paging inputs when the manifest says it pages', () => {
-    const manifest = calendarWith({ property: 'calendarIdentifier', primary: true, ...UNIQUE })
+    const manifest = calendarWith({
+      property: 'calendarIdentifier',
+      primary: true,
+      targeting: 'byId',
+      ...UNIQUE,
+    })
 
     expect(() => operationsFromContract(contractWith([wholeList]), manifest)).toThrow(
       'Contract operation "calendar.calendars.list" does not take the paging inputs, but the manifest says its list pages. Regenerate the contract.'
@@ -798,5 +860,26 @@ describe('repository manifests', () => {
       }
     }
     expect([...new Set(offenders)]).toEqual([])
+  })
+
+  // Guards the shipped manifests directly, by the rule as phases/13 D10
+  // states it rather than through the registry's own check: every usable
+  // resource whose primary identifier (as resolved, inherited ones included)
+  // declares no targeting is identified by the class's dictionary id, the
+  // property with code ID. A manifest that regressed fails here naming the
+  // app, the resource and the property.
+  it('no shipped manifest leaves an identifier other than the dictionary id untargeted', async () => {
+    const offenders: string[] = []
+    for (const manifest of await shippedManifests()) {
+      for (const [key, resource] of Object.entries(manifest.resources)) {
+        if (resource.unsupported !== undefined) continue
+        const entries = resource.identifiers ?? []
+        const primary = entries.find((entry) => entry.primary) ?? entries[0]
+        if (primary === undefined || primary.targeting !== undefined) continue
+        if (resource.properties[primary.property]?.code === 'ID  ') continue
+        offenders.push(`${manifest.app.name}: ${key}.${primary.property}`)
+      }
+    }
+    expect(offenders).toEqual([])
   })
 })

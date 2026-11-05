@@ -76,7 +76,7 @@ const WORKSHOP_MANIFEST: AppManifest = {
       plural: 'Gadgets',
       description: 'A gadget',
       properties: {},
-      identifiers: [{ property: 'serial', primary: true }],
+      identifiers: [{ property: 'serial', primary: true, targeting: 'byId' }],
     },
   },
   enums: {},

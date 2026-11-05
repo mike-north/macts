@@ -198,7 +198,8 @@ export interface AccountResourceClient {
   /** List accounts, as one page holding all of them. */
   list(options?: CallOptions): Promise<Page<Account>>
   /**
-   * Read the account identified by `name`.
+   * Read the account identified by `name`. When several accounts share the same name, the first
+   * match in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param name - Item name. Does not accept null.
    */
@@ -210,7 +211,8 @@ export interface FolderResourceClient {
   /** List folders, as one page holding all of them. */
   list(options?: CallOptions): Promise<Page<Folder>>
   /**
-   * Read the folder identified by `name`.
+   * Read the folder identified by `name`. When several folders share the same name, the first match
+   * in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param name - Item name. Does not accept null.
    */
@@ -222,7 +224,8 @@ export interface NoteResourceClient {
   /** List notes, as one page holding all of them. */
   list(options?: CallOptions): Promise<Page<Note>>
   /**
-   * Read the note identified by `name`.
+   * Read the note identified by `name`. When several notes share the same name, the first match in
+   * the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param name - Item name. Does not accept null.
    */

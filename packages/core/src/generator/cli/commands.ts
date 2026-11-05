@@ -10,6 +10,7 @@ import { usableProperties } from '../../manifest/unsupported.js'
 import { outputProperties } from '../../manifest/output-references.js'
 import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.js'
 import {
+  firstMatchNote,
   identifierWords,
   resolveIdParams,
   resourceNamespace,
@@ -360,6 +361,10 @@ export function generateGetCommand(
   const parentOptions = generateListParamOptions(parentScopeParams)
   const identifier = addressingIdentifier(resource, getCommand)
   const summary = `Get ${withArticle(identifierWords(resource.name))} by ${identifierProse(identifier)}`
+  // The usage description adds the first-match sentence for a resource
+  // matched on a property that is not claimed unique.
+  const note = firstMatchNote(resource)
+  const description = note === undefined ? summary : `${summary}. ${note}`
 
   const content = `import { Command, Option } from 'clipanion';
 import { getClient } from '${sdkImportPath}';
@@ -372,7 +377,7 @@ export class Get${resource.name}Command extends Command {
   static override paths = [[${cliPath.map((p) => JSON.stringify(p)).join(', ')}]];
 
   static override usage = Command.Usage({
-    description: '${summary}',
+    description: ${note === undefined ? `'${summary}'` : JSON.stringify(description)},
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
