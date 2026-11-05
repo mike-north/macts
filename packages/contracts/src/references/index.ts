@@ -368,6 +368,40 @@ export interface SelectorReference<T, R extends string = string>
 }
 
 /**
+ * One object denoted by its zero-based position within its container, bound
+ * to the client that decoded it: what an output position holds whose target
+ * has no identifier and is found by its position within its parent.
+ *
+ * @remarks
+ * A {@link SelectorReference} whose selector is always an
+ * {@link IndexSelector} and whose container is always present, as an
+ * identity reference to the object the field was read through. Every
+ * container level is in identity form, so a position never appears inside a
+ * container. It is assignable to {@link ObjectReference} and to
+ * {@link ObjectReferenceVariant}, so generic hydration accepts it, while a
+ * typed caller can see that it is positional.
+ *
+ * The reference means whatever object holds that position when it is
+ * resolved, not the object observed when it was read: it drifts as objects
+ * are added to, removed from or moved within the container. An index past
+ * the end fails to resolve with an invalid-selection error, and a container
+ * that no longer exists with a target-not-found error.
+ *
+ * @typeParam T - The referenced record.
+ * @typeParam R - The manifest resource key of the referenced object, as a literal
+ *   type where the position is typed.
+ */
+export interface IndexSelectorReference<T, R extends string = string> extends SelectorReference<
+  T,
+  R
+> {
+  /** The zero-based position of the object within its container. */
+  readonly selector: IndexSelector
+  /** The object the position is counted within, in identity form, bound to the same client. */
+  readonly container: IdentityReference<unknown>
+}
+
+/**
  * A deferred collection of explicitly identified objects, bound to the client
  * that decoded it.
  *

@@ -380,6 +380,12 @@ export interface IndexSelector {
 }
 
 // @public
+export interface IndexSelectorReference<T, R extends string = string> extends SelectorReference<T, R> {
+    readonly container: IdentityReference<unknown>;
+    readonly selector: IndexSelector;
+}
+
+// @public
 export type InferSdk<T extends ValueType<unknown>> = T extends ValueType<infer Sdk> ? Sdk : never;
 
 // @public
@@ -1038,6 +1044,7 @@ export type ValuePlan = {
     readonly kind: 'reference';
     readonly resource: string;
     readonly cardinality: 'one' | 'many';
+    readonly form?: 'index';
 } | {
     readonly kind: 'file';
 } | {
@@ -1071,6 +1078,7 @@ export interface ValueTypeConstructors {
     enumeration<const Members extends readonly [string, ...string[]]>(members: Members, options?: ValueTypeOptions): ValueType<Members[number]>;
     file(options?: ValueTypeOptions): ValueType<FileValue>;
     fileSource(options?: ValueTypeOptions): ValueType<FileSource>;
+    indexSelectorReference<T = unknown, R extends string = string>(scope: () => ReferenceScope, resource: R, options?: ValueTypeOptions): ValueType<IndexSelectorReference<T, R>>;
     integer(options?: ValueTypeOptions): ValueType<Integer>;
     none(options?: ValueTypeOptions): ValueType<undefined>;
     nullable<Sdk>(inner: ValueType<Sdk>, options?: ValueTypeOptions): ValueType<Sdk | null>;
