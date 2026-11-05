@@ -10,7 +10,7 @@ export class GetRunDestinationCommand extends Command {
 
   static override usage = Command.Usage({
     description:
-      "Get a run destination by name. When several run destinations share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.",
+      "Get a run destination by name. When several run destinations share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous. When several workspace documents share the same name, the first match in the app's order is used as the workspace document.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
