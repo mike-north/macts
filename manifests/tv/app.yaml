@@ -118,7 +118,10 @@ resources:
     # Found at the application by its integer `id` (the dictionary's `item`
     # class), with no uniqueness claim. Unverified: when the live probe ran on
     # TV 1.7.2 (macOS 27.2), 2026-11-03, there were 0 browser windows, so no
-    # window was read or looked up.
+    # window was read or looked up. Observed again on 2026-11-04, just after a
+    # launch: 0 browser windows, 0 playlist windows and 0 video windows; the
+    # application's only window was a hidden one of the generic `window`
+    # class, whose `view` read failed (-1728).
     identifiers:
       - property: id
         primary: true
@@ -187,8 +190,15 @@ resources:
     # other, with persistent IDs distinct within each source and across all 4;
     # each of the application's 3 playlists is under exactly one source with
     # the same persistent ID, and the fourth is found only within its source.
-    # A playlist's `container` read returns a property specifier, not its
-    # source, so the caller supplies the source rather than reading it back.
+    # A playlist's `container` has two read paths, observed on 2026-11-04 on
+    # the 4 playlists of both sources and on the application's 3. The property
+    # specifier itself, not evaluated, reads back as `<playlist>.container`.
+    # Reading the property returns the source that holds the playlist: an
+    # object of class `source` whose persistent ID equals the holding
+    # source's, on 4 of 4, and a source for each of the application's 3. A
+    # playlist's `properties()` record has no `container` entry. macts does
+    # not read a playlist's source back through `container` yet, so the
+    # caller supplies the source.
     identifiers:
       - property: persistentID
         primary: true
@@ -234,7 +244,9 @@ resources:
         # Unverified. Observed on TV 1.7.2 (macOS 27.2), 2026-11-03, on 3
         # playlists, none of them in a folder: the read failed (-1728) on all
         # 3, and no folder playlist existed to show what a playlist in a folder
-        # reports. Not marked unsupported: output leaves the field out anyway,
+        # reports. Observed again on 2026-11-04: -1728 on all 4 playlists of
+        # both sources, and still no folder playlist; verifying the read needs
+        # one. Not marked unsupported: output leaves the field out anyway,
         # because a playlist is got only within its source.
       size:
         access: r
@@ -264,7 +276,8 @@ resources:
     # Found at the application by its integer `id` (the dictionary's `item`
     # class), with no uniqueness claim. Unverified: when the live probe ran on
     # TV 1.7.2 (macOS 27.2), 2026-11-03, there were 0 playlist windows, so no
-    # window was read or looked up.
+    # window was read or looked up. Observed again on 2026-11-04: 0 playlist
+    # windows (see `BrowserWindow`).
     identifiers:
       - property: id
         primary: true
