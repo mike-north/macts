@@ -895,7 +895,8 @@ class ContractBuilder {
       (shape === 'get' || shape === 'update' || shape === 'delete') &&
       this.#isChosenCrud(route, shape)
     ) {
-      for (const field of this.#identifierFields(route.command)) identifiers.set(field.name, field)
+      for (const field of this.#identifierFields(route.command, route.resourceType))
+        identifiers.set(field.name, field)
     }
     for (const [name, field] of identifiers) fields.set(name, field)
     if (shape === 'update' && resourceKey !== undefined && this.#isChosenCrud(route, shape)) {
@@ -1051,9 +1052,9 @@ class ContractBuilder {
    *   parameter, or when its recorded parent names a parameter it does not
    *   declare (the manifest schema rejects both).
    */
-  #identifierFields(command: Command): FieldModel[] {
+  #identifierFields(command: Command, resourceKey: string | undefined): FieldModel[] {
     const { parentParam, childParam } = resolveIdParams(command)
-    const positional = this.#positionalResource(command)
+    const positional = this.#positionalResource(resourceKey)
     const field = (name: string): FieldModel => {
       const param = command.parameters.find((p) => p.name === name)
       if (param === undefined) {
@@ -1282,12 +1283,16 @@ class ContractBuilder {
     return [doc, ...notes].join(' ')
   }
 
-  #identified(resource: Resource, command: Command): { fields: FieldModel[]; phrase: string } {
-    const fields = this.#identifierFields(command)
+  #identified(
+    resource: Resource,
+    command: Command,
+    resourceKey: string | undefined
+  ): { fields: FieldModel[]; phrase: string } {
+    const fields = this.#identifierFields(command, resourceKey)
     const { parentParam, childParam } = resolveIdParams(command)
     const scope = parentParam === undefined ? '' : ` within \`${parentParam}\``
     const selected =
-      this.#positionalResource(command) === undefined
+      this.#positionalResource(resourceKey) === undefined
         ? `identified by \`${childParam}\``
         : `at the zero-based position \`${childParam}\``
     return {
@@ -1300,14 +1305,13 @@ class ContractBuilder {
    * The resource a command acts on, when it is positional and so selects its
    * item by position (`../../manifest/positional.ts`).
    */
-  #positionalResource(command: Command): string | undefined {
-    const key = command.resourceType
-    return typeof key === 'string' && isPositional(this.#manifest, key) ? key : undefined
+  #positionalResource(key: string | undefined): string | undefined {
+    return key !== undefined && isPositional(this.#manifest, key) ? key : undefined
   }
 
   #getMethod(resource: Resource, command: Command, operation: OperationModel): MethodModel {
-    const { fields, phrase } = this.#identified(resource, command)
-    const positional = this.#positionalResource(command)
+    const { fields, phrase } = this.#identified(resource, command, operation.route.resourceType)
+    const positional = this.#positionalResource(operation.route.resourceType)
     return {
       name: 'get',
       doc: this.#withFirstMatchNotes(
@@ -1349,7 +1353,7 @@ class ContractBuilder {
     command: Command,
     operation: OperationModel
   ): MethodModel {
-    const { fields, phrase } = this.#identified(resource, command)
+    const { fields, phrase } = this.#identified(resource, command, operation.route.resourceType)
     const params = this.#positional(fields)
     const input = uniqueName('input', new Set(params.map((param) => param.binding)))
     return {
@@ -1367,7 +1371,7 @@ class ContractBuilder {
   }
 
   #deleteMethod(resource: Resource, command: Command, operation: OperationModel): MethodModel {
-    const { fields, phrase } = this.#identified(resource, command)
+    const { fields, phrase } = this.#identified(resource, command, operation.route.resourceType)
     return {
       name: 'delete',
       doc: this.#withFirstMatchNotes(`Delete ${phrase}.`, command, resource),
@@ -2066,8 +2070,17 @@ export function readNullabilityNote(resolution: NullabilityResolution, appName: 
       }
       return `Nullable. Observed missing in ${String(basis.nullCount)} of ${String(basis.sampleSize)} items (${provenance}).`
     }
-    case 'curated':
+    case 'curated': {
+      const reads = basis.absentReads
+      if (nullable && reads !== undefined) {
+        // A single instance's absence, curated as depending on the data
+        // (phases/13 D10): the reason, then the reads that showed it.
+        const reason = reads.reason.trim().replace(/[.!?]$/, '')
+        const count = String(reads.failedReads)
+        return `Nullable: ${reason}. The app reported no value in ${count} of ${count} reads (${observationProvenance(appName, reads)}).`
+      }
       return `${nullable ? 'Nullable' : 'Never null'}: ${curatedBasis(appName, basis)}`
+    }
     case 'sdef':
       return "Nullable: declared by the app's scripting dictionary."
   }

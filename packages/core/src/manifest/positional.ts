@@ -131,10 +131,9 @@ function commandIssues(manifest: AppManifest, resourceKey: string): PositionalIs
 }
 
 /**
- * The issue of an item command of a positional resource whose item parameter
- * is missing or is not an integer. Item selection refuses a missing one too,
- * but only at generation and registration; this rule also holds in the
- * manifest schema.
+ * A positional item requires a declared, non-null integer parameter. Item
+ * selection also refuses a missing one at generation and registration; this
+ * shared rule holds at the manifest schema as well.
  */
 function positionParameterIssue(
   commandKey: string,
@@ -151,8 +150,14 @@ function positionParameterIssue(
       path: ['commands', commandKey, 'parameters'],
     }
   }
-  if (parameter.type === 'integer') return undefined
   const index = command.parameters.indexOf(parameter)
+  if (parameter.type === 'integer' && parameter.nullable === true) {
+    return {
+      message: `The ${command.name} command "${commandKey}" selects an item of the positional resource "${resourceKey}" by its zero-based position, so its item parameter "${parameter.name}" cannot be nullable.`,
+      path: ['commands', commandKey, 'parameters', index, 'nullable'],
+    }
+  }
+  if (parameter.type === 'integer') return undefined
   return {
     message: `The ${command.name} command "${commandKey}" selects an item of the positional resource "${resourceKey}" by its zero-based position, so its item parameter "${parameter.name}" must be of type integer.`,
     path: ['commands', commandKey, 'parameters', index, 'type'],

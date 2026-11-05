@@ -92,6 +92,24 @@ describe('the generated Panes contract', () => {
     )
   })
 
+  it.each([[['Tab']], [['Window', 'Tab']]])(
+    'documents positional selection for target metadata %j',
+    (targets) => {
+      const manifest = panesManifest()
+      const command = manifest.commands['getTab']
+      if (command === undefined) throw new Error('the Panes fixture has no getTab')
+      command.resourceType = targets
+      const text = contractText(generateContract(manifest))
+      const client = prose(declaration(text, /export interface TabResourceClient \{[\s\S]*?\n\}/))
+      expect(client).toContain(
+        `Read the tab at the zero-based position ` + '`index` within `windowId`. ' + SELECTION_NOTE
+      )
+      expect(client).toContain(
+        `@param index - The tab to read. ${SELECTION_NOTE} Does not accept null.`
+      )
+    }
+  )
+
   it('leaves out a command result holding a tab, which no window record carries', () => {
     const front = declaration(text, / {2}id: 'panes\.app\.frontTab',[\s\S]*?\n\}/)
     expect(front).toContain('  output: t.none(),')

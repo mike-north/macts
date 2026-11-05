@@ -16,6 +16,10 @@
     ".": {
       "types": "./dist/contracts.d.ts",
       "import": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "import": "./dist/client/index.js"
     }
   },
   "main": "./dist/index.js",
@@ -32,8 +36,8 @@
     "test": "vitest run",
     "test:types": "tsd",
     "typecheck": "tsc --noEmit",
-    "api-extractor": "api-extractor run --local",
-    "api-extractor:ci": "api-extractor run"
+    "api-extractor": "api-extractor run --local && api-extractor run --local --config api-extractor.client.json",
+    "api-extractor:ci": "api-extractor run && api-extractor run --config api-extractor.client.json"
   },
   "tsd": {
     "directory": "src",

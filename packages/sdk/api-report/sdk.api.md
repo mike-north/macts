@@ -4,27 +4,18 @@
 
 ```ts
 
-import { AppContract } from '@macts/contracts';
-import { BoundReferenceOf } from '@macts/contracts';
-import { ClientBrand } from '@macts/contracts';
-import { ResolvableReferenceData } from '@macts/contracts';
-import { ResourceTable } from '@macts/contracts';
+import { bindReference } from '@macts/contracts/client';
+import { createRemoteClient as createClient } from '@macts/contracts/client';
+import { RemoteClientOptions } from '@macts/contracts/client';
 
-// @public
-export function bindReference<Resources extends ResourceTable, const Data extends ResolvableReferenceData<Resources>>(client: ClientBrand<Resources>, data: Data): BoundReferenceOf<Resources, Data>;
+export { bindReference }
 
-// @public
-export function createClient<Client, Resources extends ResourceTable>(app: AppContract<Client, Resources>, options: RemoteClientOptions): Client & ClientBrand<Resources>;
+export { createClient }
 
 // @public
 export const DEFAULT_BASE_URL = "http://localhost:8372";
 
-// @public
-export interface RemoteClientOptions {
-    readonly fetch?: typeof globalThis.fetch;
-    readonly token: string;
-    readonly url: string | URL;
-}
+export { RemoteClientOptions }
 
 // @public
 export function resolveApiKey(): string;

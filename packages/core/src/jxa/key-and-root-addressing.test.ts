@@ -34,6 +34,7 @@ import { describe, expect, it } from 'vitest'
 import {
   AppOperationError,
   InternalError,
+  PASSTHROUGH_PLAN,
   TargetNotFoundError,
   UnexpectedValueError,
   type ResourcePlanTable,
@@ -45,7 +46,13 @@ import {
   ARCHIVE_MANIFEST_YAML,
   archiveManifest,
 } from '../manifest/test-support/archive-key-and-root.js'
-import type { NativeScript } from './native-codec.js'
+import { composeNativeScript } from './executor.js'
+import {
+  NATIVE_ABSENT_AS_NULL_KEY,
+  NATIVE_CODEC,
+  NATIVE_ENCODE_FUNCTION,
+  type NativeScript,
+} from './native-codec.js'
 import { createNativeExecutor } from './native-executor.js'
 import {
   buildNativeBody,
@@ -116,11 +123,15 @@ function failing(errorNumber: number) {
 }
 
 /**
- * One stand-in archive object: it exists, and reports `record` as its
- * property record, which need not hold every property it can report.
+ * One stand-in archive object: it exists, reports `record` as its property
+ * record, which need not hold every property it can report, and reads each
+ * of the record's properties on its own too; `members` add or replace reads.
  */
 function object(record: Record<string, unknown>, members: Record<string, unknown> = {}) {
-  return { exists: () => true, properties: () => ({ ...record }), ...members }
+  const readers = Object.fromEntries(
+    Object.entries(record).map(([key, value]) => [key, () => value])
+  )
+  return { exists: () => true, properties: () => ({ ...record }), ...readers, ...members }
 }
 
 const ABSENT = { exists: () => false }
@@ -718,6 +729,201 @@ describe('absent values against a stand-in Archive', () => {
 
       expect(await rejectionOf(listEntries(app))).toBeInstanceOf(UnexpectedValueError)
     })
+  })
+})
+
+/**
+ * References the app reports missing only as they are encoded (phases/13
+ * D10, "A read the app fails with 'no such object' can be the empty value").
+ * An entry's `shelf` read can hand back a volume whose own id read fails with
+ * -1728: on its evidence that is `null`, wherever the value came from. Its
+ * `holder` has no such evidence, so the same failure on the holder's
+ * `location` fails the operation, and the failure's cause names the
+ * property, and in a list its row, never a value.
+ */
+describe('references the app reports missing as they are encoded', () => {
+  const VOLUME_REF: ValuePlan = { kind: 'reference', resource: 'Volume', cardinality: 'one' }
+  const SHELVED_ENTRY: ValuePlan = {
+    kind: 'record',
+    fields: {
+      location: { presence: 'required', value: text() },
+      holder: { presence: 'required', value: nullable(ENTRY_REF) },
+      shelf: { presence: 'required', value: nullable(VOLUME_REF) },
+    },
+  }
+  /** A volume the app reads back by its id. */
+  const volume = (id: string) => ({ id: () => id })
+  /** A volume the app hands back but reports missing when its id is read. */
+  const missingVolume = () => ({ id: failing(-1728) })
+  /** An entry the app hands back but reports missing when its location is read. */
+  const missingEntry = () => ({ title: () => 'Gone', location: failing(-1728) })
+
+  /** The message of the cause `error` carries, or `undefined` when it has none. */
+  function causeMessage(error: unknown): string | undefined {
+    if (!(error instanceof Error) || !(error.cause instanceof Error)) return undefined
+    return error.cause.message
+  }
+
+  /**
+   * A get of entry `/a`, whose property record and direct reads are `record`
+   * and `members`, recording the script it runs in `scripts`.
+   */
+  function getShelved(
+    record: Record<string, unknown>,
+    members: Record<string, unknown> = {},
+    scripts: NativeScript[] = []
+  ) {
+    const entry = object({ location: '/a', ...record }, { location: () => '/a', ...members })
+    const app = {
+      includeStandardAdditions: false,
+      entries: { byName: (key: unknown) => (key === '/a' ? entry : ABSENT) },
+    }
+    return execute(
+      app,
+      'getEntry',
+      'Entry',
+      { location: '/a' },
+      { input: inputOf(text(), 'location'), output: SHELVED_ENTRY },
+      scripts
+    )
+  }
+
+  /**
+   * A list of entries `/a` and `/b`, read across the collection by
+   * `columns`, which replace the defaults (no holder, shelved in `v1`);
+   * `items` are the entries' specifiers, for reads item by item.
+   */
+  function listShelved(columns: Record<string, unknown>, items: readonly object[] = []) {
+    const entries = Object.assign(() => items, {
+      location: () => ['/a', '/b'],
+      title: () => ['A', 'B'],
+      holder: () => [null, null],
+      shelf: () => [volume('v1'), volume('v1')],
+      shelfMark: () => ['S1', 'S2'],
+      summary: () => ['Kept', 'Lent'],
+      ...columns,
+    })
+    return execute(
+      { includeStandardAdditions: false, entries },
+      'listEntries',
+      'Entry',
+      {},
+      { input: { kind: 'record', fields: {} }, output: { kind: 'array', items: SHELVED_ENTRY } }
+    )
+  }
+
+  it('gets as null a shelf the app reports missing only when its id is read', async () => {
+    // The property record holds the same volume; the read on its own decides.
+    await expect(
+      getShelved({ holder: null, shelf: missingVolume() }, { shelf: () => missingVolume() })
+    ).resolves.toEqual({ location: '/a', holder: null, shelf: null })
+  })
+
+  // D10: such a property's "evidence is of what that read reports", so a get
+  // reads it on its own and never takes it from the item's property record,
+  // even when the record holds a volume the direct read does not report.
+  it('gets as null a shelf the property record holds but its direct read reports missing', async () => {
+    await expect(
+      getShelved({ holder: null, shelf: volume('v1') }, { shelf: failing(-1728) })
+    ).resolves.toEqual({ location: '/a', holder: null, shelf: null })
+  })
+
+  // Guards that nothing serializes the body's result before the codec reads
+  // it. The stand-in runs the composed script whole, body and codec in one
+  // realm, as the automation host does. A JSON round trip in between would
+  // drop the marker's symbol key, so this -1728 would escape and fail the get.
+  it('hands a marked shelf to the codec within the one script that read it', async () => {
+    const scripts: NativeScript[] = []
+    await expect(
+      getShelved({ holder: null, shelf: null }, { shelf: () => missingVolume() }, scripts)
+    ).resolves.toEqual({ location: '/a', holder: null, shelf: null })
+    expect(scripts).toHaveLength(1)
+    const script = scripts[0]
+    if (script === undefined) throw new Error('Expected the get to run one script')
+    expect(script.body).toContain(`Symbol.for(${JSON.stringify(NATIVE_ABSENT_AS_NULL_KEY)})`)
+    const composed = composeNativeScript(script, NATIVE_CODEC)
+    expect(composed).toContain(`var value = (function (app, args, page) {\n${script.body}`)
+    expect(composed).toContain(`value: ${NATIVE_ENCODE_FUNCTION}(value, `)
+  })
+
+  it('lists as null a shelf the read across the entries returns but the app reports missing', async () => {
+    await expect(listShelved({ shelf: () => [volume('v1'), missingVolume()] })).resolves.toEqual([
+      { location: '/a', holder: null, shelf: ref('Volume', 'v1') },
+      { location: '/b', holder: null, shelf: null },
+    ])
+  })
+
+  it('lists as null a shelf read entry by entry, whether its read or its id read reports it missing', async () => {
+    const a = { location: () => '/a', shelf: () => missingVolume() }
+    const b = { location: () => '/b', shelf: failing(-1728) }
+    await expect(listShelved({ shelf: failing(-1728) }, [a, b])).resolves.toEqual([
+      { location: '/a', holder: null, shelf: null },
+      { location: '/b', holder: null, shelf: null },
+    ])
+  })
+
+  it('fails a list with a holder the app reports missing only when its location is read, naming it and its row', async () => {
+    const error = await rejectionOf(listShelved({ holder: () => [null, missingEntry()] }))
+    expect(error).toBeInstanceOf(TargetNotFoundError)
+    expect(error).toHaveProperty('message', 'Archive has no Entry matching the request.')
+    expect(causeMessage(error)).toBe('The app failed. (while reading the property "holder" at [1])')
+  })
+
+  it('fails a get with such a holder, naming it', async () => {
+    const error = await rejectionOf(
+      getShelved({ holder: missingEntry(), shelf: null }, { shelf: () => null })
+    )
+    expect(error).toBeInstanceOf(TargetNotFoundError)
+    expect(causeMessage(error)).toBe('The app failed. (while reading the property "holder")')
+  })
+
+  it('names the identifier when it fails across the entries and for one of them', async () => {
+    const a = { location: () => '/a' }
+    const b = { location: failing(-1728) }
+    const error = await rejectionOf(listShelved({ location: failing(-1728) }, [a, b]))
+    expect(error).toBeInstanceOf(TargetNotFoundError)
+    expect(causeMessage(error)).toBe('The app failed. (while reading the property "location")')
+  })
+
+  // The codec returns a passthrough result unchanged, so a marked value
+  // would reach the caller as it is: a body under a passthrough plan marks
+  // nothing, and the values it read come back as read.
+  it('marks nothing under a passthrough plan, returning what it read', async () => {
+    const body = buildNativeBody(
+      manifest,
+      { command: 'getEntry', resource: 'Entry' },
+      {
+        absentValueMarkers: false,
+      }
+    )
+    const marker = `Symbol.for(${JSON.stringify(NATIVE_ABSENT_AS_NULL_KEY)})`
+    expect(body).not.toContain(marker)
+    expect(buildNativeBody(manifest, { command: 'getEntry', resource: 'Entry' })).toContain(marker)
+    const { app } = standInArchive()
+    await expect(
+      execute(
+        app,
+        'getEntry',
+        'Entry',
+        { location: '/a' },
+        { input: inputOf(text(), 'location'), output: PASSTHROUGH_PLAN }
+      )
+    ).resolves.toMatchObject({ location: '/a', shelfMark: 'S1' })
+  })
+
+  it('names the items when listing them fails after the identifier read across them did', async () => {
+    const entries = Object.assign(failing(-1728), { location: failing(-1728) })
+    const error = await rejectionOf(
+      execute(
+        { includeStandardAdditions: false, entries },
+        'listEntries',
+        'Entry',
+        {},
+        { input: { kind: 'record', fields: {} }, output: { kind: 'array', items: SHELVED_ENTRY } }
+      )
+    )
+    expect(error).toBeInstanceOf(TargetNotFoundError)
+    expect(causeMessage(error)).toBe('The app failed. (while reading the items)')
   })
 })
 

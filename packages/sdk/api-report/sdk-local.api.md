@@ -5,15 +5,13 @@
 ```ts
 
 import { AppContract } from '@macts/contracts';
-import { BoundReferenceOf } from '@macts/contracts';
+import { bindReference } from '@macts/contracts/client';
 import { ClientBrand } from '@macts/contracts';
 import { Executor } from '@macts/core';
 import { GovernanceContext } from '@macts/runtime';
-import { ResolvableReferenceData } from '@macts/contracts';
 import { ResourceTable } from '@macts/contracts';
 
-// @public
-export function bindReference<Resources extends ResourceTable, const Data extends ResolvableReferenceData<Resources>>(client: ClientBrand<Resources>, data: Data): BoundReferenceOf<Resources, Data>;
+export { bindReference }
 
 // @public
 export function createClient<Client, Resources extends ResourceTable>(app: AppContract<Client, Resources>, options: LocalClientOptions): Client & ClientBrand<Resources>;

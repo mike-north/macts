@@ -319,3 +319,16 @@ describe('buildDeclaredInputSchema', () => {
     expect(buildCommandSchema(CREATE).safeParse({ title: 'Hello', id: 'x' }).success).toBe(true)
   })
 })
+
+/** The manifest-only path remains numeric passthrough until its retirement. */
+describe('manifest-only integer input compatibility', () => {
+  const command = createCommand({
+    parameters: [{ name: 'id', type: 'integer', description: 'Identifier', required: true }],
+  })
+  it('accepts a bare number unchanged and rejects contract-tagged integers', () => {
+    const schema = buildDeclaredInputSchema(command)
+    expect(schema.parse({ id: 7 })).toEqual({ id: 7 })
+    expect(schema.safeParse({ id: { integer: '7' } }).success).toBe(false)
+    expect(schema.safeParse({ id: '7' }).success).toBe(false)
+  })
+})
