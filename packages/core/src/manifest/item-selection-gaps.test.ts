@@ -60,12 +60,13 @@ describe('the known item-selection gaps', () => {
   // dictionary's reason the item cannot be selected yet.
   it('are exactly these commands, each with what it needs', () => {
     expect(KNOWN_ITEM_SELECTION_GAPS).toEqual([
-      // OmniPlan.sdef:1153, :596: a violation, in a scenario, has no identifier or get.
+      // OmniPlan.sdef:1153, :596, :524: a violation has no identifier or get,
+      // and is in a scenario, which is in a project.
       {
         bundleId: 'com.omnigroup.OmniPlan3.MacAppStore',
         commandKey: 'fix',
         resource: 'Violation',
-        needs: ['resource-identifier-and-get'],
+        needs: ['resource-identifier-and-get', 'multi-level-command-parents'],
       },
       // Music.sdef:126: a file track has no identifier or get.
       {
@@ -81,25 +82,26 @@ describe('the known item-selection gaps', () => {
         resource: 'FileTrack',
         needs: ['resource-identifier-and-get', 'multi-level-command-parents'],
       },
-      // System_Events.sdef:949, :981, :985: UI elements and actions have no
-      // identifier or get.
+      // SystemEvents.sdef:949, :981, :985: UI elements and actions have no
+      // identifier or get; a UI element is under a process or its window
+      // (:1379, :1595), and an action is in a UI element (:1259).
       {
         bundleId: 'com.apple.systemevents',
         commandKey: 'click',
         resource: 'UIElement',
-        needs: ['resource-identifier-and-get'],
+        needs: ['resource-identifier-and-get', 'multi-level-command-parents'],
       },
       {
         bundleId: 'com.apple.systemevents',
         commandKey: 'perform',
         resource: 'Action',
-        needs: ['resource-identifier-and-get'],
+        needs: ['resource-identifier-and-get', 'multi-level-command-parents'],
       },
       {
         bundleId: 'com.apple.systemevents',
         commandKey: 'select',
         resource: 'UIElement',
-        needs: ['resource-identifier-and-get'],
+        needs: ['resource-identifier-and-get', 'multi-level-command-parents'],
       },
       // Mail.sdef:749, :628: a message is in a mailbox, which is in an account.
       {
@@ -222,6 +224,32 @@ describe('the generated docs of a known gap', () => {
       expect(content, path).toContain('async') // the file exists and was generated
       expect(content, path).not.toContain('does not yet send')
     }
+  })
+})
+
+describe('the generated docs of a known gap described with no full stop', () => {
+  // OmniPlan's `fix` is described as "Fix a violation", with no full stop. The
+  // not-sent sentence must follow it as a new sentence on every surface, not
+  // run on from it (#287).
+  const FIX_DOC =
+    'Fix a violation. macts does not yet send the violation to the app, so the app acts on whatever it chooses.'
+
+  it('start a new sentence in the HTTP client, contract client and CLI docs', () => {
+    const result = generateConsolidatedPackages(shipped('com.omnigroup.OmniPlan3.MacAppStore'), {
+      appName: 'omniplan',
+    })
+    expect(result.errors).toEqual([])
+    const files = new Map(
+      [...result.client.files, ...result.server.files].map((file) => [file.path, file.content])
+    )
+    expect(files.get('src/resources/violation.ts')).toContain(
+      '   * Fix a violation.\n   * macts does not yet send the violation to the app, so the app acts on whatever it chooses.\n   */\n  async fix('
+    )
+    const contract = (files.get('src/contract/index.ts') ?? '').replace(/\n\s*\* /g, ' ')
+    expect(contract).toContain(FIX_DOC)
+    expect(files.get('src/cli/commands/projects/scenarios/violations/fix.ts')).toContain(
+      `description: ${JSON.stringify(FIX_DOC)},`
+    )
   })
 })
 

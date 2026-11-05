@@ -34,7 +34,8 @@ import type { AppManifest } from './schemas/app.js'
  *   needs both, from evidence.
  * - `multi-level-command-parents`: the item exists only within a parent that
  *   is itself within another (a Mail message within a mailbox within an
- *   account), and a command records one parent only.
+ *   account, an OmniPlan violation within a scenario within a project), and a
+ *   command records one parent only.
  */
 export type ItemSelectionNeed = 'resource-identifier-and-get' | 'multi-level-command-parents'
 
@@ -65,9 +66,14 @@ function gap(
  * entry's removal is expected; see the module documentation.
  */
 export const KNOWN_ITEM_SELECTION_GAPS: readonly KnownItemSelectionGap[] = Object.freeze([
-  // OmniPlan.sdef:1153: `fix` takes the violation as its direct parameter; a
-  // violation is an element of a scenario (OmniPlan.sdef:596).
-  gap('com.omnigroup.OmniPlan3.MacAppStore', 'fix', 'Violation', ['resource-identifier-and-get']),
+  // OmniPlan.sdef:1153: `fix` takes the violation as its direct parameter,
+  // and a required `with action` (:1155) the manifest does not declare yet. A
+  // violation is an element of a scenario (:596), which is an element of a
+  // project (:524).
+  gap('com.omnigroup.OmniPlan3.MacAppStore', 'fix', 'Violation', [
+    'resource-identifier-and-get',
+    'multi-level-command-parents',
+  ]),
   // Music.sdef:126: `refresh` takes the file track as its direct parameter.
   gap('com.apple.Music', 'refresh', 'FileTrack', ['resource-identifier-and-get']),
   // TV.sdef:88: as Music's, and a TV playlist is got within its source.
@@ -75,12 +81,22 @@ export const KNOWN_ITEM_SELECTION_GAPS: readonly KnownItemSelectionGap[] = Objec
     'resource-identifier-and-get',
     'multi-level-command-parents',
   ]),
-  // System_Events.sdef:949, :981 and :985: `click` and `select` take the UI
-  // element, `perform` the action, as their direct parameter; UI elements
-  // nest to any depth under a process.
-  gap('com.apple.systemevents', 'click', 'UIElement', ['resource-identifier-and-get']),
-  gap('com.apple.systemevents', 'perform', 'Action', ['resource-identifier-and-get']),
-  gap('com.apple.systemevents', 'select', 'UIElement', ['resource-identifier-and-get']),
+  // SystemEvents.sdef:949, :981 and :985: `click` and `select` take the UI
+  // element, `perform` the action, as their direct parameter. UI elements
+  // nest to any depth under a process and its windows (:1379, :1595), and an
+  // action is an element of a UI element (:1259).
+  gap('com.apple.systemevents', 'click', 'UIElement', [
+    'resource-identifier-and-get',
+    'multi-level-command-parents',
+  ]),
+  gap('com.apple.systemevents', 'perform', 'Action', [
+    'resource-identifier-and-get',
+    'multi-level-command-parents',
+  ]),
+  gap('com.apple.systemevents', 'select', 'UIElement', [
+    'resource-identifier-and-get',
+    'multi-level-command-parents',
+  ]),
   // Mail.sdef:193, :239 and :247: each takes the message as its direct
   // parameter; a message is an element of a mailbox (Mail.sdef:749), which is
   // an element of an account (Mail.sdef:628).
