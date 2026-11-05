@@ -137,3 +137,44 @@ describe('inactive containment declarations', () => {
     }
   })
 })
+
+/** A command under Tab can only be ignored when it has no usable route. */
+function commandUnderTab(unsupported: boolean) {
+  const manifest = panesManifest()
+  manifest.commands['closed'] = {
+    name: 'closed',
+    description: 'Unavailable command',
+    scope: 'application',
+    parent: { resource: 'Tab', parameter: 'tabId' },
+    parameters: [{ name: 'tabId', type: 'integer', description: 'Tab', required: true }],
+    ...(unsupported
+      ? {
+          unsupported: {
+            evidence: {
+              source: 'live' as const,
+              observedAt: '2026-11-01T06:05:32.244Z',
+              bundleId: 'com.example.panes',
+              appVersion: '1.0',
+              osVersion: '27.2',
+              expression: 'the command',
+              errorNumber: -1728,
+            },
+          },
+        }
+      : {}),
+  }
+  return manifest
+}
+
+describe('commands under a positional parent', () => {
+  it.each([
+    [true, true],
+    [false, false],
+  ])('unsupported=%s is admitted=%s', (unsupported, admitted) => {
+    const manifest = commandUnderTab(unsupported)
+    expect(AppManifestSchema.safeParse(manifest).success).toBe(admitted)
+    expect(generateConsolidatedPackages(manifest, { appName: 'panes' }).errors.length === 0).toBe(
+      admitted
+    )
+  })
+})

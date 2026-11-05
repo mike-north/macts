@@ -29,7 +29,7 @@ import { placedEntries, type PlacedEntry } from './hierarchy-placement.js'
 import { resolvePrimaryIdentifierProperty } from './identifier.js'
 import { itemIdentifierParameter, selectsOneItem } from './item-selection.js'
 import { resourceCommandEntries, resolvingCommand } from './resource-commands.js'
-import { isUnsupportedResourceKey } from './unsupported.js'
+import { isUnsupportedResourceKey, usableCommands } from './unsupported.js'
 
 /**
  * Whether the objects of `resourceKey` are found by their position within
@@ -206,7 +206,7 @@ function positionParameterIssue(
  * Every issue with the `positional` markers of a manifest read flattened, in
  * declaration order: a marked resource with a primary identifier, which is
  * found by that identifier instead, the issues of its commands
- * ({@link commandIssues}), and any command that records a positional
+ * ({@link commandIssues}), and any usable command that records a positional
  * resource as its parent. A body binds its parent by the parent's identifier
  * (`recordedParentScope`), and a positional resource has none, so such a
  * command is refused until native binding supports positional parents. The
@@ -230,7 +230,7 @@ export function findPositionalIssues(manifest: AppManifest): PositionalIssue[] {
     }
     issues.push(...commandIssues(manifest, resourceKey, placements))
   }
-  for (const [commandKey, command] of Object.entries(manifest.commands)) {
+  for (const [commandKey, command] of usableCommands(manifest)) {
     const parent = command.parent?.resource
     if (parent === undefined || !isPositional(manifest, parent)) continue
     issues.push({

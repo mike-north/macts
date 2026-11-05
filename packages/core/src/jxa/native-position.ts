@@ -57,8 +57,9 @@ export function specifierPosition(display: unknown, collection: unknown): number
   if (match === null) return undefined
   const [, container, name, digits] = match
   if (name !== collection || container === undefined || digits === undefined) return undefined
-  // The container's own step: a bare application holds the collection itself.
-  if (/^Application\([^()]*\)$/.test(container)) return undefined
+  // A quoted app name may contain parentheses or escaped quotes, none of
+  // which make the application's own collection a container's collection.
+  if (/^Application\((?:"(?:[^"\\]|\\.)*"|[^()]*)\)$/.test(container)) return undefined
   const position = Number(digits)
   return Number.isSafeInteger(position) ? position : undefined
 }

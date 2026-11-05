@@ -5,7 +5,7 @@
 
 An index selector reference must now carry a container chain of identity references only, each the parent its resource is found within, ending at one the app finds at the application. A container above that, or a selector anywhere in the chain, is rejected.
 
-A positional resource must now sit under a parent the app finds at the application by its identifier, and every command that selects one of its items must record that parent, as its get does, and declare its integer item parameter. No command may record a positional resource as its parent. A manifest that does otherwise is refused by the manifest schema, by generation and by registration.
+A positional resource must now sit under a parent the app finds at the application by its identifier, and every command that selects one of its items must record that parent, as its get does, and declare its integer item parameter. No usable command may record a positional resource as its parent. A manifest that does otherwise is refused by the manifest schema, by generation and by registration.
 
 For a positional resource's list and create, a usable hierarchy placement constrains where the command can address its collection. A nested-only collection requires a recorded parent, and any recorded parent must be a declared holder. Application-wide collections and resources with no usable placement retain their existing behavior.
 
