@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -59,8 +60,10 @@ export class iTermClient {
     splitVertically(withProfile: string, command?: string): Promise<void>;
     splitVerticallyWithDefaultProfile(command?: string): Promise<void>;
     splitVerticallyWithSameProfile(command?: string): Promise<void>;
+    readonly tabs: TabResourceClient;
     toggleHotkeyWindow(): Promise<void>;
     variable(named: string): Promise<void>;
+    readonly windows: WindowResourceClient;
     write(contentsOfFile?: string, text?: string, newline?: boolean): Promise<void>;
 }
 
@@ -510,6 +513,13 @@ export interface TabCreateInput {
     title?: string;
 }
 
+// @public
+export class TabResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(windowId: string, index: string): Promise<Tab>;
+    list(windowId: number): Promise<Page<Tab>>;
+}
+
 // @public (undocumented)
 export const TabSchema: z.ZodObject<{
     index: z.ZodNumber;
@@ -529,6 +539,7 @@ export interface Window {
         height: number;
     };
     closeable: boolean;
+    currentTab: Tab;
     frame: {
         x: number;
         y: number;
@@ -569,6 +580,7 @@ export interface WindowCreateInput {
         width: number;
         height: number;
     };
+    currentTab?: Tab;
     frame?: {
         x: number;
         y: number;
@@ -596,6 +608,13 @@ export interface WindowCreateInput {
     zoomed?: boolean;
 }
 
+// @public
+export class WindowResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(id: string): Promise<Window>;
+    list(): Promise<Page<Window>>;
+}
+
 // @public (undocumented)
 export const WindowSchema: z.ZodObject<{
     id: z.ZodNumber;
@@ -616,6 +635,7 @@ export const WindowSchema: z.ZodObject<{
     zoomable: z.ZodBoolean;
     zoomed: z.ZodBoolean;
     frontmost: z.ZodBoolean;
+    currentTab: z.ZodString;
     isHotkeyWindow: z.ZodBoolean;
     hotkeyWindowProfile: z.ZodString;
     position: z.ZodObject<{

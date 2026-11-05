@@ -20,7 +20,7 @@ export class ListTabsCommand extends Command {
 
     try {
       const client = getClient()
-      const page = await client.tabs.list(this.windowId)
+      const page = await client.tabs.list(Number(this.windowId))
 
       const output = formatter.formatList(
         page.items.map((item) => ({
