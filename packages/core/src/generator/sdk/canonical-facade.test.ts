@@ -472,6 +472,8 @@ describe('canonical generated facade', () => {
     expect(rpc).toHaveBeenCalledTimes(1)
     expect(Reflect.ownKeys(options)).toEqual(['signal'])
   })
+  // A real compiler subprocess needs its own finite budget beyond the in-memory
+  // codec cases; compilation must still satisfy every consumer type assertion.
   it('compiles canonical record aliases, numeric convenience signatures and precise shared binding', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'macts-facade-types-'))
     const repo = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../..')
@@ -546,7 +548,7 @@ export async function use(): Promise<void> {
     } finally {
       await rm(dir, { recursive: true, force: true })
     }
-  })
+  }, 30_000)
   it('encodes canonical inputs once while preserving numeric writes and verified null reset', async () => {
     const root = generated()
     const facade = new root.FixtureClient({ apiKey: 'token' })
