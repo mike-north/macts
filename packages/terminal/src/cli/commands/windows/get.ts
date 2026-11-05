@@ -9,7 +9,8 @@ export class GetWindowCommand extends Command {
   static override paths = [['terminal', 'windows', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a window by name',
+    description:
+      "Get a window by name. When several windows share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

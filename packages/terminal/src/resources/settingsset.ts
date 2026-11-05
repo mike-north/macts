@@ -30,6 +30,7 @@ export class SettingsSetResourceClient {
 
   /**
    * Get a settings set by name.
+   * When several settings sets share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async get(name: string): Promise<SettingsSet> {
     return this.#http.rpc<SettingsSet>(`${this.#app}.${this.#resource}.get`, { name })

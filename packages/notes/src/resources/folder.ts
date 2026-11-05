@@ -30,6 +30,7 @@ export class FolderResourceClient {
 
   /**
    * Get a folder by name.
+   * When several folders share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async get(name: string): Promise<Folder> {
     return this.#http.rpc<Folder>(`${this.#app}.${this.#resource}.get`, { name })

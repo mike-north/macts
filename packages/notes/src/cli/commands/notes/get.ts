@@ -9,7 +9,8 @@ export class GetNoteCommand extends Command {
   static override paths = [['notes', 'notes', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a note by name',
+    description:
+      "Get a note by name. When several notes share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

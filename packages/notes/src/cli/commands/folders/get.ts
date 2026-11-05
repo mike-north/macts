@@ -9,7 +9,8 @@ export class GetFolderCommand extends Command {
   static override paths = [['notes', 'folders', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a folder by name',
+    description:
+      "Get a folder by name. When several folders share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

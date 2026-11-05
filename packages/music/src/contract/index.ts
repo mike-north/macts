@@ -1711,7 +1711,9 @@ export interface TrackResourceClient {
    */
   list(playlistId: string, options?: CallOptions): Promise<Page<Track>>
   /**
-   * Read the track identified by `persistentID` within `playlistId`.
+   * Read the track identified by `persistentID` within `playlistId`. When several tracks share the
+   * same persistent ID, the first match in the app's order is used, and the operation does not fail
+   * as ambiguous.
    *
    * @param playlistId - Persistent ID of the playlist. Does not accept null.
    * @param persistentID - Persistent ID of the track. Does not accept null.

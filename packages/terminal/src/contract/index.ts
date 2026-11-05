@@ -250,7 +250,8 @@ export interface WindowResourceClient {
   /** List windows, as one page holding all of them. */
   list(options?: CallOptions): Promise<Page<Window>>
   /**
-   * Read the window identified by `name`.
+   * Read the window identified by `name`. When several windows share the same name, the first match
+   * in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param name - Item identifier. Does not accept null.
    */
@@ -262,7 +263,8 @@ export interface TabResourceClient {
   /** List tabs, as one page holding all of them. */
   list(options?: CallOptions): Promise<Page<Tab>>
   /**
-   * Read the tab identified by `name`.
+   * Read the tab identified by `name`. When several tabs share the same tty, the first match in the
+   * app's order is used, and the operation does not fail as ambiguous.
    *
    * @param name - Item identifier. Does not accept null.
    */
@@ -274,7 +276,8 @@ export interface SettingsSetResourceClient {
   /** List settings sets, as one page holding all of them. */
   list(options?: CallOptions): Promise<Page<SettingsSet>>
   /**
-   * Read the settings set identified by `name`.
+   * Read the settings set identified by `name`. When several settings sets share the same name, the
+   * first match in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param name - Item identifier. Does not accept null.
    */

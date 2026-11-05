@@ -353,7 +353,8 @@ export interface WorkflowResourceClient {
   /** List workflows, as one page holding all of them. */
   list(options?: CallOptions): Promise<Page<Workflow>>
   /**
-   * Read the workflow identified by `name`.
+   * Read the workflow identified by `name`. When several workflows share the same name, the first
+   * match in the app's order is used, and the operation does not fail as ambiguous.
    *
    * @param name - Workflow name. Does not accept null.
    */

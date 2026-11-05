@@ -9,7 +9,8 @@ export class GetCalendarCommand extends Command {
   static override paths = [['calendar', 'calendars', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a calendar by name',
+    description:
+      "Get a calendar by name. When several calendars share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

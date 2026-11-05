@@ -18,6 +18,8 @@
 import type { AppManifest, Command, CommandParameter, Resource } from '../manifest/index.js'
 import { itemIdentifierParameter, unselectableItemCommands } from '../manifest/item-selection.js'
 import { untargetedIdentifiers } from '../manifest/identifier-targeting.js'
+import { resolveIdentifierTargeting } from '../manifest/identifier.js'
+import { resolvePrimaryIdentifier } from '../manifest/primary-identifier.js'
 import { normalizeResourceRouteSegment } from '../manifest/route.js'
 import { splitIdentifierWords } from '../manifest/lower-camel.js'
 import {
@@ -156,6 +158,30 @@ export function identifierWords(identifier: string): string {
   return splitIdentifierWords(identifier)
     .map((word) => (/^[A-Z]{2,}/.test(word) ? word : word.toLowerCase()))
     .join(' ')
+}
+
+/**
+ * The sentence a generated get, update or delete doc adds about items that
+ * share the value the operation looks its item up by, or `undefined` when
+ * none can.
+ *
+ * A resource whose primary identifier is matched with `byProperty` is found
+ * as the first match of `whose` in the app's element order (phases/13 D10,
+ * identifier targeting). With no uniqueness claim (`unique` absent or
+ * false), several items can share the value, and the operation acts on the
+ * first of them rather than failing as ambiguous. An identifier claimed
+ * unique, or looked up by the app's id or key specifier or as a root, matches
+ * no property, so it gets no sentence.
+ *
+ * @param resource - The resource the operation acts on.
+ * @returns One sentence, naming the resource's plural and the matched
+ *   property in prose.
+ */
+export function firstMatchNote(resource: Resource | undefined): string | undefined {
+  const targeting = resolveIdentifierTargeting(resource)
+  if (resource === undefined || targeting?.strategy !== 'byProperty') return undefined
+  if (resolvePrimaryIdentifier(resource)?.unique === true) return undefined
+  return `When several ${identifierWords(resource.plural)} share the same ${identifierWords(targeting.property)}, the first match in the app's order is used, and the operation does not fail as ambiguous.`
 }
 
 /**

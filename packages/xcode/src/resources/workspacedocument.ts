@@ -30,6 +30,7 @@ export class WorkspaceDocumentResourceClient {
 
   /**
    * Get a workspace document by name.
+   * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async get(name: string): Promise<WorkspaceDocument> {
     return this.#http.rpc<WorkspaceDocument>(`${this.#app}.${this.#resource}.get`, { name })

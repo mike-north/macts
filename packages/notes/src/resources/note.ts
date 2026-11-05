@@ -30,6 +30,7 @@ export class NoteResourceClient {
 
   /**
    * Get a note by name.
+   * When several notes share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async get(name: string): Promise<Note> {
     return this.#http.rpc<Note>(`${this.#app}.${this.#resource}.get`, { name })

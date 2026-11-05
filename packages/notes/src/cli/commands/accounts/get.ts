@@ -9,7 +9,8 @@ export class GetAccountCommand extends Command {
   static override paths = [['notes', 'accounts', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get an account by name',
+    description:
+      "Get an account by name. When several accounts share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

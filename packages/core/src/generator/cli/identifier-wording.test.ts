@@ -158,7 +158,9 @@ describe('generated CLI get commands', () => {
     ['windows/get.ts', 'Get a window by name', 'name'],
   ])('%s says "%s" and labels its positional <%s>', (path, description, label) => {
     const content = command(path)
-    expect(content).toContain(`description: '${description}'`)
+    // The description starts with the summary; a property-matched identifier
+    // not claimed unique adds its first-match sentence after it.
+    expect(content).toMatch(new RegExp(`description: ['"]${description}['.]`))
     expect(content).toContain(` * ${description}.`)
     expect(content).toMatch(
       new RegExp(`Option\\.String\\(\\{ name: '${label}', required: true \\}\\)`)

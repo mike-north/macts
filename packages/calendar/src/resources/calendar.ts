@@ -30,6 +30,7 @@ export class CalendarResourceClient {
 
   /**
    * Get a calendar by id.
+   * When several calendars share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async get(id: string): Promise<Calendar> {
     return this.#http.rpc<Calendar>(`${this.#app}.${this.#resource}.get`, { id })

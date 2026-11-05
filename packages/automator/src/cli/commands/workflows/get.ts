@@ -9,7 +9,8 @@ export class GetWorkflowCommand extends Command {
   static override paths = [['automator', 'workflows', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a workflow by name',
+    description:
+      "Get a workflow by name. When several workflows share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
