@@ -13,6 +13,7 @@
  *   no id, and that the position drifts when tabs open, close or move;
  * - the tab get, and its position parameter, say that a tab is selected by
  *   its zero-based position within its window, which drifts;
+ * - so do the CLI get's help, and the HTTP client's get, update and delete;
  * - a command result holding a tab is left out, since no window record
  *   carries the tab there (parent-scoped);
  * - nothing of this reaches a reference to a resource found by identifier.
@@ -23,8 +24,10 @@
 
 import { describe, expect, it } from 'vitest'
 import { shelfManifest } from '../manifest/test-support/shelf-output-references.js'
-import { panesManifest } from '../manifest/test-support/panes-positional.js'
+import { PANES_MANIFEST_YAML, panesManifest } from '../manifest/test-support/panes-positional.js'
+import { parseManifestYaml } from '../manifest/index.js'
 import { CONTRACT_MODULE_PATH, generateContract } from './contract/index.js'
+import { generateClientPackage } from './client/index.js'
 import { generateConsolidatedPackages } from './orchestrate.js'
 
 /** The text of the generated contract module of `generated`. */
@@ -102,6 +105,80 @@ describe('the generated Panes contract', () => {
     ).toEqual([
       'panes: commands.frontTab.returns: the result of "frontTab" is left out of output for now: it holds a reference to "Tab", which the app finds only within its container, and this field is not read through a valid container for "Tab" (#219, #242).',
     ])
+  })
+})
+
+/**
+ * The Panes manifest with a tab's title writable, and a tab update and delete
+ * that select the tab by its position within its window, as its get does.
+ */
+const PANES_WITH_TAB_UPDATE_AND_DELETE = parseManifestYaml(
+  PANES_MANIFEST_YAML.replace(
+    '      title:\n        access: r\n',
+    '      title:\n        access: rw\n'
+  ) +
+    `  updateTab:
+    name: update
+    description: Rename a tab
+    scope: resource
+    resourceType: Tab
+    parent: { resource: Window, parameter: windowId }
+    parameters:
+      - { name: windowId, type: integer, description: The window, required: true }
+      - { name: index, type: integer, description: The tab, required: true }
+      - { name: title, type: string, description: The new title, required: false }
+  closeTab:
+    name: delete
+    description: Close a tab
+    scope: resource
+    resourceType: Tab
+    parent: { resource: Window, parameter: windowId }
+    parameters:
+      - { name: windowId, type: integer, description: The window, required: true }
+      - { name: index, type: integer, description: The tab, required: true }
+`
+)
+
+/** The doc comment directly above `signature` in `text`, joined into prose. */
+function docAbove(text: string, signature: string): string {
+  const at = text.indexOf(signature)
+  if (at === -1) throw new Error(`no ${signature}`)
+  const start = text.lastIndexOf('/**', at)
+  return prose(text.slice(start, at))
+}
+
+describe('the generated Panes CLI and HTTP client', () => {
+  const result = generateClientPackage(PANES_WITH_TAB_UPDATE_AND_DELETE, {
+    appName: 'panes',
+    clientPackageName: '@macts/panes',
+  })
+  const files = new Map(result.files.map((file) => [file.path, file.content]))
+
+  it('generates without errors', () => {
+    expect(result.errors).toEqual([])
+  })
+
+  // The CLI get's usage description is its help text.
+  it('says in the CLI get’s help that a tab is selected by its drifting zero-based position', () => {
+    expect(files.get('src/cli/commands/windows/tabs/get.ts')).toContain(
+      `description: "Get a tab by index. ${SELECTION_NOTE}"`
+    )
+  })
+
+  it.each(['async get(', 'async update(', 'async delete('])(
+    'says so on the HTTP client’s %s',
+    (signature) => {
+      const client = files.get('src/resources/tab.ts')
+      if (client === undefined) throw new Error('no generated src/resources/tab.ts')
+      expect(docAbove(client, signature)).toContain(`within a parent scope. ${SELECTION_NOTE}`)
+    }
+  )
+
+  // Guards that the note stays with the positional resource: a window is
+  // found by its id.
+  it('says nothing about positions for a window', () => {
+    expect(files.get('src/cli/commands/windows/get.ts')).not.toContain('zero-based')
+    expect(files.get('src/resources/window.ts')).not.toContain('zero-based')
   })
 })
 

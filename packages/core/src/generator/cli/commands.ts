@@ -9,6 +9,7 @@ import { listOperationPages, resolvePrimaryIdentifierProperty } from '../../mani
 import { usableProperties } from '../../manifest/unsupported.js'
 import { outputProperties } from '../../manifest/output-references.js'
 import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.js'
+import { itemSelectionNote } from '../positional-docs.js'
 import {
   firstMatchNote,
   identifierWords,
@@ -88,7 +89,8 @@ function identifierPositional(property: string, identifier: string | undefined):
 /**
  * The `description` value of a generated command's usage: the summary, then
  * any first-match sentences ({@link firstMatchNote},
- * {@link parentFirstMatchNote}) for a lookup that can reach several items.
+ * {@link parentFirstMatchNote}) for a lookup that can reach several items,
+ * and any note on selecting a positional item ({@link itemSelectionNote}).
  * With no sentence it stays the single-quoted summary.
  */
 function usageDescription(summary: string, notes: readonly (string | undefined)[]): string {
@@ -388,10 +390,12 @@ export function generateGetCommand(
   const identifier = addressingIdentifier(resource, getCommand)
   const summary = `Get ${withArticle(identifierWords(resource.name))} by ${identifierProse(identifier)}`
   // The usage description adds the first-match sentences for an item, and a
-  // parent, matched on a property that is not claimed unique.
+  // parent, matched on a property that is not claimed unique, then, for a
+  // positional item, that its zero-based position drifts.
   const description = usageDescription(summary, [
     firstMatchNote(resource),
     parentFirstMatchNote(getCommand, ctx.manifest),
+    itemSelectionNote(ctx.manifest, hierarchyPath.resourceName),
   ])
 
   const content = `import { Command, Option } from 'clipanion';

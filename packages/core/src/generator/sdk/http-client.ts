@@ -21,6 +21,7 @@ import { outputProperties } from '../../manifest/output-references.js'
 import { propertyTypeToTs } from '../types.js'
 import { SDK_GENERATED_NOTICE } from '../generated-header.js'
 import { pagingTypeNames } from '../contract/index.js'
+import { itemSelectionNote } from '../positional-docs.js'
 import {
   appCommandEntries,
   commandMethodParameters,
@@ -717,12 +718,14 @@ function generateResourceClient(
   }
 
   const pagingNames = pagingTypeNames(manifest)
-  // The first-match sentences of an operation: the item's, for one that
-  // selects an item, then its parent's.
+  // The notes of an operation: for one that selects an item, the item's
+  // first-match sentence, then its parent's, then, for a positional item, that
+  // its zero-based position drifts.
   const notesOf = (command: Command, selectsItem: boolean): string[] =>
     [
       selectsItem ? firstMatchNote(resource) : undefined,
       parentFirstMatchNote(command, manifest),
+      selectsItem ? itemSelectionNote(manifest, resourceName) : undefined,
     ].filter((note): note is string => note !== undefined)
   const crudMethods = [
     listCmd
@@ -940,8 +943,9 @@ function uniquePageBinding(taken: readonly string[]): string {
 }
 
 /**
- * The doc comment lines a CRUD method adds for its first-match `notes`
- * ({@link firstMatchNote}, {@link parentFirstMatchNote}), one per note, or
+ * The doc comment lines a CRUD method adds for its `notes`: first-match
+ * sentences ({@link firstMatchNote}, {@link parentFirstMatchNote}) and a
+ * positional item's selection ({@link itemSelectionNote}), one per note, or
  * nothing when there are none.
  */
 function docNoteLines(notes: readonly string[]): string {
