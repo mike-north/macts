@@ -33,77 +33,19 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[activeRunDestination](./xcode.workspacedocument.activerundestination.md)
-
-</td><td>
-
-</td><td>
-
-[RunDestination](./xcode.rundestination.md)
-
-</td><td>
-
-The workspace's run destination that will be used for scheme actions
-
-</td></tr>
-<tr><td>
-
-[activeScheme](./xcode.workspacedocument.activescheme.md)
-
-</td><td>
-
-</td><td>
-
-[Scheme](./xcode.scheme.md)
-
-</td><td>
-
-The workspace's scheme that will be used for scheme actions
-
-</td></tr>
-<tr><td>
-
 [file](./xcode.workspacedocument.file.md)
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-Its location on disk, if it has one
-
-</td></tr>
-<tr><td>
-
-[id?](./xcode.workspacedocument.id.md)
+[FileValue](./contracts.filevalue.md) \| null
 
 </td><td>
 
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
-
-</td></tr>
-<tr><td>
-
-[lastSchemeActionResult](./xcode.workspacedocument.lastschemeactionresult.md)
-
-</td><td>
-
-</td><td>
-
-[SchemeActionResult](./xcode.schemeactionresult.md)
-
-</td><td>
-
-The scheme action result for the last scheme action command issued to the workspace document
+Its location on disk, if it has one. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,13 +54,15 @@ The scheme action result for the last scheme action command issued to the worksp
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the workspace document has finished loading after being opened
+boolean \| null
+
+</td><td>
+
+Whether the workspace document has finished loading after being opened. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +71,15 @@ Whether the workspace document has finished loading after being opened
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Has it been modified since the last save?
+boolean \| null
+
+</td><td>
+
+Has it been modified since the last save? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +88,15 @@ Has it been modified since the last save?
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The name of the workspace
+The name of the workspace. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -157,13 +105,15 @@ The name of the workspace
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The document's path
+string \| null
+
+</td><td>
+
+The document's path. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

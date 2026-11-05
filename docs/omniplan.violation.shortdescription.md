@@ -4,10 +4,10 @@
 
 ## Violation.shortDescription property
 
-The short description of this violation
+The short description of this violation. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-shortDescription: string
+readonly shortDescription: string | null;
 ```

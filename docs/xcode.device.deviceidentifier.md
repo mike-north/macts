@@ -4,10 +4,10 @@
 
 ## Device.deviceIdentifier property
 
-A stable identifier for the device
+A stable identifier for the device. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-deviceIdentifier: string
+readonly deviceIdentifier: string;
 ```

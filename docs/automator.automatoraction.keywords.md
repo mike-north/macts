@@ -4,10 +4,10 @@
 
 ## AutomatorAction.keywords property
 
-The keywords that describe the action
+The keywords that describe the action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-keywords: string[];
+readonly keywords: readonly string[] | null;
 ```

@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[authorize()](./system-settings.paneresourceclient.authorize.md)
+[authorize(\_\_mactsOptions)](./system-settings.paneresourceclient.authorize.md)
 
 </td><td>
 
@@ -68,7 +68,7 @@ Prompt for authorization for a settings pane. Deprecated: no longer does anythin
 </td></tr>
 <tr><td>
 
-[timedLoad()](./system-settings.paneresourceclient.timedload.md)
+[timedLoad(\_\_mactsOptions)](./system-settings.paneresourceclient.timedload.md)
 
 </td><td>
 

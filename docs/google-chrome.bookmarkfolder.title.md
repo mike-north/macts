@@ -4,10 +4,10 @@
 
 ## BookmarkFolder.title property
 
-The title of the folder.
+The title of the folder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-title: string
+title: string | null
 ```

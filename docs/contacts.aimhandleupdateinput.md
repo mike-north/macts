@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/contacts](./contacts.md) &gt; [AIMHandleUpdateInput](./contacts.aimhandleupdateinput.md)
 
-## AIMHandleUpdateInput type
+## AIMHandleUpdateInput interface
 
-Input for updating a AIMHandle
+Input for updating an AIMHandle. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type AIMHandleUpdateInput = Partial<AIMHandleCreateInput>
+interface AIMHandleUpdateInput
 ```
 
-**References:** [AIMHandleCreateInput](./contacts.aimhandlecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[label?](./contacts.aimhandleupdateinput.label.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Label for this handle. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[value?](./contacts.aimhandleupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The AIM handle value. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

@@ -4,10 +4,10 @@
 
 ## Person.company property
 
-Is the current record a company or a person.
+Is the current record a company or a person. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-company: boolean
+company: boolean | null
 ```

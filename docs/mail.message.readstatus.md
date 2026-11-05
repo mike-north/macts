@@ -4,10 +4,10 @@
 
 ## Message.readStatus property
 
-Indicates whether the message is read or not
+Indicates whether the message is read or not. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-readStatus: boolean
+readStatus: boolean | null
 ```

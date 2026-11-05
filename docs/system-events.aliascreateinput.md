@@ -4,7 +4,7 @@
 
 ## AliasCreateInput interface
 
-Input for creating a Alias
+Input for creating an Alias.
 
 **Signature:**
 

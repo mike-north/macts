@@ -4,7 +4,7 @@
 
 ## ResolvedBuildSetting.name property
 
-The unlocalized build setting name (e.g. DSTROOT)
+The unlocalized build setting name (e.g. DSTROOT). Never null: the primary identifier.
 
 **Signature:**
 

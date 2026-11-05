@@ -4,10 +4,10 @@
 
 ## Tab.selected property
 
-Whether the tab is selected
+Whether the tab is selected. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-selected: boolean
+selected: boolean | null
 ```

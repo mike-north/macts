@@ -4,10 +4,10 @@
 
 ## Device.operatingSystemVersion property
 
-The version of the operating system installed on the device
+The version of the operating system installed on the device. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-operatingSystemVersion: string
+readonly operatingSystemVersion: string | null;
 ```

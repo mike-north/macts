@@ -232,8 +232,9 @@ describe('composeNativeScript', () => {
     expect(argsLine?.trim()).toBe(
       `var args = __mactsDecode(JSON.parse(${JSON.stringify(JSON.stringify(input))}), JSON.parse(${JSON.stringify(JSON.stringify(inputPlan))}), env);`
     )
+    // The environment also hands the codec the host's position reader.
     expect(envLine?.trim()).toBe(
-      `var env = { app: app, references: JSON.parse(${JSON.stringify(JSON.stringify(references))}) };`
+      `var env = { app: app, references: JSON.parse(${JSON.stringify(JSON.stringify(references))}), positionOf: __mactsPositionOf };`
     )
     const others = lines.filter((line) => line !== argsLine && line !== envLine).join('\n')
     for (const sentinel of [...Object.values(input), 'SENTINEL_RESOURCE_51f0']) {

@@ -57,24 +57,13 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(name)](./automator.requiredresourceresourceclient.get.md)
+[list(actionId, \_\_mactsOptions)](./automator.requiredresourceresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-Get a requiredresource by name.
-
-</td></tr>
-<tr><td>
-
-[list()](./automator.requiredresourceresourceclient.list.md)
-
-</td><td>
-
-</td><td>
-
-List all requiredresources.
+List the required resources of one automator action, as one page.
 
 </td></tr>
 </tbody></table>

@@ -4,10 +4,10 @@
 
 ## Track.enabled property
 
-is this track checked for playback?
+is this track checked for playback? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-enabled: boolean
+enabled: boolean | null
 ```

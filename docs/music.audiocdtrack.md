@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the location of the file represented by this track
+[FileValue](./contracts.filevalue.md) \| null
+
+</td><td>
+
+the location of the file represented by this track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

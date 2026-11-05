@@ -4,12 +4,10 @@
 
 ## AccountUpdateInput type
 
-Input for updating a Account
+Input for updating an Account. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type AccountUpdateInput = Partial<AccountCreateInput>
+type AccountUpdateInput = Record<string, never>
 ```
-
-**References:** [AccountCreateInput](./reminders.accountcreateinput.md)

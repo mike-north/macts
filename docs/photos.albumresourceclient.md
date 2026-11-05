@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(id)](./photos.albumresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./photos.albumresourceclient.get.md)
 
 </td><td>
 
@@ -68,13 +68,13 @@ Get a album by id.
 </td></tr>
 <tr><td>
 
-[list()](./photos.albumresourceclient.list.md)
+[list(page, \_\_mactsOptions)](./photos.albumresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all albums.
+List albums, one page at a time. When the result has a `nextCursor`<!-- -->, more remain: call again with the same arguments and `{ cursor: nextCursor }`<!-- -->.
 
 </td></tr>
 </tbody></table>

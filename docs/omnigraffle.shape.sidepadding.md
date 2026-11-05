@@ -4,10 +4,10 @@
 
 ## Shape.sidePadding property
 
-Padding at the left and right of the text space
+Padding at the left and right of the text space. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-sidePadding: number
+sidePadding: Integer | null
 ```

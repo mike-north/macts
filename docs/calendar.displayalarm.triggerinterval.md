@@ -4,10 +4,10 @@
 
 ## DisplayAlarm.triggerInterval property
 
-The interval in minutes between the event and the alarm (positive for after, negative for before)
+The interval in minutes between the event and the alarm (positive for after, negative for before). Nullable: An alarm has either a trigger interval (relative to the event start) or an absolute trigger date. The 52 sampled alarms were all relative; an absolute alarm has no interval (Calendar 27.0).
 
 **Signature:**
 
 ```typescript
-triggerInterval: number
+triggerInterval: Integer | null
 ```

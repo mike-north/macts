@@ -4,13 +4,10 @@
 
 ## Window.origin property
 
-The position of the window, relative to the lower left corner of the screen.
+The position of the window, relative to the lower left corner of the screen. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-origin: {
-  x: number
-  y: number
-}
+origin: Point | null
 ```

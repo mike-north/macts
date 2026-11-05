@@ -21,6 +21,7 @@
 export { SystemEventsClient, SystemEventsError, HttpClient } from './client.js'
 export type { SystemEventsClientOptions } from './client.js'
 export * from './types.js'
+export type { SystemEventsResources } from './contract/index.js'
 export { ClassicDomainObjectResourceClient } from './resources/classicdomainobject.js'
 export { DiskItemResourceClient } from './resources/diskitem.js'
 export { DomainResourceClient } from './resources/domain.js'

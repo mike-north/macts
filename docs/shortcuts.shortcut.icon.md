@@ -4,10 +4,10 @@
 
 ## Shortcut.icon property
 
-The shortcut's icon (TIFF image data)
+The shortcut's icon (TIFF image data). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-icon: ArrayBuffer
+readonly icon: FileValue | null;
 ```

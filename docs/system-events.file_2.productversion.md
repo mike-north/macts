@@ -4,10 +4,10 @@
 
 ## File_2.productVersion property
 
-the version of the product (visible at the top of the "Get Info" window)
+the version of the product (visible at the top of the "Get Info" window). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-productVersion: string
+readonly productVersion: string | null;
 ```

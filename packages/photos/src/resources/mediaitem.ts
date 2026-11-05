@@ -24,21 +24,42 @@ export class MediaItemResourceClient {
   /**
    * List all media items, as one page.
    */
-  async list(): Promise<Page<MediaItem>> {
-    return this.#http.rpc<Page<MediaItem>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<MediaItem>> {
+    return this.#http.invoke<Page<MediaItem>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'MediaItem'
+    )
   }
 
   /**
    * Get a media item by id.
    */
-  async get(id: string): Promise<MediaItem> {
-    return this.#http.rpc<MediaItem>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<MediaItem> {
+    return this.#http.invoke<MediaItem>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'MediaItem'
+    )
   }
 
   /**
    * Duplicate a media item
    */
-  async duplicate(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.duplicate`, { id })
+  async duplicate(
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.duplicate`,
+      { id },
+      __mactsOptions,
+      'MediaItem'
+    )
   }
 }

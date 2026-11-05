@@ -4,10 +4,10 @@
 
 ## Person.title property
 
-The title of this person.
+The title of this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-title: string
+title: string | null
 ```

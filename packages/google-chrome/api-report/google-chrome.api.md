@@ -4,14 +4,23 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { FileSource } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
+import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { Rectangle } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface BookmarkFolder {
-    id: string;
-    index: number;
-    title: string;
+    readonly id: string;
+    readonly index: number | null;
+    title: string | null;
 }
 
 // @public
@@ -19,7 +28,7 @@ export interface BookmarkFolderCreateInput {
     title?: string;
 }
 
-// @public (undocumented)
+// @public
 export const BookmarkFolderSchema: z.ZodObject<{
     id: z.ZodString;
     title: z.ZodString;
@@ -27,14 +36,16 @@ export const BookmarkFolderSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type BookmarkFolderUpdateInput = Partial<BookmarkFolderCreateInput>;
+export interface BookmarkFolderUpdateInput {
+    title?: string;
+}
 
 // @public
 export interface BookmarkItem {
-    id: string;
-    index: number;
-    title: string;
-    uRL: string;
+    readonly id: string;
+    readonly index: number | null;
+    title: string | null;
+    uRL: string | null;
 }
 
 // @public
@@ -43,7 +54,7 @@ export interface BookmarkItemCreateInput {
     uRL?: string;
 }
 
-// @public (undocumented)
+// @public
 export const BookmarkItemSchema: z.ZodObject<{
     id: z.ZodString;
     title: z.ZodString;
@@ -52,7 +63,10 @@ export const BookmarkItemSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type BookmarkItemUpdateInput = Partial<BookmarkItemCreateInput>;
+export interface BookmarkItemUpdateInput {
+    title?: string;
+    uRL?: string;
+}
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -74,32 +88,37 @@ export interface CapabilityMetadata {
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
 // @public
+export interface GoogleChromeClient extends ClientBrand<GoogleChromeResources> {
+}
+
+// @public
 export class GoogleChromeClient {
     constructor(options: GoogleChromeClientOptions);
-    close(): Promise<void>;
-    copySelection(): Promise<void>;
-    count(each?: string): Promise<void>;
-    cutSelection(): Promise<void>;
-    duplicate(to?: string, withProperties?: unknown): Promise<void>;
-    execute(javascript: string): Promise<void>;
-    exists(): Promise<void>;
-    goBack(): Promise<void>;
-    goForward(): Promise<void>;
+    close(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    copySelection(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    count(each?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    cutSelection(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    duplicate(to?: string, withProperties?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    execute(javascript: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    exists(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    goBack(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    goForward(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
-    make(_new: string, at?: string, withData?: unknown, withProperties?: unknown): Promise<void>;
-    move(to: string): Promise<void>;
-    open(): Promise<void>;
-    pasteSelection(): Promise<void>;
-    print(): Promise<void>;
-    quit(): Promise<void>;
-    redo(): Promise<void>;
-    reload(): Promise<void>;
-    save(_in?: string, as?: string): Promise<void>;
-    selectAll(): Promise<void>;
-    stop(): Promise<void>;
+    make(_new: string, at?: string, withData?: unknown, withProperties?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    move(to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    open(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    pasteSelection(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    print(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    quit(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    redo(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    reload(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "GoogleChromeClient_2" needs to be exported by the entry point index.d.ts
+    save(_in?: Parameters<GoogleChromeClient_2['save']>[0], as?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    selectAll(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    stop(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly tabs: TabResourceClient;
-    undo(): Promise<void>;
-    viewSource(): Promise<void>;
+    undo(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    viewSource(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly windows: WindowResourceClient;
 }
 
@@ -117,17 +136,39 @@ export class GoogleChromeError extends Error {
 }
 
 // @public
+export type GoogleChromeResources = Readonly<{
+    Window: ResourceDescriptor<Window, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'google-chrome.windows.get';
+        readonly list: 'google-chrome.windows.list';
+    };
+    Tab: ResourceDescriptor<Tab, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'google-chrome.tabs.get';
+        readonly list: 'google-chrome.tabs.list';
+        readonly parents: {
+            readonly get: 'Window';
+            readonly list: 'Window';
+        };
+    };
+}>;
+
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface Tab {
-    id: string;
-    loading: boolean;
-    title: string;
-    uRL: string;
+    readonly id: string;
+    readonly loading: boolean | null;
+    readonly title: string | null;
+    uRL: string | null;
 }
 
 // @public
@@ -138,11 +179,11 @@ export interface TabCreateInput {
 // @public
 export class TabResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(windowId: string, id: string): Promise<Tab>;
-    list(windowId: string): Promise<Page<Tab>>;
+    get(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Tab>;
+    list(windowId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Tab>>;
 }
 
-// @public (undocumented)
+// @public
 export const TabSchema: z.ZodObject<{
     id: z.ZodString;
     title: z.ZodString;
@@ -151,57 +192,45 @@ export const TabSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type TabUpdateInput = Partial<TabCreateInput>;
+export interface TabUpdateInput {
+    uRL?: string;
+}
 
 // @public
 export interface Window {
-    activeTab: Tab;
-    activeTabIndex: number;
-    bounds: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    };
-    closeable: boolean;
-    givenName: string;
-    id: string;
-    index: number;
-    minimizable: boolean;
-    minimized: boolean;
-    mode: string;
-    name: string;
-    resizable: boolean;
-    visible: boolean;
-    zoomable: boolean;
-    zoomed: boolean;
+    readonly activeTab: ObjectReferenceVariant<Tab, string, 'Tab'> | null;
+    activeTabIndex: Integer | null;
+    bounds: Rectangle | null;
+    readonly closeable: boolean | null;
+    givenName: string | null;
+    readonly id: string;
+    index: Integer | null;
+    readonly minimizable: boolean | null;
+    minimized: boolean | null;
+    mode: string | null;
+    readonly name: string | null;
+    readonly resizable: boolean | null;
+    visible: boolean | null;
+    readonly zoomable: boolean | null;
+    zoomed: boolean | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "WindowCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface WindowCreateInput {
-    activeTabIndex?: number;
-    bounds?: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    };
-    givenName?: string;
-    index?: number;
-    minimized?: boolean;
-    mode?: string;
-    visible?: boolean;
-    zoomed?: boolean;
-}
+export type WindowCreateInput = Omit<WindowCreateInput_2, 'index' | 'activeTabIndex'> & {
+    index?: null extends WindowCreateInput_2['index'] ? number | null : number;
+    activeTabIndex?: null extends WindowCreateInput_2['activeTabIndex'] ? number | null : number;
+};
 
 // @public
 export class WindowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Window>;
-    list(): Promise<Page<Window>>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Window>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Window>>;
 }
 
-// @public (undocumented)
+// @public
 export const WindowSchema: z.ZodObject<{
     givenName: z.ZodString;
     name: z.ZodString;
@@ -225,8 +254,13 @@ export const WindowSchema: z.ZodObject<{
     activeTabIndex: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "WindowUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type WindowUpdateInput = Partial<WindowCreateInput>;
+export type WindowUpdateInput = Omit<WindowUpdateInput_2, 'index' | 'activeTabIndex'> & {
+    index?: null extends WindowUpdateInput_2['index'] ? number | null : number;
+    activeTabIndex?: null extends WindowUpdateInput_2['activeTabIndex'] ? number | null : number;
+};
 
 // (No @packageDocumentation comment for this package)
 

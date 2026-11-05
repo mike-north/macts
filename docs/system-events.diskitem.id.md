@@ -4,10 +4,10 @@
 
 ## DiskItem.id property
 
-the unique ID of the disk item
+the unique ID of the disk item. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

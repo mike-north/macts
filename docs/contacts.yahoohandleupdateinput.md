@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/contacts](./contacts.md) &gt; [YahooHandleUpdateInput](./contacts.yahoohandleupdateinput.md)
 
-## YahooHandleUpdateInput type
+## YahooHandleUpdateInput interface
 
-Input for updating a YahooHandle
+Input for updating a YahooHandle. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type YahooHandleUpdateInput = Partial<YahooHandleCreateInput>
+interface YahooHandleUpdateInput
 ```
 
-**References:** [YahooHandleCreateInput](./contacts.yahoohandlecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[label?](./contacts.yahoohandleupdateinput.label.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Label for this handle. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[value?](./contacts.yahoohandleupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The Yahoo handle value. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

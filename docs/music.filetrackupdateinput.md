@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [FileTrackUpdateInput](./music.filetrackupdateinput.md)
 
-## FileTrackUpdateInput type
+## FileTrackUpdateInput interface
 
-Input for updating a FileTrack
+Input for updating a FileTrack. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type FileTrackUpdateInput = Partial<FileTrackCreateInput>
+interface FileTrackUpdateInput
 ```
 
-**References:** [FileTrackCreateInput](./music.filetrackcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[location?](./music.filetrackupdateinput.location.md)
+
+</td><td>
+
+</td><td>
+
+[FileSource](./contracts.filesource.md)
+
+</td><td>
+
+_(Optional)_ the location of the file represented by this track. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

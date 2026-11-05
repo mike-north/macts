@@ -4,12 +4,10 @@
 
 ## AttendeeUpdateInput type
 
-Input for updating a Attendee
+Input for updating an Attendee. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type AttendeeUpdateInput = Partial<AttendeeCreateInput>
+type AttendeeUpdateInput = Record<string, never>
 ```
-
-**References:** [AttendeeCreateInput](./calendar.attendeecreateinput.md)

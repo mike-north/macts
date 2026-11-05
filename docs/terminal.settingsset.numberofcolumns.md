@@ -4,10 +4,10 @@
 
 ## SettingsSet.numberOfColumns property
 
-The number of columns
+The number of columns. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-numberOfColumns: number
+numberOfColumns: number | null
 ```

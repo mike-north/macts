@@ -4,10 +4,10 @@
 
 ## ScriptingProperty.id property
 
-The unique identifier of the property
+The unique identifier of the property. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

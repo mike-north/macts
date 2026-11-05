@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Does the grid draw in front of all shapes?
+Does the grid draw in front of all shapes? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ Does the grid draw in front of all shapes?
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Does the grid have 'major' lines?
+Does the grid have 'major' lines? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ Does the grid have 'major' lines?
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The number of minor grid lines for each major line
+The number of minor grid lines for each major line. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ The number of minor grid lines for each major line
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-Color of the grid
+Color of the grid. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +99,11 @@ Color of the grid
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-Color of major lines
+Color of major lines. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +114,11 @@ Color of major lines
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Do points snap to the grid?
+Do points snap to the grid? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +129,11 @@ Do points snap to the grid?
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Number of pixels between minor grid lines
+Number of pixels between minor grid lines. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +144,11 @@ Number of pixels between minor grid lines
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Is the grid visible?
+Is the grid visible? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

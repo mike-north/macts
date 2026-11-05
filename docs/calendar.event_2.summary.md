@@ -4,7 +4,7 @@
 
 ## Event_2.summary property
 
-The event summary/title
+The event summary/title. Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 

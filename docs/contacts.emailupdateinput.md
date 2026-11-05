@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/contacts](./contacts.md) &gt; [EmailUpdateInput](./contacts.emailupdateinput.md)
 
-## EmailUpdateInput type
+## EmailUpdateInput interface
 
-Input for updating a Email
+Input for updating an Email. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type EmailUpdateInput = Partial<EmailCreateInput>
+interface EmailUpdateInput
 ```
 
-**References:** [EmailCreateInput](./contacts.emailcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[label?](./contacts.emailupdateinput.label.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Label for this email. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[value?](./contacts.emailupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The email address. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

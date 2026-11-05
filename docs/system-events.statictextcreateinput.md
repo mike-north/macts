@@ -4,7 +4,7 @@
 
 ## StaticTextCreateInput type
 
-Input for creating a StaticText
+Input for creating a StaticText.
 
 **Signature:**
 

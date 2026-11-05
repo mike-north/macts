@@ -4,10 +4,10 @@
 
 ## Address.street property
 
-Street part of the address, multiple lines separated by carriage returns.
+Street part of the address, multiple lines separated by carriage returns. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-street: string
+street: string | null
 ```

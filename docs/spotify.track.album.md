@@ -4,10 +4,10 @@
 
 ## Track.album property
 
-The album of the track
+The album of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-album: string
+readonly album: string | null;
 ```

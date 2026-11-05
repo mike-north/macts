@@ -4,10 +4,10 @@
 
 ## Variable.settable property
 
-Are the name and value of the variable settable?
+Are the name and value of the variable settable? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-settable: boolean
+readonly settable: boolean | null;
 ```

@@ -4,7 +4,7 @@
 
 ## HeaderCreateInput interface
 
-Input for creating a Header
+Input for creating a Header.
 
 **Signature:**
 

@@ -4,10 +4,10 @@
 
 ## Task.outlineDepth property
 
-The depth or level of this task in the project hierarchy
+The depth or level of this task in the project hierarchy. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-outlineDepth: number
+readonly outlineDepth: Integer | null;
 ```

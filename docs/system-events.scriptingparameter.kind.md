@@ -4,10 +4,10 @@
 
 ## ScriptingParameter.kind property
 
-The kind of object or data specified by this parameter
+The kind of object or data specified by this parameter. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-kind: string
+readonly kind: string | null;
 ```

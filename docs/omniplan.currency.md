@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-Locale code for this currency
+string \| null
+
+</td><td>
+
+Locale code for this currency. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ Locale code for this currency
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-Name for this currency
+string \| null
+
+</td><td>
+
+Name for this currency. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ Name for this currency
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-Symbol for this currency
+string \| null
+
+</td><td>
+
+Symbol for this currency. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -4,10 +4,10 @@
 
 ## Attribute.value property
 
-the current value of the attribute
+the current value of the attribute. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-value: string
+value: string | null
 ```

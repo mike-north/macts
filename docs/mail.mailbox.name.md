@@ -4,10 +4,10 @@
 
 ## Mailbox.name property
 
-The name of a mailbox
+The name of a mailbox. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

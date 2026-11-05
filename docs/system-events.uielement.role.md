@@ -4,10 +4,10 @@
 
 ## UIElement.role property
 
-an encoded description of the UI element and its capabilities
+an encoded description of the UI element and its capabilities. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-role: string
+readonly role: string | null;
 ```

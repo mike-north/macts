@@ -4,12 +4,12 @@
 
 ## GridUpdateInput type
 
-Input for updating a Grid
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type GridUpdateInput = Partial<GridCreateInput>
+type GridUpdateInput = Omit<GridUpdateInput$1, 'majorSpacing'> & {
+  majorSpacing?: null extends GridUpdateInput$1['majorSpacing'] ? number | null : number
+}
 ```
-
-**References:** [GridCreateInput](./omnigraffle.gridcreateinput.md)

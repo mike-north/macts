@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [AttachmentUpdateInput](./mail.attachmentupdateinput.md)
 
-## AttachmentUpdateInput type
+## AttachmentUpdateInput interface
 
-Input for updating a Attachment
+Input for updating an Attachment. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type AttachmentUpdateInput = Partial<AttachmentCreateInput>
+interface AttachmentUpdateInput
 ```
 
-**References:** [AttachmentCreateInput](./mail.attachmentcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[fileName?](./mail.attachmentupdateinput.filename.md)
+
+</td><td>
+
+</td><td>
+
+[FileSource](./contracts.filesource.md)
+
+</td><td>
+
+_(Optional)_ The file for the attachment. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

@@ -24,14 +24,29 @@ export class ClassicDomainObjectResourceClient {
   /**
    * List all classic domain objects, as one page.
    */
-  async list(): Promise<Page<ClassicDomainObject>> {
-    return this.#http.rpc<Page<ClassicDomainObject>>(`${this.#app}.${this.#resource}.list`)
+  async list(
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<ClassicDomainObject>> {
+    return this.#http.invoke<Page<ClassicDomainObject>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'ClassicDomainObject'
+    )
   }
 
   /**
    * Get a classic domain object by kind.
    */
-  async get(kind: string): Promise<ClassicDomainObject> {
-    return this.#http.rpc<ClassicDomainObject>(`${this.#app}.${this.#resource}.get`, { kind })
+  async get(
+    kind: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<ClassicDomainObject> {
+    return this.#http.invoke<ClassicDomainObject>(
+      `${this.#app}.${this.#resource}.get`,
+      { kind },
+      __mactsOptions,
+      'ClassicDomainObject'
+    )
   }
 }

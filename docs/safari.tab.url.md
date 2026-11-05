@@ -4,10 +4,10 @@
 
 ## Tab.url property
 
-The tab URL
+The tab URL. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-url: string
+url: string | null
 ```

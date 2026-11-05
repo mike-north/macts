@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the text is formatted as bold
+Whether the text is formatted as bold. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ Whether the text is formatted as bold
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The text in the range
+The text in the range. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ The text in the range
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The ending character position
+The ending character position. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ The ending character position
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The font name
+The font name. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +99,11 @@ The font name
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The font size in points
+The font size in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +114,11 @@ The font size in points
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the text is formatted as italic
+Whether the text is formatted as italic. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +129,11 @@ Whether the text is formatted as italic
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The starting character position
+The starting character position. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +144,11 @@ The starting character position
 
 </td><td>
 
-[UnderlineType](./microsoft-word.underlinetype.md)
+[UnderlineType](./microsoft-word.underlinetype.md) \| null
 
 </td><td>
 
-The underline type
+The underline type. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

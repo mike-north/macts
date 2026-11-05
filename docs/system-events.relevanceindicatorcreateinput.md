@@ -4,7 +4,7 @@
 
 ## RelevanceIndicatorCreateInput type
 
-Input for creating a RelevanceIndicator
+Input for creating a RelevanceIndicator.
 
 **Signature:**
 

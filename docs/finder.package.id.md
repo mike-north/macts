@@ -4,10 +4,10 @@
 
 ## Package.id property
 
-Unique identifier for this package
+Unique identifier for this package. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: string | null;
 ```

@@ -4,10 +4,10 @@
 
 ## Track.bookmark property
 
-the bookmark time of the track in seconds
+the bookmark time of the track in seconds. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-bookmark: number
+bookmark: number | null
 ```

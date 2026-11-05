@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier for the scheme
+The unique identifier for the scheme. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The unique identifier for the scheme
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the scheme
+string \| null
+
+</td><td>
+
+The name of the scheme. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -9,7 +9,7 @@ Send a file to a bluetooth device
 **Signature:**
 
 ```typescript
-send(file?: string, toDevice?: string): Promise<void>;
+send(file?: Parameters<BluetoothFileExchangeClient$1['send']>[0], toDevice?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -33,7 +33,7 @@ file
 
 </td><td>
 
-string
+Parameters&lt;BluetoothFileExchangeClient$1\['send'\]&gt;\[0\]
 
 </td><td>
 
@@ -47,6 +47,19 @@ toDevice
 </td><td>
 
 string
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

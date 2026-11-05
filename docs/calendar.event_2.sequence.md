@@ -4,10 +4,10 @@
 
 ## Event_2.sequence property
 
-The event version
+The event version. Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-sequence: number
+readonly sequence: Integer;
 ```

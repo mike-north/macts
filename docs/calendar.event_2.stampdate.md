@@ -4,10 +4,10 @@
 
 ## Event_2.stampDate property
 
-The event modification date
+The event modification date. Nullable. Observed missing in 4 of 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-stampDate: Date
+stampDate: Date | null
 ```

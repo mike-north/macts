@@ -4,10 +4,10 @@
 
 ## Reminder.completionDate property
 
-The completion date of the reminder
+The completion date of the reminder. Nullable: Set only when a reminder is completed; an open reminder has no completion date. Not observable on the probed library, where all 412 reminders were completed (Reminders 7.0).
 
 **Signature:**
 
 ```typescript
-completionDate: Date
+readonly completionDate: Date | null;
 ```

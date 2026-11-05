@@ -4,10 +4,10 @@
 
 ## Tab.customTitle property
 
-The custom title of the tab
+The custom title of the tab. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-customTitle: string
+customTitle: string | null
 ```

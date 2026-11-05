@@ -4,10 +4,10 @@
 
 ## AudioCDPlaylist.discCount property
 
-the total number of discs in this CD’s album
+the total number of discs in this CD’s album. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-discCount: number
+discCount: Integer | null
 ```

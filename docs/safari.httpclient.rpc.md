@@ -4,12 +4,12 @@
 
 ## HttpClient.rpc() method
 
-Make an authenticated POST request to an RPC endpoint.
+Raw wire RPC for explicit passthrough consumers; typed methods use invoke.
 
 **Signature:**
 
 ```typescript
-rpc<T>(path: string, body?: object): Promise<T>;
+rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 ```
 
 ## Parameters
@@ -45,6 +45,19 @@ body
 </td><td>
 
 object
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+options
+
+</td><td>
+
+[CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

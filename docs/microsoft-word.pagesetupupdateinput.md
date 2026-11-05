@@ -2,14 +2,153 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-word](./microsoft-word.md) &gt; [PageSetupUpdateInput](./microsoft-word.pagesetupupdateinput.md)
 
-## PageSetupUpdateInput type
+## PageSetupUpdateInput interface
 
-Input for updating a PageSetup
+Input for updating a PageSetup. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type PageSetupUpdateInput = Partial<PageSetupCreateInput>
+interface PageSetupUpdateInput
 ```
 
-**References:** [PageSetupCreateInput](./microsoft-word.pagesetupcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[bottomMargin?](./microsoft-word.pagesetupupdateinput.bottommargin.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The bottom margin in points. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[leftMargin?](./microsoft-word.pagesetupupdateinput.leftmargin.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The left margin in points. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[orientation?](./microsoft-word.pagesetupupdateinput.orientation.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The page orientation (portrait or landscape). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[pageHeight?](./microsoft-word.pagesetupupdateinput.pageheight.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The page height in points. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[pageWidth?](./microsoft-word.pagesetupupdateinput.pagewidth.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The page width in points. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[paperSize?](./microsoft-word.pagesetupupdateinput.papersize.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The paper size. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[rightMargin?](./microsoft-word.pagesetupupdateinput.rightmargin.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The right margin in points. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[topMargin?](./microsoft-word.pagesetupupdateinput.topmargin.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The top margin in points. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

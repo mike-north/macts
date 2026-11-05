@@ -4,10 +4,10 @@
 
 ## Document.duration property
 
-The duration of the document in seconds
+The duration of the document in seconds. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-duration: number
+readonly duration: number | null;
 ```

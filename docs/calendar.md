@@ -57,7 +57,7 @@ Client for a calendar event.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 </tbody></table>
@@ -93,6 +93,15 @@ A calendar containing events
 </td></tr>
 <tr><td>
 
+[CalendarClient](./calendar.calendarclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+
+</td></tr>
+<tr><td>
+
 [CalendarClientOptions](./calendar.calendarclientoptions.md)
 
 </td><td>
@@ -106,7 +115,16 @@ Client configuration options.
 
 </td><td>
 
-Input for creating a Calendar
+Input for creating a Calendar.
+
+</td></tr>
+<tr><td>
+
+[CalendarUpdateInput](./calendar.calendarupdateinput.md)
+
+</td><td>
+
+Input for updating a Calendar. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -129,15 +147,6 @@ A message/display alarm
 </td></tr>
 <tr><td>
 
-[DisplayAlarmCreateInput](./calendar.displayalarmcreateinput.md)
-
-</td><td>
-
-Input for creating a DisplayAlarm
-
-</td></tr>
-<tr><td>
-
 [Event_2](./calendar.event_2.md)
 
 </td><td>
@@ -151,7 +160,7 @@ A calendar event
 
 </td><td>
 
-Input for creating a Event
+Input for creating an Event.
 
 </td></tr>
 <tr><td>
@@ -165,15 +174,6 @@ A mail/email alarm
 </td></tr>
 <tr><td>
 
-[MailAlarmCreateInput](./calendar.mailalarmcreateinput.md)
-
-</td><td>
-
-Input for creating a MailAlarm
-
-</td></tr>
-<tr><td>
-
 [OpenFileAlarm](./calendar.openfilealarm.md)
 
 </td><td>
@@ -183,29 +183,11 @@ An 'open file' alarm
 </td></tr>
 <tr><td>
 
-[OpenFileAlarmCreateInput](./calendar.openfilealarmcreateinput.md)
-
-</td><td>
-
-Input for creating a OpenFileAlarm
-
-</td></tr>
-<tr><td>
-
 [SoundAlarm](./calendar.soundalarm.md)
 
 </td><td>
 
 A sound alarm
-
-</td></tr>
-<tr><td>
-
-[SoundAlarmCreateInput](./calendar.soundalarmcreateinput.md)
-
-</td><td>
-
-Input for creating a SoundAlarm
 
 </td></tr>
 </tbody></table>
@@ -227,12 +209,16 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [CalendarSchema](./calendar.calendarschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -250,12 +236,16 @@ Every capability exposed by Calendar, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [EventSchema](./calendar.eventschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -264,6 +254,8 @@ Every capability exposed by Calendar, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -271,12 +263,16 @@ Every capability exposed by Calendar, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [SoundAlarmSchema](./calendar.soundalarmschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -298,7 +294,7 @@ Description
 
 </td><td>
 
-Input for creating a Attendee
+Input for creating an Attendee.
 
 </td></tr>
 <tr><td>
@@ -307,7 +303,7 @@ Input for creating a Attendee
 
 </td><td>
 
-Input for updating a Attendee
+Input for updating an Attendee. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -321,11 +317,11 @@ Priority level for calendar items
 </td></tr>
 <tr><td>
 
-[CalendarUpdateInput](./calendar.calendarupdateinput.md)
+[CalendarResources](./calendar.calendarresources.md)
 
 </td><td>
 
-Input for updating a Calendar
+The type of the resource table in `calendarContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 <tr><td>
@@ -339,11 +335,20 @@ Risk classification for a capability.
 </td></tr>
 <tr><td>
 
+[DisplayAlarmCreateInput](./calendar.displayalarmcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
 [DisplayAlarmUpdateInput](./calendar.displayalarmupdateinput.md)
 
 </td><td>
 
-Input for updating a DisplayAlarm
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -361,7 +366,16 @@ Status of a calendar event
 
 </td><td>
 
-Input for updating a Event
+Canonical update input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
+[MailAlarmCreateInput](./calendar.mailalarmcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -370,7 +384,16 @@ Input for updating a Event
 
 </td><td>
 
-Input for updating a MailAlarm
+Canonical update input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
+[OpenFileAlarmCreateInput](./calendar.openfilealarmcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -379,7 +402,7 @@ Input for updating a MailAlarm
 
 </td><td>
 
-Input for updating a OpenFileAlarm
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -393,11 +416,20 @@ Status of an attendee's response to an invitation
 </td></tr>
 <tr><td>
 
+[SoundAlarmCreateInput](./calendar.soundalarmcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
 [SoundAlarmUpdateInput](./calendar.soundalarmupdateinput.md)
 
 </td><td>
 
-Input for updating a SoundAlarm
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>

@@ -257,8 +257,14 @@ describe('the generated HTTP client', () => {
   const types = fileOf(sdk.files, 'src/types.ts')
 
   it('declares only the resolvable fields in the read type and its schema', () => {
-    const read = declaration(types, /export interface Library \{[\s\S]*?\n\}/)
-    expect(read).toContain('  favoriteBook: Book;')
+    expect(types).toContain("export type { Library } from './contract/index.js';")
+    const read = declaration(
+      fileOf(sdk.files, CONTRACT_MODULE_PATH),
+      /export interface Library \{[\s\S]*?\n\}/
+    )
+    expect(read).toContain(
+      "readonly favoriteBook: ObjectReferenceVariant<Book, string, 'Book'> | null"
+    )
     const schema = declaration(types, /export const LibrarySchema = z\.object\(\{[\s\S]*?\n\}\);/)
     expect(schema).toContain('  favoriteBook:')
     for (const field of OMITTED_FIELDS) {
@@ -268,9 +274,13 @@ describe('the generated HTTP client', () => {
   })
 
   it('keeps an omitted writable field in the create input', () => {
-    expect(declaration(types, /export interface LibraryCreateInput \{[\s\S]*?\n\}/)).toContain(
-      '  currentChapter?: Chapter;'
-    )
+    expect(types).toContain("export type { LibraryCreateInput } from './contract/index.js';")
+    expect(
+      declaration(
+        fileOf(sdk.files, CONTRACT_MODULE_PATH),
+        /export interface LibraryCreateInput \{[\s\S]*?\n\}/
+      )
+    ).toContain("currentChapter?: ObjectReferenceData<string, 'Chapter'>")
   })
 })
 

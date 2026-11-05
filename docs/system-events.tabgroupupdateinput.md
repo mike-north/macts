@@ -4,12 +4,10 @@
 
 ## TabGroupUpdateInput type
 
-Input for updating a TabGroup
+Input for updating a TabGroup. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type TabGroupUpdateInput = Partial<TabGroupCreateInput>
+type TabGroupUpdateInput = Record<string, never>
 ```
-
-**References:** [TabGroupCreateInput](./system-events.tabgroupcreateinput.md)

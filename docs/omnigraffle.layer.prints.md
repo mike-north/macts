@@ -4,10 +4,10 @@
 
 ## Layer.prints property
 
-Do the layer's graphics print?
+Do the layer's graphics print? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-prints: boolean
+prints: boolean | null
 ```

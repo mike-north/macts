@@ -4,7 +4,7 @@
 
 ## AudioCDTrackCreateInput type
 
-Input for creating a AudioCDTrack
+Input for creating an AudioCDTrack.
 
 **Signature:**
 

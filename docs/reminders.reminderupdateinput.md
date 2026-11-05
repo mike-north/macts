@@ -4,12 +4,12 @@
 
 ## ReminderUpdateInput type
 
-Input for updating a Reminder
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type ReminderUpdateInput = Partial<ReminderCreateInput>
+type ReminderUpdateInput = Omit<ReminderUpdateInput$1, 'priority'> & {
+  priority?: null extends ReminderUpdateInput$1['priority'] ? number | null : number
+}
 ```
-
-**References:** [ReminderCreateInput](./reminders.remindercreateinput.md)

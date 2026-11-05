@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The connection status for this account.
+string \| null
+
+</td><td>
+
+The connection status for this account. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The connection status for this account.
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of this account as defined in Account preferences description field
+string \| null
+
+</td><td>
+
+The name of this account as defined in Account preferences description field. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +73,11 @@ The name of this account as defined in Account preferences description field
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Is the account enabled?
+Is the account enabled? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +86,15 @@ Is the account enabled?
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-A unique identifier for this account.
+A unique identifier for this account. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -97,13 +103,15 @@ A unique identifier for this account.
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The type of service for this account
+string \| null
+
+</td><td>
+
+The type of service for this account. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

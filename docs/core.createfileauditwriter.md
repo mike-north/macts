@@ -6,7 +6,7 @@
 
 Create an [AuditWriter](./core.auditwriter.md) that appends to a JSON-lines file at the given absolute path.
 
-Parent directories are created automatically on first use (equivalent to `mkdir -p`<!-- -->). Each call to `append` serialises the record via [serializeAuditRecord()](./core.serializeauditrecord.md)<!-- -->, JSON-encodes the result, appends it with a trailing newline, and resolves. Errors are propagated to the caller.
+Parent directories are created automatically on first use (equivalent to `mkdir -p`<!-- -->). Each call to `append` serialises the record via , JSON-encodes the result, appends it with a trailing newline, and resolves. Errors are propagated to the caller, including the serializer's refusal of a malformed `invalid-input` or `permission-denied` record, which writes nothing.
 
 The destination path is accepted as-is — no home-directory expansion, no environment-variable lookup. Callers are responsible for supplying an absolute path.
 

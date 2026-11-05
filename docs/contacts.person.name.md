@@ -4,10 +4,10 @@
 
 ## Person.name property
 
-First/Last name of the person, uses the name display order preference setting in Contacts.
+First/Last name of the person, uses the name display order preference setting in Contacts. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

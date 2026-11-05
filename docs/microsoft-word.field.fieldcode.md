@@ -4,10 +4,10 @@
 
 ## Field.fieldCode property
 
-The field code
+The field code. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fieldCode: string
+fieldCode: string | null
 ```

@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-Unique identifier for this row
+string \| null
+
+</td><td>
+
+Unique identifier for this row. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

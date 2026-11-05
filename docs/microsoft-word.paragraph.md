@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-[ParagraphAlignment](./microsoft-word.paragraphalignment.md)
+[ParagraphAlignment](./microsoft-word.paragraphalignment.md) \| null
 
 </td><td>
 
-The alignment for the paragraph
+The alignment for the paragraph. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +52,15 @@ The alignment for the paragraph
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The text content of the paragraph
+string \| null
+
+</td><td>
+
+The text content of the paragraph. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,26 +71,11 @@ The text content of the paragraph
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The first-line or hanging indent value in points
-
-</td></tr>
-<tr><td>
-
-[id?](./microsoft-word.paragraph.id.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `paragraphId`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
+The first-line or hanging indent value in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +86,11 @@ _(Optional)_ Canonical identifier (mirrors `paragraphId`<!-- -->); populated by 
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether all lines remain on the same page
+Whether all lines remain on the same page. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +101,11 @@ Whether all lines remain on the same page
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether paragraph stays with next paragraph
+Whether paragraph stays with next paragraph. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +116,11 @@ Whether paragraph stays with next paragraph
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The left indent in points
+The left indent in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +131,11 @@ The left indent in points
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The line spacing in points
+The line spacing in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +146,11 @@ The line spacing in points
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether a page break is forced before the paragraph
+Whether a page break is forced before the paragraph. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -172,13 +159,15 @@ Whether a page break is forced before the paragraph
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The paragraph ID
+[Integer](./contracts.integer.md)
+
+</td><td>
+
+The paragraph ID. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -189,11 +178,11 @@ The paragraph ID
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The right indent in points
+The right indent in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -204,11 +193,11 @@ The right indent in points
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The spacing in points after the paragraph
+The spacing in points after the paragraph. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -219,11 +208,11 @@ The spacing in points after the paragraph
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The spacing in points before the paragraph
+The spacing in points before the paragraph. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

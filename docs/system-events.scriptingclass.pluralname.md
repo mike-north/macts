@@ -4,10 +4,10 @@
 
 ## ScriptingClass.pluralName property
 
-The plural name of the class
+The plural name of the class. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-pluralName: string
+readonly pluralName: string | null;
 ```

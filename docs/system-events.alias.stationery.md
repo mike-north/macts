@@ -4,10 +4,10 @@
 
 ## Alias.stationery property
 
-Is the alias a stationery pad?
+Is the alias a stationery pad? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-stationery: boolean
+stationery: boolean | null
 ```

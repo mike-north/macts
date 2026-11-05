@@ -4,7 +4,7 @@
 
 ## YahooHandleCreateInput interface
 
-Input for creating a YahooHandle
+Input for creating a YahooHandle.
 
 **Signature:**
 

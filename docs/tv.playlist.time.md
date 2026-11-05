@@ -4,10 +4,10 @@
 
 ## Playlist.time property
 
-the length of all tracks in MM:SS format
+the length of all tracks in MM:SS format. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-time: string
+readonly time: string | null;
 ```

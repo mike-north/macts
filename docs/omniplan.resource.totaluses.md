@@ -4,10 +4,10 @@
 
 ## Resource.totalUses property
 
-Total number of uses of this resource
+Total number of uses of this resource. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-totalUses: number
+readonly totalUses: Integer | null;
 ```

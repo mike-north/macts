@@ -2,14 +2,153 @@
 
 [Home](./index.md) &gt; [@macts/contacts](./contacts.md) &gt; [AddressUpdateInput](./contacts.addressupdateinput.md)
 
-## AddressUpdateInput type
+## AddressUpdateInput interface
 
-Input for updating a Address
+Input for updating an Address. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type AddressUpdateInput = Partial<AddressCreateInput>
+interface AddressUpdateInput
 ```
 
-**References:** [AddressCreateInput](./contacts.addresscreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[city?](./contacts.addressupdateinput.city.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ City part of the address. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[country?](./contacts.addressupdateinput.country.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Country part of the address. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[countryCode?](./contacts.addressupdateinput.countrycode.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Country code part of the address (should be a two character iso country code). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[id?](./contacts.addressupdateinput.id.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ unique identifier for this address. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[label?](./contacts.addressupdateinput.label.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Label. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[state?](./contacts.addressupdateinput.state.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ State, Province, or Region part of the address. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[street?](./contacts.addressupdateinput.street.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Street part of the address, multiple lines separated by carriage returns. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[zip?](./contacts.addressupdateinput.zip.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Zip or postal code of the address. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

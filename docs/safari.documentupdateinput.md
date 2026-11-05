@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/safari](./safari.md) &gt; [DocumentUpdateInput](./safari.documentupdateinput.md)
 
-## DocumentUpdateInput type
+## DocumentUpdateInput interface
 
-Input for updating a Document
+Input for updating a Document. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type DocumentUpdateInput = Partial<DocumentCreateInput>
+interface DocumentUpdateInput
 ```
 
-**References:** [DocumentCreateInput](./safari.documentcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[url?](./safari.documentupdateinput.url.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The current URL. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

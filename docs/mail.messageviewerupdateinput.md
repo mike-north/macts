@@ -2,14 +2,153 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [MessageViewerUpdateInput](./mail.messageviewerupdateinput.md)
 
-## MessageViewerUpdateInput type
+## MessageViewerUpdateInput interface
 
-Input for updating a MessageViewer
+Input for updating a MessageViewer. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type MessageViewerUpdateInput = Partial<MessageViewerCreateInput>
+interface MessageViewerUpdateInput
 ```
 
-**References:** [MessageViewerCreateInput](./mail.messageviewercreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[mailboxListVisible?](./mail.messageviewerupdateinput.mailboxlistvisible.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Controls whether the list of mailboxes is visible or not. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[previewPaneIsVisible?](./mail.messageviewerupdateinput.previewpaneisvisible.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Controls whether the preview pane of the message viewer window is visible or not. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[selectedMailboxes?](./mail.messageviewerupdateinput.selectedmailboxes.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ List of mailboxes currently selected in the list of mailboxes. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[selectedMessages?](./mail.messageviewerupdateinput.selectedmessages.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ List of messages currently selected. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[sortColumn?](./mail.messageviewerupdateinput.sortcolumn.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The column that is currently sorted in the viewer. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[sortedAscending?](./mail.messageviewerupdateinput.sortedascending.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether the viewer is sorted ascending or not. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[visibleColumns?](./mail.messageviewerupdateinput.visiblecolumns.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ List of columns that are visible. The subject column and the message status column will always be visible. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[visibleMessages?](./mail.messageviewerupdateinput.visiblemessages.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ List of messages currently being displayed in the viewer. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

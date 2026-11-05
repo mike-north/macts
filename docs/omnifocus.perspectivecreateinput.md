@@ -4,7 +4,7 @@
 
 ## PerspectiveCreateInput type
 
-Input for creating a Perspective
+Input for creating a Perspective.
 
 **Signature:**
 

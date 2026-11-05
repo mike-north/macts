@@ -4,10 +4,10 @@
 
 ## FinderWindow.statusbarVisible property
 
-Is the window's status bar visible?
+Is the window's status bar visible? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-statusbarVisible: boolean
+statusbarVisible: boolean | null
 ```

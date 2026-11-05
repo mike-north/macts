@@ -1559,9 +1559,9 @@ export interface MessageResourceClient {
 
 /**
  * The Mail client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link mailContract}. Its type carries the contract's resource
- * table, {@link MailResources}, so references can be bound to it by resource; the brand has no
- * runtime member.
+ * client factory creates one from `mailContract` in the app's `/contract` entry. Its type carries
+ * the contract's resource table, {@link MailResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
 export interface MailClient extends ClientBrand<MailResources> {
   /** A new email message */
@@ -1612,7 +1612,7 @@ export interface MailClient extends ClientBrand<MailResources> {
 }
 
 /**
- * The type of the resource table of {@link mailContract}: every resource a
+ * The type of the resource table in `mailContract` (the app's `/contract` entry): every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
  * references to it, and, for each of those operations that finds the

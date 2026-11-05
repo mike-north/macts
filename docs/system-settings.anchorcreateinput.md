@@ -4,7 +4,7 @@
 
 ## AnchorCreateInput type
 
-Input for creating a Anchor
+Input for creating an Anchor.
 
 **Signature:**
 

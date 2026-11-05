@@ -177,7 +177,7 @@ describe('generateCliPlugin list commands: paging', () => {
       'cursor = Option.String(\'--cursor\', { description: "Continue from the previous page, as its output says" });'
     )
     expect(list).toContain(
-      'client.calendars.list({ ...(this.pageSize === undefined ? {} : { pageSize: Number(this.pageSize) }), ...(this.cursor === undefined ? {} : { cursor: this.cursor }) })'
+      'client.calendars.list({ ...(this.pageSize === undefined ? {} : { pageSize: __mactsParseIntegerOption(this.pageSize) }), ...(this.cursor === undefined ? {} : { cursor: this.cursor }) })'
     )
     // The output says how to read the next page when more remain.
     expect(list).toContain('formatter.formatPage(page.items.map(')
@@ -210,5 +210,19 @@ describe('generateCliPlugin list commands: paging', () => {
     expect(list).not.toContain('--cursor')
     expect(list).toContain('client.calendars.list();')
     expect(list).toContain('formatter.formatList(page.items.map(')
+  })
+})
+
+/** Standalone plugin installation must resolve the validator used by paged lists. */
+describe('standalone CLI integer validation dependency', () => {
+  it('declares contracts as a runtime dependency rather than relying on the SDK transitively', () => {
+    const result = generateCliPlugin(buildManifest(), {
+      packageName: '@macts/testapp-cli',
+      sdkPackageName: '@macts/sdk-testapp',
+    })
+    expect(result.errors).toEqual([])
+    expect(fileContent(result, 'commands/calendars/list.ts')).toContain("from '@macts/contracts'")
+    const manifest: unknown = JSON.parse(fileContent(result, 'package.json'))
+    expect(manifest).toMatchObject({ dependencies: { '@macts/contracts': 'workspace:*' } })
   })
 })

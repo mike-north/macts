@@ -4,7 +4,7 @@
 
 ## TabCreateInput interface
 
-Input for creating a Tab
+Input for creating a Tab.
 
 **Signature:**
 

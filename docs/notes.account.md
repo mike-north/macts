@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The unique identifier of the account
+string \| null
+
+</td><td>
+
+The unique identifier of the account. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The unique identifier of the account
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The name of the account
+The name of the account. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ The name of the account
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the account has been upgraded
+boolean \| null
+
+</td><td>
+
+Whether the account has been upgraded. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

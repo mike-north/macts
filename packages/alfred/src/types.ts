@@ -5,22 +5,18 @@
 
 import { z } from 'zod'
 
-/** The Alfred application */
-export interface Application {
-  /** Canonical identifier (mirrors `name`); populated by list, pass to get/delete and to write operations that reference this resource. */
-  id?: string
-  /** The name of the application */
-  name: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Application } from './contract/index.js'
 
-/** Input for creating a Application */
-export type ApplicationCreateInput = Record<string, never>
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { ApplicationCreateInput } from './contract/index.js'
 
-/** Input for updating a Application */
-export type ApplicationUpdateInput = Partial<ApplicationCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { ApplicationUpdateInput } from './contract/index.js'
 
-// Zod schemas for runtime validation
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ApplicationSchema = z.object({
   id: z.string().optional(),
   name: z.string(),

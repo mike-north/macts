@@ -5,39 +5,33 @@
 
 import { z } from 'zod'
 
-/** A settings pane. */
-export interface Pane {
-  /** The id of the settings pane. */
-  id: string
-  /** The name of the settings pane. */
-  name: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Pane } from './contract/index.js'
 
-/** Input for creating a Pane */
-export type PaneCreateInput = Record<string, never>
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { PaneCreateInput } from './contract/index.js'
 
-/** Input for updating a Pane */
-export type PaneUpdateInput = Partial<PaneCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { PaneUpdateInput } from './contract/index.js'
 
-/** An anchor within a settings pane. */
-export interface Anchor {
-  /** The name of the anchor. */
-  name: string
-}
+/** Canonical SDK record; typed operations decode through the app contract. */
+export type { Anchor } from './contract/index.js'
 
-/** Input for creating a Anchor */
-export type AnchorCreateInput = Record<string, never>
+/** Canonical create input, retaining checked numeric conveniences. */
+export type { AnchorCreateInput } from './contract/index.js'
 
-/** Input for updating a Anchor */
-export type AnchorUpdateInput = Partial<AnchorCreateInput>
+/** Canonical update input, retaining checked numeric conveniences. */
+export type { AnchorUpdateInput } from './contract/index.js'
 
-// Zod schemas for runtime validation
+// Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const PaneSchema = z.object({
   id: z.string(),
   name: z.string(),
 })
 
+/** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const AnchorSchema = z.object({
   name: z.string(),
 })

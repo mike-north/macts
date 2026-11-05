@@ -4,10 +4,10 @@
 
 ## Action.description property
 
-what the action does
+what the action does. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-description: string
+readonly description: string | null;
 ```

@@ -4,10 +4,10 @@
 
 ## Person.phoneticLastName property
 
-The phonetic version of the Last name of this person.
+The phonetic version of the Last name of this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-phoneticLastName: string
+phoneticLastName: string | null
 ```

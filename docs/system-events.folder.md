@@ -33,9 +33,62 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[busyStatus](./system-events.folder.busystatus.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+boolean \| null
+
+</td><td>
+
+Is the disk item busy? Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[creationDate](./system-events.folder.creationdate.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+Date \| null
+
+</td><td>
+
+the date on which the disk item was created. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[displayedName](./system-events.folder.displayedname.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+string \| null
+
+</td><td>
+
+the name of the disk item as displayed in the User Interface. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
 [id](./system-events.folder.id.md)
 
 </td><td>
+
+`readonly`
 
 </td><td>
 
@@ -43,7 +96,188 @@ string
 
 </td><td>
 
-Unique identifier for this folder
+the unique ID of the disk item. Never null: the primary identifier.
+
+</td></tr>
+<tr><td>
+
+[modificationDate](./system-events.folder.modificationdate.md)
+
+</td><td>
+
+</td><td>
+
+Date \| null
+
+</td><td>
+
+the date on which the disk item was last modified. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[name](./system-events.folder.name.md)
+
+</td><td>
+
+</td><td>
+
+string \| null
+
+</td><td>
+
+the name of the disk item. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[nameExtension](./system-events.folder.nameextension.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+string \| null
+
+</td><td>
+
+the extension portion of the name. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[packageFolder](./system-events.folder.packagefolder.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+boolean \| null
+
+</td><td>
+
+Is the disk item a package? Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[path](./system-events.folder.path.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+string \| null
+
+</td><td>
+
+the file system path of the disk item. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[physicalSize](./system-events.folder.physicalsize.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the actual space used by the disk item on disk. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[pOSIXPath](./system-events.folder.posixpath.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+string \| null
+
+</td><td>
+
+the POSIX file system path of the disk item. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[size](./system-events.folder.size.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the logical size of the disk item. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[uRL](./system-events.folder.url.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+string \| null
+
+</td><td>
+
+the URL of the disk item. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[visible](./system-events.folder.visible.md)
+
+</td><td>
+
+</td><td>
+
+boolean \| null
+
+</td><td>
+
+Is the disk item visible? Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[volume](./system-events.folder.volume.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+string \| null
+
+</td><td>
+
+the volume on which the disk item resides. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the table is allowed to autofit
+Whether the table is allowed to autofit. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ Whether the table is allowed to autofit
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the table has borders
+Whether the table has borders. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +67,15 @@ Whether the table has borders
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The number of columns in the table
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The number of columns in the table. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +84,15 @@ The number of columns in the table
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The number of rows in the table
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The number of rows in the table. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

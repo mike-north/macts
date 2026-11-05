@@ -4,10 +4,10 @@
 
 ## Disk.journalingEnabled property
 
-Does this disk do file system journaling?
+Does this disk do file system journaling? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-journalingEnabled: boolean
+readonly journalingEnabled: boolean | null;
 ```

@@ -4,7 +4,7 @@
 
 ## ScriptingElementCreateInput type
 
-Input for creating a ScriptingElement
+Input for creating a ScriptingElement.
 
 **Signature:**
 

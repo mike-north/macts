@@ -4,10 +4,10 @@
 
 ## XMLAttribute.value property
 
-the value of the XML attribute
+the value of the XML attribute. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-value: string
+value: string | null
 ```

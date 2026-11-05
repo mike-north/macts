@@ -4,7 +4,7 @@
 
 ## ScrollBarCreateInput type
 
-Input for creating a ScrollBar
+Input for creating a ScrollBar.
 
 **Signature:**
 

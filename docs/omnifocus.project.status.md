@@ -4,10 +4,10 @@
 
 ## Project.status property
 
-The status of the project
+The status of the project. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-status: ProjectStatus
+status: ProjectStatus | null
 ```

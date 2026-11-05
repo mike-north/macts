@@ -4,10 +4,10 @@
 
 ## UIElement.class property
 
-the class of the UI Element, which identifies it function
+the class of the UI Element, which identifies it function. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-class: string;
+readonly class: string | null;
 ```

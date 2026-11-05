@@ -4,12 +4,10 @@
 
 ## CurrencyUpdateInput type
 
-Input for updating a Currency
+Input for updating a Currency. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type CurrencyUpdateInput = Partial<CurrencyCreateInput>
+type CurrencyUpdateInput = Record<string, never>
 ```
-
-**References:** [CurrencyCreateInput](./omniplan.currencycreateinput.md)

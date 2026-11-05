@@ -24,14 +24,29 @@ export class UserDomainObjectResourceClient {
   /**
    * List all user domain objects, as one page.
    */
-  async list(): Promise<Page<UserDomainObject>> {
-    return this.#http.rpc<Page<UserDomainObject>>(`${this.#app}.${this.#resource}.list`)
+  async list(
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<UserDomainObject>> {
+    return this.#http.invoke<Page<UserDomainObject>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'UserDomainObject'
+    )
   }
 
   /**
    * Get a user domain object by kind.
    */
-  async get(kind: string): Promise<UserDomainObject> {
-    return this.#http.rpc<UserDomainObject>(`${this.#app}.${this.#resource}.get`, { kind })
+  async get(
+    kind: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<UserDomainObject> {
+    return this.#http.invoke<UserDomainObject>(
+      `${this.#app}.${this.#resource}.get`,
+      { kind },
+      __mactsOptions,
+      'UserDomainObject'
+    )
   }
 }

@@ -57,24 +57,24 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(name)](./notes.folderresourceclient.get.md)
+[get(name, \_\_mactsOptions)](./notes.folderresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a folder by name.
+Get a folder by name. When several folders share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[list()](./notes.folderresourceclient.list.md)
+[list(\_\_mactsOptions)](./notes.folderresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all folders.
+List all folders, as one page.
 
 </td></tr>
 </tbody></table>

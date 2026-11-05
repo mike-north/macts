@@ -4,10 +4,10 @@
 
 ## Artwork.id property
 
-Unique identifier for this artwork
+Unique identifier for this artwork. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: Integer | null;
 ```

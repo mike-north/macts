@@ -9,7 +9,7 @@ Import files into the library
 **Signature:**
 
 ```typescript
-_import(files: string, into?: string, skipCheckDuplicates?: boolean): Promise<void>;
+_import(files: Parameters<PhotosClient$1['_import']>[0], into?: string, skipCheckDuplicates?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -33,7 +33,7 @@ files
 
 </td><td>
 
-string
+Parameters&lt;PhotosClient$1\['\_import'\]&gt;\[0\]
 
 </td><td>
 
@@ -58,6 +58,19 @@ skipCheckDuplicates
 </td><td>
 
 boolean
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

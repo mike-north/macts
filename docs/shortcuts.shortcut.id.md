@@ -4,10 +4,10 @@
 
 ## Shortcut.id property
 
-The unique identifier of the shortcut
+The unique identifier of the shortcut. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

@@ -2,153 +2,15 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-edge](./microsoft-edge.md) &gt; [WindowCreateInput](./microsoft-edge.windowcreateinput.md)
 
-## WindowCreateInput interface
+## WindowCreateInput type
 
-Input for creating a Window
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface WindowCreateInput
+type WindowCreateInput = Omit<WindowCreateInput$1, 'index' | 'activeTabIndex'> & {
+  index?: null extends WindowCreateInput$1['index'] ? number | null : number
+  activeTabIndex?: null extends WindowCreateInput$1['activeTabIndex'] ? number | null : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[activeTabIndex?](./microsoft-edge.windowcreateinput.activetabindex.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The index of the active tab.
-
-</td></tr>
-<tr><td>
-
-[bounds?](./microsoft-edge.windowcreateinput.bounds.md)
-
-</td><td>
-
-</td><td>
-
-{ x: number; y: number; width: number; height: number; }
-
-</td><td>
-
-_(Optional)_ The bounding rectangle of the window.
-
-</td></tr>
-<tr><td>
-
-[givenName?](./microsoft-edge.windowcreateinput.givenname.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ The given name of the window.
-
-</td></tr>
-<tr><td>
-
-[index?](./microsoft-edge.windowcreateinput.index.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The index of the window, ordered front to back.
-
-</td></tr>
-<tr><td>
-
-[minimized?](./microsoft-edge.windowcreateinput.minimized.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ Whether the window is currently minimized.
-
-</td></tr>
-<tr><td>
-
-[mode?](./microsoft-edge.windowcreateinput.mode.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Window mode (normal or incognito)
-
-</td></tr>
-<tr><td>
-
-[visible?](./microsoft-edge.windowcreateinput.visible.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ Whether the window is currently visible.
-
-</td></tr>
-<tr><td>
-
-[zoomed?](./microsoft-edge.windowcreateinput.zoomed.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ Whether the window is currently zoomed.
-
-</td></tr>
-</tbody></table>

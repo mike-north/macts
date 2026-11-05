@@ -2,93 +2,15 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [ColumnCreateInput](./finder.columncreateinput.md)
 
-## ColumnCreateInput interface
+## ColumnCreateInput type
 
-Input for creating a Column
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface ColumnCreateInput
+type ColumnCreateInput = Omit<ColumnCreateInput$1, 'index' | 'width'> & {
+  index?: null extends ColumnCreateInput$1['index'] ? number | null : number
+  width?: null extends ColumnCreateInput$1['width'] ? number | null : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[index?](./finder.columncreateinput.index.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ the index in the front-to-back ordering within its container
-
-</td></tr>
-<tr><td>
-
-[sortDirection?](./finder.columncreateinput.sortdirection.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ The direction in which the window is sorted
-
-</td></tr>
-<tr><td>
-
-[visible?](./finder.columncreateinput.visible.md)
-
-</td><td>
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ is this column visible
-
-</td></tr>
-<tr><td>
-
-[width?](./finder.columncreateinput.width.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ the width of this column
-
-</td></tr>
-</tbody></table>

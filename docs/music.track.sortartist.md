@@ -4,10 +4,10 @@
 
 ## Track.sortArtist property
 
-override string to use for the track when sorting by artist
+override string to use for the track when sorting by artist. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-sortArtist: string
+sortArtist: string | null
 ```

@@ -4,7 +4,7 @@
 
 ## ParagraphCreateInput interface
 
-Input for creating a Paragraph
+Input for creating a Paragraph.
 
 **Signature:**
 
@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md)
 
 </td><td>
 

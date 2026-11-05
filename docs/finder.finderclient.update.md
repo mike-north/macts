@@ -9,7 +9,7 @@ Update the display of the specified object(s) to match their on-disk representat
 **Signature:**
 
 ```typescript
-update(necessity?: boolean, registeringApplications?: boolean): Promise<void>;
+update(necessity?: boolean, registeringApplications?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -47,6 +47,19 @@ registeringApplications
 </td><td>
 
 boolean
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

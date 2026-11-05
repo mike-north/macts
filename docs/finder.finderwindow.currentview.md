@@ -4,10 +4,10 @@
 
 ## FinderWindow.currentView property
 
-the current view for the container window
+the current view for the container window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-currentView: string
+currentView: string | null
 ```

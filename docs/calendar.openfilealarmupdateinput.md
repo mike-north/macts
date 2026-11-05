@@ -4,12 +4,14 @@
 
 ## OpenFileAlarmUpdateInput type
 
-Input for updating a OpenFileAlarm
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type OpenFileAlarmUpdateInput = Partial<OpenFileAlarmCreateInput>
+type OpenFileAlarmUpdateInput = Omit<OpenFileAlarmUpdateInput$1, 'triggerInterval'> & {
+  triggerInterval?: null extends OpenFileAlarmUpdateInput$1['triggerInterval']
+    ? number | null
+    : number
+}
 ```
-
-**References:** [OpenFileAlarmCreateInput](./calendar.openfilealarmcreateinput.md)

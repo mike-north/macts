@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the name of the attribute
+string \| null
+
+</td><td>
+
+the name of the attribute. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ the name of the attribute
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Can the attribute be set?
+boolean \| null
+
+</td><td>
+
+Can the attribute be set? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +73,11 @@ Can the attribute be set?
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the current value of the attribute
+the current value of the attribute. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

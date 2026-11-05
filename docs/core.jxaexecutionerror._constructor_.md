@@ -9,7 +9,7 @@ Constructs a new instance of the `JxaExecutionError` class
 **Signature:**
 
 ```typescript
-constructor(message: string, code: string, stderr: string, cause?: unknown);
+constructor(message: string, code: string, stderr: string, cause?: unknown, options?: JxaExecutionErrorOptions);
 ```
 
 ## Parameters
@@ -67,6 +67,19 @@ cause
 </td><td>
 
 unknown
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+options
+
+</td><td>
+
+[JxaExecutionErrorOptions](./core.jxaexecutionerroroptions.md)
 
 </td><td>
 

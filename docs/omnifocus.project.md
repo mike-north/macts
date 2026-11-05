@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-True if the project has a project that must be completed prior to it being actionable
+boolean \| null
+
+</td><td>
+
+True if the project has a project that must be completed prior to it being actionable. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ True if the project has a project that must be completed prior to it being actio
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-True if the project is completed
+boolean \| null
+
+</td><td>
+
+True if the project is completed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +73,11 @@ True if the project is completed
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-If true, complete when children are completed
+If true, complete when children are completed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +88,11 @@ If true, complete when children are completed
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The project's date of completion
+The project's date of completion. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +103,11 @@ The project's date of completion
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-When the project was created
+When the project was created. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +118,11 @@ When the project was created
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-True if the project is the default holder of singleton actions
+True if the project is the default holder of singleton actions. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +133,11 @@ True if the project is the default holder of singleton actions
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-When the project should become available for action
+When the project should become available for action. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +146,15 @@ When the project should become available for action
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-True if the project is dropped
+boolean \| null
+
+</td><td>
+
+True if the project is dropped. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +165,11 @@ True if the project is dropped
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The date the project was dropped
+The date the project was dropped. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -174,11 +180,11 @@ The date the project was dropped
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-When the project must be finished
+When the project must be finished. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -187,13 +193,15 @@ When the project must be finished
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-When the project should become available for action (including inherited)
+Date \| null
+
+</td><td>
+
+When the project should become available for action (including inherited). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -202,13 +210,15 @@ When the project should become available for action (including inherited)
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-When the project must be finished (including inherited)
+Date \| null
+
+</td><td>
+
+When the project must be finished (including inherited). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -217,13 +227,15 @@ When the project must be finished (including inherited)
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-True if the project is completed
+boolean \| null
+
+</td><td>
+
+True if the project is completed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -232,13 +244,15 @@ True if the project is completed
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-True if the project is dropped
+boolean \| null
+
+</td><td>
+
+True if the project is dropped. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -247,13 +261,15 @@ True if the project is dropped
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-The date at which work for this project is intended (including inherited)
+Date \| null
+
+</td><td>
+
+The date at which work for this project is intended (including inherited). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -262,13 +278,15 @@ The date at which work for this project is intended (including inherited)
 
 </td><td>
 
-</td><td>
-
-[ProjectStatus](./omnifocus.projectstatus.md)
+`readonly`
 
 </td><td>
 
-The effective status of the project
+[ProjectStatus](./omnifocus.projectstatus.md) \| null
+
+</td><td>
+
+The effective status of the project. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -279,11 +297,11 @@ The effective status of the project
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The estimated time, in whole minutes, that this project will take to finish
+The estimated time, in whole minutes, that this project will take to finish. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -294,11 +312,11 @@ The estimated time, in whole minutes, that this project will take to finish
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-True if flagged
+True if flagged. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -307,13 +325,15 @@ True if flagged
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the project
+The unique identifier of the project. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -324,11 +344,11 @@ The unique identifier of the project
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-When the project was last reviewed
+When the project was last reviewed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -337,13 +357,15 @@ When the project was last reviewed
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-When the project was last modified
+Date \| null
+
+</td><td>
+
+When the project was last modified. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -354,11 +376,11 @@ When the project was last modified
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the project
+The name of the project. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -369,11 +391,11 @@ The name of the project
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-When the project should next be reviewed
+When the project should next be reviewed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -384,11 +406,11 @@ When the project should next be reviewed
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The note of the project
+The note of the project. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -397,13 +419,15 @@ The note of the project
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The number of available direct children of this project
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The number of available direct children of this project. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -412,13 +436,15 @@ The number of available direct children of this project
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The number of completed direct children of this project
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The number of completed direct children of this project. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -427,13 +453,15 @@ The number of completed direct children of this project
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The number of direct children of this project
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The number of direct children of this project. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -444,11 +472,11 @@ The number of direct children of this project
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The date at which work for this project is intended
+The date at which work for this project is intended. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -459,11 +487,11 @@ The date at which work for this project is intended
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-If true, any children are sequentially dependent
+If true, any children are sequentially dependent. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -474,11 +502,11 @@ If true, any children are sequentially dependent
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-True if the project contains singleton actions
+True if the project contains singleton actions. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -489,11 +517,11 @@ True if the project contains singleton actions
 
 </td><td>
 
-[ProjectStatus](./omnifocus.projectstatus.md)
+[ProjectStatus](./omnifocus.projectstatus.md) \| null
 
 </td><td>
 
-The status of the project
+The status of the project. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

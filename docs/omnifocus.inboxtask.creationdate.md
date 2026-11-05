@@ -4,10 +4,10 @@
 
 ## InboxTask.creationDate property
 
-When the task was created
+When the task was created. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-creationDate: Date
+creationDate: Date | null
 ```

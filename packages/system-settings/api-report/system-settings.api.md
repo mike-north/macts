@@ -4,23 +4,26 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Anchor {
-    name: string;
+    readonly name: string | null;
 }
 
 // @public
 export type AnchorCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const AnchorSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type AnchorUpdateInput = Partial<AnchorCreateInput>;
+export type AnchorUpdateInput = Record<string, never>;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -44,13 +47,17 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface Pane {
-    id: string;
-    name: string;
+    readonly id: string;
+    readonly name: string | null;
 }
 
 // @public
@@ -59,25 +66,29 @@ export type PaneCreateInput = Record<string, never>;
 // @public
 export class PaneResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    authorize(): Promise<void>;
-    timedLoad(): Promise<void>;
+    authorize(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    timedLoad(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const PaneSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type PaneUpdateInput = Partial<PaneCreateInput>;
+export type PaneUpdateInput = Record<string, never>;
+
+// @public
+export interface SystemSettingsClient extends ClientBrand<SystemSettingsResources> {
+}
 
 // @public
 export class SystemSettingsClient {
     constructor(options: SystemSettingsClientOptions);
     get http(): HttpClient;
     readonly panes: PaneResourceClient;
-    reveal(): Promise<void>;
+    reveal(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -92,6 +103,9 @@ export class SystemSettingsError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type SystemSettingsResources = Readonly<Record<never, never>>;
 
 // (No @packageDocumentation comment for this package)
 

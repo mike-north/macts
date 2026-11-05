@@ -4,12 +4,10 @@
 
 ## ProjectUpdateInput type
 
-Input for updating a Project
+Input for updating a Project. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ProjectUpdateInput = Partial<ProjectCreateInput>
+type ProjectUpdateInput = Record<string, never>
 ```
-
-**References:** [ProjectCreateInput](./xcode.projectcreateinput.md)

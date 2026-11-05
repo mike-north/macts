@@ -4,7 +4,7 @@
 
 ## TextDocumentCreateInput interface
 
-Input for creating a TextDocument
+Input for creating a TextDocument.
 
 **Signature:**
 

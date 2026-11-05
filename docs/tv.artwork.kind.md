@@ -4,10 +4,10 @@
 
 ## Artwork.kind property
 
-kind or purpose of this piece of artwork
+kind or purpose of this piece of artwork. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-kind: number
+kind: Integer | null
 ```

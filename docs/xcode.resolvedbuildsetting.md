@@ -33,21 +33,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[id?](./xcode.resolvedbuildsetting.id.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
-
-</td></tr>
-<tr><td>
-
 [name](./xcode.resolvedbuildsetting.name.md)
 
 </td><td>
@@ -58,7 +43,7 @@ string
 
 </td><td>
 
-The unlocalized build setting name (e.g. DSTROOT)
+The unlocalized build setting name (e.g. DSTROOT). Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -69,11 +54,11 @@ The unlocalized build setting name (e.g. DSTROOT)
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-A string value for the build setting
+A string value for the build setting. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

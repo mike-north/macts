@@ -24,21 +24,39 @@ export class TagResourceClient {
   /**
    * List all tags, as one page.
    */
-  async list(): Promise<Page<Tag>> {
-    return this.#http.rpc<Page<Tag>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Tag>> {
+    return this.#http.invoke<Page<Tag>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'Tag'
+    )
   }
 
   /**
    * Get a tag by id.
    */
-  async get(id: string): Promise<Tag> {
-    return this.#http.rpc<Tag>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Tag> {
+    return this.#http.invoke<Tag>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Tag'
+    )
   }
 
   /**
    * Create a new tag.
    */
-  async create(input: TagCreateInput): Promise<Tag> {
-    return this.#http.rpc<Tag>(`${this.#app}.${this.#resource}.create`, input)
+  async create(
+    input: TagCreateInput,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Tag> {
+    return this.#http.invoke<Tag>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'Tag'
+    )
   }
 }

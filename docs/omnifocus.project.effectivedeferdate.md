@@ -4,10 +4,10 @@
 
 ## Project.effectiveDeferDate property
 
-When the project should become available for action (including inherited)
+When the project should become available for action (including inherited). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-effectiveDeferDate: Date
+readonly effectiveDeferDate: Date | null;
 ```

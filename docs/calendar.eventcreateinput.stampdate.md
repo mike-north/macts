@@ -4,7 +4,7 @@
 
 ## EventCreateInput.stampDate property
 
-The event modification date
+Event modification date
 
 **Signature:**
 

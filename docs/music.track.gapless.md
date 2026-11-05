@@ -4,10 +4,10 @@
 
 ## Track.gapless property
 
-is this track from a gapless album?
+is this track from a gapless album? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-gapless: boolean
+gapless: boolean | null
 ```

@@ -2,14 +2,153 @@
 
 [Home](./index.md) &gt; [@macts/omniplan](./omniplan.md) &gt; [ResourceUpdateInput](./omniplan.resourceupdateinput.md)
 
-## ResourceUpdateInput type
+## ResourceUpdateInput interface
 
-Input for updating a Resource
+Input for updating a Resource. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ResourceUpdateInput = Partial<ResourceCreateInput>
+interface ResourceUpdateInput
 ```
 
-**References:** [ResourceCreateInput](./omniplan.resourcecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[costPerHour?](./omniplan.resourceupdateinput.costperhour.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The cost per hour of this resource. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[costPerUse?](./omniplan.resourceupdateinput.costperuse.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The fixed cost per use of this resource. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[efficiency?](./omniplan.resourceupdateinput.efficiency.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ Resource efficiency (1.0 = 100%). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[emailAddress?](./omniplan.resourceupdateinput.emailaddress.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Email address for this resource. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[name?](./omniplan.resourceupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Resource name. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[note?](./omniplan.resourceupdateinput.note.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Notes. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[number?](./omniplan.resourceupdateinput.number.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The total number of units for this resource (1.0 = 100%). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[resourceType?](./omniplan.resourceupdateinput.resourcetype.md)
+
+</td><td>
+
+</td><td>
+
+[ResourceType](./omniplan.resourcetype.md)
+
+</td><td>
+
+_(Optional)_ Resource type. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

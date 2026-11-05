@@ -4,10 +4,10 @@
 
 ## Tag.hidden property
 
-Set if the tag is currently hidden
+Set if the tag is currently hidden. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-hidden: boolean
+hidden: boolean | null
 ```

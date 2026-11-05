@@ -4,10 +4,10 @@
 
 ## Canvas.rowAlignment property
 
-Row alignment
+Row alignment. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-rowAlignment: VerticalAlignment
+rowAlignment: VerticalAlignment | null
 ```

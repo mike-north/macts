@@ -4,6 +4,8 @@
 
 ## WorkflowSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript

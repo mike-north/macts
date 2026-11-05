@@ -4,10 +4,10 @@
 
 ## ApplicationFile.id property
 
-the bundle identifier or creator type of the application
+the bundle identifier or creator type of the application. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

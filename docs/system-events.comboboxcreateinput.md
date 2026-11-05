@@ -4,7 +4,7 @@
 
 ## ComboBoxCreateInput type
 
-Input for creating a ComboBox
+Input for creating a ComboBox.
 
 **Signature:**
 

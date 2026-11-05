@@ -4,7 +4,7 @@
 
 ## Document.name property
 
-The name of the document
+The name of the document. Never null: the primary identifier.
 
 **Signature:**
 

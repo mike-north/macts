@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The alternate unique identifier of the session.
+string \| null
+
+</td><td>
+
+The alternate unique identifier of the session. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ The alternate unique identifier of the session.
 
 </td><td>
 
-{ x: number; y: number; width: number; height: number; }
+[Rectangle](./contracts.rectangle.md) \| null
 
 </td><td>
 
-The bounding rectangle of the window.
+The bounding rectangle of the window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,43 +69,15 @@ The bounding rectangle of the window.
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the window has a close box.
-
-</td></tr>
-<tr><td>
-
-[currentSession](./iterm.window.currentsession.md)
+boolean \| null
 
 </td><td>
 
-</td><td>
-
-[Session](./iterm.session.md)
-
-</td><td>
-
-The current session in a window
-
-</td></tr>
-<tr><td>
-
-[currentTab](./iterm.window.currenttab.md)
-
-</td><td>
-
-</td><td>
-
-[Tab](./iterm.tab.md)
-
-</td><td>
-
-The currently selected tab
+Whether the window has a close box. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +88,11 @@ The currently selected tab
 
 </td><td>
 
-{ x: number; y: number; width: number; height: number; }
+[Rectangle](./contracts.rectangle.md) \| null
 
 </td><td>
 
-The bounding rectangle, relative to the lower left corner of the screen.
+The bounding rectangle, relative to the lower left corner of the screen. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +103,11 @@ The bounding rectangle, relative to the lower left corner of the screen.
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the window is currently the frontmost window.
+Whether the window is currently the frontmost window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +118,11 @@ Whether the window is currently the frontmost window.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-If the window is a hotkey window, this gives the name of the profile that created the window.
+If the window is a hotkey window, this gives the name of the profile that created the window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +131,15 @@ If the window is a hotkey window, this gives the name of the profile that create
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The unique identifier of the session.
+[Integer](./contracts.integer.md)
+
+</td><td>
+
+The unique identifier of the session. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -174,11 +150,11 @@ The unique identifier of the session.
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The index of the window, ordered front to back.
+The index of the window, ordered front to back. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -189,11 +165,11 @@ The index of the window, ordered front to back.
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the window is a hotkey window.
+Whether the window is a hotkey window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -202,13 +178,15 @@ Whether the window is a hotkey window.
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the window can be minimized.
+boolean \| null
+
+</td><td>
+
+Whether the window can be minimized. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -219,11 +197,11 @@ Whether the window can be minimized.
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the window is currently minimized.
+Whether the window is currently minimized. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -232,13 +210,15 @@ Whether the window is currently minimized.
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The full title of the window.
+string \| null
+
+</td><td>
+
+The full title of the window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -249,11 +229,11 @@ The full title of the window.
 
 </td><td>
 
-{ x: number; y: number; }
+[Point](./contracts.point.md) \| null
 
 </td><td>
 
-The position of the window, relative to the lower left corner of the screen.
+The position of the window, relative to the lower left corner of the screen. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -264,11 +244,11 @@ The position of the window, relative to the lower left corner of the screen.
 
 </td><td>
 
-{ x: number; y: number; }
+[Point](./contracts.point.md) \| null
 
 </td><td>
 
-The position of the window, relative to the upper left corner of the screen.
+The position of the window, relative to the upper left corner of the screen. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -277,13 +257,15 @@ The position of the window, relative to the upper left corner of the screen.
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the window can be resized.
+boolean \| null
+
+</td><td>
+
+Whether the window can be resized. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -294,11 +276,11 @@ Whether the window can be resized.
 
 </td><td>
 
-{ x: number; y: number; }
+[Point](./contracts.point.md) \| null
 
 </td><td>
 
-The width and height of the window
+The width and height of the window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -309,11 +291,11 @@ The width and height of the window
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the window is currently visible.
+Whether the window is currently visible. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -322,13 +304,15 @@ Whether the window is currently visible.
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the window can be zoomed.
+boolean \| null
+
+</td><td>
+
+Whether the window can be zoomed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -339,11 +323,11 @@ Whether the window can be zoomed.
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the window is currently zoomed.
+Whether the window is currently zoomed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

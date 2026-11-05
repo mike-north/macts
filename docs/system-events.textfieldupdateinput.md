@@ -4,12 +4,10 @@
 
 ## TextFieldUpdateInput type
 
-Input for updating a TextField
+Input for updating a TextField. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type TextFieldUpdateInput = Partial<TextFieldCreateInput>
+type TextFieldUpdateInput = Record<string, never>
 ```
-
-**References:** [TextFieldCreateInput](./system-events.textfieldcreateinput.md)

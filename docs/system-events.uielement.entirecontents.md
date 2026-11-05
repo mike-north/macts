@@ -4,10 +4,10 @@
 
 ## UIElement.entireContents property
 
-a list of every UI element contained in this UI element and its child UI elements, to the limits of the tree
+a list of every UI element contained in this UI element and its child UI elements, to the limits of the tree. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-entireContents: string
+readonly entireContents: string | null;
 ```

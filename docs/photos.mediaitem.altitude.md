@@ -4,10 +4,10 @@
 
 ## MediaItem.altitude property
 
-The GPS altitude in meters
+The GPS altitude in meters. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-altitude: number
+readonly altitude: number | null;
 ```

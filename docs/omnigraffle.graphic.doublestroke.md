@@ -4,10 +4,10 @@
 
 ## Graphic.doubleStroke property
 
-Does this graphic have a double-lined stroke?
+Does this graphic have a double-lined stroke? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-doubleStroke: boolean
+doubleStroke: boolean | null
 ```

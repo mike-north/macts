@@ -4,13 +4,10 @@
 
 ## Window.size property
 
-The width and height of the window
+The width and height of the window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-size: {
-  x: number
-  y: number
-}
+size: Point | null
 ```

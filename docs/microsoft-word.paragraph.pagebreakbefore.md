@@ -4,10 +4,10 @@
 
 ## Paragraph.pageBreakBefore property
 
-Whether a page break is forced before the paragraph
+Whether a page break is forced before the paragraph. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-pageBreakBefore: boolean
+pageBreakBefore: boolean | null
 ```

@@ -9,7 +9,7 @@ Create a new tab.
 **Signature:**
 
 ```typescript
-create(input: TabCreateInput): Promise<Tab>;
+create(input: TabCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Tab>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [TabCreateInput](./microsoft-edge.tabcreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

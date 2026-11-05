@@ -24,14 +24,27 @@ export class GraphicResourceClient {
   /**
    * List the graphics of one canvas, as one page.
    */
-  async list(canvasId: string): Promise<Page<Graphic>> {
-    return this.#http.rpc<Page<Graphic>>(`${this.#app}.${this.#resource}.list`, { canvasId })
+  async list(
+    canvasId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<Graphic>> {
+    return this.#http.invoke<Page<Graphic>>(
+      `${this.#app}.${this.#resource}.list`,
+      { canvasId },
+      __mactsOptions,
+      'Graphic'
+    )
   }
 
   /**
    * Get a graphic by id.
    */
-  async get(id: string): Promise<Graphic> {
-    return this.#http.rpc<Graphic>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Graphic> {
+    return this.#http.invoke<Graphic>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Graphic'
+    )
   }
 }

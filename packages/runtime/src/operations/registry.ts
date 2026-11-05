@@ -23,6 +23,7 @@ import {
   contractResourcePlans,
   listOperationPages,
   normalizeAppRouteSegment,
+  positionalProblems,
   resolveCommandRoutes,
   unselectableItemCommands,
   untargetedIdentifiers,
@@ -249,6 +250,29 @@ function assertIdentifiersTargeted(manifest: AppManifest, registration: Registra
   throw new OperationRegistrationError(`${refusedApp(manifest, registration)}: ${first.problem}`)
 }
 
+/**
+ * Refuse a manifest whose `positional` marker does not hold.
+ *
+ * @remarks
+ * The rule is `positionalProblems` in `@macts/core`, the one generation and
+ * the manifest schema apply: a positional resource has no primary
+ * identifier, a get under a parent the app finds by its identifier, and an
+ * integer position parameter on each command that selects one of its items.
+ *
+ * Both registrations run it, so a contract cannot register an operation for a
+ * manifest that registration from the manifest alone refuses.
+ *
+ * @param registration - What the caller is registering the app from, which
+ *   the refusal names.
+ * @throws {@link OperationRegistrationError} naming the app and the resource
+ *   or command, and saying what the marker needs.
+ */
+function assertPositionalMarkersHold(manifest: AppManifest, registration: Registration): void {
+  const [first] = positionalProblems(manifest)
+  if (first === undefined) return
+  throw new OperationRegistrationError(`${refusedApp(manifest, registration)}: ${first}`)
+}
+
 /** What a registration is made from: the manifest alone, or a contract checked against it. */
 type Registration = 'manifest' | 'contract'
 
@@ -315,6 +339,7 @@ export function operationsFromManifest(manifest: AppManifest): RegisteredOperati
   assertAppSegmentNotReserved(manifest)
   assertItemsSelectable(manifest, 'manifest')
   assertIdentifiersTargeted(manifest, 'manifest')
+  assertPositionalMarkersHold(manifest, 'manifest')
   const inputTypes = new Map<string, ValueType<unknown>>()
   return deriveManifestOperations(manifest).map(({ id, permission, target, command }) => {
     let input = inputTypes.get(target.command)
@@ -387,6 +412,7 @@ export function operationsFromContract(
   assertAppSegmentNotReserved(manifest)
   assertItemsSelectable(manifest, 'contract')
   assertIdentifiersTargeted(manifest, 'contract')
+  assertPositionalMarkersHold(manifest, 'contract')
   const appSegment = normalizeAppRouteSegment(manifest.app.name)
   if (contract.app !== appSegment) {
     throw new OperationRegistrationError(

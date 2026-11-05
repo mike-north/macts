@@ -4,10 +4,10 @@
 
 ## Selection.end property
 
-The ending character position of the selection
+The ending character position of the selection. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-end: number
+readonly end: Integer | null;
 ```

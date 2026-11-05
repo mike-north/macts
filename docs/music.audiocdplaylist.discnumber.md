@@ -4,10 +4,10 @@
 
 ## AudioCDPlaylist.discNumber property
 
-the index of this CD disc in the source album
+the index of this CD disc in the source album. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-discNumber: number
+discNumber: Integer | null
 ```

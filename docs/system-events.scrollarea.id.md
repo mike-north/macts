@@ -4,10 +4,10 @@
 
 ## ScrollArea.id property
 
-Unique identifier for this scroll area
+Unique identifier for this scroll area. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

@@ -4,10 +4,10 @@
 
 ## Paragraph.leftIndent property
 
-The left indent in points
+The left indent in points. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-leftIndent: number
+leftIndent: number | null
 ```

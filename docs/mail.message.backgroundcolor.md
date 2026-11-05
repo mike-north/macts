@@ -4,10 +4,10 @@
 
 ## Message.backgroundColor property
 
-The background color of the message
+The background color of the message. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-backgroundColor: string
+backgroundColor: string | null
 ```

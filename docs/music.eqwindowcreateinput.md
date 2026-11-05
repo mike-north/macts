@@ -4,7 +4,7 @@
 
 ## EQWindowCreateInput type
 
-Input for creating a EQWindow
+Input for creating an EQWindow.
 
 **Signature:**
 

@@ -2,123 +2,28 @@
 
 [Home](./index.md) &gt; [@macts/xcode](./xcode.md) &gt; [AnalyzerIssueCreateInput](./xcode.analyzerissuecreateinput.md)
 
-## AnalyzerIssueCreateInput interface
+## AnalyzerIssueCreateInput type
 
-Input for creating a AnalyzerIssue
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface AnalyzerIssueCreateInput
+type AnalyzerIssueCreateInput = Omit<
+  AnalyzerIssueCreateInput$1,
+  'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'
+> & {
+  startingLineNumber?: null extends AnalyzerIssueCreateInput$1['startingLineNumber']
+    ? number | null
+    : number
+  endingLineNumber?: null extends AnalyzerIssueCreateInput$1['endingLineNumber']
+    ? number | null
+    : number
+  startingColumnNumber?: null extends AnalyzerIssueCreateInput$1['startingColumnNumber']
+    ? number | null
+    : number
+  endingColumnNumber?: null extends AnalyzerIssueCreateInput$1['endingColumnNumber']
+    ? number | null
+    : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[endingColumnNumber?](./xcode.analyzerissuecreateinput.endingcolumnnumber.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The ending column number in the file where the issue occurred
-
-</td></tr>
-<tr><td>
-
-[endingLineNumber?](./xcode.analyzerissuecreateinput.endinglinenumber.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The ending line number in the file where the issue occurred
-
-</td></tr>
-<tr><td>
-
-[filePath?](./xcode.analyzerissuecreateinput.filepath.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ The file path where the issue occurred
-
-</td></tr>
-<tr><td>
-
-[message?](./xcode.analyzerissuecreateinput.message.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ The text of the issue
-
-</td></tr>
-<tr><td>
-
-[startingColumnNumber?](./xcode.analyzerissuecreateinput.startingcolumnnumber.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The starting column number in the file where the issue occurred
-
-</td></tr>
-<tr><td>
-
-[startingLineNumber?](./xcode.analyzerissuecreateinput.startinglinenumber.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ The starting line number in the file where the issue occurred
-
-</td></tr>
-</tbody></table>

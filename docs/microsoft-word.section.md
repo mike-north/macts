@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the section is protected for forms
+Whether the section is protected for forms. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +52,15 @@ Whether the section is protected for forms
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The index of the section
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The index of the section. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/omnigraffle](./omnigraffle.md) &gt; [MasterUpdateInput](./omnigraffle.masterupdateinput.md)
 
-## MasterUpdateInput type
+## MasterUpdateInput interface
 
-Input for updating a Master
+Input for updating a Master. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type MasterUpdateInput = Partial<MasterCreateInput>
+interface MasterUpdateInput
 ```
 
-**References:** [MasterCreateInput](./omnigraffle.mastercreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[id?](./omnigraffle.masterupdateinput.id.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Unique identifier. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[name?](./omnigraffle.masterupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Name of this master. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

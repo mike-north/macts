@@ -4,10 +4,10 @@
 
 ## Document.plainText property
 
-Plain text representation of the system profile document
+Plain text representation of the system profile document. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-plainText: string
+readonly plainText: string | null;
 ```

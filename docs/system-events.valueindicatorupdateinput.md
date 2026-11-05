@@ -4,12 +4,10 @@
 
 ## ValueIndicatorUpdateInput type
 
-Input for updating a ValueIndicator
+Input for updating a ValueIndicator. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ValueIndicatorUpdateInput = Partial<ValueIndicatorCreateInput>
+type ValueIndicatorUpdateInput = Record<string, never>
 ```
-
-**References:** [ValueIndicatorCreateInput](./system-events.valueindicatorcreateinput.md)

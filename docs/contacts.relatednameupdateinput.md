@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/contacts](./contacts.md) &gt; [RelatedNameUpdateInput](./contacts.relatednameupdateinput.md)
 
-## RelatedNameUpdateInput type
+## RelatedNameUpdateInput interface
 
-Input for updating a RelatedName
+Input for updating a RelatedName. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type RelatedNameUpdateInput = Partial<RelatedNameCreateInput>
+interface RelatedNameUpdateInput
 ```
 
-**References:** [RelatedNameCreateInput](./contacts.relatednamecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[label?](./contacts.relatednameupdateinput.label.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Label for this name. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[value?](./contacts.relatednameupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The related name value. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

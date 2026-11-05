@@ -9,7 +9,7 @@ Creates a forwarded message.
 **Signature:**
 
 ```typescript
-forward(openingWindow?: boolean): Promise<void>;
+forward(openingWindow?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -34,6 +34,19 @@ openingWindow
 </td><td>
 
 boolean
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

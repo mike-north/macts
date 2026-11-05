@@ -4,10 +4,10 @@
 
 ## Task.inInbox property
 
-Returns true if the task itself is an inbox task or if the task is contained by an inbox task
+Returns true if the task itself is an inbox task or if the task is contained by an inbox task. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-inInbox: boolean
+readonly inInbox: boolean | null;
 ```

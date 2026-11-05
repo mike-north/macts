@@ -4,12 +4,10 @@
 
 ## RowUpdateInput type
 
-Input for updating a Row
+Input for updating a Row. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type RowUpdateInput = Partial<RowCreateInput>
+type RowUpdateInput = Record<string, never>
 ```
-
-**References:** [RowCreateInput](./system-events.rowcreateinput.md)

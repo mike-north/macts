@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[execute(workflow)](./automator.workflowresourceclient.execute.md)
+[execute(workflow, \_\_mactsOptions)](./automator.workflowresourceclient.execute.md)
 
 </td><td>
 
@@ -68,24 +68,24 @@ Execute a workflow
 </td></tr>
 <tr><td>
 
-[get(name)](./automator.workflowresourceclient.get.md)
+[get(name, \_\_mactsOptions)](./automator.workflowresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Get a workflow by name.
+Get a workflow by name. When several workflows share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 </td></tr>
 <tr><td>
 
-[list()](./automator.workflowresourceclient.list.md)
+[list(\_\_mactsOptions)](./automator.workflowresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all workflows.
+List all workflows, as one page.
 
 </td></tr>
 </tbody></table>

@@ -4,10 +4,10 @@
 
 ## Project.note property
 
-The note of the project
+The note of the project. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-note: string
+note: string | null
 ```

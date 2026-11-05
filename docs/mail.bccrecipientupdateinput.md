@@ -4,12 +4,10 @@
 
 ## BccRecipientUpdateInput type
 
-Input for updating a BccRecipient
+Input for updating a BccRecipient. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type BccRecipientUpdateInput = Partial<BccRecipientCreateInput>
+type BccRecipientUpdateInput = Record<string, never>
 ```
-
-**References:** [BccRecipientCreateInput](./mail.bccrecipientcreateinput.md)

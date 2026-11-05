@@ -4,10 +4,10 @@
 
 ## Window.position property
 
-The position of the window
+The position of the window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-position: string
+position: string | null
 ```

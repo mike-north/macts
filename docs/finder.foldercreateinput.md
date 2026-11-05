@@ -4,7 +4,7 @@
 
 ## FolderCreateInput type
 
-Input for creating a Folder
+Input for creating a Folder.
 
 **Signature:**
 

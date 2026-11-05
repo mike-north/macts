@@ -4,7 +4,7 @@
 
 ## MenuButtonCreateInput type
 
-Input for creating a MenuButton
+Input for creating a MenuButton.
 
 **Signature:**
 

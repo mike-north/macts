@@ -4,10 +4,10 @@
 
 ## Field.locked property
 
-Whether the field is locked
+Whether the field is locked. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-locked: boolean
+locked: boolean | null
 ```

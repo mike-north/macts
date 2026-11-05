@@ -24,14 +24,30 @@ export class BookmarkItemResourceClient {
   /**
    * List the bookmark items of one bookmark folder, as one page.
    */
-  async list(folderId: string): Promise<Page<BookmarkItem>> {
-    return this.#http.rpc<Page<BookmarkItem>>(`${this.#app}.${this.#resource}.list`, { folderId })
+  async list(
+    folderId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<BookmarkItem>> {
+    return this.#http.invoke<Page<BookmarkItem>>(
+      `${this.#app}.${this.#resource}.list`,
+      { folderId },
+      __mactsOptions,
+      'BookmarkItem'
+    )
   }
 
   /**
    * Get a bookmark item by id.
    */
-  async get(id: string): Promise<BookmarkItem> {
-    return this.#http.rpc<BookmarkItem>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<BookmarkItem> {
+    return this.#http.invoke<BookmarkItem>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'BookmarkItem'
+    )
   }
 }

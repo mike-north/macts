@@ -17,7 +17,71 @@ CommandParameterSchema: z.ZodObject<
     required: z.ZodDefault<z.ZodBoolean>
     default: z.ZodOptional<z.ZodUnknown>
     code: z.ZodOptional<z.ZodString>
+    nullable: z.ZodOptional<z.ZodBoolean>
+    evidence: z.ZodOptional<
+      z.ZodObject<
+        {
+          nullable: z.ZodOptional<
+            z.ZodDiscriminatedUnion<
+              [
+                z.ZodObject<
+                  {
+                    source: z.ZodLiteral<'probe'>
+                    observedAt: z.ZodISODateTime
+                    bundleId: z.ZodString
+                    appVersion: z.ZodString
+                    osVersion: z.ZodString
+                    sampleSize: z.ZodNumber
+                    nullCount: z.ZodNumber
+                    failedReads: z.ZodNumber
+                    errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>
+                    note: z.ZodOptional<z.ZodString>
+                  },
+                  z.core.$strip
+                >,
+                z.ZodObject<
+                  {
+                    source: z.ZodLiteral<'curated'>
+                    note: z.ZodString
+                    observedAt: z.ZodOptional<z.ZodISODateTime>
+                    appVersion: z.ZodOptional<z.ZodString>
+                    absentReads: z.ZodOptional<
+                      z.ZodObject<
+                        {
+                          observedAt: z.ZodISODateTime
+                          bundleId: z.ZodString
+                          appVersion: z.ZodString
+                          osVersion: z.ZodString
+                          failedReads: z.ZodNumber
+                          errorNumbers: z.ZodArray<z.ZodNumber>
+                          reason: z.ZodString
+                        },
+                        z.core.$strict
+                      >
+                    >
+                  },
+                  z.core.$strip
+                >,
+                z.ZodObject<
+                  {
+                    source: z.ZodLiteral<'sdef'>
+                    note: z.ZodOptional<z.ZodString>
+                  },
+                  z.core.$strip
+                >,
+              ],
+              'source'
+            >
+          >
+        },
+        z.core.$strip
+      >
+    >
   },
   z.core.$strip
 >
 ```
+
+## Remarks
+
+A parameter accepts `null` only when it claims `nullable: true`<!-- -->, with evidence; without a claim it does not. (Widening an input to accept `null` later is compatible for callers; narrowing it is not, so inputs start narrow.)

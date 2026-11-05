@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the row can break across pages
+Whether the row can break across pages. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ Whether the row can break across pages
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the row is formatted as a heading
+Whether the row is formatted as a heading. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ Whether the row is formatted as a heading
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The height of the row in points
+The height of the row in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -4,10 +4,10 @@
 
 ## Window.id property
 
-The unique identifier of the window
+The unique identifier of the window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: number | null;
 ```

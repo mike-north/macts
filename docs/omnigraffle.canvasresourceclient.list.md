@@ -4,14 +4,44 @@
 
 ## CanvasResourceClient.list() method
 
-List all canvases.
+List all canvases, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Canvas[]>;
+list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Canvas>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Canvas](./omnigraffle.canvas.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Canvas](./omnigraffle.canvas.md)<!-- -->&gt;&gt;

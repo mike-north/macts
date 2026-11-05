@@ -4,10 +4,10 @@
 
 ## Disk.ignorePrivileges property
 
-Ignore permissions on this disk?
+Ignore permissions on this disk? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-ignorePrivileges: boolean
+ignorePrivileges: boolean | null
 ```

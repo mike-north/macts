@@ -4,10 +4,10 @@
 
 ## Resource.efficiency property
 
-Resource efficiency (1.0 = 100%)
+Resource efficiency (1.0 = 100%). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-efficiency: number
+efficiency: number | null
 ```

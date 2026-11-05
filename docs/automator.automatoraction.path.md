@@ -4,10 +4,10 @@
 
 ## AutomatorAction.path property
 
-The path of the file that contains the action
+The path of the file that contains the action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-path: string
+readonly path: string | null;
 ```

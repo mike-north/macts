@@ -4,10 +4,10 @@
 
 ## AirPlayDevice.networkAddress property
 
-the network (MAC) address of the device
+the network (MAC) address of the device. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-networkAddress: string
+readonly networkAddress: string | null;
 ```

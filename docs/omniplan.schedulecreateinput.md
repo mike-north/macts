@@ -4,7 +4,7 @@
 
 ## ScheduleCreateInput type
 
-Input for creating a Schedule
+Input for creating a Schedule.
 
 **Signature:**
 

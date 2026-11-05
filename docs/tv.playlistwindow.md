@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Unique identifier for this window
+[Integer](./contracts.integer.md)
+
+</td><td>
+
+Unique identifier for this window. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -52,28 +54,15 @@ Unique identifier for this window
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the selected tracks
-
-</td></tr>
-<tr><td>
-
-[view](./tv.playlistwindow.view.md)
+string \| null
 
 </td><td>
 
-</td><td>
-
-[Playlist](./tv.playlist.md)
-
-</td><td>
-
-the playlist displayed in the window
+the selected tracks. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

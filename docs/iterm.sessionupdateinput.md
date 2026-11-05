@@ -4,12 +4,13 @@
 
 ## SessionUpdateInput type
 
-Input for updating a Session
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type SessionUpdateInput = Partial<SessionCreateInput>
+type SessionUpdateInput = Omit<SessionUpdateInput$1, 'columns' | 'rows'> & {
+  columns?: null extends SessionUpdateInput$1['columns'] ? number | null : number
+  rows?: null extends SessionUpdateInput$1['rows'] ? number | null : number
+}
 ```
-
-**References:** [SessionCreateInput](./iterm.sessioncreateinput.md)

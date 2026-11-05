@@ -9,7 +9,7 @@ Write a backup archive of the document
 **Signature:**
 
 ```typescript
-archive(_in: string, compression?: boolean): Promise<void>;
+archive(_in: string, compression?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -45,6 +45,19 @@ compression
 </td><td>
 
 boolean
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

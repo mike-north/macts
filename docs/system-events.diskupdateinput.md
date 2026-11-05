@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [DiskUpdateInput](./system-events.diskupdateinput.md)
 
-## DiskUpdateInput type
+## DiskUpdateInput interface
 
-Input for updating a Disk
+Input for updating a Disk. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type DiskUpdateInput = Partial<DiskCreateInput>
+interface DiskUpdateInput
 ```
 
-**References:** [DiskCreateInput](./system-events.diskcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[ignorePrivileges?](./system-events.diskupdateinput.ignoreprivileges.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Ignore permissions on this disk? Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

@@ -4,10 +4,10 @@
 
 ## ICQHandle.value property
 
-The ICQ handle value
+The ICQ handle value. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-value: string
+value: string | null
 ```

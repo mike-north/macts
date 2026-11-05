@@ -4,12 +4,10 @@
 
 ## BusyIndicatorUpdateInput type
 
-Input for updating a BusyIndicator
+Input for updating a BusyIndicator. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type BusyIndicatorUpdateInput = Partial<BusyIndicatorCreateInput>
+type BusyIndicatorUpdateInput = Record<string, never>
 ```
-
-**References:** [BusyIndicatorCreateInput](./system-events.busyindicatorcreateinput.md)

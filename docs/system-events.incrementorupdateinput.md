@@ -4,12 +4,10 @@
 
 ## IncrementorUpdateInput type
 
-Input for updating a Incrementor
+Input for updating an Incrementor. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type IncrementorUpdateInput = Partial<IncrementorCreateInput>
+type IncrementorUpdateInput = Record<string, never>
 ```
-
-**References:** [IncrementorCreateInput](./system-events.incrementorcreateinput.md)

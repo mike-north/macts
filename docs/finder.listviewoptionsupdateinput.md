@@ -4,12 +4,12 @@
 
 ## ListViewOptionsUpdateInput type
 
-Input for updating a ListViewOptions
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type ListViewOptionsUpdateInput = Partial<ListViewOptionsCreateInput>
+type ListViewOptionsUpdateInput = Omit<ListViewOptionsUpdateInput$1, 'textSize'> & {
+  textSize?: null extends ListViewOptionsUpdateInput$1['textSize'] ? number | null : number
+}
 ```
-
-**References:** [ListViewOptionsCreateInput](./finder.listviewoptionscreateinput.md)

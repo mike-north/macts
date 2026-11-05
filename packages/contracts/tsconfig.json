@@ -2,7 +2,10 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    // Resolve the package self-reference during clean builds; emitted client
+    // declarations retain the public root import and its nominal type identity.
+    "paths": { "@macts/contracts": ["./src/index.ts"] }
   },
   "include": ["src"]
 }

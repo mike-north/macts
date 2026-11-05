@@ -4,7 +4,7 @@
 
 ## FontCreateInput interface
 
-Input for creating a Font
+Input for creating a Font.
 
 **Signature:**
 
@@ -69,7 +69,7 @@ _(Optional)_ Whether the font is bold
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md)
 
 </td><td>
 

@@ -24,9 +24,15 @@ export class RequiredResourceResourceClient {
   /**
    * List the required resources of one automator action, as one page.
    */
-  async list(actionId: string): Promise<Page<RequiredResource>> {
-    return this.#http.rpc<Page<RequiredResource>>(`${this.#app}.${this.#resource}.list`, {
-      actionId,
-    })
+  async list(
+    actionId: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<RequiredResource>> {
+    return this.#http.invoke<Page<RequiredResource>>(
+      `${this.#app}.${this.#resource}.list`,
+      { actionId },
+      __mactsOptions,
+      'RequiredResource'
+    )
   }
 }

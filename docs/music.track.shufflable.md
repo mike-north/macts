@@ -4,10 +4,10 @@
 
 ## Track.shufflable property
 
-is this track included when shuffling?
+is this track included when shuffling? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-shufflable: boolean
+shufflable: boolean | null
 ```

@@ -4,10 +4,10 @@
 
 ## Tab.history property
 
-The complete history contents of the tab
+The complete history contents of the tab. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-history: string
+readonly history: string | null;
 ```

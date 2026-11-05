@@ -4,12 +4,10 @@
 
 ## ActionUpdateInput type
 
-Input for updating a Action
+Input for updating an Action. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ActionUpdateInput = Partial<ActionCreateInput>
+type ActionUpdateInput = Record<string, never>
 ```
-
-**References:** [ActionCreateInput](./system-events.actioncreateinput.md)

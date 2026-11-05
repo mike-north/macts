@@ -4,12 +4,10 @@
 
 ## ClippingWindowUpdateInput type
 
-Input for updating a ClippingWindow
+Input for updating a ClippingWindow. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ClippingWindowUpdateInput = Partial<ClippingWindowCreateInput>
+type ClippingWindowUpdateInput = Record<string, never>
 ```
-
-**References:** [ClippingWindowCreateInput](./finder.clippingwindowcreateinput.md)

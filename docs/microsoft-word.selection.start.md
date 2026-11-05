@@ -4,10 +4,10 @@
 
 ## Selection.start property
 
-The starting character position of the selection
+The starting character position of the selection. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-start: number
+readonly start: Integer | null;
 ```

@@ -4,10 +4,10 @@
 
 ## WorkspaceDocument.modified property
 
-Has it been modified since the last save?
+Has it been modified since the last save? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-modified: boolean
+readonly modified: boolean | null;
 ```

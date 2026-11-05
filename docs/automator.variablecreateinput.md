@@ -4,7 +4,7 @@
 
 ## VariableCreateInput interface
 
-Input for creating a Variable
+Input for creating a Variable.
 
 **Signature:**
 

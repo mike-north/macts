@@ -4,10 +4,10 @@
 
 ## SettingsSet.fontSize property
 
-The size of the font
+The size of the font. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fontSize: number
+fontSize: number | null
 ```

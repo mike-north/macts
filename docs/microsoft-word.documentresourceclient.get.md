@@ -4,12 +4,12 @@
 
 ## DocumentResourceClient.get() method
 
-Get a document by id.
+Get a document by id. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 **Signature:**
 
 ```typescript
-get(id: string): Promise<Document>;
+get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Document>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ id
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

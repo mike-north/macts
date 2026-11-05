@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/notes](./notes.md) &gt; [NoteUpdateInput](./notes.noteupdateinput.md)
 
-## NoteUpdateInput type
+## NoteUpdateInput interface
 
-Input for updating a Note
+Input for updating a Note. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type NoteUpdateInput = Partial<NoteCreateInput>
+interface NoteUpdateInput
 ```
 
-**References:** [NoteCreateInput](./notes.notecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[body?](./notes.noteupdateinput.body.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ HTML content of the note. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[name?](./notes.noteupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of the note (first line). Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

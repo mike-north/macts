@@ -4,10 +4,10 @@
 
 ## Account.upgraded property
 
-Whether the account has been upgraded
+Whether the account has been upgraded. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-upgraded: boolean
+readonly upgraded: boolean | null;
 ```

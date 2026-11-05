@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Unique identifier for this track
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+Unique identifier for this track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ Unique identifier for this track
 
 </td><td>
 
-string
+[FileValue](./contracts.filevalue.md) \| null
 
 </td><td>
 
-the location of the file represented by this track
+the location of the file represented by this track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

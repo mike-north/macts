@@ -4,10 +4,10 @@
 
 ## Document.modified property
 
-Whether the document has been modified since last save
+Whether the document has been modified since last save. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-modified: boolean
+readonly modified: boolean | null;
 ```

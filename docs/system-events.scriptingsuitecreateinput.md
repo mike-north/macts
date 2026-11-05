@@ -4,7 +4,7 @@
 
 ## ScriptingSuiteCreateInput type
 
-Input for creating a ScriptingSuite
+Input for creating a ScriptingSuite.
 
 **Signature:**
 

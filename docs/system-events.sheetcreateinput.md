@@ -4,7 +4,7 @@
 
 ## SheetCreateInput type
 
-Input for creating a Sheet
+Input for creating a Sheet.
 
 **Signature:**
 

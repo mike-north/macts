@@ -21,6 +21,7 @@
 export { PhotosClient, PhotosError, HttpClient } from './client.js'
 export type { PhotosClientOptions } from './client.js'
 export * from './types.js'
+export type { PhotosResources } from './contract/index.js'
 export { MediaItemResourceClient } from './resources/mediaitem.js'
 export { AlbumResourceClient } from './resources/album.js'
 export { FolderResourceClient } from './resources/folder.js'

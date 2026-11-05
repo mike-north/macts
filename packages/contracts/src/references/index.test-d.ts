@@ -41,6 +41,7 @@ import type {
   WireValue,
   IdentityCollectionReference,
   IdentityReference,
+  IndexSelectorReference,
   ObjectReference,
   ReferenceList,
   Resolvable,
@@ -447,3 +448,21 @@ expectType<ReferenceRegistry>(null as unknown as ReferenceScope['resources'])
 // Negative: a resource table alone, or a scope without its app, is not a scope.
 expectNotAssignable<ReferenceScope>(contract.resources)
 expectNotAssignable<ReferenceScope>({ resources: { note: { id: textId } } })
+
+// A position emitted as an index selector within its container is typed
+// narrowly: it is a single-object reference generic hydration accepts, and a
+// selector reference, but never an identity reference, since its target has
+// no identifier. Its selector is always by index, and its container always
+// present, in identity form.
+declare const positional: IndexSelectorReference<Event, 'Tab'>
+expectAssignable<ObjectReference<Event>>(positional)
+expectAssignable<ObjectReferenceVariant<Event, never, 'Tab'>>(positional)
+expectAssignable<SelectorReference<Event, 'Tab'>>(positional)
+expectAssignable<ObjectReferenceData<never, 'Tab'>>(positional)
+expectNotAssignable<IdentityReference<Event>>(positional)
+expectNotAssignable<IdentityReference<Event, never, 'Tab'>>(positional)
+expectType<IndexSelector>(positional.selector)
+expectType<IdentityReference<unknown>>(positional.container)
+// Negative: a selector by name, or one with no container, is not positional.
+expectNotAssignable<IndexSelectorReference<Event>>(byName)
+expectNotAssignable<IndexSelectorReference<Event>>(byId)

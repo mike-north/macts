@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/messages](./messages.md) &gt; [AccountUpdateInput](./messages.accountupdateinput.md)
 
-## AccountUpdateInput type
+## AccountUpdateInput interface
 
-Input for updating a Account
+Input for updating an Account. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type AccountUpdateInput = Partial<AccountCreateInput>
+interface AccountUpdateInput
 ```
 
-**References:** [AccountCreateInput](./messages.accountcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[enabled?](./messages.accountupdateinput.enabled.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Is the account enabled? Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

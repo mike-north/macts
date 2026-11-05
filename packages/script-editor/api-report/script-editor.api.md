@@ -4,7 +4,12 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -28,12 +33,11 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Document {
-    contents: string;
-    id?: string;
-    language: string;
-    modified: boolean;
+    contents: string | null;
+    language: string | null;
+    readonly modified: boolean | null;
     name: string;
-    path?: string;
+    readonly path?: string | null;
 }
 
 // @public
@@ -46,12 +50,12 @@ export interface DocumentCreateInput {
 // @public
 export class DocumentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: DocumentCreateInput): Promise<Document>;
-    get(name: string): Promise<Document>;
-    list(): Promise<Page<Document>>;
+    create(input: DocumentCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Document>;
+    get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Document>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Document>>;
 }
 
-// @public (undocumented)
+// @public
 export const DocumentSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -62,12 +66,24 @@ export const DocumentSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type DocumentUpdateInput = Partial<DocumentCreateInput>;
+export interface DocumentUpdateInput {
+    contents?: string;
+    language?: string;
+    name?: string;
+}
 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
+}
+
+// @public
+export interface ScriptEditorClient extends ClientBrand<ScriptEditorResources> {
 }
 
 // @public
@@ -89,6 +105,15 @@ export class ScriptEditorError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type ScriptEditorResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'script-editor.documents.get';
+        readonly list: 'script-editor.documents.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

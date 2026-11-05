@@ -4,10 +4,10 @@
 
 ## ScriptingEnumeration.name property
 
-The name of the enumeration
+The name of the enumeration. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

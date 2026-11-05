@@ -4,10 +4,10 @@
 
 ## MediaItem.height property
 
-The height of the media item in pixels
+The height of the media item in pixels. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-height: number
+readonly height: Integer | null;
 ```

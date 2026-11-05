@@ -4,14 +4,19 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Account {
-    id: string;
-    name: string;
-    upgraded: boolean;
+    readonly id: string | null;
+    readonly name: string;
+    readonly upgraded: boolean | null;
 }
 
 // @public
@@ -20,11 +25,11 @@ export type AccountCreateInput = Record<string, never>;
 // @public
 export class AccountResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<Account>;
-    list(): Promise<Page<Account>>;
+    get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Account>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Account>>;
 }
 
-// @public (undocumented)
+// @public
 export const AccountSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -32,15 +37,15 @@ export const AccountSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type AccountUpdateInput = Partial<AccountCreateInput>;
+export type AccountUpdateInput = Record<string, never>;
 
 // @public
 export interface Attachment {
-    contentIdentifier?: string;
-    creationDate: Date;
-    id: string;
-    modificationDate: Date;
-    name: string;
+    readonly contentIdentifier?: string | null;
+    readonly creationDate: Date | null;
+    readonly id: string;
+    readonly modificationDate: Date | null;
+    readonly name: string | null;
 }
 
 // @public
@@ -49,14 +54,14 @@ export type AttachmentCreateInput = Record<string, never>;
 // @public
 export class AttachmentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Attachment>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Attachment>;
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<Page<Attachment>>;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Attachment>>;
 }
 
-// @public (undocumented)
+// @public
 export const AttachmentSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -66,7 +71,7 @@ export const AttachmentSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type AttachmentUpdateInput = Partial<AttachmentCreateInput>;
+export type AttachmentUpdateInput = Record<string, never>;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -89,9 +94,9 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Folder {
-    id: string;
+    readonly id: string | null;
     name: string;
-    shared: boolean;
+    readonly shared: boolean | null;
 }
 
 // @public
@@ -102,11 +107,11 @@ export interface FolderCreateInput {
 // @public
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<Folder>;
-    list(): Promise<Page<Folder>>;
+    get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Folder>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Folder>>;
 }
 
-// @public (undocumented)
+// @public
 export const FolderSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -114,24 +119,30 @@ export const FolderSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type FolderUpdateInput = Partial<FolderCreateInput>;
+export interface FolderUpdateInput {
+    name?: string;
+}
 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface Note {
-    body: string;
-    creationDate: Date;
-    id: string;
-    modificationDate: Date;
+    body: string | null;
+    readonly creationDate: Date;
+    readonly id: string;
+    readonly modificationDate: Date;
     name: string;
-    passwordProtected: boolean;
-    plaintext: string;
-    shared: boolean;
+    readonly passwordProtected: boolean;
+    readonly plaintext: string | null;
+    readonly shared: boolean;
 }
 
 // @public
@@ -143,13 +154,13 @@ export interface NoteCreateInput {
 // @public
 export class NoteResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: NoteCreateInput): Promise<Note>;
-    get(name: string): Promise<Note>;
-    list(): Promise<Page<Note>>;
-    show(name: string): Promise<void>;
+    create(input: NoteCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Note>;
+    get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Note>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Note>>;
+    show(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export const NoteSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
@@ -160,6 +171,10 @@ export const NoteSchema: z.ZodObject<{
     shared: z.ZodBoolean;
     passwordProtected: z.ZodBoolean;
 }, z.core.$strip>;
+
+// @public
+export interface NotesClient extends ClientBrand<NotesResources> {
+}
 
 // @public
 export class NotesClient {
@@ -185,7 +200,34 @@ export class NotesError extends Error {
 }
 
 // @public
-export type NoteUpdateInput = Partial<NoteCreateInput>;
+export type NotesResources = Readonly<{
+    Account: ResourceDescriptor<Account, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'notes.accounts.get';
+        readonly list: 'notes.accounts.list';
+    };
+    Folder: ResourceDescriptor<Folder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'notes.folders.get';
+        readonly list: 'notes.folders.list';
+    };
+    Note: ResourceDescriptor<Note, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'notes.notes.get';
+        readonly list: 'notes.notes.list';
+    };
+    Attachment: ResourceDescriptor<Attachment, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'notes.attachments.get';
+        readonly list: 'notes.attachments.list';
+    };
+}>;
+
+// @public
+export interface NoteUpdateInput {
+    body?: string;
+    name?: string;
+}
 
 // (No @packageDocumentation comment for this package)
 

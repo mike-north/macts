@@ -4,10 +4,10 @@
 
 ## Task.completed property
 
-True if the task is completed
+True if the task is completed. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-completed: boolean
+readonly completed: boolean | null;
 ```

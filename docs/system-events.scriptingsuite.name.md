@@ -4,10 +4,10 @@
 
 ## ScriptingSuite.name property
 
-The name of the suite
+The name of the suite. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

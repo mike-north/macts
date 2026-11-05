@@ -4,10 +4,10 @@
 
 ## Rule.replyText property
 
-If rule matches, reply to message and prepend with this text. Set to empty string to disable this action
+If rule matches, reply to message and prepend with this text. Set to empty string to disable this action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-replyText: string
+replyText: string | null
 ```

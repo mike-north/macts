@@ -4,10 +4,10 @@
 
 ## Track.comment property
 
-freeform notes about the track
+freeform notes about the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-comment: string
+comment: string | null
 ```

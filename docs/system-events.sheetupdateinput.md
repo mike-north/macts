@@ -4,12 +4,10 @@
 
 ## SheetUpdateInput type
 
-Input for updating a Sheet
+Input for updating a Sheet. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SheetUpdateInput = Partial<SheetCreateInput>
+type SheetUpdateInput = Record<string, never>
 ```
-
-**References:** [SheetCreateInput](./system-events.sheetcreateinput.md)

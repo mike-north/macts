@@ -4,7 +4,7 @@
 
 ## PageSetupCreateInput interface
 
-Input for creating a PageSetup
+Input for creating a PageSetup.
 
 **Signature:**
 

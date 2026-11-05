@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(id)](./omniplan.projectresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./omniplan.projectresourceclient.get.md)
 
 </td><td>
 
@@ -68,13 +68,13 @@ Get a project by id.
 </td></tr>
 <tr><td>
 
-[list()](./omniplan.projectresourceclient.list.md)
+[list(\_\_mactsOptions)](./omniplan.projectresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all projects.
+List all projects, as one page.
 
 </td></tr>
 </tbody></table>

@@ -24,14 +24,24 @@ export class DomainResourceClient {
   /**
    * List all domains, as one page.
    */
-  async list(): Promise<Page<Domain>> {
-    return this.#http.rpc<Page<Domain>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Domain>> {
+    return this.#http.invoke<Page<Domain>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'Domain'
+    )
   }
 
   /**
    * Get a domain by id.
    */
-  async get(id: string): Promise<Domain> {
-    return this.#http.rpc<Domain>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Domain> {
+    return this.#http.invoke<Domain>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Domain'
+    )
   }
 }

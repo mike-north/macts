@@ -122,7 +122,7 @@ let dir = ''
 /** The contract entry, `dist/contract/index.js`, as a file URL. */
 let contractUrl = ''
 /** Every chunk the contract entry imports dynamically, as file URLs. */
-let dynamicChunks: string[] = []
+const dynamicChunks: string[] = []
 /** Every compiled module that carries manifest data, as file URLs. */
 const manifestCarriers: string[] = []
 let trace: LoadTrace
@@ -166,10 +166,21 @@ beforeAll(async () => {
 
   const dist = join(dir, 'dist')
   contractUrl = pathToFileURL(join(dist, 'contract', 'index.js')).href
-  const contractCode = await readFile(join(dist, 'contract', 'index.js'), 'utf-8')
-  dynamicChunks = [...contractCode.matchAll(/\bimport\(\s*["']([^"']+)["']\s*\)/g)].map(
-    (match) => new URL(match[1] ?? '', contractUrl).href
-  )
+  // The root facade and /contract entry share a static chunk. Follow that
+  // closure before finding the lazy manifest edge; entry wrappers may re-export.
+  const staticModules = [contractUrl]
+  for (const url of staticModules) {
+    const code = await readFile(new URL(url), 'utf8')
+    dynamicChunks.push(
+      ...[...code.matchAll(/\bimport\(\s*["']([^"']+)["']\s*\)/g)].map(
+        (match) => new URL(match[1] ?? '', url).href
+      )
+    )
+    for (const match of code.matchAll(/\bfrom\s*["'](\.[^"']+)["']/g)) {
+      const child = new URL(match[1] ?? '', url).href
+      if (!staticModules.includes(child)) staticModules.push(child)
+    }
+  }
   const scripts = (await readdir(dist, { recursive: true })).filter((path) => path.endsWith('.js'))
   for (const path of scripts) {
     if ((await readFile(join(dist, path), 'utf-8')).includes(MANIFEST_MARKER)) {

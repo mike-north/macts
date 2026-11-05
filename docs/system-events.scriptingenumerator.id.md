@@ -4,10 +4,10 @@
 
 ## ScriptingEnumerator.id property
 
-The unique identifier of the enumerator
+The unique identifier of the enumerator. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

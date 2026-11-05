@@ -4,10 +4,10 @@
 
 ## PageSetup.topMargin property
 
-The top margin in points
+The top margin in points. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-topMargin: number
+topMargin: number | null
 ```

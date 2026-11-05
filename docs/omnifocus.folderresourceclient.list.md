@@ -4,14 +4,44 @@
 
 ## FolderResourceClient.list() method
 
-List all folders.
+List all folders, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Folder[]>;
+list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Folder>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Folder](./omnifocus.folder.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Folder](./omnifocus.folder.md)<!-- -->&gt;&gt;

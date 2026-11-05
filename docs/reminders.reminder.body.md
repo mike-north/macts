@@ -4,10 +4,10 @@
 
 ## Reminder.body property
 
-The notes attached to the reminder
+The notes attached to the reminder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-body: string
+body: string | null
 ```

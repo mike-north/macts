@@ -4,10 +4,10 @@
 
 ## Person.organization property
 
-Organization that employs this person.
+Organization that employs this person. Nullable. Observed missing in 17 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-organization: string
+organization: string | null
 ```

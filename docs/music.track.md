@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the album name of the track
+the album name of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ the album name of the track
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the album artist of the track
+the album artist of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ the album artist of the track
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-is the album for this track disliked?
+is the album for this track disliked? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ is the album for this track disliked?
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-is the album for this track favorited?
+is the album for this track favorited? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +99,11 @@ is the album for this track favorited?
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the rating of the album for this track (0 to 100)
+the rating of the album for this track (0 to 100). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,13 +112,15 @@ the rating of the album for this track (0 to 100)
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the rating kind of the album rating for this track
+string \| null
+
+</td><td>
+
+the rating kind of the album rating for this track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +131,11 @@ the rating kind of the album rating for this track
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the artist/source of the track
+the artist/source of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +144,15 @@ the artist/source of the track
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the bit rate of the track (in kbps)
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the bit rate of the track (in kbps). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +163,11 @@ the bit rate of the track (in kbps)
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-the bookmark time of the track in seconds
+the bookmark time of the track in seconds. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -174,11 +178,11 @@ the bookmark time of the track in seconds
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-is the playback position for this track remembered?
+is the playback position for this track remembered? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -189,11 +193,11 @@ is the playback position for this track remembered?
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the tempo of this track in beats per minute
+the tempo of this track in beats per minute. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -204,11 +208,11 @@ the tempo of this track in beats per minute
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the category of the track
+the category of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -217,13 +221,15 @@ the category of the track
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the iCloud status of the track
+string \| null
+
+</td><td>
+
+the iCloud status of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -234,11 +240,11 @@ the iCloud status of the track
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-freeform notes about the track
+freeform notes about the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -249,11 +255,11 @@ freeform notes about the track
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-is this track from a compilation album?
+is this track from a compilation album? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -264,11 +270,11 @@ is this track from a compilation album?
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the composer of the track
+the composer of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -277,13 +283,15 @@ the composer of the track
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the common, unique ID for this track. If two tracks in different playlists have the same database ID, they are sharing the same data.
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the common, unique ID for this track. If two tracks in different playlists have the same database ID, they are sharing the same data. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -292,13 +300,15 @@ the common, unique ID for this track. If two tracks in different playlists have 
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-the date the track was added to the playlist
+Date \| null
+
+</td><td>
+
+the date the track was added to the playlist. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -309,11 +319,11 @@ the date the track was added to the playlist
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the description of the track
+the description of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -324,11 +334,11 @@ the description of the track
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the total number of discs in the source album
+the total number of discs in the source album. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -339,11 +349,11 @@ the total number of discs in the source album
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the index of the disc containing this track on the source album
+the index of the disc containing this track on the source album. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -354,11 +364,11 @@ the index of the disc containing this track on the source album
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-is this track disliked?
+is this track disliked? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -367,13 +377,15 @@ is this track disliked?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the account of the person who downloaded this track
+string \| null
+
+</td><td>
+
+the account of the person who downloaded this track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -382,13 +394,15 @@ the account of the person who downloaded this track
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the name of the person who downloaded this track
+string \| null
+
+</td><td>
+
+the name of the person who downloaded this track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -397,13 +411,15 @@ the name of the person who downloaded this track
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the length of the track in seconds
+number \| null
+
+</td><td>
+
+the length of the track in seconds. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -414,11 +430,11 @@ the length of the track in seconds
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-is this track checked for playback?
+is this track checked for playback? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -429,11 +445,11 @@ is this track checked for playback?
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the episode ID of the track
+the episode ID of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -444,11 +460,11 @@ the episode ID of the track
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the episode number of the track
+the episode number of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -459,11 +475,11 @@ the episode number of the track
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the name of the EQ preset of the track
+the name of the EQ preset of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -474,11 +490,11 @@ the name of the EQ preset of the track
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-is this track favorited?
+is this track favorited? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -489,11 +505,11 @@ is this track favorited?
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-the stop time of the track in seconds
+the stop time of the track in seconds. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -504,11 +520,11 @@ the stop time of the track in seconds
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-is this track from a gapless album?
+is this track from a gapless album? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -519,11 +535,11 @@ is this track from a gapless album?
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the music/audio genre (category) of the track
+the music/audio genre (category) of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -534,11 +550,45 @@ the music/audio genre (category) of the track
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the grouping (piece) of the track. Generally used to denote movements within a classical work.
+the grouping (piece) of the track. Generally used to denote movements within a classical work. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[id](./music.track.id.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the id of the item. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[index](./music.track.index.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the index of the item in internal application order. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -547,13 +597,15 @@ the grouping (piece) of the track. Generally used to denote movements within a c
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-a text description of the track
+string \| null
+
+</td><td>
+
+a text description of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -564,11 +616,11 @@ a text description of the track
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the long description of the track
+the long description of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -579,11 +631,11 @@ the long description of the track
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the lyrics of the track
+the lyrics of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -594,11 +646,11 @@ the lyrics of the track
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the media kind of the track
+the media kind of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -607,13 +659,15 @@ the media kind of the track
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-the modification date of the content of this track
+Date \| null
+
+</td><td>
+
+the modification date of the content of this track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -624,11 +678,11 @@ the modification date of the content of this track
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the movement name of the track
+the movement name of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -639,11 +693,11 @@ the movement name of the track
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the total number of movements in the work
+the total number of movements in the work. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -654,11 +708,43 @@ the total number of movements in the work
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the index of the movement in the work
+the index of the movement in the work. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[name](./music.track.name.md)
+
+</td><td>
+
+</td><td>
+
+string \| null
+
+</td><td>
+
+the name of the item. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[persistentID](./music.track.persistentid.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+string
+
+</td><td>
+
+the id of the item as a hexadecimal string. This id does not change over time. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -669,11 +755,11 @@ the index of the movement in the work
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-number of times this track has been played
+number of times this track has been played. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -684,11 +770,11 @@ number of times this track has been played
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-the date and time this track was last played
+the date and time this track was last played. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -697,13 +783,15 @@ the date and time this track was last played
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the account of the person who purchased this track
+string \| null
+
+</td><td>
+
+the account of the person who purchased this track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -712,13 +800,15 @@ the account of the person who purchased this track
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the name of the person who purchased this track
+string \| null
+
+</td><td>
+
+the name of the person who purchased this track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -729,11 +819,11 @@ the name of the person who purchased this track
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the rating of this track (0 to 100)
+the rating of this track (0 to 100). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -742,13 +832,15 @@ the rating of this track (0 to 100)
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the rating kind of this track
+string \| null
+
+</td><td>
+
+the rating kind of this track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -757,13 +849,15 @@ the rating kind of this track
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-the release date of this track
+Date \| null
+
+</td><td>
+
+the release date of this track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -772,13 +866,15 @@ the release date of this track
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the sample rate of the track (in Hz)
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the sample rate of the track (in Hz). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -789,11 +885,11 @@ the sample rate of the track (in Hz)
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the season number of the track
+the season number of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -804,11 +900,11 @@ the season number of the track
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the show name of the track
+the show name of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -819,11 +915,11 @@ the show name of the track
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-is this track included when shuffling?
+is this track included when shuffling? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -832,13 +928,15 @@ is this track included when shuffling?
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the size of the track (in bytes)
+number \| null
+
+</td><td>
+
+the size of the track (in bytes). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -849,11 +947,11 @@ the size of the track (in bytes)
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-number of times this track has been skipped
+number of times this track has been skipped. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -864,11 +962,11 @@ number of times this track has been skipped
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-the date and time this track was last skipped
+the date and time this track was last skipped. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -879,11 +977,11 @@ the date and time this track was last skipped
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-override string to use for the track when sorting by album
+override string to use for the track when sorting by album. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -894,11 +992,11 @@ override string to use for the track when sorting by album
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-override string to use for the track when sorting by album artist
+override string to use for the track when sorting by album artist. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -909,11 +1007,11 @@ override string to use for the track when sorting by album artist
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-override string to use for the track when sorting by artist
+override string to use for the track when sorting by artist. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -924,11 +1022,11 @@ override string to use for the track when sorting by artist
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-override string to use for the track when sorting by composer
+override string to use for the track when sorting by composer. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -939,11 +1037,11 @@ override string to use for the track when sorting by composer
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-override string to use for the track when sorting by name
+override string to use for the track when sorting by name. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -954,11 +1052,11 @@ override string to use for the track when sorting by name
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-override string to use for the track when sorting by show name
+override string to use for the track when sorting by show name. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -969,11 +1067,11 @@ override string to use for the track when sorting by show name
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-the start time of the track in seconds
+the start time of the track in seconds. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -982,13 +1080,15 @@ the start time of the track in seconds
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the length of the track in MM:SS format
+string \| null
+
+</td><td>
+
+the length of the track in MM:SS format. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -999,11 +1099,11 @@ the length of the track in MM:SS format
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the total number of tracks on the source album
+the total number of tracks on the source album. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -1014,11 +1114,11 @@ the total number of tracks on the source album
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the index of the track on the source album
+the index of the track on the source album. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -1029,11 +1129,11 @@ the index of the track on the source album
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-is this track unplayed?
+is this track unplayed? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -1044,11 +1144,11 @@ is this track unplayed?
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-relative volume adjustment of the track (-100% to 100%)
+relative volume adjustment of the track (-100% to 100%). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -1059,11 +1159,11 @@ relative volume adjustment of the track (-100% to 100%)
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the work name of the track
+the work name of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -1074,11 +1174,11 @@ the work name of the track
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the year the track was recorded/released
+the year the track was recorded/released. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

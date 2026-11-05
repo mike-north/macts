@@ -4,10 +4,10 @@
 
 ## Message.wasRedirected property
 
-Indicates whether the message was redirected or not
+Indicates whether the message was redirected or not. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-wasRedirected: boolean
+readonly wasRedirected: boolean | null;
 ```

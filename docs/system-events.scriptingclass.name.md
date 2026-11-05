@@ -4,10 +4,10 @@
 
 ## ScriptingClass.name property
 
-The name of the class
+The name of the class. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

@@ -4,7 +4,7 @@
 
 ## ResolvedBuildSettingCreateInput interface
 
-Input for creating a ResolvedBuildSetting
+Input for creating a ResolvedBuildSetting.
 
 **Signature:**
 

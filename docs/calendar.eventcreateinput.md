@@ -4,7 +4,7 @@
 
 ## EventCreateInput interface
 
-Input for creating a Event
+Input for creating an Event.
 
 **Signature:**
 
@@ -99,11 +99,11 @@ Event end date
 
 </td><td>
 
-Date\[\]
+readonly Date\[\]
 
 </td><td>
 
-_(Optional)_ The exception dates for recurring events
+_(Optional)_ Exception dates for recurring events
 
 </td></tr>
 <tr><td>
@@ -133,7 +133,7 @@ string
 
 </td><td>
 
-_(Optional)_ The iCalendar (RFC 2445) string describing the event recurrence, if defined
+_(Optional)_ The iCalendar (RFC 2445) recurrence string
 
 </td></tr>
 <tr><td>
@@ -148,7 +148,7 @@ Date
 
 </td><td>
 
-_(Optional)_ The event modification date
+_(Optional)_ Event modification date
 
 </td></tr>
 <tr><td>
@@ -178,7 +178,7 @@ Event start date
 
 </td><td>
 
-_(Optional)_ The event status
+_(Optional)_ Event status
 
 </td></tr>
 <tr><td>
@@ -208,7 +208,7 @@ string
 
 </td><td>
 
-_(Optional)_ The URL associated with the event
+_(Optional)_ URL associated with the event
 
 </td></tr>
 </tbody></table>

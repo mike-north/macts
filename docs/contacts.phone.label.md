@@ -4,7 +4,7 @@
 
 ## Phone.label property
 
-Label for this phone
+Label for this phone. Never null: observed in all 48 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 

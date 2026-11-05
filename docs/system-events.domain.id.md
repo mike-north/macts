@@ -4,10 +4,10 @@
 
 ## Domain.id property
 
-the unique identifier of the domain
+the unique identifier of the domain. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

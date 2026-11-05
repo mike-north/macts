@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/safari](./safari.md) &gt; [TabUpdateInput](./safari.tabupdateinput.md)
 
-## TabUpdateInput type
+## TabUpdateInput interface
 
-Input for updating a Tab
+Input for updating a Tab. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type TabUpdateInput = Partial<TabCreateInput>
+interface TabUpdateInput
 ```
 
-**References:** [TabCreateInput](./safari.tabcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[url?](./safari.tabupdateinput.url.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The tab URL. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

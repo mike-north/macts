@@ -4,12 +4,10 @@
 
 ## VisualUpdateInput type
 
-Input for updating a Visual
+Input for updating a Visual. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type VisualUpdateInput = Partial<VisualCreateInput>
+type VisualUpdateInput = Record<string, never>
 ```
-
-**References:** [VisualCreateInput](./music.visualcreateinput.md)

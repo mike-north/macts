@@ -4,7 +4,7 @@
 
 ## AddressCreateInput interface
 
-Input for creating a Address
+Input for creating an Address.
 
 **Signature:**
 

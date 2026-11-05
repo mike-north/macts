@@ -4,10 +4,10 @@
 
 ## Canvas.adjustsPages property
 
-Adjust number of pages on the canvas automatically?
+Adjust number of pages on the canvas automatically? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-adjustsPages: boolean
+adjustsPages: boolean | null
 ```

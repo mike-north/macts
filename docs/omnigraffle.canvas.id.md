@@ -4,7 +4,7 @@
 
 ## Canvas.id property
 
-Unique identifier
+Unique identifier. Never null: the primary identifier.
 
 **Signature:**
 

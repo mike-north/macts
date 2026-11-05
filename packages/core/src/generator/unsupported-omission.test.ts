@@ -150,10 +150,8 @@ describe('a fixture with properties marked unsupported', () => {
   })
 
   it('leaves them out of the legacy SDK types and schemas', () => {
-    // The read type adds the canonical `id` alias for a resource with an
-    // identifier; Tag has none.
+    // The root read type re-exports the contract; only raw schemas retain the legacy id alias.
     expect(fieldsOf(lists, 'SDK interface Note', 'Note')).toEqual([
-      'id',
       'uid',
       'title',
       'priority',

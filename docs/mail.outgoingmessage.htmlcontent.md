@@ -4,10 +4,10 @@
 
 ## OutgoingMessage.htmlContent property
 
-Does nothing at all (deprecated)
+Does nothing at all (deprecated). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-htmlContent: string
+htmlContent: string | null
 ```

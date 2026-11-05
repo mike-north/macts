@@ -4,10 +4,10 @@
 
 ## Message.allHeaders property
 
-All the headers of the message
+All the headers of the message. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-allHeaders: string
+readonly allHeaders: string | null;
 ```

@@ -9,7 +9,7 @@ Invoke the "clean" scheme action
 **Signature:**
 
 ```typescript
-clean(workspaceName: string): Promise<void>;
+clean(workspaceName: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ workspaceName
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-All the headers of the message
+string \| null
+
+</td><td>
+
+All the headers of the message. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,26 +56,11 @@ All the headers of the message
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The background color of the message
-
-</td></tr>
-<tr><td>
-
-[content](./mail.message.content.md)
-
-</td><td>
-
-</td><td>
-
-unknown
-
-</td><td>
-
-Contents of an email message
+The background color of the message. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +69,15 @@ Contents of an email message
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-The date a message was received
+Date \| null
+
+</td><td>
+
+The date a message was received. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +86,15 @@ The date a message was received
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-The date a message was sent
+Date \| null
+
+</td><td>
+
+The date a message was sent. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +105,11 @@ The date a message was sent
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Indicates whether the message is deleted or not
+Indicates whether the message is deleted or not. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +120,11 @@ Indicates whether the message is deleted or not
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Indicates whether the message is flagged or not
+Indicates whether the message is flagged or not. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +135,11 @@ Indicates whether the message is flagged or not
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The flag on the message, or -1 if the message is not flagged
+The flag on the message, or -1 if the message is not flagged. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +148,15 @@ The flag on the message, or -1 if the message is not flagged
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The unique identifier of the message.
+[Integer](./contracts.integer.md)
+
+</td><td>
+
+The unique identifier of the message. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -174,26 +167,11 @@ The unique identifier of the message.
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Indicates whether the message has been marked junk or evaluated to be junk by the junk mail filter.
-
-</td></tr>
-<tr><td>
-
-[mailbox](./mail.message.mailbox.md)
-
-</td><td>
-
-</td><td>
-
-[Mailbox](./mail.mailbox.md)
-
-</td><td>
-
-The mailbox in which this message is filed
+Indicates whether the message has been marked junk or evaluated to be junk by the junk mail filter. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -202,13 +180,15 @@ The mailbox in which this message is filed
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The unique message ID string
+string \| null
+
+</td><td>
+
+The unique message ID string. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -217,13 +197,15 @@ The unique message ID string
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The size (in bytes) of a message
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The size (in bytes) of a message. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -234,11 +216,11 @@ The size (in bytes) of a message
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Indicates whether the message is read or not
+Indicates whether the message is read or not. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -247,13 +229,15 @@ Indicates whether the message is read or not
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The address that replies should be sent to
+string \| null
+
+</td><td>
+
+The address that replies should be sent to. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -262,13 +246,15 @@ The address that replies should be sent to
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The sender of the message
+string \| null
+
+</td><td>
+
+The sender of the message. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -277,13 +263,15 @@ The sender of the message
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-Raw source of the message
+string \| null
+
+</td><td>
+
+Raw source of the message. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -292,13 +280,15 @@ Raw source of the message
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The subject of the message
+string \| null
+
+</td><td>
+
+The subject of the message. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -307,13 +297,15 @@ The subject of the message
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Indicates whether the message was forwarded or not
+boolean \| null
+
+</td><td>
+
+Indicates whether the message was forwarded or not. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -322,13 +314,15 @@ Indicates whether the message was forwarded or not
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Indicates whether the message was redirected or not
+boolean \| null
+
+</td><td>
+
+Indicates whether the message was redirected or not. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -337,13 +331,15 @@ Indicates whether the message was redirected or not
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Indicates whether the message was replied to or not
+boolean \| null
+
+</td><td>
+
+Indicates whether the message was replied to or not. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

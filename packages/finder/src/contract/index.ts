@@ -643,9 +643,9 @@ export interface ColumnUpdateInput {
 
 /**
  * The Finder client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link finderContract}. Its type carries the contract's resource
- * table, {@link FinderResources}, so references can be bound to it by resource; the brand has no
- * runtime member.
+ * client factory creates one from `finderContract` in the app's `/contract` entry. Its type carries
+ * the contract's resource table, {@link FinderResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
 export interface FinderClient extends ClientBrand<FinderResources> {
   /**
@@ -792,7 +792,7 @@ export interface FinderClient extends ClientBrand<FinderResources> {
 }
 
 /**
- * The type of the resource table of {@link finderContract}: every resource a
+ * The type of the resource table in `finderContract` (the app's `/contract` entry): every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
  * references to it, and, for each of those operations that finds the

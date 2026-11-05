@@ -4,7 +4,7 @@
 
 ## Calendar.name property
 
-The calendar title
+The calendar title. Never null: the primary identifier.
 
 **Signature:**
 

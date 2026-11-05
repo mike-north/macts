@@ -4,10 +4,10 @@
 
 ## AutomatorAction.targetApplication property
 
-The application with which the action communicates
+The application with which the action communicates. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-targetApplication: string[];
+readonly targetApplication: readonly string[] | null;
 ```

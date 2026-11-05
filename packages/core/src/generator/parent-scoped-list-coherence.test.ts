@@ -31,8 +31,14 @@
  * @see ./cli/commands.ts (generateListCommand — CLI list args/options)
  */
 
+import { runInThisContext } from 'node:vm'
+import * as clipanion from 'clipanion'
+import * as contracts from '@macts/contracts'
+import * as ts from 'typescript'
 import { describe, it, expect } from 'vitest'
+import { generateContract } from './contract/index.js'
 import type { AppManifest } from '../manifest/index.js'
+import { positionalOperationSource } from './sdk/test-support/operation-source.js'
 import { generateHttpClientSdk } from './sdk/http-client.js'
 import { generateCliPlugin } from './cli/index.js'
 import { generateResourceOperationSchema } from '../capabilities/operation-schema.js'
@@ -49,7 +55,7 @@ function fileContent(files: { path: string; content: string }[], path: string): 
       `Expected generated file "${path}". Got: ${files.map((f) => f.path).join(', ')}`
     )
   }
-  return file.content
+  return positionalOperationSource(file.content)
 }
 
 /**
@@ -214,6 +220,60 @@ describe('parent-scoped list: Tab.list(windowId) coherence across surfaces', () 
   })
 })
 
+/**
+ * The fixture with the parent-scope param declared `integer`, as iTerm's
+ * window ids are. An integer input travels in the wire form of `Integer` from
+ * `@macts/contracts`, `{ integer: "<decimal>" }`, as the page size already
+ * does; a bare JSON number or string fails the operation's input validation.
+ */
+const integerScoped: AppManifest = {
+  ...manifest,
+  commands: {
+    ...manifest.commands,
+    listTabs: {
+      name: 'list',
+      description: 'List all tabs in a window',
+      scope: 'resource',
+      resourceType: 'Tab',
+      parameters: [
+        {
+          name: PARENT_SCOPE_PARAM,
+          type: 'integer',
+          description: 'Window identifier',
+          required: true,
+        },
+      ],
+      permission: 'browser:tabs:list',
+    },
+  },
+}
+
+describe('parent-scoped list by an integer param: Tab.list(windowId: number)', () => {
+  const integerSdk = generateHttpClientSdk(integerScoped, { packageName: '@macts/test-browser' })
+  const integerCli = generateCliPlugin(integerScoped, {
+    packageName: '@macts/test-browser',
+    sdkPackageName: '@macts/test-browser',
+  })
+
+  it('SDK list() takes a number and sends it in the integer wire form', () => {
+    const tabClient = fileContent(integerSdk.files, 'src/resources/tab.ts')
+    expect(tabClient).toContain(
+      `async list(${PARENT_SCOPE_PARAM}: number, page: { pageSize?: number; cursor?: string } = {}): Promise<Page<Tab>>`
+    )
+    expect(tabClient).toContain(
+      `, ${PARENT_SCOPE_PARAM}: __mactsIntegerInput(${PARENT_SCOPE_PARAM}) }`
+    )
+  })
+
+  it('CLI list command validates the --window-id text before exact numeric conversion', () => {
+    const cliList = fileContent(integerCli.files, 'src/commands/windows/tabs/list.ts')
+    expect(cliList).toContain(`Option.String('--window-id'`)
+    expect(cliList).toContain(
+      `client.tabs.list(__mactsParseIntegerOption(this.${PARENT_SCOPE_PARAM}), {`
+    )
+  })
+})
+
 describe('non-parent-scoped list: Window.list() takes no argument (negative)', () => {
   it('SDK list() signature takes only the page', () => {
     const windowClient = fileContent(sdk.files, 'src/resources/window.ts')
@@ -240,5 +300,169 @@ describe('non-parent-scoped list: Window.list() takes no argument (negative)', (
     const cliList = fileContent(cli.files, 'src/commands/windows/bookmarks/list.ts')
     expect(cliList).toContain('client.bookmarks.list({ ...(this.pageSize')
     expect(cliList).not.toContain('client.bookmarks.list(this.')
+  })
+})
+
+/**
+ * Execute trusted generated modules in the current realm, so the real contract
+ * library sees ordinary records. Only CLI acquisition and formatting are stubbed;
+ * Clipanion, the SDK body builder, and the operation descriptor are real.
+ */
+function evaluateListModule(
+  source: string,
+  dependencies: Readonly<Record<string, unknown>> = {}
+): Record<string, unknown> {
+  const exports: Record<string, unknown> = {}
+  const javascript = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+  }).outputText
+  const requireDependency = (name: string): unknown => {
+    if (name === '@macts/contracts') return contracts
+    if (name === 'clipanion') return clipanion
+    if (name in dependencies) return dependencies[name]
+    throw new Error(`Unexpected generated dependency ${name}`)
+  }
+  const execute = runInThisContext(`(function(require, exports) { ${javascript}\n})`) as (
+    require: typeof requireDependency,
+    exports: Record<string, unknown>
+  ) => void
+  execute(requireDependency, exports)
+  return exports
+}
+
+/** Numeric legacy SDK contract: CLI spellings must be checked before conversion. */
+interface IListClient {
+  list(windowId: number, page?: { pageSize?: number }): Promise<{ items: readonly unknown[] }>
+}
+
+/** Runtime inputs and outcome of the generated fixture's real CLI command. */
+interface IListCommand {
+  windowId: string
+  pageSize: string | undefined
+  cursor: string | undefined
+  json: boolean
+  context: { stdout: { write: (text: string) => void }; stderr: { write: (text: string) => void } }
+  execute(): Promise<number>
+}
+
+/** Build a fresh end-to-end list boundary with observable transport and errors. */
+function integerListBoundary(): {
+  command: IListCommand
+  client: IListClient
+  sent: unknown[]
+  errors: string[]
+  wire: { safeParse: (body: unknown) => { success: boolean } }
+} {
+  const sdkOutput = generateHttpClientSdk(integerScoped, { packageName: '@macts/test-browser' })
+  const cliOutput = generateCliPlugin(integerScoped, {
+    packageName: '@macts/test-browser',
+    sdkPackageName: '@macts/test-browser',
+  })
+  // The dynamic compilation boundary describes the known fixture exports only;
+  // production inputs are never cast to bypass either CLI or SDK validation.
+  const Client = evaluateListModule(fileContent(sdkOutput.files, 'src/resources/tab.ts'))[
+    'TabResourceClient'
+  ] as new (
+    http: { invoke: (operation: string, body: unknown) => Promise<{ items: readonly unknown[] }> },
+    app: string,
+    resource: string
+  ) => IListClient
+  const sent: unknown[] = []
+  const client = new Client(
+    {
+      invoke: (operation, body) => {
+        expect(operation).toBe('test-browser.tabs.listTabs')
+        sent.push(body)
+        return Promise.resolve({ items: [] })
+      },
+    },
+    'test-browser',
+    'tabs'
+  )
+  const Command = evaluateListModule(
+    fileContent(cliOutput.files, 'src/commands/windows/tabs/list.ts'),
+    {
+      '../../../sdk.js': { getClient: () => ({ tabs: client }) },
+      '../../../output/index.js': {
+        createFormatter: () => ({
+          formatPage: () => '',
+          formatError: (message: string) => message,
+        }),
+      },
+    }
+  )['ListTabsCommand'] as new () => IListCommand
+  const command = new Command()
+  const errors: string[] = []
+  command.windowId = '42'
+  command.pageSize = undefined
+  command.cursor = undefined
+  command.json = true
+  command.context = {
+    stdout: { write: () => undefined },
+    stderr: {
+      write: (text) => {
+        errors.push(text)
+      },
+    },
+  }
+  const contract = evaluateListModule(
+    fileContent(generateContract(integerScoped).files, 'src/contract/index.ts')
+  )['testBrowserContract'] as {
+    operations: Record<
+      string,
+      { input: { wire: { safeParse: (body: unknown) => { success: boolean } } } }
+    >
+  }
+  const descriptor = contract.operations['test-browser.tabs.listTabs']
+  if (descriptor === undefined) throw new Error('Missing fixture list descriptor')
+  return { command, client, sent, errors, wire: descriptor.input.wire }
+}
+
+/** D3 requires canonical text before any numeric conversion; D10 forbids rounding. */
+describe('CLI required-list and page integer validation before conversion', () => {
+  const invalid = [
+    '9007199254740991.1',
+    '-9007199254740991.1',
+    '9007199254740992',
+    '0x10',
+    ' 7',
+    '07',
+    '1e2',
+    '-0',
+    '7.5',
+    '',
+  ]
+  it.each(invalid)('rejects raw required-list integer %j without dispatch', async (text) => {
+    const { command, sent, errors } = integerListBoundary()
+    command.windowId = text
+    expect(await command.execute()).toBe(1)
+    expect(sent).toEqual([])
+    expect(errors.join('')).toMatch(/integer/i)
+  })
+  it.each(invalid)('rejects raw page size %j without dispatch', async (text) => {
+    const { command, sent, errors } = integerListBoundary()
+    command.pageSize = text
+    expect(await command.execute()).toBe(1)
+    expect(sent).toEqual([])
+    expect(errors.join('')).toMatch(/integer/i)
+  })
+  it.each(['-9007199254740991', '9007199254740991', '0'])(
+    'preserves valid required-list boundary %j',
+    async (text) => {
+      const { command, sent, wire } = integerListBoundary()
+      command.windowId = text
+      command.pageSize = '25'
+      expect(await command.execute()).toBe(0)
+      const expected = { windowId: Number(text), pageSize: 25 }
+      const expectedWire = { windowId: { integer: text }, pageSize: { integer: '25' } }
+      expect(sent).toEqual([expected])
+      expect(wire.safeParse(expectedWire).success).toBe(true)
+    }
+  )
+  it('preserves accepted numeric negative zero for direct SDK callers', async () => {
+    const { client, sent, wire } = integerListBoundary()
+    await client.list(-0)
+    expect(sent).toEqual([{ windowId: 0 }])
+    expect(wire.safeParse({ windowId: { integer: '0' } }).success).toBe(true)
   })
 })

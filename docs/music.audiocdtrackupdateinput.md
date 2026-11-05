@@ -4,12 +4,10 @@
 
 ## AudioCDTrackUpdateInput type
 
-Input for updating a AudioCDTrack
+Input for updating an AudioCDTrack. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type AudioCDTrackUpdateInput = Partial<AudioCDTrackCreateInput>
+type AudioCDTrackUpdateInput = Record<string, never>
 ```
-
-**References:** [AudioCDTrackCreateInput](./music.audiocdtrackcreateinput.md)

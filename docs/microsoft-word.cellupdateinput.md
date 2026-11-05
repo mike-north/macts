@@ -2,14 +2,93 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-word](./microsoft-word.md) &gt; [CellUpdateInput](./microsoft-word.cellupdateinput.md)
 
-## CellUpdateInput type
+## CellUpdateInput interface
 
-Input for updating a Cell
+Input for updating a Cell. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type CellUpdateInput = Partial<CellCreateInput>
+interface CellUpdateInput
 ```
 
-**References:** [CellCreateInput](./microsoft-word.cellcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[content?](./microsoft-word.cellupdateinput.content.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The text content of the cell. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[height?](./microsoft-word.cellupdateinput.height.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The height of the cell in points. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[verticalAlignment?](./microsoft-word.cellupdateinput.verticalalignment.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The vertical alignment of text in the cell. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[width?](./microsoft-word.cellupdateinput.width.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The width of the cell in points. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

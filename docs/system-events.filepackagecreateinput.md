@@ -4,7 +4,7 @@
 
 ## FilePackageCreateInput type
 
-Input for creating a FilePackage
+Input for creating a FilePackage.
 
 **Signature:**
 

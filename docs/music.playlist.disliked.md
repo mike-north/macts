@@ -4,10 +4,10 @@
 
 ## Playlist.disliked property
 
-is this playlist disliked?
+is this playlist disliked? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-disliked: boolean
+disliked: boolean | null
 ```

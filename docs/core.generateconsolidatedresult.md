@@ -46,6 +46,21 @@ Description
 </td></tr>
 <tr><td>
 
+[diagnostics?](./core.generateconsolidatedresult.diagnostics.md)
+
+</td><td>
+
+</td><td>
+
+string\[\]
+
+</td><td>
+
+_(Optional)_ Non-fatal findings, such as manifest types the contract could not resolve and describes as `unknown`<!-- -->. Present only when there are any.
+
+</td></tr>
+<tr><td>
+
 [errors](./core.generateconsolidatedresult.errors.md)
 
 </td><td>

@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-Unique identifier for this email
+Unique identifier for this email. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -58,7 +60,7 @@ string
 
 </td><td>
 
-Label for this email
+Label for this email. Never null: observed in all 32 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -73,7 +75,7 @@ string
 
 </td><td>
 
-The email address
+The email address. Never null: observed in all 32 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 </tbody></table>

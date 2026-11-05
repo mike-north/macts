@@ -19,6 +19,7 @@ import type { AppManifest, Command, CommandParameter, Resource } from '../manife
 import { itemIdentifierParameter, unselectableItemCommands } from '../manifest/item-selection.js'
 import { untargetedIdentifiers } from '../manifest/identifier-targeting.js'
 import { resolveIdentifierTargeting } from '../manifest/identifier.js'
+import { positionalProblems } from '../manifest/positional.js'
 import { resolvePrimaryIdentifier } from '../manifest/primary-identifier.js'
 import { normalizeResourceRouteSegment } from '../manifest/route.js'
 import { splitIdentifierWords } from '../manifest/lower-camel.js'
@@ -258,7 +259,9 @@ export function findResourceCreateCommand(
  *   command key;
  * - one per resource whose primary identifier declares no targeting and is
  *   not the class's dictionary id, code `ID  ` (`untargetedIdentifiers`),
- *   naming the resource and the identifier property.
+ *   naming the resource and the identifier property;
+ * - one per broken `positional` marker (`positionalProblems`), naming the
+ *   resource or command.
  *
  * Every package and SDK generator checks this before it builds any file and
  * returns these errors with no files, and `generateCapabilitiesModule` throws
@@ -271,6 +274,7 @@ export function generationRefusals(manifest: AppManifest): string[] {
   return [
     ...unselectableItemCommands(manifest).map(({ problem }) => `${refused}: ${problem}`),
     ...untargetedIdentifiers(manifest).map(({ problem }) => `${refused}: ${problem}`),
+    ...positionalProblems(manifest).map((problem) => `${refused}: ${problem}`),
   ]
 }
 

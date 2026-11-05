@@ -4,7 +4,7 @@
 
 ## RichTextCreateInput interface
 
-Input for creating a RichText
+Input for creating a RichText.
 
 **Signature:**
 
@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md)
 
 </td><td>
 

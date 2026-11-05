@@ -4,10 +4,10 @@
 
 ## AirPlayDevice.selected property
 
-is the device currently selected?
+is the device currently selected? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-selected: boolean
+selected: boolean | null
 ```

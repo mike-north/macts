@@ -4,10 +4,10 @@
 
 ## Shape.fill property
 
-The type of fill for this shape
+The type of fill for this shape. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fill: FillType
+fill: FillType | null
 ```

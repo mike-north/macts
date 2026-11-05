@@ -4,10 +4,10 @@
 
 ## Window.closeable property
 
-Whether the window has a close box.
+Whether the window has a close box. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-closeable: boolean
+readonly closeable: boolean | null;
 ```

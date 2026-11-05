@@ -4,10 +4,10 @@
 
 ## RequiredResource.resource property
 
-The specification of the required resource
+The specification of the required resource. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-resource: string
+readonly resource: string | null;
 ```

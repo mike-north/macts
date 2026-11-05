@@ -4,10 +4,10 @@
 
 ## Task.plannedDate property
 
-The date at which work for this task is intended
+The date at which work for this task is intended. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-plannedDate: Date
+plannedDate: Date | null
 ```

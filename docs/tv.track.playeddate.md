@@ -4,10 +4,10 @@
 
 ## Track.playedDate property
 
-the date and time this track was last played
+the date and time this track was last played. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-playedDate: Date
+playedDate: Date | null
 ```

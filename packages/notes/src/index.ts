@@ -21,6 +21,7 @@
 export { NotesClient, NotesError, HttpClient } from './client.js'
 export type { NotesClientOptions } from './client.js'
 export * from './types.js'
+export type { NotesResources } from './contract/index.js'
 export { AccountResourceClient } from './resources/account.js'
 export { FolderResourceClient } from './resources/folder.js'
 export { NoteResourceClient } from './resources/note.js'

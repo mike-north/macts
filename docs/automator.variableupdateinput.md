@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/automator](./automator.md) &gt; [VariableUpdateInput](./automator.variableupdateinput.md)
 
-## VariableUpdateInput type
+## VariableUpdateInput interface
 
-Input for updating a Variable
+Input for updating a Variable. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type VariableUpdateInput = Partial<VariableCreateInput>
+interface VariableUpdateInput
 ```
 
-**References:** [VariableCreateInput](./automator.variablecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[name?](./automator.variableupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of the variable. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[value?](./automator.variableupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+unknown
+
+</td><td>
+
+_(Optional)_ The value of the variable. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

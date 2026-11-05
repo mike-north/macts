@@ -4,10 +4,10 @@
 
 ## Track.cloudStatus property
 
-the iCloud status of the track
+the iCloud status of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-cloudStatus: string
+readonly cloudStatus: string | null;
 ```

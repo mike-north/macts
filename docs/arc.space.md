@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the space.
+The unique identifier of the space. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The unique identifier of the space.
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The full title of the space.
+string \| null
+
+</td><td>
+
+The full title of the space. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

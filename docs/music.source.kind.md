@@ -4,10 +4,10 @@
 
 ## Source.kind property
 
-The kind property
+The kind property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-kind: string
+readonly kind: string | null;
 ```

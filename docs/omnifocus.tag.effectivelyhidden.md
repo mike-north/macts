@@ -4,10 +4,10 @@
 
 ## Tag.effectivelyHidden property
 
-Set if the tag is currently hidden or any of its container tags are hidden
+Set if the tag is currently hidden or any of its container tags are hidden. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-effectivelyHidden: boolean
+readonly effectivelyHidden: boolean | null;
 ```

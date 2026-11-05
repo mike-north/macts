@@ -4,12 +4,10 @@
 
 ## SplitterGroupUpdateInput type
 
-Input for updating a SplitterGroup
+Input for updating a SplitterGroup. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type SplitterGroupUpdateInput = Partial<SplitterGroupCreateInput>
+type SplitterGroupUpdateInput = Record<string, never>
 ```
-
-**References:** [SplitterGroupCreateInput](./system-events.splittergroupcreateinput.md)

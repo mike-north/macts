@@ -4,12 +4,10 @@
 
 ## PerspectiveUpdateInput type
 
-Input for updating a Perspective
+Input for updating a Perspective. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type PerspectiveUpdateInput = Partial<PerspectiveCreateInput>
+type PerspectiveUpdateInput = Record<string, never>
 ```
-
-**References:** [PerspectiveCreateInput](./omnifocus.perspectivecreateinput.md)

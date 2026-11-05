@@ -4,10 +4,10 @@
 
 ## ExportSettings.useArtboards property
 
-Whether to export with artboards
+Whether to export with artboards. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-useArtboards: boolean
+useArtboards: boolean | null
 ```

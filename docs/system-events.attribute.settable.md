@@ -4,10 +4,10 @@
 
 ## Attribute.settable property
 
-Can the attribute be set?
+Can the attribute be set? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-settable: boolean
+readonly settable: boolean | null;
 ```

@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the index in the front-to-back ordering within its container
+the index in the front-to-back ordering within its container. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +52,15 @@ the index in the front-to-back ordering within its container
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the maximum allowed width of this column
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the maximum allowed width of this column. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +69,15 @@ the maximum allowed width of this column
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the minimum allowed width of this column
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the minimum allowed width of this column. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +86,15 @@ the minimum allowed width of this column
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the column name
+string \| null
+
+</td><td>
+
+the column name. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +105,11 @@ the column name
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The direction in which the window is sorted
+The direction in which the window is sorted. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +120,11 @@ The direction in which the window is sorted
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-is this column visible
+is this column visible. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +135,11 @@ is this column visible
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the width of this column
+the width of this column. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

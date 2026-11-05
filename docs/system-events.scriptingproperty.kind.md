@@ -4,10 +4,10 @@
 
 ## ScriptingProperty.kind property
 
-The kind of object or data returned by this property
+The kind of object or data returned by this property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-kind: string
+readonly kind: string | null;
 ```

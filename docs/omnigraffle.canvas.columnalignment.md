@@ -4,10 +4,10 @@
 
 ## Canvas.columnAlignment property
 
-Column alignment
+Column alignment. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-columnAlignment: HorizontalAlignment
+columnAlignment: HorizontalAlignment | null
 ```

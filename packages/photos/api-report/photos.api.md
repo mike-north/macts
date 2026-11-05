@@ -4,14 +4,22 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
+import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { PageRequest } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
 export interface Album {
-    id: string;
-    name: string;
-    parent: Folder;
+    readonly id: string;
+    name: string | null;
+    readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
 // @public
@@ -22,14 +30,14 @@ export interface AlbumCreateInput {
 // @public
 export class AlbumResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Album>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Album>;
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<Page<Album>>;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Album>>;
 }
 
-// @public (undocumented)
+// @public
 export const AlbumSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -37,7 +45,9 @@ export const AlbumSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type AlbumUpdateInput = Partial<AlbumCreateInput>;
+export interface AlbumUpdateInput {
+    name?: string;
+}
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -60,9 +70,9 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Container {
-    id: string;
-    name: string;
-    parent: Folder;
+    readonly id: string;
+    name: string | null;
+    readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
 // @public
@@ -70,7 +80,7 @@ export interface ContainerCreateInput {
     name?: string;
 }
 
-// @public (undocumented)
+// @public
 export const ContainerSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -78,13 +88,15 @@ export const ContainerSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type ContainerUpdateInput = Partial<ContainerCreateInput>;
+export interface ContainerUpdateInput {
+    name?: string;
+}
 
 // @public
 export interface Folder {
-    id: string;
-    name: string;
-    parent: Folder;
+    readonly id: string;
+    name: string | null;
+    readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
 // @public
@@ -95,14 +107,14 @@ export interface FolderCreateInput {
 // @public
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Folder>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Folder>;
     list(page?: {
         pageSize?: number;
         cursor?: string;
-    }): Promise<Page<Folder>>;
+    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Folder>>;
 }
 
-// @public (undocumented)
+// @public
 export const FolderSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -110,50 +122,52 @@ export const FolderSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type FolderUpdateInput = Partial<FolderCreateInput>;
+export interface FolderUpdateInput {
+    name?: string;
+}
 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface MediaItem {
-    altitude: number;
-    date: Date;
-    description: string;
-    favorite: boolean;
-    filename: string;
-    height: number;
-    id: string;
-    keywords: string[];
+    readonly altitude: number | null;
+    date: Date | null;
+    description: string | null;
+    favorite: boolean | null;
+    readonly filename: string | null;
+    readonly height: Integer | null;
+    readonly id: string;
+    keywords: readonly string[] | null;
     location: unknown;
-    name: string;
-    size: number;
-    width: number;
+    name: string | null;
+    size: Integer | null;
+    readonly width: Integer | null;
 }
 
+// Warning: (ae-forgotten-export) The symbol "MediaItemCreateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface MediaItemCreateInput {
-    date?: Date;
-    description?: string;
-    favorite?: boolean;
-    keywords?: string[];
-    location?: unknown;
-    name?: string;
-    size?: number;
-}
+export type MediaItemCreateInput = Omit<MediaItemCreateInput_2, 'size'> & {
+    size?: null extends MediaItemCreateInput_2['size'] ? number | null : number;
+};
 
 // @public
 export class MediaItemResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    duplicate(id: string): Promise<void>;
-    get(id: string): Promise<MediaItem>;
-    list(): Promise<Page<MediaItem>>;
+    duplicate(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<MediaItem>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<MediaItem>>;
 }
 
-// @public (undocumented)
+// @public
 export const MediaItemSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -169,47 +183,56 @@ export const MediaItemSchema: z.ZodObject<{
     size: z.ZodNumber;
 }, z.core.$strip>;
 
+// Warning: (ae-forgotten-export) The symbol "MediaItemUpdateInput_2" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type MediaItemUpdateInput = Partial<MediaItemCreateInput>;
+export type MediaItemUpdateInput = Omit<MediaItemUpdateInput_2, 'size'> & {
+    size?: null extends MediaItemUpdateInput_2['size'] ? number | null : number;
+};
 
 // @public
 export interface Moment {
-    id: string;
-    name: string;
+    readonly id: string;
+    readonly name: string | null;
 }
 
 // @public
 export type MomentCreateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export const MomentSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
 }, z.core.$strip>;
 
 // @public
-export type MomentUpdateInput = Partial<MomentCreateInput>;
+export type MomentUpdateInput = Record<string, never>;
+
+// @public
+export interface PhotosClient extends ClientBrand<PhotosResources> {
+}
 
 // @public
 export class PhotosClient {
     constructor(options: PhotosClientOptions);
-    add(mediaItems: string[], to: string): Promise<void>;
+    add(mediaItems: Parameters<PhotosClient_2['add']>[0], to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly albums: AlbumResourceClient;
-    _delete(target: string): Promise<void>;
-    _export(mediaItems: string[], to: string, usingOriginals?: boolean): Promise<void>;
+    _delete(target: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    _export(mediaItems: Parameters<PhotosClient_2['_export']>[0], to: string, usingOriginals?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly folders: FolderResourceClient;
     get http(): HttpClient;
-    _import(files: string[], into?: string, skipCheckDuplicates?: boolean): Promise<void>;
-    make(_new: string, named?: string, at?: string): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "PhotosClient_2" needs to be exported by the entry point index.d.ts
+    _import(files: Parameters<PhotosClient_2['_import']>[0], into?: string, skipCheckDuplicates?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    make(_new: string, named?: string, at?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly mediaItems: MediaItemResourceClient;
-    nextSlide(): Promise<void>;
-    pauseSlideshow(): Promise<void>;
-    previousSlide(): Promise<void>;
-    resumeSlideshow(): Promise<void>;
-    search(_for: string): Promise<void>;
-    spotlight(target: string): Promise<void>;
-    startSlideshow(using: string[]): Promise<void>;
-    stopSlideshow(): Promise<void>;
+    nextSlide(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    pauseSlideshow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    previousSlide(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    resumeSlideshow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    search(_for: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    spotlight(target: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    startSlideshow(using: Parameters<PhotosClient_2['startSlideshow']>[0], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    stopSlideshow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -224,6 +247,25 @@ export class PhotosError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type PhotosResources = Readonly<{
+    MediaItem: ResourceDescriptor<MediaItem, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'photos.mediaItems.get';
+        readonly list: 'photos.mediaItems.list';
+    };
+    Album: ResourceDescriptor<Album, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'photos.albums.get';
+        readonly list: 'photos.albums.list';
+    };
+    Folder: ResourceDescriptor<Folder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'photos.folders.get';
+        readonly list: 'photos.folders.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

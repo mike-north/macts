@@ -4,12 +4,13 @@
 
 ## ColumnUpdateInput type
 
-Input for updating a Column
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type ColumnUpdateInput = Partial<ColumnCreateInput>
+type ColumnUpdateInput = Omit<ColumnUpdateInput$1, 'index' | 'width'> & {
+  index?: null extends ColumnUpdateInput$1['index'] ? number | null : number
+  width?: null extends ColumnUpdateInput$1['width'] ? number | null : number
+}
 ```
-
-**References:** [ColumnCreateInput](./finder.columncreateinput.md)

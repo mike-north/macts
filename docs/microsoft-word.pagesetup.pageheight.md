@@ -4,10 +4,10 @@
 
 ## PageSetup.pageHeight property
 
-The page height in points
+The page height in points. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-pageHeight: number
+pageHeight: number | null
 ```

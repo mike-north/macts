@@ -4,10 +4,10 @@
 
 ## Label.text property
 
-The text inside the label
+The text inside the label. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-text: string
+text: string | null
 ```

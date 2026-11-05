@@ -23,7 +23,15 @@ export class FolderResourceClient {
   /**
    * Get a folder by posixPath.
    */
-  async get(posixPath: string): Promise<Folder> {
-    return this.#http.rpc<Folder>(`${this.#app}.${this.#resource}.get`, { posixPath })
+  async get(
+    posixPath: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Folder> {
+    return this.#http.invoke<Folder>(
+      `${this.#app}.${this.#resource}.get`,
+      { posixPath },
+      __mactsOptions,
+      'Folder'
+    )
   }
 }

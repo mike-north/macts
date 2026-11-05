@@ -9,7 +9,7 @@ Flip graphics
 **Signature:**
 
 ```typescript
-flip(over: Orientation): Promise<void>;
+flip(over: Parameters<OmniGraffleClient$1['flip']>[0], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -33,9 +33,22 @@ over
 
 </td><td>
 
-[Orientation](./omnigraffle.orientation.md)
+Parameters&lt;OmniGraffleClient$1\['flip'\]&gt;\[0\]
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

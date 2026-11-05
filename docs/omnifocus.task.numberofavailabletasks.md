@@ -4,10 +4,10 @@
 
 ## Task.numberOfAvailableTasks property
 
-The number of available direct children of this task
+The number of available direct children of this task. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-numberOfAvailableTasks: number
+readonly numberOfAvailableTasks: Integer | null;
 ```

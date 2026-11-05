@@ -4,12 +4,10 @@
 
 ## MiniplayerWindowUpdateInput type
 
-Input for updating a MiniplayerWindow
+Input for updating a MiniplayerWindow. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type MiniplayerWindowUpdateInput = Partial<MiniplayerWindowCreateInput>
+type MiniplayerWindowUpdateInput = Record<string, never>
 ```
-
-**References:** [MiniplayerWindowCreateInput](./music.miniplayerwindowcreateinput.md)

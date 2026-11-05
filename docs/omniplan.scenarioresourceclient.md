@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(id)](./omniplan.scenarioresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./omniplan.scenarioresourceclient.get.md)
 
 </td><td>
 
@@ -68,13 +68,13 @@ Get a scenario by id.
 </td></tr>
 <tr><td>
 
-[list()](./omniplan.scenarioresourceclient.list.md)
+[list(\_\_mactsOptions)](./omniplan.scenarioresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all scenarios.
+List all scenarios, as one page.
 
 </td></tr>
 </tbody></table>

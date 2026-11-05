@@ -9,5 +9,5 @@ The workspace's run destination that will be used for scheme actions
 **Signature:**
 
 ```typescript
-activeRunDestination?: RunDestination;
+activeRunDestination?: ObjectReferenceData<string, 'RunDestination'>;
 ```

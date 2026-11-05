@@ -2,14 +2,93 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-word](./microsoft-word.md) &gt; [DocumentUpdateInput](./microsoft-word.documentupdateinput.md)
 
-## DocumentUpdateInput type
+## DocumentUpdateInput interface
 
-Input for updating a Document
+Input for updating a Document. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type DocumentUpdateInput = Partial<DocumentCreateInput>
+interface DocumentUpdateInput
 ```
 
-**References:** [DocumentCreateInput](./microsoft-word.documentcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[defaultTabStop?](./microsoft-word.documentupdateinput.defaulttabstop.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The interval in points between default tab stops. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[saved?](./microsoft-word.documentupdateinput.saved.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether the document has been saved. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[showRevisions?](./microsoft-word.documentupdateinput.showrevisions.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether tracked changes are shown. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[trackRevisions?](./microsoft-word.documentupdateinput.trackrevisions.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether changes are tracked in the document. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

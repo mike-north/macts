@@ -4,10 +4,10 @@
 
 ## Resource.emailAddress property
 
-Email address for this resource
+Email address for this resource. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-emailAddress: string
+emailAddress: string | null
 ```

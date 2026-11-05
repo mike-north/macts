@@ -4,14 +4,44 @@
 
 ## MilestoneResourceClient.list() method
 
-List all milestones.
+List all milestones, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Milestone[]>;
+list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Milestone>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Milestone](./omniplan.milestone.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Milestone](./omniplan.milestone.md)<!-- -->&gt;&gt;

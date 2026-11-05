@@ -4,10 +4,10 @@
 
 ## ExportSettings.includeBorder property
 
-Whether or not to include a border area
+Whether or not to include a border area. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-includeBorder: boolean
+includeBorder: boolean | null
 ```

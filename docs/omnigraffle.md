@@ -39,7 +39,7 @@ Client for base class for visual elements in omnigraffle.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -111,15 +111,6 @@ A drawing page/canvas in OmniGraffle
 </td></tr>
 <tr><td>
 
-[CanvasCreateInput](./omnigraffle.canvascreateinput.md)
-
-</td><td>
-
-Input for creating a Canvas
-
-</td></tr>
-<tr><td>
-
 [CapabilityMetadata](./omnigraffle.capabilitymetadata.md)
 
 </td><td>
@@ -142,7 +133,16 @@ Export configuration settings
 
 </td><td>
 
-Input for creating a ExportSettings
+Input for creating an ExportSettings.
+
+</td></tr>
+<tr><td>
+
+[ExportSettingsUpdateInput](./omnigraffle.exportsettingsupdateinput.md)
+
+</td><td>
+
+Input for updating an ExportSettings. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -156,29 +156,11 @@ Base class for visual elements in OmniGraffle
 </td></tr>
 <tr><td>
 
-[GraphicCreateInput](./omnigraffle.graphiccreateinput.md)
-
-</td><td>
-
-Input for creating a Graphic
-
-</td></tr>
-<tr><td>
-
 [Grid](./omnigraffle.grid.md)
 
 </td><td>
 
 Grid settings for a canvas
-
-</td></tr>
-<tr><td>
-
-[GridCreateInput](./omnigraffle.gridcreateinput.md)
-
-</td><td>
-
-Input for creating a Grid
 
 </td></tr>
 <tr><td>
@@ -196,7 +178,16 @@ A group of graphics in OmniGraffle
 
 </td><td>
 
-Input for creating a Group
+Input for creating a Group.
+
+</td></tr>
+<tr><td>
+
+[GroupUpdateInput](./omnigraffle.groupupdateinput.md)
+
+</td><td>
+
+Input for updating a Group. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -214,7 +205,16 @@ A text label on a line
 
 </td><td>
 
-Input for creating a Label
+Input for creating a Label.
+
+</td></tr>
+<tr><td>
+
+[LabelUpdateInput](./omnigraffle.labelupdateinput.md)
+
+</td><td>
+
+Input for updating a Label. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -232,7 +232,16 @@ A drawing layer in OmniGraffle
 
 </td><td>
 
-Input for creating a Layer
+Input for creating a Layer.
+
+</td></tr>
+<tr><td>
+
+[LayerUpdateInput](./omnigraffle.layerupdateinput.md)
+
+</td><td>
+
+Input for updating a Layer. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -242,15 +251,6 @@ Input for creating a Layer
 </td><td>
 
 A line/connector in OmniGraffle
-
-</td></tr>
-<tr><td>
-
-[LineCreateInput](./omnigraffle.linecreateinput.md)
-
-</td><td>
-
-Input for creating a Line
 
 </td></tr>
 <tr><td>
@@ -268,7 +268,25 @@ A reusable template/master in OmniGraffle
 
 </td><td>
 
-Input for creating a Master
+Input for creating a Master.
+
+</td></tr>
+<tr><td>
+
+[MasterUpdateInput](./omnigraffle.masterupdateinput.md)
+
+</td><td>
+
+Input for updating a Master. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[OmniGraffleClient](./omnigraffle.omnigraffleclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -291,15 +309,6 @@ A shape graphic in OmniGraffle
 </td></tr>
 <tr><td>
 
-[ShapeCreateInput](./omnigraffle.shapecreateinput.md)
-
-</td><td>
-
-Input for creating a Shape
-
-</td></tr>
-<tr><td>
-
 [Subgraph](./omnigraffle.subgraph.md)
 
 </td><td>
@@ -313,7 +322,16 @@ A subgraph container in OmniGraffle
 
 </td><td>
 
-Input for creating a Subgraph
+Input for creating a Subgraph.
+
+</td></tr>
+<tr><td>
+
+[SubgraphUpdateInput](./omnigraffle.subgraphupdateinput.md)
+
+</td><td>
+
+Input for updating a Subgraph. Omitted fields are left unchanged.
 
 </td></tr>
 </tbody></table>
@@ -335,6 +353,8 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -351,12 +371,16 @@ Every capability exposed by OmniGraffle, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [GraphicSchema](./omnigraffle.graphicschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -365,12 +389,16 @@ Every capability exposed by OmniGraffle, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [GroupSchema](./omnigraffle.groupschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -379,12 +407,16 @@ Every capability exposed by OmniGraffle, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [LayerSchema](./omnigraffle.layerschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -393,12 +425,16 @@ Every capability exposed by OmniGraffle, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [MasterSchema](./omnigraffle.masterschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -407,12 +443,16 @@ Every capability exposed by OmniGraffle, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [SubgraphSchema](./omnigraffle.subgraphschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -430,11 +470,20 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[CanvasCreateInput](./omnigraffle.canvascreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
 [CanvasUpdateInput](./omnigraffle.canvasupdateinput.md)
 
 </td><td>
 
-Input for updating a Canvas
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -457,15 +506,6 @@ The type of area to be exported
 </td></tr>
 <tr><td>
 
-[ExportSettingsUpdateInput](./omnigraffle.exportsettingsupdateinput.md)
-
-</td><td>
-
-Input for updating a ExportSettings
-
-</td></tr>
-<tr><td>
-
 [FillType](./omnigraffle.filltype.md)
 
 </td><td>
@@ -475,11 +515,29 @@ Type of fill for shapes
 </td></tr>
 <tr><td>
 
+[GraphicCreateInput](./omnigraffle.graphiccreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
 [GraphicUpdateInput](./omnigraffle.graphicupdateinput.md)
 
 </td><td>
 
-Input for updating a Graphic
+Canonical update input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
+[GridCreateInput](./omnigraffle.gridcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -488,16 +546,7 @@ Input for updating a Graphic
 
 </td><td>
 
-Input for updating a Grid
-
-</td></tr>
-<tr><td>
-
-[GroupUpdateInput](./omnigraffle.groupupdateinput.md)
-
-</td><td>
-
-Input for updating a Group
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -538,24 +587,6 @@ Rotation type for labels on lines
 </td></tr>
 <tr><td>
 
-[LabelUpdateInput](./omnigraffle.labelupdateinput.md)
-
-</td><td>
-
-Input for updating a Label
-
-</td></tr>
-<tr><td>
-
-[LayerUpdateInput](./omnigraffle.layerupdateinput.md)
-
-</td><td>
-
-Input for updating a Layer
-
-</td></tr>
-<tr><td>
-
 [LayoutDirection](./omnigraffle.layoutdirection.md)
 
 </td><td>
@@ -574,6 +605,15 @@ Type of automatic layout
 </td></tr>
 <tr><td>
 
+[LineCreateInput](./omnigraffle.linecreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
 [LineType](./omnigraffle.linetype.md)
 
 </td><td>
@@ -587,16 +627,16 @@ Type of line
 
 </td><td>
 
-Input for updating a Line
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
 
-[MasterUpdateInput](./omnigraffle.masterupdateinput.md)
+[OmniGraffleResources](./omnigraffle.omnigraffleresources.md)
 
 </td><td>
 
-Input for updating a Master
+The type of the resource table in `omniGraffleContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 <tr><td>
@@ -610,11 +650,20 @@ Flip orientation
 </td></tr>
 <tr><td>
 
+[ShapeCreateInput](./omnigraffle.shapecreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
 [ShapeUpdateInput](./omnigraffle.shapeupdateinput.md)
 
 </td><td>
 
-Input for updating a Shape
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -633,15 +682,6 @@ Type of cap at ends of the stroke
 </td><td>
 
 Type of join between segments of the stroke
-
-</td></tr>
-<tr><td>
-
-[SubgraphUpdateInput](./omnigraffle.subgraphupdateinput.md)
-
-</td><td>
-
-Input for updating a Subgraph
 
 </td></tr>
 <tr><td>

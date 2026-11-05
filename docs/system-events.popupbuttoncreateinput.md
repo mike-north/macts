@@ -4,7 +4,7 @@
 
 ## PopUpButtonCreateInput type
 
-Input for creating a PopUpButton
+Input for creating a PopUpButton.
 
 **Signature:**
 

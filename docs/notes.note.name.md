@@ -4,7 +4,7 @@
 
 ## Note.name property
 
-The name of the note (first line)
+The name of the note (first line). Never null: the primary identifier.
 
 **Signature:**
 

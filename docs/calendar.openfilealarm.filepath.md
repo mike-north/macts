@@ -4,10 +4,10 @@
 
 ## OpenFileAlarm.filepath property
 
-The (POSIX) path to be opened by the alarm
+The (POSIX) path to be opened by the alarm. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-filepath: string
+filepath: string | null
 ```

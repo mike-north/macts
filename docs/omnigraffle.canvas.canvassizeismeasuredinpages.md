@@ -4,10 +4,10 @@
 
 ## Canvas.canvasSizeIsMeasuredInPages property
 
-Whether canvas size is reported as multiples of page size
+Whether canvas size is reported as multiples of page size. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-canvasSizeIsMeasuredInPages: boolean
+canvasSizeIsMeasuredInPages: boolean | null
 ```

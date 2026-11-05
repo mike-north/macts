@@ -30,7 +30,7 @@ Client for a group of projects and sub-folders representing an area of responsib
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -133,7 +133,16 @@ A group of projects and sub-folders representing an area of responsibility
 
 </td><td>
 
-Input for creating a Folder
+Input for creating a Folder.
+
+</td></tr>
+<tr><td>
+
+[FolderUpdateInput](./omnifocus.folderupdateinput.md)
+
+</td><td>
+
+Input for updating a Folder. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -151,7 +160,25 @@ A task that is in the document's inbox
 
 </td><td>
 
-Input for creating a InboxTask
+Input for creating an InboxTask.
+
+</td></tr>
+<tr><td>
+
+[InboxTaskUpdateInput](./omnifocus.inboxtaskupdateinput.md)
+
+</td><td>
+
+Input for updating an InboxTask. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[OmniFocusClient](./omnifocus.omnifocusclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -183,15 +210,6 @@ A project in OmniFocus
 </td></tr>
 <tr><td>
 
-[ProjectCreateInput](./omnifocus.projectcreateinput.md)
-
-</td><td>
-
-Input for creating a Project
-
-</td></tr>
-<tr><td>
-
 [Tag](./omnifocus.tag.md)
 
 </td><td>
@@ -205,7 +223,16 @@ A tag for organizing and filtering tasks
 
 </td><td>
 
-Input for creating a Tag
+Input for creating a Tag.
+
+</td></tr>
+<tr><td>
+
+[TagUpdateInput](./omnifocus.tagupdateinput.md)
+
+</td><td>
+
+Input for updating a Tag. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -215,15 +242,6 @@ Input for creating a Tag
 </td><td>
 
 A task within OmniFocus
-
-</td></tr>
-<tr><td>
-
-[TaskCreateInput](./omnifocus.taskcreateinput.md)
-
-</td><td>
-
-Input for creating a Task
 
 </td></tr>
 </tbody></table>
@@ -254,12 +272,16 @@ Every capability exposed by OmniFocus, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [InboxTaskSchema](./omnifocus.inboxtaskschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -268,12 +290,16 @@ Every capability exposed by OmniFocus, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ProjectSchema](./omnifocus.projectschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -282,12 +308,16 @@ Every capability exposed by OmniFocus, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [TaskSchema](./omnifocus.taskschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -314,24 +344,6 @@ Risk classification for a capability.
 </td></tr>
 <tr><td>
 
-[FolderUpdateInput](./omnifocus.folderupdateinput.md)
-
-</td><td>
-
-Input for updating a Folder
-
-</td></tr>
-<tr><td>
-
-[InboxTaskUpdateInput](./omnifocus.inboxtaskupdateinput.md)
-
-</td><td>
-
-Input for updating a InboxTask
-
-</td></tr>
-<tr><td>
-
 [IntervalUnit](./omnifocus.intervalunit.md)
 
 </td><td>
@@ -341,11 +353,20 @@ Unit for time intervals
 </td></tr>
 <tr><td>
 
+[OmniFocusResources](./omnifocus.omnifocusresources.md)
+
+</td><td>
+
+The type of the resource table in `omniFocusContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
+
+</td></tr>
+<tr><td>
+
 [PerspectiveCreateInput](./omnifocus.perspectivecreateinput.md)
 
 </td><td>
 
-Input for creating a Perspective
+Input for creating a Perspective.
 
 </td></tr>
 <tr><td>
@@ -354,7 +375,16 @@ Input for creating a Perspective
 
 </td><td>
 
-Input for updating a Perspective
+Input for updating a Perspective. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[ProjectCreateInput](./omnifocus.projectcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -372,7 +402,7 @@ Status of a project
 
 </td><td>
 
-Input for updating a Project
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -404,11 +434,11 @@ Schedule type for repetition
 </td></tr>
 <tr><td>
 
-[TagUpdateInput](./omnifocus.tagupdateinput.md)
+[TaskCreateInput](./omnifocus.taskcreateinput.md)
 
 </td><td>
 
-Input for updating a Tag
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -417,7 +447,7 @@ Input for updating a Tag
 
 </td><td>
 
-Input for updating a Task
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 </tbody></table>

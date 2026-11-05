@@ -42,7 +42,12 @@ export interface FieldPlan {
  * - `integer` and `double` fix numeric classification; a `double` leaf that
  *   holds an integral value is still encoded as a double.
  * - `nullable` admits `null` as data in addition to `value`.
- * - `reference` names the manifest resource key and the cardinality.
+ * - `reference` names the manifest resource key and the cardinality. `form`
+ *   records which form a native read emits at the position: absent for the
+ *   identity form, `'index'` for an index selector within the object the
+ *   field was read through, for a target with no identifier that is found by
+ *   its position within its parent. The codec emits by the plan and never
+ *   chooses at run time.
  * - `file` is file content an operation returns; `file-source` is a source of
  *   bytes an operation consumes.
  * - `unknown` is dynamic content whose shape no contract describes; it is
@@ -70,6 +75,7 @@ export type ValuePlan =
       readonly kind: 'reference'
       readonly resource: string
       readonly cardinality: 'one' | 'many'
+      readonly form?: 'index'
     }
   | { readonly kind: 'file' }
   | { readonly kind: 'file-source' }

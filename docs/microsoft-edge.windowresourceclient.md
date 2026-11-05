@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./microsoft-edge.windowresourceclient.create.md)
+[create(input, \_\_mactsOptions)](./microsoft-edge.windowresourceclient.create.md)
 
 </td><td>
 
@@ -68,7 +68,7 @@ Create a new window.
 </td></tr>
 <tr><td>
 
-[get(id)](./microsoft-edge.windowresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./microsoft-edge.windowresourceclient.get.md)
 
 </td><td>
 
@@ -79,13 +79,13 @@ Get a window by id.
 </td></tr>
 <tr><td>
 
-[list()](./microsoft-edge.windowresourceclient.list.md)
+[list(\_\_mactsOptions)](./microsoft-edge.windowresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all windows.
+List all windows, as one page.
 
 </td></tr>
 </tbody></table>

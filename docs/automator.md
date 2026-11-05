@@ -48,7 +48,7 @@ Error class for Automator API errors.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -111,11 +111,11 @@ A single step in a workflow
 </td></tr>
 <tr><td>
 
-[AutomatorActionCreateInput](./automator.automatoractioncreateinput.md)
+[AutomatorClient](./automator.automatorclient.md)
 
 </td><td>
 
-Input for creating a AutomatorAction
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -160,7 +160,16 @@ A named value in an action
 
 </td><td>
 
-Input for creating a Setting
+Input for creating a Setting.
+
+</td></tr>
+<tr><td>
+
+[SettingUpdateInput](./automator.settingupdateinput.md)
+
+</td><td>
+
+Input for updating a Setting. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -178,7 +187,16 @@ A variable used by the workflow
 
 </td><td>
 
-Input for creating a Variable
+Input for creating a Variable.
+
+</td></tr>
+<tr><td>
+
+[VariableUpdateInput](./automator.variableupdateinput.md)
+
+</td><td>
+
+Input for updating a Variable. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -209,6 +227,8 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -225,12 +245,16 @@ Every capability exposed by Automator, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [SettingSchema](./automator.settingschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -239,12 +263,16 @@ Every capability exposed by Automator, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [WorkflowSchema](./automator.workflowschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -262,11 +290,29 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[AutomatorActionCreateInput](./automator.automatoractioncreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
 [AutomatorActionUpdateInput](./automator.automatoractionupdateinput.md)
 
 </td><td>
 
-Input for updating a AutomatorAction
+Canonical update input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
+[AutomatorResources](./automator.automatorresources.md)
+
+</td><td>
+
+The type of the resource table in `automatorContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 <tr><td>
@@ -284,7 +330,7 @@ Risk classification for a capability.
 
 </td><td>
 
-Input for creating a RequiredResource
+Input for creating a RequiredResource.
 
 </td></tr>
 <tr><td>
@@ -293,25 +339,7 @@ Input for creating a RequiredResource
 
 </td><td>
 
-Input for updating a RequiredResource
-
-</td></tr>
-<tr><td>
-
-[SettingUpdateInput](./automator.settingupdateinput.md)
-
-</td><td>
-
-Input for updating a Setting
-
-</td></tr>
-<tr><td>
-
-[VariableUpdateInput](./automator.variableupdateinput.md)
-
-</td><td>
-
-Input for updating a Variable
+Input for updating a RequiredResource. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -329,7 +357,7 @@ The level of warning for an action
 
 </td><td>
 
-Input for creating a Workflow
+Input for creating a Workflow.
 
 </td></tr>
 <tr><td>
@@ -338,7 +366,7 @@ Input for creating a Workflow
 
 </td><td>
 
-Input for updating a Workflow
+Input for updating a Workflow. Omitted fields are left unchanged.
 
 </td></tr>
 </tbody></table>

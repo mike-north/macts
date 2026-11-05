@@ -4,7 +4,7 @@
 
 ## GrowAreaCreateInput type
 
-Input for creating a GrowArea
+Input for creating a GrowArea.
 
 **Signature:**
 

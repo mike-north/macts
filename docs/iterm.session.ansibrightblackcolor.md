@@ -4,14 +4,10 @@
 
 ## Session.aNSIBrightBlackColor property
 
-The aNSIBrightBlackColor property
+The aNSIBrightBlackColor property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-aNSIBrightBlackColor: {
-  r: number
-  g: number
-  b: number
-}
+aNSIBrightBlackColor: Rgb | null
 ```

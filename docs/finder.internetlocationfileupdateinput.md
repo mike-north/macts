@@ -4,12 +4,10 @@
 
 ## InternetLocationFileUpdateInput type
 
-Input for updating a InternetLocationFile
+Input for updating an InternetLocationFile. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type InternetLocationFileUpdateInput = Partial<InternetLocationFileCreateInput>
+type InternetLocationFileUpdateInput = Record<string, never>
 ```
-
-**References:** [InternetLocationFileCreateInput](./finder.internetlocationfilecreateinput.md)

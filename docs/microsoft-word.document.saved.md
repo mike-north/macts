@@ -4,10 +4,10 @@
 
 ## Document.saved property
 
-Whether the document has been saved
+Whether the document has been saved. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-saved: boolean
+saved: boolean | null
 ```

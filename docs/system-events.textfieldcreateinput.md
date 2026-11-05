@@ -4,7 +4,7 @@
 
 ## TextFieldCreateInput type
 
-Input for creating a TextField
+Input for creating a TextField.
 
 **Signature:**
 

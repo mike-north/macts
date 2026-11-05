@@ -4,12 +4,10 @@
 
 ## WorkflowUpdateInput type
 
-Input for updating a Workflow
+Input for updating a Workflow. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type WorkflowUpdateInput = Partial<WorkflowCreateInput>
+type WorkflowUpdateInput = Record<string, never>
 ```
-
-**References:** [WorkflowCreateInput](./automator.workflowcreateinput.md)

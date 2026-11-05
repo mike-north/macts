@@ -4,10 +4,10 @@
 
 ## Task.staticCost property
 
-Cost for this task itself
+Cost for this task itself. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-staticCost: number
+staticCost: number | null
 ```

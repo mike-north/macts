@@ -4,10 +4,10 @@
 
 ## MediaItem.description property
 
-A description of the media item
+A description of the media item. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-description: string
+description: string | null
 ```

@@ -23,7 +23,15 @@ export class DiskItemResourceClient {
   /**
    * Get a disk item by posixPath.
    */
-  async get(posixPath: string): Promise<DiskItem> {
-    return this.#http.rpc<DiskItem>(`${this.#app}.${this.#resource}.get`, { posixPath })
+  async get(
+    posixPath: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<DiskItem> {
+    return this.#http.invoke<DiskItem>(
+      `${this.#app}.${this.#resource}.get`,
+      { posixPath },
+      __mactsOptions,
+      'DiskItem'
+    )
   }
 }

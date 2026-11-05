@@ -4,10 +4,10 @@
 
 ## Task.dropped property
 
-True if the task is dropped
+True if the task is dropped. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-dropped: boolean
+readonly dropped: boolean | null;
 ```

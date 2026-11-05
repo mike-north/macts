@@ -4,7 +4,8 @@
  *
  * {@link standInTransport} evaluates the script the built-in transport would
  * run, composed by the executor's own `composeNativeScript`, in a fresh
- * `node:vm` context whose `Application()` returns the stand-in. Everything
+ * `node:vm` context whose `Application()` returns the stand-in and whose
+ * `Automation` is a stand-in for the bridge's (`StandInAutomation`). Everything
  * but the host is therefore the shipped code: the body, the value codec, the
  * input and output plans, and the reference table. {@link recorded} wraps a
  * stand-in so a test can assert exactly which of its members a script used,
@@ -22,6 +23,25 @@ import { NATIVE_CODEC, type NativeScript } from '../native-codec.js'
 import type { NativeTransport } from '../native-executor.js'
 
 /**
+ * A stand-in for the automation bridge's `Automation` object: the one member
+ * a native script uses, `getDisplayString`, which gives the display form of
+ * a specifier, such as `Application("Panes").windows.byId(1).tabs.at(0)`.
+ */
+export interface StandInAutomation {
+  getDisplayString(specifier: unknown): string
+}
+
+/**
+ * The `Automation` of a stand-in that displays no specifier: every call
+ * throws, as the bridge does for a value it cannot display.
+ */
+const NO_DISPLAY: StandInAutomation = {
+  getDisplayString() {
+    throw new Error('The stand-in application displays no specifier.')
+  },
+}
+
+/**
  * A transport that runs each script against `app` in an isolated context and
  * appends the script to `scripts`, so a test can inspect what the executor
  * built as well as what it returned. A malformed outcome rejects, as it does
@@ -29,12 +49,22 @@ import type { NativeTransport } from '../native-executor.js'
  *
  * @param app - The stand-in application every `Application()` call returns.
  * @param scripts - Receives each script run, in order.
+ * @param automation - The script's `Automation`; by default it displays no
+ *   specifier.
  */
-export function standInTransport(app: object, scripts: NativeScript[] = []): NativeTransport {
+export function standInTransport(
+  app: object,
+  scripts: NativeScript[] = [],
+  automation: StandInAutomation = NO_DISPLAY
+): NativeTransport {
   return {
     run(script) {
       scripts.push(script)
-      const context = createContext({ ObjC: { import: () => undefined }, Application: () => app })
+      const context = createContext({
+        ObjC: { import: () => undefined },
+        Application: () => app,
+        Automation: automation,
+      })
       const stdout: unknown = runInContext(composeNativeScript(script, NATIVE_CODEC), context)
       const outcome = parseNativeOutcome(String(stdout))
       if (typeof outcome === 'string') {

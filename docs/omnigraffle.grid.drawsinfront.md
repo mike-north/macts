@@ -4,10 +4,10 @@
 
 ## Grid.drawsInFront property
 
-Does the grid draw in front of all shapes?
+Does the grid draw in front of all shapes? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-drawsInFront: boolean
+drawsInFront: boolean | null
 ```

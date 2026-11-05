@@ -4,10 +4,10 @@
 
 ## TextRange.fontName property
 
-The font name
+The font name. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fontName: string
+fontName: string | null
 ```

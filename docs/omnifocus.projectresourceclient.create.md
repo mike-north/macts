@@ -9,7 +9,7 @@ Create a new project.
 **Signature:**
 
 ```typescript
-create(input: ProjectCreateInput): Promise<Project>;
+create(input: ProjectCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Project>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [ProjectCreateInput](./omnifocus.projectcreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The percentage of the task which is complete (1.0 = 100%)
+The percentage of the task which is complete (1.0 = 100%). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ The percentage of the task which is complete (1.0 = 100%)
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The person-seconds completed
+The person-seconds completed. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ The person-seconds completed
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The number of working seconds occupied by task
+The number of working seconds occupied by task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ The number of working seconds occupied by task
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The number of person-seconds required to perform the task
+The number of person-seconds required to perform the task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +99,11 @@ The number of person-seconds required to perform the task
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The latest date this task may end
+The latest date this task may end. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +114,11 @@ The latest date this task may end
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The date on which work ends
+The date on which work ends. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +129,11 @@ The date on which work ends
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the end date is locked or not
+Whether the end date is locked or not. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +142,15 @@ Whether the end date is locked or not
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Internal identifier for this task
+[Integer](./contracts.integer.md)
+
+</td><td>
+
+Internal identifier for this task. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -159,11 +161,11 @@ Internal identifier for this task
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the task
+The name of the task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -174,11 +176,11 @@ The name of the task
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Notes
+Notes. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -187,13 +189,15 @@ Notes
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The depth or level of this task in the project hierarchy
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The depth or level of this task in the project hierarchy. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -202,13 +206,15 @@ The depth or level of this task in the project hierarchy
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The hierarchical or WBS number of this task
+string \| null
+
+</td><td>
+
+The hierarchical or WBS number of this task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -219,11 +225,11 @@ The hierarchical or WBS number of this task
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-Priority of this task
+Priority of this task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -232,13 +238,15 @@ Priority of this task
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The person-seconds remaining
+number \| null
+
+</td><td>
+
+The person-seconds remaining. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -247,13 +255,15 @@ The person-seconds remaining
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Cost for paying resources assigned to this task
+number \| null
+
+</td><td>
+
+Cost for paying resources assigned to this task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -264,11 +274,11 @@ Cost for paying resources assigned to this task
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The earliest date this task may start
+The earliest date this task may start. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -279,11 +289,11 @@ The earliest date this task may start
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The date on which work begins
+The date on which work begins. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -294,11 +304,11 @@ The date on which work begins
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the start date is locked or not
+Whether the start date is locked or not. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -309,11 +319,11 @@ Whether the start date is locked or not
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Cost for this task itself
+Cost for this task itself. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -322,13 +332,15 @@ Cost for this task itself
 
 </td><td>
 
-</td><td>
-
-[TaskStatus](./omniplan.taskstatus.md)
+`readonly`
 
 </td><td>
 
-The status of the current task
+[TaskStatus](./omniplan.taskstatus.md) \| null
+
+</td><td>
+
+The status of the current task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -339,11 +351,11 @@ The status of the current task
 
 </td><td>
 
-[TaskType](./omniplan.tasktype.md)
+[TaskType](./omniplan.tasktype.md) \| null
 
 </td><td>
 
-Whether this task is a standard task, milestone, group, or hammock
+Whether this task is a standard task, milestone, group, or hammock. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -352,13 +364,15 @@ Whether this task is a standard task, milestone, group, or hammock
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Total cost for this task
+number \| null
+
+</td><td>
+
+Total cost for this task. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

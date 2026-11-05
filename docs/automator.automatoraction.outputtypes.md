@@ -4,10 +4,10 @@
 
 ## AutomatorAction.outputTypes property
 
-The output types produced by the action
+The output types produced by the action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-outputTypes: string[];
+readonly outputTypes: readonly string[] | null;
 ```

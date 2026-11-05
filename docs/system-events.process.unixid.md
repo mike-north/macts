@@ -4,10 +4,10 @@
 
 ## Process.unixId property
 
-The Unix process identifier of a process running in the native environment, or -1 for a process running in the Classic environment
+The Unix process identifier of a process running in the native environment, or -1 for a process running in the Classic environment. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-unixId: number
+readonly unixId: Integer | null;
 ```

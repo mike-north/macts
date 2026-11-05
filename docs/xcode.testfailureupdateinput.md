@@ -4,12 +4,26 @@
 
 ## TestFailureUpdateInput type
 
-Input for updating a TestFailure
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type TestFailureUpdateInput = Partial<TestFailureCreateInput>
+type TestFailureUpdateInput = Omit<
+  TestFailureUpdateInput$1,
+  'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'
+> & {
+  startingLineNumber?: null extends TestFailureUpdateInput$1['startingLineNumber']
+    ? number | null
+    : number
+  endingLineNumber?: null extends TestFailureUpdateInput$1['endingLineNumber']
+    ? number | null
+    : number
+  startingColumnNumber?: null extends TestFailureUpdateInput$1['startingColumnNumber']
+    ? number | null
+    : number
+  endingColumnNumber?: null extends TestFailureUpdateInput$1['endingColumnNumber']
+    ? number | null
+    : number
+}
 ```
-
-**References:** [TestFailureCreateInput](./xcode.testfailurecreateinput.md)

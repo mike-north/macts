@@ -4,10 +4,10 @@
 
 ## Milestone.startingDate property
 
-The date of the milestone
+The date of the milestone. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-startingDate: Date
+startingDate: Date | null
 ```

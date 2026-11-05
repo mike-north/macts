@@ -25,16 +25,30 @@ export class AutomatorActionResourceClient {
    * List the automator actions of one workflow, as one page.
    * When several workflows share the same name, the first match in the app's order is used as the workflow.
    */
-  async list(workflowName: string): Promise<Page<AutomatorAction>> {
-    return this.#http.rpc<Page<AutomatorAction>>(`${this.#app}.${this.#resource}.list`, {
-      workflowName,
-    })
+  async list(
+    workflowName: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Page<AutomatorAction>> {
+    return this.#http.invoke<Page<AutomatorAction>>(
+      `${this.#app}.${this.#resource}.list`,
+      { workflowName },
+      __mactsOptions,
+      'AutomatorAction'
+    )
   }
 
   /**
    * Get a automator action by id.
    */
-  async get(id: string): Promise<AutomatorAction> {
-    return this.#http.rpc<AutomatorAction>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<AutomatorAction> {
+    return this.#http.invoke<AutomatorAction>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'AutomatorAction'
+    )
   }
 }

@@ -4,14 +4,44 @@
 
 ## WorkspaceDocumentResourceClient.list() method
 
-List all workspacedocuments.
+List all workspace documents, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<WorkspaceDocument[]>;
+list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<WorkspaceDocument>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[WorkspaceDocument](./xcode.workspacedocument.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[WorkspaceDocument](./xcode.workspacedocument.md)<!-- -->&gt;&gt;

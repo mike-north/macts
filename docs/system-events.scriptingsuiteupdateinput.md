@@ -4,12 +4,10 @@
 
 ## ScriptingSuiteUpdateInput type
 
-Input for updating a ScriptingSuite
+Input for updating a ScriptingSuite. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ScriptingSuiteUpdateInput = Partial<ScriptingSuiteCreateInput>
+type ScriptingSuiteUpdateInput = Record<string, never>
 ```
-
-**References:** [ScriptingSuiteCreateInput](./system-events.scriptingsuitecreateinput.md)

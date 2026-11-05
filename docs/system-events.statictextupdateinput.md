@@ -4,12 +4,10 @@
 
 ## StaticTextUpdateInput type
 
-Input for updating a StaticText
+Input for updating a StaticText. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type StaticTextUpdateInput = Partial<StaticTextCreateInput>
+type StaticTextUpdateInput = Record<string, never>
 ```
-
-**References:** [StaticTextCreateInput](./system-events.statictextcreateinput.md)

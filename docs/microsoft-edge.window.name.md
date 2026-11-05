@@ -4,10 +4,10 @@
 
 ## Window.name property
 
-The full title of the window.
+The full title of the window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

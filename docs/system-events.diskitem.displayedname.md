@@ -4,10 +4,10 @@
 
 ## DiskItem.displayedName property
 
-the name of the disk item as displayed in the User Interface
+the name of the disk item as displayed in the User Interface. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-displayedName: string
+readonly displayedName: string | null;
 ```

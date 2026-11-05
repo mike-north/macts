@@ -4,10 +4,10 @@
 
 ## EQPreset.modifiable property
 
-can this preset be modified?
+can this preset be modified? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-modifiable: boolean
+readonly modifiable: boolean | null;
 ```

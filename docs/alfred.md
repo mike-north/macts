@@ -39,7 +39,7 @@ Error class for Alfred API errors.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 </tbody></table>
@@ -56,6 +56,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[AlfredClient](./alfred.alfredclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+
+</td></tr>
+<tr><td>
 
 [AlfredClientOptions](./alfred.alfredclientoptions.md)
 
@@ -101,6 +110,8 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -126,11 +137,20 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[AlfredResources](./alfred.alfredresources.md)
+
+</td><td>
+
+The type of the resource table in `alfredContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
+
+</td></tr>
+<tr><td>
+
 [ApplicationCreateInput](./alfred.applicationcreateinput.md)
 
 </td><td>
 
-Input for creating a Application
+Input for creating an Application.
 
 </td></tr>
 <tr><td>
@@ -139,7 +159,7 @@ Input for creating a Application
 
 </td><td>
 
-Input for updating a Application
+Input for updating an Application. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>

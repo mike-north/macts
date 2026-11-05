@@ -4,10 +4,10 @@
 
 ## Folder.creationDate property
 
-When the folder was created
+When the folder was created. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-creationDate: Date
+readonly creationDate: Date | null;
 ```

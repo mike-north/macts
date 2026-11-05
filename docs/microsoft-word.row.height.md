@@ -4,10 +4,10 @@
 
 ## Row.height property
 
-The height of the row in points
+The height of the row in points. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-height: number
+height: number | null
 ```

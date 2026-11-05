@@ -4,10 +4,10 @@
 
 ## Artwork.data property
 
-data for this artwork, in the form of a picture
+data for this artwork, in the form of a picture. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-data: string
+data: string | null
 ```

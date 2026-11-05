@@ -4,10 +4,10 @@
 
 ## Bookmark.name property
 
-The name of the bookmark
+The name of the bookmark. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

@@ -4,10 +4,10 @@
 
 ## Font.italic property
 
-Whether the font is italic
+Whether the font is italic. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-italic: boolean
+italic: boolean | null
 ```

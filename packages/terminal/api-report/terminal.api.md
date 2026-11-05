@@ -4,7 +4,12 @@
 
 ```ts
 
+import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
+import * as _macts_contracts from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -29,17 +34,21 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 // @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    rpc<T>(path: string, body?: object): Promise<T>;
+    // @internal
+    bind(client?: object): void;
+    // @internal
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
+    rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
 // @public
 export interface SettingsSet {
-    fontName: string;
-    fontSize: number;
-    id: number;
+    fontName: string | null;
+    fontSize: number | null;
+    readonly id: number | null;
     name: string;
-    numberOfColumns: number;
-    numberOfRows: number;
+    numberOfColumns: number | null;
+    numberOfRows: number | null;
 }
 
 // @public
@@ -54,11 +63,11 @@ export interface SettingsSetCreateInput {
 // @public
 export class SettingsSetResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<SettingsSet>;
-    list(): Promise<Page<SettingsSet>>;
+    get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<SettingsSet>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<SettingsSet>>;
 }
 
-// @public (undocumented)
+// @public
 export const SettingsSetSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodNumber;
@@ -69,20 +78,25 @@ export const SettingsSetSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type SettingsSetUpdateInput = Partial<SettingsSetCreateInput>;
+export interface SettingsSetUpdateInput {
+    fontName?: string;
+    fontSize?: number;
+    name?: string;
+    numberOfColumns?: number;
+    numberOfRows?: number;
+}
 
 // @public
 export interface Tab {
-    busy: boolean;
-    contents: string;
-    currentSettings: string;
-    customTitle: string;
-    history: string;
-    id?: string;
-    processes: string;
-    selected: boolean;
-    titleDisplaysCustomTitle: boolean;
-    tty: string;
+    readonly busy: boolean | null;
+    readonly contents: string | null;
+    currentSettings: string | null;
+    customTitle: string | null;
+    readonly history: string | null;
+    readonly processes: string | null;
+    selected: boolean | null;
+    titleDisplaysCustomTitle: boolean | null;
+    readonly tty: string;
 }
 
 // @public
@@ -96,11 +110,11 @@ export interface TabCreateInput {
 // @public
 export class TabResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<Tab>;
-    list(): Promise<Page<Tab>>;
+    get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Tab>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Tab>>;
 }
 
-// @public (undocumented)
+// @public
 export const TabSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     contents: z.ZodString;
@@ -115,12 +129,21 @@ export const TabSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type TabUpdateInput = Partial<TabCreateInput>;
+export interface TabUpdateInput {
+    currentSettings?: string;
+    customTitle?: string;
+    selected?: boolean;
+    titleDisplaysCustomTitle?: boolean;
+}
+
+// @public
+export interface TerminalClient extends ClientBrand<TerminalResources> {
+}
 
 // @public
 export class TerminalClient {
     constructor(options: TerminalClientOptions);
-    doScript(command: string, _in?: string): Promise<void>;
+    doScript(command: string, _in?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
     readonly settingsSets: SettingsSetResourceClient;
     readonly tabs: TabResourceClient;
@@ -141,12 +164,31 @@ export class TerminalError extends Error {
 }
 
 // @public
+export type TerminalResources = Readonly<{
+    Window: ResourceDescriptor<Window, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'terminal.windows.get';
+        readonly list: 'terminal.windows.list';
+    };
+    Tab: ResourceDescriptor<Tab, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'terminal.tabs.get';
+        readonly list: 'terminal.tabs.list';
+    };
+    SettingsSet: ResourceDescriptor<SettingsSet, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'terminal.settingsSets.get';
+        readonly list: 'terminal.settingsSets.list';
+    };
+}>;
+
+// @public
 export interface Window {
-    frontmost: boolean;
-    id: number;
-    name: string;
-    position: string;
-    visible: boolean;
+    readonly frontmost: boolean | null;
+    readonly id: number | null;
+    readonly name: string;
+    position: string | null;
+    visible: boolean | null;
 }
 
 // @public
@@ -158,11 +200,11 @@ export interface WindowCreateInput {
 // @public
 export class WindowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<Window>;
-    list(): Promise<Page<Window>>;
+    get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Window>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Window>>;
 }
 
-// @public (undocumented)
+// @public
 export const WindowSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodNumber;
@@ -172,7 +214,10 @@ export const WindowSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
-export type WindowUpdateInput = Partial<WindowCreateInput>;
+export interface WindowUpdateInput {
+    position?: string;
+    visible?: boolean;
+}
 
 // (No @packageDocumentation comment for this package)
 

@@ -24,15 +24,28 @@ export class DocumentResourceClient {
   /**
    * List all documents, as one page.
    */
-  async list(): Promise<Page<Document>> {
-    return this.#http.rpc<Page<Document>>(`${this.#app}.${this.#resource}.list`)
+  async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Document>> {
+    return this.#http.invoke<Page<Document>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'Document'
+    )
   }
 
   /**
    * Get a document by name.
    * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async get(name: string): Promise<Document> {
-    return this.#http.rpc<Document>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(
+    name: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Document> {
+    return this.#http.invoke<Document>(
+      `${this.#app}.${this.#resource}.get`,
+      { name },
+      __mactsOptions,
+      'Document'
+    )
   }
 }

@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The color of the character.
+The color of the character. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ The color of the character.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the font of the character.
+The name of the font of the character. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ The name of the font of the character.
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The size in points of the character.
+The size in points of the character. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

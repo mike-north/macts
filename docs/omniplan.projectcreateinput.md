@@ -4,7 +4,7 @@
 
 ## ProjectCreateInput interface
 
-Input for creating a Project
+Input for creating a Project.
 
 **Signature:**
 

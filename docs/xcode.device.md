@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-A stable identifier for the device
+A stable identifier for the device. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ A stable identifier for the device
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The model of device
+string \| null
+
+</td><td>
+
+The model of device. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,28 +71,15 @@ The model of device
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether this run destination is generic instead of representing a specific device
-
-</td></tr>
-<tr><td>
-
-[id?](./xcode.device.id.md)
+boolean \| null
 
 </td><td>
 
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `deviceIdentifier`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
+Whether this run destination is generic instead of representing a specific device. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +88,15 @@ _(Optional)_ Canonical identifier (mirrors `deviceIdentifier`<!-- -->); populate
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the device
+string \| null
+
+</td><td>
+
+The name of the device. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,13 +105,15 @@ The name of the device
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The version of the operating system installed on the device
+string \| null
+
+</td><td>
+
+The version of the operating system installed on the device. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

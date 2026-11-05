@@ -4,10 +4,10 @@
 
 ## ListViewOptions.usesRelativeDates property
 
-Are relative dates (e.g., today, yesterday) shown in the list view?
+Are relative dates (e.g., today, yesterday) shown in the list view? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-usesRelativeDates: boolean
+usesRelativeDates: boolean | null
 ```
