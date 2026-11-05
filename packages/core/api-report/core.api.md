@@ -443,6 +443,14 @@ export const AppManifestSchema: z.ZodObject<{
                 term: z.ZodString;
             }, z.core.$strict>;
         }, z.core.$strict>>>;
+        positional: z.ZodOptional<z.ZodObject<{
+            evidence: z.ZodObject<{
+                source: z.ZodLiteral<"curated">;
+                note: z.ZodString;
+                observedAt: z.ZodISODateTime;
+                appVersion: z.ZodString;
+            }, z.core.$strict>;
+        }, z.core.$strict>>;
     }, z.core.$strip>>;
     enums: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodObject<{
         name: z.ZodString;
@@ -1995,6 +2003,9 @@ export function isAppRunning(bundleId: string): Promise<boolean>;
 export function isCoarseOperation(operation: string): operation is CoarseOperation;
 
 // @public
+export function isPositional(manifest: AppManifest, resourceKey: string): boolean;
+
+// @public
 export function isPureCoarseOperation(operation: string): operation is PureCoarseOperation;
 
 // @public
@@ -2211,7 +2222,7 @@ export const NATIVE_DECODE_FUNCTION = "__mactsDecode";
 export const NATIVE_ENCODE_FUNCTION = "__mactsEncode";
 
 // @public
-export type NativeAddressing = NativeCollectionAddressing | NativeRootAddressing;
+export type NativeAddressing = NativeCollectionAddressing | NativePositionalAddressing | NativeRootAddressing;
 
 // @public
 export interface NativeBodyOptions {
@@ -2228,6 +2239,7 @@ export interface NativeCodec {
 // @public
 export interface NativeCodecEnvironment {
     readonly app: unknown;
+    readonly positionOf?: (specifier: unknown) => unknown;
     readonly references: NativeReferenceTable;
 }
 
@@ -2261,6 +2273,7 @@ export type NativeFailure = {
     readonly message: string;
     readonly unsupportedKind?: string;
     readonly missingResource?: string;
+    readonly outOfRangeResource?: string;
 };
 
 // @public
@@ -2271,6 +2284,13 @@ export type NativeOutcome = {
     readonly ok: false;
     readonly failure: NativeFailure;
 };
+
+// @public
+export interface NativePositionalAddressing {
+    readonly collection: string;
+    readonly lookup: 'byIndex';
+    readonly within: string;
+}
 
 // @public
 export interface NativeReferencePlans {
@@ -2777,6 +2797,20 @@ export const PolicySchema: z.ZodObject<{
     }, z.core.$strict>>>;
     tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
 }, z.core.$strict>;
+
+// @public (undocumented)
+export type PositionalEvidence = z.infer<typeof PositionalEvidenceSchema>;
+
+// @public
+export const PositionalEvidenceSchema: z.ZodObject<{
+    source: z.ZodLiteral<"curated">;
+    note: z.ZodString;
+    observedAt: z.ZodISODateTime;
+    appVersion: z.ZodString;
+}, z.core.$strict>;
+
+// @public
+export function positionalProblems(manifest: AppManifest): string[];
 
 // @public (undocumented)
 export type PrimitiveType = z.infer<typeof PrimitiveTypeSchema>;
@@ -3479,6 +3513,19 @@ export interface ResourceNullabilityResult {
     readonly truncated: boolean;
 }
 
+// @public (undocumented)
+export type ResourcePositional = z.infer<typeof ResourcePositionalSchema>;
+
+// @public
+export const ResourcePositionalSchema: z.ZodObject<{
+    evidence: z.ZodObject<{
+        source: z.ZodLiteral<"curated">;
+        note: z.ZodString;
+        observedAt: z.ZodISODateTime;
+        appVersion: z.ZodString;
+    }, z.core.$strict>;
+}, z.core.$strict>;
+
 // @public
 export interface ResourceProbeResult {
     candidates: IdentifierProbeResult[];
@@ -3882,6 +3929,14 @@ export const ResourceSchema: z.ZodObject<{
             term: z.ZodString;
         }, z.core.$strict>;
     }, z.core.$strict>>>;
+    positional: z.ZodOptional<z.ZodObject<{
+        evidence: z.ZodObject<{
+            source: z.ZodLiteral<"curated">;
+            note: z.ZodString;
+            observedAt: z.ZodISODateTime;
+            appVersion: z.ZodString;
+        }, z.core.$strict>;
+    }, z.core.$strict>>;
 }, z.core.$strip>;
 
 // @public (undocumented)

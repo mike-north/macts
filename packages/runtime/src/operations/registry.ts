@@ -23,6 +23,7 @@ import {
   contractResourcePlans,
   listOperationPages,
   normalizeAppRouteSegment,
+  positionalProblems,
   resolveCommandRoutes,
   unselectableItemCommands,
 } from '@macts/core'
@@ -206,6 +207,12 @@ function deriveManifestOperations(manifest: AppManifest): ManifestOperation[] {
  * command or resource marked unsupported has no operation and is never
  * refused.
  *
+ * The rule of the `positional` marker is checked with it
+ * (`positionalProblems` in `@macts/core`, the one generation and the manifest
+ * schema apply): a positional resource has no primary identifier, a get under
+ * a parent the app finds by its identifier, and an integer position
+ * parameter on each command that selects one of its items.
+ *
  * Both registrations run it, so a contract cannot register an operation for a
  * manifest that registration from the manifest alone refuses.
  *
@@ -215,13 +222,16 @@ function deriveManifestOperations(manifest: AppManifest): ManifestOperation[] {
  *   key, and saying which identifier parameter to declare.
  */
 function assertItemsSelectable(manifest: AppManifest, registration: 'manifest' | 'contract'): void {
-  const [first] = unselectableItemCommands(manifest)
+  const [first] = [
+    ...unselectableItemCommands(manifest).map(({ problem }) => problem),
+    ...positionalProblems(manifest),
+  ]
   if (first === undefined) return
   const refused =
     registration === 'manifest'
       ? 'cannot be registered from its manifest'
       : 'cannot be registered from its contract, because its manifest is refused'
-  throw new OperationRegistrationError(`App "${manifest.app.name}" ${refused}: ${first.problem}`)
+  throw new OperationRegistrationError(`App "${manifest.app.name}" ${refused}: ${first}`)
 }
 
 /** Combine a descriptor with the manifest-side facts for its command. */

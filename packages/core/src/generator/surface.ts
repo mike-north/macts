@@ -17,6 +17,7 @@
 
 import type { AppManifest, Command, CommandParameter, Resource } from '../manifest/index.js'
 import { itemIdentifierParameter, unselectableItemCommands } from '../manifest/item-selection.js'
+import { positionalProblems } from '../manifest/positional.js'
 import { normalizeResourceRouteSegment } from '../manifest/route.js'
 import { splitIdentifierWords } from '../manifest/lower-camel.js'
 import {
@@ -183,7 +184,8 @@ export function findResourceCreateCommand(
  * The errors that refuse generating anything from a manifest: one per command
  * that must select one item and declares no identifier parameter to select it
  * by (`unselectableItemCommands`), each naming the app and the command key and
- * saying what to declare.
+ * saying what to declare, then one per broken `positional` marker
+ * (`positionalProblems`).
  *
  * Every package and SDK generator checks this before it builds any file and
  * returns these errors with no files, and `generateCapabilitiesModule` throws
@@ -191,8 +193,12 @@ export function findResourceCreateCommand(
  * declare. Registration refuses the same commands by the same rule.
  */
 export function generationRefusals(manifest: AppManifest): string[] {
-  return unselectableItemCommands(manifest).map(
-    ({ problem }) => `App "${manifest.app.name}" cannot be generated from its manifest: ${problem}`
+  const problems = [
+    ...unselectableItemCommands(manifest).map(({ problem }) => problem),
+    ...positionalProblems(manifest),
+  ]
+  return problems.map(
+    (problem) => `App "${manifest.app.name}" cannot be generated from its manifest: ${problem}`
   )
 }
 

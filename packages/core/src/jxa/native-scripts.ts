@@ -75,6 +75,7 @@ import {
   omittedOutputProperties,
   outputProperties,
 } from '../manifest/output-references.js'
+import { isPositional } from '../manifest/positional.js'
 import { resolvingCommand } from '../manifest/resource-commands.js'
 import { ROOT_KIND_PROPERTY, rootProperties } from '../manifest/roots.js'
 import { ABSENT_VALUE_ERROR_NUMBER, readsAbsentAsNull } from '../manifest/schemas/evidence.js'
@@ -609,15 +610,24 @@ export function buildNestedTargetExpression(
  * `valueExpression`, in the form the resource's identifier targeting selects.
  * A resource with no identifier takes the `byId` form.
  *
- * @throws `InternalError` for a singleton root, which no collection holds.
- *   The manifest schema lets no command reach a root through a collection,
- *   so reaching this is a macts defect.
+ * @throws `InternalError` for a singleton root, which no collection holds,
+ *   and for a positional resource, which has no identifier: its items are
+ *   found by position ({@link bindTarget}). The manifest schema lets no
+ *   command reach a root through a collection, and requires a positional
+ *   resource's commands to record a parent, so reaching this is a macts
+ *   defect.
  */
 function lookupInCollection(
   resource: Resource | undefined,
   collection: string,
   valueExpression: string
 ): string {
+  if (resource?.positional !== undefined) {
+    throw new InternalError(
+      'A positional item is found by its position within its parent, not by an identifier.',
+      {}
+    )
+  }
   const lookup = identifierLookup(resource)
   if (lookup?.lookup === 'byRoot') {
     throw new InternalError('A root is held by the application, not in a collection.', {})
@@ -669,8 +679,10 @@ function identifierLookup(resource: Resource | undefined):
  * container's, and `within` names the parent, whose own addressing finds the
  * container by the parent's own targeting (`byKey` for a parent found by its
  * key). So a resource is addressable only when its parent is, level by
- * level. There is no addressing for a resource with no identifier, with no
- * get, or whose parent has none.
+ * level. A positional resource, which has no identifier, is found by its
+ * position within the parent its get records (`NativePositionalAddressing`).
+ * There is no addressing for any other resource with no identifier, for one
+ * with no get, or for one whose parent has none.
  *
  * A singleton root is addressed by its kinds: the application property each
  * one names (`NativeRootAddressing`). It is held by the application itself,
@@ -709,10 +721,25 @@ function addressingWithin(
     ? manifest.resources[resourceKey]
     : undefined
   const lookup = identifierLookup(resource)
-  if (resource === undefined || lookup === undefined || seen.has(resourceKey)) return undefined
+  if (resource === undefined || seen.has(resourceKey)) return undefined
   const get = resolvingCommand(manifest, resourceKey, 'get')
   if (get === undefined) return undefined
   const parent = get[1].parent?.resource
+  if (isPositional(manifest, resourceKey)) {
+    // Found by its position within its parent, which the manifest schema
+    // requires the get to record and the app to find by its identifier.
+    if (parent === undefined) return undefined
+    const container = addressingWithin(manifest, parent, new Set([...seen, resourceKey]))
+    if (container === undefined) return undefined
+    if (container.lookup === 'byRoot') {
+      throw new InternalError(
+        `The macOS provider cannot use the singleton root ${JSON.stringify(parent)} as a container.`,
+        {}
+      )
+    }
+    return { lookup: 'byIndex', collection: resolveCollectionAccessor(resource), within: parent }
+  }
+  if (lookup === undefined) return undefined
   if (resource.roots !== undefined) {
     if (parent !== undefined) {
       throw new InternalError(
@@ -893,7 +920,9 @@ function findParameter(command: Command, name: string): CommandParameter | undef
  * when it, or the parent it is scoped under, does not exist.
  *
  * Every get, update, and delete addresses its target this way, so a missing
- * target is reported identically whichever operation reached it.
+ * target is reported identically whichever operation reached it. A
+ * positional resource's item is the one at the zero-based position its item
+ * parameter carries, within the parent ({@link bindPosition}).
  */
 function bindTarget(
   command: Command,
@@ -903,6 +932,20 @@ function bindTarget(
   identifierParam: string
 ): string {
   const itemId = `var ${ITEM_ID_LOCAL} = ${argumentValue(identifierParam, findParameter(command, identifierParam))};`
+  if (resource?.positional !== undefined) {
+    if (parentScope === undefined) {
+      throw new InternalError(
+        'A positional item is found by its position within its parent, which its command records.',
+        {}
+      )
+    }
+    return lines(
+      readParentId(command, parentScope),
+      itemId,
+      bindParent(parentScope),
+      bindPosition(member(PARENT_LOCAL, resourcePlural))
+    )
+  }
   if (parentScope === undefined) {
     return lines(
       itemId,
@@ -915,6 +958,27 @@ function bindTarget(
     itemId,
     bindParent(parentScope),
     `var item = ${buildNestedTargetExpression(resource, PARENT_LOCAL, resourcePlural, ITEM_ID_LOCAL)};`,
+    failIfMissing('item')
+  )
+}
+
+/**
+ * Statements binding `item` to the item at the zero-based position
+ * {@link ITEM_ID_LOCAL} holds in `collection`, the app's element addressing
+ * (`collection.at(position)`). A position the collection does not reach,
+ * negative or past its end, raises the native invalid-index number, so it is
+ * classified as an invalid selection, never as a missing object; nothing
+ * else is guessed from it.
+ */
+function bindPosition(collection: string): string {
+  return lines(
+    `var positions = ${collection};`,
+    `if (!(${ITEM_ID_LOCAL} >= 0 && ${ITEM_ID_LOCAL} < positions.length)) {`,
+    "  var outOfRange = new Error('No item at this position.');",
+    `  outOfRange.errorNumber = ${String(INVALID_RANGE_ERROR_NUMBER)};`,
+    '  throw outOfRange;',
+    '}',
+    `var item = positions.at(${ITEM_ID_LOCAL});`,
     failIfMissing('item')
   )
 }

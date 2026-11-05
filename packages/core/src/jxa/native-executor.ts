@@ -422,6 +422,12 @@ function unresolvableForm(
   // A caller error, not a missing feature (phases/13 D7, container scoping).
   const misplacedContainer = `The macOS provider cannot resolve a reference to ${target} through that container: a reference carries a container only when ${app} finds its resource within another, and then as an identity reference to that resource.`
   if (reference.form === 'selector') {
+    if (reference.cardinality === 'one' && reference.selector.by === 'index') {
+      const unresolvable = unresolvablePosition(reference, references)
+      if (unresolvable === 'container') return misplacedContainer
+      if (unresolvable !== undefined) return unresolvableMessage(manifest, unresolvable)
+      return undefined
+    }
     return cannot(
       reference.cardinality === 'one'
         ? `a selector reference to ${target}`
@@ -476,9 +482,40 @@ function unresolvableChain(
   return unresolvableChain(container, references)
 }
 
+/**
+ * Why an index selector does not resolve, as {@link unresolvableChain} answers
+ * for an identity reference: its resource must be positional (its addressing
+ * is `byIndex`), and it must carry an identity container of the parent it is
+ * found within, whose chain resolves. Any other index selector names a
+ * resource the provider does not find by position.
+ */
+function unresolvablePosition(
+  reference: Extract<ReferenceWire, { readonly form: 'selector'; readonly cardinality: 'one' }>,
+  references: NativeReferenceTable
+): 'container' | Unresolvable | undefined {
+  const entry = Object.hasOwn(references, reference.resource)
+    ? references[reference.resource]
+    : undefined
+  const addressing = entry?.addressing
+  if (addressing?.lookup !== 'byIndex') return { kind: 'no-position', resource: reference.resource }
+  const container = reference.container
+  if (container === undefined) {
+    return { kind: 'no-container', resource: reference.resource, within: addressing.within }
+  }
+  if (
+    container.resource !== addressing.within ||
+    container.form !== 'identity' ||
+    container.cardinality !== 'one'
+  ) {
+    return 'container'
+  }
+  return unresolvableChain(container, references)
+}
+
 /** A level of a reference that the provider cannot resolve, and why. */
 type Unresolvable =
   | { readonly kind: 'no-addressing'; readonly resource: string }
+  | { readonly kind: 'no-position'; readonly resource: string }
   | { readonly kind: 'no-container'; readonly resource: string; readonly within: string }
 
 /** Why references to `resource` do not resolve at all, if they do not. */
@@ -487,7 +524,11 @@ function unresolvableTarget(
   references: NativeReferenceTable
 ): Unresolvable | undefined {
   const entry = Object.hasOwn(references, resource) ? references[resource] : undefined
-  return entry?.id === undefined || entry.addressing === undefined
+  // A positional resource has no identifier, so no identity reference to it
+  // resolves; an index selector to it is judged by `unresolvablePosition`.
+  return entry?.id === undefined ||
+    entry.addressing === undefined ||
+    entry.addressing.lookup === 'byIndex'
     ? { kind: 'no-addressing', resource }
     : undefined
 }
@@ -500,9 +541,14 @@ function unresolvableMessage(
   if (unresolvable === undefined) return undefined
   const app = manifest.app.name
   const target = `the ${app} resource ${JSON.stringify(unresolvable.resource)}`
-  return unresolvable.kind === 'no-addressing'
-    ? `The macOS provider cannot resolve references to ${target} yet: ${app} does not find one by its identifier alone.`
-    : `The macOS provider cannot resolve a reference to ${target} without its container: ${app} finds one only within its ${JSON.stringify(unresolvable.within)}.`
+  switch (unresolvable.kind) {
+    case 'no-addressing':
+      return `The macOS provider cannot resolve references to ${target} yet: ${app} does not find one by its identifier alone.`
+    case 'no-position':
+      return `The macOS provider cannot resolve a selector reference to ${target} yet: ${app} does not find one by its position.`
+    case 'no-container':
+      return `The macOS provider cannot resolve a reference to ${target} without its container: ${app} finds one only within its ${JSON.stringify(unresolvable.within)}.`
+  }
 }
 
 /**
@@ -555,6 +601,14 @@ function describeResolutionFailure(
           { resource },
           { cause }
         )
+  }
+  if (failure.outOfRangeResource !== undefined) {
+    const resource = failure.outOfRangeResource
+    return new InvalidSelectionError(
+      `The ${resource} collection in ${app} has no item at the position the reference selects.`,
+      { resource },
+      { cause }
+    )
   }
   if (failure.unsupportedKind !== undefined) {
     return new InternalError(
@@ -834,6 +888,9 @@ function describeReportedFailure(
   if (failure.source === 'codec' && failure.missingResource !== undefined) {
     return describeMissingReference(failure, failure.missingResource, context)
   }
+  if (failure.source === 'codec' && failure.outOfRangeResource !== undefined) {
+    return describeOutOfRangeReference(failure, failure.outOfRangeResource, context)
+  }
   if (failure.source === 'collection') {
     return new CollectionChangedError(
       `The ${context.operation.resource ?? 'item'} collection in ${app} changed while it was being read, so no consistent result exists. The same request can be retried, from the first page if it was paged.`,
@@ -943,6 +1000,25 @@ function describeMissingReference(
   const at = position === '' ? '' : ` at \`${position}\``
   return new TargetNotFoundError(
     `${context.app} has no ${resource} matching the reference${at}.`,
+    { resource },
+    { cause: Object.assign(new Error(failure.message), { path: failure.path }) }
+  )
+}
+
+/**
+ * The error for an input index selector whose position its container's
+ * collection does not reach: an invalid selection of the reference's
+ * resource.
+ */
+function describeOutOfRangeReference(
+  failure: Extract<NativeFailure, { source: 'codec' }>,
+  resource: string,
+  context: NativeFailureContext
+): InvalidSelectionError {
+  const position = describePosition(failure.path)
+  const at = position === '' ? '' : ` at \`${position}\``
+  return new InvalidSelectionError(
+    `The ${resource} collection in ${context.app} has no item at the position the reference${at} selects.`,
     { resource },
     { cause: Object.assign(new Error(failure.message), { path: failure.path }) }
   )

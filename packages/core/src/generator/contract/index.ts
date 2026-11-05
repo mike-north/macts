@@ -67,8 +67,11 @@ import {
   omittedOutputPositions,
   omittedOutputProperties,
   omittedOutputResult,
+  withEmittedForms,
   type OmittedOutputReason,
 } from '../../manifest/output-references.js'
+import { isPositional } from '../../manifest/positional.js'
+import { positionalFieldNote, positionalSelectionNote } from '../positional-docs.js'
 import {
   appCommandEntries,
   commandMethodParameters,
@@ -974,12 +977,18 @@ class ContractBuilder {
   #allRecordFields(resource: Resource): (FieldModel & { readonly readOnly: boolean })[] {
     return usableProperties(resource).map(([name, prop]) => {
       const resolution = resolveReadNullability(resource, name, prop)
-      const shape = this.#map(prop.type, 'output')
+      // A native read emits a reference to a positional target as an index
+      // selector, so the field is typed and documented as one.
+      const shape = withEmittedForms(this.#manifest, this.#map(prop.type, 'output'))
+      const positional = indexSelectorTarget(shape)
       return {
         name,
         shape: resolution.nullable ? nullableShape(shape) : shape,
         optional: prop.optional,
-        description: prop.description,
+        description:
+          positional === undefined
+            ? prop.description
+            : `${sentence(prop.description)} ${positionalFieldNote(this.#manifest, positional)}`,
         nullabilityNote: readNullabilityNote(resolution, this.#manifest.app.name),
         readOnly: prop.access === 'r',
       }
@@ -1042,12 +1051,21 @@ class ContractBuilder {
    */
   #identifierFields(command: Command): FieldModel[] {
     const { parentParam, childParam } = resolveIdParams(command)
+    const positional = this.#positionalResource(command)
     const field = (name: string): FieldModel => {
       const param = command.parameters.find((p) => p.name === name)
       if (param === undefined) {
         throw new Error(`The ${command.name} command does not declare its parameter "${name}".`)
       }
-      return { ...this.#parameterField(param), optional: false }
+      const model = { ...this.#parameterField(param), optional: false }
+      // The item of a positional resource is selected by its position, which
+      // its parameter documents.
+      return positional === undefined || name !== childParam
+        ? model
+        : {
+            ...model,
+            description: `${sentence(model.description)} ${positionalSelectionNote(this.#manifest, positional)}`,
+          }
     }
     return parentParam === undefined ? [field(childParam)] : [field(parentParam), field(childParam)]
   }
@@ -1247,17 +1265,34 @@ class ContractBuilder {
     const fields = this.#identifierFields(command)
     const { parentParam, childParam } = resolveIdParams(command)
     const scope = parentParam === undefined ? '' : ` within \`${parentParam}\``
+    const selected =
+      this.#positionalResource(command) === undefined
+        ? `identified by \`${childParam}\``
+        : `at the zero-based position \`${childParam}\``
     return {
       fields,
-      phrase: `the ${identifierWords(resource.name)} identified by \`${childParam}\`${scope}`,
+      phrase: `the ${identifierWords(resource.name)} ${selected}${scope}`,
     }
+  }
+
+  /**
+   * The resource a command acts on, when it is positional and so selects its
+   * item by position (`../../manifest/positional.ts`).
+   */
+  #positionalResource(command: Command): string | undefined {
+    const key = command.resourceType
+    return typeof key === 'string' && isPositional(this.#manifest, key) ? key : undefined
   }
 
   #getMethod(resource: Resource, command: Command, operation: OperationModel): MethodModel {
     const { fields, phrase } = this.#identified(resource, command)
+    const positional = this.#positionalResource(command)
     return {
       name: 'get',
-      doc: `Read ${phrase}.`,
+      doc:
+        positional === undefined
+          ? `Read ${phrase}.`
+          : `Read ${phrase}. ${positionalSelectionNote(this.#manifest, positional)}`,
       params: this.#positional(fields),
       returnType: resource.name,
       operation,
@@ -1908,6 +1943,24 @@ function unavailableReason(operation: OperationModel): string | undefined {
       `\`${name}\` takes a reference to ${withArticle(identifierWords(resource))}, which the app has no operation to get`
   )
   return `Not available: ${causes.join('; ')}, so the operation cannot be called.`
+}
+
+/**
+ * The positional resource an output composition references as an index
+ * selector (`form: 'index'`), looking through arrays and nullables, or
+ * `undefined` when it holds none.
+ */
+function indexSelectorTarget(shape: ValueShape): string | undefined {
+  switch (shape.kind) {
+    case 'reference':
+      return shape.form === 'index' ? shape.resourceKey : undefined
+    case 'array':
+      return indexSelectorTarget(shape.item)
+    case 'nullable':
+      return indexSelectorTarget(shape.inner)
+    default:
+      return undefined
+  }
 }
 
 /**

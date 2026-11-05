@@ -20,6 +20,7 @@ export {
   NATIVE_COLLECTION_CHANGED_ERROR_NAME,
   type NativeAddressing,
   type NativeCollectionAddressing,
+  type NativePositionalAddressing,
   type NativeRootAddressing,
   type NativeCodec,
   type NativeCodecEnvironment,

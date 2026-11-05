@@ -35,6 +35,10 @@ export {
   type UnselectableItemCommand,
 } from './item-selection.js'
 
+// The rule of the `positional` marker (shared by the manifest schema, the
+// generators and operation registration, so each refuses the same manifests)
+export { isPositional, positionalProblems } from './positional.js'
+
 // Nullability and resettability decisions for manifest fields (single source
 // of truth shared by the contract generator and the nullability probe)
 export * from './nullability.js'

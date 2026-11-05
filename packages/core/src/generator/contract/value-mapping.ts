@@ -56,6 +56,7 @@ export type ContractTypeName =
   | 'FileSource'
   | 'ObjectReferenceVariant'
   | 'ObjectReferenceData'
+  | 'IndexSelectorReference'
 
 /** What rendering needs to know about the generated module around it. */
 export interface RenderContext {
@@ -129,8 +130,14 @@ export class ValueRenderer {
       case 'nullable':
         return `t.nullable(${withOptions(this.expression(shape.inner))})`
       case 'reference': {
+        const key = stringLiteral(shape.resourceKey)
+        if (shape.form === 'index') {
+          const record = this.#context.recordInterface(shape.resourceKey)
+          const args = `() => ${this.#context.scopeBinding}, ${key}`
+          return `t.indexSelectorReference<${record}, ${key}>(${withOptions(args)})`
+        }
         const typeArgs = this.#referenceTypeArguments(shape.resourceKey)
-        const args = `() => ${this.#context.scopeBinding}, ${stringLiteral(shape.resourceKey)}, 'one'`
+        const args = `() => ${this.#context.scopeBinding}, ${key}, 'one'`
         return `t.reference<${typeArgs}>(${withOptions(args)})`
       }
     }
@@ -145,7 +152,9 @@ export class ValueRenderer {
    * can resolve. An input takes the data form
    * (`ObjectReferenceData<Id, 'Key'>`), so a caller can pass a reference it
    * built, in either form, or one it received. The resource key is a literal
-   * type in both, so a reference to another resource does not type-check.
+   * type in both, so a reference to another resource does not type-check. An
+   * output emitted as an index selector within its container (`form:
+   * 'index'`) holds the narrower `IndexSelectorReference<Record, 'Key'>`.
    */
   sdkType(shape: ValueShape, position: ValuePosition): string {
     return this.#sdkType(shape, position, new Set())
@@ -184,6 +193,9 @@ export class ValueRenderer {
         return `${this.#sdkType(shape.inner, position, visiting)} | null`
       case 'reference': {
         const key = stringLiteral(shape.resourceKey)
+        if (position === 'output' && shape.form === 'index') {
+          return `${this.#use('IndexSelectorReference')}<${this.#context.recordInterface(shape.resourceKey)}, ${key}>`
+        }
         const id = this.#identifierType(shape.resourceKey, visiting)
         return position === 'output'
           ? `${this.#use('ObjectReferenceVariant')}<${this.#context.recordInterface(shape.resourceKey)}, ${id}, ${key}>`
@@ -288,7 +300,9 @@ export class ValueBuilder {
       case 'nullable':
         return t.nullable(this.build(shape.inner), options)
       case 'reference':
-        return t.reference(() => this.#context.scope(), shape.resourceKey, 'one', options)
+        return shape.form === 'index'
+          ? t.indexSelectorReference(() => this.#context.scope(), shape.resourceKey, options)
+          : t.reference(() => this.#context.scope(), shape.resourceKey, 'one', options)
     }
   }
 }
