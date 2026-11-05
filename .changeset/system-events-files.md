@@ -17,4 +17,5 @@ A disk item and a folder are identified by their POSIX path. The path names a lo
 
 - `pOSIXPath` is renamed `posixPath` on disk items and folders.
 - `id` no longer identifies a disk item or a folder, because System Events cannot look one up by it. `DiskItem.id` and `Folder.id` are now typed `string | null`, like any field without evidence that the app always sets it.
+- `UserDomainObject.id` and `ClassicDomainObject.id` are now `string | null`; their non-null identifying field is `kind`.
 - The Classic domain's folders that current macOS does not have are removed from its record: the Apple Menu Items, Control Panels, Control Strip Modules, Desktop, Extensions, Fonts, Launcher Items, Shutdown Items, Startup Items and System folders, and the Desktop Pictures, Folder Action Scripts, Scripting Additions, Shared Documents, Speakable Items and Utilities folders it inherits from a domain. Every read of them fails on macOS 27.2, which has no Classic environment. Its Preferences folder stays.
