@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-If this scheme action performed a build, this will be the text of the build log
+If this scheme action performed a build, this will be the text of the build log. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +52,15 @@ If this scheme action performed a build, this will be the text of the build log
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether this scheme action has completed (successfully or otherwise) or not
+boolean \| null
+
+</td><td>
+
+Whether this scheme action has completed (successfully or otherwise) or not. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +71,11 @@ Whether this scheme action has completed (successfully or otherwise) or not
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-If the result's status is "error occurred", this will be the error message
+If the result's status is "error occurred", this will be the error message. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +84,15 @@ If the result's status is "error occurred", this will be the error message
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier for the scheme action result
+The unique identifier for the scheme action result. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -99,11 +103,11 @@ The unique identifier for the scheme action result
 
 </td><td>
 
-[SchemeActionResultStatus](./xcode.schemeactionresultstatus.md)
+[SchemeActionResultStatus](./xcode.schemeactionresultstatus.md) \| null
 
 </td><td>
 
-Indicates the status of the scheme action
+Indicates the status of the scheme action. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -31,7 +31,8 @@ export class LayerResourceClient {
     return this.#http.invoke<Page<Layer>>(
       `${this.#app}.${this.#resource}.list`,
       { canvasId },
-      __mactsOptions
+      __mactsOptions,
+      'Layer'
     )
   }
 
@@ -40,7 +41,12 @@ export class LayerResourceClient {
    * When several layers share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async get(name: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Layer> {
-    return this.#http.invoke<Layer>(`${this.#app}.${this.#resource}.get`, { name }, __mactsOptions)
+    return this.#http.invoke<Layer>(
+      `${this.#app}.${this.#resource}.get`,
+      { name },
+      __mactsOptions,
+      'Layer'
+    )
   }
 
   /**
@@ -50,6 +56,11 @@ export class LayerResourceClient {
     input: LayerCreateInput,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Layer> {
-    return this.#http.invoke<Layer>(`${this.#app}.${this.#resource}.create`, input, __mactsOptions)
+    return this.#http.invoke<Layer>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'Layer'
+    )
   }
 }

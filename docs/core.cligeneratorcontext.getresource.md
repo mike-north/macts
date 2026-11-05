@@ -4,7 +4,7 @@
 
 ## CliGeneratorContext.getResource() method
 
-Get a resource by name
+Get a usable resource (one not marked unsupported) by name
 
 **Signature:**
 

@@ -28,7 +28,8 @@ export class AccountResourceClient {
     return this.#http.invoke<Page<Account>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Account'
     )
   }
 
@@ -43,7 +44,8 @@ export class AccountResourceClient {
     return this.#http.invoke<Account>(
       `${this.#app}.${this.#resource}.get`,
       { name },
-      __mactsOptions
+      __mactsOptions,
+      'Account'
     )
   }
 }

@@ -4,10 +4,10 @@
 
 ## Window.isHotkeyWindow property
 
-Whether the window is a hotkey window.
+Whether the window is a hotkey window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-isHotkeyWindow: boolean
+isHotkeyWindow: boolean | null
 ```

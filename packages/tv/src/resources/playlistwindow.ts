@@ -51,7 +51,8 @@ export class PlaylistWindowResourceClient {
     return this.#http.invoke<Page<PlaylistWindow>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'PlaylistWindow'
     )
   }
 
@@ -65,7 +66,8 @@ export class PlaylistWindowResourceClient {
     return this.#http.invoke<PlaylistWindow>(
       `${this.#app}.${this.#resource}.get`,
       { id: __mactsIntegerInput(id) },
-      __mactsOptions
+      __mactsOptions,
+      'PlaylistWindow'
     )
   }
 }

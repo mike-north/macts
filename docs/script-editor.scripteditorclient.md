@@ -2,106 +2,14 @@
 
 [Home](./index.md) &gt; [@macts/script-editor](./script-editor.md) &gt; [ScriptEditorClient](./script-editor.scripteditorclient.md)
 
-## ScriptEditorClient class
+## ScriptEditorClient interface
 
-ScriptEditor client for HTTP-based macOS automation.
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 **Signature:**
 
 ```typescript
-declare class ScriptEditorClient
+interface ScriptEditorClient extends ClientBrand<ScriptEditorResources>
 ```
 
-## Example
-
-```typescript
-const client = new ScriptEditorClient({
-  apiKey: process.env.MACTS_API_KEY!,
-})
-
-// List calendars
-const calendars = await client.calendars.list()
-```
-
-## Constructors
-
-<table><thead><tr><th>
-
-Constructor
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[(constructor)(options)](./script-editor.scripteditorclient._constructor_.md)
-
-</td><td>
-
-</td><td>
-
-Constructs a new instance of the `ScriptEditorClient` class
-
-</td></tr>
-</tbody></table>
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[documents](./script-editor.scripteditorclient.documents.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[DocumentResourceClient](./script-editor.documentresourceclient.md)
-
-</td><td>
-
-A Script Editor document
-
-</td></tr>
-<tr><td>
-
-[http](./script-editor.scripteditorclient.http.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[HttpClient](./script-editor.httpclient.md)
-
-</td><td>
-
-Get the HTTP client for making custom requests.
-
-</td></tr>
-</tbody></table>
+**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[ScriptEditorResources](./script-editor.scripteditorresources.md)<!-- -->&gt;

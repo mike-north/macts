@@ -4,7 +4,7 @@
 
 ## Reminder.flagged property
 
-Whether the reminder is flagged
+Whether the reminder is flagged. Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 

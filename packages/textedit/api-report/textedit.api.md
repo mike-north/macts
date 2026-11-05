@@ -39,10 +39,11 @@ export interface Document {
     text: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DocumentCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentCreateInput = DocumentCreateInput_2;
+export interface DocumentCreateInput {
+    name?: string;
+    text?: string;
+}
 
 // @public
 export class DocumentResourceClient {
@@ -61,20 +62,19 @@ export const DocumentSchema: z.ZodObject<{
     text: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "DocumentUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentUpdateInput = DocumentUpdateInput_2;
+export interface DocumentUpdateInput {
+    name?: string;
+    text?: string;
+}
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "TextEditResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<TextEditResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -82,7 +82,7 @@ export class HttpClient {
 export interface TextEditClient extends ClientBrand<TextEditResources> {
 }
 
-// @public (undocumented)
+// @public
 export class TextEditClient {
     constructor(options: TextEditClientOptions);
     readonly documents: DocumentResourceClient;
@@ -101,6 +101,15 @@ export class TextEditError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type TextEditResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'textedit.documents.get';
+        readonly list: 'textedit.documents.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

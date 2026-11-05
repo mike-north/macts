@@ -28,7 +28,8 @@ export class SourceResourceClient {
     return this.#http.invoke<Page<Source>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Source'
     )
   }
 
@@ -42,7 +43,8 @@ export class SourceResourceClient {
     return this.#http.invoke<Source>(
       `${this.#app}.${this.#resource}.get`,
       { persistentID },
-      __mactsOptions
+      __mactsOptions,
+      'Source'
     )
   }
 }

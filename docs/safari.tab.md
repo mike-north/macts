@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the tab
+The unique identifier of the tab. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The unique identifier of the tab
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The tab name
+string \| null
+
+</td><td>
+
+The tab name. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ The tab name
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The HTML source of the web page currently loaded in the tab
+string \| null
+
+</td><td>
+
+The HTML source of the web page currently loaded in the tab. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ The HTML source of the web page currently loaded in the tab
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The text of the web page currently loaded in the tab
+string \| null
+
+</td><td>
+
+The text of the web page currently loaded in the tab. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +107,11 @@ The text of the web page currently loaded in the tab
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The tab URL
+The tab URL. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

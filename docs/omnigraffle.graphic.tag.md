@@ -4,10 +4,10 @@
 
 ## Graphic.tag property
 
-Arbitrary string tag attached to this graphic
+Arbitrary string tag attached to this graphic. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-tag: string
+tag: string | null
 ```

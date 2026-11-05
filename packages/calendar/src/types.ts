@@ -17,16 +17,16 @@ export type { ViewType } from './contract/index.js'
 export type { Calendar } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type CalendarCreateInput = import('./contract/index.js').CalendarCreateInput
+export type { CalendarCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type CalendarUpdateInput = import('./contract/index.js').CalendarUpdateInput
+export type { CalendarUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Event } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type EventCreateInput = import('./contract/index.js').EventCreateInput
+export type { EventCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
 export type EventUpdateInput = import('./contract/index.js').EventUpdateInput & {
@@ -37,10 +37,10 @@ export type EventUpdateInput = import('./contract/index.js').EventUpdateInput & 
 export type { Attendee } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type AttendeeCreateInput = import('./contract/index.js').AttendeeCreateInput
+export type { AttendeeCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type AttendeeUpdateInput = import('./contract/index.js').AttendeeUpdateInput
+export type { AttendeeUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { DisplayAlarm } from './contract/index.js'
@@ -51,9 +51,9 @@ export type DisplayAlarmCreateInput = Omit<
   'triggerInterval'
 > & {
   /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
-  triggerInterval?:
-    | number
-    | Extract<import('./contract/index.js').DisplayAlarmCreateInput['triggerInterval'], null>
+  triggerInterval?: null extends import('./contract/index.js').DisplayAlarmCreateInput['triggerInterval']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -62,9 +62,9 @@ export type DisplayAlarmUpdateInput = Omit<
   'triggerInterval'
 > & {
   /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
-  triggerInterval?:
-    | number
-    | Extract<import('./contract/index.js').DisplayAlarmUpdateInput['triggerInterval'], null>
+  triggerInterval?: null extends import('./contract/index.js').DisplayAlarmUpdateInput['triggerInterval']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
@@ -76,9 +76,9 @@ export type MailAlarmCreateInput = Omit<
   'triggerInterval'
 > & {
   /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
-  triggerInterval?:
-    | number
-    | Extract<import('./contract/index.js').MailAlarmCreateInput['triggerInterval'], null>
+  triggerInterval?: null extends import('./contract/index.js').MailAlarmCreateInput['triggerInterval']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -87,9 +87,9 @@ export type MailAlarmUpdateInput = Omit<
   'triggerInterval'
 > & {
   /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
-  triggerInterval?:
-    | number
-    | Extract<import('./contract/index.js').MailAlarmUpdateInput['triggerInterval'], null>
+  triggerInterval?: null extends import('./contract/index.js').MailAlarmUpdateInput['triggerInterval']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
@@ -101,9 +101,9 @@ export type SoundAlarmCreateInput = Omit<
   'triggerInterval'
 > & {
   /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
-  triggerInterval?:
-    | number
-    | Extract<import('./contract/index.js').SoundAlarmCreateInput['triggerInterval'], null>
+  triggerInterval?: null extends import('./contract/index.js').SoundAlarmCreateInput['triggerInterval']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -112,9 +112,9 @@ export type SoundAlarmUpdateInput = Omit<
   'triggerInterval'
 > & {
   /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
-  triggerInterval?:
-    | number
-    | Extract<import('./contract/index.js').SoundAlarmUpdateInput['triggerInterval'], null>
+  triggerInterval?: null extends import('./contract/index.js').SoundAlarmUpdateInput['triggerInterval']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
@@ -126,9 +126,9 @@ export type OpenFileAlarmCreateInput = Omit<
   'triggerInterval'
 > & {
   /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
-  triggerInterval?:
-    | number
-    | Extract<import('./contract/index.js').OpenFileAlarmCreateInput['triggerInterval'], null>
+  triggerInterval?: null extends import('./contract/index.js').OpenFileAlarmCreateInput['triggerInterval']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -137,9 +137,9 @@ export type OpenFileAlarmUpdateInput = Omit<
   'triggerInterval'
 > & {
   /** The interval in minutes between the event and the alarm (positive for after, negative for before) Numeric values are validated by the contract before dispatch. */
-  triggerInterval?:
-    | number
-    | Extract<import('./contract/index.js').OpenFileAlarmUpdateInput['triggerInterval'], null>
+  triggerInterval?: null extends import('./contract/index.js').OpenFileAlarmUpdateInput['triggerInterval']
+    ? number | null
+    : number
 }
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.

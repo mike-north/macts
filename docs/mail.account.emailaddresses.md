@@ -4,10 +4,10 @@
 
 ## Account.emailAddresses property
 
-The list of email addresses configured for an account
+The list of email addresses configured for an account. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-emailAddresses: string
+emailAddresses: string | null
 ```

@@ -42,13 +42,13 @@ export type CanvasCreateInput = Omit<
   'horizontalPages' | 'verticalPages'
 > & {
   /** Horizontal pages Numeric values are validated by the contract before dispatch. */
-  horizontalPages?:
-    | number
-    | Extract<import('./contract/index.js').CanvasCreateInput['horizontalPages'], null>
+  horizontalPages?: null extends import('./contract/index.js').CanvasCreateInput['horizontalPages']
+    ? number | null
+    : number
   /** Vertical pages Numeric values are validated by the contract before dispatch. */
-  verticalPages?:
-    | number
-    | Extract<import('./contract/index.js').CanvasCreateInput['verticalPages'], null>
+  verticalPages?: null extends import('./contract/index.js').CanvasCreateInput['verticalPages']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -57,13 +57,13 @@ export type CanvasUpdateInput = Omit<
   'horizontalPages' | 'verticalPages'
 > & {
   /** Horizontal pages Numeric values are validated by the contract before dispatch. */
-  horizontalPages?:
-    | number
-    | Extract<import('./contract/index.js').CanvasUpdateInput['horizontalPages'], null>
+  horizontalPages?: null extends import('./contract/index.js').CanvasUpdateInput['horizontalPages']
+    ? number | null
+    : number
   /** Vertical pages Numeric values are validated by the contract before dispatch. */
-  verticalPages?:
-    | number
-    | Extract<import('./contract/index.js').CanvasUpdateInput['verticalPages'], null>
+  verticalPages?: null extends import('./contract/index.js').CanvasUpdateInput['verticalPages']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
@@ -75,11 +75,13 @@ export type GraphicCreateInput = Omit<
   'strokePattern' | 'rankGroup'
 > & {
   /** Dash pattern of the stroke Numeric values are validated by the contract before dispatch. */
-  strokePattern?:
-    | number
-    | Extract<import('./contract/index.js').GraphicCreateInput['strokePattern'], null>
+  strokePattern?: null extends import('./contract/index.js').GraphicCreateInput['strokePattern']
+    ? number | null
+    : number
   /** Rank group assigned to this graphic for hierarchical layout Numeric values are validated by the contract before dispatch. */
-  rankGroup?: number | Extract<import('./contract/index.js').GraphicCreateInput['rankGroup'], null>
+  rankGroup?: null extends import('./contract/index.js').GraphicCreateInput['rankGroup']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -88,11 +90,13 @@ export type GraphicUpdateInput = Omit<
   'strokePattern' | 'rankGroup'
 > & {
   /** Dash pattern of the stroke Numeric values are validated by the contract before dispatch. */
-  strokePattern?:
-    | number
-    | Extract<import('./contract/index.js').GraphicUpdateInput['strokePattern'], null>
+  strokePattern?: null extends import('./contract/index.js').GraphicUpdateInput['strokePattern']
+    ? number | null
+    : number
   /** Rank group assigned to this graphic for hierarchical layout Numeric values are validated by the contract before dispatch. */
-  rankGroup?: number | Extract<import('./contract/index.js').GraphicUpdateInput['rankGroup'], null>
+  rankGroup?: null extends import('./contract/index.js').GraphicUpdateInput['rankGroup']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
@@ -104,15 +108,17 @@ export type ShapeCreateInput = Omit<
   'sidePadding' | 'verticalPadding' | 'canvasId'
 > & {
   /** Padding at the left and right of the text space Numeric values are validated by the contract before dispatch. */
-  sidePadding?:
-    | number
-    | Extract<import('./contract/index.js').ShapeCreateInput['sidePadding'], null>
+  sidePadding?: null extends import('./contract/index.js').ShapeCreateInput['sidePadding']
+    ? number | null
+    : number
   /** Padding at the top and bottom of the text space Numeric values are validated by the contract before dispatch. */
-  verticalPadding?:
-    | number
-    | Extract<import('./contract/index.js').ShapeCreateInput['verticalPadding'], null>
+  verticalPadding?: null extends import('./contract/index.js').ShapeCreateInput['verticalPadding']
+    ? number | null
+    : number
   /** Canvas identifier for the shape Numeric values are validated by the contract before dispatch. */
-  canvasId: number | Extract<import('./contract/index.js').ShapeCreateInput['canvasId'], null>
+  canvasId: null extends import('./contract/index.js').ShapeCreateInput['canvasId']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -121,15 +127,17 @@ export type ShapeUpdateInput = Omit<
   'sidePadding' | 'verticalPadding' | 'canvasId'
 > & {
   /** Padding at the left and right of the text space Numeric values are validated by the contract before dispatch. */
-  sidePadding?:
-    | number
-    | Extract<import('./contract/index.js').ShapeUpdateInput['sidePadding'], null>
+  sidePadding?: null extends import('./contract/index.js').ShapeUpdateInput['sidePadding']
+    ? number | null
+    : number
   /** Padding at the top and bottom of the text space Numeric values are validated by the contract before dispatch. */
-  verticalPadding?:
-    | number
-    | Extract<import('./contract/index.js').ShapeUpdateInput['verticalPadding'], null>
+  verticalPadding?: null extends import('./contract/index.js').ShapeUpdateInput['verticalPadding']
+    ? number | null
+    : number
   /** Canvas identifier for the shape Numeric values are validated by the contract before dispatch. */
-  canvasId?: number | Extract<import('./contract/index.js').ShapeUpdateInput['canvasId'], null>
+  canvasId?: null extends import('./contract/index.js').ShapeUpdateInput['canvasId']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
@@ -141,9 +149,13 @@ export type LineCreateInput = Omit<
   'headMagnet' | 'tailMagnet'
 > & {
   /** Which magnet of the destination graphic the line attaches to Numeric values are validated by the contract before dispatch. */
-  headMagnet?: number | Extract<import('./contract/index.js').LineCreateInput['headMagnet'], null>
+  headMagnet?: null extends import('./contract/index.js').LineCreateInput['headMagnet']
+    ? number | null
+    : number
   /** Which magnet of the source graphic the line attaches to Numeric values are validated by the contract before dispatch. */
-  tailMagnet?: number | Extract<import('./contract/index.js').LineCreateInput['tailMagnet'], null>
+  tailMagnet?: null extends import('./contract/index.js').LineCreateInput['tailMagnet']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -152,46 +164,50 @@ export type LineUpdateInput = Omit<
   'headMagnet' | 'tailMagnet'
 > & {
   /** Which magnet of the destination graphic the line attaches to Numeric values are validated by the contract before dispatch. */
-  headMagnet?: number | Extract<import('./contract/index.js').LineUpdateInput['headMagnet'], null>
+  headMagnet?: null extends import('./contract/index.js').LineUpdateInput['headMagnet']
+    ? number | null
+    : number
   /** Which magnet of the source graphic the line attaches to Numeric values are validated by the contract before dispatch. */
-  tailMagnet?: number | Extract<import('./contract/index.js').LineUpdateInput['tailMagnet'], null>
+  tailMagnet?: null extends import('./contract/index.js').LineUpdateInput['tailMagnet']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Group } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type GroupCreateInput = import('./contract/index.js').GroupCreateInput
+export type { GroupCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type GroupUpdateInput = import('./contract/index.js').GroupUpdateInput
+export type { GroupUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Layer } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type LayerCreateInput = import('./contract/index.js').LayerCreateInput
+export type { LayerCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type LayerUpdateInput = import('./contract/index.js').LayerUpdateInput
+export type { LayerUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Subgraph } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type SubgraphCreateInput = import('./contract/index.js').SubgraphCreateInput
+export type { SubgraphCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type SubgraphUpdateInput = import('./contract/index.js').SubgraphUpdateInput
+export type { SubgraphUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Label } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type LabelCreateInput = import('./contract/index.js').LabelCreateInput
+export type { LabelCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type LabelUpdateInput = import('./contract/index.js').LabelUpdateInput
+export type { LabelUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Grid } from './contract/index.js'
@@ -202,9 +218,9 @@ export type GridCreateInput = Omit<
   'majorSpacing'
 > & {
   /** The number of minor grid lines for each major line Numeric values are validated by the contract before dispatch. */
-  majorSpacing?:
-    | number
-    | Extract<import('./contract/index.js').GridCreateInput['majorSpacing'], null>
+  majorSpacing?: null extends import('./contract/index.js').GridCreateInput['majorSpacing']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -213,28 +229,28 @@ export type GridUpdateInput = Omit<
   'majorSpacing'
 > & {
   /** The number of minor grid lines for each major line Numeric values are validated by the contract before dispatch. */
-  majorSpacing?:
-    | number
-    | Extract<import('./contract/index.js').GridUpdateInput['majorSpacing'], null>
+  majorSpacing?: null extends import('./contract/index.js').GridUpdateInput['majorSpacing']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Master } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type MasterCreateInput = import('./contract/index.js').MasterCreateInput
+export type { MasterCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type MasterUpdateInput = import('./contract/index.js').MasterUpdateInput
+export type { MasterUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { ExportSettings } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ExportSettingsCreateInput = import('./contract/index.js').ExportSettingsCreateInput
+export type { ExportSettingsCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ExportSettingsUpdateInput = import('./contract/index.js').ExportSettingsUpdateInput
+export type { ExportSettingsUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

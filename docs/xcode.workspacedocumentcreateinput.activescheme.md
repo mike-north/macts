@@ -9,5 +9,5 @@ The workspace's scheme that will be used for scheme actions
 **Signature:**
 
 ```typescript
-activeScheme?: Scheme;
+activeScheme?: ObjectReferenceData<string, 'Scheme'>;
 ```

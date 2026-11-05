@@ -4,12 +4,12 @@
 
 ## AirPlayDeviceUpdateInput type
 
-Input for updating a AirPlayDevice
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type AirPlayDeviceUpdateInput = Partial<AirPlayDeviceCreateInput>
+type AirPlayDeviceUpdateInput = Omit<AirPlayDeviceUpdateInput$1, 'soundVolume'> & {
+  soundVolume?: null extends AirPlayDeviceUpdateInput$1['soundVolume'] ? number | null : number
+}
 ```
-
-**References:** [AirPlayDeviceCreateInput](./music.airplaydevicecreateinput.md)

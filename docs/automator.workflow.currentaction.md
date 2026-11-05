@@ -4,10 +4,10 @@
 
 ## Workflow.currentAction property
 
-The current or most recent action of the workflow
+The current or most recent action of the workflow. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-currentAction: unknown
+readonly currentAction: unknown;
 ```

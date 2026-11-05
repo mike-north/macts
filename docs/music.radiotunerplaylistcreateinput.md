@@ -4,7 +4,7 @@
 
 ## RadioTunerPlaylistCreateInput type
 
-Input for creating a RadioTunerPlaylist
+Input for creating a RadioTunerPlaylist.
 
 **Signature:**
 

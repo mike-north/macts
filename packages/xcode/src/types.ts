@@ -11,126 +11,118 @@ export type { SchemeActionResultStatus } from './contract/index.js'
 export type { WorkspaceDocument } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type WorkspaceDocumentCreateInput =
-  import('./contract/index.js').WorkspaceDocumentCreateInput
+export type { WorkspaceDocumentCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type WorkspaceDocumentUpdateInput =
-  import('./contract/index.js').WorkspaceDocumentUpdateInput
+export type { WorkspaceDocumentUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { FileDocument } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type FileDocumentCreateInput = import('./contract/index.js').FileDocumentCreateInput
+export type { FileDocumentCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type FileDocumentUpdateInput = import('./contract/index.js').FileDocumentUpdateInput
+export type { FileDocumentUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { TextDocument } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type TextDocumentCreateInput = import('./contract/index.js').TextDocumentCreateInput
+export type { TextDocumentCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type TextDocumentUpdateInput = import('./contract/index.js').TextDocumentUpdateInput
+export type { TextDocumentUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { SourceDocument } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type SourceDocumentCreateInput = import('./contract/index.js').SourceDocumentCreateInput
+export type { SourceDocumentCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type SourceDocumentUpdateInput = import('./contract/index.js').SourceDocumentUpdateInput
+export type { SourceDocumentUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Project } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ProjectCreateInput = import('./contract/index.js').ProjectCreateInput
+export type { ProjectCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ProjectUpdateInput = import('./contract/index.js').ProjectUpdateInput
+export type { ProjectUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Target } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type TargetCreateInput = import('./contract/index.js').TargetCreateInput
+export type { TargetCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type TargetUpdateInput = import('./contract/index.js').TargetUpdateInput
+export type { TargetUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { BuildConfiguration } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type BuildConfigurationCreateInput =
-  import('./contract/index.js').BuildConfigurationCreateInput
+export type { BuildConfigurationCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type BuildConfigurationUpdateInput =
-  import('./contract/index.js').BuildConfigurationUpdateInput
+export type { BuildConfigurationUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { BuildSetting } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type BuildSettingCreateInput = import('./contract/index.js').BuildSettingCreateInput
+export type { BuildSettingCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type BuildSettingUpdateInput = import('./contract/index.js').BuildSettingUpdateInput
+export type { BuildSettingUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { ResolvedBuildSetting } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ResolvedBuildSettingCreateInput =
-  import('./contract/index.js').ResolvedBuildSettingCreateInput
+export type { ResolvedBuildSettingCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ResolvedBuildSettingUpdateInput =
-  import('./contract/index.js').ResolvedBuildSettingUpdateInput
+export type { ResolvedBuildSettingUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Scheme } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type SchemeCreateInput = import('./contract/index.js').SchemeCreateInput
+export type { SchemeCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type SchemeUpdateInput = import('./contract/index.js').SchemeUpdateInput
+export type { SchemeUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { RunDestination } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type RunDestinationCreateInput = import('./contract/index.js').RunDestinationCreateInput
+export type { RunDestinationCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type RunDestinationUpdateInput = import('./contract/index.js').RunDestinationUpdateInput
+export type { RunDestinationUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Device } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type DeviceCreateInput = import('./contract/index.js').DeviceCreateInput
+export type { DeviceCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type DeviceUpdateInput = import('./contract/index.js').DeviceUpdateInput
+export type { DeviceUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { SchemeActionResult } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type SchemeActionResultCreateInput =
-  import('./contract/index.js').SchemeActionResultCreateInput
+export type { SchemeActionResultCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type SchemeActionResultUpdateInput =
-  import('./contract/index.js').SchemeActionResultUpdateInput
+export type { SchemeActionResultUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { BuildError } from './contract/index.js'
@@ -141,21 +133,21 @@ export type BuildErrorCreateInput = Omit<
   'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'
 > & {
   /** The starting line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildErrorCreateInput['startingLineNumber'], null>
+  startingLineNumber?: null extends import('./contract/index.js').BuildErrorCreateInput['startingLineNumber']
+    ? number | null
+    : number
   /** The ending line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildErrorCreateInput['endingLineNumber'], null>
+  endingLineNumber?: null extends import('./contract/index.js').BuildErrorCreateInput['endingLineNumber']
+    ? number | null
+    : number
   /** The starting column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildErrorCreateInput['startingColumnNumber'], null>
+  startingColumnNumber?: null extends import('./contract/index.js').BuildErrorCreateInput['startingColumnNumber']
+    ? number | null
+    : number
   /** The ending column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildErrorCreateInput['endingColumnNumber'], null>
+  endingColumnNumber?: null extends import('./contract/index.js').BuildErrorCreateInput['endingColumnNumber']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -164,21 +156,21 @@ export type BuildErrorUpdateInput = Omit<
   'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'
 > & {
   /** The starting line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildErrorUpdateInput['startingLineNumber'], null>
+  startingLineNumber?: null extends import('./contract/index.js').BuildErrorUpdateInput['startingLineNumber']
+    ? number | null
+    : number
   /** The ending line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildErrorUpdateInput['endingLineNumber'], null>
+  endingLineNumber?: null extends import('./contract/index.js').BuildErrorUpdateInput['endingLineNumber']
+    ? number | null
+    : number
   /** The starting column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildErrorUpdateInput['startingColumnNumber'], null>
+  startingColumnNumber?: null extends import('./contract/index.js').BuildErrorUpdateInput['startingColumnNumber']
+    ? number | null
+    : number
   /** The ending column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildErrorUpdateInput['endingColumnNumber'], null>
+  endingColumnNumber?: null extends import('./contract/index.js').BuildErrorUpdateInput['endingColumnNumber']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
@@ -190,21 +182,21 @@ export type BuildWarningCreateInput = Omit<
   'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'
 > & {
   /** The starting line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildWarningCreateInput['startingLineNumber'], null>
+  startingLineNumber?: null extends import('./contract/index.js').BuildWarningCreateInput['startingLineNumber']
+    ? number | null
+    : number
   /** The ending line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildWarningCreateInput['endingLineNumber'], null>
+  endingLineNumber?: null extends import('./contract/index.js').BuildWarningCreateInput['endingLineNumber']
+    ? number | null
+    : number
   /** The starting column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildWarningCreateInput['startingColumnNumber'], null>
+  startingColumnNumber?: null extends import('./contract/index.js').BuildWarningCreateInput['startingColumnNumber']
+    ? number | null
+    : number
   /** The ending column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildWarningCreateInput['endingColumnNumber'], null>
+  endingColumnNumber?: null extends import('./contract/index.js').BuildWarningCreateInput['endingColumnNumber']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -213,21 +205,21 @@ export type BuildWarningUpdateInput = Omit<
   'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'
 > & {
   /** The starting line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildWarningUpdateInput['startingLineNumber'], null>
+  startingLineNumber?: null extends import('./contract/index.js').BuildWarningUpdateInput['startingLineNumber']
+    ? number | null
+    : number
   /** The ending line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildWarningUpdateInput['endingLineNumber'], null>
+  endingLineNumber?: null extends import('./contract/index.js').BuildWarningUpdateInput['endingLineNumber']
+    ? number | null
+    : number
   /** The starting column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildWarningUpdateInput['startingColumnNumber'], null>
+  startingColumnNumber?: null extends import('./contract/index.js').BuildWarningUpdateInput['startingColumnNumber']
+    ? number | null
+    : number
   /** The ending column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').BuildWarningUpdateInput['endingColumnNumber'], null>
+  endingColumnNumber?: null extends import('./contract/index.js').BuildWarningUpdateInput['endingColumnNumber']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
@@ -239,21 +231,21 @@ export type AnalyzerIssueCreateInput = Omit<
   'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'
 > & {
   /** The starting line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').AnalyzerIssueCreateInput['startingLineNumber'], null>
+  startingLineNumber?: null extends import('./contract/index.js').AnalyzerIssueCreateInput['startingLineNumber']
+    ? number | null
+    : number
   /** The ending line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').AnalyzerIssueCreateInput['endingLineNumber'], null>
+  endingLineNumber?: null extends import('./contract/index.js').AnalyzerIssueCreateInput['endingLineNumber']
+    ? number | null
+    : number
   /** The starting column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').AnalyzerIssueCreateInput['startingColumnNumber'], null>
+  startingColumnNumber?: null extends import('./contract/index.js').AnalyzerIssueCreateInput['startingColumnNumber']
+    ? number | null
+    : number
   /** The ending column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').AnalyzerIssueCreateInput['endingColumnNumber'], null>
+  endingColumnNumber?: null extends import('./contract/index.js').AnalyzerIssueCreateInput['endingColumnNumber']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -262,21 +254,21 @@ export type AnalyzerIssueUpdateInput = Omit<
   'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'
 > & {
   /** The starting line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').AnalyzerIssueUpdateInput['startingLineNumber'], null>
+  startingLineNumber?: null extends import('./contract/index.js').AnalyzerIssueUpdateInput['startingLineNumber']
+    ? number | null
+    : number
   /** The ending line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').AnalyzerIssueUpdateInput['endingLineNumber'], null>
+  endingLineNumber?: null extends import('./contract/index.js').AnalyzerIssueUpdateInput['endingLineNumber']
+    ? number | null
+    : number
   /** The starting column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').AnalyzerIssueUpdateInput['startingColumnNumber'], null>
+  startingColumnNumber?: null extends import('./contract/index.js').AnalyzerIssueUpdateInput['startingColumnNumber']
+    ? number | null
+    : number
   /** The ending column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').AnalyzerIssueUpdateInput['endingColumnNumber'], null>
+  endingColumnNumber?: null extends import('./contract/index.js').AnalyzerIssueUpdateInput['endingColumnNumber']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
@@ -288,21 +280,21 @@ export type TestFailureCreateInput = Omit<
   'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'
 > & {
   /** The starting line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').TestFailureCreateInput['startingLineNumber'], null>
+  startingLineNumber?: null extends import('./contract/index.js').TestFailureCreateInput['startingLineNumber']
+    ? number | null
+    : number
   /** The ending line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').TestFailureCreateInput['endingLineNumber'], null>
+  endingLineNumber?: null extends import('./contract/index.js').TestFailureCreateInput['endingLineNumber']
+    ? number | null
+    : number
   /** The starting column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').TestFailureCreateInput['startingColumnNumber'], null>
+  startingColumnNumber?: null extends import('./contract/index.js').TestFailureCreateInput['startingColumnNumber']
+    ? number | null
+    : number
   /** The ending column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').TestFailureCreateInput['endingColumnNumber'], null>
+  endingColumnNumber?: null extends import('./contract/index.js').TestFailureCreateInput['endingColumnNumber']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -311,21 +303,21 @@ export type TestFailureUpdateInput = Omit<
   'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'
 > & {
   /** The starting line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').TestFailureUpdateInput['startingLineNumber'], null>
+  startingLineNumber?: null extends import('./contract/index.js').TestFailureUpdateInput['startingLineNumber']
+    ? number | null
+    : number
   /** The ending line number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingLineNumber?:
-    | number
-    | Extract<import('./contract/index.js').TestFailureUpdateInput['endingLineNumber'], null>
+  endingLineNumber?: null extends import('./contract/index.js').TestFailureUpdateInput['endingLineNumber']
+    ? number | null
+    : number
   /** The starting column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  startingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').TestFailureUpdateInput['startingColumnNumber'], null>
+  startingColumnNumber?: null extends import('./contract/index.js').TestFailureUpdateInput['startingColumnNumber']
+    ? number | null
+    : number
   /** The ending column number in the file where the issue occurred Numeric values are validated by the contract before dispatch. */
-  endingColumnNumber?:
-    | number
-    | Extract<import('./contract/index.js').TestFailureUpdateInput['endingColumnNumber'], null>
+  endingColumnNumber?: null extends import('./contract/index.js').TestFailureUpdateInput['endingColumnNumber']
+    ? number | null
+    : number
 }
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.

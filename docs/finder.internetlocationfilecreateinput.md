@@ -4,7 +4,7 @@
 
 ## InternetLocationFileCreateInput type
 
-Input for creating a InternetLocationFile
+Input for creating an InternetLocationFile.
 
 **Signature:**
 

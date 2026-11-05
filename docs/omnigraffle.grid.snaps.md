@@ -4,10 +4,10 @@
 
 ## Grid.snaps property
 
-Do points snap to the grid?
+Do points snap to the grid? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-snaps: boolean
+snaps: boolean | null
 ```

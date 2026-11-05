@@ -31,7 +31,8 @@ export class BookmarkItemResourceClient {
     return this.#http.invoke<Page<BookmarkItem>>(
       `${this.#app}.${this.#resource}.list`,
       { folderId },
-      __mactsOptions
+      __mactsOptions,
+      'BookmarkItem'
     )
   }
 
@@ -45,7 +46,8 @@ export class BookmarkItemResourceClient {
     return this.#http.invoke<BookmarkItem>(
       `${this.#app}.${this.#resource}.get`,
       { id },
-      __mactsOptions
+      __mactsOptions,
+      'BookmarkItem'
     )
   }
 }

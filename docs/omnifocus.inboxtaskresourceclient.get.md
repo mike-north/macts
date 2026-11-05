@@ -4,12 +4,12 @@
 
 ## InboxTaskResourceClient.get() method
 
-Get a inboxtask by id.
+Get a inbox task by id.
 
 **Signature:**
 
 ```typescript
-get(id: string): Promise<InboxTask>;
+get(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<InboxTask>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ id
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

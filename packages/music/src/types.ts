@@ -40,9 +40,9 @@ export type AirPlayDeviceCreateInput = Omit<
   'soundVolume'
 > & {
   /** the output volume for the device (0 = minimum, 100 = maximum) Numeric values are validated by the contract before dispatch. */
-  soundVolume?:
-    | number
-    | Extract<import('./contract/index.js').AirPlayDeviceCreateInput['soundVolume'], null>
+  soundVolume?: null extends import('./contract/index.js').AirPlayDeviceCreateInput['soundVolume']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -51,9 +51,9 @@ export type AirPlayDeviceUpdateInput = Omit<
   'soundVolume'
 > & {
   /** the output volume for the device (0 = minimum, 100 = maximum) Numeric values are validated by the contract before dispatch. */
-  soundVolume?:
-    | number
-    | Extract<import('./contract/index.js').AirPlayDeviceUpdateInput['soundVolume'], null>
+  soundVolume?: null extends import('./contract/index.js').AirPlayDeviceUpdateInput['soundVolume']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
@@ -62,13 +62,17 @@ export type { Artwork } from './contract/index.js'
 /** Canonical create input, retaining checked numeric conveniences. */
 export type ArtworkCreateInput = Omit<import('./contract/index.js').ArtworkCreateInput, 'kind'> & {
   /** kind or purpose of this piece of artwork Numeric values are validated by the contract before dispatch. */
-  kind?: number | Extract<import('./contract/index.js').ArtworkCreateInput['kind'], null>
+  kind?: null extends import('./contract/index.js').ArtworkCreateInput['kind']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
 export type ArtworkUpdateInput = Omit<import('./contract/index.js').ArtworkUpdateInput, 'kind'> & {
   /** kind or purpose of this piece of artwork Numeric values are validated by the contract before dispatch. */
-  kind?: number | Extract<import('./contract/index.js').ArtworkUpdateInput['kind'], null>
+  kind?: null extends import('./contract/index.js').ArtworkUpdateInput['kind']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
@@ -80,15 +84,17 @@ export type AudioCDPlaylistCreateInput = Omit<
   'discCount' | 'discNumber' | 'year'
 > & {
   /** the total number of discs in this CD’s album Numeric values are validated by the contract before dispatch. */
-  discCount?:
-    | number
-    | Extract<import('./contract/index.js').AudioCDPlaylistCreateInput['discCount'], null>
+  discCount?: null extends import('./contract/index.js').AudioCDPlaylistCreateInput['discCount']
+    ? number | null
+    : number
   /** the index of this CD disc in the source album Numeric values are validated by the contract before dispatch. */
-  discNumber?:
-    | number
-    | Extract<import('./contract/index.js').AudioCDPlaylistCreateInput['discNumber'], null>
+  discNumber?: null extends import('./contract/index.js').AudioCDPlaylistCreateInput['discNumber']
+    ? number | null
+    : number
   /** the year the album was recorded/released Numeric values are validated by the contract before dispatch. */
-  year?: number | Extract<import('./contract/index.js').AudioCDPlaylistCreateInput['year'], null>
+  year?: null extends import('./contract/index.js').AudioCDPlaylistCreateInput['year']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -97,146 +103,144 @@ export type AudioCDPlaylistUpdateInput = Omit<
   'discCount' | 'discNumber' | 'year'
 > & {
   /** the total number of discs in this CD’s album Numeric values are validated by the contract before dispatch. */
-  discCount?:
-    | number
-    | Extract<import('./contract/index.js').AudioCDPlaylistUpdateInput['discCount'], null>
+  discCount?: null extends import('./contract/index.js').AudioCDPlaylistUpdateInput['discCount']
+    ? number | null
+    : number
   /** the index of this CD disc in the source album Numeric values are validated by the contract before dispatch. */
-  discNumber?:
-    | number
-    | Extract<import('./contract/index.js').AudioCDPlaylistUpdateInput['discNumber'], null>
+  discNumber?: null extends import('./contract/index.js').AudioCDPlaylistUpdateInput['discNumber']
+    ? number | null
+    : number
   /** the year the album was recorded/released Numeric values are validated by the contract before dispatch. */
-  year?: number | Extract<import('./contract/index.js').AudioCDPlaylistUpdateInput['year'], null>
+  year?: null extends import('./contract/index.js').AudioCDPlaylistUpdateInput['year']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { AudioCDTrack } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type AudioCDTrackCreateInput = import('./contract/index.js').AudioCDTrackCreateInput
+export type { AudioCDTrackCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type AudioCDTrackUpdateInput = import('./contract/index.js').AudioCDTrackUpdateInput
+export type { AudioCDTrackUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { BrowserWindow } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type BrowserWindowCreateInput = import('./contract/index.js').BrowserWindowCreateInput
+export type { BrowserWindowCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type BrowserWindowUpdateInput = import('./contract/index.js').BrowserWindowUpdateInput
+export type { BrowserWindowUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Encoder } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type EncoderCreateInput = import('./contract/index.js').EncoderCreateInput
+export type { EncoderCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type EncoderUpdateInput = import('./contract/index.js').EncoderUpdateInput
+export type { EncoderUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { EQPreset } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type EQPresetCreateInput = import('./contract/index.js').EQPresetCreateInput
+export type { EQPresetCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type EQPresetUpdateInput = import('./contract/index.js').EQPresetUpdateInput
+export type { EQPresetUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { EQWindow } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type EQWindowCreateInput = import('./contract/index.js').EQWindowCreateInput
+export type { EQWindowCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type EQWindowUpdateInput = import('./contract/index.js').EQWindowUpdateInput
+export type { EQWindowUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { FileTrack } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type FileTrackCreateInput = import('./contract/index.js').FileTrackCreateInput
+export type { FileTrackCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type FileTrackUpdateInput = import('./contract/index.js').FileTrackUpdateInput
+export type { FileTrackUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { LibraryPlaylist } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type LibraryPlaylistCreateInput = import('./contract/index.js').LibraryPlaylistCreateInput
+export type { LibraryPlaylistCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type LibraryPlaylistUpdateInput = import('./contract/index.js').LibraryPlaylistUpdateInput
+export type { LibraryPlaylistUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { MiniplayerWindow } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type MiniplayerWindowCreateInput = import('./contract/index.js').MiniplayerWindowCreateInput
+export type { MiniplayerWindowCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type MiniplayerWindowUpdateInput = import('./contract/index.js').MiniplayerWindowUpdateInput
+export type { MiniplayerWindowUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Playlist } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type PlaylistCreateInput = import('./contract/index.js').PlaylistCreateInput
+export type { PlaylistCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type PlaylistUpdateInput = import('./contract/index.js').PlaylistUpdateInput
+export type { PlaylistUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { PlaylistWindow } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type PlaylistWindowCreateInput = import('./contract/index.js').PlaylistWindowCreateInput
+export type { PlaylistWindowCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type PlaylistWindowUpdateInput = import('./contract/index.js').PlaylistWindowUpdateInput
+export type { PlaylistWindowUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { RadioTunerPlaylist } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type RadioTunerPlaylistCreateInput =
-  import('./contract/index.js').RadioTunerPlaylistCreateInput
+export type { RadioTunerPlaylistCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type RadioTunerPlaylistUpdateInput =
-  import('./contract/index.js').RadioTunerPlaylistUpdateInput
+export type { RadioTunerPlaylistUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { SharedTrack } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type SharedTrackCreateInput = import('./contract/index.js').SharedTrackCreateInput
+export type { SharedTrackCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type SharedTrackUpdateInput = import('./contract/index.js').SharedTrackUpdateInput
+export type { SharedTrackUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Source } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type SourceCreateInput = import('./contract/index.js').SourceCreateInput
+export type { SourceCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type SourceUpdateInput = import('./contract/index.js').SourceUpdateInput
+export type { SourceUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { SubscriptionPlaylist } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type SubscriptionPlaylistCreateInput =
-  import('./contract/index.js').SubscriptionPlaylistCreateInput
+export type { SubscriptionPlaylistCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type SubscriptionPlaylistUpdateInput =
-  import('./contract/index.js').SubscriptionPlaylistUpdateInput
+export type { SubscriptionPlaylistUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Track } from './contract/index.js'
@@ -261,53 +265,63 @@ export type TrackCreateInput = Omit<
   | 'year'
 > & {
   /** the rating of the album for this track (0 to 100) Numeric values are validated by the contract before dispatch. */
-  albumRating?:
-    | number
-    | Extract<import('./contract/index.js').TrackCreateInput['albumRating'], null>
+  albumRating?: null extends import('./contract/index.js').TrackCreateInput['albumRating']
+    ? number | null
+    : number
   /** the tempo of this track in beats per minute Numeric values are validated by the contract before dispatch. */
-  bpm?: number | Extract<import('./contract/index.js').TrackCreateInput['bpm'], null>
+  bpm?: null extends import('./contract/index.js').TrackCreateInput['bpm'] ? number | null : number
   /** the total number of discs in the source album Numeric values are validated by the contract before dispatch. */
-  discCount?: number | Extract<import('./contract/index.js').TrackCreateInput['discCount'], null>
+  discCount?: null extends import('./contract/index.js').TrackCreateInput['discCount']
+    ? number | null
+    : number
   /** the index of the disc containing this track on the source album Numeric values are validated by the contract before dispatch. */
-  discNumber?: number | Extract<import('./contract/index.js').TrackCreateInput['discNumber'], null>
+  discNumber?: null extends import('./contract/index.js').TrackCreateInput['discNumber']
+    ? number | null
+    : number
   /** the episode number of the track Numeric values are validated by the contract before dispatch. */
-  episodeNumber?:
-    | number
-    | Extract<import('./contract/index.js').TrackCreateInput['episodeNumber'], null>
+  episodeNumber?: null extends import('./contract/index.js').TrackCreateInput['episodeNumber']
+    ? number | null
+    : number
   /** the total number of movements in the work Numeric values are validated by the contract before dispatch. */
-  movementCount?:
-    | number
-    | Extract<import('./contract/index.js').TrackCreateInput['movementCount'], null>
+  movementCount?: null extends import('./contract/index.js').TrackCreateInput['movementCount']
+    ? number | null
+    : number
   /** the index of the movement in the work Numeric values are validated by the contract before dispatch. */
-  movementNumber?:
-    | number
-    | Extract<import('./contract/index.js').TrackCreateInput['movementNumber'], null>
+  movementNumber?: null extends import('./contract/index.js').TrackCreateInput['movementNumber']
+    ? number | null
+    : number
   /** number of times this track has been played Numeric values are validated by the contract before dispatch. */
-  playedCount?:
-    | number
-    | Extract<import('./contract/index.js').TrackCreateInput['playedCount'], null>
+  playedCount?: null extends import('./contract/index.js').TrackCreateInput['playedCount']
+    ? number | null
+    : number
   /** the rating of this track (0 to 100) Numeric values are validated by the contract before dispatch. */
-  rating?: number | Extract<import('./contract/index.js').TrackCreateInput['rating'], null>
+  rating?: null extends import('./contract/index.js').TrackCreateInput['rating']
+    ? number | null
+    : number
   /** the season number of the track Numeric values are validated by the contract before dispatch. */
-  seasonNumber?:
-    | number
-    | Extract<import('./contract/index.js').TrackCreateInput['seasonNumber'], null>
+  seasonNumber?: null extends import('./contract/index.js').TrackCreateInput['seasonNumber']
+    ? number | null
+    : number
   /** number of times this track has been skipped Numeric values are validated by the contract before dispatch. */
-  skippedCount?:
-    | number
-    | Extract<import('./contract/index.js').TrackCreateInput['skippedCount'], null>
+  skippedCount?: null extends import('./contract/index.js').TrackCreateInput['skippedCount']
+    ? number | null
+    : number
   /** the total number of tracks on the source album Numeric values are validated by the contract before dispatch. */
-  trackCount?: number | Extract<import('./contract/index.js').TrackCreateInput['trackCount'], null>
+  trackCount?: null extends import('./contract/index.js').TrackCreateInput['trackCount']
+    ? number | null
+    : number
   /** the index of the track on the source album Numeric values are validated by the contract before dispatch. */
-  trackNumber?:
-    | number
-    | Extract<import('./contract/index.js').TrackCreateInput['trackNumber'], null>
+  trackNumber?: null extends import('./contract/index.js').TrackCreateInput['trackNumber']
+    ? number | null
+    : number
   /** relative volume adjustment of the track (-100% to 100%) Numeric values are validated by the contract before dispatch. */
-  volumeAdjustment?:
-    | number
-    | Extract<import('./contract/index.js').TrackCreateInput['volumeAdjustment'], null>
+  volumeAdjustment?: null extends import('./contract/index.js').TrackCreateInput['volumeAdjustment']
+    ? number | null
+    : number
   /** the year the track was recorded/released Numeric values are validated by the contract before dispatch. */
-  year?: number | Extract<import('./contract/index.js').TrackCreateInput['year'], null>
+  year?: null extends import('./contract/index.js').TrackCreateInput['year']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -330,90 +344,100 @@ export type TrackUpdateInput = Omit<
   | 'year'
 > & {
   /** the rating of the album for this track (0 to 100) Numeric values are validated by the contract before dispatch. */
-  albumRating?:
-    | number
-    | Extract<import('./contract/index.js').TrackUpdateInput['albumRating'], null>
+  albumRating?: null extends import('./contract/index.js').TrackUpdateInput['albumRating']
+    ? number | null
+    : number
   /** the tempo of this track in beats per minute Numeric values are validated by the contract before dispatch. */
-  bpm?: number | Extract<import('./contract/index.js').TrackUpdateInput['bpm'], null>
+  bpm?: null extends import('./contract/index.js').TrackUpdateInput['bpm'] ? number | null : number
   /** the total number of discs in the source album Numeric values are validated by the contract before dispatch. */
-  discCount?: number | Extract<import('./contract/index.js').TrackUpdateInput['discCount'], null>
+  discCount?: null extends import('./contract/index.js').TrackUpdateInput['discCount']
+    ? number | null
+    : number
   /** the index of the disc containing this track on the source album Numeric values are validated by the contract before dispatch. */
-  discNumber?: number | Extract<import('./contract/index.js').TrackUpdateInput['discNumber'], null>
+  discNumber?: null extends import('./contract/index.js').TrackUpdateInput['discNumber']
+    ? number | null
+    : number
   /** the episode number of the track Numeric values are validated by the contract before dispatch. */
-  episodeNumber?:
-    | number
-    | Extract<import('./contract/index.js').TrackUpdateInput['episodeNumber'], null>
+  episodeNumber?: null extends import('./contract/index.js').TrackUpdateInput['episodeNumber']
+    ? number | null
+    : number
   /** the total number of movements in the work Numeric values are validated by the contract before dispatch. */
-  movementCount?:
-    | number
-    | Extract<import('./contract/index.js').TrackUpdateInput['movementCount'], null>
+  movementCount?: null extends import('./contract/index.js').TrackUpdateInput['movementCount']
+    ? number | null
+    : number
   /** the index of the movement in the work Numeric values are validated by the contract before dispatch. */
-  movementNumber?:
-    | number
-    | Extract<import('./contract/index.js').TrackUpdateInput['movementNumber'], null>
+  movementNumber?: null extends import('./contract/index.js').TrackUpdateInput['movementNumber']
+    ? number | null
+    : number
   /** number of times this track has been played Numeric values are validated by the contract before dispatch. */
-  playedCount?:
-    | number
-    | Extract<import('./contract/index.js').TrackUpdateInput['playedCount'], null>
+  playedCount?: null extends import('./contract/index.js').TrackUpdateInput['playedCount']
+    ? number | null
+    : number
   /** the rating of this track (0 to 100) Numeric values are validated by the contract before dispatch. */
-  rating?: number | Extract<import('./contract/index.js').TrackUpdateInput['rating'], null>
+  rating?: null extends import('./contract/index.js').TrackUpdateInput['rating']
+    ? number | null
+    : number
   /** the season number of the track Numeric values are validated by the contract before dispatch. */
-  seasonNumber?:
-    | number
-    | Extract<import('./contract/index.js').TrackUpdateInput['seasonNumber'], null>
+  seasonNumber?: null extends import('./contract/index.js').TrackUpdateInput['seasonNumber']
+    ? number | null
+    : number
   /** number of times this track has been skipped Numeric values are validated by the contract before dispatch. */
-  skippedCount?:
-    | number
-    | Extract<import('./contract/index.js').TrackUpdateInput['skippedCount'], null>
+  skippedCount?: null extends import('./contract/index.js').TrackUpdateInput['skippedCount']
+    ? number | null
+    : number
   /** the total number of tracks on the source album Numeric values are validated by the contract before dispatch. */
-  trackCount?: number | Extract<import('./contract/index.js').TrackUpdateInput['trackCount'], null>
+  trackCount?: null extends import('./contract/index.js').TrackUpdateInput['trackCount']
+    ? number | null
+    : number
   /** the index of the track on the source album Numeric values are validated by the contract before dispatch. */
-  trackNumber?:
-    | number
-    | Extract<import('./contract/index.js').TrackUpdateInput['trackNumber'], null>
+  trackNumber?: null extends import('./contract/index.js').TrackUpdateInput['trackNumber']
+    ? number | null
+    : number
   /** relative volume adjustment of the track (-100% to 100%) Numeric values are validated by the contract before dispatch. */
-  volumeAdjustment?:
-    | number
-    | Extract<import('./contract/index.js').TrackUpdateInput['volumeAdjustment'], null>
+  volumeAdjustment?: null extends import('./contract/index.js').TrackUpdateInput['volumeAdjustment']
+    ? number | null
+    : number
   /** the year the track was recorded/released Numeric values are validated by the contract before dispatch. */
-  year?: number | Extract<import('./contract/index.js').TrackUpdateInput['year'], null>
+  year?: null extends import('./contract/index.js').TrackUpdateInput['year']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { URLTrack } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type URLTrackCreateInput = import('./contract/index.js').URLTrackCreateInput
+export type { URLTrackCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type URLTrackUpdateInput = import('./contract/index.js').URLTrackUpdateInput
+export type { URLTrackUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { UserPlaylist } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type UserPlaylistCreateInput = import('./contract/index.js').UserPlaylistCreateInput
+export type { UserPlaylistCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type UserPlaylistUpdateInput = import('./contract/index.js').UserPlaylistUpdateInput
+export type { UserPlaylistUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { VideoWindow } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type VideoWindowCreateInput = import('./contract/index.js').VideoWindowCreateInput
+export type { VideoWindowCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type VideoWindowUpdateInput = import('./contract/index.js').VideoWindowUpdateInput
+export type { VideoWindowUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Visual } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type VisualCreateInput = import('./contract/index.js').VisualCreateInput
+export type { VisualCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type VisualUpdateInput = import('./contract/index.js').VisualUpdateInput
+export type { VisualUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

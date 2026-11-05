@@ -4,10 +4,10 @@
 
 ## Interface.id property
 
-the unique identifier for the interface
+the unique identifier for the interface. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

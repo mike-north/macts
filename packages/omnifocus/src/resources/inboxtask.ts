@@ -28,7 +28,8 @@ export class InboxTaskResourceClient {
     return this.#http.invoke<Page<InboxTask>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'InboxTask'
     )
   }
 
@@ -42,7 +43,8 @@ export class InboxTaskResourceClient {
     return this.#http.invoke<InboxTask>(
       `${this.#app}.${this.#resource}.get`,
       { id },
-      __mactsOptions
+      __mactsOptions,
+      'InboxTask'
     )
   }
 
@@ -56,7 +58,8 @@ export class InboxTaskResourceClient {
     return this.#http.invoke<InboxTask>(
       `${this.#app}.${this.#resource}.create`,
       input,
-      __mactsOptions
+      __mactsOptions,
+      'InboxTask'
     )
   }
 }

@@ -4,7 +4,7 @@
 
 ## PlaylistWindowCreateInput type
 
-Input for creating a PlaylistWindow
+Input for creating a PlaylistWindow.
 
 **Signature:**
 

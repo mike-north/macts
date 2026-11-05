@@ -21,10 +21,10 @@ export interface Bookmark {
     readonly start: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "BookmarkCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type BookmarkCreateInput = BookmarkCreateInput_2;
+export interface BookmarkCreateInput {
+    name?: string;
+}
 
 // @public
 export const BookmarkSchema: z.ZodObject<{
@@ -33,10 +33,10 @@ export const BookmarkSchema: z.ZodObject<{
     end: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "BookmarkUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type BookmarkUpdateInput = BookmarkUpdateInput_2;
+export interface BookmarkUpdateInput {
+    name?: string;
+}
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -67,10 +67,13 @@ export interface Cell {
     width: number | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "CellCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type CellCreateInput = CellCreateInput_2;
+export interface CellCreateInput {
+    content?: string;
+    height?: number;
+    verticalAlignment?: string;
+    width?: number;
+}
 
 // @public
 export const CellSchema: z.ZodObject<{
@@ -82,10 +85,13 @@ export const CellSchema: z.ZodObject<{
     columnIndex: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "CellUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type CellUpdateInput = CellUpdateInput_2;
+export interface CellUpdateInput {
+    content?: string;
+    height?: number;
+    verticalAlignment?: string;
+    width?: number;
+}
 
 // @public
 export interface Column {
@@ -93,10 +99,11 @@ export interface Column {
     width: number | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ColumnCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ColumnCreateInput = ColumnCreateInput_2;
+export interface ColumnCreateInput {
+    preferredWidth?: number;
+    width?: number;
+}
 
 // @public
 export const ColumnSchema: z.ZodObject<{
@@ -104,10 +111,11 @@ export const ColumnSchema: z.ZodObject<{
     preferredWidth: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ColumnUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ColumnUpdateInput = ColumnUpdateInput_2;
+export interface ColumnUpdateInput {
+    preferredWidth?: number;
+    width?: number;
+}
 
 // @public
 export interface Document {
@@ -124,10 +132,13 @@ export interface Document {
     trackRevisions: boolean | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DocumentCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentCreateInput = DocumentCreateInput_2;
+export interface DocumentCreateInput {
+    defaultTabStop?: number;
+    saved?: boolean;
+    showRevisions?: boolean;
+    trackRevisions?: boolean;
+}
 
 // @public
 export class DocumentResourceClient {
@@ -139,7 +150,8 @@ export class DocumentResourceClient {
     list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Document>>;
     print(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     save(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    saveAs(fileName: string, fileFormat?: SaveFormat, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "DocumentResourceClient_2" needs to be exported by the entry point index.d.ts
+    saveAs(fileName: string, fileFormat?: Parameters<DocumentResourceClient_2['saveAs']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -158,10 +170,13 @@ export const DocumentSchema: z.ZodObject<{
     defaultTabStop: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "DocumentUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentUpdateInput = DocumentUpdateInput_2;
+export interface DocumentUpdateInput {
+    defaultTabStop?: number;
+    saved?: boolean;
+    showRevisions?: boolean;
+    trackRevisions?: boolean;
+}
 
 // @public
 export interface Field {
@@ -172,10 +187,13 @@ export interface Field {
     showCodes: boolean | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "FieldCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FieldCreateInput = FieldCreateInput_2;
+export interface FieldCreateInput {
+    fieldCode?: string;
+    fieldText?: string;
+    locked?: boolean;
+    showCodes?: boolean;
+}
 
 // @public
 export const FieldSchema: z.ZodObject<{
@@ -189,10 +207,13 @@ export const FieldSchema: z.ZodObject<{
 // @public
 export type FieldType = 'fieldAddin' | 'fieldDate' | 'fieldHyperlink' | 'fieldPageNumber' | 'fieldRef';
 
-// Warning: (ae-forgotten-export) The symbol "FieldUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FieldUpdateInput = FieldUpdateInput_2;
+export interface FieldUpdateInput {
+    fieldCode?: string;
+    fieldText?: string;
+    locked?: boolean;
+    showCodes?: boolean;
+}
 
 // @public
 export interface Font {
@@ -208,10 +229,19 @@ export interface Font {
     underline: UnderlineType | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "FontCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FontCreateInput = FontCreateInput_2;
+export interface FontCreateInput {
+    allCaps?: boolean;
+    bold?: boolean;
+    color?: Rgb;
+    italic?: boolean;
+    name?: string;
+    size?: number;
+    strikethrough?: boolean;
+    subscript?: boolean;
+    superscript?: boolean;
+    underline?: UnderlineType;
+}
 
 // @public
 export const FontSchema: z.ZodObject<{
@@ -231,20 +261,27 @@ export const FontSchema: z.ZodObject<{
     allCaps: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "FontUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FontUpdateInput = FontUpdateInput_2;
+export interface FontUpdateInput {
+    allCaps?: boolean;
+    bold?: boolean;
+    color?: Rgb;
+    italic?: boolean;
+    name?: string;
+    size?: number;
+    strikethrough?: boolean;
+    subscript?: boolean;
+    superscript?: boolean;
+    underline?: UnderlineType;
+}
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "MicrosoftWordResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<MicrosoftWordResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -252,7 +289,7 @@ export class HttpClient {
 export interface MicrosoftWordClient extends ClientBrand<MicrosoftWordResources> {
 }
 
-// @public (undocumented)
+// @public
 export class MicrosoftWordClient {
     constructor(options: MicrosoftWordClientOptions);
     copyObject(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -283,6 +320,15 @@ export class MicrosoftWordError extends Error {
 }
 
 // @public
+export type MicrosoftWordResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'microsoft-word.documents.get';
+        readonly list: 'microsoft-word.documents.list';
+    };
+}>;
+
+// @public
 export interface PageSetup {
     bottomMargin: number | null;
     leftMargin: number | null;
@@ -294,10 +340,17 @@ export interface PageSetup {
     topMargin: number | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "PageSetupCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PageSetupCreateInput = PageSetupCreateInput_2;
+export interface PageSetupCreateInput {
+    bottomMargin?: number;
+    leftMargin?: number;
+    orientation?: string;
+    pageHeight?: number;
+    pageWidth?: number;
+    paperSize?: string;
+    rightMargin?: number;
+    topMargin?: number;
+}
 
 // @public
 export const PageSetupSchema: z.ZodObject<{
@@ -311,10 +364,17 @@ export const PageSetupSchema: z.ZodObject<{
     paperSize: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "PageSetupUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PageSetupUpdateInput = PageSetupUpdateInput_2;
+export interface PageSetupUpdateInput {
+    bottomMargin?: number;
+    leftMargin?: number;
+    orientation?: string;
+    pageHeight?: number;
+    pageWidth?: number;
+    paperSize?: string;
+    rightMargin?: number;
+    topMargin?: number;
+}
 
 // @public
 export interface Paragraph {
@@ -335,10 +395,19 @@ export interface Paragraph {
 // @public
 export type ParagraphAlignment = 'left' | 'center' | 'right' | 'justify';
 
-// Warning: (ae-forgotten-export) The symbol "ParagraphCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ParagraphCreateInput = ParagraphCreateInput_2;
+export interface ParagraphCreateInput {
+    alignment?: ParagraphAlignment;
+    firstLineIndent?: number;
+    keepTogether?: boolean;
+    keepWithNext?: boolean;
+    leftIndent?: number;
+    lineSpacing?: number;
+    pageBreakBefore?: boolean;
+    rightIndent?: number;
+    spaceAfter?: number;
+    spaceBefore?: number;
+}
 
 // @public
 export const ParagraphSchema: z.ZodObject<{
@@ -357,10 +426,19 @@ export const ParagraphSchema: z.ZodObject<{
     content: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ParagraphUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ParagraphUpdateInput = ParagraphUpdateInput_2;
+export interface ParagraphUpdateInput {
+    alignment?: ParagraphAlignment;
+    firstLineIndent?: number;
+    keepTogether?: boolean;
+    keepWithNext?: boolean;
+    leftIndent?: number;
+    lineSpacing?: number;
+    pageBreakBefore?: boolean;
+    rightIndent?: number;
+    spaceAfter?: number;
+    spaceBefore?: number;
+}
 
 // @public
 export interface Row {
@@ -369,10 +447,12 @@ export interface Row {
     height: number | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "RowCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RowCreateInput = RowCreateInput_2;
+export interface RowCreateInput {
+    allowBreakAcrossPages?: boolean;
+    headingFormat?: boolean;
+    height?: number;
+}
 
 // @public
 export const RowSchema: z.ZodObject<{
@@ -381,10 +461,12 @@ export const RowSchema: z.ZodObject<{
     headingFormat: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "RowUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RowUpdateInput = RowUpdateInput_2;
+export interface RowUpdateInput {
+    allowBreakAcrossPages?: boolean;
+    headingFormat?: boolean;
+    height?: number;
+}
 
 // @public
 export type SaveFormat = 'document' | 'documentFormat97' | 'template' | 'rtf' | 'text' | 'html' | 'pdf';
@@ -395,10 +477,10 @@ export interface Section {
     readonly sectionIndex: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "SectionCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SectionCreateInput = SectionCreateInput_2;
+export interface SectionCreateInput {
+    protectedForForms?: boolean;
+}
 
 // @public
 export const SectionSchema: z.ZodObject<{
@@ -406,10 +488,10 @@ export const SectionSchema: z.ZodObject<{
     protectedForForms: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "SectionUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SectionUpdateInput = SectionUpdateInput_2;
+export interface SectionUpdateInput {
+    protectedForForms?: boolean;
+}
 
 // @public
 export interface Selection {
@@ -423,10 +505,14 @@ export interface Selection {
     readonly start: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "SelectionCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SelectionCreateInput = SelectionCreateInput_2;
+export interface SelectionCreateInput {
+    bold?: boolean;
+    content?: string;
+    fontName?: string;
+    fontSize?: number;
+    italic?: boolean;
+}
 
 // @public
 export const SelectionSchema: z.ZodObject<{
@@ -440,10 +526,14 @@ export const SelectionSchema: z.ZodObject<{
     selectionType: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "SelectionUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SelectionUpdateInput = SelectionUpdateInput_2;
+export interface SelectionUpdateInput {
+    bold?: boolean;
+    content?: string;
+    fontName?: string;
+    fontSize?: number;
+    italic?: boolean;
+}
 
 // @public
 export interface Table {
@@ -453,10 +543,11 @@ export interface Table {
     readonly rowCount: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "TableCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TableCreateInput = TableCreateInput_2;
+export interface TableCreateInput {
+    allowAutoFit?: boolean;
+    borders?: boolean;
+}
 
 // @public
 export const TableSchema: z.ZodObject<{
@@ -466,10 +557,11 @@ export const TableSchema: z.ZodObject<{
     borders: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "TableUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TableUpdateInput = TableUpdateInput_2;
+export interface TableUpdateInput {
+    allowAutoFit?: boolean;
+    borders?: boolean;
+}
 
 // @public
 export interface TextRange {
@@ -487,8 +579,8 @@ export interface TextRange {
 //
 // @public
 export type TextRangeCreateInput = Omit<TextRangeCreateInput_2, 'start' | 'end'> & {
-    start?: number | Extract<TextRangeCreateInput_2['start'], null>;
-    end?: number | Extract<TextRangeCreateInput_2['end'], null>;
+    start?: null extends TextRangeCreateInput_2['start'] ? number | null : number;
+    end?: null extends TextRangeCreateInput_2['end'] ? number | null : number;
 };
 
 // @public
@@ -507,8 +599,8 @@ export const TextRangeSchema: z.ZodObject<{
 //
 // @public
 export type TextRangeUpdateInput = Omit<TextRangeUpdateInput_2, 'start' | 'end'> & {
-    start?: number | Extract<TextRangeUpdateInput_2['start'], null>;
-    end?: number | Extract<TextRangeUpdateInput_2['end'], null>;
+    start?: null extends TextRangeUpdateInput_2['start'] ? number | null : number;
+    end?: null extends TextRangeUpdateInput_2['end'] ? number | null : number;
 };
 
 // @public

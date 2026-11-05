@@ -4,10 +4,10 @@
 
 ## Process.file property
 
-the file from which the process was launched
+the file from which the process was launched. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-file: string
+readonly file: string | null;
 ```

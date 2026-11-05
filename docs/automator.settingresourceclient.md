@@ -57,24 +57,13 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(name)](./automator.settingresourceclient.get.md)
+[list(actionId, \_\_mactsOptions)](./automator.settingresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-Get a setting by name.
-
-</td></tr>
-<tr><td>
-
-[list()](./automator.settingresourceclient.list.md)
-
-</td><td>
-
-</td><td>
-
-List all settings.
+List the settings of one automator action, as one page.
 
 </td></tr>
 </tbody></table>

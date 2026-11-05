@@ -28,7 +28,8 @@ export class DependencyResourceClient {
     return this.#http.invoke<Page<Dependency>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Dependency'
     )
   }
 }

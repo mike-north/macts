@@ -51,7 +51,8 @@ export class BrowserWindowResourceClient {
     return this.#http.invoke<Page<BrowserWindow>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'BrowserWindow'
     )
   }
 
@@ -65,7 +66,8 @@ export class BrowserWindowResourceClient {
     return this.#http.invoke<BrowserWindow>(
       `${this.#app}.${this.#resource}.get`,
       { id: __mactsIntegerInput(id) },
-      __mactsOptions
+      __mactsOptions,
+      'BrowserWindow'
     )
   }
 }

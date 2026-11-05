@@ -23,7 +23,12 @@ export class MessageResourceClient {
    * Does nothing at all (deprecated)
    */
   async bounce(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
-    await this.#http.invoke<undefined>(`${this.#app}.${this.#resource}.bounce`, {}, __mactsOptions)
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.bounce`,
+      {},
+      __mactsOptions,
+      'Message'
+    )
   }
 
   /**
@@ -36,7 +41,8 @@ export class MessageResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.forward`,
       { openingWindow },
-      __mactsOptions
+      __mactsOptions,
+      'Message'
     )
   }
 
@@ -50,7 +56,8 @@ export class MessageResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.redirect`,
       { openingWindow },
-      __mactsOptions
+      __mactsOptions,
+      'Message'
     )
   }
 
@@ -65,7 +72,8 @@ export class MessageResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.reply`,
       { openingWindow, replyToAll },
-      __mactsOptions
+      __mactsOptions,
+      'Message'
     )
   }
 }

@@ -4,10 +4,10 @@
 
 ## BuildSetting.value property
 
-A string value for the build setting
+A string value for the build setting. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-value: string
+value: string | null
 ```

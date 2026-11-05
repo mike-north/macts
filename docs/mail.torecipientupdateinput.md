@@ -4,12 +4,10 @@
 
 ## ToRecipientUpdateInput type
 
-Input for updating a ToRecipient
+Input for updating a ToRecipient. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ToRecipientUpdateInput = Partial<ToRecipientCreateInput>
+type ToRecipientUpdateInput = Record<string, never>
 ```
-
-**References:** [ToRecipientCreateInput](./mail.torecipientcreateinput.md)

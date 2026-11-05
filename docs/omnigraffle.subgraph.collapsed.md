@@ -4,10 +4,10 @@
 
 ## Subgraph.collapsed property
 
-Is the subgraph collapsed?
+Is the subgraph collapsed? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-collapsed: boolean
+collapsed: boolean | null
 ```

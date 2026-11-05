@@ -5,5 +5,5 @@
 export function positionalOperationSource(source: string): string {
   return source
     .replace(/,? ?__mactsOptions\?: import\('@macts\/contracts'\)\.CallOptions/g, '')
-    .replace(/, __mactsOptions\);/g, ');')
+    .replace(/, __mactsOptions(?:, (?:'[^']*'|"[^"]*"))?\);/g, ');')
 }

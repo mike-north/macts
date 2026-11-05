@@ -6,12 +6,11 @@
  */
 
 import { PaneResourceClient } from './resources/pane.js'
-
 import { systemSettingsContract as appContract } from './contract/index.js'
 import {
   createCodecClient,
   createRemoteTransport,
-  type ClientTransport,
+  type RemoteTransport,
 } from '@macts/contracts/client'
 import {
   MactsError,
@@ -38,51 +37,36 @@ export interface SystemSettingsClientOptions {
   baseUrl?: string
 }
 
-/**
- * HTTP client wrapper for making authenticated requests.
- */
 /** Canonical failures retained privately while raw RPC preserves the legacy error class. */
 const canonicalFailures = new WeakMap<Error, MactsError>()
 
-/**
- * Private request metadata selects the canonical POST while retaining the public
- * raw RPC hook. It never enters the request body or caller-owned options.
- */
-const canonicalCall = Symbol('canonical contract call')
-
+/** Raw RPC compatibility and canonical typed invocation for this app and credential. */
 export class HttpClient {
-  readonly #transport: ClientTransport
-  readonly #baseUrl: string
-  readonly #apiKey: string
+  readonly #transport: RemoteTransport
   #runtime: ClientRuntime | undefined
 
   constructor(baseUrl: string, apiKey: string) {
-    this.#baseUrl = baseUrl
-    this.#apiKey = apiKey
     this.#transport = createRemoteTransport(appContract, { url: baseUrl, token: apiKey })
   }
 
   /**
-   * Bind the actual public facade in the shared reference registry. A copied
+   * Bind the actual public facade in the shared reference registry. Standalone
+   * resource clients lazily bind an ordinary contract client instead. A copied
    * contract changes only construction; its descriptors and codecs are shared.
    * @internal
    */
-  bind<Client extends ClientBrand<SystemSettingsResources>>(client: Client): void {
-    const contract: AppContract<Client, SystemSettingsResources> = {
+  bind(client?: object): void {
+    const contract: AppContract<object, SystemSettingsResources> = {
       ...appContract,
       bind: (runtime) => {
         this.#runtime = runtime
-        return client
+        return client ?? appContract.bind(runtime)
       },
     }
     createCodecClient(contract, {
       invoke: async (operation, input, options) => {
         try {
-          const requestOptions: CallOptions & { readonly [canonicalCall]: true } = {
-            ...options,
-            [canonicalCall]: true,
-          }
-          return await this.rpc(operation, input as object, requestOptions)
+          return await this.rpc(operation, input as object, options)
         } catch (error) {
           if (error instanceof MactsError) throw error
           if (error instanceof Error) {
@@ -98,46 +82,51 @@ export class HttpClient {
     })
   }
 
-  /** Invoke a registered operation with SDK input; raw RPC hooks still see wire input. @internal */
-  async invoke<T>(path: string, input: object = {}, options?: CallOptions): Promise<T> {
+  /** Invoke a descriptor with SDK input; generated return types come from that contract and its output codec validates the result. @internal */
+  async invoke<T>(
+    path: string,
+    input: object = {},
+    options?: CallOptions,
+    expectedResource?: string
+  ): Promise<T> {
     const operation = Object.values(appContract.operations).find(
       (candidate) => candidate.id === path
     )
-    if (operation === undefined || operation.unavailable !== undefined) {
+    if (
+      operation === undefined ||
+      operation.unavailable !== undefined ||
+      (expectedResource !== undefined && operation.target.resource !== expectedResource)
+    ) {
       throw new ValidationError('The operation is not registered in this app contract.', {
-        issues: [{ path: [], message: 'Unknown operation route.' }],
+        issues: [{ path: [], message: 'Unknown or mismatched operation route.' }],
       })
     }
-    if (this.#runtime === undefined) this.bind({})
+    if (this.#runtime === undefined) this.bind()
     if (this.#runtime === undefined) throw new Error('Client runtime was not initialized.')
     return this.#runtime.invoke(operation, input, options) as Promise<T>
   }
 
   /** Raw wire RPC for explicit passthrough consumers; typed methods use invoke. */
   async rpc<T>(path: string, body: object = {}, options?: CallOptions): Promise<T> {
-    // Typed wrappers still dispatch through overrides; an override forwarding to
-    // super retains the shared transport's envelope/cancellation semantics.
-    if (options !== undefined && canonicalCall in options) {
-      return (await this.#transport.invoke(path as OperationId, body as WireValue, options)) as T
-    }
-    const response = await fetch(`${this.#baseUrl}/api/v1/rpc/${path}`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${this.#apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      ...(options?.signal === undefined ? {} : { signal: options.signal }),
-    })
-    if (!response.ok) {
-      const envelope: unknown = await response.json()
-      const error = envelope as { error?: { code?: string; message?: string } }
-      const legacy = new SystemSettingsError(
-        error.error?.code ?? 'UNKNOWN_ERROR',
-        error.error?.message ?? `HTTP ${String(response.status)}`
-      )
-      canonicalFailures.set(legacy, fromWireErrorEnvelope(envelope, { status: response.status }))
-      throw legacy
-    }
-    const result = (await response.json()) as { result: T }
-    return result.result
+    // Typed wrappers dispatch through this public hook, including overrides
+    // that forward only two arguments. Shared protocol handling needs no hidden
+    // request metadata; forwarding options preserves cancellation only.
+    const outcome = await this.#transport.requestRpc(
+      path as OperationId,
+      body as WireValue,
+      options
+    )
+    if (outcome.ok) return outcome.result as T
+    const error = outcome.envelope as { error?: { code?: string; message?: string } } | null
+    const legacy = new SystemSettingsError(
+      error?.error?.code ?? 'UNKNOWN_ERROR',
+      error?.error?.message ?? `HTTP ${String(outcome.status)}`
+    )
+    canonicalFailures.set(
+      legacy,
+      fromWireErrorEnvelope(outcome.envelope, { status: outcome.status })
+    )
+    throw legacy
   }
 }
 
@@ -155,6 +144,14 @@ export class SystemSettingsError extends Error {
 }
 
 /**
+ * The shared type-only resource brand lets caller-built references target this facade.
+ * It adds no runtime fields; construction registers the actual instance.
+ * @public
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-declaration-merging -- Only the non-runtime brand is merged into the retained class constructor.
+export interface SystemSettingsClient extends ClientBrand<SystemSettingsResources> {}
+
+/**
  * SystemSettings client for HTTP-based macOS automation.
  *
  * @example
@@ -167,9 +164,7 @@ export class SystemSettingsError extends Error {
  * const calendars = await client.calendars.list();
  * ```
  */
-/** Shared type-only resource brand lets caller-built references target this facade. */
-export interface SystemSettingsClient extends ClientBrand<SystemSettingsResources> {}
-
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging -- The merged interface contributes only the shared phantom brand, never runtime members.
 export class SystemSettingsClient {
   readonly #httpClient: HttpClient
 

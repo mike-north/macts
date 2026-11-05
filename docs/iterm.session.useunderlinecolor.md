@@ -4,10 +4,10 @@
 
 ## Session.useUnderlineColor property
 
-Whether the use a dedicated color for underlining.
+Whether the use a dedicated color for underlining. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-useUnderlineColor: boolean
+useUnderlineColor: boolean | null
 ```

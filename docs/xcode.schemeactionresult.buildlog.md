@@ -4,10 +4,10 @@
 
 ## SchemeActionResult.buildLog property
 
-If this scheme action performed a build, this will be the text of the build log
+If this scheme action performed a build, this will be the text of the build log. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-buildLog: string
+buildLog: string | null
 ```

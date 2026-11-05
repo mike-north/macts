@@ -32,7 +32,8 @@ export class RunDestinationResourceClient {
     return this.#http.invoke<Page<RunDestination>>(
       `${this.#app}.${this.#resource}.list`,
       { workspaceName },
-      __mactsOptions
+      __mactsOptions,
+      'RunDestination'
     )
   }
 
@@ -49,7 +50,8 @@ export class RunDestinationResourceClient {
     return this.#http.invoke<RunDestination>(
       `${this.#app}.${this.#resource}.get`,
       { workspaceName, name },
-      __mactsOptions
+      __mactsOptions,
+      'RunDestination'
     )
   }
 }

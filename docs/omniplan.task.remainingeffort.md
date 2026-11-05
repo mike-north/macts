@@ -4,10 +4,10 @@
 
 ## Task.remainingEffort property
 
-The person-seconds remaining
+The person-seconds remaining. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-remainingEffort: number
+readonly remainingEffort: number | null;
 ```

@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[get(id)](./automator.variableresourceclient.get.md)
+[get(id, \_\_mactsOptions)](./automator.variableresourceclient.get.md)
 
 </td><td>
 
@@ -68,13 +68,13 @@ Get a variable by id.
 </td></tr>
 <tr><td>
 
-[list()](./automator.variableresourceclient.list.md)
+[list(workflowName, \_\_mactsOptions)](./automator.variableresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all variables.
+List the variables of one workflow, as one page. When several workflows share the same name, the first match in the app's order is used as the workflow.
 
 </td></tr>
 </tbody></table>

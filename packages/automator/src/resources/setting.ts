@@ -31,7 +31,8 @@ export class SettingResourceClient {
     return this.#http.invoke<Page<Setting>>(
       `${this.#app}.${this.#resource}.list`,
       { actionId },
-      __mactsOptions
+      __mactsOptions,
+      'Setting'
     )
   }
 }

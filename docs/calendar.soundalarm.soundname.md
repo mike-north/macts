@@ -4,10 +4,10 @@
 
 ## SoundAlarm.soundName property
 
-The system sound name to be used for the alarm
+The system sound name to be used for the alarm. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-soundName: string
+soundName: string | null
 ```

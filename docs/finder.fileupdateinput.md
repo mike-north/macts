@@ -2,14 +2,78 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [FileUpdateInput](./finder.fileupdateinput.md)
 
-## FileUpdateInput type
+## FileUpdateInput interface
 
-Input for updating a File
+Input for updating a File. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type FileUpdateInput = Partial<FileCreateInput>
+interface FileUpdateInput
 ```
 
-**References:** [FileCreateInput](./finder.filecreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[creatorType?](./finder.fileupdateinput.creatortype.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the OSType identifying the application that created the item. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[fileType?](./finder.fileupdateinput.filetype.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the OSType identifying the type of data contained in the item. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[stationery?](./finder.fileupdateinput.stationery.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Is the file a stationery pad? Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

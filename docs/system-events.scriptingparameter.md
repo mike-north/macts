@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The description of the parameter
+string \| null
+
+</td><td>
+
+The description of the parameter. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The description of the parameter
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the parameter hidden?
+boolean \| null
+
+</td><td>
+
+Is the parameter hidden? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ Is the parameter hidden?
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the parameter
+The unique identifier of the parameter. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ The unique identifier of the parameter
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The kind of object or data specified by this parameter
+string \| null
+
+</td><td>
+
+The kind of object or data specified by this parameter. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +105,15 @@ The kind of object or data specified by this parameter
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the parameter
+string \| null
+
+</td><td>
+
+The name of the parameter. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,13 +122,15 @@ The name of the parameter
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the parameter optional?
+boolean \| null
+
+</td><td>
+
+Is the parameter optional? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The column index of the cell
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The column index of the cell. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ The column index of the cell
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The text content of the cell
+The text content of the cell. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +71,11 @@ The text content of the cell
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The height of the cell in points
+The height of the cell in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +84,15 @@ The height of the cell in points
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The row index of the cell
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The row index of the cell. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +103,11 @@ The row index of the cell
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The vertical alignment of text in the cell
+The vertical alignment of text in the cell. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +118,11 @@ The vertical alignment of text in the cell
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The width of the cell in points
+The width of the cell in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

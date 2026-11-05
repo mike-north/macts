@@ -4,10 +4,10 @@
 
 ## Layer.locked property
 
-Are the layer's graphics locked?
+Are the layer's graphics locked? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-locked: boolean
+locked: boolean | null
 ```

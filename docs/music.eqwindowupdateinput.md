@@ -4,12 +4,10 @@
 
 ## EQWindowUpdateInput type
 
-Input for updating a EQWindow
+Input for updating an EQWindow. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type EQWindowUpdateInput = Partial<EQWindowCreateInput>
+type EQWindowUpdateInput = Record<string, never>
 ```
-
-**References:** [EQWindowCreateInput](./music.eqwindowcreateinput.md)

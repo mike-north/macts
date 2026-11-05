@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-Which magnet of the destination graphic the line attaches to
+Which magnet of the destination graphic the line attaches to. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ Which magnet of the destination graphic the line attaches to
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Scale of line ending on the head of the line
+Scale of line ending on the head of the line. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ Scale of line ending on the head of the line
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Type of line ending on the head of the line
+Type of line ending on the head of the line. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ Type of line ending on the head of the line
 
 </td><td>
 
-[HopType](./omnigraffle.hoptype.md)
+[HopType](./omnigraffle.hoptype.md) \| null
 
 </td><td>
 
-The behavior when one line crosses over another line
+The behavior when one line crosses over another line. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +97,15 @@ The behavior when one line crosses over another line
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-Unique identifier
+Unique identifier. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -114,11 +116,11 @@ Unique identifier
 
 </td><td>
 
-[LineType](./omnigraffle.linetype.md)
+[LineType](./omnigraffle.linetype.md) \| null
 
 </td><td>
 
-Type of the line
+Type of the line. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +131,11 @@ Type of the line
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-Which magnet of the source graphic the line attaches to
+Which magnet of the source graphic the line attaches to. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +146,11 @@ Which magnet of the source graphic the line attaches to
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Scale of line ending on the tail of the line
+Scale of line ending on the tail of the line. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +161,11 @@ Scale of line ending on the tail of the line
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Type of line ending on the tail of the line
+Type of line ending on the tail of the line. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

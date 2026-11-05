@@ -4,10 +4,10 @@
 
 ## FinderWindow.toolbarVisible property
 
-Is the window's toolbar visible?
+Is the window's toolbar visible? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-toolbarVisible: boolean
+toolbarVisible: boolean | null
 ```

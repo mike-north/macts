@@ -4,7 +4,7 @@
 
 ## ScenarioCreateInput interface
 
-Input for creating a Scenario
+Input for creating a Scenario.
 
 **Signature:**
 

@@ -9,7 +9,7 @@ Execute a piece of javascript
 **Signature:**
 
 ```typescript
-execute(tabId: string, javascript: string): Promise<void>;
+execute(tabId: string, javascript: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -47,6 +47,19 @@ javascript
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

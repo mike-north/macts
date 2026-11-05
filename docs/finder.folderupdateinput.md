@@ -4,12 +4,10 @@
 
 ## FolderUpdateInput type
 
-Input for updating a Folder
+Input for updating a Folder. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type FolderUpdateInput = Partial<FolderCreateInput>
+type FolderUpdateInput = Record<string, never>
 ```
-
-**References:** [FolderCreateInput](./finder.foldercreateinput.md)

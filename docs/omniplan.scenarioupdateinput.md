@@ -2,14 +2,78 @@
 
 [Home](./index.md) &gt; [@macts/omniplan](./omniplan.md) &gt; [ScenarioUpdateInput](./omniplan.scenarioupdateinput.md)
 
-## ScenarioUpdateInput type
+## ScenarioUpdateInput interface
 
-Input for updating a Scenario
+Input for updating a Scenario. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ScenarioUpdateInput = Partial<ScenarioCreateInput>
+interface ScenarioUpdateInput
 ```
 
-**References:** [ScenarioCreateInput](./omniplan.scenariocreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[name?](./omniplan.scenarioupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of the scenario. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[schedulingGranularity?](./omniplan.scenarioupdateinput.schedulinggranularity.md)
+
+</td><td>
+
+</td><td>
+
+[SchedulingGranularity](./omniplan.schedulinggranularity.md)
+
+</td><td>
+
+_(Optional)_ Scheduling granularity for this scenario. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[startingDate?](./omniplan.scenarioupdateinput.startingdate.md)
+
+</td><td>
+
+</td><td>
+
+Date
+
+</td><td>
+
+_(Optional)_ The date on which work can begin. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

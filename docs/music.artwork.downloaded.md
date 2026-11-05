@@ -4,10 +4,10 @@
 
 ## Artwork.downloaded property
 
-was this artwork downloaded by Music?
+was this artwork downloaded by Music? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-downloaded: boolean
+readonly downloaded: boolean | null;
 ```

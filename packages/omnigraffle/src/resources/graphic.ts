@@ -31,7 +31,8 @@ export class GraphicResourceClient {
     return this.#http.invoke<Page<Graphic>>(
       `${this.#app}.${this.#resource}.list`,
       { canvasId },
-      __mactsOptions
+      __mactsOptions,
+      'Graphic'
     )
   }
 
@@ -39,6 +40,11 @@ export class GraphicResourceClient {
    * Get a graphic by id.
    */
   async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Graphic> {
-    return this.#http.invoke<Graphic>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
+    return this.#http.invoke<Graphic>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Graphic'
+    )
   }
 }

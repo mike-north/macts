@@ -4,7 +4,7 @@
 
 ## ScrollAreaCreateInput type
 
-Input for creating a ScrollArea
+Input for creating a ScrollArea.
 
 **Signature:**
 

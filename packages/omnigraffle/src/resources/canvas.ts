@@ -28,7 +28,8 @@ export class CanvasResourceClient {
     return this.#http.invoke<Page<Canvas>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Canvas'
     )
   }
 
@@ -36,7 +37,12 @@ export class CanvasResourceClient {
    * Get a canvas by id.
    */
   async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Canvas> {
-    return this.#http.invoke<Canvas>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
+    return this.#http.invoke<Canvas>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Canvas'
+    )
   }
 
   /**
@@ -46,6 +52,11 @@ export class CanvasResourceClient {
     input: CanvasCreateInput,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Canvas> {
-    return this.#http.invoke<Canvas>(`${this.#app}.${this.#resource}.create`, input, __mactsOptions)
+    return this.#http.invoke<Canvas>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'Canvas'
+    )
   }
 }

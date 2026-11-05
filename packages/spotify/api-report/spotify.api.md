@@ -29,15 +29,13 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "SpotifyResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<SpotifyResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -48,7 +46,7 @@ export type PlayerState = 'stopped' | 'playing' | 'paused';
 export interface SpotifyClient extends ClientBrand<SpotifyResources> {
 }
 
-// @public (undocumented)
+// @public
 export class SpotifyClient {
     constructor(options: SpotifyClientOptions);
     get http(): HttpClient;
@@ -74,6 +72,9 @@ export class SpotifyError extends Error {
 }
 
 // @public
+export type SpotifyResources = Readonly<Record<never, never>>;
+
+// @public
 export interface Track {
     readonly album: string | null;
     readonly albumArtist: string | null;
@@ -90,10 +91,8 @@ export interface Track {
     readonly trackNumber: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "TrackCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TrackCreateInput = TrackCreateInput_2;
+export type TrackCreateInput = Record<string, never>;
 
 // @public
 export const TrackSchema: z.ZodObject<{
@@ -112,10 +111,8 @@ export const TrackSchema: z.ZodObject<{
     playerState: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "TrackUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TrackUpdateInput = TrackUpdateInput_2;
+export type TrackUpdateInput = Record<string, never>;
 
 // (No @packageDocumentation comment for this package)
 

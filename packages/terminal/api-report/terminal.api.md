@@ -31,15 +31,13 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "TerminalResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<TerminalResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -53,10 +51,14 @@ export interface SettingsSet {
     numberOfRows: number | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "SettingsSetCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SettingsSetCreateInput = SettingsSetCreateInput_2;
+export interface SettingsSetCreateInput {
+    fontName?: string;
+    fontSize?: number;
+    name?: string;
+    numberOfColumns?: number;
+    numberOfRows?: number;
+}
 
 // @public
 export class SettingsSetResourceClient {
@@ -75,10 +77,14 @@ export const SettingsSetSchema: z.ZodObject<{
     fontSize: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "SettingsSetUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SettingsSetUpdateInput = SettingsSetUpdateInput_2;
+export interface SettingsSetUpdateInput {
+    fontName?: string;
+    fontSize?: number;
+    name?: string;
+    numberOfColumns?: number;
+    numberOfRows?: number;
+}
 
 // @public
 export interface Tab {
@@ -93,10 +99,13 @@ export interface Tab {
     readonly tty: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "TabCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TabCreateInput = TabCreateInput_2;
+export interface TabCreateInput {
+    currentSettings?: string;
+    customTitle?: string;
+    selected?: boolean;
+    titleDisplaysCustomTitle?: boolean;
+}
 
 // @public
 export class TabResourceClient {
@@ -119,16 +128,19 @@ export const TabSchema: z.ZodObject<{
     currentSettings: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "TabUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TabUpdateInput = TabUpdateInput_2;
+export interface TabUpdateInput {
+    currentSettings?: string;
+    customTitle?: string;
+    selected?: boolean;
+    titleDisplaysCustomTitle?: boolean;
+}
 
 // @public
 export interface TerminalClient extends ClientBrand<TerminalResources> {
 }
 
-// @public (undocumented)
+// @public
 export class TerminalClient {
     constructor(options: TerminalClientOptions);
     doScript(command: string, _in?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -152,6 +164,25 @@ export class TerminalError extends Error {
 }
 
 // @public
+export type TerminalResources = Readonly<{
+    Window: ResourceDescriptor<Window, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'terminal.windows.get';
+        readonly list: 'terminal.windows.list';
+    };
+    Tab: ResourceDescriptor<Tab, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'terminal.tabs.get';
+        readonly list: 'terminal.tabs.list';
+    };
+    SettingsSet: ResourceDescriptor<SettingsSet, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'terminal.settingsSets.get';
+        readonly list: 'terminal.settingsSets.list';
+    };
+}>;
+
+// @public
 export interface Window {
     readonly frontmost: boolean | null;
     readonly id: number | null;
@@ -160,10 +191,11 @@ export interface Window {
     visible: boolean | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "WindowCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type WindowCreateInput = WindowCreateInput_2;
+export interface WindowCreateInput {
+    position?: string;
+    visible?: boolean;
+}
 
 // @public
 export class WindowResourceClient {
@@ -181,10 +213,11 @@ export const WindowSchema: z.ZodObject<{
     frontmost: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "WindowUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type WindowUpdateInput = WindowUpdateInput_2;
+export interface WindowUpdateInput {
+    position?: string;
+    visible?: boolean;
+}
 
 // (No @packageDocumentation comment for this package)
 

@@ -189,7 +189,7 @@ describe('generateHttpClientSdk', () => {
 
     // Check resource type
     expect(content).toContain("export type { Item } from './contract/index.js';")
-    expect(content).toContain('number | Extract<')
+    expect(content).toContain('null extends import(')
 
     // Check create input type
     expect(content).toContain('export type ItemCreateInput = Omit<')
@@ -433,11 +433,12 @@ describe('generateHttpClientSdk', () => {
 
     const content = findFile(result.files, 'src/resources/item.ts').content
 
-    // The method signature references the enum...
-    expect(content).toContain('async setStatus(status: Status)')
-    // ...and the enum is imported alongside the resource's own types.
+    // The canonical method owns its enum input, so no independent type map can drift.
     expect(content).toContain(
-      "import type { Item, ItemCreateInput, ItemUpdateInput, Status } from '../types.js';"
+      "async setStatus(status: Parameters<import('../contract/index.js').ItemResourceClient['setStatus']>[0])"
+    )
+    expect(content).toContain(
+      "import type { Item, ItemCreateInput, ItemUpdateInput } from '../types.js';"
     )
   })
 

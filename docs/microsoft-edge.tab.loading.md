@@ -4,10 +4,10 @@
 
 ## Tab.loading property
 
-Is loading?
+Is loading? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-loading: boolean
+readonly loading: boolean | null;
 ```

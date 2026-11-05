@@ -4,12 +4,26 @@
 
 ## AnalyzerIssueUpdateInput type
 
-Input for updating a AnalyzerIssue
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type AnalyzerIssueUpdateInput = Partial<AnalyzerIssueCreateInput>
+type AnalyzerIssueUpdateInput = Omit<
+  AnalyzerIssueUpdateInput$1,
+  'startingLineNumber' | 'endingLineNumber' | 'startingColumnNumber' | 'endingColumnNumber'
+> & {
+  startingLineNumber?: null extends AnalyzerIssueUpdateInput$1['startingLineNumber']
+    ? number | null
+    : number
+  endingLineNumber?: null extends AnalyzerIssueUpdateInput$1['endingLineNumber']
+    ? number | null
+    : number
+  startingColumnNumber?: null extends AnalyzerIssueUpdateInput$1['startingColumnNumber']
+    ? number | null
+    : number
+  endingColumnNumber?: null extends AnalyzerIssueUpdateInput$1['endingColumnNumber']
+    ? number | null
+    : number
+}
 ```
-
-**References:** [AnalyzerIssueCreateInput](./xcode.analyzerissuecreateinput.md)

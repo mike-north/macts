@@ -4,7 +4,7 @@
 
 ## LocalDomainObjectCreateInput type
 
-Input for creating a LocalDomainObject
+Input for creating a LocalDomainObject.
 
 **Signature:**
 

@@ -4,10 +4,10 @@
 
 ## Graphic.strokeCap property
 
-Type of cap at ends of the stroke
+Type of cap at ends of the stroke. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-strokeCap: StrokeCap
+strokeCap: StrokeCap | null
 ```

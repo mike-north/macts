@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The cost per hour of this resource
+The cost per hour of this resource. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ The cost per hour of this resource
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The fixed cost per use of this resource
+The fixed cost per use of this resource. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ The fixed cost per use of this resource
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Resource efficiency (1.0 = 100%)
+Resource efficiency (1.0 = 100%). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ Resource efficiency (1.0 = 100%)
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Email address for this resource
+Email address for this resource. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +97,15 @@ Email address for this resource
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Internal identifier for this resource
+[Integer](./contracts.integer.md)
+
+</td><td>
+
+Internal identifier for this resource. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -114,11 +116,11 @@ Internal identifier for this resource
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the resource
+The name of the resource. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +131,11 @@ The name of the resource
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Notes
+Notes. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +146,11 @@ Notes
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The total number of units for this resource (1.0 = 100%)
+The total number of units for this resource (1.0 = 100%). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +159,15 @@ The total number of units for this resource (1.0 = 100%)
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The depth or level of this resource in the hierarchy
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The depth or level of this resource in the hierarchy. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -174,11 +178,11 @@ The depth or level of this resource in the hierarchy
 
 </td><td>
 
-[ResourceType](./omniplan.resourcetype.md)
+[ResourceType](./omniplan.resourcetype.md) \| null
 
 </td><td>
 
-Type of the resource
+Type of the resource. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -187,13 +191,15 @@ Type of the resource
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Total cost of all assignments for this resource
+number \| null
+
+</td><td>
+
+Total cost of all assignments for this resource. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -202,13 +208,15 @@ Total cost of all assignments for this resource
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Total seconds worked by this resource
+number \| null
+
+</td><td>
+
+Total seconds worked by this resource. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -217,13 +225,15 @@ Total seconds worked by this resource
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Total number of uses of this resource
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+Total number of uses of this resource. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

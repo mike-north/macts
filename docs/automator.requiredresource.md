@@ -33,32 +33,19 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[id?](./automator.requiredresource.id.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
-
-</td></tr>
-<tr><td>
-
 [kind](./automator.requiredresource.kind.md)
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The kind of required resource
+string \| null
+
+</td><td>
+
+The kind of required resource. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +54,15 @@ The kind of required resource
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The name of the required resource
+The name of the required resource. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -82,13 +71,15 @@ The name of the required resource
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The specification of the required resource
+string \| null
+
+</td><td>
+
+The specification of the required resource. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +88,15 @@ The specification of the required resource
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The minimum acceptable version of the required resource
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The minimum acceptable version of the required resource. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

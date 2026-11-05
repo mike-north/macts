@@ -4,7 +4,7 @@
 
 ## SubscriptionPlaylistCreateInput type
 
-Input for creating a SubscriptionPlaylist
+Input for creating a SubscriptionPlaylist.
 
 **Signature:**
 

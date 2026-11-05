@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/xcode](./xcode.md) &gt; [BuildSettingUpdateInput](./xcode.buildsettingupdateinput.md)
 
-## BuildSettingUpdateInput type
+## BuildSettingUpdateInput interface
 
-Input for updating a BuildSetting
+Input for updating a BuildSetting. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type BuildSettingUpdateInput = Partial<BuildSettingCreateInput>
+interface BuildSettingUpdateInput
 ```
 
-**References:** [BuildSettingCreateInput](./xcode.buildsettingcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[name?](./xcode.buildsettingupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The unlocalized build setting name (e.g. DSTROOT). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[value?](./xcode.buildsettingupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ A string value for the build setting. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

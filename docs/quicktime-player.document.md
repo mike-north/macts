@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The current playback time in seconds
+The current playback time in seconds. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +52,15 @@ The current playback time in seconds
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The duration of the document in seconds
+number \| null
+
+</td><td>
+
+The duration of the document in seconds. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +69,15 @@ The duration of the document in seconds
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the document
+The unique identifier of the document. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -82,13 +86,15 @@ The unique identifier of the document
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The document name
+string \| null
+
+</td><td>
+
+The document name. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +103,15 @@ The document name
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The file path of the document
+string \| null
+
+</td><td>
+
+The file path of the document. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +122,11 @@ The file path of the document
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the document is currently playing
+Whether the document is currently playing. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

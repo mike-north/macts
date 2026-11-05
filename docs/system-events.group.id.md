@@ -4,10 +4,10 @@
 
 ## Group.id property
 
-Unique identifier for this group
+Unique identifier for this group. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

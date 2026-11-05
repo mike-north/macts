@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-Unique ID of the tab.
+Unique ID of the tab among the tabs of its window, within one browser session: ids start over each time the browser is relaunched, so an id kept across a relaunch may find a different tab, not merely none, and an action through it, such as closing the tab, would act on that other tab. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ Unique ID of the tab.
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is loading?
+boolean \| null
+
+</td><td>
+
+Is loading? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ Is loading?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The title of the tab.
+string \| null
+
+</td><td>
+
+The title of the tab. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +90,11 @@ The title of the tab.
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The url visible to the user.
+The url visible to the user. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

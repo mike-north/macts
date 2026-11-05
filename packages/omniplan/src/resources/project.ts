@@ -28,7 +28,8 @@ export class ProjectResourceClient {
     return this.#http.invoke<Page<Project>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Project'
     )
   }
 
@@ -36,6 +37,11 @@ export class ProjectResourceClient {
    * Get a project by id.
    */
   async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Project> {
-    return this.#http.invoke<Project>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
+    return this.#http.invoke<Project>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Project'
+    )
   }
 }

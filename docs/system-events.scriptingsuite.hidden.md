@@ -4,10 +4,10 @@
 
 ## ScriptingSuite.hidden property
 
-Is the suite hidden?
+Is the suite hidden? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-hidden: boolean
+readonly hidden: boolean | null;
 ```

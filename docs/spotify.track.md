@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The album of the track
+string \| null
+
+</td><td>
+
+The album of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The album of the track
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The album artist of the track
+string \| null
+
+</td><td>
+
+The album artist of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ The album artist of the track
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The artist of the track
+string \| null
+
+</td><td>
+
+The artist of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ The artist of the track
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The track artwork
+string \| null
+
+</td><td>
+
+The track artwork. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +105,15 @@ The track artwork
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The URL of the track artwork
+string \| null
+
+</td><td>
+
+The URL of the track artwork. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,13 +122,15 @@ The URL of the track artwork
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The disc number of the track
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The disc number of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +139,15 @@ The disc number of the track
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The duration of the track in milliseconds
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The duration of the track in milliseconds. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +156,15 @@ The duration of the track in milliseconds
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the track
+The unique identifier of the track. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -157,13 +173,15 @@ The unique identifier of the track
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the track
+string \| null
+
+</td><td>
+
+The name of the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -172,13 +190,15 @@ The name of the track
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Number of times this track has been played
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+Number of times this track has been played. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -187,13 +207,15 @@ Number of times this track has been played
 
 </td><td>
 
-</td><td>
-
-[PlayerState](./spotify.playerstate.md)
+`readonly`
 
 </td><td>
 
-The current player state
+[PlayerState](./spotify.playerstate.md) \| null
+
+</td><td>
+
+The current player state. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -202,13 +224,15 @@ The current player state
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The Spotify URL for the track
+string \| null
+
+</td><td>
+
+The Spotify URL for the track. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -217,13 +241,15 @@ The Spotify URL for the track
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The track number
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The track number. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

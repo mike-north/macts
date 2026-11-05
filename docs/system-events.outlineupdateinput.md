@@ -4,12 +4,10 @@
 
 ## OutlineUpdateInput type
 
-Input for updating a Outline
+Input for updating an Outline. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type OutlineUpdateInput = Partial<OutlineCreateInput>
+type OutlineUpdateInput = Record<string, never>
 ```
-
-**References:** [OutlineCreateInput](./system-events.outlinecreateinput.md)

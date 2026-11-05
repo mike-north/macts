@@ -2,14 +2,78 @@
 
 [Home](./index.md) &gt; [@macts/script-editor](./script-editor.md) &gt; [DocumentUpdateInput](./script-editor.documentupdateinput.md)
 
-## DocumentUpdateInput type
+## DocumentUpdateInput interface
 
-Input for updating a Document
+Input for updating a Document. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type DocumentUpdateInput = Partial<DocumentCreateInput>
+interface DocumentUpdateInput
 ```
 
-**References:** [DocumentCreateInput](./script-editor.documentcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[contents?](./script-editor.documentupdateinput.contents.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Initial script contents. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[language?](./script-editor.documentupdateinput.language.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The scripting language (AppleScript or JavaScript). Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[name?](./script-editor.documentupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of the document. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

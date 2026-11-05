@@ -4,10 +4,10 @@
 
 ## Cell.width property
 
-The width of the cell in points
+The width of the cell in points. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-width: number
+width: number | null
 ```

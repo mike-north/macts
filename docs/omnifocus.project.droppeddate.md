@@ -4,10 +4,10 @@
 
 ## Project.droppedDate property
 
-The date the project was dropped
+The date the project was dropped. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-droppedDate: Date
+droppedDate: Date | null
 ```

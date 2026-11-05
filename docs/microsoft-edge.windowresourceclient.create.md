@@ -9,7 +9,7 @@ Create a new window.
 **Signature:**
 
 ```typescript
-create(input: WindowCreateInput): Promise<Window>;
+create(input: WindowCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Window>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [WindowCreateInput](./microsoft-edge.windowcreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

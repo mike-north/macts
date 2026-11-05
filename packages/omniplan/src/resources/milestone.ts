@@ -49,7 +49,8 @@ export class MilestoneResourceClient {
     return this.#http.invoke<Page<Milestone>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Milestone'
     )
   }
 
@@ -63,7 +64,8 @@ export class MilestoneResourceClient {
     return this.#http.invoke<Milestone>(
       `${this.#app}.${this.#resource}.get`,
       { id: __mactsIntegerInput(id) },
-      __mactsOptions
+      __mactsOptions,
+      'Milestone'
     )
   }
 
@@ -77,7 +79,8 @@ export class MilestoneResourceClient {
     return this.#http.invoke<Milestone>(
       `${this.#app}.${this.#resource}.create`,
       input,
-      __mactsOptions
+      __mactsOptions,
+      'Milestone'
     )
   }
 }

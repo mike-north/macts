@@ -4,10 +4,10 @@
 
 ## Event_2.uid property
 
-A unique event key
+A unique event key. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-uid: string
+readonly uid: string;
 ```

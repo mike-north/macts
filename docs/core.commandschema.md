@@ -28,13 +28,83 @@ CommandSchema: z.ZodObject<
             required: z.ZodDefault<z.ZodBoolean>
             default: z.ZodOptional<z.ZodUnknown>
             code: z.ZodOptional<z.ZodString>
+            nullable: z.ZodOptional<z.ZodBoolean>
+            evidence: z.ZodOptional<
+              z.ZodObject<
+                {
+                  nullable: z.ZodOptional<
+                    z.ZodDiscriminatedUnion<
+                      [
+                        z.ZodObject<
+                          {
+                            source: z.ZodLiteral<'probe'>
+                            observedAt: z.ZodISODateTime
+                            bundleId: z.ZodString
+                            appVersion: z.ZodString
+                            osVersion: z.ZodString
+                            sampleSize: z.ZodNumber
+                            nullCount: z.ZodNumber
+                            failedReads: z.ZodNumber
+                            errorNumbers: z.ZodOptional<z.ZodArray<z.ZodNumber>>
+                            note: z.ZodOptional<z.ZodString>
+                          },
+                          z.core.$strip
+                        >,
+                        z.ZodObject<
+                          {
+                            source: z.ZodLiteral<'curated'>
+                            note: z.ZodString
+                            observedAt: z.ZodOptional<z.ZodISODateTime>
+                            appVersion: z.ZodOptional<z.ZodString>
+                            absentReads: z.ZodOptional<
+                              z.ZodObject<
+                                {
+                                  observedAt: z.ZodISODateTime
+                                  bundleId: z.ZodString
+                                  appVersion: z.ZodString
+                                  osVersion: z.ZodString
+                                  failedReads: z.ZodNumber
+                                  errorNumbers: z.ZodArray<z.ZodNumber>
+                                  reason: z.ZodString
+                                },
+                                z.core.$strict
+                              >
+                            >
+                          },
+                          z.core.$strip
+                        >,
+                        z.ZodObject<
+                          {
+                            source: z.ZodLiteral<'sdef'>
+                            note: z.ZodOptional<z.ZodString>
+                          },
+                          z.core.$strip
+                        >,
+                      ],
+                      'source'
+                    >
+                  >
+                },
+                z.core.$strip
+              >
+            >
           },
           z.core.$strip
         >
       >
     >
+    parent: z.ZodOptional<
+      z.ZodObject<
+        {
+          resource: z.ZodString
+          parameter: z.ZodString
+        },
+        z.core.$strict
+      >
+    >
     returns: z.ZodOptional<z.ZodString>
     code: z.ZodOptional<z.ZodString>
+    routeName: z.ZodOptional<z.ZodString>
     permission: z.ZodOptional<z.ZodString>
     risk: z.ZodOptional<
       z.ZodEnum<{
@@ -57,6 +127,25 @@ CommandSchema: z.ZodObject<
           },
           z.core.$strip
         >
+      >
+    >
+    unsupported: z.ZodOptional<
+      z.ZodObject<
+        {
+          evidence: z.ZodObject<
+            {
+              source: z.ZodLiteral<'live'>
+              observedAt: z.ZodISODateTime
+              bundleId: z.ZodString
+              appVersion: z.ZodString
+              osVersion: z.ZodString
+              expression: z.ZodString
+              errorNumber: z.ZodNumber
+            },
+            z.core.$strict
+          >
+        },
+        z.core.$strict
       >
     >
   },

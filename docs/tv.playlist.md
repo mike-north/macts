@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the description of the playlist
+the description of the playlist. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +52,15 @@ the description of the playlist
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the total length of all tracks (in seconds)
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the total length of all tracks (in seconds). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +69,15 @@ the total length of all tracks (in seconds)
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Unique identifier for this playlist
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+Unique identifier for this playlist. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,26 +88,28 @@ Unique identifier for this playlist
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the name of the playlist
+the name of the playlist. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
 
-[parent](./tv.playlist.parent.md)
+[persistentID](./tv.playlist.persistentid.md)
 
 </td><td>
 
-</td><td>
-
-[Playlist](./tv.playlist.md)
+`readonly`
 
 </td><td>
 
-folder which contains this playlist (if any)
+string
+
+</td><td>
+
+the id of the item as a hexadecimal string. This id does not change over time. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -112,13 +118,15 @@ folder which contains this playlist (if any)
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-the total size of all tracks (in bytes)
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+the total size of all tracks (in bytes). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +135,15 @@ the total size of all tracks (in bytes)
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-special playlist kind
+string \| null
+
+</td><td>
+
+special playlist kind. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +152,15 @@ special playlist kind
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the length of all tracks in MM:SS format
+string \| null
+
+</td><td>
+
+the length of all tracks in MM:SS format. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +169,15 @@ the length of all tracks in MM:SS format
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-is this playlist visible in the Source list?
+boolean \| null
+
+</td><td>
+
+is this playlist visible in the Source list? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

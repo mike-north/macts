@@ -9,19 +9,19 @@ import { z } from 'zod'
 export type { Shortcut } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ShortcutCreateInput = import('./contract/index.js').ShortcutCreateInput
+export type { ShortcutCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ShortcutUpdateInput = import('./contract/index.js').ShortcutUpdateInput
+export type { ShortcutUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Folder } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type FolderCreateInput = import('./contract/index.js').FolderCreateInput
+export type { FolderCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type FolderUpdateInput = import('./contract/index.js').FolderUpdateInput
+export type { FolderUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

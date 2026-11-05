@@ -4,6 +4,8 @@
 
 ## TargetSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -11,7 +13,6 @@ TargetSchema: z.ZodObject<
   {
     id: z.ZodString
     name: z.ZodString
-    project: z.ZodString
   },
   z.core.$strip
 >

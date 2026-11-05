@@ -18,10 +18,10 @@ export interface Assignment {
     units: number | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "AssignmentCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AssignmentCreateInput = AssignmentCreateInput_2;
+export interface AssignmentCreateInput {
+    units?: number;
+}
 
 // @public
 export class AssignmentResourceClient {
@@ -34,10 +34,10 @@ export const AssignmentSchema: z.ZodObject<{
     units: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "AssignmentUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AssignmentUpdateInput = AssignmentUpdateInput_2;
+export interface AssignmentUpdateInput {
+    units?: number;
+}
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -65,10 +65,8 @@ export interface Currency {
     readonly symbol: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "CurrencyCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type CurrencyCreateInput = CurrencyCreateInput_2;
+export type CurrencyCreateInput = Record<string, never>;
 
 // @public
 export const CurrencySchema: z.ZodObject<{
@@ -77,10 +75,8 @@ export const CurrencySchema: z.ZodObject<{
     symbol: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "CurrencyUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type CurrencyUpdateInput = CurrencyUpdateInput_2;
+export type CurrencyUpdateInput = Record<string, never>;
 
 // @public
 export interface Dependency {
@@ -89,10 +85,12 @@ export interface Dependency {
     leadTime: number | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DependencyCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DependencyCreateInput = DependencyCreateInput_2;
+export interface DependencyCreateInput {
+    dependencyType?: DependencyType;
+    leadPercentage?: number;
+    leadTime?: number;
+}
 
 // @public
 export class DependencyResourceClient {
@@ -110,20 +108,20 @@ export const DependencySchema: z.ZodObject<{
 // @public
 export type DependencyType = 'startstart' | 'startfinish' | 'finishstart' | 'finishfinish';
 
-// Warning: (ae-forgotten-export) The symbol "DependencyUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DependencyUpdateInput = DependencyUpdateInput_2;
+export interface DependencyUpdateInput {
+    dependencyType?: DependencyType;
+    leadPercentage?: number;
+    leadTime?: number;
+}
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "OmniPlanResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<OmniPlanResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -135,10 +133,12 @@ export interface Milestone {
     startingDate: Date | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "MilestoneCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MilestoneCreateInput = MilestoneCreateInput_2;
+export interface MilestoneCreateInput {
+    name: string;
+    note?: string;
+    startingDate?: Date;
+}
 
 // @public
 export class MilestoneResourceClient {
@@ -156,16 +156,18 @@ export const MilestoneSchema: z.ZodObject<{
     note: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "MilestoneUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MilestoneUpdateInput = MilestoneUpdateInput_2;
+export interface MilestoneUpdateInput {
+    name?: string;
+    note?: string;
+    startingDate?: Date;
+}
 
 // @public
 export interface OmniPlanClient extends ClientBrand<OmniPlanResources> {
 }
 
-// @public (undocumented)
+// @public
 export class OmniPlanClient {
     constructor(options: OmniPlanClientOptions);
     addWorkTime(schedule: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -204,6 +206,44 @@ export class OmniPlanError extends Error {
 }
 
 // @public
+export type OmniPlanResources = Readonly<{
+    Project: ResourceDescriptor<Project, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omniplan.projects.get';
+        readonly list: 'omniplan.projects.list';
+    };
+    Task: ResourceDescriptor<Task, Integer> & {
+        readonly id: ValueType<Integer>;
+        readonly get: 'omniplan.tasks.get';
+        readonly list: 'omniplan.tasks.list';
+    };
+    Milestone: ResourceDescriptor<Milestone, Integer> & {
+        readonly id: ValueType<Integer>;
+        readonly get: 'omniplan.milestones.get';
+        readonly list: 'omniplan.milestones.list';
+    };
+    Resource: ResourceDescriptor<Resource, Integer> & {
+        readonly id: ValueType<Integer>;
+        readonly get: 'omniplan.resources.get';
+        readonly list: 'omniplan.resources.list';
+    };
+    Assignment: ResourceDescriptor<Assignment> & {
+        readonly list: 'omniplan.assignments.list';
+    };
+    Dependency: ResourceDescriptor<Dependency> & {
+        readonly list: 'omniplan.dependencies.list';
+    };
+    Violation: ResourceDescriptor<Violation> & {
+        readonly list: 'omniplan.violations.list';
+    };
+    Scenario: ResourceDescriptor<Scenario, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omniplan.scenarios.get';
+        readonly list: 'omniplan.scenarios.list';
+    };
+}>;
+
+// @public
 export interface Project {
     readonly completed: number | null;
     readonly duration: number | null;
@@ -215,10 +255,10 @@ export interface Project {
     readonly totalCost: number | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ProjectCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ProjectCreateInput = ProjectCreateInput_2;
+export interface ProjectCreateInput {
+    startingDate?: Date;
+}
 
 // @public
 export class ProjectResourceClient {
@@ -239,10 +279,10 @@ export const ProjectSchema: z.ZodObject<{
     effort: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ProjectUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ProjectUpdateInput = ProjectUpdateInput_2;
+export interface ProjectUpdateInput {
+    startingDate?: Date;
+}
 
 // @public
 export interface Resource {
@@ -261,10 +301,17 @@ export interface Resource {
     readonly totalUses: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ResourceCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ResourceCreateInput = ResourceCreateInput_2;
+export interface ResourceCreateInput {
+    costPerHour?: number;
+    costPerUse?: number;
+    efficiency?: number;
+    emailAddress?: string;
+    name: string;
+    note?: string;
+    number?: number;
+    resourceType?: ResourceType;
+}
 
 // @public
 export class ResourceResourceClient {
@@ -294,10 +341,17 @@ export const ResourceSchema: z.ZodObject<{
 // @public
 export type ResourceType = 'person' | 'equipment' | 'material' | 'resourceGroup';
 
-// Warning: (ae-forgotten-export) The symbol "ResourceUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ResourceUpdateInput = ResourceUpdateInput_2;
+export interface ResourceUpdateInput {
+    costPerHour?: number;
+    costPerUse?: number;
+    efficiency?: number;
+    emailAddress?: string;
+    name?: string;
+    note?: string;
+    number?: number;
+    resourceType?: ResourceType;
+}
 
 // @public
 export interface Scenario {
@@ -313,10 +367,12 @@ export interface Scenario {
     readonly violationCount: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ScenarioCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScenarioCreateInput = ScenarioCreateInput_2;
+export interface ScenarioCreateInput {
+    name?: string;
+    schedulingGranularity?: SchedulingGranularity;
+    startingDate?: Date;
+}
 
 // @public
 export class ScenarioResourceClient {
@@ -339,26 +395,24 @@ export const ScenarioSchema: z.ZodObject<{
     schedulingGranularity: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ScenarioUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScenarioUpdateInput = ScenarioUpdateInput_2;
+export interface ScenarioUpdateInput {
+    name?: string;
+    schedulingGranularity?: SchedulingGranularity;
+    startingDate?: Date;
+}
 
 // @public
 export type Schedule = Record<string, never>;
 
-// Warning: (ae-forgotten-export) The symbol "ScheduleCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScheduleCreateInput = ScheduleCreateInput_2;
+export type ScheduleCreateInput = Record<string, never>;
 
 // @public
 export const ScheduleSchema: z.ZodObject<{}, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ScheduleUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScheduleUpdateInput = ScheduleUpdateInput_2;
+export type ScheduleUpdateInput = Record<string, never>;
 
 // @public
 export type SchedulingGranularity = 'exactScheduling' | 'hourlyScheduling' | 'dailyScheduling';
@@ -393,7 +447,7 @@ export interface Task {
 //
 // @public
 export type TaskCreateInput = Omit<TaskCreateInput_2, 'priority'> & {
-    priority?: number | Extract<TaskCreateInput_2['priority'], null>;
+    priority?: null extends TaskCreateInput_2['priority'] ? number | null : number;
 };
 
 // @public
@@ -440,7 +494,7 @@ export type TaskType = 'standardTask' | 'milestoneTask' | 'groupTask' | 'hammock
 //
 // @public
 export type TaskUpdateInput = Omit<TaskUpdateInput_2, 'priority'> & {
-    priority?: number | Extract<TaskUpdateInput_2['priority'], null>;
+    priority?: null extends TaskUpdateInput_2['priority'] ? number | null : number;
 };
 
 // @public
@@ -450,10 +504,8 @@ export interface Violation {
     readonly violationType: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ViolationCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ViolationCreateInput = ViolationCreateInput_2;
+export type ViolationCreateInput = Record<string, never>;
 
 // @public
 export class ViolationResourceClient {
@@ -469,10 +521,8 @@ export const ViolationSchema: z.ZodObject<{
     html: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ViolationUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ViolationUpdateInput = ViolationUpdateInput_2;
+export type ViolationUpdateInput = Record<string, never>;
 
 // (No @packageDocumentation comment for this package)
 

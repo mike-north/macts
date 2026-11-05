@@ -4,12 +4,12 @@
 
 ## MessageUpdateInput type
 
-Input for updating a Message
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type MessageUpdateInput = Partial<MessageCreateInput>
+type MessageUpdateInput = Omit<MessageUpdateInput$1, 'flagIndex'> & {
+  flagIndex?: null extends MessageUpdateInput$1['flagIndex'] ? number | null : number
+}
 ```
-
-**References:** [MessageCreateInput](./mail.messagecreateinput.md)

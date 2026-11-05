@@ -4,10 +4,10 @@
 
 ## Paragraph.lineSpacing property
 
-The line spacing in points
+The line spacing in points. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-lineSpacing: number
+lineSpacing: number | null
 ```

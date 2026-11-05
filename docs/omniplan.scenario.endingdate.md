@@ -4,10 +4,10 @@
 
 ## Scenario.endingDate property
 
-The date on which work is complete
+The date on which work is complete. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-endingDate: Date
+readonly endingDate: Date | null;
 ```

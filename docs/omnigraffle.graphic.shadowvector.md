@@ -4,13 +4,10 @@
 
 ## Graphic.shadowVector property
 
-The direction of the graphic's shadow
+The direction of the graphic's shadow. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-shadowVector: {
-  x: number
-  y: number
-}
+shadowVector: Point | null
 ```

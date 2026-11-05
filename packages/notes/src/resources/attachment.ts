@@ -56,7 +56,8 @@ export class AttachmentResourceClient {
         ...(page.pageSize === undefined ? {} : { pageSize: __mactsIntegerInput(page.pageSize) }),
         ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
       },
-      __mactsOptions
+      __mactsOptions,
+      'Attachment'
     )
   }
 
@@ -70,7 +71,8 @@ export class AttachmentResourceClient {
     return this.#http.invoke<Attachment>(
       `${this.#app}.${this.#resource}.get`,
       { id },
-      __mactsOptions
+      __mactsOptions,
+      'Attachment'
     )
   }
 }

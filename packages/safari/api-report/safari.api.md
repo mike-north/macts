@@ -35,10 +35,10 @@ export interface Document {
     url: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DocumentCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentCreateInput = DocumentCreateInput_2;
+export interface DocumentCreateInput {
+    url?: string;
+}
 
 // @public
 export const DocumentSchema: z.ZodObject<{
@@ -47,20 +47,18 @@ export const DocumentSchema: z.ZodObject<{
     url: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "DocumentUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentUpdateInput = DocumentUpdateInput_2;
+export interface DocumentUpdateInput {
+    url?: string;
+}
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "SafariResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<SafariResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -68,7 +66,7 @@ export class HttpClient {
 export interface SafariClient extends ClientBrand<SafariResources> {
 }
 
-// @public (undocumented)
+// @public
 export class SafariClient {
     constructor(options: SafariClientOptions);
     addReadingListItem(andPreviewText?: string, withTitle?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -98,6 +96,9 @@ export class SafariError extends Error {
 }
 
 // @public
+export type SafariResources = Readonly<Record<never, never>>;
+
+// @public
 export interface Tab {
     readonly id: string;
     readonly name: string | null;
@@ -106,10 +107,10 @@ export interface Tab {
     url: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "TabCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TabCreateInput = TabCreateInput_2;
+export interface TabCreateInput {
+    url?: string;
+}
 
 // @public
 export const TabSchema: z.ZodObject<{
@@ -120,10 +121,10 @@ export const TabSchema: z.ZodObject<{
     text: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "TabUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TabUpdateInput = TabUpdateInput_2;
+export interface TabUpdateInput {
+    url?: string;
+}
 
 // (No @packageDocumentation comment for this package)
 

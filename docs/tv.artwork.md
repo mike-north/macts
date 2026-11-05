@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-data for this artwork, in the form of a picture
+data for this artwork, in the form of a picture. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ data for this artwork, in the form of a picture
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-description of artwork as a string
+description of artwork as a string. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +67,15 @@ description of artwork as a string
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-was this artwork downloaded by iTunes?
+boolean \| null
+
+</td><td>
+
+was this artwork downloaded by iTunes? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +84,15 @@ was this artwork downloaded by iTunes?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the data format for this piece of artwork
+string \| null
+
+</td><td>
+
+the data format for this piece of artwork. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +101,15 @@ the data format for this piece of artwork
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Unique identifier for this artwork
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+Unique identifier for this artwork. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +120,11 @@ Unique identifier for this artwork
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-kind or purpose of this piece of artwork
+kind or purpose of this piece of artwork. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -133,7 +139,7 @@ unknown
 
 </td><td>
 
-data for this artwork, in original format
+data for this artwork, in original format. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

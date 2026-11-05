@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the enumeration hidden?
+boolean \| null
+
+</td><td>
+
+Is the enumeration hidden? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ Is the enumeration hidden?
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the enumeration
+The unique identifier of the enumeration. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ The unique identifier of the enumeration
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the enumeration
+string \| null
+
+</td><td>
+
+The name of the enumeration. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

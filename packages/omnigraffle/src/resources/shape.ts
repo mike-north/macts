@@ -31,7 +31,8 @@ export class ShapeResourceClient {
     return this.#http.invoke<Page<Shape>>(
       `${this.#app}.${this.#resource}.list`,
       { canvasId },
-      __mactsOptions
+      __mactsOptions,
+      'Shape'
     )
   }
 
@@ -39,7 +40,12 @@ export class ShapeResourceClient {
    * Get a shape by id.
    */
   async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Shape> {
-    return this.#http.invoke<Shape>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
+    return this.#http.invoke<Shape>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Shape'
+    )
   }
 
   /**
@@ -49,6 +55,11 @@ export class ShapeResourceClient {
     input: ShapeCreateInput,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Shape> {
-    return this.#http.invoke<Shape>(`${this.#app}.${this.#resource}.create`, input, __mactsOptions)
+    return this.#http.invoke<Shape>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'Shape'
+    )
   }
 }

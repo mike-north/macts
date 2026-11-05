@@ -4,10 +4,10 @@
 
 ## Shape.text property
 
-The text inside the shape
+The text inside the shape. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-text: string
+text: string | null
 ```

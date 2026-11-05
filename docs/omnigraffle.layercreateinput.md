@@ -4,7 +4,7 @@
 
 ## LayerCreateInput interface
 
-Input for creating a Layer
+Input for creating a Layer.
 
 **Signature:**
 

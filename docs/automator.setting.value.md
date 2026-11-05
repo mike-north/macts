@@ -4,7 +4,7 @@
 
 ## Setting.value property
 
-The value of the setting
+The value of the setting. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 

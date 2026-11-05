@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the selection is formatted as bold
+Whether the selection is formatted as bold. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ Whether the selection is formatted as bold
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The text in the selection
+The text in the selection. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +67,15 @@ The text in the selection
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The ending character position of the selection
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The ending character position of the selection. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +86,11 @@ The ending character position of the selection
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The font name of the selection
+The font name of the selection. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +101,11 @@ The font name of the selection
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The font size of the selection in points
+The font size of the selection in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +116,11 @@ The font size of the selection in points
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the selection is formatted as italic
+Whether the selection is formatted as italic. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +129,15 @@ Whether the selection is formatted as italic
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The type of selection (e.g., text, table, graphic)
+string \| null
+
+</td><td>
+
+The type of selection (e.g., text, table, graphic). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +146,15 @@ The type of selection (e.g., text, table, graphic)
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The starting character position of the selection
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The starting character position of the selection. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

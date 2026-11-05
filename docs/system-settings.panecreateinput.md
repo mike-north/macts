@@ -4,7 +4,7 @@
 
 ## PaneCreateInput type
 
-Input for creating a Pane
+Input for creating a Pane.
 
 **Signature:**
 

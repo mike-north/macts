@@ -56,7 +56,8 @@ export class ListResourceClient {
         ...(page.pageSize === undefined ? {} : { pageSize: __mactsIntegerInput(page.pageSize) }),
         ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
       },
-      __mactsOptions
+      __mactsOptions,
+      'List'
     )
   }
 
@@ -64,7 +65,12 @@ export class ListResourceClient {
    * Get a list by id.
    */
   async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<List> {
-    return this.#http.invoke<List>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
+    return this.#http.invoke<List>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'List'
+    )
   }
 
   /**
@@ -74,6 +80,11 @@ export class ListResourceClient {
     input: ListCreateInput,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<List> {
-    return this.#http.invoke<List>(`${this.#app}.${this.#resource}.create`, input, __mactsOptions)
+    return this.#http.invoke<List>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'List'
+    )
   }
 }

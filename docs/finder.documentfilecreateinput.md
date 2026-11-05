@@ -4,7 +4,7 @@
 
 ## DocumentFileCreateInput type
 
-Input for creating a DocumentFile
+Input for creating a DocumentFile.
 
 **Signature:**
 

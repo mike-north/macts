@@ -4,10 +4,10 @@
 
 ## XMLData.id property
 
-the unique identifier of the XML data
+the unique identifier of the XML data. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

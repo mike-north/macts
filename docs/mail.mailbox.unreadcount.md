@@ -4,10 +4,10 @@
 
 ## Mailbox.unreadCount property
 
-The number of unread messages in the mailbox
+The number of unread messages in the mailbox. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-unreadCount: number
+readonly unreadCount: Integer | null;
 ```

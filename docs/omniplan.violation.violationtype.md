@@ -4,10 +4,10 @@
 
 ## Violation.violationType property
 
-The type of violation
+The type of violation. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-violationType: string
+readonly violationType: string | null;
 ```

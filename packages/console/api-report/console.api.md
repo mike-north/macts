@@ -27,13 +27,11 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// Warning: (ae-forgotten-export) The symbol "ConsoleResources" needs to be exported by the entry point index.d.ts
-//
 // @public
 export interface ConsoleClient extends ClientBrand<ConsoleResources> {
 }
 
-// @public (undocumented)
+// @public
 export class ConsoleClient {
     constructor(options: ConsoleClientOptions);
     get http(): HttpClient;
@@ -53,13 +51,16 @@ export class ConsoleError extends Error {
     readonly code: string;
 }
 
-// @public (undocumented)
+// @public
+export type ConsoleResources = Readonly<Record<never, never>>;
+
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
     // @internal
-    bind<Client extends ClientBrand<ConsoleResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 

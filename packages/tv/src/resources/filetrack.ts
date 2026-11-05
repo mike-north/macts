@@ -23,6 +23,11 @@ export class FileTrackResourceClient {
    * update file track information from the current information in the track’s file
    */
   async refresh(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
-    await this.#http.invoke<undefined>(`${this.#app}.${this.#resource}.refresh`, {}, __mactsOptions)
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.refresh`,
+      {},
+      __mactsOptions,
+      'FileTrack'
+    )
   }
 }

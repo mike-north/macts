@@ -4,10 +4,10 @@
 
 ## ScriptingParameter.optional property
 
-Is the parameter optional?
+Is the parameter optional? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-optional: boolean
+readonly optional: boolean | null;
 ```

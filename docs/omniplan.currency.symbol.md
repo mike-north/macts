@@ -4,10 +4,10 @@
 
 ## Currency.symbol property
 
-Symbol for this currency
+Symbol for this currency. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-symbol: string
+readonly symbol: string | null;
 ```

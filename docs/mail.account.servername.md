@@ -4,10 +4,10 @@
 
 ## Account.serverName property
 
-The host name used to connect to an account
+The host name used to connect to an account. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-serverName: string
+serverName: string | null
 ```

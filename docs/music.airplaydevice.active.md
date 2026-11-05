@@ -4,10 +4,10 @@
 
 ## AirPlayDevice.active property
 
-is the device currently being played to?
+is the device currently being played to? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-active: boolean
+readonly active: boolean | null;
 ```

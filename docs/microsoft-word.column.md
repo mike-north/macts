@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The preferred width of the column
+The preferred width of the column. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ The preferred width of the column
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The width of the column in points
+The width of the column in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

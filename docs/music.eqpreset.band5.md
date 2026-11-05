@@ -4,10 +4,10 @@
 
 ## EQPreset.band5 property
 
-the equalizer 500 Hz band level (-12.0 dB to +12.0 dB)
+the equalizer 500 Hz band level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-band5: number
+band5: number | null
 ```

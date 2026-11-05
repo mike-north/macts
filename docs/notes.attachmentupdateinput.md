@@ -4,12 +4,10 @@
 
 ## AttachmentUpdateInput type
 
-Input for updating a Attachment
+Input for updating an Attachment. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type AttachmentUpdateInput = Partial<AttachmentCreateInput>
+type AttachmentUpdateInput = Record<string, never>
 ```
-
-**References:** [AttachmentCreateInput](./notes.attachmentcreateinput.md)

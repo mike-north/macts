@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-An absolute alarm date
+An absolute alarm date. Nullable. Observed missing in 40 of 40 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ An absolute alarm date
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-The interval in minutes between the event and the alarm (positive for after, negative for before)
+The interval in minutes between the event and the alarm (positive for after, negative for before). Nullable: An alarm has either a trigger interval (relative to the event start) or an absolute trigger date. The 52 sampled alarms were all relative; an absolute alarm has no interval (Calendar 27.0).
 
 </td></tr>
 </tbody></table>

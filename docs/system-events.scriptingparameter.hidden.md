@@ -4,10 +4,10 @@
 
 ## ScriptingParameter.hidden property
 
-Is the parameter hidden?
+Is the parameter hidden? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-hidden: boolean
+readonly hidden: boolean | null;
 ```

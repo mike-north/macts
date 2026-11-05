@@ -4,10 +4,10 @@
 
 ## Attachment.fileName property
 
-The file for the attachment
+The file for the attachment. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fileName: string
+fileName: FileValue | null
 ```

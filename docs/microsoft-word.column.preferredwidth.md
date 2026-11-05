@@ -4,10 +4,10 @@
 
 ## Column.preferredWidth property
 
-The preferred width of the column
+The preferred width of the column. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-preferredWidth: number
+preferredWidth: number | null
 ```

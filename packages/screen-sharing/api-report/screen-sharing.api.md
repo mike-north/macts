@@ -27,15 +27,13 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "ScreenSharingResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<ScreenSharingResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -43,7 +41,7 @@ export class HttpClient {
 export interface ScreenSharingClient extends ClientBrand<ScreenSharingResources> {
 }
 
-// @public (undocumented)
+// @public
 export class ScreenSharingClient {
     constructor(options: ScreenSharingClientOptions);
     getURL(url: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -62,6 +60,9 @@ export class ScreenSharingError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type ScreenSharingResources = Readonly<Record<never, never>>;
 
 // (No @packageDocumentation comment for this package)
 

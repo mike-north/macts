@@ -725,9 +725,9 @@ export interface SessionUpdateInput {
 
 /**
  * The iTerm client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link iTermContract}. Its type carries the contract's resource
- * table, {@link iTermResources}, so references can be bound to it by resource; the brand has no
- * runtime member.
+ * client factory creates one from `iTermContract` in the app's `/contract` entry. Its type carries
+ * the contract's resource table, {@link iTermResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
 export interface iTermClient extends ClientBrand<iTermResources> {
   /**
@@ -890,7 +890,7 @@ export interface iTermClient extends ClientBrand<iTermResources> {
 }
 
 /**
- * The type of the resource table of {@link iTermContract}: every resource a
+ * The type of the resource table in `iTermContract` (the app's `/contract` entry): every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
  * references to it, and, for each of those operations that finds the

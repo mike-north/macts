@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+[FileValue](./contracts.filevalue.md) \| null
 
 </td><td>
 
-The file for the attachment
+The file for the attachment. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

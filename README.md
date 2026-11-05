@@ -98,7 +98,8 @@ errors such as `TargetNotFoundError` from `@macts/contracts`.
 The exported `*Schema` validators describe raw passthrough responses; typed SDK values use the
 contract codecs. Existing `HttpClient.rpc` overrides still receive typed methods' encoded requests.
 Overrides that forward to `super.rpc` should forward the optional call options to retain cancellation
-and canonical HTTP response handling.
+only. Canonical HTTP response handling is shared even when an override forwards only two arguments.
+Malformed JSON or a missing success result throws `TransportError` for both raw and typed calls.
 
 **MCP tools (for AI assistants):**
 

@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Bottom margin
+Bottom margin. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ Bottom margin
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Is the subgraph collapsed?
+Is the subgraph collapsed? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +67,15 @@ Is the subgraph collapsed?
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-Unique identifier
+Unique identifier. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -84,11 +86,11 @@ Unique identifier
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Left margin
+Left margin. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +101,11 @@ Left margin
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Right margin
+Right margin. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +116,11 @@ Right margin
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-Top margin
+Top margin. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

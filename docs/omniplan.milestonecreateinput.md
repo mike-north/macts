@@ -4,7 +4,7 @@
 
 ## MilestoneCreateInput interface
 
-Input for creating a Milestone
+Input for creating a Milestone.
 
 **Signature:**
 

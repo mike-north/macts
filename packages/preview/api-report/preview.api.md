@@ -38,10 +38,10 @@ export interface Document {
     readonly path?: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DocumentCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentCreateInput = DocumentCreateInput_2;
+export interface DocumentCreateInput {
+    name?: string;
+}
 
 // @public
 export class DocumentResourceClient {
@@ -58,20 +58,18 @@ export const DocumentSchema: z.ZodObject<{
     modified: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "DocumentUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentUpdateInput = DocumentUpdateInput_2;
+export interface DocumentUpdateInput {
+    name?: string;
+}
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "PreviewResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<PreviewResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -79,7 +77,7 @@ export class HttpClient {
 export interface PreviewClient extends ClientBrand<PreviewResources> {
 }
 
-// @public (undocumented)
+// @public
 export class PreviewClient {
     constructor(options: PreviewClientOptions);
     readonly documents: DocumentResourceClient;
@@ -98,6 +96,15 @@ export class PreviewError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type PreviewResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'preview.documents.get';
+        readonly list: 'preview.documents.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

@@ -9,7 +9,7 @@ Send text as though it was typed.
 **Signature:**
 
 ```typescript
-write(contentsOfFile?: string, text?: string, newline?: boolean): Promise<void>;
+write(contentsOfFile?: Parameters<iTermClient$1['write']>[0], text?: string, newline?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -33,7 +33,7 @@ contentsOfFile
 
 </td><td>
 
-string
+Parameters&lt;iTermClient$1\['write'\]&gt;\[0\]
 
 </td><td>
 
@@ -60,6 +60,19 @@ newline
 </td><td>
 
 boolean
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

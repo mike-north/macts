@@ -4,10 +4,10 @@
 
 ## Project.numberOfAvailableTasks property
 
-The number of available direct children of this project
+The number of available direct children of this project. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-numberOfAvailableTasks: number
+readonly numberOfAvailableTasks: Integer | null;
 ```

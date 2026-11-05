@@ -28,7 +28,8 @@ export class ShortcutResourceClient {
     return this.#http.invoke<Page<Shortcut>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Shortcut'
     )
   }
 
@@ -39,7 +40,12 @@ export class ShortcutResourceClient {
     id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Shortcut> {
-    return this.#http.invoke<Shortcut>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
+    return this.#http.invoke<Shortcut>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Shortcut'
+    )
   }
 
   /**
@@ -53,7 +59,8 @@ export class ShortcutResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.run`,
       { id, withInput },
-      __mactsOptions
+      __mactsOptions,
+      'Shortcut'
     )
   }
 }

@@ -4,10 +4,10 @@
 
 ## DiskItem.pOSIXPath property
 
-the POSIX file system path of the disk item
+the POSIX file system path of the disk item. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-pOSIXPath: string
+readonly pOSIXPath: string | null;
 ```

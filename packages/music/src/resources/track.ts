@@ -31,7 +31,8 @@ export class TrackResourceClient {
     return this.#http.invoke<Page<Track>>(
       `${this.#app}.${this.#resource}.list`,
       { playlistId },
-      __mactsOptions
+      __mactsOptions,
+      'Track'
     )
   }
 
@@ -47,7 +48,8 @@ export class TrackResourceClient {
     return this.#http.invoke<Track>(
       `${this.#app}.${this.#resource}.get`,
       { playlistId, persistentID },
-      __mactsOptions
+      __mactsOptions,
+      'Track'
     )
   }
 }

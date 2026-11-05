@@ -43,7 +43,7 @@ string
 
 </td><td>
 
-Unique identifier
+Unique identifier. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ Unique identifier
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Name of this master
+Name of this master. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

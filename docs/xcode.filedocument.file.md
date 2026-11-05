@@ -4,10 +4,10 @@
 
 ## FileDocument.file property
 
-Its location on disk, if it has one
+Its location on disk, if it has one. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-file: string
+readonly file: FileValue | null;
 ```

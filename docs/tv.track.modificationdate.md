@@ -4,10 +4,10 @@
 
 ## Track.modificationDate property
 
-the modification date of the content of this track
+the modification date of the content of this track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-modificationDate: Date
+readonly modificationDate: Date | null;
 ```

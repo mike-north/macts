@@ -56,7 +56,8 @@ export class GroupResourceClient {
         ...(page.pageSize === undefined ? {} : { pageSize: __mactsIntegerInput(page.pageSize) }),
         ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
       },
-      __mactsOptions
+      __mactsOptions,
+      'Group'
     )
   }
 
@@ -64,6 +65,11 @@ export class GroupResourceClient {
    * Get a group by id.
    */
   async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Group> {
-    return this.#http.invoke<Group>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
+    return this.#http.invoke<Group>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Group'
+    )
   }
 }

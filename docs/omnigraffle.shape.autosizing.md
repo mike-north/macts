@@ -4,10 +4,10 @@
 
 ## Shape.autosizing property
 
-Autosizing behavior of the shape around the text
+Autosizing behavior of the shape around the text. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-autosizing: TextAutosizing
+autosizing: TextAutosizing | null
 ```

@@ -4,10 +4,10 @@
 
 ## Task.completedEffort property
 
-The person-seconds completed
+The person-seconds completed. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-completedEffort: number
+completedEffort: number | null
 ```

@@ -11,10 +11,10 @@ export type { PlayerState } from './contract/index.js'
 export type { Track } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type TrackCreateInput = import('./contract/index.js').TrackCreateInput
+export type { TrackCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type TrackUpdateInput = import('./contract/index.js').TrackUpdateInput
+export type { TrackUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

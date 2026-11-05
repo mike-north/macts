@@ -4,7 +4,7 @@
 
 ## UserDomainObjectCreateInput type
 
-Input for creating a UserDomainObject
+Input for creating an UserDomainObject.
 
 **Signature:**
 

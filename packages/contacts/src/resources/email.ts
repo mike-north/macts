@@ -58,7 +58,8 @@ export class EmailResourceClient {
         ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
         personId,
       },
-      __mactsOptions
+      __mactsOptions,
+      'Email'
     )
   }
 
@@ -73,7 +74,8 @@ export class EmailResourceClient {
     return this.#http.invoke<Email>(
       `${this.#app}.${this.#resource}.get`,
       { personId, id },
-      __mactsOptions
+      __mactsOptions,
+      'Email'
     )
   }
 }

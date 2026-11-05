@@ -32,7 +32,8 @@ export class EventResourceClient {
     return this.#http.invoke<Page<Event>>(
       `${this.#app}.${this.#resource}.list`,
       { calendarId },
-      __mactsOptions
+      __mactsOptions,
+      'Event'
     )
   }
 
@@ -48,7 +49,8 @@ export class EventResourceClient {
     return this.#http.invoke<Event>(
       `${this.#app}.${this.#resource}.get`,
       { calendarId, id },
-      __mactsOptions
+      __mactsOptions,
+      'Event'
     )
   }
 
@@ -60,7 +62,12 @@ export class EventResourceClient {
     input: EventCreateInput,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Event> {
-    return this.#http.invoke<Event>(`${this.#app}.${this.#resource}.create`, input, __mactsOptions)
+    return this.#http.invoke<Event>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'Event'
+    )
   }
 
   /**
@@ -81,7 +88,8 @@ export class EventResourceClient {
     return this.#http.invoke<Event>(
       `${this.#app}.${this.#resource}.update`,
       { calendarId, id, ...defined },
-      __mactsOptions
+      __mactsOptions,
+      'Event'
     )
   }
 
@@ -97,7 +105,8 @@ export class EventResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.delete`,
       { calendarId, id },
-      __mactsOptions
+      __mactsOptions,
+      'Event'
     )
   }
 
@@ -105,6 +114,11 @@ export class EventResourceClient {
    * Show the event or to-do in the calendar window
    */
   async show(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
-    await this.#http.invoke<undefined>(`${this.#app}.${this.#resource}.show`, {}, __mactsOptions)
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.show`,
+      {},
+      __mactsOptions,
+      'Event'
+    )
   }
 }

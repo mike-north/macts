@@ -4,10 +4,10 @@
 
 ## Project.defaultSingletonActionHolder property
 
-True if the project is the default holder of singleton actions
+True if the project is the default holder of singleton actions. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-defaultSingletonActionHolder: boolean
+defaultSingletonActionHolder: boolean | null
 ```

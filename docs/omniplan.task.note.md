@@ -4,10 +4,10 @@
 
 ## Task.note property
 
-Notes
+Notes. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-note: string
+note: string | null
 ```

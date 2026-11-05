@@ -4,10 +4,10 @@
 
 ## Task.duration property
 
-The number of working seconds occupied by task
+The number of working seconds occupied by task. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-duration: number
+duration: number | null
 ```

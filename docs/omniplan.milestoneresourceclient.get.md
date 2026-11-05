@@ -9,7 +9,7 @@ Get a milestone by id.
 **Signature:**
 
 ```typescript
-get(id: string): Promise<Milestone>;
+get(id: string | number, __mactsOptions?: _macts_contracts.CallOptions): Promise<Milestone>;
 ```
 
 ## Parameters
@@ -33,9 +33,22 @@ id
 
 </td><td>
 
-string
+string \| number
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

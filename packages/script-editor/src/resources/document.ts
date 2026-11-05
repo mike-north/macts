@@ -28,7 +28,8 @@ export class DocumentResourceClient {
     return this.#http.invoke<Page<Document>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Document'
     )
   }
 
@@ -43,7 +44,8 @@ export class DocumentResourceClient {
     return this.#http.invoke<Document>(
       `${this.#app}.${this.#resource}.get`,
       { name },
-      __mactsOptions
+      __mactsOptions,
+      'Document'
     )
   }
 
@@ -57,7 +59,8 @@ export class DocumentResourceClient {
     return this.#http.invoke<Document>(
       `${this.#app}.${this.#resource}.create`,
       input,
-      __mactsOptions
+      __mactsOptions,
+      'Document'
     )
   }
 }

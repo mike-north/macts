@@ -2,14 +2,48 @@
 
 [Home](./index.md) &gt; [@macts/shortcuts](./shortcuts.md) &gt; [ShortcutUpdateInput](./shortcuts.shortcutupdateinput.md)
 
-## ShortcutUpdateInput type
+## ShortcutUpdateInput interface
 
-Input for updating a Shortcut
+Input for updating a Shortcut. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ShortcutUpdateInput = Partial<ShortcutCreateInput>
+interface ShortcutUpdateInput
 ```
 
-**References:** [ShortcutCreateInput](./shortcuts.shortcutcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[folder?](./shortcuts.shortcutupdateinput.folder.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The folder containing this shortcut (folder ID). Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

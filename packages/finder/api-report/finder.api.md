@@ -15,20 +15,20 @@ export interface AliasFile {
     originalItem: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "AliasFileCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AliasFileCreateInput = AliasFileCreateInput_2;
+export interface AliasFileCreateInput {
+    originalItem?: string;
+}
 
 // @public
 export const AliasFileSchema: z.ZodObject<{
     originalItem: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "AliasFileUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AliasFileUpdateInput = AliasFileUpdateInput_2;
+export interface AliasFileUpdateInput {
+    originalItem?: string;
+}
 
 // @public
 export interface ApplicationFile {
@@ -37,10 +37,8 @@ export interface ApplicationFile {
     readonly id: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ApplicationFileCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ApplicationFileCreateInput = ApplicationFileCreateInput_2;
+export type ApplicationFileCreateInput = Record<string, never>;
 
 // @public
 export const ApplicationFileSchema: z.ZodObject<{
@@ -49,10 +47,8 @@ export const ApplicationFileSchema: z.ZodObject<{
     hasScriptingTerminology: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ApplicationFileUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ApplicationFileUpdateInput = ApplicationFileUpdateInput_2;
+export type ApplicationFileUpdateInput = Record<string, never>;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -78,40 +74,32 @@ export interface Clipping {
     readonly clippingWindow: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ClippingCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ClippingCreateInput = ClippingCreateInput_2;
+export type ClippingCreateInput = Record<string, never>;
 
 // @public
 export const ClippingSchema: z.ZodObject<{
     clippingWindow: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ClippingUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ClippingUpdateInput = ClippingUpdateInput_2;
+export type ClippingUpdateInput = Record<string, never>;
 
 // @public
 export interface ClippingWindow {
     readonly id: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ClippingWindowCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ClippingWindowCreateInput = ClippingWindowCreateInput_2;
+export type ClippingWindowCreateInput = Record<string, never>;
 
 // @public
 export const ClippingWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ClippingWindowUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ClippingWindowUpdateInput = ClippingWindowUpdateInput_2;
+export type ClippingWindowUpdateInput = Record<string, never>;
 
 // @public
 export interface Column {
@@ -128,8 +116,8 @@ export interface Column {
 //
 // @public
 export type ColumnCreateInput = Omit<ColumnCreateInput_2, 'index' | 'width'> & {
-    index?: number | Extract<ColumnCreateInput_2['index'], null>;
-    width?: number | Extract<ColumnCreateInput_2['width'], null>;
+    index?: null extends ColumnCreateInput_2['index'] ? number | null : number;
+    width?: null extends ColumnCreateInput_2['width'] ? number | null : number;
 };
 
 // @public
@@ -147,8 +135,8 @@ export const ColumnSchema: z.ZodObject<{
 //
 // @public
 export type ColumnUpdateInput = Omit<ColumnUpdateInput_2, 'index' | 'width'> & {
-    index?: number | Extract<ColumnUpdateInput_2['index'], null>;
-    width?: number | Extract<ColumnUpdateInput_2['width'], null>;
+    index?: null extends ColumnUpdateInput_2['index'] ? number | null : number;
+    width?: null extends ColumnUpdateInput_2['width'] ? number | null : number;
 };
 
 // @public
@@ -156,20 +144,16 @@ export interface Container {
     readonly entireContents: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ContainerCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ContainerCreateInput = ContainerCreateInput_2;
+export type ContainerCreateInput = Record<string, never>;
 
 // @public
 export const ContainerSchema: z.ZodObject<{
     entireContents: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ContainerUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ContainerUpdateInput = ContainerUpdateInput_2;
+export type ContainerUpdateInput = Record<string, never>;
 
 // @public
 export interface Disk {
@@ -184,10 +168,10 @@ export interface Disk {
     readonly startup: boolean | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DiskCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DiskCreateInput = DiskCreateInput_2;
+export interface DiskCreateInput {
+    ignorePrivileges?: boolean;
+}
 
 // @public
 export const DiskSchema: z.ZodObject<{
@@ -202,26 +186,22 @@ export const DiskSchema: z.ZodObject<{
     ignorePrivileges: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "DiskUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DiskUpdateInput = DiskUpdateInput_2;
+export interface DiskUpdateInput {
+    ignorePrivileges?: boolean;
+}
 
 // @public
 export type DocumentFile = Record<string, never>;
 
-// Warning: (ae-forgotten-export) The symbol "DocumentFileCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentFileCreateInput = DocumentFileCreateInput_2;
+export type DocumentFileCreateInput = Record<string, never>;
 
 // @public
 export const DocumentFileSchema: z.ZodObject<{}, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "DocumentFileUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentFileUpdateInput = DocumentFileUpdateInput_2;
+export type DocumentFileUpdateInput = Record<string, never>;
 
 // @public
 export type Earr = 'notArranged' | 'snapToGrid' | 'arrangedByName' | 'arrangedByModificationDate' | 'arrangedByCreationDate' | 'arrangedBySize' | 'arrangedByKind' | 'arrangedByLabel';
@@ -248,10 +228,12 @@ interface File_2 {
 }
 export { File_2 as File }
 
-// Warning: (ae-forgotten-export) The symbol "FileCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FileCreateInput = FileCreateInput_2;
+export interface FileCreateInput {
+    creatorType?: string;
+    fileType?: string;
+    stationery?: boolean;
+}
 
 // @public
 export const FileSchema: z.ZodObject<{
@@ -262,18 +244,18 @@ export const FileSchema: z.ZodObject<{
     version: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "FileUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FileUpdateInput = FileUpdateInput_2;
+export interface FileUpdateInput {
+    creatorType?: string;
+    fileType?: string;
+    stationery?: boolean;
+}
 
-// Warning: (ae-forgotten-export) The symbol "FinderResources" needs to be exported by the entry point index.d.ts
-//
 // @public
 export interface FinderClient extends ClientBrand<FinderResources> {
 }
 
-// @public (undocumented)
+// @public
 export class FinderClient {
     constructor(options: FinderClientOptions);
     activate(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -317,6 +299,9 @@ export class FinderError extends Error {
 }
 
 // @public
+export type FinderResources = Readonly<Record<never, never>>;
+
+// @public
 export interface FinderWindow {
     readonly columnViewOptions: unknown;
     currentView: string | null;
@@ -332,7 +317,7 @@ export interface FinderWindow {
 //
 // @public
 export type FinderWindowCreateInput = Omit<FinderWindowCreateInput_2, 'sidebarWidth'> & {
-    sidebarWidth?: number | Extract<FinderWindowCreateInput_2['sidebarWidth'], null>;
+    sidebarWidth?: null extends FinderWindowCreateInput_2['sidebarWidth'] ? number | null : number;
 };
 
 // @public
@@ -351,7 +336,7 @@ export const FinderWindowSchema: z.ZodObject<{
 //
 // @public
 export type FinderWindowUpdateInput = Omit<FinderWindowUpdateInput_2, 'sidebarWidth'> & {
-    sidebarWidth?: number | Extract<FinderWindowUpdateInput_2['sidebarWidth'], null>;
+    sidebarWidth?: null extends FinderWindowUpdateInput_2['sidebarWidth'] ? number | null : number;
 };
 
 // @public
@@ -359,28 +344,24 @@ export interface Folder {
     readonly id: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "FolderCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FolderCreateInput = FolderCreateInput_2;
+export type FolderCreateInput = Record<string, never>;
 
 // @public
 export const FolderSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "FolderUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FolderUpdateInput = FolderUpdateInput_2;
+export type FolderUpdateInput = Record<string, never>;
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
     // @internal
-    bind<Client extends ClientBrand<FinderResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -389,20 +370,16 @@ export interface InternetLocationFile {
     readonly location: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "InternetLocationFileCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type InternetLocationFileCreateInput = InternetLocationFileCreateInput_2;
+export type InternetLocationFileCreateInput = Record<string, never>;
 
 // @public
 export const InternetLocationFileSchema: z.ZodObject<{
     location: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "InternetLocationFileUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type InternetLocationFileUpdateInput = InternetLocationFileUpdateInput_2;
+export type InternetLocationFileUpdateInput = Record<string, never>;
 
 // @public
 export type Ipnl = 'generalInformationPanel' | 'sharingPanel' | 'memoryPanel' | 'previewPanel' | 'applicationPanel' | 'languagesPanel' | 'pluginsPanel' | 'nameExtensionPanel' | 'commentsPanel' | 'contentIndexPanel' | 'burningPanel' | 'moreInfoPanel' | 'simpleHeaderPanel';
@@ -423,7 +400,7 @@ export interface ListViewOptions {
 //
 // @public
 export type ListViewOptionsCreateInput = Omit<ListViewOptionsCreateInput_2, 'textSize'> & {
-    textSize?: number | Extract<ListViewOptionsCreateInput_2['textSize'], null>;
+    textSize?: null extends ListViewOptionsCreateInput_2['textSize'] ? number | null : number;
 };
 
 // @public
@@ -439,7 +416,7 @@ export const ListViewOptionsSchema: z.ZodObject<{
 //
 // @public
 export type ListViewOptionsUpdateInput = Omit<ListViewOptionsUpdateInput_2, 'textSize'> & {
-    textSize?: number | Extract<ListViewOptionsUpdateInput_2['textSize'], null>;
+    textSize?: null extends ListViewOptionsUpdateInput_2['textSize'] ? number | null : number;
 };
 
 // @public
@@ -450,20 +427,16 @@ export interface Package {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "PackageCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PackageCreateInput = PackageCreateInput_2;
+export type PackageCreateInput = Record<string, never>;
 
 // @public
 export const PackageSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "PackageUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PackageUpdateInput = PackageUpdateInput_2;
+export type PackageUpdateInput = Record<string, never>;
 
 // @public
 export type Pple = 'generalPreferencesPanel' | 'labelPreferencesPanel' | 'sidebarPreferencesPanel' | 'advancedPreferencesPanel';

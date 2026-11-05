@@ -4,7 +4,7 @@
 
 ## JabberHandleCreateInput interface
 
-Input for creating a JabberHandle
+Input for creating a JabberHandle.
 
 **Signature:**
 

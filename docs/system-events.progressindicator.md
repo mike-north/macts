@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-Unique identifier for this progress indicator
+string \| null
+
+</td><td>
+
+Unique identifier for this progress indicator. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -19,10 +19,10 @@ export type { SchedulingGranularity } from './contract/index.js'
 export type { Project } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ProjectCreateInput = import('./contract/index.js').ProjectCreateInput
+export type { ProjectCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ProjectUpdateInput = import('./contract/index.js').ProjectUpdateInput
+export type { ProjectUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Task } from './contract/index.js'
@@ -30,86 +30,90 @@ export type { Task } from './contract/index.js'
 /** Canonical create input, retaining checked numeric conveniences. */
 export type TaskCreateInput = Omit<import('./contract/index.js').TaskCreateInput, 'priority'> & {
   /** Priority of this task Numeric values are validated by the contract before dispatch. */
-  priority?: number | Extract<import('./contract/index.js').TaskCreateInput['priority'], null>
+  priority?: null extends import('./contract/index.js').TaskCreateInput['priority']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
 export type TaskUpdateInput = Omit<import('./contract/index.js').TaskUpdateInput, 'priority'> & {
   /** Priority of this task Numeric values are validated by the contract before dispatch. */
-  priority?: number | Extract<import('./contract/index.js').TaskUpdateInput['priority'], null>
+  priority?: null extends import('./contract/index.js').TaskUpdateInput['priority']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Milestone } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type MilestoneCreateInput = import('./contract/index.js').MilestoneCreateInput
+export type { MilestoneCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type MilestoneUpdateInput = import('./contract/index.js').MilestoneUpdateInput
+export type { MilestoneUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Resource } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ResourceCreateInput = import('./contract/index.js').ResourceCreateInput
+export type { ResourceCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ResourceUpdateInput = import('./contract/index.js').ResourceUpdateInput
+export type { ResourceUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Assignment } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type AssignmentCreateInput = import('./contract/index.js').AssignmentCreateInput
+export type { AssignmentCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type AssignmentUpdateInput = import('./contract/index.js').AssignmentUpdateInput
+export type { AssignmentUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Dependency } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type DependencyCreateInput = import('./contract/index.js').DependencyCreateInput
+export type { DependencyCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type DependencyUpdateInput = import('./contract/index.js').DependencyUpdateInput
+export type { DependencyUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Violation } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ViolationCreateInput = import('./contract/index.js').ViolationCreateInput
+export type { ViolationCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ViolationUpdateInput = import('./contract/index.js').ViolationUpdateInput
+export type { ViolationUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Scenario } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ScenarioCreateInput = import('./contract/index.js').ScenarioCreateInput
+export type { ScenarioCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ScenarioUpdateInput = import('./contract/index.js').ScenarioUpdateInput
+export type { ScenarioUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Schedule } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ScheduleCreateInput = import('./contract/index.js').ScheduleCreateInput
+export type { ScheduleCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ScheduleUpdateInput = import('./contract/index.js').ScheduleUpdateInput
+export type { ScheduleUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Currency } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type CurrencyCreateInput = import('./contract/index.js').CurrencyCreateInput
+export type { CurrencyCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type CurrencyUpdateInput = import('./contract/index.js').CurrencyUpdateInput
+export type { CurrencyUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

@@ -4,7 +4,7 @@
 
 ## ColorWellCreateInput type
 
-Input for creating a ColorWell
+Input for creating a ColorWell.
 
 **Signature:**
 

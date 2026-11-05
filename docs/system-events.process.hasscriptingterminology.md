@@ -4,10 +4,10 @@
 
 ## Process.hasScriptingTerminology property
 
-Does the process have a scripting terminology, i.e., can it be scripted?
+Does the process have a scripting terminology, i.e., can it be scripted? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-hasScriptingTerminology: boolean
+readonly hasScriptingTerminology: boolean | null;
 ```

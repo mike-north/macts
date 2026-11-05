@@ -4,12 +4,12 @@
 
 ## WindowUpdateInput type
 
-Input for updating a Window
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type WindowUpdateInput = Partial<WindowCreateInput>
+type WindowUpdateInput = Omit<WindowUpdateInput$1, 'index'> & {
+  index?: null extends WindowUpdateInput$1['index'] ? number | null : number
+}
 ```
-
-**References:** [WindowCreateInput](./iterm.windowcreateinput.md)

@@ -9,7 +9,7 @@ Create a new milestone.
 **Signature:**
 
 ```typescript
-create(input: MilestoneCreateInput): Promise<Milestone>;
+create(input: MilestoneCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Milestone>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [MilestoneCreateInput](./omniplan.milestonecreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

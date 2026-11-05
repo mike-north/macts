@@ -56,7 +56,8 @@ export class AccountResourceClient {
         ...(page.pageSize === undefined ? {} : { pageSize: __mactsIntegerInput(page.pageSize) }),
         ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
       },
-      __mactsOptions
+      __mactsOptions,
+      'Account'
     )
   }
 }

@@ -4,10 +4,10 @@
 
 ## Task.startingDateLocked property
 
-Whether the start date is locked or not
+Whether the start date is locked or not. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-startingDateLocked: boolean
+startingDateLocked: boolean | null
 ```

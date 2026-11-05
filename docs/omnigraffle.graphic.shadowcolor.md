@@ -4,14 +4,10 @@
 
 ## Graphic.shadowColor property
 
-Color of the shadow
+Color of the shadow. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-shadowColor: {
-  r: number
-  g: number
-  b: number
-}
+shadowColor: Rgb | null
 ```

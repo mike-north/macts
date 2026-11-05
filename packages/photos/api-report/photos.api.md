@@ -10,6 +10,7 @@ import { Integer } from '@macts/contracts';
 import * as _macts_contracts from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { PageRequest } from '@macts/contracts';
 import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
@@ -21,10 +22,10 @@ export interface Album {
     readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "AlbumCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AlbumCreateInput = AlbumCreateInput_2;
+export interface AlbumCreateInput {
+    name?: string;
+}
 
 // @public
 export class AlbumResourceClient {
@@ -43,10 +44,10 @@ export const AlbumSchema: z.ZodObject<{
     parent: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "AlbumUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AlbumUpdateInput = AlbumUpdateInput_2;
+export interface AlbumUpdateInput {
+    name?: string;
+}
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -74,10 +75,10 @@ export interface Container {
     readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ContainerCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ContainerCreateInput = ContainerCreateInput_2;
+export interface ContainerCreateInput {
+    name?: string;
+}
 
 // @public
 export const ContainerSchema: z.ZodObject<{
@@ -86,10 +87,10 @@ export const ContainerSchema: z.ZodObject<{
     parent: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ContainerUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ContainerUpdateInput = ContainerUpdateInput_2;
+export interface ContainerUpdateInput {
+    name?: string;
+}
 
 // @public
 export interface Folder {
@@ -98,10 +99,10 @@ export interface Folder {
     readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "FolderCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FolderCreateInput = FolderCreateInput_2;
+export interface FolderCreateInput {
+    name?: string;
+}
 
 // @public
 export class FolderResourceClient {
@@ -120,20 +121,18 @@ export const FolderSchema: z.ZodObject<{
     parent: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "FolderUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FolderUpdateInput = FolderUpdateInput_2;
+export interface FolderUpdateInput {
+    name?: string;
+}
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "PhotosResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<PhotosResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -157,7 +156,7 @@ export interface MediaItem {
 //
 // @public
 export type MediaItemCreateInput = Omit<MediaItemCreateInput_2, 'size'> & {
-    size?: number | Extract<MediaItemCreateInput_2['size'], null>;
+    size?: null extends MediaItemCreateInput_2['size'] ? number | null : number;
 };
 
 // @public
@@ -188,7 +187,7 @@ export const MediaItemSchema: z.ZodObject<{
 //
 // @public
 export type MediaItemUpdateInput = Omit<MediaItemUpdateInput_2, 'size'> & {
-    size?: number | Extract<MediaItemUpdateInput_2['size'], null>;
+    size?: null extends MediaItemUpdateInput_2['size'] ? number | null : number;
 };
 
 // @public
@@ -197,10 +196,8 @@ export interface Moment {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "MomentCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MomentCreateInput = MomentCreateInput_2;
+export type MomentCreateInput = Record<string, never>;
 
 // @public
 export const MomentSchema: z.ZodObject<{
@@ -208,25 +205,24 @@ export const MomentSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "MomentUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MomentUpdateInput = MomentUpdateInput_2;
+export type MomentUpdateInput = Record<string, never>;
 
 // @public
 export interface PhotosClient extends ClientBrand<PhotosResources> {
 }
 
-// @public (undocumented)
+// @public
 export class PhotosClient {
     constructor(options: PhotosClientOptions);
-    add(mediaItems: string[], to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    add(mediaItems: Parameters<PhotosClient_2['add']>[0], to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly albums: AlbumResourceClient;
     _delete(target: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    _export(mediaItems: string[], to: string, usingOriginals?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    _export(mediaItems: Parameters<PhotosClient_2['_export']>[0], to: string, usingOriginals?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly folders: FolderResourceClient;
     get http(): HttpClient;
-    _import(files: string[], into?: string, skipCheckDuplicates?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "PhotosClient_2" needs to be exported by the entry point index.d.ts
+    _import(files: Parameters<PhotosClient_2['_import']>[0], into?: string, skipCheckDuplicates?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     make(_new: string, named?: string, at?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly mediaItems: MediaItemResourceClient;
     nextSlide(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -235,7 +231,7 @@ export class PhotosClient {
     resumeSlideshow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     search(_for: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     spotlight(target: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    startSlideshow(using: string[], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    startSlideshow(using: Parameters<PhotosClient_2['startSlideshow']>[0], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     stopSlideshow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
@@ -251,6 +247,25 @@ export class PhotosError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type PhotosResources = Readonly<{
+    MediaItem: ResourceDescriptor<MediaItem, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'photos.mediaItems.get';
+        readonly list: 'photos.mediaItems.list';
+    };
+    Album: ResourceDescriptor<Album, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'photos.albums.get';
+        readonly list: 'photos.albums.list';
+    };
+    Folder: ResourceDescriptor<Folder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'photos.folders.get';
+        readonly list: 'photos.folders.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

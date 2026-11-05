@@ -28,7 +28,8 @@ export class FolderResourceClient {
     return this.#http.invoke<Page<Folder>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Folder'
     )
   }
 
@@ -40,6 +41,11 @@ export class FolderResourceClient {
     name: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Folder> {
-    return this.#http.invoke<Folder>(`${this.#app}.${this.#resource}.get`, { name }, __mactsOptions)
+    return this.#http.invoke<Folder>(
+      `${this.#app}.${this.#resource}.get`,
+      { name },
+      __mactsOptions,
+      'Folder'
+    )
   }
 }

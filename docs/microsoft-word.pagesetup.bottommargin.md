@@ -4,10 +4,10 @@
 
 ## PageSetup.bottomMargin property
 
-The bottom margin in points
+The bottom margin in points. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-bottomMargin: number
+bottomMargin: number | null
 ```

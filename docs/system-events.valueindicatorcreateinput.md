@@ -4,7 +4,7 @@
 
 ## ValueIndicatorCreateInput type
 
-Input for creating a ValueIndicator
+Input for creating a ValueIndicator.
 
 **Signature:**
 

@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/textedit](./textedit.md) &gt; [DocumentUpdateInput](./textedit.documentupdateinput.md)
 
-## DocumentUpdateInput type
+## DocumentUpdateInput interface
 
-Input for updating a Document
+Input for updating a Document. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type DocumentUpdateInput = Partial<DocumentCreateInput>
+interface DocumentUpdateInput
 ```
 
-**References:** [DocumentCreateInput](./textedit.documentcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[name?](./textedit.documentupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of the document. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[text?](./textedit.documentupdateinput.text.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Initial text content. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

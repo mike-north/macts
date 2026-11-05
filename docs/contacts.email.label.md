@@ -4,7 +4,7 @@
 
 ## Email.label property
 
-Label for this email
+Label for this email. Never null: observed in all 32 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 

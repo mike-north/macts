@@ -26,7 +26,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { ValidationError, type OperationId } from '@macts/contracts'
+import { UnexpectedValueError, ValidationError, type OperationId } from '@macts/contracts'
 import { AutomatorClient } from '@macts/automator'
 import { automatorContract } from '@macts/automator/contract'
 import { MicrosoftWordClient } from '@macts/microsoft-word'
@@ -67,11 +67,13 @@ beforeEach(() => {
   vi.stubEnv('MACTS_API_KEY', 'macts_sk_test')
   vi.stubEnv('MACTS_API_URL', BASE_URL)
   vi.stubGlobal('fetch', (url: string | URL, init?: RequestInit): Promise<Response> => {
+    // Input checks use an intentionally incomplete get response, which typed
+    // methods reject after dispatch. No-result commands receive canonical null.
     // The generated HttpClient sends its body as JSON text.
     const body = typeof init?.body === 'string' ? (JSON.parse(init.body) as unknown) : undefined
     sent.push({ url: String(url), body })
     return Promise.resolve(
-      new Response(JSON.stringify({ result: {} }), {
+      new Response(JSON.stringify({ result: String(url).endsWith('.get') ? {} : null }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       })
@@ -211,7 +213,7 @@ describe('a get by an integer id sends the id in the contract wire form (#207)',
   it.each(INTEGER_GETS.map((get) => [get.label, get]))(
     '%s: the HTTP client sends a body its contract input admits (bug #207: id sent as a string)',
     async (_label, get) => {
-      await get.callClient()
+      await expect(get.callClient()).rejects.toBeInstanceOf(UnexpectedValueError)
       const body = onlyRequest(get.operation)
       expect(body).toEqual(EXPECTED_BODY)
       expect(get.wire().safeParse(body).success).toBe(true)
@@ -221,7 +223,9 @@ describe('a get by an integer id sends the id in the contract wire form (#207)',
   it.each(INTEGER_GETS.map((get) => [get.label, get]))(
     '%s: the CLI get sends a body its contract input admits (bug #207: positional sent as a string)',
     async (_label, get) => {
-      await runCli(get.commands, get.cliPath, get.positional)
+      await expect(runCli(get.commands, get.cliPath, get.positional)).rejects.toThrow(
+        /result.*contract/
+      )
       const body = onlyRequest(get.operation)
       expect(body).toEqual(EXPECTED_BODY)
       expect(get.wire().safeParse(body).success).toBe(true)
@@ -377,7 +381,7 @@ describe('integer input validation before HTTP dispatch', () => {
     [9007199254740991, '9007199254740991'],
     [-0, '0'],
   ] as const)('encodes valid boundary %s exactly', async (id, text) => {
-    await omniPlan().tasks.get(id)
+    await expect(omniPlan().tasks.get(id)).rejects.toBeInstanceOf(UnexpectedValueError)
     const body = onlyRequest('omniplan.tasks.get')
     expect(body).toEqual({ id: { integer: text } })
     expect(inputWire(omniPlanContract, 'omniplan.tasks.get').safeParse(body).success).toBe(true)

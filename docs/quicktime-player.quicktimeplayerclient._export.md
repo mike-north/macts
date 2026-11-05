@@ -9,7 +9,7 @@ Export a movie to another file
 **Signature:**
 
 ```typescript
-_export(_in: string, usingSettingsPreset: string): Promise<void>;
+_export(_in: Parameters<QuickTimePlayerClient$1['_export']>[0], usingSettingsPreset: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -33,7 +33,7 @@ Description
 
 </td><td>
 
-string
+Parameters&lt;QuickTimePlayerClient$1\['\_export'\]&gt;\[0\]
 
 </td><td>
 
@@ -47,6 +47,19 @@ usingSettingsPreset
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

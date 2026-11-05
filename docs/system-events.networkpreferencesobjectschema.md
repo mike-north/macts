@@ -4,13 +4,10 @@
 
 ## NetworkPreferencesObjectSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
-NetworkPreferencesObjectSchema: z.ZodObject<
-  {
-    currentLocation: z.ZodString
-  },
-  z.core.$strip
->
+NetworkPreferencesObjectSchema: z.ZodObject<{}, z.core.$strip>
 ```

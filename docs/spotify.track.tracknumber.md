@@ -4,10 +4,10 @@
 
 ## Track.trackNumber property
 
-The track number
+The track number. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-trackNumber: number
+readonly trackNumber: Integer | null;
 ```

@@ -58,7 +58,8 @@ export class AddressResourceClient {
         ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
         personId,
       },
-      __mactsOptions
+      __mactsOptions,
+      'Address'
     )
   }
 
@@ -73,7 +74,8 @@ export class AddressResourceClient {
     return this.#http.invoke<Address>(
       `${this.#app}.${this.#resource}.get`,
       { personId, id },
-      __mactsOptions
+      __mactsOptions,
+      'Address'
     )
   }
 }

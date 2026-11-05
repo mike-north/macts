@@ -4,10 +4,10 @@
 
 ## NetworkDomainObject.id property
 
-Unique identifier for this domain
+Unique identifier for this domain. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

@@ -4,12 +4,12 @@
 
 ## ArtworkUpdateInput type
 
-Input for updating a Artwork
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type ArtworkUpdateInput = Partial<ArtworkCreateInput>
+type ArtworkUpdateInput = Omit<ArtworkUpdateInput$1, 'kind'> & {
+  kind?: null extends ArtworkUpdateInput$1['kind'] ? number | null : number
+}
 ```
-
-**References:** [ArtworkCreateInput](./tv.artworkcreateinput.md)

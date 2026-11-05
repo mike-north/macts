@@ -4,17 +4,21 @@
 
 ## PlaylistSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
 PlaylistSchema: z.ZodObject<
   {
+    id: z.ZodNumber
+    index: z.ZodNumber
+    persistentID: z.ZodString
     description: z.ZodString
     disliked: z.ZodBoolean
     duration: z.ZodNumber
     name: z.ZodString
     favorited: z.ZodBoolean
-    parent: z.ZodString
     size: z.ZodNumber
     specialKind: z.ZodString
     time: z.ZodString

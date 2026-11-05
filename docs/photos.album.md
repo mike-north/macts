@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique ID of this album
+The unique ID of this album. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ The unique ID of this album
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of this album
+The name of this album. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +69,15 @@ The name of this album
 
 </td><td>
 
-</td><td>
-
-[Folder](./photos.folder.md)
+`readonly`
 
 </td><td>
 
-This album's parent folder, if any
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./photos.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+This album's parent folder, if any. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

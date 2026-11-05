@@ -2,153 +2,15 @@
 
 [Home](./index.md) &gt; [@macts/omnigraffle](./omnigraffle.md) &gt; [LineCreateInput](./omnigraffle.linecreateinput.md)
 
-## LineCreateInput interface
+## LineCreateInput type
 
-Input for creating a Line
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface LineCreateInput
+type LineCreateInput = Omit<LineCreateInput$1, 'headMagnet' | 'tailMagnet'> & {
+  headMagnet?: null extends LineCreateInput$1['headMagnet'] ? number | null : number
+  tailMagnet?: null extends LineCreateInput$1['tailMagnet'] ? number | null : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[headMagnet?](./omnigraffle.linecreateinput.headmagnet.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ Which magnet of the destination graphic the line attaches to
-
-</td></tr>
-<tr><td>
-
-[headScale?](./omnigraffle.linecreateinput.headscale.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ Scale of line ending on the head of the line
-
-</td></tr>
-<tr><td>
-
-[headType?](./omnigraffle.linecreateinput.headtype.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Type of line ending on the head of the line
-
-</td></tr>
-<tr><td>
-
-[hopType?](./omnigraffle.linecreateinput.hoptype.md)
-
-</td><td>
-
-</td><td>
-
-[HopType](./omnigraffle.hoptype.md)
-
-</td><td>
-
-_(Optional)_ The behavior when one line crosses over another line
-
-</td></tr>
-<tr><td>
-
-[lineType?](./omnigraffle.linecreateinput.linetype.md)
-
-</td><td>
-
-</td><td>
-
-[LineType](./omnigraffle.linetype.md)
-
-</td><td>
-
-_(Optional)_ Type of the line
-
-</td></tr>
-<tr><td>
-
-[tailMagnet?](./omnigraffle.linecreateinput.tailmagnet.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ Which magnet of the source graphic the line attaches to
-
-</td></tr>
-<tr><td>
-
-[tailScale?](./omnigraffle.linecreateinput.tailscale.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ Scale of line ending on the tail of the line
-
-</td></tr>
-<tr><td>
-
-[tailType?](./omnigraffle.linecreateinput.tailtype.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Type of line ending on the tail of the line
-
-</td></tr>
-</tbody></table>

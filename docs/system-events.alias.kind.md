@@ -4,10 +4,10 @@
 
 ## Alias.kind property
 
-The kind of alias, as shown in Finder
+The kind of alias, as shown in Finder. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-kind: string
+readonly kind: string | null;
 ```

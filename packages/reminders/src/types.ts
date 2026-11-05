@@ -11,19 +11,19 @@ export type { ReminderPriority } from './contract/index.js'
 export type { Account } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type AccountCreateInput = import('./contract/index.js').AccountCreateInput
+export type { AccountCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type AccountUpdateInput = import('./contract/index.js').AccountUpdateInput
+export type { AccountUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { List } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ListCreateInput = import('./contract/index.js').ListCreateInput
+export type { ListCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ListUpdateInput = import('./contract/index.js').ListUpdateInput
+export type { ListUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Reminder } from './contract/index.js'
@@ -34,7 +34,9 @@ export type ReminderCreateInput = Omit<
   'priority'
 > & {
   /** Priority (0=none, 1=high, 5=medium, 9=low) Numeric values are validated by the contract before dispatch. */
-  priority?: number | Extract<import('./contract/index.js').ReminderCreateInput['priority'], null>
+  priority?: null extends import('./contract/index.js').ReminderCreateInput['priority']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -43,7 +45,9 @@ export type ReminderUpdateInput = Omit<
   'priority'
 > & {
   /** Priority (0=none, 1=high, 5=medium, 9=low) Numeric values are validated by the contract before dispatch. */
-  priority?: number | Extract<import('./contract/index.js').ReminderUpdateInput['priority'], null>
+  priority?: null extends import('./contract/index.js').ReminderUpdateInput['priority']
+    ? number | null
+    : number
 }
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.

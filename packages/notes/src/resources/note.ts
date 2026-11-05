@@ -25,7 +25,12 @@ export class NoteResourceClient {
    * List all notes, as one page.
    */
   async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Note>> {
-    return this.#http.invoke<Page<Note>>(`${this.#app}.${this.#resource}.list`, {}, __mactsOptions)
+    return this.#http.invoke<Page<Note>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'Note'
+    )
   }
 
   /**
@@ -33,7 +38,12 @@ export class NoteResourceClient {
    * When several notes share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async get(name: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Note> {
-    return this.#http.invoke<Note>(`${this.#app}.${this.#resource}.get`, { name }, __mactsOptions)
+    return this.#http.invoke<Note>(
+      `${this.#app}.${this.#resource}.get`,
+      { name },
+      __mactsOptions,
+      'Note'
+    )
   }
 
   /**
@@ -43,7 +53,12 @@ export class NoteResourceClient {
     input: NoteCreateInput,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Note> {
-    return this.#http.invoke<Note>(`${this.#app}.${this.#resource}.create`, input, __mactsOptions)
+    return this.#http.invoke<Note>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'Note'
+    )
   }
 
   /**
@@ -53,7 +68,8 @@ export class NoteResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.show`,
       { name },
-      __mactsOptions
+      __mactsOptions,
+      'Note'
     )
   }
 }

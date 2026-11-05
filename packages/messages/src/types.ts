@@ -17,28 +17,28 @@ export type { ConnectionStatus } from './contract/index.js'
 export type { Participant } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ParticipantCreateInput = import('./contract/index.js').ParticipantCreateInput
+export type { ParticipantCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ParticipantUpdateInput = import('./contract/index.js').ParticipantUpdateInput
+export type { ParticipantUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Account } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type AccountCreateInput = import('./contract/index.js').AccountCreateInput
+export type { AccountCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type AccountUpdateInput = import('./contract/index.js').AccountUpdateInput
+export type { AccountUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Chat } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ChatCreateInput = import('./contract/index.js').ChatCreateInput
+export type { ChatCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ChatUpdateInput = import('./contract/index.js').ChatUpdateInput
+export type { ChatUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

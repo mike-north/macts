@@ -39,7 +39,7 @@ Error class for Finder API errors.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 </tbody></table>
@@ -70,7 +70,16 @@ An alias file (created with “Make Alias”)
 
 </td><td>
 
-Input for creating a AliasFile
+Input for creating an AliasFile.
+
+</td></tr>
+<tr><td>
+
+[AliasFileUpdateInput](./finder.aliasfileupdateinput.md)
+
+</td><td>
+
+Input for updating an AliasFile. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -80,15 +89,6 @@ Input for creating a AliasFile
 </td><td>
 
 An application's file on disk
-
-</td></tr>
-<tr><td>
-
-[ApplicationFileCreateInput](./finder.applicationfilecreateinput.md)
-
-</td><td>
-
-Input for creating a ApplicationFile
 
 </td></tr>
 <tr><td>
@@ -129,38 +129,11 @@ a column of a list view
 </td></tr>
 <tr><td>
 
-[ColumnCreateInput](./finder.columncreateinput.md)
-
-</td><td>
-
-Input for creating a Column
-
-</td></tr>
-<tr><td>
-
 [Container](./finder.container.md)
 
 </td><td>
 
 An item that contains other items
-
-</td></tr>
-<tr><td>
-
-[ContainerCreateInput](./finder.containercreateinput.md)
-
-</td><td>
-
-Input for creating a Container
-
-</td></tr>
-<tr><td>
-
-[DesktopObject](./finder.desktopobject.md)
-
-</td><td>
-
-Desktop-object is the class of the "desktop" object
 
 </td></tr>
 <tr><td>
@@ -178,16 +151,16 @@ A disk
 
 </td><td>
 
-Input for creating a Disk
+Input for creating a Disk.
 
 </td></tr>
 <tr><td>
 
-[DocumentFile](./finder.documentfile.md)
+[DiskUpdateInput](./finder.diskupdateinput.md)
 
 </td><td>
 
-A document file
+Input for updating a Disk. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -205,7 +178,25 @@ A file
 
 </td><td>
 
-Input for creating a File
+Input for creating a File.
+
+</td></tr>
+<tr><td>
+
+[FileUpdateInput](./finder.fileupdateinput.md)
+
+</td><td>
+
+Input for updating a File. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[FinderClient](./finder.finderclient.md)
+
+</td><td>
+
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -224,15 +215,6 @@ Client configuration options.
 </td><td>
 
 A file viewer window
-
-</td></tr>
-<tr><td>
-
-[FinderWindowCreateInput](./finder.finderwindowcreateinput.md)
-
-</td><td>
-
-Input for creating a FinderWindow
 
 </td></tr>
 <tr><td>
@@ -264,38 +246,11 @@ the list view options
 </td></tr>
 <tr><td>
 
-[ListViewOptionsCreateInput](./finder.listviewoptionscreateinput.md)
-
-</td><td>
-
-Input for creating a ListViewOptions
-
-</td></tr>
-<tr><td>
-
 [Package](./finder.package.md)
 
 </td><td>
 
 A package
-
-</td></tr>
-<tr><td>
-
-[TrashObject](./finder.trashobject.md)
-
-</td><td>
-
-Trash-object is the class of the “trash” object
-
-</td></tr>
-<tr><td>
-
-[TrashObjectCreateInput](./finder.trashobjectcreateinput.md)
-
-</td><td>
-
-Input for creating a TrashObject
 
 </td></tr>
 </tbody></table>
@@ -317,12 +272,16 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ApplicationFileSchema](./finder.applicationfileschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -340,12 +299,16 @@ Every capability exposed by Finder, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [ClippingWindowSchema](./finder.clippingwindowschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -354,6 +317,8 @@ Every capability exposed by Finder, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -361,12 +326,7 @@ Every capability exposed by Finder, with risk metadata.
 
 </td><td>
 
-</td></tr>
-<tr><td>
-
-[DesktopObjectSchema](./finder.desktopobjectschema.md)
-
-</td><td>
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -375,12 +335,16 @@ Every capability exposed by Finder, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [DocumentFileSchema](./finder.documentfileschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -389,12 +353,16 @@ Every capability exposed by Finder, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [FinderWindowSchema](./finder.finderwindowschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -403,12 +371,16 @@ Every capability exposed by Finder, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [InternetLocationFileSchema](./finder.internetlocationfileschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -417,6 +389,8 @@ Every capability exposed by Finder, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
@@ -424,12 +398,7 @@ Every capability exposed by Finder, with risk metadata.
 
 </td><td>
 
-</td></tr>
-<tr><td>
-
-[TrashObjectSchema](./finder.trashobjectschema.md)
-
-</td><td>
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -447,11 +416,11 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[AliasFileUpdateInput](./finder.aliasfileupdateinput.md)
+[ApplicationFileCreateInput](./finder.applicationfilecreateinput.md)
 
 </td><td>
 
-Input for updating a AliasFile
+Input for creating an ApplicationFile.
 
 </td></tr>
 <tr><td>
@@ -460,7 +429,7 @@ Input for updating a AliasFile
 
 </td><td>
 
-Input for updating a ApplicationFile
+Input for updating an ApplicationFile. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -478,7 +447,7 @@ Risk classification for a capability.
 
 </td><td>
 
-Input for creating a Clipping
+Input for creating a Clipping.
 
 </td></tr>
 <tr><td>
@@ -487,7 +456,7 @@ Input for creating a Clipping
 
 </td><td>
 
-Input for updating a Clipping
+Input for updating a Clipping. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -496,7 +465,7 @@ Input for updating a Clipping
 
 </td><td>
 
-Input for creating a ClippingWindow
+Input for creating a ClippingWindow.
 
 </td></tr>
 <tr><td>
@@ -505,7 +474,16 @@ Input for creating a ClippingWindow
 
 </td><td>
 
-Input for updating a ClippingWindow
+Input for updating a ClippingWindow. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[ColumnCreateInput](./finder.columncreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -514,7 +492,16 @@ Input for updating a ClippingWindow
 
 </td><td>
 
-Input for updating a Column
+Canonical update input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
+[ContainerCreateInput](./finder.containercreateinput.md)
+
+</td><td>
+
+Input for creating a Container.
 
 </td></tr>
 <tr><td>
@@ -523,34 +510,16 @@ Input for updating a Column
 
 </td><td>
 
-Input for updating a Container
+Input for updating a Container. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
 
-[DesktopObjectCreateInput](./finder.desktopobjectcreateinput.md)
+[DocumentFile](./finder.documentfile.md)
 
 </td><td>
 
-Input for creating a DesktopObject
-
-</td></tr>
-<tr><td>
-
-[DesktopObjectUpdateInput](./finder.desktopobjectupdateinput.md)
-
-</td><td>
-
-Input for updating a DesktopObject
-
-</td></tr>
-<tr><td>
-
-[DiskUpdateInput](./finder.diskupdateinput.md)
-
-</td><td>
-
-Input for updating a Disk
+A document file
 
 </td></tr>
 <tr><td>
@@ -559,7 +528,7 @@ Input for updating a Disk
 
 </td><td>
 
-Input for creating a DocumentFile
+Input for creating a DocumentFile.
 
 </td></tr>
 <tr><td>
@@ -568,7 +537,7 @@ Input for creating a DocumentFile
 
 </td><td>
 
-Input for updating a DocumentFile
+Input for updating a DocumentFile. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -618,11 +587,20 @@ Epos
 </td></tr>
 <tr><td>
 
-[FileUpdateInput](./finder.fileupdateinput.md)
+[FinderResources](./finder.finderresources.md)
 
 </td><td>
 
-Input for updating a File
+The type of the resource table in `finderContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
+
+</td></tr>
+<tr><td>
+
+[FinderWindowCreateInput](./finder.finderwindowcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -631,7 +609,7 @@ Input for updating a File
 
 </td><td>
 
-Input for updating a FinderWindow
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -640,7 +618,7 @@ Input for updating a FinderWindow
 
 </td><td>
 
-Input for creating a Folder
+Input for creating a Folder.
 
 </td></tr>
 <tr><td>
@@ -649,7 +627,7 @@ Input for creating a Folder
 
 </td><td>
 
-Input for updating a Folder
+Input for updating a Folder. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -658,7 +636,7 @@ Input for updating a Folder
 
 </td><td>
 
-Input for creating a InternetLocationFile
+Input for creating an InternetLocationFile.
 
 </td></tr>
 <tr><td>
@@ -667,7 +645,7 @@ Input for creating a InternetLocationFile
 
 </td><td>
 
-Input for updating a InternetLocationFile
+Input for updating an InternetLocationFile. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -690,11 +668,20 @@ Isiz
 </td></tr>
 <tr><td>
 
+[ListViewOptionsCreateInput](./finder.listviewoptionscreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
+
+</td></tr>
+<tr><td>
+
 [ListViewOptionsUpdateInput](./finder.listviewoptionsupdateinput.md)
 
 </td><td>
 
-Input for updating a ListViewOptions
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -712,7 +699,7 @@ Lvic
 
 </td><td>
 
-Input for creating a Package
+Input for creating a Package.
 
 </td></tr>
 <tr><td>
@@ -721,7 +708,7 @@ Input for creating a Package
 
 </td><td>
 
-Input for updating a Package
+Input for updating a Package. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -758,15 +745,6 @@ Sodr
 </td><td>
 
 Sort
-
-</td></tr>
-<tr><td>
-
-[TrashObjectUpdateInput](./finder.trashobjectupdateinput.md)
-
-</td><td>
-
-Input for updating a TrashObject
 
 </td></tr>
 </tbody></table>

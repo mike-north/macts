@@ -4,10 +4,10 @@
 
 ## Project.name property
 
-The name of the project
+The name of the project. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

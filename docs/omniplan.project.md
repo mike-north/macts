@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The percentage of the project which is complete (1.0 = 100%)
+number \| null
+
+</td><td>
+
+The percentage of the project which is complete (1.0 = 100%). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The percentage of the project which is complete (1.0 = 100%)
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The total duration of the project in seconds
+number \| null
+
+</td><td>
+
+The total duration of the project in seconds. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ The total duration of the project in seconds
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The number of person-seconds required to complete the project
+number \| null
+
+</td><td>
+
+The number of person-seconds required to complete the project. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ The number of person-seconds required to complete the project
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-The date on which work is complete
+Date \| null
+
+</td><td>
+
+The date on which work is complete. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +105,15 @@ The date on which work is complete
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier for the project
+The unique identifier for the project. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -112,13 +122,15 @@ The unique identifier for the project
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The project's name
+string \| null
+
+</td><td>
+
+The project's name. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +141,11 @@ The project's name
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The date on which work can begin
+The date on which work can begin. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +154,15 @@ The date on which work can begin
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The cost of the entire project
+number \| null
+
+</td><td>
+
+The cost of the entire project. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

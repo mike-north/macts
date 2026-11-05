@@ -2,14 +2,108 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [UIElementUpdateInput](./system-events.uielementupdateinput.md)
 
-## UIElementUpdateInput type
+## UIElementUpdateInput interface
 
-Input for updating a UIElement
+Input for updating an UIElement. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type UIElementUpdateInput = Partial<UIElementCreateInput>
+interface UIElementUpdateInput
 ```
 
-**References:** [UIElementCreateInput](./system-events.uielementcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[focused?](./system-events.uielementupdateinput.focused.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Is the focus on this UI element? Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[position?](./system-events.uielementupdateinput.position.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the position of the UI element. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[selected?](./system-events.uielementupdateinput.selected.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Is the UI element selected? Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[size?](./system-events.uielementupdateinput.size.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the size of the UI element. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[value?](./system-events.uielementupdateinput.value.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the current value of the UI element. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

@@ -17,6 +17,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[BrowserWindowResourceClient](./tv.browserwindowresourceclient.md)
+
+</td><td>
+
+Client for the main window.
+
+</td></tr>
+<tr><td>
+
 [FileTrackResourceClient](./tv.filetrackresourceclient.md)
 
 </td><td>
@@ -30,7 +39,7 @@ Client for a track representing a video file.
 
 </td><td>
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 </td></tr>
 <tr><td>
@@ -40,6 +49,24 @@ HTTP client wrapper for making authenticated requests.
 </td><td>
 
 Client for a list of tracks/streams.
+
+</td></tr>
+<tr><td>
+
+[PlaylistWindowResourceClient](./tv.playlistwindowresourceclient.md)
+
+</td><td>
+
+Client for a sub-window showing a single playlist.
+
+</td></tr>
+<tr><td>
+
+[SourceResourceClient](./tv.sourceresourceclient.md)
+
+</td><td>
+
+Client for a media source (library, cd, device, etc.).
 
 </td></tr>
 <tr><td>
@@ -84,15 +111,6 @@ a piece of art within a track or playlist
 </td></tr>
 <tr><td>
 
-[ArtworkCreateInput](./tv.artworkcreateinput.md)
-
-</td><td>
-
-Input for creating a Artwork
-
-</td></tr>
-<tr><td>
-
 [BrowserWindow](./tv.browserwindow.md)
 
 </td><td>
@@ -106,7 +124,16 @@ the main window
 
 </td><td>
 
-Input for creating a BrowserWindow
+Input for creating a BrowserWindow.
+
+</td></tr>
+<tr><td>
+
+[BrowserWindowUpdateInput](./tv.browserwindowupdateinput.md)
+
+</td><td>
+
+Input for updating a BrowserWindow. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -133,7 +160,16 @@ a track representing a video file
 
 </td><td>
 
-Input for creating a FileTrack
+Input for creating a FileTrack.
+
+</td></tr>
+<tr><td>
+
+[FileTrackUpdateInput](./tv.filetrackupdateinput.md)
+
+</td><td>
+
+Input for updating a FileTrack. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -160,7 +196,16 @@ a list of tracks/streams
 
 </td><td>
 
-Input for creating a Playlist
+Input for creating a Playlist.
+
+</td></tr>
+<tr><td>
+
+[PlaylistUpdateInput](./tv.playlistupdateinput.md)
+
+</td><td>
+
+Input for updating a Playlist. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -201,11 +246,11 @@ playable video source
 </td></tr>
 <tr><td>
 
-[TrackCreateInput](./tv.trackcreateinput.md)
+[TVClient](./tv.tvclient.md)
 
 </td><td>
 
-Input for creating a Track
+The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
 
 </td></tr>
 <tr><td>
@@ -232,7 +277,16 @@ a track representing a network stream
 
 </td><td>
 
-Input for creating a URLTrack
+Input for creating an URLTrack.
+
+</td></tr>
+<tr><td>
+
+[URLTrackUpdateInput](./tv.urltrackupdateinput.md)
+
+</td><td>
+
+Input for updating an URLTrack. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -250,7 +304,16 @@ custom playlists created by the user
 
 </td><td>
 
-Input for creating a UserPlaylist
+Input for creating an UserPlaylist.
+
+</td></tr>
+<tr><td>
+
+[UserPlaylistUpdateInput](./tv.userplaylistupdateinput.md)
+
+</td><td>
+
+Input for updating an UserPlaylist. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -281,12 +344,16 @@ Description
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [BrowserWindowSchema](./tv.browserwindowschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -304,12 +371,16 @@ Every capability exposed by TV, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [LibraryPlaylistSchema](./tv.libraryplaylistschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -318,12 +389,16 @@ Every capability exposed by TV, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [PlaylistWindowSchema](./tv.playlistwindowschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -332,12 +407,16 @@ Every capability exposed by TV, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [SourceSchema](./tv.sourceschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -346,12 +425,16 @@ Every capability exposed by TV, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [URLTrackSchema](./tv.urltrackschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 <tr><td>
@@ -360,12 +443,16 @@ Every capability exposed by TV, with risk metadata.
 
 </td><td>
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 </td></tr>
 <tr><td>
 
 [VideoWindowSchema](./tv.videowindowschema.md)
 
 </td><td>
+
+Raw passthrough validator; typed SDK records use the canonical contract codec.
 
 </td></tr>
 </tbody></table>
@@ -383,20 +470,20 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[ArtworkUpdateInput](./tv.artworkupdateinput.md)
+[ArtworkCreateInput](./tv.artworkcreateinput.md)
 
 </td><td>
 
-Input for updating a Artwork
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
 
-[BrowserWindowUpdateInput](./tv.browserwindowupdateinput.md)
+[ArtworkUpdateInput](./tv.artworkupdateinput.md)
 
 </td><td>
 
-Input for updating a BrowserWindow
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -464,20 +551,11 @@ ESrc
 </td></tr>
 <tr><td>
 
-[FileTrackUpdateInput](./tv.filetrackupdateinput.md)
-
-</td><td>
-
-Input for updating a FileTrack
-
-</td></tr>
-<tr><td>
-
 [LibraryPlaylistCreateInput](./tv.libraryplaylistcreateinput.md)
 
 </td><td>
 
-Input for creating a LibraryPlaylist
+Input for creating a LibraryPlaylist.
 
 </td></tr>
 <tr><td>
@@ -486,16 +564,7 @@ Input for creating a LibraryPlaylist
 
 </td><td>
 
-Input for updating a LibraryPlaylist
-
-</td></tr>
-<tr><td>
-
-[PlaylistUpdateInput](./tv.playlistupdateinput.md)
-
-</td><td>
-
-Input for updating a Playlist
+Input for updating a LibraryPlaylist. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -504,7 +573,7 @@ Input for updating a Playlist
 
 </td><td>
 
-Input for creating a PlaylistWindow
+Input for creating a PlaylistWindow.
 
 </td></tr>
 <tr><td>
@@ -513,7 +582,7 @@ Input for creating a PlaylistWindow
 
 </td><td>
 
-Input for updating a PlaylistWindow
+Input for updating a PlaylistWindow. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -522,7 +591,7 @@ Input for updating a PlaylistWindow
 
 </td><td>
 
-Input for creating a SharedTrack
+Input for creating a SharedTrack.
 
 </td></tr>
 <tr><td>
@@ -531,7 +600,7 @@ Input for creating a SharedTrack
 
 </td><td>
 
-Input for updating a SharedTrack
+Input for updating a SharedTrack. Omitted fields are left unchanged.
 
 </td></tr>
 <tr><td>
@@ -540,7 +609,7 @@ Input for updating a SharedTrack
 
 </td><td>
 
-Input for creating a Source
+Input for creating a Source.
 
 </td></tr>
 <tr><td>
@@ -549,7 +618,16 @@ Input for creating a Source
 
 </td><td>
 
-Input for updating a Source
+Input for updating a Source. Omitted fields are left unchanged.
+
+</td></tr>
+<tr><td>
+
+[TrackCreateInput](./tv.trackcreateinput.md)
+
+</td><td>
+
+Canonical create input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
@@ -558,25 +636,16 @@ Input for updating a Source
 
 </td><td>
 
-Input for updating a Track
+Canonical update input, retaining checked numeric conveniences.
 
 </td></tr>
 <tr><td>
 
-[URLTrackUpdateInput](./tv.urltrackupdateinput.md)
+[TVResources](./tv.tvresources.md)
 
 </td><td>
 
-Input for updating a URLTrack
-
-</td></tr>
-<tr><td>
-
-[UserPlaylistUpdateInput](./tv.userplaylistupdateinput.md)
-
-</td><td>
-
-Input for updating a UserPlaylist
+The type of the resource table in `tvContract` (the app's `/contract` entry): every resource a reference can name, keyed by manifest resource key, with its record type, its identifier type (when it has one), the operations that resolve references to it, and, for each of those operations that finds the resource only within another resource, that parent. A client created from the contract carries it, so `bindReference` admits only references the contract can resolve.
 
 </td></tr>
 <tr><td>
@@ -585,7 +654,7 @@ Input for updating a UserPlaylist
 
 </td><td>
 
-Input for creating a VideoWindow
+Input for creating a VideoWindow.
 
 </td></tr>
 <tr><td>
@@ -594,7 +663,7 @@ Input for creating a VideoWindow
 
 </td><td>
 
-Input for updating a VideoWindow
+Input for updating a VideoWindow. Omitted fields are left unchanged.
 
 </td></tr>
 </tbody></table>

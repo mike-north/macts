@@ -4,10 +4,10 @@
 
 ## Project.singletonActionHolder property
 
-True if the project contains singleton actions
+True if the project contains singleton actions. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-singletonActionHolder: boolean
+singletonActionHolder: boolean | null
 ```

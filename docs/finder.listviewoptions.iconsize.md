@@ -4,10 +4,10 @@
 
 ## ListViewOptions.iconSize property
 
-the size of icons displayed in the list view
+the size of icons displayed in the list view. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-iconSize: string
+iconSize: string | null
 ```

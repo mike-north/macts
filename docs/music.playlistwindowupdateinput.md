@@ -4,12 +4,10 @@
 
 ## PlaylistWindowUpdateInput type
 
-Input for updating a PlaylistWindow
+Input for updating a PlaylistWindow. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type PlaylistWindowUpdateInput = Partial<PlaylistWindowCreateInput>
+type PlaylistWindowUpdateInput = Record<string, never>
 ```
-
-**References:** [PlaylistWindowCreateInput](./music.playlistwindowcreateinput.md)

@@ -4,10 +4,10 @@
 
 ## Track.name property
 
-The name of the track
+The name of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

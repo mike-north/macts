@@ -4,7 +4,7 @@
 
 ## UrlCreateInput interface
 
-Input for creating a Url
+Input for creating an Url.
 
 **Signature:**
 

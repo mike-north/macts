@@ -9,10 +9,10 @@ import { z } from 'zod'
 export type { Application } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ApplicationCreateInput = import('./contract/index.js').ApplicationCreateInput
+export type { ApplicationCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ApplicationUpdateInput = import('./contract/index.js').ApplicationUpdateInput
+export type { ApplicationUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

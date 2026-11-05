@@ -9,7 +9,7 @@ Restart the computer
 **Signature:**
 
 ```typescript
-restart(stateSavingPreference?: boolean): Promise<void>;
+restart(stateSavingPreference?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -34,6 +34,19 @@ stateSavingPreference
 </td><td>
 
 boolean
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

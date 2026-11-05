@@ -28,7 +28,8 @@ export class ViolationResourceClient {
     return this.#http.invoke<Page<Violation>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Violation'
     )
   }
 
@@ -36,6 +37,11 @@ export class ViolationResourceClient {
    * Fix a violation
    */
   async fix(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
-    await this.#http.invoke<undefined>(`${this.#app}.${this.#resource}.fix`, {}, __mactsOptions)
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.fix`,
+      {},
+      __mactsOptions,
+      'Violation'
+    )
   }
 }

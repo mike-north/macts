@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the font is all caps
+Whether the font is all caps. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ Whether the font is all caps
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the font is bold
+Whether the font is bold. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ Whether the font is bold
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md) \| null
 
 </td><td>
 
-The font color
+The font color. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ The font color
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the font is italic
+Whether the font is italic. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +99,11 @@ Whether the font is italic
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The font name
+The font name. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +114,11 @@ The font name
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The font size in points
+The font size in points. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +129,11 @@ The font size in points
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the font has strikethrough
+Whether the font has strikethrough. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +144,11 @@ Whether the font has strikethrough
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the font is subscript
+Whether the font is subscript. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +159,11 @@ Whether the font is subscript
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Whether the font is superscript
+Whether the font is superscript. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -174,11 +174,11 @@ Whether the font is superscript
 
 </td><td>
 
-[UnderlineType](./microsoft-word.underlinetype.md)
+[UnderlineType](./microsoft-word.underlinetype.md) \| null
 
 </td><td>
 
-The underline type
+The underline type. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

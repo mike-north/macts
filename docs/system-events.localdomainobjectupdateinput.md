@@ -4,12 +4,10 @@
 
 ## LocalDomainObjectUpdateInput type
 
-Input for updating a LocalDomainObject
+Input for updating a LocalDomainObject. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type LocalDomainObjectUpdateInput = Partial<LocalDomainObjectCreateInput>
+type LocalDomainObjectUpdateInput = Record<string, never>
 ```
-
-**References:** [LocalDomainObjectCreateInput](./system-events.localdomainobjectcreateinput.md)

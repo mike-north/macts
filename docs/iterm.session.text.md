@@ -4,10 +4,10 @@
 
 ## Session.text property
 
-The currently visible contents of the session.
+The currently visible contents of the session. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-text: string
+readonly text: string | null;
 ```

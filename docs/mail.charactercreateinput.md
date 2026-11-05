@@ -4,7 +4,7 @@
 
 ## CharacterCreateInput interface
 
-Input for creating a Character
+Input for creating a Character.
 
 **Signature:**
 
@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+[Rgb](./contracts.rgb.md)
 
 </td><td>
 

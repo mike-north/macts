@@ -4,14 +4,10 @@
 
 ## RichText.color property
 
-The color of the first character.
+The color of the first character. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-color: {
-  r: number
-  g: number
-  b: number
-}
+color: Rgb | null
 ```

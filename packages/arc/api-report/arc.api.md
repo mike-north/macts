@@ -10,13 +10,11 @@ import { Integer } from '@macts/contracts';
 import * as _macts_contracts from '@macts/contracts';
 import { z } from 'zod';
 
-// Warning: (ae-forgotten-export) The symbol "ArcResources" needs to be exported by the entry point index.d.ts
-//
 // @public
 export interface ArcClient extends ClientBrand<ArcResources> {
 }
 
-// @public (undocumented)
+// @public
 export class ArcClient {
     constructor(options: ArcClientOptions);
     close(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -46,6 +44,9 @@ export class ArcError extends Error {
 }
 
 // @public
+export type ArcResources = Readonly<Record<never, never>>;
+
+// @public
 export const capabilities: readonly CapabilityMetadata[];
 
 // @public
@@ -64,13 +65,13 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
     // @internal
-    bind<Client extends ClientBrand<ArcResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -80,10 +81,8 @@ export interface Space {
     readonly title: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "SpaceCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SpaceCreateInput = SpaceCreateInput_2;
+export type SpaceCreateInput = Record<string, never>;
 
 // @public
 export const SpaceSchema: z.ZodObject<{
@@ -91,10 +90,8 @@ export const SpaceSchema: z.ZodObject<{
     title: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "SpaceUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SpaceUpdateInput = SpaceUpdateInput_2;
+export type SpaceUpdateInput = Record<string, never>;
 
 // @public
 export interface Tab {
@@ -105,10 +102,11 @@ export interface Tab {
     uRL: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "TabCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TabCreateInput = TabCreateInput_2;
+export interface TabCreateInput {
+    location?: string;
+    uRL?: string;
+}
 
 // @public
 export const TabSchema: z.ZodObject<{
@@ -119,10 +117,11 @@ export const TabSchema: z.ZodObject<{
     location: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "TabUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TabUpdateInput = TabUpdateInput_2;
+export interface TabUpdateInput {
+    location?: string;
+    uRL?: string;
+}
 
 // @public
 export interface Window {
@@ -144,7 +143,7 @@ export interface Window {
 //
 // @public
 export type WindowCreateInput = Omit<WindowCreateInput_2, 'index'> & {
-    index?: number | Extract<WindowCreateInput_2['index'], null>;
+    index?: null extends WindowCreateInput_2['index'] ? number | null : number;
 };
 
 // @public
@@ -167,7 +166,7 @@ export const WindowSchema: z.ZodObject<{
 //
 // @public
 export type WindowUpdateInput = Omit<WindowUpdateInput_2, 'index'> & {
-    index?: number | Extract<WindowUpdateInput_2['index'], null>;
+    index?: null extends WindowUpdateInput_2['index'] ? number | null : number;
 };
 
 // (No @packageDocumentation comment for this package)

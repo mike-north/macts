@@ -28,7 +28,8 @@ export class PerspectiveResourceClient {
     return this.#http.invoke<Page<Perspective>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Perspective'
     )
   }
 
@@ -42,7 +43,8 @@ export class PerspectiveResourceClient {
     return this.#http.invoke<Perspective>(
       `${this.#app}.${this.#resource}.get`,
       { id },
-      __mactsOptions
+      __mactsOptions,
+      'Perspective'
     )
   }
 }

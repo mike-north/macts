@@ -28,7 +28,8 @@ export class SettingsSetResourceClient {
     return this.#http.invoke<Page<SettingsSet>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'SettingsSet'
     )
   }
 
@@ -43,7 +44,8 @@ export class SettingsSetResourceClient {
     return this.#http.invoke<SettingsSet>(
       `${this.#app}.${this.#resource}.get`,
       { name },
-      __mactsOptions
+      __mactsOptions,
+      'SettingsSet'
     )
   }
 }

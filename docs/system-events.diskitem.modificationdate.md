@@ -4,10 +4,10 @@
 
 ## DiskItem.modificationDate property
 
-the date on which the disk item was last modified
+the date on which the disk item was last modified. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-modificationDate: Date
+modificationDate: Date | null
 ```

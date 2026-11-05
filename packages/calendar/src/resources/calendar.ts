@@ -28,7 +28,8 @@ export class CalendarResourceClient {
     return this.#http.invoke<Page<Calendar>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Calendar'
     )
   }
 
@@ -40,7 +41,12 @@ export class CalendarResourceClient {
     id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Calendar> {
-    return this.#http.invoke<Calendar>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
+    return this.#http.invoke<Calendar>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Calendar'
+    )
   }
 
   /**
@@ -53,7 +59,8 @@ export class CalendarResourceClient {
     return this.#http.invoke<Calendar>(
       `${this.#app}.${this.#resource}.create`,
       input,
-      __mactsOptions
+      __mactsOptions,
+      'Calendar'
     )
   }
 }

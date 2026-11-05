@@ -11,32 +11,36 @@ export type { Window } from './contract/index.js'
 /** Canonical create input, retaining checked numeric conveniences. */
 export type WindowCreateInput = Omit<import('./contract/index.js').WindowCreateInput, 'index'> & {
   /** The index of the window, ordered front to back. Numeric values are validated by the contract before dispatch. */
-  index?: number | Extract<import('./contract/index.js').WindowCreateInput['index'], null>
+  index?: null extends import('./contract/index.js').WindowCreateInput['index']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
 export type WindowUpdateInput = Omit<import('./contract/index.js').WindowUpdateInput, 'index'> & {
   /** The index of the window, ordered front to back. Numeric values are validated by the contract before dispatch. */
-  index?: number | Extract<import('./contract/index.js').WindowUpdateInput['index'], null>
+  index?: null extends import('./contract/index.js').WindowUpdateInput['index']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Tab } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type TabCreateInput = import('./contract/index.js').TabCreateInput
+export type { TabCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type TabUpdateInput = import('./contract/index.js').TabUpdateInput
+export type { TabUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Space } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type SpaceCreateInput = import('./contract/index.js').SpaceCreateInput
+export type { SpaceCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type SpaceUpdateInput = import('./contract/index.js').SpaceUpdateInput
+export type { SpaceUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

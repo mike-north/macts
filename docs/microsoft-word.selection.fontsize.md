@@ -4,10 +4,10 @@
 
 ## Selection.fontSize property
 
-The font size of the selection in points
+The font size of the selection in points. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fontSize: number
+fontSize: number | null
 ```

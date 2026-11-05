@@ -4,10 +4,10 @@
 
 ## Resource.resourceType property
 
-Type of the resource
+Type of the resource. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-resourceType: ResourceType
+resourceType: ResourceType | null
 ```

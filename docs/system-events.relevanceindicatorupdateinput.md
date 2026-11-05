@@ -4,12 +4,10 @@
 
 ## RelevanceIndicatorUpdateInput type
 
-Input for updating a RelevanceIndicator
+Input for updating a RelevanceIndicator. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type RelevanceIndicatorUpdateInput = Partial<RelevanceIndicatorCreateInput>
+type RelevanceIndicatorUpdateInput = Record<string, never>
 ```
-
-**References:** [RelevanceIndicatorCreateInput](./system-events.relevanceindicatorcreateinput.md)

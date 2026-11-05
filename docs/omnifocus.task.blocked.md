@@ -4,10 +4,10 @@
 
 ## Task.blocked property
 
-True if the task has a task that must be completed prior to it being actionable
+True if the task has a task that must be completed prior to it being actionable. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-blocked: boolean
+readonly blocked: boolean | null;
 ```

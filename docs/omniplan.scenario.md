@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The percentage complete (1.0 = 100%)
+number \| null
+
+</td><td>
+
+The percentage complete (1.0 = 100%). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The percentage complete (1.0 = 100%)
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The total duration in seconds
+number \| null
+
+</td><td>
+
+The total duration in seconds. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ The total duration in seconds
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The number of person-seconds required
+number \| null
+
+</td><td>
+
+The number of person-seconds required. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ The number of person-seconds required
 
 </td><td>
 
-</td><td>
-
-Date
+`readonly`
 
 </td><td>
 
-The date on which work is complete
+Date \| null
+
+</td><td>
+
+The date on which work is complete. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +105,15 @@ The date on which work is complete
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier for the scenario
+The unique identifier for the scenario. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -114,11 +124,11 @@ The unique identifier for the scenario
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the scenario
+The name of the scenario. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +139,11 @@ The name of the scenario
 
 </td><td>
 
-[SchedulingGranularity](./omniplan.schedulinggranularity.md)
+[SchedulingGranularity](./omniplan.schedulinggranularity.md) \| null
 
 </td><td>
 
-Scheduling granularity for this scenario
+Scheduling granularity for this scenario. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +154,11 @@ Scheduling granularity for this scenario
 
 </td><td>
 
-Date
+Date \| null
 
 </td><td>
 
-The date on which work can begin
+The date on which work can begin. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +167,15 @@ The date on which work can begin
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The cost of the entire project
+number \| null
+
+</td><td>
+
+The cost of the entire project. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -172,13 +184,15 @@ The cost of the entire project
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-Number of violations in the scenario
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+Number of violations in the scenario. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

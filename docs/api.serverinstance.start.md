@@ -4,7 +4,7 @@
 
 ## ServerInstance.start() method
 
-Start the server
+Start the server.
 
 **Signature:**
 
@@ -15,3 +15,7 @@ start(): Promise<void>;
 **Returns:**
 
 Promise&lt;void&gt;
+
+## Remarks
+
+Resolves once the listener is accepting connections, so `url` is reachable when it resolves. Rejects when the listener cannot bind (for example, when the port is in use).

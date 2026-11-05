@@ -4,10 +4,10 @@
 
 ## Task.effort property
 
-The number of person-seconds required to perform the task
+The number of person-seconds required to perform the task. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-effort: number
+effort: number | null
 ```

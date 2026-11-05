@@ -4,12 +4,12 @@
 
 ## ProjectResourceClient.get() method
 
-Get a project by id.
+Get a project by id within a parent scope. When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
 
 **Signature:**
 
 ```typescript
-get(id: string): Promise<Project>;
+get(workspaceName: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Project>;
 ```
 
 ## Parameters
@@ -29,6 +29,17 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+workspaceName
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 id
 
 </td><td>
@@ -36,6 +47,19 @@ id
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

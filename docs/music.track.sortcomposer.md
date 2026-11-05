@@ -4,10 +4,10 @@
 
 ## Track.sortComposer property
 
-override string to use for the track when sorting by composer
+override string to use for the track when sorting by composer. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-sortComposer: string
+sortComposer: string | null
 ```

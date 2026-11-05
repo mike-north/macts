@@ -4,10 +4,10 @@
 
 ## Task.effectiveDueDate property
 
-When the task must be finished (including inherited)
+When the task must be finished (including inherited). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-effectiveDueDate: Date
+readonly effectiveDueDate: Date | null;
 ```

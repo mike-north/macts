@@ -14,7 +14,9 @@ export type MediaItemCreateInput = Omit<
   'size'
 > & {
   /** The selected media item file size Numeric values are validated by the contract before dispatch. */
-  size?: number | Extract<import('./contract/index.js').MediaItemCreateInput['size'], null>
+  size?: null extends import('./contract/index.js').MediaItemCreateInput['size']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -23,44 +25,46 @@ export type MediaItemUpdateInput = Omit<
   'size'
 > & {
   /** The selected media item file size Numeric values are validated by the contract before dispatch. */
-  size?: number | Extract<import('./contract/index.js').MediaItemUpdateInput['size'], null>
+  size?: null extends import('./contract/index.js').MediaItemUpdateInput['size']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Container } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ContainerCreateInput = import('./contract/index.js').ContainerCreateInput
+export type { ContainerCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ContainerUpdateInput = import('./contract/index.js').ContainerUpdateInput
+export type { ContainerUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Album } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type AlbumCreateInput = import('./contract/index.js').AlbumCreateInput
+export type { AlbumCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type AlbumUpdateInput = import('./contract/index.js').AlbumUpdateInput
+export type { AlbumUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Folder } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type FolderCreateInput = import('./contract/index.js').FolderCreateInput
+export type { FolderCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type FolderUpdateInput = import('./contract/index.js').FolderUpdateInput
+export type { FolderUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Moment } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type MomentCreateInput = import('./contract/index.js').MomentCreateInput
+export type { MomentCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type MomentUpdateInput = import('./contract/index.js').MomentUpdateInput
+export type { MomentUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

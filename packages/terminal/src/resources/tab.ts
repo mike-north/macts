@@ -25,7 +25,12 @@ export class TabResourceClient {
    * List all tabs, as one page.
    */
   async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Tab>> {
-    return this.#http.invoke<Page<Tab>>(`${this.#app}.${this.#resource}.list`, {}, __mactsOptions)
+    return this.#http.invoke<Page<Tab>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'Tab'
+    )
   }
 
   /**
@@ -33,6 +38,11 @@ export class TabResourceClient {
    * When several tabs share the same tty, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async get(name: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Tab> {
-    return this.#http.invoke<Tab>(`${this.#app}.${this.#resource}.get`, { name }, __mactsOptions)
+    return this.#http.invoke<Tab>(
+      `${this.#app}.${this.#resource}.get`,
+      { name },
+      __mactsOptions,
+      'Tab'
+    )
   }
 }

@@ -2,14 +2,93 @@
 
 [Home](./index.md) &gt; [@macts/terminal](./terminal.md) &gt; [TabUpdateInput](./terminal.tabupdateinput.md)
 
-## TabUpdateInput type
+## TabUpdateInput interface
 
-Input for updating a Tab
+Input for updating a Tab. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type TabUpdateInput = Partial<TabCreateInput>
+interface TabUpdateInput
 ```
 
-**References:** [TabCreateInput](./terminal.tabcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[currentSettings?](./terminal.tabupdateinput.currentsettings.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of the current settings set. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[customTitle?](./terminal.tabupdateinput.customtitle.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The custom title of the tab. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[selected?](./terminal.tabupdateinput.selected.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether the tab is selected. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[titleDisplaysCustomTitle?](./terminal.tabupdateinput.titledisplayscustomtitle.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Whether the title displays a custom title. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

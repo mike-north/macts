@@ -32,7 +32,8 @@ export class VariableResourceClient {
     return this.#http.invoke<Page<Variable>>(
       `${this.#app}.${this.#resource}.list`,
       { workflowName },
-      __mactsOptions
+      __mactsOptions,
+      'Variable'
     )
   }
 
@@ -43,6 +44,11 @@ export class VariableResourceClient {
     id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Variable> {
-    return this.#http.invoke<Variable>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
+    return this.#http.invoke<Variable>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Variable'
+    )
   }
 }

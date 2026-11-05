@@ -33,47 +33,17 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[account](./mail.mailbox.account.md)
-
-</td><td>
-
-</td><td>
-
-[Account](./mail.account.md)
-
-</td><td>
-
-The account property
-
-</td></tr>
-<tr><td>
-
-[container](./mail.mailbox.container.md)
-
-</td><td>
-
-</td><td>
-
-[Mailbox](./mail.mailbox.md)
-
-</td><td>
-
-The container property
-
-</td></tr>
-<tr><td>
-
 [name](./mail.mailbox.name.md)
 
 </td><td>
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of a mailbox
+The name of a mailbox. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +52,15 @@ The name of a mailbox
 
 </td><td>
 
-</td><td>
-
-number
+`readonly`
 
 </td><td>
 
-The number of unread messages in the mailbox
+[Integer](./contracts.integer.md) \| null
+
+</td><td>
+
+The number of unread messages in the mailbox. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

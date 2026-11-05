@@ -4,10 +4,10 @@
 
 ## Task.id property
 
-Internal identifier for this task
+Internal identifier for this task. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: Integer;
 ```

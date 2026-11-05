@@ -4,10 +4,10 @@
 
 ## Task.next property
 
-If the task is the next task of its containing project, next is true
+If the task is the next task of its containing project, next is true. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-next: boolean
+readonly next: boolean | null;
 ```

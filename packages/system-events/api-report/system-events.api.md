@@ -8,6 +8,7 @@ import { CallOptions } from '@macts/contracts';
 import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import * as _macts_contracts from '@macts/contracts';
+import { Rectangle } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -19,10 +20,8 @@ export interface Action {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ActionCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ActionCreateInput = ActionCreateInput_2;
+export type ActionCreateInput = Record<string, never>;
 
 // @public
 export class ActionResourceClient {
@@ -36,10 +35,8 @@ export const ActionSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ActionUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ActionUpdateInput = ActionUpdateInput_2;
+export type ActionUpdateInput = Record<string, never>;
 
 // @public
 export type Actn = 'itemsAdded' | 'itemsRemoved' | 'windowClosed' | 'windowMoved' | 'windowOpened';
@@ -57,10 +54,13 @@ export interface Alias {
     readonly version: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "AliasCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AliasCreateInput = AliasCreateInput_2;
+export interface AliasCreateInput {
+    creatorType?: string;
+    defaultApplication?: string;
+    fileType?: string;
+    stationery?: boolean;
+}
 
 // @public
 export const AliasSchema: z.ZodObject<{
@@ -75,10 +75,13 @@ export const AliasSchema: z.ZodObject<{
     version: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "AliasUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AliasUpdateInput = AliasUpdateInput_2;
+export interface AliasUpdateInput {
+    creatorType?: string;
+    defaultApplication?: string;
+    fileType?: string;
+    stationery?: boolean;
+}
 
 // @public
 export type Appearances = 'blue' | 'graphite';
@@ -90,10 +93,10 @@ export interface Attribute {
     value: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "AttributeCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AttributeCreateInput = AttributeCreateInput_2;
+export interface AttributeCreateInput {
+    value?: string;
+}
 
 // @public
 export const AttributeSchema: z.ZodObject<{
@@ -102,70 +105,58 @@ export const AttributeSchema: z.ZodObject<{
     value: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "AttributeUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AttributeUpdateInput = AttributeUpdateInput_2;
+export interface AttributeUpdateInput {
+    value?: string;
+}
 
 // @public
 export interface Browser {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "BrowserCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type BrowserCreateInput = BrowserCreateInput_2;
+export type BrowserCreateInput = Record<string, never>;
 
 // @public
 export const BrowserSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "BrowserUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type BrowserUpdateInput = BrowserUpdateInput_2;
+export type BrowserUpdateInput = Record<string, never>;
 
 // @public
 export interface BusyIndicator {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "BusyIndicatorCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type BusyIndicatorCreateInput = BusyIndicatorCreateInput_2;
+export type BusyIndicatorCreateInput = Record<string, never>;
 
 // @public
 export const BusyIndicatorSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "BusyIndicatorUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type BusyIndicatorUpdateInput = BusyIndicatorUpdateInput_2;
+export type BusyIndicatorUpdateInput = Record<string, never>;
 
 // @public
 export interface Button {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ButtonCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ButtonCreateInput = ButtonCreateInput_2;
+export type ButtonCreateInput = Record<string, never>;
 
 // @public
 export const ButtonSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ButtonUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ButtonUpdateInput = ButtonUpdateInput_2;
+export type ButtonUpdateInput = Record<string, never>;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -191,20 +182,16 @@ export interface Checkbox {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "CheckboxCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type CheckboxCreateInput = CheckboxCreateInput_2;
+export type CheckboxCreateInput = Record<string, never>;
 
 // @public
 export const CheckboxSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "CheckboxUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type CheckboxUpdateInput = CheckboxUpdateInput_2;
+export type CheckboxUpdateInput = Record<string, never>;
 
 // @public
 export interface ClassicDomainObject {
@@ -212,10 +199,8 @@ export interface ClassicDomainObject {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ClassicDomainObjectCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ClassicDomainObjectCreateInput = ClassicDomainObjectCreateInput_2;
+export type ClassicDomainObjectCreateInput = Record<string, never>;
 
 // @public
 export const ClassicDomainObjectSchema: z.ZodObject<{
@@ -223,70 +208,56 @@ export const ClassicDomainObjectSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ClassicDomainObjectUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ClassicDomainObjectUpdateInput = ClassicDomainObjectUpdateInput_2;
+export type ClassicDomainObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface ColorWell {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ColorWellCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ColorWellCreateInput = ColorWellCreateInput_2;
+export type ColorWellCreateInput = Record<string, never>;
 
 // @public
 export const ColorWellSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ColorWellUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ColorWellUpdateInput = ColorWellUpdateInput_2;
+export type ColorWellUpdateInput = Record<string, never>;
 
 // @public
 export interface Column {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ColumnCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ColumnCreateInput = ColumnCreateInput_2;
+export type ColumnCreateInput = Record<string, never>;
 
 // @public
 export const ColumnSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ColumnUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ColumnUpdateInput = ColumnUpdateInput_2;
+export type ColumnUpdateInput = Record<string, never>;
 
 // @public
 export interface ComboBox {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ComboBoxCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ComboBoxCreateInput = ComboBoxCreateInput_2;
+export type ComboBoxCreateInput = Record<string, never>;
 
 // @public
 export const ComboBoxSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ComboBoxUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ComboBoxUpdateInput = ComboBoxUpdateInput_2;
+export type ComboBoxUpdateInput = Record<string, never>;
 
 // @public
 export interface Configuration {
@@ -296,10 +267,10 @@ export interface Configuration {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ConfigurationCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ConfigurationCreateInput = ConfigurationCreateInput_2;
+export interface ConfigurationCreateInput {
+    accountName?: string;
+}
 
 // @public
 export const ConfigurationSchema: z.ZodObject<{
@@ -309,10 +280,10 @@ export const ConfigurationSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ConfigurationUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ConfigurationUpdateInput = ConfigurationUpdateInput_2;
+export interface ConfigurationUpdateInput {
+    accountName?: string;
+}
 
 // @public
 export type Dhac = 'askWhatToDo' | 'ignore' | 'openApplication' | 'runAScript';
@@ -330,10 +301,10 @@ export interface Disk {
     readonly zone: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DiskCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DiskCreateInput = DiskCreateInput_2;
+export interface DiskCreateInput {
+    ignorePrivileges?: boolean;
+}
 
 // @public
 export interface DiskItem {
@@ -354,10 +325,12 @@ export interface DiskItem {
     readonly volume: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DiskItemCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DiskItemCreateInput = DiskItemCreateInput_2;
+export interface DiskItemCreateInput {
+    modificationDate?: Date;
+    name?: string;
+    visible?: boolean;
+}
 
 // @public
 export const DiskItemSchema: z.ZodObject<{
@@ -378,10 +351,12 @@ export const DiskItemSchema: z.ZodObject<{
     volume: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "DiskItemUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DiskItemUpdateInput = DiskItemUpdateInput_2;
+export interface DiskItemUpdateInput {
+    modificationDate?: Date;
+    name?: string;
+    visible?: boolean;
+}
 
 // @public
 export const DiskSchema: z.ZodObject<{
@@ -396,10 +371,10 @@ export const DiskSchema: z.ZodObject<{
     zone: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "DiskUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DiskUpdateInput = DiskUpdateInput_2;
+export interface DiskUpdateInput {
+    ignorePrivileges?: boolean;
+}
 
 // @public
 export interface Domain {
@@ -407,10 +382,8 @@ export interface Domain {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DomainCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DomainCreateInput = DomainCreateInput_2;
+export type DomainCreateInput = Record<string, never>;
 
 // @public
 export const DomainSchema: z.ZodObject<{
@@ -418,10 +391,8 @@ export const DomainSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "DomainUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DomainUpdateInput = DomainUpdateInput_2;
+export type DomainUpdateInput = Record<string, never>;
 
 // @public
 export type Dpbh = 'minimize' | 'off' | 'zoom';
@@ -437,20 +408,16 @@ export interface Drawer {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DrawerCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DrawerCreateInput = DrawerCreateInput_2;
+export type DrawerCreateInput = Record<string, never>;
 
 // @public
 export const DrawerSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "DrawerUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DrawerUpdateInput = DrawerUpdateInput_2;
+export type DrawerUpdateInput = Record<string, never>;
 
 // @public
 export type DynamicStyle = 'auto' | 'dynamic' | 'light' | 'dark' | 'unknown';
@@ -481,30 +448,29 @@ interface File_2 {
 }
 export { File_2 as File }
 
-// Warning: (ae-forgotten-export) The symbol "FileCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FileCreateInput = FileCreateInput_2;
+export interface FileCreateInput {
+    creatorType?: string;
+    defaultApplication?: string;
+    fileType?: string;
+    stationery?: boolean;
+}
 
 // @public
 export interface FilePackage {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "FilePackageCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FilePackageCreateInput = FilePackageCreateInput_2;
+export type FilePackageCreateInput = Record<string, never>;
 
 // @public
 export const FilePackageSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "FilePackageUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FilePackageUpdateInput = FilePackageUpdateInput_2;
+export type FilePackageUpdateInput = Record<string, never>;
 
 // @public
 export const FileSchema: z.ZodObject<{
@@ -519,10 +485,13 @@ export const FileSchema: z.ZodObject<{
     version: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "FileUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FileUpdateInput = FileUpdateInput_2;
+export interface FileUpdateInput {
+    creatorType?: string;
+    defaultApplication?: string;
+    fileType?: string;
+    stationery?: boolean;
+}
 
 // @public
 export interface Folder {
@@ -543,10 +512,12 @@ export interface Folder {
     readonly volume: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "FolderCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FolderCreateInput = FolderCreateInput_2;
+export interface FolderCreateInput {
+    modificationDate?: Date;
+    name?: string;
+    visible?: boolean;
+}
 
 // @public
 export const FolderSchema: z.ZodObject<{
@@ -567,10 +538,12 @@ export const FolderSchema: z.ZodObject<{
     volume: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "FolderUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FolderUpdateInput = FolderUpdateInput_2;
+export interface FolderUpdateInput {
+    modificationDate?: Date;
+    name?: string;
+    visible?: boolean;
+}
 
 // @public
 export type FontSmoothingStyles = 'automatic' | 'light' | 'medium' | 'standard' | 'strong';
@@ -580,53 +553,43 @@ export interface Group {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "GroupCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type GroupCreateInput = GroupCreateInput_2;
+export type GroupCreateInput = Record<string, never>;
 
 // @public
 export const GroupSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "GroupUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type GroupUpdateInput = GroupUpdateInput_2;
+export type GroupUpdateInput = Record<string, never>;
 
 // @public
 export interface GrowArea {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "GrowAreaCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type GrowAreaCreateInput = GrowAreaCreateInput_2;
+export type GrowAreaCreateInput = Record<string, never>;
 
 // @public
 export const GrowAreaSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "GrowAreaUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type GrowAreaUpdateInput = GrowAreaUpdateInput_2;
+export type GrowAreaUpdateInput = Record<string, never>;
 
 // @public
 export type HighlightColors = 'blue' | 'gold' | 'graphite' | 'green' | 'orange' | 'purple' | 'red' | 'silver';
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "SystemEventsResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<SystemEventsResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -635,40 +598,32 @@ export interface Image {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ImageCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ImageCreateInput = ImageCreateInput_2;
+export type ImageCreateInput = Record<string, never>;
 
 // @public
 export const ImageSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ImageUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ImageUpdateInput = ImageUpdateInput_2;
+export type ImageUpdateInput = Record<string, never>;
 
 // @public
 export interface Incrementor {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "IncrementorCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type IncrementorCreateInput = IncrementorCreateInput_2;
+export type IncrementorCreateInput = Record<string, never>;
 
 // @public
 export const IncrementorSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "IncrementorUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type IncrementorUpdateInput = IncrementorUpdateInput_2;
+export type IncrementorUpdateInput = Record<string, never>;
 
 // @public
 export interface Interface {
@@ -686,8 +641,8 @@ export interface Interface {
 //
 // @public
 export type InterfaceCreateInput = Omit<InterfaceCreateInput_2, 'mtu' | 'speed'> & {
-    mtu?: number | Extract<InterfaceCreateInput_2['mtu'], null>;
-    speed?: number | Extract<InterfaceCreateInput_2['speed'], null>;
+    mtu?: null extends InterfaceCreateInput_2['mtu'] ? number | null : number;
+    speed?: null extends InterfaceCreateInput_2['speed'] ? number | null : number;
 };
 
 // @public
@@ -706,8 +661,8 @@ export const InterfaceSchema: z.ZodObject<{
 //
 // @public
 export type InterfaceUpdateInput = Omit<InterfaceUpdateInput_2, 'mtu' | 'speed'> & {
-    mtu?: number | Extract<InterfaceUpdateInput_2['mtu'], null>;
-    speed?: number | Extract<InterfaceUpdateInput_2['speed'], null>;
+    mtu?: null extends InterfaceUpdateInput_2['mtu'] ? number | null : number;
+    speed?: null extends InterfaceUpdateInput_2['speed'] ? number | null : number;
 };
 
 // @public
@@ -715,40 +670,32 @@ export interface List {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ListCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ListCreateInput = ListCreateInput_2;
+export type ListCreateInput = Record<string, never>;
 
 // @public
 export const ListSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ListUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ListUpdateInput = ListUpdateInput_2;
+export type ListUpdateInput = Record<string, never>;
 
 // @public
 export interface LocalDomainObject {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "LocalDomainObjectCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type LocalDomainObjectCreateInput = LocalDomainObjectCreateInput_2;
+export type LocalDomainObjectCreateInput = Record<string, never>;
 
 // @public
 export const LocalDomainObjectSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "LocalDomainObjectUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type LocalDomainObjectUpdateInput = LocalDomainObjectUpdateInput_2;
+export type LocalDomainObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface Location {
@@ -756,10 +703,10 @@ export interface Location {
     name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "LocationCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type LocationCreateInput = LocationCreateInput_2;
+export interface LocationCreateInput {
+    name?: string;
+}
 
 // @public
 export const LocationSchema: z.ZodObject<{
@@ -767,10 +714,10 @@ export const LocationSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "LocationUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type LocationUpdateInput = LocationUpdateInput_2;
+export interface LocationUpdateInput {
+    name?: string;
+}
 
 // @public
 export interface Menu {
@@ -782,191 +729,151 @@ export interface MenuBar {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "MenuBarCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MenuBarCreateInput = MenuBarCreateInput_2;
+export type MenuBarCreateInput = Record<string, never>;
 
 // @public
 export interface MenuBarItem {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "MenuBarItemCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MenuBarItemCreateInput = MenuBarItemCreateInput_2;
+export type MenuBarItemCreateInput = Record<string, never>;
 
 // @public
 export const MenuBarItemSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "MenuBarItemUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MenuBarItemUpdateInput = MenuBarItemUpdateInput_2;
+export type MenuBarItemUpdateInput = Record<string, never>;
 
 // @public
 export const MenuBarSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "MenuBarUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MenuBarUpdateInput = MenuBarUpdateInput_2;
+export type MenuBarUpdateInput = Record<string, never>;
 
 // @public
 export interface MenuButton {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "MenuButtonCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MenuButtonCreateInput = MenuButtonCreateInput_2;
+export type MenuButtonCreateInput = Record<string, never>;
 
 // @public
 export const MenuButtonSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "MenuButtonUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MenuButtonUpdateInput = MenuButtonUpdateInput_2;
+export type MenuButtonUpdateInput = Record<string, never>;
 
-// Warning: (ae-forgotten-export) The symbol "MenuCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MenuCreateInput = MenuCreateInput_2;
+export type MenuCreateInput = Record<string, never>;
 
 // @public
 export interface MenuItem {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "MenuItemCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MenuItemCreateInput = MenuItemCreateInput_2;
+export type MenuItemCreateInput = Record<string, never>;
 
 // @public
 export const MenuItemSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "MenuItemUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MenuItemUpdateInput = MenuItemUpdateInput_2;
+export type MenuItemUpdateInput = Record<string, never>;
 
 // @public
 export const MenuSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "MenuUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MenuUpdateInput = MenuUpdateInput_2;
+export type MenuUpdateInput = Record<string, never>;
 
 // @public
 export interface NetworkDomainObject {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "NetworkDomainObjectCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type NetworkDomainObjectCreateInput = NetworkDomainObjectCreateInput_2;
+export type NetworkDomainObjectCreateInput = Record<string, never>;
 
 // @public
 export const NetworkDomainObjectSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "NetworkDomainObjectUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type NetworkDomainObjectUpdateInput = NetworkDomainObjectUpdateInput_2;
+export type NetworkDomainObjectUpdateInput = Record<string, never>;
 
 // @public
 export type NetworkPreferencesObject = Record<string, never>;
 
-// Warning: (ae-forgotten-export) The symbol "NetworkPreferencesObjectCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type NetworkPreferencesObjectCreateInput = NetworkPreferencesObjectCreateInput_2;
+export type NetworkPreferencesObjectCreateInput = Record<string, never>;
 
 // @public
 export const NetworkPreferencesObjectSchema: z.ZodObject<{}, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "NetworkPreferencesObjectUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type NetworkPreferencesObjectUpdateInput = NetworkPreferencesObjectUpdateInput_2;
+export type NetworkPreferencesObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface Outline {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "OutlineCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type OutlineCreateInput = OutlineCreateInput_2;
+export type OutlineCreateInput = Record<string, never>;
 
 // @public
 export const OutlineSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "OutlineUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type OutlineUpdateInput = OutlineUpdateInput_2;
+export type OutlineUpdateInput = Record<string, never>;
 
 // @public
 export interface PopOver {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "PopOverCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PopOverCreateInput = PopOverCreateInput_2;
+export type PopOverCreateInput = Record<string, never>;
 
 // @public
 export const PopOverSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "PopOverUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PopOverUpdateInput = PopOverUpdateInput_2;
+export type PopOverUpdateInput = Record<string, never>;
 
 // @public
 export interface PopUpButton {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "PopUpButtonCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PopUpButtonCreateInput = PopUpButtonCreateInput_2;
+export type PopUpButtonCreateInput = Record<string, never>;
 
 // @public
 export const PopUpButtonSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "PopUpButtonUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PopUpButtonUpdateInput = PopUpButtonUpdateInput_2;
+export type PopUpButtonUpdateInput = Record<string, never>;
 
 // @public
 export interface Process {
@@ -991,10 +898,11 @@ export interface Process {
     visible: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ProcessCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ProcessCreateInput = ProcessCreateInput_2;
+export interface ProcessCreateInput {
+    frontmost?: boolean;
+    visible?: string;
+}
 
 // @public
 export const ProcessSchema: z.ZodObject<{
@@ -1019,30 +927,27 @@ export const ProcessSchema: z.ZodObject<{
     visible: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ProcessUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ProcessUpdateInput = ProcessUpdateInput_2;
+export interface ProcessUpdateInput {
+    frontmost?: boolean;
+    visible?: string;
+}
 
 // @public
 export interface ProgressIndicator {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ProgressIndicatorCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ProgressIndicatorCreateInput = ProgressIndicatorCreateInput_2;
+export type ProgressIndicatorCreateInput = Record<string, never>;
 
 // @public
 export const ProgressIndicatorSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ProgressIndicatorUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ProgressIndicatorUpdateInput = ProgressIndicatorUpdateInput_2;
+export type ProgressIndicatorUpdateInput = Record<string, never>;
 
 // @public
 export interface PropertyListItem {
@@ -1052,10 +957,11 @@ export interface PropertyListItem {
     value: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "PropertyListItemCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PropertyListItemCreateInput = PropertyListItemCreateInput_2;
+export interface PropertyListItemCreateInput {
+    text?: string;
+    value?: string;
+}
 
 // @public
 export const PropertyListItemSchema: z.ZodObject<{
@@ -1065,90 +971,75 @@ export const PropertyListItemSchema: z.ZodObject<{
     value: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "PropertyListItemUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PropertyListItemUpdateInput = PropertyListItemUpdateInput_2;
+export interface PropertyListItemUpdateInput {
+    text?: string;
+    value?: string;
+}
 
 // @public
 export interface RadioButton {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "RadioButtonCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RadioButtonCreateInput = RadioButtonCreateInput_2;
+export type RadioButtonCreateInput = Record<string, never>;
 
 // @public
 export const RadioButtonSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "RadioButtonUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RadioButtonUpdateInput = RadioButtonUpdateInput_2;
+export type RadioButtonUpdateInput = Record<string, never>;
 
 // @public
 export interface RadioGroup {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "RadioGroupCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RadioGroupCreateInput = RadioGroupCreateInput_2;
+export type RadioGroupCreateInput = Record<string, never>;
 
 // @public
 export const RadioGroupSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "RadioGroupUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RadioGroupUpdateInput = RadioGroupUpdateInput_2;
+export type RadioGroupUpdateInput = Record<string, never>;
 
 // @public
 export interface RelevanceIndicator {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "RelevanceIndicatorCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RelevanceIndicatorCreateInput = RelevanceIndicatorCreateInput_2;
+export type RelevanceIndicatorCreateInput = Record<string, never>;
 
 // @public
 export const RelevanceIndicatorSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "RelevanceIndicatorUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RelevanceIndicatorUpdateInput = RelevanceIndicatorUpdateInput_2;
+export type RelevanceIndicatorUpdateInput = Record<string, never>;
 
 // @public
 export interface Row {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "RowCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RowCreateInput = RowCreateInput_2;
+export type RowCreateInput = Record<string, never>;
 
 // @public
 export const RowSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "RowUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RowUpdateInput = RowUpdateInput_2;
+export type RowUpdateInput = Record<string, never>;
 
 // @public
 export type SaveableFileFormat = 'text';
@@ -1163,10 +1054,8 @@ export interface ScriptingClass {
     readonly suiteName: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingClassCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingClassCreateInput = ScriptingClassCreateInput_2;
+export type ScriptingClassCreateInput = Record<string, never>;
 
 // @public
 export const ScriptingClassSchema: z.ZodObject<{
@@ -1178,10 +1067,8 @@ export const ScriptingClassSchema: z.ZodObject<{
     suiteName: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingClassUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingClassUpdateInput = ScriptingClassUpdateInput_2;
+export type ScriptingClassUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingCommand {
@@ -1193,10 +1080,8 @@ export interface ScriptingCommand {
     readonly suiteName: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingCommandCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingCommandCreateInput = ScriptingCommandCreateInput_2;
+export type ScriptingCommandCreateInput = Record<string, never>;
 
 // @public
 export const ScriptingCommandSchema: z.ZodObject<{
@@ -1208,50 +1093,40 @@ export const ScriptingCommandSchema: z.ZodObject<{
     suiteName: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingCommandUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingCommandUpdateInput = ScriptingCommandUpdateInput_2;
+export type ScriptingCommandUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingDefinitionObject {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingDefinitionObjectCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingDefinitionObjectCreateInput = ScriptingDefinitionObjectCreateInput_2;
+export type ScriptingDefinitionObjectCreateInput = Record<string, never>;
 
 // @public
 export const ScriptingDefinitionObjectSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingDefinitionObjectUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingDefinitionObjectUpdateInput = ScriptingDefinitionObjectUpdateInput_2;
+export type ScriptingDefinitionObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingElement {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingElementCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingElementCreateInput = ScriptingElementCreateInput_2;
+export type ScriptingElementCreateInput = Record<string, never>;
 
 // @public
 export const ScriptingElementSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingElementUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingElementUpdateInput = ScriptingElementUpdateInput_2;
+export type ScriptingElementUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingEnumeration {
@@ -1260,10 +1135,8 @@ export interface ScriptingEnumeration {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingEnumerationCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingEnumerationCreateInput = ScriptingEnumerationCreateInput_2;
+export type ScriptingEnumerationCreateInput = Record<string, never>;
 
 // @public
 export const ScriptingEnumerationSchema: z.ZodObject<{
@@ -1272,10 +1145,8 @@ export const ScriptingEnumerationSchema: z.ZodObject<{
     hidden: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingEnumerationUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingEnumerationUpdateInput = ScriptingEnumerationUpdateInput_2;
+export type ScriptingEnumerationUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingEnumerator {
@@ -1285,10 +1156,8 @@ export interface ScriptingEnumerator {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingEnumeratorCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingEnumeratorCreateInput = ScriptingEnumeratorCreateInput_2;
+export type ScriptingEnumeratorCreateInput = Record<string, never>;
 
 // @public
 export const ScriptingEnumeratorSchema: z.ZodObject<{
@@ -1298,10 +1167,8 @@ export const ScriptingEnumeratorSchema: z.ZodObject<{
     hidden: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingEnumeratorUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingEnumeratorUpdateInput = ScriptingEnumeratorUpdateInput_2;
+export type ScriptingEnumeratorUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingParameter {
@@ -1313,10 +1180,8 @@ export interface ScriptingParameter {
     readonly optional: boolean | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingParameterCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingParameterCreateInput = ScriptingParameterCreateInput_2;
+export type ScriptingParameterCreateInput = Record<string, never>;
 
 // @public
 export const ScriptingParameterSchema: z.ZodObject<{
@@ -1328,10 +1193,8 @@ export const ScriptingParameterSchema: z.ZodObject<{
     optional: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingParameterUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingParameterUpdateInput = ScriptingParameterUpdateInput_2;
+export type ScriptingParameterUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingProperty {
@@ -1345,10 +1208,8 @@ export interface ScriptingProperty {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingPropertyCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingPropertyCreateInput = ScriptingPropertyCreateInput_2;
+export type ScriptingPropertyCreateInput = Record<string, never>;
 
 // @public
 export const ScriptingPropertySchema: z.ZodObject<{
@@ -1362,10 +1223,8 @@ export const ScriptingPropertySchema: z.ZodObject<{
     listed: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingPropertyUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingPropertyUpdateInput = ScriptingPropertyUpdateInput_2;
+export type ScriptingPropertyUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingSuite {
@@ -1375,10 +1234,8 @@ export interface ScriptingSuite {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingSuiteCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingSuiteCreateInput = ScriptingSuiteCreateInput_2;
+export type ScriptingSuiteCreateInput = Record<string, never>;
 
 // @public
 export const ScriptingSuiteSchema: z.ZodObject<{
@@ -1388,50 +1245,40 @@ export const ScriptingSuiteSchema: z.ZodObject<{
     hidden: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ScriptingSuiteUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScriptingSuiteUpdateInput = ScriptingSuiteUpdateInput_2;
+export type ScriptingSuiteUpdateInput = Record<string, never>;
 
 // @public
 export interface ScrollArea {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ScrollAreaCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScrollAreaCreateInput = ScrollAreaCreateInput_2;
+export type ScrollAreaCreateInput = Record<string, never>;
 
 // @public
 export const ScrollAreaSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ScrollAreaUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScrollAreaUpdateInput = ScrollAreaUpdateInput_2;
+export type ScrollAreaUpdateInput = Record<string, never>;
 
 // @public
 export interface ScrollBar {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ScrollBarCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScrollBarCreateInput = ScrollBarCreateInput_2;
+export type ScrollBarCreateInput = Record<string, never>;
 
 // @public
 export const ScrollBarSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ScrollBarUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ScrollBarUpdateInput = ScrollBarUpdateInput_2;
+export type ScrollBarUpdateInput = Record<string, never>;
 
 // @public
 export type ScrollPageBehaviors = 'jumpToHere' | 'jumpToNextPage';
@@ -1444,10 +1291,10 @@ export interface Service {
     name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ServiceCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ServiceCreateInput = ServiceCreateInput_2;
+export interface ServiceCreateInput {
+    name?: string;
+}
 
 // @public
 export const ServiceSchema: z.ZodObject<{
@@ -1457,136 +1304,112 @@ export const ServiceSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ServiceUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ServiceUpdateInput = ServiceUpdateInput_2;
+export interface ServiceUpdateInput {
+    name?: string;
+}
 
 // @public
 export interface Sheet {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "SheetCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SheetCreateInput = SheetCreateInput_2;
+export type SheetCreateInput = Record<string, never>;
 
 // @public
 export const SheetSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "SheetUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SheetUpdateInput = SheetUpdateInput_2;
+export type SheetUpdateInput = Record<string, never>;
 
 // @public
 export interface Slider {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "SliderCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SliderCreateInput = SliderCreateInput_2;
+export type SliderCreateInput = Record<string, never>;
 
 // @public
 export const SliderSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "SliderUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SliderUpdateInput = SliderUpdateInput_2;
+export type SliderUpdateInput = Record<string, never>;
 
 // @public
 export interface Splitter {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "SplitterCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SplitterCreateInput = SplitterCreateInput_2;
+export type SplitterCreateInput = Record<string, never>;
 
 // @public
 export interface SplitterGroup {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "SplitterGroupCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SplitterGroupCreateInput = SplitterGroupCreateInput_2;
+export type SplitterGroupCreateInput = Record<string, never>;
 
 // @public
 export const SplitterGroupSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "SplitterGroupUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SplitterGroupUpdateInput = SplitterGroupUpdateInput_2;
+export type SplitterGroupUpdateInput = Record<string, never>;
 
 // @public
 export const SplitterSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "SplitterUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SplitterUpdateInput = SplitterUpdateInput_2;
+export type SplitterUpdateInput = Record<string, never>;
 
 // @public
 export interface StaticText {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "StaticTextCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type StaticTextCreateInput = StaticTextCreateInput_2;
+export type StaticTextCreateInput = Record<string, never>;
 
 // @public
 export const StaticTextSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "StaticTextUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type StaticTextUpdateInput = StaticTextUpdateInput_2;
+export type StaticTextUpdateInput = Record<string, never>;
 
 // @public
 export interface SystemDomainObject {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "SystemDomainObjectCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SystemDomainObjectCreateInput = SystemDomainObjectCreateInput_2;
+export type SystemDomainObjectCreateInput = Record<string, never>;
 
 // @public
 export const SystemDomainObjectSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "SystemDomainObjectUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SystemDomainObjectUpdateInput = SystemDomainObjectUpdateInput_2;
+export type SystemDomainObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface SystemEventsClient extends ClientBrand<SystemEventsResources> {
 }
 
-// @public (undocumented)
+// @public
 export class SystemEventsClient {
     constructor(options: SystemEventsClientOptions);
     abortTransaction(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -1599,12 +1422,8 @@ export class SystemEventsClient {
     connect(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     decrement(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     disconnect(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    doFolderAction(folderActionCode: string, withItemList?: unknown, withWindowSize?: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    }, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "SystemEventsClient_2" needs to be exported by the entry point index.d.ts
+    doFolderAction(folderActionCode: string, withItemList?: unknown, withWindowSize?: Parameters<SystemEventsClient_2['doFolderAction']>[2], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     editActionOf(usingActionName?: string, usingActionNumber?: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     endTransaction(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
@@ -1640,104 +1459,87 @@ export class SystemEventsError extends Error {
 }
 
 // @public
+export type SystemEventsResources = Readonly<Record<never, never>>;
+
+// @public
 export interface TabGroup {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "TabGroupCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TabGroupCreateInput = TabGroupCreateInput_2;
+export type TabGroupCreateInput = Record<string, never>;
 
 // @public
 export const TabGroupSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "TabGroupUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TabGroupUpdateInput = TabGroupUpdateInput_2;
+export type TabGroupUpdateInput = Record<string, never>;
 
 // @public
 export interface Table {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "TableCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TableCreateInput = TableCreateInput_2;
+export type TableCreateInput = Record<string, never>;
 
 // @public
 export const TableSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "TableUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TableUpdateInput = TableUpdateInput_2;
+export type TableUpdateInput = Record<string, never>;
 
 // @public
 export interface TextArea {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "TextAreaCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TextAreaCreateInput = TextAreaCreateInput_2;
+export type TextAreaCreateInput = Record<string, never>;
 
 // @public
 export const TextAreaSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "TextAreaUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TextAreaUpdateInput = TextAreaUpdateInput_2;
+export type TextAreaUpdateInput = Record<string, never>;
 
 // @public
 export interface TextField {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "TextFieldCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TextFieldCreateInput = TextFieldCreateInput_2;
+export type TextFieldCreateInput = Record<string, never>;
 
 // @public
 export const TextFieldSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "TextFieldUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TextFieldUpdateInput = TextFieldUpdateInput_2;
+export type TextFieldUpdateInput = Record<string, never>;
 
 // @public
 export interface Toolbar {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ToolbarCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ToolbarCreateInput = ToolbarCreateInput_2;
+export type ToolbarCreateInput = Record<string, never>;
 
 // @public
 export const ToolbarSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ToolbarUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ToolbarUpdateInput = ToolbarUpdateInput_2;
+export type ToolbarUpdateInput = Record<string, never>;
 
 // @public
 export interface UIElement {
@@ -1762,10 +1564,14 @@ export interface UIElement {
     value: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "UIElementCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type UIElementCreateInput = UIElementCreateInput_2;
+export interface UIElementCreateInput {
+    focused?: string;
+    position?: string;
+    selected?: string;
+    size?: string;
+    value?: string;
+}
 
 // @public
 export class UIElementResourceClient {
@@ -1797,10 +1603,14 @@ export const UIElementSchema: z.ZodObject<{
     value: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "UIElementUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type UIElementUpdateInput = UIElementUpdateInput_2;
+export interface UIElementUpdateInput {
+    focused?: string;
+    position?: string;
+    selected?: string;
+    size?: string;
+    value?: string;
+}
 
 // @public
 export interface UserDomainObject {
@@ -1808,10 +1618,8 @@ export interface UserDomainObject {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "UserDomainObjectCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type UserDomainObjectCreateInput = UserDomainObjectCreateInput_2;
+export type UserDomainObjectCreateInput = Record<string, never>;
 
 // @public
 export const UserDomainObjectSchema: z.ZodObject<{
@@ -1819,30 +1627,24 @@ export const UserDomainObjectSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "UserDomainObjectUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type UserDomainObjectUpdateInput = UserDomainObjectUpdateInput_2;
+export type UserDomainObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface ValueIndicator {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ValueIndicatorCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ValueIndicatorCreateInput = ValueIndicatorCreateInput_2;
+export type ValueIndicatorCreateInput = Record<string, never>;
 
 // @public
 export const ValueIndicatorSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ValueIndicatorUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ValueIndicatorUpdateInput = ValueIndicatorUpdateInput_2;
+export type ValueIndicatorUpdateInput = Record<string, never>;
 
 // @public
 export interface XMLAttribute {
@@ -1850,10 +1652,10 @@ export interface XMLAttribute {
     value: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "XMLAttributeCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type XMLAttributeCreateInput = XMLAttributeCreateInput_2;
+export interface XMLAttributeCreateInput {
+    value?: string;
+}
 
 // @public
 export const XMLAttributeSchema: z.ZodObject<{
@@ -1861,10 +1663,10 @@ export const XMLAttributeSchema: z.ZodObject<{
     value: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "XMLAttributeUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type XMLAttributeUpdateInput = XMLAttributeUpdateInput_2;
+export interface XMLAttributeUpdateInput {
+    value?: string;
+}
 
 // @public
 export interface XMLData {
@@ -1873,10 +1675,11 @@ export interface XMLData {
     text: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "XMLDataCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type XMLDataCreateInput = XMLDataCreateInput_2;
+export interface XMLDataCreateInput {
+    name?: string;
+    text?: string;
+}
 
 // @public
 export const XMLDataSchema: z.ZodObject<{
@@ -1885,10 +1688,11 @@ export const XMLDataSchema: z.ZodObject<{
     text: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "XMLDataUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type XMLDataUpdateInput = XMLDataUpdateInput_2;
+export interface XMLDataUpdateInput {
+    name?: string;
+    text?: string;
+}
 
 // @public
 export interface XMLElement {
@@ -1897,10 +1701,10 @@ export interface XMLElement {
     value: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "XMLElementCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type XMLElementCreateInput = XMLElementCreateInput_2;
+export interface XMLElementCreateInput {
+    value?: string;
+}
 
 // @public
 export const XMLElementSchema: z.ZodObject<{
@@ -1909,10 +1713,10 @@ export const XMLElementSchema: z.ZodObject<{
     value: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "XMLElementUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type XMLElementUpdateInput = XMLElementUpdateInput_2;
+export interface XMLElementUpdateInput {
+    value?: string;
+}
 
 // (No @packageDocumentation comment for this package)
 

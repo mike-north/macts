@@ -4,12 +4,12 @@
 
 ## EventResourceClient.get() method
 
-Get a event by id.
+Get a event by id within a parent scope. When several calendars share the same name, the first match in the app's order is used as the calendar.
 
 **Signature:**
 
 ```typescript
-get(id: string): Promise<Event>;
+get(calendarId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Event>;
 ```
 
 ## Parameters
@@ -29,6 +29,17 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+calendarId
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 id
 
 </td><td>
@@ -36,6 +47,19 @@ id
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

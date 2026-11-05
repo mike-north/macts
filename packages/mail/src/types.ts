@@ -33,73 +33,73 @@ export type { TypeOfAccount } from './contract/index.js'
 export type { RichText } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type RichTextCreateInput = import('./contract/index.js').RichTextCreateInput
+export type { RichTextCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type RichTextUpdateInput = import('./contract/index.js').RichTextUpdateInput
+export type { RichTextUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Attachment } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type AttachmentCreateInput = import('./contract/index.js').AttachmentCreateInput
+export type { AttachmentCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type AttachmentUpdateInput = import('./contract/index.js').AttachmentUpdateInput
+export type { AttachmentUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Paragraph } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ParagraphCreateInput = import('./contract/index.js').ParagraphCreateInput
+export type { ParagraphCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ParagraphUpdateInput = import('./contract/index.js').ParagraphUpdateInput
+export type { ParagraphUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Word } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type WordCreateInput = import('./contract/index.js').WordCreateInput
+export type { WordCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type WordUpdateInput = import('./contract/index.js').WordUpdateInput
+export type { WordUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Character } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type CharacterCreateInput = import('./contract/index.js').CharacterCreateInput
+export type { CharacterCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type CharacterUpdateInput = import('./contract/index.js').CharacterUpdateInput
+export type { CharacterUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { AttributeRun } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type AttributeRunCreateInput = import('./contract/index.js').AttributeRunCreateInput
+export type { AttributeRunCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type AttributeRunUpdateInput = import('./contract/index.js').AttributeRunUpdateInput
+export type { AttributeRunUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { OutgoingMessage } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type OutgoingMessageCreateInput = import('./contract/index.js').OutgoingMessageCreateInput
+export type { OutgoingMessageCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type OutgoingMessageUpdateInput = import('./contract/index.js').OutgoingMessageUpdateInput
+export type { OutgoingMessageUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { MessageViewer } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type MessageViewerCreateInput = import('./contract/index.js').MessageViewerCreateInput
+export type { MessageViewerCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type MessageViewerUpdateInput = import('./contract/index.js').MessageViewerUpdateInput
+export type { MessageViewerUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Message } from './contract/index.js'
@@ -110,7 +110,9 @@ export type MessageCreateInput = Omit<
   'flagIndex'
 > & {
   /** The flag on the message, or -1 if the message is not flagged Numeric values are validated by the contract before dispatch. */
-  flagIndex?: number | Extract<import('./contract/index.js').MessageCreateInput['flagIndex'], null>
+  flagIndex?: null extends import('./contract/index.js').MessageCreateInput['flagIndex']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -119,7 +121,9 @@ export type MessageUpdateInput = Omit<
   'flagIndex'
 > & {
   /** The flag on the message, or -1 if the message is not flagged Numeric values are validated by the contract before dispatch. */
-  flagIndex?: number | Extract<import('./contract/index.js').MessageUpdateInput['flagIndex'], null>
+  flagIndex?: null extends import('./contract/index.js').MessageUpdateInput['flagIndex']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
@@ -131,19 +135,21 @@ export type AccountCreateInput = Omit<
   'emptyJunkMessagesFrequency' | 'emptySentMessagesFrequency' | 'emptyTrashFrequency' | 'port'
 > & {
   /** Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete) Numeric values are validated by the contract before dispatch. */
-  emptyJunkMessagesFrequency?:
-    | number
-    | Extract<import('./contract/index.js').AccountCreateInput['emptyJunkMessagesFrequency'], null>
+  emptyJunkMessagesFrequency?: null extends import('./contract/index.js').AccountCreateInput['emptyJunkMessagesFrequency']
+    ? number | null
+    : number
   /** Does nothing at all (deprecated) Numeric values are validated by the contract before dispatch. */
-  emptySentMessagesFrequency?:
-    | number
-    | Extract<import('./contract/index.js').AccountCreateInput['emptySentMessagesFrequency'], null>
+  emptySentMessagesFrequency?: null extends import('./contract/index.js').AccountCreateInput['emptySentMessagesFrequency']
+    ? number | null
+    : number
   /** Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete) Numeric values are validated by the contract before dispatch. */
-  emptyTrashFrequency?:
-    | number
-    | Extract<import('./contract/index.js').AccountCreateInput['emptyTrashFrequency'], null>
+  emptyTrashFrequency?: null extends import('./contract/index.js').AccountCreateInput['emptyTrashFrequency']
+    ? number | null
+    : number
   /** The port used to connect to an account Numeric values are validated by the contract before dispatch. */
-  port?: number | Extract<import('./contract/index.js').AccountCreateInput['port'], null>
+  port?: null extends import('./contract/index.js').AccountCreateInput['port']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -152,29 +158,31 @@ export type AccountUpdateInput = Omit<
   'emptyJunkMessagesFrequency' | 'emptySentMessagesFrequency' | 'emptyTrashFrequency' | 'port'
 > & {
   /** Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete) Numeric values are validated by the contract before dispatch. */
-  emptyJunkMessagesFrequency?:
-    | number
-    | Extract<import('./contract/index.js').AccountUpdateInput['emptyJunkMessagesFrequency'], null>
+  emptyJunkMessagesFrequency?: null extends import('./contract/index.js').AccountUpdateInput['emptyJunkMessagesFrequency']
+    ? number | null
+    : number
   /** Does nothing at all (deprecated) Numeric values are validated by the contract before dispatch. */
-  emptySentMessagesFrequency?:
-    | number
-    | Extract<import('./contract/index.js').AccountUpdateInput['emptySentMessagesFrequency'], null>
+  emptySentMessagesFrequency?: null extends import('./contract/index.js').AccountUpdateInput['emptySentMessagesFrequency']
+    ? number | null
+    : number
   /** Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete) Numeric values are validated by the contract before dispatch. */
-  emptyTrashFrequency?:
-    | number
-    | Extract<import('./contract/index.js').AccountUpdateInput['emptyTrashFrequency'], null>
+  emptyTrashFrequency?: null extends import('./contract/index.js').AccountUpdateInput['emptyTrashFrequency']
+    ? number | null
+    : number
   /** The port used to connect to an account Numeric values are validated by the contract before dispatch. */
-  port?: number | Extract<import('./contract/index.js').AccountUpdateInput['port'], null>
+  port?: null extends import('./contract/index.js').AccountUpdateInput['port']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Mailbox } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type MailboxCreateInput = import('./contract/index.js').MailboxCreateInput
+export type { MailboxCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type MailboxUpdateInput = import('./contract/index.js').MailboxUpdateInput
+export type { MailboxUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Rule } from './contract/index.js'
@@ -185,9 +193,9 @@ export type RuleCreateInput = Omit<
   'markFlagIndex'
 > & {
   /** If rule matches, mark message with the specified flag. Set to -1 to disable this action Numeric values are validated by the contract before dispatch. */
-  markFlagIndex?:
-    | number
-    | Extract<import('./contract/index.js').RuleCreateInput['markFlagIndex'], null>
+  markFlagIndex?: null extends import('./contract/index.js').RuleCreateInput['markFlagIndex']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -196,73 +204,73 @@ export type RuleUpdateInput = Omit<
   'markFlagIndex'
 > & {
   /** If rule matches, mark message with the specified flag. Set to -1 to disable this action Numeric values are validated by the contract before dispatch. */
-  markFlagIndex?:
-    | number
-    | Extract<import('./contract/index.js').RuleUpdateInput['markFlagIndex'], null>
+  markFlagIndex?: null extends import('./contract/index.js').RuleUpdateInput['markFlagIndex']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { RuleCondition } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type RuleConditionCreateInput = import('./contract/index.js').RuleConditionCreateInput
+export type { RuleConditionCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type RuleConditionUpdateInput = import('./contract/index.js').RuleConditionUpdateInput
+export type { RuleConditionUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Recipient } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type RecipientCreateInput = import('./contract/index.js').RecipientCreateInput
+export type { RecipientCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type RecipientUpdateInput = import('./contract/index.js').RecipientUpdateInput
+export type { RecipientUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { BccRecipient } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type BccRecipientCreateInput = import('./contract/index.js').BccRecipientCreateInput
+export type { BccRecipientCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type BccRecipientUpdateInput = import('./contract/index.js').BccRecipientUpdateInput
+export type { BccRecipientUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { CcRecipient } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type CcRecipientCreateInput = import('./contract/index.js').CcRecipientCreateInput
+export type { CcRecipientCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type CcRecipientUpdateInput = import('./contract/index.js').CcRecipientUpdateInput
+export type { CcRecipientUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { ToRecipient } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ToRecipientCreateInput = import('./contract/index.js').ToRecipientCreateInput
+export type { ToRecipientCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ToRecipientUpdateInput = import('./contract/index.js').ToRecipientUpdateInput
+export type { ToRecipientUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Header } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type HeaderCreateInput = import('./contract/index.js').HeaderCreateInput
+export type { HeaderCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type HeaderUpdateInput = import('./contract/index.js').HeaderUpdateInput
+export type { HeaderUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { MailAttachment } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type MailAttachmentCreateInput = import('./contract/index.js').MailAttachmentCreateInput
+export type { MailAttachmentCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type MailAttachmentUpdateInput = import('./contract/index.js').MailAttachmentUpdateInput
+export type { MailAttachmentUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

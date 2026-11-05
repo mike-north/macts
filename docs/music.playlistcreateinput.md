@@ -4,7 +4,7 @@
 
 ## PlaylistCreateInput interface
 
-Input for creating a Playlist
+Input for creating a Playlist.
 
 **Signature:**
 

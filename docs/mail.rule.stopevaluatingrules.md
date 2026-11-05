@@ -4,10 +4,10 @@
 
 ## Rule.stopEvaluatingRules property
 
-If rule matches, stop rule evaluation for this message
+If rule matches, stop rule evaluation for this message. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-stopEvaluatingRules: boolean
+stopEvaluatingRules: boolean | null
 ```

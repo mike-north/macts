@@ -4,10 +4,10 @@
 
 ## ExportSettings.exportScale property
 
-The scale to use during export
+The scale to use during export. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-exportScale: number
+exportScale: number | null
 ```

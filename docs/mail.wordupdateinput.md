@@ -2,14 +2,78 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [WordUpdateInput](./mail.wordupdateinput.md)
 
-## WordUpdateInput type
+## WordUpdateInput interface
 
-Input for updating a Word
+Input for updating a Word. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type WordUpdateInput = Partial<WordCreateInput>
+interface WordUpdateInput
 ```
 
-**References:** [WordCreateInput](./mail.wordcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[color?](./mail.wordupdateinput.color.md)
+
+</td><td>
+
+</td><td>
+
+[Rgb](./contracts.rgb.md)
+
+</td><td>
+
+_(Optional)_ The color of the first character. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[font?](./mail.wordupdateinput.font.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ The name of the font of the first character. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[size?](./mail.wordupdateinput.size.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The size in points of the first character. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

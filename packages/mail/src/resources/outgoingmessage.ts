@@ -23,6 +23,11 @@ export class OutgoingMessageResourceClient {
    * Sends a message.
    */
   async send(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
-    await this.#http.invoke<undefined>(`${this.#app}.${this.#resource}.send`, {}, __mactsOptions)
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.send`,
+      {},
+      __mactsOptions,
+      'OutgoingMessage'
+    )
   }
 }

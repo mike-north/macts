@@ -4,6 +4,8 @@
 
 ## JxaExecutorOptions interface
 
+Options for [runJxa()](./core.runjxa.md) and [runWithApp()](./core.runwithapp.md)<!-- -->.
+
 **Signature:**
 
 ```typescript
@@ -31,6 +33,21 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[maxOutputBytes?](./core.jxaexecutoroptions.maxoutputbytes.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ The most output, in bytes, read on each of standard output and standard error before the process is stopped. Defaults to [MAX_OUTPUT_BYTES](./core.max_output_bytes.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
 [onStderr?](./core.jxaexecutoroptions.onstderr.md)
 
 </td><td>
@@ -46,6 +63,21 @@ _(Optional)_ Optional callback for stderr output. Defaults to console.warn if no
 </td></tr>
 <tr><td>
 
+[signal?](./core.jxaexecutoroptions.signal.md)
+
+</td><td>
+
+</td><td>
+
+AbortSignal \| undefined
+
+</td><td>
+
+_(Optional)_ Stops the automation process when it aborts. The call then fails with `kind: 'cancelled'`<!-- -->; an already-aborted signal prevents the process from starting.
+
+</td></tr>
+<tr><td>
+
 [timeout?](./core.jxaexecutoroptions.timeout.md)
 
 </td><td>
@@ -56,7 +88,7 @@ number
 
 </td><td>
 
-_(Optional)_
+_(Optional)_ Time limit in milliseconds. Defaults to 30000; `0` disables the limit.
 
 </td></tr>
 </tbody></table>

@@ -9,19 +9,19 @@ import { z } from 'zod'
 export type { Document } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type DocumentCreateInput = import('./contract/index.js').DocumentCreateInput
+export type { DocumentCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type DocumentUpdateInput = import('./contract/index.js').DocumentUpdateInput
+export type { DocumentUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Tab } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type TabCreateInput = import('./contract/index.js').TabCreateInput
+export type { TabCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type TabUpdateInput = import('./contract/index.js').TabUpdateInput
+export type { TabUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

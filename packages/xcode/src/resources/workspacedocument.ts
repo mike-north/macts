@@ -51,7 +51,8 @@ export class WorkspaceDocumentResourceClient {
     return this.#http.invoke<Page<WorkspaceDocument>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'WorkspaceDocument'
     )
   }
 
@@ -66,7 +67,8 @@ export class WorkspaceDocumentResourceClient {
     return this.#http.invoke<WorkspaceDocument>(
       `${this.#app}.${this.#resource}.get`,
       { name },
-      __mactsOptions
+      __mactsOptions,
+      'WorkspaceDocument'
     )
   }
 
@@ -80,7 +82,8 @@ export class WorkspaceDocumentResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.build`,
       { workspaceName },
-      __mactsOptions
+      __mactsOptions,
+      'WorkspaceDocument'
     )
   }
 
@@ -94,7 +97,8 @@ export class WorkspaceDocumentResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.clean`,
       { workspaceName },
-      __mactsOptions
+      __mactsOptions,
+      'WorkspaceDocument'
     )
   }
 
@@ -108,7 +112,8 @@ export class WorkspaceDocumentResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.stop`,
       { workspaceName },
-      __mactsOptions
+      __mactsOptions,
+      'WorkspaceDocument'
     )
   }
 
@@ -124,7 +129,8 @@ export class WorkspaceDocumentResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.run`,
       { workspaceName, withCommandLineArguments, withEnvironmentVariables },
-      __mactsOptions
+      __mactsOptions,
+      'WorkspaceDocument'
     )
   }
 
@@ -140,7 +146,8 @@ export class WorkspaceDocumentResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.test`,
       { workspaceName, withCommandLineArguments, withEnvironmentVariables },
-      __mactsOptions
+      __mactsOptions,
+      'WorkspaceDocument'
     )
   }
 
@@ -156,7 +163,8 @@ export class WorkspaceDocumentResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.attach`,
       { workspaceName, toProcessIdentifier: __mactsIntegerInput(toProcessIdentifier), suspended },
-      __mactsOptions
+      __mactsOptions,
+      'WorkspaceDocument'
     )
   }
 
@@ -182,7 +190,8 @@ export class WorkspaceDocumentResourceClient {
         commandLineArguments,
         environmentVariables,
       },
-      __mactsOptions
+      __mactsOptions,
+      'WorkspaceDocument'
     )
   }
 }

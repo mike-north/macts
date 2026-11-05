@@ -4,10 +4,10 @@
 
 ## Workflow.executionResult property
 
-The result of the most recent execution; the output of the last action of that execution
+The result of the most recent execution; the output of the last action of that execution. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-executionResult: unknown
+readonly executionResult: unknown;
 ```

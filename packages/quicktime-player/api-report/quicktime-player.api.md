@@ -6,6 +6,8 @@
 
 import { CallOptions } from '@macts/contracts';
 import { ClientBrand } from '@macts/contracts';
+import { FileSource } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
 import * as _macts_contracts from '@macts/contracts';
 import { z } from 'zod';
 
@@ -38,10 +40,11 @@ export interface Document {
     playing: boolean | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DocumentCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentCreateInput = DocumentCreateInput_2;
+export interface DocumentCreateInput {
+    currentTime?: number;
+    playing?: boolean;
+}
 
 // @public
 export const DocumentSchema: z.ZodObject<{
@@ -53,20 +56,19 @@ export const DocumentSchema: z.ZodObject<{
     currentTime: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "DocumentUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentUpdateInput = DocumentUpdateInput_2;
+export interface DocumentUpdateInput {
+    currentTime?: number;
+    playing?: boolean;
+}
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "QuickTimePlayerResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<QuickTimePlayerResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -74,10 +76,11 @@ export class HttpClient {
 export interface QuickTimePlayerClient extends ClientBrand<QuickTimePlayerResources> {
 }
 
-// @public (undocumented)
+// @public
 export class QuickTimePlayerClient {
     constructor(options: QuickTimePlayerClientOptions);
-    _export(_in: string, usingSettingsPreset: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "QuickTimePlayerClient_2" needs to be exported by the entry point index.d.ts
+    _export(_in: Parameters<QuickTimePlayerClient_2['_export']>[0], usingSettingsPreset: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
     newAudioRecording(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     newMovieRecording(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -107,6 +110,9 @@ export class QuickTimePlayerError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type QuickTimePlayerResources = Readonly<Record<never, never>>;
 
 // (No @packageDocumentation comment for this package)
 

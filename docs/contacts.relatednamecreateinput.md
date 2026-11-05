@@ -4,7 +4,7 @@
 
 ## RelatedNameCreateInput interface
 
-Input for creating a RelatedName
+Input for creating a RelatedName.
 
 **Signature:**
 

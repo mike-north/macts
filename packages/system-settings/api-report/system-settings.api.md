@@ -14,20 +14,16 @@ export interface Anchor {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "AnchorCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AnchorCreateInput = AnchorCreateInput_2;
+export type AnchorCreateInput = Record<string, never>;
 
 // @public
 export const AnchorSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "AnchorUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AnchorUpdateInput = AnchorUpdateInput_2;
+export type AnchorUpdateInput = Record<string, never>;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -48,15 +44,13 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "SystemSettingsResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<SystemSettingsResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -66,10 +60,8 @@ export interface Pane {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "PaneCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PaneCreateInput = PaneCreateInput_2;
+export type PaneCreateInput = Record<string, never>;
 
 // @public
 export class PaneResourceClient {
@@ -84,16 +76,14 @@ export const PaneSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "PaneUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PaneUpdateInput = PaneUpdateInput_2;
+export type PaneUpdateInput = Record<string, never>;
 
 // @public
 export interface SystemSettingsClient extends ClientBrand<SystemSettingsResources> {
 }
 
-// @public (undocumented)
+// @public
 export class SystemSettingsClient {
     constructor(options: SystemSettingsClientOptions);
     get http(): HttpClient;
@@ -113,6 +103,9 @@ export class SystemSettingsError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type SystemSettingsResources = Readonly<Record<never, never>>;
 
 // (No @packageDocumentation comment for this package)
 

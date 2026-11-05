@@ -4,7 +4,7 @@
 
 ## DeviceCreateInput type
 
-Input for creating a Device
+Input for creating a Device.
 
 **Signature:**
 

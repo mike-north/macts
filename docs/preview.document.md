@@ -33,32 +33,19 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[id?](./preview.document.id.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
-
-</td></tr>
-<tr><td>
-
 [modified](./preview.document.modified.md)
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Whether the document has been modified since last save
+boolean \| null
+
+</td><td>
+
+Whether the document has been modified since last save. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -73,7 +60,7 @@ string
 
 </td><td>
 
-The name of the document
+The name of the document. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -82,13 +69,15 @@ The name of the document
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-_(Optional)_ The file path of the document
+string \| null
+
+</td><td>
+
+_(Optional)_ The file path of the document. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

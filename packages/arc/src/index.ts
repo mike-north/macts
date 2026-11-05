@@ -21,6 +21,7 @@
 export { ArcClient, ArcError, HttpClient } from './client.js'
 export type { ArcClientOptions } from './client.js'
 export * from './types.js'
+export type { ArcResources } from './contract/index.js'
 
 export { capabilities } from './capabilities.js'
 export type { CapabilityMetadata, CapabilityRisk } from './capabilities.js'

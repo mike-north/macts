@@ -4,10 +4,10 @@
 
 ## UIElement.title property
 
-the title of the UI element as it appears on the screen
+the title of the UI element as it appears on the screen. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-title: string
+readonly title: string | null;
 ```

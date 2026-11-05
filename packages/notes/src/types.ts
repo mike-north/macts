@@ -9,37 +9,37 @@ import { z } from 'zod'
 export type { Account } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type AccountCreateInput = import('./contract/index.js').AccountCreateInput
+export type { AccountCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type AccountUpdateInput = import('./contract/index.js').AccountUpdateInput
+export type { AccountUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Folder } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type FolderCreateInput = import('./contract/index.js').FolderCreateInput
+export type { FolderCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type FolderUpdateInput = import('./contract/index.js').FolderUpdateInput
+export type { FolderUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Note } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type NoteCreateInput = import('./contract/index.js').NoteCreateInput
+export type { NoteCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type NoteUpdateInput = import('./contract/index.js').NoteUpdateInput
+export type { NoteUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Attachment } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type AttachmentCreateInput = import('./contract/index.js').AttachmentCreateInput
+export type { AttachmentCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type AttachmentUpdateInput = import('./contract/index.js').AttachmentUpdateInput
+export type { AttachmentUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

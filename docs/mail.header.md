@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Contents of the header
+Contents of the header. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ Contents of the header
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Name of the header value
+Name of the header value. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

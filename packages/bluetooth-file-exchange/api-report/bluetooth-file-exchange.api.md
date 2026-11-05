@@ -6,6 +6,7 @@
 
 import { CallOptions } from '@macts/contracts';
 import { ClientBrand } from '@macts/contracts';
+import { FileSource } from '@macts/contracts';
 import * as _macts_contracts from '@macts/contracts';
 import { z } from 'zod';
 
@@ -14,10 +15,8 @@ export interface Application {
     readonly name: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ApplicationCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ApplicationCreateInput = ApplicationCreateInput_2;
+export type ApplicationCreateInput = Record<string, never>;
 
 // @public
 export const ApplicationSchema: z.ZodObject<{
@@ -25,23 +24,20 @@ export const ApplicationSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ApplicationUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ApplicationUpdateInput = ApplicationUpdateInput_2;
+export type ApplicationUpdateInput = Record<string, never>;
 
-// Warning: (ae-forgotten-export) The symbol "BluetoothFileExchangeResources" needs to be exported by the entry point index.d.ts
-//
 // @public
 export interface BluetoothFileExchangeClient extends ClientBrand<BluetoothFileExchangeResources> {
 }
 
-// @public (undocumented)
+// @public
 export class BluetoothFileExchangeClient {
     constructor(options: BluetoothFileExchangeClientOptions);
     browse(device?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
-    send(file?: string[], toDevice?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "BluetoothFileExchangeClient_2" needs to be exported by the entry point index.d.ts
+    send(file?: Parameters<BluetoothFileExchangeClient_2['send']>[0], toDevice?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -56,6 +52,9 @@ export class BluetoothFileExchangeError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type BluetoothFileExchangeResources = Readonly<Record<never, never>>;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -76,13 +75,13 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
     // @internal
-    bind<Client extends ClientBrand<BluetoothFileExchangeResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 

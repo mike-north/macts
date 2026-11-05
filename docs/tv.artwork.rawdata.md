@@ -4,7 +4,7 @@
 
 ## Artwork.rawData property
 
-data for this artwork, in original format
+data for this artwork, in original format. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 

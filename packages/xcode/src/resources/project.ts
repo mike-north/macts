@@ -32,7 +32,8 @@ export class ProjectResourceClient {
     return this.#http.invoke<Page<Project>>(
       `${this.#app}.${this.#resource}.list`,
       { workspaceName },
-      __mactsOptions
+      __mactsOptions,
+      'Project'
     )
   }
 
@@ -48,7 +49,8 @@ export class ProjectResourceClient {
     return this.#http.invoke<Project>(
       `${this.#app}.${this.#resource}.get`,
       { workspaceName, id },
-      __mactsOptions
+      __mactsOptions,
+      'Project'
     )
   }
 }

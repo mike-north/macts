@@ -4,14 +4,55 @@
 
 ## SchemeResourceClient.list() method
 
-List all schemes.
+List the schemes of one workspace document, as one page. When several workspace documents share the same name, the first match in the app's order is used as the workspace document.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Scheme[]>;
+list(workspaceName: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Scheme>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+workspaceName
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Scheme](./xcode.scheme.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Scheme](./xcode.scheme.md)<!-- -->&gt;&gt;

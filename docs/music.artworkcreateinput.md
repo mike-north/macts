@@ -2,93 +2,14 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [ArtworkCreateInput](./music.artworkcreateinput.md)
 
-## ArtworkCreateInput interface
+## ArtworkCreateInput type
 
-Input for creating a Artwork
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface ArtworkCreateInput
+type ArtworkCreateInput = Omit<ArtworkCreateInput$1, 'kind'> & {
+  kind?: null extends ArtworkCreateInput$1['kind'] ? number | null : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[data?](./music.artworkcreateinput.data.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ data for this artwork, in the form of a picture
-
-</td></tr>
-<tr><td>
-
-[description?](./music.artworkcreateinput.description.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ description of artwork as a string
-
-</td></tr>
-<tr><td>
-
-[kind?](./music.artworkcreateinput.kind.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ kind or purpose of this piece of artwork
-
-</td></tr>
-<tr><td>
-
-[rawData?](./music.artworkcreateinput.rawdata.md)
-
-</td><td>
-
-</td><td>
-
-unknown
-
-</td><td>
-
-_(Optional)_ data for this artwork, in original format
-
-</td></tr>
-</tbody></table>

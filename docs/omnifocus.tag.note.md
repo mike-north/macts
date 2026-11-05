@@ -4,10 +4,10 @@
 
 ## Tag.note property
 
-The note of the tag
+The note of the tag. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-note: string
+note: string | null
 ```

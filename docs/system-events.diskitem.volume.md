@@ -4,10 +4,10 @@
 
 ## DiskItem.volume property
 
-the volume on which the disk item resides
+the volume on which the disk item resides. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-volume: string
+readonly volume: string | null;
 ```

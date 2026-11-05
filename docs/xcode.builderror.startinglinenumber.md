@@ -4,10 +4,10 @@
 
 ## BuildError.startingLineNumber property
 
-The starting line number in the file where the issue occurred
+The starting line number in the file where the issue occurred. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-startingLineNumber: number
+startingLineNumber: Integer | null
 ```

@@ -4,6 +4,8 @@
 
 ## PlaylistWindowSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -11,7 +13,6 @@ PlaylistWindowSchema: z.ZodObject<
   {
     id: z.ZodNumber
     selection: z.ZodString
-    view: z.ZodString
   },
   z.core.$strip
 >

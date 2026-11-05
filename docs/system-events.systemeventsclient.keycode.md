@@ -9,7 +9,7 @@ cause the target process to behave as if key codes were entered
 **Signature:**
 
 ```typescript
-keyCode(using?: string): Promise<void>;
+keyCode(using?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -34,6 +34,19 @@ using
 </td><td>
 
 string
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

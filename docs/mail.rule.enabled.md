@@ -4,10 +4,10 @@
 
 ## Rule.enabled property
 
-Indicates whether the rule is enabled
+Indicates whether the rule is enabled. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-enabled: boolean
+enabled: boolean | null
 ```

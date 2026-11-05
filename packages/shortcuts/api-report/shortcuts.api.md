@@ -40,10 +40,10 @@ export interface Folder {
     name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "FolderCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FolderCreateInput = FolderCreateInput_2;
+export interface FolderCreateInput {
+    name?: string;
+}
 
 // @public
 export class FolderResourceClient {
@@ -61,20 +61,18 @@ export const FolderSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "FolderUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FolderUpdateInput = FolderUpdateInput_2;
+export interface FolderUpdateInput {
+    name?: string;
+}
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "ShortcutsResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<ShortcutsResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -90,10 +88,10 @@ export interface Shortcut {
     readonly subtitle: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ShortcutCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ShortcutCreateInput = ShortcutCreateInput_2;
+export interface ShortcutCreateInput {
+    folder?: string;
+}
 
 // @public
 export class ShortcutResourceClient {
@@ -123,7 +121,7 @@ export const ShortcutSchema: z.ZodObject<{
 export interface ShortcutsClient extends ClientBrand<ShortcutsResources> {
 }
 
-// @public (undocumented)
+// @public
 export class ShortcutsClient {
     constructor(options: ShortcutsClientOptions);
     readonly folders: FolderResourceClient;
@@ -144,10 +142,24 @@ export class ShortcutsError extends Error {
     readonly code: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ShortcutUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ShortcutUpdateInput = ShortcutUpdateInput_2;
+export type ShortcutsResources = Readonly<{
+    Shortcut: ResourceDescriptor<Shortcut, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'shortcuts.shortcuts.get';
+        readonly list: 'shortcuts.shortcuts.list';
+    };
+    Folder: ResourceDescriptor<Folder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'shortcuts.folders.get';
+        readonly list: 'shortcuts.folders.list';
+    };
+}>;
+
+// @public
+export interface ShortcutUpdateInput {
+    folder?: string;
+}
 
 // (No @packageDocumentation comment for this package)
 

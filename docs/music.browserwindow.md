@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the selected tracks
+string \| null
+
+</td><td>
+
+the selected tracks. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ the selected tracks
 
 </td><td>
 
-[Playlist](./music.playlist.md)
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Playlist](./music.playlist.md)<!-- -->, string, 'Playlist'&gt; \| null
 
 </td><td>
 
-the playlist currently displayed in the window
+the playlist currently displayed in the window. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

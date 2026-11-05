@@ -26,7 +26,8 @@ export class UIElementResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.click`,
       { at },
-      __mactsOptions
+      __mactsOptions,
+      'UIElement'
     )
   }
 
@@ -34,6 +35,11 @@ export class UIElementResourceClient {
    * set the selected property of the UI element
    */
   async select(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
-    await this.#http.invoke<undefined>(`${this.#app}.${this.#resource}.select`, {}, __mactsOptions)
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.select`,
+      {},
+      __mactsOptions,
+      'UIElement'
+    )
   }
 }

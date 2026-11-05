@@ -4,10 +4,10 @@
 
 ## AliasFile.originalItem property
 
-the original item pointed to by the alias
+the original item pointed to by the alias. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-originalItem: string
+originalItem: string | null
 ```

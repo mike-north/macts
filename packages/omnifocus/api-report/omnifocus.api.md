@@ -43,10 +43,12 @@ export interface Folder {
     note: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "FolderCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FolderCreateInput = FolderCreateInput_2;
+export interface FolderCreateInput {
+    hidden?: boolean;
+    name: string;
+    note?: string;
+}
 
 // @public
 export class FolderResourceClient {
@@ -67,20 +69,20 @@ export const FolderSchema: z.ZodObject<{
     modificationDate: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "FolderUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FolderUpdateInput = FolderUpdateInput_2;
+export interface FolderUpdateInput {
+    hidden?: boolean;
+    name?: string;
+    note?: string;
+}
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "OmniFocusResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<OmniFocusResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -95,10 +97,15 @@ export interface InboxTask {
     note: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "InboxTaskCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type InboxTaskCreateInput = InboxTaskCreateInput_2;
+export interface InboxTaskCreateInput {
+    creationDate?: Date;
+    deferDate?: Date;
+    dueDate?: Date;
+    flagged?: boolean;
+    name: string;
+    note?: string;
+}
 
 // @public
 export class InboxTaskResourceClient {
@@ -119,10 +126,15 @@ export const InboxTaskSchema: z.ZodObject<{
     creationDate: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "InboxTaskUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type InboxTaskUpdateInput = InboxTaskUpdateInput_2;
+export interface InboxTaskUpdateInput {
+    creationDate?: Date;
+    deferDate?: Date;
+    dueDate?: Date;
+    flagged?: boolean;
+    name?: string;
+    note?: string;
+}
 
 // @public
 export type IntervalUnit = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
@@ -131,7 +143,7 @@ export type IntervalUnit = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
 export interface OmniFocusClient extends ClientBrand<OmniFocusResources> {
 }
 
-// @public (undocumented)
+// @public
 export class OmniFocusClient {
     constructor(options: OmniFocusClientOptions);
     archive(_in: string, compression?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -168,15 +180,47 @@ export class OmniFocusError extends Error {
 }
 
 // @public
+export type OmniFocusResources = Readonly<{
+    Task: ResourceDescriptor<Task, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.tasks.get';
+        readonly list: 'omnifocus.tasks.list';
+    };
+    Project: ResourceDescriptor<Project, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.projects.get';
+        readonly list: 'omnifocus.projects.list';
+    };
+    Folder: ResourceDescriptor<Folder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.folders.get';
+        readonly list: 'omnifocus.folders.list';
+    };
+    Tag: ResourceDescriptor<Tag, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.tags.get';
+        readonly list: 'omnifocus.tags.list';
+    };
+    InboxTask: ResourceDescriptor<InboxTask, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.inboxTasks.get';
+        readonly list: 'omnifocus.inboxTasks.list';
+    };
+    Perspective: ResourceDescriptor<Perspective, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'omnifocus.perspectives.get';
+        readonly list: 'omnifocus.perspectives.list';
+    };
+}>;
+
+// @public
 export interface Perspective {
     readonly id: string;
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "PerspectiveCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PerspectiveCreateInput = PerspectiveCreateInput_2;
+export type PerspectiveCreateInput = Record<string, never>;
 
 // @public
 export class PerspectiveResourceClient {
@@ -191,10 +235,8 @@ export const PerspectiveSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "PerspectiveUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PerspectiveUpdateInput = PerspectiveUpdateInput_2;
+export type PerspectiveUpdateInput = Record<string, never>;
 
 // @public
 export interface Project {
@@ -235,7 +277,7 @@ export interface Project {
 //
 // @public
 export type ProjectCreateInput = Omit<ProjectCreateInput_2, 'estimatedMinutes'> & {
-    estimatedMinutes?: number | Extract<ProjectCreateInput_2['estimatedMinutes'], null>;
+    estimatedMinutes?: null extends ProjectCreateInput_2['estimatedMinutes'] ? number | null : number;
 };
 
 // @public
@@ -288,7 +330,7 @@ export type ProjectStatus = 'active' | 'onHold' | 'done' | 'dropped';
 //
 // @public
 export type ProjectUpdateInput = Omit<ProjectUpdateInput_2, 'estimatedMinutes'> & {
-    estimatedMinutes?: number | Extract<ProjectUpdateInput_2['estimatedMinutes'], null>;
+    estimatedMinutes?: null extends ProjectUpdateInput_2['estimatedMinutes'] ? number | null : number;
 };
 
 // @public
@@ -312,10 +354,13 @@ export interface Tag {
     readonly remainingTaskCount: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "TagCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TagCreateInput = TagCreateInput_2;
+export interface TagCreateInput {
+    allowsNextAction?: boolean;
+    hidden?: boolean;
+    name: string;
+    note?: string;
+}
 
 // @public
 export class TagResourceClient {
@@ -337,10 +382,13 @@ export const TagSchema: z.ZodObject<{
     remainingTaskCount: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "TagUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TagUpdateInput = TagUpdateInput_2;
+export interface TagUpdateInput {
+    allowsNextAction?: boolean;
+    hidden?: boolean;
+    name?: string;
+    note?: string;
+}
 
 // @public
 export interface Task {
@@ -377,7 +425,7 @@ export interface Task {
 //
 // @public
 export type TaskCreateInput = Omit<TaskCreateInput_2, 'estimatedMinutes'> & {
-    estimatedMinutes?: number | Extract<TaskCreateInput_2['estimatedMinutes'], null>;
+    estimatedMinutes?: null extends TaskCreateInput_2['estimatedMinutes'] ? number | null : number;
 };
 
 // @public
@@ -423,7 +471,7 @@ export const TaskSchema: z.ZodObject<{
 //
 // @public
 export type TaskUpdateInput = Omit<TaskUpdateInput_2, 'estimatedMinutes'> & {
-    estimatedMinutes?: number | Extract<TaskUpdateInput_2['estimatedMinutes'], null>;
+    estimatedMinutes?: null extends TaskUpdateInput_2['estimatedMinutes'] ? number | null : number;
 };
 
 // (No @packageDocumentation comment for this package)

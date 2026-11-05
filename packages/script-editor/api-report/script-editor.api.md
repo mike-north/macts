@@ -40,10 +40,12 @@ export interface Document {
     readonly path?: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DocumentCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentCreateInput = DocumentCreateInput_2;
+export interface DocumentCreateInput {
+    contents?: string;
+    language?: string;
+    name?: string;
+}
 
 // @public
 export class DocumentResourceClient {
@@ -63,20 +65,20 @@ export const DocumentSchema: z.ZodObject<{
     modified: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "DocumentUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentUpdateInput = DocumentUpdateInput_2;
+export interface DocumentUpdateInput {
+    contents?: string;
+    language?: string;
+    name?: string;
+}
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "ScriptEditorResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<ScriptEditorResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -84,7 +86,7 @@ export class HttpClient {
 export interface ScriptEditorClient extends ClientBrand<ScriptEditorResources> {
 }
 
-// @public (undocumented)
+// @public
 export class ScriptEditorClient {
     constructor(options: ScriptEditorClientOptions);
     readonly documents: DocumentResourceClient;
@@ -103,6 +105,15 @@ export class ScriptEditorError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type ScriptEditorResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'script-editor.documents.get';
+        readonly list: 'script-editor.documents.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

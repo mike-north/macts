@@ -4,10 +4,10 @@
 
 ## Font.strikethrough property
 
-Whether the font has strikethrough
+Whether the font has strikethrough. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-strikethrough: boolean
+strikethrough: boolean | null
 ```

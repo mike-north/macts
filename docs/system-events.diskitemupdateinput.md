@@ -2,14 +2,78 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [DiskItemUpdateInput](./system-events.diskitemupdateinput.md)
 
-## DiskItemUpdateInput type
+## DiskItemUpdateInput interface
 
-Input for updating a DiskItem
+Input for updating a DiskItem. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type DiskItemUpdateInput = Partial<DiskItemCreateInput>
+interface DiskItemUpdateInput
 ```
 
-**References:** [DiskItemCreateInput](./system-events.diskitemcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[modificationDate?](./system-events.diskitemupdateinput.modificationdate.md)
+
+</td><td>
+
+</td><td>
+
+Date
+
+</td><td>
+
+_(Optional)_ the date on which the disk item was last modified. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[name?](./system-events.diskitemupdateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ the name of the disk item. Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[visible?](./system-events.diskitemupdateinput.visible.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Is the disk item visible? Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

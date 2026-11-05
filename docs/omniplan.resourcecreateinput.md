@@ -4,7 +4,7 @@
 
 ## ResourceCreateInput interface
 
-Input for creating a Resource
+Input for creating a Resource.
 
 **Signature:**
 

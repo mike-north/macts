@@ -4,12 +4,12 @@
 
 ## TabResourceClient.get() method
 
-Get a tab by name.
+Get a tab by name. When several tabs share the same tty, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 **Signature:**
 
 ```typescript
-get(name: string): Promise<Tab>;
+get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Tab>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ name
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

@@ -46,7 +46,12 @@ export class TaskResourceClient {
    * List all tasks, as one page.
    */
   async list(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<Page<Task>> {
-    return this.#http.invoke<Page<Task>>(`${this.#app}.${this.#resource}.list`, {}, __mactsOptions)
+    return this.#http.invoke<Page<Task>>(
+      `${this.#app}.${this.#resource}.list`,
+      {},
+      __mactsOptions,
+      'Task'
+    )
   }
 
   /**
@@ -59,7 +64,8 @@ export class TaskResourceClient {
     return this.#http.invoke<Task>(
       `${this.#app}.${this.#resource}.get`,
       { id: __mactsIntegerInput(id) },
-      __mactsOptions
+      __mactsOptions,
+      'Task'
     )
   }
 
@@ -70,6 +76,11 @@ export class TaskResourceClient {
     input: TaskCreateInput,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Task> {
-    return this.#http.invoke<Task>(`${this.#app}.${this.#resource}.create`, input, __mactsOptions)
+    return this.#http.invoke<Task>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'Task'
+    )
   }
 }

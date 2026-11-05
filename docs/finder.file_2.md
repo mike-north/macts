@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the OSType identifying the application that created the item
+the OSType identifying the application that created the item. Nullable. Observed missing in 58 of 60 items (Finder 27.2, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ the OSType identifying the application that created the item
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the OSType identifying the type of data contained in the item
+the OSType identifying the type of data contained in the item. Nullable. Observed missing in 58 of 60 items (Finder 27.2, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -67,13 +67,15 @@ the OSType identifying the type of data contained in the item
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-the version of the product (visible at the top of the “Get Info” window)
+the version of the product (visible at the top of the “Get Info” window). Never null: observed in all 60 items (Finder 27.2, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -88,7 +90,7 @@ boolean
 
 </td><td>
 
-Is the file a stationery pad?
+Is the file a stationery pad? Never null: observed in all 60 items (Finder 27.2, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -97,13 +99,15 @@ Is the file a stationery pad?
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-the version of the file (visible at the bottom of the “Get Info” window)
+the version of the file (visible at the bottom of the “Get Info” window). Never null: observed in all 60 items (Finder 27.2, macOS 27.2, 2026-11-01).
 
 </td></tr>
 </tbody></table>

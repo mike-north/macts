@@ -4,10 +4,10 @@
 
 ## Session.isProcessing property
 
-The session has received output recently.
+The session has received output recently. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-isProcessing: boolean
+isProcessing: boolean | null
 ```

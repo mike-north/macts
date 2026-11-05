@@ -9,7 +9,7 @@ Create a new album or folder
 **Signature:**
 
 ```typescript
-make(_new: string, named?: string, at?: string): Promise<void>;
+make(_new: string, named?: string, at?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -58,6 +58,19 @@ at
 </td><td>
 
 string
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

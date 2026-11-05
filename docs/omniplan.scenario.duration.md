@@ -4,10 +4,10 @@
 
 ## Scenario.duration property
 
-The total duration in seconds
+The total duration in seconds. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-duration: number
+readonly duration: number | null;
 ```

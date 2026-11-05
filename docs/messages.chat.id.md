@@ -4,10 +4,10 @@
 
 ## Chat.id property
 
-A guid identifier for this chat.
+A guid identifier for this chat. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

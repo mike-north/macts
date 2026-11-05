@@ -9,7 +9,7 @@ Converts a textual representation of tasks into tasks
 **Signature:**
 
 ```typescript
-parseTasksInto(text: string, into: string): Promise<void>;
+parseTasksInto(text: string, into: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -47,6 +47,19 @@ into
 string
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

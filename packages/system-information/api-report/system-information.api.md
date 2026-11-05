@@ -42,10 +42,10 @@ export interface Document {
     readonly xmlText: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DocumentCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentCreateInput = DocumentCreateInput_2;
+export interface DocumentCreateInput {
+    detailLevel?: DetailLevel;
+}
 
 // @public
 export class DocumentResourceClient {
@@ -63,20 +63,18 @@ export const DocumentSchema: z.ZodObject<{
     detailLevel: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "DocumentUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type DocumentUpdateInput = DocumentUpdateInput_2;
+export interface DocumentUpdateInput {
+    detailLevel?: DetailLevel;
+}
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "SystemInformationResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<SystemInformationResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -84,7 +82,7 @@ export class HttpClient {
 export interface SystemInformationClient extends ClientBrand<SystemInformationResources> {
 }
 
-// @public (undocumented)
+// @public
 export class SystemInformationClient {
     constructor(options: SystemInformationClientOptions);
     readonly documents: DocumentResourceClient;
@@ -104,6 +102,15 @@ export class SystemInformationError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type SystemInformationResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'system-information.documents.get';
+        readonly list: 'system-information.documents.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

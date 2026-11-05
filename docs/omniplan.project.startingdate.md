@@ -4,10 +4,10 @@
 
 ## Project.startingDate property
 
-The date on which work can begin
+The date on which work can begin. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-startingDate: Date
+startingDate: Date | null
 ```

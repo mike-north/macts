@@ -2,48 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [DocumentFile](./finder.documentfile.md)
 
-## DocumentFile interface
+## DocumentFile type
 
 A document file
 
 **Signature:**
 
 ```typescript
-interface DocumentFile
+type DocumentFile = Record<string, never>
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[id](./finder.documentfile.id.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-Unique identifier for this document
-
-</td></tr>
-</tbody></table>

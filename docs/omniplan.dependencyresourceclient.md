@@ -57,13 +57,13 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[list()](./omniplan.dependencyresourceclient.list.md)
+[list(\_\_mactsOptions)](./omniplan.dependencyresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all dependencies.
+List all dependencies, as one page.
 
 </td></tr>
 </tbody></table>

@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-{ r: number; g: number; b: number; }
+string \| null
 
 </td><td>
 
-The color of the list
+The color of the list. Nullable. Observed missing in 2 of 3 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ The color of the list
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The emblem icon name of the list
+The emblem icon name of the list. Nullable. Observed missing in 3 of 3 items (Reminders 7.0, macOS 27.2, 2026-11-01).
 
 </td></tr>
 <tr><td>
@@ -67,13 +67,15 @@ The emblem icon name of the list
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the list
+The unique identifier of the list. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -84,11 +86,11 @@ The unique identifier of the list
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the list
+The name of the list. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

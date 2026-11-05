@@ -4,10 +4,10 @@
 
 ## Alias.defaultApplication property
 
-the application that will launch if the alias is opened
+the application that will launch if the alias is opened. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-defaultApplication: string
+defaultApplication: string | null
 ```

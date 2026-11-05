@@ -4,10 +4,10 @@
 
 ## Window.mode property
 
-Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window.
+Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-mode: string
+mode: string | null
 ```

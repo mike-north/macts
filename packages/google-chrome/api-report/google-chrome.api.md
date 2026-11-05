@@ -6,6 +6,7 @@
 
 import { CallOptions } from '@macts/contracts';
 import { ClientBrand } from '@macts/contracts';
+import { FileSource } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import * as _macts_contracts from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
@@ -22,10 +23,10 @@ export interface BookmarkFolder {
     title: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "BookmarkFolderCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type BookmarkFolderCreateInput = BookmarkFolderCreateInput_2;
+export interface BookmarkFolderCreateInput {
+    title?: string;
+}
 
 // @public
 export const BookmarkFolderSchema: z.ZodObject<{
@@ -34,10 +35,10 @@ export const BookmarkFolderSchema: z.ZodObject<{
     index: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "BookmarkFolderUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type BookmarkFolderUpdateInput = BookmarkFolderUpdateInput_2;
+export interface BookmarkFolderUpdateInput {
+    title?: string;
+}
 
 // @public
 export interface BookmarkItem {
@@ -47,10 +48,11 @@ export interface BookmarkItem {
     uRL: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "BookmarkItemCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type BookmarkItemCreateInput = BookmarkItemCreateInput_2;
+export interface BookmarkItemCreateInput {
+    title?: string;
+    uRL?: string;
+}
 
 // @public
 export const BookmarkItemSchema: z.ZodObject<{
@@ -60,10 +62,11 @@ export const BookmarkItemSchema: z.ZodObject<{
     index: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "BookmarkItemUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type BookmarkItemUpdateInput = BookmarkItemUpdateInput_2;
+export interface BookmarkItemUpdateInput {
+    title?: string;
+    uRL?: string;
+}
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -84,13 +87,11 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// Warning: (ae-forgotten-export) The symbol "GoogleChromeResources" needs to be exported by the entry point index.d.ts
-//
 // @public
 export interface GoogleChromeClient extends ClientBrand<GoogleChromeResources> {
 }
 
-// @public (undocumented)
+// @public
 export class GoogleChromeClient {
     constructor(options: GoogleChromeClientOptions);
     close(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -111,7 +112,8 @@ export class GoogleChromeClient {
     quit(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     redo(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     reload(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    save(_in?: string, as?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "GoogleChromeClient_2" needs to be exported by the entry point index.d.ts
+    save(_in?: Parameters<GoogleChromeClient_2['save']>[0], as?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     selectAll(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     stop(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly tabs: TabResourceClient;
@@ -133,13 +135,31 @@ export class GoogleChromeError extends Error {
     readonly code: string;
 }
 
-// @public (undocumented)
+// @public
+export type GoogleChromeResources = Readonly<{
+    Window: ResourceDescriptor<Window, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'google-chrome.windows.get';
+        readonly list: 'google-chrome.windows.list';
+    };
+    Tab: ResourceDescriptor<Tab, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'google-chrome.tabs.get';
+        readonly list: 'google-chrome.tabs.list';
+        readonly parents: {
+            readonly get: 'Window';
+            readonly list: 'Window';
+        };
+    };
+}>;
+
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
     // @internal
-    bind<Client extends ClientBrand<GoogleChromeResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -151,10 +171,10 @@ export interface Tab {
     uRL: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "TabCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TabCreateInput = TabCreateInput_2;
+export interface TabCreateInput {
+    uRL?: string;
+}
 
 // @public
 export class TabResourceClient {
@@ -171,10 +191,10 @@ export const TabSchema: z.ZodObject<{
     loading: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "TabUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type TabUpdateInput = TabUpdateInput_2;
+export interface TabUpdateInput {
+    uRL?: string;
+}
 
 // @public
 export interface Window {
@@ -199,8 +219,8 @@ export interface Window {
 //
 // @public
 export type WindowCreateInput = Omit<WindowCreateInput_2, 'index' | 'activeTabIndex'> & {
-    index?: number | Extract<WindowCreateInput_2['index'], null>;
-    activeTabIndex?: number | Extract<WindowCreateInput_2['activeTabIndex'], null>;
+    index?: null extends WindowCreateInput_2['index'] ? number | null : number;
+    activeTabIndex?: null extends WindowCreateInput_2['activeTabIndex'] ? number | null : number;
 };
 
 // @public
@@ -238,8 +258,8 @@ export const WindowSchema: z.ZodObject<{
 //
 // @public
 export type WindowUpdateInput = Omit<WindowUpdateInput_2, 'index' | 'activeTabIndex'> & {
-    index?: number | Extract<WindowUpdateInput_2['index'], null>;
-    activeTabIndex?: number | Extract<WindowUpdateInput_2['activeTabIndex'], null>;
+    index?: null extends WindowUpdateInput_2['index'] ? number | null : number;
+    activeTabIndex?: null extends WindowUpdateInput_2['activeTabIndex'] ? number | null : number;
 };
 
 // (No @packageDocumentation comment for this package)

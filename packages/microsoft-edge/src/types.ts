@@ -14,11 +14,13 @@ export type WindowCreateInput = Omit<
   'index' | 'activeTabIndex'
 > & {
   /** The index of the window, ordered front to back. Numeric values are validated by the contract before dispatch. */
-  index?: number | Extract<import('./contract/index.js').WindowCreateInput['index'], null>
+  index?: null extends import('./contract/index.js').WindowCreateInput['index']
+    ? number | null
+    : number
   /** The index of the active tab. Numeric values are validated by the contract before dispatch. */
-  activeTabIndex?:
-    | number
-    | Extract<import('./contract/index.js').WindowCreateInput['activeTabIndex'], null>
+  activeTabIndex?: null extends import('./contract/index.js').WindowCreateInput['activeTabIndex']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -27,39 +29,41 @@ export type WindowUpdateInput = Omit<
   'index' | 'activeTabIndex'
 > & {
   /** The index of the window, ordered front to back. Numeric values are validated by the contract before dispatch. */
-  index?: number | Extract<import('./contract/index.js').WindowUpdateInput['index'], null>
+  index?: null extends import('./contract/index.js').WindowUpdateInput['index']
+    ? number | null
+    : number
   /** The index of the active tab. Numeric values are validated by the contract before dispatch. */
-  activeTabIndex?:
-    | number
-    | Extract<import('./contract/index.js').WindowUpdateInput['activeTabIndex'], null>
+  activeTabIndex?: null extends import('./contract/index.js').WindowUpdateInput['activeTabIndex']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Tab } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type TabCreateInput = import('./contract/index.js').TabCreateInput
+export type { TabCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type TabUpdateInput = import('./contract/index.js').TabUpdateInput
+export type { TabUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { BookmarkFolder } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type BookmarkFolderCreateInput = import('./contract/index.js').BookmarkFolderCreateInput
+export type { BookmarkFolderCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type BookmarkFolderUpdateInput = import('./contract/index.js').BookmarkFolderUpdateInput
+export type { BookmarkFolderUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { BookmarkItem } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type BookmarkItemCreateInput = import('./contract/index.js').BookmarkItemCreateInput
+export type { BookmarkItemCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type BookmarkItemUpdateInput = import('./contract/index.js').BookmarkItemUpdateInput
+export type { BookmarkItemUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

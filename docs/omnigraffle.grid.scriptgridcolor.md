@@ -4,14 +4,10 @@
 
 ## Grid.scriptGridColor property
 
-Color of the grid
+Color of the grid. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-scriptGridColor: {
-  r: number
-  g: number
-  b: number
-}
+scriptGridColor: Rgb | null
 ```

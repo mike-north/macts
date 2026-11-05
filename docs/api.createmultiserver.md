@@ -40,7 +40,7 @@ manifests
 
 </td><td>
 
-Array of app manifests
+App manifests to serve as passthrough; `[]` when every app is registered from its contract
 
 </td></tr>
 <tr><td>
@@ -53,7 +53,7 @@ options
 
 </td><td>
 
-_(Optional)_ Server configuration
+_(Optional)_ Server configuration, including contract registration
 
 </td></tr>
 </tbody></table>
@@ -63,6 +63,14 @@ _(Optional)_ Server configuration
 [ServerInstance](./api.serverinstance.md)
 
 Hono app configured with routes for all apps
+
+## Exceptions
+
+`OperationRegistrationError` from `@macts/runtime` when a manifest, or a registration the `register` callback does not catch, is refused
+
+## Remarks
+
+The server serves every app registered when it is constructed: the `manifests`<!-- -->, registered as passthrough (no contract value types; an input key that is not a declared parameter of the command is rejected as `VALIDATION_FAILED`<!-- -->), and any apps the [ServerOptions.register](./api.serveroptions.register.md) callback registers from their generated contracts (inputs are validated against each contract's wire schemas). Either may be empty. `/health` and `/api/v1` list every registered app.
 
 ## Example
 

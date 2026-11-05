@@ -4,7 +4,7 @@
 
 ## ContainerCreateInput interface
 
-Input for creating a Container
+Input for creating a Container.
 
 **Signature:**
 

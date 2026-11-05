@@ -4,10 +4,10 @@
 
 ## RelatedName.id property
 
-Unique identifier for this name
+Unique identifier for this name. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

@@ -4,10 +4,10 @@
 
 ## Track.size property
 
-the size of the track (in bytes)
+the size of the track (in bytes). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-size: number
+readonly size: number | null;
 ```

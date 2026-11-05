@@ -4,10 +4,10 @@
 
 ## RunDestination.architecture property
 
-The architecture for which this run destination results in execution
+The architecture for which this run destination results in execution. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-architecture: string
+readonly architecture: string | null;
 ```

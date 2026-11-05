@@ -29,7 +29,7 @@ export function createCodecClient<Client, Resources extends ResourceTable>(app: 
 export function createRemoteClient<Client, Resources extends ResourceTable>(app: AppContract<Client, Resources>, options: RemoteClientOptions): Client & ClientBrand<Resources>;
 
 // @public
-export function createRemoteTransport(app: Pick<AppContract<unknown>, 'app'>, options: RemoteClientOptions): ClientTransport;
+export function createRemoteTransport(app: Pick<AppContract<unknown>, 'app'>, options: RemoteClientOptions): RemoteTransport;
 
 // Warning: (ae-forgotten-export) The symbol "OperationId" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "WireValue" needs to be exported by the entry point index.d.ts
@@ -43,6 +43,21 @@ export interface RemoteClientOptions {
     readonly fetch?: typeof globalThis.fetch;
     readonly token: string;
     readonly url: string | URL;
+}
+
+// @public
+export type RemoteRpcOutcome = {
+    readonly ok: true;
+    readonly result: unknown;
+} | {
+    readonly ok: false;
+    readonly envelope: unknown;
+    readonly status: number;
+};
+
+// @public
+export interface RemoteTransport extends ClientTransport {
+    requestRpc(operation: OperationId, input: WireValue, options?: CallOptions): Promise<RemoteRpcOutcome>;
 }
 
 // @public

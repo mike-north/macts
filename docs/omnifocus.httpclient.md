@@ -4,7 +4,7 @@
 
 ## HttpClient class
 
-HTTP client wrapper for making authenticated requests.
+Raw RPC compatibility and canonical typed invocation for this app and credential.
 
 **Signature:**
 
@@ -57,13 +57,13 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[rpc(path, body)](./omnifocus.httpclient.rpc.md)
+[rpc(path, body, options)](./omnifocus.httpclient.rpc.md)
 
 </td><td>
 
 </td><td>
 
-Make an authenticated POST request to an RPC endpoint.
+Raw wire RPC for explicit passthrough consumers; typed methods use invoke.
 
 </td></tr>
 </tbody></table>

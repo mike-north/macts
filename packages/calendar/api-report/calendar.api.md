@@ -21,10 +21,8 @@ export interface Attendee {
     readonly participationStatus: ParticipationStatus;
 }
 
-// Warning: (ae-forgotten-export) The symbol "AttendeeCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AttendeeCreateInput = AttendeeCreateInput_2;
+export type AttendeeCreateInput = Record<string, never>;
 
 // @public
 export const AttendeeSchema: z.ZodObject<{
@@ -33,10 +31,8 @@ export const AttendeeSchema: z.ZodObject<{
     participationStatus: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "AttendeeUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AttendeeUpdateInput = AttendeeUpdateInput_2;
+export type AttendeeUpdateInput = Record<string, never>;
 
 // @public
 export interface Calendar {
@@ -47,20 +43,19 @@ export interface Calendar {
     readonly writable: boolean | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "CalendarResources" needs to be exported by the entry point index.d.ts
-//
 // @public
 export interface CalendarClient extends ClientBrand<CalendarResources> {
 }
 
-// @public (undocumented)
+// @public
 export class CalendarClient {
     constructor(options: CalendarClientOptions);
     readonly calendars: CalendarResourceClient;
     readonly events: EventResourceClient;
     get http(): HttpClient;
     reloadCalendars(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    switchView(to: ViewType, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "CalendarClient_2" needs to be exported by the entry point index.d.ts
+    switchView(to: Parameters<CalendarClient_2['switchView']>[0], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     viewCalendar(at: Date, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
@@ -70,10 +65,13 @@ export interface CalendarClientOptions {
     baseUrl?: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "CalendarCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type CalendarCreateInput = CalendarCreateInput_2;
+export interface CalendarCreateInput {
+    color?: Rgb;
+    description?: string;
+    name: string;
+    title?: string;
+}
 
 // @public
 export class CalendarError extends Error {
@@ -94,6 +92,24 @@ export class CalendarResourceClient {
 }
 
 // @public
+export type CalendarResources = Readonly<{
+    Calendar: ResourceDescriptor<Calendar, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'calendar.calendars.get';
+        readonly list: 'calendar.calendars.list';
+    };
+    Event: ResourceDescriptor<Event_2, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'calendar.events.get';
+        readonly list: 'calendar.events.list';
+        readonly parents: {
+            readonly get: 'Calendar';
+            readonly list: 'Calendar';
+        };
+    };
+}>;
+
+// @public
 export const CalendarSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -107,10 +123,13 @@ export const CalendarSchema: z.ZodObject<{
     description: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "CalendarUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type CalendarUpdateInput = CalendarUpdateInput_2;
+export interface CalendarUpdateInput {
+    color?: Rgb;
+    description?: string;
+    name?: string;
+    title?: string;
+}
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -141,7 +160,7 @@ export interface DisplayAlarm {
 //
 // @public
 export type DisplayAlarmCreateInput = Omit<DisplayAlarmCreateInput_2, 'triggerInterval'> & {
-    triggerInterval?: number | Extract<DisplayAlarmCreateInput_2['triggerInterval'], null>;
+    triggerInterval?: null extends DisplayAlarmCreateInput_2['triggerInterval'] ? number | null : number;
 };
 
 // @public
@@ -154,7 +173,7 @@ export const DisplayAlarmSchema: z.ZodObject<{
 //
 // @public
 export type DisplayAlarmUpdateInput = Omit<DisplayAlarmUpdateInput_2, 'triggerInterval'> & {
-    triggerInterval?: number | Extract<DisplayAlarmUpdateInput_2['triggerInterval'], null>;
+    triggerInterval?: null extends DisplayAlarmUpdateInput_2['triggerInterval'] ? number | null : number;
 };
 
 // @public
@@ -175,10 +194,21 @@ interface Event_2 {
 }
 export { Event_2 as Event }
 
-// Warning: (ae-forgotten-export) The symbol "EventCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type EventCreateInput = EventCreateInput_2;
+export interface EventCreateInput {
+    alldayEvent?: boolean;
+    calendarId: string;
+    description?: string;
+    endDate: Date;
+    excludedDates?: readonly Date[];
+    location?: string;
+    recurrence?: string;
+    stampDate?: Date;
+    startDate: Date;
+    status?: EventStatus;
+    summary: string;
+    url?: string;
+}
 
 // @public
 export class EventResourceClient {
@@ -219,13 +249,13 @@ export type EventUpdateInput = EventUpdateInput_2 & {
     calendarId?: string;
 };
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
     // @internal
-    bind<Client extends ClientBrand<CalendarResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -239,7 +269,7 @@ export interface MailAlarm {
 //
 // @public
 export type MailAlarmCreateInput = Omit<MailAlarmCreateInput_2, 'triggerInterval'> & {
-    triggerInterval?: number | Extract<MailAlarmCreateInput_2['triggerInterval'], null>;
+    triggerInterval?: null extends MailAlarmCreateInput_2['triggerInterval'] ? number | null : number;
 };
 
 // @public
@@ -252,7 +282,7 @@ export const MailAlarmSchema: z.ZodObject<{
 //
 // @public
 export type MailAlarmUpdateInput = Omit<MailAlarmUpdateInput_2, 'triggerInterval'> & {
-    triggerInterval?: number | Extract<MailAlarmUpdateInput_2['triggerInterval'], null>;
+    triggerInterval?: null extends MailAlarmUpdateInput_2['triggerInterval'] ? number | null : number;
 };
 
 // @public
@@ -266,7 +296,7 @@ export interface OpenFileAlarm {
 //
 // @public
 export type OpenFileAlarmCreateInput = Omit<OpenFileAlarmCreateInput_2, 'triggerInterval'> & {
-    triggerInterval?: number | Extract<OpenFileAlarmCreateInput_2['triggerInterval'], null>;
+    triggerInterval?: null extends OpenFileAlarmCreateInput_2['triggerInterval'] ? number | null : number;
 };
 
 // @public
@@ -280,7 +310,7 @@ export const OpenFileAlarmSchema: z.ZodObject<{
 //
 // @public
 export type OpenFileAlarmUpdateInput = Omit<OpenFileAlarmUpdateInput_2, 'triggerInterval'> & {
-    triggerInterval?: number | Extract<OpenFileAlarmUpdateInput_2['triggerInterval'], null>;
+    triggerInterval?: null extends OpenFileAlarmUpdateInput_2['triggerInterval'] ? number | null : number;
 };
 
 // @public
@@ -298,7 +328,7 @@ export interface SoundAlarm {
 //
 // @public
 export type SoundAlarmCreateInput = Omit<SoundAlarmCreateInput_2, 'triggerInterval'> & {
-    triggerInterval?: number | Extract<SoundAlarmCreateInput_2['triggerInterval'], null>;
+    triggerInterval?: null extends SoundAlarmCreateInput_2['triggerInterval'] ? number | null : number;
 };
 
 // @public
@@ -313,7 +343,7 @@ export const SoundAlarmSchema: z.ZodObject<{
 //
 // @public
 export type SoundAlarmUpdateInput = Omit<SoundAlarmUpdateInput_2, 'triggerInterval'> & {
-    triggerInterval?: number | Extract<SoundAlarmUpdateInput_2['triggerInterval'], null>;
+    triggerInterval?: null extends SoundAlarmUpdateInput_2['triggerInterval'] ? number | null : number;
 };
 
 // @public

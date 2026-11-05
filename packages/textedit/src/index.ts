@@ -21,6 +21,7 @@
 export { TextEditClient, TextEditError, HttpClient } from './client.js'
 export type { TextEditClientOptions } from './client.js'
 export * from './types.js'
+export type { TextEditResources } from './contract/index.js'
 export { DocumentResourceClient } from './resources/document.js'
 export { capabilities } from './capabilities.js'
 export type { CapabilityMetadata, CapabilityRisk } from './capabilities.js'

@@ -331,7 +331,7 @@ describe('the generated HTTP client', () => {
         ?.content ?? ''
     const create = /export interface NoteCreateInput \{[\s\S]*?\n\}/.exec(canonical)?.[0] ?? ''
     expect(create).not.toContain('primaryTag')
-    expect(create).toContain("  relatedTags?: ObjectReferenceData<unknown, 'Tag'>[]")
+    expect(create).toContain("  relatedTags?: readonly ObjectReferenceData<never, 'Tag'>[]")
   })
   it('leaves an omitted property out of both input types of a resource with no create command', () => {
     // Folder has no create or update command. Its `owner`, a tag, is made
@@ -395,10 +395,10 @@ describe('the generated HTTP client', () => {
       ''
     const create = /export interface NoteCreateInput \{[\s\S]*?\n\}/.exec(canonical)?.[0] ?? ''
     const update = /export interface NoteUpdateInput \{[\s\S]*?\n\}/.exec(canonical)?.[0] ?? ''
-    expect(create).toContain("  label: ObjectReferenceData<unknown, 'Tag'>")
+    expect(create).toContain("  label: ObjectReferenceData<never, 'Tag'>")
     expect(update).not.toContain('label')
     expect(update).not.toContain('primaryTag')
     expect(update).toContain('  title?: string')
-    expect(update).toContain("  relatedTags?: ObjectReferenceData<unknown, 'Tag'>[]")
+    expect(update).toContain("  relatedTags?: readonly ObjectReferenceData<never, 'Tag'>[]")
   })
 })

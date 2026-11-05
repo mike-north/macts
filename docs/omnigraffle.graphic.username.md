@@ -4,10 +4,10 @@
 
 ## Graphic.userName property
 
-Name of a graphic
+Name of a graphic. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-userName: string
+userName: string | null
 ```

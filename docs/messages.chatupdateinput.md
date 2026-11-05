@@ -4,12 +4,10 @@
 
 ## ChatUpdateInput type
 
-Input for updating a Chat
+Input for updating a Chat. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type ChatUpdateInput = Partial<ChatCreateInput>
+type ChatUpdateInput = Record<string, never>
 ```
-
-**References:** [ChatCreateInput](./messages.chatcreateinput.md)

@@ -28,7 +28,8 @@ export class MediaItemResourceClient {
     return this.#http.invoke<Page<MediaItem>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'MediaItem'
     )
   }
 
@@ -42,7 +43,8 @@ export class MediaItemResourceClient {
     return this.#http.invoke<MediaItem>(
       `${this.#app}.${this.#resource}.get`,
       { id },
-      __mactsOptions
+      __mactsOptions,
+      'MediaItem'
     )
   }
 
@@ -56,7 +58,8 @@ export class MediaItemResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.duplicate`,
       { id },
-      __mactsOptions
+      __mactsOptions,
+      'MediaItem'
     )
   }
 }

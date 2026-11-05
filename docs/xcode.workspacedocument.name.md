@@ -4,10 +4,10 @@
 
 ## WorkspaceDocument.name property
 
-The name of the workspace
+The name of the workspace. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string;
 ```

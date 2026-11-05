@@ -4,7 +4,7 @@
 
 ## MasterCreateInput interface
 
-Input for creating a Master
+Input for creating a Master.
 
 **Signature:**
 

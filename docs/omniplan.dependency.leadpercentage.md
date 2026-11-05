@@ -4,10 +4,10 @@
 
 ## Dependency.leadPercentage property
 
-The lead time, in percentage of the length of the prerequisite
+The lead time, in percentage of the length of the prerequisite. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-leadPercentage: number
+leadPercentage: number | null
 ```

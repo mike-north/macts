@@ -32,7 +32,8 @@ export class AutomatorActionResourceClient {
     return this.#http.invoke<Page<AutomatorAction>>(
       `${this.#app}.${this.#resource}.list`,
       { workflowName },
-      __mactsOptions
+      __mactsOptions,
+      'AutomatorAction'
     )
   }
 
@@ -46,7 +47,8 @@ export class AutomatorActionResourceClient {
     return this.#http.invoke<AutomatorAction>(
       `${this.#app}.${this.#resource}.get`,
       { id },
-      __mactsOptions
+      __mactsOptions,
+      'AutomatorAction'
     )
   }
 }

@@ -1102,9 +1102,9 @@ export interface DocumentResourceClient {
 
 /**
  * The Microsoft Word client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link microsoftWordContract}. Its type carries the
- * contract's resource table, {@link MicrosoftWordResources}, so references can be bound to it by
- * resource; the brand has no runtime member.
+ * commands. A client factory creates one from `microsoftWordContract` in the app's `/contract`
+ * entry. Its type carries the contract's resource table, {@link MicrosoftWordResources}, so
+ * references can be bound to it by resource; the brand has no runtime member.
  */
 export interface MicrosoftWordClient extends ClientBrand<MicrosoftWordResources> {
   /** A Microsoft Word document */
@@ -1199,7 +1199,7 @@ const documentRecordType: ValueType<Document> = t.record(
 )
 
 /**
- * The type of the resource table of {@link microsoftWordContract}: every resource a
+ * The type of the resource table in `microsoftWordContract` (the app's `/contract` entry): every resource a
  * reference can name, keyed by manifest resource key, with its record type,
  * its identifier type (when it has one), the operations that resolve
  * references to it, and, for each of those operations that finds the

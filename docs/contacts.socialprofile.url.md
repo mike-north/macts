@@ -4,10 +4,10 @@
 
 ## SocialProfile.url property
 
-The URL of this social profile.
+The URL of this social profile. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-url: string
+url: string | null
 ```

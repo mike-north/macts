@@ -4,10 +4,10 @@
 
 ## Account.accountType property
 
-The type of an account
+The type of an account. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-accountType: string
+readonly accountType: string | null;
 ```

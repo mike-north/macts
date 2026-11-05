@@ -4,10 +4,10 @@
 
 ## AirPlayDevice.protected property
 
-is the device password- or passcode-protected?
+is the device password- or passcode-protected? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-protected: boolean
+readonly protected: boolean | null;
 ```

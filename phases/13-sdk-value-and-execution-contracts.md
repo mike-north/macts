@@ -667,8 +667,11 @@ Resource constructors, `.http`, raw `HttpClient.rpc`, app-specific errors and
 raw response validators remain available. Typed methods use canonical SDK
 values and errors against contract registration; raw calls explicitly retain
 wire/passthrough semantics. A typed invocation still passes through the public
-`rpc` hook, with private non-wire metadata on cloned call options so forwarding
-hooks reuse the shared canonical transport without changing external raw calls.
+`rpc` hook. Both paths share one HTTP wire-outcome boundary; raw calls preserve
+valid results and arbitrary server app-error codes, while typed calls map server
+errors through the canonical registry. Malformed JSON or missing success results
+raise `TransportError` on either path. Forwarding optional call options preserves
+cancellation; protocol handling does not depend on forwarding hidden metadata.
 
 Manifest types map to value types as follows:
 

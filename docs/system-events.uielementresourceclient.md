@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[click(at)](./system-events.uielementresourceclient.click.md)
+[click(at, \_\_mactsOptions)](./system-events.uielementresourceclient.click.md)
 
 </td><td>
 
@@ -68,7 +68,7 @@ cause the target process to behave as if the UI element were clicked
 </td></tr>
 <tr><td>
 
-[select()](./system-events.uielementresourceclient.select.md)
+[select(\_\_mactsOptions)](./system-events.uielementresourceclient.select.md)
 
 </td><td>
 

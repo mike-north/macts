@@ -4,6 +4,8 @@
 
 ## ListViewOptionsSchema variable
 
+Raw passthrough validator; typed SDK records use the canonical contract codec.
+
 **Signature:**
 
 ```typescript
@@ -13,7 +15,6 @@ ListViewOptionsSchema: z.ZodObject<
     showsIconPreview: z.ZodBoolean
     iconSize: z.ZodString
     textSize: z.ZodNumber
-    sortColumn: z.ZodString
     usesRelativeDates: z.ZodBoolean
   },
   z.core.$strip

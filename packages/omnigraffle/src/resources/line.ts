@@ -31,7 +31,8 @@ export class LineResourceClient {
     return this.#http.invoke<Page<Line>>(
       `${this.#app}.${this.#resource}.list`,
       { canvasId },
-      __mactsOptions
+      __mactsOptions,
+      'Line'
     )
   }
 
@@ -39,6 +40,11 @@ export class LineResourceClient {
    * Get a line by id.
    */
   async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Line> {
-    return this.#http.invoke<Line>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
+    return this.#http.invoke<Line>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Line'
+    )
   }
 }

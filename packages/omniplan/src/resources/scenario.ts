@@ -28,7 +28,8 @@ export class ScenarioResourceClient {
     return this.#http.invoke<Page<Scenario>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Scenario'
     )
   }
 
@@ -39,6 +40,11 @@ export class ScenarioResourceClient {
     id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Scenario> {
-    return this.#http.invoke<Scenario>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
+    return this.#http.invoke<Scenario>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Scenario'
+    )
   }
 }

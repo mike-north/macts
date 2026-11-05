@@ -4,10 +4,10 @@
 
 ## Line.headScale property
 
-Scale of line ending on the head of the line
+Scale of line ending on the head of the line. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-headScale: number
+headScale: number | null
 ```

@@ -4,10 +4,10 @@
 
 ## XMLAttribute.name property
 
-the name of the XML attribute
+the name of the XML attribute. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

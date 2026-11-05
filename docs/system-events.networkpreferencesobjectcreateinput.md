@@ -2,48 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [NetworkPreferencesObjectCreateInput](./system-events.networkpreferencesobjectcreateinput.md)
 
-## NetworkPreferencesObjectCreateInput interface
+## NetworkPreferencesObjectCreateInput type
 
-Input for creating a NetworkPreferencesObject
+Input for creating a NetworkPreferencesObject.
 
 **Signature:**
 
 ```typescript
-interface NetworkPreferencesObjectCreateInput
+type NetworkPreferencesObjectCreateInput = Record<string, never>
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[currentLocation?](./system-events.networkpreferencesobjectcreateinput.currentlocation.md)
-
-</td><td>
-
-</td><td>
-
-[Location](./system-events.location.md)
-
-</td><td>
-
-_(Optional)_ the current location
-
-</td></tr>
-</tbody></table>

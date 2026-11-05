@@ -31,7 +31,8 @@ export class TabResourceClient {
     return this.#http.invoke<Page<Tab>>(
       `${this.#app}.${this.#resource}.list`,
       { windowId },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 
@@ -46,7 +47,8 @@ export class TabResourceClient {
     return this.#http.invoke<Tab>(
       `${this.#app}.${this.#resource}.get`,
       { windowId, id },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 
@@ -57,7 +59,12 @@ export class TabResourceClient {
     input: TabCreateInput,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Tab> {
-    return this.#http.invoke<Tab>(`${this.#app}.${this.#resource}.create`, input, __mactsOptions)
+    return this.#http.invoke<Tab>(
+      `${this.#app}.${this.#resource}.create`,
+      input,
+      __mactsOptions,
+      'Tab'
+    )
   }
 
   /**
@@ -70,7 +77,8 @@ export class TabResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.reload`,
       { tabId },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 
@@ -84,7 +92,8 @@ export class TabResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.goBack`,
       { tabId },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 
@@ -98,7 +107,8 @@ export class TabResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.goForward`,
       { tabId },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 
@@ -112,7 +122,8 @@ export class TabResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.selectAll`,
       { tabId },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 
@@ -126,7 +137,8 @@ export class TabResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.cutSelection`,
       { tabId },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 
@@ -140,7 +152,8 @@ export class TabResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.copySelection`,
       { tabId },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 
@@ -154,7 +167,8 @@ export class TabResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.pasteSelection`,
       { tabId },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 
@@ -168,7 +182,8 @@ export class TabResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.undo`,
       { tabId },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 
@@ -182,7 +197,8 @@ export class TabResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.redo`,
       { tabId },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 
@@ -196,7 +212,8 @@ export class TabResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.stop`,
       { tabId },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 
@@ -210,7 +227,8 @@ export class TabResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.viewSource`,
       { tabId },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 
@@ -225,7 +243,8 @@ export class TabResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.execute`,
       { tabId, javascript },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 }

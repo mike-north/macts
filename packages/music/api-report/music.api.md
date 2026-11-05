@@ -34,7 +34,7 @@ export interface AirPlayDevice {
 //
 // @public
 export type AirPlayDeviceCreateInput = Omit<AirPlayDeviceCreateInput_2, 'soundVolume'> & {
-    soundVolume?: number | Extract<AirPlayDeviceCreateInput_2['soundVolume'], null>;
+    soundVolume?: null extends AirPlayDeviceCreateInput_2['soundVolume'] ? number | null : number;
 };
 
 // @public
@@ -54,7 +54,7 @@ export const AirPlayDeviceSchema: z.ZodObject<{
 //
 // @public
 export type AirPlayDeviceUpdateInput = Omit<AirPlayDeviceUpdateInput_2, 'soundVolume'> & {
-    soundVolume?: number | Extract<AirPlayDeviceUpdateInput_2['soundVolume'], null>;
+    soundVolume?: null extends AirPlayDeviceUpdateInput_2['soundVolume'] ? number | null : number;
 };
 
 // @public
@@ -71,7 +71,7 @@ export interface Artwork {
 //
 // @public
 export type ArtworkCreateInput = Omit<ArtworkCreateInput_2, 'kind'> & {
-    kind?: number | Extract<ArtworkCreateInput_2['kind'], null>;
+    kind?: null extends ArtworkCreateInput_2['kind'] ? number | null : number;
 };
 
 // @public
@@ -88,7 +88,7 @@ export const ArtworkSchema: z.ZodObject<{
 //
 // @public
 export type ArtworkUpdateInput = Omit<ArtworkUpdateInput_2, 'kind'> & {
-    kind?: number | Extract<ArtworkUpdateInput_2['kind'], null>;
+    kind?: null extends ArtworkUpdateInput_2['kind'] ? number | null : number;
 };
 
 // @public
@@ -106,9 +106,9 @@ export interface AudioCDPlaylist {
 //
 // @public
 export type AudioCDPlaylistCreateInput = Omit<AudioCDPlaylistCreateInput_2, 'discCount' | 'discNumber' | 'year'> & {
-    discCount?: number | Extract<AudioCDPlaylistCreateInput_2['discCount'], null>;
-    discNumber?: number | Extract<AudioCDPlaylistCreateInput_2['discNumber'], null>;
-    year?: number | Extract<AudioCDPlaylistCreateInput_2['year'], null>;
+    discCount?: null extends AudioCDPlaylistCreateInput_2['discCount'] ? number | null : number;
+    discNumber?: null extends AudioCDPlaylistCreateInput_2['discNumber'] ? number | null : number;
+    year?: null extends AudioCDPlaylistCreateInput_2['year'] ? number | null : number;
 };
 
 // @public
@@ -126,9 +126,9 @@ export const AudioCDPlaylistSchema: z.ZodObject<{
 //
 // @public
 export type AudioCDPlaylistUpdateInput = Omit<AudioCDPlaylistUpdateInput_2, 'discCount' | 'discNumber' | 'year'> & {
-    discCount?: number | Extract<AudioCDPlaylistUpdateInput_2['discCount'], null>;
-    discNumber?: number | Extract<AudioCDPlaylistUpdateInput_2['discNumber'], null>;
-    year?: number | Extract<AudioCDPlaylistUpdateInput_2['year'], null>;
+    discCount?: null extends AudioCDPlaylistUpdateInput_2['discCount'] ? number | null : number;
+    discNumber?: null extends AudioCDPlaylistUpdateInput_2['discNumber'] ? number | null : number;
+    year?: null extends AudioCDPlaylistUpdateInput_2['year'] ? number | null : number;
 };
 
 // @public
@@ -136,20 +136,16 @@ export interface AudioCDTrack {
     readonly location: FileValue | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "AudioCDTrackCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AudioCDTrackCreateInput = AudioCDTrackCreateInput_2;
+export type AudioCDTrackCreateInput = Record<string, never>;
 
 // @public
 export const AudioCDTrackSchema: z.ZodObject<{
     location: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "AudioCDTrackUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AudioCDTrackUpdateInput = AudioCDTrackUpdateInput_2;
+export type AudioCDTrackUpdateInput = Record<string, never>;
 
 // @public
 export interface BrowserWindow {
@@ -157,10 +153,10 @@ export interface BrowserWindow {
     view: ObjectReferenceVariant<Playlist, string, 'Playlist'> | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "BrowserWindowCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type BrowserWindowCreateInput = BrowserWindowCreateInput_2;
+export interface BrowserWindowCreateInput {
+    view?: ObjectReferenceData<string, 'Playlist'>;
+}
 
 // @public
 export const BrowserWindowSchema: z.ZodObject<{
@@ -168,10 +164,10 @@ export const BrowserWindowSchema: z.ZodObject<{
     view: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "BrowserWindowUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type BrowserWindowUpdateInput = BrowserWindowUpdateInput_2;
+export interface BrowserWindowUpdateInput {
+    view?: ObjectReferenceData<string, 'Playlist'>;
+}
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -212,20 +208,16 @@ export interface Encoder {
     readonly format: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "EncoderCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type EncoderCreateInput = EncoderCreateInput_2;
+export type EncoderCreateInput = Record<string, never>;
 
 // @public
 export const EncoderSchema: z.ZodObject<{
     format: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "EncoderUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type EncoderUpdateInput = EncoderUpdateInput_2;
+export type EncoderUpdateInput = Record<string, never>;
 
 // @public
 export type Enum = 'standard' | 'detailed';
@@ -250,10 +242,21 @@ export interface EQPreset {
     updateTracks: boolean | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "EQPresetCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type EQPresetCreateInput = EQPresetCreateInput_2;
+export interface EQPresetCreateInput {
+    band1?: number;
+    band10?: number;
+    band2?: number;
+    band3?: number;
+    band4?: number;
+    band5?: number;
+    band6?: number;
+    band7?: number;
+    band8?: number;
+    band9?: number;
+    preamp?: number;
+    updateTracks?: boolean;
+}
 
 // @public
 export const EQPresetSchema: z.ZodObject<{
@@ -272,30 +275,37 @@ export const EQPresetSchema: z.ZodObject<{
     updateTracks: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "EQPresetUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type EQPresetUpdateInput = EQPresetUpdateInput_2;
+export interface EQPresetUpdateInput {
+    band1?: number;
+    band10?: number;
+    band2?: number;
+    band3?: number;
+    band4?: number;
+    band5?: number;
+    band6?: number;
+    band7?: number;
+    band8?: number;
+    band9?: number;
+    preamp?: number;
+    updateTracks?: boolean;
+}
 
 // @public
 export interface EQWindow {
     readonly id: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "EQWindowCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type EQWindowCreateInput = EQWindowCreateInput_2;
+export type EQWindowCreateInput = Record<string, never>;
 
 // @public
 export const EQWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "EQWindowUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type EQWindowUpdateInput = EQWindowUpdateInput_2;
+export type EQWindowUpdateInput = Record<string, never>;
 
 // @public
 export type ERpt = 'off' | 'one' | 'all';
@@ -320,10 +330,10 @@ export interface FileTrack {
     location: FileValue | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "FileTrackCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FileTrackCreateInput = FileTrackCreateInput_2;
+export interface FileTrackCreateInput {
+    location?: FileSource;
+}
 
 // @public
 export class FileTrackResourceClient {
@@ -336,20 +346,18 @@ export const FileTrackSchema: z.ZodObject<{
     location: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "FileTrackUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FileTrackUpdateInput = FileTrackUpdateInput_2;
+export interface FileTrackUpdateInput {
+    location?: FileSource;
+}
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "MusicResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<MusicResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -358,46 +366,38 @@ export interface LibraryPlaylist {
     readonly id: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "LibraryPlaylistCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type LibraryPlaylistCreateInput = LibraryPlaylistCreateInput_2;
+export type LibraryPlaylistCreateInput = Record<string, never>;
 
 // @public
 export const LibraryPlaylistSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "LibraryPlaylistUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type LibraryPlaylistUpdateInput = LibraryPlaylistUpdateInput_2;
+export type LibraryPlaylistUpdateInput = Record<string, never>;
 
 // @public
 export interface MiniplayerWindow {
     readonly id: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "MiniplayerWindowCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MiniplayerWindowCreateInput = MiniplayerWindowCreateInput_2;
+export type MiniplayerWindowCreateInput = Record<string, never>;
 
 // @public
 export const MiniplayerWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "MiniplayerWindowUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MiniplayerWindowUpdateInput = MiniplayerWindowUpdateInput_2;
+export type MiniplayerWindowUpdateInput = Record<string, never>;
 
 // @public
 export interface MusicClient extends ClientBrand<MusicResources> {
 }
 
-// @public (undocumented)
+// @public
 export class MusicClient {
     constructor(options: MusicClientOptions);
     add(to?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -408,7 +408,8 @@ export class MusicClient {
     download(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     duplicate(to?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     exists(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    _export(as?: string, to?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "MusicClient_2" needs to be exported by the entry point index.d.ts
+    _export(as?: string, to?: Parameters<MusicClient_2['_export']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     fastForward(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly fileTracks: FileTrackResourceClient;
     get http(): HttpClient;
@@ -447,6 +448,24 @@ export class MusicError extends Error {
 }
 
 // @public
+export type MusicResources = Readonly<{
+    Playlist: ResourceDescriptor<Playlist, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'music.playlists.get';
+        readonly list: 'music.playlists.list';
+    };
+    Track: ResourceDescriptor<Track, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'music.tracks.get';
+        readonly list: 'music.tracks.list';
+        readonly parents: {
+            readonly get: 'Playlist';
+            readonly list: 'Playlist';
+        };
+    };
+}>;
+
+// @public
 export interface Playlist {
     description: string | null;
     disliked: boolean | null;
@@ -462,10 +481,13 @@ export interface Playlist {
     readonly visible: boolean | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "PlaylistCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PlaylistCreateInput = PlaylistCreateInput_2;
+export interface PlaylistCreateInput {
+    description?: string;
+    disliked?: boolean;
+    favorited?: boolean;
+    name?: string;
+}
 
 // @public
 export class PlaylistResourceClient {
@@ -492,10 +514,13 @@ export const PlaylistSchema: z.ZodObject<{
     visible: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "PlaylistUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PlaylistUpdateInput = PlaylistUpdateInput_2;
+export interface PlaylistUpdateInput {
+    description?: string;
+    disliked?: boolean;
+    favorited?: boolean;
+    name?: string;
+}
 
 // @public
 export interface PlaylistWindow {
@@ -503,10 +528,8 @@ export interface PlaylistWindow {
     readonly view: ObjectReferenceVariant<Playlist, string, 'Playlist'> | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "PlaylistWindowCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PlaylistWindowCreateInput = PlaylistWindowCreateInput_2;
+export type PlaylistWindowCreateInput = Record<string, never>;
 
 // @public
 export const PlaylistWindowSchema: z.ZodObject<{
@@ -514,50 +537,40 @@ export const PlaylistWindowSchema: z.ZodObject<{
     view: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "PlaylistWindowUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type PlaylistWindowUpdateInput = PlaylistWindowUpdateInput_2;
+export type PlaylistWindowUpdateInput = Record<string, never>;
 
 // @public
 export interface RadioTunerPlaylist {
     readonly id: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "RadioTunerPlaylistCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RadioTunerPlaylistCreateInput = RadioTunerPlaylistCreateInput_2;
+export type RadioTunerPlaylistCreateInput = Record<string, never>;
 
 // @public
 export const RadioTunerPlaylistSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "RadioTunerPlaylistUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RadioTunerPlaylistUpdateInput = RadioTunerPlaylistUpdateInput_2;
+export type RadioTunerPlaylistUpdateInput = Record<string, never>;
 
 // @public
 export interface SharedTrack {
     readonly id: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "SharedTrackCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SharedTrackCreateInput = SharedTrackCreateInput_2;
+export type SharedTrackCreateInput = Record<string, never>;
 
 // @public
 export const SharedTrackSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "SharedTrackUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SharedTrackUpdateInput = SharedTrackUpdateInput_2;
+export type SharedTrackUpdateInput = Record<string, never>;
 
 // @public
 export interface Source {
@@ -566,10 +579,8 @@ export interface Source {
     readonly kind: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "SourceCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SourceCreateInput = SourceCreateInput_2;
+export type SourceCreateInput = Record<string, never>;
 
 // @public
 export const SourceSchema: z.ZodObject<{
@@ -578,30 +589,24 @@ export const SourceSchema: z.ZodObject<{
     kind: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "SourceUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SourceUpdateInput = SourceUpdateInput_2;
+export type SourceUpdateInput = Record<string, never>;
 
 // @public
 export interface SubscriptionPlaylist {
     readonly id: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "SubscriptionPlaylistCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SubscriptionPlaylistCreateInput = SubscriptionPlaylistCreateInput_2;
+export type SubscriptionPlaylistCreateInput = Record<string, never>;
 
 // @public
 export const SubscriptionPlaylistSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "SubscriptionPlaylistUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SubscriptionPlaylistUpdateInput = SubscriptionPlaylistUpdateInput_2;
+export type SubscriptionPlaylistUpdateInput = Record<string, never>;
 
 // @public
 export interface Track {
@@ -685,21 +690,21 @@ export interface Track {
 //
 // @public
 export type TrackCreateInput = Omit<TrackCreateInput_2, 'albumRating' | 'bpm' | 'discCount' | 'discNumber' | 'episodeNumber' | 'movementCount' | 'movementNumber' | 'playedCount' | 'rating' | 'seasonNumber' | 'skippedCount' | 'trackCount' | 'trackNumber' | 'volumeAdjustment' | 'year'> & {
-    albumRating?: number | Extract<TrackCreateInput_2['albumRating'], null>;
-    bpm?: number | Extract<TrackCreateInput_2['bpm'], null>;
-    discCount?: number | Extract<TrackCreateInput_2['discCount'], null>;
-    discNumber?: number | Extract<TrackCreateInput_2['discNumber'], null>;
-    episodeNumber?: number | Extract<TrackCreateInput_2['episodeNumber'], null>;
-    movementCount?: number | Extract<TrackCreateInput_2['movementCount'], null>;
-    movementNumber?: number | Extract<TrackCreateInput_2['movementNumber'], null>;
-    playedCount?: number | Extract<TrackCreateInput_2['playedCount'], null>;
-    rating?: number | Extract<TrackCreateInput_2['rating'], null>;
-    seasonNumber?: number | Extract<TrackCreateInput_2['seasonNumber'], null>;
-    skippedCount?: number | Extract<TrackCreateInput_2['skippedCount'], null>;
-    trackCount?: number | Extract<TrackCreateInput_2['trackCount'], null>;
-    trackNumber?: number | Extract<TrackCreateInput_2['trackNumber'], null>;
-    volumeAdjustment?: number | Extract<TrackCreateInput_2['volumeAdjustment'], null>;
-    year?: number | Extract<TrackCreateInput_2['year'], null>;
+    albumRating?: null extends TrackCreateInput_2['albumRating'] ? number | null : number;
+    bpm?: null extends TrackCreateInput_2['bpm'] ? number | null : number;
+    discCount?: null extends TrackCreateInput_2['discCount'] ? number | null : number;
+    discNumber?: null extends TrackCreateInput_2['discNumber'] ? number | null : number;
+    episodeNumber?: null extends TrackCreateInput_2['episodeNumber'] ? number | null : number;
+    movementCount?: null extends TrackCreateInput_2['movementCount'] ? number | null : number;
+    movementNumber?: null extends TrackCreateInput_2['movementNumber'] ? number | null : number;
+    playedCount?: null extends TrackCreateInput_2['playedCount'] ? number | null : number;
+    rating?: null extends TrackCreateInput_2['rating'] ? number | null : number;
+    seasonNumber?: null extends TrackCreateInput_2['seasonNumber'] ? number | null : number;
+    skippedCount?: null extends TrackCreateInput_2['skippedCount'] ? number | null : number;
+    trackCount?: null extends TrackCreateInput_2['trackCount'] ? number | null : number;
+    trackNumber?: null extends TrackCreateInput_2['trackNumber'] ? number | null : number;
+    volumeAdjustment?: null extends TrackCreateInput_2['volumeAdjustment'] ? number | null : number;
+    year?: null extends TrackCreateInput_2['year'] ? number | null : number;
 };
 
 // @public
@@ -791,21 +796,21 @@ export const TrackSchema: z.ZodObject<{
 //
 // @public
 export type TrackUpdateInput = Omit<TrackUpdateInput_2, 'albumRating' | 'bpm' | 'discCount' | 'discNumber' | 'episodeNumber' | 'movementCount' | 'movementNumber' | 'playedCount' | 'rating' | 'seasonNumber' | 'skippedCount' | 'trackCount' | 'trackNumber' | 'volumeAdjustment' | 'year'> & {
-    albumRating?: number | Extract<TrackUpdateInput_2['albumRating'], null>;
-    bpm?: number | Extract<TrackUpdateInput_2['bpm'], null>;
-    discCount?: number | Extract<TrackUpdateInput_2['discCount'], null>;
-    discNumber?: number | Extract<TrackUpdateInput_2['discNumber'], null>;
-    episodeNumber?: number | Extract<TrackUpdateInput_2['episodeNumber'], null>;
-    movementCount?: number | Extract<TrackUpdateInput_2['movementCount'], null>;
-    movementNumber?: number | Extract<TrackUpdateInput_2['movementNumber'], null>;
-    playedCount?: number | Extract<TrackUpdateInput_2['playedCount'], null>;
-    rating?: number | Extract<TrackUpdateInput_2['rating'], null>;
-    seasonNumber?: number | Extract<TrackUpdateInput_2['seasonNumber'], null>;
-    skippedCount?: number | Extract<TrackUpdateInput_2['skippedCount'], null>;
-    trackCount?: number | Extract<TrackUpdateInput_2['trackCount'], null>;
-    trackNumber?: number | Extract<TrackUpdateInput_2['trackNumber'], null>;
-    volumeAdjustment?: number | Extract<TrackUpdateInput_2['volumeAdjustment'], null>;
-    year?: number | Extract<TrackUpdateInput_2['year'], null>;
+    albumRating?: null extends TrackUpdateInput_2['albumRating'] ? number | null : number;
+    bpm?: null extends TrackUpdateInput_2['bpm'] ? number | null : number;
+    discCount?: null extends TrackUpdateInput_2['discCount'] ? number | null : number;
+    discNumber?: null extends TrackUpdateInput_2['discNumber'] ? number | null : number;
+    episodeNumber?: null extends TrackUpdateInput_2['episodeNumber'] ? number | null : number;
+    movementCount?: null extends TrackUpdateInput_2['movementCount'] ? number | null : number;
+    movementNumber?: null extends TrackUpdateInput_2['movementNumber'] ? number | null : number;
+    playedCount?: null extends TrackUpdateInput_2['playedCount'] ? number | null : number;
+    rating?: null extends TrackUpdateInput_2['rating'] ? number | null : number;
+    seasonNumber?: null extends TrackUpdateInput_2['seasonNumber'] ? number | null : number;
+    skippedCount?: null extends TrackUpdateInput_2['skippedCount'] ? number | null : number;
+    trackCount?: null extends TrackUpdateInput_2['trackCount'] ? number | null : number;
+    trackNumber?: null extends TrackUpdateInput_2['trackNumber'] ? number | null : number;
+    volumeAdjustment?: null extends TrackUpdateInput_2['volumeAdjustment'] ? number | null : number;
+    year?: null extends TrackUpdateInput_2['year'] ? number | null : number;
 };
 
 // @public
@@ -813,20 +818,20 @@ export interface URLTrack {
     address: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "URLTrackCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type URLTrackCreateInput = URLTrackCreateInput_2;
+export interface URLTrackCreateInput {
+    address?: string;
+}
 
 // @public
 export const URLTrackSchema: z.ZodObject<{
     address: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "URLTrackUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type URLTrackUpdateInput = URLTrackUpdateInput_2;
+export interface URLTrackUpdateInput {
+    address?: string;
+}
 
 // @public
 export interface UserPlaylist {
@@ -835,10 +840,10 @@ export interface UserPlaylist {
     readonly smart: boolean | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "UserPlaylistCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type UserPlaylistCreateInput = UserPlaylistCreateInput_2;
+export interface UserPlaylistCreateInput {
+    shared?: boolean;
+}
 
 // @public
 export const UserPlaylistSchema: z.ZodObject<{
@@ -847,50 +852,42 @@ export const UserPlaylistSchema: z.ZodObject<{
     genius: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "UserPlaylistUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type UserPlaylistUpdateInput = UserPlaylistUpdateInput_2;
+export interface UserPlaylistUpdateInput {
+    shared?: boolean;
+}
 
 // @public
 export interface VideoWindow {
     readonly id: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "VideoWindowCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type VideoWindowCreateInput = VideoWindowCreateInput_2;
+export type VideoWindowCreateInput = Record<string, never>;
 
 // @public
 export const VideoWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "VideoWindowUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type VideoWindowUpdateInput = VideoWindowUpdateInput_2;
+export type VideoWindowUpdateInput = Record<string, never>;
 
 // @public
 export interface Visual {
     readonly id: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "VisualCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type VisualCreateInput = VisualCreateInput_2;
+export type VisualCreateInput = Record<string, never>;
 
 // @public
 export const VisualSchema: z.ZodObject<{
     id: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "VisualUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type VisualUpdateInput = VisualUpdateInput_2;
+export type VisualUpdateInput = Record<string, never>;
 
 // (No @packageDocumentation comment for this package)
 

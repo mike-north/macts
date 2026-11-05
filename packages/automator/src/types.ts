@@ -11,10 +11,10 @@ export type { WarningLevel } from './contract/index.js'
 export type { Workflow } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type WorkflowCreateInput = import('./contract/index.js').WorkflowCreateInput
+export type { WorkflowCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type WorkflowUpdateInput = import('./contract/index.js').WorkflowUpdateInput
+export type { WorkflowUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { AutomatorAction } from './contract/index.js'
@@ -25,7 +25,9 @@ export type AutomatorActionCreateInput = Omit<
   'index'
 > & {
   /** The index of the action Numeric values are validated by the contract before dispatch. */
-  index?: number | Extract<import('./contract/index.js').AutomatorActionCreateInput['index'], null>
+  index?: null extends import('./contract/index.js').AutomatorActionCreateInput['index']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -34,35 +36,37 @@ export type AutomatorActionUpdateInput = Omit<
   'index'
 > & {
   /** The index of the action Numeric values are validated by the contract before dispatch. */
-  index?: number | Extract<import('./contract/index.js').AutomatorActionUpdateInput['index'], null>
+  index?: null extends import('./contract/index.js').AutomatorActionUpdateInput['index']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Variable } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type VariableCreateInput = import('./contract/index.js').VariableCreateInput
+export type { VariableCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type VariableUpdateInput = import('./contract/index.js').VariableUpdateInput
+export type { VariableUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Setting } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type SettingCreateInput = import('./contract/index.js').SettingCreateInput
+export type { SettingCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type SettingUpdateInput = import('./contract/index.js').SettingUpdateInput
+export type { SettingUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { RequiredResource } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type RequiredResourceCreateInput = import('./contract/index.js').RequiredResourceCreateInput
+export type { RequiredResourceCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type RequiredResourceUpdateInput = import('./contract/index.js').RequiredResourceUpdateInput
+export type { RequiredResourceUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

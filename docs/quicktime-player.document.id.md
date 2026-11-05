@@ -4,10 +4,10 @@
 
 ## Document.id property
 
-The unique identifier of the document
+The unique identifier of the document. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

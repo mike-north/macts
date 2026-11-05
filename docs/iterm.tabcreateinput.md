@@ -2,78 +2,14 @@
 
 [Home](./index.md) &gt; [@macts/iterm](./iterm.md) &gt; [TabCreateInput](./iterm.tabcreateinput.md)
 
-## TabCreateInput interface
+## TabCreateInput type
 
-Input for creating a Tab
+Canonical create input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-interface TabCreateInput
+type TabCreateInput = Omit<TabCreateInput$1, 'index'> & {
+  index?: null extends TabCreateInput$1['index'] ? number | null : number
+}
 ```
-
-## Properties
-
-<table><thead><tr><th>
-
-Property
-
-</th><th>
-
-Modifiers
-
-</th><th>
-
-Type
-
-</th><th>
-
-Description
-
-</th></tr></thead>
-<tbody><tr><td>
-
-[currentSession?](./iterm.tabcreateinput.currentsession.md)
-
-</td><td>
-
-</td><td>
-
-[Session](./iterm.session.md)
-
-</td><td>
-
-_(Optional)_ The current session in a tab
-
-</td></tr>
-<tr><td>
-
-[index?](./iterm.tabcreateinput.index.md)
-
-</td><td>
-
-</td><td>
-
-number
-
-</td><td>
-
-_(Optional)_ Index of tab in parent tab view control
-
-</td></tr>
-<tr><td>
-
-[title?](./iterm.tabcreateinput.title.md)
-
-</td><td>
-
-</td><td>
-
-string
-
-</td><td>
-
-_(Optional)_ The title property
-
-</td></tr>
-</tbody></table>

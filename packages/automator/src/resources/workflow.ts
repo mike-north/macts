@@ -28,7 +28,8 @@ export class WorkflowResourceClient {
     return this.#http.invoke<Page<Workflow>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Workflow'
     )
   }
 
@@ -43,7 +44,8 @@ export class WorkflowResourceClient {
     return this.#http.invoke<Workflow>(
       `${this.#app}.${this.#resource}.get`,
       { name },
-      __mactsOptions
+      __mactsOptions,
+      'Workflow'
     )
   }
 
@@ -57,7 +59,8 @@ export class WorkflowResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.execute`,
       { workflow },
-      __mactsOptions
+      __mactsOptions,
+      'Workflow'
     )
   }
 }

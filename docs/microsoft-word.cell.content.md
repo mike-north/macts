@@ -4,10 +4,10 @@
 
 ## Cell.content property
 
-The text content of the cell
+The text content of the cell. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-content: string
+content: string | null
 ```

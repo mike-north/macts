@@ -4,10 +4,10 @@
 
 ## AirPlayDevice.supportsAudio property
 
-does the device support audio playback?
+does the device support audio playback? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-supportsAudio: boolean
+readonly supportsAudio: boolean | null;
 ```

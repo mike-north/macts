@@ -4,7 +4,7 @@
 
 ## SubgraphCreateInput interface
 
-Input for creating a Subgraph
+Input for creating a Subgraph.
 
 **Signature:**
 

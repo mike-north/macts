@@ -57,13 +57,13 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[list()](./omniplan.assignmentresourceclient.list.md)
+[list(\_\_mactsOptions)](./omniplan.assignmentresourceclient.list.md)
 
 </td><td>
 
 </td><td>
 
-List all assignments.
+List all assignments, as one page.
 
 </td></tr>
 </tbody></table>

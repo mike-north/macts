@@ -58,7 +58,8 @@ export class PhoneResourceClient {
         ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
         personId,
       },
-      __mactsOptions
+      __mactsOptions,
+      'Phone'
     )
   }
 
@@ -73,7 +74,8 @@ export class PhoneResourceClient {
     return this.#http.invoke<Phone>(
       `${this.#app}.${this.#resource}.get`,
       { personId, id },
-      __mactsOptions
+      __mactsOptions,
+      'Phone'
     )
   }
 }

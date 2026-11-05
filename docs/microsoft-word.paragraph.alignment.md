@@ -4,10 +4,10 @@
 
 ## Paragraph.alignment property
 
-The alignment for the paragraph
+The alignment for the paragraph. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-alignment: ParagraphAlignment
+alignment: ParagraphAlignment | null
 ```

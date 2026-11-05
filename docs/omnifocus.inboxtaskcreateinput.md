@@ -4,7 +4,7 @@
 
 ## InboxTaskCreateInput interface
 
-Input for creating a InboxTask
+Input for creating an InboxTask.
 
 **Signature:**
 

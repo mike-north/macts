@@ -4,7 +4,7 @@
 
 ## CheckboxCreateInput type
 
-Input for creating a Checkbox
+Input for creating a Checkbox.
 
 **Signature:**
 

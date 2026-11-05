@@ -4,10 +4,10 @@
 
 ## Disk.format property
 
-the file system format of this disk
+the file system format of this disk. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-format: string
+readonly format: string | null;
 ```

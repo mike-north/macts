@@ -19,10 +19,8 @@ export interface Account {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "AccountCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AccountCreateInput = AccountCreateInput_2;
+export type AccountCreateInput = Record<string, never>;
 
 // @public
 export class AccountResourceClient {
@@ -39,10 +37,8 @@ export const AccountSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "AccountUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AccountUpdateInput = AccountUpdateInput_2;
+export type AccountUpdateInput = Record<string, never>;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -63,15 +59,13 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "RemindersResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<RemindersResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -83,10 +77,12 @@ export interface List {
     name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ListCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ListCreateInput = ListCreateInput_2;
+export interface ListCreateInput {
+    color?: string;
+    emblem?: string;
+    name: string;
+}
 
 // @public
 export class ListResourceClient {
@@ -107,10 +103,12 @@ export const ListSchema: z.ZodObject<{
     emblem: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ListUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ListUpdateInput = ListUpdateInput_2;
+export interface ListUpdateInput {
+    color?: string;
+    emblem?: string;
+    name?: string;
+}
 
 // @public
 export interface Reminder {
@@ -132,7 +130,7 @@ export interface Reminder {
 //
 // @public
 export type ReminderCreateInput = Omit<ReminderCreateInput_2, 'priority'> & {
-    priority?: number | Extract<ReminderCreateInput_2['priority'], null>;
+    priority?: null extends ReminderCreateInput_2['priority'] ? number | null : number;
 };
 
 // @public
@@ -172,7 +170,7 @@ export const ReminderSchema: z.ZodObject<{
 export interface RemindersClient extends ClientBrand<RemindersResources> {
 }
 
-// @public (undocumented)
+// @public
 export class RemindersClient {
     constructor(options: RemindersClientOptions);
     readonly accounts: AccountResourceClient;
@@ -194,11 +192,32 @@ export class RemindersError extends Error {
     readonly code: string;
 }
 
+// @public
+export type RemindersResources = Readonly<{
+    Account: ResourceDescriptor<Account, string> & {
+        readonly id: ValueType<string>;
+        readonly list: 'reminders.accounts.list';
+    };
+    List: ResourceDescriptor<List, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'reminders.lists.get';
+        readonly list: 'reminders.lists.list';
+    };
+    Reminder: ResourceDescriptor<Reminder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'reminders.reminders.get';
+        readonly list: 'reminders.reminders.list';
+        readonly parents: {
+            readonly list: 'List';
+        };
+    };
+}>;
+
 // Warning: (ae-forgotten-export) The symbol "ReminderUpdateInput_2" needs to be exported by the entry point index.d.ts
 //
 // @public
 export type ReminderUpdateInput = Omit<ReminderUpdateInput_2, 'priority'> & {
-    priority?: number | Extract<ReminderUpdateInput_2['priority'], null>;
+    priority?: null extends ReminderUpdateInput_2['priority'] ? number | null : number;
 };
 
 // (No @packageDocumentation comment for this package)

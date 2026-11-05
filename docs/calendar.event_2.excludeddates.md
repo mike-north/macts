@@ -4,10 +4,10 @@
 
 ## Event_2.excludedDates property
 
-The exception dates for recurring events
+The exception dates for recurring events. Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-excludedDates: Date[];
+excludedDates: readonly Date[];
 ```

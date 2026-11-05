@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the folder
+The unique identifier of the folder. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ The unique identifier of the folder
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the folder
+The name of the folder. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

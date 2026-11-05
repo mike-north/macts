@@ -4,10 +4,10 @@
 
 ## Resource.id property
 
-Internal identifier for this resource
+Internal identifier for this resource. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: Integer;
 ```

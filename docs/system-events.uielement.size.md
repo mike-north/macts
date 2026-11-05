@@ -4,10 +4,10 @@
 
 ## UIElement.size property
 
-the size of the UI element
+the size of the UI element. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-size: string
+size: string | null
 ```

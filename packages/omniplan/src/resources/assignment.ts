@@ -28,7 +28,8 @@ export class AssignmentResourceClient {
     return this.#http.invoke<Page<Assignment>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Assignment'
     )
   }
 }

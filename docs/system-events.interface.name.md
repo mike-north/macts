@@ -4,10 +4,10 @@
 
 ## Interface.name property
 
-the name of the interface
+the name of the interface. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+readonly name: string | null;
 ```

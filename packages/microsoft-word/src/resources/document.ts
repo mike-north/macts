@@ -5,7 +5,7 @@
 
 import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
-import type { Document, SaveFormat } from '../types.js'
+import type { Document } from '../types.js'
 
 import {
   Integer as __mactsInteger,
@@ -49,7 +49,8 @@ export class DocumentResourceClient {
     return this.#http.invoke<Page<Document>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Document'
     )
   }
 
@@ -61,14 +62,24 @@ export class DocumentResourceClient {
     id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Document> {
-    return this.#http.invoke<Document>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
+    return this.#http.invoke<Document>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Document'
+    )
   }
 
   /**
    * Save the specified document
    */
   async save(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
-    await this.#http.invoke<undefined>(`${this.#app}.${this.#resource}.save`, {}, __mactsOptions)
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.save`,
+      {},
+      __mactsOptions,
+      'Document'
+    )
   }
 
   /**
@@ -76,13 +87,14 @@ export class DocumentResourceClient {
    */
   async saveAs(
     fileName: string,
-    fileFormat?: SaveFormat,
+    fileFormat?: Parameters<import('../contract/index.js').DocumentResourceClient['saveAs']>[1],
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.saveAs`,
       { fileName, fileFormat },
-      __mactsOptions
+      __mactsOptions,
+      'Document'
     )
   }
 
@@ -96,7 +108,8 @@ export class DocumentResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.close`,
       { saving },
-      __mactsOptions
+      __mactsOptions,
+      'Document'
     )
   }
 
@@ -104,7 +117,12 @@ export class DocumentResourceClient {
    * Print the specified document
    */
   async print(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
-    await this.#http.invoke<undefined>(`${this.#app}.${this.#resource}.print`, {}, __mactsOptions)
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.print`,
+      {},
+      __mactsOptions,
+      'Document'
+    )
   }
 
   /**
@@ -114,7 +132,8 @@ export class DocumentResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.activate`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Document'
     )
   }
 
@@ -132,7 +151,8 @@ export class DocumentResourceClient {
         ...(start === undefined ? {} : { start: __mactsIntegerInput(start) }),
         ...(end === undefined ? {} : { end: __mactsIntegerInput(end) }),
       },
-      __mactsOptions
+      __mactsOptions,
+      'Document'
     )
   }
 }

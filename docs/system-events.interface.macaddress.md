@@ -4,10 +4,10 @@
 
 ## Interface.mACAddress property
 
-the MAC address for the interface
+the MAC address for the interface. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-mACAddress: string
+readonly mACAddress: string | null;
 ```

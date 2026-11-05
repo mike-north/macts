@@ -9,19 +9,19 @@ import { z } from 'zod'
 export type { Pane } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type PaneCreateInput = import('./contract/index.js').PaneCreateInput
+export type { PaneCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type PaneUpdateInput = import('./contract/index.js').PaneUpdateInput
+export type { PaneUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Anchor } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type AnchorCreateInput = import('./contract/index.js').AnchorCreateInput
+export type { AnchorCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type AnchorUpdateInput = import('./contract/index.js').AnchorUpdateInput
+export type { AnchorUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

@@ -4,10 +4,10 @@
 
 ## Track.albumRatingKind property
 
-the rating kind of the album rating for this track
+the rating kind of the album rating for this track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-albumRatingKind: string
+readonly albumRatingKind: string | null;
 ```

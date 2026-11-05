@@ -4,10 +4,10 @@
 
 ## Project.flagged property
 
-True if flagged
+True if flagged. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-flagged: boolean
+flagged: boolean | null
 ```

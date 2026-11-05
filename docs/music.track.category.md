@@ -4,10 +4,10 @@
 
 ## Track.category property
 
-the category of the track
+the category of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-category: string
+category: string | null
 ```

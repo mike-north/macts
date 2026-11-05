@@ -4,7 +4,7 @@
 
 ## MenuBarCreateInput type
 
-Input for creating a MenuBar
+Input for creating a MenuBar.
 
 **Signature:**
 

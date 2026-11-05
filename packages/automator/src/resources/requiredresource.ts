@@ -31,7 +31,8 @@ export class RequiredResourceResourceClient {
     return this.#http.invoke<Page<RequiredResource>>(
       `${this.#app}.${this.#resource}.list`,
       { actionId },
-      __mactsOptions
+      __mactsOptions,
+      'RequiredResource'
     )
   }
 }

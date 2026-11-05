@@ -11,10 +11,10 @@ export type { DetailLevel } from './contract/index.js'
 export type { Document } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type DocumentCreateInput = import('./contract/index.js').DocumentCreateInput
+export type { DocumentCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type DocumentUpdateInput = import('./contract/index.js').DocumentUpdateInput
+export type { DocumentUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

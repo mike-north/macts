@@ -4,10 +4,10 @@
 
 ## Task.totalCost property
 
-Total cost for this task
+Total cost for this task. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-totalCost: number
+readonly totalCost: number | null;
 ```

@@ -4,10 +4,10 @@
 
 ## SchemeActionResult.completed property
 
-Whether this scheme action has completed (successfully or otherwise) or not
+Whether this scheme action has completed (successfully or otherwise) or not. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-completed: boolean
+readonly completed: boolean | null;
 ```

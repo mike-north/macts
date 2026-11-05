@@ -4,7 +4,7 @@
 
 ## LibraryPlaylistCreateInput type
 
-Input for creating a LibraryPlaylist
+Input for creating a LibraryPlaylist.
 
 **Signature:**
 

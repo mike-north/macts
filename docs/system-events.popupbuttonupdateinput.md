@@ -4,12 +4,10 @@
 
 ## PopUpButtonUpdateInput type
 
-Input for updating a PopUpButton
+Input for updating a PopUpButton. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type PopUpButtonUpdateInput = Partial<PopUpButtonCreateInput>
+type PopUpButtonUpdateInput = Record<string, never>
 ```
-
-**References:** [PopUpButtonCreateInput](./system-events.popupbuttoncreateinput.md)

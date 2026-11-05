@@ -4,10 +4,10 @@
 
 ## Track.volumeAdjustment property
 
-relative volume adjustment of the track (-100% to 100%)
+relative volume adjustment of the track (-100% to 100%). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-volumeAdjustment: number
+volumeAdjustment: Integer | null
 ```

@@ -4,10 +4,10 @@
 
 ## Track.rating property
 
-the rating of this track (0 to 100)
+the rating of this track (0 to 100). Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-rating: number
+rating: Integer | null
 ```

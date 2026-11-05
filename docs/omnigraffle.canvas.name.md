@@ -4,10 +4,10 @@
 
 ## Canvas.name property
 
-Name of this canvas
+Name of this canvas. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

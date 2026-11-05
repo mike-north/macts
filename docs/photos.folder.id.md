@@ -4,10 +4,10 @@
 
 ## Folder.id property
 
-The unique ID of this folder
+The unique ID of this folder. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

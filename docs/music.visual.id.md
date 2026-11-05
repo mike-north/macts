@@ -4,10 +4,10 @@
 
 ## Visual.id property
 
-Unique identifier for this visual
+Unique identifier for this visual. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: Integer | null;
 ```

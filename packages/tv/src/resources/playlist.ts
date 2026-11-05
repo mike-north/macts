@@ -31,7 +31,8 @@ export class PlaylistResourceClient {
     return this.#http.invoke<Page<Playlist>>(
       `${this.#app}.${this.#resource}.list`,
       { sourceId },
-      __mactsOptions
+      __mactsOptions,
+      'Playlist'
     )
   }
 
@@ -46,7 +47,8 @@ export class PlaylistResourceClient {
     return this.#http.invoke<Playlist>(
       `${this.#app}.${this.#resource}.get`,
       { sourceId, persistentID },
-      __mactsOptions
+      __mactsOptions,
+      'Playlist'
     )
   }
 
@@ -57,7 +59,8 @@ export class PlaylistResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.move`,
       { to },
-      __mactsOptions
+      __mactsOptions,
+      'Playlist'
     )
   }
 
@@ -72,7 +75,8 @@ export class PlaylistResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.search`,
       { for: _for, only },
-      __mactsOptions
+      __mactsOptions,
+      'Playlist'
     )
   }
 }

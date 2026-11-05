@@ -32,7 +32,8 @@ export class SchemeResourceClient {
     return this.#http.invoke<Page<Scheme>>(
       `${this.#app}.${this.#resource}.list`,
       { workspaceName },
-      __mactsOptions
+      __mactsOptions,
+      'Scheme'
     )
   }
 
@@ -48,7 +49,8 @@ export class SchemeResourceClient {
     return this.#http.invoke<Scheme>(
       `${this.#app}.${this.#resource}.get`,
       { workspaceName, id },
-      __mactsOptions
+      __mactsOptions,
+      'Scheme'
     )
   }
 }

@@ -4,10 +4,10 @@
 
 ## SchemeActionResult.status property
 
-Indicates the status of the scheme action
+Indicates the status of the scheme action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-status: SchemeActionResultStatus
+status: SchemeActionResultStatus | null
 ```

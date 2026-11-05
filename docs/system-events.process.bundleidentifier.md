@@ -4,10 +4,10 @@
 
 ## Process.bundleIdentifier property
 
-the bundle identifier of the process' application file
+the bundle identifier of the process' application file. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-bundleIdentifier: string
+readonly bundleIdentifier: string | null;
 ```

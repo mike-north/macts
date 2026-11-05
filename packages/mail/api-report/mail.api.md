@@ -43,10 +43,10 @@ export interface Account {
 //
 // @public
 export type AccountCreateInput = Omit<AccountCreateInput_2, 'emptyJunkMessagesFrequency' | 'emptySentMessagesFrequency' | 'emptyTrashFrequency' | 'port'> & {
-    emptyJunkMessagesFrequency?: number | Extract<AccountCreateInput_2['emptyJunkMessagesFrequency'], null>;
-    emptySentMessagesFrequency?: number | Extract<AccountCreateInput_2['emptySentMessagesFrequency'], null>;
-    emptyTrashFrequency?: number | Extract<AccountCreateInput_2['emptyTrashFrequency'], null>;
-    port?: number | Extract<AccountCreateInput_2['port'], null>;
+    emptyJunkMessagesFrequency?: null extends AccountCreateInput_2['emptyJunkMessagesFrequency'] ? number | null : number;
+    emptySentMessagesFrequency?: null extends AccountCreateInput_2['emptySentMessagesFrequency'] ? number | null : number;
+    emptyTrashFrequency?: null extends AccountCreateInput_2['emptyTrashFrequency'] ? number | null : number;
+    port?: null extends AccountCreateInput_2['port'] ? number | null : number;
 };
 
 // @public
@@ -79,10 +79,10 @@ export const AccountSchema: z.ZodObject<{
 //
 // @public
 export type AccountUpdateInput = Omit<AccountUpdateInput_2, 'emptyJunkMessagesFrequency' | 'emptySentMessagesFrequency' | 'emptyTrashFrequency' | 'port'> & {
-    emptyJunkMessagesFrequency?: number | Extract<AccountUpdateInput_2['emptyJunkMessagesFrequency'], null>;
-    emptySentMessagesFrequency?: number | Extract<AccountUpdateInput_2['emptySentMessagesFrequency'], null>;
-    emptyTrashFrequency?: number | Extract<AccountUpdateInput_2['emptyTrashFrequency'], null>;
-    port?: number | Extract<AccountUpdateInput_2['port'], null>;
+    emptyJunkMessagesFrequency?: null extends AccountUpdateInput_2['emptyJunkMessagesFrequency'] ? number | null : number;
+    emptySentMessagesFrequency?: null extends AccountUpdateInput_2['emptySentMessagesFrequency'] ? number | null : number;
+    emptyTrashFrequency?: null extends AccountUpdateInput_2['emptyTrashFrequency'] ? number | null : number;
+    port?: null extends AccountUpdateInput_2['port'] ? number | null : number;
 };
 
 // @public
@@ -90,20 +90,20 @@ export interface Attachment {
     fileName: FileValue | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "AttachmentCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AttachmentCreateInput = AttachmentCreateInput_2;
+export interface AttachmentCreateInput {
+    fileName?: FileSource;
+}
 
 // @public
 export const AttachmentSchema: z.ZodObject<{
     fileName: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "AttachmentUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AttachmentUpdateInput = AttachmentUpdateInput_2;
+export interface AttachmentUpdateInput {
+    fileName?: FileSource;
+}
 
 // @public
 export interface AttributeRun {
@@ -112,10 +112,12 @@ export interface AttributeRun {
     size: number | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "AttributeRunCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AttributeRunCreateInput = AttributeRunCreateInput_2;
+export interface AttributeRunCreateInput {
+    color?: Rgb;
+    font?: string;
+    size?: number;
+}
 
 // @public
 export const AttributeRunSchema: z.ZodObject<{
@@ -128,10 +130,12 @@ export const AttributeRunSchema: z.ZodObject<{
     size: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "AttributeRunUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AttributeRunUpdateInput = AttributeRunUpdateInput_2;
+export interface AttributeRunUpdateInput {
+    color?: Rgb;
+    font?: string;
+    size?: number;
+}
 
 // @public
 export type Authentication = 'password' | 'apop' | 'kerberos5' | 'ntlm' | 'md5' | 'external' | 'appleToken' | 'none';
@@ -141,20 +145,16 @@ export interface BccRecipient {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "BccRecipientCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type BccRecipientCreateInput = BccRecipientCreateInput_2;
+export type BccRecipientCreateInput = Record<string, never>;
 
 // @public
 export const BccRecipientSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "BccRecipientUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type BccRecipientUpdateInput = BccRecipientUpdateInput_2;
+export type BccRecipientUpdateInput = Record<string, never>;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -180,20 +180,16 @@ export interface CcRecipient {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "CcRecipientCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type CcRecipientCreateInput = CcRecipientCreateInput_2;
+export type CcRecipientCreateInput = Record<string, never>;
 
 // @public
 export const CcRecipientSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "CcRecipientUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type CcRecipientUpdateInput = CcRecipientUpdateInput_2;
+export type CcRecipientUpdateInput = Record<string, never>;
 
 // @public
 export interface Character {
@@ -202,10 +198,12 @@ export interface Character {
     size: number | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "CharacterCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type CharacterCreateInput = CharacterCreateInput_2;
+export interface CharacterCreateInput {
+    color?: Rgb;
+    font?: string;
+    size?: number;
+}
 
 // @public
 export const CharacterSchema: z.ZodObject<{
@@ -218,10 +216,12 @@ export const CharacterSchema: z.ZodObject<{
     size: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "CharacterUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type CharacterUpdateInput = CharacterUpdateInput_2;
+export interface CharacterUpdateInput {
+    color?: Rgb;
+    font?: string;
+    size?: number;
+}
 
 // @public
 export type DefaultMessageFormat = 'plainFormat' | 'richFormat';
@@ -232,10 +232,11 @@ export interface Header {
     name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "HeaderCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type HeaderCreateInput = HeaderCreateInput_2;
+export interface HeaderCreateInput {
+    content?: string;
+    name?: string;
+}
 
 // @public
 export type HeaderDetail = 'all' | 'custom' | 'default' | 'noHeaders';
@@ -246,23 +247,22 @@ export const HeaderSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "HeaderUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type HeaderUpdateInput = HeaderUpdateInput_2;
+export interface HeaderUpdateInput {
+    content?: string;
+    name?: string;
+}
 
 // @public
 export type HighlightColors = 'blue' | 'gray' | 'green' | 'none' | 'orange' | 'other' | 'purple' | 'red' | 'yellow';
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "MailResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<MailResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -278,10 +278,8 @@ export interface MailAttachment {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "MailAttachmentCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MailAttachmentCreateInput = MailAttachmentCreateInput_2;
+export type MailAttachmentCreateInput = Record<string, never>;
 
 // @public
 export const MailAttachmentSchema: z.ZodObject<{
@@ -292,10 +290,8 @@ export const MailAttachmentSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "MailAttachmentUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MailAttachmentUpdateInput = MailAttachmentUpdateInput_2;
+export type MailAttachmentUpdateInput = Record<string, never>;
 
 // @public
 export interface Mailbox {
@@ -303,10 +299,10 @@ export interface Mailbox {
     readonly unreadCount: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "MailboxCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MailboxCreateInput = MailboxCreateInput_2;
+export interface MailboxCreateInput {
+    name?: string;
+}
 
 // @public
 export const MailboxSchema: z.ZodObject<{
@@ -314,16 +310,16 @@ export const MailboxSchema: z.ZodObject<{
     unreadCount: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "MailboxUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MailboxUpdateInput = MailboxUpdateInput_2;
+export interface MailboxUpdateInput {
+    name?: string;
+}
 
 // @public
 export interface MailClient extends ClientBrand<MailResources> {
 }
 
-// @public (undocumented)
+// @public
 export class MailClient {
     constructor(options: MailClientOptions);
     checkForNewMail(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -332,7 +328,8 @@ export class MailClient {
     extractNameFrom(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     getURL(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get http(): HttpClient;
-    importMailMailbox(at: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "MailClient_2" needs to be exported by the entry point index.d.ts
+    importMailMailbox(at: Parameters<MailClient_2['importMailMailbox']>[0], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     mailto(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly messages: MessageResourceClient;
     move(to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -352,6 +349,9 @@ export class MailError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type MailResources = Readonly<Record<never, never>>;
 
 // @public
 export interface Message {
@@ -383,7 +383,7 @@ export type MessageCachingPolicy = 'doNotKeepCopiesOfAnyMessages' | 'onlyMessage
 //
 // @public
 export type MessageCreateInput = Omit<MessageCreateInput_2, 'flagIndex'> & {
-    flagIndex?: number | Extract<MessageCreateInput_2['flagIndex'], null>;
+    flagIndex?: null extends MessageCreateInput_2['flagIndex'] ? number | null : number;
 };
 
 // @public
@@ -422,7 +422,7 @@ export const MessageSchema: z.ZodObject<{
 //
 // @public
 export type MessageUpdateInput = Omit<MessageUpdateInput_2, 'flagIndex'> & {
-    flagIndex?: number | Extract<MessageUpdateInput_2['flagIndex'], null>;
+    flagIndex?: null extends MessageUpdateInput_2['flagIndex'] ? number | null : number;
 };
 
 // @public
@@ -438,10 +438,17 @@ export interface MessageViewer {
     visibleMessages: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "MessageViewerCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MessageViewerCreateInput = MessageViewerCreateInput_2;
+export interface MessageViewerCreateInput {
+    mailboxListVisible?: boolean;
+    previewPaneIsVisible?: boolean;
+    selectedMailboxes?: string;
+    selectedMessages?: string;
+    sortColumn?: string;
+    sortedAscending?: boolean;
+    visibleColumns?: string;
+    visibleMessages?: string;
+}
 
 // @public
 export const MessageViewerSchema: z.ZodObject<{
@@ -456,10 +463,17 @@ export const MessageViewerSchema: z.ZodObject<{
     selectedMailboxes: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "MessageViewerUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type MessageViewerUpdateInput = MessageViewerUpdateInput_2;
+export interface MessageViewerUpdateInput {
+    mailboxListVisible?: boolean;
+    previewPaneIsVisible?: boolean;
+    selectedMailboxes?: string;
+    selectedMessages?: string;
+    sortColumn?: string;
+    sortedAscending?: boolean;
+    visibleColumns?: string;
+    visibleMessages?: string;
+}
 
 // @public
 export interface OutgoingMessage {
@@ -472,10 +486,15 @@ export interface OutgoingMessage {
     visible: boolean | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "OutgoingMessageCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type OutgoingMessageCreateInput = OutgoingMessageCreateInput_2;
+export interface OutgoingMessageCreateInput {
+    htmlContent?: string;
+    messageSignature?: string;
+    sender?: string;
+    subject?: string;
+    vcardPath?: FileSource;
+    visible?: boolean;
+}
 
 // @public
 export class OutgoingMessageResourceClient {
@@ -494,10 +513,15 @@ export const OutgoingMessageSchema: z.ZodObject<{
     vcardPath: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "OutgoingMessageUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type OutgoingMessageUpdateInput = OutgoingMessageUpdateInput_2;
+export interface OutgoingMessageUpdateInput {
+    htmlContent?: string;
+    messageSignature?: string;
+    sender?: string;
+    subject?: string;
+    vcardPath?: FileSource;
+    visible?: boolean;
+}
 
 // @public
 export interface Paragraph {
@@ -506,10 +530,12 @@ export interface Paragraph {
     size: number | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ParagraphCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ParagraphCreateInput = ParagraphCreateInput_2;
+export interface ParagraphCreateInput {
+    color?: Rgb;
+    font?: string;
+    size?: number;
+}
 
 // @public
 export const ParagraphSchema: z.ZodObject<{
@@ -522,10 +548,12 @@ export const ParagraphSchema: z.ZodObject<{
     size: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ParagraphUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ParagraphUpdateInput = ParagraphUpdateInput_2;
+export interface ParagraphUpdateInput {
+    color?: Rgb;
+    font?: string;
+    size?: number;
+}
 
 // @public
 export type QuotingColor = 'blue' | 'green' | 'orange' | 'other' | 'purple' | 'red' | 'yellow';
@@ -536,10 +564,11 @@ export interface Recipient {
     name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "RecipientCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RecipientCreateInput = RecipientCreateInput_2;
+export interface RecipientCreateInput {
+    address?: string;
+    name?: string;
+}
 
 // @public
 export const RecipientSchema: z.ZodObject<{
@@ -547,10 +576,11 @@ export const RecipientSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "RecipientUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RecipientUpdateInput = RecipientUpdateInput_2;
+export interface RecipientUpdateInput {
+    address?: string;
+    name?: string;
+}
 
 // @public
 export interface RichText {
@@ -559,10 +589,12 @@ export interface RichText {
     size: number | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "RichTextCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RichTextCreateInput = RichTextCreateInput_2;
+export interface RichTextCreateInput {
+    color?: Rgb;
+    font?: string;
+    size?: number;
+}
 
 // @public
 export const RichTextSchema: z.ZodObject<{
@@ -575,10 +607,12 @@ export const RichTextSchema: z.ZodObject<{
     size: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "RichTextUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RichTextUpdateInput = RichTextUpdateInput_2;
+export interface RichTextUpdateInput {
+    color?: Rgb;
+    font?: string;
+    size?: number;
+}
 
 // @public
 export interface Rule {
@@ -610,10 +644,13 @@ export interface RuleCondition {
     ruleType: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "RuleConditionCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RuleConditionCreateInput = RuleConditionCreateInput_2;
+export interface RuleConditionCreateInput {
+    expression?: string;
+    header?: string;
+    qualifier?: string;
+    ruleType?: string;
+}
 
 // @public
 export const RuleConditionSchema: z.ZodObject<{
@@ -623,16 +660,19 @@ export const RuleConditionSchema: z.ZodObject<{
     ruleType: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "RuleConditionUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RuleConditionUpdateInput = RuleConditionUpdateInput_2;
+export interface RuleConditionUpdateInput {
+    expression?: string;
+    header?: string;
+    qualifier?: string;
+    ruleType?: string;
+}
 
 // Warning: (ae-forgotten-export) The symbol "RuleCreateInput_2" needs to be exported by the entry point index.d.ts
 //
 // @public
 export type RuleCreateInput = Omit<RuleCreateInput_2, 'markFlagIndex'> & {
-    markFlagIndex?: number | Extract<RuleCreateInput_2['markFlagIndex'], null>;
+    markFlagIndex?: null extends RuleCreateInput_2['markFlagIndex'] ? number | null : number;
 };
 
 // @public
@@ -667,7 +707,7 @@ export type RuleType = 'account' | 'anyRecipient' | 'ccHeader' | 'matchesEveryMe
 //
 // @public
 export type RuleUpdateInput = Omit<RuleUpdateInput_2, 'markFlagIndex'> & {
-    markFlagIndex?: number | Extract<RuleUpdateInput_2['markFlagIndex'], null>;
+    markFlagIndex?: null extends RuleUpdateInput_2['markFlagIndex'] ? number | null : number;
 };
 
 // @public
@@ -678,20 +718,16 @@ export interface ToRecipient {
     readonly id: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ToRecipientCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ToRecipientCreateInput = ToRecipientCreateInput_2;
+export type ToRecipientCreateInput = Record<string, never>;
 
 // @public
 export const ToRecipientSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ToRecipientUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ToRecipientUpdateInput = ToRecipientUpdateInput_2;
+export type ToRecipientUpdateInput = Record<string, never>;
 
 // @public
 export type TypeOfAccount = 'pop' | 'smtp' | 'imap' | 'iCloud' | 'unknown';
@@ -706,10 +742,12 @@ export interface Word {
     size: number | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "WordCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type WordCreateInput = WordCreateInput_2;
+export interface WordCreateInput {
+    color?: Rgb;
+    font?: string;
+    size?: number;
+}
 
 // @public
 export const WordSchema: z.ZodObject<{
@@ -722,10 +760,12 @@ export const WordSchema: z.ZodObject<{
     size: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "WordUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type WordUpdateInput = WordUpdateInput_2;
+export interface WordUpdateInput {
+    color?: Rgb;
+    font?: string;
+    size?: number;
+}
 
 // (No @packageDocumentation comment for this package)
 

@@ -28,7 +28,8 @@ export class WindowResourceClient {
     return this.#http.invoke<Page<Window>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Window'
     )
   }
 
@@ -36,6 +37,11 @@ export class WindowResourceClient {
    * Get a window by id.
    */
   async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Window> {
-    return this.#http.invoke<Window>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
+    return this.#http.invoke<Window>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Window'
+    )
   }
 }

@@ -4,7 +4,7 @@
 
 ## GroupCreateInput interface
 
-Input for creating a Group
+Input for creating a Group.
 
 **Signature:**
 

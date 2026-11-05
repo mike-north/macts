@@ -4,10 +4,10 @@
 
 ## Message.flaggedStatus property
 
-Indicates whether the message is flagged or not
+Indicates whether the message is flagged or not. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-flaggedStatus: boolean
+flaggedStatus: boolean | null
 ```

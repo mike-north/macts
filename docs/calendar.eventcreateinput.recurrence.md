@@ -4,7 +4,7 @@
 
 ## EventCreateInput.recurrence property
 
-The iCalendar (RFC 2445) string describing the event recurrence, if defined
+The iCalendar (RFC 2445) recurrence string
 
 **Signature:**
 

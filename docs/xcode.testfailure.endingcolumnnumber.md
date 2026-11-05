@@ -4,10 +4,10 @@
 
 ## TestFailure.endingColumnNumber property
 
-The ending column number in the file where the issue occurred
+The ending column number in the file where the issue occurred. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-endingColumnNumber: number
+endingColumnNumber: Integer | null
 ```

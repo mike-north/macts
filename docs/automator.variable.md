@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier for the variable
+The unique identifier for the variable. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ The unique identifier for the variable
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The name of the variable
+The name of the variable. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +69,15 @@ The name of the variable
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Are the name and value of the variable settable?
+boolean \| null
+
+</td><td>
+
+Are the name and value of the variable settable? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -88,7 +92,7 @@ unknown
 
 </td><td>
 
-The value of the variable
+The value of the variable. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

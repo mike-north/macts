@@ -66,6 +66,21 @@ const manifest: AppManifest = {
   enums: {},
   hierarchy: { children: { items: { resource: 'Item', access: 'r' } } },
   commands: {
+    nullableInteger: {
+      name: 'nullableInteger',
+      description: 'Nullable numeric input',
+      scope: 'application',
+      parameters: [
+        {
+          name: 'amount',
+          type: 'integer',
+          description: 'Optional meaning',
+          required: true,
+          nullable: true,
+          evidence: { nullable: { source: 'curated', note: 'Fixture explicitly accepts null' } },
+        },
+      ],
+    },
     list: {
       name: 'list',
       description: 'One page of items',
@@ -136,6 +151,7 @@ interface FixtureHttp {
 interface FixtureClient extends contracts.ClientBrand<FixtureResources> {
   readonly http: FixtureHttp
   readonly items: FixtureResource
+  nullableInteger(amount: number | null): Promise<void>
   follow(
     target: contracts.ObjectReferenceData<contracts.Integer, 'Item'>
   ): Promise<contracts.ObjectReferenceVariant<FixtureRecord, contracts.Integer> | null>
@@ -214,11 +230,7 @@ describe('canonical generated facade', () => {
     const rpc = vi.spyOn(facade.http, 'rpc').mockImplementation(<T>() => Promise.resolve(wire as T))
     const result = await facade.items.get('7')
     expect(result).toEqual({ id: 7, modified: new Date('2026-11-05T12:34:56.123Z') })
-    expect(rpc).toHaveBeenCalledWith(
-      'fixture.items.get',
-      { id: { integer: '7' } },
-      expect.any(Object)
-    )
+    expect(rpc).toHaveBeenCalledWith('fixture.items.get', { id: { integer: '7' } }, undefined)
     const factory = client.createRemoteClient(root.contract, {
       token: 'token',
       url: 'http://example.test',
@@ -246,6 +258,54 @@ describe('canonical generated facade', () => {
       )
       await expect(facade.items.get('07')).rejects.toBeInstanceOf(contracts.ValidationError)
       expect(fetch).toHaveBeenCalledTimes(2)
+    } finally {
+      fetch.mockRestore()
+    }
+  })
+  it('keeps concurrent raw and typed failures associated with their own request', async () => {
+    const root = generated()
+    const facade = new root.FixtureClient({ apiKey: 'token' })
+    // Resolve responses out of order: error identity belongs to the thrown
+    // instance, never the most recent request or a shared transport mode.
+    const pending: ((response: Response) => void)[] = []
+    const fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(
+      () =>
+        new Promise<Response>((resolve) => {
+          pending.push(resolve)
+        })
+    )
+    try {
+      const first = facade.items.get(7).catch((error: unknown) => error)
+      const second = facade.items.get(8).catch((error: unknown) => error)
+      const raw = facade.http.rpc('legacy.route').catch((error: unknown) => error)
+      await vi.waitFor(() => {
+        expect(pending).toHaveLength(3)
+      })
+      const denied = (required: string): Response =>
+        Response.json(
+          {
+            error: { code: 'PERMISSION_DENIED', message: required, details: { required } },
+          },
+          { status: 403 }
+        )
+      pending[1]?.(denied('second'))
+      pending[2]?.(
+        Response.json(
+          {
+            error: { code: 'LEGACY_CODE', message: 'raw failure' },
+          },
+          { status: 418 }
+        )
+      )
+      pending[0]?.(denied('first'))
+      const [firstError, secondError, rawError] = await Promise.all([first, second, raw])
+      expect(firstError).toBeInstanceOf(contracts.PermissionDeniedError)
+      expect(firstError).toMatchObject({ details: { required: 'first' } })
+      expect(secondError).toBeInstanceOf(contracts.PermissionDeniedError)
+      expect(secondError).toMatchObject({ details: { required: 'second' } })
+      expect(rawError).toBeInstanceOf(root.FixtureError)
+      expect(rawError).toMatchObject({ code: 'LEGACY_CODE', message: 'raw failure' })
+      expect(firstError).not.toBe(secondError)
     } finally {
       fetch.mockRestore()
     }
@@ -401,10 +461,12 @@ describe('canonical generated facade', () => {
       controller.abort()
       return Promise.reject(new Error('aborted'))
     })
-    await expect(facade.items.get(7, { signal: controller.signal })).rejects.toBeInstanceOf(
+    const options = { signal: controller.signal }
+    await expect(facade.items.get(7, options)).rejects.toBeInstanceOf(
       contracts.OperationCancelledError
     )
     expect(rpc).toHaveBeenCalledTimes(1)
+    expect(Reflect.ownKeys(options)).toEqual(['signal'])
   })
   it('compiles canonical record aliases, numeric convenience signatures and precise shared binding', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'macts-facade-types-'))
@@ -444,8 +506,11 @@ import { Integer, type Integer as IntegerType } from '@macts/contracts'
 import { bindReference } from '@macts/contracts/client'
 const facade = new FixtureClient({ apiKey: 'test' })
 export async function use(): Promise<void> {
+  await facade.nullableInteger(null)
   await facade.items.create({ count: 7, appointment: new Date('2026-11-05T12:34:56.123Z') })
   await facade.items.update(7, { title: null, count: 8 })
+  // @ts-expect-error -- read nullability does not grant numeric reset permission.
+  await facade.items.update(7, { count: null })
   const canonicalFactory = {} as import('./contract/index.js').FixtureClient
   // @ts-expect-error -- the canonical factory retains branded integer writes.
   await canonicalFactory.items.create({ count: 7 })
@@ -486,13 +551,13 @@ export async function use(): Promise<void> {
     expect(rpc).toHaveBeenLastCalledWith(
       'fixture.items.create',
       { count: { integer: '7' }, appointment: { date: '2026-11-05T12:34:56.123Z' } },
-      expect.any(Object)
+      undefined
     )
     await facade.items.update(7, { count: 8, title: null })
     expect(rpc).toHaveBeenLastCalledWith(
       'fixture.items.update',
       { id: { integer: '7' }, count: { integer: '8' }, title: null },
-      expect.any(Object)
+      undefined
     )
     rpc.mockClear()
     await expect(facade.items.create({ count: 1.5 })).rejects.toBeInstanceOf(
@@ -516,11 +581,7 @@ export async function use(): Promise<void> {
       cardinality: 'one',
       id: contracts.Integer.validate(7),
     })
-    expect(rpc).toHaveBeenCalledWith(
-      'fixture.app.follow',
-      { target: referenceWire },
-      expect.any(Object)
-    )
+    expect(rpc).toHaveBeenCalledWith('fixture.app.follow', { target: referenceWire }, undefined)
     expect(result).toMatchObject({ app: 'fixture', resource: 'Item', cardinality: 'one', id: 7 })
     expect(typeof result?.resolve).toBe('function')
   })
@@ -533,7 +594,7 @@ export async function use(): Promise<void> {
     expect(rpc).toHaveBeenCalledWith(
       'fixture.items.list',
       { pageSize: { integer: '2' }, cursor: 'previous-page' },
-      expect.any(Object)
+      undefined
     )
     expect(result).toEqual({
       items: [{ id: 7, modified: new Date('2026-11-05T12:34:56.123Z') }],
@@ -589,4 +650,393 @@ export async function use(): Promise<void> {
       fetch.mockRestore()
     }
   })
+  it('preserves declared semantic null for a numeric command without coercion', async () => {
+    const root = generated()
+    const facade = new root.FixtureClient({ apiKey: 'token' })
+    const rpc = vi.spyOn(facade.http, 'rpc').mockImplementation(<T>() => Promise.resolve(null as T))
+    await expect(facade.nullableInteger(null)).resolves.toBeUndefined()
+    expect(rpc).toHaveBeenCalledWith('fixture.app.nullableInteger', { amount: null }, undefined)
+  })
+  it('retains get-only path resources, parent addressing and container-aware hydration', async () => {
+    const item = manifest.resources['Item']
+    const get = manifest.commands['get']
+    const list = manifest.commands['list']
+    if (item === undefined || get === undefined || list === undefined)
+      throw new Error('Missing fixture operation')
+    const scoped: AppManifest = {
+      ...manifest,
+      resources: {
+        ...manifest.resources,
+        Item: {
+          ...item,
+          properties: {
+            ...item.properties,
+            related: {
+              access: 'r',
+              type: { resource: 'Group' },
+              description: 'Container reference',
+              optional: true,
+            },
+          },
+        },
+        Group: {
+          name: 'Group',
+          plural: 'Groups',
+          description: 'Path-addressed container',
+          properties: {
+            id: { type: 'string', access: 'r', optional: false, description: 'Container path' },
+            label: { type: 'string', access: 'r', optional: false, description: 'Container label' },
+          },
+          identifiers: [{ property: 'id', primary: true, targeting: 'byKey', ...UNIQUE_CLAIM }],
+        },
+      },
+      hierarchy: {
+        children: {
+          groups: {
+            resource: 'Group',
+            access: 'r',
+            children: { items: { resource: 'Item', access: 'r' } },
+          },
+        },
+      },
+      commands: {
+        ...manifest.commands,
+        get: {
+          ...get,
+          parent: { resource: 'Group', parameter: 'parentPath' },
+          parameters: [
+            { name: 'parentPath', type: 'string', required: true, description: 'Container path' },
+            ...get.parameters,
+          ],
+        },
+        list: {
+          ...list,
+          parent: { resource: 'Group', parameter: 'parentPath' },
+          parameters: [
+            { name: 'parentPath', type: 'string', required: true, description: 'Container path' },
+          ],
+        },
+        getGroup: {
+          name: 'get',
+          routeName: 'get',
+          description: 'Read a path container',
+          scope: 'resource',
+          resourceType: 'Group',
+          parameters: [
+            { name: 'path', type: 'string', required: true, description: 'Container path' },
+          ],
+        },
+      },
+    }
+    interface GroupRecord {
+      readonly id: string
+      readonly label: string | null
+    }
+    interface ScopedRecord extends Omit<FixtureRecord, 'related'> {
+      readonly related?: contracts.ObjectReferenceVariant<GroupRecord, string, 'Group'> | null
+    }
+    // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- Closed resource keys must satisfy ResourceTable without a widening index signature.
+    type ScopedResources = {
+      readonly Item: FixtureResources['Item'] & {
+        readonly parents: { readonly get: 'Group'; readonly list: 'Group' }
+      }
+      readonly Group: {
+        readonly name: 'Group'
+        readonly record: contracts.ValueType<GroupRecord>
+        readonly id: contracts.ValueType<string>
+        readonly get: 'fixture.groups.get'
+      }
+    }
+    interface ScopedClient extends contracts.ClientBrand<ScopedResources> {
+      readonly http: FixtureHttp
+      readonly items: { get(parentPath: string, id: string | number): Promise<ScopedRecord> }
+      readonly groups: {
+        get(path: string): Promise<{ readonly id: string; readonly label: string | null }>
+      }
+    }
+    interface ScopedExports {
+      readonly FixtureClient: new (options: { apiKey: string; baseUrl?: string }) => ScopedClient
+      readonly contract: contracts.AppContract<Omit<ScopedClient, 'http'>, ScopedResources>
+    }
+    const root = generated(scoped) as unknown as ScopedExports
+    const facade = new root.FixtureClient({ apiKey: 'credential', baseUrl: 'http://example.test' })
+    const related = {
+      resource: 'Item',
+      form: 'identity',
+      cardinality: 'one',
+      id: { integer: '9' },
+      container: { resource: 'Group', form: 'identity', cardinality: 'one', id: '/groups/a' },
+    }
+    const groupWire = { id: '/groups/a', label: 'Container' }
+    const groupReference = {
+      resource: 'Group',
+      form: 'identity',
+      cardinality: 'one',
+      id: '/groups/a',
+    }
+    const scopedWire = { ...wire, related: { reference: groupReference } }
+    const rpc = vi
+      .spyOn(facade.http, 'rpc')
+      .mockImplementation(<T>(path: string) =>
+        Promise.resolve(
+          (path === 'fixture.groups.get'
+            ? { id: '/groups/a', label: 'Container' }
+            : scopedWire) as T
+        )
+      )
+    const result = await facade.items.get('/groups/a', '7')
+    expect(rpc).toHaveBeenLastCalledWith(
+      'fixture.items.get',
+      { parentPath: '/groups/a', id: { integer: '7' } },
+      undefined
+    )
+    expect(await facade.groups.get('/groups/a')).toEqual({ id: '/groups/a', label: 'Container' })
+    expect(rpc).toHaveBeenLastCalledWith('fixture.groups.get', { path: '/groups/a' }, undefined)
+    expect('list' in facade.groups).toBe(false)
+    const fetch = vi.spyOn(globalThis, 'fetch').mockImplementation((url, init) => {
+      const endpoint = typeof url === 'string' ? url : url instanceof URL ? url.href : url.url
+      if (typeof init?.body !== 'string') throw new Error('Expected wire JSON')
+      if (endpoint.endsWith('/references/v1/resolve')) {
+        const request = JSON.parse(init.body) as { reference: { reference: { resource: string } } }
+        if (request.reference.reference.resource === 'Group') {
+          expect(request).toEqual({ app: 'fixture', reference: { reference: groupReference } })
+          return Promise.resolve(Response.json({ result: groupWire }))
+        }
+        expect(request).toEqual({ app: 'fixture', reference: { reference: related } })
+        return Promise.resolve(Response.json({ result: { ...wire, id: { integer: '9' } } }))
+      }
+      expect(JSON.parse(init.body)).toEqual({ parentPath: '/groups/a', id: { integer: '7' } })
+      return Promise.resolve(Response.json({ result: scopedWire }))
+    })
+    try {
+      expect(await result.related?.resolve()).toEqual(groupWire)
+      // The item's parent is explicit in caller-built addressing data.
+      const contained = client.bindReference(facade, {
+        app: 'fixture',
+        resource: 'Item',
+        form: 'identity',
+        cardinality: 'one',
+        id: contracts.Integer.validate(9),
+        container: {
+          app: 'fixture',
+          resource: 'Group',
+          form: 'identity',
+          cardinality: 'one',
+          id: '/groups/a',
+        },
+      })
+      expect(await contained.resolve()).toEqual({
+        id: 9,
+        modified: new Date('2026-11-05T12:34:56.123Z'),
+      })
+      const factory = client.createRemoteClient(root.contract, {
+        token: 'credential',
+        url: 'http://example.test',
+      })
+      expect(await factory.items.get('/groups/a', contracts.Integer.validate(7))).toEqual(result)
+      rpc.mockClear()
+      const uncheckedGet = facade.items.get.bind(facade.items) as (
+        parent: unknown,
+        id: unknown
+      ) => Promise<unknown>
+      await expect(uncheckedGet(undefined, 7)).rejects.toBeInstanceOf(contracts.ValidationError)
+      expect(rpc).not.toHaveBeenCalled()
+    } finally {
+      fetch.mockRestore()
+    }
+  })
+
+  it('keeps unpaged input shape and does not synthesize a continuation', async () => {
+    const item = manifest.resources['Item']
+    if (item === undefined) throw new Error('Missing fixture item')
+    const { rangeRead, ...unpaged } = item
+    void rangeRead
+    const root = generated({ ...manifest, resources: { Item: unpaged } })
+    const facade = new root.FixtureClient({ apiKey: 'token' })
+    const rpc = vi
+      .spyOn(facade.http, 'rpc')
+      .mockImplementation(<T>() => Promise.resolve({ items: [] } as T))
+    const result = await facade.items.list()
+    expect(result).toEqual({ items: [] })
+    expect(Object.hasOwn(result, 'nextCursor')).toBe(false)
+    expect(rpc).toHaveBeenCalledWith('fixture.items.list', {}, undefined)
+    const source = generateHttpClientSdk(
+      { ...manifest, resources: { Item: unpaged } },
+      { packageName: '@macts/fixture' }
+    ).files.find((file) => file.path === 'src/resources/item.ts')?.content
+    expect(source).not.toContain('pageSize?: number')
+  })
+
+  it('normalizes an explicit date offset to the same instant as the contract factory', async () => {
+    const root = generated()
+    const facade = new root.FixtureClient({ apiKey: 'token' })
+    const offset = { ...wire, modified: { date: '2026-11-05T04:34:56.123-08:00' } }
+    vi.spyOn(facade.http, 'rpc').mockImplementation(<T>() => Promise.resolve(offset as T))
+    const factory = client.createRemoteClient(root.contract, {
+      token: 'token',
+      url: 'http://example.test',
+      fetch: () => Promise.resolve(Response.json({ result: offset })),
+    })
+    const result = await facade.items.get(7)
+    expect(result.modified).toEqual(new Date('2026-11-05T12:34:56.123Z'))
+    expect(await factory.items.get(contracts.Integer.validate(7))).toEqual(result)
+  })
+  it('rejects a resource constructor routed to another registered resource with a compatible input shape', async () => {
+    const other: AppManifest = {
+      ...manifest,
+      resources: {
+        ...manifest.resources,
+        OtherItem: {
+          name: 'OtherItem',
+          plural: 'OtherItems',
+          description: 'A distinct record shape',
+          properties: {
+            id: { access: 'r', type: 'integer', description: 'Identity', optional: false },
+            label: {
+              access: 'r',
+              type: 'string',
+              description: 'Different output',
+              optional: false,
+            },
+          },
+          identifiers: [{ property: 'id', primary: true, targeting: 'byId', ...UNIQUE_CLAIM }],
+        },
+      },
+      hierarchy: {
+        children: {
+          ...manifest.hierarchy.children,
+          otherItems: { resource: 'OtherItem', access: 'r' },
+        },
+      },
+      commands: {
+        ...manifest.commands,
+        getOther: {
+          name: 'get',
+          routeName: 'get',
+          description: 'Read the other record',
+          scope: 'resource',
+          resourceType: 'OtherItem',
+          parameters: [{ name: 'id', type: 'integer', description: 'Identity', required: true }],
+        },
+      },
+    }
+    const root = generated(other)
+    const facade = new root.FixtureClient({ apiKey: 'token' })
+    const rpc = vi
+      .spyOn(facade.http, 'rpc')
+      .mockImplementation(<T>() => Promise.resolve({ id: { integer: '7' }, label: 'Other' } as T))
+    const misrouted = new root.ItemResourceClient(facade.http, 'fixture', 'otherItems')
+    await expect(misrouted.get(7)).rejects.toBeInstanceOf(contracts.ValidationError)
+    expect(rpc).not.toHaveBeenCalled()
+  })
+  it('retains canonical transport handling through a forwarding HttpClient subclass', async () => {
+    const root = generated()
+    const calls: string[] = []
+    class ForwardingHttp extends root.HttpClient {
+      override rpc<T>(
+        path: string,
+        body: object = {},
+        options?: contracts.CallOptions
+      ): Promise<T> {
+        calls.push(path)
+        return super.rpc<T>(path, body, options)
+      }
+    }
+    const http = new ForwardingHttp('http://example.test', 'token')
+    const resource = new root.ItemResourceClient(http, 'fixture', 'items')
+    const fetch = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation(() => Promise.resolve(Response.json({ result: wire })))
+    try {
+      expect(await resource.get(7)).toEqual({
+        id: 7,
+        modified: new Date('2026-11-05T12:34:56.123Z'),
+      })
+      fetch.mockImplementation(() => Promise.resolve(Response.json({})))
+      await expect(resource.get(7)).rejects.toMatchObject({
+        code: 'TRANSPORT_FAILED',
+        details: { reason: 'invalid-response', status: 200 },
+      })
+      fetch.mockImplementation(() =>
+        Promise.resolve(
+          Response.json(
+            { error: { code: 'LEGACY_CODE', message: 'Raw legacy failure' } },
+            { status: 418 }
+          )
+        )
+      )
+      await expect(http.rpc('raw.operation')).rejects.toBeInstanceOf(root.FixtureError)
+      expect(calls).toEqual(['fixture.items.get', 'fixture.items.get', 'raw.operation'])
+    } finally {
+      fetch.mockRestore()
+    }
+  })
+  it.each(['two arguments', 'public options only'])(
+    'preserves factory protocol failures through an existing override forwarding %s',
+    async (forwarding) => {
+      const root = generated()
+      class LegacyForwardingHttp extends root.HttpClient {
+        override rpc<T>(
+          path: string,
+          body: object = {},
+          options?: contracts.CallOptions
+        ): Promise<T> {
+          return forwarding === 'two arguments'
+            ? super.rpc<T>(path, body)
+            : super.rpc<T>(
+                path,
+                body,
+                options?.signal === undefined ? {} : { signal: options.signal }
+              )
+        }
+      }
+      const resource = new root.ItemResourceClient(
+        new LegacyForwardingHttp('http://example.test', 'token'),
+        'fixture',
+        'items'
+      )
+      const factory = client.createRemoteClient(root.contract, {
+        token: 'token',
+        url: 'http://example.test',
+      })
+      const responses = [
+        () => Response.json({}),
+        () => new Response('invalid JSON', { status: 200 }),
+      ]
+      const fetch = vi.spyOn(globalThis, 'fetch')
+      try {
+        for (const response of responses) {
+          fetch.mockImplementation(() => Promise.resolve(response()))
+          const expected = {
+            code: 'TRANSPORT_FAILED',
+            details: { reason: 'invalid-response', status: 200 },
+          }
+          await expect(factory.items.get(contracts.Integer.validate(7))).rejects.toMatchObject(
+            expected
+          )
+          await expect(resource.get(7)).rejects.toMatchObject(expected)
+        }
+        fetch.mockImplementation(() =>
+          Promise.resolve(
+            Response.json(
+              {
+                error: {
+                  code: 'PERMISSION_DENIED',
+                  message: 'Denied',
+                  details: { required: 'fixture:items:get' },
+                },
+              },
+              { status: 403 }
+            )
+          )
+        )
+        await expect(resource.get(7)).rejects.toMatchObject({
+          code: 'PERMISSION_DENIED',
+          details: { required: 'fixture:items:get' },
+        })
+      } finally {
+        fetch.mockRestore()
+      }
+    }
+  )
 })

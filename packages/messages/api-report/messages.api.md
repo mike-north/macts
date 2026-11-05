@@ -18,10 +18,10 @@ export interface Account {
     readonly serviceType: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "AccountCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AccountCreateInput = AccountCreateInput_2;
+export interface AccountCreateInput {
+    enabled?: boolean;
+}
 
 // @public
 export const AccountSchema: z.ZodObject<{
@@ -32,10 +32,10 @@ export const AccountSchema: z.ZodObject<{
     serviceType: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "AccountUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AccountUpdateInput = AccountUpdateInput_2;
+export interface AccountUpdateInput {
+    enabled?: boolean;
+}
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -62,10 +62,8 @@ export interface Chat {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ChatCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ChatCreateInput = ChatCreateInput_2;
+export type ChatCreateInput = Record<string, never>;
 
 // @public
 export const ChatSchema: z.ZodObject<{
@@ -73,10 +71,8 @@ export const ChatSchema: z.ZodObject<{
     name: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ChatUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ChatUpdateInput = ChatUpdateInput_2;
+export type ChatUpdateInput = Record<string, never>;
 
 // @public
 export type ConnectionStatus = 'disconnecting' | 'connected' | 'connecting' | 'disconnected';
@@ -84,15 +80,13 @@ export type ConnectionStatus = 'disconnecting' | 'connected' | 'connecting' | 'd
 // @public
 export type Direction = 'incoming' | 'outgoing';
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "MessagesResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<MessagesResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -100,7 +94,7 @@ export class HttpClient {
 export interface MessagesClient extends ClientBrand<MessagesResources> {
 }
 
-// @public (undocumented)
+// @public
 export class MessagesClient {
     constructor(options: MessagesClientOptions);
     get http(): HttpClient;
@@ -123,6 +117,9 @@ export class MessagesError extends Error {
 }
 
 // @public
+export type MessagesResources = Readonly<Record<never, never>>;
+
+// @public
 export interface Participant {
     readonly firstName: string | null;
     readonly fullName: string | null;
@@ -132,10 +129,8 @@ export interface Participant {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ParticipantCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ParticipantCreateInput = ParticipantCreateInput_2;
+export type ParticipantCreateInput = Record<string, never>;
 
 // @public
 export const ParticipantSchema: z.ZodObject<{
@@ -147,10 +142,8 @@ export const ParticipantSchema: z.ZodObject<{
     fullName: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "ParticipantUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ParticipantUpdateInput = ParticipantUpdateInput_2;
+export type ParticipantUpdateInput = Record<string, never>;
 
 // @public
 export type ServiceType = 'sMS' | 'iMessage' | 'rCS';

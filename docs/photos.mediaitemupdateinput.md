@@ -4,12 +4,12 @@
 
 ## MediaItemUpdateInput type
 
-Input for updating a MediaItem
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type MediaItemUpdateInput = Partial<MediaItemCreateInput>
+type MediaItemUpdateInput = Omit<MediaItemUpdateInput$1, 'size'> & {
+  size?: null extends MediaItemUpdateInput$1['size'] ? number | null : number
+}
 ```
-
-**References:** [MediaItemCreateInput](./photos.mediaitemcreateinput.md)

@@ -4,10 +4,10 @@
 
 ## Track.discNumber property
 
-The disc number of the track
+The disc number of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-discNumber: number
+readonly discNumber: Integer | null;
 ```

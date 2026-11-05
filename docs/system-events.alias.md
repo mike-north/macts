@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the OSType identifying the application that created the alias
+the OSType identifying the application that created the alias. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ the OSType identifying the application that created the alias
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the application that will launch if the alias is opened
+the application that will launch if the alias is opened. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ the application that will launch if the alias is opened
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the OSType identifying the type of data contained in the alias
+the OSType identifying the type of data contained in the alias. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +82,15 @@ the OSType identifying the type of data contained in the alias
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The kind of alias, as shown in Finder
+string \| null
+
+</td><td>
+
+The kind of alias, as shown in Finder. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +99,15 @@ The kind of alias, as shown in Finder
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the version of the product (visible at the top of the "Get Info" window)
+string \| null
+
+</td><td>
+
+the version of the product (visible at the top of the "Get Info" window). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -112,13 +116,15 @@ the version of the product (visible at the top of the "Get Info" window)
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the short version of the application bundle referenced by the alias
+string \| null
+
+</td><td>
+
+the short version of the application bundle referenced by the alias. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +135,11 @@ the short version of the application bundle referenced by the alias
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Is the alias a stationery pad?
+Is the alias a stationery pad? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +148,15 @@ Is the alias a stationery pad?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The type identifier of the alias
+string \| null
+
+</td><td>
+
+The type identifier of the alias. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -157,13 +165,15 @@ The type identifier of the alias
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the version of the application bundle referenced by the alias (visible at the bottom of the "Get Info" window)
+string \| null
+
+</td><td>
+
+the version of the application bundle referenced by the alias (visible at the bottom of the "Get Info" window). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -31,7 +31,8 @@ export class TabResourceClient {
     return this.#http.invoke<Page<Tab>>(
       `${this.#app}.${this.#resource}.list`,
       { windowId },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 
@@ -46,7 +47,8 @@ export class TabResourceClient {
     return this.#http.invoke<Tab>(
       `${this.#app}.${this.#resource}.get`,
       { windowId, id },
-      __mactsOptions
+      __mactsOptions,
+      'Tab'
     )
   }
 }

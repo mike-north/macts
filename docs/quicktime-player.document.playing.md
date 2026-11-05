@@ -4,10 +4,10 @@
 
 ## Document.playing property
 
-Whether the document is currently playing
+Whether the document is currently playing. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-playing: boolean
+playing: boolean | null
 ```

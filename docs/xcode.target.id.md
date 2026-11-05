@@ -4,10 +4,10 @@
 
 ## Target.id property
 
-The unique identifier for the target
+The unique identifier for the target. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

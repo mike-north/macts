@@ -320,7 +320,7 @@ describe('@macts/calendar events update and delete', () => {
     // excludedDates is an array of date, not a comma-separated string.
     expect(body).toContain('excludedDates?: readonly Date[]')
     // status references the EventStatus enum, not widened to string.
-    expect(body).toContain('status?: EventStatus;')
+    expect(body).toContain('status?: EventStatus')
   })
 
   it('updateEvent has mutable event fields as optional parameters', () => {

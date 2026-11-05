@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the original item pointed to by the alias
+the original item pointed to by the alias. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

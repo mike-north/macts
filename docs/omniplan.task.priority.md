@@ -4,10 +4,10 @@
 
 ## Task.priority property
 
-Priority of this task
+Priority of this task. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-priority: number
+priority: Integer | null
 ```

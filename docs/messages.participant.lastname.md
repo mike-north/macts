@@ -4,10 +4,10 @@
 
 ## Participant.lastName property
 
-The last name from this participant's Contacts card, if available
+The last name from this participant's Contacts card, if available. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-lastName: string
+readonly lastName: string | null;
 ```

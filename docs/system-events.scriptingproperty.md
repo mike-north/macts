@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The type of access to this property
+string \| null
+
+</td><td>
+
+The type of access to this property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -52,13 +54,15 @@ The type of access to this property
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The description of the property
+string \| null
+
+</td><td>
+
+The description of the property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +71,15 @@ The description of the property
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the property's value an enumerator?
+boolean \| null
+
+</td><td>
+
+Is the property's value an enumerator? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -82,13 +88,15 @@ Is the property's value an enumerator?
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the property hidden?
+boolean \| null
+
+</td><td>
+
+Is the property hidden? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +105,15 @@ Is the property hidden?
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-The unique identifier of the property
+The unique identifier of the property. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -112,13 +122,15 @@ The unique identifier of the property
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The kind of object or data returned by this property
+string \| null
+
+</td><td>
+
+The kind of object or data returned by this property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +139,15 @@ The kind of object or data returned by this property
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-Is the property's value a list?
+boolean \| null
+
+</td><td>
+
+Is the property's value a list? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -142,13 +156,15 @@ Is the property's value a list?
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-The name of the property
+string \| null
+
+</td><td>
+
+The name of the property. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

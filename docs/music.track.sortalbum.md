@@ -4,10 +4,10 @@
 
 ## Track.sortAlbum property
 
-override string to use for the track when sorting by album
+override string to use for the track when sorting by album. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-sortAlbum: string
+sortAlbum: string | null
 ```

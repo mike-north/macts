@@ -4,10 +4,10 @@
 
 ## ComboBox.id property
 
-Unique identifier for this combo box
+Unique identifier for this combo box. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-the equalizer 32 Hz band level (-12.0 dB to +12.0 dB)
+the equalizer 32 Hz band level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ the equalizer 32 Hz band level (-12.0 dB to +12.0 dB)
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-the equalizer 16 kHz band level (-12.0 dB to +12.0 dB)
+the equalizer 16 kHz band level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ the equalizer 16 kHz band level (-12.0 dB to +12.0 dB)
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-the equalizer 64 Hz band level (-12.0 dB to +12.0 dB)
+the equalizer 64 Hz band level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +84,11 @@ the equalizer 64 Hz band level (-12.0 dB to +12.0 dB)
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-the equalizer 125 Hz band level (-12.0 dB to +12.0 dB)
+the equalizer 125 Hz band level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +99,11 @@ the equalizer 125 Hz band level (-12.0 dB to +12.0 dB)
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-the equalizer 250 Hz band level (-12.0 dB to +12.0 dB)
+the equalizer 250 Hz band level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +114,11 @@ the equalizer 250 Hz band level (-12.0 dB to +12.0 dB)
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-the equalizer 500 Hz band level (-12.0 dB to +12.0 dB)
+the equalizer 500 Hz band level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +129,11 @@ the equalizer 500 Hz band level (-12.0 dB to +12.0 dB)
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-the equalizer 1 kHz band level (-12.0 dB to +12.0 dB)
+the equalizer 1 kHz band level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +144,11 @@ the equalizer 1 kHz band level (-12.0 dB to +12.0 dB)
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-the equalizer 2 kHz band level (-12.0 dB to +12.0 dB)
+the equalizer 2 kHz band level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +159,11 @@ the equalizer 2 kHz band level (-12.0 dB to +12.0 dB)
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-the equalizer 4 kHz band level (-12.0 dB to +12.0 dB)
+the equalizer 4 kHz band level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -174,11 +174,11 @@ the equalizer 4 kHz band level (-12.0 dB to +12.0 dB)
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-the equalizer 8 kHz band level (-12.0 dB to +12.0 dB)
+the equalizer 8 kHz band level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -187,13 +187,15 @@ the equalizer 8 kHz band level (-12.0 dB to +12.0 dB)
 
 </td><td>
 
-</td><td>
-
-boolean
+`readonly`
 
 </td><td>
 
-can this preset be modified?
+boolean \| null
+
+</td><td>
+
+can this preset be modified? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -204,11 +206,11 @@ can this preset be modified?
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-the equalizer preamp level (-12.0 dB to +12.0 dB)
+the equalizer preamp level (-12.0 dB to +12.0 dB). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -219,11 +221,11 @@ the equalizer preamp level (-12.0 dB to +12.0 dB)
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-should tracks which refer to this preset be updated when the preset is renamed or deleted?
+should tracks which refer to this preset be updated when the preset is renamed or deleted? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

@@ -26,7 +26,8 @@ export class PaneResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.authorize`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Pane'
     )
   }
 
@@ -37,7 +38,8 @@ export class PaneResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.timedLoad`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Pane'
     )
   }
 }

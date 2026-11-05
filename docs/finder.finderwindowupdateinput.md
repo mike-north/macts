@@ -4,12 +4,12 @@
 
 ## FinderWindowUpdateInput type
 
-Input for updating a FinderWindow
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type FinderWindowUpdateInput = Partial<FinderWindowCreateInput>
+type FinderWindowUpdateInput = Omit<FinderWindowUpdateInput$1, 'sidebarWidth'> & {
+  sidebarWidth?: null extends FinderWindowUpdateInput$1['sidebarWidth'] ? number | null : number
+}
 ```
-
-**References:** [FinderWindowCreateInput](./finder.finderwindowcreateinput.md)

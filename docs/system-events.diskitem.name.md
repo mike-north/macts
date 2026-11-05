@@ -4,10 +4,10 @@
 
 ## DiskItem.name property
 
-the name of the disk item
+the name of the disk item. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-name: string
+name: string | null
 ```

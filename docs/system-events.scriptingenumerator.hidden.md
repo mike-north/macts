@@ -4,10 +4,10 @@
 
 ## ScriptingEnumerator.hidden property
 
-Is the enumerator hidden?
+Is the enumerator hidden? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-hidden: boolean
+readonly hidden: boolean | null;
 ```

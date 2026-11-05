@@ -4,10 +4,10 @@
 
 ## RequiredResource.version property
 
-The minimum acceptable version of the required resource
+The minimum acceptable version of the required resource. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-version: number
+readonly version: Integer | null;
 ```

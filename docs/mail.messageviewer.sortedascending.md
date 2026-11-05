@@ -4,10 +4,10 @@
 
 ## MessageViewer.sortedAscending property
 
-Whether the viewer is sorted ascending or not
+Whether the viewer is sorted ascending or not. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-sortedAscending: boolean
+sortedAscending: boolean | null
 ```

@@ -6,6 +6,7 @@
 
 import { CallOptions } from '@macts/contracts';
 import { ClientBrand } from '@macts/contracts';
+import { FileSource } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import * as _macts_contracts from '@macts/contracts';
 import { Point } from '@macts/contracts';
@@ -32,15 +33,13 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "iTermResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<iTermResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -48,7 +47,7 @@ export class HttpClient {
 export interface iTermClient extends ClientBrand<iTermResources> {
 }
 
-// @public (undocumented)
+// @public
 export class iTermClient {
     constructor(options: iTermClientOptions);
     close(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -78,7 +77,8 @@ export class iTermClient {
     splitVerticallyWithSameProfile(command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     toggleHotkeyWindow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     variable(named: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    write(contentsOfFile?: string, text?: string, newline?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "iTermClient_2" needs to be exported by the entry point index.d.ts
+    write(contentsOfFile?: Parameters<iTermClient_2['write']>[0], text?: string, newline?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public
@@ -93,6 +93,9 @@ export class iTermError extends Error {
     // (undocumented)
     readonly code: string;
 }
+
+// @public
+export type iTermResources = Readonly<Record<never, never>>;
 
 // @public
 export type SaveOptions = 'yes' | 'no' | 'ask';
@@ -145,8 +148,8 @@ export interface Session {
 //
 // @public
 export type SessionCreateInput = Omit<SessionCreateInput_2, 'columns' | 'rows'> & {
-    columns?: number | Extract<SessionCreateInput_2['columns'], null>;
-    rows?: number | Extract<SessionCreateInput_2['rows'], null>;
+    columns?: null extends SessionCreateInput_2['columns'] ? number | null : number;
+    rows?: null extends SessionCreateInput_2['rows'] ? number | null : number;
 };
 
 // @public
@@ -293,8 +296,8 @@ export const SessionSchema: z.ZodObject<{
 //
 // @public
 export type SessionUpdateInput = Omit<SessionUpdateInput_2, 'columns' | 'rows'> & {
-    columns?: number | Extract<SessionUpdateInput_2['columns'], null>;
-    rows?: number | Extract<SessionUpdateInput_2['rows'], null>;
+    columns?: null extends SessionUpdateInput_2['columns'] ? number | null : number;
+    rows?: null extends SessionUpdateInput_2['rows'] ? number | null : number;
 };
 
 // @public
@@ -307,7 +310,7 @@ export interface Tab {
 //
 // @public
 export type TabCreateInput = Omit<TabCreateInput_2, 'index'> & {
-    index?: number | Extract<TabCreateInput_2['index'], null>;
+    index?: null extends TabCreateInput_2['index'] ? number | null : number;
 };
 
 // @public
@@ -320,7 +323,7 @@ export const TabSchema: z.ZodObject<{
 //
 // @public
 export type TabUpdateInput = Omit<TabUpdateInput_2, 'index'> & {
-    index?: number | Extract<TabUpdateInput_2['index'], null>;
+    index?: null extends TabUpdateInput_2['index'] ? number | null : number;
 };
 
 // @public
@@ -350,7 +353,7 @@ export interface Window {
 //
 // @public
 export type WindowCreateInput = Omit<WindowCreateInput_2, 'index'> & {
-    index?: number | Extract<WindowCreateInput_2['index'], null>;
+    index?: null extends WindowCreateInput_2['index'] ? number | null : number;
 };
 
 // @public
@@ -399,7 +402,7 @@ export const WindowSchema: z.ZodObject<{
 //
 // @public
 export type WindowUpdateInput = Omit<WindowUpdateInput_2, 'index'> & {
-    index?: number | Extract<WindowUpdateInput_2['index'], null>;
+    index?: null extends WindowUpdateInput_2['index'] ? number | null : number;
 };
 
 // (No @packageDocumentation comment for this package)

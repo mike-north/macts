@@ -8,6 +8,8 @@ export {
   createClient as createRemoteClient,
   createRemoteTransport,
   type RemoteClientOptions,
+  type RemoteRpcOutcome,
+  type RemoteTransport,
 } from './remote.js'
 export {
   bindReference,

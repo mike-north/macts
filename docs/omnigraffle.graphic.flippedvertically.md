@@ -4,10 +4,10 @@
 
 ## Graphic.flippedVertically property
 
-Is this graphic flipped vertically?
+Is this graphic flipped vertically? Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-flippedVertically: boolean
+flippedVertically: boolean | null
 ```

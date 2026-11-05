@@ -4,12 +4,10 @@
 
 ## DomainUpdateInput type
 
-Input for updating a Domain
+Input for updating a Domain. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type DomainUpdateInput = Partial<DomainCreateInput>
+type DomainUpdateInput = Record<string, never>
 ```
-
-**References:** [DomainCreateInput](./system-events.domaincreateinput.md)

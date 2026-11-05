@@ -4,10 +4,10 @@
 
 ## Tab.titleDisplaysCustomTitle property
 
-Whether the title displays a custom title
+Whether the title displays a custom title. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-titleDisplaysCustomTitle: boolean
+titleDisplaysCustomTitle: boolean | null
 ```

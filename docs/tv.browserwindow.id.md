@@ -4,10 +4,10 @@
 
 ## BrowserWindow.id property
 
-Unique identifier for this window
+Unique identifier for this window. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: number
+readonly id: Integer;
 ```

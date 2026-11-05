@@ -4,7 +4,7 @@
 
 ## BookmarkItemCreateInput interface
 
-Input for creating a BookmarkItem
+Input for creating a BookmarkItem.
 
 **Signature:**
 

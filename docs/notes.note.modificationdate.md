@@ -4,10 +4,10 @@
 
 ## Note.modificationDate property
 
-The modification date of the note
+The modification date of the note. Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-modificationDate: string
+readonly modificationDate: Date;
 ```

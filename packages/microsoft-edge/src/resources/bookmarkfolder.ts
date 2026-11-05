@@ -30,7 +30,8 @@ export class BookmarkFolderResourceClient {
     return this.#http.invoke<Page<BookmarkFolder>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'BookmarkFolder'
     )
   }
 
@@ -44,7 +45,8 @@ export class BookmarkFolderResourceClient {
     return this.#http.invoke<BookmarkFolder>(
       `${this.#app}.${this.#resource}.get`,
       { id },
-      __mactsOptions
+      __mactsOptions,
+      'BookmarkFolder'
     )
   }
 }

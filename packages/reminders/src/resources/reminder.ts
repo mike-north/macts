@@ -58,7 +58,8 @@ export class ReminderResourceClient {
         ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
         listId,
       },
-      __mactsOptions
+      __mactsOptions,
+      'Reminder'
     )
   }
 
@@ -69,7 +70,12 @@ export class ReminderResourceClient {
     id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<Reminder> {
-    return this.#http.invoke<Reminder>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
+    return this.#http.invoke<Reminder>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Reminder'
+    )
   }
 
   /**
@@ -82,7 +88,8 @@ export class ReminderResourceClient {
     return this.#http.invoke<Reminder>(
       `${this.#app}.${this.#resource}.create`,
       input,
-      __mactsOptions
+      __mactsOptions,
+      'Reminder'
     )
   }
 
@@ -93,7 +100,8 @@ export class ReminderResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.delete`,
       { id },
-      __mactsOptions
+      __mactsOptions,
+      'Reminder'
     )
   }
 
@@ -107,7 +115,8 @@ export class ReminderResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.complete`,
       { id },
-      __mactsOptions
+      __mactsOptions,
+      'Reminder'
     )
   }
 
@@ -115,6 +124,11 @@ export class ReminderResourceClient {
    * Show the reminder in Reminders.app UI
    */
   async show(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
-    await this.#http.invoke<undefined>(`${this.#app}.${this.#resource}.show`, {}, __mactsOptions)
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.show`,
+      {},
+      __mactsOptions,
+      'Reminder'
+    )
   }
 }

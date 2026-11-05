@@ -4,14 +4,10 @@
 
 ## Shape.fillColor property
 
-The fill color
+The fill color. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-fillColor: {
-  r: number
-  g: number
-  b: number
-}
+fillColor: Rgb | null
 ```

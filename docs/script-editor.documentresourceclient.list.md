@@ -4,14 +4,44 @@
 
 ## DocumentResourceClient.list() method
 
-List all documents.
+List all documents, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Document[]>;
+list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Document>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Document](./script-editor.document.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Document](./script-editor.document.md)<!-- -->&gt;&gt;

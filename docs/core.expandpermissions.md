@@ -6,12 +6,15 @@
 
 Expand multiple permissions, handling coarse and wildcard permissions.
 
+Each permission expands as [expandCoarsePermission()](./core.expandcoarsepermission.md) describes. A fine-grained permission the mapping lists is included as-is; one it does not list is included as-is only when `options.unmapped` is `keep`<!-- -->, and otherwise throws.
+
 **Signature:**
 
 ```typescript
 declare function expandPermissions(
   permissions: string[],
-  permissionsSection: PermissionsSection
+  permissionsSection: PermissionsSection,
+  options?: ExpandPermissionOptions
 ): string[]
 ```
 
@@ -56,6 +59,19 @@ permissionsSection
 The permissions mapping from the manifest
 
 </td></tr>
+<tr><td>
+
+options
+
+</td><td>
+
+[ExpandPermissionOptions](./core.expandpermissionoptions.md)
+
+</td><td>
+
+_(Optional)_ How to treat a permission the mapping does not contain
+
+</td></tr>
 </tbody></table>
 
 **Returns:**
@@ -63,3 +79,7 @@ The permissions mapping from the manifest
 string\[\]
 
 Array of unique fine-grained permission strings
+
+## Exceptions
+
+PermissionExpansionError if a permission cannot be expanded

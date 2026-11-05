@@ -2,14 +2,63 @@
 
 [Home](./index.md) &gt; [@macts/omnigraffle](./omnigraffle.md) &gt; [GroupUpdateInput](./omnigraffle.groupupdateinput.md)
 
-## GroupUpdateInput type
+## GroupUpdateInput interface
 
-Input for updating a Group
+Input for updating a Group. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type GroupUpdateInput = Partial<GroupCreateInput>
+interface GroupUpdateInput
 ```
 
-**References:** [GroupCreateInput](./omnigraffle.groupcreateinput.md)
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[connectToGroupOnly?](./omnigraffle.groupupdateinput.connecttogrouponly.md)
+
+</td><td>
+
+</td><td>
+
+boolean
+
+</td><td>
+
+_(Optional)_ Only connect to the group? Cannot be reset: null is rejected.
+
+</td></tr>
+<tr><td>
+
+[rotation?](./omnigraffle.groupupdateinput.rotation.md)
+
+</td><td>
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ Rotation of the group in degrees. Cannot be reset: null is rejected.
+
+</td></tr>
+</tbody></table>

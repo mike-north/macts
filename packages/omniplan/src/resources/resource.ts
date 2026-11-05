@@ -49,7 +49,8 @@ export class ResourceResourceClient {
     return this.#http.invoke<Page<Resource>>(
       `${this.#app}.${this.#resource}.list`,
       {},
-      __mactsOptions
+      __mactsOptions,
+      'Resource'
     )
   }
 
@@ -63,7 +64,8 @@ export class ResourceResourceClient {
     return this.#http.invoke<Resource>(
       `${this.#app}.${this.#resource}.get`,
       { id: __mactsIntegerInput(id) },
-      __mactsOptions
+      __mactsOptions,
+      'Resource'
     )
   }
 
@@ -77,7 +79,8 @@ export class ResourceResourceClient {
     return this.#http.invoke<Resource>(
       `${this.#app}.${this.#resource}.create`,
       input,
-      __mactsOptions
+      __mactsOptions,
+      'Resource'
     )
   }
 }

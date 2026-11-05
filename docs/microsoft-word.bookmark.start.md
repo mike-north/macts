@@ -4,10 +4,10 @@
 
 ## Bookmark.start property
 
-The starting character position
+The starting character position. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-start: number
+readonly start: Integer | null;
 ```

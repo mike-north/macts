@@ -37,13 +37,15 @@ Description
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-Unique identifier for this name
+string \| null
+
+</td><td>
+
+Unique identifier for this name. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +56,11 @@ Unique identifier for this name
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Label for this name
+Label for this name. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +71,11 @@ Label for this name
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-The related name value
+The related name value. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

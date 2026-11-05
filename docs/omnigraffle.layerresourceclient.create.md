@@ -9,7 +9,7 @@ Create a new layer.
 **Signature:**
 
 ```typescript
-create(input: LayerCreateInput): Promise<Layer>;
+create(input: LayerCreateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Layer>;
 ```
 
 ## Parameters
@@ -36,6 +36,19 @@ input
 [LayerCreateInput](./omnigraffle.layercreateinput.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
 
 </td></tr>
 </tbody></table>

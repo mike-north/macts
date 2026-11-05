@@ -4,12 +4,10 @@
 
 ## FileDocumentUpdateInput type
 
-Input for updating a FileDocument
+Input for updating a FileDocument. Omitted fields are left unchanged.
 
 **Signature:**
 
 ```typescript
-type FileDocumentUpdateInput = Partial<FileDocumentCreateInput>
+type FileDocumentUpdateInput = Record<string, never>
 ```
-
-**References:** [FileDocumentCreateInput](./xcode.filedocumentcreateinput.md)

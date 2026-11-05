@@ -4,7 +4,7 @@
 
 ## ScriptingEnumeratorCreateInput type
 
-Input for creating a ScriptingEnumerator
+Input for creating a ScriptingEnumerator.
 
 **Signature:**
 

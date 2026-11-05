@@ -4,10 +4,10 @@
 
 ## Paragraph.spaceAfter property
 
-The spacing in points after the paragraph
+The spacing in points after the paragraph. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-spaceAfter: number
+spaceAfter: number | null
 ```

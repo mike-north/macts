@@ -4,10 +4,10 @@
 
 ## OutgoingMessage.subject property
 
-The subject of the message
+The subject of the message. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-subject: string
+subject: string | null
 ```

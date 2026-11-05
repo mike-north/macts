@@ -9,7 +9,7 @@ Print the specified object(s)
 **Signature:**
 
 ```typescript
-print(printDialog?: boolean, withProperties?: string, kind?: string, theme?: string): Promise<void>;
+print(printDialog?: boolean, withProperties?: string, kind?: string, theme?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -73,6 +73,19 @@ theme
 </td><td>
 
 string
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

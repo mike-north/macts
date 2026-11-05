@@ -4,10 +4,10 @@
 
 ## Message.replyTo property
 
-The address that replies should be sent to
+The address that replies should be sent to. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-replyTo: string
+readonly replyTo: string | null;
 ```

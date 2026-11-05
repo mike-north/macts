@@ -56,7 +56,8 @@ export class PersonResourceClient {
         ...(page.pageSize === undefined ? {} : { pageSize: __mactsIntegerInput(page.pageSize) }),
         ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
       },
-      __mactsOptions
+      __mactsOptions,
+      'Person'
     )
   }
 
@@ -64,6 +65,11 @@ export class PersonResourceClient {
    * Get a person by id.
    */
   async get(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<Person> {
-    return this.#http.invoke<Person>(`${this.#app}.${this.#resource}.get`, { id }, __mactsOptions)
+    return this.#http.invoke<Person>(
+      `${this.#app}.${this.#resource}.get`,
+      { id },
+      __mactsOptions,
+      'Person'
+    )
   }
 }

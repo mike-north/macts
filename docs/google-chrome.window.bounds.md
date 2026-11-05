@@ -4,15 +4,10 @@
 
 ## Window.bounds property
 
-The bounding rectangle of the window.
+The bounding rectangle of the window. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-bounds: {
-  x: number
-  y: number
-  width: number
-  height: number
-}
+bounds: Rectangle | null
 ```

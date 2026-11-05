@@ -4,10 +4,10 @@
 
 ## BookmarkItem.uRL property
 
-The URL of the bookmark.
+The URL of the bookmark. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-uRL: string
+uRL: string | null
 ```

@@ -60,7 +60,7 @@ const expectedAttachment: Attachment = {
 /** Construct all three consumer entry points over actual contract registration. */
 async function clients(
   permissions: string[],
-  response: () => Promise<WireValue> = async () => attachmentWire
+  response: () => Promise<WireValue> = () => Promise.resolve(attachmentWire)
 ) {
   const { token } = await createApiKey({ name: 'Generated root parity', permissions })
   const manifest = AppManifestSchema.parse(await notesContract.loadManifest())
@@ -70,7 +70,9 @@ async function clients(
     prettyJson: false,
     executor,
     governance: { policy: ALLOW_ALL_POLICY },
-    register: (registrar) => registrar.registerContract(notesContract, manifest),
+    register: (registrar) => {
+      registrar.registerContract(notesContract, manifest)
+    },
   })
   const fetch: typeof globalThis.fetch = async (input, init) => app.fetch(new Request(input, init))
   const facade = new NotesClient({ apiKey: token, baseUrl: 'http://macts.test' })
@@ -103,9 +105,9 @@ describe('generated root over the contract-registered service', () => {
   })
 
   it('matches canonical missing and permission errors with their details', async () => {
-    const missing = await clients(['notes:attachments:get'], async () => {
-      throw new TargetNotFoundError('Missing attachment.', { resource: 'Attachment' })
-    })
+    const missing = await clients(['notes:attachments:get'], () =>
+      Promise.reject(new TargetNotFoundError('Missing attachment.', { resource: 'Attachment' }))
+    )
     const fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(missing.fetch)
     try {
       for (const consumer of [missing.facade, missing.remote, missing.local]) {
@@ -142,6 +144,63 @@ describe('generated root over the contract-registered service', () => {
       }
       expect(fetch).not.toHaveBeenCalled()
       expect(all.executor.requests).toHaveLength(0)
+    } finally {
+      fetch.mockRestore()
+    }
+  })
+  it('preserves a valid null void result from manifest registration through explicit raw RPC', async () => {
+    const manifest = AppManifestSchema.parse({
+      version: '1.0',
+      app: { name: 'Legacy', bundleId: 'test.legacy', tccEntitlements: [] },
+      resources: {
+        Item: {
+          name: 'Item',
+          plural: 'Items',
+          description: 'Unused manifest resource',
+          properties: {},
+        },
+      },
+      enums: {},
+      hierarchy: { children: {} },
+      suites: [],
+      relationships: [],
+      commands: {
+        noop: {
+          name: 'noop',
+          description: 'A command without a result',
+          scope: 'application',
+          parameters: [],
+        },
+      },
+    })
+    const { token } = await createApiKey({
+      name: 'Legacy void protocol',
+      permissions: ['legacy:app:noop'],
+    })
+    const executor = createRecordingExecutor(() => Promise.resolve(null))
+    const app = createApp([manifest], {
+      cors: false,
+      prettyJson: false,
+      executor,
+      governance: { policy: ALLOW_ALL_POLICY },
+    })
+    const response = await app.fetch(
+      new Request('http://macts.test/api/v1/rpc/legacy.app.noop', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: '{}',
+      })
+    )
+    expect(response.status).toBe(200)
+    expect(await response.json()).toEqual({ result: null })
+    const fetch = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation((input, init) => Promise.resolve(app.fetch(new Request(input, init))))
+    try {
+      const root = new NotesClient({ apiKey: token, baseUrl: 'http://macts.test' })
+      expect(await root.http.rpc('legacy.app.noop')).toBeNull()
+      expect(executor.requests).toHaveLength(2)
+      expect(executor.requests[0]?.outputPlan.kind).toBe('passthrough')
     } finally {
       fetch.mockRestore()
     }

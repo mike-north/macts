@@ -19,19 +19,19 @@ export type { FieldType } from './contract/index.js'
 export type { Document } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type DocumentCreateInput = import('./contract/index.js').DocumentCreateInput
+export type { DocumentCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type DocumentUpdateInput = import('./contract/index.js').DocumentUpdateInput
+export type { DocumentUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Paragraph } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ParagraphCreateInput = import('./contract/index.js').ParagraphCreateInput
+export type { ParagraphCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ParagraphUpdateInput = import('./contract/index.js').ParagraphUpdateInput
+export type { ParagraphUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { TextRange } from './contract/index.js'
@@ -42,9 +42,13 @@ export type TextRangeCreateInput = Omit<
   'start' | 'end'
 > & {
   /** The starting character position Numeric values are validated by the contract before dispatch. */
-  start?: number | Extract<import('./contract/index.js').TextRangeCreateInput['start'], null>
+  start?: null extends import('./contract/index.js').TextRangeCreateInput['start']
+    ? number | null
+    : number
   /** The ending character position Numeric values are validated by the contract before dispatch. */
-  end?: number | Extract<import('./contract/index.js').TextRangeCreateInput['end'], null>
+  end?: null extends import('./contract/index.js').TextRangeCreateInput['end']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -53,100 +57,104 @@ export type TextRangeUpdateInput = Omit<
   'start' | 'end'
 > & {
   /** The starting character position Numeric values are validated by the contract before dispatch. */
-  start?: number | Extract<import('./contract/index.js').TextRangeUpdateInput['start'], null>
+  start?: null extends import('./contract/index.js').TextRangeUpdateInput['start']
+    ? number | null
+    : number
   /** The ending character position Numeric values are validated by the contract before dispatch. */
-  end?: number | Extract<import('./contract/index.js').TextRangeUpdateInput['end'], null>
+  end?: null extends import('./contract/index.js').TextRangeUpdateInput['end']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Selection } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type SelectionCreateInput = import('./contract/index.js').SelectionCreateInput
+export type { SelectionCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type SelectionUpdateInput = import('./contract/index.js').SelectionUpdateInput
+export type { SelectionUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Table } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type TableCreateInput = import('./contract/index.js').TableCreateInput
+export type { TableCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type TableUpdateInput = import('./contract/index.js').TableUpdateInput
+export type { TableUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Row } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type RowCreateInput = import('./contract/index.js').RowCreateInput
+export type { RowCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type RowUpdateInput = import('./contract/index.js').RowUpdateInput
+export type { RowUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Column } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ColumnCreateInput = import('./contract/index.js').ColumnCreateInput
+export type { ColumnCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ColumnUpdateInput = import('./contract/index.js').ColumnUpdateInput
+export type { ColumnUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Cell } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type CellCreateInput = import('./contract/index.js').CellCreateInput
+export type { CellCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type CellUpdateInput = import('./contract/index.js').CellUpdateInput
+export type { CellUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Font } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type FontCreateInput = import('./contract/index.js').FontCreateInput
+export type { FontCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type FontUpdateInput = import('./contract/index.js').FontUpdateInput
+export type { FontUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { PageSetup } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type PageSetupCreateInput = import('./contract/index.js').PageSetupCreateInput
+export type { PageSetupCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type PageSetupUpdateInput = import('./contract/index.js').PageSetupUpdateInput
+export type { PageSetupUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Section } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type SectionCreateInput = import('./contract/index.js').SectionCreateInput
+export type { SectionCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type SectionUpdateInput = import('./contract/index.js').SectionUpdateInput
+export type { SectionUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Bookmark } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type BookmarkCreateInput = import('./contract/index.js').BookmarkCreateInput
+export type { BookmarkCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type BookmarkUpdateInput = import('./contract/index.js').BookmarkUpdateInput
+export type { BookmarkUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Field } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type FieldCreateInput = import('./contract/index.js').FieldCreateInput
+export type { FieldCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type FieldUpdateInput = import('./contract/index.js').FieldUpdateInput
+export type { FieldUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

@@ -4,7 +4,7 @@
 
 ## BrowserWindowCreateInput interface
 
-Input for creating a BrowserWindow
+Input for creating a BrowserWindow.
 
 **Signature:**
 
@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-[Playlist](./music.playlist.md)
+[ObjectReferenceData](./contracts.objectreferencedata.md)<!-- -->&lt;string, 'Playlist'&gt;
 
 </td><td>
 

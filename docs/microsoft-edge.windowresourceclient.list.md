@@ -4,14 +4,44 @@
 
 ## WindowResourceClient.list() method
 
-List all windows.
+List all windows, as one page.
 
 **Signature:**
 
 ```typescript
-list(): Promise<Window[]>;
+list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Window>>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 
-Promise&lt;[Window](./microsoft-edge.window.md)<!-- -->\[\]&gt;
+Promise&lt;[Page](./contracts.page.md)<!-- -->&lt;[Window](./microsoft-edge.window.md)<!-- -->&gt;&gt;

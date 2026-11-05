@@ -9,9 +9,5 @@ List color
 **Signature:**
 
 ```typescript
-color?: {
-        r: number;
-        g: number;
-        b: number;
-    };
+color?: string;
 ```

@@ -4,10 +4,10 @@
 
 ## Person.phoneticMiddleName property
 
-The Phonetic version of the Middle name of this person.
+The Phonetic version of the Middle name of this person. Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
 
 **Signature:**
 
 ```typescript
-phoneticMiddleName: string
+phoneticMiddleName: string | null
 ```

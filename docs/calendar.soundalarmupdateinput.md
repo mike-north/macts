@@ -4,12 +4,12 @@
 
 ## SoundAlarmUpdateInput type
 
-Input for updating a SoundAlarm
+Canonical update input, retaining checked numeric conveniences.
 
 **Signature:**
 
 ```typescript
-type SoundAlarmUpdateInput = Partial<SoundAlarmCreateInput>
+type SoundAlarmUpdateInput = Omit<SoundAlarmUpdateInput$1, 'triggerInterval'> & {
+  triggerInterval?: null extends SoundAlarmUpdateInput$1['triggerInterval'] ? number | null : number
+}
 ```
-
-**References:** [SoundAlarmCreateInput](./calendar.soundalarmcreateinput.md)

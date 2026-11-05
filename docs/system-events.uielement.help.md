@@ -4,10 +4,10 @@
 
 ## UIElement.help property
 
-an elaborate description of the UI element and its capabilities
+an elaborate description of the UI element and its capabilities. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-help: string
+readonly help: string | null;
 ```

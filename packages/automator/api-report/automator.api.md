@@ -44,7 +44,7 @@ export interface AutomatorAction {
 //
 // @public
 export type AutomatorActionCreateInput = Omit<AutomatorActionCreateInput_2, 'index'> & {
-    index?: number | Extract<AutomatorActionCreateInput_2['index'], null>;
+    index?: null extends AutomatorActionCreateInput_2['index'] ? number | null : number;
 };
 
 // @public
@@ -85,16 +85,14 @@ export const AutomatorActionSchema: z.ZodObject<{
 //
 // @public
 export type AutomatorActionUpdateInput = Omit<AutomatorActionUpdateInput_2, 'index'> & {
-    index?: number | Extract<AutomatorActionUpdateInput_2['index'], null>;
+    index?: null extends AutomatorActionUpdateInput_2['index'] ? number | null : number;
 };
 
-// Warning: (ae-forgotten-export) The symbol "AutomatorResources" needs to be exported by the entry point index.d.ts
-//
 // @public
 export interface AutomatorClient extends ClientBrand<AutomatorResources> {
 }
 
-// @public (undocumented)
+// @public
 export class AutomatorClient {
     constructor(options: AutomatorClientOptions);
     add(object: unknown, to: unknown, atIndex?: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -121,6 +119,45 @@ export class AutomatorError extends Error {
 }
 
 // @public
+export type AutomatorResources = Readonly<{
+    Workflow: ResourceDescriptor<Workflow, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'automator.workflows.get';
+        readonly list: 'automator.workflows.list';
+    };
+    AutomatorAction: ResourceDescriptor<AutomatorAction, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'automator.automatorActions.get';
+        readonly list: 'automator.automatorActions.list';
+        readonly parents: {
+            readonly list: 'Workflow';
+        };
+    };
+    Variable: ResourceDescriptor<Variable, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'automator.variables.get';
+        readonly list: 'automator.variables.list';
+        readonly parents: {
+            readonly list: 'Workflow';
+        };
+    };
+    Setting: ResourceDescriptor<Setting, string> & {
+        readonly id: ValueType<string>;
+        readonly list: 'automator.settings.list';
+        readonly parents: {
+            readonly list: 'AutomatorAction';
+        };
+    };
+    RequiredResource: ResourceDescriptor<RequiredResource, string> & {
+        readonly id: ValueType<string>;
+        readonly list: 'automator.requiredResources.list';
+        readonly parents: {
+            readonly list: 'AutomatorAction';
+        };
+    };
+}>;
+
+// @public
 export const capabilities: readonly CapabilityMetadata[];
 
 // @public
@@ -139,13 +176,13 @@ export interface CapabilityMetadata {
 // @public
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
     // @internal
-    bind<Client extends ClientBrand<AutomatorResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -157,10 +194,8 @@ export interface RequiredResource {
     readonly version: Integer | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "RequiredResourceCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RequiredResourceCreateInput = RequiredResourceCreateInput_2;
+export type RequiredResourceCreateInput = Record<string, never>;
 
 // @public
 export class RequiredResourceResourceClient {
@@ -177,10 +212,8 @@ export const RequiredResourceSchema: z.ZodObject<{
     version: z.ZodNumber;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "RequiredResourceUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type RequiredResourceUpdateInput = RequiredResourceUpdateInput_2;
+export type RequiredResourceUpdateInput = Record<string, never>;
 
 // @public
 export interface Setting {
@@ -189,10 +222,10 @@ export interface Setting {
     value: unknown;
 }
 
-// Warning: (ae-forgotten-export) The symbol "SettingCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SettingCreateInput = SettingCreateInput_2;
+export interface SettingCreateInput {
+    value?: unknown;
+}
 
 // @public
 export class SettingResourceClient {
@@ -208,10 +241,10 @@ export const SettingSchema: z.ZodObject<{
     defaultValue: z.ZodUnknown;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "SettingUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type SettingUpdateInput = SettingUpdateInput_2;
+export interface SettingUpdateInput {
+    value?: unknown;
+}
 
 // @public
 export interface Variable {
@@ -221,10 +254,11 @@ export interface Variable {
     value: unknown;
 }
 
-// Warning: (ae-forgotten-export) The symbol "VariableCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type VariableCreateInput = VariableCreateInput_2;
+export interface VariableCreateInput {
+    name?: string;
+    value?: unknown;
+}
 
 // @public
 export class VariableResourceClient {
@@ -241,10 +275,11 @@ export const VariableSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "VariableUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type VariableUpdateInput = VariableUpdateInput_2;
+export interface VariableUpdateInput {
+    name?: string;
+    value?: unknown;
+}
 
 // @public
 export type WarningLevel = 'none' | 'reversible' | 'irreversible';
@@ -259,10 +294,8 @@ export interface Workflow {
     readonly name: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "WorkflowCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type WorkflowCreateInput = WorkflowCreateInput_2;
+export type WorkflowCreateInput = Record<string, never>;
 
 // @public
 export class WorkflowResourceClient {
@@ -283,10 +316,8 @@ export const WorkflowSchema: z.ZodObject<{
     executionId: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "WorkflowUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type WorkflowUpdateInput = WorkflowUpdateInput_2;
+export type WorkflowUpdateInput = Record<string, never>;
 
 // (No @packageDocumentation comment for this package)
 

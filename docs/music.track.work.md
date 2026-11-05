@@ -4,10 +4,10 @@
 
 ## Track.work property
 
-the work name of the track
+the work name of the track. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-work: string
+work: string | null
 ```

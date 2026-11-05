@@ -9,7 +9,7 @@ Duplicate one or more object(s)
 **Signature:**
 
 ```typescript
-duplicate(to?: string, replacing?: boolean, routingSuppressed?: boolean, exactCopy?: boolean): Promise<void>;
+duplicate(to?: string, replacing?: boolean, routingSuppressed?: boolean, exactCopy?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -73,6 +73,19 @@ exactCopy
 </td><td>
 
 boolean
+
+</td><td>
+
+_(Optional)_
+
+</td></tr>
+<tr><td>
+
+\_\_mactsOptions
+
+</td><td>
+
+[\_macts_contracts.CallOptions](./contracts.calloptions.md)
 
 </td><td>
 

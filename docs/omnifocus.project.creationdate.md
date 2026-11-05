@@ -4,10 +4,10 @@
 
 ## Project.creationDate property
 
-When the project was created
+When the project was created. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-creationDate: Date
+creationDate: Date | null
 ```

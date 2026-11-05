@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-configure the interface speed, duplex, and mtu automatically?
+configure the interface speed, duplex, and mtu automatically? Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ configure the interface speed, duplex, and mtu automatically?
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the duplex setting half \| full \| full with flow control
+the duplex setting half \| full \| full with flow control. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -67,13 +67,15 @@ the duplex setting half \| full \| full with flow control
 
 </td><td>
 
+`readonly`
+
 </td><td>
 
 string
 
 </td><td>
 
-the unique identifier for the interface
+the unique identifier for the interface. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>
@@ -82,13 +84,15 @@ the unique identifier for the interface
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the type of interface
+string \| null
+
+</td><td>
+
+the type of interface. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -97,13 +101,15 @@ the type of interface
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the MAC address for the interface
+string \| null
+
+</td><td>
+
+the MAC address for the interface. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +120,11 @@ the MAC address for the interface
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-the packet size
+the packet size. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -127,13 +133,15 @@ the packet size
 
 </td><td>
 
-</td><td>
-
-string
+`readonly`
 
 </td><td>
 
-the name of the interface
+string \| null
+
+</td><td>
+
+the name of the interface. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +152,11 @@ the name of the interface
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-ethernet speed 10 \| 100 \| 1000
+ethernet speed 10 \| 100 \| 1000. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

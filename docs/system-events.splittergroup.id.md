@@ -4,10 +4,10 @@
 
 ## SplitterGroup.id property
 
-Unique identifier for this splitter group
+Unique identifier for this splitter group. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string | null;
 ```

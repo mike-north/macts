@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Indicates whether all conditions must be met for rule to execute
+Indicates whether all conditions must be met for rule to execute. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,26 +54,11 @@ Indicates whether all conditions must be met for rule to execute
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-If rule matches, apply this color
-
-</td></tr>
-<tr><td>
-
-[copyMessage](./mail.rule.copymessage.md)
-
-</td><td>
-
-</td><td>
-
-[Mailbox](./mail.mailbox.md)
-
-</td><td>
-
-If rule matches, copy to this mailbox
+If rule matches, apply this color. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -84,11 +69,11 @@ If rule matches, copy to this mailbox
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-If rule matches, delete message
+If rule matches, delete message. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -99,11 +84,11 @@ If rule matches, delete message
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Indicates whether the rule is enabled
+Indicates whether the rule is enabled. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -114,11 +99,11 @@ Indicates whether the rule is enabled
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-If rule matches, forward message to this address, or multiple addresses, separated by commas. Set to empty string to disable this action
+If rule matches, forward message to this address, or multiple addresses, separated by commas. Set to empty string to disable this action. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -129,11 +114,11 @@ If rule matches, forward message to this address, or multiple addresses, separat
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-If rule matches, prepend this text to the forwarded message. Set to empty string to include no prepended text
+If rule matches, prepend this text to the forwarded message. Set to empty string to include no prepended text. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -144,11 +129,11 @@ If rule matches, prepend this text to the forwarded message. Set to empty string
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Indicates whether the color will be used to highlight the text or background of a message in the message list
+Indicates whether the color will be used to highlight the text or background of a message in the message list. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -159,11 +144,11 @@ Indicates whether the color will be used to highlight the text or background of 
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-If rule matches, mark message as flagged
+If rule matches, mark message as flagged. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -174,11 +159,11 @@ If rule matches, mark message as flagged
 
 </td><td>
 
-number
+[Integer](./contracts.integer.md) \| null
 
 </td><td>
 
-If rule matches, mark message with the specified flag. Set to -1 to disable this action
+If rule matches, mark message with the specified flag. Set to -1 to disable this action. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -189,26 +174,11 @@ If rule matches, mark message with the specified flag. Set to -1 to disable this
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-If rule matches, mark message as read
-
-</td></tr>
-<tr><td>
-
-[moveMessage](./mail.rule.movemessage.md)
-
-</td><td>
-
-</td><td>
-
-[Mailbox](./mail.mailbox.md)
-
-</td><td>
-
-If rule matches, move to this mailbox
+If rule matches, mark message as read. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -219,11 +189,11 @@ If rule matches, move to this mailbox
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-Name of rule
+Name of rule. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -234,11 +204,11 @@ Name of rule
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-If rule matches, play this sound (specify name of sound or path to sound)
+If rule matches, play this sound (specify name of sound or path to sound). Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -249,11 +219,11 @@ If rule matches, play this sound (specify name of sound or path to sound)
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-If rule matches, redirect message to this address or multiple addresses, separate by commas. Set to empty string to disable this action
+If rule matches, redirect message to this address or multiple addresses, separate by commas. Set to empty string to disable this action. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -264,11 +234,11 @@ If rule matches, redirect message to this address or multiple addresses, separat
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-If rule matches, reply to message and prepend with this text. Set to empty string to disable this action
+If rule matches, reply to message and prepend with this text. Set to empty string to disable this action. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -279,11 +249,11 @@ If rule matches, reply to message and prepend with this text. Set to empty strin
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-If rule matches, run this compiled AppleScript file. Set to empty string to disable this action
+If rule matches, run this compiled AppleScript file. Set to empty string to disable this action. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -294,11 +264,11 @@ If rule matches, run this compiled AppleScript file. Set to empty string to disa
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Indicates whether the rule has a copy action
+Indicates whether the rule has a copy action. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -309,11 +279,11 @@ Indicates whether the rule has a copy action
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-Indicates whether the rule has a move action
+Indicates whether the rule has a move action. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -324,11 +294,11 @@ Indicates whether the rule has a move action
 
 </td><td>
 
-boolean
+boolean \| null
 
 </td><td>
 
-If rule matches, stop rule evaluation for this message
+If rule matches, stop rule evaluation for this message. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

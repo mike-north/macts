@@ -19,10 +19,8 @@ export interface Account {
     readonly upgraded: boolean | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "AccountCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AccountCreateInput = AccountCreateInput_2;
+export type AccountCreateInput = Record<string, never>;
 
 // @public
 export class AccountResourceClient {
@@ -38,10 +36,8 @@ export const AccountSchema: z.ZodObject<{
     upgraded: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "AccountUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AccountUpdateInput = AccountUpdateInput_2;
+export type AccountUpdateInput = Record<string, never>;
 
 // @public
 export interface Attachment {
@@ -52,10 +48,8 @@ export interface Attachment {
     readonly name: string | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "AttachmentCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AttachmentCreateInput = AttachmentCreateInput_2;
+export type AttachmentCreateInput = Record<string, never>;
 
 // @public
 export class AttachmentResourceClient {
@@ -76,10 +70,8 @@ export const AttachmentSchema: z.ZodObject<{
     modificationDate: z.ZodString;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "AttachmentUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AttachmentUpdateInput = AttachmentUpdateInput_2;
+export type AttachmentUpdateInput = Record<string, never>;
 
 // @public
 export const capabilities: readonly CapabilityMetadata[];
@@ -107,10 +99,10 @@ export interface Folder {
     readonly shared: boolean | null;
 }
 
-// Warning: (ae-forgotten-export) The symbol "FolderCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FolderCreateInput = FolderCreateInput_2;
+export interface FolderCreateInput {
+    name?: string;
+}
 
 // @public
 export class FolderResourceClient {
@@ -126,20 +118,18 @@ export const FolderSchema: z.ZodObject<{
     shared: z.ZodBoolean;
 }, z.core.$strip>;
 
-// Warning: (ae-forgotten-export) The symbol "FolderUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FolderUpdateInput = FolderUpdateInput_2;
+export interface FolderUpdateInput {
+    name?: string;
+}
 
-// @public (undocumented)
+// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
-    // Warning: (ae-forgotten-export) The symbol "NotesResources" needs to be exported by the entry point index.d.ts
-    //
     // @internal
-    bind<Client extends ClientBrand<NotesResources>>(client: Client): void;
+    bind(client?: object): void;
     // @internal
-    invoke<T>(path: string, input?: object, options?: CallOptions): Promise<T>;
+    invoke<T>(path: string, input?: object, options?: CallOptions, expectedResource?: string): Promise<T>;
     rpc<T>(path: string, body?: object, options?: CallOptions): Promise<T>;
 }
 
@@ -155,10 +145,11 @@ export interface Note {
     readonly shared: boolean;
 }
 
-// Warning: (ae-forgotten-export) The symbol "NoteCreateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type NoteCreateInput = NoteCreateInput_2;
+export interface NoteCreateInput {
+    body?: string;
+    name?: string;
+}
 
 // @public
 export class NoteResourceClient {
@@ -185,7 +176,7 @@ export const NoteSchema: z.ZodObject<{
 export interface NotesClient extends ClientBrand<NotesResources> {
 }
 
-// @public (undocumented)
+// @public
 export class NotesClient {
     constructor(options: NotesClientOptions);
     readonly accounts: AccountResourceClient;
@@ -208,10 +199,35 @@ export class NotesError extends Error {
     readonly code: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "NoteUpdateInput_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type NoteUpdateInput = NoteUpdateInput_2;
+export type NotesResources = Readonly<{
+    Account: ResourceDescriptor<Account, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'notes.accounts.get';
+        readonly list: 'notes.accounts.list';
+    };
+    Folder: ResourceDescriptor<Folder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'notes.folders.get';
+        readonly list: 'notes.folders.list';
+    };
+    Note: ResourceDescriptor<Note, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'notes.notes.get';
+        readonly list: 'notes.notes.list';
+    };
+    Attachment: ResourceDescriptor<Attachment, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'notes.attachments.get';
+        readonly list: 'notes.attachments.list';
+    };
+}>;
+
+// @public
+export interface NoteUpdateInput {
+    body?: string;
+    name?: string;
+}
 
 // (No @packageDocumentation comment for this package)
 

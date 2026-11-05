@@ -4,10 +4,10 @@
 
 ## Track.discCount property
 
-the total number of discs in the source album
+the total number of discs in the source album. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-discCount: number
+discCount: Integer | null
 ```

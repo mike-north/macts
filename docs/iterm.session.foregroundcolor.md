@@ -4,14 +4,10 @@
 
 ## Session.foregroundColor property
 
-The foregroundColor property
+The foregroundColor property. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-foregroundColor: {
-  r: number
-  g: number
-  b: number
-}
+foregroundColor: Rgb | null
 ```

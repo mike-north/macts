@@ -4,7 +4,7 @@
 
 ## MailAttachmentCreateInput type
 
-Input for creating a MailAttachment
+Input for creating a MailAttachment.
 
 **Signature:**
 

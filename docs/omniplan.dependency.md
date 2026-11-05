@@ -39,11 +39,11 @@ Description
 
 </td><td>
 
-[DependencyType](./omniplan.dependencytype.md)
+[DependencyType](./omniplan.dependencytype.md) \| null
 
 </td><td>
 
-Type of dependency
+Type of dependency. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -54,11 +54,11 @@ Type of dependency
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The lead time, in percentage of the length of the prerequisite
+The lead time, in percentage of the length of the prerequisite. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -69,11 +69,11 @@ The lead time, in percentage of the length of the prerequisite
 
 </td><td>
 
-number
+number \| null
 
 </td><td>
 
-The number of seconds of lead time required between the tasks
+The number of seconds of lead time required between the tasks. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 </tbody></table>

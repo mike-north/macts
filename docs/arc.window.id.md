@@ -4,10 +4,10 @@
 
 ## Window.id property
 
-The unique identifier of the window.
+The unique identifier of the window. Never null: the primary identifier.
 
 **Signature:**
 
 ```typescript
-id: string
+readonly id: string;
 ```

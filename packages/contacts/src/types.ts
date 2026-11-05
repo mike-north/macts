@@ -13,127 +13,127 @@ export type { InstantMessageServiceType } from './contract/index.js'
 export type { Address } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type AddressCreateInput = import('./contract/index.js').AddressCreateInput
+export type { AddressCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type AddressUpdateInput = import('./contract/index.js').AddressUpdateInput
+export type { AddressUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { AIMHandle } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type AIMHandleCreateInput = import('./contract/index.js').AIMHandleCreateInput
+export type { AIMHandleCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type AIMHandleUpdateInput = import('./contract/index.js').AIMHandleUpdateInput
+export type { AIMHandleUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { CustomDate } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type CustomDateCreateInput = import('./contract/index.js').CustomDateCreateInput
+export type { CustomDateCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type CustomDateUpdateInput = import('./contract/index.js').CustomDateUpdateInput
+export type { CustomDateUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Email } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type EmailCreateInput = import('./contract/index.js').EmailCreateInput
+export type { EmailCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type EmailUpdateInput = import('./contract/index.js').EmailUpdateInput
+export type { EmailUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Group } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type GroupCreateInput = import('./contract/index.js').GroupCreateInput
+export type { GroupCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type GroupUpdateInput = import('./contract/index.js').GroupUpdateInput
+export type { GroupUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { ICQHandle } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type ICQHandleCreateInput = import('./contract/index.js').ICQHandleCreateInput
+export type { ICQHandleCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type ICQHandleUpdateInput = import('./contract/index.js').ICQHandleUpdateInput
+export type { ICQHandleUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { JabberHandle } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type JabberHandleCreateInput = import('./contract/index.js').JabberHandleCreateInput
+export type { JabberHandleCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type JabberHandleUpdateInput = import('./contract/index.js').JabberHandleUpdateInput
+export type { JabberHandleUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { MSNHandle } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type MSNHandleCreateInput = import('./contract/index.js').MSNHandleCreateInput
+export type { MSNHandleCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type MSNHandleUpdateInput = import('./contract/index.js').MSNHandleUpdateInput
+export type { MSNHandleUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Person } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type PersonCreateInput = import('./contract/index.js').PersonCreateInput
+export type { PersonCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type PersonUpdateInput = import('./contract/index.js').PersonUpdateInput
+export type { PersonUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Phone } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type PhoneCreateInput = import('./contract/index.js').PhoneCreateInput
+export type { PhoneCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type PhoneUpdateInput = import('./contract/index.js').PhoneUpdateInput
+export type { PhoneUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { RelatedName } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type RelatedNameCreateInput = import('./contract/index.js').RelatedNameCreateInput
+export type { RelatedNameCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type RelatedNameUpdateInput = import('./contract/index.js').RelatedNameUpdateInput
+export type { RelatedNameUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { SocialProfile } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type SocialProfileCreateInput = import('./contract/index.js').SocialProfileCreateInput
+export type { SocialProfileCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type SocialProfileUpdateInput = import('./contract/index.js').SocialProfileUpdateInput
+export type { SocialProfileUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Url } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type UrlCreateInput = import('./contract/index.js').UrlCreateInput
+export type { UrlCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type UrlUpdateInput = import('./contract/index.js').UrlUpdateInput
+export type { UrlUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { YahooHandle } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type YahooHandleCreateInput = import('./contract/index.js').YahooHandleCreateInput
+export type { YahooHandleCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type YahooHandleUpdateInput = import('./contract/index.js').YahooHandleUpdateInput
+export type { YahooHandleUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

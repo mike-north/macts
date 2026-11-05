@@ -24,9 +24,9 @@ export type TaskCreateInput = Omit<
   'estimatedMinutes'
 > & {
   /** The estimated time, in whole minutes, that this task will take to finish Numeric values are validated by the contract before dispatch. */
-  estimatedMinutes?:
-    | number
-    | Extract<import('./contract/index.js').TaskCreateInput['estimatedMinutes'], null>
+  estimatedMinutes?: null extends import('./contract/index.js').TaskCreateInput['estimatedMinutes']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -35,9 +35,9 @@ export type TaskUpdateInput = Omit<
   'estimatedMinutes'
 > & {
   /** The estimated time, in whole minutes, that this task will take to finish Numeric values are validated by the contract before dispatch. */
-  estimatedMinutes?:
-    | number
-    | Extract<import('./contract/index.js').TaskUpdateInput['estimatedMinutes'], null>
+  estimatedMinutes?: null extends import('./contract/index.js').TaskUpdateInput['estimatedMinutes']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
@@ -49,9 +49,9 @@ export type ProjectCreateInput = Omit<
   'estimatedMinutes'
 > & {
   /** The estimated time, in whole minutes, that this project will take to finish Numeric values are validated by the contract before dispatch. */
-  estimatedMinutes?:
-    | number
-    | Extract<import('./contract/index.js').ProjectCreateInput['estimatedMinutes'], null>
+  estimatedMinutes?: null extends import('./contract/index.js').ProjectCreateInput['estimatedMinutes']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -60,46 +60,46 @@ export type ProjectUpdateInput = Omit<
   'estimatedMinutes'
 > & {
   /** The estimated time, in whole minutes, that this project will take to finish Numeric values are validated by the contract before dispatch. */
-  estimatedMinutes?:
-    | number
-    | Extract<import('./contract/index.js').ProjectUpdateInput['estimatedMinutes'], null>
+  estimatedMinutes?: null extends import('./contract/index.js').ProjectUpdateInput['estimatedMinutes']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Folder } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type FolderCreateInput = import('./contract/index.js').FolderCreateInput
+export type { FolderCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type FolderUpdateInput = import('./contract/index.js').FolderUpdateInput
+export type { FolderUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Tag } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type TagCreateInput = import('./contract/index.js').TagCreateInput
+export type { TagCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type TagUpdateInput = import('./contract/index.js').TagUpdateInput
+export type { TagUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { InboxTask } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type InboxTaskCreateInput = import('./contract/index.js').InboxTaskCreateInput
+export type { InboxTaskCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type InboxTaskUpdateInput = import('./contract/index.js').InboxTaskUpdateInput
+export type { InboxTaskUpdateInput } from './contract/index.js'
 
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Perspective } from './contract/index.js'
 
 /** Canonical create input, retaining checked numeric conveniences. */
-export type PerspectiveCreateInput = import('./contract/index.js').PerspectiveCreateInput
+export type { PerspectiveCreateInput } from './contract/index.js'
 
 /** Canonical update input, retaining checked numeric conveniences. */
-export type PerspectiveUpdateInput = import('./contract/index.js').PerspectiveUpdateInput
+export type { PerspectiveUpdateInput } from './contract/index.js'
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
 

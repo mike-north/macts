@@ -13,13 +13,17 @@ export type { Window } from './contract/index.js'
 /** Canonical create input, retaining checked numeric conveniences. */
 export type WindowCreateInput = Omit<import('./contract/index.js').WindowCreateInput, 'index'> & {
   /** The index of the window, ordered front to back. Numeric values are validated by the contract before dispatch. */
-  index?: number | Extract<import('./contract/index.js').WindowCreateInput['index'], null>
+  index?: null extends import('./contract/index.js').WindowCreateInput['index']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
 export type WindowUpdateInput = Omit<import('./contract/index.js').WindowUpdateInput, 'index'> & {
   /** The index of the window, ordered front to back. Numeric values are validated by the contract before dispatch. */
-  index?: number | Extract<import('./contract/index.js').WindowUpdateInput['index'], null>
+  index?: null extends import('./contract/index.js').WindowUpdateInput['index']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
@@ -28,13 +32,17 @@ export type { Tab } from './contract/index.js'
 /** Canonical create input, retaining checked numeric conveniences. */
 export type TabCreateInput = Omit<import('./contract/index.js').TabCreateInput, 'index'> & {
   /** Index of tab in parent tab view control Numeric values are validated by the contract before dispatch. */
-  index?: number | Extract<import('./contract/index.js').TabCreateInput['index'], null>
+  index?: null extends import('./contract/index.js').TabCreateInput['index']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
 export type TabUpdateInput = Omit<import('./contract/index.js').TabUpdateInput, 'index'> & {
   /** Index of tab in parent tab view control Numeric values are validated by the contract before dispatch. */
-  index?: number | Extract<import('./contract/index.js').TabUpdateInput['index'], null>
+  index?: null extends import('./contract/index.js').TabUpdateInput['index']
+    ? number | null
+    : number
 }
 
 /** Canonical SDK record; typed operations decode through the app contract. */
@@ -46,9 +54,13 @@ export type SessionCreateInput = Omit<
   'columns' | 'rows'
 > & {
   /** The columns property Numeric values are validated by the contract before dispatch. */
-  columns?: number | Extract<import('./contract/index.js').SessionCreateInput['columns'], null>
+  columns?: null extends import('./contract/index.js').SessionCreateInput['columns']
+    ? number | null
+    : number
   /** The rows property Numeric values are validated by the contract before dispatch. */
-  rows?: number | Extract<import('./contract/index.js').SessionCreateInput['rows'], null>
+  rows?: null extends import('./contract/index.js').SessionCreateInput['rows']
+    ? number | null
+    : number
 }
 
 /** Canonical update input, retaining checked numeric conveniences. */
@@ -57,9 +69,13 @@ export type SessionUpdateInput = Omit<
   'columns' | 'rows'
 > & {
   /** The columns property Numeric values are validated by the contract before dispatch. */
-  columns?: number | Extract<import('./contract/index.js').SessionUpdateInput['columns'], null>
+  columns?: null extends import('./contract/index.js').SessionUpdateInput['columns']
+    ? number | null
+    : number
   /** The rows property Numeric values are validated by the contract before dispatch. */
-  rows?: number | Extract<import('./contract/index.js').SessionUpdateInput['rows'], null>
+  rows?: null extends import('./contract/index.js').SessionUpdateInput['rows']
+    ? number | null
+    : number
 }
 
 // Raw/passthrough response validators retained for explicit raw RPC consumers. SDK records use the contract codecs.
