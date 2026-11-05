@@ -229,6 +229,11 @@ export { plugin } from './plugin.js';
 `
 }
 
+/**
+ * Describe a standalone CLI plugin's installation boundary. Every runtime
+ * import must be declared directly so isolated dependency resolution does not
+ * depend on the SDK's transitive installation layout.
+ */
 function generatePackageJson(ctx: CliGeneratorContext): string {
   const unscopedName = ctx.options.packageName.replace(/^@[^/]+\//, '')
   const typesPath = `./dist/${unscopedName}.d.ts`
@@ -257,6 +262,8 @@ function generatePackageJson(ctx: CliGeneratorContext): string {
     },
     dependencies: {
       '@macts/cli': 'workspace:*',
+      // List flags validate their spelling against the shared integer policy.
+      '@macts/contracts': 'workspace:*',
       [ctx.options.sdkPackageName]: 'workspace:*',
       clipanion: 'catalog:',
       typanion: 'catalog:',

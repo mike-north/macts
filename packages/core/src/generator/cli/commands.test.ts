@@ -212,3 +212,17 @@ describe('generateCliPlugin list commands: paging', () => {
     expect(list).toContain('formatter.formatList(page.items.map(')
   })
 })
+
+/** Standalone plugin installation must resolve the validator used by paged lists. */
+describe('standalone CLI integer validation dependency', () => {
+  it('declares contracts as a runtime dependency rather than relying on the SDK transitively', () => {
+    const result = generateCliPlugin(buildManifest(), {
+      packageName: '@macts/testapp-cli',
+      sdkPackageName: '@macts/sdk-testapp',
+    })
+    expect(result.errors).toEqual([])
+    expect(fileContent(result, 'commands/calendars/list.ts')).toContain("from '@macts/contracts'")
+    const manifest: unknown = JSON.parse(fileContent(result, 'package.json'))
+    expect(manifest).toMatchObject({ dependencies: { '@macts/contracts': 'workspace:*' } })
+  })
+})
