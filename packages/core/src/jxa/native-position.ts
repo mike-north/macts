@@ -12,10 +12,12 @@
  * position within its container: `….tabs.at(0)` in the automation bridge's
  * display form, zero-based.
  *
- * The reader fails closed: it accepts only a display form whose final step is
- * `.at(N)`, with `N` a canonical non-negative safe integer, and answers
- * `undefined` for anything else, which the codec reports as a reference it
- * cannot convert (`InternalError`). It never falls back to another property.
+ * The reader fails closed: it accepts only a display form whose final steps
+ * are `.<collection>.at(N)`, for the collection the resource is found in
+ * (`tabs`), held by a container rather than by the application, with `N` a
+ * canonical non-negative safe integer. It answers `undefined` for anything
+ * else, which the codec reports as a reference it cannot convert
+ * (`InternalError`). It never falls back to another property.
  *
  * {@link NATIVE_POSITION_READER} is the automation-process function a native
  * script hands the codec as `positionOf`; a live test can run it against the
@@ -27,13 +29,16 @@
 
 /**
  * Name of the top-level function {@link NATIVE_POSITION_READER} defines:
- * `(specifier) => number | undefined`.
+ * `(specifier, collection) => number | undefined`.
  */
 export const NATIVE_POSITION_FUNCTION = '__mactsPositionOf'
 
 /**
- * The zero-based position a specifier's display form gives in its final
- * step, or `undefined` when its final step is not `.at(N)`.
+ * The zero-based position a specifier's display form gives within
+ * `collection` of its container, or `undefined` when its final steps are not
+ * `.<collection>.at(N)` after a container's own step: a position in another
+ * collection, or in the application's own, is no position within the
+ * container.
  *
  * @remarks
  * It is embedded into the automation process through
@@ -42,13 +47,18 @@ export const NATIVE_POSITION_FUNCTION = '__mactsPositionOf'
  *
  * @param display - The bridge's display form of a specifier, such as
  *   `Application("iTerm2").windows.byId(7).tabs.at(0)`.
+ * @param collection - The collection accessor the resource is found in, such
+ *   as `tabs`.
  * @returns The position, or `undefined`.
  */
-export function specifierPosition(display: unknown): number | undefined {
-  if (typeof display !== 'string') return undefined
-  const match = /\.at\((0|[1-9][0-9]*)\)$/.exec(display)
-  const digits = match === null ? undefined : match[1]
-  if (digits === undefined) return undefined
+export function specifierPosition(display: unknown, collection: unknown): number | undefined {
+  if (typeof display !== 'string' || typeof collection !== 'string') return undefined
+  const match = /^(.*)\.([A-Za-z_$][\w$]*)\.at\((0|[1-9][0-9]*)\)$/.exec(display)
+  if (match === null) return undefined
+  const [, container, name, digits] = match
+  if (name !== collection || container === undefined || digits === undefined) return undefined
+  // The container's own step: a bare application holds the collection itself.
+  if (/^Application\([^()]*\)$/.test(container)) return undefined
   const position = Number(digits)
   return Number.isSafeInteger(position) ? position : undefined
 }
@@ -63,14 +73,14 @@ export const NATIVE_POSITION_READER: { readonly prelude: string } = Object.freez
   prelude: `var ${NATIVE_POSITION_FUNCTION} = (function () {
   'use strict';
   var position = (${specifierPosition.toString()});
-  return function (specifier) {
+  return function (specifier, collection) {
     var display;
     try {
       display = Automation.getDisplayString(specifier);
     } catch (e) {
       return undefined;
     }
-    return position(display);
+    return position(display, collection);
   };
 })();
 `,

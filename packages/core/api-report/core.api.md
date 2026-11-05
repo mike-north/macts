@@ -2242,7 +2242,7 @@ export interface NativeCodec {
 // @public
 export interface NativeCodecEnvironment {
     readonly app: unknown;
-    readonly positionOf?: (specifier: unknown) => unknown;
+    readonly positionOf?: (specifier: unknown, collection: string) => unknown;
     readonly references: NativeReferenceTable;
 }
 

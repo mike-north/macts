@@ -894,12 +894,16 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   /**
    * {@link decodeReference} of a reference's payload: what a `reference`
    * control record holds, and what a reference's `container` holds directly.
+   * A container (`asContainer`) converts in identity form only, at every
+   * level of the chain: a selector never appears inside a container (D7), and
+   * resolution refuses one there too.
    */
   function decodeReferencePayload(
     payload: unknown,
     plan: ReferencePlan,
     env: Env,
-    path: Path
+    path: Path,
+    asContainer = false
   ): PendingAddress {
     if (!isKeyed(payload)) {
       return fail('decode', path, 'Expected a reference, received ' + describeValue(payload))
@@ -926,7 +930,17 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         'Collection references have no conversion in this codec'
       )
     }
-    if (form === 'selector') return decodeIndexSelector(payload, plan, env, path)
+    if (form === 'selector') {
+      if (asContainer) {
+        return failUnsupported(
+          'decode',
+          path,
+          'reference',
+          'A container converts only as an identity reference, never as a selector'
+        )
+      }
+      return decodeIndexSelector(payload, plan, env, path)
+    }
     for (const key of Object.keys(payload)) {
       if (
         key !== 'resource' &&
@@ -963,7 +977,8 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
             payload['container'],
             { kind: 'reference', resource: within, cardinality: 'one' },
             env,
-            path.concat(['container'])
+            path.concat(['container']),
+            true
           )
     if (env === undefined || !isHostObject(env.app)) {
       return failUnsupported(
@@ -1044,7 +1059,8 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       payload['container'],
       { kind: 'reference', resource: addressing.within, cardinality: 'one' },
       env,
-      path.concat(['container'])
+      path.concat(['container']),
+      true
     )
     if (env === undefined || !isHostObject(env.app)) {
       return failUnsupported(
@@ -1181,7 +1197,8 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
    * Encodes an object of a positional resource at a position whose plan
    * records the index form, as the index selector within its container that
    * finds it again: its zero-based position is the one its own specifier
-   * gives (`env.positionOf`), never a dictionary `index` property, and its
+   * gives within the resource's collection of its container
+   * (`env.positionOf`), never a dictionary `index` property, and its
    * container is the record it was read through ({@link containedValue}),
    * encoded as {@link containerPayload} does. A specifier that gives no
    * position fails as unsupported, as does a resource that is not
@@ -1213,7 +1230,8 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       )
     }
     const reader = env.positionOf
-    const position: unknown = typeof reader === 'function' ? reader(held.value) : undefined
+    const position: unknown =
+      typeof reader === 'function' ? reader(held.value, addressing.collection) : undefined
     if (typeof position !== 'number' || !Number.isSafeInteger(position) || position < 0) {
       return failUnsupported(
         'encode',
