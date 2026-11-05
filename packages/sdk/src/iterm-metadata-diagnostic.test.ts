@@ -11,6 +11,10 @@ function fixture(
     failClose?: boolean
     wrongOwner?: boolean
     concurrent?: boolean
+    failRunning?: boolean
+    failBaseline?: boolean
+    failApplication?: boolean
+    driftingHandle?: boolean
   } = {}
 ) {
   const calls: string[] = []
@@ -60,7 +64,10 @@ function fixture(
     })
   }
   const windows = Object.assign(() => rows.map(window), {
-    id: () => rows.map((row) => row.id),
+    id: () => {
+      if (options.failBaseline) throw new Error('private baseline text')
+      return rows.map((row) => row.id)
+    },
     byId: (id: number) => {
       const row = rows.find((row) => row.id === id)
       return row === undefined
@@ -70,7 +77,10 @@ function fixture(
   })
   const app = closed({
     windows,
-    running: () => options.running !== false,
+    running: () => {
+      if (options.failRunning) throw new Error('private running text')
+      return options.running !== false
+    },
     currentWindow: () => window(requiredRow(rows.find((row) => row.id === current) ?? rows[0])),
     createWindowWithDefaultProfile: () => {
       creates += 1
@@ -82,7 +92,7 @@ function fixture(
       tab(row)
       current = row.id
       calls.push(`create:${String(row.id)}`)
-      return window(row)
+      return options.driftingHandle ? { id: () => current } : window(row)
     },
     createTabWithDefaultProfile: (owner: { id(): number }) => {
       const row = requiredRow(rows.find((row) => row.id === owner.id()))
@@ -121,7 +131,10 @@ function fixture(
       JSON.parse(
         String(
           runInNewContext(ITERM_METADATA_DIAGNOSTIC + '\nJSON.stringify(run())', {
-            Application: () => app,
+            Application: () => {
+              if (options.failApplication) throw new Error('private application text')
+              return app
+            },
             Automation: { getDisplayString: (item: object) => displays.get(item)?.() },
           })
         )
@@ -184,6 +197,28 @@ describe('diagnostic ownership boundaries', () => {
     const app = fixture({ wrongOwner: true })
     const report = app.run()
     expect(report.completed).toBe(false)
+    expect(report.cleanupComplete).toBe(true)
+    expect(app.rows.map((row) => row.id)).toEqual([1])
+  })
+})
+
+/** Failure text never leaves the candidate; returned handles need not be identity-qualified. */
+describe('diagnostic startup and returned-handle safety', () => {
+  it.each([{ failBaseline: true }, { failApplication: true }, { failRunning: true }])(
+    'sanitizes startup failure %j',
+    (options) => {
+      const app = fixture(options)
+      expect(() => app.run()).not.toThrow()
+      const report = app.run()
+      expect(report.completed).toBe(false)
+      expect(JSON.stringify(report)).not.toContain('private')
+      expect(app.calls).toEqual([])
+    }
+  )
+  it('rebinds a returned handle by identity before later creation can make it drift', () => {
+    const app = fixture({ driftingHandle: true })
+    const report = app.run()
+    expect(report.completed).toBe(true)
     expect(report.cleanupComplete).toBe(true)
     expect(app.rows.map((row) => row.id)).toEqual([1])
   })

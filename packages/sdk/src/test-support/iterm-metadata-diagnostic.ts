@@ -14,8 +14,19 @@
  */
 export const ITERM_METADATA_DIAGNOSTIC = String.raw`
 function run() {
-  var app = Application('com.googlecode.iterm2');
   var report = { completed: false, cleanupComplete: true, baselinePreserved: true, checks: {}, shapes: [] };
+  try { return inspect(report); }
+  catch (error) {
+    // Even Application construction and baseline discovery can fail. Never let
+    // host exception text escape this diagnostic's closed report boundary.
+    report.completed = false;
+    report.cleanupComplete = false;
+    report.errorNumber = error && typeof error.errorNumber === 'number' ? error.errorNumber : 0;
+    return report;
+  }
+}
+function inspect(report) {
+  var app = Application('com.googlecode.iterm2');
   if (!app.running()) return report;
   var baseline = app.windows.id();
   var owned = [];
@@ -38,7 +49,11 @@ function run() {
       report.cleanupComplete = false;
       throw { errorNumber: 0 };
     }
-    var row = { id: id, window: item, tabs: [] };
+    // Creation results can be positional/current-window specifiers. Qualify the
+    // owned identity before any subsequent creation or mutation can shift it.
+    var target = app.windows.byId(id);
+    if (!target.exists() || target.id() !== id) throw { errorNumber: 0 };
+    var row = { id: id, window: target, tabs: [] };
     owned.push(row);
     report.cleanupComplete = priorCleanup;
     return row;
@@ -84,7 +99,9 @@ function run() {
     app.close(first.tabs[0]);
     requireCheck('drift', first.window.tabs.length === 2 && selected(first) === 1);
     app.close(first.window.tabs.at(0));
-    requireCheck('savedPositionOutOfRange', first.window.tabs.length === 1 && selected(first) === 0);
+    // Cardinality evidence only: production SDK error mapping is exercised by
+    // separate stand-in tests, not by this projected adapter diagnostic.
+    requireCheck('savedPositionBeyondLength', first.window.tabs.length === 1 && selected(first) === 0);
     ['bounds', 'position', 'origin', 'size', 'frame'].forEach(function(field) {
       try { report.shapes.push({ field: field, shape: shape(first.window[field]()) }); }
       catch (error) { report.shapes.push({ field: field, errorNumber: number(error) }); }
@@ -96,7 +113,12 @@ function run() {
     // Never close by set difference or guessed position; only returned, proven
     // owned windows are cleanup targets. No quit or prompt interaction occurs.
     owned.slice().reverse().forEach(function(row) {
-      try { app.close(row.window); }
+      try {
+        var target = app.windows.byId(row.id);
+        if (!target.exists()) return;
+        if (contains(baseline, row.id) || target.id() !== row.id) throw { errorNumber: 0 };
+        app.close(target);
+      }
       catch (error) { report.cleanupComplete = false; }
     });
     try {
