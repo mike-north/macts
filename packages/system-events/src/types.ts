@@ -76,6 +76,12 @@ export type Actn = 'itemsAdded' | 'itemsRemoved' | 'windowClosed' | 'windowMoved
 /** Accs */
 export type Accs = 'none' | 'readOnly' | 'readWrite' | 'writeOnly'
 
+/** The kinds of ClassicDomainObject: each names the application property that holds one. */
+export type ClassicDomainObjectKind = 'classic'
+
+/** The kinds of UserDomainObject: each names the application property that holds one. */
+export type UserDomainObjectKind = 'user'
+
 /** A collection of settings for configuring a connection */
 export interface Configuration {
   /** the name used to authenticate */
@@ -218,10 +224,24 @@ export type AliasUpdateInput = Partial<AliasCreateInput>
 
 /** The Classic domain in the file system */
 export interface ClassicDomainObject {
+  /** The Classic Preferences folder */
+  preferencesFolder: Folder
+  /** Which ClassicDomainObject this is: the kind naming the application property that holds it */
+  kind: ClassicDomainObjectKind
+  /** The Application Support folder */
+  applicationSupportFolder: Folder
+  /** The Applications folder */
+  applicationsFolder: Folder
   /** the unique identifier of the domain */
   id: string
+  /** The Library folder */
+  libraryFolder: Folder
   /** the name of the domain */
   name: string
+  /** The Scripts folder */
+  scriptsFolder: Folder
+  /** The Automator Workflows folder */
+  workflowsFolder: Folder
 }
 
 /** Input for creating a ClassicDomainObject */
@@ -265,6 +285,8 @@ export type DiskUpdateInput = Partial<DiskCreateInput>
 export interface DiskItem {
   /** Is the disk item busy? */
   busyStatus: boolean
+  /** the folder or disk which has this disk item as an element */
+  container: unknown
   /** the date on which the disk item was created */
   creationDate: Date
   /** the name of the disk item as displayed in the User Interface */
@@ -284,7 +306,7 @@ export interface DiskItem {
   /** the actual space used by the disk item on disk */
   physicalSize: number
   /** the POSIX file system path of the disk item */
-  pOSIXPath: string
+  posixPath: string
   /** the logical size of the disk item */
   size: number
   /** the URL of the disk item */
@@ -310,10 +332,36 @@ export type DiskItemUpdateInput = Partial<DiskItemCreateInput>
 
 /** A domain in the file system */
 export interface Domain {
+  /** The Application Support folder */
+  applicationSupportFolder: Folder
+  /** The Applications folder */
+  applicationsFolder: Folder
+  /** The Desktop Pictures folder */
+  desktopPicturesFolder: Folder
+  /** The Folder Action Scripts folder */
+  folderActionScriptsFolder: Folder
+  /** The Fonts folder */
+  fontsFolder: Folder
   /** the unique identifier of the domain */
   id: string
+  /** The Library folder */
+  libraryFolder: Folder
   /** the name of the domain */
   name: string
+  /** The Preferences folder */
+  preferencesFolder: Folder
+  /** The Scripting Additions folder */
+  scriptingAdditionsFolder: Folder
+  /** The Scripts folder */
+  scriptsFolder: Folder
+  /** The Shared Documents folder */
+  sharedDocumentsFolder: Folder
+  /** The Speakable Items folder */
+  speakableItemsFolder: Folder
+  /** The Utilities folder */
+  utilitiesFolder: Folder
+  /** The Automator Workflows folder */
+  workflowsFolder: Folder
 }
 
 /** Input for creating a Domain */
@@ -375,6 +423,8 @@ export type FilePackageUpdateInput = Partial<FilePackageCreateInput>
 export interface Folder {
   /** Is the disk item busy? */
   busyStatus: boolean
+  /** the folder or disk which has this disk item as an element */
+  container: unknown
   /** the date on which the disk item was created */
   creationDate: Date
   /** the name of the disk item as displayed in the User Interface */
@@ -394,7 +444,7 @@ export interface Folder {
   /** the actual space used by the disk item on disk */
   physicalSize: number
   /** the POSIX file system path of the disk item */
-  pOSIXPath: string
+  posixPath: string
   /** the logical size of the disk item */
   size: number
   /** the URL of the disk item */
@@ -456,10 +506,60 @@ export type SystemDomainObjectUpdateInput = Partial<SystemDomainObjectCreateInpu
 
 /** The user domain in the file system */
 export interface UserDomainObject {
+  /** The user's Desktop folder */
+  desktopFolder: Folder
+  /** The user's Documents folder */
+  documentsFolder: Folder
+  /** The user's Downloads folder */
+  downloadsFolder: Folder
+  /** The user's Favorites folder */
+  favoritesFolder: Folder
+  /** The user's Home folder */
+  homeFolder: Folder
+  /** The user's Movies folder */
+  moviesFolder: Folder
+  /** The user's Music folder */
+  musicFolder: Folder
+  /** The user's Pictures folder */
+  picturesFolder: Folder
+  /** The user's Public folder */
+  publicFolder: Folder
+  /** The user's Sites folder */
+  sitesFolder: Folder
+  /** The Temporary Items folder */
+  temporaryItemsFolder: Folder
+  /** Which UserDomainObject this is: the kind naming the application property that holds it */
+  kind: UserDomainObjectKind
+  /** The Application Support folder */
+  applicationSupportFolder: Folder
+  /** The Applications folder */
+  applicationsFolder: Folder
+  /** The Desktop Pictures folder */
+  desktopPicturesFolder: Folder
+  /** The Folder Action Scripts folder */
+  folderActionScriptsFolder: Folder
+  /** The Fonts folder */
+  fontsFolder: Folder
   /** the unique identifier of the domain */
   id: string
+  /** The Library folder */
+  libraryFolder: Folder
   /** the name of the domain */
   name: string
+  /** The Preferences folder */
+  preferencesFolder: Folder
+  /** The Scripting Additions folder */
+  scriptingAdditionsFolder: Folder
+  /** The Scripts folder */
+  scriptsFolder: Folder
+  /** The Shared Documents folder */
+  sharedDocumentsFolder: Folder
+  /** The Speakable Items folder */
+  speakableItemsFolder: Folder
+  /** The Utilities folder */
+  utilitiesFolder: Folder
+  /** The Automator Workflows folder */
+  workflowsFolder: Folder
 }
 
 /** Input for creating a UserDomainObject */
@@ -1376,8 +1476,15 @@ export const AliasSchema = z.object({
 })
 
 export const ClassicDomainObjectSchema = z.object({
+  preferencesFolder: z.string(),
+  kind: z.string(),
+  applicationSupportFolder: z.string(),
+  applicationsFolder: z.string(),
   id: z.string(),
+  libraryFolder: z.string(),
   name: z.string(),
+  scriptsFolder: z.string(),
+  workflowsFolder: z.string(),
 })
 
 export const DiskSchema = z.object({
@@ -1394,6 +1501,7 @@ export const DiskSchema = z.object({
 
 export const DiskItemSchema = z.object({
   busyStatus: z.boolean(),
+  container: z.string(),
   creationDate: z.string(),
   displayedName: z.string(),
   id: z.string(),
@@ -1403,7 +1511,7 @@ export const DiskItemSchema = z.object({
   packageFolder: z.boolean(),
   path: z.string(),
   physicalSize: z.number(),
-  pOSIXPath: z.string(),
+  posixPath: z.string(),
   size: z.number(),
   uRL: z.string(),
   visible: z.boolean(),
@@ -1411,8 +1519,21 @@ export const DiskItemSchema = z.object({
 })
 
 export const DomainSchema = z.object({
+  applicationSupportFolder: z.string(),
+  applicationsFolder: z.string(),
+  desktopPicturesFolder: z.string(),
+  folderActionScriptsFolder: z.string(),
+  fontsFolder: z.string(),
   id: z.string(),
+  libraryFolder: z.string(),
   name: z.string(),
+  preferencesFolder: z.string(),
+  scriptingAdditionsFolder: z.string(),
+  scriptsFolder: z.string(),
+  sharedDocumentsFolder: z.string(),
+  speakableItemsFolder: z.string(),
+  utilitiesFolder: z.string(),
+  workflowsFolder: z.string(),
 })
 
 export const FileSchema = z.object({
@@ -1433,6 +1554,7 @@ export const FilePackageSchema = z.object({
 
 export const FolderSchema = z.object({
   busyStatus: z.boolean(),
+  container: z.string(),
   creationDate: z.string(),
   displayedName: z.string(),
   id: z.string(),
@@ -1442,7 +1564,7 @@ export const FolderSchema = z.object({
   packageFolder: z.boolean(),
   path: z.string(),
   physicalSize: z.number(),
-  pOSIXPath: z.string(),
+  posixPath: z.string(),
   size: z.number(),
   uRL: z.string(),
   visible: z.boolean(),
@@ -1462,8 +1584,33 @@ export const SystemDomainObjectSchema = z.object({
 })
 
 export const UserDomainObjectSchema = z.object({
+  desktopFolder: z.string(),
+  documentsFolder: z.string(),
+  downloadsFolder: z.string(),
+  favoritesFolder: z.string(),
+  homeFolder: z.string(),
+  moviesFolder: z.string(),
+  musicFolder: z.string(),
+  picturesFolder: z.string(),
+  publicFolder: z.string(),
+  sitesFolder: z.string(),
+  temporaryItemsFolder: z.string(),
+  kind: z.string(),
+  applicationSupportFolder: z.string(),
+  applicationsFolder: z.string(),
+  desktopPicturesFolder: z.string(),
+  folderActionScriptsFolder: z.string(),
+  fontsFolder: z.string(),
   id: z.string(),
+  libraryFolder: z.string(),
   name: z.string(),
+  preferencesFolder: z.string(),
+  scriptingAdditionsFolder: z.string(),
+  scriptsFolder: z.string(),
+  sharedDocumentsFolder: z.string(),
+  speakableItemsFolder: z.string(),
+  utilitiesFolder: z.string(),
+  workflowsFolder: z.string(),
 })
 
 export const ActionSchema = z.object({

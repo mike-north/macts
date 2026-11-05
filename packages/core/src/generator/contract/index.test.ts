@@ -991,10 +991,14 @@ describe('contractNames', () => {
   })
 })
 
-describe('generateContract: a class that inherits its superclass (shipped System Events manifest)', () => {
-  // D10, "Superclasses": the dictionary's `folder` inherits `disk item`, so a
-  // folder record has a disk item's fields. Its `container` is a disk item
-  // reference, which stays out of output until disk items have a get.
+describe('generateContract: the shipped System Events disk items, folders and domains', () => {
+  // Expected values come from the System Events 1.3.6 dictionary
+  // (`sdef /System/Library/CoreServices/System\ Events.app`) and phases/13:
+  // D10 "Superclasses" (`folder` inherits `disk item`; `user domain object`
+  // and `Classic domain object` inherit `domain`), "Key targeting" (a disk
+  // item and a folder are found by POSIX path), and "Singleton roots" (the
+  // application's `user domain` and `Classic domain` properties). A field the
+  // manifest marks unsupported is on no surface.
   let text = ''
   beforeAll(async () => {
     const manifest = await loadManifest(resolve(MANIFESTS_DIR, 'system-events', 'app.yaml'))
@@ -1003,36 +1007,221 @@ describe('generateContract: a class that inherits its superclass (shipped System
 
   /** The fields the generated interface `name` declares, in order. */
   function interfaceFields(name: string): string[] {
-    const start = text.indexOf(`export interface ${name} {`)
-    if (start < 0) throw new Error(`no interface ${name}`)
-    const body = text.slice(start, text.indexOf('\n}\n', start))
-    return [...body.matchAll(/^ {2}(?:readonly )?(\w+)\??:/gm)].map((match) => match[1] ?? '')
+    return [...interfaceBody(name).matchAll(/^ {2}(?:readonly )?(\w+)\??:/gm)].map(
+      (match) => match[1] ?? ''
+    )
   }
 
-  it("declares a disk item's fields on a folder, without its container", () => {
-    expect(interfaceFields('Folder')).toEqual([
-      'busyStatus',
-      'creationDate',
-      'displayedName',
-      'id',
-      'modificationDate',
-      'name',
-      'nameExtension',
-      'packageFolder',
-      'path',
-      'physicalSize',
-      'pOSIXPath',
-      'size',
-      'uRL',
-      'visible',
-      'volume',
-    ])
+  /** The body of the generated interface `name`. */
+  function interfaceBody(name: string): string {
+    const start = text.indexOf(`export interface ${name} {`)
+    if (start < 0) throw new Error(`no interface ${name}`)
+    return text.slice(start, text.indexOf('\n}\n', start))
+  }
+
+  /** The 16 properties of the dictionary's `disk item`, in manifest order. */
+  const DISK_ITEM_FIELDS = [
+    'busyStatus',
+    'container',
+    'creationDate',
+    'displayedName',
+    'id',
+    'modificationDate',
+    'name',
+    'nameExtension',
+    'packageFolder',
+    'path',
+    'physicalSize',
+    'posixPath',
+    'size',
+    'uRL',
+    'visible',
+    'volume',
+  ]
+
+  /** The 15 properties of the dictionary's `domain`, in manifest order. */
+  const DOMAIN_FIELDS = [
+    'applicationSupportFolder',
+    'applicationsFolder',
+    'desktopPicturesFolder',
+    'folderActionScriptsFolder',
+    'fontsFolder',
+    'id',
+    'libraryFolder',
+    'name',
+    'preferencesFolder',
+    'scriptingAdditionsFolder',
+    'scriptsFolder',
+    'sharedDocumentsFolder',
+    'speakableItemsFolder',
+    'utilitiesFolder',
+    'workflowsFolder',
+  ]
+
+  it('declares every disk item field on a disk item and a folder, its container included', () => {
+    expect(interfaceFields('DiskItem')).toEqual(DISK_ITEM_FIELDS)
+    expect(interfaceFields('Folder')).toEqual(DISK_ITEM_FIELDS)
+    expect(interfaceBody('Folder')).toContain(
+      "  readonly container: ObjectReferenceVariant<DiskItem, string, 'DiskItem'> | null"
+    )
   })
 
-  it("declares the domain's id and name on the user and Classic domains", () => {
-    for (const name of ['UserDomainObject', 'ClassicDomainObject']) {
-      expect(interfaceFields(name)).toEqual(['id', 'name'])
+  it('identifies a disk item and a folder by POSIX path, so their id is no longer non-null', () => {
+    for (const name of ['DiskItem', 'Folder']) {
+      expect(interfaceBody(name)).toContain('  readonly posixPath: string\n')
+      expect(interfaceBody(name)).toContain('  readonly id: string | null\n')
     }
+    expect(text).toContain('  get(posixPath: string, options?: CallOptions): Promise<DiskItem>')
+    expect(text).toContain('  get(posixPath: string, options?: CallOptions): Promise<Folder>')
+  })
+
+  it('lists domains and gets one by id, each folder a folder reference', () => {
+    expect(interfaceFields('Domain')).toEqual(DOMAIN_FIELDS)
+    expect(interfaceBody('Domain')).toContain(
+      "  readonly applicationsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null"
+    )
+    expect(text).toContain('  get(id: string, options?: CallOptions): Promise<Domain>')
+    expect(text).toContain('  list(options?: CallOptions): Promise<Page<Domain>>')
+  })
+
+  it('reads the user domain as a root of one kind, with its own and its inherited folders', () => {
+    expect(text).toContain("export type UserDomainObjectKind = 'user'")
+    expect(interfaceFields('UserDomainObject')).toEqual([
+      'desktopFolder',
+      'documentsFolder',
+      'downloadsFolder',
+      'favoritesFolder',
+      'homeFolder',
+      'moviesFolder',
+      'musicFolder',
+      'picturesFolder',
+      'publicFolder',
+      'sitesFolder',
+      'temporaryItemsFolder',
+      'kind',
+      ...DOMAIN_FIELDS,
+    ])
+    expect(text).toContain(
+      '  get(kind: UserDomainObjectKind, options?: CallOptions): Promise<UserDomainObject>'
+    )
+    expect(text).toContain('  list(options?: CallOptions): Promise<Page<UserDomainObject>>')
+  })
+
+  /**
+   * The domain folders a read-only probe of the 5 domains (2026-11-04T04:41:36Z)
+   * found missing on some domains, with how many of the 5 reads the app
+   * reported missing (-1728); each is nullable on that evidence.
+   */
+  const REPORTED_MISSING: Record<string, number> = {
+    desktopPicturesFolder: 4,
+    folderActionScriptsFolder: 4,
+    fontsFolder: 2,
+    preferencesFolder: 1,
+    scriptingAdditionsFolder: 3,
+    scriptsFolder: 2,
+    sharedDocumentsFolder: 1,
+    speakableItemsFolder: 4,
+    utilitiesFolder: 3,
+    workflowsFolder: 3,
+  }
+
+  /**
+   * The domain folders every domain answered with an id in that probe, but
+   * which a read-only probe of the 5 domains (2026-11-05T03:10:09.000Z) that
+   * read each folder as the generated body does, the folder and then its
+   * POSIX path, found missing on 1 domain (-1728).
+   */
+  const REPORTED_MISSING_ON_PATH_READ: Record<string, number> = {
+    applicationSupportFolder: 1,
+    applicationsFolder: 1,
+    libraryFolder: 1,
+  }
+
+  /** The domain's 13 folders, each nullable on one of the two probes above. */
+  const DOMAIN_FOLDER_FIELDS = [
+    ...Object.keys(REPORTED_MISSING),
+    ...Object.keys(REPORTED_MISSING_ON_PATH_READ),
+  ]
+
+  /** The doc comment and declaration of field `field` in the interface `name`, joined on one line. */
+  function fieldDeclaration(name: string, field: string): string {
+    const body = interfaceBody(name)
+    const at = body.indexOf(`  readonly ${field}:`)
+    if (at < 0) throw new Error(`${name} declares no ${field}`)
+    const doc = body.lastIndexOf('/**', at)
+    // The last field's line ends the body, with no newline after it.
+    const end = body.indexOf('\n', at)
+    return body.slice(doc, end < 0 ? body.length : end).replace(/\s*\n\s*\*?\s*/g, ' ')
+  }
+
+  it('types each domain folder the app reported missing as nullable, saying how often', () => {
+    for (const name of ['Domain', 'UserDomainObject']) {
+      for (const [field, missing] of Object.entries(REPORTED_MISSING)) {
+        const declaration = fieldDeclaration(name, field)
+        expect(declaration).toContain(
+          `Nullable. The app reported no value in ${String(missing)} of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).`
+        )
+        expect(declaration).toContain(
+          `readonly ${field}: ObjectReferenceVariant<Folder, string, 'Folder'> | null`
+        )
+      }
+    }
+    for (const name of ['Domain', 'UserDomainObject']) {
+      for (const [field, missing] of Object.entries(REPORTED_MISSING_ON_PATH_READ)) {
+        const declaration = fieldDeclaration(name, field)
+        expect(declaration).toContain(
+          `Nullable. The app reported no value in ${String(missing)} of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-05).`
+        )
+        expect(declaration).toContain(
+          `readonly ${field}: ObjectReferenceVariant<Folder, string, 'Folder'> | null`
+        )
+      }
+    }
+    // All 13 of the domain's folders are nullable on that evidence.
+    const evidenced = DOMAIN_FOLDER_FIELDS.filter((field) =>
+      fieldDeclaration('Domain', field).includes('The app reported no value in')
+    )
+    expect(evidenced).toHaveLength(13)
+  })
+
+  it("types the user's Sites folder as nullable, giving the curated reason and the reads behind it", () => {
+    // The user domain is the only one, so one failed read (-1728, probe of
+    // 2026-11-04T04:51:11Z) cannot show structure; the curated reason
+    // decides that the absence depends on the data (phases/13 D10).
+    const declaration = fieldDeclaration('UserDomainObject', 'sitesFolder')
+    expect(declaration).toContain(
+      'Nullable: The Sites folder exists only once the user creates one. The app reported no value in 1 of 1 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).'
+    )
+    expect(declaration).toContain(
+      "readonly sitesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null"
+    )
+    // With the 13 domain folders, 14 user-domain fields are nullable on
+    // evidence the app reported no value.
+    const evidenced = [...DOMAIN_FOLDER_FIELDS, 'sitesFolder'].filter((field) =>
+      fieldDeclaration('UserDomainObject', field).includes('The app reported no value in')
+    )
+    expect(evidenced).toHaveLength(14)
+  })
+
+  it('reads the Classic domain as a root of one kind, without the 16 folders current macOS lacks', () => {
+    expect(text).toContain("export type ClassicDomainObjectKind = 'classic'")
+    // Of its own 11 folders only the Preferences folder reads; of the
+    // domain's 13, it declares the Fonts and Preferences folders itself, and
+    // 6 of the 11 it inherits are missing.
+    expect(interfaceFields('ClassicDomainObject')).toEqual([
+      'preferencesFolder',
+      'kind',
+      'applicationSupportFolder',
+      'applicationsFolder',
+      'id',
+      'libraryFolder',
+      'name',
+      'scriptsFolder',
+      'workflowsFolder',
+    ])
+    expect(text).toContain(
+      '  get(kind: ClassicDomainObjectKind, options?: CallOptions): Promise<ClassicDomainObject>'
+    )
   })
 })
 
@@ -1147,12 +1336,16 @@ describe('real app manifests', () => {
     // resource while its get records no parent (`unrecorded-parent`), and no
     // shipped command records a result, so no result is left out. A new omission
     // fails until it is reviewed and added here. Removing a row records
-    // restored coverage: the field is back in output. The 25 System Events
-    // rows marked as inherited (a folder's `container`, and the domain
-    // folders the user and Classic domains inherit) are references macts did
-    // not read at all before those resources were read with their
-    // superclass's properties (D10, "Superclasses"); each stays out until its
-    // target has a read.
+    // restored coverage: the field is back in output. A row also leaves when
+    // the manifest marks the field unsupported: it is then on no surface.
+    //
+    // The System Events disk item and folder gets took 61 rows off: every
+    // field holding a Folder or a DiskItem (the domain's 13 folders, the user
+    // domain's 11 own and 13 inherited, the Classic domain's 11 own and 11
+    // inherited, and a folder's and a disk item's `container`). 45 are back
+    // in output; 16 Classic folders left as unsupported, because current
+    // macOS has none (10 the Classic domain declares, 6 it inherits). 96 - 61
+    // = 35.
     const found = apps
       .flatMap(({ manifest }) => collectContractDiagnostics(manifest))
       .flatMap((diagnostic) => {
@@ -1193,69 +1386,8 @@ describe('real app manifests', () => {
       ['system-events', 'NetworkPreferencesObject', 'currentLocation', 'Location', 'no-get'],
       ['system-events', 'Service', 'currentConfiguration', 'Configuration', 'no-get'],
       ['system-events', 'Service', 'interface', 'Interface', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'appleMenuFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'controlPanelsFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'controlStripModulesFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'desktopFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'extensionsFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'fontsFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'launcherItemsFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'preferencesFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'shutdownFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'startupItemsFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'systemFolder', 'Folder', 'no-get'],
-      ['system-events', 'DiskItem', 'container', 'DiskItem', 'no-get'],
-      ['system-events', 'Domain', 'applicationSupportFolder', 'Folder', 'no-get'],
-      ['system-events', 'Domain', 'applicationsFolder', 'Folder', 'no-get'],
-      ['system-events', 'Domain', 'desktopPicturesFolder', 'Folder', 'no-get'],
-      ['system-events', 'Domain', 'folderActionScriptsFolder', 'Folder', 'no-get'],
-      ['system-events', 'Domain', 'fontsFolder', 'Folder', 'no-get'],
-      ['system-events', 'Domain', 'libraryFolder', 'Folder', 'no-get'],
-      ['system-events', 'Domain', 'preferencesFolder', 'Folder', 'no-get'],
-      ['system-events', 'Domain', 'scriptingAdditionsFolder', 'Folder', 'no-get'],
-      ['system-events', 'Domain', 'scriptsFolder', 'Folder', 'no-get'],
-      ['system-events', 'Domain', 'sharedDocumentsFolder', 'Folder', 'no-get'],
-      ['system-events', 'Domain', 'speakableItemsFolder', 'Folder', 'no-get'],
-      ['system-events', 'Domain', 'utilitiesFolder', 'Folder', 'no-get'],
-      ['system-events', 'Domain', 'workflowsFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'desktopFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'documentsFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'downloadsFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'favoritesFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'homeFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'moviesFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'musicFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'picturesFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'publicFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'sitesFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'temporaryItemsFolder', 'Folder', 'no-get'],
       // Inherited: a folder is a disk item, and the user and Classic domains
       // are domains (D10, "Superclasses"). 1 + 13 + 11 rows.
-      ['system-events', 'Folder', 'container', 'DiskItem', 'no-get'],
-      ['system-events', 'UserDomainObject', 'applicationSupportFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'applicationsFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'desktopPicturesFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'folderActionScriptsFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'fontsFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'libraryFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'preferencesFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'scriptingAdditionsFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'scriptsFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'sharedDocumentsFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'speakableItemsFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'utilitiesFolder', 'Folder', 'no-get'],
-      ['system-events', 'UserDomainObject', 'workflowsFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'applicationSupportFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'applicationsFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'desktopPicturesFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'folderActionScriptsFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'libraryFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'scriptingAdditionsFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'scriptsFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'sharedDocumentsFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'speakableItemsFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'utilitiesFolder', 'Folder', 'no-get'],
-      ['system-events', 'ClassicDomainObject', 'workflowsFolder', 'Folder', 'no-get'],
       ['system-events', 'ScriptingClass', 'superclass', 'ScriptingClass', 'no-get'],
       ['system-events', 'ScriptingCommand', 'directParameter', 'ScriptingParameter', 'no-get'],
       ['tv', 'BrowserWindow', 'view', 'Playlist', 'parent-scoped'],
@@ -1280,7 +1412,7 @@ describe('real app manifests', () => {
       ['xcode', 'RunDestination', 'device', 'Device', 'no-get'],
       ['xcode', 'RunDestination', 'companionDevice', 'Device', 'no-get'],
     ]
-    expect(expected).toHaveLength(96)
+    expect(expected).toHaveLength(35)
     expect(found.sort()).toEqual(expected.sort())
   })
 

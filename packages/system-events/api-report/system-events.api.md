@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -183,17 +184,41 @@ export type CheckboxUpdateInput = Partial<CheckboxCreateInput>;
 
 // @public
 export interface ClassicDomainObject {
+    applicationsFolder: Folder;
+    applicationSupportFolder: Folder;
     id: string;
+    kind: ClassicDomainObjectKind;
+    libraryFolder: Folder;
     name: string;
+    preferencesFolder: Folder;
+    scriptsFolder: Folder;
+    workflowsFolder: Folder;
 }
 
 // @public
 export type ClassicDomainObjectCreateInput = Record<string, never>;
 
+// @public
+export type ClassicDomainObjectKind = 'classic';
+
+// @public
+export class ClassicDomainObjectResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(kind: string): Promise<ClassicDomainObject>;
+    list(): Promise<Page<ClassicDomainObject>>;
+}
+
 // @public (undocumented)
 export const ClassicDomainObjectSchema: z.ZodObject<{
+    preferencesFolder: z.ZodString;
+    kind: z.ZodString;
+    applicationSupportFolder: z.ZodString;
+    applicationsFolder: z.ZodString;
     id: z.ZodString;
+    libraryFolder: z.ZodString;
     name: z.ZodString;
+    scriptsFolder: z.ZodString;
+    workflowsFolder: z.ZodString;
 }, z.core.$strip>;
 
 // @public
@@ -295,6 +320,7 @@ export interface DiskCreateInput {
 // @public
 export interface DiskItem {
     busyStatus: boolean;
+    container: unknown;
     creationDate: Date;
     displayedName: string;
     id: string;
@@ -304,7 +330,7 @@ export interface DiskItem {
     packageFolder: boolean;
     path: string;
     physicalSize: number;
-    pOSIXPath: string;
+    posixPath: string;
     size: number;
     uRL: string;
     visible: boolean;
@@ -318,9 +344,16 @@ export interface DiskItemCreateInput {
     visible?: boolean;
 }
 
+// @public
+export class DiskItemResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(posixPath: string): Promise<DiskItem>;
+}
+
 // @public (undocumented)
 export const DiskItemSchema: z.ZodObject<{
     busyStatus: z.ZodBoolean;
+    container: z.ZodString;
     creationDate: z.ZodString;
     displayedName: z.ZodString;
     id: z.ZodString;
@@ -330,7 +363,7 @@ export const DiskItemSchema: z.ZodObject<{
     packageFolder: z.ZodBoolean;
     path: z.ZodString;
     physicalSize: z.ZodNumber;
-    pOSIXPath: z.ZodString;
+    posixPath: z.ZodString;
     size: z.ZodNumber;
     uRL: z.ZodString;
     visible: z.ZodBoolean;
@@ -358,17 +391,50 @@ export type DiskUpdateInput = Partial<DiskCreateInput>;
 
 // @public
 export interface Domain {
+    applicationsFolder: Folder;
+    applicationSupportFolder: Folder;
+    desktopPicturesFolder: Folder;
+    folderActionScriptsFolder: Folder;
+    fontsFolder: Folder;
     id: string;
+    libraryFolder: Folder;
     name: string;
+    preferencesFolder: Folder;
+    scriptingAdditionsFolder: Folder;
+    scriptsFolder: Folder;
+    sharedDocumentsFolder: Folder;
+    speakableItemsFolder: Folder;
+    utilitiesFolder: Folder;
+    workflowsFolder: Folder;
 }
 
 // @public
 export type DomainCreateInput = Record<string, never>;
 
+// @public
+export class DomainResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(id: string): Promise<Domain>;
+    list(): Promise<Page<Domain>>;
+}
+
 // @public (undocumented)
 export const DomainSchema: z.ZodObject<{
+    applicationSupportFolder: z.ZodString;
+    applicationsFolder: z.ZodString;
+    desktopPicturesFolder: z.ZodString;
+    folderActionScriptsFolder: z.ZodString;
+    fontsFolder: z.ZodString;
     id: z.ZodString;
+    libraryFolder: z.ZodString;
     name: z.ZodString;
+    preferencesFolder: z.ZodString;
+    scriptingAdditionsFolder: z.ZodString;
+    scriptsFolder: z.ZodString;
+    sharedDocumentsFolder: z.ZodString;
+    speakableItemsFolder: z.ZodString;
+    utilitiesFolder: z.ZodString;
+    workflowsFolder: z.ZodString;
 }, z.core.$strip>;
 
 // @public
@@ -471,6 +537,7 @@ export type FileUpdateInput = Partial<FileCreateInput>;
 // @public
 export interface Folder {
     busyStatus: boolean;
+    container: unknown;
     creationDate: Date;
     displayedName: string;
     id: string;
@@ -480,7 +547,7 @@ export interface Folder {
     packageFolder: boolean;
     path: string;
     physicalSize: number;
-    pOSIXPath: string;
+    posixPath: string;
     size: number;
     uRL: string;
     visible: boolean;
@@ -494,9 +561,16 @@ export interface FolderCreateInput {
     visible?: boolean;
 }
 
+// @public
+export class FolderResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(posixPath: string): Promise<Folder>;
+}
+
 // @public (undocumented)
 export const FolderSchema: z.ZodObject<{
     busyStatus: z.ZodBoolean;
+    container: z.ZodString;
     creationDate: z.ZodString;
     displayedName: z.ZodString;
     id: z.ZodString;
@@ -506,7 +580,7 @@ export const FolderSchema: z.ZodObject<{
     packageFolder: z.ZodBoolean;
     path: z.ZodString;
     physicalSize: z.ZodNumber;
-    pOSIXPath: z.ZodString;
+    posixPath: z.ZodString;
     size: z.ZodNumber;
     uRL: z.ZodString;
     visible: z.ZodBoolean;
@@ -1366,18 +1440,22 @@ export class SystemEventsClient {
     attachedScripts(): Promise<void>;
     beginTransaction(): Promise<void>;
     cancel(): Promise<void>;
+    readonly classicDomainObjects: ClassicDomainObjectResourceClient;
     confirm(): Promise<void>;
     connect(): Promise<void>;
     decrement(): Promise<void>;
     disconnect(): Promise<void>;
+    readonly diskItems: DiskItemResourceClient;
     doFolderAction(folderActionCode: string, withItemList?: unknown, withWindowSize?: {
         x: number;
         y: number;
         width: number;
         height: number;
     }): Promise<void>;
+    readonly domains: DomainResourceClient;
     editActionOf(usingActionName?: string, usingActionNumber?: number): Promise<void>;
     endTransaction(): Promise<void>;
+    readonly folders: FolderResourceClient;
     get http(): HttpClient;
     increment(): Promise<void>;
     keyCode(using?: string): Promise<void>;
@@ -1395,6 +1473,7 @@ export class SystemEventsClient {
     start(): Promise<void>;
     stop(): Promise<void>;
     readonly uiElements: UIElementResourceClient;
+    readonly userDomainObjects: UserDomainObjectResourceClient;
 }
 
 // @public
@@ -1557,17 +1636,77 @@ export type UIElementUpdateInput = Partial<UIElementCreateInput>;
 
 // @public
 export interface UserDomainObject {
+    applicationsFolder: Folder;
+    applicationSupportFolder: Folder;
+    desktopFolder: Folder;
+    desktopPicturesFolder: Folder;
+    documentsFolder: Folder;
+    downloadsFolder: Folder;
+    favoritesFolder: Folder;
+    folderActionScriptsFolder: Folder;
+    fontsFolder: Folder;
+    homeFolder: Folder;
     id: string;
+    kind: UserDomainObjectKind;
+    libraryFolder: Folder;
+    moviesFolder: Folder;
+    musicFolder: Folder;
     name: string;
+    picturesFolder: Folder;
+    preferencesFolder: Folder;
+    publicFolder: Folder;
+    scriptingAdditionsFolder: Folder;
+    scriptsFolder: Folder;
+    sharedDocumentsFolder: Folder;
+    sitesFolder: Folder;
+    speakableItemsFolder: Folder;
+    temporaryItemsFolder: Folder;
+    utilitiesFolder: Folder;
+    workflowsFolder: Folder;
 }
 
 // @public
 export type UserDomainObjectCreateInput = Record<string, never>;
 
+// @public
+export type UserDomainObjectKind = 'user';
+
+// @public
+export class UserDomainObjectResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(kind: string): Promise<UserDomainObject>;
+    list(): Promise<Page<UserDomainObject>>;
+}
+
 // @public (undocumented)
 export const UserDomainObjectSchema: z.ZodObject<{
+    desktopFolder: z.ZodString;
+    documentsFolder: z.ZodString;
+    downloadsFolder: z.ZodString;
+    favoritesFolder: z.ZodString;
+    homeFolder: z.ZodString;
+    moviesFolder: z.ZodString;
+    musicFolder: z.ZodString;
+    picturesFolder: z.ZodString;
+    publicFolder: z.ZodString;
+    sitesFolder: z.ZodString;
+    temporaryItemsFolder: z.ZodString;
+    kind: z.ZodString;
+    applicationSupportFolder: z.ZodString;
+    applicationsFolder: z.ZodString;
+    desktopPicturesFolder: z.ZodString;
+    folderActionScriptsFolder: z.ZodString;
+    fontsFolder: z.ZodString;
     id: z.ZodString;
+    libraryFolder: z.ZodString;
     name: z.ZodString;
+    preferencesFolder: z.ZodString;
+    scriptingAdditionsFolder: z.ZodString;
+    scriptsFolder: z.ZodString;
+    sharedDocumentsFolder: z.ZodString;
+    speakableItemsFolder: z.ZodString;
+    utilitiesFolder: z.ZodString;
+    workflowsFolder: z.ZodString;
 }, z.core.$strip>;
 
 // @public

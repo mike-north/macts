@@ -5,6 +5,11 @@
  * @packageDocumentation
  */
 
+import { ClassicDomainObjectResourceClient } from './resources/classicdomainobject.js'
+import { DiskItemResourceClient } from './resources/diskitem.js'
+import { DomainResourceClient } from './resources/domain.js'
+import { FolderResourceClient } from './resources/folder.js'
+import { UserDomainObjectResourceClient } from './resources/userdomainobject.js'
 import { ActionResourceClient } from './resources/action.js'
 import { UIElementResourceClient } from './resources/uielement.js'
 
@@ -85,6 +90,21 @@ export class SystemEventsError extends Error {
 export class SystemEventsClient {
   readonly #httpClient: HttpClient
 
+  /** The Classic domain in the file system */
+  readonly classicDomainObjects: ClassicDomainObjectResourceClient
+
+  /** An item stored in the file system */
+  readonly diskItems: DiskItemResourceClient
+
+  /** A domain in the file system */
+  readonly domains: DomainResourceClient
+
+  /** A folder in the file system */
+  readonly folders: FolderResourceClient
+
+  /** The user domain in the file system */
+  readonly userDomainObjects: UserDomainObjectResourceClient
+
   /** An action that can be performed on the UI element */
   readonly actions: ActionResourceClient
 
@@ -94,6 +114,19 @@ export class SystemEventsClient {
   constructor(options: SystemEventsClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
+    this.classicDomainObjects = new ClassicDomainObjectResourceClient(
+      this.#httpClient,
+      'system-events',
+      'classicDomainObjects'
+    )
+    this.diskItems = new DiskItemResourceClient(this.#httpClient, 'system-events', 'diskItems')
+    this.domains = new DomainResourceClient(this.#httpClient, 'system-events', 'domains')
+    this.folders = new FolderResourceClient(this.#httpClient, 'system-events', 'folders')
+    this.userDomainObjects = new UserDomainObjectResourceClient(
+      this.#httpClient,
+      'system-events',
+      'userDomainObjects'
+    )
     this.actions = new ActionResourceClient(this.#httpClient, 'system-events', 'actions')
     this.uiElements = new UIElementResourceClient(this.#httpClient, 'system-events', 'uiElements')
   }
