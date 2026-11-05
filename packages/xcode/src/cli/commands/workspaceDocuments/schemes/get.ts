@@ -9,7 +9,8 @@ export class GetSchemeCommand extends Command {
   static override paths = [['xcode', 'workspaceDocuments', 'schemes', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a scheme by ID',
+    description:
+      "Get a scheme by ID. When several workspace documents share the same name, the first match in the app's order is used as the workspace document.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
