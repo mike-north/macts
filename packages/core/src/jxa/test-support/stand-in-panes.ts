@@ -13,6 +13,13 @@
  *
  * Every lookup it serves is recorded in `lookups`, labelled by the path that
  * reached it (`windows.byId(1)`, `windows.byId(1).tabs.at(0)`).
+ *
+ * An app of the same shape, such as iTerm, is stood in for by adding the
+ * further record fields its manifest declares ({@link StandInPanesOptions})
+ * and its own display form.
+ *
+ * Reachable from other macts packages through `@macts/core/testing`, which is
+ * not public API.
  */
 
 import type { StandInAutomation } from './stand-in-app.js'
@@ -42,6 +49,10 @@ export interface StandInPanesOptions {
    * `Application("Panes").windows.byId(<windowId>).tabs.at(<position>)`.
    */
   readonly display?: (windowId: number, position: number) => string
+  /** Further fields of every window record, keyed by the app's name for each. */
+  readonly windowFields?: Readonly<Record<string, unknown>>
+  /** Further fields of every tab record, keyed by the app's name for each. */
+  readonly tabFields?: Readonly<Record<string, unknown>>
 }
 
 /** A stand-in Panes application and the `Automation` that displays its specifiers. */
@@ -56,6 +67,7 @@ const ABSENT = Object.freeze({ exists: () => false })
 /**
  * A stand-in element collection: calling it lists its item specifiers, and
  * reading a property of it reads that property of every item in order.
+ * `columns` are the record's keys when it holds no item.
  */
 function collection(
   items: readonly object[],
@@ -65,7 +77,7 @@ function collection(
   const list = (): object[] => [...items]
   // Defined rather than assigned: a function's own `name` and `length` are
   // read-only.
-  for (const key of columns) {
+  for (const key of records[0] === undefined ? columns : Object.keys(records[0])) {
     Object.defineProperty(list, key, { value: () => records.map((record) => record[key]) })
   }
   return list
@@ -83,6 +95,8 @@ export function standInPanes(
 ): StandInPanes {
   const {
     lookups = [],
+    windowFields = {},
+    tabFields = {},
     display = (windowId, position) =>
       `Application("Panes").windows.byId(${String(windowId)}).tabs.at(${String(position)})`,
   } = options
@@ -90,6 +104,7 @@ export function standInPanes(
   const windowItem = (row: StandInPaneWindow) => {
     const label = `windows.byId(${String(row.id)}).tabs`
     const tabRecords = row.tabs.map((tab, position) => ({
+      ...tabFields,
       index: tab.index ?? position + 1,
       title: tab.title,
     }))
@@ -112,6 +127,7 @@ export function standInPanes(
       },
     })
     const record: Record<string, unknown> = {
+      ...windowFields,
       id: row.id,
       name: row.name,
       currentTab: tabItems[row.currentTab ?? 0] ?? null,

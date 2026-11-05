@@ -9,7 +9,8 @@
  * stand-in Chromium browser application, the record keys the native get and
  * list bodies read for a resource, the Archive stand-in manifest that
  * exercises key targeting, singleton roots and reported absences, the Panes
- * stand-in manifest whose tabs are positional, and the
+ * stand-in manifest whose tabs are positional and a stand-in app of its shape,
+ * and the
  * reader of an object's position from its specifier, which a live test runs
  * against a real app to check the display form it parses.
  * Tests in other macts packages use it to drive the real native executor end
@@ -40,3 +41,10 @@ export {
 export { nativeReadKeys, type NativeReadKeys } from './jxa/native-scripts.js'
 export { archiveManifest } from './manifest/test-support/archive-key-and-root.js'
 export { panesManifest } from './manifest/test-support/panes-positional.js'
+export {
+  standInPanes,
+  type StandInPanes,
+  type StandInPaneTab,
+  type StandInPaneWindow,
+  type StandInPanesOptions,
+} from './jxa/test-support/stand-in-panes.js'
