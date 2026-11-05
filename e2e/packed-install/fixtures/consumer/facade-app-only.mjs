@@ -27,19 +27,21 @@ try {
 } catch (error) {
   rawError = error instanceof SystemEventsError
 }
-let boundFacade = false
-// This base contract has no get/list resources yet. Registry admission is
-// observable as canonical reference validation rather than an unregistered-client TypeError.
+// The app-only facade binds references to the same contract-backed client used
+// by its generated methods, so resolution retains canonical errors.
+const reference = bindReference(facade, {
+  app: 'system-events',
+  resource: 'DiskItem',
+  form: 'identity',
+  cardinality: 'one',
+  id: 'missing',
+})
+const boundFacade = reference.app === 'system-events' && reference.resource === 'DiskItem'
+let boundReferenceCanonicalError = false
 try {
-  bindReference(facade, {
-    app: 'system-events',
-    resource: 'DiskItem',
-    form: 'identity',
-    cardinality: 'one',
-    id: 'missing',
-  })
+  await reference.resolve()
 } catch (error) {
-  boundFacade = error instanceof ValidationError
+  boundReferenceCanonicalError = error instanceof TargetNotFoundError
 }
 const count = requests.length
 let validationBeforeDispatch = false
@@ -49,5 +51,12 @@ try {
   validationBeforeDispatch = error instanceof ValidationError && requests.length === count
 }
 process.stdout.write(
-  JSON.stringify({ input, canonicalError, rawError, boundFacade, validationBeforeDispatch })
+  JSON.stringify({
+    input,
+    canonicalError,
+    rawError,
+    boundFacade,
+    boundReferenceCanonicalError,
+    validationBeforeDispatch,
+  })
 )
