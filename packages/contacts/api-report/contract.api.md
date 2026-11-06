@@ -77,19 +77,19 @@ export interface AIMHandleUpdateInput {
 
 // @public
 export interface ContactsClient extends ClientBrand<ContactsResources> {
-    actionProperty(options?: CallOptions): Promise<void>;
-    actionTitle(_with: unknown, _for: ObjectReferenceData<string, 'Person'>, options?: CallOptions): Promise<void>;
+    actionProperty(options?: CallOptions): Promise<string | null>;
+    actionTitle(_with: unknown, _for: ObjectReferenceData<string, 'Person'>, options?: CallOptions): Promise<string | null>;
     add(to: string, options?: CallOptions): Promise<void>;
     readonly addresses: AddressResourceClient;
     readonly emails: EmailResourceClient;
     readonly groups: GroupResourceClient;
     make(_new: string, at?: string, withData?: unknown, withProperties?: unknown, options?: CallOptions): Promise<void>;
     readonly people: PersonResourceClient;
-    performAction(_with: unknown, _for: ObjectReferenceData<string, 'Person'>, options?: CallOptions): Promise<void>;
+    performAction(_with: unknown, _for: ObjectReferenceData<string, 'Person'>, options?: CallOptions): Promise<boolean | null>;
     readonly phones: PhoneResourceClient;
     remove(from: string, options?: CallOptions): Promise<void>;
     save(options?: CallOptions): Promise<void>;
-    shouldEnableAction(_with: unknown, _for: ObjectReferenceData<string, 'Person'>, options?: CallOptions): Promise<void>;
+    shouldEnableAction(_with: unknown, _for: ObjectReferenceData<string, 'Person'>, options?: CallOptions): Promise<boolean | null>;
 }
 
 // @public

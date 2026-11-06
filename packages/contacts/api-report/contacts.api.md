@@ -126,9 +126,9 @@ export interface ContactsClient extends ClientBrand<ContactsResources> {
 // @public
 export class ContactsClient {
     constructor(options: ContactsClientOptions);
-    actionProperty(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     // Warning: (ae-forgotten-export) The symbol "ContactsClient_2" needs to be exported by the entry point index.d.ts
-    actionTitle(_with: unknown, _for: Parameters<ContactsClient_2['actionTitle']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    actionProperty(__mactsOptions?: _macts_contracts.CallOptions): Promise<Awaited<ReturnType<ContactsClient_2['actionProperty']>>>;
+    actionTitle(_with: unknown, _for: Parameters<ContactsClient_2['actionTitle']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<Awaited<ReturnType<ContactsClient_2['actionTitle']>>>;
     add(to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly addresses: AddressResourceClient;
     readonly emails: EmailResourceClient;
@@ -136,11 +136,11 @@ export class ContactsClient {
     get http(): HttpClient;
     make(_new: string, at?: string, withData?: unknown, withProperties?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly people: PersonResourceClient;
-    performAction(_with: unknown, _for: Parameters<ContactsClient_2['performAction']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    performAction(_with: unknown, _for: Parameters<ContactsClient_2['performAction']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<Awaited<ReturnType<ContactsClient_2['performAction']>>>;
     readonly phones: PhoneResourceClient;
     remove(from: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     save(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    shouldEnableAction(_with: unknown, _for: Parameters<ContactsClient_2['shouldEnableAction']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    shouldEnableAction(_with: unknown, _for: Parameters<ContactsClient_2['shouldEnableAction']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<Awaited<ReturnType<ContactsClient_2['shouldEnableAction']>>>;
 }
 
 // @public

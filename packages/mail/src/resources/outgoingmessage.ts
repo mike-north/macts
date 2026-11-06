@@ -43,8 +43,15 @@ export class OutgoingMessageResourceClient {
   /**
    * Sends a message.
    */
-  async send(id: number, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
-    await this.#http.invoke<undefined>(
+  async send(
+    id: number,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<
+    Awaited<ReturnType<import('../contract/index.js').OutgoingMessageResourceClient['send']>>
+  > {
+    return this.#http.invoke<
+      Awaited<ReturnType<import('../contract/index.js').OutgoingMessageResourceClient['send']>>
+    >(
       `${this.#app}.${this.#resource}.send`,
       { id: __mactsIntegerInput(id) },
       __mactsOptions,

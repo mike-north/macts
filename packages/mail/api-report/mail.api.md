@@ -498,7 +498,8 @@ export interface OutgoingMessageCreateInput {
 // @public
 export class OutgoingMessageResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    send(id: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "OutgoingMessageResourceClient_2" needs to be exported by the entry point index.d.ts
+    send(id: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<Awaited<ReturnType<OutgoingMessageResourceClient_2['send']>>>;
 }
 
 // @public

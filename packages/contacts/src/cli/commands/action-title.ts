@@ -23,12 +23,12 @@ export class ActionTitleCommand extends Command {
 
     try {
       const client = getClient()
-      await client.actionTitle(
+      const result = await client.actionTitle(
         this.with as unknown as Parameters<typeof client.actionTitle>[0],
         this.for as unknown as Parameters<typeof client.actionTitle>[1]
       )
 
-      const output = formatter.formatSuccess('actionTitle completed successfully')
+      const output = formatter.format(result)
       this.context.stdout.write(output + '\n')
       return 0
     } catch (error) {
