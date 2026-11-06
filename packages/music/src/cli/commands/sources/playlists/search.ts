@@ -14,7 +14,6 @@ export class SearchPlaylistCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  sourceId = Option.String('--source-id', { required: true, description: 'Source ID' })
   playlistId = Option.String({ name: 'persistent-id', required: true })
   for = Option.String('--for', { required: true, description: 'the search text' })
   only = Option.String('--only', {
@@ -27,8 +26,9 @@ export class SearchPlaylistCommand extends Command {
     try {
       const client = getClient()
       await client.playlists.search(
-        this.for as unknown as Parameters<typeof client.playlists.search>[0],
-        this.only as unknown as Parameters<typeof client.playlists.search>[1]
+        this.playlistId as unknown as Parameters<typeof client.playlists.search>[0],
+        this.for as unknown as Parameters<typeof client.playlists.search>[1],
+        this.only as unknown as Parameters<typeof client.playlists.search>[2]
       )
 
       const output = formatter.formatSuccess('search completed successfully')

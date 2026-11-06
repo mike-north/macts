@@ -515,9 +515,9 @@ export const manifest: unknown = {
       resourceType: 'Workflow',
       parameters: [
         {
-          name: 'workflow',
-          type: 'any',
-          description: 'The workflow to execute',
+          name: 'name',
+          type: 'string',
+          description: 'Workflow name',
           required: true,
         },
       ],

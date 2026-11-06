@@ -79,7 +79,7 @@ List all playlists, as one page.
 </td></tr>
 <tr><td>
 
-[move(to, \_\_mactsOptions)](./music.playlistresourceclient.move.md)
+[move(persistentID, to, \_\_mactsOptions)](./music.playlistresourceclient.move.md)
 
 </td><td>
 
@@ -90,7 +90,7 @@ Move playlist(s) to a new location
 </td></tr>
 <tr><td>
 
-[search(\_for, only, \_\_mactsOptions)](./music.playlistresourceclient.search.md)
+[search(persistentID, \_for, only, \_\_mactsOptions)](./music.playlistresourceclient.search.md)
 
 </td><td>
 

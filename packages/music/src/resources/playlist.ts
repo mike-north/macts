@@ -51,10 +51,14 @@ export class PlaylistResourceClient {
   /**
    * Move playlist(s) to a new location
    */
-  async move(to: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+  async move(
+    persistentID: string,
+    to: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.move`,
-      { to },
+      { persistentID, to },
       __mactsOptions,
       'Playlist'
     )
@@ -64,13 +68,14 @@ export class PlaylistResourceClient {
    * search a playlist for tracks matching the search string. Identical to entering search text in the Search field.
    */
   async search(
+    persistentID: string,
     _for: string,
     only?: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.search`,
-      { for: _for, only },
+      { persistentID, for: _for, only },
       __mactsOptions,
       'Playlist'
     )

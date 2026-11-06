@@ -419,7 +419,21 @@ resources:
     description: The Classic domain in the file system
     code: domc
     # The dictionary's class inherits `domain`: it has the domain's folders,
-    # `id` and `name` besides its own, and is identified by the domain's `id`.
+    # `id` and `name` besides its own. The app holds the one Classic domain as
+    # its `Classic domain` property; its class is no collection of the app
+    # (reading one as a collection fails), so it is a root, identified by its
+    # kind. Current macOS has no Classic environment: the domain exists, but
+    # every folder it records except its Preferences folder is missing, so
+    # those are marked unsupported, inherited ones in `inheritedClaims`.
+    roots:
+      classic:
+        property: classicDomain
+        evidence:
+          source: dictionary
+          bundleId: com.apple.systemevents
+          appVersion: 1.3.6
+          osVersion: '27.2'
+          term: Classic domain
     inherits:
       resource: Domain
       evidence:
@@ -428,6 +442,85 @@ resources:
         appVersion: 1.3.6
         osVersion: '27.2'
         term: domain
+    inheritedClaims:
+      desktopPicturesFolder:
+        unsupported:
+          reason: The Classic domain has no Desktop Pictures folder on macOS 27.2, which has no Classic environment; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T04:51:11Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
+      folderActionScriptsFolder:
+        unsupported:
+          reason: The Classic domain has no Folder Action Scripts folder on macOS 27.2, which has no Classic environment; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T04:51:11Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
+      scriptingAdditionsFolder:
+        unsupported:
+          reason: The Classic domain has no Scripting Additions folder on macOS 27.2, which has no Classic environment; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T04:51:11Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
+      sharedDocumentsFolder:
+        unsupported:
+          reason: The Classic domain has no Shared Documents folder on macOS 27.2, which has no Classic environment; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T04:51:11Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
+      speakableItemsFolder:
+        unsupported:
+          reason: The Classic domain has no Speakable Items folder on macOS 27.2, which has no Classic environment; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T04:51:11Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
+      utilitiesFolder:
+        unsupported:
+          reason: The Classic domain has no Utilities folder on macOS 27.2, which has no Classic environment; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T04:51:11Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
     properties:
       appleMenuFolder:
         access: r
@@ -435,42 +528,126 @@ resources:
           resource: Folder
         description: The Apple Menu Items folder
         code: amnu
+        unsupported:
+          reason: The Classic domain has no Apple Menu Items folder on current macOS; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T01:22:55.365Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
       controlPanelsFolder:
         access: r
         type:
           resource: Folder
         description: The Control Panels folder
         code: ctrl
+        unsupported:
+          reason: The Classic domain has no Control Panels folder on current macOS; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T01:22:55.365Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
       controlStripModulesFolder:
         access: r
         type:
           resource: Folder
         description: The Control Strip Modules folder
         code: sdev
+        unsupported:
+          reason: The Classic domain has no Control Strip Modules folder on current macOS; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T01:22:55.365Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
       desktopFolder:
         access: r
         type:
           resource: Folder
         description: The Classic Desktop folder
         code: desk
+        unsupported:
+          reason: The Classic domain has no Desktop folder on current macOS; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T01:22:55.365Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
       extensionsFolder:
         access: r
         type:
           resource: Folder
         description: The Extensions folder
         code: extz
+        unsupported:
+          reason: The Classic domain has no Extensions folder on current macOS; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T01:22:55.365Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
       fontsFolder:
         access: r
         type:
           resource: Folder
         description: The Fonts folder
         code: font
+        unsupported:
+          reason: The Classic domain has no Fonts folder on current macOS; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T01:22:55.365Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
       launcherItemsFolder:
         access: r
         type:
           resource: Folder
         description: The Launcher Items folder
         code: laun
+        unsupported:
+          reason: The Classic domain has no Launcher Items folder on current macOS; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T01:22:55.365Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
       preferencesFolder:
         access: r
         type:
@@ -483,18 +660,54 @@ resources:
           resource: Folder
         description: The Shutdown Items folder
         code: shdf
+        unsupported:
+          reason: The Classic domain has no Shutdown Items folder on current macOS; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T01:22:55.365Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
       startupItemsFolder:
         access: r
         type:
           resource: Folder
         description: The StartupItems folder
         code: empz
+        unsupported:
+          reason: The Classic domain has no Startup Items folder on current macOS; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T01:22:55.365Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
       systemFolder:
         access: r
         type:
           resource: Folder
         description: The System folder
         code: macs
+        unsupported:
+          reason: The Classic domain has no System Folder on current macOS; every read of it fails.
+          evidence:
+            source: probe
+            observedAt: '2026-11-04T01:22:55.365Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            failedReads: 1
+            errorNumbers:
+              - -1728
   Disk:
     name: Disk
     plural: Disks
@@ -608,19 +821,11 @@ resources:
         type: integer
         description: the actual space used by the disk item on disk
         code: phys
-      pOSIXPath:
+      posixPath:
         access: r
         type: string
         description: the POSIX file system path of the disk item
         code: posx
-        native:
-          name: posixPath
-          evidence:
-            source: dictionary
-            bundleId: com.apple.systemevents
-            appVersion: 1.3.6
-            osVersion: '27.2'
-            term: POSIX path
       size:
         access: r
         type: integer
@@ -649,9 +854,22 @@ resources:
         type: string
         description: the volume on which the disk item resides
         code: volu
+    # A disk item is identified by its POSIX path, the app's own key for its
+    # disk items. The path names a location, not an item: it finds whatever
+    # is at that path now, and a moved or renamed item is found at its new
+    # path, not its old one. The disk item's own `id` reads but cannot be
+    # looked up, so it identifies nothing.
     identifiers:
-      - property: id
+      - property: posixPath
         primary: true
+        targeting: byKey
+        unique: true
+        evidence:
+          unique:
+            source: curated
+            note: A path names one item at a time. A read-only probe of System Events 1.3.6 on macOS 27.2 looked up a folder (the home folder), a disk (the startup disk, "/") and a file by their POSIX paths through the disk items' key, and each read the same item back; the disk items' own ids are not found by an id lookup.
+            observedAt: '2026-11-04T04:44:08Z'
+            appVersion: 1.3.6
   Domain:
     name: Domain
     plural: Domains
@@ -664,30 +882,97 @@ resources:
           resource: Folder
         description: The Application Support folder
         code: asup
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-05T03:10:09.000Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 4
+            nullCount: 0
+            failedReads: 1
+            errorNumbers:
+              - -1728
+            note: A read-only probe read this folder on each of the 5 domains the way the generated body does, the folder and then its POSIX path; an earlier probe read only the folder's id, which every domain answered.
       applicationsFolder:
         access: r
         type:
           resource: Folder
         description: The Applications folder
         code: apps
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-05T03:10:09.000Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 4
+            nullCount: 0
+            failedReads: 1
+            errorNumbers:
+              - -1728
+            note: A read-only probe read this folder on each of the 5 domains the way the generated body does, the folder and then its POSIX path; an earlier probe read only the folder's id, which every domain answered.
       desktopPicturesFolder:
         access: r
         type:
           resource: Folder
         description: The Desktop Pictures folder
         code: dtp$
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-04T04:41:36Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            nullCount: 0
+            failedReads: 4
+            errorNumbers:
+              - -1728
       folderActionScriptsFolder:
         access: r
         type:
           resource: Folder
         description: The Folder Action Scripts folder
         code: fasf
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-04T04:41:36Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            nullCount: 0
+            failedReads: 4
+            errorNumbers:
+              - -1728
       fontsFolder:
         access: r
         type:
           resource: Folder
         description: The Fonts folder
         code: font
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-04T04:41:36Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 3
+            nullCount: 0
+            failedReads: 2
+            errorNumbers:
+              - -1728
       id:
         access: r
         type: string
@@ -699,6 +984,20 @@ resources:
           resource: Folder
         description: The Library folder
         code: dlib
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-05T03:10:09.000Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 4
+            nullCount: 0
+            failedReads: 1
+            errorNumbers:
+              - -1728
+            note: A read-only probe read this folder on each of the 5 domains the way the generated body does, the folder and then its POSIX path; an earlier probe read only the folder's id, which every domain answered.
       name:
         access: r
         type: string
@@ -710,45 +1009,147 @@ resources:
           resource: Folder
         description: The Preferences folder
         code: pref
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-04T04:41:36Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 4
+            nullCount: 0
+            failedReads: 1
+            errorNumbers:
+              - -1728
       scriptingAdditionsFolder:
         access: r
         type:
           resource: Folder
         description: The Scripting Additions folder
         code: $scr
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-04T04:41:36Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 2
+            nullCount: 0
+            failedReads: 3
+            errorNumbers:
+              - -1728
       scriptsFolder:
         access: r
         type:
           resource: Folder
         description: The Scripts folder
         code: scr$
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-04T04:41:36Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 3
+            nullCount: 0
+            failedReads: 2
+            errorNumbers:
+              - -1728
       sharedDocumentsFolder:
         access: r
         type:
           resource: Folder
         description: The Shared Documents folder
         code: sdat
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-04T04:41:36Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 4
+            nullCount: 0
+            failedReads: 1
+            errorNumbers:
+              - -1728
       speakableItemsFolder:
         access: r
         type:
           resource: Folder
         description: The Speakable Items folder
         code: spki
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-04T04:41:36Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 1
+            nullCount: 0
+            failedReads: 4
+            errorNumbers:
+              - -1728
       utilitiesFolder:
         access: r
         type:
           resource: Folder
         description: The Utilities folder
         code: uti$
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-04T04:41:36Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 2
+            nullCount: 0
+            failedReads: 3
+            errorNumbers:
+              - -1728
       workflowsFolder:
         access: r
         type:
           resource: Folder
         description: The Automator Workflows folder
         code: flow
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-04T04:41:36Z'
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            sampleSize: 2
+            nullCount: 0
+            failedReads: 3
+            errorNumbers:
+              - -1728
+    # A domain holds only the folders its kind of domain has: a read-only
+    # probe of the 5 domains read 10 of these folders on some domains, and
+    # the app reported no such object (-1728) on the others, so each is
+    # nullable on that evidence, and a read the app reports that way is null.
     identifiers:
       - property: id
         primary: true
+        unique: true
+        evidence:
+          unique:
+            source: curated
+            note: A read-only probe of System Events 1.3.6 on macOS 27.2 read the 5 domains' ids, which were distinct, and an id lookup of each read the same domain back.
+            observedAt: '2026-11-04T04:41:36Z'
+            appVersion: 1.3.6
   File:
     name: File
     plural: Files
@@ -819,7 +1220,10 @@ resources:
     description: A folder in the file system
     code: cfol
     # The dictionary's `folder` declares no property of its own: it has every
-    # property of `disk item`, its `id` among them, and is identified by it.
+    # property of `disk item`. It is found through the folders' key, which
+    # finds only folders, so it states its own identifier rather than
+    # inheriting the disk items': a POSIX path, which names a location, as
+    # for a disk item.
     inherits:
       resource: DiskItem
       evidence:
@@ -828,6 +1232,17 @@ resources:
         appVersion: 1.3.6
         osVersion: '27.2'
         term: disk item
+    identifiers:
+      - property: posixPath
+        primary: true
+        targeting: byKey
+        unique: true
+        evidence:
+          unique:
+            source: curated
+            note: A path names one item at a time. A read-only probe of System Events 1.3.6 on macOS 27.2 looked up the home folder by its POSIX path through the folders' key and read the same folder back; the folders' key finds nothing at a file's path.
+            observedAt: '2026-11-04T04:44:08Z'
+            appVersion: 1.3.6
 
   LocalDomainObject:
     name: LocalDomainObject
@@ -874,7 +1289,18 @@ resources:
     description: The user domain in the file system
     code: domu
     # The dictionary's class inherits `domain`: it has the domain's folders,
-    # `id` and `name` besides its own, and is identified by the domain's `id`.
+    # `id` and `name` besides its own. The app holds the one user domain as its
+    # `user domain` property; its class is no collection of the app (reading
+    # one as a collection fails), so it is a root, identified by its kind.
+    roots:
+      user:
+        property: userDomain
+        evidence:
+          source: dictionary
+          bundleId: com.apple.systemevents
+          appVersion: 1.3.6
+          osVersion: '27.2'
+          term: user domain
     inherits:
       resource: Domain
       evidence:
@@ -944,6 +1370,20 @@ resources:
           resource: Folder
         description: The user's Sites folder
         code: site
+        nullable: true
+        evidence:
+          nullable:
+            source: curated
+            note: System Events holds one user domain, so its reads cannot show whether a missing Sites folder is structural. Read-only probes read it twice, at 2026-11-04T04:41:36Z and 04:51:11Z, and both reads failed as no such object.
+            absentReads:
+              observedAt: '2026-11-04T04:51:11Z'
+              bundleId: com.apple.systemevents
+              appVersion: 1.3.6
+              osVersion: '27.2'
+              failedReads: 1
+              errorNumbers:
+                - -1728
+              reason: The Sites folder exists only once the user creates one
       temporaryItemsFolder:
         access: r
         type:
@@ -2418,7 +2858,22 @@ enums:
         description: write only
         code: writ
 hierarchy:
-  children: {}
+  # The app holds disk items and folders as its elements, but lists only a few
+  # of them (no folder or file the file system holds): they are got by POSIX
+  # path, and have no list.
+  children:
+    diskItems:
+      resource: DiskItem
+      access: r
+      description: The disk items of the file system, got by POSIX path
+    domains:
+      resource: Domain
+      access: r
+      description: The domains of the file system
+    folders:
+      resource: Folder
+      access: r
+      description: The folders of the file system, got by POSIX path
 
 commands:
   abortTransaction:
@@ -2463,10 +2918,10 @@ commands:
     scope: application
     code: 'stop'
     parameters: []
-  # Deleting a disk item is not offered yet. The app's `delete` verb needs the
-  # disk item as its direct object, and a DiskItem cannot yet be selected by
-  # an identifier parameter. A delete that targets one disk item returns once
-  # DiskItem is identified by its POSIX path.
+  # Deleting a disk item is not offered yet. A DiskItem is found by its POSIX
+  # path, so a delete could name the one item it removes, but no live
+  # observation yet shows what the app's `delete` verb does to the item at
+  # that path; a targeted delete waits on that evidence.
   move:
     name: move
     description: Move disk item(s) to a new location.
@@ -2678,3 +3133,73 @@ commands:
         description: the index number of the action to remove...
         required: false
         code: indx
+  getDiskItem:
+    name: get
+    routeName: get
+    description: Get the disk item at a POSIX path
+    scope: resource
+    resourceType: DiskItem
+    parameters:
+      - name: posixPath
+        type: string
+        description: The POSIX path of the disk item. It names a location, so it finds whatever is at that path now.
+  getFolder:
+    name: get
+    routeName: get
+    description: Get the folder at a POSIX path
+    scope: resource
+    resourceType: Folder
+    parameters:
+      - name: posixPath
+        type: string
+        description: The POSIX path of the folder. It names a location, so it finds whatever folder is at that path now.
+  listDomains:
+    name: list
+    routeName: list
+    description: List the domains of the file system
+    scope: resource
+    resourceType: Domain
+  getDomain:
+    name: get
+    routeName: get
+    description: Get a domain by its id
+    scope: resource
+    resourceType: Domain
+    parameters:
+      - name: id
+        type: string
+        description: The id of the domain
+  listUserDomainObjects:
+    name: list
+    routeName: list
+    description: List the user domain
+    scope: resource
+    resourceType: UserDomainObject
+  getUserDomainObject:
+    name: get
+    routeName: get
+    description: Get the user domain by its kind
+    scope: resource
+    resourceType: UserDomainObject
+    parameters:
+      - name: kind
+        type:
+          enum: UserDomainObjectKind
+        description: Which user domain
+  listClassicDomainObjects:
+    name: list
+    routeName: list
+    description: List the Classic domain
+    scope: resource
+    resourceType: ClassicDomainObject
+  getClassicDomainObject:
+    name: get
+    routeName: get
+    description: Get the Classic domain by its kind
+    scope: resource
+    resourceType: ClassicDomainObject
+    parameters:
+      - name: kind
+        type:
+          enum: ClassicDomainObjectKind
+        description: Which Classic domain

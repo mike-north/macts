@@ -3,25 +3,31 @@ import { getClient } from '../../../sdk.js'
 import { createFormatter } from '../../../output/index.js'
 
 /**
- * Show the event or to-do in the calendar window
+ * Show the event or to-do in the calendar window. When several calendars share the same name, the first match in the app's order is used as the calendar.
  */
 export class ShowEventCommand extends Command {
   static override paths = [['calendar', 'calendars', 'events', 'show']]
 
   static override usage = Command.Usage({
-    description: 'Show the event or to-do in the calendar window',
+    description:
+      "Show the event or to-do in the calendar window. When several calendars share the same name, the first match in the app's order is used as the calendar.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  calendarId = Option.String('--calendar-id', { required: true, description: 'Calendar ID' })
+  calendarId = Option.String('--calendar-id', {
+    required: true,
+    description: 'Calendar identifier (the calendar containing the event)',
+  })
   eventId = Option.String({ name: 'uid', required: true })
-
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      await client.events.show()
+      await client.events.show(
+        this.calendarId as unknown as Parameters<typeof client.events.show>[0],
+        this.eventId as unknown as Parameters<typeof client.events.show>[1]
+      )
 
       const output = formatter.formatSuccess('show completed successfully')
       this.context.stdout.write(output + '\n')

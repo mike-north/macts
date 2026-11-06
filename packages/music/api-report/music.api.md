@@ -494,8 +494,8 @@ export class PlaylistResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(persistentID: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Playlist>;
     list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Playlist>>;
-    move(to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    search(_for: string, only?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    move(persistentID: string, to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    search(persistentID: string, _for: string, only?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public

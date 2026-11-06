@@ -4,13 +4,14 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Save the document with a new name or format
+ * Save the document with a new name or format. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
  */
 export class SaveAsDocumentCommand extends Command {
   static override paths = [['microsoft-word', 'documents', 'save-as']]
 
   static override usage = Command.Usage({
-    description: 'Save the document with a new name or format',
+    description:
+      "Save the document with a new name or format. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.",
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -30,8 +31,9 @@ export class SaveAsDocumentCommand extends Command {
     try {
       const client = getClient()
       await client.documents.saveAs(
-        this.fileName as unknown as Parameters<typeof client.documents.saveAs>[0],
-        this.fileFormat as unknown as Parameters<typeof client.documents.saveAs>[1]
+        this.documentId as unknown as Parameters<typeof client.documents.saveAs>[0],
+        this.fileName as unknown as Parameters<typeof client.documents.saveAs>[1],
+        this.fileFormat as unknown as Parameters<typeof client.documents.saveAs>[2]
       )
 
       const output = formatter.formatSuccess('saveAs completed successfully')

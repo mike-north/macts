@@ -4,12 +4,12 @@
 
 ## DocumentResourceClient.activate() method
 
-Activate the specified document window
+Activate the specified document window. When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 **Signature:**
 
 ```typescript
-activate(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+activate(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -28,6 +28,17 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+id
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
 
 \_\_mactsOptions
 

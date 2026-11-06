@@ -167,6 +167,9 @@ commands:
     scope: resource
     resourceType: Shortcut
     code: srun
+    # The dictionary's `run` takes the shortcut as its direct parameter
+    # (Shortcuts.sdef:73). `id` selects it as `get` does, and is not sent as a
+    # named parameter.
     parameters:
       - name: id
         type: string

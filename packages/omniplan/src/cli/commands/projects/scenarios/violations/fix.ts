@@ -3,13 +3,14 @@ import { getClient } from '../../../../sdk.js'
 import { createFormatter } from '../../../../output/index.js'
 
 /**
- * Fix a violation
+ * Fix a violation. macts does not yet send the violation to the app, so the app acts on whatever it chooses.
  */
 export class FixViolationCommand extends Command {
   static override paths = [['omniplan', 'projects', 'scenarios', 'violations', 'fix']]
 
   static override usage = Command.Usage({
-    description: 'Fix a violation',
+    description:
+      'Fix a violation. macts does not yet send the violation to the app, so the app acts on whatever it chooses.',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })

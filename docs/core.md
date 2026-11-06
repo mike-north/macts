@@ -1070,7 +1070,16 @@ The declared parameter that identifies a command's item: its first required para
 
 </td><td>
 
-Why a command cannot be offered, when it must name one item (a resource-scoped get, update or delete, or a delete at application scope) and declares no identifier parameter ([itemIdentifierParameter()](./core.itemidentifierparameter.md)<!-- -->).
+Why a command cannot be offered, when it must name one item (a resource-scoped command other than a list or create, or a delete at application scope) and declares no identifier parameter ([itemIdentifierParameter()](./core.itemidentifierparameter.md)<!-- -->).
+
+</td></tr>
+<tr><td>
+
+[knownItemSelectionGap(manifest, commandKey)](./core.knownitemselectiongap.md)
+
+</td><td>
+
+The known gap for `commandKey` of `manifest`<!-- -->'s app, or `undefined` when the command is not one.
 
 </td></tr>
 <tr><td>
@@ -2565,6 +2574,15 @@ A manifest defect: the kinds of a property's values contradict its declared type
 </td></tr>
 <tr><td>
 
+[KnownItemSelectionGap](./core.knownitemselectiongap.md)
+
+</td><td>
+
+One shipped resource command that cannot yet select its item.
+
+</td></tr>
+<tr><td>
+
 [LayeredPolicyEvaluation](./core.layeredpolicyevaluation.md)
 
 </td><td>
@@ -3751,6 +3769,15 @@ Uniqueness decides whether a list can page (phases/13 D9, \_Bounded list pages\_
 </td><td>
 
 Schema for resource type inheritance/variants. Used for union types like Alarm (DisplayAlarm \| SoundAlarm \| etc.)
+
+</td></tr>
+<tr><td>
+
+[KNOWN_ITEM_SELECTION_GAPS](./core.known_item_selection_gaps.md)
+
+</td><td>
+
+Every shipped resource command that cannot yet select its item. Only an entry's removal is expected; see the module documentation.
 
 </td></tr>
 <tr><td>
@@ -4986,6 +5013,17 @@ A decision reached by governance (policy, or a human through the approval gate) 
 </td><td>
 
 The outcome of a governance-aware inspect-by-name lookup.
+
+</td></tr>
+<tr><td>
+
+[ItemSelectionNeed](./core.itemselectionneed.md)
+
+</td><td>
+
+What a known gap needs before its command can select its item.
+
+- `resource-identifier-and-get`<!-- -->: the command's resource declares no identifier and no get, so there is nothing to look the item up by. It needs both, from evidence. - `multi-level-command-parents`<!-- -->: the item exists only within a parent that is itself within another (a Mail message within a mailbox within an account, an OmniPlan violation within a scenario within a project), and a command records one parent only.
 
 </td></tr>
 <tr><td>

@@ -127,7 +127,12 @@ commands:
     description: Refresh
     scope: resource
     resourceType: [Speaker, Connection]
-  close: { name: close, description: Close, scope: resource }
+    parameters: [{ name: id, type: string, description: The item to refresh }]
+  close:
+    name: close
+    description: Close
+    scope: resource
+    parameters: [{ name: id, type: string, description: The item to close }]
   openURL:
     name: openURL
     description: Open a URL

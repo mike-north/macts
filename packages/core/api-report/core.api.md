@@ -2106,6 +2106,9 @@ export function isValidPermission(permission: string): boolean;
 export function itemIdentifierParameter(command: Command): CommandParameter | undefined;
 
 // @public
+export type ItemSelectionNeed = 'resource-identifier-and-get' | 'multi-level-command-parents';
+
+// @public
 export function itemSelectionProblem(commandKey: string, command: Command): string | undefined;
 
 // @public
@@ -2181,6 +2184,20 @@ export interface KindMismatchDefect {
     readonly unexpected: ValueKindCounts;
     readonly values: number;
 }
+
+// @public
+export const KNOWN_ITEM_SELECTION_GAPS: readonly KnownItemSelectionGap[];
+
+// @public
+export interface KnownItemSelectionGap {
+    readonly bundleId: string;
+    readonly commandKey: string;
+    readonly needs: readonly ItemSelectionNeed[];
+    readonly resource: string;
+}
+
+// @public
+export function knownItemSelectionGap(manifest: AppManifest, commandKey: string): KnownItemSelectionGap | undefined;
 
 // @public
 export interface LayeredPolicyEvaluation extends PolicyEvaluation {

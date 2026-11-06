@@ -13,14 +13,17 @@ export class RedoTabCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  windowId = Option.String('--window-id', { required: true, description: 'Window ID' })
-  tabId = Option.String('--tab-id', { required: true, description: 'Tab identifier' })
+  windowId = Option.String('--window-id', { required: true, description: 'Window identifier' })
+  tabId = Option.String({ name: 'id', required: true })
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      await client.tabs.redo(this.tabId as unknown as Parameters<typeof client.tabs.redo>[0])
+      await client.tabs.redo(
+        this.windowId as unknown as Parameters<typeof client.tabs.redo>[0],
+        this.tabId as unknown as Parameters<typeof client.tabs.redo>[1]
+      )
 
       const output = formatter.formatSuccess('redo completed successfully')
       this.context.stdout.write(output + '\n')

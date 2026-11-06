@@ -4,7 +4,7 @@
 
 ## MessageResourceClient.forward() method
 
-Creates a forwarded message.
+Creates a forwarded message. macts does not yet send the message to the app, so the app acts on whatever it chooses.
 
 **Signature:**
 

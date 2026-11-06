@@ -1,19 +1,23 @@
 /** Executable generated facade checks: typed values cross the shared codec boundary. */
 import { runInThisContext } from 'node:vm'
+import { Writable } from 'node:stream'
 import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises'
 import { spawnSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, posix, resolve } from 'node:path'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as ts from 'typescript'
 import * as zod from 'zod'
 import * as contracts from '@macts/contracts'
 import * as client from '@macts/contracts/client'
+import * as clipanion from 'clipanion'
 import type { AppManifest } from '../../manifest/index.js'
+import { loadManifest } from '../../manifest/loader.js'
 import { RANGE_READ_SUPPORTED, UNIQUE_CLAIM } from '../../manifest/test-support/unique-claim.js'
 import { generateContract } from '../contract/index.js'
+import { generateCliPlugin } from '../cli/index.js'
 import { generateHttpClientSdk } from './http-client.js'
 /** A bounded fixture with values JSON cannot represent as SDK values directly. */
 const manifest: AppManifest = {
@@ -130,6 +134,8 @@ interface FixtureRecord {
   readonly related?: contracts.ObjectReferenceVariant<FixtureRecord, contracts.Integer> | null
 }
 interface FixtureResource {
+  stamp(id: number, copies?: number): Promise<void>
+  within(parentId: number, id: number): Promise<void>
   list(
     page?: { pageSize?: number; cursor?: string },
     options?: contracts.CallOptions
@@ -174,6 +180,10 @@ interface FactoryClient {
   }
 }
 interface GeneratedFixture {
+  /** Run the emitted command against the same real root client used by SDK callers. */
+  run(args: string[], facade: unknown): Promise<number>
+  /** Read an evaluated generated module for a shipped-app regression. */
+  module(path: string): Readonly<Record<string, unknown>>
   readonly FixtureClient: new (options: { apiKey: string; baseUrl?: string }) => FixtureClient
   readonly HttpClient: new (baseUrl: string, apiKey: string) => FixtureHttp
   readonly ItemResourceClient: new (
@@ -192,6 +202,12 @@ function generated(definition: AppManifest = manifest): GeneratedFixture {
     ])
   )
   for (const file of generateContract(definition).files) sources.set(file.path, file.content)
+  for (const file of generateCliPlugin(definition, {
+    packageName: '@macts/fixture',
+    sdkPackageName: '@macts/fixture',
+  }).files)
+    sources.set(`cli/${file.path}`, file.content)
+  let cliClient: unknown
   const cache = new Map<string, Record<string, unknown>>()
   function load(path: string): Record<string, unknown> {
     const cached = cache.get(path)
@@ -204,7 +220,15 @@ function generated(definition: AppManifest = manifest): GeneratedFixture {
       if (name === '@macts/contracts') return contracts
       if (name === '@macts/contracts/client') return client
       if (name === 'zod') return zod
-      return load(posix.normalize(posix.join(posix.dirname(path), name)).replace(/\.js$/, '.ts'))
+      if (name === 'clipanion') return clipanion
+      const resolved = posix
+        .normalize(posix.join(posix.dirname(path), name))
+        .replace(/\.js$/, '.ts')
+      if (resolved === 'cli/src/sdk.ts') return { getClient: () => cliClient }
+      if (resolved === 'cli/src/output/index.ts') {
+        return { createFormatter: () => ({ formatSuccess: String, formatError: String }) }
+      }
+      return load(resolved)
     }
     const js = ts.transpileModule(source, {
       compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
@@ -218,9 +242,141 @@ function generated(definition: AppManifest = manifest): GeneratedFixture {
   }
   return {
     ...load('src/index.ts'),
-    contract: load('src/contract/index.ts')['fixtureContract'],
+    contract: Object.values(load('src/contract/index.ts')).find(
+      (value) => typeof value === 'object' && value !== null && 'operations' in value
+    ),
+    module: load,
+    run: async (args: string[], facade: unknown): Promise<number> => {
+      cliClient = facade
+      const commandPath = `cli/src/commands/${args.slice(1, 3).join('/')}.ts`
+      const commands = Object.values(load(commandPath))
+      const cli = new clipanion.Cli()
+      for (const command of commands) {
+        if (typeof command === 'function' && command.prototype instanceof clipanion.Command) {
+          // Generated exports were checked as actual Clipanion command classes above.
+          cli.register(command as clipanion.CommandClass)
+        }
+      }
+      const output = new Writable({
+        write: (_chunk, _encoding, done) => {
+          done()
+        },
+      })
+      return cli.run(args, { stdout: output, stderr: output })
+    },
   } as unknown as GeneratedFixture
 }
+
+/** Commands distinguish an app-level item lookup from an explicitly recorded parent. */
+const commandManifest: AppManifest = {
+  ...manifest,
+  commands: {
+    ...manifest.commands,
+    stamp: {
+      name: 'stamp',
+      description: 'Stamp one item',
+      scope: 'resource',
+      resourceType: 'Item',
+      parameters: [
+        { name: 'id', type: 'integer', description: 'Item', required: true },
+        { name: 'copies', type: 'integer', description: 'Copies', required: false },
+      ],
+    },
+    within: {
+      name: 'within',
+      description: 'Stamp an item within its parent',
+      scope: 'resource',
+      resourceType: 'Item',
+      parent: { resource: 'Item', parameter: 'parentId' },
+      parameters: [
+        { name: 'parentId', type: 'integer', description: 'Parent item', required: true },
+        { name: 'id', type: 'integer', description: 'Item', required: true },
+      ],
+    },
+  },
+}
+
+describe('resource command CLI through the canonical facade', () => {
+  beforeEach(() => {
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(
+      new Error('Only the recording transport is permitted')
+    )
+  })
+  afterEach(() => vi.restoreAllMocks())
+
+  it('sends the shipped Mail outgoing-message identifier through its real descriptor without invoking Mail', async () => {
+    const mail = await loadManifest(
+      fileURLToPath(new URL('../../../../../manifests/mail/app.yaml', import.meta.url))
+    )
+    const root = generated(mail)
+    const constructor = root.module('src/index.ts')['MailClient']
+    if (typeof constructor !== 'function') throw new Error('MailClient was not generated')
+    const facade: unknown = Reflect.construct(constructor, [{ apiKey: 'token' }])
+    if (typeof facade !== 'object' || facade === null)
+      throw new Error('MailClient is not an object')
+    const http: unknown = Reflect.get(facade, 'http')
+    if (typeof http !== 'object' || http === null) throw new Error('MailClient has no transport')
+    const rpc = vi.fn((_path: string, _body?: object) => Promise.resolve(null))
+    Reflect.set(http, 'rpc', rpc)
+    expect(await root.run(['mail', 'outgoingMessages', 'send', '7'], facade)).toBe(0)
+    expect(rpc).toHaveBeenCalledWith(
+      'mail.outgoingMessages.send',
+      { id: { integer: '7' } },
+      undefined
+    )
+    expect(
+      root.contract.operations['mail.outgoingMessages.send']?.input.wire.safeParse(
+        rpc.mock.calls[0]?.[1]
+      ).success
+    ).toBe(true)
+  })
+
+  // Regression (#287): a type assertion sent CLI text to a numeric SDK method.
+  it('converts canonical item text before the declared numeric boundary, then encodes it once', async () => {
+    const root = generated(commandManifest)
+    const facade = new root.FixtureClient({ apiKey: 'token' })
+    const boundary = vi.spyOn(facade.items, 'stamp')
+    const rpc = vi.spyOn(facade.http, 'rpc').mockResolvedValue(null)
+    expect(await root.run(['fixture', 'items', 'stamp', '7', '--copies', '2'], facade)).toBe(0)
+    expect(boundary).toHaveBeenCalledWith(7, 2)
+    expect(rpc).toHaveBeenCalledWith(
+      'fixture.items.stamp',
+      { id: { integer: '7' }, copies: { integer: '2' } },
+      undefined
+    )
+    const descriptor = root.contract.operations['fixture.items.stamp']
+    expect(descriptor?.input.wire.safeParse(rpc.mock.calls[0]?.[1]).success).toBe(true)
+  })
+
+  it('preserves recorded parent scope and app context while omitting absent optional inputs', async () => {
+    const root = generated(commandManifest)
+    const facade = new root.FixtureClient({ apiKey: 'token' })
+    const boundary = vi.spyOn(facade.items, 'within')
+    const rpc = vi.spyOn(facade.http, 'rpc').mockResolvedValue(null)
+    expect(await root.run(['fixture', 'items', 'within', '--parent-id', '3', '7'], facade)).toBe(0)
+    expect(boundary).toHaveBeenCalledWith(3, 7)
+    expect(rpc).toHaveBeenLastCalledWith(
+      'fixture.items.within',
+      { parentId: { integer: '3' }, id: { integer: '7' } },
+      undefined
+    )
+    expect(await root.run(['fixture', 'items', 'stamp', '7'], facade)).toBe(0)
+    expect(rpc).toHaveBeenLastCalledWith('fixture.items.stamp', { id: { integer: '7' } }, undefined)
+  })
+
+  it.each(['07', '1e2', '1.0000000000000001', '9007199254740992'])(
+    'rejects item text %s before the SDK boundary or transport',
+    async (id) => {
+      const root = generated(commandManifest)
+      const facade = new root.FixtureClient({ apiKey: 'token' })
+      const boundary = vi.spyOn(facade.items, 'stamp')
+      const rpc = vi.spyOn(facade.http, 'rpc').mockResolvedValue(null)
+      expect(await root.run(['fixture', 'items', 'stamp', id], facade)).toBe(1)
+      expect(boundary).not.toHaveBeenCalled()
+      expect(rpc).not.toHaveBeenCalled()
+    }
+  )
+})
 /** Tagged wire values are deliberately hand-written, rather than encoded by the implementation under test. */
 const wire = { id: { integer: '7' }, modified: { date: '2026-11-05T12:34:56.123Z' } }
 describe('canonical generated facade', () => {

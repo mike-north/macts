@@ -79,7 +79,7 @@ List the playlists of one source, as one page.
 </td></tr>
 <tr><td>
 
-[move(to, \_\_mactsOptions)](./tv.playlistresourceclient.move.md)
+[move(sourceId, persistentID, to, \_\_mactsOptions)](./tv.playlistresourceclient.move.md)
 
 </td><td>
 
@@ -90,7 +90,7 @@ Move playlist(s) to a new location
 </td></tr>
 <tr><td>
 
-[search(\_for, only, \_\_mactsOptions)](./tv.playlistresourceclient.search.md)
+[search(sourceId, persistentID, \_for, only, \_\_mactsOptions)](./tv.playlistresourceclient.search.md)
 
 </td><td>
 

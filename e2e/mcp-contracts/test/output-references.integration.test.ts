@@ -126,6 +126,62 @@ function outputReferences(
   }
 }
 
+/**
+ * The System Events folder fields that hold a folder reference, written from
+ * the dictionary's `domain`, `user domain object` and `Classic domain object`
+ * classes (System Events 1.3.6). The Classic list leaves out the folders the
+ * manifest marks unsupported.
+ */
+const DOMAIN_FOLDERS = [
+  'applicationSupportFolder',
+  'applicationsFolder',
+  'desktopPicturesFolder',
+  'folderActionScriptsFolder',
+  'fontsFolder',
+  'libraryFolder',
+  'preferencesFolder',
+  'scriptingAdditionsFolder',
+  'scriptsFolder',
+  'sharedDocumentsFolder',
+  'speakableItemsFolder',
+  'utilitiesFolder',
+  'workflowsFolder',
+]
+const USER_FOLDERS = [
+  'applicationSupportFolder',
+  'applicationsFolder',
+  'desktopFolder',
+  'desktopPicturesFolder',
+  'documentsFolder',
+  'downloadsFolder',
+  'favoritesFolder',
+  'folderActionScriptsFolder',
+  'fontsFolder',
+  'homeFolder',
+  'libraryFolder',
+  'moviesFolder',
+  'musicFolder',
+  'picturesFolder',
+  'preferencesFolder',
+  'publicFolder',
+  'scriptingAdditionsFolder',
+  'scriptsFolder',
+  'sharedDocumentsFolder',
+  'sitesFolder',
+  'speakableItemsFolder',
+  'temporaryItemsFolder',
+  'utilitiesFolder',
+  'workflowsFolder',
+]
+const CLASSIC_FOLDERS = [
+  'applicationSupportFolder',
+  'applicationsFolder',
+  'libraryFolder',
+  'preferencesFolder',
+  'scriptsFolder',
+  'workflowsFolder',
+]
+
 describe('output references in every real contract', () => {
   it('loads every app', () => {
     // Guards against a vacuous pass if the manifests directory moves.
@@ -162,7 +218,11 @@ describe('output references in every real contract', () => {
     // but their resources have neither a get nor a list, so the table carries
     // no record for them. Xcode's WorkspaceDocument `activeScheme` is left
     // out: a scheme is got within its workspace document, which is identified
-    // by its name with no claim, so it is no valid container.
+    // by its name with no claim, so it is no valid container. System Events
+    // folders and disk items are got by POSIX path: every domain folder
+    // (13), the user domain's 11 own and 13 inherited folders, the Classic
+    // domain's own Preferences folder and the 5 inherited folders current
+    // macOS has, and a disk item's and a folder's `container`.
     expect(positions.sort()).toEqual(
       [
         'google-chrome Window.activeTab → Tab',
@@ -170,6 +230,11 @@ describe('output references in every real contract', () => {
         'microsoft-edge Window.activeTab → Tab',
         'photos Album.parent → Folder',
         'photos Folder.parent → Folder',
+        ...CLASSIC_FOLDERS.map((field) => `system-events ClassicDomainObject.${field} → Folder`),
+        'system-events DiskItem.container → DiskItem',
+        ...DOMAIN_FOLDERS.map((field) => `system-events Domain.${field} → Folder`),
+        'system-events Folder.container → DiskItem',
+        ...USER_FOLDERS.map((field) => `system-events UserDomainObject.${field} → Folder`),
       ].sort()
     )
   })
@@ -204,6 +269,14 @@ describe('output references in every real contract', () => {
         'photos.albums.list → Folder',
         'photos.folders.get → Folder',
         'photos.folders.list → Folder',
+        'system-events.classicDomainObjects.get → Folder',
+        'system-events.classicDomainObjects.list → Folder',
+        'system-events.diskItems.get → DiskItem',
+        'system-events.domains.get → Folder',
+        'system-events.domains.list → Folder',
+        'system-events.folders.get → DiskItem',
+        'system-events.userDomainObjects.get → Folder',
+        'system-events.userDomainObjects.list → Folder',
       ].sort()
     )
   })

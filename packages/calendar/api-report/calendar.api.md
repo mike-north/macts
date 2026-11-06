@@ -217,7 +217,7 @@ export class EventResourceClient {
     delete(calendarId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get(calendarId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Event_2>;
     list(calendarId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Event_2>>;
-    show(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    show(calendarId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     update(calendarId: string, id: string, input: EventUpdateInput, __mactsOptions?: _macts_contracts.CallOptions): Promise<Event_2>;
 }
 

@@ -147,7 +147,7 @@ export class ReminderResourceClient {
         pageSize?: number;
         cursor?: string;
     }, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Reminder>>;
-    show(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    show(id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public

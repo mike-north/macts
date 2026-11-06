@@ -4,7 +4,7 @@
 
 ## UIElementResourceClient.click() method
 
-cause the target process to behave as if the UI element were clicked
+cause the target process to behave as if the UI element were clicked. macts does not yet send the UI element to the app, so the app acts on whatever it chooses.
 
 **Signature:**
 

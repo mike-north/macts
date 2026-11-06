@@ -2,9 +2,11 @@
  * Tests that generation refuses a manifest with a command that must select one
  * item and declares no identifier parameter to select it by.
  *
- * Such a command is a resource-scoped get, update or delete with no required
- * parameter other than its parent's, or a delete at application scope with no
- * parameters (phases/13 D5). Every package and SDK generator refuses it before
+ * Such a command is a resource-scoped command other than a list or create (a
+ * get, update or delete, or a command such as `show` the app sends the item
+ * as its direct parameter) with no required parameter other than its
+ * parent's, or a delete at application scope with no parameters (phases/13
+ * D5). Every package and SDK generator refuses it before
  * it builds a file, and the capability module generator refuses it too, so no
  * generated interface takes an identifier the manifest does not declare. The
  * expected messages are written by hand from the stand-in manifests below.
@@ -64,6 +66,21 @@ const PARAMETERLESS_GET = widgets({
   },
 })
 
+/**
+ * A resource command that declares no identifier parameter, as Mail's `send`
+ * did (#287): the app takes the item as the command's direct parameter, so
+ * without an identifier no item can be sent.
+ */
+const PARAMETERLESS_RESOURCE_COMMAND = widgets({
+  polish: {
+    name: 'polish',
+    description: 'Polish a widget',
+    scope: 'resource',
+    resourceType: 'Widget',
+    parameters: [{ name: 'gloss', type: 'boolean', description: 'Gloss', required: false }],
+  },
+})
+
 /** A delete at application scope that declares no parameters. */
 const APPLICATION_DELETE = widgets({
   delete: { name: 'delete', description: 'Delete an object', scope: 'application', parameters: [] },
@@ -74,6 +91,9 @@ const GET_REFUSAL =
 
 const DELETE_REFUSAL =
   'App "Widgets" cannot be generated from its manifest: its application-scoped delete command "delete" declares no identifier parameter. A delete acts on one item, selected by a required parameter, so without one no item can be selected. Scope "delete" to the resource whose items it deletes and declare the item\'s identifier as a required parameter.'
+
+const RESOURCE_COMMAND_REFUSAL =
+  'App "Widgets" cannot be generated from its manifest: its resource-scoped command "polish" declares no identifier parameter. A resource-scoped command acts on one item, which the app receives as the command\'s direct parameter, selected by a required parameter, so without one no item can be selected. Declare the item\'s identifier as a required parameter of "polish", as the resource\'s get declares it.'
 
 /** Every generator entry point, each returning the files it built and its errors. */
 const ENTRY_POINTS: [string, (m: AppManifest) => { files: unknown[]; errors: string[] }][] = [
@@ -123,6 +143,14 @@ describe('generation refuses a command that cannot select its item', () => {
     expect(result.files).toEqual([])
   })
 
+  // Regression (#287): a resource command with no identifier generated a
+  // surface that sent the app no item. It generates nothing now.
+  it.each(ENTRY_POINTS)('%s refuses a resource command with no identifier', (_n, gen) => {
+    const result = gen(PARAMETERLESS_RESOURCE_COMMAND)
+    expect(result.errors).toEqual([RESOURCE_COMMAND_REFUSAL])
+    expect(result.files).toEqual([])
+  })
+
   // Guards that the refusal is specific: the same app with its get's
   // identifier declared generates without errors.
   it.each(ENTRY_POINTS)('%s generates the app once the identifier is declared', (_n, gen) => {
@@ -139,6 +167,29 @@ describe('generation refuses a command that cannot select its item', () => {
     expect(result.errors).toEqual([])
     expect(result.files.length).toBeGreaterThan(0)
   })
+
+  // Guards that a resource command declaring its item's identifier is
+  // generated: the refusal reaches only one that declares none.
+  it.each(ENTRY_POINTS)(
+    '%s generates a resource command that declares its identifier',
+    (_n, gen) => {
+      const declared = widgets({
+        polish: {
+          name: 'polish',
+          description: 'Polish a widget',
+          scope: 'resource',
+          resourceType: 'Widget',
+          parameters: [
+            { name: 'name', type: 'string', description: 'Name', required: true },
+            { name: 'gloss', type: 'boolean', description: 'Gloss', required: false },
+          ],
+        },
+      })
+      const result = gen(declared)
+      expect(result.errors).toEqual([])
+      expect(result.files.length).toBeGreaterThan(0)
+    }
+  )
 })
 
 describe('generateCapabilitiesModule refuses a command that cannot select its item', () => {
@@ -150,6 +201,12 @@ describe('generateCapabilitiesModule refuses a command that cannot select its it
 
   it('refuses an application-scoped delete with no parameters', () => {
     expect(() => generateCapabilitiesModule(APPLICATION_DELETE)).toThrow(DELETE_REFUSAL)
+  })
+
+  it('refuses a resource command with no identifier', () => {
+    expect(() => generateCapabilitiesModule(PARAMETERLESS_RESOURCE_COMMAND)).toThrow(
+      RESOURCE_COMMAND_REFUSAL
+    )
   })
 
   it('describes the app once the identifier is declared', () => {

@@ -33,6 +33,40 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[applicationsFolder](./system-events.classicdomainobject.applicationsfolder.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Applications folder. Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-05).
+
+</td></tr>
+<tr><td>
+
+[applicationSupportFolder](./system-events.classicdomainobject.applicationsupportfolder.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Application Support folder. Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-05).
+
+</td></tr>
+<tr><td>
+
 [id](./system-events.classicdomainobject.id.md)
 
 </td><td>
@@ -41,11 +75,45 @@ Description
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the unique identifier of the domain. Never null: the primary identifier.
+the unique identifier of the domain. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[kind](./system-events.classicdomainobject.kind.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ClassicDomainObjectKind](./system-events.classicdomainobjectkind.md)
+
+</td><td>
+
+Which ClassicDomainObject this is: the kind naming the application property that holds it. Never null: the primary identifier.
+
+</td></tr>
+<tr><td>
+
+[libraryFolder](./system-events.classicdomainobject.libraryfolder.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Library folder. Nullable. The app reported no value in 1 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-05).
 
 </td></tr>
 <tr><td>
@@ -63,6 +131,57 @@ string \| null
 </td><td>
 
 the name of the domain. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[preferencesFolder](./system-events.classicdomainobject.preferencesfolder.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Classic Preferences folder. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[scriptsFolder](./system-events.classicdomainobject.scriptsfolder.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Scripts folder. Nullable. The app reported no value in 2 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
+
+</td></tr>
+<tr><td>
+
+[workflowsFolder](./system-events.classicdomainobject.workflowsfolder.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Folder](./system-events.folder.md)<!-- -->, string, 'Folder'&gt; \| null
+
+</td><td>
+
+The Automator Workflows folder. Nullable. The app reported no value in 3 of 5 reads (System Events 1.3.6, macOS 27.2, 2026-11-04).
 
 </td></tr>
 </tbody></table>

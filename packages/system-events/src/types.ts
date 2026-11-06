@@ -37,6 +37,10 @@ export type { Actn } from './contract/index.js'
 
 export type { Accs } from './contract/index.js'
 
+export type { ClassicDomainObjectKind } from './contract/index.js'
+
+export type { UserDomainObjectKind } from './contract/index.js'
+
 /** Canonical SDK record; typed operations decode through the app contract. */
 export type { Configuration } from './contract/index.js'
 
@@ -772,8 +776,15 @@ export const AliasSchema = z.object({
 
 /** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const ClassicDomainObjectSchema = z.object({
+  preferencesFolder: z.string(),
+  kind: z.string(),
+  applicationSupportFolder: z.string(),
+  applicationsFolder: z.string(),
   id: z.string(),
+  libraryFolder: z.string(),
   name: z.string(),
+  scriptsFolder: z.string(),
+  workflowsFolder: z.string(),
 })
 
 /** Raw passthrough validator; typed SDK records use the canonical contract codec. */
@@ -792,6 +803,7 @@ export const DiskSchema = z.object({
 /** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const DiskItemSchema = z.object({
   busyStatus: z.boolean(),
+  container: z.string(),
   creationDate: z.string(),
   displayedName: z.string(),
   id: z.string(),
@@ -801,7 +813,7 @@ export const DiskItemSchema = z.object({
   packageFolder: z.boolean(),
   path: z.string(),
   physicalSize: z.number(),
-  pOSIXPath: z.string(),
+  posixPath: z.string(),
   size: z.number(),
   uRL: z.string(),
   visible: z.boolean(),
@@ -810,8 +822,21 @@ export const DiskItemSchema = z.object({
 
 /** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const DomainSchema = z.object({
+  applicationSupportFolder: z.string(),
+  applicationsFolder: z.string(),
+  desktopPicturesFolder: z.string(),
+  folderActionScriptsFolder: z.string(),
+  fontsFolder: z.string(),
   id: z.string(),
+  libraryFolder: z.string(),
   name: z.string(),
+  preferencesFolder: z.string(),
+  scriptingAdditionsFolder: z.string(),
+  scriptsFolder: z.string(),
+  sharedDocumentsFolder: z.string(),
+  speakableItemsFolder: z.string(),
+  utilitiesFolder: z.string(),
+  workflowsFolder: z.string(),
 })
 
 /** Raw passthrough validator; typed SDK records use the canonical contract codec. */
@@ -835,6 +860,7 @@ export const FilePackageSchema = z.object({
 /** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const FolderSchema = z.object({
   busyStatus: z.boolean(),
+  container: z.string(),
   creationDate: z.string(),
   displayedName: z.string(),
   id: z.string(),
@@ -844,7 +870,7 @@ export const FolderSchema = z.object({
   packageFolder: z.boolean(),
   path: z.string(),
   physicalSize: z.number(),
-  pOSIXPath: z.string(),
+  posixPath: z.string(),
   size: z.number(),
   uRL: z.string(),
   visible: z.boolean(),
@@ -868,8 +894,33 @@ export const SystemDomainObjectSchema = z.object({
 
 /** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const UserDomainObjectSchema = z.object({
+  desktopFolder: z.string(),
+  documentsFolder: z.string(),
+  downloadsFolder: z.string(),
+  favoritesFolder: z.string(),
+  homeFolder: z.string(),
+  moviesFolder: z.string(),
+  musicFolder: z.string(),
+  picturesFolder: z.string(),
+  publicFolder: z.string(),
+  sitesFolder: z.string(),
+  temporaryItemsFolder: z.string(),
+  kind: z.string(),
+  applicationSupportFolder: z.string(),
+  applicationsFolder: z.string(),
+  desktopPicturesFolder: z.string(),
+  folderActionScriptsFolder: z.string(),
+  fontsFolder: z.string(),
   id: z.string(),
+  libraryFolder: z.string(),
   name: z.string(),
+  preferencesFolder: z.string(),
+  scriptingAdditionsFolder: z.string(),
+  scriptsFolder: z.string(),
+  sharedDocumentsFolder: z.string(),
+  speakableItemsFolder: z.string(),
+  utilitiesFolder: z.string(),
+  workflowsFolder: z.string(),
 })
 
 /** Raw passthrough validator; typed SDK records use the canonical contract codec. */

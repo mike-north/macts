@@ -1,4 +1,12 @@
 import type { CliPlugin } from '@macts/cli'
+import { GetDiskItemCommand } from './commands/diskItems/get.js'
+import { ListDomainsCommand } from './commands/domains/list.js'
+import { GetDomainCommand } from './commands/domains/get.js'
+import { GetFolderCommand } from './commands/folders/get.js'
+import { ListClassicDomainObjectsCommand } from './commands/classicDomainObjects/list.js'
+import { GetClassicDomainObjectCommand } from './commands/classicDomainObjects/get.js'
+import { ListUserDomainObjectsCommand } from './commands/userDomainObjects/list.js'
+import { GetUserDomainObjectCommand } from './commands/userDomainObjects/get.js'
 import { AbortTransactionCommand } from './commands/abort-transaction.js'
 import { BeginTransactionCommand } from './commands/begin-transaction.js'
 import { EndTransactionCommand } from './commands/end-transaction.js'
@@ -34,6 +42,14 @@ export const plugin: CliPlugin = {
   name: 'system-events',
   description: 'Commands for System Events',
   commands: [
+    GetDiskItemCommand,
+    ListDomainsCommand,
+    GetDomainCommand,
+    GetFolderCommand,
+    ListClassicDomainObjectsCommand,
+    GetClassicDomainObjectCommand,
+    ListUserDomainObjectsCommand,
+    GetUserDomainObjectCommand,
     AbortTransactionCommand,
     BeginTransactionCommand,
     EndTransactionCommand,

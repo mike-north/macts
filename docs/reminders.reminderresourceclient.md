@@ -112,7 +112,7 @@ List the reminders of one list, one page at a time. When the result has a `nextC
 </td></tr>
 <tr><td>
 
-[show(\_\_mactsOptions)](./reminders.reminderresourceclient.show.md)
+[show(id, \_\_mactsOptions)](./reminders.reminderresourceclient.show.md)
 
 </td><td>
 

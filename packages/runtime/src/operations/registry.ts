@@ -196,15 +196,17 @@ function deriveManifestOperations(manifest: AppManifest): ManifestOperation[] {
  *
  * @remarks
  * The rule is `unselectableItemCommands` in `@macts/core`, the one generation
- * applies too: a resource-scoped get, update or delete, or a delete at
- * application scope, must declare a required parameter other than its
- * parent's (the parameter `command.parent` names). For a resource-scoped
- * command that parameter is the identifier its native body addresses the item
- * by; an application-scoped delete's body passes its declared parameters to
- * the app's delete (`planNativeInvocation` in `@macts/core`). Such a manifest
- * is refused rather than registered with an operation that names no item. The
- * rule is the same for
- * every command it covers; a command is never exempt because of its name. A
+ * applies too: every resource-scoped command other than a list or create (a
+ * get, update or delete, or a command such as `show` or `build` that the app
+ * sends the item as its direct parameter), and a delete at application
+ * scope, must declare a required parameter other than its parent's (the
+ * parameter `command.parent` names). For a resource-scoped command that
+ * parameter is the identifier its native body addresses the item by; an
+ * application-scoped delete's body passes its declared parameters to the
+ * app's delete (`planNativeInvocation` in `@macts/core`). Such a manifest is
+ * refused rather than registered with an operation that names no item. The
+ * rule is the same for every command it covers; a command is never exempt
+ * because of its name. A
  * command or resource marked unsupported has no operation and is never
  * refused.
  *
@@ -319,8 +321,8 @@ function toRegisteredOperation(
  * JSON, so a key that is not a parameter is rejected as it is for an operation
  * registered from a contract; the output is any JSON value. A
  * manifest-registered list does not page, so its input declares no paging
- * inputs. A resource-scoped get, update or delete, or a delete at application
- * scope, must declare a required identifier parameter, or the
+ * inputs. A resource-scoped command other than a list or create, or a delete
+ * at application scope, must declare a required identifier parameter, or the
  * manifest is refused (`unselectableItemCommands` in `@macts/core`), and so
  * is a manifest with a resource whose primary identifier declares no targeting
  * and is not the class's dictionary id (`untargetedIdentifiers`). They stand in

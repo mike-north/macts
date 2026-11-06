@@ -559,15 +559,15 @@ export interface WorkspaceDocumentCreateInput {
 // @public
 export class WorkspaceDocumentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    attach(workspaceName: string, toProcessIdentifier: number, suspended: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    build(workspaceName: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    clean(workspaceName: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    debug(workspaceName: string, scheme?: string, runDestinationSpecifier?: string, skipBuilding?: boolean, commandLineArguments?: unknown, environmentVariables?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    attach(name: string, toProcessIdentifier: number, suspended: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    build(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    clean(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    debug(name: string, scheme?: string, runDestinationSpecifier?: string, skipBuilding?: boolean, commandLineArguments?: unknown, environmentVariables?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     get(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<WorkspaceDocument>;
     list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<WorkspaceDocument>>;
-    run(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    stop(workspaceName: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    test(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    run(name: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    stop(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    test(name: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public

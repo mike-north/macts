@@ -362,8 +362,8 @@ export interface PlaylistCreateInput {
 export interface PlaylistResourceClient {
     get(persistentID: string, options?: CallOptions): Promise<Playlist>;
     list(options?: CallOptions): Promise<Page<Playlist>>;
-    move(to: string, options?: CallOptions): Promise<void>;
-    search(_for: string, only?: string, options?: CallOptions): Promise<void>;
+    move(persistentID: string, to: string, options?: CallOptions): Promise<void>;
+    search(persistentID: string, _for: string, only?: string, options?: CallOptions): Promise<void>;
 }
 
 // @public

@@ -347,76 +347,88 @@ export interface TabResourceClient {
   /**
    * Reload a tab
    *
-   * @param tabId - Tab identifier. Does not accept null.
+   * @param windowId - Window identifier. Does not accept null.
+   * @param id - Tab identifier. Does not accept null.
    */
-  reload(tabId: string, options?: CallOptions): Promise<void>
+  reload(windowId: string, id: string, options?: CallOptions): Promise<void>
   /**
    * Go Back (If Possible)
    *
-   * @param tabId - Tab identifier. Does not accept null.
+   * @param windowId - Window identifier. Does not accept null.
+   * @param id - Tab identifier. Does not accept null.
    */
-  goBack(tabId: string, options?: CallOptions): Promise<void>
+  goBack(windowId: string, id: string, options?: CallOptions): Promise<void>
   /**
    * Go Forward (If Possible)
    *
-   * @param tabId - Tab identifier. Does not accept null.
+   * @param windowId - Window identifier. Does not accept null.
+   * @param id - Tab identifier. Does not accept null.
    */
-  goForward(tabId: string, options?: CallOptions): Promise<void>
+  goForward(windowId: string, id: string, options?: CallOptions): Promise<void>
   /**
    * Select all
    *
-   * @param tabId - Tab identifier. Does not accept null.
+   * @param windowId - Window identifier. Does not accept null.
+   * @param id - Tab identifier. Does not accept null.
    */
-  selectAll(tabId: string, options?: CallOptions): Promise<void>
+  selectAll(windowId: string, id: string, options?: CallOptions): Promise<void>
   /**
    * Cut selected text (If Possible)
    *
-   * @param tabId - Tab identifier. Does not accept null.
+   * @param windowId - Window identifier. Does not accept null.
+   * @param id - Tab identifier. Does not accept null.
    */
-  cutSelection(tabId: string, options?: CallOptions): Promise<void>
+  cutSelection(windowId: string, id: string, options?: CallOptions): Promise<void>
   /**
    * Copy text
    *
-   * @param tabId - Tab identifier. Does not accept null.
+   * @param windowId - Window identifier. Does not accept null.
+   * @param id - Tab identifier. Does not accept null.
    */
-  copySelection(tabId: string, options?: CallOptions): Promise<void>
+  copySelection(windowId: string, id: string, options?: CallOptions): Promise<void>
   /**
    * Paste text (If Possible)
    *
-   * @param tabId - Tab identifier. Does not accept null.
+   * @param windowId - Window identifier. Does not accept null.
+   * @param id - Tab identifier. Does not accept null.
    */
-  pasteSelection(tabId: string, options?: CallOptions): Promise<void>
+  pasteSelection(windowId: string, id: string, options?: CallOptions): Promise<void>
   /**
    * Undo the last change
    *
-   * @param tabId - Tab identifier. Does not accept null.
+   * @param windowId - Window identifier. Does not accept null.
+   * @param id - Tab identifier. Does not accept null.
    */
-  undo(tabId: string, options?: CallOptions): Promise<void>
+  undo(windowId: string, id: string, options?: CallOptions): Promise<void>
   /**
    * Redo the last change
    *
-   * @param tabId - Tab identifier. Does not accept null.
+   * @param windowId - Window identifier. Does not accept null.
+   * @param id - Tab identifier. Does not accept null.
    */
-  redo(tabId: string, options?: CallOptions): Promise<void>
+  redo(windowId: string, id: string, options?: CallOptions): Promise<void>
   /**
    * Stop the current tab from loading
    *
-   * @param tabId - Tab identifier. Does not accept null.
+   * @param windowId - Window identifier. Does not accept null.
+   * @param id - Tab identifier. Does not accept null.
    */
-  stop(tabId: string, options?: CallOptions): Promise<void>
+  stop(windowId: string, id: string, options?: CallOptions): Promise<void>
   /**
    * View the HTML source of the tab
    *
-   * @param tabId - Tab identifier. Does not accept null.
+   * @param windowId - Window identifier. Does not accept null.
+   * @param id - Tab identifier. Does not accept null.
    */
-  viewSource(tabId: string, options?: CallOptions): Promise<void>
+  viewSource(windowId: string, id: string, options?: CallOptions): Promise<void>
   /**
    * Execute a piece of javascript
    *
-   * @param tabId - Tab identifier. Does not accept null.
+   * @param windowId - Window identifier. Does not accept null.
+   * @param id - Tab identifier. Does not accept null.
    * @param javascript - The javascript code to execute. Does not accept null.
    */
-  execute(tabId: string, javascript: string, options?: CallOptions): Promise<void>
+  execute(windowId: string, id: string, javascript: string, options?: CallOptions): Promise<void>
 }
 
 /** A bookmarks folder that contains other bookmarks folder and bookmark items. */
@@ -905,206 +917,283 @@ const bookmarkItemGetBookmarkItemOperation: OperationDescriptor<
   },
 }
 
-const tabReloadOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
+const tabReloadOperation: OperationDescriptor<
+  { readonly windowId: string; readonly id: string },
+  undefined
+> = {
   id: 'microsoft-edge.tabs.reload',
   permission: 'microsoft-edge:tabs:reload',
   target: { command: 'reload', resource: 'Tab' },
   description: 'Reload a tab',
   input: t.record({
-    tabId: t.string({ description: 'Tab identifier' }),
+    windowId: t.string({ description: 'Window identifier' }),
+    id: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
-    required: ['tabId'],
+    properties: {
+      windowId: { type: 'string', description: 'Window identifier' },
+      id: { type: 'string', description: 'Tab identifier' },
+    },
+    required: ['windowId', 'id'],
     additionalProperties: false,
   },
 }
 
-const tabGoBackOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
+const tabGoBackOperation: OperationDescriptor<
+  { readonly windowId: string; readonly id: string },
+  undefined
+> = {
   id: 'microsoft-edge.tabs.goBack',
   permission: 'microsoft-edge:tabs:goBack',
   target: { command: 'goBack', resource: 'Tab' },
   description: 'Go Back (If Possible)',
   input: t.record({
-    tabId: t.string({ description: 'Tab identifier' }),
+    windowId: t.string({ description: 'Window identifier' }),
+    id: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
-    required: ['tabId'],
+    properties: {
+      windowId: { type: 'string', description: 'Window identifier' },
+      id: { type: 'string', description: 'Tab identifier' },
+    },
+    required: ['windowId', 'id'],
     additionalProperties: false,
   },
 }
 
-const tabGoForwardOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
+const tabGoForwardOperation: OperationDescriptor<
+  { readonly windowId: string; readonly id: string },
+  undefined
+> = {
   id: 'microsoft-edge.tabs.goForward',
   permission: 'microsoft-edge:tabs:goForward',
   target: { command: 'goForward', resource: 'Tab' },
   description: 'Go Forward (If Possible)',
   input: t.record({
-    tabId: t.string({ description: 'Tab identifier' }),
+    windowId: t.string({ description: 'Window identifier' }),
+    id: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
-    required: ['tabId'],
+    properties: {
+      windowId: { type: 'string', description: 'Window identifier' },
+      id: { type: 'string', description: 'Tab identifier' },
+    },
+    required: ['windowId', 'id'],
     additionalProperties: false,
   },
 }
 
-const tabSelectAllOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
+const tabSelectAllOperation: OperationDescriptor<
+  { readonly windowId: string; readonly id: string },
+  undefined
+> = {
   id: 'microsoft-edge.tabs.selectAll',
   permission: 'microsoft-edge:tabs:selectAll',
   target: { command: 'selectAll', resource: 'Tab' },
   description: 'Select all',
   input: t.record({
-    tabId: t.string({ description: 'Tab identifier' }),
+    windowId: t.string({ description: 'Window identifier' }),
+    id: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
-    required: ['tabId'],
+    properties: {
+      windowId: { type: 'string', description: 'Window identifier' },
+      id: { type: 'string', description: 'Tab identifier' },
+    },
+    required: ['windowId', 'id'],
     additionalProperties: false,
   },
 }
 
-const tabCutSelectionOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
+const tabCutSelectionOperation: OperationDescriptor<
+  { readonly windowId: string; readonly id: string },
+  undefined
+> = {
   id: 'microsoft-edge.tabs.cutSelection',
   permission: 'microsoft-edge:tabs:cutSelection',
   target: { command: 'cutSelection', resource: 'Tab' },
   description: 'Cut selected text (If Possible)',
   input: t.record({
-    tabId: t.string({ description: 'Tab identifier' }),
+    windowId: t.string({ description: 'Window identifier' }),
+    id: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
-    required: ['tabId'],
+    properties: {
+      windowId: { type: 'string', description: 'Window identifier' },
+      id: { type: 'string', description: 'Tab identifier' },
+    },
+    required: ['windowId', 'id'],
     additionalProperties: false,
   },
 }
 
-const tabCopySelectionOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
+const tabCopySelectionOperation: OperationDescriptor<
+  { readonly windowId: string; readonly id: string },
+  undefined
+> = {
   id: 'microsoft-edge.tabs.copySelection',
   permission: 'microsoft-edge:tabs:copySelection',
   target: { command: 'copySelection', resource: 'Tab' },
   description: 'Copy text',
   input: t.record({
-    tabId: t.string({ description: 'Tab identifier' }),
+    windowId: t.string({ description: 'Window identifier' }),
+    id: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
-    required: ['tabId'],
+    properties: {
+      windowId: { type: 'string', description: 'Window identifier' },
+      id: { type: 'string', description: 'Tab identifier' },
+    },
+    required: ['windowId', 'id'],
     additionalProperties: false,
   },
 }
 
-const tabPasteSelectionOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
+const tabPasteSelectionOperation: OperationDescriptor<
+  { readonly windowId: string; readonly id: string },
+  undefined
+> = {
   id: 'microsoft-edge.tabs.pasteSelection',
   permission: 'microsoft-edge:tabs:pasteSelection',
   target: { command: 'pasteSelection', resource: 'Tab' },
   description: 'Paste text (If Possible)',
   input: t.record({
-    tabId: t.string({ description: 'Tab identifier' }),
+    windowId: t.string({ description: 'Window identifier' }),
+    id: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
-    required: ['tabId'],
+    properties: {
+      windowId: { type: 'string', description: 'Window identifier' },
+      id: { type: 'string', description: 'Tab identifier' },
+    },
+    required: ['windowId', 'id'],
     additionalProperties: false,
   },
 }
 
-const tabUndoOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
+const tabUndoOperation: OperationDescriptor<
+  { readonly windowId: string; readonly id: string },
+  undefined
+> = {
   id: 'microsoft-edge.tabs.undo',
   permission: 'microsoft-edge:tabs:undo',
   target: { command: 'undo', resource: 'Tab' },
   description: 'Undo the last change',
   input: t.record({
-    tabId: t.string({ description: 'Tab identifier' }),
+    windowId: t.string({ description: 'Window identifier' }),
+    id: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
-    required: ['tabId'],
+    properties: {
+      windowId: { type: 'string', description: 'Window identifier' },
+      id: { type: 'string', description: 'Tab identifier' },
+    },
+    required: ['windowId', 'id'],
     additionalProperties: false,
   },
 }
 
-const tabRedoOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
+const tabRedoOperation: OperationDescriptor<
+  { readonly windowId: string; readonly id: string },
+  undefined
+> = {
   id: 'microsoft-edge.tabs.redo',
   permission: 'microsoft-edge:tabs:redo',
   target: { command: 'redo', resource: 'Tab' },
   description: 'Redo the last change',
   input: t.record({
-    tabId: t.string({ description: 'Tab identifier' }),
+    windowId: t.string({ description: 'Window identifier' }),
+    id: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
-    required: ['tabId'],
+    properties: {
+      windowId: { type: 'string', description: 'Window identifier' },
+      id: { type: 'string', description: 'Tab identifier' },
+    },
+    required: ['windowId', 'id'],
     additionalProperties: false,
   },
 }
 
-const tabStopOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
+const tabStopOperation: OperationDescriptor<
+  { readonly windowId: string; readonly id: string },
+  undefined
+> = {
   id: 'microsoft-edge.tabs.stop',
   permission: 'microsoft-edge:tabs:stop',
   target: { command: 'stop', resource: 'Tab' },
   description: 'Stop the current tab from loading',
   input: t.record({
-    tabId: t.string({ description: 'Tab identifier' }),
+    windowId: t.string({ description: 'Window identifier' }),
+    id: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
-    required: ['tabId'],
+    properties: {
+      windowId: { type: 'string', description: 'Window identifier' },
+      id: { type: 'string', description: 'Tab identifier' },
+    },
+    required: ['windowId', 'id'],
     additionalProperties: false,
   },
 }
 
-const tabViewSourceOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
+const tabViewSourceOperation: OperationDescriptor<
+  { readonly windowId: string; readonly id: string },
+  undefined
+> = {
   id: 'microsoft-edge.tabs.viewSource',
   permission: 'microsoft-edge:tabs:viewSource',
   target: { command: 'viewSource', resource: 'Tab' },
   description: 'View the HTML source of the tab',
   input: t.record({
-    tabId: t.string({ description: 'Tab identifier' }),
+    windowId: t.string({ description: 'Window identifier' }),
+    id: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
-    required: ['tabId'],
+    properties: {
+      windowId: { type: 'string', description: 'Window identifier' },
+      id: { type: 'string', description: 'Tab identifier' },
+    },
+    required: ['windowId', 'id'],
     additionalProperties: false,
   },
 }
 
 const tabExecuteOperation: OperationDescriptor<
-  { readonly tabId: string; readonly javascript: string },
+  { readonly windowId: string; readonly id: string; readonly javascript: string },
   undefined
 > = {
   id: 'microsoft-edge.tabs.execute',
@@ -1112,7 +1201,8 @@ const tabExecuteOperation: OperationDescriptor<
   target: { command: 'execute', resource: 'Tab' },
   description: 'Execute a piece of javascript',
   input: t.record({
-    tabId: t.string({ description: 'Tab identifier' }),
+    windowId: t.string({ description: 'Window identifier' }),
+    id: t.string({ description: 'Tab identifier' }),
     javascript: t.string({ description: 'The javascript code to execute' }),
   }),
   output: t.none(),
@@ -1120,10 +1210,11 @@ const tabExecuteOperation: OperationDescriptor<
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: {
-      tabId: { type: 'string', description: 'Tab identifier' },
+      windowId: { type: 'string', description: 'Window identifier' },
+      id: { type: 'string', description: 'Tab identifier' },
       javascript: { type: 'string', description: 'The javascript code to execute' },
     },
-    required: ['tabId', 'javascript'],
+    required: ['windowId', 'id', 'javascript'],
     additionalProperties: false,
   },
 }
@@ -1166,22 +1257,27 @@ function bind(runtime: ClientRuntime): MicrosoftEdgeClient {
       list: (windowId, options) => runtime.invoke(tabListTabsOperation, { windowId }, options),
       get: (windowId, id, options) => runtime.invoke(tabGetTabOperation, { windowId, id }, options),
       create: (input, options) => runtime.invoke(tabCreateTabOperation, input, options),
-      reload: (tabId, options) => runtime.invoke(tabReloadOperation, { tabId }, options),
-      goBack: (tabId, options) => runtime.invoke(tabGoBackOperation, { tabId }, options),
-      goForward: (tabId, options) => runtime.invoke(tabGoForwardOperation, { tabId }, options),
-      selectAll: (tabId, options) => runtime.invoke(tabSelectAllOperation, { tabId }, options),
-      cutSelection: (tabId, options) =>
-        runtime.invoke(tabCutSelectionOperation, { tabId }, options),
-      copySelection: (tabId, options) =>
-        runtime.invoke(tabCopySelectionOperation, { tabId }, options),
-      pasteSelection: (tabId, options) =>
-        runtime.invoke(tabPasteSelectionOperation, { tabId }, options),
-      undo: (tabId, options) => runtime.invoke(tabUndoOperation, { tabId }, options),
-      redo: (tabId, options) => runtime.invoke(tabRedoOperation, { tabId }, options),
-      stop: (tabId, options) => runtime.invoke(tabStopOperation, { tabId }, options),
-      viewSource: (tabId, options) => runtime.invoke(tabViewSourceOperation, { tabId }, options),
-      execute: (tabId, javascript, options) =>
-        runtime.invoke(tabExecuteOperation, { tabId, javascript }, options),
+      reload: (windowId, id, options) =>
+        runtime.invoke(tabReloadOperation, { windowId, id }, options),
+      goBack: (windowId, id, options) =>
+        runtime.invoke(tabGoBackOperation, { windowId, id }, options),
+      goForward: (windowId, id, options) =>
+        runtime.invoke(tabGoForwardOperation, { windowId, id }, options),
+      selectAll: (windowId, id, options) =>
+        runtime.invoke(tabSelectAllOperation, { windowId, id }, options),
+      cutSelection: (windowId, id, options) =>
+        runtime.invoke(tabCutSelectionOperation, { windowId, id }, options),
+      copySelection: (windowId, id, options) =>
+        runtime.invoke(tabCopySelectionOperation, { windowId, id }, options),
+      pasteSelection: (windowId, id, options) =>
+        runtime.invoke(tabPasteSelectionOperation, { windowId, id }, options),
+      undo: (windowId, id, options) => runtime.invoke(tabUndoOperation, { windowId, id }, options),
+      redo: (windowId, id, options) => runtime.invoke(tabRedoOperation, { windowId, id }, options),
+      stop: (windowId, id, options) => runtime.invoke(tabStopOperation, { windowId, id }, options),
+      viewSource: (windowId, id, options) =>
+        runtime.invoke(tabViewSourceOperation, { windowId, id }, options),
+      execute: (windowId, id, javascript, options) =>
+        runtime.invoke(tabExecuteOperation, { windowId, id, javascript }, options),
     },
     bookmarkFolders: {
       list: (options) => runtime.invoke(bookmarkFolderListBookmarkFoldersOperation, {}, options),

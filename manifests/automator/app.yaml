@@ -383,10 +383,13 @@ commands:
     scope: resource
     resourceType: Workflow
     code: exec
+    # The dictionary's `execute` takes the workflow as its direct parameter
+    # (Automator.sdef:3). `name` selects it as `get` does, and is not sent as a
+    # named parameter.
     parameters:
-      - name: workflow
-        type: any
-        description: The workflow to execute
+      - name: name
+        type: string
+        description: Workflow name
         required: true
 
   # AutomatorAction commands

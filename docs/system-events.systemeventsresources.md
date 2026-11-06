@@ -9,5 +9,31 @@ The type of the resource table in `systemEventsContract` (the app's `/contract` 
 **Signature:**
 
 ```typescript
-type SystemEventsResources = Readonly<Record<never, never>>
+type SystemEventsResources = Readonly<{
+  ClassicDomainObject: ResourceDescriptor<ClassicDomainObject, ClassicDomainObjectKind> & {
+    readonly id: ValueType<ClassicDomainObjectKind>
+    readonly get: 'system-events.classicDomainObjects.get'
+    readonly list: 'system-events.classicDomainObjects.list'
+  }
+  DiskItem: ResourceDescriptor<DiskItem, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'system-events.diskItems.get'
+  }
+  Domain: ResourceDescriptor<Domain, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'system-events.domains.get'
+    readonly list: 'system-events.domains.list'
+  }
+  Folder: ResourceDescriptor<Folder, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'system-events.folders.get'
+  }
+  UserDomainObject: ResourceDescriptor<UserDomainObject, UserDomainObjectKind> & {
+    readonly id: ValueType<UserDomainObjectKind>
+    readonly get: 'system-events.userDomainObjects.get'
+    readonly list: 'system-events.userDomainObjects.list'
+  }
+}>
 ```
+
+**References:** [ResourceDescriptor](./contracts.resourcedescriptor.md)<!-- -->, [ClassicDomainObject](./system-events.classicdomainobject.md)<!-- -->, [ClassicDomainObjectKind](./system-events.classicdomainobjectkind.md)<!-- -->, [ValueType](./contracts.valuetype.md)<!-- -->, [DiskItem](./system-events.diskitem.md)<!-- -->, [Domain](./system-events.domain.md)<!-- -->, [Folder](./system-events.folder.md)<!-- -->, [UserDomainObject](./system-events.userdomainobject.md)<!-- -->, [UserDomainObjectKind](./system-events.userdomainobjectkind.md)

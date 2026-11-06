@@ -4,7 +4,7 @@
 
 ## ActionResourceClient.perform() method
 
-cause the target process to behave as if the action were applied to its UI element
+cause the target process to behave as if the action were applied to its UI element. macts does not yet send the action to the app, so the app acts on whatever it chooses.
 
 **Signature:**
 

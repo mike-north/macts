@@ -563,7 +563,14 @@ commands:
     scope: resource
     resourceType: Reminder
     code: '????'
-    parameters: []
+    # The dictionary's `show` takes the reminder as its direct parameter
+    # (Reminders.sdef:7). `id` selects it as `getReminder` does, and is not sent
+    # as a named parameter.
+    parameters:
+      - name: id
+        type: string
+        description: Reminder identifier
+        required: true
 
   # Account commands
   listAccounts:

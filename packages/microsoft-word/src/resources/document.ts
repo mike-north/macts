@@ -71,76 +71,88 @@ export class DocumentResourceClient {
   }
 
   /**
-   * Save the specified document
+   * Save the specified document.
+   * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async save(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+  async save(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.save`,
-      {},
+      { id },
       __mactsOptions,
       'Document'
     )
   }
 
   /**
-   * Save the document with a new name or format
+   * Save the document with a new name or format.
+   * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async saveAs(
+    id: string,
     fileName: string,
-    fileFormat?: Parameters<import('../contract/index.js').DocumentResourceClient['saveAs']>[1],
+    fileFormat?: Parameters<import('../contract/index.js').DocumentResourceClient['saveAs']>[2],
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.saveAs`,
-      { fileName, fileFormat },
+      { id, fileName, fileFormat },
       __mactsOptions,
       'Document'
     )
   }
 
   /**
-   * Close the specified document
+   * Close the specified document.
+   * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async close(
+    id: string,
     saving?: boolean,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.close`,
-      { saving },
+      { id, saving },
       __mactsOptions,
       'Document'
     )
   }
 
   /**
-   * Print the specified document
+   * Print the specified document.
+   * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async print(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+  async print(id: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.print`,
-      {},
+      { id },
       __mactsOptions,
       'Document'
     )
   }
 
   /**
-   * Activate the specified document window
+   * Activate the specified document window.
+   * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async activate(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
+  async activate(
+    id: string,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.activate`,
-      {},
+      { id },
       __mactsOptions,
       'Document'
     )
   }
 
   /**
-   * Create a text range by character positions
+   * Create a text range by character positions.
+   * When several documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async createRange(
+    id: string,
     start?: number,
     end?: number,
     __mactsOptions?: import('@macts/contracts').CallOptions
@@ -148,6 +160,7 @@ export class DocumentResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.createRange`,
       {
+        id,
         ...(start === undefined ? {} : { start: __mactsIntegerInput(start) }),
         ...(end === undefined ? {} : { end: __mactsIntegerInput(end) }),
       },

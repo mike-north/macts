@@ -8,7 +8,11 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { ObjectReferenceVariant } from '@macts/contracts';
+import { Page } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export type Accs = 'none' | 'readOnly' | 'readWrite' | 'writeOnly';
@@ -128,12 +132,28 @@ export type CheckboxUpdateInput = Record<string, never>;
 
 // @public
 export interface ClassicDomainObject {
-    readonly id: string;
+    readonly applicationsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly applicationSupportFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly id: string | null;
+    readonly kind: ClassicDomainObjectKind;
+    readonly libraryFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
     readonly name: string | null;
+    readonly preferencesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly scriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly workflowsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
 // @public
 export type ClassicDomainObjectCreateInput = Record<string, never>;
+
+// @public
+export type ClassicDomainObjectKind = 'classic';
+
+// @public
+export interface ClassicDomainObjectResourceClient {
+    get(kind: ClassicDomainObjectKind, options?: CallOptions): Promise<ClassicDomainObject>;
+    list(options?: CallOptions): Promise<Page<ClassicDomainObject>>;
+}
 
 // @public
 export type ClassicDomainObjectUpdateInput = Record<string, never>;
@@ -213,16 +233,17 @@ export interface DiskCreateInput {
 // @public
 export interface DiskItem {
     readonly busyStatus: boolean | null;
+    readonly container: ObjectReferenceVariant<DiskItem, string, 'DiskItem'> | null;
     readonly creationDate: Date | null;
     readonly displayedName: string | null;
-    readonly id: string;
+    readonly id: string | null;
     modificationDate: Date | null;
     name: string | null;
     readonly nameExtension: string | null;
     readonly packageFolder: boolean | null;
     readonly path: string | null;
     readonly physicalSize: Integer | null;
-    readonly pOSIXPath: string | null;
+    readonly posixPath: string;
     readonly size: Integer | null;
     readonly uRL: string | null;
     visible: boolean | null;
@@ -234,6 +255,11 @@ export interface DiskItemCreateInput {
     modificationDate?: Date;
     name?: string;
     visible?: boolean;
+}
+
+// @public
+export interface DiskItemResourceClient {
+    get(posixPath: string, options?: CallOptions): Promise<DiskItem>;
 }
 
 // @public
@@ -250,12 +276,31 @@ export interface DiskUpdateInput {
 
 // @public
 export interface Domain {
+    readonly applicationsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly applicationSupportFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly desktopPicturesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly folderActionScriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly fontsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
     readonly id: string;
+    readonly libraryFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
     readonly name: string | null;
+    readonly preferencesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly scriptingAdditionsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly scriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly sharedDocumentsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly speakableItemsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly utilitiesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly workflowsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
 // @public
 export type DomainCreateInput = Record<string, never>;
+
+// @public
+export interface DomainResourceClient {
+    get(id: string, options?: CallOptions): Promise<Domain>;
+    list(options?: CallOptions): Promise<Page<Domain>>;
+}
 
 // @public
 export type DomainUpdateInput = Record<string, never>;
@@ -339,16 +384,17 @@ export interface FileUpdateInput {
 // @public
 export interface Folder {
     readonly busyStatus: boolean | null;
+    readonly container: ObjectReferenceVariant<DiskItem, string, 'DiskItem'> | null;
     readonly creationDate: Date | null;
     readonly displayedName: string | null;
-    readonly id: string;
+    readonly id: string | null;
     modificationDate: Date | null;
     name: string | null;
     readonly nameExtension: string | null;
     readonly packageFolder: boolean | null;
     readonly path: string | null;
     readonly physicalSize: Integer | null;
-    readonly pOSIXPath: string | null;
+    readonly posixPath: string;
     readonly size: Integer | null;
     readonly uRL: string | null;
     visible: boolean | null;
@@ -360,6 +406,11 @@ export interface FolderCreateInput {
     modificationDate?: Date;
     name?: string;
     visible?: boolean;
+}
+
+// @public
+export interface FolderResourceClient {
+    get(posixPath: string, options?: CallOptions): Promise<Folder>;
 }
 
 // @public
@@ -952,13 +1003,17 @@ export interface SystemEventsClient extends ClientBrand<SystemEventsResources> {
     attachedScripts(options?: CallOptions): Promise<void>;
     beginTransaction(options?: CallOptions): Promise<void>;
     cancel(options?: CallOptions): Promise<void>;
+    readonly classicDomainObjects: ClassicDomainObjectResourceClient;
     confirm(options?: CallOptions): Promise<void>;
     connect(options?: CallOptions): Promise<void>;
     decrement(options?: CallOptions): Promise<void>;
     disconnect(options?: CallOptions): Promise<void>;
+    readonly diskItems: DiskItemResourceClient;
     doFolderAction(folderActionCode: string, withItemList?: unknown, withWindowSize?: Rectangle, options?: CallOptions): Promise<void>;
+    readonly domains: DomainResourceClient;
     editActionOf(usingActionName?: string, usingActionNumber?: Integer, options?: CallOptions): Promise<void>;
     endTransaction(options?: CallOptions): Promise<void>;
+    readonly folders: FolderResourceClient;
     increment(options?: CallOptions): Promise<void>;
     keyCode(using?: string, options?: CallOptions): Promise<void>;
     keyDown(options?: CallOptions): Promise<void>;
@@ -975,13 +1030,38 @@ export interface SystemEventsClient extends ClientBrand<SystemEventsResources> {
     start(options?: CallOptions): Promise<void>;
     stop(options?: CallOptions): Promise<void>;
     readonly uiElements: UIElementResourceClient;
+    readonly userDomainObjects: UserDomainObjectResourceClient;
 }
 
 // @public
 export const systemEventsContract: AppContract<SystemEventsClient, SystemEventsResources>;
 
 // @public
-export type SystemEventsResources = Readonly<Record<never, never>>;
+export type SystemEventsResources = Readonly<{
+    ClassicDomainObject: ResourceDescriptor<ClassicDomainObject, ClassicDomainObjectKind> & {
+        readonly id: ValueType<ClassicDomainObjectKind>;
+        readonly get: 'system-events.classicDomainObjects.get';
+        readonly list: 'system-events.classicDomainObjects.list';
+    };
+    DiskItem: ResourceDescriptor<DiskItem, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'system-events.diskItems.get';
+    };
+    Domain: ResourceDescriptor<Domain, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'system-events.domains.get';
+        readonly list: 'system-events.domains.list';
+    };
+    Folder: ResourceDescriptor<Folder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'system-events.folders.get';
+    };
+    UserDomainObject: ResourceDescriptor<UserDomainObject, UserDomainObjectKind> & {
+        readonly id: ValueType<UserDomainObjectKind>;
+        readonly get: 'system-events.userDomainObjects.get';
+        readonly list: 'system-events.userDomainObjects.list';
+    };
+}>;
 
 // @public
 export interface TabGroup {
@@ -1087,12 +1167,46 @@ export interface UIElementUpdateInput {
 
 // @public
 export interface UserDomainObject {
-    readonly id: string;
+    readonly applicationsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly applicationSupportFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly desktopFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly desktopPicturesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly documentsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly downloadsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly favoritesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly folderActionScriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly fontsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly homeFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly id: string | null;
+    readonly kind: UserDomainObjectKind;
+    readonly libraryFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly moviesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly musicFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
     readonly name: string | null;
+    readonly picturesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly preferencesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly publicFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly scriptingAdditionsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly scriptsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly sharedDocumentsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly sitesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly speakableItemsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly temporaryItemsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly utilitiesFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
+    readonly workflowsFolder: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
 // @public
 export type UserDomainObjectCreateInput = Record<string, never>;
+
+// @public
+export type UserDomainObjectKind = 'user';
+
+// @public
+export interface UserDomainObjectResourceClient {
+    get(kind: UserDomainObjectKind, options?: CallOptions): Promise<UserDomainObject>;
+    list(options?: CallOptions): Promise<Page<UserDomainObject>>;
+}
 
 // @public
 export type UserDomainObjectUpdateInput = Record<string, never>;

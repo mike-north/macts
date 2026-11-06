@@ -4,7 +4,7 @@
 
 ## itemSelectionProblem() function
 
-Why a command cannot be offered, when it must name one item (a resource-scoped get, update or delete, or a delete at application scope) and declares no identifier parameter ([itemIdentifierParameter()](./core.itemidentifierparameter.md)<!-- -->).
+Why a command cannot be offered, when it must name one item (a resource-scoped command other than a list or create, or a delete at application scope) and declares no identifier parameter ([itemIdentifierParameter()](./core.itemidentifierparameter.md)<!-- -->).
 
 **Signature:**
 

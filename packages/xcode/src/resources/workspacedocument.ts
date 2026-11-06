@@ -73,106 +73,110 @@ export class WorkspaceDocumentResourceClient {
   }
 
   /**
-   * Invoke the "build" scheme action
+   * Invoke the "build" scheme action.
+   * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async build(
-    workspaceName: string,
+    name: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.build`,
-      { workspaceName },
+      { name },
       __mactsOptions,
       'WorkspaceDocument'
     )
   }
 
   /**
-   * Invoke the "clean" scheme action
+   * Invoke the "clean" scheme action.
+   * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async clean(
-    workspaceName: string,
+    name: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.clean`,
-      { workspaceName },
+      { name },
       __mactsOptions,
       'WorkspaceDocument'
     )
   }
 
   /**
-   * Stop the active scheme action, if one is running
+   * Stop the active scheme action, if one is running.
+   * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
-  async stop(
-    workspaceName: string,
-    __mactsOptions?: import('@macts/contracts').CallOptions
-  ): Promise<void> {
+  async stop(name: string, __mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.stop`,
-      { workspaceName },
+      { name },
       __mactsOptions,
       'WorkspaceDocument'
     )
   }
 
   /**
-   * Invoke the "run" scheme action
+   * Invoke the "run" scheme action.
+   * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async run(
-    workspaceName: string,
+    name: string,
     withCommandLineArguments?: unknown,
     withEnvironmentVariables?: unknown,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.run`,
-      { workspaceName, withCommandLineArguments, withEnvironmentVariables },
+      { name, withCommandLineArguments, withEnvironmentVariables },
       __mactsOptions,
       'WorkspaceDocument'
     )
   }
 
   /**
-   * Invoke the "test" scheme action
+   * Invoke the "test" scheme action.
+   * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async test(
-    workspaceName: string,
+    name: string,
     withCommandLineArguments?: unknown,
     withEnvironmentVariables?: unknown,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.test`,
-      { workspaceName, withCommandLineArguments, withEnvironmentVariables },
+      { name, withCommandLineArguments, withEnvironmentVariables },
       __mactsOptions,
       'WorkspaceDocument'
     )
   }
 
   /**
-   * Start a new debugging session in the workspace
+   * Start a new debugging session in the workspace.
+   * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async attach(
-    workspaceName: string,
+    name: string,
     toProcessIdentifier: number,
     suspended: boolean,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.attach`,
-      { workspaceName, toProcessIdentifier: __mactsIntegerInput(toProcessIdentifier), suspended },
+      { name, toProcessIdentifier: __mactsIntegerInput(toProcessIdentifier), suspended },
       __mactsOptions,
       'WorkspaceDocument'
     )
   }
 
   /**
-   * Start a debugging session using the "run" or "run without building" scheme action
+   * Start a debugging session using the "run" or "run without building" scheme action.
+   * When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    */
   async debug(
-    workspaceName: string,
+    name: string,
     scheme?: string,
     runDestinationSpecifier?: string,
     skipBuilding?: boolean,
@@ -183,7 +187,7 @@ export class WorkspaceDocumentResourceClient {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.debug`,
       {
-        workspaceName,
+        name,
         scheme,
         runDestinationSpecifier,
         skipBuilding,

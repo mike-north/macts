@@ -7,17 +7,23 @@
  * command on a resource the application does not hold, with no recorded
  * parent, would address a collection the app does not have.
  *
- * This suite fails when, in any shipped manifest, a usable list, get, create,
- * update or delete command on a resource that the hierarchy nests under
- * another resource, and that is not also a top-level child of the hierarchy
+ * This suite fails when, in any shipped manifest, a usable resource-scoped
+ * command on a resource that the hierarchy nests under another resource,
+ * and that is not also a top-level child of the hierarchy
  * (`nestedOnlyResources`, `./hierarchy-placement.ts`), records no parent.
- * Only those five command shapes address a collection; every other command
+ * Every resource-scoped command addresses its resource's collection: a list
+ * or create the collection, and any other command the one item it acts on,
+ * which a get, update or delete reads or changes and any other command sends
+ * the app as its direct parameter (#287). Only an application-scoped command
  * is called on the application with its parameters. A resource the
  * hierarchy does not place at all has no parent to record, and is not
  * checked. A recorded parent is always accepted here; the manifest schema
  * checks that it names a declared resource and a required parameter.
  *
- * The one exception is {@link AWAITING_PARENT_DESIGN}: nested commands whose
+ * A known gap, a resource command that cannot select its item yet
+ * (`KNOWN_ITEM_SELECTION_GAPS`), is not checked: it addresses no collection.
+ *
+ * The one other exception is {@link AWAITING_PARENT_DESIGN}: nested commands whose
  * parent, or whether they need one, awaits a design decision. The list is
  * exact: an entry that records a parent, or whose resource becomes a
  * top-level child, fails the suite until it is removed.
@@ -37,13 +43,14 @@
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md §D10 (command parents)
  * @see https://github.com/mike-north/macts/issues/165
  * @see https://github.com/mike-north/macts/issues/173
+ * @see https://github.com/mike-north/macts/issues/287
  */
 
 import { readdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { isCrudName } from '../generator/surface.js'
 import { nestedOnlyResources, placedEntries } from './hierarchy-placement.js'
+import { knownItemSelectionGap } from './item-selection-gaps.js'
 import { loadManifest } from './loader.js'
 import { resolveManifestRoutes } from './route.js'
 import type { AppManifest } from './schemas/index.js'
@@ -88,10 +95,14 @@ interface AddressedCommand {
   readonly resource: string
 }
 
-/** The usable CRUD-shaped commands of `manifest`, one entry per resource they address. */
+/**
+ * The usable resource-scoped commands of `manifest`, one entry per resource
+ * they address. Every one addresses its resource's collection: a list or
+ * create the collection itself, and any other command the item it acts on.
+ */
 function addressedCommands(dir: string, manifest: AppManifest): AddressedCommand[] {
   return resolveManifestRoutes(manifest).flatMap((route) =>
-    route.resourceType === undefined || !isCrudName(route.command.name)
+    route.resourceType === undefined || route.command.scope !== 'resource'
       ? []
       : [
           {
@@ -103,12 +114,18 @@ function addressedCommands(dir: string, manifest: AppManifest): AddressedCommand
   )
 }
 
-/** The commands of `manifest` on a nested-only resource that record no parent. */
+/**
+ * The commands of `manifest` on a nested-only resource that record no
+ * parent. A known gap (`KNOWN_ITEM_SELECTION_GAPS`) is left out: it declares
+ * no item and addresses no collection until it can, and its own ratchet
+ * lists it.
+ */
 function parentlessNestedCommands(dir: string, manifest: AppManifest): string[] {
   const nested = nestedOnlyResources(manifest)
   const missing = new Set<string>()
   for (const { id, commandKey, resource } of addressedCommands(dir, manifest)) {
     if (!nested.has(resource)) continue
+    if (knownItemSelectionGap(manifest, commandKey) !== undefined) continue
     if (manifest.commands[commandKey]?.parent === undefined) missing.add(id)
   }
   return [...missing]

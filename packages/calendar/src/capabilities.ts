@@ -329,8 +329,18 @@ export const capabilities: readonly CapabilityMetadata[] = [
     risk: 'read',
     inputSchema: {
       type: 'object',
-      properties: {},
+      properties: {
+        calendarId: {
+          description: 'Calendar identifier (the calendar containing the event)',
+          type: 'string',
+        },
+        id: {
+          description: 'Event identifier (uid)',
+          type: 'string',
+        },
+      },
       additionalProperties: false,
+      required: ['calendarId', 'id'],
     },
   },
   {

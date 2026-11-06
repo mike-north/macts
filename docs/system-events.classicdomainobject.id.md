@@ -4,10 +4,10 @@
 
 ## ClassicDomainObject.id property
 
-the unique identifier of the domain. Never null: the primary identifier.
+the unique identifier of the domain. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-readonly id: string;
+readonly id: string | null;
 ```

@@ -43,7 +43,6 @@ export const manifest: unknown = {
       code: 'emal',
       resources: ['OutgoingMessage', 'MessageViewer'],
       commands: [
-        'bounce',
         'checkForNewMail',
         'extractNameFrom',
         'extractAddressFrom',
@@ -1974,14 +1973,6 @@ export const manifest: unknown = {
       ],
       code: 'move',
     },
-    bounce: {
-      name: 'bounce',
-      description: 'Does nothing at all (deprecated)',
-      scope: 'resource',
-      resourceType: 'Message',
-      parameters: [],
-      code: 'bcms',
-    },
     checkForNewMail: {
       name: 'checkForNewMail',
       description: 'Triggers a check for email.',
@@ -2137,7 +2128,14 @@ export const manifest: unknown = {
       description: 'Sends a message.',
       scope: 'resource',
       resourceType: 'OutgoingMessage',
-      parameters: [],
+      parameters: [
+        {
+          name: 'id',
+          type: 'integer',
+          description: 'The unique identifier of the outgoing message',
+          required: true,
+        },
+      ],
       code: 'send',
     },
     synchronize: {

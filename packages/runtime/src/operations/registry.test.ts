@@ -10,9 +10,10 @@
  * else its key, and the target names the manifest command key and resource
  * key. A contract
  * descriptor whose permission disagrees with the manifest is refused at
- * registration (D2, fail closed). A resource-scoped get, update or
- * delete with no identifier parameter (no required parameter other than its
- * parent's), or an application-scoped delete with none, selects no item and
+ * registration (D2, fail closed). A resource-scoped command other than a
+ * list or create (a get, update or delete, or a command such as `show`) with
+ * no identifier parameter (no required parameter other than its parent's),
+ * or an application-scoped delete with none, selects no item and
  * is refused at registration (D5), from the manifest or from a contract. The
  * refusal names the app and the command and says what to declare. A
  * resource whose primary identifier declares no targeting and is not the
@@ -25,7 +26,12 @@ import { readdir } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
-import { loadManifest, resolveManifestRoutes, type AppManifest } from '@macts/core'
+import {
+  knownItemSelectionGap,
+  loadManifest,
+  resolveManifestRoutes,
+  type AppManifest,
+} from '@macts/core'
 import { panesManifest } from '@macts/core/testing'
 import {
   PASSTHROUGH_PLAN,
@@ -98,11 +104,12 @@ const CALENDAR: AppManifest = {
       ],
     },
     // No resourceType: applies to every resource, one operation per resource.
+    // It acts on one item, so it declares the item's identifier.
     show: {
       name: 'show',
       description: 'Show an item',
       scope: 'resource',
-      parameters: [],
+      parameters: [{ name: 'id', type: 'string', description: 'Identifier', required: true }],
     },
     reloadCalendars: {
       name: 'reloadCalendars',
@@ -343,6 +350,32 @@ describe('operationsFromManifest', () => {
     )
     // No identifier name is supplied on the command's behalf.
     expect(message).not.toContain('"id"')
+  })
+
+  // Regression (#287): a resource command that declares no identifier
+  // registered an operation that sent the app no item (Mail's `send`, Word's
+  // `save`). It is refused by the same rule as a get, naming the command and
+  // saying the app receives the item as the command's direct parameter.
+  it('refuses a resource command with no identifier parameter, naming the app and command', () => {
+    const broken: AppManifest = {
+      ...CALENDAR,
+      commands: {
+        ...CALENDAR.commands,
+        showEvent: {
+          name: 'show',
+          description: 'Show an event',
+          scope: 'resource',
+          resourceType: 'Event',
+          parameters: [],
+        },
+      },
+    }
+    const refusal = (): unknown => operationsFromManifest(broken)
+    expect(refusal).toThrow(OperationRegistrationError)
+    expect(refusal).toThrow(
+      'App "Calendar" cannot be registered from its manifest: its resource-scoped command "showEvent" declares no identifier parameter.'
+    )
+    expect(refusal).toThrow("which the app receives as the command's direct parameter")
   })
 
   // Guards the application-scoped delete with no parameters (the shape of the
@@ -649,6 +682,34 @@ describe('operationsFromContract', () => {
     )
   })
 
+  // Regression (#287): the contract registration refuses a resource command
+  // with no identifier, as registration from the manifest alone does.
+  it('refuses a contract whose operation targets a resource command with no identifier parameter', () => {
+    const manifest: AppManifest = {
+      ...CALENDAR,
+      commands: {
+        ...CALENDAR.commands,
+        showEvent: {
+          name: 'show',
+          description: 'Show an event',
+          scope: 'resource',
+          resourceType: 'Event',
+          parameters: [],
+        },
+      },
+    }
+    const show = descriptor({
+      id: 'calendar.events.showEvent',
+      permission: 'calendar:events:showEvent',
+      target: { command: 'showEvent', resource: 'Event' },
+    })
+    const refusal = (): unknown => operationsFromContract(contractWith([show]), manifest)
+    expect(refusal).toThrow(OperationRegistrationError)
+    expect(refusal).toThrow(
+      'App "Calendar" cannot be registered from its contract, because its manifest is refused: its resource-scoped command "showEvent" declares no identifier parameter.'
+    )
+  })
+
   // Guards that the check covers the manifest, not only the contract's
   // operations: a contract that leaves out the application-scoped delete is
   // still refused for a manifest that declares it, as registering the
@@ -842,18 +903,23 @@ describe('repository manifests', () => {
 
   // Guards the shipped manifests directly, by the rule as phases/13 D5 states
   // it rather than through the registry's own check: every routed
-  // resource-scoped get, update or delete, and every routed delete at
-  // application scope, declares a required parameter other than its
-  // parent's. A manifest that regressed would fail here with the offending
-  // app and command named, before any surface was generated from it.
+  // resource-scoped command other than a list or create (a get, update or
+  // delete, or a command the app sends the item as its direct parameter),
+  // and every routed delete at application scope, declares a required
+  // parameter other than its parent's. A manifest that regressed would fail
+  // here with the offending app and command named, before any surface was
+  // generated from it. Regression (#287): 48 resource commands, Mail's `send`
+  // and Word's `save` among them, declared none.
   it('no shipped manifest offers a command that cannot select its item', async () => {
     const offenders: string[] = []
     for (const manifest of await shippedManifests()) {
       for (const { commandKey, command } of resolveManifestRoutes(manifest)) {
         const itemCommand =
           command.name === 'delete' ||
-          (command.scope === 'resource' && (command.name === 'get' || command.name === 'update'))
-        if (!itemCommand) continue
+          (command.scope === 'resource' && command.name !== 'list' && command.name !== 'create')
+        // A known gap stays offered until its command can select its item;
+        // its own ratchet in @macts/core pins the list.
+        if (!itemCommand || knownItemSelectionGap(manifest, commandKey) !== undefined) continue
         const parent = command.parent?.parameter
         if (command.parameters.some((p) => p.required && p.name !== parent)) continue
         offenders.push(`${manifest.app.name}: ${commandKey}`)

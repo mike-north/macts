@@ -79,6 +79,8 @@ import {
   findCrudCommand,
   firstMatchNote,
   parentFirstMatchNote,
+  resourceCommandNotes,
+  describeWithNotes,
   identifierWords,
   isCrudName,
   listMethodParameters,
@@ -1200,7 +1202,7 @@ class ContractBuilder {
       for (const [commandKey, command] of commands) {
         if (isCrudName(command.name)) continue
         const operation = this.#callableOperation(this.#routeOf(commandKey, resourceKey))
-        if (operation !== undefined) methods.push(this.#commandMethod(command, operation))
+        if (operation !== undefined) methods.push(this.#commandMethod(command, operation, resource))
       }
       namespaces.push({
         name: resourceNamespace(resource),
@@ -1382,8 +1384,13 @@ class ContractBuilder {
     }
   }
 
-  /** A method for an app command or a resource command that is not a CRUD shape. */
-  #commandMethod(command: Command, operation: OperationModel): MethodModel {
+  /**
+   * A method for an app command or a resource command that is not a CRUD
+   * shape. A resource command's item is selected as a get selects it, so its
+   * doc carries the first-match sentences a get's does, or, for a known gap
+   * that sends no item, the sentence saying so (`resourceCommandNotes`).
+   */
+  #commandMethod(command: Command, operation: OperationModel, resource?: Resource): MethodModel {
     // The method takes exactly the fields of its operation's input, so a
     // parameter left out of the input is left out of the signature too.
     const inputFields = new Set(this.#inputFields(operation.input).map(({ name }) => name))
@@ -1394,7 +1401,10 @@ class ContractBuilder {
     const output = operation.output
     return {
       name: safeIdentifier(command.name),
-      doc: command.description,
+      doc: describeWithNotes(
+        command.description,
+        resource === undefined ? [] : resourceCommandNotes(command, resource, this.#manifest)
+      ),
       params: signature.map(({ parameter, bindingName, optional }) => {
         const field = this.#parameterField(parameter)
         return {

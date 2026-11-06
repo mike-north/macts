@@ -4,12 +4,12 @@
 
 ## WorkspaceDocumentResourceClient.build() method
 
-Invoke the "build" scheme action
+Invoke the "build" scheme action. When several workspace documents share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 **Signature:**
 
 ```typescript
-build(workspaceName: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+build(name: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -29,7 +29,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-workspaceName
+name
 
 </td><td>
 

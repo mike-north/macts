@@ -9,7 +9,7 @@ Move playlist(s) to a new location
 **Signature:**
 
 ```typescript
-move(to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+move(persistentID: string, to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -28,6 +28,17 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+persistentID
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
 
 to
 

@@ -4,7 +4,7 @@
 
 ## NoteResourceClient.show() method
 
-Show a note in the Notes app
+Show a note in the Notes app. When several notes share the same name, the first match in the app's order is used, and the operation does not fail as ambiguous.
 
 **Signature:**
 

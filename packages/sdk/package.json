@@ -65,6 +65,7 @@
     "@macts/notes": "workspace:*",
     "@macts/omnigraffle": "workspace:*",
     "@macts/reminders": "workspace:*",
+    "@macts/system-events": "workspace:*",
     "@macts/tv": "workspace:*",
     "@macts/xcode": "workspace:*",
     "tsd": "catalog:",

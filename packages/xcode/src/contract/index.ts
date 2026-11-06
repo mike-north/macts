@@ -933,71 +933,80 @@ export interface WorkspaceDocumentResourceClient {
    */
   get(name: string, options?: CallOptions): Promise<WorkspaceDocument>
   /**
-   * Invoke the "build" scheme action
+   * Invoke the "build" scheme action. When several workspace documents share the same name, the
+   * first match in the app's order is used, and the operation does not fail as ambiguous.
    *
-   * @param workspaceName - Workspace document name. Does not accept null.
+   * @param name - Workspace document name. Does not accept null.
    */
-  build(workspaceName: string, options?: CallOptions): Promise<void>
+  build(name: string, options?: CallOptions): Promise<void>
   /**
-   * Invoke the "clean" scheme action
+   * Invoke the "clean" scheme action. When several workspace documents share the same name, the
+   * first match in the app's order is used, and the operation does not fail as ambiguous.
    *
-   * @param workspaceName - Workspace document name. Does not accept null.
+   * @param name - Workspace document name. Does not accept null.
    */
-  clean(workspaceName: string, options?: CallOptions): Promise<void>
+  clean(name: string, options?: CallOptions): Promise<void>
   /**
-   * Stop the active scheme action, if one is running
+   * Stop the active scheme action, if one is running. When several workspace documents share the
+   * same name, the first match in the app's order is used, and the operation does not fail as
+   * ambiguous.
    *
-   * @param workspaceName - Workspace document name. Does not accept null.
+   * @param name - Workspace document name. Does not accept null.
    */
-  stop(workspaceName: string, options?: CallOptions): Promise<void>
+  stop(name: string, options?: CallOptions): Promise<void>
   /**
-   * Invoke the "run" scheme action
+   * Invoke the "run" scheme action. When several workspace documents share the same name, the first
+   * match in the app's order is used, and the operation does not fail as ambiguous.
    *
-   * @param workspaceName - Workspace document name. Does not accept null.
+   * @param name - Workspace document name. Does not accept null.
    * @param withCommandLineArguments - Additional command line arguments to pass to the action. Does
    * not accept null.
    * @param withEnvironmentVariables - Additional environment variables to set for the action. Does
    * not accept null.
    */
   run(
-    workspaceName: string,
+    name: string,
     withCommandLineArguments?: unknown,
     withEnvironmentVariables?: unknown,
     options?: CallOptions
   ): Promise<void>
   /**
-   * Invoke the "test" scheme action
+   * Invoke the "test" scheme action. When several workspace documents share the same name, the
+   * first match in the app's order is used, and the operation does not fail as ambiguous.
    *
-   * @param workspaceName - Workspace document name. Does not accept null.
+   * @param name - Workspace document name. Does not accept null.
    * @param withCommandLineArguments - Additional command line arguments to pass to the action. Does
    * not accept null.
    * @param withEnvironmentVariables - Additional environment variables to set for the action. Does
    * not accept null.
    */
   test(
-    workspaceName: string,
+    name: string,
     withCommandLineArguments?: unknown,
     withEnvironmentVariables?: unknown,
     options?: CallOptions
   ): Promise<void>
   /**
-   * Start a new debugging session in the workspace
+   * Start a new debugging session in the workspace. When several workspace documents share the same
+   * name, the first match in the app's order is used, and the operation does not fail as ambiguous.
    *
-   * @param workspaceName - Workspace document name. Does not accept null.
+   * @param name - Workspace document name. Does not accept null.
    * @param toProcessIdentifier - The process identifier (pid) to which to attach. Does not accept
    * null.
    * @param suspended - Whether to start debugging in a suspended state. Does not accept null.
    */
   attach(
-    workspaceName: string,
+    name: string,
     toProcessIdentifier: Integer,
     suspended: boolean,
     options?: CallOptions
   ): Promise<void>
   /**
-   * Start a debugging session using the "run" or "run without building" scheme action
+   * Start a debugging session using the "run" or "run without building" scheme action. When several
+   * workspace documents share the same name, the first match in the app's order is used, and the
+   * operation does not fail as ambiguous.
    *
-   * @param workspaceName - Workspace document name. Does not accept null.
+   * @param name - Workspace document name. Does not accept null.
    * @param scheme - Scheme name. Does not accept null.
    * @param runDestinationSpecifier - Run destination specifier string. Does not accept null.
    * @param skipBuilding - Whether to perform "run without building" rather than "run". Does not
@@ -1008,7 +1017,7 @@ export interface WorkspaceDocumentResourceClient {
    * accept null.
    */
   debug(
-    workspaceName: string,
+    name: string,
     scheme?: string,
     runDestinationSpecifier?: string,
     skipBuilding?: boolean,
@@ -1426,72 +1435,63 @@ const runDestinationGetRunDestinationOperation: OperationDescriptor<
   },
 }
 
-const workspaceDocumentBuildOperation: OperationDescriptor<
-  { readonly workspaceName: string },
-  undefined
-> = {
+const workspaceDocumentBuildOperation: OperationDescriptor<{ readonly name: string }, undefined> = {
   id: 'xcode.workspaceDocuments.build',
   permission: 'xcode:workspace:build',
   target: { command: 'build', resource: 'WorkspaceDocument' },
   description: 'Invoke the "build" scheme action',
   input: t.record({
-    workspaceName: t.string({ description: 'Workspace document name' }),
+    name: t.string({ description: 'Workspace document name' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { workspaceName: { type: 'string', description: 'Workspace document name' } },
-    required: ['workspaceName'],
+    properties: { name: { type: 'string', description: 'Workspace document name' } },
+    required: ['name'],
     additionalProperties: false,
   },
 }
 
-const workspaceDocumentCleanOperation: OperationDescriptor<
-  { readonly workspaceName: string },
-  undefined
-> = {
+const workspaceDocumentCleanOperation: OperationDescriptor<{ readonly name: string }, undefined> = {
   id: 'xcode.workspaceDocuments.clean',
   permission: 'xcode:workspace:clean',
   target: { command: 'clean', resource: 'WorkspaceDocument' },
   description: 'Invoke the "clean" scheme action',
   input: t.record({
-    workspaceName: t.string({ description: 'Workspace document name' }),
+    name: t.string({ description: 'Workspace document name' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { workspaceName: { type: 'string', description: 'Workspace document name' } },
-    required: ['workspaceName'],
+    properties: { name: { type: 'string', description: 'Workspace document name' } },
+    required: ['name'],
     additionalProperties: false,
   },
 }
 
-const workspaceDocumentStopOperation: OperationDescriptor<
-  { readonly workspaceName: string },
-  undefined
-> = {
+const workspaceDocumentStopOperation: OperationDescriptor<{ readonly name: string }, undefined> = {
   id: 'xcode.workspaceDocuments.stop',
   permission: 'xcode:workspace:stop',
   target: { command: 'stop', resource: 'WorkspaceDocument' },
   description: 'Stop the active scheme action, if one is running',
   input: t.record({
-    workspaceName: t.string({ description: 'Workspace document name' }),
+    name: t.string({ description: 'Workspace document name' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { workspaceName: { type: 'string', description: 'Workspace document name' } },
-    required: ['workspaceName'],
+    properties: { name: { type: 'string', description: 'Workspace document name' } },
+    required: ['name'],
     additionalProperties: false,
   },
 }
 
 const workspaceDocumentRunOperation: OperationDescriptor<
   {
-    readonly workspaceName: string
+    readonly name: string
     readonly withCommandLineArguments?: unknown
     readonly withEnvironmentVariables?: unknown
   },
@@ -1502,7 +1502,7 @@ const workspaceDocumentRunOperation: OperationDescriptor<
   target: { command: 'run', resource: 'WorkspaceDocument' },
   description: 'Invoke the "run" scheme action',
   input: t.record({
-    workspaceName: t.string({ description: 'Workspace document name' }),
+    name: t.string({ description: 'Workspace document name' }),
     withCommandLineArguments: t.optional(
       t.unknown({ description: 'Additional command line arguments to pass to the action' })
     ),
@@ -1515,7 +1515,7 @@ const workspaceDocumentRunOperation: OperationDescriptor<
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: {
-      workspaceName: { type: 'string', description: 'Workspace document name' },
+      name: { type: 'string', description: 'Workspace document name' },
       withCommandLineArguments: {
         allOf: [
           {
@@ -1533,7 +1533,7 @@ const workspaceDocumentRunOperation: OperationDescriptor<
         ],
       },
     },
-    required: ['workspaceName'],
+    required: ['name'],
     additionalProperties: false,
     definitions: {
       __schema0: {
@@ -1611,7 +1611,7 @@ const workspaceDocumentRunOperation: OperationDescriptor<
 
 const workspaceDocumentTestOperation: OperationDescriptor<
   {
-    readonly workspaceName: string
+    readonly name: string
     readonly withCommandLineArguments?: unknown
     readonly withEnvironmentVariables?: unknown
   },
@@ -1622,7 +1622,7 @@ const workspaceDocumentTestOperation: OperationDescriptor<
   target: { command: 'test', resource: 'WorkspaceDocument' },
   description: 'Invoke the "test" scheme action',
   input: t.record({
-    workspaceName: t.string({ description: 'Workspace document name' }),
+    name: t.string({ description: 'Workspace document name' }),
     withCommandLineArguments: t.optional(
       t.unknown({ description: 'Additional command line arguments to pass to the action' })
     ),
@@ -1635,7 +1635,7 @@ const workspaceDocumentTestOperation: OperationDescriptor<
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: {
-      workspaceName: { type: 'string', description: 'Workspace document name' },
+      name: { type: 'string', description: 'Workspace document name' },
       withCommandLineArguments: {
         allOf: [
           {
@@ -1653,7 +1653,7 @@ const workspaceDocumentTestOperation: OperationDescriptor<
         ],
       },
     },
-    required: ['workspaceName'],
+    required: ['name'],
     additionalProperties: false,
     definitions: {
       __schema0: {
@@ -1730,11 +1730,7 @@ const workspaceDocumentTestOperation: OperationDescriptor<
 }
 
 const workspaceDocumentAttachOperation: OperationDescriptor<
-  {
-    readonly workspaceName: string
-    readonly toProcessIdentifier: Integer
-    readonly suspended: boolean
-  },
+  { readonly name: string; readonly toProcessIdentifier: Integer; readonly suspended: boolean },
   undefined
 > = {
   id: 'xcode.workspaceDocuments.attach',
@@ -1742,7 +1738,7 @@ const workspaceDocumentAttachOperation: OperationDescriptor<
   target: { command: 'attach', resource: 'WorkspaceDocument' },
   description: 'Start a new debugging session in the workspace',
   input: t.record({
-    workspaceName: t.string({ description: 'Workspace document name' }),
+    name: t.string({ description: 'Workspace document name' }),
     toProcessIdentifier: t.integer({
       description: 'The process identifier (pid) to which to attach',
     }),
@@ -1753,7 +1749,7 @@ const workspaceDocumentAttachOperation: OperationDescriptor<
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: {
-      workspaceName: { type: 'string', description: 'Workspace document name' },
+      name: { type: 'string', description: 'Workspace document name' },
       toProcessIdentifier: {
         type: 'object',
         properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
@@ -1766,14 +1762,14 @@ const workspaceDocumentAttachOperation: OperationDescriptor<
         description: 'Whether to start debugging in a suspended state',
       },
     },
-    required: ['workspaceName', 'toProcessIdentifier', 'suspended'],
+    required: ['name', 'toProcessIdentifier', 'suspended'],
     additionalProperties: false,
   },
 }
 
 const workspaceDocumentDebugOperation: OperationDescriptor<
   {
-    readonly workspaceName: string
+    readonly name: string
     readonly scheme?: string | undefined
     readonly runDestinationSpecifier?: string | undefined
     readonly skipBuilding?: boolean | undefined
@@ -1787,7 +1783,7 @@ const workspaceDocumentDebugOperation: OperationDescriptor<
   target: { command: 'debug', resource: 'WorkspaceDocument' },
   description: 'Start a debugging session using the "run" or "run without building" scheme action',
   input: t.record({
-    workspaceName: t.string({ description: 'Workspace document name' }),
+    name: t.string({ description: 'Workspace document name' }),
     scheme: t.optional(t.string({ description: 'Scheme name' })),
     runDestinationSpecifier: t.optional(
       t.string({ description: 'Run destination specifier string' })
@@ -1807,7 +1803,7 @@ const workspaceDocumentDebugOperation: OperationDescriptor<
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: {
-      workspaceName: { type: 'string', description: 'Workspace document name' },
+      name: { type: 'string', description: 'Workspace document name' },
       scheme: { type: 'string', description: 'Scheme name' },
       runDestinationSpecifier: { type: 'string', description: 'Run destination specifier string' },
       skipBuilding: {
@@ -1831,7 +1827,7 @@ const workspaceDocumentDebugOperation: OperationDescriptor<
         ],
       },
     },
-    required: ['workspaceName'],
+    required: ['name'],
     additionalProperties: false,
     definitions: {
       __schema0: {
@@ -1934,32 +1930,29 @@ function bind(runtime: ClientRuntime): XcodeClient {
         runtime.invoke(workspaceDocumentListWorkspaceDocumentsOperation, {}, options),
       get: (name, options) =>
         runtime.invoke(workspaceDocumentGetWorkspaceDocumentOperation, { name }, options),
-      build: (workspaceName, options) =>
-        runtime.invoke(workspaceDocumentBuildOperation, { workspaceName }, options),
-      clean: (workspaceName, options) =>
-        runtime.invoke(workspaceDocumentCleanOperation, { workspaceName }, options),
-      stop: (workspaceName, options) =>
-        runtime.invoke(workspaceDocumentStopOperation, { workspaceName }, options),
-      run: (workspaceName, withCommandLineArguments, withEnvironmentVariables, options) =>
+      build: (name, options) => runtime.invoke(workspaceDocumentBuildOperation, { name }, options),
+      clean: (name, options) => runtime.invoke(workspaceDocumentCleanOperation, { name }, options),
+      stop: (name, options) => runtime.invoke(workspaceDocumentStopOperation, { name }, options),
+      run: (name, withCommandLineArguments, withEnvironmentVariables, options) =>
         runtime.invoke(
           workspaceDocumentRunOperation,
-          { workspaceName, withCommandLineArguments, withEnvironmentVariables },
+          { name, withCommandLineArguments, withEnvironmentVariables },
           options
         ),
-      test: (workspaceName, withCommandLineArguments, withEnvironmentVariables, options) =>
+      test: (name, withCommandLineArguments, withEnvironmentVariables, options) =>
         runtime.invoke(
           workspaceDocumentTestOperation,
-          { workspaceName, withCommandLineArguments, withEnvironmentVariables },
+          { name, withCommandLineArguments, withEnvironmentVariables },
           options
         ),
-      attach: (workspaceName, toProcessIdentifier, suspended, options) =>
+      attach: (name, toProcessIdentifier, suspended, options) =>
         runtime.invoke(
           workspaceDocumentAttachOperation,
-          { workspaceName, toProcessIdentifier, suspended },
+          { name, toProcessIdentifier, suspended },
           options
         ),
       debug: (
-        workspaceName,
+        name,
         scheme,
         runDestinationSpecifier,
         skipBuilding,
@@ -1970,7 +1963,7 @@ function bind(runtime: ClientRuntime): XcodeClient {
         runtime.invoke(
           workspaceDocumentDebugOperation,
           {
-            workspaceName,
+            name,
             scheme,
             runDestinationSpecifier,
             skipBuilding,

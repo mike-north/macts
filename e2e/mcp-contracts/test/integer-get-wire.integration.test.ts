@@ -276,9 +276,9 @@ const INTEGER_COMMANDS: readonly IntegerCommand[] = [
     label: 'Microsoft Word createRange (start, end)',
     operation: 'microsoft-word.documents.createRange',
     wire: () => inputWire(microsoftWordContract, 'microsoft-word.documents.createRange'),
-    call: () => word().documents.createRange(1, 4),
-    expected: { start: { integer: '1' }, end: { integer: '4' } },
-    before: { start: 1, end: 4 },
+    call: () => word().documents.createRange('Draft', 1, 4),
+    expected: { id: 'Draft', start: { integer: '1' }, end: { integer: '4' } },
+    before: { id: 'Draft', start: 1, end: 4 },
   },
   {
     label: 'QuickTime Player stepForward (by)',
@@ -318,11 +318,11 @@ const INTEGER_COMMANDS: readonly IntegerCommand[] = [
     wire: () => inputWire(xcodeContract, 'xcode.workspaceDocuments.attach'),
     call: () => xcode().workspaceDocuments.attach('MyApp', 4242, false),
     expected: {
-      workspaceName: 'MyApp',
+      name: 'MyApp',
       toProcessIdentifier: { integer: '4242' },
       suspended: false,
     },
-    before: { workspaceName: 'MyApp', toProcessIdentifier: 4242, suspended: false },
+    before: { name: 'MyApp', toProcessIdentifier: 4242, suspended: false },
   },
 ]
 

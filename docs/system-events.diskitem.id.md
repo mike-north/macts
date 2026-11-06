@@ -4,10 +4,10 @@
 
 ## DiskItem.id property
 
-the unique ID of the disk item. Never null: the primary identifier.
+the unique ID of the disk item. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-readonly id: string;
+readonly id: string | null;
 ```

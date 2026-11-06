@@ -25,7 +25,7 @@ export * from './route.js'
 // under, shared by the server list executor and identifier-consuming surfaces)
 export * from './identifier.js'
 
-// Which declared parameter selects the item a get, update or delete acts on
+// Which declared parameter selects the item a resource-scoped command acts on
 // (single source of truth shared by the generators, the native planner and
 // operation registration, so each refuses the same commands)
 export {
@@ -34,6 +34,16 @@ export {
   unselectableItemCommands,
   type UnselectableItemCommand,
 } from './item-selection.js'
+
+// The shipped resource commands that cannot yet select their item, which
+// stay offered as a call on the app and are exempt from the refusal; the
+// list may only shrink
+export {
+  KNOWN_ITEM_SELECTION_GAPS,
+  knownItemSelectionGap,
+  type ItemSelectionNeed,
+  type KnownItemSelectionGap,
+} from './item-selection-gaps.js'
 
 // The rule of the `positional` marker (shared by the manifest schema, the
 // generators and operation registration, so each refuses the same manifests)

@@ -286,7 +286,6 @@ export interface MessageCreateInput {
 
 // @public
 export interface MessageResourceClient {
-    bounce(options?: CallOptions): Promise<void>;
     forward(openingWindow?: boolean, options?: CallOptions): Promise<void>;
     redirect(openingWindow?: boolean, options?: CallOptions): Promise<void>;
     reply(openingWindow?: boolean, replyToAll?: boolean, options?: CallOptions): Promise<void>;
@@ -362,7 +361,7 @@ export interface OutgoingMessageCreateInput {
 
 // @public
 export interface OutgoingMessageResourceClient {
-    send(options?: CallOptions): Promise<void>;
+    send(id: Integer, options?: CallOptions): Promise<void>;
 }
 
 // @public

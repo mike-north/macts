@@ -572,13 +572,17 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
+        persistentID: {
+          description: 'Persistent ID of the playlist',
+          type: 'string',
+        },
         to: {
           description: 'the new location for the playlist(s)',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['to'],
+      required: ['persistentID', 'to'],
     },
   },
   {
@@ -594,6 +598,10 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
+        persistentID: {
+          description: 'Persistent ID of the playlist',
+          type: 'string',
+        },
         for: {
           description: 'the search text',
           type: 'string',
@@ -604,7 +612,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
         },
       },
       additionalProperties: false,
-      required: ['for'],
+      required: ['persistentID', 'for'],
     },
   },
   {

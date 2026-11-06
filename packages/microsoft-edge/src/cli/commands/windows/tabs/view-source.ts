@@ -13,15 +13,16 @@ export class ViewSourceTabCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  windowId = Option.String('--window-id', { required: true, description: 'Window ID' })
-  tabId = Option.String('--tab-id', { required: true, description: 'Tab identifier' })
+  windowId = Option.String('--window-id', { required: true, description: 'Window identifier' })
+  tabId = Option.String({ name: 'id', required: true })
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
       await client.tabs.viewSource(
-        this.tabId as unknown as Parameters<typeof client.tabs.viewSource>[0]
+        this.windowId as unknown as Parameters<typeof client.tabs.viewSource>[0],
+        this.tabId as unknown as Parameters<typeof client.tabs.viewSource>[1]
       )
 
       const output = formatter.formatSuccess('viewSource completed successfully')

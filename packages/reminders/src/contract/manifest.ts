@@ -712,7 +712,14 @@ export const manifest: unknown = {
       description: 'Show the reminder in Reminders.app UI',
       scope: 'resource',
       resourceType: 'Reminder',
-      parameters: [],
+      parameters: [
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Reminder identifier',
+          required: true,
+        },
+      ],
       code: '????',
     },
     listAccounts: {

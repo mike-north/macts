@@ -309,8 +309,12 @@ export interface ReminderResourceClient {
    * @param id - Reminder identifier. Does not accept null.
    */
   complete(id: string, options?: CallOptions): Promise<void>
-  /** Show the reminder in Reminders.app UI */
-  show(options?: CallOptions): Promise<void>
+  /**
+   * Show the reminder in Reminders.app UI
+   *
+   * @param id - Reminder identifier. Does not accept null.
+   */
+  show(id: string, options?: CallOptions): Promise<void>
 }
 
 /**
@@ -666,17 +670,20 @@ const reminderCompleteReminderOperation: OperationDescriptor<{ readonly id: stri
   },
 }
 
-const reminderShowOperation: OperationDescriptor<Record<string, never>, undefined> = {
+const reminderShowOperation: OperationDescriptor<{ readonly id: string }, undefined> = {
   id: 'reminders.reminders.show',
   permission: 'reminders:reminders:show',
   target: { command: 'show', resource: 'Reminder' },
   description: 'Show the reminder in Reminders.app UI',
-  input: t.record({}),
+  input: t.record({
+    id: t.string({ description: 'Reminder identifier' }),
+  }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {},
+    properties: { id: { type: 'string', description: 'Reminder identifier' } },
+    required: ['id'],
     additionalProperties: false,
   },
 }
@@ -743,7 +750,7 @@ function bind(runtime: ClientRuntime): RemindersClient {
       create: (input, options) => runtime.invoke(reminderCreateReminderOperation, input, options),
       delete: (id, options) => runtime.invoke(reminderDeleteReminderOperation, { id }, options),
       complete: (id, options) => runtime.invoke(reminderCompleteReminderOperation, { id }, options),
-      show: (options) => runtime.invoke(reminderShowOperation, {}, options),
+      show: (id, options) => runtime.invoke(reminderShowOperation, { id }, options),
     },
   }
 }

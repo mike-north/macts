@@ -7,7 +7,7 @@
  * (`ResourcePositionalSchema`); nothing is inferred from a missing
  * identifier. Then:
  *
- * - its `get`, `update` and `delete` find their item at the zero-based
+ * - its item commands find their item at the zero-based
  *   position their item parameter carries, within the parent the command
  *   records, as `parent[collection].at(index)`, and a position the
  *   collection does not reach is an invalid selection;
@@ -28,7 +28,7 @@ import type { Command } from './schemas/command.js'
 import { placedEntries, type PlacedEntry } from './hierarchy-placement.js'
 import { resolvePrimaryIdentifierProperty } from './identifier.js'
 import { itemIdentifierParameter, selectsOneItem } from './item-selection.js'
-import { CRUD_OPERATIONS, resourceCommandEntries, resolvingCommand } from './resource-commands.js'
+import { resourceCommandEntries, resolvingCommand } from './resource-commands.js'
 import { isUnsupportedResourceKey } from './unsupported.js'
 import { resolveManifestRoutes } from './route.js'
 
@@ -115,7 +115,7 @@ function recordedParentIssue(
 /**
  * What is wrong with one positional resource's commands: its `get` must exist
  * and record a parent the app finds at the application by its identifier, and
- * every CRUD address must agree with known containment and supply a qualified
+ * every resource-command address must agree with known containment and supply a qualified
  * parent identity. Item commands additionally record the resolving get's parent
  * and select the item by an integer position.
  */
@@ -144,7 +144,6 @@ function commandIssues(
     })
   }
   for (const [commandKey, command] of resourceCommandEntries(manifest, resourceKey)) {
-    if (!CRUD_OPERATIONS.some((operation) => operation === command.name)) continue
     const qualification = recordedParentIssue(manifest, commandKey, command, placements)
     if (qualification !== undefined) issues.push(qualification)
     const containment = collectionPlacementIssue(commandKey, command, resourceKey, placements)
@@ -164,7 +163,7 @@ function commandIssues(
 }
 
 /**
- * Every positional CRUD route addresses the collection at its recorded
+ * Every positional resource route addresses the collection at its recorded
  * parent, or at the application when it records none. A usable hierarchy
  * placement is evidence of where that collection exists; no placement leaves
  * existing sparse-manifest behavior unchanged.

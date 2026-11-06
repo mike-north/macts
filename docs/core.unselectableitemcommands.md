@@ -50,4 +50,4 @@ One entry per such command; empty when every command qualifies.
 
 ## Remarks
 
-Only a command with a route is considered: a command or resource marked unsupported is offered nowhere, so it is never refused.
+Only a command with a route is considered: a command or resource marked unsupported is offered nowhere, so it is never refused. A known gap (`knownItemSelectionGap`<!-- -->) is not refused either.

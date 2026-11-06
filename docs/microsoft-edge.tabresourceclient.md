@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[copySelection(tabId, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.copyselection.md)
+[copySelection(windowId, id, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.copyselection.md)
 
 </td><td>
 
@@ -79,7 +79,7 @@ Create a new tab.
 </td></tr>
 <tr><td>
 
-[cutSelection(tabId, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.cutselection.md)
+[cutSelection(windowId, id, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.cutselection.md)
 
 </td><td>
 
@@ -90,7 +90,7 @@ Cut selected text (If Possible)
 </td></tr>
 <tr><td>
 
-[execute(tabId, javascript, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.execute.md)
+[execute(windowId, id, javascript, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.execute.md)
 
 </td><td>
 
@@ -112,7 +112,7 @@ Get a tab by id within a parent scope.
 </td></tr>
 <tr><td>
 
-[goBack(tabId, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.goback.md)
+[goBack(windowId, id, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.goback.md)
 
 </td><td>
 
@@ -123,7 +123,7 @@ Go Back (If Possible)
 </td></tr>
 <tr><td>
 
-[goForward(tabId, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.goforward.md)
+[goForward(windowId, id, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.goforward.md)
 
 </td><td>
 
@@ -145,7 +145,7 @@ List the tabs of one window, as one page.
 </td></tr>
 <tr><td>
 
-[pasteSelection(tabId, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.pasteselection.md)
+[pasteSelection(windowId, id, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.pasteselection.md)
 
 </td><td>
 
@@ -156,7 +156,7 @@ Paste text (If Possible)
 </td></tr>
 <tr><td>
 
-[redo(tabId, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.redo.md)
+[redo(windowId, id, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.redo.md)
 
 </td><td>
 
@@ -167,7 +167,7 @@ Redo the last change
 </td></tr>
 <tr><td>
 
-[reload(tabId, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.reload.md)
+[reload(windowId, id, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.reload.md)
 
 </td><td>
 
@@ -178,7 +178,7 @@ Reload a tab
 </td></tr>
 <tr><td>
 
-[selectAll(tabId, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.selectall.md)
+[selectAll(windowId, id, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.selectall.md)
 
 </td><td>
 
@@ -189,7 +189,7 @@ Select all
 </td></tr>
 <tr><td>
 
-[stop(tabId, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.stop.md)
+[stop(windowId, id, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.stop.md)
 
 </td><td>
 
@@ -200,7 +200,7 @@ Stop the current tab from loading
 </td></tr>
 <tr><td>
 
-[undo(tabId, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.undo.md)
+[undo(windowId, id, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.undo.md)
 
 </td><td>
 
@@ -211,7 +211,7 @@ Undo the last change
 </td></tr>
 <tr><td>
 
-[viewSource(tabId, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.viewsource.md)
+[viewSource(windowId, id, \_\_mactsOptions)](./microsoft-edge.tabresourceclient.viewsource.md)
 
 </td><td>
 

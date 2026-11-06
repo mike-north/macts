@@ -1,12 +1,16 @@
 /**
  * Which declared parameter selects the item a command acts on.
  *
- * A resource-scoped `get`, `update` or `delete` acts on one item of its
- * resource, and selects that item by a parameter the manifest declares: its
- * first required parameter other than its parent's (the parameter
+ * Every resource-scoped command other than a `list` or a `create` acts on one
+ * item of its resource: a `get`, `update` or `delete`, and any other command
+ * the app's dictionary defines on the resource's class (Notes' `show`,
+ * Xcode's `build`, Mail's `send`), whose direct parameter is that item. It
+ * selects the item by a parameter the manifest declares:
+ * its first required parameter other than its parent's (the parameter
  * `command.parent` names). The generated contract, HTTP client and CLI take
  * that parameter as the item's identifier, the native body addresses the item
- * in its resource's collection by it, and registration admits it as input.
+ * in its resource's collection by it, exactly as a get does, and
+ * registration admits it as input.
  *
  * A `delete` at application scope must declare a required parameter too. Its
  * native body is a call on the app: it passes the command's declared
@@ -18,27 +22,34 @@
  *
  * A command that must select an item and declares no such parameter is
  * refused, by generation and by registration alike, through
- * {@link itemSelectionProblem}. Any other command, including an
- * application-scoped `get` or `update`, is a call on the app with its
- * parameters and selects no item, so this rule does not apply to it.
+ * {@link itemSelectionProblem}, unless it is one of the shipped commands
+ * that cannot select their item yet (`KNOWN_ITEM_SELECTION_GAPS`), which stay
+ * offered as a call on the app that sends no item. A resource-scoped `list` or `create` acts on
+ * the collection, and any other application-scoped command, an
+ * application-scoped `get` or `update` included, is a call on the app with
+ * its parameters, so neither selects an item and this rule does not apply to
+ * them.
  *
  * @packageDocumentation
  */
 
 import type { AppManifest } from './schemas/app.js'
 import type { Command, CommandParameter } from './schemas/command.js'
+import { knownItemSelectionGap } from './item-selection-gaps.js'
 import { resolveManifestRoutes } from './route.js'
 
 /**
- * The command names that act on one item of a resource when the command is
- * resource-scoped. A command of any other name selects no item.
+ * The command names that act on a resource's collection rather than on one
+ * of its items when the command is resource-scoped: a `list` reads the
+ * collection and a `create` adds to it. Every other resource-scoped command
+ * selects one item.
  */
-const ITEM_COMMAND_NAMES: readonly string[] = ['get', 'update', 'delete']
+const COLLECTION_COMMAND_NAMES: readonly string[] = ['list', 'create']
 
 /**
- * Whether a command must declare a required identifier parameter: a
- * resource-scoped `get`, `update` or `delete`, or a `delete` at application
- * scope, which has no other way to name what it removes.
+ * Whether a command must declare a required identifier parameter: any
+ * resource-scoped command other than a `list` or `create`, or a `delete` at
+ * application scope, which has no other way to name what it removes.
  *
  * @param command - A manifest command.
  * @returns `true` when the command acts on one item it must name.
@@ -47,7 +58,7 @@ const ITEM_COMMAND_NAMES: readonly string[] = ['get', 'update', 'delete']
  *   {@link itemSelectionProblem} and {@link unselectableItemCommands}.
  */
 export function selectsOneItem(command: Command): boolean {
-  if (command.scope === 'resource') return ITEM_COMMAND_NAMES.includes(command.name)
+  if (command.scope === 'resource') return !COLLECTION_COMMAND_NAMES.includes(command.name)
   return command.name === 'delete'
 }
 
@@ -68,8 +79,8 @@ export function itemIdentifierParameter(command: Command): CommandParameter | un
 
 /**
  * Why a command cannot be offered, when it must name one item
- * (a resource-scoped get, update or delete, or a delete at application
- * scope) and declares no identifier parameter
+ * (a resource-scoped command other than a list or create, or a delete at
+ * application scope) and declares no identifier parameter
  * ({@link itemIdentifierParameter}).
  *
  * @remarks
@@ -88,8 +99,14 @@ export function itemSelectionProblem(commandKey: string, command: Command): stri
   if (command.scope === 'application') {
     return `its application-scoped delete command "${commandKey}" declares no identifier parameter. A delete acts on one item, selected by a required parameter, so without one no item can be selected. Scope "${commandKey}" to the resource whose items it deletes and declare the item's identifier as a required parameter.`
   }
-  return `its ${command.name} command "${commandKey}" declares no identifier parameter. A ${command.name} acts on one item, selected by a required parameter${besideParent}, so without one no item can be selected. Declare the item's identifier as a required parameter of "${commandKey}".`
+  if (CRUD_ITEM_COMMAND_NAMES.includes(command.name)) {
+    return `its ${command.name} command "${commandKey}" declares no identifier parameter. A ${command.name} acts on one item, selected by a required parameter${besideParent}, so without one no item can be selected. Declare the item's identifier as a required parameter of "${commandKey}".`
+  }
+  return `its resource-scoped command "${commandKey}" declares no identifier parameter. A resource-scoped command acts on one item, which the app receives as the command's direct parameter, selected by a required parameter${besideParent}, so without one no item can be selected. Declare the item's identifier as a required parameter of "${commandKey}", as the resource's get declares it.`
 }
+
+/** The item commands that are standard CRUD shapes, whose refusal names the shape. */
+const CRUD_ITEM_COMMAND_NAMES: readonly string[] = ['get', 'update', 'delete']
 
 /** A routed command that must select one item and declares no parameter to do so. */
 export interface UnselectableItemCommand {
@@ -102,12 +119,30 @@ export interface UnselectableItemCommand {
 }
 
 /**
+ * Whether a resource-scoped command acts on one item yet declares no
+ * parameter to select it by, so it sends the app no item. Generation and
+ * registration refuse every such command except the known gaps
+ * (`KNOWN_ITEM_SELECTION_GAPS`), so a generator that meets one is generating
+ * a known gap.
+ *
+ * @param command - A manifest command.
+ */
+export function sendsNoItem(command: Command): boolean {
+  return (
+    command.scope === 'resource' &&
+    selectsOneItem(command) &&
+    itemIdentifierParameter(command) === undefined
+  )
+}
+
+/**
  * The commands of a manifest that would be offered as an operation but cannot
  * select the item they act on, in declaration order, each once.
  *
  * @remarks
  * Only a command with a route is considered: a command or resource marked
- * unsupported is offered nowhere, so it is never refused.
+ * unsupported is offered nowhere, so it is never refused. A known gap
+ * (`knownItemSelectionGap`) is not refused either.
  *
  * @param manifest - A validated app manifest.
  * @returns One entry per such command; empty when every command qualifies.
@@ -115,7 +150,7 @@ export interface UnselectableItemCommand {
 export function unselectableItemCommands(manifest: AppManifest): UnselectableItemCommand[] {
   const found = new Map<string, UnselectableItemCommand>()
   for (const { commandKey, command } of resolveManifestRoutes(manifest)) {
-    if (found.has(commandKey)) continue
+    if (found.has(commandKey) || knownItemSelectionGap(manifest, commandKey) !== undefined) continue
     const problem = itemSelectionProblem(commandKey, command)
     if (problem !== undefined) found.set(commandKey, { commandKey, command, problem })
   }

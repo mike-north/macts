@@ -417,6 +417,9 @@ commands:
     scope: resource
     resourceType: MediaItem
     code: IPXS
+    # The dictionary's `duplicate` takes the media item as its direct parameter
+    # (Photos.sdef:88). `id` selects it as `getMediaItem` does, and is not sent
+    # as a named parameter.
     parameters:
       - name: id
         type: string

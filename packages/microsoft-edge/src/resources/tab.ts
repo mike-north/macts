@@ -71,12 +71,13 @@ export class TabResourceClient {
    * Reload a tab
    */
   async reload(
-    tabId: string,
+    windowId: string,
+    id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.reload`,
-      { tabId },
+      { windowId, id },
       __mactsOptions,
       'Tab'
     )
@@ -86,12 +87,13 @@ export class TabResourceClient {
    * Go Back (If Possible)
    */
   async goBack(
-    tabId: string,
+    windowId: string,
+    id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.goBack`,
-      { tabId },
+      { windowId, id },
       __mactsOptions,
       'Tab'
     )
@@ -101,12 +103,13 @@ export class TabResourceClient {
    * Go Forward (If Possible)
    */
   async goForward(
-    tabId: string,
+    windowId: string,
+    id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.goForward`,
-      { tabId },
+      { windowId, id },
       __mactsOptions,
       'Tab'
     )
@@ -116,12 +119,13 @@ export class TabResourceClient {
    * Select all
    */
   async selectAll(
-    tabId: string,
+    windowId: string,
+    id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.selectAll`,
-      { tabId },
+      { windowId, id },
       __mactsOptions,
       'Tab'
     )
@@ -131,12 +135,13 @@ export class TabResourceClient {
    * Cut selected text (If Possible)
    */
   async cutSelection(
-    tabId: string,
+    windowId: string,
+    id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.cutSelection`,
-      { tabId },
+      { windowId, id },
       __mactsOptions,
       'Tab'
     )
@@ -146,12 +151,13 @@ export class TabResourceClient {
    * Copy text
    */
   async copySelection(
-    tabId: string,
+    windowId: string,
+    id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.copySelection`,
-      { tabId },
+      { windowId, id },
       __mactsOptions,
       'Tab'
     )
@@ -161,12 +167,13 @@ export class TabResourceClient {
    * Paste text (If Possible)
    */
   async pasteSelection(
-    tabId: string,
+    windowId: string,
+    id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.pasteSelection`,
-      { tabId },
+      { windowId, id },
       __mactsOptions,
       'Tab'
     )
@@ -176,12 +183,13 @@ export class TabResourceClient {
    * Undo the last change
    */
   async undo(
-    tabId: string,
+    windowId: string,
+    id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.undo`,
-      { tabId },
+      { windowId, id },
       __mactsOptions,
       'Tab'
     )
@@ -191,12 +199,13 @@ export class TabResourceClient {
    * Redo the last change
    */
   async redo(
-    tabId: string,
+    windowId: string,
+    id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.redo`,
-      { tabId },
+      { windowId, id },
       __mactsOptions,
       'Tab'
     )
@@ -206,12 +215,13 @@ export class TabResourceClient {
    * Stop the current tab from loading
    */
   async stop(
-    tabId: string,
+    windowId: string,
+    id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.stop`,
-      { tabId },
+      { windowId, id },
       __mactsOptions,
       'Tab'
     )
@@ -221,12 +231,13 @@ export class TabResourceClient {
    * View the HTML source of the tab
    */
   async viewSource(
-    tabId: string,
+    windowId: string,
+    id: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.viewSource`,
-      { tabId },
+      { windowId, id },
       __mactsOptions,
       'Tab'
     )
@@ -236,13 +247,14 @@ export class TabResourceClient {
    * Execute a piece of javascript
    */
   async execute(
-    tabId: string,
+    windowId: string,
+    id: string,
     javascript: string,
     __mactsOptions?: import('@macts/contracts').CallOptions
   ): Promise<void> {
     await this.#http.invoke<undefined>(
       `${this.#app}.${this.#resource}.execute`,
-      { tabId, javascript },
+      { windowId, id, javascript },
       __mactsOptions,
       'Tab'
     )

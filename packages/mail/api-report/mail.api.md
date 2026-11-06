@@ -389,7 +389,6 @@ export type MessageCreateInput = Omit<MessageCreateInput_2, 'flagIndex'> & {
 // @public
 export class MessageResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    bounce(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     forward(openingWindow?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     redirect(openingWindow?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     reply(openingWindow?: boolean, replyToAll?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -499,7 +498,7 @@ export interface OutgoingMessageCreateInput {
 // @public
 export class OutgoingMessageResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    send(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    send(id: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public

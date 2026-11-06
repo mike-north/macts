@@ -41,8 +41,8 @@ function expectAdmission(manifest: AppManifest, admitted: boolean): void {
     } else expect(register).toThrow(/parent|hierarchy|identifier/i)
   }
 }
-/** Isolate one CRUD route, retaining get as the positional identity authority. */
-function fixture(operation: 'list' | 'get' | 'create' | 'update' | 'delete') {
+/** Isolate one route, retaining get as the positional identity authority. */
+function fixture(operation: 'list' | 'get' | 'create' | 'update' | 'delete' | 'activate') {
   const manifest = panesManifest()
   const window = required(manifest.resources['Window'])
   manifest.resources['Group'] = { ...window, name: 'Group', plural: 'Groups' }
@@ -66,7 +66,8 @@ function fixture(operation: 'list' | 'get' | 'create' | 'update' | 'delete') {
   }
   return { manifest, key }
 }
-const operations = ['list', 'get', 'create', 'update', 'delete'] as const
+// Non-CRUD commands select one item and must retain the same refusal boundaries.
+const operations = ['list', 'get', 'create', 'update', 'delete', 'activate'] as const
 describe.each(operations)('%s parent reachability', (operation) => {
   it.each([
     'nested-only',

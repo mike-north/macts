@@ -121,21 +121,21 @@ export interface TabCreateInput {
 
 // @public
 export interface TabResourceClient {
-    copySelection(tabId: string, options?: CallOptions): Promise<void>;
+    copySelection(windowId: string, id: string, options?: CallOptions): Promise<void>;
     create(input: TabCreateInput, options?: CallOptions): Promise<Tab>;
-    cutSelection(tabId: string, options?: CallOptions): Promise<void>;
-    execute(tabId: string, javascript: string, options?: CallOptions): Promise<void>;
+    cutSelection(windowId: string, id: string, options?: CallOptions): Promise<void>;
+    execute(windowId: string, id: string, javascript: string, options?: CallOptions): Promise<void>;
     get(windowId: string, id: string, options?: CallOptions): Promise<Tab>;
-    goBack(tabId: string, options?: CallOptions): Promise<void>;
-    goForward(tabId: string, options?: CallOptions): Promise<void>;
+    goBack(windowId: string, id: string, options?: CallOptions): Promise<void>;
+    goForward(windowId: string, id: string, options?: CallOptions): Promise<void>;
     list(windowId: string, options?: CallOptions): Promise<Page<Tab>>;
-    pasteSelection(tabId: string, options?: CallOptions): Promise<void>;
-    redo(tabId: string, options?: CallOptions): Promise<void>;
-    reload(tabId: string, options?: CallOptions): Promise<void>;
-    selectAll(tabId: string, options?: CallOptions): Promise<void>;
-    stop(tabId: string, options?: CallOptions): Promise<void>;
-    undo(tabId: string, options?: CallOptions): Promise<void>;
-    viewSource(tabId: string, options?: CallOptions): Promise<void>;
+    pasteSelection(windowId: string, id: string, options?: CallOptions): Promise<void>;
+    redo(windowId: string, id: string, options?: CallOptions): Promise<void>;
+    reload(windowId: string, id: string, options?: CallOptions): Promise<void>;
+    selectAll(windowId: string, id: string, options?: CallOptions): Promise<void>;
+    stop(windowId: string, id: string, options?: CallOptions): Promise<void>;
+    undo(windowId: string, id: string, options?: CallOptions): Promise<void>;
+    viewSource(windowId: string, id: string, options?: CallOptions): Promise<void>;
 }
 
 // @public

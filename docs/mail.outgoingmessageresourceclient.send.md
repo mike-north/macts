@@ -9,7 +9,7 @@ Sends a message.
 **Signature:**
 
 ```typescript
-send(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+send(id: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -28,6 +28,17 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+id
+
+</td><td>
+
+number
+
+</td><td>
+
+</td></tr>
+<tr><td>
 
 \_\_mactsOptions
 

@@ -1365,6 +1365,18 @@ export const manifest: unknown = {
       resourceType: 'Playlist',
       parameters: [
         {
+          name: 'sourceId',
+          type: 'string',
+          description: 'Persistent ID of the source',
+          required: true,
+        },
+        {
+          name: 'persistentID',
+          type: 'string',
+          description: 'Persistent ID of the playlist',
+          required: true,
+        },
+        {
           name: 'to',
           type: 'string',
           description: 'the new location for the playlist(s)',
@@ -1372,6 +1384,10 @@ export const manifest: unknown = {
           code: 'insh',
         },
       ],
+      parent: {
+        resource: 'Source',
+        parameter: 'sourceId',
+      },
       code: 'move',
     },
     open: {
@@ -1526,6 +1542,18 @@ export const manifest: unknown = {
       resourceType: 'Playlist',
       parameters: [
         {
+          name: 'sourceId',
+          type: 'string',
+          description: 'Persistent ID of the source',
+          required: true,
+        },
+        {
+          name: 'persistentID',
+          type: 'string',
+          description: 'Persistent ID of the playlist',
+          required: true,
+        },
+        {
           name: 'for',
           type: 'string',
           description: 'the search text',
@@ -1540,6 +1568,10 @@ export const manifest: unknown = {
           code: 'pAre',
         },
       ],
+      parent: {
+        resource: 'Source',
+        parameter: 'sourceId',
+      },
       code: 'Srch',
     },
     select: {

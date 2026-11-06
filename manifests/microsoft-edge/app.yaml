@@ -429,8 +429,19 @@ commands:
     scope: resource
     resourceType: Tab
     code: CrSu
+    # The Chromium suite's `reload` takes the tab as its direct parameter
+    # (Chrome.sdef:290; Edge, not installed here, ships the same suite), and a
+    # tab exists only within its window. `windowId` and `id` select it as
+    # `getTab` does, and neither is sent as a named parameter.
+    parent:
+      resource: Window
+      parameter: windowId
     parameters:
-      - name: tabId
+      - name: windowId
+        type: string
+        description: Window identifier
+        required: true
+      - name: id
         type: string
         description: Tab identifier
         required: true
@@ -441,8 +452,19 @@ commands:
     scope: resource
     resourceType: Tab
     code: CrSu
+    # The Chromium suite's `go back` takes the tab as its direct parameter
+    # (Chrome.sdef:294; Edge, not installed here, ships the same suite), and a
+    # tab exists only within its window. `windowId` and `id` select it as
+    # `getTab` does, and neither is sent as a named parameter.
+    parent:
+      resource: Window
+      parameter: windowId
     parameters:
-      - name: tabId
+      - name: windowId
+        type: string
+        description: Window identifier
+        required: true
+      - name: id
         type: string
         description: Tab identifier
         required: true
@@ -453,8 +475,19 @@ commands:
     scope: resource
     resourceType: Tab
     code: CrSu
+    # The Chromium suite's `go forward` takes the tab as its direct parameter
+    # (Chrome.sdef:298; Edge, not installed here, ships the same suite), and a
+    # tab exists only within its window. `windowId` and `id` select it as
+    # `getTab` does, and neither is sent as a named parameter.
+    parent:
+      resource: Window
+      parameter: windowId
     parameters:
-      - name: tabId
+      - name: windowId
+        type: string
+        description: Window identifier
+        required: true
+      - name: id
         type: string
         description: Tab identifier
         required: true
@@ -465,8 +498,19 @@ commands:
     scope: resource
     resourceType: Tab
     code: CrSu
+    # The Chromium suite's `select all` takes the tab as its direct parameter
+    # (Chrome.sdef:302; Edge, not installed here, ships the same suite), and a
+    # tab exists only within its window. `windowId` and `id` select it as
+    # `getTab` does, and neither is sent as a named parameter.
+    parent:
+      resource: Window
+      parameter: windowId
     parameters:
-      - name: tabId
+      - name: windowId
+        type: string
+        description: Window identifier
+        required: true
+      - name: id
         type: string
         description: Tab identifier
         required: true
@@ -477,8 +521,19 @@ commands:
     scope: resource
     resourceType: Tab
     code: CrSu
+    # The Chromium suite's `cut selection` takes the tab as its direct parameter
+    # (Chrome.sdef:306; Edge, not installed here, ships the same suite), and a
+    # tab exists only within its window. `windowId` and `id` select it as
+    # `getTab` does, and neither is sent as a named parameter.
+    parent:
+      resource: Window
+      parameter: windowId
     parameters:
-      - name: tabId
+      - name: windowId
+        type: string
+        description: Window identifier
+        required: true
+      - name: id
         type: string
         description: Tab identifier
         required: true
@@ -489,8 +544,19 @@ commands:
     scope: resource
     resourceType: Tab
     code: CrSu
+    # The Chromium suite's `copy selection` takes the tab as its direct
+    # parameter (Chrome.sdef:310; Edge, not installed here, ships the same
+    # suite), and a tab exists only within its window. `windowId` and `id`
+    # select it as `getTab` does, and neither is sent as a named parameter.
+    parent:
+      resource: Window
+      parameter: windowId
     parameters:
-      - name: tabId
+      - name: windowId
+        type: string
+        description: Window identifier
+        required: true
+      - name: id
         type: string
         description: Tab identifier
         required: true
@@ -501,8 +567,19 @@ commands:
     scope: resource
     resourceType: Tab
     code: CrSu
+    # The Chromium suite's `paste selection` takes the tab as its direct
+    # parameter (Chrome.sdef:314; Edge, not installed here, ships the same
+    # suite), and a tab exists only within its window. `windowId` and `id`
+    # select it as `getTab` does, and neither is sent as a named parameter.
+    parent:
+      resource: Window
+      parameter: windowId
     parameters:
-      - name: tabId
+      - name: windowId
+        type: string
+        description: Window identifier
+        required: true
+      - name: id
         type: string
         description: Tab identifier
         required: true
@@ -513,8 +590,19 @@ commands:
     scope: resource
     resourceType: Tab
     code: CrSu
+    # The Chromium suite's `undo` takes the tab as its direct parameter
+    # (Chrome.sdef:318; Edge, not installed here, ships the same suite), and a
+    # tab exists only within its window. `windowId` and `id` select it as
+    # `getTab` does, and neither is sent as a named parameter.
+    parent:
+      resource: Window
+      parameter: windowId
     parameters:
-      - name: tabId
+      - name: windowId
+        type: string
+        description: Window identifier
+        required: true
+      - name: id
         type: string
         description: Tab identifier
         required: true
@@ -525,8 +613,19 @@ commands:
     scope: resource
     resourceType: Tab
     code: CrSu
+    # The Chromium suite's `redo` takes the tab as its direct parameter
+    # (Chrome.sdef:322; Edge, not installed here, ships the same suite), and a
+    # tab exists only within its window. `windowId` and `id` select it as
+    # `getTab` does, and neither is sent as a named parameter.
+    parent:
+      resource: Window
+      parameter: windowId
     parameters:
-      - name: tabId
+      - name: windowId
+        type: string
+        description: Window identifier
+        required: true
+      - name: id
         type: string
         description: Tab identifier
         required: true
@@ -537,8 +636,19 @@ commands:
     scope: resource
     resourceType: Tab
     code: CrSu
+    # The Chromium suite's `stop` takes the tab as its direct parameter
+    # (Chrome.sdef:326; Edge, not installed here, ships the same suite), and a
+    # tab exists only within its window. `windowId` and `id` select it as
+    # `getTab` does, and neither is sent as a named parameter.
+    parent:
+      resource: Window
+      parameter: windowId
     parameters:
-      - name: tabId
+      - name: windowId
+        type: string
+        description: Window identifier
+        required: true
+      - name: id
         type: string
         description: Tab identifier
         required: true
@@ -549,8 +659,19 @@ commands:
     scope: resource
     resourceType: Tab
     code: CrSu
+    # The Chromium suite's `view source` takes the tab as its direct parameter
+    # (Chrome.sdef:330; Edge, not installed here, ships the same suite), and a
+    # tab exists only within its window. `windowId` and `id` select it as
+    # `getTab` does, and neither is sent as a named parameter.
+    parent:
+      resource: Window
+      parameter: windowId
     parameters:
-      - name: tabId
+      - name: windowId
+        type: string
+        description: Window identifier
+        required: true
+      - name: id
         type: string
         description: Tab identifier
         required: true
@@ -561,8 +682,19 @@ commands:
     scope: resource
     resourceType: Tab
     code: CrSu
+    # The Chromium suite's `execute` takes the tab as its direct parameter
+    # (Chrome.sdef:334; Edge, not installed here, ships the same suite), and a
+    # tab exists only within its window. `windowId` and `id` select it as
+    # `getTab` does, and neither is sent as a named parameter.
+    parent:
+      resource: Window
+      parameter: windowId
     parameters:
-      - name: tabId
+      - name: windowId
+        type: string
+        description: Window identifier
+        required: true
+      - name: id
         type: string
         description: Tab identifier
         required: true

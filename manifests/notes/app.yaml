@@ -395,6 +395,9 @@ commands:
     description: Show a note in the Notes app
     scope: resource
     resourceType: Note
+    # The dictionary's `show` takes the note as its direct parameter
+    # (Notes.sdef:18). `name` selects it as `get` does, and is not sent as a
+    # named parameter.
     parameters:
       - name: name
         type: string

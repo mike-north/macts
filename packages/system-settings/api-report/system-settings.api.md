@@ -64,13 +64,6 @@ export interface Pane {
 export type PaneCreateInput = Record<string, never>;
 
 // @public
-export class PaneResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    authorize(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    timedLoad(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-}
-
-// @public
 export const PaneSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
@@ -87,7 +80,6 @@ export interface SystemSettingsClient extends ClientBrand<SystemSettingsResource
 export class SystemSettingsClient {
     constructor(options: SystemSettingsClientOptions);
     get http(): HttpClient;
-    readonly panes: PaneResourceClient;
     reveal(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 

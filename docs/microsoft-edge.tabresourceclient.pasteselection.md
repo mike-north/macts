@@ -9,7 +9,7 @@ Paste text (If Possible)
 **Signature:**
 
 ```typescript
-pasteSelection(tabId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+pasteSelection(windowId: string, id: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 ```
 
 ## Parameters
@@ -29,7 +29,18 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-tabId
+windowId
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+id
 
 </td><td>
 

@@ -50,6 +50,23 @@ Is the disk item busy? Nullable. No evidence that the app always sets it.
 </td></tr>
 <tr><td>
 
+[container](./system-events.diskitem.container.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[DiskItem](./system-events.diskitem.md)<!-- -->, string, 'DiskItem'&gt; \| null
+
+</td><td>
+
+the folder or disk which has this disk item as an element. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
 [creationDate](./system-events.diskitem.creationdate.md)
 
 </td><td>
@@ -92,11 +109,11 @@ the name of the disk item as displayed in the User Interface. Nullable. No evide
 
 </td><td>
 
-string
+string \| null
 
 </td><td>
 
-the unique ID of the disk item. Never null: the primary identifier.
+the unique ID of the disk item. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -199,7 +216,7 @@ the actual space used by the disk item on disk. Nullable. No evidence that the a
 </td></tr>
 <tr><td>
 
-[pOSIXPath](./system-events.diskitem.posixpath.md)
+[posixPath](./system-events.diskitem.posixpath.md)
 
 </td><td>
 
@@ -207,11 +224,11 @@ the actual space used by the disk item on disk. Nullable. No evidence that the a
 
 </td><td>
 
-string \| null
+string
 
 </td><td>
 
-the POSIX file system path of the disk item. Nullable. No evidence that the app always sets it.
+the POSIX file system path of the disk item. Never null: the primary identifier.
 
 </td></tr>
 <tr><td>

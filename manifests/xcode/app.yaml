@@ -932,8 +932,11 @@ commands:
     scope: resource
     resourceType: WorkspaceDocument
     code: xcod
+    # The dictionary says `build` should be sent to a workspace document, its
+    # direct parameter (Xcode.sdef:331). `name` selects the document as
+    # `getWorkspaceDocument` does, and is not sent as a named parameter.
     parameters:
-      - name: workspaceName
+      - name: name
         type: string
         description: Workspace document name
         required: true
@@ -945,8 +948,11 @@ commands:
     scope: resource
     resourceType: WorkspaceDocument
     code: xcod
+    # The dictionary says `clean` should be sent to a workspace document, its
+    # direct parameter (Xcode.sdef:351). `name` selects the document as
+    # `getWorkspaceDocument` does, and is not sent as a named parameter.
     parameters:
-      - name: workspaceName
+      - name: name
         type: string
         description: Workspace document name
         required: true
@@ -958,8 +964,11 @@ commands:
     scope: resource
     resourceType: WorkspaceDocument
     code: xcod
+    # The dictionary says `stop` should be sent to a workspace document, its
+    # direct parameter (Xcode.sdef:355). `name` selects the document as
+    # `getWorkspaceDocument` does, and is not sent as a named parameter.
     parameters:
-      - name: workspaceName
+      - name: name
         type: string
         description: Workspace document name
         required: true
@@ -971,8 +980,11 @@ commands:
     scope: resource
     resourceType: WorkspaceDocument
     code: xcod
+    # The dictionary says `run` should be sent to a workspace document, its
+    # direct parameter (Xcode.sdef:358). `name` selects the document as
+    # `getWorkspaceDocument` does, and is not sent as a named parameter.
     parameters:
-      - name: workspaceName
+      - name: name
         type: string
         description: Workspace document name
         required: true
@@ -992,8 +1004,11 @@ commands:
     scope: resource
     resourceType: WorkspaceDocument
     code: xcod
+    # The dictionary says `test` should be sent to a workspace document, its
+    # direct parameter (Xcode.sdef:368). `name` selects the document as
+    # `getWorkspaceDocument` does, and is not sent as a named parameter.
     parameters:
-      - name: workspaceName
+      - name: name
         type: string
         description: Workspace document name
         required: true
@@ -1013,8 +1028,11 @@ commands:
     scope: resource
     resourceType: WorkspaceDocument
     code: xcod
+    # The dictionary says `attach` should be sent to a workspace document, its
+    # direct parameter (Xcode.sdef:378). `name` selects the document as
+    # `getWorkspaceDocument` does, and is not sent as a named parameter.
     parameters:
-      - name: workspaceName
+      - name: name
         type: string
         description: Workspace document name
         required: true
@@ -1034,8 +1052,11 @@ commands:
     scope: resource
     resourceType: WorkspaceDocument
     code: xcod
+    # The dictionary says `debug` should be sent to a workspace document, its
+    # direct parameter (Xcode.sdef:387). `name` selects the document as
+    # `getWorkspaceDocument` does, and is not sent as a named parameter.
     parameters:
-      - name: workspaceName
+      - name: name
         type: string
         description: Workspace document name
         required: true

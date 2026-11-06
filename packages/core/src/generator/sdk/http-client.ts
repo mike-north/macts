@@ -30,6 +30,8 @@ import {
   findCrudCommand,
   generationRefusals,
   firstMatchNote,
+  resourceCommandNotes,
+  describedSentences,
   identifierWords,
   isCrudName,
   listMethodParameters,
@@ -659,7 +661,12 @@ function generateResourceClient(
 
   const commandMethods = resourceCommands
     .map(([key, cmd]) =>
-      generateResourceCommandMethod(commandRouteSegment(key, cmd), cmd, resourceName)
+      generateResourceCommandMethod(
+        commandRouteSegment(key, cmd),
+        cmd,
+        resourceName,
+        resourceCommandNotes(cmd, resource, manifest)
+      )
     )
     .join('\n')
 
@@ -899,8 +906,9 @@ function uniquePageBinding(taken: readonly string[]): string {
 }
 
 /**
- * The doc comment lines a CRUD method adds for its first-match `notes`
- * ({@link firstMatchNote}, {@link parentFirstMatchNote}), one per note, or
+ * The doc comment lines a method that acts on one item, or within a parent,
+ * adds for its `notes` ({@link firstMatchNote}, {@link parentFirstMatchNote},
+ * or a resource command's {@link resourceCommandNotes}), one per note, or
  * nothing when there are none.
  */
 function docNoteLines(notes: readonly string[]): string {
@@ -1203,7 +1211,8 @@ function buildParamsAndBody(
 function generateResourceCommandMethod(
   routeSegment: string,
   cmd: Command,
-  resourceName: string
+  resourceName: string,
+  notes: readonly string[]
 ): string {
   // Skip standard CRUD commands as they're already generated
   if (isCrudName(cmd.name)) {
@@ -1227,7 +1236,7 @@ function generateResourceCommandMethod(
 
   return `
   /**
-   * ${cmd.description}
+   * ${describedSentences(cmd.description, notes).join('\n   * ')}
    */
   async ${safeIdentifier(cmd.name)}(${signature}): Promise<${returnType}> {
     ${rpcCall}
