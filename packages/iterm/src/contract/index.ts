@@ -128,25 +128,29 @@ export interface Window {
    */
   hotkeyWindowProfile: string | null
   /**
-   * The position of the window, relative to the upper left corner of the screen.
+   * Deprecated compatibility position relative to the upper left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
    * Nullable. No evidence that the app always sets it.
    */
-  position: Point | null
+  position?: Point | null
   /**
-   * The position of the window, relative to the lower left corner of the screen.
+   * Deprecated compatibility position relative to the lower left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
    * Nullable. No evidence that the app always sets it.
    */
-  origin: Point | null
+  origin?: Point | null
   /**
-   * The width and height of the window.
+   * Deprecated compatibility width and height of the window. Use bounds instead. Omitted when iTerm
+   * cannot report it.
    * Nullable. No evidence that the app always sets it.
    */
-  size: Point | null
+  size?: Point | null
   /**
-   * The bounding rectangle, relative to the lower left corner of the screen.
+   * Deprecated compatibility rectangle relative to the lower left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
    * Nullable. No evidence that the app always sets it.
    */
-  frame: Rectangle | null
+  frame?: Rectangle | null
 }
 
 /** A terminal tab */
@@ -389,13 +393,25 @@ export interface WindowCreateInput {
    * If the window is a hotkey window, this gives the name of the profile that created the window.
    */
   hotkeyWindowProfile?: string
-  /** The position of the window, relative to the upper left corner of the screen. */
+  /**
+   * Deprecated compatibility position relative to the upper left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
+   */
   position?: Point
-  /** The position of the window, relative to the lower left corner of the screen. */
+  /**
+   * Deprecated compatibility position relative to the lower left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
+   */
   origin?: Point
-  /** The width and height of the window */
+  /**
+   * Deprecated compatibility width and height of the window. Use bounds instead. Omitted when iTerm
+   * cannot report it.
+   */
   size?: Point
-  /** The bounding rectangle, relative to the lower left corner of the screen. */
+  /**
+   * Deprecated compatibility rectangle relative to the lower left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
+   */
   frame?: Rectangle
 }
 
@@ -447,22 +463,26 @@ export interface WindowUpdateInput {
    */
   hotkeyWindowProfile?: string
   /**
-   * The position of the window, relative to the upper left corner of the screen.
+   * Deprecated compatibility position relative to the upper left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
    * Cannot be reset: null is rejected.
    */
   position?: Point
   /**
-   * The position of the window, relative to the lower left corner of the screen.
+   * Deprecated compatibility position relative to the lower left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
    * Cannot be reset: null is rejected.
    */
   origin?: Point
   /**
-   * The width and height of the window.
+   * Deprecated compatibility width and height of the window. Use bounds instead. Omitted when iTerm
+   * cannot report it.
    * Cannot be reset: null is rejected.
    */
   size?: Point
   /**
-   * The bounding rectangle, relative to the lower left corner of the screen.
+   * Deprecated compatibility rectangle relative to the lower left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
    * Cannot be reset: null is rejected.
    */
   frame?: Rectangle
@@ -993,16 +1013,30 @@ const windowRecordType: ValueType<Window> = t.record(
       description:
         'If the window is a hotkey window, this gives the name of the profile that created the window.',
     }),
-    position: t.nullable(t.point(), {
-      description: 'The position of the window, relative to the upper left corner of the screen.',
-    }),
-    origin: t.nullable(t.point(), {
-      description: 'The position of the window, relative to the lower left corner of the screen.',
-    }),
-    size: t.nullable(t.point(), { description: 'The width and height of the window' }),
-    frame: t.nullable(t.rectangle(), {
-      description: 'The bounding rectangle, relative to the lower left corner of the screen.',
-    }),
+    position: t.optional(
+      t.nullable(t.point(), {
+        description:
+          'Deprecated compatibility position relative to the upper left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it.',
+      })
+    ),
+    origin: t.optional(
+      t.nullable(t.point(), {
+        description:
+          'Deprecated compatibility position relative to the lower left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it.',
+      })
+    ),
+    size: t.optional(
+      t.nullable(t.point(), {
+        description:
+          'Deprecated compatibility width and height of the window. Use bounds instead. Omitted when iTerm cannot report it.',
+      })
+    ),
+    frame: t.optional(
+      t.nullable(t.rectangle(), {
+        description:
+          'Deprecated compatibility rectangle relative to the lower left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it.',
+      })
+    ),
   },
   { description: 'A window.' }
 )

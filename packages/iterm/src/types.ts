@@ -98,10 +98,12 @@ export const WindowSchema = z.object({
   currentTab: z.string(),
   isHotkeyWindow: z.boolean(),
   hotkeyWindowProfile: z.string(),
-  position: z.object({ x: z.number(), y: z.number() }),
-  origin: z.object({ x: z.number(), y: z.number() }),
-  size: z.object({ x: z.number(), y: z.number() }),
-  frame: z.object({ x: z.number(), y: z.number(), width: z.number(), height: z.number() }),
+  position: z.object({ x: z.number(), y: z.number() }).optional(),
+  origin: z.object({ x: z.number(), y: z.number() }).optional(),
+  size: z.object({ x: z.number(), y: z.number() }).optional(),
+  frame: z
+    .object({ x: z.number(), y: z.number(), width: z.number(), height: z.number() })
+    .optional(),
 })
 
 /** Raw passthrough validator; typed SDK records use the canonical contract codec. */

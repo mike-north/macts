@@ -11,3 +11,5 @@ iTerm windows and tabs can now be read:
 iTerm gives a tab no id, so a tab is selected by its zero-based position within its window. A window's `currentTab` is returned as a selector for that position within the window, and resolves to the tab there.
 
 A position is not a lasting name for a tab: it drifts when tabs open, close or move, so a position kept for later may select a different tab.
+
+The deprecated compatibility geometry fields `position`, `origin`, `size` and `frame` remain available when iTerm reports them and are omitted when unavailable. Use `bounds` for the window rectangle.

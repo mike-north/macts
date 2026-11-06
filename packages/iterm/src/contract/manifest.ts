@@ -196,31 +196,45 @@ export const manifest: unknown = {
           access: 'rw',
           type: 'point',
           description:
-            'The position of the window, relative to the upper left corner of the screen.',
+            'Deprecated compatibility position relative to the upper left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it.',
           code: 'ppos',
-          optional: false,
+          optional: true,
+          deprecated: {
+            message: 'Use bounds instead.',
+          },
         },
         origin: {
           access: 'rw',
           type: 'point',
           description:
-            'The position of the window, relative to the lower left corner of the screen.',
+            'Deprecated compatibility position relative to the lower left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it.',
           code: 'pori',
-          optional: false,
+          optional: true,
+          deprecated: {
+            message: 'Use bounds instead.',
+          },
         },
         size: {
           access: 'rw',
           type: 'point',
-          description: 'The width and height of the window',
+          description:
+            'Deprecated compatibility width and height of the window. Use bounds instead. Omitted when iTerm cannot report it.',
           code: 'psiz',
-          optional: false,
+          optional: true,
+          deprecated: {
+            message: 'Use bounds instead.',
+          },
         },
         frame: {
           access: 'rw',
           type: 'rect',
-          description: 'The bounding rectangle, relative to the lower left corner of the screen.',
+          description:
+            'Deprecated compatibility rectangle relative to the lower left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it.',
           code: 'pfra',
-          optional: false,
+          optional: true,
+          deprecated: {
+            message: 'Use bounds instead.',
+          },
         },
       },
       identifiers: [
@@ -263,8 +277,8 @@ export const manifest: unknown = {
       positional: {
         evidence: {
           source: 'curated',
-          note: "Observed on 2026-11-04 on iTerm 3.7.6, macOS 27.2, iTerm launched then quit, read only: 5 windows, 1 tab each. Window ids were integers and distinct, and windows.byId(id) round-tripped 5 of 5. Window index values were 1..5, one-based; tab index was 0, zero-based. currentTab read back as windows.byId(N).tabs.at(N), with N equal to the tab's index. tabs.at(N) gave the same tab (the same session ids) on 5 of 5. 2+ tabs per window were not observed.",
-          observedAt: '2026-11-04T00:00:00.000Z',
+          note: "Initially observed on 2026-11-04 on iTerm 3.7.6: five windows with one tab each, integer Window identities and currentTab specifiers addressing tabs within windows. Metadata-only validation on 2026-11-05 created two owned windows and three tabs in one: the selected second and third tabs used zero-based positions 1 and 2 within their own window. Selecting the third tab and closing earlier owned tabs shifted its position to 1 and then 0. The sibling window retained its own tab at position 0. The dictionary's index property was not used for addressing. Owned windows were removed and baseline windows preserved. No session or window/tab text was read. This validates adapter metadata and drift, not complete SDK record hydration.",
+          observedAt: '2026-11-05T21:19:08.471Z',
           appVersion: '3.7.6',
         },
       },

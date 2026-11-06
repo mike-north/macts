@@ -44,6 +44,7 @@ import {
   InternalError,
   InvalidSelectionError,
   TargetNotFoundError,
+  UnexpectedValueError,
 } from '@macts/contracts'
 import { iTermContract, type iTermClient } from '@macts/iterm/contract'
 import {
@@ -93,11 +94,64 @@ function nullFields(keys: readonly string[], known: readonly string[]): Record<s
   return Object.fromEntries(keys.filter((key) => !known.includes(key)).map((key) => [key, null]))
 }
 
+/** Mutable app metadata seen on each request; geometry cases model dictionary compatibility reads. */
+interface IWindowState {
+  id: number | null
+  windows?: readonly StandInPaneWindow[]
+  geometry?: 'readable' | 'unavailable' | 'invalid'
+}
+
+/** Geometry exposed by the supported bounds getter; expected values are independent of generated code. */
+const BOUNDS = { x: 10, y: 20, width: 300, height: 200 }
+/** Deprecated compatibility getters can be unavailable independently of bounds. */
+const COMPATIBILITY_GEOMETRY = ['position', 'origin', 'size', 'frame'] as const
+
+/** Preserve the host's failed getter behavior without invoking a real application. */
+function withUnavailableGeometry(app: object): object {
+  const windows: unknown = Reflect.get(app, 'windows')
+  if (typeof windows !== 'function') throw new Error('Expected a stand-in Window collection')
+  const wrap = (item: unknown): unknown => {
+    if (typeof item !== 'object' || item === null) return item
+    return new Proxy(item, {
+      get(target, key, receiver) {
+        if (typeof key === 'string' && COMPATIBILITY_GEOMETRY.some((field) => field === key)) {
+          return () => {
+            throw Object.assign(new Error('Compatibility getter unavailable'), {
+              errorNumber: -10000,
+            })
+          }
+        }
+        const member: unknown = Reflect.get(target, key, receiver)
+        return member
+      },
+    })
+  }
+  return {
+    ...app,
+    // Proxy a fresh forwarding callable: the original fixture collection has
+    // frozen lookup members whose values a proxy is forbidden to replace.
+    windows: new Proxy(
+      (...args: unknown[]): unknown => {
+        const value: unknown = Reflect.apply(windows, undefined, args)
+        return value
+      },
+      {
+        get(_target, key) {
+          const member: unknown = Reflect.get(windows, key, windows)
+          if (key !== 'byId' || typeof member !== 'function') return member
+          return (...args: unknown[]) => wrap(Reflect.apply(member, windows, args))
+        },
+        apply(_target, receiver, args) {
+          const result: unknown = Reflect.apply(windows, receiver, args)
+          return Array.isArray(result) ? result.map(wrap) : result
+        },
+      }
+    ),
+  }
+}
+
 /** A native executor against a stand-in iTerm holding {@link WINDOWS}. */
-async function standInExecutor(
-  lookups: string[],
-  current: { id: number | null; windows?: readonly StandInPaneWindow[] } = { id: 8 }
-) {
+async function standInExecutor(lookups: string[], current: IWindowState = { id: 8 }) {
   const manifest = await itermManifest()
   const windowKeys = nativeReadKeys(manifest, 'Window', manifest.resources['Window'])
   const tabKeys = nativeReadKeys(manifest, 'Tab', manifest.resources['Tab'])
@@ -110,11 +164,30 @@ async function standInExecutor(
           lookups,
           display: (windowId, position) =>
             `Application("iTerm").windows.byId(${String(windowId)}).tabs.at(${String(position)})`,
-          windowFields: nullFields(windowKeys.get, ['id', 'name', 'currentTab']),
+          windowFields: {
+            ...nullFields(windowKeys.get, ['id', 'name', 'currentTab']),
+            ...(current.geometry === undefined
+              ? {}
+              : {
+                  bounds: BOUNDS,
+                  position: current.geometry === 'unavailable' ? undefined : { x: 10, y: 20 },
+                  origin: current.geometry === 'unavailable' ? undefined : { x: 10, y: 50 },
+                  size: current.geometry === 'unavailable' ? undefined : { x: 300, y: 200 },
+                  frame:
+                    current.geometry === 'unavailable'
+                      ? undefined
+                      : current.geometry === 'invalid'
+                        ? 'malformed'
+                        : BOUNDS,
+                }),
+          },
           tabFields: nullFields(tabKeys.get, ['index', 'title']),
         })
         return standInTransport(
-          { ...app, currentWindow: () => (current.id === null ? null : { id: () => current.id }) },
+          {
+            ...(current.geometry === 'unavailable' ? withUnavailableGeometry(app) : app),
+            currentWindow: () => (current.id === null ? null : { id: () => current.id }),
+          },
           [],
           automation
         ).run(script, options)
@@ -135,10 +208,7 @@ const PERMISSIONS = [
 /** A client of each locality, both over a stand-in iTerm that records its lookups. */
 const FACTORIES: readonly {
   readonly name: string
-  readonly build: (
-    lookups: string[],
-    current?: { id: number | null; windows?: readonly StandInPaneWindow[] }
-  ) => Promise<iTermClient>
+  readonly build: (lookups: string[], current?: IWindowState) => Promise<iTermClient>
 }[] = [
   {
     name: 'the local client',
@@ -254,6 +324,19 @@ describe('the generated iTerm contract', () => {
       expect(output?.wire.safeParse({ reference: invalid }).success, JSON.stringify(invalid)).toBe(
         false
       )
+  })
+
+  it('keeps bounds required while compatibility geometry may be absent', () => {
+    const output = iTermContract.operations['iterm.windows.get']?.output
+    const plan = iTermContract.resources.Window.record.plan
+    const keys = plan.kind === 'record' ? Object.keys(plan.fields) : []
+    const record = {
+      ...nullFields(keys, ['bounds', ...COMPATIBILITY_GEOMETRY]),
+      id: { integer: '8' },
+    }
+    expect(output?.wire.safeParse(record).success).toBe(false)
+    expect(output?.wire.safeParse({ ...record, bounds: null }).success).toBe(true)
+    expect(output?.wire.safeParse({ ...record, bounds: 'malformed' }).success).toBe(false)
   })
 
   it('gets a tab by its window and its position', () => {
@@ -452,3 +535,39 @@ describe.each(FACTORIES)(
     })
   }
 )
+
+/** Deprecated getters may be absent; present geometry remains validated and never derived from bounds. */
+describe.each(FACTORIES)('compatibility geometry availability, through $name', ({ build }) => {
+  it('hydrates windows and current tabs while omitting failed deprecated getters instead of inventing null', async () => {
+    const client = await build([], { id: 8, geometry: 'unavailable' })
+    const window = await client.windows.get(int(8))
+    expect(window.bounds).toEqual(BOUNDS)
+    for (const field of COMPATIBILITY_GEOMETRY) expect(window).not.toHaveProperty(field)
+    expect(window.currentTab).toMatchObject(tabAt(8, 1))
+    expect((await window.currentTab?.resolve())?.title).toBe('Tests')
+    const current = await (await client.currentWindow())?.resolve()
+    expect(current?.bounds).toEqual(BOUNDS)
+    const page = await client.windows.list()
+    expect(page.items).toHaveLength(2)
+    for (const item of page.items) {
+      expect(item.bounds).toEqual(BOUNDS)
+      for (const field of COMPATIBILITY_GEOMETRY) expect(item).not.toHaveProperty(field)
+    }
+  })
+
+  it('preserves compatibility values when the app reports them', async () => {
+    const client = await build([], { id: 8, geometry: 'readable' })
+    await expect(client.windows.get(int(8))).resolves.toMatchObject({
+      bounds: BOUNDS,
+      position: { x: 10, y: 20 },
+      origin: { x: 10, y: 50 },
+      size: { x: 300, y: 200 },
+      frame: BOUNDS,
+    })
+  })
+
+  it('rejects invalid present compatibility geometry rather than treating it as absent', async () => {
+    const client = await build([], { id: 8, geometry: 'invalid' })
+    await expect(client.windows.get(int(8))).rejects.toBeInstanceOf(UnexpectedValueError)
+  })
+})

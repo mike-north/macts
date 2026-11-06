@@ -170,9 +170,9 @@ export interface Session {
 // Warning: (ae-forgotten-export) The symbol "SessionCreateInput_2" needs to be exported by the entry point index.d.ts
 //
 // @public
-export type SessionCreateInput = Omit<SessionCreateInput_2, "columns" | "rows"> & {
-    "columns"?: null extends SessionCreateInput_2["columns"] ? number | null : number;
-    "rows"?: null extends SessionCreateInput_2["rows"] ? number | null : number;
+export type SessionCreateInput = Omit<SessionCreateInput_2, 'columns' | 'rows'> & {
+    columns?: null extends SessionCreateInput_2['columns'] ? number | null : number;
+    rows?: null extends SessionCreateInput_2['rows'] ? number | null : number;
 };
 
 // @public
@@ -318,9 +318,9 @@ export const SessionSchema: z.ZodObject<{
 // Warning: (ae-forgotten-export) The symbol "SessionUpdateInput_2" needs to be exported by the entry point index.d.ts
 //
 // @public
-export type SessionUpdateInput = Omit<SessionUpdateInput_2, "columns" | "rows"> & {
-    "columns"?: null extends SessionUpdateInput_2["columns"] ? number | null : number;
-    "rows"?: null extends SessionUpdateInput_2["rows"] ? number | null : number;
+export type SessionUpdateInput = Omit<SessionUpdateInput_2, 'columns' | 'rows'> & {
+    columns?: null extends SessionUpdateInput_2['columns'] ? number | null : number;
+    rows?: null extends SessionUpdateInput_2['rows'] ? number | null : number;
 };
 
 // @public
@@ -332,8 +332,8 @@ export interface Tab {
 // Warning: (ae-forgotten-export) The symbol "TabCreateInput_2" needs to be exported by the entry point index.d.ts
 //
 // @public
-export type TabCreateInput = Omit<TabCreateInput_2, "index"> & {
-    "index"?: null extends TabCreateInput_2["index"] ? number | null : number;
+export type TabCreateInput = Omit<TabCreateInput_2, 'index'> & {
+    index?: null extends TabCreateInput_2['index'] ? number | null : number;
 };
 
 // @public
@@ -352,8 +352,8 @@ export const TabSchema: z.ZodObject<{
 // Warning: (ae-forgotten-export) The symbol "TabUpdateInput_2" needs to be exported by the entry point index.d.ts
 //
 // @public
-export type TabUpdateInput = Omit<TabUpdateInput_2, "index"> & {
-    "index"?: null extends TabUpdateInput_2["index"] ? number | null : number;
+export type TabUpdateInput = Omit<TabUpdateInput_2, 'index'> & {
+    index?: null extends TabUpdateInput_2['index'] ? number | null : number;
 };
 
 // @public
@@ -362,7 +362,7 @@ export interface Window {
     bounds: Rectangle | null;
     readonly closeable: boolean | null;
     currentTab: IndexSelectorReference<Tab, 'Tab'> | null;
-    frame: Rectangle | null;
+    frame?: Rectangle | null;
     frontmost: boolean | null;
     hotkeyWindowProfile: string | null;
     readonly id: Integer;
@@ -371,10 +371,10 @@ export interface Window {
     readonly miniaturizable: boolean | null;
     miniaturized: boolean | null;
     readonly name: string | null;
-    origin: Point | null;
-    position: Point | null;
+    origin?: Point | null;
+    position?: Point | null;
     readonly resizable: boolean | null;
-    size: Point | null;
+    size?: Point | null;
     visible: boolean | null;
     readonly zoomable: boolean | null;
     zoomed: boolean | null;
@@ -383,8 +383,8 @@ export interface Window {
 // Warning: (ae-forgotten-export) The symbol "WindowCreateInput_2" needs to be exported by the entry point index.d.ts
 //
 // @public
-export type WindowCreateInput = Omit<WindowCreateInput_2, "index"> & {
-    "index"?: null extends WindowCreateInput_2["index"] ? number | null : number;
+export type WindowCreateInput = Omit<WindowCreateInput_2, 'index'> & {
+    index?: null extends WindowCreateInput_2['index'] ? number | null : number;
 };
 
 // @public
@@ -417,31 +417,31 @@ export const WindowSchema: z.ZodObject<{
     currentTab: z.ZodString;
     isHotkeyWindow: z.ZodBoolean;
     hotkeyWindowProfile: z.ZodString;
-    position: z.ZodObject<{
+    position: z.ZodOptional<z.ZodObject<{
         x: z.ZodNumber;
         y: z.ZodNumber;
-    }, z.core.$strip>;
-    origin: z.ZodObject<{
+    }, z.core.$strip>>;
+    origin: z.ZodOptional<z.ZodObject<{
         x: z.ZodNumber;
         y: z.ZodNumber;
-    }, z.core.$strip>;
-    size: z.ZodObject<{
+    }, z.core.$strip>>;
+    size: z.ZodOptional<z.ZodObject<{
         x: z.ZodNumber;
         y: z.ZodNumber;
-    }, z.core.$strip>;
-    frame: z.ZodObject<{
+    }, z.core.$strip>>;
+    frame: z.ZodOptional<z.ZodObject<{
         x: z.ZodNumber;
         y: z.ZodNumber;
         width: z.ZodNumber;
         height: z.ZodNumber;
-    }, z.core.$strip>;
+    }, z.core.$strip>>;
 }, z.core.$strip>;
 
 // Warning: (ae-forgotten-export) The symbol "WindowUpdateInput_2" needs to be exported by the entry point index.d.ts
 //
 // @public
-export type WindowUpdateInput = Omit<WindowUpdateInput_2, "index"> & {
-    "index"?: null extends WindowUpdateInput_2["index"] ? number | null : number;
+export type WindowUpdateInput = Omit<WindowUpdateInput_2, 'index'> & {
+    index?: null extends WindowUpdateInput_2['index'] ? number | null : number;
 };
 
 // (No @packageDocumentation comment for this package)

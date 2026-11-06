@@ -228,7 +228,7 @@ export interface Window {
     bounds: Rectangle | null;
     readonly closeable: boolean | null;
     currentTab: IndexSelectorReference<Tab, 'Tab'> | null;
-    frame: Rectangle | null;
+    frame?: Rectangle | null;
     frontmost: boolean | null;
     hotkeyWindowProfile: string | null;
     readonly id: Integer;
@@ -237,10 +237,10 @@ export interface Window {
     readonly miniaturizable: boolean | null;
     miniaturized: boolean | null;
     readonly name: string | null;
-    origin: Point | null;
-    position: Point | null;
+    origin?: Point | null;
+    position?: Point | null;
     readonly resizable: boolean | null;
-    size: Point | null;
+    size?: Point | null;
     visible: boolean | null;
     readonly zoomable: boolean | null;
     zoomed: boolean | null;
