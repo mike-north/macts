@@ -255,11 +255,13 @@ describe('output references in every real contract', () => {
     expect(found).toEqual([])
     // Guards against a vacuous pass: the references above, each on a record
     // that some operation returns. Chrome and iTerm get and list windows; Edge
-    // also creates one, and returns its record.
+    // also creates one, and returns its record. The current-window getter returns
+    // a top-level Window identity, without requiring a containing record.
     expect([...checked].sort()).toEqual(
       [
         'google-chrome.windows.get → Tab',
         'google-chrome.windows.list → Tab',
+        'iterm.app.currentWindow → Window',
         'iterm.windows.get → Tab',
         'iterm.windows.list → Tab',
         'microsoft-edge.windows.create → Tab',
