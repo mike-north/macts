@@ -19,9 +19,9 @@ export class CurrentWindowCommand extends Command {
 
     try {
       const client = getClient()
-      await client.currentWindow()
+      const result = await client.currentWindow()
 
-      const output = formatter.formatSuccess('currentWindow completed successfully')
+      const output = formatter.format(result)
       this.context.stdout.write(output + '\n')
       return 0
     } catch (error) {
