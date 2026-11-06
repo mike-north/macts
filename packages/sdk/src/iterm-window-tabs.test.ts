@@ -47,6 +47,7 @@ import {
   UnexpectedValueError,
 } from '@macts/contracts'
 import { iTermContract, type iTermClient } from '@macts/iterm/contract'
+import { plugin as itermCliPlugin } from '@macts/iterm/cli'
 import {
   ALLOW_ALL_POLICY,
   closeKeyStore,
@@ -569,5 +570,114 @@ describe.each(FACTORIES)('compatibility geometry availability, through $name', (
   it('rejects invalid present compatibility geometry rather than treating it as absent', async () => {
     const client = await build([], { id: 8, geometry: 'invalid' })
     await expect(client.windows.get(int(8))).rejects.toBeInstanceOf(UnexpectedValueError)
+  })
+})
+
+/** The generated CLI's cached client keeps one transport; route it only to the current in-process fixture. */
+const CLI_ORIGIN = 'http://macts-cli-iterm.test'
+let cliKey: string | undefined
+let cliBackend: ReturnType<typeof createApp> | undefined
+let cliRequests: string[] = []
+
+/** Origin checking forbids accidental network access; bound references remain lazy while formatted. */
+const cliFetch: typeof globalThis.fetch = async (input, init) => {
+  const request = new Request(input, init)
+  if (new URL(request.url).origin !== CLI_ORIGIN || cliBackend === undefined) {
+    throw new Error('Unexpected CLI fixture transport target')
+  }
+  cliRequests.push(new URL(request.url).pathname)
+  return cliBackend.fetch(request)
+}
+
+/** Execute the shipped plugin and real formatter over the actual API/codec pipeline, with only the native host replaced. */
+async function runCurrentWindowCli(json: boolean, id: number | null) {
+  cliKey ??= (
+    await createApiKey({ name: 'iTerm CLI reference fixture', permissions: [...PERMISSIONS] })
+  ).token
+  const lookups: string[] = []
+  const manifest = await itermManifest()
+  cliBackend = createApp([], {
+    cors: false,
+    prettyJson: false,
+    executor: await standInExecutor(lookups, { id }),
+    governance: { policy: ALLOW_ALL_POLICY },
+    register: (registrar) => {
+      registrar.registerContract(iTermContract, manifest)
+    },
+  })
+  cliRequests = []
+  let stdout = ''
+  let stderr = ''
+  const CurrentWindow = itermCliPlugin.commands.find((command) =>
+    command.paths?.some((path) => path.join(' ') === 'iterm current-window')
+  )
+  if (CurrentWindow === undefined) throw new Error('Missing shipped current-window CLI command')
+  const command = new CurrentWindow()
+  Reflect.set(command, 'json', json)
+  Reflect.set(command, 'context', {
+    stdout: {
+      write: (value: string) => {
+        stdout += value
+      },
+    },
+    stderr: {
+      write: (value: string) => {
+        stderr += value
+      },
+    },
+  })
+  vi.stubEnv('MACTS_API_KEY', cliKey)
+  vi.stubEnv('MACTS_API_URL', CLI_ORIGIN)
+  vi.stubGlobal('fetch', cliFetch)
+  try {
+    const exit = await command.execute()
+    return { exit, stdout, stderr, lookups, requests: [...cliRequests] }
+  } finally {
+    cliBackend = undefined
+    vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
+  }
+}
+
+/** Reference data is presentation data: rendering it must neither hydrate records nor leak the private resolver. */
+describe('the shipped current-window CLI reference result', () => {
+  it('prints the bound Window identity data in JSON without hydration', async () => {
+    const result = await runCurrentWindowCli(true, 8)
+    expect(result.exit).toBe(0)
+    expect(result.stderr).toBe('')
+    expect(JSON.parse(result.stdout)).toEqual({
+      data: { app: 'iterm', resource: 'Window', form: 'identity', cardinality: 'one', id: 8 },
+    })
+    expect(result.lookups).toEqual([])
+    expect(result.requests).toEqual(['/api/v1/rpc/iterm.app.currentWindow'])
+  })
+
+  it('prints only identity data in the existing human formatter', async () => {
+    const result = await runCurrentWindowCli(false, 8)
+    expect(result.exit).toBe(0)
+    expect(result.stderr).toBe('')
+    expect(result.stdout.trim().split('\n').sort()).toEqual(
+      ['app: iterm', 'resource: Window', 'form: identity', 'cardinality: one', 'id: 8'].sort()
+    )
+    expect(result.lookups).toEqual([])
+    expect(result.requests).toEqual(['/api/v1/rpc/iterm.app.currentWindow'])
+  })
+
+  it('preserves a null result in JSON instead of a completion envelope', async () => {
+    const result = await runCurrentWindowCli(true, null)
+    expect(result.exit).toBe(0)
+    expect(result.stderr).toBe('')
+    expect(JSON.parse(result.stdout)).toEqual({ data: null })
+    expect(result.lookups).toEqual([])
+    expect(result.requests).toEqual(['/api/v1/rpc/iterm.app.currentWindow'])
+  })
+
+  it('uses the existing empty human presentation for null', async () => {
+    const result = await runCurrentWindowCli(false, null)
+    expect(result.exit).toBe(0)
+    expect(result.stderr).toBe('')
+    expect(result.stdout).toBe('\n')
+    expect(result.lookups).toEqual([])
+    expect(result.requests).toEqual(['/api/v1/rpc/iterm.app.currentWindow'])
   })
 })
