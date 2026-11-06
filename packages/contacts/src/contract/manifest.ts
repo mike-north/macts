@@ -1857,6 +1857,7 @@ export const manifest: unknown = {
         'RollOver - Which property this roll over is associated with (Properties can be one of maiden name, phone, email, url, birth date, custom date, related name, aim, icq, jabber, msn, yahoo, address.)',
       scope: 'application',
       parameters: [],
+      returns: 'string',
       code: 'az57',
     },
     actionTitle: {
@@ -1882,6 +1883,7 @@ export const manifest: unknown = {
           code: 'az61',
         },
       ],
+      returns: 'string',
       code: 'az58',
     },
     performAction: {
@@ -1906,6 +1908,7 @@ export const manifest: unknown = {
           code: 'az61',
         },
       ],
+      returns: 'boolean',
       code: 'az60',
     },
     shouldEnableAction: {
@@ -1931,6 +1934,7 @@ export const manifest: unknown = {
           code: 'az61',
         },
       ],
+      returns: 'boolean',
       code: 'az59',
     },
   },

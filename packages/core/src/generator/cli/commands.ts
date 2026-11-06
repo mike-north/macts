@@ -20,7 +20,7 @@ import {
 } from '../../manifest/index.js'
 import { sendsNoItem } from '../../manifest/item-selection.js'
 import { usableProperties } from '../../manifest/unsupported.js'
-import { outputProperties } from '../../manifest/output-references.js'
+import { omittedOutputResult, outputProperties } from '../../manifest/output-references.js'
 import { itemSelectionNote } from '../positional-docs.js'
 import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.js'
 import {
@@ -508,6 +508,7 @@ export function generateAppCommand(
   )
 
   const needsTypanion = paramFlags.includes('t.isEnum')
+  const result = commandResult(cmd, ctx.manifest, `client.${safeMethodName}(${methodArgs})`)
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
 import { getClient } from '../sdk.js';
 import { createFormatter } from '../output/index.js';
@@ -529,9 +530,9 @@ ${paramFlags}
 
     try {
       const client = getClient();
-      await client.${safeMethodName}(${methodArgs});
+      ${result.invocation}
 
-      const output = formatter.formatSuccess('${cmd.name} completed successfully');
+      const output = ${result.format};
       this.context.stdout.write(output + '\\n');
       return 0;
     } catch (error) {
@@ -590,6 +591,7 @@ export function generateResourceCommand(
   const integerSupport = methodArgs.includes('__mactsParseIntegerOption(')
     ? integerOptionSupport()
     : ''
+  const result = commandResult(cmd, ctx.manifest, `${methodRef}(${methodArgs})`)
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
 import { getClient } from '${sdkImportPath}';
 import { createFormatter } from '${outputImportPath}';
@@ -612,9 +614,9 @@ ${inputs}
 
     try {
       const client = getClient();
-      await ${methodRef}(${methodArgs});
+      ${result.invocation}
 
-      const output = formatter.formatSuccess('${cmd.name} completed successfully');
+      const output = ${result.format};
       this.context.stdout.write(output + '\\n');
       return 0;
     } catch (error) {
@@ -629,6 +631,27 @@ ${inputs}
   return {
     path: buildCommandPath(hierarchyPath.path, cmdNameKebab),
     content,
+  }
+}
+
+/**
+ * Invoke a command and render its effective contract output. A declared,
+ * usable result is data even when false, zero, empty or null; only an absent
+ * or omitted result keeps the established success message. Result validation
+ * and nullability belong to the SDK contract, not this rendering boundary.
+ */
+function commandResult(
+  command: ManifestCommand,
+  manifest: AppManifest,
+  call: string
+): { invocation: string; format: string } {
+  const value =
+    command.returns !== undefined && omittedOutputResult(manifest, command) === undefined
+  return {
+    invocation: `${value ? 'const result = ' : ''}await ${call};`,
+    format: value
+      ? 'formatter.format(result)'
+      : `formatter.formatSuccess(${JSON.stringify(`${command.name} completed successfully`)})`,
   }
 }
 

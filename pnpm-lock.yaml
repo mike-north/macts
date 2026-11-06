@@ -1805,6 +1805,9 @@ importers:
       '@macts/iterm':
         specifier: workspace:*
         version: link:../iterm
+      '@macts/mail':
+        specifier: workspace:*
+        version: link:../mail
       '@macts/microsoft-edge':
         specifier: workspace:*
         version: link:../microsoft-edge

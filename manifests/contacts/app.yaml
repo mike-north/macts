@@ -1511,12 +1511,17 @@ commands:
     description: RollOver - Which property this roll over is associated with (Properties can be one of maiden name, phone, email, url, birth date, custom date, related name, aim, icq, jabber, msn, yahoo, address.)
     scope: application
     code: az57
+    # Contacts.sdef:434 declares text. Keep default nullable result semantics;
+    # a dictionary type does not establish that every invocation yields a value.
+    returns: string
     parameters: []
   actionTitle:
     name: actionTitle
     description: RollOver - Returns the title that will be placed in the menu for this roll over
     scope: application
     code: az58
+    # Contacts.sdef:444 declares the menu title as text.
+    returns: string
     parameters:
       - name: with
         type: any
@@ -1534,6 +1539,8 @@ commands:
     description: RollOver - Performs the action on the given person and value
     scope: application
     code: az60
+    # Contacts.sdef:454 declares boolean; false is an ordinary returned value.
+    returns: boolean
     parameters:
       - name: with
         type: any
@@ -1551,6 +1558,8 @@ commands:
     description: RollOver - Determines if the rollover action should be enabled for the given person and value
     scope: application
     code: az59
+    # Contacts.sdef:464 declares whether the action should be enabled.
+    returns: boolean
     parameters:
       - name: with
         type: any

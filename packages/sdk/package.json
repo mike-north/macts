@@ -60,6 +60,7 @@
     "@macts/contacts": "workspace:*",
     "@macts/google-chrome": "workspace:*",
     "@macts/iterm": "workspace:*",
+    "@macts/mail": "workspace:*",
     "@macts/microsoft-edge": "workspace:*",
     "@macts/music": "workspace:*",
     "@macts/notes": "workspace:*",

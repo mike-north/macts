@@ -1059,44 +1059,49 @@ export interface ContactsClient extends ClientBrand<ContactsResources> {
    * RollOver - Which property this roll over is associated with (Properties can be one of maiden
    * name, phone, email, url, birth date, custom date, related name, aim, icq, jabber, msn, yahoo,
    * address.)
+   *
+   * @returns Nullable. No evidence that the app always returns a value.
    */
-  actionProperty(options?: CallOptions): Promise<void>
+  actionProperty(options?: CallOptions): Promise<string | null>
   /**
    * RollOver - Returns the title that will be placed in the menu for this roll over
    *
    * @param _with - property that that was returned from the "action property" handler. Does not
    * accept null.
    * @param _for - Currently selected person. Does not accept null.
+   * @returns Nullable. No evidence that the app always returns a value.
    */
   actionTitle(
     _with: unknown,
     _for: ObjectReferenceData<string, 'Person'>,
     options?: CallOptions
-  ): Promise<void>
+  ): Promise<string | null>
   /**
    * RollOver - Performs the action on the given person and value
    *
    * @param _with - property that that was returned from the "action property" handler. Does not
    * accept null.
    * @param _for - Currently selected person. Does not accept null.
+   * @returns Nullable. No evidence that the app always returns a value.
    */
   performAction(
     _with: unknown,
     _for: ObjectReferenceData<string, 'Person'>,
     options?: CallOptions
-  ): Promise<void>
+  ): Promise<boolean | null>
   /**
    * RollOver - Determines if the rollover action should be enabled for the given person and value
    *
    * @param _with - property that that was returned from the "action property" handler. Does not
    * accept null.
    * @param _for - Currently selected person. Does not accept null.
+   * @returns Nullable. No evidence that the app always returns a value.
    */
   shouldEnableAction(
     _with: unknown,
     _for: ObjectReferenceData<string, 'Person'>,
     options?: CallOptions
-  ): Promise<void>
+  ): Promise<boolean | null>
 }
 
 const addressRecordType: ValueType<Address> = t.record(
@@ -1726,14 +1731,14 @@ const appSaveOperation: OperationDescriptor<Record<string, never>, undefined> = 
   },
 }
 
-const appActionPropertyOperation: OperationDescriptor<Record<string, never>, undefined> = {
+const appActionPropertyOperation: OperationDescriptor<Record<string, never>, string | null> = {
   id: 'contacts.app.actionProperty',
   permission: 'contacts:app:actionProperty',
   target: { command: 'actionProperty' },
   description:
     'RollOver - Which property this roll over is associated with (Properties can be one of maiden name, phone, email, url, birth date, custom date, related name, aim, icq, jabber, msn, yahoo, address.)',
   input: t.record({}),
-  output: t.none(),
+  output: t.nullable(t.string()),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -1744,7 +1749,7 @@ const appActionPropertyOperation: OperationDescriptor<Record<string, never>, und
 
 const appActionTitleOperation: OperationDescriptor<
   { readonly with: unknown; readonly for: ObjectReferenceData<string, 'Person'> },
-  undefined
+  string | null
 > = {
   id: 'contacts.app.actionTitle',
   permission: 'contacts:app:actionTitle',
@@ -1758,7 +1763,7 @@ const appActionTitleOperation: OperationDescriptor<
       description: 'Currently selected person.',
     }),
   }),
-  output: t.none(),
+  output: t.nullable(t.string()),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -2501,7 +2506,7 @@ const appActionTitleOperation: OperationDescriptor<
 
 const appPerformActionOperation: OperationDescriptor<
   { readonly with: unknown; readonly for: ObjectReferenceData<string, 'Person'> },
-  undefined
+  boolean | null
 > = {
   id: 'contacts.app.performAction',
   permission: 'contacts:app:performAction',
@@ -2515,7 +2520,7 @@ const appPerformActionOperation: OperationDescriptor<
       description: 'Currently selected person.',
     }),
   }),
-  output: t.none(),
+  output: t.nullable(t.boolean()),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -3258,7 +3263,7 @@ const appPerformActionOperation: OperationDescriptor<
 
 const appShouldEnableActionOperation: OperationDescriptor<
   { readonly with: unknown; readonly for: ObjectReferenceData<string, 'Person'> },
-  undefined
+  boolean | null
 > = {
   id: 'contacts.app.shouldEnableAction',
   permission: 'contacts:app:shouldEnableAction',
@@ -3273,7 +3278,7 @@ const appShouldEnableActionOperation: OperationDescriptor<
       description: 'Currently selected person.',
     }),
   }),
-  output: t.none(),
+  output: t.nullable(t.boolean()),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',

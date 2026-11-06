@@ -249,8 +249,12 @@ export class ContactsClient {
   /**
    * RollOver - Which property this roll over is associated with (Properties can be one of maiden name, phone, email, url, birth date, custom date, related name, aim, icq, jabber, msn, yahoo, address.)
    */
-  async actionProperty(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
-    await this.#httpClient.invoke<undefined>('contacts.app.actionProperty', {}, __mactsOptions)
+  async actionProperty(
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Awaited<ReturnType<import('./contract/index.js').ContactsClient['actionProperty']>>> {
+    return this.#httpClient.invoke<
+      Awaited<ReturnType<import('./contract/index.js').ContactsClient['actionProperty']>>
+    >('contacts.app.actionProperty', {}, __mactsOptions)
   }
 
   /**
@@ -260,12 +264,10 @@ export class ContactsClient {
     _with: unknown,
     _for: Parameters<import('./contract/index.js').ContactsClient['actionTitle']>[1],
     __mactsOptions?: import('@macts/contracts').CallOptions
-  ): Promise<void> {
-    await this.#httpClient.invoke<undefined>(
-      'contacts.app.actionTitle',
-      { with: _with, for: _for },
-      __mactsOptions
-    )
+  ): Promise<Awaited<ReturnType<import('./contract/index.js').ContactsClient['actionTitle']>>> {
+    return this.#httpClient.invoke<
+      Awaited<ReturnType<import('./contract/index.js').ContactsClient['actionTitle']>>
+    >('contacts.app.actionTitle', { with: _with, for: _for }, __mactsOptions)
   }
 
   /**
@@ -275,12 +277,10 @@ export class ContactsClient {
     _with: unknown,
     _for: Parameters<import('./contract/index.js').ContactsClient['performAction']>[1],
     __mactsOptions?: import('@macts/contracts').CallOptions
-  ): Promise<void> {
-    await this.#httpClient.invoke<undefined>(
-      'contacts.app.performAction',
-      { with: _with, for: _for },
-      __mactsOptions
-    )
+  ): Promise<Awaited<ReturnType<import('./contract/index.js').ContactsClient['performAction']>>> {
+    return this.#httpClient.invoke<
+      Awaited<ReturnType<import('./contract/index.js').ContactsClient['performAction']>>
+    >('contacts.app.performAction', { with: _with, for: _for }, __mactsOptions)
   }
 
   /**
@@ -290,11 +290,11 @@ export class ContactsClient {
     _with: unknown,
     _for: Parameters<import('./contract/index.js').ContactsClient['shouldEnableAction']>[1],
     __mactsOptions?: import('@macts/contracts').CallOptions
-  ): Promise<void> {
-    await this.#httpClient.invoke<undefined>(
-      'contacts.app.shouldEnableAction',
-      { with: _with, for: _for },
-      __mactsOptions
-    )
+  ): Promise<
+    Awaited<ReturnType<import('./contract/index.js').ContactsClient['shouldEnableAction']>>
+  > {
+    return this.#httpClient.invoke<
+      Awaited<ReturnType<import('./contract/index.js').ContactsClient['shouldEnableAction']>>
+    >('contacts.app.shouldEnableAction', { with: _with, for: _for }, __mactsOptions)
   }
 }

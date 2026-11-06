@@ -9,7 +9,7 @@ RollOver - Which property this roll over is associated with (Properties can be o
 **Signature:**
 
 ```typescript
-actionProperty(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+actionProperty(__mactsOptions?: _macts_contracts.CallOptions): Promise<Awaited<ReturnType<ContactsClient$1['actionProperty']>>>;
 ```
 
 ## Parameters
@@ -44,4 +44,4 @@ _(Optional)_
 
 **Returns:**
 
-Promise&lt;void&gt;
+Promise&lt;Awaited&lt;ReturnType&lt;ContactsClient$1\['actionProperty'\]&gt;&gt;&gt;

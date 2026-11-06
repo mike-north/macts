@@ -23,12 +23,12 @@ export class PerformActionCommand extends Command {
 
     try {
       const client = getClient()
-      await client.performAction(
+      const result = await client.performAction(
         this.with as unknown as Parameters<typeof client.performAction>[0],
         this.for as unknown as Parameters<typeof client.performAction>[1]
       )
 
-      const output = formatter.formatSuccess('performAction completed successfully')
+      const output = formatter.format(result)
       this.context.stdout.write(output + '\n')
       return 0
     } catch (error) {

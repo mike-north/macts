@@ -361,7 +361,7 @@ export interface OutgoingMessageCreateInput {
 
 // @public
 export interface OutgoingMessageResourceClient {
-    send(id: Integer, options?: CallOptions): Promise<void>;
+    send(id: Integer, options?: CallOptions): Promise<boolean | null>;
 }
 
 // @public

@@ -2136,6 +2136,7 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      returns: 'boolean',
       code: 'send',
     },
     synchronize: {
