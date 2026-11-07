@@ -1,5 +1,43 @@
 # @macts/contacts-server
 
+## 0.3.0
+
+### Minor Changes
+
+- 18564b2: Contacts fields now carry observed nullability.
+
+  A read-only probe of Contacts 14.0 on macOS 27.2 recorded which fields the app leaves empty. The probe records presence only, never a value.
+  - Six fields that the app filled in every sampled item (at least 30 items) are now non-null in the generated types. They are `Email.id`, `Email.label`, `Email.value`, `Phone.id`, `Phone.label` and `Phone.value`, each typed `string` instead of `string | null`. Breaking for callers that handle `null` on these fields.
+  - Fields observed empty stay nullable, and their documentation states how often they were missing. For example, `Person.birthDate` was empty in all 23 sampled people.
+
+- c4717eb: App manifests can now record the app's own spelling of a term and mark what the app does not have, and native operations use both.
+  - **Native spellings.** A resource can name its collection as the app spells it (`native.collection`), and a property its field (`native.name`). Native bodies address the app by those names and return records under the public keys. Music's AirPlay devices are reached as `airplayDevices`, and 23 fields in Google Chrome, iTerm, Mail, Music and System Events (such as `url`, `ansiBlackColor` and `macAddress`) are read under the app's spelling.
+  - **Probes read the app by its own spelling.** `macts probe` and `macts probe --nullability` address collections and properties by the recorded native spellings, and report under the manifest keys. Before, Music's AirPlay devices looked empty and fields such as Chrome's `url` and iTerm's ANSI colours counted as failed reads. Neither probe reads a resource marked unsupported.
+  - **Fewer round trips for get, create and update.** Each reads the item's record once. A property the app leaves out of that record, such as Finder's `entireContents`, is read on its own.
+  - **Unsupported resources and commands.** A resource or command can be marked unsupported, with the evidence for it: the app's dictionary has no such class or element, or a live read failed with a recorded error. A marked resource or command gets no route, no permission, and no generated operation or type. Screen Sharing connections, Console devices, Finder desktop and trash objects, and Contacts instant messages are marked, as are Automator's `getSetting` and `getRequiredResource`.
+  - **Top-level collections.** The Reminders and Automator manifests now record that reminders, and Automator's actions and variables, are collections of the application itself, as live counts confirm. No route changes.
+
+  Breaking for callers of what is removed: the Screen Sharing connections `list` and `get` operations and the Automator `settings get` and `requiredResources get` operations, with their permissions; and the exported types and schemas for Console `Device`, Finder `DesktopObject` and `TrashObject`, Contacts `InstantMessage`, and Screen Sharing `Connection`.
+
+- 2a00978: Server packages are now contract-only. Each re-exports its app's generated contract from `@macts/<app>/contract` as `contract`, and depends only on `@macts/<app>`. The `./mcp` export (the generated MCP plugin) and the `plugin` export (the HTTP API plugin with its embedded manifest) are removed, along with the dependencies on `@macts/api`, `@macts/core` and `@macts/types`. A macts host serves the app from the contract and the app's manifest. The package's `types` entry now points at the declarations the build emits.
+
+### Patch Changes
+
+- Updated dependencies [c945d04]
+- Updated dependencies [c5a4690]
+- Updated dependencies [686212a]
+- Updated dependencies [90ba160]
+- Updated dependencies [686212a]
+- Updated dependencies [18564b2]
+- Updated dependencies [80fad3c]
+- Updated dependencies [c4717eb]
+- Updated dependencies [7aed949]
+- Updated dependencies [ead44ad]
+- Updated dependencies [aadc2fe]
+- Updated dependencies [36942f9]
+- Updated dependencies [a746285]
+  - @macts/contacts@0.3.0
+
 ## 0.2.0
 
 ### Patch Changes

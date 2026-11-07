@@ -1,5 +1,35 @@
 # @macts/preview-server
 
+## 0.3.0
+
+### Minor Changes
+
+- dae51a7: Each resource is now spelled the same way on every public surface.
+
+  A resource's segment is the acronym-aware lower camel case of its plural (`MediaItems` → `mediaItems`, `AIMHandles` → `aimHandles`, `URLs` → `urls`). One shared function derives it, and these all use it: routes and operation ids, SDK accessors, MCP tool names, capability names, and the scope segment of derived permissions.
+
+  **Breaking for multi-word resources.** These change:
+  - routes and operation ids: `photos.mediaitems.list` becomes `photos.mediaItems.list`
+  - SDK accessors: `photos.mediaitems` becomes `photos.mediaItems`
+  - MCP tool names: `macts__photos__mediaitems_list` becomes `macts__photos__mediaItems_list`
+  - MCP operation names split acronyms as words: `macts__iterm__app_invoke_a_p_i_expression` becomes `macts__iterm__app_invoke_api_expression`, and `macts__mail__app_get_u_r_l` becomes `macts__mail__app_get_url` (5 tools in iTerm, Mail, QuickTime Player and Screen Sharing)
+  - derived permissions: for example, `mail:outgoingmessages:send` becomes `mail:outgoingMessages:send`
+
+  A permission granted with the old lowercase scope no longer matches. The permission error suggests the correctly spelled one. Single-word resources are unchanged.
+
+  Explicit manifest permissions that only restated the derived default are removed, so they can't drift from the derivation. Every route's enforced permission is unchanged except where its spelling changes as above.
+
+- 2a00978: Server packages are now contract-only. Each re-exports its app's generated contract from `@macts/<app>/contract` as `contract`, and depends only on `@macts/<app>`. The `./mcp` export (the generated MCP plugin) and the `plugin` export (the HTTP API plugin with its embedded manifest) are removed, along with the dependencies on `@macts/api`, `@macts/core` and `@macts/types`. A macts host serves the app from the contract and the app's manifest. The package's `types` entry now points at the declarations the build emits.
+
+### Patch Changes
+
+- Updated dependencies [c945d04]
+- Updated dependencies [686212a]
+- Updated dependencies [7429951]
+- Updated dependencies [dae51a7]
+- Updated dependencies [a746285]
+  - @macts/preview@0.3.0
+
 ## 0.2.0
 
 ### Patch Changes
