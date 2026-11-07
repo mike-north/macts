@@ -1,6 +1,6 @@
 {
   "name": "@macts/messages-server",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Server package for macOS Messages.app: the contract a macts host serves",
   "license": "MIT",
   "repository": {
