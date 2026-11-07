@@ -1,5 +1,548 @@
 # @macts/core
 
+## 0.3.0
+
+### Minor Changes
+
+- 8edbbc2: A caller can abandon a call that is held for human approval. `seekApprovalUnlessCancelled()` in `@macts/core` waits for a decision like `seekApproval()`, but ends at once when the caller's signal aborts, aborting the provider's signal so it can retract its prompt. It returns an `ApprovalCancellation` instead of a decision, and `recordApprovalCancellation()` resolves the held call's audit trail with the new `'cancelled'` decision. The runtime uses both: an abort during a hold now fails with `OperationCancelledError` right away, records `'cancelled'` rather than an approval, and never executes the call.
+
+  The runtime also exports `operationsFromContract()`, which checks a generated contract against its manifest without constructing a runtime. Operator logs record an unexpected failure as its name, code, message, and stack, with the caller's credential scrubbed, rather than as the raw error object.
+
+- 361b04c: Audit permission denials as `permission-denied` records.
+
+  A call whose key lacks the operation's permission now writes one `permission-denied` audit record, for `invoke` and `resolveReference` alike, wherever the governance context has an audit writer (the host governance always has one, its audit log). With no audit writer, nothing is written. It is written after admission, so where the runtime has a rate limiter (as the HTTP server does by default) that limit also bounds how many are written, and before input validation, so it carries only the operation's permission, the app, the key and the time: the record is the same whatever the call's input. A call turned away earlier (an unverified credential, a rate-limited call, an unknown operation or app) still writes nothing. The caller's answer is unchanged: the same `PermissionDeniedError`, with the same message, code and details. If the record cannot be written, the caller is still answered `PermissionDeniedError` and the failure is logged to the operator log with the operation, the key and the correlation id.
+
+  In `@macts/core`, `AUDIT_DECISIONS` and `AuditDecision` gain `'permission-denied'`, so an exhaustive `switch` over decisions needs a new case. `AuditRecord`, `AuditRecordInput` and `SerializedAuditRecord` gain the `PermissionDeniedAuditRecord` kind, which has no `argsSummary`, `reason`, `approvalId` or `issueCount`; the constructor, serializer and file writer refuse one that carries any of them. `GovernedAuditDecision` excludes it: narrow to a governed decision (one that is neither `'invalid-input'` nor `'permission-denied'`) before reading `argsSummary`. A custom `AuditWriter` receives these records. Audit volume grows by one record per denied call. `recordPermissionDenied()` writes the new record.
+
+- c945d04: Breaking change: list operations return bounded pages.
+
+  Every list output changed from an array to a page, `{ items, nextCursor? }` (`Page<T>` and `t.page(item)` in `@macts/contracts`). Lists whose items have an identifier the manifest claims unique take two optional inputs, `pageSize` and `cursor`. A page holds at most `pageSize` items: 25 by default and at most 100, the same on every transport. A page size of zero, below zero, not an integer or above 100 is rejected, never clamped. When more items remain, the page carries a `nextCursor`; send the same inputs again with it as `cursor` to read the next page. The cursor is opaque. Paging bounds the size of each call. It bounds the latency of each call only for lists whose pages are read by range, which is most of them: a list read by column costs what its whole collection costs per page (see the entry on how each list reads its pages). Paging does not make a full listing cheaper in total.
+
+  Every other list takes neither input and returns its whole collection as one page with no `nextCursor`: a page is anchored on the identifier of the item before it, which only a unique identifier can do. Uniqueness is opt-in, from evidence: a manifest identifier records `unique: true` (or `unique: false`) with `evidence.unique` saying where the claim comes from, and the capability registry's input schemas show the paging inputs for exactly the lists that page. Contacts lists (people, groups, and a person's emails, phones and addresses) page, because Contacts describes each of those identifiers as unique. Music's playlist list pages. Its track list does not: a playlist can hold the same song more than once, and both entries are expected to share one persistent ID. Calendar event and calendar lists do not page: recurring events share a uid, and calendar names can repeat. `listOperationPages` in `@macts/core` is the one rule every surface uses, and the runtime refuses a contract whose list takes the paging inputs when the manifest says it does not page, or the reverse. Resolving a collection reference is not paged: it still returns the full array of records.
+
+  Each surface takes the paging inputs from the contract. Generated SDK list methods take a trailing `page` argument (`list(listId, { pageSize, cursor })`) and return `Page<T>`. HTTP and MCP callers send `pageSize` and `cursor` in the input. When more items remain, MCP adds a second text block after the result, saying how many items the page holds and how to read more; the first block is always the JSON result. Generated CLI list commands take `--page-size` and `--cursor` and print how to see the next page. App parameters named `pageSize` or `cursor` on a list operation are now a generation error.
+
+  There is a new error, `COLLECTION_CHANGED` (`CollectionChangedError`, HTTP 409, no details). It replaces `UnexpectedValueError` for a collection that changed while it was being read. The same request is correct and can be retried, from the first page if it was paged. A cursor whose item has since moved or been deleted fails this way. A malformed cursor, or one sent to another operation or with other inputs, is a validation error at `cursor`. Audit records and logs record only that a cursor was presented, never its contents.
+
+- c8dd396: Permissions can now name camelCase resources and operations
+
+  The resource and operation segments of a permission are camelCase (`photos:mediaItems:list`, `iterm:app:splitVertically`) or `*`. The app segment is unchanged. Before this, 129 of the 473 route permissions failed the format and could not be granted by any key. Dashes and underscores are no longer allowed in the resource and operation segments; no shipped manifest used them. Matching is still exact and case-sensitive.
+
+  A denied call whose key holds a grant that differs from the required permission only in letter case now gets a hint naming both and the permission to grant. `createApiKey` rejects a malformed permission with the rule and the closest valid permissions, and accepts `knownPermissions` to also reject a permission that differs from a real one only in case (`PermissionCaseMismatchError`). `macts api-key create` and `macts permissions expand` do the same against the app's manifest, from `--manifest` or the discovered manifests directory, and warn on stderr about a well-formed permission no known route requires, saying so explicitly when the manifest's permissions map lists it but no route requires it yet. `@macts/core` adds `suggestPermissions`, `listKnownPermissions`, `findCaseOnlyMismatch`, `explainInvalidPermission`, and `PERMISSION_FORMAT_DESCRIPTION`.
+
+- 127d864: Generated app constructors now share the contract client's value codec, reference authority and HTTP transport. Typed methods return canonical Date, Integer, null and hydratable reference values, and throw canonical structured errors. Constructors, numeric argument conveniences, standalone resource clients and custom HttpClient.rpc overrides remain available.
+
+  Root record and input types reuse their app contract definitions. Numeric create/update conveniences retain runtime validation before dispatch. Raw HttpClient.rpc, app-specific error exports and raw response schema validators remain available for explicit passthrough consumers; typed methods target contract-registered services.
+
+  Raw and typed RPC now share protocol handling even through overrides forwarding only public arguments. Valid raw results, including null void results, and arbitrary server app-error codes/messages are preserved. Malformed JSON and missing success results now consistently throw TransportError for explicit raw calls as well as typed methods.
+
+- a18ee4b: A command on a nested resource now names its parent in the manifest instead of having it guessed.
+
+  A manifest command records `parent: { resource, parameter }`: the resource whose items hold the command's target, and the command's required parameter that carries the parent's identifier. The manifest schema rejects a parent resource the manifest does not declare or marks unsupported, and a parameter that is not one of the command's required parameters. Every operation takes its parent from this record. A command that records no parent addresses its resource at the application. Nothing infers a parent from a parameter's name or position any more.
+
+  These operations now reach the right collection, where before they addressed one their app does not have:
+  - Microsoft Edge: `bookmarkItems.list`, under a bookmark folder.
+  - Xcode: `projects.list`, `schemes.list` and `runDestinations.list`, under a workspace document.
+  - Automator: `automatorActions.list` and `variables.list`, under a workflow; `settings.list` and `requiredResources.list`, under an action.
+
+  Xcode workspace documents and Automator workflows, which have no `id` in their apps, are now looked up by name when they are the parent.
+
+  Calendar events, Microsoft Edge tabs, OmniGraffle graphics, shapes, lines and layers, and Reminders reminders record the parent they already used, so they behave as before. The generated SDK, CLI and tool signatures are unchanged; each app's contract manifest now carries the recorded parents.
+
+- 686212a: Contacts and Music can now be read. Before, neither app had a list or get operation on any surface, so an agent could not list people or read a playlist.
+
+  Contacts:
+  - `people.list` and `people.get`, and `groups.list` and `groups.get`, by each record's `id`, which the app keeps with the record.
+  - `emails`, `phones` and `addresses` of one person: `list(personId)` and `get(personId, id)`.
+  - People and groups now include their `id`, `creationDate` and `modificationDate`. A person's `birthDate` is now a date, as the app reports it, instead of a string.
+  - People no longer include `vcard` or `image`, and a person's create and update inputs no longer take `image`. The app reports both only one person at a time, so a list of a few hundred people took several seconds and carried megabytes of card and photo data.
+
+  Music:
+  - `playlists.list` and `playlists.get(persistentID)`.
+  - `tracks.list(playlistId)` and `tracks.get(playlistId, persistentID)`, under a playlist. The library playlist holds every track in the library, so a track listed under any playlist can also be read under the library playlist.
+  - Playlists and tracks are looked up by their persistent ID, which is the same in every playlist that holds a track. Their numeric `id`, also included, identifies a track's entry in one playlist. Tracks now include their `name`, `id`, `index` and `persistentID`; playlists, their `id`, `index` and `persistentID`.
+  - A playlist's `parent` is left out: for a playlist that is in no folder, the app fails the read instead of reporting no value.
+
+  Behavior change: a get, update or delete of an item under a parent now looks the item up the way its resource is identified, as top-level lookups already did, instead of always by `id`. In the shipped manifests only Music's `tracks.get` is affected.
+
+  Behavior change: when a list result carries identifier aliases (operations served without a typed contract), its canonical `id` no longer overwrites a resource's own `id` field. This affects Notes accounts, folders and notes and Terminal windows and settings sets, whose list records carried their name as `id`. They now keep their real `id`, as their read types already declared. `resolveCanonicalIdentifierSource` names the field a resource's alias mirrors, if any.
+
+- 7cb8bc4: A manifest can say that a property of a resource with a single instance is absent because of the data, not the app's structure.
+
+  A probe tells the two kinds of absence apart only across several instances: a property some instances read is nullable, and one that every instance fails to read is `unsupported`. A singleton root with one kind has one instance, so one failed read cannot show which it is. On such a resource, curated nullability evidence can record `absentReads`: the probe's failed reads (`observedAt`, `bundleId`, `appVersion`, `osVersion`, `failedReads`, and `errorNumbers`, which must be -1728 only) and a `reason` saying why the absence depends on the data. The claim must be `nullable: true`. A read of that property failing with -1728 then returns `null`, as it does for probe evidence of absence, and the generated SDK's documentation gives the reason and the reads.
+
+  The manifest schema rejects `absentReads` without a reason, on a command parameter, and on a resource with several instances (one reached through a collection, or a root with more than one kind), whether the resource declares the property or states a claim about one it inherits. A superclass's claim reaches its subclasses only once the superclass is valid, so a claim on a superclass with several instances is rejected even if a subclass has one. Each rejection points to probe evidence or to `unsupported` instead.
+
+  `readsAbsentAsNull` now also takes the resource the property belongs to (`ClaimResource`). New exports: `hasSingleInstance`, `checkCuratedAbsence`, `CuratedAbsentReadsSchema` and its type.
+
+- 9144fc3: Summarize only declared arguments in audit and approval records, validate input before governance, and record calls rejected by input validation as `invalid-input` audit entries without their arguments.
+
+  The runtime checks a call's permission, then validates its input, and only then applies governance and approval. Validating a paged list's input includes checking any cursor against the operation and the call's other inputs, so a cursor that cannot continue the listing is rejected before governance; only an anchor that has moved is reported during execution, as `COLLECTION_CHANGED`. Audit and approval records summarize the operation's declared parameters from the validated input; any other keys are recorded only as a count, `unknownKeys: N`. A call whose input fails validation after the permission check writes one `invalid-input` audit record with its issue count, is not evaluated by policy, and is never put to an approver.
+
+  In `@macts/core`, `AuditRecord`, `AuditRecordInput` and `SerializedAuditRecord` are now unions discriminated by `decision`: `GovernedAuditRecord` carries `argsSummary` as before, and `InvalidInputAuditRecord` carries `issueCount` and never a summary, reason or approval id. Narrow to a governed decision (one that is neither `'invalid-input'` nor `'permission-denied'`) before reading `argsSummary`. `AUDIT_DECISIONS` and `AuditDecision` gain `'invalid-input'`, so an exhaustive `switch` over decisions needs a new case, and a custom `AuditWriter` now receives records that have no `argsSummary`. `recordInvalidInput()` writes the new record.
+
+- a189125: A get, update or delete now selects its item only by a parameter its manifest command declares.
+
+  The item's identifier is the command's first required parameter other than its parent's (`itemIdentifierParameter` in `@macts/core`). This applies to a resource-scoped get, update or delete, and to a delete at application scope. No generated interface, CLI command or native body supplies an `id` parameter the manifest does not declare.
+
+  Generation refuses a manifest with a command that must select an item and declares no identifier parameter. `generateConsolidatedPackages`, `generateClientPackage`, `generateServerPackage`, `generateHttpClientSdk`, `generateCliPlugin` and `generateSdk` return one error for each such command and no files, and `generateCapabilitiesModule` throws with the same errors. Each error names the app and the command key and says to declare the item's identifier as a required parameter. `unselectableItemCommands` and `itemSelectionProblem` in `@macts/core` report the same commands.
+
+  Registration refuses the same commands. `operationsFromManifest` (`registerManifest`) now also refuses an application-scoped delete that declares no identifier parameter. `operationsFromContract` (`registerContract`) now runs the same check against the manifest, whichever operations the contract covers. Both throw `OperationRegistrationError` naming the app and the command, and register nothing from the app.
+
+  An application-scoped get or update is a plain command call and selects no item, so the rule does not reach it. If a manifest of yours is refused, declare the item's identifier as a required parameter of the command named in the error.
+
+  A runtime from this release refuses an installed `@macts/finder`, `@macts/google-chrome`, `@macts/iterm`, `@macts/mail`, `@macts/music` or `@macts/tv` package from an earlier release as a whole, because those packages still declare the application-level delete. Update them together with `@macts/runtime`.
+
+- 16cda4d: Generate a transport-neutral contract for each app
+
+  Each generated app package now exposes `@macts/<app>/contract`. It holds the app's contract (for example `notesContract`), the client interface, and the record, input, and enum types. The contract contains one descriptor per operation, with its identity, permission, and input and result value types. Resource-typed fields are references, files are file values on output and file sources on input, and resources without an identifier are referenced by selectors. The manifest is loaded lazily, and only by the Mac-side runtime.
+
+  Each `ManifestRoute` now carries the operation's `permission`, derived once from the manifest. Generated packages declare `engines.node >=22.13.0`. The existing package entry points are unchanged.
+
+- 2a00978: The generator no longer emits an HTTP API plugin or an MCP plugin into server packages. `@macts/core` drops `generateMcpPlugin`, `createMcpGeneratorContext`, `generateApiPlugin`, `generateAllHttpPackages` and their option and result types (`McpGeneratorContext`, `CreateMcpContextOptions`, `GeneratedMcpPlugin`, `GeneratedTool`, `GeneratedToolFile`, `ApiPluginGeneratorOptions`, `GenerateApiPluginResult`, `GenerateAllOptions`, `GenerateAllResult`). `generateServerPackage` now emits a contract-only package, and every generated contract descriptor carries `inputJsonSchema`. `JsonSchema` stays exported, now alongside the capability types that use it, and capability input schemas and MCP tool names are unchanged.
+
+  `macts generate --target server` writes the contract-only server package.
+
+- 2a00978: Generated packages now record the files the generator emitted, in `.macts-generated.json`, and regenerating deletes any of them it no longer emits, so removing an operation or a resource from a manifest leaves no stale files behind. Files the generator never emitted, such as a changelog or handwritten tests, are kept. A package without a record yet takes the files carrying the generator's "do not edit" notice as its previous set; this applies only to a directory holding a `package.json`, and never reaches into a nested package, so an output directory that holds other packages loses none of their files.
+
+  `@macts/core` adds `writeGeneratedPackage`, which writes a package, prunes what it no longer emits and writes its record, along with `OWNED_OUTPUT_RECORD_FILE` and the `GeneratedPackageWriteResult` and `OwnedOutputSource` types (`record`, `headers`, or `none` for a directory that is not yet a package). `macts generate` uses it for every target and names each deleted file on stdout.
+
+- 62a95dd: A manifest whose hierarchy names a resource it does not declare is now rejected. Every hierarchy entry's `resource`, at any depth, must be a key of `resources`; the error names the entry's path and the value. Before, a misspelt key was accepted and placed nothing, so the checks that read the hierarchy for which resources the app holds only within a container silently skipped the resource it meant. Every shipped manifest already meets the rule.
+- 915effc: Manifests can describe two more ways an app finds its objects.
+  - **Key targeting.** An identifier can set `targeting: byKey`: the app finds an item from the identifier's value through its collection's key form, which the app interprets (for example, a file path). Gets, lookups under a parent, parents found by key and references all use it, and a key that finds nothing fails as a missing target. A `byKey` identifier takes no `runtimeProperty`.
+  - **Singleton roots.** A resource can record `roots: { <kind>: { property, evidence } }` when the app holds its objects as application properties, one per kind, instead of in a collection. Validation gives the resource a closed enum of its kinds (`<Resource>Kind`), a read-only `kind` property, and a unique primary identifier on `kind` with the new `byRoot` targeting. Its get takes a kind and fails as a missing target when that kind's property holds nothing on this Mac; its list returns one record per kind the app has, skipping the rest. A reference by kind is accepted as input and resolves. An output field holding a reference to a root is left out, with the new `root-kind-unmapped` reason, until a manifest can say which kind the field holds. A root has no create, update or delete, records no parent, and no hierarchy entry names it.
+
+  `IdentifierTargeting` gains `'byKey'` and `'byRoot'`. `NativeAddressing` becomes a union of `NativeCollectionAddressing` (whose `lookup` gains `'byKey'`) and the new `NativeRootAddressing`. New exports: `ResourceRootSchema` and `ResourceRootsSchema`, which validate one kind's entry and a resource's whole `roots`, with their `ResourceRoot` and `ResourceRoots` types.
+
+- ee7ba82: Manifest properties can carry nullability and resettability claims with their evidence. Generated contracts make a read field nullable unless the manifest has evidence that it is never empty, and an update field accepts `null` only when the property is resettable. Each generated field documents its nullability and the evidence for it.
+
+  `macts probe <app> --nullability` gathers that evidence read-only from the running app. It records, per field, how often a value was missing, never the values themselves. Probe writes now keep the manifest's formatting.
+
+  A manifest command can set `routeName`, the segment of its public route and default permission, which otherwise is the command key. Two commands that resolve to the same route are rejected when the manifest loads. The HTTP router and the runtime operation registry take each operation's permission from its resolved route.
+
+  Breaking: Notes attachments are identified by `id` instead of `name`, which can be empty. Their route stays `notes.attachments.get`, and the permission stays `notes:attachments:get`.
+
+- 0dd1855: A manifest resource can now say which class it inherits, and it then gets what that class declares.
+
+  A resource whose class in the app's dictionary inherits another class records `inherits: { resource, evidence }`. `resource` is the key of the superclass in the same manifest, and the evidence is the superclass's name as the dictionary writes it. Every reader of a manifest sees the resource with what it inherits:
+  - each property of its ancestors that it does not declare, nearest first, with its code, native spelling, any `unsupported` marker, and every claim the ancestor records about it (nullability and resettability, whatever their evidence);
+  - the nearest ancestor's identifiers, when it declares none, with their uniqueness claims, targeting and runtime property.
+
+  A resource replaces an inherited claim with its own evidence through `inheritedClaims.<property>`, a claims-only overlay that states a nullability claim, a resettability claim or an `unsupported` marker without redeclaring the property. Each claim the overlay states replaces the inherited one, the others stay inherited, and the resource's own subclasses inherit the result. An overlay on a resource with no superclass, on a property the resource declares itself, on a property no ancestor declares, or with no claim, is a manifest error. A property the resource declares replaces the inherited one whole. Commands, the hierarchy and collection-level fields are not inherited. A superclass the manifest does not declare, and a chain of superclasses that loops, are manifest errors. A resource's own rules hold for what it inherits: an inherited property whose type the manifest marks unsupported is an error on the resource that declares it.
+
+  `macts probe --nullability` writes a claim about an inherited property as the resource's overlay. `writeNullabilityResults` reports each claim it had nowhere to write in `notWritten`, and the command names each one on its own line.
+
+  `Resource` gains the optional `inherits` and `inheritedClaims` fields, described by the new `ResourceInheritsSchema` and `PropertyClaimsSchema`. `DictionaryTermEvidenceSchema` (and its `DictionaryTermEvidence` type) is the dictionary evidence that both `inherits` and native spellings record.
+
+- 9ddbb58: Serve MCP tools derived from operation contracts, dispatched through the shared runtime
+
+  **`@macts/mcp`** can now serve every operation registered on a `MactsRuntime` as an MCP tool, with no generated tool code. The existing plugin-based server is unchanged.
+  - **`createMcpAdapter(runtime, options?)`** derives one tool per registered operation and runs each tool call as one `runtime.invoke`, so MCP calls pass through the same credential, permission, governance, and input checks as the HTTP API and the SDK. `listTools()` returns the tools; `callTool(name, args, context)` handles one call.
+  - **`attachMcpAdapter(server, adapter, resolveCredential)`** registers the `tools/list` and `tools/call` handlers on an MCP SDK `Server`. The resolver locates each call's credential in the request context (the startup key for stdio, the per-request bearer for HTTP), and each request's abort signal cancels the operation.
+  - **Tool names** come from the operation id: `<app>.<resource>.<operation>` is served as `macts__<app>__<resource>_<operation in snake case>`, for example `macts__calendar__app_reload_calendars`. `toolNameFor(id)` exposes the derivation. Words are split by `splitIdentifierWords`, now exported from **`@macts/core`**, the same split every generated surface uses, so an acronym and its plural stay one word (`listURLs` is `list_urls`).
+  - **Input schemas** are the JSON Schema (draft 7) of each operation's wire contract, and are always object schemas. An operation whose contract cannot be represented, or two operations that derive the same tool name, make the adapter refuse to build with `McpToolDerivationError`, naming the operations involved.
+  - **Results and errors** use the same shapes as the HTTP API. Success is `{ "result": <wire value> }`; a failure is `isError: true` with `{ "error": { code, message, details } }`. An unexpected failure is a generic `INTERNAL` that never repeats the underlying message, and a call to an unknown tool is an MCP `InvalidParams` protocol error.
+
+- 261a888: An operation on an item under a parent now names the parent when the parent is missing. Getting a Calendar event in a calendar that does not exist fails with `TargetNotFoundError` whose `resource` is `Calendar`, where it was `Event`; the same holds for every list, get, create, update and delete scoped to a parent, such as a Music track in a playlist or a Contacts email address of a person. A missing item in a parent that exists still names the item's own resource.
+
+  `NativeFailure` from the app may now carry `missingResource`, the resource the operation found missing when it is not the operation's own.
+
+- 3885b38: Native operations now convert values through their contract inside the automation process. The native executor runs every operation with the in-process value codec, so integers, special doubles, negative zero, and dates survive the trip to and from the app. A result that violates the contract fails with `UnexpectedValueError`, and input that cannot be converted fails with `ValidationError`, each with the offending `issues`. A script that does not compile, or whose outcome cannot be read, fails with `InternalError`. `runNativeScript()` runs one native script with a codec, honoring the time limit, the abort signal, and the output limit, and resolves to the outcome the automation process reported. The executor's `NativeTransport` now runs a native script and resolves to that outcome.
+
+  List results keep the legacy `id` alias, and the declared identifier mirrored from a working property, only when the operation's output passes through unconverted. A typed result contract receives exactly the record's declared fields. `buildNativeBody()` takes `{ identifierAliases }` to choose between the two.
+
+  Native gets and lists read only a resource's usable properties. A property the manifest marks unsupported is never read, so it no longer costs a failed round trip per item.
+
+- 7ac69f1: Add the native macOS executor. `createNativeExecutor()` implements the executor seam: it runs manifest-defined operations against the target app and reports failures as the canonical structured errors, so a missing target, an app that is not installed or not responding, missing automation permission, and a timeout are each distinguishable. A missing target, or a missing parent of a scoped operation, fails as a missing target before anything is read, changed, or deleted. Host failures (an automation host that cannot start, a process killed from outside, oversized output) are internal errors, never blamed on the app. `buildNativeBody()` produces the script body for one operation; input values are read at run time and never written into script text.
+
+  The automation transport now reports every process failure as a `JxaExecutionError` with a `kind`: `timed-out`, `cancelled`, `output-too-large`, `not-started`, `signalled`, `exited`, or `unreadable-output`. `timedOut` is true only when the transport's own time limit stopped the process. `runJxa()` accepts an abort `signal`, which stops the process, and `maxOutputBytes`. Output is read up to `MAX_OUTPUT_BYTES` (64 MiB) per stream, up from 1 MiB, so large list results no longer fail.
+
+- f9d86f8: The macOS provider now converts references at operation inputs and outputs. Contacts `actionTitle`, `performAction` and `shouldEnableAction`, whose `for` takes a single person reference, no longer fail: they accept the reference and pass that person to the app. `actionTitle` still resolves to `undefined` rather than the title, because no manifest records command results yet (#233).
+
+  A reference converts when it is a single identity reference with no container, to a resource the app finds at the application by its identifier, or with its container, to a resource found within one (see the container reference changeset). An input reference becomes the app's object, found as the resource's `get` finds it. If no object has that identifier, the call fails with `TargetNotFoundError` with `details.resource` set to the referenced resource, before any command is sent, for example: Contacts has no Person matching the reference at `for`. An app object at an output position becomes an identity reference with no container. The output positions that convert, on records an operation returns, are Photos album and folder `parent`. Microsoft Edge and Google Chrome window `activeTab` convert to a reference that carries its window (see the container reference changeset). Xcode workspace document `activeScheme`, `activeRunDestination` and `lastSchemeActionResult`, and run destination `device` and `companionDevice`, are left out of output for now, as is every other output field whose reference macts cannot yet return in a resolvable form (see the output reference changeset; #219).
+
+  At an operation position, every other reference still fails with `InternalError`: selectors; identity collections, including one whose entries carry a container; references to a resource with no identifier, no `get`, or no entry in the contract's resource table; a reference with a container to a resource the app finds at the application, or with a container of another resource; and a reference without its container to a resource the app finds only within one. The message for a reference changed to: The Contacts operation "performAction" takes a reference at `for` that the macOS provider cannot convert yet.
+
+  Breaking change for executor implementers: `ExecutionRequest` and `ResolutionRequest` have a new required field, `resourcePlans`, a `ResourcePlanTable` (in `@macts/contracts`) with each resource's identifier plan. `resourcePlanTable(resources)` derives it from an app contract, and `EMPTY_RESOURCE_PLAN_TABLE` is the table for a caller without a contract. The runtime fills it from the registered contract on every request. `registerContract` now refuses, with `OperationRegistrationError`, a contract whose resource is missing from the manifest or whose identifier type differs from the manifest's primary identifier type.
+
+  Nothing reaches the app before the whole input converted: a value that cannot convert, such as a file, a file source, a reference form the provider cannot convert yet, or an invalid value, fails before any event is sent, wherever it sits in the input. Referenced objects are found, and their existence checked, only after that. A call to an app that is not installed fails with `AppUnavailableError` (`not-installed`) whatever its input holds.
+
+  The native codec's functions take a third argument, `{ app, references }`, and a native script carries its `references` table. `@macts/core/testing` is a new internal entry for macts' own tests; it is not public API and not covered by semantic versioning.
+
+- ed3bf17: The macOS provider now resolves references. A single identity reference with no container, to a resource the app finds by its identifier alone, resolves to that object's record, the same record the resource's `get` returns. An identity collection of such references resolves to one record per entry, in entry order, and to `[]` when it has no entries, without starting an automation process; permission, governance, approval and audit still apply to it. With the local SDK, `resolve()` on such a reference, for example a Contacts person or a Reminders list, now returns the record instead of failing.
+
+  The object is found the same way an operation finds a reference it takes as input. A missing object fails with `TargetNotFoundError` with `details.resource` set to the referenced resource, for example: Contacts has no Person matching the reference. In an identity collection, `details.entryIndex` is the position of the first missing entry, and nothing is read. A record that does not match the resource's record type fails with `UnexpectedValueError`.
+
+  Other forms still fail with `InternalError`, before anything is sent to the app: selectors, references and identity-collection entries with a container, and references to a resource that has no identifier, is found only within a container, or has no entry in the contract's resource table. The message names the form, for example: The macOS provider cannot resolve a selector reference to the Contacts resource "Person" yet.
+
+  `@macts/core/testing`, the internal entry for macts' own tests, adds `standInTransport` and `nativeReadKeys`. It is not public API and not covered by semantic versioning.
+
+- c4717eb: App manifests can now record the app's own spelling of a term and mark what the app does not have, and native operations use both.
+  - **Native spellings.** A resource can name its collection as the app spells it (`native.collection`), and a property its field (`native.name`). Native bodies address the app by those names and return records under the public keys. Music's AirPlay devices are reached as `airplayDevices`, and 23 fields in Google Chrome, iTerm, Mail, Music and System Events (such as `url`, `ansiBlackColor` and `macAddress`) are read under the app's spelling.
+  - **Probes read the app by its own spelling.** `macts probe` and `macts probe --nullability` address collections and properties by the recorded native spellings, and report under the manifest keys. Before, Music's AirPlay devices looked empty and fields such as Chrome's `url` and iTerm's ANSI colours counted as failed reads. Neither probe reads a resource marked unsupported.
+  - **Fewer round trips for get, create and update.** Each reads the item's record once. A property the app leaves out of that record, such as Finder's `entireContents`, is read on its own.
+  - **Unsupported resources and commands.** A resource or command can be marked unsupported, with the evidence for it: the app's dictionary has no such class or element, or a live read failed with a recorded error. A marked resource or command gets no route, no permission, and no generated operation or type. Screen Sharing connections, Console devices, Finder desktop and trash objects, and Contacts instant messages are marked, as are Automator's `getSetting` and `getRequiredResource`.
+  - **Top-level collections.** The Reminders and Automator manifests now record that reminders, and Automator's actions and variables, are collections of the application itself, as live counts confirm. No route changes.
+
+  Breaking for callers of what is removed: the Screen Sharing connections `list` and `get` operations and the Automator `settings get` and `requiredResources get` operations, with their permissions; and the exported types and schemas for Console `Device`, Finder `DesktopObject` and `TrashObject`, Contacts `InstantMessage`, and Screen Sharing `Connection`.
+
+- 862bf2d: Add the in-process native value codec, `NATIVE_CODEC`
+
+  `NATIVE_CODEC.prelude` converts wire values to native values for operation arguments, and native results to wire values, inside the automation process and before results are serialized. Integers become canonical decimal text within the safe-integer range. Doubles keep their classification, including `NaN`, the infinities, and `-0`. Dates carry exact milliseconds. Points, rectangles, and 16-bit RGB colors wrap each numeric member. Closed enums reject unknown members with an actionable message. Records follow the presence rules: a missing value is `null` only where the field is nullable, and is omitted at an optional field. Numbers in dynamic content are always doubles, and user records there are enveloped so they cannot be mistaken for control records. A value that violates its plan fails with a structured codec error that carries the direction and the path. Reference and file values have no conversion in this codec and fail with a codec error that says so. Absence is never turned into `null`: `undefined` is accepted only at an optional record field, where it is omitted.
+
+- e2c7efc: Generated contracts leave out, for now, an output field holding a reference that macts cannot yet return in a form a caller can resolve. Each is a gap in what macts covers, not something the app cannot do. Restoring them is planned under #219, and each field comes back on regeneration once macts provides a way to read its target. A field is left out when it references:
+  - a resource macts has no get for yet;
+  - a resource macts has no identifier for yet;
+  - a resource the app finds only within its container, unless the field is on that container's own record and the container is identified by an id, or by a name claimed unique with evidence (see the container reference changeset);
+  - or a resource macts identifies by its name, when the manifest has no evidence yet that the name is unique. Such a reference resolves to whichever object has that name, which may not be the one the app returned. A primary identifier claimed `unique: true`, with its evidence, counts as identity.
+
+  A field left out is not declared by the contract's record type or value type, and native reads do not read it. It is also gone from the HTTP client's read type and schema and from what the CLI prints. Input types are unchanged, so a writable field may still be set. Generation warns once per field left out. The warning names the app, the field, the referenced resource and what macts does not provide yet, for example: macts has no get for "Mailbox" yet. The same rule applies to a command result, but no manifest records one yet. The generator's tests pin every field left out, as a ledger of the coverage still to restore.
+
+  Breaking change: these record fields are gone from the HTTP client's read types and schemas, and from what the CLI prints. Only the four Xcode fields were on records a call returned before this change: RunDestination and WorkspaceDocument have a get and a list. Every other record listed here has no get, list, create or update in macts today, so no call returned it, and only its declared type changes.
+  - Arc: Window `activeTab` and `activeSpace`.
+  - Finder: FinderWindow `listViewOptions`, and ListViewOptions `sortColumn`.
+  - iTerm: Window `currentTab` and `currentSession`, and Tab `currentSession`.
+  - Mail:
+    - Message `mailbox` and `content`;
+    - MessageViewer `draftsMailbox`, `inbox`, `junkMailbox`, `outbox`, `sentMailbox` and `trashMailbox`;
+    - Mailbox `account` and `container`;
+    - Rule `copyMessage` and `moveMessage`.
+  - Messages: Participant and Chat `account`.
+  - System Events:
+    - the folder fields of ClassicDomainObject, Domain and UserDomainObject;
+    - DiskItem `container`;
+    - NetworkPreferencesObject `currentLocation`;
+    - Service `currentConfiguration` and `interface`;
+    - ScriptingClass `superclass`;
+    - ScriptingCommand `directParameter`.
+  - TV: BrowserWindow and PlaylistWindow `view`, and Playlist `parent`.
+  - Xcode, on records a call returns: RunDestination `device` and `companionDevice` (macts has no get for Device yet), and WorkspaceDocument `lastSchemeActionResult` (no get for SchemeActionResult yet) and `activeRunDestination`. A run destination is identified by its name, and the manifest has no evidence yet that the name is unique. It is also found only within its workspace document, so the field needs its workspace container as well as that evidence.
+
+- aadc2fe: Some reference inputs now require a container. When the operation that resolves a reference finds objects only within an object of another resource, the reference has to name that parent as its container.
+  - Music gets and lists tracks within a playlist.
+  - Contacts gets and lists addresses, emails and phones within a person.
+  - Calendar gets and lists events within a calendar.
+  - Google Chrome and Microsoft Edge get and list tabs within a window.
+  - Xcode gets and lists projects, schemes and run destinations within a workspace document.
+  - Some apps list resources only within a parent, though each gets a single one without a parent:
+    - Reminders lists reminders within a list.
+    - Microsoft Edge lists bookmark items within a bookmark folder.
+    - OmniGraffle lists graphics, shapes, lines and layers within a canvas.
+    - Automator lists actions and variables within a workflow, and an action's settings and required resources within that action.
+
+  The generated resource table records this for each resolving operation, as `parents: { get?, list? }` on the resource. `ResourceDescriptor.parents` (of type `ResourceParents`) in `@macts/contracts` describes it. A reference takes the parent of the operation that resolves it:
+  - A single-object reference, a container and an identity-collection entry take the `get` parent.
+  - A selector collection (every or range) takes the `list` parent.
+
+  Where a parent applies, the reference's `container` must be an identity reference to it. The following reject a reference with no container, with a container naming another resource, or with a selector container:
+  - encoding and decoding;
+  - `bindReference`;
+  - the runtime's reference check;
+  - the published input JSON Schemas.
+
+  Encoding and `bindReference` raise a `ValidationError` at `container` that names the parent. The reference data types reject the same references at compile time. A chain of parents is checked level by level. A container whose parent is name-keyed and not claimed unique (Calendar calendars, Automator workflows, Xcode workspace documents) names the parent by name, so a name others share resolves to the first match the app returns. References resolved through an operation that works at the application are unchanged.
+
+  Behavior change: code that built such a reference without its container now fails to compile and is rejected at runtime. That covers references to a track, address, email, phone or event, and collections of reminders, tabs, graphics and the other listed resources. Add the parent's identity reference as `container`. Contacts' input JSON Schemas grow, because each container branch for an address, email or phone now spells out the person container it requires.
+
+  The macOS provider still does not convert a reference with a container. Passing one to an operation still fails with `InternalError`, and operations still return no references to these resources.
+
+- 8c4faef: App permission groups now list only permissions that some operation requires.
+
+  The permission groups in 14 app manifests listed 122 permissions that no operation required, such as `microsoft-edge:tabs:update` (Edge has no tab update operation) and `calendar:calendars:delete`. Granting one authorized nothing. They are removed from the permission groups that discovery and the generated packages publish, and a test over every shipped manifest keeps them from coming back. An operation's permission returns to its group together with the operation's command.
+
+  Grants of the removed permissions authorized nothing before and still authorize nothing. `macts api-key create` still accepts one, with or without `--manifest`, and warns on stderr that no route requires it, appending `Closest: "…"` when a permission a route requires is close. For example, `omniplan:tasks:update` names `omniplan:tasks:create`. Before, with `--manifest` it failed with `Resource "…" not found in permissions mapping` or `Operation "…" not found`. Without `--manifest`, a `create` or `delete` permission was accepted silently.
+
+  `createApiKey` in `@macts/runtime` grants a well-formed fine-grained permission that the permissions map does not list as written, and still expands coarse and wildcard permissions through the map. `expandPermissions` and `expandCoarsePermission` in `@macts/core` take a new option, `{ unmapped: 'keep' | 'reject' }`, which `createApiKey` sets to `keep`. The default stays `reject`, so `macts permissions expand` still fails for such a permission.
+
+- 1cfc8fd: A manifest can now declare a positional resource: one whose objects have no identifier and are found only by their zero-based position within their parent. The resource records `positional: { evidence }`, with curated evidence (`source: curated`, a `note`, `observedAt` and `appVersion`). Nothing is inferred from a missing identifier.
+
+  The manifest schema, every generator and both operation registrations refuse the marker on a resource that has a primary identifier, has no get, has a get that records no parent, has a parent the app does not find by its identifier, or has a command that selects one of its items by anything but a non-null `integer` parameter. `@macts/core` exports the rule as `positionalProblems()`, and `isPositional()`.
+
+  For a positional resource:
+  - Its native get, update and delete find the item at the given zero-based position within its parent, after checking that the parent holds that many. A position past the end is `InvalidSelectionError`; a missing parent is `TargetNotFoundError` naming the parent.
+  - An output field holding one, read through its parent's own record, is emitted as an index selector within that parent: `{form: 'selector', cardinality: 'one', selector: {by: 'index', index}, container}`. The index is the position the app itself reports for the object within that parent, never a dictionary `index` property; an object whose position the app does not report fails as `InternalError`. A command result holding one stays out of output.
+  - The native executor resolves, and converts at input positions, an index selector to it within its parent's identity container, with the same errors.
+  - Generated docs say the object has no id, is selected by its zero-based position, and that the position drifts when objects open, close or move.
+
+  In `@macts/contracts`, `IndexSelectorReference<T, R>` is a `SelectorReference` whose selector is an index and whose container is an identity reference; it is assignable to `ObjectReference`. `t.indexSelectorReference(scope, resource)` is its value type: its wire schema, and so the runtime's output check, admits only that form. A reference plan gains an optional `form: 'index'`, which records the form the native codec emits.
+
+  In `@macts/core`, `NativeAddressing` gains `NativePositionalAddressing` (`lookup: 'byIndex'`), `NativeCodecEnvironment` gains an optional `positionOf`, and a codec failure can carry `outOfRangeResource`. An exhaustive `switch` over `NativeAddressing['lookup']` needs a new case.
+
+- e319917: Generated SDKs no longer expose properties that the app cannot provide at runtime.
+  - A manifest property can now carry an evidence-backed `unsupported` marker. Every generated surface (contract, SDK, CLI, MCP tools, HTTP routes) omits a marked property.
+  - `macts probe --nullability` reports a defect when every read of a property fails. It also reports a defect when the observed value kind (date, number, boolean, string, record, list, reference) contradicts the declared type, and suggests the marker where it fits.
+  - Nested resources are now sampled from evenly spaced parents within a bounded scan, so deep collections such as calendar event alarms yield items instead of hitting the time limit. The probe record gains `parentsScanned`.
+  - **Breaking SDK field changes:**
+    - Finder: `Container.expandable`, `expanded`, `completelyExpanded`, `containerWindow` removed. `ApplicationFile.suggestedSize`, `minimumSize`, `preferredSize`, `opensInClassic` removed. `DocumentFile.id` removed. `Package.id` is now a string.
+    - Calendar: `Calendar.calendarIdentifier` removed. Calendars are targeted by name. `Event.stampDate` is now nullable, because a wider sample found events without it.
+    - Notes: `Folder.container` removed.
+    - Reminders: `allDayDueDate` is renamed `alldayDueDate` and is nullable. `List.color` is now a string.
+
+- 36942f9: A reference now names the app it belongs to. Every reference data and bound form (`IdentityReferenceData`, `SelectorReferenceData`, `IdentityCollectionReferenceData`, `SelectorCollectionReferenceData`, and the bound `ObjectReference` and `CollectionReference` types) has a required `app` field: the `app` of the contract it is used with. Containers and identity-collection entries carry it too.
+  - **Decoding** sets `app` from the contract at every level.
+  - **Encoding** rejects a reference whose `app` is missing or names another app, at any level. The issue is at `[...path, 'app']`, so a reference from one app cannot be passed to another app's operation; the call fails with a validation error before anything is sent.
+  - **The wire form is unchanged.** It never carries `app`, because the route already names the app. A wire reference that carries `app` is rejected.
+
+  `t.reference` now takes a scope instead of a resource table: `t.reference(() => scope, resource, cardinality)`, where the new `ReferenceScope` type is `{ app, resources }`. An app contract is assignable to `ReferenceScope`, and generated contracts pass `() => <app>Contract`. Code that builds references by hand must add `app`, and code that calls `t.reference` with a resource table must pass a scope instead.
+
+  Reference types now carry their resource key as a literal type. The data types (`IdentityReferenceData`, `SelectorReferenceData`, `IdentityCollectionReferenceData`, `SelectorCollectionReferenceData`, `ObjectReferenceData`, `CollectionReferenceData`) and the bound types (`ObjectReference`, `CollectionReference`, `IdentityReference`, `SelectorReference`, `IdentityCollectionReference`, `SelectorCollectionReference`, `ObjectReferenceVariant`, `CollectionReferenceVariant`) each take a final type parameter for it, which defaults to `string`. `t.reference` infers it from its `resource` argument.
+
+  Generated contracts type references by direction:
+  - Record fields and command results hold a bound reference, `ObjectReferenceVariant<Record, Id, 'Key'>`.
+  - Parameters and create and update fields take its data form, `ObjectReferenceData<Id, 'Key'>`. Callers can pass a reference they build, by identifier or by selector, or one they received.
+
+  A reference to another resource, or of the other cardinality, no longer type-checks.
+
+  A reference must now name objects that can be resolved, at every level:
+  - A single reference, every container, and every identity-collection entry need a resource with a `get` operation.
+  - A collection needs a resource with `list`.
+
+  `ReferenceRegistry` entries record `get` and `list` for this, and an app contract's `resources` table already has them. The runtime's reference resolution applies the rule too: a resolve request whose container or entry names a resource with no `get` is rejected as a validation failure. A resource whose resolving operation is unavailable cannot be resolved. The rule is part of the reference wire schema, so it applies everywhere: to encoding, decoding, the runtime's check of raw HTTP and MCP requests, and the JSON Schema of every reference position. That JSON Schema now lists only the resources that can contain a reference, and a position whose resource lacks its operation admits no value (`{"not": {}}`). A violation is reported at the reference itself, or at the `resource` of the offending container or entry.
+
+  `ResourceDescriptor.id` now documents the meaning of an identity reference to a resource keyed by name. It resolves to whichever object has that name when it is resolved. When several objects share the name, the app decides which one that is.
+
+  Generated surfaces never offer an operation that cannot be called. An input position that takes a single reference to a resource with no `get` admits no value, so the rule above rejects every request that fills it. An optional position like that is left out of the input. A required one makes the operation unavailable:
+  - generation warns, naming the app, the operation and the position;
+  - the descriptor stays in the contract's `operations`, with a new `unavailable` member (`OperationUnavailability`: the positions and the reason);
+  - the runtime answers `invoke` of it exactly as an unknown operation, with the same validation error, before permission, governance or approval, so no one is asked to approve a call that cannot run;
+  - the MCP adapter lists no tool for it, and calling its tool name is an unknown-tool call;
+  - the HTTP API neither routes nor lists it: `POST /rpc/<id>` gets the same 404 as an unknown operation, and introspection leaves it out;
+  - neither generated client has a method for it, the generated CLI has no command for it, and capability discovery lists no capability for it;
+  - its permission is no longer a known permission: `macts api-key create` rejects a grant naming it (for example `mail:app:synchronize`) as an unknown permission, and `macts permissions expand` no longer lists or suggests it. These permissions never authorized anything that could be called.
+
+  A left-out position has no parameter in either generated client, no CLI flag, and no field in the capability schema.
+
+  None of the affected positions ever worked through the native runtime, because it cannot yet encode references. What changes is how a request that uses them is treated. A request that sends a left-out field used to reach the server, and is now rejected as an unknown field. An unavailable operation is no longer offered as a tool, a route, a client method, a command or a capability.
+
+  The operation that becomes unavailable is Mail `mail.app.synchronize`: its required `with` takes an account, and Mail has no operation that gets one. The `synchronize` method of both the contract client and the `MailClient` HTTP client, and the CLI command `macts mail synchronize`, are removed.
+
+  Operations that lose an optional position:
+  - Mail `mail.app.checkForNewMail` loses `for` (an account). The contract client method is now `checkForNewMail(options?)`, the HTTP client method `checkForNewMail()`, and the CLI flag `--for` is removed.
+  - Mail `mail.app.performMailActionWithMessages` loses `inMailboxes` (a mailbox) and `forRule` (a rule). The contract client method is now `performMailActionWithMessages(options?)`, the HTTP client method `performMailActionWithMessages()`, and the CLI flags `--in-mailboxes` and `--for-rule` are removed.
+
+  Create and update input types that no operation takes lose the same kind of field, in both the contract and the HTTP client types (`src/types.ts`), so the two clients' input types agree for every resource. The types change, but no request does:
+  - Finder `ListViewOptionsCreateInput` and `ListViewOptionsUpdateInput` lose `sortColumn`.
+  - iTerm `WindowCreateInput` and `WindowUpdateInput` lose `currentTab` and `currentSession`, and `TabCreateInput` and `TabUpdateInput` lose `currentSession`.
+  - Mail `MessageCreateInput` and `MessageUpdateInput` lose `mailbox`, and `RuleCreateInput` and `RuleUpdateInput` lose `copyMessage` and `moveMessage`.
+  - TV `BrowserWindowCreateInput` and `BrowserWindowUpdateInput` lose `view`, and become `Record<string, never>`.
+  - System Events `NetworkPreferencesObjectCreateInput` and `NetworkPreferencesObjectUpdateInput` lose `currentLocation`, and become `Record<string, never>`. `ServiceCreateInput` and `ServiceUpdateInput` lose `currentConfiguration`.
+
+  `CliGeneratorContext` gains `isOperationAvailable` and `omittedInputs`, which the CLI generator uses to apply the rule.
+
+- 5033b73: References to objects an app holds only inside another object now carry that object as their container, and the macOS provider reads and resolves them.
+
+  Google Chrome and Microsoft Edge: window records include the window's `activeTab`, from `windows.get`, `windows.list` and Edge's `windows.create`. In Edge, the field keeps its type, and its value now carries its window, so it can be resolved; before, it could not be used to read the tab. It is a reference to the tab that carries the window it was read from as its container, for example `{ resource: 'Tab', id: '…', container: { resource: 'Window', id: '…' } }`. Chrome and Edge hold each tab in its window, so a tab is identified only within its window, and `activeTab.resolve()` finds the window first, then the tab in it. A window or tab id identifies it within one browser session: ids start over when the browser is relaunched, so a reference kept across a relaunch may resolve to a different tab or window, not merely fail, and an action through it, such as closing the tab, would act on that other tab. Nothing shows an id changing while the browser keeps running. The Edge behavior follows Edge's scripting dictionary and has not been verified on an installed Edge.
+
+  `@macts/core`:
+  - The macOS provider now converts and resolves a reference whose target is found within a container: it finds the container first, by the container's own targeting (a container found by its key is looked up by its key), then the target within it, by the target's. If the container is missing, the call fails with `TargetNotFoundError` whose `details.resource` names the container's resource (for example `Window`), and the target is not looked up. If the container does not hold the target, it fails with `TargetNotFoundError` naming the target's resource. A container on an object found at the app level, or a container of another resource, still fails with `InternalError`.
+  - This also covers Contacts email addresses, phone numbers and addresses within their person, Music tracks within their playlist, TV playlists within their source, Calendar events within their calendar, and Xcode projects, schemes and run destinations within their workspace document, at inputs and on resolution. Each still needs its own check against the live app before it is claimed. Calendar resolution is not exact: calendars are found by name, which is not claimed unique, and an event's `uid` is not unique, so an event reference you build addresses the first match, as the existing Calendar operations that take a calendar already do. Xcode resolution is not exact either: a workspace document is found by name, which is not claimed unique, and a run destination by its name within it, so a reference you build addresses the first match.
+  - An output field holding such a reference is now kept when it is read from its container's own record and the container is identified by an id, or by a name claimed unique with evidence. Of such fields, only Chrome and Edge `Window.activeTab` qualify. The others stay left out: TV browser window and playlist window `view` and a playlist's `parent`, which are read through a window or a playlist rather than the playlist's source; Xcode workspace document `activeScheme` and `activeRunDestination`, which need the workspace document identified by its path; and an Xcode target's `project`, which also needs references whose container is itself found within another.
+  - `NativeCollectionAddressing` gains `within`, the resource an object is found within, and `NativeBodyOptions` gains `containerReferences`.
+
+- 3463be6: Manifests can describe an app that reports an absent value by failing the read.
+
+  Probe nullability evidence can record `errorNumbers`. When some reads failed, every failed read raised "no such object" (-1728), and at least one read succeeded, the evidence supports `nullable: true`, and a read of that property failing that way returns `null` after the item itself is found, in a get, a resolved reference, a create or update's read-back, and a list's item-by-item reads (an update checks the item exists before its writes, and a create just made the item). The generated SDK's documentation for such a property says the app reported no value in some reads. Evidence whose every read failed describes structural absence, which is `unsupported`, not nullable. The same failure of any other property, and any other failure, still fails.
+
+  New exports: `ABSENT_VALUE_ERROR_NUMBER` (-1728); `reportsAbsence`, which says whether nullability evidence records only that failure; and `readsAbsentAsNull`, which says whether a property reads that failure as `null`, and the `NullabilityClaim` type it takes.
+
+- e6214e2: A resource command now sends the app the item you name. Commands such as `show`, `build`, `send` or `save` are now sent their item as the command's direct parameter.
+
+  Each of these commands acts on one item, and the app's command takes that item as its direct parameter. The generated native body used to call the command on the application with only its declared parameters, so the app never received the item. Depending on the app, the call failed or acted on an item the app picked, such as the front document.
+
+  The body now selects the item exactly as a get does, through the same lookup, under the parent the command records, by the resource's identifier targeting. A missing parent or item fails with `TargetNotFoundError` naming its resource, before the command is sent. The item is then sent as the direct parameter. Only the command's other declared parameters are sent as named parameters; the item's and the parent's identifiers never are.
+
+  The rule that selects an item now covers every resource-scoped command except a list or create. The item's identifier is the command's first required parameter other than its parent's. The generated contract client, HTTP client and CLI take a resource command's inputs in the same order as a get's: the parent's identifier, then the item's, then the command's other parameters. The generated CLI command now asks only for those inputs, as follows:
+  - a flag for the parent, when the command records one;
+  - one positional for the item, labelled with the identifier a get takes;
+  - a flag for each other parameter.
+
+  It no longer asks for a positional it never used, for parent flags taken from the resource's place in the hierarchy, or for the identifier a second time as a flag. When the resource, or the parent the command records, is matched on a name that is not claimed unique, the generated docs and CLI help say the first match is used, as a get's do.
+
+  A few shipped commands cannot select their item yet, because their resource has no identifier or get, or because their item lies more than one parent deep and a command records only one parent: OmniPlan `fix`, Music and TV `refresh`, System Events `click`, `perform` and `select`, and Mail `forward`, `redirect` and `reply`. `@macts/core` lists them in `KNOWN_ITEM_SELECTION_GAPS`, each with what it still needs. They stay available and behave as before, with the same inputs on every surface, CLI included, and their generated docs and CLI help say so: "macts does not yet send the <item> to the app, so the app acts on whatever it chooses." Generation and registration refuse any other command that cannot select its item.
+
+  Generation and registration now refuse a resource command that declares no identifier parameter, as they already refused such a get, update or delete. Each refusal names the app and the command key and says to declare the item's identifier as a required parameter. If a manifest of yours is refused, declare it, together with the command's `parent` where the resource's get records one.
+
+  Update the app packages together with `@macts/runtime` and `@macts/core`. A runtime from this release refuses an earlier Calendar, Mail, Microsoft Word, Reminders or System Settings package. It runs an earlier Music or TV playlist `move` or `search` against the playlist named by its `to` or `for` value, and an earlier Microsoft Edge tab command against the application, which has no tabs, so those fail.
+
+  Refs #287
+
+- dae51a7: Each resource is now spelled the same way on every public surface.
+
+  A resource's segment is the acronym-aware lower camel case of its plural (`MediaItems` → `mediaItems`, `AIMHandles` → `aimHandles`, `URLs` → `urls`). One shared function derives it, and these all use it: routes and operation ids, SDK accessors, MCP tool names, capability names, and the scope segment of derived permissions.
+
+  **Breaking for multi-word resources.** These change:
+  - routes and operation ids: `photos.mediaitems.list` becomes `photos.mediaItems.list`
+  - SDK accessors: `photos.mediaitems` becomes `photos.mediaItems`
+  - MCP tool names: `macts__photos__mediaitems_list` becomes `macts__photos__mediaItems_list`
+  - MCP operation names split acronyms as words: `macts__iterm__app_invoke_a_p_i_expression` becomes `macts__iterm__app_invoke_api_expression`, and `macts__mail__app_get_u_r_l` becomes `macts__mail__app_get_url` (5 tools in iTerm, Mail, QuickTime Player and Screen Sharing)
+  - derived permissions: for example, `mail:outgoingmessages:send` becomes `mail:outgoingMessages:send`
+
+  A permission granted with the old lowercase scope no longer matches. The permission error suggests the correctly spelled one. Single-word resources are unchanged.
+
+  Explicit manifest permissions that only restated the derived default are removed, so they can't drift from the derivation. Every route's enforced permission is unchanged except where its spelling changes as above.
+
+- fb9a0a1: The runtime resolves references. `MactsRuntime.resolveReference(app, reference, context)` takes a reference in wire form (the `{"reference": …}` control record) and resolves it as a call of the referenced resource's `get` operation (a single reference) or `list` operation (a collection reference). It needs that operation's permission, is governed, approved, and audited exactly like a direct call of it, validates the reference against the app contract's resource table, and validates the result against the operation's output contract. A container's permission is not required, because containers only locate the target. A reference to a resource absent from the contract's resource table fails with `ValidationError` ("The reference names no resource of the app."), and so does one whose resource has no such operation, with an issue at the reference's `resource` naming the missing operation. `InvalidSelectionError` is for an index or range the collection cannot satisfy. An app now has at most one registered contract, and `registerContract` refuses a second contract for the same app. `registerContract` also refuses a contract whose resource table records a `get` or `list` operation that is not one of its operations targeting that resource. For an identity collection, the result must hold exactly one record per entry, so an entry is never silently dropped.
+
+  The `Executor` interface in `@macts/core` gains a required `resolve(request: ResolutionRequest)` method, which resolves a validated reference into the record or records it denotes. Custom executors must implement it. To migrate, add a `resolve` method; one that does not support references can return a rejected promise with `InternalError`, as the native macOS executor does.
+
+  `TargetNotFoundError` details in `@macts/contracts` can carry `entryIndex`, the zero-based position of the identity-collection entry whose target no longer exists.
+
+  `@macts/cli`: the host's built-in test executor implements the new `resolve` method.
+
+- f717527: Add the shared contracts for local and remote SDK clients
+
+  **`@macts/contracts`** is a new platform-neutral package. It holds the contracts that both clients, the runtime, the adapters, and generated app packages share:
+  - **Values** — the `Integer` brand and its safe-integer domain (`INTEGER_LIMITS`), `Point`, `Rectangle`, 16-bit `Rgb`, and the wire control records. Integers travel as decimal text (`{"integer":"42"}`); doubles, including `NaN`, the infinities, and `-0`, travel as `{"double":…}`. The package also defines the serializable `ValuePlan` (including `PASSTHROUGH_PLAN` for values that carry no wire encoding), the `WireRecord` input shape, and the `ValueType` contract that ties an SDK schema, a wire schema, and a native plan together.
+  - **References** — identity versus selector and single versus collection as independent axes, plus materialized `ReferenceList`s, each with precise `resolve()` result types.
+  - **Files** — `FileValue` and the transfer handles, which are distinct per locality: `TemporaryFileCopy`, `SignedDownload`, `CallerOwnedFile`, `UploadedFile`, and `UploadTarget`.
+  - **Invocation** — `Credential`, `InvocationContext`, and the token-derived `Authority`.
+  - **Errors** — the canonical structured error classes (`ValidationError`, `TargetNotFoundError`, `PermissionDeniedError`, `PolicyDeniedError`, and the rest), their typed `details`, the `WireError` envelope, and the `ERROR_CLASSES` registry used to reconstruct the same class from the wire.
+  - **Operations** — `OperationDescriptor`, `AppContract`, `ClientRuntime`, `ClientFactory`, and the `CallOptions` that invocation, reference resolution, and file fetching share.
+  - **Exhaustiveness** — `UnreachableError`, whose constructor accepts only `never`, so an unhandled member of a closed union becomes a compile error.
+
+  **`@macts/core`** adds two interfaces:
+  - **The executor seam** — `Executor` and `ExecutionRequest`, the provider-neutral interface through which an authorized, validated operation is handed to a provider.
+  - **The in-process native codec contract** — `NativeCodec`, `NativeScript`, `NativeFailure`, and `NativeOutcome`, plus the `NATIVE_*` names. It defines how wire values are converted to and from native values inside the automation process, before results are serialized.
+
+  These are interfaces and error classes only; no existing behavior changes.
+
+- a746285: `bindReference` now accepts only resource keys a reference can resolve through, and generated contracts expose their resource table's type.
+
+  Each generated contract exports the type of its resource table as `<App>Resources` (for example `NotesResources`), and the contract is typed `AppContract<<App>Client, <App>Resources>`. The type declares one entry per resource: each builds on `ResourceDescriptor<Record, Id>` and requires the identifier and the literal `get` and `list` operation ids the resource has. The table value is checked against it with `satisfies`, so the type and the value describe one table. `AppContract` takes the table type as an optional second type argument, so `AppContract<Client>` still means a contract whose table keys are not known. Both `createClient` factories return `Client & ClientBrand<Resources>`, and each generated client interface extends `ClientBrand<<App>Resources>` (for example `interface NotesClient extends ClientBrand<NotesResources>`), so the client's type carries the contract's table, including a variable or parameter annotated `NotesClient`. The brand exists only in the type; a client has no added property under any key, and its members are still exactly the app's operations.
+
+  A generated resource table now lists only the resources that have a `get` or a `list` operation. No reference to any other resource can be resolved, in any form or position, so encoding and decoding already rejected them; they now fail as references to a resource the app cannot resolve references through. Their record interfaces are still exported.
+
+  `MactsRuntime.resolveReference` (and so the `/references/v1` route) rejects both kinds of unresolvable target with `ValidationError` (`VALIDATION_FAILED`, 400), with an issue at the reference's `resource`. A reference to a resource absent from the contract's table fails with "The reference names no resource of the app.", the issue saying the app has no such resource. A reference to a resource in the table that has no `get` (for a single reference) or no `list` (for a collection) fails with an issue naming that missing operation. `InvalidSelectionError` is reserved for an index or range the collection cannot satisfy.
+
+  `bindReference(client, data)` reads the table from the client's type. Data type-checks only when every level names a key that records the operation it resolves through: `get` for a single-object reference, a container, and an identity-collection entry, and `list` for a collection. An identity reference needs a resource with an identifier, of the identifier's type. The result is the bound variant for the data's resource, form and cardinality, with the resource's record and identifier types, so `resolve()` returns `Promise<Record>` or `Promise<readonly Record[]>` instead of `unknown`. Where the position takes any container, a container that is itself a reference a client decoded is accepted as it is. At a parent-scoped position, only an identity reference to the parent is accepted. Clients of a contract with no declared table type accept any reference data, as before. `bindReference` behaves as before at runtime. `@macts/contracts` exports the types involved: `ResourceTable`, `ClientBrand`, `ResolvableResourceKey`, `ResolvableReferenceData` (and its object and collection halves), `ResolvableContainment`, `ResourceRecordOf`, `ResourceIdOf`, and `BoundReferenceOf`.
+
+  Generated HTTP clients' list methods return `Page<T>` from `@macts/contracts` instead of an inline `{ items, nextCursor? }` shape, so their items are read-only arrays.
+
+- 62a95dd: Code generation leaves out an output field when its reference is to a resource the manifest's hierarchy holds only within another resource, never at the application, while that resource's get names no container. Such a reference could not be resolved, because the get would look in a list the app does not have. Generation warns about each one, saying that the app holds the resource only within a container and that macts's get for it does not name that container yet. If the hierarchy does not place the resource anywhere, this rule does not apply. No shipped manifest has such a field after this change.
+
+### Patch Changes
+
+- 7cb8bc4: A property whose evidence makes the app's "no such object" failure (-1728) its empty value now reads as `null` when the app reports its object missing only as the object is read for the reference, not only when the property read itself fails. This holds wherever the value came from: an item's property record, a column read across a list, or a read on its own. Before, a get or a list could fail as if the item itself were missing. Such a property is also always read on its own in a get, never taken from the item's property record, because its evidence is of what that read reports.
+
+  Only the read of the field's own object counts. The same failure while reading the identity of the item the field was read through still fails.
+
+  The body marks such a value for the codec with a registry symbol, which no app record or JSON value can carry, so app data is never taken for the marker. The codec honours the marker only as a record field's value, where bodies put it; anywhere else it fails by its plan, under an `unknown` plan too, rather than encoding as an empty record. A value handed over with the record it was read through (a reference whose resource is found within a container) is marked the same way, so an app record with a key of the old marker's name is ordinary data. A body marks values only for a result encoded by a typed plan: `NativeBodyOptions.absentValueMarkers` (default `true`) turns marking off, and the native executor turns it off under a passthrough plan, whose result the codec returns unchanged.
+
+- 7cb8bc4: When the app fails a read inside a list or a get, the error's cause now says what was being read: a property by its manifest name, with its position in the result (`while reading the property "holder" at [2]`), or the items themselves. It names properties and positions only, never a value the app returned. The error's class and message are unchanged.
+- 89168af: Pass the script to the automation process without a shell. Script text, and every value embedded in it, now reaches the process byte for byte, so values containing quotes, backslashes, or newlines arrive unchanged. Bundle identifiers, element names, selector values, and property keys are embedded in generated scripts as literals. A process that exits before reading a large script now rejects the call instead of crashing the host process.
+- e569256: List operations now read each property once across the collection instead of once per item. List operations in apps where each request is slow, such as Reminders, now finish much faster: a Reminders list that took over four minutes now takes seconds. Records are assembled by position. After reading the properties, a list reads the identifiers once more and checks that no item was added, removed or moved meanwhile; if the collection changed, it reads again from the start rather than returning records that pair values from different items. A resource with no identifier is counted again instead, which catches items added or removed but not items that swap places. A property the app cannot read across the collection is still read item by item, so it is never dropped. A list whose app quits, stops answering, is cancelled or loses its automation authorization partway through fails, rather than returning records that lack a field. Events in one calendar that share an identifier now each report their own details; before, each one repeated the first event's.
+
+  Behavior change: Script Editor's document list now reads `contents` across the collection, like every other property, instead of taking it from each document's property record. A document whose record left `contents` out now includes it.
+
+- c5a4690: Discovery reports the permission every operation requires. A capability's permission was reported only when the manifest declared one, so most capabilities showed no permission although the server enforces one for every operation. Each capability, in the capability registry, in discovery and CLI search output, and in every generated `capabilities.ts`, now reports the permission the server enforces for its route: the declared one, else the one derived from the route, such as `notes:attachments:get`.
+- 7429951: An identifier other than the class's dictionary id must now declare how it is looked up.
+
+  An identifier with no `targeting` is looked up with the app's id specifier (`byId`). That finds an item only by the class's dictionary id, the property the app's scripting dictionary declares with code `ID  `, whatever the property is named. Calendar's event `uid` carries that code and keeps the default. Any other identifier, such as a document's `name`, must declare its targeting, whether or not the class also has an `id`: usually `byProperty` or `byKey`. An explicit `byId` is accepted as the manifest's own claim that the app's id specifier finds the item by that property. A property with no code never qualifies. The rule judges the resource's primary identifier with what it inherits from its superclasses.
+
+  Generation refuses a manifest with such an identifier. `generateConsolidatedPackages`, `generateClientPackage`, `generateServerPackage`, `generateHttpClientSdk`, `generateCliPlugin` and `generateSdk` return one error for each such resource and no files, and `generateCapabilitiesModule` throws with the same errors. Each error names the app, the resource and the identifier property, and says to declare its targeting. `untargetedIdentifiers` and `identifierTargetingProblem` in `@macts/core` report the same resources.
+
+  Registration refuses the same manifests. `operationsFromManifest` (`registerManifest`) and `operationsFromContract` (`registerContract`) throw `OperationRegistrationError` naming the app, the resource and the property, and register nothing from the app.
+
+  If a manifest of yours is refused, add `targeting: byProperty` to the identifier the error names, to match items on that property, or `targeting: byKey` if the app looks items up by that value as a key.
+
+- 7429951: Generated docs now say which item a get, update or delete acts on when several items share the value it looks the item up by.
+
+  When a resource is matched on a property (`byProperty`) that is not claimed unique, the generated HTTP client's get, update and delete docs, the contract client's, and the CLI get's help add one sentence: when several items share the value, the first match in the app's order is used, and the operation does not fail as ambiguous. Nothing is added for a value claimed unique, or for a resource looked up by the app's id or key specifier.
+
+  This adds the sentence to Calendar calendars and Music tracks. It also reaches Automator workflows, Xcode workspace documents and run destinations, and the documents, layers, Notes items and Terminal windows, settings sets and tabs that are now matched by name or tty. No operation, input or capability changes.
+
+  `ResourceDescriptor.id` now says that an identity reference to a resource matched on a property resolves to the first match in the app's order when several objects share the value, and that a key is interpreted by the app.
+
+- e0d2969: Generated app packages now include a `.gitattributes` that marks the files the generator owns there as `linguist-generated`: the whole `src/` tree, the build, TypeScript and API Extractor configuration, `LICENSE`, `.gitignore`, the `.macts-generated.json` record and the `.gitattributes` itself. Because they are marked `linguist-generated`, GitHub collapses these files in pull-request diffs and leaves them out of the repository's language statistics, so a change that regenerates packages shows its generated code as generated, and review-size checks that honour the attribute stop counting it as hand-written. `package.json` is left unmarked, because its version and dependency changes are meant to be reviewed. The file is listed in each package's `.macts-generated.json` like any other generated file, and it is not published: the packages' `files` field still includes only `dist`.
+- 80fad3c: The generated HTTP client and CLI now send integer ids and integer list parameters in the contract's wire form, so `get` by an integer id works through them.
+
+  A get keyed by an integer id, such as OmniPlan's tasks, resources and milestones or TV's browser and playlist windows, sent the id as the text it was given, and the operation's input rejected it. The client's `get` now takes the id as a number or as text and sends `{ integer: "<digits>" }`. A list's required integer parameter is sent the same way, and the CLI's `list` converts the flag's text to a number. So are a delete's and an update's integer ids and every integer parameter of a command, such as Automator `add`'s `atIndex`, Word `insertText`'s `at` and `createRange`'s `start` and `end`, QuickTime Player's step `by`, System Events' `usingActionNumber` and Xcode `attach`'s `toProcessIdentifier`. An optional integer that is omitted is not sent.
+
+  Required integer list flags and page-size flags validate their original text before exact conversion to the numeric SDK input, so fractional boundary values and noncanonical spellings cannot change the selected scope.
+
+  Malformed, fractional, non-finite, and out-of-range integer inputs now fail locally with `ValidationError` before any HTTP request. Text identifiers must use canonical decimal spelling; numeric negative zero is sent as zero. The safe-integer bounds and validation policy come from the shared operation value contract.
+
+  Standalone CLI plugin manifests also declare the shared contract runtime directly, so integer validation resolves under isolated dependency installation.
+
+  Refs #207
+
+- eb51c54: Native operations on multi-word collections now reach the app. Bodies used to address a collection by its plural lowercased (`app["mediaitems"]`), which no app resolves. They now use the app's own spelling of the dictionary term: the first word lowercased whole, each later word capitalized (`mediaItems`, `urlTracks`). That covers the collection itself, the parent a nested resource is reached through, and a parent derived from a parameter name.
+- 7aed949: A list now returns bounded pages only when the app was seen to read the list's items a page at a time. Music's playlists list failed on every call, because Music rejects that kind of read. It now returns every playlist again.
+
+  These lists stop paging: `music.playlists.list`, `photos.mediaItems.list`, `shortcuts.shortcuts.list`, `automator.automatorActions.list`, `xcode.projects.list`, `xcode.schemes.list`, `omniplan.scenarios.list`, and the Microsoft Edge `windows`, `tabs`, `bookmarkFolders` and `bookmarkItems` lists. Each one loses its `pageSize` and `cursor` inputs: the SDK method no longer takes a page argument, the CLI command no longer takes `--page-size` or `--cursor`, and the capability listing no longer shows either input. The list returns its whole collection as one page, with no `nextCursor`. Callers that pass `pageSize` or `cursor` to one of these lists now get a validation error, so remove those inputs.
+
+  These lists still page, because each passed the check: Contacts people, groups, email addresses, phone numbers and addresses; Notes attachments; Photos albums and folders; Reminders lists, reminders and accounts; and Shortcuts folders.
+
+  A manifest resource records the check in a new `rangeRead` field: `supported: true` or `false`, with evidence of the app version, macOS version and time it was checked, plus the error numbers when the check failed. A list pages only when its resource's primary identifier is claimed unique and its resource records `rangeRead.supported: true`. A resource with no `rangeRead`, or with `supported: false`, has lists that return their whole collection. `RangeReadEvidenceSchema` and `ResourceRangeReadSchema` are exported from `@macts/core`.
+
+- ead44ad: Each list that pages reads its pages in one of two ways, chosen for its app from live measurement of both:
+  - by range: each value is read for the page's items only;
+  - by column: each value is read for the whole collection, then cut to the page.
+
+  Two ways exist because apps answer them differently. Contacts reads a page's worth of people one person at a time, but reads a value for every person at once, so with 295 people a page of 25 takes about 1.6 seconds by column and about 15 seconds by range. Reminders is the opposite: with 332 reminders in a list, a page takes about 7 seconds by range and over 40 seconds by column.
+
+  Both ways return the same page, cursor and `COLLECTION_CHANGED` error. Range is the default, because a page read by range costs what the page holds however large the collection grows. A list reads by column only when that was measured clearly faster, taking at most three quarters of the time. Contacts people, Notes attachments and Photos albums are read by column. Every other list that pages is read by range.
+
+  A page read by column costs what the whole collection costs, so it gets slower as the collection grows.
+
+  A manifest's `rangeRead` marker with `supported: true` now requires `read: range` or `read: column`. Its evidence also requires `cost`, what a page cost, as its own observation:
+  - `observedAt`, when the page was timed;
+  - `pageMs` and `columnMs`, the time of the first page read each way, in milliseconds;
+  - `items`, the collection size they were measured at;
+  - `runs`, how many times the page was read each way, each time being the median of those runs;
+  - `pageSize`, the size of the page timed.
+
+  All six are required, and a `rangeRead` marker with `supported: false` records no `read` and no `cost`. `read` must be `column` exactly when `columnMs` is at most 0.75 × `pageMs`, and `range` otherwise. `PAGE_READS`, the `PageRead` type, `pageReadFor`, which applies that rule, and `PageCostSchema` with its `PageCost` type are exported from `@macts/core`.
+
+- bd34a91: Generated docs now say which parent an operation uses when several parents share the value it looks the parent up by.
+
+  A list, get, create, update or delete under a parent looks the parent up by the parent's own identifier. When that identifier is matched on a property (`byProperty`) that is not claimed unique, these docs add one sentence:
+  - the generated HTTP client's docs for those operations;
+  - the contract client's docs for them;
+  - the CLI's list, get and create help.
+
+  For example: "When several calendars share the same name, the first match in the app's order is used as the calendar." When the item is matched the same way, this sentence comes after the item's own first-match sentence.
+
+  Nothing is added for a parent claimed unique, for a parent looked up by the app's id or key specifier, or for an operation with no parent.
+
+  This adds the sentence to:
+  - Calendar events, under a calendar;
+  - Automator actions and variables, under a workflow;
+  - Xcode projects, schemes and run destinations, under a workspace document.
+
+  No operation, input or capability changes.
+
+- 99a59fa: An index selector reference must now carry a container chain of identity references only, each the parent its resource is found within, ending at one the app finds at the application. A container above that, or a selector anywhere in the chain, is rejected.
+
+  A positional resource must now sit under a parent the app finds at the application by its identifier, and every command that selects one of its items must record that parent, as its get does, and declare its integer item parameter. No command with an executable route may record a positional resource as its parent. A manifest that does otherwise is refused by the manifest schema, by generation and by registration.
+
+  For every positional CRUD route, usable hierarchy placement constrains where the command can address its collection. A nested-only collection requires a recorded parent, and any recorded parent must be a declared holder. Application-wide list/create and resources with no usable placement retain their existing scope behavior. Every recorded parent must be an ordinary identified collection resource with a usable unparented get, must not be known nested-only, and must have its required identity parameter supplied. A top-level collection does not waive an explicitly recorded ancestor requirement. Unsupported commands and resource targets contribute no executable route.
+
+  The native codec now converts a reference's container only as an identity reference: an input reference whose container chain holds a selector fails as `InternalError` before the app is touched. In `@macts/core`, `NativeCodecEnvironment.positionOf` now takes the collection the position is counted in, and reads a position only from a specifier that ends at that collection of a container below the application.
+
+- d393e28: API keys with no stored record are now refused, so deleting a key removes its access immediately in the process that deleted it, and within a few seconds elsewhere. Validation reports such a key with the new `UNKNOWN_KEY` error code; the HTTP and MCP surfaces answer it like any other key that cannot be verified (`UNAUTHENTICATED`, reason `invalid`, HTTP 401 with `WWW-Authenticate: Bearer`). The new `getKeyRecordStatus` returns `'active'`, `'revoked'`, or `'missing'` (`KeyRecordStatus`); `isKeyRevoked` keeps its meaning (a stored record marked revoked) and is deprecated in its favour.
+- b49af54: A call whose input or result holds a value of a kind the macOS provider cannot convert yet (a reference, a file, or a file source) now fails with an internal error that names the operation, the kind and the position, instead of an input error that blamed the caller, or an unexpected-value error that blamed the app. For example, the Contacts rollover actions, which take a person, now report that the macOS provider does not support reference values yet. A call with such an input still fails before the app is contacted.
+- Updated dependencies [c945d04]
+- Updated dependencies [127d864]
+- Updated dependencies [2a00978]
+- Updated dependencies [7429951]
+- Updated dependencies [7400f3b]
+- Updated dependencies [87985bb]
+- Updated dependencies [f9d86f8]
+- Updated dependencies [aadc2fe]
+- Updated dependencies [99a59fa]
+- Updated dependencies [1cfc8fd]
+- Updated dependencies [20e7083]
+- Updated dependencies [36942f9]
+- Updated dependencies [fb9a0a1]
+- Updated dependencies [fe1c06c]
+- Updated dependencies [f717527]
+- Updated dependencies [075e994]
+- Updated dependencies [dba9328]
+- Updated dependencies [a746285]
+- Updated dependencies [762a1ef]
+  - @macts/contracts@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes

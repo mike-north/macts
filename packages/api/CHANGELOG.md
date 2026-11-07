@@ -1,5 +1,259 @@
 # @macts/api
 
+## 0.3.0
+
+### Minor Changes
+
+- c945d04: Breaking change: list operations return bounded pages.
+
+  Every list output changed from an array to a page, `{ items, nextCursor? }` (`Page<T>` and `t.page(item)` in `@macts/contracts`). Lists whose items have an identifier the manifest claims unique take two optional inputs, `pageSize` and `cursor`. A page holds at most `pageSize` items: 25 by default and at most 100, the same on every transport. A page size of zero, below zero, not an integer or above 100 is rejected, never clamped. When more items remain, the page carries a `nextCursor`; send the same inputs again with it as `cursor` to read the next page. The cursor is opaque. Paging bounds the size of each call. It bounds the latency of each call only for lists whose pages are read by range, which is most of them: a list read by column costs what its whole collection costs per page (see the entry on how each list reads its pages). Paging does not make a full listing cheaper in total.
+
+  Every other list takes neither input and returns its whole collection as one page with no `nextCursor`: a page is anchored on the identifier of the item before it, which only a unique identifier can do. Uniqueness is opt-in, from evidence: a manifest identifier records `unique: true` (or `unique: false`) with `evidence.unique` saying where the claim comes from, and the capability registry's input schemas show the paging inputs for exactly the lists that page. Contacts lists (people, groups, and a person's emails, phones and addresses) page, because Contacts describes each of those identifiers as unique. Music's playlist list pages. Its track list does not: a playlist can hold the same song more than once, and both entries are expected to share one persistent ID. Calendar event and calendar lists do not page: recurring events share a uid, and calendar names can repeat. `listOperationPages` in `@macts/core` is the one rule every surface uses, and the runtime refuses a contract whose list takes the paging inputs when the manifest says it does not page, or the reverse. Resolving a collection reference is not paged: it still returns the full array of records.
+
+  Each surface takes the paging inputs from the contract. Generated SDK list methods take a trailing `page` argument (`list(listId, { pageSize, cursor })`) and return `Page<T>`. HTTP and MCP callers send `pageSize` and `cursor` in the input. When more items remain, MCP adds a second text block after the result, saying how many items the page holds and how to read more; the first block is always the JSON result. Generated CLI list commands take `--page-size` and `--cursor` and print how to see the next page. App parameters named `pageSize` or `cursor` on a list operation are now a generation error.
+
+  There is a new error, `COLLECTION_CHANGED` (`CollectionChangedError`, HTTP 409, no details). It replaces `UnexpectedValueError` for a collection that changed while it was being read. The same request is correct and can be retried, from the first page if it was paged. A cursor whose item has since moved or been deleted fails this way. A malformed cursor, or one sent to another operation or with other inputs, is a validation error at `cursor`. Audit records and logs record only that a cursor was presented, never its contents.
+
+- 7400f3b: Serve the HTTP API through the shared runtime, with structured errors and rate limiting
+
+  **`@macts/api`** now composes `createRuntime` with a thin HTTP adapter. Every `POST /api/v1/rpc/<operation>` runs through the runtime's pipeline (verify the credential, admit against the rate limit, check permission, validate input, enforce governance, execute), so the HTTP server and every other surface enforce exactly the same checks.
+  - **`createHttpAdapter(runtime, options?)`** is the pure HTTP transport, mounted at `/api/v1` by `createServer`. It reads the JSON body (a missing or blank body is `{}`), the `Authorization: Bearer` credential, the request's abort signal, and an optional `X-Request-Id` correlation id. Unknown routes, including `POST /rpc/<unknown operation>`, are 404 `NOT_FOUND` and never reach the runtime.
+  - **Errors** are always `{ "error": { code, message, details } }` with the structured codes from `@macts/contracts`, so a client can rebuild the same error class with `fromWireErrorEnvelope`. `httpStatusForError(error)` gives the status for each code. Native failures are no longer collapsed into `EXECUTION_ERROR`: a missing target is 404 `TARGET_NOT_FOUND`, an unavailable app is 503 `APP_UNAVAILABLE`, a timeout is 504 `TIMEOUT`, and so on. An unexpected failure is a generic 500 `INTERNAL` that never repeats the underlying message. A confirm-first call with no approval provider is now 409 `APPROVAL_PENDING` instead of 202.
+  - **`ServerOptions`** gains `executor`, `verifier`, and `clientAddress`, so tests and alternate providers can compose the server without a Mac app or key store. `createApp` accepts every option except the listener ones.
+  - **Rate limiting** answers 429 `RATE_LIMITED` with a `Retry-After` header. The per-key limit (default 100 calls per minute) now runs in the runtime. A new per-client-address limit (default 300 requests per minute, `rateLimit.perAddress`) runs before the credential is checked, so failed authentication attempts are bounded too. `rateLimit: false` disables both. The `X-RateLimit-*` headers are no longer sent.
+  - `/health` reports the installed `@macts/api` version instead of a fixed `1.0.0`.
+  - Removed: `authMiddleware`, `requirePermission`, `rpcPathToPermission`, `requirePolicy`, `createRpcRouter`, `createMultiAppRpcRouter`, the server-only `createRateLimiter` middleware, and their response types (`AuthVariables`, `AuthErrorCode`, `AuthErrorResponse`, `PermissionErrorResponse`, `PermissionMiddlewareOptions`, `RequirePolicyOptions`, `GovernanceDeniedResponse`, `GovernancePendingResponse`, `GovernanceApprovalDeniedResponse`, `RpcRequest`, `RpcErrorResponse`, `RpcHandler`, `RpcHandlerContext`, `RpcEndpointInfo`, `RateLimiterInstance`). Error bodies are now typed by `WireErrorEnvelope`, re-exported from `@macts/contracts`.
+  - Removed: the automation bridge that `@macts/api` re-exported from `@macts/core` (`runJxa`, `runWithApp`, `JxaExecutionError`, `connect`, `isAppRunning`, `activateApp`, `quitApp`, `getAppName`, `ObjectSpecifier`, `dateCoercer`, `colorCoercer`, `createEnumCoercer`, `pathCoercer`, `booleanCoercer`, `numberCoercer`, `stringCoercer`, `createArrayCoercer`, `nullSafe`, `HexColorSchema`, and the types `JxaExecutorOptions`, `AppConnection`, `AppConnectionOptions`, `SpecifierStep`, `Selector`, `TypeCoercer`, `HexColor`, `JxaEnumValue`). They remain available from `@macts/core` for anyone who needs them.
+
+  **`@macts/runtime`** adds an optional admission step: `createRuntime({ rateLimiter })` admits each call by the verified key after authentication and before the permission check, raising `RateLimitedError` when the limit is exhausted. Admission never grants anything, and a limiter that fails denies the call with `InternalError`. `createRateLimiter({ max, windowMs })` is the in-memory fixed-window limiter.
+
+  **`@macts/contracts`** adds `RateLimitedError` (code `RATE_LIMITED`, details `{ retryAfterSeconds }`), with its registry entry and wire schema.
+
+- ee7ba82: Manifest properties can carry nullability and resettability claims with their evidence. Generated contracts make a read field nullable unless the manifest has evidence that it is never empty, and an update field accepts `null` only when the property is resettable. Each generated field documents its nullability and the evidence for it.
+
+  `macts probe <app> --nullability` gathers that evidence read-only from the running app. It records, per field, how often a value was missing, never the values themselves. Probe writes now keep the manifest's formatting.
+
+  A manifest command can set `routeName`, the segment of its public route and default permission, which otherwise is the command key. Two commands that resolve to the same route are rejected when the manifest loads. The HTTP router and the runtime operation registry take each operation's permission from its resolved route.
+
+  Breaking: Notes attachments are identified by `id` instead of `name`, which can be empty. Their route stays `notes.attachments.get`, and the permission stays `notes:attachments:get`.
+
+- 36942f9: A reference now names the app it belongs to. Every reference data and bound form (`IdentityReferenceData`, `SelectorReferenceData`, `IdentityCollectionReferenceData`, `SelectorCollectionReferenceData`, and the bound `ObjectReference` and `CollectionReference` types) has a required `app` field: the `app` of the contract it is used with. Containers and identity-collection entries carry it too.
+  - **Decoding** sets `app` from the contract at every level.
+  - **Encoding** rejects a reference whose `app` is missing or names another app, at any level. The issue is at `[...path, 'app']`, so a reference from one app cannot be passed to another app's operation; the call fails with a validation error before anything is sent.
+  - **The wire form is unchanged.** It never carries `app`, because the route already names the app. A wire reference that carries `app` is rejected.
+
+  `t.reference` now takes a scope instead of a resource table: `t.reference(() => scope, resource, cardinality)`, where the new `ReferenceScope` type is `{ app, resources }`. An app contract is assignable to `ReferenceScope`, and generated contracts pass `() => <app>Contract`. Code that builds references by hand must add `app`, and code that calls `t.reference` with a resource table must pass a scope instead.
+
+  Reference types now carry their resource key as a literal type. The data types (`IdentityReferenceData`, `SelectorReferenceData`, `IdentityCollectionReferenceData`, `SelectorCollectionReferenceData`, `ObjectReferenceData`, `CollectionReferenceData`) and the bound types (`ObjectReference`, `CollectionReference`, `IdentityReference`, `SelectorReference`, `IdentityCollectionReference`, `SelectorCollectionReference`, `ObjectReferenceVariant`, `CollectionReferenceVariant`) each take a final type parameter for it, which defaults to `string`. `t.reference` infers it from its `resource` argument.
+
+  Generated contracts type references by direction:
+  - Record fields and command results hold a bound reference, `ObjectReferenceVariant<Record, Id, 'Key'>`.
+  - Parameters and create and update fields take its data form, `ObjectReferenceData<Id, 'Key'>`. Callers can pass a reference they build, by identifier or by selector, or one they received.
+
+  A reference to another resource, or of the other cardinality, no longer type-checks.
+
+  A reference must now name objects that can be resolved, at every level:
+  - A single reference, every container, and every identity-collection entry need a resource with a `get` operation.
+  - A collection needs a resource with `list`.
+
+  `ReferenceRegistry` entries record `get` and `list` for this, and an app contract's `resources` table already has them. The runtime's reference resolution applies the rule too: a resolve request whose container or entry names a resource with no `get` is rejected as a validation failure. A resource whose resolving operation is unavailable cannot be resolved. The rule is part of the reference wire schema, so it applies everywhere: to encoding, decoding, the runtime's check of raw HTTP and MCP requests, and the JSON Schema of every reference position. That JSON Schema now lists only the resources that can contain a reference, and a position whose resource lacks its operation admits no value (`{"not": {}}`). A violation is reported at the reference itself, or at the `resource` of the offending container or entry.
+
+  `ResourceDescriptor.id` now documents the meaning of an identity reference to a resource keyed by name. It resolves to whichever object has that name when it is resolved. When several objects share the name, the app decides which one that is.
+
+  Generated surfaces never offer an operation that cannot be called. An input position that takes a single reference to a resource with no `get` admits no value, so the rule above rejects every request that fills it. An optional position like that is left out of the input. A required one makes the operation unavailable:
+  - generation warns, naming the app, the operation and the position;
+  - the descriptor stays in the contract's `operations`, with a new `unavailable` member (`OperationUnavailability`: the positions and the reason);
+  - the runtime answers `invoke` of it exactly as an unknown operation, with the same validation error, before permission, governance or approval, so no one is asked to approve a call that cannot run;
+  - the MCP adapter lists no tool for it, and calling its tool name is an unknown-tool call;
+  - the HTTP API neither routes nor lists it: `POST /rpc/<id>` gets the same 404 as an unknown operation, and introspection leaves it out;
+  - neither generated client has a method for it, the generated CLI has no command for it, and capability discovery lists no capability for it;
+  - its permission is no longer a known permission: `macts api-key create` rejects a grant naming it (for example `mail:app:synchronize`) as an unknown permission, and `macts permissions expand` no longer lists or suggests it. These permissions never authorized anything that could be called.
+
+  A left-out position has no parameter in either generated client, no CLI flag, and no field in the capability schema.
+
+  None of the affected positions ever worked through the native runtime, because it cannot yet encode references. What changes is how a request that uses them is treated. A request that sends a left-out field used to reach the server, and is now rejected as an unknown field. An unavailable operation is no longer offered as a tool, a route, a client method, a command or a capability.
+
+  The operation that becomes unavailable is Mail `mail.app.synchronize`: its required `with` takes an account, and Mail has no operation that gets one. The `synchronize` method of both the contract client and the `MailClient` HTTP client, and the CLI command `macts mail synchronize`, are removed.
+
+  Operations that lose an optional position:
+  - Mail `mail.app.checkForNewMail` loses `for` (an account). The contract client method is now `checkForNewMail(options?)`, the HTTP client method `checkForNewMail()`, and the CLI flag `--for` is removed.
+  - Mail `mail.app.performMailActionWithMessages` loses `inMailboxes` (a mailbox) and `forRule` (a rule). The contract client method is now `performMailActionWithMessages(options?)`, the HTTP client method `performMailActionWithMessages()`, and the CLI flags `--in-mailboxes` and `--for-rule` are removed.
+
+  Create and update input types that no operation takes lose the same kind of field, in both the contract and the HTTP client types (`src/types.ts`), so the two clients' input types agree for every resource. The types change, but no request does:
+  - Finder `ListViewOptionsCreateInput` and `ListViewOptionsUpdateInput` lose `sortColumn`.
+  - iTerm `WindowCreateInput` and `WindowUpdateInput` lose `currentTab` and `currentSession`, and `TabCreateInput` and `TabUpdateInput` lose `currentSession`.
+  - Mail `MessageCreateInput` and `MessageUpdateInput` lose `mailbox`, and `RuleCreateInput` and `RuleUpdateInput` lose `copyMessage` and `moveMessage`.
+  - TV `BrowserWindowCreateInput` and `BrowserWindowUpdateInput` lose `view`, and become `Record<string, never>`.
+  - System Events `NetworkPreferencesObjectCreateInput` and `NetworkPreferencesObjectUpdateInput` lose `currentLocation`, and become `Record<string, never>`. `ServiceCreateInput` and `ServiceUpdateInput` lose `currentConfiguration`.
+
+  `CliGeneratorContext` gains `isOperationAvailable` and `omittedInputs`, which the CLI generator uses to apply the rule.
+
+- e796f6b: The HTTP server resolves references remotely at `POST /references/v1/resolve`, a top-level namespace beside `/api/v1`. The body is exactly `{ "app", "reference" }`, where `reference` is the reference control record as encoding produces it; any other field is refused with `VALIDATION_FAILED` rather than ignored. The route runs `MactsRuntime.resolveReference` with the request's bearer credential, abort signal, and correlation id, so a resolution is authorized, governed, and audited as the resource's `get` or `list` operation. It answers `200 { result }` or the structured error envelope with the same statuses as the operation routes, and shares their per-client-address limit. `createReferencesAdapter` serves the route for a runtime you compose yourself.
+
+  Every 401 from the HTTP server now carries `WWW-Authenticate: Bearer`.
+
+  Apps named `introspect`, `rpc`, `references`, or `transfers` are refused: `registerManifest` and `registerContract` throw `OperationRegistrationError` and register nothing. The reserved names are exported as `RESERVED_APP_ROUTE_SEGMENTS` from `@macts/runtime`.
+
+- 8edbbc2: Add the shared invocation pipeline to `@macts/runtime`
+
+  **`createRuntime({ executor })`** builds a runtime that runs every operation through one ordered pipeline: verify the caller's credential, check the operation's permission, validate the input, enforce governance policy (auditing the decision and, for a held call, asking a human and recording the answer), and only then hand the request to the executor. No step can be skipped, and failures are the structured errors from `@macts/contracts` (`AuthenticationError`, `PermissionDeniedError`, `PolicyDeniedError`, `ApprovalPendingError`, `ApprovalRejectedError`, `ValidationError`, `OperationCancelledError`, `InternalError`). Anything unexpected, such as an unreadable key policy or an audit record that cannot be written, denies the call. An executor failure that is not a structured error becomes an `InternalError` whose message does not repeat the underlying failure.
+  - `runtime.registerManifest(manifest)` registers every operation a manifest exposes, with the same ids and permissions as the RPC routes. `runtime.registerContract(contract, manifest)` registers a generated contract's operations and refuses any whose permission or target disagrees with the manifest, so a stale or altered package cannot widen what a key authorizes. Registering the same operation id twice is refused.
+  - `createBearerCredential(token)` wraps an API key so it never appears in logs, errors, `JSON.stringify`, or `util.inspect`. Only `reveal()` returns it.
+  - `createKeyStoreVerifier()` verifies macts API keys against the local key store and reports failures as `missing`, `malformed`, `invalid`, `expired`, or `revoked`.
+  - The executor is supplied at construction, so any implementation of `Executor` from `@macts/core` can be wired in.
+
+  `buildCommandSchema` and `buildSchemaRegistry` now live in `@macts/runtime`. `@macts/api/server` still re-exports them, and `@macts/api` no longer depends on `zod` directly.
+
+- 62f30ba: Add `@macts/runtime` and store API keys with Node's built-in SQLite
+
+  **`@macts/runtime`** is a new package for the Mac-side state and checks that every macts surface shares. It holds:
+  - **API keys**: minting, verification, revocation, and the on-disk key store, including per-key governance policies. `closeKeyStore()` releases the store's database for a graceful shutdown.
+  - **Governance loading**: the active host policy, the configured approval provider, per-key policy resolution, and the `GovernanceContext` a call is enforced against, with `resolveGovernanceForRequest`.
+  - **Shared host state**: `getMactsHome()` and the process-wide logger (`getLogger`, `setLogger`, `createLogger`).
+
+  The HTTP server, the MCP server, and the CLI's `api-key` commands now all use it. `@macts/mcp` no longer depends on `@macts/api`.
+
+  **The key store uses Node's built-in `node:sqlite`.** Installing macts no longer builds or downloads a native addon. Existing key databases open unchanged. Node.js **22.13.0** or later is now required, because it is the first release that loads `node:sqlite` without a flag. On Node versions that still label SQLite experimental, macts keeps that one-time notice off stderr and leaves every other warning visible.
+
+  **Breaking for direct importers of `@macts/api`:**
+  - The `@macts/api/keys` entry point is removed. Import key management from `@macts/runtime` instead.
+  - `@macts/api` and `@macts/api/server` no longer re-export key management, the logger, governance policy and approval loading, or the governance context types. Import them from `@macts/runtime`. `requirePolicy` and the HTTP response types stay in `@macts/api`.
+
+  **Logging no longer requires `pino-pretty`.** Outside production the logger pretty-prints only when `pino-pretty` is installed, and otherwise falls back to structured JSON. Before, the first log line crashed any installed CLI or MCP server.
+
+- b8a7587: Create typed clients from an app's contract, remotely or on this Mac, under this Mac's governance
+
+  **`@macts/sdk`** now has two entry points with the same `createClient(app, options)` factory. Each takes an app's contract (app packages expose it at the `/contract` subpath) and returns that app's typed client:
+  - **`@macts/sdk`**: `createClient(app, { token, url, fetch? })` runs operations on a macts service over HTTP. Inputs are validated before anything is sent (`ValidationError`), results are validated on the way back (`UnexpectedValueError`), and service errors come back as the same canonical classes a local call throws. Aborts become `OperationCancelledError`, and an unreachable service or unusable response becomes `TransportError`. The token is sent only in the `Authorization` header and never appears in an error. This entry point never loads the Mac-side runtime, so it runs anywhere Node runs.
+  - **`@macts/sdk/local`**: `createClient(app, { token, governance?, executor? })` runs operations in process on this Mac, through the same pipeline the service runs: token verification, permission checks, governance, and validation. A contract whose permissions disagree with its manifest is refused on the first call.
+  - Both entry points re-export everything from `@macts/contracts` (error classes, value types), so `instanceof` works across them and application code imports only `@macts/sdk`.
+  - `resolveClientOptions()` reads `MACTS_API_KEY` and `MACTS_API_URL` and returns `{ token, url }` for `createClient`.
+  - Node.js 22.13.0 or later is required.
+
+  **Breaking:** `createMactsClients`, `MactsClients`, the re-exported per-app client types, `resolveConnectionOptions`, and `MactsConnectionOptions` are removed, along with the 35 optional app peer dependencies. `@macts/sdk` no longer fails to import when app packages are missing ([#118](https://github.com/mike-north/macts/issues/118)). Create each app's client from its contract instead, and install the app packages a script uses. `resolveClientOptions()` replaces `resolveConnectionOptions()` and reads the same `MACTS_API_KEY` and `MACTS_API_URL`. Method names, arguments, and results are unchanged:
+
+  ```typescript
+  // Before: one map of every app's client, configured from the environment.
+  import { createMactsClients } from '@macts/sdk'
+
+  const m = createMactsClients()
+  const calendars = await m.calendar.calendars.list()
+
+  // After: one client per app, created from that app's contract.
+  import { createClient, resolveClientOptions } from '@macts/sdk'
+  import { calendarContract } from '@macts/calendar/contract'
+
+  const calendar = createClient(calendarContract, resolveClientOptions())
+  const calendars = await calendar.calendars.list()
+  ```
+
+  **`@macts/runtime`** adds `loadHostGovernance()`, the governance this Mac enforces when none is supplied: the policy file and approval provider under `MACTS_HOME`, each key's own policy, and an audit log at `<macts-home>/governance/audit.jsonl` (`getAuditLogPath()`). A missing policy file means the default policy. A malformed or unreadable policy or approval file denies every call that passes the permission check with `InternalError` and never falls back to allowing everything; a caller without the permission is still answered `PermissionDeniedError`. `createRuntime({ governance })` now also accepts a loader such as `loadHostGovernance`, which runs once, on the first call that reaches governance or needs the audit log.
+
+  **Breaking:** `createRuntime` now requires `governance`. Omitting it used to mean an allow-all policy with no audit log; now it is a type error, so a host can never run calls under governance it forgot to supply. Pass `loadHostGovernance` to enforce this Mac's governance, or `{ policy: ALLOW_ALL_POLICY }` to state that nothing is restricted.
+
+  **`@macts/api`**: `createServer`, `createMultiServer`, and `createApp` now enforce `loadHostGovernance()` when no `governance` option is given, instead of an allow-all policy with no audit log. Every governed call is now recorded in the audit log under `MACTS_HOME`. Pass `governance` explicitly to enforce something else.
+
+- dbab1db: `macts --serve` serves every installed app, validated against each app's contract
+
+  **`@macts/cli`**
+  - **Fixed:** `macts --serve` previously served only Calendar, from a manifest file it searched for in a few fixed places, and failed to start when it found none. It now serves every app whose server package is installed in the macts plugins directory (`macts mcp install <app>`), registered from that app's generated contract.
+  - Inputs are validated against each app's contract, which is stricter than before: an unknown field, or a value of the wrong type, is now rejected with 400 `VALIDATION_FAILED` before anything runs. Errors keep the same `{ "error": { code, message, details } }` envelope.
+  - At startup, `macts --serve` lists the apps it serves, any installed app that failed to load (with the reason), and any app installed without its server package (with the command that installs it). With no apps installed it still starts, says so, and serves no operations.
+
+  **`@macts/api`**
+  - `createServer`, `createMultiServer`, and `createApp` gain a `register` option, which registers apps from their generated contracts on the server's runtime before its routes are built: `register: (registrar) => registrar.registerContract(contract, manifest)`. Each contract is checked against its manifest, and its operations validate inputs against the contract's wire schemas. The registrar type is exported as `AppRegistrar`.
+  - Manifest registration (the `manifests` parameter) remains, as passthrough: operations carry no contract value types, and inputs are validated by each command's request schema.
+  - `/health` and `/api/v1` list every registered app, whether it was registered from a contract or a manifest.
+
+- 5869dfc: Manifest-registered operations now reject input keys that are not declared parameters, as contract-registered operations already do.
+
+  An operation registered with `registerManifest` (in `@macts/api`, every app passed to `createApp` as a manifest) accepts exactly its command's declared parameters. A call with any other key fails input validation with `VALIDATION_FAILED` (HTTP 400), with one issue at the input itself. As for any input that fails validation after the permission check, the call writes one `invalid-input` audit record, is not evaluated by policy, is never put to an approver, and does not run. Clients that sent extra keys to a manifest-served operation now receive this validation error; send only the operation's declared parameters.
+
+  A resource-scoped get, update or delete whose manifest command declares no identifier parameter (no required parameter other than its parent's) is rejected at registration: `registerManifest` throws `OperationRegistrationError` naming the app and the command, and registers nothing from the app. Such a get or update could not be called once undeclared keys are rejected, and such a delete selects no item: it calls the app's delete with no target.
+
+  Breaking change in `@macts/system-events`: the `diskItems.delete` operation (`system-events.diskItems.delete`) is removed, because it did not target the disk item it named. It took an `id` but called System Events' delete with no target. The contract client's `diskItems.delete(id)`, the HTTP client's `DiskItemResourceClient` and `SystemEventsClient.diskItems`, and the capability entry are gone, and the System Events manifest no longer declares the command. A delete that targets one disk item will be added once disk items can be selected by an identifier. No other shipped command is affected.
+
+  A list registered from a manifest does not page, so it does not accept `pageSize` or `cursor`. Lists registered from a contract page as before.
+
+  `buildCommandSchema` and `buildSchemaRegistry` are unchanged and still let undeclared keys through; the runtime no longer validates operation input with them.
+
+### Patch Changes
+
+- Updated dependencies [7cb8bc4]
+- Updated dependencies [7cb8bc4]
+- Updated dependencies [8edbbc2]
+- Updated dependencies [361b04c]
+- Updated dependencies [89168af]
+- Updated dependencies [e569256]
+- Updated dependencies [c945d04]
+- Updated dependencies [c8dd396]
+- Updated dependencies [127d864]
+- Updated dependencies [c5a4690]
+- Updated dependencies [a18ee4b]
+- Updated dependencies [686212a]
+- Updated dependencies [7cb8bc4]
+- Updated dependencies [9144fc3]
+- Updated dependencies [a189125]
+- Updated dependencies [2a00978]
+- Updated dependencies [7429951]
+- Updated dependencies [7429951]
+- Updated dependencies [16cda4d]
+- Updated dependencies [e0d2969]
+- Updated dependencies [2a00978]
+- Updated dependencies [2a00978]
+- Updated dependencies [62a95dd]
+- Updated dependencies [7400f3b]
+- Updated dependencies [87985bb]
+- Updated dependencies [80fad3c]
+- Updated dependencies [915effc]
+- Updated dependencies [ee7ba82]
+- Updated dependencies [0dd1855]
+- Updated dependencies [9ddbb58]
+- Updated dependencies [b43d6af]
+- Updated dependencies [261a888]
+- Updated dependencies [eb51c54]
+- Updated dependencies [3885b38]
+- Updated dependencies [7ac69f1]
+- Updated dependencies [f9d86f8]
+- Updated dependencies [ed3bf17]
+- Updated dependencies [c4717eb]
+- Updated dependencies [862bf2d]
+- Updated dependencies [e2c7efc]
+- Updated dependencies [7aed949]
+- Updated dependencies [ead44ad]
+- Updated dependencies [bd34a91]
+- Updated dependencies [aadc2fe]
+- Updated dependencies [8c4faef]
+- Updated dependencies [99a59fa]
+- Updated dependencies [1cfc8fd]
+- Updated dependencies [e319917]
+- Updated dependencies [20e7083]
+- Updated dependencies [36942f9]
+- Updated dependencies [5033b73]
+- Updated dependencies [e796f6b]
+- Updated dependencies [d393e28]
+- Updated dependencies [3463be6]
+- Updated dependencies [e6214e2]
+- Updated dependencies [dae51a7]
+- Updated dependencies [8edbbc2]
+- Updated dependencies [5f49d6f]
+- Updated dependencies [62f30ba]
+- Updated dependencies [fb9a0a1]
+- Updated dependencies [b8a7587]
+- Updated dependencies [fe1c06c]
+- Updated dependencies [f717527]
+- Updated dependencies [075e994]
+- Updated dependencies [832e1ad]
+- Updated dependencies [5869dfc]
+- Updated dependencies [dba9328]
+- Updated dependencies [a746285]
+- Updated dependencies [b49af54]
+- Updated dependencies [62a95dd]
+- Updated dependencies [762a1ef]
+  - @macts/core@0.3.0
+  - @macts/runtime@0.3.0
+  - @macts/contracts@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes
