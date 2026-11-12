@@ -17,6 +17,7 @@ export const manifest: unknown = {
     bundleId: 'com.apple.iCal',
     name: 'Calendar',
     displayName: 'Calendar',
+    rgbChannels: 'normalized',
     tccEntitlements: ['calendar', 'automation'],
     distributionModel: 'system',
   },

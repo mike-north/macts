@@ -205,6 +205,9 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       assertRequiredArguments(plan.requiredArguments, input)
       const script: NativeScript = {
         bundleId: manifest.app.bundleId,
+        ...(manifest.app.rgbChannels === undefined
+          ? {}
+          : { rgbChannels: manifest.app.rgbChannels }),
         body: plan.body,
         input,
         inputPlan,
@@ -250,6 +253,9 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       }
       const script: NativeScript = {
         bundleId: manifest.app.bundleId,
+        ...(manifest.app.rgbChannels === undefined
+          ? {}
+          : { rgbChannels: manifest.app.rgbChannels }),
         body: buildResolutionBody(manifest, reference.resource, reference.cardinality, {
           containerReferences: outputPlan.kind !== 'passthrough',
           absentValueMarkers: outputPlan.kind !== 'passthrough',

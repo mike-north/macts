@@ -4,6 +4,9 @@ app:
   bundleId: com.apple.iCal
   name: Calendar
   displayName: Calendar
+  # Calendar reports color components as fractions (issue #202); callers use
+  # 16-bit RGB channels. Other apps retain their own color representation.
+  rgbChannels: normalized
   tccEntitlements:
     - calendar
     - automation
