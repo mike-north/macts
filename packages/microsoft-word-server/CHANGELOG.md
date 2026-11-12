@@ -1,5 +1,11 @@
 # @macts/microsoft-word-server
 
+## 0.4.0
+
+### Patch Changes
+
+- @macts/microsoft-word@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

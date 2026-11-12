@@ -1,5 +1,11 @@
 # @macts/bluetooth-file-exchange-server
 
+## 0.4.0
+
+### Patch Changes
+
+- @macts/bluetooth-file-exchange@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

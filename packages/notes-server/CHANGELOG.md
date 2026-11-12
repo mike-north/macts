@@ -1,5 +1,12 @@
 # @macts/notes-server
 
+## 0.4.0
+
+### Patch Changes
+
+- Updated dependencies [d87b6bf]
+  - @macts/notes@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

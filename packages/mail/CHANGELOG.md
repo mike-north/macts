@@ -1,5 +1,19 @@
 # @macts/mail
 
+## 0.4.0
+
+### Minor Changes
+
+- 76d53b9: Return the scalar values declared by Mail and Contacts commands instead of discarding them. Mail `outgoingMessages.send` returns `boolean | null`; Contacts `actionProperty` and `actionTitle` return `string | null`, and `performAction` and `shouldEnableAction` return `boolean | null`.
+
+  Generated CLI commands print a declared, available result using the existing human or JSON formatter. Values such as `false`, `0`, empty text and explicit null remain data; JSON output uses the `data` field. Commands without an effective result retain their existing success message. Result validation and nullable defaults remain shared with the SDK contract.
+
+  Other command results and reference retrieval gaps remain separate work.
+
+### Patch Changes
+
+- @macts/contracts@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

@@ -1,5 +1,23 @@
 # @macts/core
 
+## 0.4.0
+
+### Minor Changes
+
+- ae76d85: `@macts/core/testing` now exports `standInPanes`, a stand-in app of windows holding tabs that have no id, for testing apps whose tabs are selected by their position within their window. Its windows and tabs can carry extra fields, so it can stand in for an app such as iTerm.
+
+### Patch Changes
+
+- eb4f199: Convert Calendar's normalized color components to 16-bit RGB channels on reads and back to fractions on writes. Other apps retain their declared color representation.
+- b3f160f: Complete a selected reminder by setting its completed property, using the reminder update permission. JSON errors retain their structured code and details.
+- ae76d85: The generated CLI get help, and the generated HTTP client's get, update and delete, now say what the contract client already says about an object with no id: it is selected by its zero-based position within its parent, and that position drifts when objects open, close or move.
+- 76d53b9: Return the scalar values declared by Mail and Contacts commands instead of discarding them. Mail `outgoingMessages.send` returns `boolean | null`; Contacts `actionProperty` and `actionTitle` return `string | null`, and `performAction` and `shouldEnableAction` return `boolean | null`.
+
+  Generated CLI commands print a declared, available result using the existing human or JSON formatter. Values such as `false`, `0`, empty text and explicit null remain data; JSON output uses the `data` field. Commands without an effective result retain their existing success message. Result validation and nullable defaults remain shared with the SDK contract.
+
+  Other command results and reference retrieval gaps remain separate work.
+  - @macts/contracts@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

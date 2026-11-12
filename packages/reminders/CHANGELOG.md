@@ -1,5 +1,12 @@
 # @macts/reminders
 
+## 0.4.0
+
+### Patch Changes
+
+- b3f160f: Complete a selected reminder by setting its completed property, using the reminder update permission. JSON errors retain their structured code and details.
+  - @macts/contracts@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

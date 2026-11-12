@@ -1,5 +1,11 @@
 # @macts/alfred-server
 
+## 0.4.0
+
+### Patch Changes
+
+- @macts/alfred@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

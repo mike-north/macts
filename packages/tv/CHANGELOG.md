@@ -1,5 +1,15 @@
 # @macts/tv
 
+## 0.4.0
+
+### Minor Changes
+
+- d423b62: Expose a playlist's source as a lazy reference that resolves by the source's persistent ID. Playlist reads remain scoped to their source; unreadable source relationships fail with a structured error.
+
+### Patch Changes
+
+- @macts/contracts@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

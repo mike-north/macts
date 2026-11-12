@@ -1,5 +1,18 @@
 # @macts/sdk
 
+## 0.4.0
+
+### Patch Changes
+
+- Updated dependencies [eb4f199]
+- Updated dependencies [ae76d85]
+- Updated dependencies [b3f160f]
+- Updated dependencies [ae76d85]
+- Updated dependencies [76d53b9]
+  - @macts/core@0.4.0
+  - @macts/runtime@0.4.0
+  - @macts/contracts@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes
