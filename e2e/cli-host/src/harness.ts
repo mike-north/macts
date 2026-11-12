@@ -31,6 +31,7 @@ import { createServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { launchOwnedBackground, type OwnedBackground } from './background-owner.js'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
@@ -183,6 +184,21 @@ function minimalEnv(
       : {}),
     ...extra,
   }
+}
+
+/** Launch the CLI with ownership of the detached child, even if startup fails. */
+export function startOwnedMcp(
+  home: MactsHome,
+  args: readonly string[],
+  extraEnv: Readonly<Record<string, string>>
+): OwnedBackground {
+  return launchOwnedBackground(
+    process.execPath,
+    [CLI_BIN, 'mcp', 'start', ...args],
+    home.path,
+    minimalEnv(home, extraEnv),
+    REPO_ROOT
+  )
 }
 
 /** The outcome of a CLI run. */

@@ -9,6 +9,7 @@ import {
   createMactsHome,
   freePort,
   runCli,
+  startOwnedMcp,
   writePolicyFile,
 } from '../src/harness.js'
 
@@ -16,12 +17,14 @@ describe('macts mcp start log (issue #186)', () => {
   it('creates a missing home and log before starting the child', async () => {
     const fixture = createMactsHome()
     const home = { ...fixture, path: join(fixture.path, 'new', 'home') }
+    const owned = startOwnedMcp(home, [], { MACTS_TEST_EXECUTOR: 'invalid' })
     try {
-      const result = await runCli(home, ['mcp', 'start'], { MACTS_TEST_EXECUTOR: 'invalid' })
+      const result = await owned.result
       expect(result.code).toBe(1)
       expect(existsSync(join(home.path, 'mcp.log'))).toBe(true)
     } finally {
-      fixture.dispose()
+      await owned.cleanup()
+      if (owned.exited()) fixture.dispose()
     }
   }, 30000)
 
@@ -34,12 +37,14 @@ describe('macts mcp start log (issue #186)', () => {
       MACTS_TEST_EXECUTOR: 'stub',
     }
     let session: Awaited<ReturnType<typeof connectMcpHttp>> | undefined
+    let owned: ReturnType<typeof startOwnedMcp> | undefined
     try {
       const token = await createKey(home, 'notes:notes:list')
       writePolicyFile(home, '{ malformed')
       writeFileSync(log, 'previous log\n')
       const port = await freePort()
-      const started = await runCli(home, ['mcp', 'start', '--port', String(port)], guard)
+      owned = startOwnedMcp(home, ['--port', String(port)], guard)
+      const started = await owned.result
       expect(started.code, `${started.stdout} ${started.stderr}`).toBe(0)
       session = await connectMcpHttp(`http://127.0.0.1:${String(port)}`, token)
       expect((await callTool(session, 'macts__notes__notes_list', {})).isError).toBe(true)
@@ -64,30 +69,12 @@ describe('macts mcp start log (issue #186)', () => {
       const diagnose = await runCli(home, ['mcp', 'diagnose'], guard)
       expect(diagnose.stdout).toContain(log)
     } finally {
-      await session?.close()
-      const pidFile = join(home.path, 'mcp.pid')
-      // A slow child can create its PID after start has already returned failure.
-      for (let i = 0; i < 200 && !existsSync(pidFile); i++)
-        await new Promise((resolve) => setTimeout(resolve, 50))
-      if (existsSync(pidFile)) {
-        const pid = Number(readFileSync(pidFile, 'utf8'))
-        try {
-          process.kill(pid, 'SIGTERM')
-        } catch {
-          /* Already stopped. */
-        }
-        for (let i = 0; i < 100 && existsSync(pidFile); i++) {
-          await new Promise((resolve) => setTimeout(resolve, 50))
-        }
-        if (existsSync(pidFile)) {
-          try {
-            process.kill(pid, 'SIGKILL')
-          } catch {
-            // The process may have exited between the check and the signal.
-          }
-        }
+      try {
+        if (owned) await owned.cleanup(() => session?.close() ?? Promise.resolve())
+      } finally {
+        // Keep the home for investigation unless the detached process is confirmed gone.
+        if (!owned || owned.exited()) home.dispose()
       }
-      home.dispose()
     }
   }, 90000)
 })

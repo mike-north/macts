@@ -4,6 +4,7 @@
     "outDir": "./dist",
     "rootDir": ".",
     "composite": false,
+    "allowJs": true,
     // The MCP SDK's declarations use DOM fetch types (`HeadersInit`) without
     // declaring them, so they need the DOM library to type-check.
     "lib": ["ES2022", "DOM"],
