@@ -28,6 +28,7 @@ import {
   type FileValue,
   type Integer,
   type ObjectReferenceData,
+  type ObjectReferenceVariant,
   type OperationDescriptor,
   type Page,
   type ResourceDescriptor,
@@ -132,6 +133,12 @@ export interface LibraryPlaylist {
 
 /** a list of tracks/streams */
 export interface Playlist {
+  /**
+   * The source that holds this playlist.
+   * Never null: A playlist belongs to a source; reading its source must return that containing
+   * object. An unreadable source is a failed read, not an empty relationship.
+   */
+  readonly source: ObjectReferenceVariant<Source, string, 'Source'>
   /**
    * Unique identifier for this playlist.
    * Nullable. No evidence that the app always sets it.
@@ -1134,6 +1141,9 @@ const browserWindowRecordType: ValueType<BrowserWindow> = t.record(
 
 const playlistRecordType: ValueType<Playlist> = t.record(
   {
+    source: t.reference<Source, string, 'Source'>(() => tvContract, 'Source', 'one', {
+      description: 'The source that holds this playlist',
+    }),
     id: t.nullable(t.integer(), { description: 'Unique identifier for this playlist' }),
     persistentID: t.string({
       description: 'the id of the item as a hexadecimal string. This id does not change over time.',

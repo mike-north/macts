@@ -226,6 +226,32 @@ export const manifest: unknown = {
       description: 'a list of tracks/streams',
       code: 'cPly',
       properties: {
+        source: {
+          access: 'r',
+          type: {
+            resource: 'Source',
+          },
+          description: 'The source that holds this playlist',
+          code: 'ctnr',
+          optional: false,
+          nullable: false,
+          evidence: {
+            nullable: {
+              source: 'curated',
+              note: 'A playlist belongs to a source; reading its source must return that containing object. An unreadable source is a failed read, not an empty relationship.',
+            },
+          },
+          native: {
+            name: 'container',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.apple.TV',
+              appVersion: '1.7.2',
+              osVersion: '27.2',
+              term: 'container',
+            },
+          },
+        },
         id: {
           access: 'r',
           type: 'integer',

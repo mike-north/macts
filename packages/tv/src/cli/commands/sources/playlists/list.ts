@@ -27,6 +27,7 @@ export class ListPlaylistsCommand extends Command {
 
       const output = formatter.formatList(
         page.items.map((item) => ({
+          source: item.source,
           id: item.id,
           persistentID: item.persistentID,
           description: item.description,

@@ -11,6 +11,7 @@ import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import * as _macts_contracts from '@macts/contracts';
 import { ObjectReferenceData } from '@macts/contracts';
+import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { ResourceDescriptor } from '@macts/contracts';
 import { ValueType } from '@macts/contracts';
@@ -180,6 +181,7 @@ export interface Playlist {
     name: string | null;
     readonly persistentID: string;
     readonly size: Integer | null;
+    readonly source: ObjectReferenceVariant<Source, string, 'Source'>;
     readonly specialKind: string | null;
     readonly time: string | null;
     readonly visible: boolean | null;
@@ -202,6 +204,7 @@ export class PlaylistResourceClient {
 
 // @public
 export const PlaylistSchema: z.ZodObject<{
+    source: z.ZodString;
     id: z.ZodNumber;
     persistentID: z.ZodString;
     description: z.ZodString;
