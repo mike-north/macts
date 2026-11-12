@@ -30,6 +30,8 @@ import {
   type Unsupported,
 } from '../manifest/index.js'
 import { loadManifest, parseManifestYaml } from '../manifest/loader.js'
+import { resolveManifestRoutes } from '../manifest/route.js'
+import { generateConsolidatedPackages } from './orchestrate.js'
 import { JOTTER_MANIFEST_YAML } from './contract/test-fixtures.js'
 import {
   exposedProperties,
@@ -284,7 +286,35 @@ function markEveryProperty(manifest: AppManifest): AppManifest {
       return [key, { ...resource, properties }]
     })
   )
-  return AppManifestSchema.parse({ ...manifest, resources })
+  // An operation that writes an unsupported property is itself unsupported.
+  const commands = Object.fromEntries(
+    Object.entries(manifest.commands).map(([key, command]) => {
+      const property =
+        typeof command.resourceType !== 'string' || command.assignsProperty === undefined
+          ? undefined
+          : resources[command.resourceType]?.properties[command.assignsProperty.property]
+      return [
+        key,
+        property?.unsupported === undefined
+          ? command
+          : {
+              ...command,
+              unsupported: command.unsupported ?? {
+                evidence: {
+                  source: 'live',
+                  observedAt: '2026-11-01T06:05:32.244Z',
+                  bundleId: 'com.example.jotter',
+                  appVersion: '2.1',
+                  osVersion: '27.2',
+                  expression: 'the property on the selected item',
+                  errorNumber: -1728,
+                },
+              },
+            },
+      ]
+    })
+  )
+  return AppManifestSchema.parse({ ...manifest, resources, commands })
 }
 
 describe('every shipped manifest', async () => {
@@ -307,4 +337,36 @@ describe('every shipped manifest', async () => {
       expect(exposedUnsupportedProperties(markEveryProperty(manifest))).toEqual([])
     }
   )
+})
+
+/** The operation's contract supplies the MCP adapter as well as the SDK. */
+function reminderCompletionSurfaces(manifest: AppManifest): Set<string> {
+  const surfaces = new Set<string>()
+  const result = generateConsolidatedPackages(manifest, { appName: 'reminders' })
+  expect(result.errors).toEqual([])
+  const files = new Map(result.client.files.map((file) => [file.path, file.content]))
+  if (resolveManifestRoutes(manifest).some((route) => route.commandKey === 'completeReminder')) {
+    surfaces.add('route')
+  }
+  if (files.get('src/contract/index.ts')?.includes("'reminders.reminders.complete'") === true) {
+    surfaces.add('contract and MCP')
+  }
+  if (files.get('src/resources/reminder.ts')?.includes('async complete(') === true) {
+    surfaces.add('SDK')
+  }
+  if (
+    files.has('src/cli/commands/lists/reminders/complete.ts') ||
+    files.has('src/cli/commands/reminders/complete.ts')
+  ) {
+    surfaces.add('CLI')
+  }
+  return surfaces
+}
+
+it('omits an assignment to a marked property from every operation surface', async () => {
+  const manifest = await loadManifest(resolve(MANIFESTS_DIR, 'reminders', 'app.yaml'))
+  expect(reminderCompletionSurfaces(manifest)).toEqual(
+    new Set(['route', 'contract and MCP', 'SDK', 'CLI'])
+  )
+  expect(reminderCompletionSurfaces(markEveryProperty(manifest))).toEqual(new Set())
 })

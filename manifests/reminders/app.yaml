@@ -546,16 +546,19 @@ commands:
   completeReminder:
     name: complete
     routeName: complete
-    description: Mark a reminder as complete
+    description: Complete a reminder with a property-backed convenience that sets completed to true
     scope: resource
     resourceType: Reminder
-    code: '????'
+    assignsProperty:
+      property: completed
+      value: true
     parameters:
       - name: id
         type: string
         description: Reminder identifier
         required: true
     permission: reminders:reminders:update
+    risk: write
 
   show:
     name: show
@@ -621,6 +624,3 @@ extraction:
     - question: What are the exact 4-char codes for Reminders.app resources and properties?
       context: Placeholder codes used - run sdef /System/Applications/Reminders.app to get exact codes
       relatedTo: all resources
-    - question: Does Reminders.app expose an explicit complete command or is it done via setting the completed property?
-      context: The completeReminder command may be a convenience wrapper over property update
-      relatedTo: completeReminder

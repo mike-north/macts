@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { TargetNotFoundError } from '@macts/contracts'
 import { JsonFormatter } from './json.js'
 
 describe('JsonFormatter', () => {
@@ -59,6 +60,19 @@ describe('JsonFormatter', () => {
   })
 
   describe('formatError', () => {
+    it('retains the canonical code and details of a target failure', () => {
+      const error = new TargetNotFoundError('Missing reminder', {
+        resource: 'Reminder',
+      })
+      expect(JSON.parse(formatter.formatError(error))).toEqual({
+        error: {
+          code: 'TARGET_NOT_FOUND',
+          message: 'Missing reminder',
+          details: { resource: 'Reminder' },
+        },
+      })
+    })
+
     it('should format error messages', () => {
       const result = formatter.formatError('Something went wrong')
       const parsed = JSON.parse(result) as { error: { message: string } }

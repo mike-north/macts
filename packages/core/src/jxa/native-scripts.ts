@@ -1088,6 +1088,9 @@ function buildResourceBody(
   if (paged && command.name !== 'list') {
     throw new InternalError('Only a list operation can read a page.', {})
   }
+  if (command.assignsProperty !== undefined) {
+    return buildUpdateBody(command, source, resourcePlural, manifest)
+  }
   switch (command.name) {
     case 'list':
       return buildListBody(command, source, resourcePlural, manifest, identifierAliases, paged)
@@ -2076,6 +2079,18 @@ function buildUpdateBody(
   const selected = bindSelectedItem(command, resource, resourcePlural, manifest)
   const excluded = new Set([selected.itemParameter, selected.parentParameter])
   const writableFields = command.parameters.filter((p) => !excluded.has(p.name))
+  // A fixed assignment is a property-backed convenience over the same target
+  // as an update. It has no record result and propagates a failed write.
+  if (command.assignsProperty !== undefined) {
+    return {
+      body: lines(
+        selected.statements,
+        `${member('item', nativePropertyName(resource, command.assignsProperty.property))} = ${JSON.stringify(command.assignsProperty.value)};`,
+        'return undefined;'
+      ),
+      identifierArguments: selected.identifierArguments,
+    }
+  }
   const body = lines(
     selected.statements,
     ...writableFields.map(

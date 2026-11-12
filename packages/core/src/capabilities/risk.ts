@@ -374,7 +374,8 @@ export function classifyRiskFromOperation(operationName: string): RiskClass {
  *
  * Precedence:
  * 1. An explicit, valid `risk` on the command (manifest override / lossless-plus).
- * 2. Otherwise, the risk derived from the command's operation name via
+ * 2. A fixed property assignment is a write regardless of its name.
+ * 3. Otherwise, the risk derived from the command's operation name via
  *    {@link classifyRiskFromOperation}.
  *
  * @param command - The manifest command
@@ -384,5 +385,7 @@ export function classifyCommandRisk(command: Command): RiskClass {
   if (isRiskClass(command.risk)) {
     return command.risk
   }
+  // A fixed assignment changes state even when its name sounds observational.
+  if (command.assignsProperty !== undefined) return 'write'
   return classifyRiskFromOperation(command.name)
 }

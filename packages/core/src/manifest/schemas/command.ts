@@ -171,6 +171,18 @@ export const CommandSchema = z.object({
   parent: CommandParentSchema.optional(),
   /** Return type (void if omitted) */
   returns: z.string().optional(),
+  /**
+   * A property-backed convenience: assign one fixed literal to a writable
+   * property of the selected item, rather than invoking an app command.
+   * Manifest validation checks its target, value, permission, and inputs.
+   */
+  assignsProperty: z
+    .object({
+      property: z.string().min(1),
+      value: z.union([z.string(), z.number(), z.boolean()]),
+    })
+    .strict()
+    .optional(),
   /** AppleScript four-character code */
   code: z.string().min(1).max(4).optional(),
   /**
