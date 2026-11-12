@@ -3,7 +3,7 @@ import { afterAll, describe, expect, it, vi } from 'vitest'
 import { createApp } from '@macts/api/server'
 import { AppManifestSchema, createNativeExecutor } from '@macts/core'
 import { standInTransport } from '@macts/core/testing'
-import { PermissionDeniedError, TargetNotFoundError } from '@macts/contracts'
+import { PermissionDeniedError, PolicyDeniedError, TargetNotFoundError } from '@macts/contracts'
 import { remindersContract } from '@macts/reminders/contract'
 import { plugin } from '@macts/reminders/cli'
 import {
@@ -238,4 +238,76 @@ it('the MCP tool completes the selected reminder', async () => {
     { id: 'one', completed: false },
     { id: 'two', completed: true },
   ])
+})
+
+it('read-only governance refuses a fixed assignment before it changes the reminder', async () => {
+  const state = fixture()
+  const manifest = structuredClone(AppManifestSchema.parse(await remindersContract.loadManifest()))
+  const command = manifest.commands['completeReminder']
+  if (command === undefined) throw new Error('Missing completion declaration')
+  command.name = 'showCompletion'
+  delete command.risk
+  const runtime = createRuntime({
+    executor: state.executor,
+    verifier: { verify: () => Promise.resolve({ subject: 'reader', permissions: [permission] }) },
+    governance: { policy: { version: '1', defaultDisposition: 'read-only', apps: [], tags: [] } },
+  })
+  runtime.registerManifest(AppManifestSchema.parse(manifest))
+  await expect(
+    runtime.invoke(
+      'reminders.reminders.complete',
+      { id: 'one' },
+      { credential: createBearerCredential('fixture') }
+    )
+  ).rejects.toBeInstanceOf(PolicyDeniedError)
+  expect(state.rows[0]?.completed).toBe(false)
+})
+
+it('does not expose an unsupported assignment command', async () => {
+  const manifest = structuredClone(AppManifestSchema.parse(await remindersContract.loadManifest()))
+  const property = manifest.resources['Reminder']?.properties['completed']
+  const command = manifest.commands['completeReminder']
+  if (property === undefined || command === undefined)
+    throw new Error('Missing completion declaration')
+  delete property.nullable
+  delete property.evidence
+  property.unsupported = {
+    reason: 'The application cannot provide this property.',
+    evidence: {
+      source: 'probe',
+      observedAt: '2026-11-01T00:00:00.000Z',
+      bundleId: 'com.apple.reminders',
+      appVersion: '1',
+      osVersion: '27',
+      sampleSize: 1,
+      failedReads: 1,
+      errorNumbers: [-1728],
+    },
+  }
+  command.unsupported = {
+    evidence: {
+      source: 'live',
+      observedAt: '2026-11-01T00:00:00.000Z',
+      bundleId: 'com.apple.reminders',
+      appVersion: '1',
+      osVersion: '27',
+      expression: 'completion',
+      errorNumber: -1728,
+    },
+  }
+  const state = fixture()
+  const runtime = createRuntime({
+    executor: state.executor,
+    verifier: { verify: () => Promise.resolve({ subject: 'operator', permissions: [permission] }) },
+    governance: { policy: ALLOW_ALL_POLICY },
+  })
+  runtime.registerManifest(AppManifestSchema.parse(manifest))
+  await expect(
+    runtime.invoke(
+      'reminders.reminders.complete',
+      { id: 'one' },
+      { credential: createBearerCredential('fixture') }
+    )
+  ).rejects.toThrow('Unknown operation "reminders.reminders.complete".')
+  expect(state.rows[0]?.completed).toBe(false)
 })

@@ -214,6 +214,15 @@ describe('classifyRiskFromOperation — compound read+mutator names resolve to m
 })
 
 describe('classifyCommandRisk', () => {
+  it('classifies a fixed assignment as a write regardless of its name', () => {
+    expect(
+      classifyCommandRisk({
+        ...command('showCompletion'),
+        assignsProperty: { property: 'completed', value: true },
+      })
+    ).toBe('write')
+  })
+
   it('derives risk from the operation name when no override is present', () => {
     expect(classifyCommandRisk(command('createEvent'))).toBe('write')
     expect(classifyCommandRisk(command('list'))).toBe('read')

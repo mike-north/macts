@@ -222,6 +222,10 @@ export const AppManifestSchema = z
         ['list', 'create', 'get', 'update', 'delete'].includes(command.name) ||
         resource === undefined ||
         property?.access !== 'rw' ||
+        // Unsupported properties have no usable surface to mutate.
+        (property.unsupported !== undefined && command.unsupported === undefined) ||
+        // Assigning state is never a read, regardless of the command name.
+        command.risk === 'read' ||
         !compatible ||
         command.parameters.length !== 1 ||
         itemIdentifierParameter(command) === undefined ||
@@ -235,7 +239,7 @@ export const AppManifestSchema = z
           code: 'custom',
           path: ['commands', key, 'assignsProperty'],
           message:
-            'A property-backed convenience requires one target identifier, an explicit permission, and a type-compatible literal for a writable property of its resource.',
+            'A property-backed convenience requires one target identifier, an explicit permission, a mutating risk, and a type-compatible literal for a usable writable property of its resource.',
         })
       }
     }
