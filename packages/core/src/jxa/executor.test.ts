@@ -3,7 +3,8 @@
  * (`runJxa`, `runWithApp`) and native invocations composed with the value codec
  * (`runNativeScript`).
  *
- * Every case runs the real automation host. None sends an event to any app:
+ * The composeNativeScript cases inspect text without running the host. Other
+ * cases run the real automation host. None sends an event to any app:
  * constructing an application object for an installed app sends nothing and
  * raises no permission prompt, and a bundle identifier with no installed app
  * fails before anything is sent (`runWithApp` cases excepted, which read
@@ -232,9 +233,9 @@ describe('composeNativeScript', () => {
     expect(argsLine?.trim()).toBe(
       `var args = __mactsDecode(JSON.parse(${JSON.stringify(JSON.stringify(input))}), JSON.parse(${JSON.stringify(JSON.stringify(inputPlan))}), env);`
     )
-    // The environment also hands the codec the host's position reader.
+    // The environment supplies the default channel scale and position reader.
     expect(envLine?.trim()).toBe(
-      `var env = { app: app, references: JSON.parse(${JSON.stringify(JSON.stringify(references))}), positionOf: __mactsPositionOf };`
+      `var env = { app: app, references: JSON.parse(${JSON.stringify(JSON.stringify(references))}), rgbChannels: JSON.parse(${JSON.stringify(JSON.stringify('integer16'))}), positionOf: __mactsPositionOf };`
     )
     const others = lines.filter((line) => line !== argsLine && line !== envLine).join('\n')
     for (const sentinel of [...Object.values(input), 'SENTINEL_RESOURCE_51f0']) {
@@ -248,6 +249,17 @@ describe('composeNativeScript', () => {
     // With no page window, the body's `page` argument is embedded null.
     expect(source).toContain(`})(app, args, JSON.parse(${JSON.stringify('null')}));`)
     expect(source.trimEnd().endsWith('JSON.stringify(__mactsOutcome);')).toBe(true)
+  })
+
+  it('embeds a declared normalized channel scale as a JSON string literal', () => {
+    const source = composeNativeScript(
+      nativeScript({ bundleId: 'com.apple.iCal', rgbChannels: 'normalized' }),
+      NATIVE_CODEC
+    )
+    const envLine = source.split('\n').find((line) => line.trimStart().startsWith('var env = '))
+    expect(envLine?.trim()).toBe(
+      `var env = { app: app, references: JSON.parse(${JSON.stringify('{}')}), rgbChannels: JSON.parse(${JSON.stringify(JSON.stringify('normalized'))}), positionOf: __mactsPositionOf };`
+    )
   })
 
   it('creates the app before decoding, and runs the body only after the input decoded', () => {
