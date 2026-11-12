@@ -11,12 +11,15 @@
  * - an output field emitted as an index selector within the record it was
  *   read through ({@link positionalFieldNote});
  * - an operation that selects one of its objects by position, and that
- *   operation's position parameter ({@link positionalSelectionNote}).
+ *   operation's position parameter ({@link positionalSelectionNote}), on
+ *   every surface that documents the operation: the contract client, the CLI
+ *   get's help and the HTTP client ({@link itemSelectionNote}).
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md §D7
  */
 
 import type { AppManifest } from '../manifest/schemas/app.js'
+import { isPositional } from '../manifest/positional.js'
 import { resolvingCommand } from '../manifest/resource-commands.js'
 import { identifierWords, withArticle } from './surface.js'
 
@@ -75,4 +78,18 @@ export function positionalSelectionNote(manifest: AppManifest, resourceKey: stri
     `${article.charAt(0).toUpperCase()}${article.slice(1)} has no id, so it is selected by its ` +
     `zero-based position within its ${parent}, which drifts when ${many} open, close or move.`
   )
+}
+
+/**
+ * The note a get, update or delete of `resourceKey` carries about how it
+ * selects its item: {@link positionalSelectionNote} for a positional
+ * resource, and nothing for a resource found by an identifier.
+ *
+ * @param manifest - The app manifest.
+ * @param resourceKey - The resource the operation selects one item of.
+ */
+export function itemSelectionNote(manifest: AppManifest, resourceKey: string): string | undefined {
+  return isPositional(manifest, resourceKey)
+    ? positionalSelectionNote(manifest, resourceKey)
+    : undefined
 }

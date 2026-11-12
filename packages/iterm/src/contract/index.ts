@@ -25,11 +25,17 @@ import {
   type ClientBrand,
   type ClientRuntime,
   type FileSource,
+  type IndexSelectorReference,
   type Integer,
+  type ObjectReferenceData,
+  type ObjectReferenceVariant,
   type OperationDescriptor,
+  type Page,
   type Point,
   type Rectangle,
+  type ResourceDescriptor,
   type Rgb,
+  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -105,6 +111,13 @@ export interface Window {
    */
   frontmost: boolean | null
   /**
+   * The currently selected tab. Returned as an index selector: the tab at its zero-based position
+   * within this window, since a tab has no id. The position drifts when tabs open, close or move,
+   * so the reference resolves to whichever tab holds it then.
+   * Nullable. No evidence that the app always sets it.
+   */
+  currentTab: IndexSelectorReference<Tab, 'Tab'> | null
+  /**
    * Whether the window is a hotkey window.
    * Nullable. No evidence that the app always sets it.
    */
@@ -115,25 +128,29 @@ export interface Window {
    */
   hotkeyWindowProfile: string | null
   /**
-   * The position of the window, relative to the upper left corner of the screen.
+   * Deprecated compatibility position relative to the upper left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
    * Nullable. No evidence that the app always sets it.
    */
-  position: Point | null
+  position?: Point | null
   /**
-   * The position of the window, relative to the lower left corner of the screen.
+   * Deprecated compatibility position relative to the lower left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
    * Nullable. No evidence that the app always sets it.
    */
-  origin: Point | null
+  origin?: Point | null
   /**
-   * The width and height of the window.
+   * Deprecated compatibility width and height of the window. Use bounds instead. Omitted when iTerm
+   * cannot report it.
    * Nullable. No evidence that the app always sets it.
    */
-  size: Point | null
+  size?: Point | null
   /**
-   * The bounding rectangle, relative to the lower left corner of the screen.
+   * Deprecated compatibility rectangle relative to the lower left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
    * Nullable. No evidence that the app always sets it.
    */
-  frame: Rectangle | null
+  frame?: Rectangle | null
 }
 
 /** A terminal tab */
@@ -368,19 +385,33 @@ export interface WindowCreateInput {
   zoomed?: boolean
   /** Whether the window is currently the frontmost window. */
   frontmost?: boolean
+  /** The currently selected tab */
+  currentTab?: ObjectReferenceData<never, 'Tab'>
   /** Whether the window is a hotkey window. */
   isHotkeyWindow?: boolean
   /**
    * If the window is a hotkey window, this gives the name of the profile that created the window.
    */
   hotkeyWindowProfile?: string
-  /** The position of the window, relative to the upper left corner of the screen. */
+  /**
+   * Deprecated compatibility position relative to the upper left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
+   */
   position?: Point
-  /** The position of the window, relative to the lower left corner of the screen. */
+  /**
+   * Deprecated compatibility position relative to the lower left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
+   */
   origin?: Point
-  /** The width and height of the window */
+  /**
+   * Deprecated compatibility width and height of the window. Use bounds instead. Omitted when iTerm
+   * cannot report it.
+   */
   size?: Point
-  /** The bounding rectangle, relative to the lower left corner of the screen. */
+  /**
+   * Deprecated compatibility rectangle relative to the lower left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
+   */
   frame?: Rectangle
 }
 
@@ -417,6 +448,11 @@ export interface WindowUpdateInput {
    */
   frontmost?: boolean
   /**
+   * The currently selected tab.
+   * Cannot be reset: null is rejected.
+   */
+  currentTab?: ObjectReferenceData<never, 'Tab'>
+  /**
    * Whether the window is a hotkey window.
    * Cannot be reset: null is rejected.
    */
@@ -427,22 +463,26 @@ export interface WindowUpdateInput {
    */
   hotkeyWindowProfile?: string
   /**
-   * The position of the window, relative to the upper left corner of the screen.
+   * Deprecated compatibility position relative to the upper left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
    * Cannot be reset: null is rejected.
    */
   position?: Point
   /**
-   * The position of the window, relative to the lower left corner of the screen.
+   * Deprecated compatibility position relative to the lower left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
    * Cannot be reset: null is rejected.
    */
   origin?: Point
   /**
-   * The width and height of the window.
+   * Deprecated compatibility width and height of the window. Use bounds instead. Omitted when iTerm
+   * cannot report it.
    * Cannot be reset: null is rejected.
    */
   size?: Point
   /**
-   * The bounding rectangle, relative to the lower left corner of the screen.
+   * Deprecated compatibility rectangle relative to the lower left corner of the screen. Use bounds
+   * instead. Omitted when iTerm cannot report it.
    * Cannot be reset: null is rejected.
    */
   frame?: Rectangle
@@ -723,6 +763,39 @@ export interface SessionUpdateInput {
   answerbackString?: string
 }
 
+/** A window. */
+export interface WindowResourceClient {
+  /** List windows, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Window>>
+  /**
+   * Read the window identified by `id`.
+   *
+   * @param id - Window identifier. Does not accept null.
+   */
+  get(id: Integer, options?: CallOptions): Promise<Window>
+}
+
+/** A terminal tab */
+export interface TabResourceClient {
+  /**
+   * List tabs, as one page holding all of them.
+   *
+   * @param windowId - Window identifier. Does not accept null.
+   */
+  list(windowId: Integer, options?: CallOptions): Promise<Page<Tab>>
+  /**
+   * Read the tab at the zero-based position `index` within `windowId`. A tab has no id, so it is
+   * selected by its zero-based position within its window, which drifts when tabs open, close or
+   * move.
+   *
+   * @param windowId - Window identifier. Does not accept null.
+   * @param index - The zero-based position of the tab within its window. A tab has no id, so it is
+   * selected by its zero-based position within its window, which drifts when tabs open, close or
+   * move. Does not accept null.
+   */
+  get(windowId: Integer, index: Integer, options?: CallOptions): Promise<Tab>
+}
+
 /**
  * The iTerm client: one namespace per resource that has operations, plus the app's own commands. A
  * client factory creates one from `iTermContract` in the app's `/contract` entry. Its type carries
@@ -730,6 +803,18 @@ export interface SessionUpdateInput {
  * resource; the brand has no runtime member.
  */
 export interface iTermClient extends ClientBrand<iTermResources> {
+  /** A window. */
+  readonly windows: WindowResourceClient
+  /** A terminal tab */
+  readonly tabs: TabResourceClient
+  /**
+   * Get a reference to the currently selected window.
+   *
+   * @returns Nullable. No evidence that the app always returns a value.
+   */
+  currentWindow(
+    options?: CallOptions
+  ): Promise<ObjectReferenceVariant<Window, Integer, 'Window'> | null>
   /**
    * Return the number of elements of a particular class within an object.
    *
@@ -889,6 +974,81 @@ export interface iTermClient extends ClientBrand<iTermResources> {
   toggleHotkeyWindow(options?: CallOptions): Promise<void>
 }
 
+const windowRecordType: ValueType<Window> = t.record(
+  {
+    id: t.integer({ description: 'The unique identifier of the session.' }),
+    alternateIdentifier: t.nullable(t.string(), {
+      description: 'The alternate unique identifier of the session.',
+    }),
+    name: t.nullable(t.string(), { description: 'The full title of the window.' }),
+    index: t.nullable(t.integer(), {
+      description: 'The index of the window, ordered front to back.',
+    }),
+    bounds: t.nullable(t.rectangle(), { description: 'The bounding rectangle of the window.' }),
+    closeable: t.nullable(t.boolean(), { description: 'Whether the window has a close box.' }),
+    miniaturizable: t.nullable(t.boolean(), {
+      description: 'Whether the window can be minimized.',
+    }),
+    miniaturized: t.nullable(t.boolean(), {
+      description: 'Whether the window is currently minimized.',
+    }),
+    resizable: t.nullable(t.boolean(), { description: 'Whether the window can be resized.' }),
+    visible: t.nullable(t.boolean(), { description: 'Whether the window is currently visible.' }),
+    zoomable: t.nullable(t.boolean(), { description: 'Whether the window can be zoomed.' }),
+    zoomed: t.nullable(t.boolean(), { description: 'Whether the window is currently zoomed.' }),
+    frontmost: t.nullable(t.boolean(), {
+      description: 'Whether the window is currently the frontmost window.',
+    }),
+    currentTab: t.nullable(
+      t.indexSelectorReference<Tab, 'Tab'>(() => iTermContract, 'Tab'),
+      {
+        description:
+          'The currently selected tab. Returned as an index selector: the tab at its zero-based position within this window, since a tab has no id. The position drifts when tabs open, close or move, so the reference resolves to whichever tab holds it then.',
+      }
+    ),
+    isHotkeyWindow: t.nullable(t.boolean(), {
+      description: 'Whether the window is a hotkey window.',
+    }),
+    hotkeyWindowProfile: t.nullable(t.string(), {
+      description:
+        'If the window is a hotkey window, this gives the name of the profile that created the window.',
+    }),
+    position: t.optional(
+      t.nullable(t.point(), {
+        description:
+          'Deprecated compatibility position relative to the upper left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it.',
+      })
+    ),
+    origin: t.optional(
+      t.nullable(t.point(), {
+        description:
+          'Deprecated compatibility position relative to the lower left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it.',
+      })
+    ),
+    size: t.optional(
+      t.nullable(t.point(), {
+        description:
+          'Deprecated compatibility width and height of the window. Use bounds instead. Omitted when iTerm cannot report it.',
+      })
+    ),
+    frame: t.optional(
+      t.nullable(t.rectangle(), {
+        description:
+          'Deprecated compatibility rectangle relative to the lower left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it.',
+      })
+    ),
+  },
+  { description: 'A window.' }
+)
+
+const tabRecordType: ValueType<Tab> = t.record(
+  {
+    index: t.nullable(t.integer(), { description: 'Index of tab in parent tab view control' }),
+    title: t.nullable(t.string(), { description: 'The title property' }),
+  },
+  { description: 'A terminal tab' }
+)
+
 /**
  * The type of the resource table in `iTermContract` (the app's `/contract` entry): every resource a
  * reference can name, keyed by manifest resource key, with its record type,
@@ -898,7 +1058,18 @@ export interface iTermClient extends ClientBrand<iTermResources> {
  * the contract carries it, so `bindReference` admits only references the
  * contract can resolve.
  */
-export type iTermResources = Readonly<Record<never, never>>
+export type iTermResources = Readonly<{
+  Window: ResourceDescriptor<Window, Integer> & {
+    readonly id: ValueType<Integer>
+    readonly get: 'iterm.windows.get'
+    readonly list: 'iterm.windows.list'
+  }
+  Tab: ResourceDescriptor<Tab> & {
+    readonly get: 'iterm.tabs.get'
+    readonly list: 'iterm.tabs.list'
+    readonly parents: { readonly get: 'Window'; readonly list: 'Window' }
+  }
+}>
 
 /**
  * The resource table: the implementation of {@link iTermResources}, which
@@ -908,7 +1079,148 @@ export type iTermResources = Readonly<Record<never, never>>
  * D7, "Resolvable targets"). This table is also the registry that reference
  * value types read, lazily.
  */
-const resources = {} satisfies iTermResources
+const resources = {
+  Window: {
+    name: 'Window',
+    record: windowRecordType,
+    id: t.integer({ description: 'The unique identifier of the session.' }),
+    get: 'iterm.windows.get',
+    list: 'iterm.windows.list',
+  },
+  Tab: {
+    name: 'Tab',
+    record: tabRecordType,
+    get: 'iterm.tabs.get',
+    list: 'iterm.tabs.list',
+    parents: { get: 'Window', list: 'Window' },
+  },
+} satisfies iTermResources
+
+const appCurrentWindowOperation: OperationDescriptor<
+  Record<string, never>,
+  ObjectReferenceVariant<Window, Integer, 'Window'> | null
+> = {
+  id: 'iterm.app.currentWindow',
+  permission: 'iterm:app:currentWindow',
+  target: { command: 'currentWindow' },
+  description: 'Get a reference to the currently selected window.',
+  input: t.record({}),
+  output: t.nullable(t.reference<Window, Integer, 'Window'>(() => iTermContract, 'Window', 'one')),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
+}
+
+const windowListWindowsOperation: OperationDescriptor<Record<string, never>, Page<Window>> = {
+  id: 'iterm.windows.list',
+  permission: 'iterm:windows:list',
+  target: { command: 'listWindows', resource: 'Window' },
+  description: 'List the windows',
+  input: t.record({}),
+  output: t.page(windowRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
+}
+
+const windowGetWindowOperation: OperationDescriptor<{ readonly id: Integer }, Window> = {
+  id: 'iterm.windows.get',
+  permission: 'iterm:windows:get',
+  target: { command: 'getWindow', resource: 'Window' },
+  description: 'Get a window by its ID',
+  input: t.record({
+    id: t.integer({ description: 'Window identifier' }),
+  }),
+  output: windowRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      id: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Window identifier',
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+  },
+}
+
+const tabListTabsOperation: OperationDescriptor<{ readonly windowId: Integer }, Page<Tab>> = {
+  id: 'iterm.tabs.list',
+  permission: 'iterm:tabs:list',
+  target: { command: 'listTabs', resource: 'Tab' },
+  description: 'List the tabs of a window',
+  input: t.record({
+    windowId: t.integer({ description: 'Window identifier' }),
+  }),
+  output: t.page(tabRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      windowId: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Window identifier',
+      },
+    },
+    required: ['windowId'],
+    additionalProperties: false,
+  },
+}
+
+const tabGetTabOperation: OperationDescriptor<
+  { readonly windowId: Integer; readonly index: Integer },
+  Tab
+> = {
+  id: 'iterm.tabs.get',
+  permission: 'iterm:tabs:get',
+  target: { command: 'getTab', resource: 'Tab' },
+  description: 'Get a tab of a window by its position',
+  input: t.record({
+    windowId: t.integer({ description: 'Window identifier' }),
+    index: t.integer({
+      description:
+        'The zero-based position of the tab within its window. A tab has no id, so it is selected by its zero-based position within its window, which drifts when tabs open, close or move.',
+    }),
+  }),
+  output: tabRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      windowId: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Window identifier',
+      },
+      index: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description:
+          'The zero-based position of the tab within its window. A tab has no id, so it is selected by its zero-based position within its window, which drifts when tabs open, close or move.',
+      },
+    },
+    required: ['windowId', 'index'],
+    additionalProperties: false,
+  },
+}
 
 const appCountOperation: OperationDescriptor<{ readonly each?: string | undefined }, undefined> = {
   id: 'iterm.app.count',
@@ -1665,6 +1977,11 @@ const appToggleHotkeyWindowOperation: OperationDescriptor<Record<string, never>,
 
 /** Every operation, keyed by its identity. */
 const operations: AppContract<iTermClient>['operations'] = {
+  'iterm.app.currentWindow': appCurrentWindowOperation,
+  'iterm.windows.list': windowListWindowsOperation,
+  'iterm.windows.get': windowGetWindowOperation,
+  'iterm.tabs.list': tabListTabsOperation,
+  'iterm.tabs.get': tabGetTabOperation,
   'iterm.app.count': appCountOperation,
   'iterm.app.duplicate': appDuplicateOperation,
   'iterm.app.exists': appExistsOperation,
@@ -1697,6 +2014,16 @@ const operations: AppContract<iTermClient>['operations'] = {
 /** Build the client on top of a factory-supplied runtime. */
 function bind(runtime: ClientRuntime): iTermClient {
   return {
+    windows: {
+      list: (options) => runtime.invoke(windowListWindowsOperation, {}, options),
+      get: (id, options) => runtime.invoke(windowGetWindowOperation, { id }, options),
+    },
+    tabs: {
+      list: (windowId, options) => runtime.invoke(tabListTabsOperation, { windowId }, options),
+      get: (windowId, index, options) =>
+        runtime.invoke(tabGetTabOperation, { windowId, index }, options),
+    },
+    currentWindow: (options) => runtime.invoke(appCurrentWindowOperation, {}, options),
     count: (each, options) => runtime.invoke(appCountOperation, { each }, options),
     duplicate: (to, withProperties, options) =>
       runtime.invoke(appDuplicateOperation, { to, withProperties }, options),

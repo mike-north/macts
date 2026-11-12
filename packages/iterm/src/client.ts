@@ -5,6 +5,8 @@
  * @packageDocumentation
  */
 
+import { WindowResourceClient } from './resources/window.js'
+import { TabResourceClient } from './resources/tab.js'
 import { iTermContract as appContract } from './contract/index.js'
 import {
   createCodecClient,
@@ -167,10 +169,17 @@ export interface iTermClient extends ClientBrand<iTermResources> {}
 export class iTermClient {
   readonly #httpClient: HttpClient
 
+  /** A window. */
+  readonly windows: WindowResourceClient
+
+  /** A terminal tab */
+  readonly tabs: TabResourceClient
+
   constructor(options: iTermClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-
+    this.windows = new WindowResourceClient(this.#httpClient, 'iterm', 'windows')
+    this.tabs = new TabResourceClient(this.#httpClient, 'iterm', 'tabs')
     this.#httpClient.bind(this)
   }
 
@@ -179,6 +188,17 @@ export class iTermClient {
    */
   get http(): HttpClient {
     return this.#httpClient
+  }
+
+  /**
+   * Get a reference to the currently selected window.
+   */
+  async currentWindow(
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<Awaited<ReturnType<import('./contract/index.js').iTermClient['currentWindow']>>> {
+    return this.#httpClient.invoke<
+      Awaited<ReturnType<import('./contract/index.js').iTermClient['currentWindow']>>
+    >('iterm.app.currentWindow', {}, __mactsOptions)
   }
 
   /**

@@ -21,6 +21,7 @@ import {
 import { sendsNoItem } from '../../manifest/item-selection.js'
 import { usableProperties } from '../../manifest/unsupported.js'
 import { omittedOutputResult, outputProperties } from '../../manifest/output-references.js'
+import { itemSelectionNote } from '../positional-docs.js'
 import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.js'
 import {
   commandMethodParameters,
@@ -414,6 +415,7 @@ export function generateGetCommand(
   const description = usageDescription(summary, [
     firstMatchNote(resource),
     parentFirstMatchNote(getCommand, ctx.manifest),
+    itemSelectionNote(ctx.manifest, hierarchyPath.resourceName),
   ])
 
   const content = `import { Command, Option } from 'clipanion';

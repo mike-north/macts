@@ -8,10 +8,16 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { ClientBrand } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
+import { IndexSelectorReference } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { ObjectReferenceData } from '@macts/contracts';
+import { ObjectReferenceVariant } from '@macts/contracts';
+import { Page } from '@macts/contracts';
 import { Point } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface iTermClient extends ClientBrand<iTermResources> {
@@ -22,6 +28,7 @@ export interface iTermClient extends ClientBrand<iTermResources> {
     createTabWithDefaultProfile(command?: string, options?: CallOptions): Promise<void>;
     createWindowWithDefaultProfile(command?: string, options?: CallOptions): Promise<void>;
     createWindowWithProfile(command?: string, options?: CallOptions): Promise<void>;
+    currentWindow(options?: CallOptions): Promise<ObjectReferenceVariant<Window, Integer, 'Window'> | null>;
     duplicate(to: string, withProperties?: unknown, options?: CallOptions): Promise<void>;
     exists(options?: CallOptions): Promise<void>;
     hideHotkeyWindow(options?: CallOptions): Promise<void>;
@@ -39,8 +46,10 @@ export interface iTermClient extends ClientBrand<iTermResources> {
     splitVertically(withProfile: string, command?: string, options?: CallOptions): Promise<void>;
     splitVerticallyWithDefaultProfile(command?: string, options?: CallOptions): Promise<void>;
     splitVerticallyWithSameProfile(command?: string, options?: CallOptions): Promise<void>;
+    readonly tabs: TabResourceClient;
     toggleHotkeyWindow(options?: CallOptions): Promise<void>;
     variable(named: string, options?: CallOptions): Promise<void>;
+    readonly windows: WindowResourceClient;
     write(contentsOfFile?: FileSource, text?: string, newline?: boolean, options?: CallOptions): Promise<void>;
 }
 
@@ -48,7 +57,21 @@ export interface iTermClient extends ClientBrand<iTermResources> {
 export const iTermContract: AppContract<iTermClient, iTermResources>;
 
 // @public
-export type iTermResources = Readonly<Record<never, never>>;
+export type iTermResources = Readonly<{
+    Window: ResourceDescriptor<Window, Integer> & {
+        readonly id: ValueType<Integer>;
+        readonly get: 'iterm.windows.get';
+        readonly list: 'iterm.windows.list';
+    };
+    Tab: ResourceDescriptor<Tab> & {
+        readonly get: 'iterm.tabs.get';
+        readonly list: 'iterm.tabs.list';
+        readonly parents: {
+            readonly get: 'Window';
+            readonly list: 'Window';
+        };
+    };
+}>;
 
 // @public
 export type SaveOptions = 'yes' | 'no' | 'ask';
@@ -188,6 +211,12 @@ export interface TabCreateInput {
 }
 
 // @public
+export interface TabResourceClient {
+    get(windowId: Integer, index: Integer, options?: CallOptions): Promise<Tab>;
+    list(windowId: Integer, options?: CallOptions): Promise<Page<Tab>>;
+}
+
+// @public
 export interface TabUpdateInput {
     index?: Integer;
     title?: string;
@@ -198,7 +227,8 @@ export interface Window {
     readonly alternateIdentifier: string | null;
     bounds: Rectangle | null;
     readonly closeable: boolean | null;
-    frame: Rectangle | null;
+    currentTab: IndexSelectorReference<Tab, 'Tab'> | null;
+    frame?: Rectangle | null;
     frontmost: boolean | null;
     hotkeyWindowProfile: string | null;
     readonly id: Integer;
@@ -207,10 +237,10 @@ export interface Window {
     readonly miniaturizable: boolean | null;
     miniaturized: boolean | null;
     readonly name: string | null;
-    origin: Point | null;
-    position: Point | null;
+    origin?: Point | null;
+    position?: Point | null;
     readonly resizable: boolean | null;
-    size: Point | null;
+    size?: Point | null;
     visible: boolean | null;
     readonly zoomable: boolean | null;
     zoomed: boolean | null;
@@ -219,6 +249,7 @@ export interface Window {
 // @public
 export interface WindowCreateInput {
     bounds?: Rectangle;
+    currentTab?: ObjectReferenceData<never, 'Tab'>;
     frame?: Rectangle;
     frontmost?: boolean;
     hotkeyWindowProfile?: string;
@@ -233,8 +264,15 @@ export interface WindowCreateInput {
 }
 
 // @public
+export interface WindowResourceClient {
+    get(id: Integer, options?: CallOptions): Promise<Window>;
+    list(options?: CallOptions): Promise<Page<Window>>;
+}
+
+// @public
 export interface WindowUpdateInput {
     bounds?: Rectangle;
+    currentTab?: ObjectReferenceData<never, 'Tab'>;
     frame?: Rectangle;
     frontmost?: boolean;
     hotkeyWindowProfile?: string;

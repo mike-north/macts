@@ -196,31 +196,45 @@ export const manifest: unknown = {
           access: 'rw',
           type: 'point',
           description:
-            'The position of the window, relative to the upper left corner of the screen.',
+            'Deprecated compatibility position relative to the upper left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it.',
           code: 'ppos',
-          optional: false,
+          optional: true,
+          deprecated: {
+            message: 'Use bounds instead.',
+          },
         },
         origin: {
           access: 'rw',
           type: 'point',
           description:
-            'The position of the window, relative to the lower left corner of the screen.',
+            'Deprecated compatibility position relative to the lower left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it.',
           code: 'pori',
-          optional: false,
+          optional: true,
+          deprecated: {
+            message: 'Use bounds instead.',
+          },
         },
         size: {
           access: 'rw',
           type: 'point',
-          description: 'The width and height of the window',
+          description:
+            'Deprecated compatibility width and height of the window. Use bounds instead. Omitted when iTerm cannot report it.',
           code: 'psiz',
-          optional: false,
+          optional: true,
+          deprecated: {
+            message: 'Use bounds instead.',
+          },
         },
         frame: {
           access: 'rw',
           type: 'rect',
-          description: 'The bounding rectangle, relative to the lower left corner of the screen.',
+          description:
+            'Deprecated compatibility rectangle relative to the lower left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it.',
           code: 'pfra',
-          optional: false,
+          optional: true,
+          deprecated: {
+            message: 'Use bounds instead.',
+          },
         },
       },
       identifiers: [
@@ -258,6 +272,14 @@ export const manifest: unknown = {
           description: 'The title property',
           code: 'titl',
           optional: false,
+        },
+      },
+      positional: {
+        evidence: {
+          source: 'curated',
+          note: "Initially observed on 2026-11-04 on iTerm 3.7.6: five windows with one tab each, integer Window identities and currentTab specifiers addressing tabs within windows. Metadata-only validation on 2026-11-05 created two owned windows and three tabs in one: the selected second and third tabs used zero-based positions 1 and 2 within their own window. Selecting the third tab and closing earlier owned tabs shifted its position to 1 and then 0. The sibling window retained its own tab at position 0. The dictionary's index property was not used for addressing. Owned windows were removed and baseline windows preserved. No session or window/tab text was read. This validates adapter metadata and drift, not complete SDK record hydration.",
+          observedAt: '2026-11-05T21:19:08.471Z',
+          appVersion: '3.7.6',
         },
       },
     },
@@ -767,6 +789,83 @@ export const manifest: unknown = {
   },
   relationships: [],
   commands: {
+    currentWindow: {
+      name: 'currentWindow',
+      description: 'Get a reference to the currently selected window.',
+      scope: 'application',
+      parameters: [],
+      returns: 'Window',
+      routeName: 'currentWindow',
+      permission: 'iterm:app:currentWindow',
+      risk: 'read',
+    },
+    listWindows: {
+      name: 'list',
+      description: 'List the windows',
+      scope: 'resource',
+      resourceType: 'Window',
+      parameters: [],
+      routeName: 'list',
+    },
+    getWindow: {
+      name: 'get',
+      description: 'Get a window by its ID',
+      scope: 'resource',
+      resourceType: 'Window',
+      parameters: [
+        {
+          name: 'id',
+          type: 'integer',
+          description: 'Window identifier',
+          required: true,
+        },
+      ],
+      routeName: 'get',
+    },
+    listTabs: {
+      name: 'list',
+      description: 'List the tabs of a window',
+      scope: 'resource',
+      resourceType: 'Tab',
+      parameters: [
+        {
+          name: 'windowId',
+          type: 'integer',
+          description: 'Window identifier',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
+      routeName: 'list',
+    },
+    getTab: {
+      name: 'get',
+      description: 'Get a tab of a window by its position',
+      scope: 'resource',
+      resourceType: 'Tab',
+      parameters: [
+        {
+          name: 'windowId',
+          type: 'integer',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'index',
+          type: 'integer',
+          description: 'The zero-based position of the tab within its window',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
+      routeName: 'get',
+    },
     count: {
       name: 'count',
       description: 'Return the number of elements of a particular class within an object.',

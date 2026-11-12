@@ -20,6 +20,7 @@ import {
 import { usableResources } from '../../manifest/unsupported.js'
 import { outputProperties } from '../../manifest/output-references.js'
 import { propertyTypeToTs } from '../types.js'
+import { itemSelectionNote } from '../positional-docs.js'
 import { SDK_GENERATED_NOTICE } from '../generated-header.js'
 import { contractNames, generateContract, pagingTypeNames } from '../contract/index.js'
 import {
@@ -682,6 +683,7 @@ function generateResourceClient(
     [
       selectsItem ? firstMatchNote(resource) : undefined,
       parentFirstMatchNote(command, manifest),
+      selectsItem ? itemSelectionNote(manifest, resourceName) : undefined,
     ].filter((note): note is string => note !== undefined)
   const crudMethods = [
     listCmd

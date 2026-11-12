@@ -12,7 +12,8 @@ export type Pin = readonly [app: string, resource: string, parent: string]
  * Resources whose `get` and `list` both record the parent: calendar
  * `getEvent`/`listEvents`; contacts `getAddress`/`listAddresses`,
  * `getEmail`/`listEmails` and `getPhone`/`listPhones`; google-chrome and
- * microsoft-edge `getTab`/`listTabs`; music `getTrack`/`listTracks`; tv
+ * microsoft-edge `getTab`/`listTabs`; iterm `getTab`/`listTabs`, a tab found by
+ * its position within its window; music `getTrack`/`listTracks`; tv
  * `getPlaylist`/`listPlaylists`; xcode `getProject`/`listProjects`,
  * `getScheme`/`listSchemes` and `getRunDestination`/`listRunDestinations`.
  */
@@ -22,6 +23,7 @@ export const BOTH_ROUTE_PINS: readonly Pin[] = [
   ['contacts', 'Email', 'Person'],
   ['contacts', 'Phone', 'Person'],
   ['google-chrome', 'Tab', 'Window'],
+  ['iterm', 'Tab', 'Window'],
   ['microsoft-edge', 'Tab', 'Window'],
   ['music', 'Track', 'Playlist'],
   ['tv', 'Playlist', 'Source'],

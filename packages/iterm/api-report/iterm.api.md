@@ -7,11 +7,17 @@
 import { CallOptions } from '@macts/contracts';
 import { ClientBrand } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
+import { IndexSelectorReference } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import * as _macts_contracts from '@macts/contracts';
+import { ObjectReferenceData } from '@macts/contracts';
+import { ObjectReferenceVariant } from '@macts/contracts';
+import { Page } from '@macts/contracts';
 import { Point } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -57,6 +63,8 @@ export class iTermClient {
     createTabWithDefaultProfile(command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     createWindowWithDefaultProfile(command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     createWindowWithProfile(command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "iTermClient_2" needs to be exported by the entry point index.d.ts
+    currentWindow(__mactsOptions?: _macts_contracts.CallOptions): Promise<Awaited<ReturnType<iTermClient_2['currentWindow']>>>;
     duplicate(to: string, withProperties?: unknown, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     exists(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     hideHotkeyWindow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -75,9 +83,10 @@ export class iTermClient {
     splitVertically(withProfile: string, command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     splitVerticallyWithDefaultProfile(command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     splitVerticallyWithSameProfile(command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    readonly tabs: TabResourceClient;
     toggleHotkeyWindow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     variable(named: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
-    // Warning: (ae-forgotten-export) The symbol "iTermClient_2" needs to be exported by the entry point index.d.ts
+    readonly windows: WindowResourceClient;
     write(contentsOfFile?: Parameters<iTermClient_2['write']>[0], text?: string, newline?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
@@ -95,7 +104,21 @@ export class iTermError extends Error {
 }
 
 // @public
-export type iTermResources = Readonly<Record<never, never>>;
+export type iTermResources = Readonly<{
+    Window: ResourceDescriptor<Window, Integer> & {
+        readonly id: ValueType<Integer>;
+        readonly get: 'iterm.windows.get';
+        readonly list: 'iterm.windows.list';
+    };
+    Tab: ResourceDescriptor<Tab> & {
+        readonly get: 'iterm.tabs.get';
+        readonly list: 'iterm.tabs.list';
+        readonly parents: {
+            readonly get: 'Window';
+            readonly list: 'Window';
+        };
+    };
+}>;
 
 // @public
 export type SaveOptions = 'yes' | 'no' | 'ask';
@@ -314,6 +337,13 @@ export type TabCreateInput = Omit<TabCreateInput_2, 'index'> & {
 };
 
 // @public
+export class TabResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(windowId: string | number, index: string | number, __mactsOptions?: _macts_contracts.CallOptions): Promise<Tab>;
+    list(windowId: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Tab>>;
+}
+
+// @public
 export const TabSchema: z.ZodObject<{
     index: z.ZodNumber;
     title: z.ZodString;
@@ -331,7 +361,8 @@ export interface Window {
     readonly alternateIdentifier: string | null;
     bounds: Rectangle | null;
     readonly closeable: boolean | null;
-    frame: Rectangle | null;
+    currentTab: IndexSelectorReference<Tab, 'Tab'> | null;
+    frame?: Rectangle | null;
     frontmost: boolean | null;
     hotkeyWindowProfile: string | null;
     readonly id: Integer;
@@ -340,10 +371,10 @@ export interface Window {
     readonly miniaturizable: boolean | null;
     miniaturized: boolean | null;
     readonly name: string | null;
-    origin: Point | null;
-    position: Point | null;
+    origin?: Point | null;
+    position?: Point | null;
     readonly resizable: boolean | null;
-    size: Point | null;
+    size?: Point | null;
     visible: boolean | null;
     readonly zoomable: boolean | null;
     zoomed: boolean | null;
@@ -355,6 +386,13 @@ export interface Window {
 export type WindowCreateInput = Omit<WindowCreateInput_2, 'index'> & {
     index?: null extends WindowCreateInput_2['index'] ? number | null : number;
 };
+
+// @public
+export class WindowResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(id: string | number, __mactsOptions?: _macts_contracts.CallOptions): Promise<Window>;
+    list(__mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Window>>;
+}
 
 // @public
 export const WindowSchema: z.ZodObject<{
@@ -376,26 +414,27 @@ export const WindowSchema: z.ZodObject<{
     zoomable: z.ZodBoolean;
     zoomed: z.ZodBoolean;
     frontmost: z.ZodBoolean;
+    currentTab: z.ZodString;
     isHotkeyWindow: z.ZodBoolean;
     hotkeyWindowProfile: z.ZodString;
-    position: z.ZodObject<{
+    position: z.ZodOptional<z.ZodObject<{
         x: z.ZodNumber;
         y: z.ZodNumber;
-    }, z.core.$strip>;
-    origin: z.ZodObject<{
+    }, z.core.$strip>>;
+    origin: z.ZodOptional<z.ZodObject<{
         x: z.ZodNumber;
         y: z.ZodNumber;
-    }, z.core.$strip>;
-    size: z.ZodObject<{
+    }, z.core.$strip>>;
+    size: z.ZodOptional<z.ZodObject<{
         x: z.ZodNumber;
         y: z.ZodNumber;
-    }, z.core.$strip>;
-    frame: z.ZodObject<{
+    }, z.core.$strip>>;
+    frame: z.ZodOptional<z.ZodObject<{
         x: z.ZodNumber;
         y: z.ZodNumber;
         width: z.ZodNumber;
         height: z.ZodNumber;
-    }, z.core.$strip>;
+    }, z.core.$strip>>;
 }, z.core.$strip>;
 
 // Warning: (ae-forgotten-export) The symbol "WindowUpdateInput_2" needs to be exported by the entry point index.d.ts

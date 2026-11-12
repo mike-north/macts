@@ -1802,6 +1802,9 @@ importers:
       '@macts/google-chrome':
         specifier: workspace:*
         version: link:../google-chrome
+      '@macts/iterm':
+        specifier: workspace:*
+        version: link:../iterm
       '@macts/mail':
         specifier: workspace:*
         version: link:../mail

@@ -143,25 +143,41 @@ resources:
         type: string
         description: If the window is a hotkey window, this gives the name of the profile that created the window.
         code: hkwp
+      # iTerm retains these deprecated compatibility getters in its dictionary,
+      # but can fail to report them even while bounds remains readable. Optional
+      # preserves their values when available without inventing a null or deriving
+      # coordinates from bounds (the origin conventions are not interchangeable).
       position:
         access: rw
+        optional: true
+        deprecated:
+          message: Use bounds instead.
         type: point
-        description: The position of the window, relative to the upper left corner of the screen.
+        description: Deprecated compatibility position relative to the upper left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it.
         code: ppos
       origin:
         access: rw
+        optional: true
+        deprecated:
+          message: Use bounds instead.
         type: point
-        description: The position of the window, relative to the lower left corner of the screen.
+        description: Deprecated compatibility position relative to the lower left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it.
         code: pori
       size:
         access: rw
+        optional: true
+        deprecated:
+          message: Use bounds instead.
         type: point
-        description: The width and height of the window
+        description: Deprecated compatibility width and height of the window. Use bounds instead. Omitted when iTerm cannot report it.
         code: psiz
       frame:
         access: rw
+        optional: true
+        deprecated:
+          message: Use bounds instead.
         type: rect
-        description: The bounding rectangle, relative to the lower left corner of the screen.
+        description: Deprecated compatibility rectangle relative to the lower left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it.
         code: pfra
     identifiers:
       - property: id
@@ -171,6 +187,27 @@ resources:
     plural: Tabs
     description: A terminal tab
     code: Trmt
+    # The dictionary gives a tab no id property, and the app's own specifier
+    # for a window's current tab addresses it by position within the window.
+    # A tab's `index` property is not used as that position: its base is the
+    # app's, and the window `index` counts from 1. The owning window is part
+    # of every tab reference; a position alone is not a tab identity.
+    positional:
+      evidence:
+        source: curated
+        note: >-
+          Initially observed on 2026-11-04 on iTerm 3.7.6: five windows with one tab
+          each, integer Window identities and currentTab specifiers addressing tabs
+          within windows. Metadata-only validation on 2026-11-05 created two owned
+          windows and three tabs in one: the selected second and third tabs used
+          zero-based positions 1 and 2 within their own window. Selecting the third
+          tab and closing earlier owned tabs shifted its position to 1 and then 0.
+          The sibling window retained its own tab at position 0. The dictionary's
+          index property was not used for addressing. Owned windows were removed
+          and baseline windows preserved. No session or window/tab text was read.
+          This validates adapter metadata and drift, not complete SDK record hydration.
+        observedAt: '2026-11-05T21:19:08.471Z'
+        appVersion: '3.7.6'
     properties:
       currentSession:
         access: rw
@@ -559,6 +596,71 @@ hierarchy:
               access: r
               description: A terminal session
 commands:
+  # The dictionary's application property "current window" (Crwn) is read
+  # through its parameterless getter. The ordinary operation result is a
+  # Window identity reference, so selecting another window later does not
+  # change the object a previously returned reference denotes.
+  currentWindow:
+    name: currentWindow
+    routeName: currentWindow
+    description: Get a reference to the currently selected window.
+    scope: application
+    parameters: []
+    returns: Window
+    permission: iterm:app:currentWindow
+    risk: read
+  listWindows:
+    name: list
+    routeName: list
+    description: List the windows
+    scope: resource
+    resourceType: Window
+    parameters: []
+  getWindow:
+    name: get
+    routeName: get
+    description: Get a window by its ID
+    scope: resource
+    resourceType: Window
+    parameters:
+      - name: id
+        type: integer
+        description: Window identifier
+        required: true
+  # A tab is an element of its window only, and has no id, so it is listed
+  # and got within the window, by its zero-based position there.
+  listTabs:
+    name: list
+    routeName: list
+    description: List the tabs of a window
+    scope: resource
+    resourceType: Tab
+    parent:
+      resource: Window
+      parameter: windowId
+    parameters:
+      - name: windowId
+        type: integer
+        description: Window identifier
+        required: true
+  getTab:
+    name: get
+    routeName: get
+    description: Get a tab of a window by its position
+    scope: resource
+    resourceType: Tab
+    parent:
+      resource: Window
+      parameter: windowId
+    parameters:
+      - name: windowId
+        type: integer
+        description: Window identifier
+        required: true
+      - name: index
+        type: integer
+        description: The zero-based position of the tab within its window
+        required: true
   count:
     name: count
     description: Return the number of elements of a particular class within an object.
