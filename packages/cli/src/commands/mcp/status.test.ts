@@ -333,6 +333,7 @@ describe('McpStatusCommand', () => {
         running: true,
         pid: 1234,
         endpoint: '/tmp/test-mcp.sock',
+        logPath: expect.stringMatching(/\/mcp\.log$/) as string,
         health: {
           status: 'ok',
           plugins: 5,
@@ -368,6 +369,7 @@ describe('McpStatusCommand', () => {
         running: true,
         pid: 1234,
         endpoint: '/tmp/test-mcp.sock',
+        logPath: expect.stringMatching(/\/mcp\.log$/) as string,
         health: null,
         error: 'Connection refused',
       })

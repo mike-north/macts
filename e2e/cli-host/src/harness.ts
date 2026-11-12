@@ -50,8 +50,11 @@ function execFileAsync(
 ): Promise<{ stdout: string; stderr: string }> {
   return new Promise((resolveResult, reject) => {
     execFile(file, args, options, (error, stdout, stderr) => {
-      if (error) reject(Object.assign(error, { stdout, stderr }))
-      else resolveResult({ stdout, stderr })
+      if (error) {
+        const failure = new Error(error.message, { cause: error })
+        Object.assign(failure, { stdout, stderr, code: error.code })
+        reject(failure)
+      } else resolveResult({ stdout, stderr })
     })
   })
 }

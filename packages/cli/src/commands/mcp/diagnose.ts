@@ -1,6 +1,7 @@
 import { Command } from 'clipanion'
 import { readFileSync, existsSync } from 'node:fs'
 import { getPidFile, getSocketPath } from '@macts/mcp'
+import { getMcpLogPath } from './log-path.js'
 import { loadInstalledApps } from '../../host/installed-apps.js'
 import { request } from 'node:http'
 import type { Stats } from 'node:fs'
@@ -57,6 +58,8 @@ interface AppDiagnostics {
  */
 interface DiagnosticReport {
   timestamp: string
+  /** Location of the background server diagnostics. */
+  logPath: string
   daemon: DaemonDiagnostics
   socket: SocketDiagnostics
   apps: AppDiagnostics
@@ -100,6 +103,7 @@ export class McpDiagnoseCommand extends Command {
   async execute(): Promise<number> {
     const diagnostics: DiagnosticReport = {
       timestamp: new Date().toISOString(),
+      logPath: getMcpLogPath(),
       daemon: this.checkDaemon(),
       socket: await this.checkSocket(),
       apps: await this.checkApps(),

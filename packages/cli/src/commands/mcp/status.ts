@@ -2,6 +2,7 @@ import { Command, Option } from 'clipanion'
 import { readFileSync, existsSync } from 'node:fs'
 import { getPidFile, getSocketPath } from '@macts/mcp'
 import { request } from 'node:http'
+import { getMcpLogPath } from './log-path.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
@@ -51,10 +52,13 @@ export class McpStatusCommand extends Command {
     const formatter = createFormatter(this.json ?? false)
     const pidFile = getPidFile()
     const socketPath = getSocketPath()
+    const logPath = getMcpLogPath()
 
     // Check if PID file exists
     if (!existsSync(pidFile)) {
-      this.context.stdout.write(formatter.formatError('MCP server is not running') + '\n')
+      this.context.stdout.write(
+        formatter.formatError(`MCP server is not running. Log: ${logPath}`) + '\n'
+      )
       return 1
     }
 
@@ -64,7 +68,7 @@ export class McpStatusCommand extends Command {
 
     if (isNaN(pid)) {
       this.context.stdout.write(
-        formatter.formatError(`Invalid PID in ${pidFile}: ${pidStr}`) + '\n'
+        formatter.formatError(`Invalid PID in ${pidFile}: ${pidStr}. Log: ${logPath}`) + '\n'
       )
       return 1
     }
@@ -74,7 +78,9 @@ export class McpStatusCommand extends Command {
       process.kill(pid, 0) // Signal 0 checks existence
     } catch {
       this.context.stdout.write(
-        formatter.formatError(`Process ${String(pid)} is not running (stale PID file)`) + '\n'
+        formatter.formatError(
+          `Process ${String(pid)} is not running (stale PID file). Log: ${logPath}`
+        ) + '\n'
       )
       return 1
     }
@@ -90,6 +96,7 @@ export class McpStatusCommand extends Command {
               running: true,
               pid,
               endpoint: socketPath,
+              logPath,
               health,
             },
             null,
@@ -100,6 +107,7 @@ export class McpStatusCommand extends Command {
         this.context.stdout.write(formatter.formatSuccess('MCP server is running') + '\n')
         this.context.stdout.write(`PID: ${String(pid)}\n`)
         this.context.stdout.write(`Endpoint: ${socketPath}\n`)
+        this.context.stdout.write(`Log: ${logPath}\n`)
         this.context.stdout.write(`Plugins: ${String(health.plugins)}\n`)
         this.context.stdout.write(`Status: ${health.status}\n`)
       }
@@ -115,6 +123,7 @@ export class McpStatusCommand extends Command {
               running: true,
               pid,
               endpoint: socketPath,
+              logPath,
               health: null,
               error: message,
             },
@@ -128,6 +137,7 @@ export class McpStatusCommand extends Command {
         )
         this.context.stdout.write(`PID: ${String(pid)}\n`)
         this.context.stdout.write(`Endpoint: ${socketPath}\n`)
+        this.context.stdout.write(`Log: ${logPath}\n`)
       }
 
       return 1
