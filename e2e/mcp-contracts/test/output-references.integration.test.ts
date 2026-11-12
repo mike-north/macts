@@ -222,7 +222,8 @@ describe('output references in every real contract', () => {
     // folders and disk items are got by POSIX path: every domain folder
     // (13), the user domain's 11 own and 13 inherited folders, the Classic
     // domain's own Preferences folder and the 5 inherited folders current
-    // macOS has, and a disk item's and a folder's `container`.
+    // macOS has, and a disk item's and a folder's `container`. A TV
+    // playlist's source is a top-level Source identity read through container.
     expect(positions.sort()).toEqual(
       [
         'google-chrome Window.activeTab → Tab',
@@ -230,6 +231,7 @@ describe('output references in every real contract', () => {
         'microsoft-edge Window.activeTab → Tab',
         'photos Album.parent → Folder',
         'photos Folder.parent → Folder',
+        'tv Playlist.source → Source',
         ...CLASSIC_FOLDERS.map((field) => `system-events ClassicDomainObject.${field} → Folder`),
         'system-events DiskItem.container → DiskItem',
         ...DOMAIN_FOLDERS.map((field) => `system-events Domain.${field} → Folder`),
@@ -271,6 +273,8 @@ describe('output references in every real contract', () => {
         'photos.albums.list → Folder',
         'photos.folders.get → Folder',
         'photos.folders.list → Folder',
+        'tv.playlists.get → Source',
+        'tv.playlists.list → Source',
         'system-events.classicDomainObjects.get → Folder',
         'system-events.classicDomainObjects.list → Folder',
         'system-events.diskItems.get → DiskItem',

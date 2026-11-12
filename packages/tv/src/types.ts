@@ -293,6 +293,7 @@ export const LibraryPlaylistSchema = z.object({
 
 /** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const PlaylistSchema = z.object({
+  source: z.string(),
   id: z.number(),
   persistentID: z.string(),
   description: z.string(),

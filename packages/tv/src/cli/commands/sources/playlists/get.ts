@@ -28,6 +28,7 @@ export class GetPlaylistCommand extends Command {
       const item = await client.playlists.get(this.sourceId, this.playlistId)
 
       const output = formatter.format({
+        source: item.source,
         id: item.id,
         persistentID: item.persistentID,
         description: item.description,
