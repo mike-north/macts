@@ -357,6 +357,25 @@ beforeAll(async () => {
   notes = await loadManifest(manifestPath('notes'))
 })
 
+describe('Notes note creation (#194)', () => {
+  it('passes only supplied name and body to the new note', () => {
+    const received: Record<string, unknown>[] = []
+    const app = {
+      Note: (properties: Record<string, unknown>) => {
+        received.push(properties)
+        return { make: () => undefined, properties: () => properties }
+      },
+    }
+    const body = buildNativeBody(notes, { command: 'create', resource: 'Note' })
+    callBody(body, app, { name: 'Heading', body: '<p>Text</p>' })
+    callBody(body, app, { body: '<p>Only body</p>' })
+    expect(received).toEqual([
+      { name: 'Heading', body: '<p>Text</p>' },
+      { body: '<p>Only body</p>' },
+    ])
+  })
+})
+
 describe('list bodies: batched reads (issue #89, issue #204)', () => {
   it("never reads an item's whole property record", () => {
     expect(listBody(eventResource)).not.toContain('properties()')

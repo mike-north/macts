@@ -385,7 +385,12 @@ commands:
     description: Create a new note
     scope: resource
     resourceType: Note
+    # Notes permits the writable name (normally the first line) at creation.
     parameters:
+      - name: name
+        type: string
+        description: The name of the note (first line)
+        required: false
       - name: body
         type: string
         description: HTML content of the note
