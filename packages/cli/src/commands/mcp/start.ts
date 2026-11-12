@@ -1,9 +1,10 @@
 import { Command, Option } from 'clipanion'
 import { spawn } from 'node:child_process'
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync, existsSync, mkdirSync, openSync, closeSync } from 'node:fs'
 import { getPidFile, getSocketPath } from '@macts/mcp'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { getMcpLogPath } from './log-path.js'
 import { warnIfRemovedTrustSwitchSet } from '../../removed-options.js'
 
 /**
@@ -26,7 +27,7 @@ export class McpStartCommand extends Command {
 
       - Run detached from the terminal
       - Continue running after terminal closes
-      - Write logs to ~/.macts/mcp.log
+      - Append stdout and stderr to mcp.log under MACTS_HOME (default ~/.macts/mcp.log)
       - Store its PID in ~/.macts/mcp.pid
 
       Use 'macts mcp stop' to stop the server.
@@ -71,7 +72,7 @@ export class McpStartCommand extends Command {
     // In development: packages/cli/dist/bin.js
     // In production: node_modules/.bin/macts points to dist/bin.js
     const currentFile = fileURLToPath(import.meta.url)
-    const cliDir = dirname(dirname(currentFile)) // Go up to cli/dist/
+    const cliDir = dirname(currentFile) // The bundled launcher and binary share dist/.
     const binPath = join(cliDir, 'bin.js')
 
     if (!existsSync(binPath)) {
@@ -88,11 +89,19 @@ export class McpStartCommand extends Command {
       args.push('--socket', this.socket)
     }
 
-    // Spawn daemon process
-    const child = spawn(process.execPath, [binPath, ...args], {
-      detached: true,
-      stdio: 'ignore',
-    })
+    // The child inherits the append descriptor; the parent must release its copy.
+    const logPath = getMcpLogPath()
+    mkdirSync(dirname(logPath), { recursive: true, mode: 0o700 })
+    const logFd = openSync(logPath, 'a', 0o600)
+    let child: ReturnType<typeof spawn>
+    try {
+      child = spawn(process.execPath, [binPath, ...args], {
+        detached: true,
+        stdio: ['ignore', logFd, logFd],
+      })
+    } finally {
+      closeSync(logFd)
+    }
 
     // Detach from parent
     child.unref()
@@ -114,7 +123,7 @@ export class McpStartCommand extends Command {
       return 0
     } else {
       this.context.stderr.write('Failed to start MCP server\n')
-      this.context.stderr.write('Check logs at ~/.macts/mcp.log for details\n')
+      this.context.stderr.write(`Check logs at ${logPath} for details\n`)
       return 1
     }
   }

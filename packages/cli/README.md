@@ -468,7 +468,7 @@ The server will:
 
 - Run detached from the terminal
 - Continue running after the terminal closes
-- Write logs to `~/.macts/mcp.log`
+- Append stdout and stderr to `mcp.log` under `MACTS_HOME` (default `~/.macts/mcp.log`)
 - Store its PID in `~/.macts/mcp.pid`
 
 Use `macts mcp stop` to stop the server.

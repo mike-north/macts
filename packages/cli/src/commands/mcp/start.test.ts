@@ -12,6 +12,9 @@ vi.mock('node:fs', async () => {
     existsSync: vi.fn(),
     readFileSync: vi.fn(),
     unlinkSync: vi.fn(),
+    mkdirSync: vi.fn(),
+    openSync: vi.fn(() => 42),
+    closeSync: vi.fn(),
   }
 })
 
@@ -161,7 +164,7 @@ describe('McpStartCommand', () => {
         expect.arrayContaining(['mcp', 'serve', '--port', '3000']) as string[],
         expect.objectContaining({
           detached: true,
-          stdio: 'ignore',
+          stdio: ['ignore', 42, 42],
         })
       )
       expect(getStdout()).toContain('http://127.0.0.1:3000')
@@ -198,7 +201,7 @@ describe('McpStartCommand', () => {
         expect.arrayContaining(['mcp', 'serve', '--socket', '/custom/path.sock']) as string[],
         expect.objectContaining({
           detached: true,
-          stdio: 'ignore',
+          stdio: ['ignore', 42, 42],
         })
       )
       expect(getStdout()).toContain('/custom/path.sock')
@@ -247,6 +250,15 @@ describe('McpStartCommand', () => {
       expect(spawnArgs.slice(1)).toEqual(['mcp', 'serve'])
     })
 
+    it('closes the log descriptor if spawning throws', async () => {
+      const { stdout, stderr } = createMockStreams()
+      vi.mocked(childProcess.spawn).mockImplementation(() => {
+        throw new Error('spawn failed')
+      })
+      await cli.run(['mcp', 'start'], { stdout, stderr })
+      expect(fs.closeSync).toHaveBeenCalledWith(42)
+    })
+
     it('should handle missing binary path', async () => {
       const { stdout, stderr, getStderr } = createMockStreams()
 
@@ -287,7 +299,7 @@ describe('McpStartCommand', () => {
 
       expect(exitCode).toBe(1)
       expect(getStderr()).toContain('Failed to start MCP server')
-      expect(getStderr()).toContain('Check logs at ~/.macts/mcp.log for details')
+      expect(getStderr()).toMatch(/Check logs at .*\/mcp.log for details/)
     })
 
     it('should output success message with PID and endpoint', async () => {
@@ -345,10 +357,16 @@ describe('McpStartCommand', () => {
         expect.arrayContaining(['mcp', 'serve']) as string[],
         {
           detached: true,
-          stdio: 'ignore',
+          stdio: ['ignore', 42, 42],
         }
       )
 
+      expect(fs.mkdirSync).toHaveBeenCalledWith(expect.any(String), {
+        recursive: true,
+        mode: 0o700,
+      })
+      expect(fs.openSync).toHaveBeenCalledWith(expect.stringContaining('mcp.log'), 'a', 0o600)
+      expect(fs.closeSync).toHaveBeenCalledWith(42)
       expect(mockChild.unref).toHaveBeenCalled()
     })
   })

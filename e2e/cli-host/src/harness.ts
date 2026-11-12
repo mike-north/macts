@@ -31,7 +31,7 @@ import { createServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { promisify } from 'node:util'
+import { launchOwnedBackground, type OwnedBackground } from './background-owner.js'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
@@ -43,7 +43,22 @@ import {
   type JSONRPCMessage,
 } from '@modelcontextprotocol/sdk/types.js'
 
-const execFileAsync = promisify(execFile)
+/** Preserve both output streams when execFile is wrapped by a process guard. */
+function execFileAsync(
+  file: string,
+  args: string[],
+  options: { cwd: string; env: Record<string, string> }
+): Promise<{ stdout: string; stderr: string }> {
+  return new Promise((resolveResult, reject) => {
+    execFile(file, args, options, (error, stdout, stderr) => {
+      if (error) {
+        const failure = new Error(error.message, { cause: error })
+        Object.assign(failure, { stdout, stderr, code: error.code })
+        reject(failure)
+      } else resolveResult({ stdout, stderr })
+    })
+  })
+}
 
 /** This package's root. */
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -161,8 +176,29 @@ function minimalEnv(
     TMPDIR: tmpdir(),
     MACTS_HOME: home.path,
     NO_COLOR: '1',
+    ...(process.env['NODE_OPTIONS'] !== undefined
+      ? { NODE_OPTIONS: process.env['NODE_OPTIONS'] }
+      : {}),
+    ...(process.env['MACTS_NONNATIVE_BLOCK_LOG'] !== undefined
+      ? { MACTS_NONNATIVE_BLOCK_LOG: process.env['MACTS_NONNATIVE_BLOCK_LOG'] }
+      : {}),
     ...extra,
   }
+}
+
+/** Launch the CLI with ownership of the detached child, even if startup fails. */
+export function startOwnedMcp(
+  home: MactsHome,
+  args: readonly string[],
+  extraEnv: Readonly<Record<string, string>>
+): OwnedBackground {
+  return launchOwnedBackground(
+    process.execPath,
+    [CLI_BIN, 'mcp', 'start', ...args],
+    home.path,
+    minimalEnv(home, extraEnv),
+    REPO_ROOT
+  )
 }
 
 /** The outcome of a CLI run. */
