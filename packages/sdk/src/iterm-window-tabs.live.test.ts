@@ -23,7 +23,7 @@
  *   5. `tabs.get` at the position just past a window's last tab is
  *      `InvalidSelectionError` naming Tab;
  *   6. when a window holds 2 or more tabs, the second is got and resolved by
- *      position, and both find the same tab. Otherwise the case is skipped,
+ *      position, and each is checked against the independently addressed tab. Otherwise the case is skipped,
  *      with its reason.
  *
  * Every call is a read. No window or tab is opened, closed, focused, moved
@@ -184,6 +184,24 @@ async function holdsCurrentSessions(
     return ${JSON.stringify(checks)}.map(function (check) {
       var window = app.windows.byId(check[0]);
       return ids(window.tabs.at(check[1])) === ids(window.currentTab());
+    });`,
+    { timeout: 30_000 }
+  )
+}
+
+/** Compare uniquely identified dictionary indexes to the second tab without returning session ids. */
+async function holdsSecondSessions(
+  windowId: number,
+  indexes: readonly (number | null)[]
+): Promise<boolean[]> {
+  return runJxa<boolean[]>(
+    `var window = Application(${JSON.stringify(ITERM)}).windows.byId(${String(windowId)});
+    var tabs = window.tabs();
+    var expected = JSON.stringify(window.tabs.at(1).sessions.id());
+    return ${JSON.stringify(indexes)}.map(function (index) {
+      if (index === null) return false;
+      var matches = tabs.filter(function (tab) { return tab.index() === index; });
+      return matches.length === 1 && JSON.stringify(matches[0].sessions.id()) === expected;
     });`,
     { timeout: 30_000 }
   )
@@ -426,13 +444,11 @@ describe.skipIf(!liveAppsEnabled || launchRefusal !== undefined)(
             id: holder.id,
           },
         }).resolve()
-        // The get and the resolution find the same tab; its own index is
-        // reported, not asserted, since 2+ tabs had not been observed before.
-        const same = got.index === resolved.index
-        console.info(
-          `second tab: get and resolve agree ${String(same)}, its index is 1 ${String(got.index === 1)}`
-        )
-        expect(same).toBe(true)
+        // Dictionary indexes identify the returned records for comparison;
+        // they are not the zero-based position used to address the tab.
+        const same = await holdsSecondSessions(holder.id, [got.index, resolved.index])
+        console.info(`second tab: get ${String(same[0])}, resolve ${String(same[1])}`)
+        expect(same).toEqual([true, true])
       },
       LIVE_TEST_TIMEOUT_MS
     )

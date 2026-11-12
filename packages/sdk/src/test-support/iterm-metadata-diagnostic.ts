@@ -49,13 +49,16 @@ function inspect(report) {
       report.cleanupComplete = false;
       throw { errorNumber: 0 };
     }
+    // A valid returned identity is a cleanup candidate even if qualification
+    // fails. Cleanup rechecks it against the baseline and the live identity.
+    var row = { id: id, window: null, tabs: [] };
+    owned.push(row);
+    report.cleanupComplete = priorCleanup;
     // Creation results can be positional/current-window specifiers. Qualify the
     // owned identity before any subsequent creation or mutation can shift it.
     var target = app.windows.byId(id);
     if (!target.exists() || target.id() !== id) throw { errorNumber: 0 };
-    var row = { id: id, window: target, tabs: [] };
-    owned.push(row);
-    report.cleanupComplete = priorCleanup;
+    row.window = target;
     return row;
   }
   function position(item, owner) {
@@ -110,8 +113,8 @@ function inspect(report) {
   } catch (error) {
     report.errorNumber = number(error);
   } finally {
-    // Never close by set difference or guessed position; only returned, proven
-    // owned windows are cleanup targets. No quit or prompt interaction occurs.
+    // Never close by set difference or guessed position; returned identities
+    // are revalidated before closing. No quit or prompt interaction occurs.
     owned.slice().reverse().forEach(function(row) {
       try {
         var target = app.windows.byId(row.id);

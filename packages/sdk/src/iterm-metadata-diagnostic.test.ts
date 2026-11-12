@@ -15,6 +15,7 @@ function fixture(
     failBaseline?: boolean
     failApplication?: boolean
     driftingHandle?: boolean
+    failQualificationOnce?: boolean
   } = {}
 ) {
   const calls: string[] = []
@@ -25,6 +26,7 @@ function fixture(
   ]
   const displays = new WeakMap<object, () => string>()
   let current = 1
+  let qualificationFailed = false
   const closed = <T extends object>(object: T): T =>
     new Proxy(object, {
       get(target, key, receiver) {
@@ -72,7 +74,16 @@ function fixture(
       const row = rows.find((row) => row.id === id)
       return row === undefined
         ? { exists: (): boolean => false }
-        : { ...window(row), exists: (): boolean => true }
+        : {
+            ...window(row),
+            exists: (): boolean => {
+              if (options.failQualificationOnce && !qualificationFailed) {
+                qualificationFailed = true
+                throw Object.assign(new Error('private lookup text'), { errorNumber: -1712 })
+              }
+              return true
+            },
+          }
     },
   })
   const app = closed({
@@ -187,6 +198,15 @@ describe('the inert iTerm metadata-only diagnostic', () => {
 
 /** Concurrent user activity never becomes cleanup authority. */
 describe('diagnostic ownership boundaries', () => {
+  it('cleans a returned window when its first qualification read fails', () => {
+    const app = fixture({ failQualificationOnce: true })
+    const report = app.run()
+    expect(report.completed).toBe(false)
+    expect(report.errorNumber).toBe(-1712)
+    expect(app.rows.map((row) => row.id)).toEqual([1])
+    expect(report.cleanupComplete).toBe(true)
+    expect(report.baselinePreserved).toBe(true)
+  })
   it('preserves a concurrently appearing unowned window', () => {
     const app = fixture({ concurrent: true })
     expect(app.run().cleanupComplete).toBe(true)
