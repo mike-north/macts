@@ -71,7 +71,7 @@ export class McpStartCommand extends Command {
     // In development: packages/cli/dist/bin.js
     // In production: node_modules/.bin/macts points to dist/bin.js
     const currentFile = fileURLToPath(import.meta.url)
-    const cliDir = dirname(dirname(currentFile)) // Go up to cli/dist/
+    const cliDir = dirname(currentFile) // The bundled launcher and binary share dist/.
     const binPath = join(cliDir, 'bin.js')
 
     if (!existsSync(binPath)) {
