@@ -723,6 +723,71 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
   describe('rgb', () => {
     const wire = { r: { integer: '65535' }, g: { integer: '0' }, b: { integer: '257' } }
 
+    // Native representation belongs to the app; SDK and wire channels stay 16-bit.
+    const normalizedEnv = { app: null, references: {}, rgbChannels: 'normalized' as const }
+
+    it.each([
+      [[0, 1, 0.5], { r: { integer: '0' }, g: { integer: '65535' }, b: { integer: '32768' } }],
+      [
+        [0.25, 0.75, 0.1],
+        { r: { integer: '16384' }, g: { integer: '49151' }, b: { integer: '6554' } },
+      ],
+    ])(
+      'scales declared normalized channels with nearest-integer rounding: %j',
+      (native, expected) => {
+        expect(encode(native, RGB, normalizedEnv)).toEqual(expected)
+      }
+    )
+
+    it('divides validated wire channels only for a normalized interface', () => {
+      expect(
+        decode(
+          { r: { integer: '0' }, g: { integer: '65535' }, b: { integer: '32768' } },
+          RGB,
+          normalizedEnv
+        )
+      ).toEqual([0, 1, 32768 / 65535])
+      expect(
+        decode(
+          { r: { integer: '1' }, g: { integer: '16384' }, b: { integer: '49151' } },
+          RGB,
+          normalizedEnv
+        )
+      ).toEqual([1 / 65535, 16384 / 65535, 49151 / 65535])
+    })
+
+    it.each([-0.01, 1.01, 65535, NaN, Infinity, -Infinity, '0.5', null, undefined])(
+      'rejects invalid normalized native channel %s without clamping',
+      (channel) => {
+        expectCodecError(() => encode([0, channel, 1], RGB, normalizedEnv), {
+          direction: 'encode',
+          path: [1],
+        })
+      }
+    )
+
+    it.each([[0, 1], [0, 1, 0.5, 1], { r: 0, g: 1 }, '#ffffff'].map((native) => [native]))(
+      'rejects malformed normalized native color %j',
+      (native) => {
+        expectCodecError(() => encode(native, RGB, normalizedEnv), {
+          direction: 'encode',
+          path: Array.isArray(native) || typeof native === 'string' ? [] : ['b'],
+        })
+      }
+    )
+
+    it.each([
+      { r: { integer: '-1' }, g: { integer: '0' }, b: { integer: '1' } },
+      { r: { integer: '65536' }, g: { integer: '0' }, b: { integer: '1' } },
+      { r: { double: 0.5 }, g: { integer: '0' }, b: { integer: '1' } },
+      { r: 1, g: { integer: '0' }, b: { integer: '1' } },
+    ])('rejects invalid normalized-interface wire channels %j', (value) => {
+      expectCodecError(() => decode(value, RGB, normalizedEnv), {
+        direction: 'decode',
+        path: ['r'],
+      })
+    })
+
     it('encodes a three-channel list and both object spellings', () => {
       expect(encode([65535, 0, 257], RGB)).toEqual(wire)
       expect(encode({ r: 65535, g: 0, b: 257 }, RGB)).toEqual(wire)

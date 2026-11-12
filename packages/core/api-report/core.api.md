@@ -100,6 +100,10 @@ export const AppManifestSchema: z.ZodObject<{
         bundleId: z.ZodString;
         name: z.ZodString;
         displayName: z.ZodOptional<z.ZodString>;
+        rgbChannels: z.ZodOptional<z.ZodEnum<{
+            integer16: "integer16";
+            normalized: "normalized";
+        }>>;
         version: z.ZodOptional<z.ZodString>;
         minMacOSVersion: z.ZodOptional<z.ZodString>;
         icon: z.ZodOptional<z.ZodString>;
@@ -615,6 +619,10 @@ export const AppMetadataSchema: z.ZodObject<{
     bundleId: z.ZodString;
     name: z.ZodString;
     displayName: z.ZodOptional<z.ZodString>;
+    rgbChannels: z.ZodOptional<z.ZodEnum<{
+        integer16: "integer16";
+        normalized: "normalized";
+    }>>;
     version: z.ZodOptional<z.ZodString>;
     minMacOSVersion: z.ZodOptional<z.ZodString>;
     icon: z.ZodOptional<z.ZodString>;
@@ -2344,6 +2352,7 @@ export interface NativeCodecEnvironment {
     readonly app: unknown;
     readonly positionOf?: (specifier: unknown, collection: string) => unknown;
     readonly references: NativeReferenceTable;
+    readonly rgbChannels?: 'integer16' | 'normalized';
 }
 
 // @public
@@ -2426,6 +2435,7 @@ export interface NativeScript {
     readonly outputPlan: ValuePlan;
     readonly page?: PageWindow | undefined;
     readonly references: NativeReferenceTable;
+    readonly rgbChannels?: 'integer16' | 'normalized';
 }
 
 // @public

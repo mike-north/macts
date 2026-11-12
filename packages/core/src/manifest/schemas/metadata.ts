@@ -92,6 +92,12 @@ export const AppMetadataSchema = z.object({
   name: z.string(),
   /** Display name shown to users */
   displayName: z.string().optional(),
+  /**
+   * Native RGB channel representation for this app's color interface.
+   * Absence preserves 16-bit integer channels; normalized fractions require
+   * an explicit declaration and never change the SDK or wire color domain.
+   */
+  rgbChannels: z.enum(['integer16', 'normalized']).optional(),
   /** App version */
   version: z.string().optional(),
   /** Minimum macOS version required */

@@ -564,16 +564,31 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     return value
   }
 
-  /** Encodes one validated 16-bit color channel as an integer. */
-  function encodeChannel(native: unknown, path: Path): Record<string, string> {
+  /**
+   * Converts only a declared normalized interface to the canonical 16-bit
+   * integer channel. Validate before rounding so out-of-range components
+   * cannot be silently clamped into the accepted domain.
+   */
+  function encodeChannel(native: unknown, path: Path, env: Env): Record<string, string> {
+    if (env?.rgbChannels === 'normalized') {
+      if (typeof native !== 'number' || !Number.isFinite(native) || !inRange(native, 0, 1)) {
+        fail(
+          'encode',
+          path,
+          'Expected a color channel from 0 to 1, received ' + describeValue(native)
+        )
+      }
+      return encodeInteger(Math.round(native * CHANNEL_MAX), path)
+    }
     return encodeInteger(checkChannel('encode', native, path), path)
   }
 
   /**
-   * Encodes a 16-bit RGB color given as a three-channel list, as `{r, g, b}`,
-   * or as `{red, green, blue}`.
+   * Encodes an RGB color given as a three-channel list, as `{r, g, b}`,
+   * or as `{red, green, blue}`. The app's declared interface selects channel
+   * units; the wire always carries 16-bit integers.
    */
-  function encodeRgb(native: unknown, path: Path): Record<string, unknown> {
+  function encodeRgb(native: unknown, path: Path, env: Env): Record<string, unknown> {
     if (isList(native)) {
       if (native.length !== 3) {
         fail(
@@ -583,9 +598,9 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         )
       }
       return {
-        r: encodeChannel(native[0], path.concat([0])),
-        g: encodeChannel(native[1], path.concat([1])),
-        b: encodeChannel(native[2], path.concat([2])),
+        r: encodeChannel(native[0], path.concat([0]), env),
+        g: encodeChannel(native[1], path.concat([1]), env),
+        b: encodeChannel(native[2], path.concat([2]), env),
       }
     }
     if (!isKeyed(native)) {
@@ -596,9 +611,9 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       ? ['r', 'g', 'b']
       : ['red', 'green', 'blue']
     return {
-      r: encodeChannel(ownValue(native, names[0]), path.concat([names[0]])),
-      g: encodeChannel(ownValue(native, names[1]), path.concat([names[1]])),
-      b: encodeChannel(ownValue(native, names[2]), path.concat([names[2]])),
+      r: encodeChannel(ownValue(native, names[0]), path.concat([names[0]]), env),
+      g: encodeChannel(ownValue(native, names[1]), path.concat([names[1]]), env),
+      b: encodeChannel(ownValue(native, names[2]), path.concat([names[2]]), env),
     }
   }
 
@@ -1584,7 +1599,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       case 'rectangle':
         return encodeRectangle(native, path)
       case 'rgb':
-        return encodeRgb(native, path)
+        return encodeRgb(native, path, env)
       case 'enum':
         return checkMember('encode', native, plan.members, path)
       case 'array': {
@@ -1792,14 +1807,11 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   }
 
   /**
-   * Decodes an RGB color to the 16-bit channel list `[r, g, b]`.
-   *
-   * @remarks
-   * This is the bridge form for apps whose interface uses 16-bit channel
-   * lists. Other bridge forms, such as normalized `0..1` components, are
-   * selected per app by future plan data.
+   * Decodes canonical 16-bit wire channels to the app's channel list.
+   * Only a declared normalized interface divides by the 16-bit maximum;
+   * every wire channel is validated in its original integer domain first.
    */
-  function decodeRgb(wire: unknown, path: Path): number[] {
+  function decodeRgb(wire: unknown, path: Path, env: Env): number[] {
     const members = exactMembers(
       wire,
       ['r', 'g', 'b'],
@@ -1809,7 +1821,8 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     const channels: number[] = []
     for (const key of ['r', 'g', 'b']) {
       const channelPath = path.concat([key])
-      channels.push(checkChannel('decode', decodeInteger(members[key], channelPath), channelPath))
+      const channel = checkChannel('decode', decodeInteger(members[key], channelPath), channelPath)
+      channels.push(env?.rgbChannels === 'normalized' ? channel / CHANNEL_MAX : channel)
     }
     return channels
   }
@@ -1926,7 +1939,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       case 'rectangle':
         return decodeRectangle(wire, path)
       case 'rgb':
-        return decodeRgb(wire, path)
+        return decodeRgb(wire, path, env)
       case 'enum':
         return checkMember('decode', wire, plan.members, path)
       case 'array': {

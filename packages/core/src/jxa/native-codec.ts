@@ -336,6 +336,11 @@ export type NativeReferenceTable = Readonly<Record<string, NativeReferencePlans>
  * which the script composes from {@link NATIVE_POSITION_READER}.
  */
 export interface NativeCodecEnvironment {
+  /**
+   * The app's declared color interface from the invocation plan. Omission
+   * means 16-bit integer channels; normalized channels are never inferred.
+   */
+  readonly rgbChannels?: 'integer16' | 'normalized'
   /** The target application. */
   readonly app: unknown
   /** The resources whose references convert. */
@@ -367,6 +372,12 @@ export interface NativeCodecEnvironment {
  * cannot convert fails before the app receives any event.
  */
 export interface NativeScript {
+  /**
+   * Color representation selected from this app's manifest, independent of
+   * provider-neutral value plans. Omission preserves integer channel lists.
+   */
+  readonly rgbChannels?: 'integer16' | 'normalized'
+
   /** Bundle identifier of the target application. */
   readonly bundleId: string
   /** Function body run as `(app, args, page)`. */

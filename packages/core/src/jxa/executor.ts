@@ -369,7 +369,7 @@ export function composeNativeScript(script: NativeScript, codec: NativeCodec): s
     '  try {',
     `    var app = Application(${JSON.stringify(script.bundleId)});`,
     '    app.includeStandardAdditions = true;',
-    `    var env = { app: app, references: ${embedJson(script.references)}, positionOf: ${NATIVE_POSITION_FUNCTION} };`,
+    `    var env = { app: app, references: ${embedJson(script.references)}, rgbChannels: ${embedJson(script.rgbChannels ?? 'integer16')}, positionOf: ${NATIVE_POSITION_FUNCTION} };`,
     `    var args = ${NATIVE_DECODE_FUNCTION}(${embedJson(script.input)}, ${embedJson(script.inputPlan)}, env);`,
     '    var value = (function (app, args, page) {',
     script.body,
