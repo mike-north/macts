@@ -20,9 +20,9 @@ export class ActionPropertyCommand extends Command {
 
     try {
       const client = getClient()
-      await client.actionProperty()
+      const result = await client.actionProperty()
 
-      const output = formatter.formatSuccess('actionProperty completed successfully')
+      const output = formatter.format(result)
       this.context.stdout.write(output + '\n')
       return 0
     } catch (error) {

@@ -9,7 +9,7 @@ Sends a message.
 **Signature:**
 
 ```typescript
-send(id: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+send(id: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<Awaited<ReturnType<OutgoingMessageResourceClient$1['send']>>>;
 ```
 
 ## Parameters
@@ -55,4 +55,4 @@ _(Optional)_
 
 **Returns:**
 
-Promise&lt;void&gt;
+Promise&lt;Awaited&lt;ReturnType&lt;OutgoingMessageResourceClient$1\['send'\]&gt;&gt;&gt;

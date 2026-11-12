@@ -226,7 +226,9 @@ function generated(definition: AppManifest = manifest): GeneratedFixture {
         .replace(/\.js$/, '.ts')
       if (resolved === 'cli/src/sdk.ts') return { getClient: () => cliClient }
       if (resolved === 'cli/src/output/index.ts') {
-        return { createFormatter: () => ({ formatSuccess: String, formatError: String }) }
+        return {
+          createFormatter: () => ({ format: String, formatSuccess: String, formatError: String }),
+        }
       }
       return load(resolved)
     }

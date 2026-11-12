@@ -1497,6 +1497,9 @@ commands:
     scope: resource
     resourceType: OutgoingMessage
     code: send
+    # Mail.sdef:260 declares a boolean result: false is data, not a transport
+    # failure. The dictionary provides no evidence that the result is non-null.
+    returns: boolean
     # The dictionary's `send` takes the outgoing message as its direct parameter
     # (Mail.sdef:258), and the application holds outgoing messages as elements
     # (Mail.sdef:331). `id`, the message's dictionary id, selects it, and is not

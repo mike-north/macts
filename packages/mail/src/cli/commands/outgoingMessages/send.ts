@@ -40,9 +40,11 @@ export class SendOutgoingMessageCommand extends Command {
 
     try {
       const client = getClient()
-      await client.outgoingMessages.send(__mactsParseIntegerOption(this.outgoingMessageId))
+      const result = await client.outgoingMessages.send(
+        __mactsParseIntegerOption(this.outgoingMessageId)
+      )
 
-      const output = formatter.formatSuccess('send completed successfully')
+      const output = formatter.format(result)
       this.context.stdout.write(output + '\n')
       return 0
     } catch (error) {

@@ -9,7 +9,7 @@ RollOver - Returns the title that will be placed in the menu for this roll over
 **Signature:**
 
 ```typescript
-actionTitle(_with: unknown, _for: Parameters<ContactsClient$1['actionTitle']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+actionTitle(_with: unknown, _for: Parameters<ContactsClient$1['actionTitle']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<Awaited<ReturnType<ContactsClient$1['actionTitle']>>>;
 ```
 
 ## Parameters
@@ -66,4 +66,4 @@ _(Optional)_
 
 **Returns:**
 
-Promise&lt;void&gt;
+Promise&lt;Awaited&lt;ReturnType&lt;ContactsClient$1\['actionTitle'\]&gt;&gt;&gt;

@@ -9,7 +9,7 @@ RollOver - Determines if the rollover action should be enabled for the given per
 **Signature:**
 
 ```typescript
-shouldEnableAction(_with: unknown, _for: Parameters<ContactsClient$1['shouldEnableAction']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+shouldEnableAction(_with: unknown, _for: Parameters<ContactsClient$1['shouldEnableAction']>[1], __mactsOptions?: _macts_contracts.CallOptions): Promise<Awaited<ReturnType<ContactsClient$1['shouldEnableAction']>>>;
 ```
 
 ## Parameters
@@ -66,4 +66,4 @@ _(Optional)_
 
 **Returns:**
 
-Promise&lt;void&gt;
+Promise&lt;Awaited&lt;ReturnType&lt;ContactsClient$1\['shouldEnableAction'\]&gt;&gt;&gt;

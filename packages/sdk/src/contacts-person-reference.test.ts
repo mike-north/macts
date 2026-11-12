@@ -142,9 +142,8 @@ describe('a Contacts action given a person reference', () => {
     const scripts: NativeScript[] = []
     const client = await contactsClient('contacts.app.actionTitle', standInTransport(app, scripts))
 
-    // The contract declares no result for actionTitle, so the call resolves
-    // to no value whatever the command returned.
-    await expect(client.actionTitle('value', PERSON)).resolves.toBeUndefined()
+    // Contacts.sdef declares the menu title as text; addressing must not discard it.
+    await expect(client.actionTitle('value', PERSON)).resolves.toBe('Title')
     expect(commands).toHaveLength(1)
     expect(commands[0]?.name).toBe('actionTitle')
     expect(commands[0]?.params['with']).toBe('value')

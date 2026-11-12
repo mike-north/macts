@@ -1528,8 +1528,9 @@ export interface OutgoingMessageResourceClient {
    * Sends a message.
    *
    * @param id - The unique identifier of the outgoing message. Does not accept null.
+   * @returns Nullable. No evidence that the app always returns a value.
    */
-  send(id: Integer, options?: CallOptions): Promise<void>
+  send(id: Integer, options?: CallOptions): Promise<boolean | null>
 }
 
 /** An email message */
@@ -2006,31 +2007,32 @@ const messageReplyOperation: OperationDescriptor<
   },
 }
 
-const outgoingMessageSendOperation: OperationDescriptor<{ readonly id: Integer }, undefined> = {
-  id: 'mail.outgoingMessages.send',
-  permission: 'mail:outgoingMessages:send',
-  target: { command: 'send', resource: 'OutgoingMessage' },
-  description: 'Sends a message.',
-  input: t.record({
-    id: t.integer({ description: 'The unique identifier of the outgoing message' }),
-  }),
-  output: t.none(),
-  inputJsonSchema: {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: {
-      id: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The unique identifier of the outgoing message',
+const outgoingMessageSendOperation: OperationDescriptor<{ readonly id: Integer }, boolean | null> =
+  {
+    id: 'mail.outgoingMessages.send',
+    permission: 'mail:outgoingMessages:send',
+    target: { command: 'send', resource: 'OutgoingMessage' },
+    description: 'Sends a message.',
+    input: t.record({
+      id: t.integer({ description: 'The unique identifier of the outgoing message' }),
+    }),
+    output: t.nullable(t.boolean()),
+    inputJsonSchema: {
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      type: 'object',
+      properties: {
+        id: {
+          type: 'object',
+          properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+          required: ['integer'],
+          additionalProperties: false,
+          description: 'The unique identifier of the outgoing message',
+        },
       },
+      required: ['id'],
+      additionalProperties: false,
     },
-    required: ['id'],
-    additionalProperties: false,
-  },
-}
+  }
 
 const appSynchronizeOperation: OperationDescriptor<
   { readonly with: ObjectReferenceData<string, 'Account'> },
