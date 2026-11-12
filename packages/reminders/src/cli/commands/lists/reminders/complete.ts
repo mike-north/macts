@@ -1,15 +1,17 @@
 import { Command, Option } from 'clipanion'
+import { MactsError } from '@macts/contracts'
 import { getClient } from '../../../sdk.js'
 import { createFormatter } from '../../../output/index.js'
 
 /**
- * Mark a reminder as complete
+ * Complete a reminder with a property-backed convenience that sets completed to true
  */
 export class CompleteReminderCommand extends Command {
   static override paths = [['reminders', 'lists', 'reminders', 'complete']]
 
   static override usage = Command.Usage({
-    description: 'Mark a reminder as complete',
+    description:
+      'Complete a reminder with a property-backed convenience that sets completed to true',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -27,8 +29,9 @@ export class CompleteReminderCommand extends Command {
       this.context.stdout.write(output + '\n')
       return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      this.context.stderr.write(formatter.formatError(message) + '\n')
+      const failure =
+        error instanceof MactsError ? error : error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(failure) + '\n')
       return 1
     }
   }

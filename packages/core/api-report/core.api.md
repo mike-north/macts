@@ -560,6 +560,10 @@ export const AppManifestSchema: z.ZodObject<{
             parameter: z.ZodString;
         }, z.core.$strict>>;
         returns: z.ZodOptional<z.ZodString>;
+        assignsProperty: z.ZodOptional<z.ZodObject<{
+            property: z.ZodString;
+            value: z.ZodUnion<readonly [z.ZodString, z.ZodNumber, z.ZodBoolean]>;
+        }, z.core.$strict>>;
         code: z.ZodOptional<z.ZodString>;
         routeName: z.ZodOptional<z.ZodString>;
         permission: z.ZodOptional<z.ZodString>;
@@ -1121,6 +1125,10 @@ export const CommandSchema: z.ZodObject<{
         parameter: z.ZodString;
     }, z.core.$strict>>;
     returns: z.ZodOptional<z.ZodString>;
+    assignsProperty: z.ZodOptional<z.ZodObject<{
+        property: z.ZodString;
+        value: z.ZodUnion<readonly [z.ZodString, z.ZodNumber, z.ZodBoolean]>;
+    }, z.core.$strict>>;
     code: z.ZodOptional<z.ZodString>;
     routeName: z.ZodOptional<z.ZodString>;
     permission: z.ZodOptional<z.ZodString>;

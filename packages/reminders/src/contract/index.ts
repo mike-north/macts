@@ -304,7 +304,7 @@ export interface ReminderResourceClient {
    */
   delete(id: string, options?: CallOptions): Promise<void>
   /**
-   * Mark a reminder as complete
+   * Complete a reminder with a property-backed convenience that sets completed to true
    *
    * @param id - Reminder identifier. Does not accept null.
    */
@@ -656,7 +656,7 @@ const reminderCompleteReminderOperation: OperationDescriptor<{ readonly id: stri
   id: 'reminders.reminders.complete',
   permission: 'reminders:reminders:update',
   target: { command: 'completeReminder', resource: 'Reminder' },
-  description: 'Mark a reminder as complete',
+  description: 'Complete a reminder with a property-backed convenience that sets completed to true',
   input: t.record({
     id: t.string({ description: 'Reminder identifier' }),
   }),

@@ -106,7 +106,7 @@ export class ReminderResourceClient {
   }
 
   /**
-   * Mark a reminder as complete
+   * Complete a reminder with a property-backed convenience that sets completed to true
    */
   async complete(
     id: string,

@@ -592,7 +592,7 @@ export function generateResourceCommand(
     ? integerOptionSupport()
     : ''
   const result = commandResult(cmd, ctx.manifest, `${methodRef}(${methodArgs})`)
-  const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
+  const content = `import { Command, Option } from 'clipanion';${cmd.assignsProperty !== undefined ? "\nimport { MactsError } from '@macts/contracts';" : ''}${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
 import { getClient } from '${sdkImportPath}';
 import { createFormatter } from '${outputImportPath}';
 ${integerSupport}
@@ -620,8 +620,7 @@ ${inputs}
       this.context.stdout.write(output + '\\n');
       return 0;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\\n');
+      ${cmd.assignsProperty !== undefined ? "const failure = error instanceof MactsError ? error : error instanceof Error ? error.message : String(error);\n      this.context.stderr.write(formatter.formatError(failure) + '\\n');" : "const message = error instanceof Error ? error.message : String(error);\n      this.context.stderr.write(formatter.formatError(message) + '\\n');"}
       return 1;
     }
   }

@@ -153,9 +153,10 @@ export const capabilities: readonly CapabilityMetadata[] = [
     appBundleId: 'com.apple.reminders',
     resource: 'reminders',
     operation: 'complete',
-    description: 'Mark a reminder as complete',
+    description:
+      'Complete a reminder with a property-backed convenience that sets completed to true',
     permission: 'reminders:reminders:update',
-    risk: 'execute',
+    risk: 'write',
     inputSchema: {
       type: 'object',
       properties: {

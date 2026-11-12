@@ -692,7 +692,8 @@ export const manifest: unknown = {
     },
     completeReminder: {
       name: 'complete',
-      description: 'Mark a reminder as complete',
+      description:
+        'Complete a reminder with a property-backed convenience that sets completed to true',
       scope: 'resource',
       resourceType: 'Reminder',
       parameters: [
@@ -703,9 +704,13 @@ export const manifest: unknown = {
           required: true,
         },
       ],
-      code: '????',
+      assignsProperty: {
+        property: 'completed',
+        value: true,
+      },
       routeName: 'complete',
       permission: 'reminders:reminders:update',
+      risk: 'write',
     },
     show: {
       name: 'show',
@@ -764,12 +769,6 @@ export const manifest: unknown = {
         context:
           'Placeholder codes used - run sdef /System/Applications/Reminders.app to get exact codes',
         relatedTo: 'all resources',
-      },
-      {
-        question:
-          'Does Reminders.app expose an explicit complete command or is it done via setting the completed property?',
-        context: 'The completeReminder command may be a convenience wrapper over property update',
-        relatedTo: 'completeReminder',
       },
     ],
   },

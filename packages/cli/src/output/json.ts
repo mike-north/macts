@@ -1,3 +1,4 @@
+import { MactsError } from '@macts/contracts'
 import type { OutputFormatter, TableOptions } from './types.js'
 import { isRgb } from './utils.js'
 
@@ -32,6 +33,13 @@ export class JsonFormatter implements OutputFormatter {
 
   formatError(error: Error | string): string {
     const message = error instanceof Error ? error.message : error
+
+    // Structured failures retain their public code and details without a local stack.
+    if (error instanceof MactsError) {
+      const code: unknown = Reflect.get(error, 'code')
+      const details: unknown = Reflect.get(error, 'details')
+      return this.stringify({ error: { code, message, details } })
+    }
 
     if (error instanceof Error && error.stack) {
       return this.stringify({ error: { message, stack: error.stack } })

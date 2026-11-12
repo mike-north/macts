@@ -6,6 +6,7 @@ import { HierarchySchema, type HierarchyChild } from './hierarchy.js'
 import { RelationshipSchema } from './relationship.js'
 import { AppMetadataSchema, SuiteSchema, ExtractionMetadataSchema } from './metadata.js'
 import { findPositionalIssues } from '../positional.js'
+import { itemIdentifierParameter } from '../item-selection.js'
 import { findDuplicateRoutes } from '../route.js'
 import { findRootIssues, normalizeRoots } from '../roots.js'
 import { findSuperclassIssues, flattenSuperclasses, superclassChain } from '../superclasses.js'
@@ -193,6 +194,51 @@ export const AppManifestSchema = z
   // keeps the manifest's type, so the schema stays an object schema.
   .overwrite((data) => flattenSuperclasses(normalizeRoots(data)))
   .superRefine((data, ctx) => {
+    // Assignment conveniences use only the selected item and a typed literal;
+    // validate after flattening so inherited writable properties are visible.
+    for (const [key, command] of Object.entries(data.commands)) {
+      const assignment = command.assignsProperty
+      if (assignment === undefined) continue
+      const resource =
+        typeof command.resourceType === 'string' &&
+        Object.hasOwn(data.resources, command.resourceType)
+          ? data.resources[command.resourceType]
+          : undefined
+      const property =
+        resource !== undefined && Object.hasOwn(resource.properties, assignment.property)
+          ? resource.properties[assignment.property]
+          : undefined
+      const value = assignment.value
+      const compatible =
+        property !== undefined &&
+        ((property.type === 'boolean' && typeof value === 'boolean') ||
+          (property.type === 'string' && typeof value === 'string') ||
+          (property.type === 'integer' &&
+            typeof value === 'number' &&
+            Number.isSafeInteger(value)) ||
+          (property.type === 'number' && typeof value === 'number'))
+      if (
+        command.scope !== 'resource' ||
+        ['list', 'create', 'get', 'update', 'delete'].includes(command.name) ||
+        resource === undefined ||
+        property?.access !== 'rw' ||
+        !compatible ||
+        command.parameters.length !== 1 ||
+        itemIdentifierParameter(command) === undefined ||
+        command.parent !== undefined ||
+        command.permission === undefined ||
+        command.permission.length === 0 ||
+        command.code !== undefined ||
+        command.returns !== undefined
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['commands', key, 'assignsProperty'],
+          message:
+            'A property-backed convenience requires one target identifier, an explicit permission, and a type-compatible literal for a writable property of its resource.',
+        })
+      }
+    }
     // A resource's own rules hold for what it inherits too: an inherited
     // primary identifier, say, cannot be marked unsupported by the subclass.
     // Checked only on a manifest that is otherwise valid, so an issue of the
