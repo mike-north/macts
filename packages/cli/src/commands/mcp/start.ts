@@ -1,9 +1,11 @@
+/** Launch a detached MCP server and hand it off only after explicit child readiness. */
 import { Command, Option } from 'clipanion'
 import { spawn } from 'node:child_process'
 import { readFileSync, existsSync, mkdirSync, openSync, closeSync } from 'node:fs'
 import { getPidFile, getSocketPath } from '@macts/mcp'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { awaitMcpReadiness, MCP_START_ENV } from './background-readiness.js'
 import { getMcpLogPath } from './log-path.js'
 import { warnIfRemovedTrustSwitchSet } from '../../removed-options.js'
 
@@ -21,7 +23,9 @@ export class McpStartCommand extends Command {
     description: 'Start the MCP HTTP server in background',
     details: `
       Starts the MCP daemon server ('macts mcp serve') as a background
-      process.
+      process. Waits up to 30 seconds for the server to become ready.
+      If the readiness deadline is exceeded, stops the child before reporting failure.
+      If shutdown cannot be confirmed, reports its PID and log location.
 
       The server will:
 
@@ -96,35 +100,33 @@ export class McpStartCommand extends Command {
     let child: ReturnType<typeof spawn>
     try {
       child = spawn(process.execPath, [binPath, ...args], {
+        env: { ...process.env, [MCP_START_ENV]: '1' },
         detached: true,
-        stdio: ['ignore', logFd, logFd],
+        stdio: ['ignore', logFd, logFd, 'ipc'],
       })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(`Failed to start MCP server: ${message}\n`)
+      this.context.stderr.write(`Check logs at ${logPath} for details\n`)
+      return 1
     } finally {
       closeSync(logFd)
     }
 
-    // Detach from parent
-    child.unref()
-
-    // Give it a moment to start
-    await new Promise((resolve) => {
-      setTimeout(resolve, 1000)
-    })
-
-    // Verify it started
-    if (existsSync(pidFile)) {
-      const pid = readFileSync(pidFile, 'utf-8').trim()
-      const endpoint =
-        this.port !== undefined ? `http://127.0.0.1:${this.port}` : (this.socket ?? getSocketPath())
-
-      this.context.stdout.write(`MCP server started (PID ${pid})\n`)
-      this.context.stdout.write(`Endpoint: ${endpoint}\n`)
-      this.context.stdout.write('Use `macts mcp stop` to stop the server.\n')
-      return 0
-    } else {
-      this.context.stderr.write('Failed to start MCP server\n')
+    try {
+      await awaitMcpReadiness(child)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(`Failed to start MCP server: ${message}\n`)
       this.context.stderr.write(`Check logs at ${logPath} for details\n`)
       return 1
     }
+
+    const endpoint =
+      this.port !== undefined ? `http://127.0.0.1:${this.port}` : (this.socket ?? getSocketPath())
+    this.context.stdout.write(`MCP server started (PID ${String(child.pid)})\n`)
+    this.context.stdout.write(`Endpoint: ${endpoint}\n`)
+    this.context.stdout.write('Use `macts mcp stop` to stop the server.\n')
+    return 0
   }
 }

@@ -45,7 +45,12 @@ describe('macts mcp start log (issue #186)', () => {
       const port = await freePort()
       owned = startOwnedMcp(home, ['--port', String(port)], guard)
       const started = await owned.result
-      expect(started.code, `${started.stdout} ${started.stderr}`).toBe(0)
+      expect(
+        started.code,
+        `${started.stdout} ${started.stderr}\n${readFileSync(log, 'utf8')
+          .replaceAll(token, '[REDACTED]')
+          .replace(/macts_sk_[\w-]+/g, '[REDACTED]')}`
+      ).toBe(0)
       session = await connectMcpHttp(`http://127.0.0.1:${String(port)}`, token)
       expect((await callTool(session, 'macts__notes__notes_list', {})).isError).toBe(true)
       let content = readFileSync(log, 'utf8')
