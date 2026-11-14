@@ -1,5 +1,16 @@
 # @macts/cli
 
+## 0.4.1
+
+### Patch Changes
+
+- 4cf0e8c: Wait up to 30 seconds for the background MCP server to become ready. Report startup errors promptly and stop a child that exceeds the readiness deadline, including its PID if shutdown cannot be confirmed. Keep startup diagnostics in mcp.log.
+  - @macts/api@0.4.1
+  - @macts/contracts@0.4.1
+  - @macts/core@0.4.1
+  - @macts/mcp@0.4.1
+  - @macts/runtime@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes

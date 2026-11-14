@@ -1,5 +1,11 @@
 # @macts/calendar-server
 
+## 0.4.1
+
+### Patch Changes
+
+- @macts/calendar@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes

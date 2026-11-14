@@ -1,5 +1,11 @@
 # @macts/arc-server
 
+## 0.4.1
+
+### Patch Changes
+
+- @macts/arc@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes

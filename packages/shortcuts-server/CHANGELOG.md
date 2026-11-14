@@ -1,5 +1,11 @@
 # @macts/shortcuts-server
 
+## 0.4.1
+
+### Patch Changes
+
+- @macts/shortcuts@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes

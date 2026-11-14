@@ -1,5 +1,11 @@
 # @macts/safari-server
 
+## 0.4.1
+
+### Patch Changes
+
+- @macts/safari@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes

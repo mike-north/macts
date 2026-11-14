@@ -1,5 +1,11 @@
 # @macts/contacts-server
 
+## 0.4.1
+
+### Patch Changes
+
+- @macts/contacts@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes
