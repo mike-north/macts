@@ -1,5 +1,13 @@
 # @macts/sdk
 
+## 0.4.1
+
+### Patch Changes
+
+- @macts/contracts@0.4.1
+- @macts/core@0.4.1
+- @macts/runtime@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes

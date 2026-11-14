@@ -1,5 +1,11 @@
 # @macts/google-chrome-server
 
+## 0.4.1
+
+### Patch Changes
+
+- @macts/google-chrome@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes

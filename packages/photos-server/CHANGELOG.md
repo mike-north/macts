@@ -1,5 +1,11 @@
 # @macts/photos-server
 
+## 0.4.1
+
+### Patch Changes
+
+- @macts/photos@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes

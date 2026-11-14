@@ -1,5 +1,11 @@
 # @macts/preview
 
+## 0.4.1
+
+### Patch Changes
+
+- @macts/contracts@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes

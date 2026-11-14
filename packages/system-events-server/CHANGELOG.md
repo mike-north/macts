@@ -1,5 +1,11 @@
 # @macts/system-events-server
 
+## 0.4.1
+
+### Patch Changes
+
+- @macts/system-events@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes

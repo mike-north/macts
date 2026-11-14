@@ -1,5 +1,11 @@
 # @macts/notes-server
 
+## 0.4.1
+
+### Patch Changes
+
+- @macts/notes@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes

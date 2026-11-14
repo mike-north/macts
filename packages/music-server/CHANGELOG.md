@@ -1,5 +1,11 @@
 # @macts/music-server
 
+## 0.4.1
+
+### Patch Changes
+
+- @macts/music@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @macts/messages-server
 
+## 0.4.1
+
+### Patch Changes
+
+- @macts/messages@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes
