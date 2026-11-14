@@ -1,6 +1,6 @@
 {
   "name": "@macts/contracts",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Platform-neutral value, error, reference, transfer, and operation contracts shared by macts clients and runtimes",
   "license": "MIT",
   "repository": {

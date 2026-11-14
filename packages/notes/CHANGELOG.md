@@ -1,5 +1,12 @@
 # @macts/notes
 
+## 0.4.0
+
+### Patch Changes
+
+- d87b6bf: Forward a supplied note name when creating a note.
+  - @macts/contracts@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes
