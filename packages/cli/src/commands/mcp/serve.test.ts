@@ -71,6 +71,9 @@ describe('McpServeCommand', () => {
     }
     createDaemon = vi.spyOn(mcp, 'createDaemon').mockReturnValue(daemon)
 
+    // Foreground commands have no private launcher channel; preserve the test runner's IPC.
+    vi.stubGlobal('process', Object.assign(Object.create(process), { send: undefined }))
+
     // End the blocking command as soon as it waits for a signal.
     const originalOn = process.on.bind(process)
     vi.spyOn(process, 'on').mockImplementation((event, handler) => {
@@ -85,6 +88,7 @@ describe('McpServeCommand', () => {
   })
 
   afterEach(() => {
+    vi.unstubAllGlobals()
     vi.restoreAllMocks()
     vi.unstubAllEnvs()
     plugins.dispose()
@@ -96,6 +100,29 @@ describe('McpServeCommand', () => {
     if (options === undefined) throw new Error('createDaemon was not called')
     return options
   }
+
+  it('signals background readiness only after daemon.start resolves', async () => {
+    let release: (() => void) | undefined
+    startDaemon.mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          release = resolve
+        })
+    )
+    const send = vi.fn().mockReturnValue(true)
+    vi.stubGlobal('process', Object.assign(Object.create(process), { send }))
+    const streams = createMockStreams()
+    const run = cli.run(['mcp', 'serve'], streams)
+    // Host loading is asynchronous; wait until it reaches the controlled daemon.
+    await vi.waitFor(() => {
+      expect(startDaemon).toHaveBeenCalledOnce()
+    })
+    expect(send).not.toHaveBeenCalled()
+    release?.()
+    expect(await run).toBe(0)
+    expect(send).toHaveBeenCalledWith({ type: 'macts:mcp:ready' }, expect.any(Function))
+    vi.unstubAllGlobals()
+  })
 
   it('serves the installed apps’ tools and the discovery tool on the given port', async () => {
     writeInstalledApp(plugins.nodeModules, 'widgets')

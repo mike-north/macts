@@ -1,5 +1,7 @@
+/** Run the MCP daemon in the foreground, with a private readiness handoff when launched over IPC. */
 import { Command, Option } from 'clipanion'
 import { createDaemon, getSocketPath, type DaemonServer } from '@macts/mcp'
+import { MCP_READY_MESSAGE } from './background-readiness.js'
 import { createMcpHost } from '../../host/mcp-host.js'
 import { warnIfRemovedTrustSwitchSet } from '../../removed-options.js'
 
@@ -91,6 +93,12 @@ export class McpServeCommand extends Command {
         })
         process.on('SIGTERM', () => {
           void cleanup()
+        })
+        // Foreground invocations have no IPC channel. A background parent receives
+        // readiness only after listening and after graceful shutdown is available.
+        process.send?.(MCP_READY_MESSAGE, (error: Error | null) => {
+          // A failed handoff must not leave a server whose launcher has disappeared.
+          if (error) void cleanup()
         })
       })
 
