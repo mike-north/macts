@@ -376,6 +376,7 @@ describe('McpStartCommand', () => {
         {
           detached: true,
           stdio: ['ignore', 42, 42, 'ipc'],
+          env: { ...process.env, MACTS_INTERNAL_MCP_START: '1' },
         }
       )
 

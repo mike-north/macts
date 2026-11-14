@@ -43,6 +43,8 @@ import { createMockStreams } from './test-helpers.js'
 
 describe('McpServeCommand', () => {
   let cli: Cli
+  /** Whether a simulated terminal signal ends the foreground fixture. */
+  let automaticSignal: boolean
   let plugins: PluginsFixture
   let mactsHome: string
   let daemon: DaemonServer
@@ -51,6 +53,8 @@ describe('McpServeCommand', () => {
   let createDaemon: MockInstance<typeof mcp.createDaemon>
 
   beforeEach(() => {
+    automaticSignal = true
+    vi.stubEnv('MACTS_INTERNAL_MCP_START', undefined)
     cli = new Cli({ binaryLabel: 'macts', binaryName: 'macts' })
     cli.register(McpServeCommand)
 
@@ -71,13 +75,13 @@ describe('McpServeCommand', () => {
     }
     createDaemon = vi.spyOn(mcp, 'createDaemon').mockReturnValue(daemon)
 
-    // Foreground commands have no private launcher channel; preserve the test runner's IPC.
+    // Isolate each fixture's IPC from the test runner's channel.
     vi.stubGlobal('process', Object.assign(Object.create(process), { send: undefined }))
 
     // End the blocking command as soon as it waits for a signal.
     const originalOn = process.on.bind(process)
     vi.spyOn(process, 'on').mockImplementation((event, handler) => {
-      if (event === 'SIGINT') {
+      if (event === 'SIGINT' && automaticSignal) {
         setImmediate(() => {
           ;(handler as () => void)()
         })
@@ -102,6 +106,7 @@ describe('McpServeCommand', () => {
   }
 
   it('signals background readiness only after daemon.start resolves', async () => {
+    vi.stubEnv('MACTS_INTERNAL_MCP_START', '1')
     let release: (() => void) | undefined
     startDaemon.mockImplementation(
       () =>
@@ -118,10 +123,36 @@ describe('McpServeCommand', () => {
       expect(startDaemon).toHaveBeenCalledOnce()
     })
     expect(send).not.toHaveBeenCalled()
+    expect(process.env['MACTS_INTERNAL_MCP_START']).toBeUndefined()
     release?.()
     expect(await run).toBe(0)
     expect(send).toHaveBeenCalledWith({ type: 'macts:mcp:ready' }, expect.any(Function))
     vi.unstubAllGlobals()
+  })
+
+  it('sends nothing over unrelated IPC without the start opt-in (issue #302)', async () => {
+    const send = vi.fn().mockReturnValue(true)
+    vi.stubGlobal('process', Object.assign(Object.create(process), { send }))
+
+    expect(await cli.run(['mcp', 'serve'], createMockStreams())).toBe(0)
+    expect(send).not.toHaveBeenCalled()
+  })
+
+  it.each(['failed send', 'missing channel'])('stops an owned server after %s', async (failure) => {
+    automaticSignal = false
+    vi.stubEnv('MACTS_INTERNAL_MCP_START', '1')
+    const send = vi.fn((_message: unknown, callback: (error: Error | null) => void) => {
+      callback(new Error('launcher disconnected'))
+      return false
+    })
+    vi.stubGlobal(
+      'process',
+      Object.assign(Object.create(process), { send: failure === 'failed send' ? send : undefined })
+    )
+
+    expect(await cli.run(['mcp', 'serve'], createMockStreams())).toBe(0)
+    expect(stopDaemon).toHaveBeenCalledOnce()
+    expect(process.env['MACTS_INTERNAL_MCP_START']).toBeUndefined()
   })
 
   it('serves the installed apps’ tools and the discovery tool on the given port', async () => {

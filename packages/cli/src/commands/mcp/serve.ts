@@ -1,7 +1,7 @@
-/** Run the MCP daemon in the foreground, with a private readiness handoff when launched over IPC. */
+/** Run the MCP daemon in the foreground, with a private readiness handoff only for an explicit background launch. */
 import { Command, Option } from 'clipanion'
 import { createDaemon, getSocketPath, type DaemonServer } from '@macts/mcp'
-import { MCP_READY_MESSAGE } from './background-readiness.js'
+import { MCP_READY_MESSAGE, MCP_START_ENV } from './background-readiness.js'
 import { createMcpHost } from '../../host/mcp-host.js'
 import { warnIfRemovedTrustSwitchSet } from '../../removed-options.js'
 
@@ -51,6 +51,9 @@ export class McpServeCommand extends Command {
   socket = Option.String('--socket', { description: 'Unix socket path' })
 
   async execute(): Promise<number> {
+    // Consume ownership before host loading can spawn any subprocesses.
+    const ownedByStart = process.env[MCP_START_ENV] === '1'
+    Reflect.deleteProperty(process.env, MCP_START_ENV)
     const stderr = this.context.stderr
     warnIfRemovedTrustSwitchSet(process.env, stderr)
 
@@ -94,12 +97,23 @@ export class McpServeCommand extends Command {
         process.on('SIGTERM', () => {
           void cleanup()
         })
-        // Foreground invocations have no IPC channel. A background parent receives
-        // readiness only after listening and after graceful shutdown is available.
-        process.send?.(MCP_READY_MESSAGE, (error: Error | null) => {
-          // A failed handoff must not leave a server whose launcher has disappeared.
-          if (error) void cleanup()
-        })
+        // Only an opted-in launcher receives readiness, after listening and after
+        // graceful shutdown is available. Other IPC parents retain foreground semantics.
+        if (ownedByStart) {
+          // If the launcher disappeared before handoff, stop its owned server so it
+          // cannot outlive a failed start without the launcher reporting its PID.
+          if (process.send === undefined) {
+            void cleanup()
+          } else {
+            try {
+              process.send(MCP_READY_MESSAGE, (error: Error | null) => {
+                if (error) void cleanup()
+              })
+            } catch {
+              void cleanup()
+            }
+          }
+        }
       })
 
       return 0

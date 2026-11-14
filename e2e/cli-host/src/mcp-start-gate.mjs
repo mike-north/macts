@@ -1,4 +1,4 @@
-/** Hold only the real background server before initialization; the launcher runs normally. */
+/** Hold the real server before initialization; the background launcher runs normally. */
 import { existsSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import process from 'node:process'
@@ -7,6 +7,10 @@ import { setTimeout as delay } from 'node:timers/promises'
 
 const gate = process.env.MACTS_TEST_START_GATE
 if (gate && process.argv.includes('serve')) {
+  // A receipt lets IPC tests release initialization only after the child sees disconnection.
+  process.once('disconnect', () => {
+    writeFileSync(join(gate, 'disconnected'), '')
+  })
   writeFileSync(join(gate, 'entered'), String(process.pid))
   while (!existsSync(join(gate, 'release'))) await delay(20)
 }

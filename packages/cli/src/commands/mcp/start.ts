@@ -5,7 +5,7 @@ import { readFileSync, existsSync, mkdirSync, openSync, closeSync } from 'node:f
 import { getPidFile, getSocketPath } from '@macts/mcp'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import { awaitMcpReadiness } from './background-readiness.js'
+import { awaitMcpReadiness, MCP_START_ENV } from './background-readiness.js'
 import { getMcpLogPath } from './log-path.js'
 import { warnIfRemovedTrustSwitchSet } from '../../removed-options.js'
 
@@ -100,6 +100,7 @@ export class McpStartCommand extends Command {
     let child: ReturnType<typeof spawn>
     try {
       child = spawn(process.execPath, [binPath, ...args], {
+        env: { ...process.env, [MCP_START_ENV]: '1' },
         detached: true,
         stdio: ['ignore', logFd, logFd, 'ipc'],
       })

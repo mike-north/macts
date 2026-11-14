@@ -1,9 +1,12 @@
 /** Subprocess readiness must describe the owned server's actual state (issue #302). */
+import { spawn } from 'node:child_process'
+import { once } from 'node:events'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
 import { describe, expect, it } from 'vitest'
 import {
+  CLI_BIN,
   connectMcpHttp,
   createKey,
   createMactsHome,
@@ -115,6 +118,56 @@ describe('mcp start readiness (issue #302)', () => {
     } finally {
       await owned.cleanup()
       if (owned.exited()) home.dispose()
+    }
+  }, 30000)
+})
+
+describe('foreground IPC ownership (issue #302)', () => {
+  it('keeps listening after an unrelated parent disconnects before initialization', async () => {
+    const home = createMactsHome()
+    const port = await freePort()
+    const child = spawn(process.execPath, [CLI_BIN, 'mcp', 'serve', '--port', String(port)], {
+      env: { ...process.env, ...gateEnv(home.path), MACTS_HOME: home.path },
+      stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
+    })
+    let stderr = ''
+    const exited = once(child, 'exit')
+    try {
+      if (child.stdout === null || child.stderr === null) {
+        throw new Error('Foreground fixture requires piped output streams')
+      }
+      child.stdout.resume()
+      child.stderr.on('data', (chunk: Buffer) => {
+        stderr += chunk.toString()
+      })
+      await awaitGate(join(home.path, 'entered'))
+      child.disconnect()
+      await awaitGate(join(home.path, 'disconnected'))
+      writeFileSync(join(home.path, 'release'), '')
+      for (let attempt = 0; attempt < 500; attempt++) {
+        if (stderr.includes('MCP server running at') || child.exitCode !== null) break
+        await delay(20)
+      }
+      expect(stderr).toContain('MCP server running at')
+      // Allow a failed readiness callback to run before checking sustained listening.
+      await delay(300)
+      expect(child.exitCode, stderr).toBeNull()
+      expect(child.signalCode, stderr).toBeNull()
+      expect((await fetch(`http://127.0.0.1:${String(port)}/health`)).status).toBe(200)
+      child.kill('SIGTERM')
+      expect(await exited).toEqual([0, null])
+      expect(() => process.kill(Number(child.pid), 0)).toThrow(/ESRCH/)
+    } finally {
+      if (child.exitCode === null && child.signalCode === null) {
+        const escalation = setTimeout(() => child.kill('SIGKILL'), 2000)
+        child.kill('SIGTERM')
+        try {
+          await exited
+        } finally {
+          clearTimeout(escalation)
+        }
+      } else await exited
+      home.dispose()
     }
   }, 30000)
 })

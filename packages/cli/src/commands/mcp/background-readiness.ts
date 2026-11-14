@@ -4,6 +4,14 @@ import type { ChildProcess } from 'node:child_process'
 /** Allow contract loading on a busy host, while bounding how long start waits. @internal */
 export const MCP_READY_TIMEOUT_MS = 30_000
 
+/**
+ * Only `mcp start` sets this private, one-use marker on its direct child's environment.
+ * IPC alone does not imply launcher ownership. `serve` consumes the marker before
+ * host initialization so later subprocesses cannot inherit the readiness obligation.
+ * @internal
+ */
+export const MCP_START_ENV = 'MACTS_INTERNAL_MCP_START'
+
 /** Each shutdown signal gets a bounded interval to produce an observed child exit. */
 const EXIT_TIMEOUT_MS = 2000
 
