@@ -1,6 +1,6 @@
 {
   "name": "@macts/spotify",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "SDK and CLI for macOS spotify automation",
   "license": "MIT",
   "repository": {

@@ -1,5 +1,22 @@
 # @macts/cli
 
+## 0.4.0
+
+### Patch Changes
+
+- b3f160f: Complete a selected reminder by setting its completed property, using the reminder update permission. JSON errors retain their structured code and details.
+- 6ba1f10: Write background MCP server diagnostics to `mcp.log` under `MACTS_HOME`, and show its location in status and diagnostics. Fix background server startup from the packaged CLI.
+- Updated dependencies [eb4f199]
+- Updated dependencies [ae76d85]
+- Updated dependencies [b3f160f]
+- Updated dependencies [ae76d85]
+- Updated dependencies [76d53b9]
+  - @macts/core@0.4.0
+  - @macts/api@0.4.0
+  - @macts/mcp@0.4.0
+  - @macts/runtime@0.4.0
+  - @macts/contracts@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

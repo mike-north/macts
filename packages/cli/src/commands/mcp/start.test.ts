@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import type { ChildProcess } from 'node:child_process'
+import { describe, it, expect, beforeEach, vi, afterEach, type Mock } from 'vitest'
 import { Cli } from 'clipanion'
 import { McpStartCommand } from './start.js'
 import { createMockStreams } from './test-helpers.js'
@@ -40,6 +41,32 @@ const fs = await import('node:fs')
 const childProcess = await import('node:child_process')
 const mcp = await import('@macts/mcp')
 
+/** A child stand-in exposes recorded lifecycle methods without their native receiver requirement. */
+interface IStandInChild extends ChildProcess {
+  unref: Mock<ChildProcess['unref']>
+  disconnect: Mock<ChildProcess['disconnect']>
+  kill: Mock<ChildProcess['kill']>
+}
+
+/** A live stand-in whose private readiness signal is independent of PID files. */
+function makeChild(ready = true): IStandInChild {
+  const child = new childProcess.ChildProcess()
+  Object.assign(child, { pid: 12345, connected: true })
+  const unref = vi.fn<ChildProcess['unref']>()
+  const disconnect = vi.fn<ChildProcess['disconnect']>(() => {
+    Object.assign(child, { connected: false })
+  })
+  const kill = vi.fn<ChildProcess['kill']>((signal) => {
+    queueMicrotask(() => {
+      Object.assign(child, { signalCode: signal === 'SIGKILL' ? 'SIGKILL' : 'SIGTERM' })
+      child.emit('exit', null, child.signalCode)
+    })
+    return true
+  })
+  if (ready) queueMicrotask(() => child.emit('message', { type: 'macts:mcp:ready' }))
+  return Object.assign(child, { unref, disconnect, kill })
+}
+
 describe('McpStartCommand', () => {
   let cli: Cli
 
@@ -59,7 +86,8 @@ describe('McpStartCommand', () => {
   })
 
   afterEach(() => {
-    vi.clearAllMocks()
+    vi.restoreAllMocks()
+    vi.useRealTimers()
   })
 
   describe('daemon already running', () => {
@@ -83,14 +111,14 @@ describe('McpStartCommand', () => {
       expect(getStderr()).toContain('Use `macts mcp stop` to stop it first.')
     })
 
-    it('should clean up stale PID file and proceed when process is dead', async () => {
+    it('warns about a stale PID and proceeds when the process is dead', async () => {
       const { stdout, stderr, getStdout, getStderr } = createMockStreams()
 
       // Mock PID file exists but process is dead
       vi.mocked(fs.existsSync).mockImplementation((path) => {
-        // Initially PID file exists, then check for binary
+        // A stale PID can exist before this child is launched.
         if (path === '/tmp/test-mcp.pid') {
-          return true // PID file exists initially, then after spawn completes
+          return true // A PID file alone does not announce readiness.
         }
         // Mock binary exists
         if (typeof path === 'string' && path.includes('bin.js')) {
@@ -109,9 +137,7 @@ describe('McpStartCommand', () => {
       })
 
       // Mock spawn
-      const mockChild = {
-        unref: vi.fn(),
-      }
+      const mockChild = makeChild()
       vi.mocked(childProcess.spawn).mockReturnValue(mockChild as never)
 
       const exitCode = await cli.run(['mcp', 'start'], { stdout, stderr })
@@ -139,17 +165,15 @@ describe('McpStartCommand', () => {
     it('should pass port option to spawned process', async () => {
       const { stdout, stderr, getStdout } = createMockStreams()
 
-      const mockChild = {
-        unref: vi.fn(),
-      }
+      const mockChild = makeChild()
       vi.mocked(childProcess.spawn).mockReturnValue(mockChild as never)
 
-      // Track calls to existsSync - first call is for PID (false), rest are true
+      // The preflight sees no PID; only the child can announce readiness.
       let pidCheckCount = 0
       vi.mocked(fs.existsSync).mockImplementation((path) => {
         if (path === '/tmp/test-mcp.pid') {
           pidCheckCount++
-          return pidCheckCount > 1 // False for first check, true after spawn
+          return pidCheckCount > 1
         }
         return true // Binary exists
       })
@@ -164,7 +188,7 @@ describe('McpStartCommand', () => {
         expect.arrayContaining(['mcp', 'serve', '--port', '3000']) as string[],
         expect.objectContaining({
           detached: true,
-          stdio: ['ignore', 42, 42],
+          stdio: ['ignore', 42, 42, 'ipc'],
         })
       )
       expect(getStdout()).toContain('http://127.0.0.1:3000')
@@ -173,17 +197,15 @@ describe('McpStartCommand', () => {
     it('should pass socket option to spawned process', async () => {
       const { stdout, stderr, getStdout } = createMockStreams()
 
-      const mockChild = {
-        unref: vi.fn(),
-      }
+      const mockChild = makeChild()
       vi.mocked(childProcess.spawn).mockReturnValue(mockChild as never)
 
-      // Track calls to existsSync - first call is for PID (false), rest are true
+      // The preflight sees no PID; only the child can announce readiness.
       let pidCheckCount = 0
       vi.mocked(fs.existsSync).mockImplementation((path) => {
         if (path === '/tmp/test-mcp.pid') {
           pidCheckCount++
-          return pidCheckCount > 1 // False for first check, true after spawn
+          return pidCheckCount > 1
         }
         return true // Binary exists
       })
@@ -201,7 +223,7 @@ describe('McpStartCommand', () => {
         expect.arrayContaining(['mcp', 'serve', '--socket', '/custom/path.sock']) as string[],
         expect.objectContaining({
           detached: true,
-          stdio: ['ignore', 42, 42],
+          stdio: ['ignore', 42, 42, 'ipc'],
         })
       )
       expect(getStdout()).toContain('/custom/path.sock')
@@ -227,9 +249,7 @@ describe('McpStartCommand', () => {
     it('spawns exactly `mcp serve` when no option is given', async () => {
       const { stdout, stderr } = createMockStreams()
 
-      const mockChild = {
-        unref: vi.fn(),
-      }
+      const mockChild = makeChild()
       vi.mocked(childProcess.spawn).mockReturnValue(mockChild as never)
 
       let pidCheckCount = 0
@@ -279,12 +299,14 @@ describe('McpStartCommand', () => {
     it('should fail if daemon does not start successfully', async () => {
       const { stdout, stderr, getStderr } = createMockStreams()
 
-      const mockChild = {
-        unref: vi.fn(),
-      }
+      const mockChild = makeChild(false)
+      queueMicrotask(() => {
+        Object.assign(mockChild, { exitCode: 1 })
+        mockChild.emit('exit', 1, null)
+      })
       vi.mocked(childProcess.spawn).mockReturnValue(mockChild as never)
 
-      // Mock PID file never appears
+      // The child exits without ever announcing readiness.
       vi.mocked(fs.existsSync).mockImplementation((path) => {
         if (path === '/tmp/test-mcp.pid') {
           return false // PID file never created
@@ -305,17 +327,15 @@ describe('McpStartCommand', () => {
     it('should output success message with PID and endpoint', async () => {
       const { stdout, stderr, getStdout } = createMockStreams()
 
-      const mockChild = {
-        unref: vi.fn(),
-      }
+      const mockChild = makeChild()
       vi.mocked(childProcess.spawn).mockReturnValue(mockChild as never)
 
-      // Track calls to existsSync - first call is for PID (false), rest are true
+      // The preflight sees no PID; only the child can announce readiness.
       let pidCheckCount = 0
       vi.mocked(fs.existsSync).mockImplementation((path) => {
         if (path === '/tmp/test-mcp.pid') {
           pidCheckCount++
-          return pidCheckCount > 1 // False for first check, true after spawn
+          return pidCheckCount > 1
         }
         return true // Binary exists
       })
@@ -333,17 +353,15 @@ describe('McpStartCommand', () => {
     it('should spawn process with correct options', async () => {
       const { stdout, stderr } = createMockStreams()
 
-      const mockChild = {
-        unref: vi.fn(),
-      }
+      const mockChild = makeChild()
       vi.mocked(childProcess.spawn).mockReturnValue(mockChild as never)
 
-      // Track calls to existsSync - first call is for PID (false), rest are true
+      // The preflight sees no PID; only the child can announce readiness.
       let pidCheckCount = 0
       vi.mocked(fs.existsSync).mockImplementation((path) => {
         if (path === '/tmp/test-mcp.pid') {
           pidCheckCount++
-          return pidCheckCount > 1 // False for first check, true after spawn
+          return pidCheckCount > 1
         }
         return true // Binary exists
       })
@@ -357,7 +375,8 @@ describe('McpStartCommand', () => {
         expect.arrayContaining(['mcp', 'serve']) as string[],
         {
           detached: true,
-          stdio: ['ignore', 42, 42],
+          stdio: ['ignore', 42, 42, 'ipc'],
+          env: { ...process.env, MACTS_INTERNAL_MCP_START: '1' },
         }
       )
 
@@ -392,9 +411,7 @@ describe('McpStartCommand', () => {
         throw new Error('Invalid PID')
       })
 
-      const mockChild = {
-        unref: vi.fn(),
-      }
+      const mockChild = makeChild()
       vi.mocked(childProcess.spawn).mockReturnValue(mockChild as never)
 
       const exitCode = await cli.run(['mcp', 'start'], { stdout, stderr })
@@ -403,6 +420,129 @@ describe('McpStartCommand', () => {
       expect(exitCode).toBe(0)
       expect(getStderr()).toContain('Removing stale PID file...')
       expect(getStdout()).toContain('MCP server started')
+    })
+  })
+  describe('owned readiness (issue #302)', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+      vi.mocked(fs.existsSync).mockImplementation((path) => String(path).endsWith('bin.js'))
+    })
+
+    /** Start a controlled child without reading a readiness PID file. */
+    function launch() {
+      const child = makeChild(false)
+      vi.mocked(childProcess.spawn).mockReturnValue(child as never)
+      const streams = createMockStreams()
+      const result = cli.run(['mcp', 'start'], streams)
+      return { child, result, ...streams }
+    }
+
+    it('waits beyond one second and succeeds only on this child’s readiness', async () => {
+      const run = launch()
+      const settled = vi.fn()
+      void run.result.then(settled)
+      await vi.advanceTimersByTimeAsync(1500)
+      expect(settled).not.toHaveBeenCalled()
+      run.child.emit('message', { type: 'unrelated' })
+      await Promise.resolve()
+      expect(settled).not.toHaveBeenCalled()
+      run.child.emit('message', { type: 'macts:mcp:ready' })
+      expect(await run.result).toBe(0)
+      expect(run.getStdout()).toContain('MCP server started (PID 12345)')
+      expect(run.child.disconnect).toHaveBeenCalledOnce()
+      expect(run.child.unref).toHaveBeenCalledOnce()
+      expect(vi.getTimerCount()).toBe(0)
+    })
+
+    it('terminates and awaits exit at the 30 second deadline, ignoring late readiness', async () => {
+      const run = launch()
+      await vi.advanceTimersByTimeAsync(30_000)
+      expect(await run.result).toBe(1)
+      expect(run.getStderr()).toContain('readiness deadline of 30 seconds')
+      expect(run.getStderr()).toContain('Check logs at')
+      expect(run.child.kill).toHaveBeenCalledWith('SIGTERM')
+      expect(run.child.signalCode).toBe('SIGTERM')
+      run.child.emit('message', { type: 'macts:mcp:ready' })
+      expect(run.getStdout()).toBe('')
+      expect(vi.getTimerCount()).toBe(0)
+    })
+
+    it('escalates to SIGKILL and waits for verified exit', async () => {
+      const run = launch()
+      vi.mocked(run.child.kill).mockImplementation((signal) => {
+        if (signal === 'SIGKILL')
+          queueMicrotask(() => {
+            Object.assign(run.child, { signalCode: 'SIGKILL' })
+            run.child.emit('exit', null, 'SIGKILL')
+          })
+        return true
+      })
+      await vi.advanceTimersByTimeAsync(32_000)
+      expect(await run.result).toBe(1)
+      expect(run.child.kill).toHaveBeenCalledWith('SIGKILL')
+      expect(run.child.signalCode).toBe('SIGKILL')
+    })
+
+    it('reports the PID if exit cannot be confirmed after escalation', async () => {
+      const run = launch()
+      vi.mocked(run.child.kill).mockReturnValue(false)
+      await vi.advanceTimersByTimeAsync(34_000)
+      expect(await run.result).toBe(1)
+      expect(run.getStderr()).toContain('Could not confirm exit of MCP server (PID 12345)')
+      expect(run.getStderr()).toContain('Check logs at')
+    })
+
+    it.each([0, 2])(
+      'fails promptly when the child exits with %i before readiness',
+      async (code) => {
+        const run = launch()
+        Object.assign(run.child, { exitCode: code })
+        run.child.emit('exit', code, null)
+        expect(await run.result).toBe(1)
+        expect(run.getStderr()).toContain(`exited before readiness (code ${String(code)})`)
+        expect(run.getStdout()).toBe('')
+        expect(vi.getTimerCount()).toBe(0)
+      }
+    )
+
+    it('fails promptly on spawn error without a child PID', async () => {
+      const run = launch()
+      Object.assign(run.child, { pid: undefined })
+      run.child.emit('error', new Error('ENOENT'))
+      expect(await run.result).toBe(1)
+      expect(run.getStderr()).toContain('ENOENT')
+      expect(run.child.kill).not.toHaveBeenCalled()
+      expect(vi.getTimerCount()).toBe(0)
+    })
+
+    it.each(['error', 'disconnect'])(
+      'cleans up a live child after %s before readiness',
+      async (event) => {
+        const run = launch()
+        if (event === 'error') run.child.emit('error', new Error('startup channel failed'))
+        else run.child.emit('disconnect')
+        await vi.advanceTimersByTimeAsync(0)
+        expect(await run.result).toBe(1)
+        expect(run.child.signalCode).toBe('SIGTERM')
+        expect(run.child.kill).toHaveBeenCalledWith('SIGTERM')
+        expect(run.getStderr()).toContain(
+          event === 'error' ? 'startup channel failed' : 'disconnected before readiness'
+        )
+        expect(run.getStderr()).toContain('Check logs at')
+      }
+    )
+
+    it.each([29_999, 30_000])('settles once with readiness at %i ms', async (delay) => {
+      const run = launch()
+      const settled = vi.fn()
+      void run.result.then(settled)
+      setTimeout(() => run.child.emit('message', { type: 'macts:mcp:ready' }), delay)
+      await vi.advanceTimersByTimeAsync(34_000)
+      expect(await run.result).toBe(delay < 30_000 ? 0 : 1)
+      expect(settled).toHaveBeenCalledOnce()
+      expect(run.child.kill).toHaveBeenCalledTimes(delay < 30_000 ? 0 : 1)
+      expect(run.child.listenerCount('message')).toBe(0)
+      expect(run.child.listenerCount('exit')).toBe(0)
     })
   })
 })

@@ -1,6 +1,6 @@
 {
   "name": "@macts/sdk",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Typed, governed clients for macOS apps automated by macts: one client factory for a remote macts service and one for in-process use on the Mac, with the canonical errors and value types",
   "license": "MIT",
   "repository": {

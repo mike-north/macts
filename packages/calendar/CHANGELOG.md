@@ -1,5 +1,12 @@
 # @macts/calendar
 
+## 0.4.0
+
+### Patch Changes
+
+- eb4f199: Convert Calendar's normalized color components to 16-bit RGB channels on reads and back to fractions on writes. Other apps retain their declared color representation.
+  - @macts/contracts@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

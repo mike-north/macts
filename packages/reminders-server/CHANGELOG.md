@@ -1,5 +1,12 @@
 # @macts/reminders-server
 
+## 0.4.0
+
+### Patch Changes
+
+- Updated dependencies [b3f160f]
+  - @macts/reminders@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes
