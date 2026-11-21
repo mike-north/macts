@@ -25,6 +25,7 @@ import {
 import { untargetedIdentifiers } from '../manifest/identifier-targeting.js'
 import { resolveIdentifierTargeting } from '../manifest/identifier.js'
 import { positionalProblems } from '../manifest/positional.js'
+import { findAddressIssues } from '../manifest/address.js'
 import { resolvePrimaryIdentifier } from '../manifest/primary-identifier.js'
 import { normalizeResourceRouteSegment } from '../manifest/route.js'
 import { splitIdentifierWords } from '../manifest/lower-camel.js'
@@ -329,6 +330,7 @@ export function generationRefusals(manifest: AppManifest): string[] {
     ...unselectableItemCommands(manifest).map(({ problem }) => `${refused}: ${problem}`),
     ...untargetedIdentifiers(manifest).map(({ problem }) => `${refused}: ${problem}`),
     ...positionalProblems(manifest).map((problem) => `${refused}: ${problem}`),
+    ...findAddressIssues(manifest).map(({ message }) => `${refused}: ${message}`),
   ]
 }
 
@@ -425,11 +427,13 @@ export function commandMethodParameters(command: Command): {
     command.scope === 'resource' && selectsOneItem(command)
       ? itemIdentifierParameter(command)
       : undefined
-  const parent =
-    item === undefined
-      ? undefined
-      : command.parameters.find((p) => p.name === command.parent?.parameter)
-  const leading = [parent, item].filter((p): p is Command['parameters'][number] => p !== undefined)
+  const parents =
+    command.parents?.map(({ parameter }) => parameter) ??
+    (command.parent === undefined ? [] : [command.parent.parameter])
+  const leading = [
+    ...parents.map((name) => command.parameters.find((p) => p.name === name)),
+    item,
+  ].filter((p): p is Command['parameters'][number] => p !== undefined)
   const rest = command.parameters
     .filter((p) => !leading.includes(p))
     .sort((a, b) => {

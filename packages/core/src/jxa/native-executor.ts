@@ -53,6 +53,7 @@ import {
   type WireValue,
 } from '@macts/contracts'
 import type { AppManifest } from '../manifest/schemas/app.js'
+import { assertAddressInput, commandAddress } from '../manifest/address.js'
 import type { ExecutionRequest, Executor, ResolutionRequest } from '../execution/executor.js'
 import { isWireValue, JxaExecutionError, MAX_OUTPUT_BYTES, runNativeScript } from './executor.js'
 import {
@@ -203,6 +204,15 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
         absentValueMarkers: outputPlan.kind !== 'passthrough',
       })
       assertRequiredArguments(plan.requiredArguments, input)
+      const command = manifest.commands[target.command]
+      assertAddressInput(
+        command !== undefined &&
+          target.resource !== undefined &&
+          (command.parents !== undefined || command.item !== undefined)
+          ? commandAddress(manifest, command, target.resource)
+          : undefined,
+        input
+      )
       const script: NativeScript = {
         bundleId: manifest.app.bundleId,
         ...(manifest.app.rgbChannels === undefined

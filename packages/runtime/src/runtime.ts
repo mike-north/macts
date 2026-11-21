@@ -64,6 +64,7 @@ import type {
 } from '@macts/core'
 import {
   DEFAULT_APPROVAL_TIMEOUT_MS,
+  assertAddressInput,
   enforceCall,
   recordApprovalDecision,
   recordInvalidInput,
@@ -999,6 +1000,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       )
       throw new InternalError('The operation input contract is invalid.', internalDetails(context))
     }
+    assertAddressInput(operation.descriptor.address, parsed.data)
     return parsed.data
   }
 

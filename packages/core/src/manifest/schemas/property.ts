@@ -148,6 +148,15 @@ export const PropertySchema = z
      * Absent means the app spells it as the key.
      */
     native: PropertyNativeSpellingSchema.optional(),
+    /** Supported value reserved for an explicit operation with independent read cost and authority. */
+    separateRead: z
+      .object({
+        operation: z.string().min(1),
+        permission: z.string().min(1),
+        reason: z.string().min(1),
+      })
+      .strict()
+      .optional(),
   })
   .superRefine((property, ctx) => {
     if (property.unsupported !== undefined && property.native !== undefined) {

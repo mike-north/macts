@@ -21,6 +21,37 @@ export const ABSENT_VALUE_ERROR_NUMBER = -1728;
 export function activateApp(bundleId: string): Promise<undefined>;
 
 // @public
+export interface AddressIssue {
+    // (undocumented)
+    readonly message: string;
+    // (undocumented)
+    readonly path: (string | number)[];
+}
+
+// @public
+export type AddressParent = z.infer<typeof AddressParentSchema>;
+
+// @public
+export const AddressParentSchema: z.ZodObject<{
+    by: z.ZodEnum<{
+        identity: "identity";
+        index: "index";
+    }>;
+    parameter: z.ZodString;
+    resource: z.ZodString;
+    collection: z.ZodString;
+}, z.core.$strict>;
+
+// @public
+export const AddressSelectionSchema: z.ZodObject<{
+    by: z.ZodEnum<{
+        identity: "identity";
+        index: "index";
+    }>;
+    parameter: z.ZodString;
+}, z.core.$strict>;
+
+// @public
 export const ALLOW_ALL_GOVERNANCE: GovernanceFilter;
 
 // @public
@@ -95,7 +126,10 @@ export type AppManifest = z.infer<typeof AppManifestSchema>;
 
 // @public
 export const AppManifestSchema: z.ZodObject<{
-    version: z.ZodLiteral<"1.0">;
+    version: z.ZodEnum<{
+        "1.0": "1.0";
+        1.1: "1.1";
+    }>;
     app: z.ZodObject<{
         bundleId: z.ZodString;
         name: z.ZodString;
@@ -243,6 +277,11 @@ export const AppManifestSchema: z.ZodObject<{
                     osVersion: z.ZodString;
                     term: z.ZodString;
                 }, z.core.$strict>;
+            }, z.core.$strict>>;
+            separateRead: z.ZodOptional<z.ZodObject<{
+                operation: z.ZodString;
+                permission: z.ZodString;
+                reason: z.ZodString;
             }, z.core.$strict>>;
         }, z.core.$strip>>>;
         identifiers: z.ZodOptional<z.ZodArray<z.ZodObject<{
@@ -563,6 +602,27 @@ export const AppManifestSchema: z.ZodObject<{
             resource: z.ZodString;
             parameter: z.ZodString;
         }, z.core.$strict>>;
+        parents: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            by: z.ZodEnum<{
+                identity: "identity";
+                index: "index";
+            }>;
+            parameter: z.ZodString;
+            resource: z.ZodString;
+            collection: z.ZodString;
+        }, z.core.$strict>>>;
+        item: z.ZodOptional<z.ZodObject<{
+            by: z.ZodEnum<{
+                identity: "identity";
+                index: "index";
+            }>;
+            parameter: z.ZodString;
+        }, z.core.$strict>>;
+        resolvesReferences: z.ZodOptional<z.ZodBoolean>;
+        identityTraversal: z.ZodOptional<z.ZodObject<{
+            collections: z.ZodArray<z.ZodString>;
+            evidence: z.ZodString;
+        }, z.core.$strict>>;
         returns: z.ZodOptional<z.ZodString>;
         assignsProperty: z.ZodOptional<z.ZodObject<{
             property: z.ZodString;
@@ -828,6 +888,9 @@ export const AppRuleSchema: z.ZodObject<{
 }, z.core.$strict>;
 
 // @public
+export function assertAddressInput(address: CommandAddress | undefined, input: Readonly<Record<string, unknown>>): void;
+
+// @public
 export const AUDIT_DECISIONS: readonly ["allowed", "denied", "pending", "approved", "rejected", "cancelled", "invalid-input", "permission-denied"];
 
 // @public
@@ -1022,6 +1085,20 @@ export const ColorTypeSchema: z.ZodString;
 // @public (undocumented)
 export type Command = z.infer<typeof CommandSchema>;
 
+// @public
+export interface CommandAddress {
+    readonly collection: string;
+    readonly item?: {
+        readonly by: 'identity' | 'index';
+        readonly parameter: string;
+    };
+    readonly parents: readonly AddressParent[];
+    readonly traversal?: readonly string[];
+}
+
+// @public
+export function commandAddress(manifest: AppManifest, command: Command, resourceKey: string): CommandAddress;
+
 // @public (undocumented)
 export type CommandParameter = z.infer<typeof CommandParameterSchema>;
 
@@ -1131,6 +1208,27 @@ export const CommandSchema: z.ZodObject<{
     parent: z.ZodOptional<z.ZodObject<{
         resource: z.ZodString;
         parameter: z.ZodString;
+    }, z.core.$strict>>;
+    parents: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        by: z.ZodEnum<{
+            identity: "identity";
+            index: "index";
+        }>;
+        parameter: z.ZodString;
+        resource: z.ZodString;
+        collection: z.ZodString;
+    }, z.core.$strict>>>;
+    item: z.ZodOptional<z.ZodObject<{
+        by: z.ZodEnum<{
+            identity: "identity";
+            index: "index";
+        }>;
+        parameter: z.ZodString;
+    }, z.core.$strict>>;
+    resolvesReferences: z.ZodOptional<z.ZodBoolean>;
+    identityTraversal: z.ZodOptional<z.ZodObject<{
+        collections: z.ZodArray<z.ZodString>;
+        evidence: z.ZodString;
     }, z.core.$strict>>;
     returns: z.ZodOptional<z.ZodString>;
     assignsProperty: z.ZodOptional<z.ZodObject<{
@@ -1545,6 +1643,9 @@ export const FileTypeSchema: z.ZodObject<{
 
 // @public
 export function filterPermissionsByApp(permissions: string[], app: string): string[];
+
+// @public
+export function findAddressIssues(manifest: AppManifest): AddressIssue[];
 
 // @public
 export function findCaseOnlyMismatch(permission: string, known: readonly string[]): string | undefined;
@@ -2358,6 +2459,10 @@ export interface NativeCodec {
 // @public
 export interface NativeCodecEnvironment {
     readonly app: unknown;
+    readonly contexts?: WeakMap<object, readonly {
+        readonly resource: string;
+        readonly item: unknown;
+    }[]>;
     readonly positionOf?: (specifier: unknown, collection: string) => unknown;
     readonly references: NativeReferenceTable;
     readonly rgbChannels?: 'integer16' | 'normalized';
@@ -2368,6 +2473,7 @@ export interface NativeCollectionAddressing {
     readonly collection: string;
     readonly lookup: 'byId' | 'byProperty' | 'byKey';
     readonly property: string;
+    readonly traversal?: readonly string[];
     readonly within?: string;
 }
 
@@ -3293,6 +3399,11 @@ export const PropertySchema: z.ZodObject<{
             term: z.ZodString;
         }, z.core.$strict>;
     }, z.core.$strict>>;
+    separateRead: z.ZodOptional<z.ZodObject<{
+        operation: z.ZodString;
+        permission: z.ZodString;
+        reason: z.ZodString;
+    }, z.core.$strict>>;
 }, z.core.$strip>;
 
 // @public (undocumented)
@@ -3883,6 +3994,11 @@ export const ResourceSchema: z.ZodObject<{
                 osVersion: z.ZodString;
                 term: z.ZodString;
             }, z.core.$strict>;
+        }, z.core.$strict>>;
+        separateRead: z.ZodOptional<z.ZodObject<{
+            operation: z.ZodString;
+            permission: z.ZodString;
+            reason: z.ZodString;
         }, z.core.$strict>>;
     }, z.core.$strip>>>;
     identifiers: z.ZodOptional<z.ZodArray<z.ZodObject<{

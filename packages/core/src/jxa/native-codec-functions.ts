@@ -896,6 +896,47 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   ): HostObject {
     // A root has no container (`containerOf`), so its owner is the application.
     if (addressing.lookup === 'byRoot') return addressRoot(owner, addressing, id, resource, path)
+    if (addressing.lookup !== 'byIndex' && addressing.traversal !== undefined) {
+      const matches: HostObject[] = []
+      const visit = (parent: HostObject, edges: readonly string[]): void => {
+        const edge = edges[0]
+        if (edge === undefined) return
+        const elements = parent[edge]
+        if (!isHostObject(elements))
+          return fail('encode', path, 'Identity traversal has no declared collection')
+        const length = elements['length']
+        if (typeof length !== 'number')
+          return fail('encode', path, 'Identity traversal has no collection length')
+        for (let i = 0; i < length; i++) {
+          const item = callMember('decode', elements, 'at', [i], path, 'a collection')
+          if (
+            !isHostObject(item) ||
+            callMember('decode', item, 'exists', [], path, 'an item') !== true
+          ) {
+            const error = new Error('Identity traversal changed while reading.')
+            error.name = 'MactsCollectionChanged'
+            throw error
+          }
+          if (edges.length > 1) visit(item, edges.slice(1))
+          else if (callMember('decode', item, addressing.property, [], path, 'an identity') === id)
+            matches.push(item)
+        }
+        if (elements['length'] !== length) {
+          const error = new Error('Identity traversal changed while reading.')
+          error.name = 'MactsCollectionChanged'
+          throw error
+        }
+      }
+      visit(owner, addressing.traversal.concat([addressing.collection]))
+      if (matches.length > 1)
+        return fail(
+          'encode',
+          path,
+          'Identity matched multiple objects within its declared container'
+        )
+      const match = matches[0]
+      return match ?? failMissing(path, resource)
+    }
     const expected =
       (addressing.within === undefined ? 'the application' : 'the container') +
       ' to have a collection ' +
@@ -1217,12 +1258,26 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
    * container's resource, before the object is looked up; a missing object
    * names its own resource.
    */
-  function addressPending(app: HostObject, pending: PendingAddress, path: Path): HostObject {
+  function addressPending(
+    app: HostObject,
+    pending: PendingAddress,
+    path: Path,
+    env: Env
+  ): HostObject {
     const owner =
       pending.container === undefined
         ? app
-        : addressPending(app, pending.container, path.concat(['container']))
-    return addressObject(owner, pending.addressing, pending.id, pending.resource, path)
+        : addressPending(app, pending.container, path.concat(['container']), env)
+    const object = addressObject(owner, pending.addressing, pending.id, pending.resource, path)
+    if (pending.container !== undefined && env?.contexts !== undefined) {
+      env.contexts.set(
+        object,
+        (env.contexts.get(owner) ?? []).concat([
+          { resource: pending.container.resource, item: owner },
+        ])
+      )
+    }
+    return object
   }
 
   /**
@@ -1238,7 +1293,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         if (!isPendingAddress(value) || env === undefined || !isHostObject(env.app)) {
           return fail('decode', path, 'Expected a converted reference')
         }
-        return addressPending(env.app, value, path)
+        return addressPending(env.app, value, path, env)
       }
       case 'array': {
         if (!Array.isArray(value)) return value
@@ -1389,35 +1444,52 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
    * The identity payload of the container a body handed over with an object
    * of `resource`, which is found within a `within`: encoded by the parent's
    * own addressing and identifier plan, from the record's item or its
-   * identifier already read. Only a top-level container is emitted: a parent
-   * that is itself found within a container fails as unsupported.
+   * identifier already read. Nested containers reuse validated read provenance;
+   * no reverse-container lookup or positional identity is invented.
    */
   function containerPayload(
-    resource: string,
+    _resource: string,
     within: string,
-    held: { readonly container: unknown; readonly containerId: unknown },
+    held: {
+      readonly container: unknown
+      readonly containerId: unknown
+      readonly ancestors?: readonly { resource: string; item: unknown }[] | undefined
+    },
     env: Env,
     path: Path
   ): Record<string, unknown> {
     const containerPath = path.concat(['container'])
     const parentPlans = referencePlansOf('encode', env, within, containerPath)
-    if (containerOf(parentPlans.addressing) !== undefined) {
-      return failUnsupported(
-        'encode',
-        containerPath,
-        'reference',
-        'References to ' +
-          quote(resource) +
-          ' within a ' +
-          quote(within) +
-          ' have no conversion in this codec: the ' +
-          quote(within) +
-          ' is itself found within a container'
+    const payload =
+      held.containerId === undefined
+        ? identityPayload(within, held.container, parentPlans, env, containerPath, false)
+        : identityFromId(within, held.containerId, parentPlans, env, containerPath)
+    const ancestor = containerOf(parentPlans.addressing)
+    if (ancestor !== undefined) {
+      const context =
+        held.ancestors ??
+        (isHostObject(held.container) ? env?.contexts?.get(held.container) : undefined)
+      const parent = context?.filter((entry) => entry.resource === ancestor).slice(-1)[0]
+      if (parent === undefined)
+        return failUnsupported(
+          'encode',
+          containerPath,
+          'reference',
+          'Missing validated ancestor context'
+        )
+      setOwn(
+        payload,
+        'container',
+        containerPayload(
+          within,
+          ancestor,
+          { container: parent.item, containerId: undefined },
+          env,
+          containerPath
+        )
       )
     }
-    return held.containerId === undefined
-      ? identityPayload(within, held.container, parentPlans, env, containerPath, false)
-      : identityFromId(within, held.containerId, parentPlans, env, containerPath)
+    return payload
   }
 
   /**
@@ -1434,7 +1506,12 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     native: unknown,
     resource: string,
     path: Path
-  ): { readonly value: unknown; readonly container: unknown; readonly containerId: unknown } {
+  ): {
+    readonly value: unknown
+    readonly container: unknown
+    readonly containerId: unknown
+    readonly ancestors: readonly { resource: string; item: unknown }[] | undefined
+  } {
     const inner = isMarked(native, CONTAINED) ? native[CONTAINED] : null
     if (!isPlainObject(inner) || !hasOwn(inner, 'value')) {
       return failUnsupported(
@@ -1446,10 +1523,28 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
           ' came without the record it was read through, so its container cannot be encoded'
       )
     }
+    // List rows already supplied their id, so preserve their validated
+    // ancestors without asking the app to materialize each row again.
+    const ancestors: { resource: string; item: unknown }[] = []
+    const supplied = ownValue(inner, 'ancestors')
+    if (supplied !== undefined) {
+      if (!Array.isArray(supplied))
+        return failUnsupported('encode', path, 'reference', 'Malformed ancestor context')
+      for (const entry of supplied) {
+        if (
+          !isPlainObject(entry) ||
+          typeof entry['resource'] !== 'string' ||
+          !hasOwn(entry, 'item')
+        )
+          return failUnsupported('encode', path, 'reference', 'Malformed ancestor context')
+        ancestors.push({ resource: entry['resource'], item: entry['item'] })
+      }
+    }
     return {
       value: inner['value'],
       container: ownValue(inner, 'container'),
       containerId: ownValue(inner, 'containerId'),
+      ancestors: supplied === undefined ? undefined : ancestors,
     }
   }
 

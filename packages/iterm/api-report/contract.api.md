@@ -39,6 +39,7 @@ export interface iTermClient extends ClientBrand<iTermResources> {
     requestCookie(andKeyForAppNamed?: string, options?: CallOptions): Promise<void>;
     revealHotkeyWindow(options?: CallOptions): Promise<void>;
     select(options?: CallOptions): Promise<void>;
+    readonly sessions: SessionResourceClient;
     setVariable(named: string, to: string, options?: CallOptions): Promise<void>;
     splitHorizontally(withProfile: string, command?: string, options?: CallOptions): Promise<void>;
     splitHorizontallyWithDefaultProfile(command?: string, options?: CallOptions): Promise<void>;
@@ -71,6 +72,13 @@ export type iTermResources = Readonly<{
             readonly list: 'Window';
         };
     };
+    Session: ResourceDescriptor<Session, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'iterm.sessions.resolve';
+        readonly parents: {
+            readonly get: 'Window';
+        };
+    };
 }>;
 
 // @public
@@ -100,7 +108,6 @@ export interface Session {
     boldColor: Rgb | null;
     colorPreset: string | null;
     columns: Integer | null;
-    contents: string | null;
     cursorColor: Rgb | null;
     cursorTextColor: Rgb | null;
     foregroundColor: Rgb | null;
@@ -112,7 +119,6 @@ export interface Session {
     rows: Integer | null;
     selectedTextColor: Rgb | null;
     selectionColor: Rgb | null;
-    readonly text: string | null;
     transparency: number | null;
     readonly tty: string | null;
     underlineColor: Rgb | null;
@@ -160,6 +166,13 @@ export interface SessionCreateInput {
 }
 
 // @public
+export interface SessionResourceClient {
+    get(windowId: Integer, tabIndex: Integer, sessionId: string, options?: CallOptions): Promise<Session>;
+    list(windowId: Integer, tabIndex: Integer, options?: CallOptions): Promise<Page<Session>>;
+    resolve(windowId: Integer, sessionId: string, options?: CallOptions): Promise<Session>;
+}
+
+// @public
 export interface SessionUpdateInput {
     aNSIBlackColor?: Rgb;
     aNSIBlueColor?: Rgb;
@@ -200,12 +213,14 @@ export interface SessionUpdateInput {
 
 // @public
 export interface Tab {
+    currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null;
     index: Integer | null;
     title: string | null;
 }
 
 // @public
 export interface TabCreateInput {
+    currentSession?: ObjectReferenceData<string, 'Session'>;
     index?: Integer;
     title?: string;
 }
@@ -218,6 +233,7 @@ export interface TabResourceClient {
 
 // @public
 export interface TabUpdateInput {
+    currentSession?: ObjectReferenceData<string, 'Session'>;
     index?: Integer;
     title?: string;
 }
@@ -227,6 +243,7 @@ export interface Window {
     readonly alternateIdentifier: string | null;
     bounds: Rectangle | null;
     readonly closeable: boolean | null;
+    currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null;
     currentTab: IndexSelectorReference<Tab, 'Tab'> | null;
     frame?: Rectangle | null;
     frontmost: boolean | null;
@@ -249,6 +266,7 @@ export interface Window {
 // @public
 export interface WindowCreateInput {
     bounds?: Rectangle;
+    currentSession?: ObjectReferenceData<string, 'Session'>;
     currentTab?: ObjectReferenceData<never, 'Tab'>;
     frame?: Rectangle;
     frontmost?: boolean;
@@ -272,6 +290,7 @@ export interface WindowResourceClient {
 // @public
 export interface WindowUpdateInput {
     bounds?: Rectangle;
+    currentSession?: ObjectReferenceData<string, 'Session'>;
     currentTab?: ObjectReferenceData<never, 'Tab'>;
     frame?: Rectangle;
     frontmost?: boolean;

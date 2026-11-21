@@ -118,6 +118,11 @@ export interface Window {
    */
   currentTab: IndexSelectorReference<Tab, 'Tab'> | null
   /**
+   * The current session in a window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null
+  /**
    * Whether the window is a hotkey window.
    * Nullable. No evidence that the app always sets it.
    */
@@ -155,6 +160,11 @@ export interface Window {
 
 /** A terminal tab */
 export interface Tab {
+  /**
+   * The current session in a tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null
   /**
    * Index of tab in parent tab view control.
    * Nullable. No evidence that the app always sets it.
@@ -199,16 +209,6 @@ export interface Session {
    * Nullable. No evidence that the app always sets it.
    */
   readonly tty: string | null
-  /**
-   * The currently visible contents of the session.
-   * Nullable. No evidence that the app always sets it.
-   */
-  contents: string | null
-  /**
-   * The currently visible contents of the session.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly text: string | null
   /**
    * The colorPreset property.
    * Nullable. No evidence that the app always sets it.
@@ -387,6 +387,8 @@ export interface WindowCreateInput {
   frontmost?: boolean
   /** The currently selected tab */
   currentTab?: ObjectReferenceData<never, 'Tab'>
+  /** The current session in a window */
+  currentSession?: ObjectReferenceData<string, 'Session'>
   /** Whether the window is a hotkey window. */
   isHotkeyWindow?: boolean
   /**
@@ -453,6 +455,11 @@ export interface WindowUpdateInput {
    */
   currentTab?: ObjectReferenceData<never, 'Tab'>
   /**
+   * The current session in a window.
+   * Cannot be reset: null is rejected.
+   */
+  currentSession?: ObjectReferenceData<string, 'Session'>
+  /**
    * Whether the window is a hotkey window.
    * Cannot be reset: null is rejected.
    */
@@ -490,6 +497,8 @@ export interface WindowUpdateInput {
 
 /** Input for creating a Tab. */
 export interface TabCreateInput {
+  /** The current session in a tab */
+  currentSession?: ObjectReferenceData<string, 'Session'>
   /** Index of tab in parent tab view control */
   index?: Integer
   /** The title property */
@@ -498,6 +507,11 @@ export interface TabCreateInput {
 
 /** Input for updating a Tab. Omitted fields are left unchanged. */
 export interface TabUpdateInput {
+  /**
+   * The current session in a tab.
+   * Cannot be reset: null is rejected.
+   */
+  currentSession?: ObjectReferenceData<string, 'Session'>
   /**
    * Index of tab in parent tab view control.
    * Cannot be reset: null is rejected.
@@ -796,6 +810,38 @@ export interface TabResourceClient {
   get(windowId: Integer, index: Integer, options?: CallOptions): Promise<Tab>
 }
 
+/** A terminal session */
+export interface SessionResourceClient {
+  /**
+   * List sessions, as one page holding all of them.
+   *
+   * @param windowId - Window identifier. Does not accept null.
+   * @param tabIndex - Zero-based tab position. Does not accept null.
+   */
+  list(windowId: Integer, tabIndex: Integer, options?: CallOptions): Promise<Page<Session>>
+  /**
+   * Read the session identified by `sessionId`.
+   *
+   * @param windowId - Window identifier. Does not accept null.
+   * @param tabIndex - Zero-based tab position. Does not accept null.
+   * @param sessionId - Session identifier within the Window. Does not accept null.
+   */
+  get(
+    windowId: Integer,
+    tabIndex: Integer,
+    sessionId: string,
+    options?: CallOptions
+  ): Promise<Session>
+  /**
+   * Read a session identity across all tabs of its Window. A move to another Window makes this
+   * identity missing.
+   *
+   * @param windowId - Window identifier. Does not accept null.
+   * @param sessionId - Session identifier within the Window. Does not accept null.
+   */
+  resolve(windowId: Integer, sessionId: string, options?: CallOptions): Promise<Session>
+}
+
 /**
  * The iTerm client: one namespace per resource that has operations, plus the app's own commands. A
  * client factory creates one from `iTermContract` in the app's `/contract` entry. Its type carries
@@ -807,6 +853,8 @@ export interface iTermClient extends ClientBrand<iTermResources> {
   readonly windows: WindowResourceClient
   /** A terminal tab */
   readonly tabs: TabResourceClient
+  /** A terminal session */
+  readonly sessions: SessionResourceClient
   /**
    * Get a reference to the currently selected window.
    *
@@ -1006,6 +1054,10 @@ const windowRecordType: ValueType<Window> = t.record(
           'The currently selected tab. Returned as an index selector: the tab at its zero-based position within this window, since a tab has no id. The position drifts when tabs open, close or move, so the reference resolves to whichever tab holds it then.',
       }
     ),
+    currentSession: t.nullable(
+      t.reference<Session, string, 'Session'>(() => iTermContract, 'Session', 'one'),
+      { description: 'The current session in a window' }
+    ),
     isHotkeyWindow: t.nullable(t.boolean(), {
       description: 'Whether the window is a hotkey window.',
     }),
@@ -1043,10 +1095,68 @@ const windowRecordType: ValueType<Window> = t.record(
 
 const tabRecordType: ValueType<Tab> = t.record(
   {
+    currentSession: t.nullable(
+      t.reference<Session, string, 'Session'>(() => iTermContract, 'Session', 'one'),
+      { description: 'The current session in a tab' }
+    ),
     index: t.nullable(t.integer(), { description: 'Index of tab in parent tab view control' }),
     title: t.nullable(t.string(), { description: 'The title property' }),
   },
   { description: 'A terminal tab' }
+)
+
+const sessionRecordType: ValueType<Session> = t.record(
+  {
+    id: t.string({ description: 'The unique identifier of the session.' }),
+    isProcessing: t.nullable(t.boolean(), {
+      description: 'The session has received output recently.',
+    }),
+    isAtShellPrompt: t.nullable(t.boolean(), {
+      description: 'The terminal is at the shell prompt. Requires shell integration.',
+    }),
+    columns: t.nullable(t.integer(), { description: 'The columns property' }),
+    rows: t.nullable(t.integer(), { description: 'The rows property' }),
+    tty: t.nullable(t.string(), { description: 'The tty property' }),
+    colorPreset: t.nullable(t.string(), { description: 'The colorPreset property' }),
+    backgroundColor: t.nullable(t.rgb(), { description: 'The backgroundColor property' }),
+    boldColor: t.nullable(t.rgb(), { description: 'The boldColor property' }),
+    cursorColor: t.nullable(t.rgb(), { description: 'The cursorColor property' }),
+    cursorTextColor: t.nullable(t.rgb(), { description: 'The cursorTextColor property' }),
+    foregroundColor: t.nullable(t.rgb(), { description: 'The foregroundColor property' }),
+    selectedTextColor: t.nullable(t.rgb(), { description: 'The selectedTextColor property' }),
+    selectionColor: t.nullable(t.rgb(), { description: 'The selectionColor property' }),
+    aNSIBlackColor: t.nullable(t.rgb(), { description: 'The aNSIBlackColor property' }),
+    aNSIRedColor: t.nullable(t.rgb(), { description: 'The aNSIRedColor property' }),
+    aNSIGreenColor: t.nullable(t.rgb(), { description: 'The aNSIGreenColor property' }),
+    aNSIYellowColor: t.nullable(t.rgb(), { description: 'The aNSIYellowColor property' }),
+    aNSIBlueColor: t.nullable(t.rgb(), { description: 'The aNSIBlueColor property' }),
+    aNSIMagentaColor: t.nullable(t.rgb(), { description: 'The aNSIMagentaColor property' }),
+    aNSICyanColor: t.nullable(t.rgb(), { description: 'The aNSICyanColor property' }),
+    aNSIWhiteColor: t.nullable(t.rgb(), { description: 'The aNSIWhiteColor property' }),
+    aNSIBrightBlackColor: t.nullable(t.rgb(), { description: 'The aNSIBrightBlackColor property' }),
+    aNSIBrightRedColor: t.nullable(t.rgb(), { description: 'The aNSIBrightRedColor property' }),
+    aNSIBrightGreenColor: t.nullable(t.rgb(), { description: 'The aNSIBrightGreenColor property' }),
+    aNSIBrightYellowColor: t.nullable(t.rgb(), {
+      description: 'The aNSIBrightYellowColor property',
+    }),
+    aNSIBrightBlueColor: t.nullable(t.rgb(), { description: 'The aNSIBrightBlueColor property' }),
+    aNSIBrightMagentaColor: t.nullable(t.rgb(), {
+      description: 'The aNSIBrightMagentaColor property',
+    }),
+    aNSIBrightCyanColor: t.nullable(t.rgb(), { description: 'The aNSIBrightCyanColor property' }),
+    aNSIBrightWhiteColor: t.nullable(t.rgb(), { description: 'The aNSIBrightWhiteColor property' }),
+    underlineColor: t.nullable(t.rgb(), { description: 'The underlineColor property' }),
+    useUnderlineColor: t.nullable(t.boolean(), {
+      description: 'Whether the use a dedicated color for underlining.',
+    }),
+    backgroundImage: t.nullable(t.string(), { description: 'The backgroundImage property' }),
+    name: t.nullable(t.string(), { description: 'The name property' }),
+    transparency: t.nullable(t.double(), { description: 'The transparency property' }),
+    uniqueID: t.nullable(t.string(), { description: 'The uniqueID property' }),
+    profileName: t.nullable(t.string(), { description: "The session's profile name" }),
+    answerbackString: t.nullable(t.string(), { description: 'ENQ Answerback string' }),
+  },
+  { description: 'A terminal session' }
 )
 
 /**
@@ -1068,6 +1178,11 @@ export type iTermResources = Readonly<{
     readonly get: 'iterm.tabs.get'
     readonly list: 'iterm.tabs.list'
     readonly parents: { readonly get: 'Window'; readonly list: 'Window' }
+  }
+  Session: ResourceDescriptor<Session, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'iterm.sessions.resolve'
+    readonly parents: { readonly get: 'Window' }
   }
 }>
 
@@ -1093,6 +1208,13 @@ const resources = {
     get: 'iterm.tabs.get',
     list: 'iterm.tabs.list',
     parents: { get: 'Window', list: 'Window' },
+  },
+  Session: {
+    name: 'Session',
+    record: sessionRecordType,
+    id: t.string({ description: 'The unique identifier of the session.' }),
+    get: 'iterm.sessions.resolve',
+    parents: { get: 'Window' },
   },
 } satisfies iTermResources
 
@@ -1218,6 +1340,135 @@ const tabGetTabOperation: OperationDescriptor<
       },
     },
     required: ['windowId', 'index'],
+    additionalProperties: false,
+  },
+}
+
+const sessionListSessionsOperation: OperationDescriptor<
+  { readonly windowId: Integer; readonly tabIndex: Integer },
+  Page<Session>
+> = {
+  id: 'iterm.sessions.list',
+  permission: 'iterm:sessions:list',
+  target: { command: 'listSessions', resource: 'Session' },
+  address: {
+    parents: [
+      { by: 'identity', parameter: 'windowId', resource: 'Window', collection: 'windows' },
+      { by: 'index', parameter: 'tabIndex', resource: 'Tab', collection: 'tabs' },
+    ],
+    collection: 'sessions',
+  },
+  description: 'List the sessions in the tab at a window position.',
+  input: t.record({
+    windowId: t.integer({ description: 'Window identifier' }),
+    tabIndex: t.integer({ description: 'Zero-based tab position' }),
+  }),
+  output: t.page(sessionRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      windowId: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Window identifier',
+      },
+      tabIndex: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Zero-based tab position',
+      },
+    },
+    required: ['windowId', 'tabIndex'],
+    additionalProperties: false,
+  },
+}
+
+const sessionGetSessionOperation: OperationDescriptor<
+  { readonly windowId: Integer; readonly tabIndex: Integer; readonly sessionId: string },
+  Session
+> = {
+  id: 'iterm.sessions.getWithinTab',
+  permission: 'iterm:sessions:getWithinTab',
+  target: { command: 'getSession', resource: 'Session' },
+  address: {
+    parents: [
+      { by: 'identity', parameter: 'windowId', resource: 'Window', collection: 'windows' },
+      { by: 'index', parameter: 'tabIndex', resource: 'Tab', collection: 'tabs' },
+    ],
+    collection: 'sessions',
+    item: { by: 'identity', parameter: 'sessionId' },
+  },
+  description: 'Read a session by id in the tab at a window position.',
+  input: t.record({
+    windowId: t.integer({ description: 'Window identifier' }),
+    tabIndex: t.integer({ description: 'Zero-based tab position' }),
+    sessionId: t.string({ description: 'Session identifier within the Window' }),
+  }),
+  output: sessionRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      windowId: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Window identifier',
+      },
+      tabIndex: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Zero-based tab position',
+      },
+      sessionId: { type: 'string', description: 'Session identifier within the Window' },
+    },
+    required: ['windowId', 'tabIndex', 'sessionId'],
+    additionalProperties: false,
+  },
+}
+
+const sessionResolveSessionOperation: OperationDescriptor<
+  { readonly windowId: Integer; readonly sessionId: string },
+  Session
+> = {
+  id: 'iterm.sessions.resolve',
+  permission: 'iterm:sessions:resolve',
+  target: { command: 'resolveSession', resource: 'Session' },
+  address: {
+    parents: [{ resource: 'Window', parameter: 'windowId', by: 'identity', collection: 'windows' }],
+    traversal: ['tabs'],
+    collection: 'sessions',
+    item: { by: 'identity', parameter: 'sessionId' },
+  },
+  description:
+    'Read a session identity across all tabs of its Window. A move to another Window makes this identity missing.',
+  input: t.record({
+    windowId: t.integer({ description: 'Window identifier' }),
+    sessionId: t.string({ description: 'Session identifier within the Window' }),
+  }),
+  output: sessionRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      windowId: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Window identifier',
+      },
+      sessionId: { type: 'string', description: 'Session identifier within the Window' },
+    },
+    required: ['windowId', 'sessionId'],
     additionalProperties: false,
   },
 }
@@ -1982,6 +2233,9 @@ const operations: AppContract<iTermClient>['operations'] = {
   'iterm.windows.get': windowGetWindowOperation,
   'iterm.tabs.list': tabListTabsOperation,
   'iterm.tabs.get': tabGetTabOperation,
+  'iterm.sessions.list': sessionListSessionsOperation,
+  'iterm.sessions.getWithinTab': sessionGetSessionOperation,
+  'iterm.sessions.resolve': sessionResolveSessionOperation,
   'iterm.app.count': appCountOperation,
   'iterm.app.duplicate': appDuplicateOperation,
   'iterm.app.exists': appExistsOperation,
@@ -2022,6 +2276,14 @@ function bind(runtime: ClientRuntime): iTermClient {
       list: (windowId, options) => runtime.invoke(tabListTabsOperation, { windowId }, options),
       get: (windowId, index, options) =>
         runtime.invoke(tabGetTabOperation, { windowId, index }, options),
+    },
+    sessions: {
+      list: (windowId, tabIndex, options) =>
+        runtime.invoke(sessionListSessionsOperation, { windowId, tabIndex }, options),
+      get: (windowId, tabIndex, sessionId, options) =>
+        runtime.invoke(sessionGetSessionOperation, { windowId, tabIndex, sessionId }, options),
+      resolve: (windowId, sessionId, options) =>
+        runtime.invoke(sessionResolveSessionOperation, { windowId, sessionId }, options),
     },
     currentWindow: (options) => runtime.invoke(appCurrentWindowOperation, {}, options),
     count: (each, options) => runtime.invoke(appCountOperation, { each }, options),

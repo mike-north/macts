@@ -73,6 +73,9 @@ export function selectsOneItem(command: Command): boolean {
  *   no required parameter besides its parent's.
  */
 export function itemIdentifierParameter(command: Command): CommandParameter | undefined {
+  if (command.parents !== undefined || command.item !== undefined) {
+    return command.parameters.find((p) => p.required && p.name === command.item?.parameter)
+  }
   const parent = command.parent?.parameter
   return command.parameters.find((p) => p.required && p.name !== parent)
 }

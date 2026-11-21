@@ -126,7 +126,11 @@ function parentlessNestedCommands(dir: string, manifest: AppManifest): string[] 
   for (const { id, commandKey, resource } of addressedCommands(dir, manifest)) {
     if (!nested.has(resource)) continue
     if (knownItemSelectionGap(manifest, commandKey) !== undefined) continue
-    if (manifest.commands[commandKey]?.parent === undefined) missing.add(id)
+    if (
+      manifest.commands[commandKey]?.parent === undefined &&
+      manifest.commands[commandKey]?.parents === undefined
+    )
+      missing.add(id)
   }
   return [...missing]
 }
@@ -180,6 +184,8 @@ describe('every command on a nested resource records its parent (#165)', () => {
       )
       for (const { id, commandKey, resource } of addressedCommands(dir, manifest)) {
         const parent = manifest.commands[commandKey]?.parent
+        // Identity traversal declares the physical intermediate collections separately.
+        if (manifest.commands[commandKey]?.identityTraversal !== undefined) continue
         if (parent === undefined) continue
         if (!holds.has(`${parent.resource} > ${resource}`)) {
           mismatched.push(`${id}: ${parent.resource} does not hold ${resource}`)

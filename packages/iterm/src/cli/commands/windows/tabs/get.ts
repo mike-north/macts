@@ -26,6 +26,7 @@ export class GetTabCommand extends Command {
       const item = await client.tabs.get(this.windowId, this.tabId)
 
       const output = formatter.format({
+        currentSession: item.currentSession,
         index: item.index,
         title: item.title,
       })

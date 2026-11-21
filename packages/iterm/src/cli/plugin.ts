@@ -3,6 +3,9 @@ import { ListWindowsCommand } from './commands/windows/list.js'
 import { GetWindowCommand } from './commands/windows/get.js'
 import { ListTabsCommand } from './commands/windows/tabs/list.js'
 import { GetTabCommand } from './commands/windows/tabs/get.js'
+import { ListSessionsCommand } from './commands/windows/tabs/sessions/list.js'
+import { GetSessionCommand } from './commands/windows/tabs/sessions/get.js'
+import { ResolveSessionCommand } from './commands/windows/tabs/sessions/resolve.js'
 import { CurrentWindowCommand } from './commands/current-window.js'
 import { CountCommand } from './commands/count.js'
 import { DuplicateCommand } from './commands/duplicate.js'
@@ -43,6 +46,9 @@ export const plugin: CliPlugin = {
     GetWindowCommand,
     ListTabsCommand,
     GetTabCommand,
+    ListSessionsCommand,
+    GetSessionCommand,
+    ResolveSessionCommand,
     CurrentWindowCommand,
     CountCommand,
     DuplicateCommand,

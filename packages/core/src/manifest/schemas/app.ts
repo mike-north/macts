@@ -6,6 +6,7 @@ import { HierarchySchema, type HierarchyChild } from './hierarchy.js'
 import { RelationshipSchema } from './relationship.js'
 import { AppMetadataSchema, SuiteSchema, ExtractionMetadataSchema } from './metadata.js'
 import { findPositionalIssues } from '../positional.js'
+import { findAddressIssues } from '../address.js'
 import { itemIdentifierParameter } from '../item-selection.js'
 import { findDuplicateRoutes } from '../route.js'
 import { findRootIssues, normalizeRoots } from '../roots.js'
@@ -126,7 +127,7 @@ function findHierarchyResourceIssues(
 export const AppManifestSchema = z
   .object({
     /** Manifest format version */
-    version: z.literal('1.0'),
+    version: z.enum(['1.0', '1.1']),
     /** Application metadata */
     app: AppMetadataSchema,
     /** Suite organization (from dictionary) */
@@ -251,6 +252,9 @@ export const AppManifestSchema = z
     // A positional marker is judged on what the resource inherits too: an
     // inherited primary identifier means it is found by that identifier.
     for (const issue of findPositionalIssues(data)) {
+      ctx.addIssue({ code: 'custom', ...issue })
+    }
+    for (const issue of findAddressIssues(data)) {
       ctx.addIssue({ code: 'custom', ...issue })
     }
     // An inherited property is checked where it is used: a usable subclass of

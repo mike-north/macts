@@ -242,7 +242,7 @@ export interface RunNativeScriptOptions {
  *
  * @remarks
  * The script decodes `script.input` against `script.inputPlan`, invokes
- * `script.body` as `(app, args, page)` with the target application, encodes the
+ * `script.body` as `(app, args, page, env)` with the target application, encodes the
  * result against `script.outputPlan`, and reports a {@link NativeOutcome}.
  * Everything the app or the codec raises inside the process resolves as a
  * failed outcome; it is not a rejection. A success whose value was dropped by
@@ -345,7 +345,7 @@ const DESCRIBE_THROWN = [
  * its final expression is that outcome serialized as JSON, which the host
  * prints. The input, both plans, and the reference table are embedded as JSON
  * text parsed inside the process, the bundle identifier as a JSON string literal, and the
- * body inside its own `(function (app, args, page) { ... })`, called with the
+ * body inside its own `(function (app, args, page, env) { ... })`, called with the
  * page window (or `null`) embedded the same way.
  *
  * The application object comes first, because finding a referenced object
@@ -369,11 +369,11 @@ export function composeNativeScript(script: NativeScript, codec: NativeCodec): s
     '  try {',
     `    var app = Application(${JSON.stringify(script.bundleId)});`,
     '    app.includeStandardAdditions = true;',
-    `    var env = { app: app, references: ${embedJson(script.references)}, rgbChannels: ${embedJson(script.rgbChannels ?? 'integer16')}, positionOf: ${NATIVE_POSITION_FUNCTION} };`,
+    `    var env = { app: app, contexts: new WeakMap(), references: ${embedJson(script.references)}, rgbChannels: ${embedJson(script.rgbChannels ?? 'integer16')}, positionOf: ${NATIVE_POSITION_FUNCTION} };`,
     `    var args = ${NATIVE_DECODE_FUNCTION}(${embedJson(script.input)}, ${embedJson(script.inputPlan)}, env);`,
-    '    var value = (function (app, args, page) {',
+    '    var value = (function (app, args, page, env) {',
     script.body,
-    `    })(app, args, ${embedJson(script.page ?? null)});`,
+    `    })(app, args, ${embedJson(script.page ?? null)}, env);`,
     `    return { ok: true, value: ${NATIVE_ENCODE_FUNCTION}(value, ${embedJson(script.outputPlan)}, env) };`,
     '  } catch (e) {',
     DESCRIBE_THROWN,

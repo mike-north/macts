@@ -732,6 +732,24 @@ function generateResourceClient(
           notesOf(deleteCmd[1], true)
         )
       : '',
+    ...allCommands
+      .filter(
+        ([key, command]) =>
+          command.name === 'get' &&
+          command.identityTraversal !== undefined &&
+          key !== getCmd?.[0] &&
+          available(command)
+      )
+      .map(([key, command]) =>
+        generateGetMethod(
+          commandRouteSegment(key, command),
+          command,
+          resourceName,
+          nameWords,
+          notesOf(command, true),
+          safeIdentifier(command.routeName ?? key)
+        )
+      ),
   ]
     .filter(Boolean)
     .join('\n')
@@ -931,8 +949,18 @@ function generateGetMethod(
   command: Command,
   resourceName: string,
   nameWords: string,
-  notes: readonly string[]
+  notes: readonly string[],
+  methodName = 'get'
 ): string {
+  if (command.parents !== undefined || methodName !== 'get') {
+    const params = commandMethodParameters(command).signature.map(({ parameter }) => parameter)
+    return `
+  /** ${command.description} */
+  async ${methodName}(${params.map((p) => `${p.name}: ${identifierType(command, p.name)}`).join(', ')}): Promise<${resourceName}> {
+    return this.#http.invoke<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${params.map((p) => identifierField(command, p.name)).join(', ')} });
+  }
+`
+  }
   const { parentParam, childParam } = resolveIdParams(command)
   const noteLine = docNoteLines(notes)
   const field = (name: string): string => identifierField(command, name)
@@ -941,7 +969,7 @@ function generateGetMethod(
   /**
    * Get a ${nameWords} by ${childParam} within a parent scope.${noteLine}
    */
-  async get(${parentParam}: ${identifierType(command, parentParam)}, ${childParam}: ${identifierType(command, childParam)}): Promise<${resourceName}> {
+  async ${methodName}(${parentParam}: ${identifierType(command, parentParam)}, ${childParam}: ${identifierType(command, childParam)}): Promise<${resourceName}> {
     return this.#http.invoke<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${field(parentParam)}, ${field(childParam)} });
   }
 `
@@ -950,7 +978,7 @@ function generateGetMethod(
   /**
    * Get a ${nameWords} by ${childParam}.${noteLine}
    */
-  async get(${childParam}: ${identifierType(command, childParam)}): Promise<${resourceName}> {
+  async ${methodName}(${childParam}: ${identifierType(command, childParam)}): Promise<${resourceName}> {
     return this.#http.invoke<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${field(childParam)} });
   }
 `

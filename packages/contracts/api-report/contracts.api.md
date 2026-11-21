@@ -543,6 +543,20 @@ export class OperationCancelledError extends MactsError<'CANCELLED'> {
 
 // @public
 export interface OperationDescriptor<Input, Output> {
+    readonly address?: {
+        readonly parents: readonly {
+            readonly resource: string;
+            readonly collection: string;
+            readonly by: 'identity' | 'index';
+            readonly parameter: string;
+        }[];
+        readonly collection: string;
+        readonly item?: {
+            readonly by: 'identity' | 'index';
+            readonly parameter: string;
+        };
+        readonly traversal?: readonly string[];
+    };
     readonly description: string;
     readonly id: OperationId;
     readonly input: ValueType<Input>;

@@ -149,6 +149,23 @@ export const CommandParentSchema = z
  */
 export type CommandParent = z.infer<typeof CommandParentSchema>
 
+/** An explicit selection binding; positions are selectors and never identity. */
+export const AddressSelectionSchema = z
+  .object({
+    by: z.enum(['identity', 'index']),
+    parameter: z.string().min(1),
+  })
+  .strict()
+
+/** A selected containment edge, ordered from the application toward the target. */
+export const AddressParentSchema = AddressSelectionSchema.extend({
+  resource: z.string().min(1),
+  collection: z.string().min(1),
+}).strict()
+
+/** One explicit ancestor selection in an operation address. */
+export type AddressParent = z.infer<typeof AddressParentSchema>
+
 /**
  * Schema for a command definition.
  */
@@ -169,6 +186,20 @@ export const CommandSchema = z.object({
    * resource is addressed at the application.
    */
   parent: CommandParentSchema.optional(),
+  /** Complete navigation path; cannot be combined with the legacy single parent. */
+  parents: z.array(AddressParentSchema).min(1).optional(),
+  /** Explicit final item binding, separate from ancestors and action arguments. */
+  item: AddressSelectionSchema.optional(),
+  /** Mixed paths are explicit calls only; canonical resolving routes remain identity-addressable. */
+  resolvesReferences: z.boolean().optional(),
+  /** Complete plural search between the identity parent and the final identified collection. */
+  identityTraversal: z
+    .object({
+      collections: z.array(z.string().min(1)).min(1),
+      evidence: z.string().min(1),
+    })
+    .strict()
+    .optional(),
   /** Return type (void if omitted) */
   returns: z.string().optional(),
   /**

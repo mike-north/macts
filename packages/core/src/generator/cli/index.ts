@@ -96,6 +96,15 @@ export function generateCliPlugin(
       // Resource-level commands (like "show" for events)
       // Skip standard CRUD commands since they're already generated above
       for (const cmd of resourceCommands) {
+        // A separate identity get is a declared read operation on every surface.
+        if (
+          cmd.name === 'get' &&
+          cmd.identityTraversal !== undefined &&
+          cmd !== resourceCommands.find((command) => command.name === 'get') &&
+          available(cmd)
+        ) {
+          commands.push(generateGetCommand(hierarchyPath, ctx, cmd))
+        }
         if (standardOps.has(cmd.name) || !available(cmd)) continue
         commands.push(generateResourceCommand(cmd, hierarchyPath, ctx))
       }

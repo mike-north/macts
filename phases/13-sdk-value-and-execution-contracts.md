@@ -2763,6 +2763,90 @@ Every surface takes the parent from the record. Native bodies address the parent
 
 **Every surface follows the kind.** The native get looks the kind up in the root's kinds, addresses the application property it names, and fails as a missing target when the kind is not one of them or its property holds no object on this Mac (the app reports it missing, or "no such object"); it never returns an empty record. The native list reads each kind in declaration order, skips a kind whose property holds no object, fails on any other error, and reads each record as the get does. Every record's `kind` is the kind it was found by, since the object does not say. A list of roots reads every kind it has, so it never pages. The contract, the clients and the CLI treat the root as an identified resource whose identifier is its kind: the CLI reaches it at its namespace, as it would a collection. References follow D7 (singleton roots).
 
+### Multilevel addresses and identity scope
+
+An **address path** selects ancestors outside-in, from the application to the
+collection holding the target. An **identity chain** identifies particular
+objects within identified containers. A position selects the current occupant;
+it never supplies identity. Mixed identity/position paths are operation inputs
+only, with no new reference form.
+
+Commands may declare `parents`, an ordered nonempty sequence of
+`{ resource, collection, by: identity | index, parameter }`, and, for an item
+operation, `item: { by: identity | index, parameter }`. `collection` names a
+declared containment edge, not an executable expression. The target's final
+edge must be unambiguous. `parent` and `parents` are mutually exclusive. Legacy
+`parent` commands retain their input and reference shapes and normalize to one
+identity ancestor. New paths bind every selection explicitly; a required action
+argument must never accidentally select an item.
+
+These address declarations require manifest format `1.1`; existing manifests
+retain `1.0`. Parsing, generation and registration refuse every new addressing
+field under `1.0`, naming `1.1` in the error. A `1.0`-only runtime rejects the
+new version before it can discard the new fields and reinterpret the address.
+Identity traversal, reference-route selection and separate-read property
+metadata also require `1.1`. Reference forms retain their existing version.
+`resolvesReferences: false` keeps an explicit get/list operation out of the
+canonical reference routes. Its operation descriptor still advertises the full
+normalized `address`; the resource table's `get` names the identity resolver,
+and a mixed-path list supplies no selector-collection route. `identityTraversal`
+records plural `collections` and their evidence on an identity get, within its
+identified parent. `separateRead: { operation, permission, reason }` reserves a
+supported property for a separate read without publishing that operation yet.
+
+The schema, generators and both registration paths validate the same normalized
+plan: supported resources and declared edges in order, required non-null
+parameters of the matching identifier or integer type, no reused selection
+parameters, usable ancestor gets and identifier targeting, and evidenced
+positional resources. Roots, unknown modes and ambiguous placements are refused.
+Identified ancestors may nest to arbitrary finite depth, and a finite path may
+repeat a resource type. Reference data must remain acyclic. A selector is never
+admitted as an identity container.
+
+Every surface advertises the complete operation address. SDK inputs, CLI flags,
+MCP inputs and HTTP inputs carry the same fields. Descriptors separately record
+the identity resolver and operation addresses. The codec, generated bodies,
+reference resolution and adapters consume the shared plan; adapters never
+implement their own traversal or normalization. Unsupported address metadata
+fails closed. Existing unavailable-operation admission ordering still applies.
+Credential, permission, governance and whole-input validation precede native
+access, including for raw or cast inputs.
+
+Execution checks each selected ancestor before reading its children. A missing
+ancestor is `TargetNotFoundError` naming that ancestor; a missing child names
+the child. A negative or non-integral index is `ValidationError` before access;
+an index beyond the collection is `InvalidSelectionError` naming its resource.
+No lookup broadens to another container or application scope. Observed
+inconsistency is `CollectionChangedError`, without hidden retry; app access
+failures remain failures, never empty lists. These rules do not promise an
+atomic snapshot.
+
+**iTerm Sessions.** A Session identity contains its `id` and its Window identity.
+The canonical identity get searches every Tab's Sessions in that Window: zero
+matches is `TargetNotFoundError`, multiple matches is `UnexpectedValueError`.
+It never searches another Window. Tab reorder, closure of an earlier Tab, or
+movement between Tabs in that Window does not change the reference's meaning.
+Movement to another Window makes the old reference missing. No persistence
+across restoration or relaunch is promised.
+
+The explicit tab-scoped get requires `windowId`, `tabIndex` and `sessionId`;
+the list requires `windowId` and `tabIndex`. Each re-evaluates the position when
+called. The get only returns that id in that Tab, never another occupant. The
+list reads whichever Tab now holds the position. The canonical identity get
+is a separate operation requiring Window and Session ids, never an optional
+`tabIndex` that changes lookup scope. `Window.currentSession` and
+`Tab.currentSession` emit that Window-scoped identity using validated read-path
+context, without promoting the Tab's position into identity or guessing a
+reverse container. All-identity output chains similarly preserve the complete
+validated ancestor context, superseding the top-level-only emission limit.
+
+Session records hydrate every supported property except bulk screen text
+(`contents`, `text`). Those properties remain declared as deliberate separate
+reads, with explicit operation names and permissions to be delivered separately;
+they are neither unsupported nor inlined. Session operations here are reads.
+Write permissions do not follow from read access. Native behavior remains
+unverified until separately checked against the running app.
+
 ### Positional resources
 
 **A resource whose objects have no identifier, and are found only by their position within their parent, is positional.** Some apps address an object only as an element of its container, by position: an iTerm tab has no id, and the app's own specifier for one is `….windows.byId(7).tabs.at(0)`. The resource records `positional: { evidence }`, curated: `source: curated`, a `note` saying what was observed, `observedAt` and the `appVersion` it was observed on. Nothing is inferred from a missing identifier: a resource with no identifier that is not marked stays out of output as `no-identifier` (D7, resolvable targets).

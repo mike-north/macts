@@ -37,6 +37,7 @@ export class ListWindowsCommand extends Command {
           zoomed: item.zoomed,
           frontmost: item.frontmost,
           currentTab: item.currentTab,
+          currentSession: item.currentSession,
           isHotkeyWindow: item.isHotkeyWindow,
           hotkeyWindowProfile: item.hotkeyWindowProfile,
           position: item.position,

@@ -17,13 +17,16 @@
  * @packageDocumentation
  */
 
+import { isDeepStrictEqual } from 'node:util'
 import type { AppManifest, Command, PermissionHistoryEntry, RiskClass } from '@macts/core'
 import {
   classifyCommandRisk,
+  commandAddress,
   contractResourcePlans,
   listOperationPages,
   normalizeAppRouteSegment,
   positionalProblems,
+  findAddressIssues,
   resolveCommandRoutes,
   unselectableItemCommands,
   untargetedIdentifiers,
@@ -270,6 +273,12 @@ function assertIdentifiersTargeted(manifest: AppManifest, registration: Registra
  *   or command, and saying what the marker needs.
  */
 function assertPositionalMarkersHold(manifest: AppManifest, registration: Registration): void {
+  const [address] = findAddressIssues(manifest)
+  if (address !== undefined) {
+    throw new OperationRegistrationError(
+      `${refusedApp(manifest, registration)}: ${address.message}`
+    )
+  }
   const [first] = positionalProblems(manifest)
   if (first === undefined) return
   throw new OperationRegistrationError(`${refusedApp(manifest, registration)}: ${first}`)
@@ -350,6 +359,10 @@ export function operationsFromManifest(manifest: AppManifest): RegisteredOperati
       inputTypes.set(target.command, input)
     }
     const descriptor: AnyOperationDescriptor = {
+      ...(target.resource !== undefined &&
+      (command.parents !== undefined || command.identityTraversal !== undefined)
+        ? { address: commandAddress(manifest, command, target.resource) }
+        : {}),
       id,
       permission,
       target,
@@ -444,6 +457,16 @@ export function operationsFromContract(
     if (!sameTarget(descriptor.target, expected.target)) {
       throw new OperationRegistrationError(
         `Contract operation "${descriptor.id}" targets a different manifest command than the manifest route does`
+      )
+    }
+    const address =
+      expected.target.resource !== undefined &&
+      (expected.command.parents !== undefined || expected.command.identityTraversal !== undefined)
+        ? commandAddress(manifest, expected.command, expected.target.resource)
+        : undefined
+    if (!isDeepStrictEqual(descriptor.address, address)) {
+      throw new OperationRegistrationError(
+        `Contract operation "${descriptor.id}" has stale or unsupported address metadata. Regenerate the contract for manifest format 1.1.`
       )
     }
     if (takesPagingInputs(descriptor) !== expected.pages) {

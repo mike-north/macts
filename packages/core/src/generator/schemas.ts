@@ -83,7 +83,9 @@ export function generateResourceSchema(
   resource: Resource,
   _ctx: GeneratorContext
 ): GeneratedSchema {
-  const properties = usableProperties(resource)
+  const properties = usableProperties(resource).filter(
+    ([, property]) => property.separateRead === undefined
+  )
   const imports = ["import { z } from 'zod';"]
 
   const propLines = properties.map(([name, prop]) => {

@@ -85,5 +85,15 @@ export function resolvingCommand(
   resourceName: string,
   shape: 'get' | 'list'
 ): [string, Command] | undefined {
-  return findCrudCommand(resourceCommandEntries(manifest, resourceName), shape)
+  return findCrudCommand(
+    resourceCommandEntries(manifest, resourceName).filter(
+      ([, command]) => command.resolvesReferences !== false
+    ),
+    shape
+  )
+}
+
+/** The identified container of a canonical resolving route. @internal */
+export function referenceParent(command: Command): string | undefined {
+  return command.parent?.resource ?? command.parents?.at(-1)?.resource
 }

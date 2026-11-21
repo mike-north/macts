@@ -28,7 +28,7 @@ import type { Command } from './schemas/command.js'
 import { placedEntries, type PlacedEntry } from './hierarchy-placement.js'
 import { resolvePrimaryIdentifierProperty } from './identifier.js'
 import { itemIdentifierParameter, selectsOneItem } from './item-selection.js'
-import { resourceCommandEntries, resolvingCommand } from './resource-commands.js'
+import { resourceCommandEntries, resolvingCommand, referenceParent } from './resource-commands.js'
 import { isUnsupportedResourceKey } from './unsupported.js'
 import { resolveManifestRoutes } from './route.js'
 
@@ -100,7 +100,7 @@ function recordedParentIssue(
   command: Command,
   placements: readonly PlacedEntry[]
 ): PositionalIssue | undefined {
-  if (command.parent === undefined) return undefined
+  if (command.parents !== undefined || command.parent === undefined) return undefined
   const parameter = command.parameters.find(({ name }) => name === command.parent?.parameter)
   const problem = !parameter?.required
     ? 'needs its declared required parent parameter'
@@ -135,7 +135,7 @@ function commandIssues(
     ]
   }
   const [getKey, getCommand] = get
-  const parent = getCommand.parent?.resource
+  const parent = referenceParent(getCommand)
   const issues: PositionalIssue[] = []
   if (parent === undefined) {
     issues.push({
@@ -148,7 +148,7 @@ function commandIssues(
     if (qualification !== undefined) issues.push(qualification)
     const containment = collectionPlacementIssue(commandKey, command, resourceKey, placements)
     if (containment !== undefined) issues.push(containment)
-    if (parent !== undefined && selectsOneItem(command) && command.parent?.resource !== parent) {
+    if (parent !== undefined && selectsOneItem(command) && referenceParent(command) !== parent) {
       // Its body finds the item within the parent the command records, so a
       // command recording none, or another, could not find it.
       issues.push({
@@ -178,7 +178,7 @@ function collectionPlacementIssue(
     .filter(({ child }) => child.resource === resourceKey)
     .map(({ holder }) => holder)
   if (holders.length === 0) return undefined
-  const parent = command.parent?.resource
+  const parent = referenceParent(command)
   if (holders.includes(parent)) return undefined
   return {
     message:

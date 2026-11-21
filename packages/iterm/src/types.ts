@@ -96,6 +96,7 @@ export const WindowSchema = z.object({
   zoomed: z.boolean(),
   frontmost: z.boolean(),
   currentTab: z.string(),
+  currentSession: z.string(),
   isHotkeyWindow: z.boolean(),
   hotkeyWindowProfile: z.string(),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
@@ -108,6 +109,7 @@ export const WindowSchema = z.object({
 
 /** Raw passthrough validator; typed SDK records use the canonical contract codec. */
 export const TabSchema = z.object({
+  currentSession: z.string(),
   index: z.number(),
   title: z.string(),
 })
@@ -120,8 +122,6 @@ export const SessionSchema = z.object({
   columns: z.number(),
   rows: z.number(),
   tty: z.string(),
-  contents: z.string(),
-  text: z.string(),
   colorPreset: z.string(),
   backgroundColor: z.object({ red: z.number(), green: z.number(), blue: z.number() }),
   boldColor: z.object({ red: z.number(), green: z.number(), blue: z.number() }),

@@ -3,7 +3,7 @@
  * one manifest-defined operation against a target app, or reads the records a
  * resolved reference denotes.
  *
- * Each body is a function body run as `(app, args, page)` (see
+ * Each body is a function body run as `(app, args, page, env)` (see
  * `NativeScript.body`): `app` is the target application, `args` is the
  * operation's input record, and `page` is the window a paged list reads
  * (`null` for every other body).
@@ -53,10 +53,9 @@
  * emitted as JSON string literals in bracket form wherever the syntax allows, so
  * an unusual manifest key cannot change the meaning of the script.
  *
- * A body references only `app`, `args`, `page`, its own locals, and standard
- * ECMAScript built-ins: no host globals, no codec bindings, and no per-call state. That
- * keeps a body independent of how it is run, so a long-lived automation
- * process can compile it once and invoke it for many calls.
+ * Bodies use `app`, `args`, `page`, and the invocation's `env` provenance map,
+ * plus their own locals and language built-ins. Ancestor context belongs to
+ * one invocation and is never retained as application selection state.
  *
  * @packageDocumentation
  */
@@ -84,9 +83,10 @@ import {
   containedOutputProperties,
   omittedOutputProperties,
   outputProperties,
+  outputPropertyContainer,
 } from '../manifest/output-references.js'
 import { isPositional } from '../manifest/positional.js'
-import { resolvingCommand } from '../manifest/resource-commands.js'
+import { resolvingCommand, referenceParent } from '../manifest/resource-commands.js'
 import { ROOT_KIND_PROPERTY, rootProperties } from '../manifest/roots.js'
 import { ABSENT_VALUE_ERROR_NUMBER, readsAbsentAsNull } from '../manifest/schemas/evidence.js'
 import {
@@ -104,7 +104,7 @@ import {
  * and the operation target alone.
  */
 export interface NativeInvocationPlan {
-  /** Function body run as `(app, args, page)`. */
+  /** Function body run as `(app, args, page, env)`. */
   readonly body: string
   /**
    * Input keys the body cannot run without. The command's required parameters,
@@ -189,7 +189,7 @@ interface RecordSource {
  * @param manifest - The validated manifest of the target app.
  * @param target - The manifest command (and resource) to run.
  * @param options - How returned records are shaped.
- * @returns A function body run as `(app, args, page)`.
+ * @returns A function body run as `(app, args, page, env)`.
  * @throws `InternalError` when `target` names a command the manifest does not
  *   declare.
  */
@@ -374,7 +374,9 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * public names. get, create and update all return a record built here, so
  * the three cannot drift, and none reads a field the contract leaves out.
  *
- * The read is batched across the item's properties: one `properties()` call,
+ * Resources reserving separate reads use individual supported getters, so a
+ * bulk property request cannot read those reserved values. Other resources
+ * batch across the item's properties with one `properties()` call,
  * from whose record each usable property is taken under the app's name for it, and
  * stored under its public key. An app's property record need not hold every
  * property it can report (a Finder container's has no `entireContents`), so a
@@ -424,28 +426,47 @@ function readOutputProperties(
     (key) => !rooted || key !== ROOT_KIND_PROPERTY
   )
   const native = (key: string): string => nativePropertyName(resource, key)
+  // Separate reads prohibit bulk property access; communication failure still
+  // fails the whole operation rather than becoming an omitted record field.
+  const separate = Object.values(resource?.properties ?? {}).some(
+    (property) => property.separateRead !== undefined
+  )
+  const propagate = separate
+    ? `if (e && ${JSON.stringify(Object.values(COMMUNICATION_FAILURE_ERROR_NUMBERS))}.indexOf(e.errorNumber) >= 0) { throw e; } `
+    : ''
   const readOnItsOwn = (key: string): string =>
     absentAsNull(resource, key)
-      ? `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) { if (e && e.errorNumber === ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}) { ${member('obj', key)} = null; } }`
-      : `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {}`
+      ? `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) { ${propagate}if (e && e.errorNumber === ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}) { ${member('obj', key)} = null; } }`
+      : `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {${propagate}}`
   return lines(
     'var obj = {};',
-    'try {',
-    `var props = ${itemLocal}.properties();`,
-    ...keys.map((key) =>
-      absentAsNull(resource, key)
-        ? readOnItsOwn(key)
-        : `if (${member('props', native(key))} !== undefined) { ${member('obj', key)} = ${member('props', native(key))}; } else { ${readOnItsOwn(key)} }`
-    ),
-    '} catch (e) {',
-    ...keys.map(readOnItsOwn),
-    '}',
+    ...(separate
+      ? keys.map(readOnItsOwn)
+      : [
+          'try {',
+          `var props = ${itemLocal}.properties();`,
+          ...keys.map((key) =>
+            absentAsNull(resource, key)
+              ? readOnItsOwn(key)
+              : `if (${member('props', native(key))} !== undefined) { ${member('obj', key)} = ${member('props', native(key))}; } else { ${readOnItsOwn(key)} }`
+          ),
+          '} catch (e) {',
+          ...keys.map(readOnItsOwn),
+          '}',
+        ]),
     rooted && kindExpression !== undefined
       ? `${member('obj', ROOT_KIND_PROPERTY)} = ${kindExpression};`
       : '',
     ...containedKeys(manifest, source).map(
       (key) =>
-        `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${wrapContained(member('obj', key), 'container', itemLocal)}; }`
+        `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${wrapContained(
+          member('obj', key),
+          'container',
+          source.resource?.properties[key] !== undefined &&
+            outputPropertyContainer(manifest, source.resource.properties[key]) !== source.key
+            ? `(env.contexts.get(${itemLocal}) || []).filter(function(entry) { return entry.resource === ${JSON.stringify(outputPropertyContainer(manifest, source.resource.properties[key]))}; }).slice(-1)[0].item`
+            : itemLocal
+        )}; }`
     ),
     ...keys
       .filter((key) => marksAbsentAsNull(source, key))
@@ -505,9 +526,10 @@ function absentAsNull(resource: Resource | undefined, key: string): boolean {
 function wrapContained(
   valueExpression: string,
   how: 'container' | 'containerId',
-  containerExpression: string
+  containerExpression: string,
+  ancestorsExpression?: string
 ): string {
-  const held = `function held(e) { var m = {}; m[Symbol.for(${literal(NATIVE_CONTAINED_REFERENCE_KEY)})] = { value: e, ${how}: ${containerExpression} }; return m; }`
+  const held = `function held(e) { var m = {}; m[Symbol.for(${literal(NATIVE_CONTAINED_REFERENCE_KEY)})] = { value: e, ${how}: ${containerExpression}${ancestorsExpression === undefined ? '' : `, ancestors: ${ancestorsExpression}`} }; return m; }`
   return `(function (v) { ${held} return v === null ? null : Array.isArray(v) ? v.map(function (e) { return e === null ? null : held(e); }) : held(v); })(${valueExpression})`
 }
 
@@ -794,7 +816,7 @@ function addressingWithin(
   if (resource === undefined || seen.has(resourceKey)) return undefined
   const get = resolvingCommand(manifest, resourceKey, 'get')
   if (get === undefined) return undefined
-  const parent = get[1].parent?.resource
+  const parent = referenceParent(get[1])
   if (isPositional(manifest, resourceKey)) {
     // Found by its position within its parent, which the manifest schema
     // requires the get to record and the app to find by its identifier.
@@ -824,6 +846,9 @@ function addressingWithin(
     collection: resolveCollectionAccessor(resource),
     lookup: lookup.lookup,
     property: lookup.property,
+    ...(get[1].identityTraversal === undefined
+      ? {}
+      : { traversal: nativeTraversal(manifest, get[1]) }),
   }
   if (parent === undefined) return addressing
   const container = addressingWithin(manifest, parent, new Set([...seen, resourceKey]))
@@ -842,6 +867,10 @@ function addressingWithin(
  * manifest records for it (`command.parent`).
  */
 interface ParentScope {
+  /** Complete binding for an explicit path; legacy scope retains its established body shape. */
+  readonly binding?: string
+  /** Every ancestor argument, in navigation order. */
+  readonly parameters?: readonly string[]
   /** The request parameter carrying the parent's identifier. */
   readonly parentIdParam: string
   /** The manifest key of the parent's resource, named when the parent is missing. */
@@ -925,6 +954,7 @@ function failIfMissing(local: string, missingResource?: string): string {
  * identifier from {@link PARENT_ID_LOCAL}.
  */
 function bindParent(parentScope: ParentScope): string {
+  if (parentScope.binding !== undefined) return parentScope.binding
   return lines(
     `var ${PARENT_LOCAL} = ${parentScope.parentTarget};`,
     failIfMissing(PARENT_LOCAL, parentScope.parentResource)
@@ -947,6 +977,46 @@ function bindParent(parentScope: ParentScope): string {
  *   reaching this is a macts defect.
  */
 function recordedParentScope(command: Command, manifest: AppManifest): ParentScope | undefined {
+  if (command.parents !== undefined) {
+    const statements: string[] = []
+    let owner = 'app'
+    for (const [index, segment] of command.parents.entries()) {
+      const resource = manifest.resources[segment.resource]
+      const accessor =
+        resource === undefined ? segment.collection : resolveCollectionAccessor(resource)
+      const local = `ancestor${String(index)}`
+      const value = argumentValue(segment.parameter, findParameter(command, segment.parameter))
+      if (segment.by === 'index') {
+        const collection = member(owner, accessor)
+        statements.push(
+          `if (!Number.isSafeInteger(${value}) || ${value} < 0 || ${value} >= ${collection}.length) { throw { name: 'MactsCodecError', direction: 'decode', path: [], message: 'No item at this position.', outOfRangeResource: ${literal(segment.resource)} }; }`,
+          `var ${local} = ${collection}.at(${value});`
+        )
+      } else {
+        statements.push(
+          `var ${local} = ${buildNestedTargetExpression(resource, owner, accessor, value)};`
+        )
+      }
+      statements.push(failIfMissing(local, segment.resource))
+      const ancestors = command.parents
+        .slice(0, index)
+        .map((entry, at) => `{ resource: ${literal(entry.resource)}, item: ancestor${String(at)} }`)
+      statements.push(
+        `if (typeof env !== 'undefined' && env.contexts) { env.contexts.set(${local}, [${ancestors.join(', ')}]); }`
+      )
+      owner = local
+    }
+    const last = command.parents.at(-1)
+    if (last === undefined) throw new InternalError('An explicit address requires ancestors.', {})
+    statements.push(`var ${PARENT_LOCAL} = ${owner};`)
+    return {
+      parentIdParam: last.parameter,
+      parentResource: last.resource,
+      parentTarget: owner,
+      binding: lines(...statements),
+      parameters: command.parents.map(({ parameter }) => parameter),
+    }
+  }
   const parent = command.parent
   if (parent === undefined) return undefined
   const resource = Object.hasOwn(manifest.resources, parent.resource)
@@ -974,6 +1044,7 @@ function recordedParentScope(command: Command, manifest: AppManifest): ParentSco
  * {@link PARENT_ID_LOCAL}, as the native value the app expects.
  */
 function readParentId(command: Command, parentScope: ParentScope): string {
+  if (parentScope.binding !== undefined) return ''
   return `var ${PARENT_ID_LOCAL} = ${argumentValue(
     parentScope.parentIdParam,
     findParameter(command, parentScope.parentIdParam)
@@ -1732,7 +1803,11 @@ function buildListBody(
   // the codec with the row's identifier, already read and checked, so the
   // container costs no read of its own.
   const contained = new Set(containedKeys(manifest, source))
-  if (contained.size > 0 && runtimeIdProperty === undefined) {
+  const needsRowIdentity = [...contained].some((key) => {
+    const property = resource?.properties[key]
+    return property !== undefined && outputPropertyContainer(manifest, property) === source.key
+  })
+  if (needsRowIdentity && runtimeIdProperty === undefined) {
     throw new InternalError(
       'A list cannot return references with their container without the identifiers of its items.',
       {}
@@ -1740,7 +1815,28 @@ function buildListBody(
   }
   const recordFields = bestEffortProps.map((p, index) => {
     const value = `${columnLocal(index)}[i]`
-    const held = contained.has(p) ? wrapContained(value, 'containerId', `${IDS_LOCAL}[i]`) : value
+    const property = resource?.properties[p]
+    const container =
+      property === undefined ? undefined : outputPropertyContainer(manifest, property)
+    const ancestorIndex = command.parents?.findIndex(({ resource }) => resource === container)
+    const held = !contained.has(p)
+      ? value
+      : container === source.key
+        ? wrapContained(
+            value,
+            'containerId',
+            `${IDS_LOCAL}[i]`,
+            command.parents === undefined
+              ? undefined
+              : `[${command.parents.map((entry, at) => `{ resource: ${literal(entry.resource)}, item: ancestor${String(at)} }`).join(', ')}]`
+          )
+        : wrapContained(
+            value,
+            'container',
+            ancestorIndex !== undefined && ancestorIndex >= 0
+              ? `ancestor${String(ancestorIndex)}`
+              : PARENT_LOCAL
+          )
     const marked = marksAbsentAsNull(source, p) ? markAbsentAsNull(held) : held
     return `if (${value} !== undefined) { ${member('obj', p)} = ${marked}; }`
   })
@@ -1819,7 +1915,8 @@ function buildListBody(
   )
   return {
     body,
-    identifierArguments: parentScope === undefined ? [] : [parentScope.parentIdParam],
+    identifierArguments:
+      parentScope === undefined ? [] : (parentScope.parameters ?? [parentScope.parentIdParam]),
   }
 }
 
@@ -1874,12 +1971,73 @@ function bindSelectedItem(
   }
   const parentScope = recordedParentScope(command, manifest)
   return {
-    statements: bindTarget(command, resource, resourcePlural, parentScope, itemParameter),
+    statements: lines(
+      command.identityTraversal === undefined
+        ? bindTarget(command, resource, resourcePlural, parentScope, itemParameter)
+        : bindIdentityTraversal(
+            command,
+            resource,
+            resourcePlural,
+            parentScope,
+            itemParameter,
+            manifest
+          ),
+      parentScope === undefined
+        ? ''
+        : `if (typeof env !== 'undefined' && env.contexts) { env.contexts.set(item, ${
+            command.parents === undefined
+              ? `(env.contexts.get(parent) || []).concat([{ resource: ${literal(parentScope.parentResource)}, item: parent }])`
+              : `[${command.parents.map((entry, index) => `{ resource: ${literal(entry.resource)}, item: ancestor${String(index)} }`).join(', ')}]`
+          }); }`
+    ),
     identifierArguments: identifierArgumentsOf(parentScope, itemParameter),
     parentParameter: parentScope?.parentIdParam,
     itemParameter,
     kindLocal: undefined,
   }
+}
+
+/** Resolve semantic containment edges to the app accessors, as for singular ancestors. */
+function nativeTraversal(manifest: AppManifest, command: Command): string[] {
+  let children = Object.values(manifest.hierarchy.children).find(
+    ({ resource }) => resource === command.parent?.resource
+  )?.children
+  return (command.identityTraversal?.collections ?? []).map((edge) => {
+    const child = children?.[edge]
+    children = child?.children
+    const resource = child === undefined ? undefined : manifest.resources[child.resource]
+    if (resource === undefined)
+      throw new InternalError('Identity traversal has an undeclared collection.', {})
+    return resolveCollectionAccessor(resource)
+  })
+}
+
+/** Search every declared branch within one identity scope, rejecting duplicate identities. */
+function bindIdentityTraversal(
+  command: Command,
+  resource: Resource | undefined,
+  collection: string,
+  parent: ParentScope | undefined,
+  parameter: string,
+  manifest: AppManifest
+): string {
+  if (parent === undefined || command.identityTraversal === undefined)
+    throw new InternalError('Identity traversal needs a parent.', {})
+  const property = resolveIdentifierTargeting(resource)?.property ?? 'id'
+  return lines(
+    readParentId(command, parent),
+    bindParent(parent),
+    `var sought = ${argumentValue(parameter, findParameter(command, parameter))};`,
+    'var matches = [];',
+    'function visit(owner, edges) { var elements = owner[edges[0]]; var count = elements.length; for (var i = 0; i < count; i++) { var candidate = elements.at(i);',
+    `if (!candidate.exists()) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity traversal changed.' }; }`,
+    `if (edges.length > 1) { visit(candidate, edges.slice(1)); } else if (candidate[${literal(nativePropertyName(resource, property))}]() === sought) { matches.push(candidate); }`,
+    `} if (elements.length !== count) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity traversal changed.' }; } }`,
+    `visit(parent, ${JSON.stringify([...nativeTraversal(manifest, command), collection])});`,
+    `if (matches.length > 1) { throw { name: ${literal(NATIVE_CODEC_ERROR_NAME)}, direction: 'encode', path: [], message: 'Identity matched multiple objects within its declared container.' }; }`,
+    'var item = matches[0];',
+    `if (!item) { var missing = new Error('No such object.'); missing.errorNumber = ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}; throw missing; }`
+  )
 }
 
 /**
@@ -1919,7 +2077,7 @@ function buildItemCommandBody(
   manifest: AppManifest
 ): ResourceBody {
   const selected = bindSelectedItem(command, resource, resourcePlural, manifest)
-  const lookupKeys = new Set([selected.itemParameter, selected.parentParameter])
+  const lookupKeys = new Set(selected.identifierArguments)
   const named = command.parameters.filter((p) => !lookupKeys.has(p.name))
   const call = member('app', command.name)
   const invocation =
@@ -2035,7 +2193,9 @@ function buildCreateBody(
       bindParent(parentScope),
       collectSuppliedParameters(
         'props',
-        command.parameters.filter((p) => p.name !== parentScope.parentIdParam),
+        command.parameters.filter(
+          (p) => !(parentScope.parameters ?? [parentScope.parentIdParam]).includes(p.name)
+        ),
         native
       ),
       `var item = ${itemClass}(props);`,
@@ -2043,7 +2203,7 @@ function buildCreateBody(
       readOutputProperties(manifest, source, 'item'),
       'return obj;'
     )
-    return { body, identifierArguments: [parentScope.parentIdParam] }
+    return { body, identifierArguments: parentScope.parameters ?? [parentScope.parentIdParam] }
   }
 
   // TODO(#81 follow-up): top-level `item.make()` has not been verified against a
@@ -2077,7 +2237,7 @@ function buildUpdateBody(
 ): ResourceBody {
   const { resource } = source
   const selected = bindSelectedItem(command, resource, resourcePlural, manifest)
-  const excluded = new Set([selected.itemParameter, selected.parentParameter])
+  const excluded = new Set(selected.identifierArguments)
   const writableFields = command.parameters.filter((p) => !excluded.has(p.name))
   // A fixed assignment is a property-backed convenience over the same target
   // as an update. It has no record result and propagates a failed write.
@@ -2204,5 +2364,5 @@ function identifierArgumentsOf(
 ): readonly string[] {
   return parentScope === undefined
     ? [identifierParam]
-    : [parentScope.parentIdParam, identifierParam]
+    : [...(parentScope.parameters ?? [parentScope.parentIdParam]), identifierParam]
 }

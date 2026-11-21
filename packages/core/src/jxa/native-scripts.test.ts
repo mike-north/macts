@@ -172,7 +172,7 @@ function fakeSpecifier(present: boolean, children: Record<string, unknown> = {})
  * nor receives as `app` or `args`, and that are not standard ECMAScript (ES5)
  * built-ins.
  *
- * Each body is type-checked as the JavaScript function `(app, args)` in its
+ * Each body is type-checked with its application, input, page and provenance parameters in its
  * own module, against the ES5 standard library only (no host or Node types),
  * so every unresolved name is reported as "Cannot find name". Module scope
  * keeps bodies from resolving names in one another. A body that does not parse
@@ -191,7 +191,7 @@ function freeIdentifiers(bodies: readonly string[]): string[][] {
   const files = new Map(
     bodies.map((body, index) => [
       `/native-body-${String(index)}.js`,
-      `function nativeBody(app, args) {\n${body}\n}\nexport {};\n`,
+      `function nativeBody(app, args, page, env) {\n${body}\n}\nexport {};\n`,
     ])
   )
   const host = ts.createCompilerHost(options)
@@ -2218,10 +2218,11 @@ describe('free identifiers', () => {
     expect(free?.sort()).toEqual(['Application', '__mactsDecode', 'delay', 'leaked', 'value'])
   })
 
-  it('accepts app, args, locals, and standard built-ins', () => {
+  it('accepts app, args, provenance, locals, and standard built-ins', () => {
     const body = [
       'var missing = new Error(JSON.stringify(Object.keys(args)));',
       'var when = new Date(args.at);',
+      'var context = env.contexts.get(app);',
       'try { app.windows(); } catch (e) { throw missing; }',
       'return [when, Math.max(1, 2), String(app)];',
     ].join('\n')
