@@ -5,7 +5,7 @@
  * container a reference resolved through the route needs.
  *
  * A route records a parent when the manifest command behind the `get` or
- * `list` its table entry records has a `parent` (D10, command parents). The
+ * `list` its table entry records has an identified ancestor (D10, command parents). The
  * entry's `parents` must then name the same resource under the same route,
  * and that parent must be in the table with a `get` and an identifier, since
  * the container is an identity reference resolved through that `get`
@@ -47,7 +47,8 @@ function manifestParent(
   if (id === undefined) return undefined
   const operation = contract.operations[id]
   if (operation === undefined) throw new Error(`${contract.app}: ${id} is not an operation`)
-  return manifest.commands[operation.target.command]?.parent?.resource
+  const command = manifest.commands[operation.target.command]
+  return command?.parents?.at(-1)?.resource ?? command?.parent?.resource
 }
 
 /** Every `[app, resource, route, parent]` the tables record. */

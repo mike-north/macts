@@ -820,7 +820,7 @@ export interface SessionResourceClient {
    */
   list(windowId: Integer, tabIndex: Integer, options?: CallOptions): Promise<Page<Session>>
   /**
-   * Read the session identified by `sessionId`.
+   * Read the session identified by `sessionId` within `tabIndex`.
    *
    * @param windowId - Window identifier. Does not accept null.
    * @param tabIndex - Zero-based tab position. Does not accept null.
@@ -1240,6 +1240,7 @@ const windowListWindowsOperation: OperationDescriptor<Record<string, never>, Pag
   id: 'iterm.windows.list',
   permission: 'iterm:windows:list',
   target: { command: 'listWindows', resource: 'Window' },
+  address: { parents: [], collection: 'windows' },
   description: 'List the windows',
   input: t.record({}),
   output: t.page(windowRecordType),
@@ -1255,6 +1256,7 @@ const windowGetWindowOperation: OperationDescriptor<{ readonly id: Integer }, Wi
   id: 'iterm.windows.get',
   permission: 'iterm:windows:get',
   target: { command: 'getWindow', resource: 'Window' },
+  address: { parents: [], collection: 'windows', item: { by: 'identity', parameter: 'id' } },
   description: 'Get a window by its ID',
   input: t.record({
     id: t.integer({ description: 'Window identifier' }),
@@ -1281,6 +1283,10 @@ const tabListTabsOperation: OperationDescriptor<{ readonly windowId: Integer }, 
   id: 'iterm.tabs.list',
   permission: 'iterm:tabs:list',
   target: { command: 'listTabs', resource: 'Tab' },
+  address: {
+    parents: [{ resource: 'Window', collection: 'windows', by: 'identity', parameter: 'windowId' }],
+    collection: 'tabs',
+  },
   description: 'List the tabs of a window',
   input: t.record({
     windowId: t.integer({ description: 'Window identifier' }),
@@ -1310,6 +1316,11 @@ const tabGetTabOperation: OperationDescriptor<
   id: 'iterm.tabs.get',
   permission: 'iterm:tabs:get',
   target: { command: 'getTab', resource: 'Tab' },
+  address: {
+    parents: [{ resource: 'Window', collection: 'windows', by: 'identity', parameter: 'windowId' }],
+    collection: 'tabs',
+    item: { by: 'index', parameter: 'index' },
+  },
   description: 'Get a tab of a window by its position',
   input: t.record({
     windowId: t.integer({ description: 'Window identifier' }),
@@ -1353,8 +1364,8 @@ const sessionListSessionsOperation: OperationDescriptor<
   target: { command: 'listSessions', resource: 'Session' },
   address: {
     parents: [
-      { by: 'identity', parameter: 'windowId', resource: 'Window', collection: 'windows' },
-      { by: 'index', parameter: 'tabIndex', resource: 'Tab', collection: 'tabs' },
+      { resource: 'Window', collection: 'windows', by: 'identity', parameter: 'windowId' },
+      { resource: 'Tab', collection: 'tabs', by: 'index', parameter: 'tabIndex' },
     ],
     collection: 'sessions',
   },
@@ -1397,8 +1408,8 @@ const sessionGetSessionOperation: OperationDescriptor<
   target: { command: 'getSession', resource: 'Session' },
   address: {
     parents: [
-      { by: 'identity', parameter: 'windowId', resource: 'Window', collection: 'windows' },
-      { by: 'index', parameter: 'tabIndex', resource: 'Tab', collection: 'tabs' },
+      { resource: 'Window', collection: 'windows', by: 'identity', parameter: 'windowId' },
+      { resource: 'Tab', collection: 'tabs', by: 'index', parameter: 'tabIndex' },
     ],
     collection: 'sessions',
     item: { by: 'identity', parameter: 'sessionId' },
@@ -1443,7 +1454,7 @@ const sessionResolveSessionOperation: OperationDescriptor<
   permission: 'iterm:sessions:resolve',
   target: { command: 'resolveSession', resource: 'Session' },
   address: {
-    parents: [{ resource: 'Window', parameter: 'windowId', by: 'identity', collection: 'windows' }],
+    parents: [{ resource: 'Window', collection: 'windows', by: 'identity', parameter: 'windowId' }],
     traversal: ['tabs'],
     collection: 'sessions',
     item: { by: 'identity', parameter: 'sessionId' },

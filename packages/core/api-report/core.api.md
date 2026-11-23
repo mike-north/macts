@@ -1710,7 +1710,7 @@ export interface GenerateClientPackageResult {
 // @public
 export function generateCliPlugin(manifest: AppManifest, options: CliGeneratorOptions): GenerateCliPluginResult;
 
-// @public
+// @public (undocumented)
 export interface GenerateCliPluginResult {
     // (undocumented)
     errors: string[];
@@ -2566,6 +2566,9 @@ export const NON_NULL_SAMPLE_THRESHOLD = 30;
 
 // @public
 export function normalizeAppRouteSegment(appName: string): string;
+
+// @public
+export function normalizeManifestAddresses(manifest: AppManifest): AppManifest;
 
 // @public
 export function normalizeResourceRouteSegment(plural: string): string;

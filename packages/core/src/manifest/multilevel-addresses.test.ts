@@ -751,8 +751,8 @@ it('executes a repeated-Folder list without substituting the outer reference con
   expect(codec.decode(encoded, plan, env)).toBe(innerEntry)
 })
 
-/** Equivalent parent syntax must preserve every identified container of a row's related reference. */
-it('emits the same complete row identity from legacy and explicit list addresses', () => {
+/** Related Entries require the complete Document-within-Folder identity namespace. */
+function nestedReferenceFixture() {
   const manifest = repeatedFolderFixture()
   const folderResource = manifest.resources['Folder'],
     documentResource = manifest.resources['Document']
@@ -805,6 +805,12 @@ it('emits the same complete row identity from legacy and explicit list addresses
       identityParameter('id'),
     ],
   }
+  return { manifest, folder }
+}
+
+/** Equivalent parent syntax must preserve every identified container of a row's related reference. */
+it('emits the same complete row identity from legacy and explicit list addresses', () => {
+  const { manifest, folder } = nestedReferenceFixture()
   const entry = { exists: () => true, id: () => 'entry' }
   const nativeDocument = {
     exists: () => true,
@@ -968,3 +974,72 @@ it('retains format 1.1 application-root reads', () => {
   expect(parsed.success).toBe(true)
   expect(generateConsolidatedPackages(manifest, { appName: 'archive' }).errors).toEqual([])
 })
+
+/** Format 1.1 has one post-normalization representation without mutating source declarations. */
+it.each(['parent', 'parents'] as const)(
+  'canonicalizes the %s item declaration before validation',
+  (syntax) => {
+    const manifest = { ...panesManifest(), version: '1.1' as const }
+    const get = manifest.commands['getTab']
+    if (get === undefined) throw new Error('Missing Tab get')
+    const parents = [
+      { resource: 'Window', collection: 'windows', by: 'identity' as const, parameter: 'windowId' },
+    ]
+    if (syntax === 'parents') {
+      delete get.parent
+      get.parents = parents
+      get.item = { by: 'index', parameter: 'index' }
+    }
+    const source = structuredClone(manifest)
+    const canonical = AppManifestSchema.parse(manifest)
+    expect(canonical.commands['getTab']).toMatchObject({
+      parents,
+      item: { by: 'index', parameter: 'index' },
+    })
+    expect(Object.values(canonical.commands).every((command) => command.parent === undefined)).toBe(
+      true
+    )
+    expect(AppManifestSchema.parse(canonical)).toEqual(canonical)
+    expect(manifest).toEqual(source)
+  }
+)
+
+/** The source row supplies its id, never the missing ancestors of its identity namespace. */
+it.each(['parent', 'parents'] as const)(
+  'refuses a %s row with an incomplete nested field namespace',
+  (syntax) => {
+    const { manifest } = nestedReferenceFixture()
+    const window = manifest.hierarchy.children['windows']
+    const documents = manifest.hierarchy.children['folders']?.children?.['documents']
+    if (!window || !documents) throw new Error('Missing placement')
+    window.children = { ...window.children, documents }
+    manifest.commands['listDocuments'] = {
+      name: 'list',
+      scope: 'resource',
+      resourceType: 'Document',
+      description: 'Alternate Document placement',
+      resolvesReferences: false,
+      parameters: [
+        { name: 'windowId', type: 'integer', required: true, description: 'Window identity' },
+      ],
+      ...(syntax === 'parent'
+        ? { parent: { resource: 'Window', parameter: 'windowId' } }
+        : {
+            parents: [
+              { resource: 'Window', collection: 'windows', by: 'identity', parameter: 'windowId' },
+            ],
+          }),
+    }
+    const parsed = AppManifestSchema.safeParse(manifest)
+    const generated = generateConsolidatedPackages(manifest, { appName: 'panes' })
+    for (const message of [
+      parsed.success ? 'accepted' : parsed.error.message,
+      generated.errors.join(' '),
+    ]) {
+      expect(['listDocuments', 'favorite', 'Folder'].every((word) => message.includes(word))).toBe(
+        true
+      )
+    }
+    expect(generated.client.files).toEqual([])
+  }
+)

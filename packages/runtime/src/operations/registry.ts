@@ -25,6 +25,7 @@ import {
   contractResourcePlans,
   listOperationPages,
   normalizeAppRouteSegment,
+  normalizeManifestAddresses,
   positionalProblems,
   findAddressIssues,
   resolveCommandRoutes,
@@ -35,6 +36,7 @@ import {
   EMPTY_RESOURCE_PLAN_TABLE,
   PAGING_INPUT_NAMES,
   resourcePlanTable,
+  ValidationError,
   type AnyOperationDescriptor,
   type AppContract,
   type OperationId,
@@ -296,6 +298,19 @@ function refusedApp(manifest: AppManifest, registration: Registration): string {
   return `App "${manifest.app.name}" ${refused}`
 }
 
+/** Canonicalization failures are configuration errors at either registration boundary. */
+function registrationManifest(manifest: AppManifest, registration: Registration): AppManifest {
+  try {
+    return normalizeManifestAddresses(manifest)
+  } catch (error) {
+    if (!(error instanceof ValidationError)) throw error
+    throw new OperationRegistrationError(
+      `${refusedApp(manifest, registration)}: ${error.details.issues[0]?.message ?? error.message}`,
+      { cause: error }
+    )
+  }
+}
+
 /** Combine a descriptor with the manifest-side facts for its command. */
 function toRegisteredOperation(
   descriptor: AnyOperationDescriptor,
@@ -347,6 +362,7 @@ function toRegisteredOperation(
  *   is not the class's dictionary id.
  */
 export function operationsFromManifest(manifest: AppManifest): RegisteredOperation[] {
+  manifest = registrationManifest(manifest, 'manifest')
   assertAppSegmentNotReserved(manifest)
   assertItemsSelectable(manifest, 'manifest')
   assertIdentifiersTargeted(manifest, 'manifest')
@@ -359,8 +375,7 @@ export function operationsFromManifest(manifest: AppManifest): RegisteredOperati
       inputTypes.set(target.command, input)
     }
     const descriptor: AnyOperationDescriptor = {
-      ...(target.resource !== undefined &&
-      (command.parents !== undefined || command.identityTraversal !== undefined)
+      ...(target.resource !== undefined && manifest.version === '1.1'
         ? { address: commandAddress(manifest, command, target.resource) }
         : {}),
       id,
@@ -424,6 +439,7 @@ export function operationsFromContract(
   contract: AppContract<unknown>,
   manifest: AppManifest
 ): RegisteredOperation[] {
+  manifest = registrationManifest(manifest, 'contract')
   assertAppSegmentNotReserved(manifest)
   assertItemsSelectable(manifest, 'contract')
   assertIdentifiersTargeted(manifest, 'contract')
@@ -460,8 +476,7 @@ export function operationsFromContract(
       )
     }
     const address =
-      expected.target.resource !== undefined &&
-      (expected.command.parents !== undefined || expected.command.identityTraversal !== undefined)
+      expected.target.resource !== undefined && manifest.version === '1.1'
         ? commandAddress(manifest, expected.command, expected.target.resource)
         : undefined
     if (!isDeepStrictEqual(descriptor.address, address)) {

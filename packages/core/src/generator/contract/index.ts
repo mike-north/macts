@@ -23,6 +23,7 @@
  *
  * @packageDocumentation
  */
+import { normalizeManifestAddresses } from '../../manifest/normalize-addresses.js'
 
 import { z } from 'zod'
 import {
@@ -329,6 +330,7 @@ export function collectContractDiagnostics(manifest: AppManifest): ContractDiagn
  * @param manifest - The validated app manifest.
  */
 export function generateContract(manifest: AppManifest): GeneratedContract {
+  manifest = normalizeManifestAddresses(manifest)
   const builder = new ContractBuilder(manifest)
   const contract = builder.build()
   return {
@@ -536,6 +538,7 @@ class ContractBuilder {
   readonly #pagingNames: { readonly page: string; readonly pageRequest: string }
 
   constructor(manifest: AppManifest) {
+    manifest = normalizeManifestAddresses(manifest)
     this.#manifest = manifest
     this.#names = contractNames(manifest)
     this.#pagingNames = pagingTypeNames(manifest)
@@ -1063,10 +1066,18 @@ class ContractBuilder {
    *   declare (the manifest schema rejects both).
    */
   #identifierFields(command: Command, resourceKey: string | undefined): FieldModel[] {
-    if (command.parents !== undefined)
-      return commandMethodParameters(command).signature.map(({ parameter }) =>
-        this.#parameterField(parameter)
-      )
+    if (this.#manifest.version === '1.1') {
+      const positional = this.#positionalResource(resourceKey)
+      return commandMethodParameters(command).signature.map(({ parameter }) => {
+        const model = this.#parameterField(parameter)
+        return positional === undefined || parameter.name !== command.item?.parameter
+          ? model
+          : {
+              ...model,
+              description: `${sentence(model.description)} ${positionalSelectionNote(this.#manifest, positional)}`,
+            }
+      })
+    }
     const { parentParam, childParam } = resolveIdParams(command)
     const positional = this.#positionalResource(resourceKey)
     const field = (name: string): FieldModel => {
@@ -1870,7 +1881,7 @@ ${valueEntries.join('\n')}
     return `const ${operation.binding}: OperationDescriptor<${this.#inputType(operation.input)}, ${this.#outputType(operation.output)}> = {
   id: ${stringLiteral(route.route)},
   permission: ${stringLiteral(route.permission)},
-  target: ${target},${route.resourceType !== undefined && (route.command.parents !== undefined || route.command.identityTraversal !== undefined) ? `\n  address: ${JSON.stringify(commandAddress(this.#manifest, route.command, route.resourceType))},` : ''}
+  target: ${target},${route.resourceType !== undefined && this.#manifest.version === '1.1' ? `\n  address: ${JSON.stringify(commandAddress(this.#manifest, route.command, route.resourceType))},` : ''}
   description: ${stringLiteral(route.command.description)},
   input: ${input},
   output: ${this.#outputExpression(operation.output)},

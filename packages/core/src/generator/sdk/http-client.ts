@@ -1,3 +1,5 @@
+import { referenceParent } from '../../manifest/resource-commands.js'
+import { addressNormalization } from '../../manifest/normalize-addresses.js'
 /**
  * HTTP client SDK generator for macts.
  *
@@ -86,7 +88,9 @@ export function generateHttpClientSdk(
   manifest: AppManifest,
   options: HttpClientGeneratorOptions
 ): GeneratedHttpClientSdk {
-  const refusals = generationRefusals(manifest)
+  const normalized = addressNormalization(manifest)
+  manifest = normalized.manifest
+  const refusals = generationRefusals(manifest, normalized.issues)
   if (refusals.length > 0) return { files: [], errors: refusals }
   const files: { path: string; content: string }[] = []
   const errors: string[] = []
@@ -700,6 +704,7 @@ function generateResourceClient(
       : '',
     getCmd
       ? generateGetMethod(
+          manifest.version,
           commandRouteSegment(...getCmd),
           getCmd[1],
           resourceName,
@@ -743,6 +748,7 @@ function generateResourceClient(
       )
       .map(([key, command]) =>
         generateGetMethod(
+          manifest.version,
           commandRouteSegment(key, command),
           command,
           resourceName,
@@ -892,10 +898,9 @@ function generateListMethod(
   const bodyArg = bodyProps.length === 0 ? '' : `, { ${bodyProps.join(', ')} }`
   const returnType = `${pagingNames.page}<${resourceName}>`
   // A list under a command parent returns that parent's items, not all of them.
+  const parent = referenceParent(command)
   const scope =
-    command.parent === undefined
-      ? undefined
-      : `the ${pluralWords} of one ${identifierWords(command.parent.resource)}`
+    parent === undefined ? undefined : `the ${pluralWords} of one ${identifierWords(parent)}`
   const listed = scope ?? `all ${pluralWords}`
   const doc = paged
     ? `   * List ${scope ?? pluralWords}, one page at a time. When the result has a \`nextCursor\`,
@@ -946,6 +951,7 @@ function docNoteLines(notes: readonly string[]): string {
  * ({@link bodyField}); other identifiers retain their declared addressing text.
  */
 function generateGetMethod(
+  version: AppManifest['version'],
   routeSegment: string,
   command: Command,
   resourceName: string,
@@ -953,7 +959,7 @@ function generateGetMethod(
   notes: readonly string[],
   methodName = 'get'
 ): string {
-  if (command.parents !== undefined || methodName !== 'get') {
+  if (version === '1.1' || methodName !== 'get') {
     const selectors = new Set(
       [
         ...(command.parents?.map(({ parameter }) => parameter) ??

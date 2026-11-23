@@ -15,7 +15,6 @@ export class ResolveSessionCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   windowId = Option.String('--window-id', { required: true, description: 'Window identifier' })
-
   sessionId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
@@ -23,7 +22,10 @@ export class ResolveSessionCommand extends Command {
 
     try {
       const client = getClient()
-      const item = await client.sessions.resolve(this.windowId, this.sessionId)
+      const item = await client.sessions.resolve(
+        this.windowId as unknown as Parameters<typeof client.sessions.resolve>[0],
+        this.sessionId as unknown as Parameters<typeof client.sessions.resolve>[1]
+      )
 
       const output = formatter.format({
         id: item.id,

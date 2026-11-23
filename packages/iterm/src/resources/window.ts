@@ -54,9 +54,7 @@ export class WindowResourceClient {
     )
   }
 
-  /**
-   * Get a window by id.
-   */
+  /** Get a window by its ID */
   async get(
     id: string | number,
     __mactsOptions?: import('@macts/contracts').CallOptions

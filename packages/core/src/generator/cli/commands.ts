@@ -424,7 +424,7 @@ export function generateGetCommand(
   const identifier = addressingIdentifier(resource, getCommand)
   // Explicit gets use the same admitted signature and collision handling as item commands.
   const explicit =
-    getCommand.parents === undefined
+    ctx.manifest.version === '1.0'
       ? undefined
       : itemCommandInputs(
           getCommand,

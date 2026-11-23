@@ -3,6 +3,7 @@
  * The same normalized path and refusal rules serve parsing, generation and
  * registration, so no consumer may guess an ancestor or item from argument order.
  */
+import { addressNormalization, normalizeManifestAddresses } from './normalize-addresses.js'
 import type { AppManifest } from './schemas/app.js'
 import {
   CommandSchema,
@@ -15,7 +16,7 @@ import type { HierarchyChild } from './schemas/hierarchy.js'
 import { resolvePrimaryIdentifierProperty, resolveIdentifierTargeting } from './identifier.js'
 import { resolveCollectionAccessor } from './native-accessor.js'
 import { commandParents, resourceCommandEntries } from './resource-commands.js'
-import { outputProperties, outputPropertyContainer } from './output-references.js'
+import { outputProperties, outputPropertyContainers } from './output-references.js'
 import { resolveManifestRoutes } from './route.js'
 import { itemIdentifierParameter, selectsOneItem } from './item-selection.js'
 import { PropertySchema } from './schemas/property.js'
@@ -69,8 +70,9 @@ export function assertAddressInput(
 }
 
 /**
- * Normalize legacy scope without changing its sparse-hierarchy compatibility.
- * New paths are validated before consumption; their final edge is unique.
+ * The operation plan for canonical 1.1 paths or sparse 1.0 scope. Raw 1.1
+ * commands pass through the shared normalizer before their path is read.
+ * Validated paths have one final containment edge.
  * @public
  */
 export function commandAddress(
@@ -78,14 +80,31 @@ export function commandAddress(
   command: Command,
   resourceKey: string
 ): CommandAddress {
+  if (manifest.version === '1.1') {
+    const canonical = normalizeManifestAddresses({ ...manifest, commands: { operation: command } })
+      .commands['operation']
+    if (canonical === undefined)
+      throw new ValidationError('Missing operation address.', {
+        issues: [{ path: [], message: 'Expected a normalized operation.' }],
+      })
+    command = canonical
+  }
   const resource = manifest.resources[resourceKey]
-  const parents = commandParents(manifest, command)
+  // Plans have one stable field order regardless of how source objects were constructed.
+  const parents = commandParents(manifest, command).map(
+    ({ resource, collection, by, parameter }) => ({
+      resource,
+      collection,
+      by,
+      parameter,
+    })
+  )
   let children = manifest.hierarchy.children
-  if (command.parents !== undefined) {
+  if (manifest.version === '1.1') {
     for (const segment of parents) children = children[segment.collection]?.children ?? {}
   }
   const edge =
-    command.parents === undefined
+    manifest.version === '1.0' || parents.length === 0
       ? undefined
       : Object.entries(children).find(([, child]) => child.resource === resourceKey)?.[0]
   const item = itemIdentifierParameter(command)
@@ -123,7 +142,7 @@ function ancestorContextMatches(
     key
   ).parents.map(({ resource, by }) => ({ resource, by }))
   let children = Object.values(manifest.hierarchy.children).find(
-    ({ resource }) => resource === get.parent?.resource
+    ({ resource }) => resource === commandAddress(manifest, get, key).parents.at(-1)?.resource
   )?.children
   for (const edge of get.identityTraversal?.collections ?? []) {
     const child = children?.[edge]
@@ -169,28 +188,23 @@ function selectionParameterMatches(
  * @public
  */
 export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
+  const normalized = addressNormalization(manifest)
+  if (normalized.issues.length > 0) return normalized.issues
+  manifest = normalized.manifest
   const issues: AddressIssue[] = []
   for (const [key, command] of Object.entries(manifest.commands)) {
-    if (
-      (manifest.version === '1.1' ||
-        command.parents !== undefined ||
-        command.item !== undefined ||
-        command.identityTraversal !== undefined ||
-        command.resolvesReferences !== undefined) &&
-      !CommandSchema.safeParse(command).success
-    ) {
+    const metadata =
+      command.parents !== undefined ||
+      command.item !== undefined ||
+      command.identityTraversal !== undefined ||
+      command.resolvesReferences !== undefined
+    if ((manifest.version === '1.1' || metadata) && !CommandSchema.safeParse(command).success) {
       issues.push({
         path: ['commands', key],
         message: `Command "${key}" has malformed address or command metadata.`,
       })
     }
-    if (
-      manifest.version === '1.0' &&
-      (command.parents !== undefined ||
-        command.item !== undefined ||
-        command.resolvesReferences !== undefined ||
-        command.identityTraversal !== undefined)
-    ) {
+    if (manifest.version === '1.0' && metadata) {
       issues.push({
         path: ['commands', key],
         message: `Command "${key}" uses explicit address metadata, which requires manifest format 1.1.`,
@@ -232,8 +246,7 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
     // Read inputs follow selection semantics, independently of the address spelling.
     if (
       command.identityTraversal !== undefined ||
-      (command.name === 'list' &&
-        (command.parents !== undefined || (manifest.version === '1.1' && parents.length > 0)))
+      (command.name === 'list' && manifest.version === '1.1' && parents.length > 0)
     ) {
       const selectors = new Set([
         ...parents.map(({ parameter }) => parameter),
@@ -247,7 +260,7 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
       }
     }
     if (command.identityTraversal !== undefined) {
-      const parent = command.parent
+      const parent = parents[0]
       const roots = Object.values(manifest.hierarchy.children).filter(
         ({ resource }) => resource === parent?.resource
       )
@@ -261,14 +274,15 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
               ([, entry]) => entry.name === 'get'
             )?.[1]
       let valid =
+        parents.length === 1 &&
+        parent?.by === 'identity' &&
         roots.length === 1 &&
         resource !== undefined &&
         resource.unsupported === undefined &&
         resource.roots === undefined &&
         id !== undefined &&
         get !== undefined &&
-        get.parent === undefined &&
-        get.parents === undefined &&
+        commandAddress(manifest, get, parent?.resource ?? '').parents.length === 0 &&
         parameter?.required === true &&
         parameter.nullable !== true &&
         parameter.type === resource.properties[id]?.type &&
@@ -292,7 +306,6 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
         !valid ||
         command.name !== 'get' ||
         parent === undefined ||
-        command.parents !== undefined ||
         Object.values(children ?? {}).filter(({ resource }) => resource === resourceType).length !==
           1
       ) {
@@ -302,7 +315,6 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
         })
       }
     }
-    const explicit = command.parents !== undefined || command.item !== undefined
     const base = ['commands', commandKey]
     const refuse = (message: string, field = 'parents'): void => {
       issues.push({
@@ -319,22 +331,30 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
       resource !== undefined &&
       ['get', 'list'].includes(command.name)
     ) {
-      const context = address.parents
+      const available = address.parents
+        .filter(({ by }) => by === 'identity')
+        .map(({ resource }) => resource)
+      if (resolvePrimaryIdentifierProperty(resource) !== undefined) available.push(resourceType)
       for (const [name, property] of outputProperties(manifest, resourceType, resource)) {
-        const container = outputPropertyContainer(manifest, property)
-        if (
-          container !== undefined &&
-          container !== resourceType &&
-          !context.some(({ resource, by }) => resource === container && by === 'identity')
-        ) {
-          refuse(`field "${name}" requires identified container "${container}" in this read path.`)
+        // Match inside-out, like reference encoding: a row supplies its id, not its namespace.
+        let before = available.length - 1
+        for (const container of outputPropertyContainers(manifest, property).reverse()) {
+          const index = available.lastIndexOf(container, before)
+          if (before < 0 || index < 0) {
+            refuse(
+              `field "${name}" requires identified container "${container}" in this read path.`
+            )
+            break
+          }
+          before = index - 1
         }
       }
     }
-    // Collection-path rules do not replace the separate contract of unscoped root reads.
-    if (!explicit && (manifest.version !== '1.1' || parents.length === 0)) continue
-    if (command.parent !== undefined && command.parents !== undefined)
-      refuse('parent and parents are mutually exclusive.')
+    // Unscoped roots retain their own contract; scoped 1.1 commands have only explicit bindings.
+    if (manifest.version === '1.0') continue
+    if (command.item !== undefined && command.parents === undefined)
+      refuse('an item binding requires parents.', 'item')
+    if (parents.length === 0) continue
     if (
       address?.parents.some(({ by }) => by === 'index') &&
       command.resolvesReferences !== false &&
@@ -348,12 +368,12 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
       command.scope !== 'resource' ||
       resourceType === undefined ||
       address === undefined ||
-      (explicit && command.parents === undefined)
+      parents.length === 0
     ) {
       refuse('explicit selection requires a resource command with parents.')
       continue
     }
-    if (selectsOneItem(command) !== ((explicit ? command.item : address.item) !== undefined))
+    if (selectsOneItem(command) !== (command.item !== undefined))
       refuse('item binding must be present exactly for an item operation.', 'item')
     const used = new Set<string>()
     const check = (selection: { by: string; parameter: string }, key: string): void => {
@@ -392,7 +412,7 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
     if (Object.values(children).filter(({ resource }) => resource === resourceType).length !== 1) {
       refuse(`target "${resourceType}" needs exactly one final containment edge.`)
     }
-    const item = command.item ?? address.item
+    const item = command.item
     if (item !== undefined) check(item, resourceType)
   }
   return issues

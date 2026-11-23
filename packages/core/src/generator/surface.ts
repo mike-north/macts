@@ -25,7 +25,7 @@ import {
 import { untargetedIdentifiers } from '../manifest/identifier-targeting.js'
 import { resolveIdentifierTargeting } from '../manifest/identifier.js'
 import { positionalProblems } from '../manifest/positional.js'
-import { findAddressIssues } from '../manifest/address.js'
+import { findAddressIssues, type AddressIssue } from '../manifest/address.js'
 import { resolvePrimaryIdentifier } from '../manifest/primary-identifier.js'
 import { normalizeResourceRouteSegment } from '../manifest/route.js'
 import { splitIdentifierWords } from '../manifest/lower-camel.js'
@@ -210,7 +210,7 @@ export function firstMatchNote(resource: Resource | undefined): string | undefin
  *   the parent in prose.
  */
 export function parentFirstMatchNote(command: Command, manifest: AppManifest): string | undefined {
-  const parent = command.parent
+  const parent = command.parents?.at(-1) ?? command.parent
   if (parent === undefined || command.scope !== 'resource' || sendsNoItem(command)) {
     return undefined
   }
@@ -324,8 +324,13 @@ export function findResourceCreateCommand(
  * declare, and no surface looks an item up by an id specifier that cannot
  * find it. Registration refuses the same manifests by the same rules.
  */
-export function generationRefusals(manifest: AppManifest): string[] {
+export function generationRefusals(
+  manifest: AppManifest,
+  normalizationIssues: readonly AddressIssue[] = []
+): string[] {
   const refused = `App "${manifest.app.name}" cannot be generated from its manifest`
+  if (normalizationIssues.length > 0)
+    return normalizationIssues.map(({ message }) => `${refused}: ${message}`)
   return [
     ...unselectableItemCommands(manifest).map(({ problem }) => `${refused}: ${problem}`),
     ...untargetedIdentifiers(manifest).map(({ problem }) => `${refused}: ${problem}`),
@@ -358,7 +363,7 @@ export function resolveIdParams(command: Command): {
   parentParam: string | undefined
   childParam: string
 } {
-  const parentParam = command.parent?.parameter
+  const parentParam = command.parents?.at(-1)?.parameter ?? command.parent?.parameter
   const child = itemIdentifierParameter(command)
   if (child === undefined) {
     const besideParent =

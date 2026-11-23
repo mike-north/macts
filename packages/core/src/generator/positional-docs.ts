@@ -20,7 +20,7 @@
 
 import type { AppManifest } from '../manifest/schemas/app.js'
 import { isPositional } from '../manifest/positional.js'
-import { resolvingCommand } from '../manifest/resource-commands.js'
+import { resolvingCommand, referenceParent } from '../manifest/resource-commands.js'
 import { identifierWords, withArticle } from './surface.js'
 
 /** The words naming one object, the objects, and the parent of a positional resource. */
@@ -33,7 +33,8 @@ interface PositionalWords {
 /** {@link PositionalWords} of `resourceKey`, a positional resource of `manifest`. */
 function wordsOf(manifest: AppManifest, resourceKey: string): PositionalWords {
   const resource = manifest.resources[resourceKey]
-  const parentKey = resolvingCommand(manifest, resourceKey, 'get')?.[1].parent?.resource
+  const get = resolvingCommand(manifest, resourceKey, 'get')?.[1]
+  const parentKey = get === undefined ? undefined : referenceParent(get)
   const parent = parentKey === undefined ? undefined : manifest.resources[parentKey]
   return {
     one: identifierWords(resource?.name ?? resourceKey),

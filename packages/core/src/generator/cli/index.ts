@@ -5,6 +5,7 @@
  *
  * @packageDocumentation
  */
+import { addressNormalization } from '../../manifest/normalize-addresses.js'
 
 import { join } from 'node:path'
 import type { AppManifest } from '../../manifest/index.js'
@@ -45,7 +46,9 @@ export function generateCliPlugin(
   manifest: AppManifest,
   options: CliGeneratorOptions
 ): GenerateCliPluginResult {
-  const refusals = generationRefusals(manifest)
+  const normalized = addressNormalization(manifest)
+  manifest = normalized.manifest
+  const refusals = generationRefusals(manifest, normalized.issues)
   if (refusals.length > 0) return { files: [], errors: refusals }
   const ctx = createCliGeneratorContext(manifest, options)
   const files: { path: string; content: string }[] = []

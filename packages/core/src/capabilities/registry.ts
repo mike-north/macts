@@ -11,6 +11,7 @@
  *
  * @packageDocumentation
  */
+import { normalizeManifestAddresses } from '../manifest/normalize-addresses.js'
 
 import type { AppManifest, Command, Resource, HierarchyChild } from '../manifest/index.js'
 import {
@@ -149,10 +150,11 @@ function buildResourceCliSnippet(
   cliPath: ResourceCliPath,
   operation: string,
   inputSchema: JsonSchema,
-  command: Command
+  command: Command,
+  version: AppManifest['version']
 ): string {
   // Explicit selections use declared inputs, never parent flags invented from placement.
-  if (command.parents !== undefined || command.identityTraversal !== undefined) {
+  if (version === '1.1') {
     const item = itemIdentifierParameter(command)?.name
     const inputs = commandMethodParameters(command)
       .signature.filter(({ parameter }) => parameter.required)
@@ -255,7 +257,8 @@ function deriveResourceCapability(
   primaryGet: Command | undefined,
   cliPath: ResourceCliPath,
   route: ManifestRoute,
-  omitted: ReadonlySet<string>
+  omitted: ReadonlySet<string>,
+  version: AppManifest['version']
 ): Capability {
   const resourceName = normalizeResourceRouteSegment(resource.plural)
   const inputSchema = withoutInputs(generateResourceOperationSchema(command, resource), omitted)
@@ -284,7 +287,8 @@ function deriveResourceCapability(
       cliPath,
       command === primaryGet || command.identityTraversal === undefined ? command.name : operation,
       inputSchema,
-      command
+      command,
+      version
     ),
     mcpToolName: generateToolName(app, resourceName, operation),
   }
@@ -340,6 +344,7 @@ function deriveAppCapability(
  * @returns Capabilities derived from this manifest, in stable name order
  */
 export function deriveCapabilities(manifest: AppManifest): Capability[] {
+  manifest = normalizeManifestAddresses(manifest)
   const app = manifest.app.name.replace(/\s+/g, '-').toLowerCase()
   const bundleId = manifest.app.bundleId
   const cliPaths = buildResourceCliPaths(manifest)
@@ -365,7 +370,8 @@ export function deriveCapabilities(manifest: AppManifest): Capability[] {
           commands.find((entry) => entry.name === 'get'),
           cliPath,
           routeOf(command, resource),
-          omittedInputs(manifest, command, resource.name)
+          omittedInputs(manifest, command, resource.name),
+          manifest.version
         )
       )
     }

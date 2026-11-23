@@ -59,6 +59,7 @@
  *
  * @packageDocumentation
  */
+import { normalizeManifestAddresses } from '../manifest/normalize-addresses.js'
 
 import { InternalError, ValidationError, type OperationTarget } from '@macts/contracts'
 import type { AppManifest } from '../manifest/schemas/app.js'
@@ -224,6 +225,7 @@ export function planNativeInvocation(
   target: OperationTarget,
   options: NativeBodyOptions = {}
 ): NativeInvocationPlan {
+  manifest = normalizeManifestAddresses(manifest)
   const command = Object.hasOwn(manifest.commands, target.command)
     ? manifest.commands[target.command]
     : undefined
@@ -806,6 +808,7 @@ export function referenceAddressing(
   manifest: AppManifest,
   resourceKey: string
 ): NativeAddressing | undefined {
+  manifest = normalizeManifestAddresses(manifest)
   return addressingWithin(manifest, resourceKey, new Set())
 }
 
@@ -877,7 +880,7 @@ function addressingWithin(
  * manifest records for it (`command.parent`).
  */
 interface ParentScope {
-  /** Complete binding for an explicit path; legacy scope retains its established body shape. */
+  /** Complete binding for format 1.1; format 1.0 retains its established body shape. */
   readonly binding?: string
   /** Every ancestor argument, in navigation order. */
   readonly parameters?: readonly string[]
@@ -987,10 +990,12 @@ function bindParent(parentScope: ParentScope): string {
  *   reaching this is a macts defect.
  */
 function recordedParentScope(command: Command, manifest: AppManifest): ParentScope | undefined {
-  if (command.parents !== undefined) {
+  if (manifest.version === '1.1') {
+    const parents = command.parents ?? []
+    if (parents.length === 0) return undefined
     const statements: string[] = []
     let owner = 'app'
-    for (const [index, segment] of command.parents.entries()) {
+    for (const [index, segment] of parents.entries()) {
       const resource = manifest.resources[segment.resource]
       const accessor =
         resource === undefined ? segment.collection : resolveCollectionAccessor(resource)
@@ -1008,7 +1013,7 @@ function recordedParentScope(command: Command, manifest: AppManifest): ParentSco
         )
       }
       statements.push(failIfMissing(local, segment.resource))
-      const ancestors = command.parents
+      const ancestors = parents
         .slice(0, index)
         .map((entry, at) => `{ resource: ${literal(entry.resource)}, item: ancestor${String(at)} }`)
       statements.push(
@@ -1016,7 +1021,7 @@ function recordedParentScope(command: Command, manifest: AppManifest): ParentSco
       )
       owner = local
     }
-    const last = command.parents.at(-1)
+    const last = parents.at(-1)
     if (last === undefined) throw new InternalError('An explicit address requires ancestors.', {})
     statements.push(`var ${PARENT_LOCAL} = ${owner};`)
     return {
@@ -1024,7 +1029,7 @@ function recordedParentScope(command: Command, manifest: AppManifest): ParentSco
       parentResource: last.resource,
       parentTarget: owner,
       binding: lines(...statements),
-      parameters: command.parents.map(({ parameter }) => parameter),
+      parameters: parents.map(({ parameter }) => parameter),
     }
   }
   const parent = command.parent
@@ -1733,8 +1738,8 @@ function pageReadOf(resource: Resource | undefined): PageRead {
  * Index assembly is only correct while every read describes the same items in
  * the same order. Every read is checked against the item count, and the
  * identifiers are read again after the properties and must not have changed
- * (see {@link attemptReader}). An explicit address refuses the first observed
- * inconsistency. A legacy collection that changes while it is read is
+ * (see {@link attemptReader}). Format 1.1 refuses the first observed
+ * inconsistency. A format 1.0 collection that changes while it is read is
  * read once more from the start, and if the second read also disagrees the
  * list fails, as a changed collection when the items changed and as an
  * unexpected value when they did not (see {@link listAttempts}): never
@@ -1918,7 +1923,7 @@ function buildListBody(
           columnReads,
           pageRead
         ),
-    listAttempts(command.parents === undefined),
+    listAttempts(manifest.version === '1.0'),
     'var result = [];',
     `for (var i = 0; i < ${COUNT_LOCAL}; i++) {`,
     'var obj = {};',
@@ -2007,9 +2012,9 @@ function bindSelectedItem(
       parentScope === undefined
         ? ''
         : `if (typeof env !== 'undefined' && env.contexts) { env.contexts.set(item, ${
-            command.parents === undefined
+            manifest.version === '1.0'
               ? `(env.contexts.get(parent) || []).concat([{ resource: ${literal(parentScope.parentResource)}, item: parent }])`
-              : `[${command.parents.map((entry, index) => `{ resource: ${literal(entry.resource)}, item: ancestor${String(index)} }`).join(', ')}]`
+              : `[${(command.parents ?? []).map((entry, index) => `{ resource: ${literal(entry.resource)}, item: ancestor${String(index)} }`).join(', ')}]`
           }); }`
     ),
     identifierArguments: identifierArgumentsOf(parentScope, itemParameter),
@@ -2022,7 +2027,7 @@ function bindSelectedItem(
 /** Resolve semantic containment edges to the app accessors, as for singular ancestors. */
 function nativeTraversal(manifest: AppManifest, command: Command): string[] {
   let children = Object.values(manifest.hierarchy.children).find(
-    ({ resource }) => resource === command.parent?.resource
+    ({ resource }) => resource === referenceParent(command)
   )?.children
   return (command.identityTraversal?.collections ?? []).map((edge) => {
     const child = children?.[edge]
@@ -2350,6 +2355,7 @@ export function buildResolutionBody(
   cardinality: 'one' | 'many',
   options: Pick<NativeBodyOptions, 'containerReferences' | 'absentValueMarkers'> = {}
 ): string {
+  manifest = normalizeManifestAddresses(manifest)
   const resource = Object.hasOwn(manifest.resources, resourceKey)
     ? manifest.resources[resourceKey]
     : undefined

@@ -411,13 +411,19 @@ export function containedOutputProperties(
     .map(([name]) => name)
 }
 
-/** Identity container required by a retained reference field, independent of physical placement. */
+/** Ordered identity namespace needed by a retained field's canonical get, including the row's ancestors. */
+export function outputPropertyContainers(manifest: AppManifest, property: Property): string[] {
+  const target = referencedResources(outputShape(property.type, createNameResolver(manifest)))[0]
+  const get = target === undefined ? undefined : resolvingCommand(manifest, target, 'get')
+  return get === undefined ? [] : commandParents(manifest, get[1]).map(({ resource }) => resource)
+}
+
+/** Immediate container used by the native field renderer; namespace admission checks the full chain. */
 export function outputPropertyContainer(
   manifest: AppManifest,
   property: Property
 ): string | undefined {
-  const target = referencedResources(outputShape(property.type, createNameResolver(manifest)))[0]
-  return target === undefined ? undefined : outputContainer(manifest, target)
+  return outputPropertyContainers(manifest, property).at(-1)
 }
 
 /**

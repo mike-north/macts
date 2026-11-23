@@ -22,6 +22,7 @@
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md §D7, §D10
  */
+import { addressNormalization } from './normalize-addresses.js'
 
 import type { AppManifest } from './schemas/app.js'
 import type { Command } from './schemas/command.js'
@@ -100,7 +101,7 @@ function recordedParentIssue(
   command: Command,
   placements: readonly PlacedEntry[]
 ): PositionalIssue | undefined {
-  if (command.parents !== undefined || command.parent === undefined) return undefined
+  if (manifest.version !== '1.0' || command.parent === undefined) return undefined
   const parameter = command.parameters.find(({ name }) => name === command.parent?.parameter)
   const problem = !parameter?.required
     ? 'needs its declared required parent parameter'
@@ -240,6 +241,9 @@ function positionParameterIssue(
  * @param manifest - The manifest, as validation reads it after flattening.
  */
 export function findPositionalIssues(manifest: AppManifest): PositionalIssue[] {
+  const normalized = addressNormalization(manifest)
+  if (normalized.issues.length > 0) return normalized.issues
+  manifest = normalized.manifest
   const issues: PositionalIssue[] = []
   const placements = placedEntries(manifest)
   for (const [resourceKey, resource] of Object.entries(manifest.resources)) {

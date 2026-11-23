@@ -28,6 +28,7 @@
  *
  * @packageDocumentation
  */
+import { normalizeManifestAddresses } from '../manifest/normalize-addresses.js'
 
 import {
   AppAuthorizationRequiredError,
@@ -189,8 +190,17 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
   return {
     provider: 'macos',
     async execute(request: ExecutionRequest): Promise<WireValue> {
-      const { manifest, target, input, inputPlan, outputPlan, page, resourcePlans, signal } =
-        request
+      const {
+        manifest: sourceManifest,
+        target,
+        input,
+        inputPlan,
+        outputPlan,
+        page,
+        resourcePlans,
+        signal,
+      } = request
+      const manifest = normalizeManifestAddresses(sourceManifest)
       throwIfAborted(signal)
 
       // Legacy identifier aliases belong only to results that pass through
@@ -206,9 +216,7 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       assertRequiredArguments(plan.requiredArguments, input)
       const command = manifest.commands[target.command]
       assertAddressInput(
-        command !== undefined &&
-          target.resource !== undefined &&
-          (command.parents !== undefined || command.item !== undefined)
+        command !== undefined && target.resource !== undefined && manifest.version === '1.1'
           ? commandAddress(manifest, command, target.resource)
           : undefined,
         input
@@ -233,7 +241,8 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       })
     },
     async resolve(request: ResolutionRequest): Promise<WireValue> {
-      const { manifest, reference, outputPlan, resourcePlans, signal } = request
+      const { manifest: sourceManifest, reference, outputPlan, resourcePlans, signal } = request
+      const manifest = normalizeManifestAddresses(sourceManifest)
       throwIfAborted(signal)
 
       const rooted = resolveRoots(manifest, reference.resource) !== undefined

@@ -15,6 +15,7 @@
  *
  * Internal to this package: nothing here is part of the public entry.
  */
+import { normalizeManifestAddresses } from './normalize-addresses.js'
 
 import type { AppManifest } from './schemas/app.js'
 import type { AddressParent, Command } from './schemas/command.js'
@@ -52,6 +53,7 @@ export function resourceCommandEntries(
   manifest: AppManifest,
   resourceName: string
 ): [string, Command][] {
+  manifest = normalizeManifestAddresses(manifest)
   if (isUnsupportedResourceKey(manifest, resourceName)) return []
   return usableCommands(manifest).filter(([, cmd]) => commandAppliesToResource(cmd, resourceName))
 }
@@ -101,19 +103,17 @@ export function referenceParent(command: Command): string | undefined {
 
 /** Shared ancestor selections for navigation and output identity context. @internal */
 export function commandParents(manifest: AppManifest, command: Command): readonly AddressParent[] {
+  if (manifest.version === '1.1') return command.parents ?? []
   const parent = command.parent
-  return (
-    command.parents ??
-    (parent === undefined
-      ? []
-      : [
-          {
-            ...parent,
-            by: 'identity' as const,
-            collection: resolveCollectionAccessor(
-              manifest.resources[parent.resource] ?? { plural: parent.resource }
-            ),
-          },
-        ])
-  )
+  return parent === undefined
+    ? []
+    : [
+        {
+          ...parent,
+          by: 'identity' as const,
+          collection: resolveCollectionAccessor(
+            manifest.resources[parent.resource] ?? { plural: parent.resource }
+          ),
+        },
+      ]
 }

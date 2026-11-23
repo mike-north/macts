@@ -10,6 +10,8 @@
 // Re-export all schemas and types from schemas module
 export * from './schemas/index.js'
 
+export { normalizeManifestAddresses } from './normalize-addresses.js'
+
 // Manifest loading and parsing utilities
 export * from './loader.js'
 

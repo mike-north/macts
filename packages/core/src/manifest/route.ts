@@ -13,6 +13,7 @@
  *
  * @packageDocumentation
  */
+import { normalizeManifestAddresses } from './normalize-addresses.js'
 
 import type { AppManifest } from './schemas/index.js'
 import type { Command } from './schemas/command.js'
@@ -241,6 +242,7 @@ export function resolveCommandRoutes(
  *   none for a command or a resource marked unsupported.
  */
 export function resolveManifestRoutes(manifest: AppManifest): ManifestRoute[] {
+  manifest = normalizeManifestAddresses(manifest)
   const routes: ManifestRoute[] = []
   for (const [commandKey, command] of Object.entries(manifest.commands)) {
     routes.push(...resolveCommandRoutes(manifest, commandKey, command))

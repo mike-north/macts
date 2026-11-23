@@ -1,15 +1,48 @@
 /** Registration enforces the same versioned address contract as parsing and generation. */
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { parseManifestYaml, AppManifestSchema, generateConsolidatedPackages } from '@macts/core'
+import {
+  parseManifestYaml,
+  AppManifestSchema,
+  generateConsolidatedPackages,
+  buildNativeBody,
+  createNativeExecutor,
+} from '@macts/core'
 import { iTermContract } from '@macts/iterm/contract'
-import { operationsFromContract, operationsFromManifest } from '@macts/runtime'
+import {
+  createRuntime,
+  createBearerCredential,
+  ALLOW_ALL_POLICY,
+  operationsFromContract,
+  operationsFromManifest,
+  OperationRegistrationError,
+} from '@macts/runtime'
+
+/** Collect every admission refusal before asserting any boundary's result. */
+function refusalMessage(run: () => unknown): string {
+  try {
+    run()
+    return 'accepted'
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error)
+  }
+}
 
 const load = () =>
   parseManifestYaml(
     readFileSync(new URL('../../../manifests/iterm/app.yaml', import.meta.url), 'utf8')
   )
 describe('versioned addresses at registration', () => {
+  it.each([
+    operationsFromManifest,
+    (manifest: ReturnType<typeof load>) => operationsFromContract(iTermContract, manifest),
+  ])('reports conflicting source bindings as a registration error', (register) => {
+    const manifest = load()
+    const command = manifest.commands['getTab']
+    if (command === undefined) throw new Error('Missing Tab get')
+    command.parent = { resource: 'Window', parameter: 'windowId' }
+    expect(() => register(manifest)).toThrow(OperationRegistrationError)
+  })
   it.each([
     operationsFromManifest,
     (manifest: ReturnType<typeof load>) => operationsFromContract(iTermContract, manifest),
@@ -80,20 +113,12 @@ it.each([
     required,
     description: 'Extra read input',
   })
-  const failure = (register: () => unknown): string => {
-    try {
-      register()
-      return 'accepted'
-    } catch (error) {
-      return error instanceof Error ? error.message : String(error)
-    }
-  }
   const parsed = AppManifestSchema.safeParse(manifest)
   const outcomes = {
     parse: parsed.success ? 'accepted' : parsed.error.message,
     generation: generateConsolidatedPackages(manifest, { appName: 'iterm' }).errors.join(' '),
-    manifest: failure(() => operationsFromManifest(manifest)),
-    contract: failure(() => operationsFromContract(iTermContract, manifest)),
+    manifest: refusalMessage(() => operationsFromManifest(manifest)),
+    contract: refusalMessage(() => operationsFromContract(iTermContract, manifest)),
   }
   expect(
     Object.fromEntries(
@@ -126,21 +151,13 @@ it.each(['wrong-type', 'nullable'] as const)(
         nullable: { source: 'curated', note: 'Null is invalid for an identity selector' },
       }
     }
-    const capture = (run: () => unknown): string => {
-      try {
-        run()
-        return 'accepted'
-      } catch (error) {
-        return error instanceof Error ? error.message : String(error)
-      }
-    }
     const parsed = AppManifestSchema.safeParse(manifest)
     const generated = generateConsolidatedPackages(manifest, { appName: 'iterm' })
     const outcomes = {
       parse: parsed.success ? 'accepted' : parsed.error.message,
       generation: generated.errors.join(' '),
-      manifest: capture(() => operationsFromManifest(manifest)),
-      contract: capture(() => operationsFromContract(iTermContract, manifest)),
+      manifest: refusalMessage(() => operationsFromManifest(manifest)),
+      contract: refusalMessage(() => operationsFromContract(iTermContract, manifest)),
     }
     expect(
       Object.fromEntries(
@@ -183,21 +200,13 @@ it.each(['parent', 'parents'] as const)(
     }
     list.parameters = get.parameters
     list.resolvesReferences = false
-    const capture = (run: () => unknown): string => {
-      try {
-        run()
-        return 'accepted'
-      } catch (error) {
-        return error instanceof Error ? error.message : String(error)
-      }
-    }
     const parsed = AppManifestSchema.safeParse(manifest)
     const generated = generateConsolidatedPackages(manifest, { appName: 'iterm' })
     const outcomes = {
       parse: parsed.success ? 'accepted' : parsed.error.message,
       generation: generated.errors.join(' '),
-      manifest: capture(() => operationsFromManifest(manifest)),
-      contract: capture(() => operationsFromContract(iTermContract, manifest)),
+      manifest: refusalMessage(() => operationsFromManifest(manifest)),
+      contract: refusalMessage(() => operationsFromContract(iTermContract, manifest)),
     }
     expect(
       Object.fromEntries(
@@ -208,5 +217,113 @@ it.each(['parent', 'parents'] as const)(
       )
     ).toEqual({ parse: true, generation: true, manifest: true, contract: true })
     expect(generated.client.files).toEqual([])
+  }
+)
+
+/** Equivalent 1.1 declarations publish one plan and validate positions before policy or transport. */
+it.each(['parent', 'parents'] as const)(
+  'gives %s the canonical descriptor, body and execution contract',
+  async (syntax) => {
+    const manifest = load()
+    const get = manifest.commands['getTab']
+    if (get === undefined) throw new Error('Missing Tab get')
+    const parents = [
+      { resource: 'Window', collection: 'windows', by: 'identity' as const, parameter: 'windowId' },
+    ]
+    delete get.parent
+    get.parents = parents
+    get.item = { by: 'index', parameter: 'index' }
+    const peer = structuredClone(manifest)
+    if (syntax === 'parent') {
+      delete get.parents
+      delete get.item
+      get.parent = { resource: 'Window', parameter: 'windowId' }
+    } else {
+      const other = peer.commands['getTab']
+      if (other === undefined) throw new Error('Missing peer Tab get')
+      delete other.parents
+      delete other.item
+      other.parent = { resource: 'Window', parameter: 'windowId' }
+    }
+    const descriptors = [manifest, peer].map(
+      (m) =>
+        operationsFromManifest(m).find((op) => op.descriptor.target.command === 'getTab')
+          ?.descriptor
+    )
+    const bodies = [manifest, peer].map((m) =>
+      buildNativeBody(m, { command: 'getTab', resource: 'Tab' })
+    )
+    const contracts = [manifest, peer].map(
+      (m) =>
+        generateConsolidatedPackages(m, { appName: 'iterm' }).client.files.find(
+          (file) => file.path === 'src/contract/index.ts'
+        )?.content
+    )
+    let loads = 0,
+      executions = 0
+    const runtime = createRuntime({
+      executor: {
+        provider: 'recording',
+        execute: () => {
+          executions++
+          return Promise.resolve({ index: 0 })
+        },
+        resolve: () => Promise.resolve(null),
+      },
+      verifier: {
+        verify: () => Promise.resolve({ subject: 'reader', permissions: ['iterm:tabs:get'] }),
+      },
+      governance: {
+        policy: ALLOW_ALL_POLICY,
+        keyPolicies: {
+          invalidate: () => undefined,
+          resolve: () => {
+            loads++
+            return Promise.resolve(undefined)
+          },
+        },
+      },
+      logger: { info: () => undefined, warn: () => undefined, error: () => undefined },
+    })
+    runtime.registerManifest(manifest)
+    const credential = createBearerCredential('fixture')
+    const error: unknown = await runtime
+      .invoke('iterm.tabs.get', { windowId: 7, index: -1 }, { credential })
+      .catch((e: unknown) => e)
+    const negativeCounts = [loads, executions]
+    const valid = await runtime.invoke('iterm.tabs.get', { windowId: 7, index: 0 }, { credential })
+    let reads = 0
+    const executor = createNativeExecutor({
+      transport: {
+        run: () => {
+          reads++
+          return Promise.reject(new Error('Invalid position reached app transport'))
+        },
+      },
+    })
+    const executorError: unknown = await executor
+      .execute({
+        manifest,
+        target: { command: 'getTab', resource: 'Tab' },
+        input: { windowId: 7, index: -1 },
+        inputPlan: { kind: 'passthrough' },
+        outputPlan: { kind: 'passthrough' },
+      })
+      .catch((e: unknown) => e)
+    for (const descriptor of descriptors)
+      expect(descriptor?.address).toEqual({
+        parents,
+        collection: 'tabs',
+        item: { by: 'index', parameter: 'index' },
+      })
+    expect(contracts[0]).toBeDefined()
+    expect(contracts[0]).toBe(contracts[1])
+    expect(bodies[0]).toBe(bodies[1])
+    expect(error).toMatchObject({ code: 'VALIDATION_FAILED' })
+    expect(negativeCounts).toEqual([0, 0])
+    expect(valid).toEqual({ index: 0 })
+    expect([loads, executions]).toEqual([1, 1])
+    expect(executorError).toMatchObject({ code: 'VALIDATION_FAILED' })
+    expect(reads).toBe(0)
   }
 )

@@ -15,7 +15,6 @@ export class GetTabCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   windowId = Option.String('--window-id', { required: true, description: 'Window identifier' })
-
   tabId = Option.String({ name: 'index', required: true })
 
   async execute(): Promise<number> {
@@ -23,7 +22,10 @@ export class GetTabCommand extends Command {
 
     try {
       const client = getClient()
-      const item = await client.tabs.get(this.windowId, this.tabId)
+      const item = await client.tabs.get(
+        this.windowId as unknown as Parameters<typeof client.tabs.get>[0],
+        this.tabId as unknown as Parameters<typeof client.tabs.get>[1]
+      )
 
       const output = formatter.format({
         currentSession: item.currentSession,

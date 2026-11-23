@@ -9,6 +9,7 @@
  *
  * @packageDocumentation
  */
+import { addressNormalization } from '../../manifest/normalize-addresses.js'
 
 import type { AppManifest } from '../../manifest/index.js'
 import { generationRefusals } from '../surface.js'
@@ -96,7 +97,9 @@ export function generateClientPackage(
   options: GenerateClientPackageOptions
 ): GenerateClientPackageResult {
   const appName = options.appName.replace(/\s+/g, '-').toLowerCase()
-  const refusals = generationRefusals(manifest)
+  const normalized = addressNormalization(manifest)
+  manifest = normalized.manifest
+  const refusals = generationRefusals(manifest, normalized.issues)
   if (refusals.length > 0) return { dir: appName, files: [], errors: refusals }
 
   const files: { path: string; content: string }[] = []

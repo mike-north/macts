@@ -43,7 +43,7 @@ export class SessionResourceClient {
   }
 
   /**
-   * List all sessions, as one page.
+   * List the sessions of one tab, as one page.
    */
   async list(
     windowId: number,

@@ -2,6 +2,8 @@
 import { readFileSync } from 'node:fs'
 import { runInNewContext } from 'node:vm'
 import { expect, it } from 'vitest'
+import { AppManifestSchema } from '../manifest/schemas/app.js'
+import { panesManifest } from '../manifest/test-support/panes-positional.js'
 import { parseManifestYaml } from '../manifest/loader.js'
 import { createNativeCodecFunctions } from './native-codec-functions.js'
 import { buildNativeBody, buildResolutionBody } from './native-scripts.js'
@@ -152,48 +154,84 @@ it.each(['record', 'later'] as const)(
   }
 )
 
-/** Explicit addresses refuse the first observed change; legacy collections retain stabilization. */
-it('refuses a changed explicit list without changing legacy retry behavior', () => {
+/** Format 1.1 exposes observed inconsistency; format 1.0 retains its established stabilization. */
+it.each([
+  ['1.1', 'parent'],
+  ['1.1', 'parents'],
+  ['1.0', 'parent'],
+] as const)('checks %s list consistency under %s syntax', (version, syntax) => {
+  const fixture = { ...panesManifest(), version }
+  fixture.resources['Entry'] = {
+    name: 'Entry',
+    plural: 'Entries',
+    description: 'An identified entry',
+    properties: {
+      id: {
+        access: 'r',
+        type: 'string',
+        code: 'ID  ',
+        optional: false,
+        description: 'Entry identity',
+      },
+    },
+    identifiers: [{ property: 'id', primary: true }],
+  }
+  const window = fixture.hierarchy.children['windows']
+  if (!window) throw new Error('Missing Window')
+  window.children = { ...window.children, entries: { resource: 'Entry', access: 'r' } }
+  const parent = { resource: 'Window', parameter: 'windowId' }
+  const parameter = {
+    name: 'windowId',
+    type: 'integer',
+    required: true,
+    description: 'Window identity',
+  }
+  fixture.commands['getEntry'] = {
+    name: 'get',
+    scope: 'resource',
+    resourceType: 'Entry',
+    description: 'Read Entry',
+    parent,
+    parameters: [
+      parameter,
+      { name: 'id', type: 'string', required: true, description: 'Entry identity' },
+    ],
+  }
+  fixture.commands['listEntries'] = {
+    name: 'list',
+    scope: 'resource',
+    resourceType: 'Entry',
+    description: 'Read Entries',
+    parameters: [parameter],
+    ...(syntax === 'parent'
+      ? { parent }
+      : { parents: [{ ...parent, collection: 'windows', by: 'identity' }] }),
+  }
+  expect(AppManifestSchema.safeParse(fixture).success).toBe(true)
   let reads = 0
-  let ids = ['a', 'b']
-  const sessions = new Proxy(() => [], {
+  const ids = ['a', 'b']
+  const entries = new Proxy(() => [], {
     get: (_target, key) => () => {
       if (key === 'id') {
-        if (++reads === 2) {
-          ids.reverse()
-        }
+        if (++reads === 2) ids.reverse()
         return [...ids]
       }
       return ids.map(() => null)
     },
   })
-  const window = {
-    exists: () => true,
-    sessions,
-    tabs: { length: 1, at: () => ({ exists: () => true, sessions }) },
-  }
-  const app = { windows: { byId: () => window } }
-  const target = { command: 'listSessions', resource: 'Session' }
-  expectCollectionChange(() =>
+  const app = { windows: { byId: () => ({ exists: () => true, entries }) } }
+  const read = () =>
     evaluateBody(
-      buildNativeBody(manifest, target),
+      buildNativeBody(fixture, { command: 'listEntries', resource: 'Entry' }),
       app,
-      { windowId: 7, tabIndex: 0 },
+      { windowId: 7 },
       environment(app)
     )
-  )
-  expect(reads).toBe(2)
-  const legacy = structuredClone(manifest)
-  const command = legacy.commands['listSessions']
-  if (command === undefined) {
-    throw new Error('Missing list')
+  if (version === '1.1') {
+    expectCollectionChange(read)
+    expect(reads).toBe(2)
+  } else {
+    expect(read()).toMatchObject([{ id: 'b' }, { id: 'a' }])
+    expect(reads).toBe(4)
   }
-  delete command.parents
-  command.parent = { resource: 'Window', parameter: 'windowId' }
-  reads = 0
-  ids = ['a', 'b']
-  expect(
-    evaluateBody(buildNativeBody(legacy, target), app, { windowId: 7 }, environment(app))
-  ).toMatchObject([{ id: 'b' }, { id: 'a' }])
-  expect(reads).toBe(4)
 })

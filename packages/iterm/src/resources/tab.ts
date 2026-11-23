@@ -57,10 +57,7 @@ export class TabResourceClient {
     )
   }
 
-  /**
-   * Get a tab by index within a parent scope.
-   * A tab has no id, so it is selected by its zero-based position within its window, which drifts when tabs open, close or move.
-   */
+  /** Get a tab of a window by its position */
   async get(
     windowId: string | number,
     index: string | number,

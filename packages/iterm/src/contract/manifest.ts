@@ -845,11 +845,15 @@ export const manifest: unknown = {
           required: true,
         },
       ],
-      parent: {
-        resource: 'Window',
-        parameter: 'windowId',
-      },
       routeName: 'list',
+      parents: [
+        {
+          resource: 'Window',
+          parameter: 'windowId',
+          by: 'identity',
+          collection: 'windows',
+        },
+      ],
     },
     getTab: {
       name: 'get',
@@ -870,11 +874,19 @@ export const manifest: unknown = {
           required: true,
         },
       ],
-      parent: {
-        resource: 'Window',
-        parameter: 'windowId',
-      },
       routeName: 'get',
+      parents: [
+        {
+          resource: 'Window',
+          parameter: 'windowId',
+          by: 'identity',
+          collection: 'windows',
+        },
+      ],
+      item: {
+        by: 'index',
+        parameter: 'index',
+      },
     },
     listSessions: {
       name: 'list',
@@ -980,10 +992,6 @@ export const manifest: unknown = {
           required: true,
         },
       ],
-      parent: {
-        resource: 'Window',
-        parameter: 'windowId',
-      },
       identityTraversal: {
         collections: ['tabs'],
         evidence:
@@ -991,6 +999,18 @@ export const manifest: unknown = {
       },
       routeName: 'resolve',
       risk: 'read',
+      parents: [
+        {
+          resource: 'Window',
+          parameter: 'windowId',
+          by: 'identity',
+          collection: 'windows',
+        },
+      ],
+      item: {
+        by: 'identity',
+        parameter: 'sessionId',
+      },
     },
     count: {
       name: 'count',
