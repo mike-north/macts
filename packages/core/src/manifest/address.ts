@@ -4,7 +4,13 @@
  * registration, so no consumer may guess an ancestor or item from argument order.
  */
 import type { AppManifest } from './schemas/app.js'
-import { CommandSchema, type Command, type AddressParent } from './schemas/command.js'
+import {
+  CommandSchema,
+  type Command,
+  type AddressParent,
+  type CommandParameter,
+} from './schemas/command.js'
+import type { Resource } from './schemas/resource.js'
 import type { HierarchyChild } from './schemas/hierarchy.js'
 import { resolvePrimaryIdentifierProperty, resolveIdentifierTargeting } from './identifier.js'
 import { resolveCollectionAccessor } from './native-accessor.js'
@@ -150,6 +156,23 @@ function ancestorContextMatches(
   )
 }
 
+/** Selection inputs are required, non-null and match the selected identifier or position domain. */
+function selectionParameterMatches(
+  resource: Resource | undefined,
+  parameter: CommandParameter | undefined,
+  by: string
+): boolean {
+  const id = resolvePrimaryIdentifierProperty(resource)
+  const expected =
+    by === 'index' ? 'integer' : id === undefined ? undefined : resource?.properties[id]?.type
+  return (
+    parameter?.required === true &&
+    parameter.nullable !== true &&
+    expected !== undefined &&
+    parameter.type === expected
+  )
+}
+
 /**
  * Validate only opted-in paths; existing single-parent contracts retain their
  * established validation. Raw-object consumers also reject malformed modes.
@@ -254,7 +277,12 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
         get.parents === undefined &&
         parameter?.required === true &&
         parameter.nullable !== true &&
-        parameter.type === resource.properties[id]?.type
+        parameter.type === resource.properties[id]?.type &&
+        selectionParameterMatches(
+          resourceType === undefined ? undefined : manifest.resources[resourceType],
+          itemIdentifierParameter(command),
+          'identity'
+        )
       let children = roots[0]?.children
       for (const edge of command.identityTraversal.collections) {
         const child = children?.[edge]
@@ -276,7 +304,7 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
       ) {
         issues.push({
           path: ['commands', commandKey, 'identityTraversal'],
-          message: `Identity traversal needs an identified parent and a declared complete collection path to its get target.`,
+          message: `Identity traversal needs an identified parent, a declared complete collection path, and a required non-null item parameter matching the target identifier type.`,
         })
       }
     }
@@ -317,13 +345,6 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
     const check = (selection: { by: string; parameter: string }, key: string): void => {
       const resource = manifest.resources[key]
       const parameter = command.parameters.find(({ name }) => name === selection.parameter)
-      const id = resolvePrimaryIdentifierProperty(resource)
-      const expected =
-        selection.by === 'index'
-          ? 'integer'
-          : id === undefined
-            ? undefined
-            : resource?.properties[id]?.type
       if (used.has(selection.parameter))
         refuse(`selection parameter "${selection.parameter}" is reused.`)
       used.add(selection.parameter)
@@ -332,11 +353,8 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
         resource.unsupported !== undefined ||
         resource.roots !== undefined ||
         !resourceCommandEntries(manifest, key).some(([, command]) => command.name === 'get') ||
-        expected === undefined ||
         (selection.by === 'index' && resource.positional === undefined) ||
-        parameter?.required !== true ||
-        parameter.nullable === true ||
-        parameter.type !== expected
+        !selectionParameterMatches(resource, parameter, selection.by)
       ) {
         refuse(
           `"${key}" requires a supported collection, usable get and required non-null ${selection.by} parameter of the matching type.`

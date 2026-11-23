@@ -109,3 +109,47 @@ it.each([
     contract: true,
   })
 })
+
+/** Traversal identities must use the same required, non-null identifier domain as explicit items. */
+it.each(['wrong-type', 'nullable'] as const)(
+  'refuses a %s traversal selector at every boundary',
+  (kind) => {
+    const manifest = load()
+    const parameter = manifest.commands['resolveSession']?.parameters.find(
+      ({ name }) => name === 'sessionId'
+    )
+    if (parameter === undefined) throw new Error('Missing Session selector')
+    if (kind === 'wrong-type') parameter.type = 'integer'
+    else {
+      parameter.nullable = true
+      parameter.evidence = {
+        nullable: { source: 'curated', note: 'Null is invalid for an identity selector' },
+      }
+    }
+    const capture = (run: () => unknown): string => {
+      try {
+        run()
+        return 'accepted'
+      } catch (error) {
+        return error instanceof Error ? error.message : String(error)
+      }
+    }
+    const parsed = AppManifestSchema.safeParse(manifest)
+    const generated = generateConsolidatedPackages(manifest, { appName: 'iterm' })
+    const outcomes = {
+      parse: parsed.success ? 'accepted' : parsed.error.message,
+      generation: generated.errors.join(' '),
+      manifest: capture(() => operationsFromManifest(manifest)),
+      contract: capture(() => operationsFromContract(iTermContract, manifest)),
+    }
+    expect(
+      Object.fromEntries(
+        Object.entries(outcomes).map(([boundary, message]) => [
+          boundary,
+          message.includes('required non-null'),
+        ])
+      )
+    ).toEqual({ parse: true, generation: true, manifest: true, contract: true })
+    expect(generated.client.files).toEqual([])
+  }
+)
