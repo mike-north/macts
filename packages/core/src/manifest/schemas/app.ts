@@ -178,7 +178,7 @@ export const AppManifestSchema = ManifestDeclarations.refine(
     return canonical
   })
   .superRefine((data, ctx) => {
-    if (ctx.issues.length > 0) return
+    // Recoverable subschema issues must not suppress cross-field root and route diagnostics.
     // A route string identifies one operation; two commands that resolve to
     // the same route (through `routeName`, say) would shadow each other.
     for (const { route, commandKeys } of findDuplicateRoutes(data)) {

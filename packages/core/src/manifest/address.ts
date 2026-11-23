@@ -282,7 +282,7 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
         resource.roots === undefined &&
         id !== undefined &&
         get !== undefined &&
-        commandAddress(manifest, get, parent?.resource ?? '').parents.length === 0 &&
+        commandAddress(manifest, get, parent.resource).parents.length === 0 &&
         parameter?.required === true &&
         parameter.nullable !== true &&
         parameter.type === resource.properties[id]?.type &&
