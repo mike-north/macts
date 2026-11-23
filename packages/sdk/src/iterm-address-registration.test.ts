@@ -89,15 +89,23 @@ it.each([
     }
   }
   const parsed = AppManifestSchema.safeParse(manifest)
-  expect({
+  const outcomes = {
     parse: parsed.success ? 'accepted' : parsed.error.message,
     generation: generateConsolidatedPackages(manifest, { appName: 'iterm' }).errors.join(' '),
     manifest: failure(() => operationsFromManifest(manifest)),
     contract: failure(() => operationsFromContract(iTermContract, manifest)),
-  }).toEqual({
-    parse: expect.stringMatching(/non-selection inputs/),
-    generation: expect.stringMatching(/non-selection inputs/),
-    manifest: expect.stringMatching(/non-selection inputs/),
-    contract: expect.stringMatching(/non-selection inputs/),
+  }
+  expect(
+    Object.fromEntries(
+      Object.entries(outcomes).map(([boundary, message]) => [
+        boundary,
+        message.includes('non-selection inputs'),
+      ])
+    )
+  ).toEqual({
+    parse: true,
+    generation: true,
+    manifest: true,
+    contract: true,
   })
 })
