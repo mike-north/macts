@@ -39,6 +39,7 @@
 import type { FieldPlan, IssuePath, ValuePlan } from '@macts/contracts'
 import type {
   NativeAddressing,
+  NativeCollectionAddressing,
   NativeCodecEnvironment,
   NativePositionalAddressing,
   NativeRootAddressing,
@@ -897,7 +898,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     // A root has no container (`containerOf`), so its owner is the application.
     if (addressing.lookup === 'byRoot') return addressRoot(owner, addressing, id, resource, path)
     if (addressing.lookup !== 'byIndex' && addressing.traversal !== undefined) {
-      const matches: HostObject[] = []
+      const matches: [HostObject, HostObject][] = []
       const visit = (parent: HostObject, edges: readonly string[]): void => {
         const edge = edges[0]
         if (edge === undefined) return
@@ -919,7 +920,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
           }
           if (edges.length > 1) visit(item, edges.slice(1))
           else if (callMember('decode', item, addressing.property, [], path, 'an identity') === id)
-            matches.push(item)
+            matches.push([item, elements])
         }
         if (elements['length'] !== length) {
           const error = new Error('Identity traversal changed while reading.')
@@ -934,14 +935,22 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
           path,
           'Identity matched multiple objects within its declared container'
         )
-      const match = matches[0]
-      if (match === undefined) return failMissing(path, resource)
+      const found = matches[0]
+      if (found === undefined) return failMissing(path, resource)
       // at(i) can re-evaluate to another occupant even when every count is unchanged.
-      if (callMember('decode', match, addressing.property, [], path, 'an identity') !== id) {
+      if (callMember('decode', found[0], addressing.property, [], path, 'an identity') !== id) {
         const error = new Error('Identity traversal changed while reading.')
         error.name = 'MactsCollectionChanged'
         throw error
       }
+      // Re-anchored by identity within its own collection: a later shift of positions makes
+      // it a missing target rather than another occupant.
+      const match = identityLookup(found[1], addressing, id, path, 'a collection')
+      if (
+        !isHostObject(match) ||
+        callMember('decode', match, 'exists', [], path, 'an object') !== true
+      )
+        return failMissing(path, resource)
       return match
     }
     const expected =
@@ -973,16 +982,8 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       }
       if (typeof id !== 'number' || !(id >= 0 && id < length)) return failOutOfRange(path, resource)
       object = callMember('decode', collection, 'at', [id], path, expected)
-    } else if (addressing.lookup === 'byProperty') {
-      const match: Record<string, unknown> = {}
-      setOwn(match, addressing.property, id)
-      const matches = callMember('decode', collection, 'whose', [match], path, expected)
-      object = isHostObject(matches) ? matches[0] : undefined
-    } else if (addressing.lookup === 'byKey') {
-      // The bridge's key specifier: the identifier is the key the app interprets.
-      object = callMember('decode', collection, 'byName', [id], path, expected)
     } else {
-      object = callMember('decode', collection, 'byId', [id], path, expected)
+      object = identityLookup(collection, addressing, id, path, expected)
     }
     if (!isHostObject(object)) {
       return fail('decode', path, 'Expected ' + expected + ', received ' + describeValue(object))
@@ -991,6 +992,30 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       return failMissing(path, resource)
     }
     return object
+  }
+
+  /**
+   * The specifier naming the item of `collection` whose identifier is `id`, by
+   * `addressing`'s identity lookup. It names the item by identity, not by
+   * position, and is not checked for existence here.
+   */
+  function identityLookup(
+    collection: HostObject,
+    addressing: NativeCollectionAddressing,
+    id: unknown,
+    path: Path,
+    expected: string
+  ): unknown {
+    if (addressing.lookup === 'byProperty') {
+      const match: Record<string, unknown> = {}
+      setOwn(match, addressing.property, id)
+      const matches = callMember('decode', collection, 'whose', [match], path, expected)
+      return isHostObject(matches) ? matches[0] : undefined
+    }
+    // The bridge's key specifier: the identifier is the key the app interprets.
+    if (addressing.lookup === 'byKey')
+      return callMember('decode', collection, 'byName', [id], path, expected)
+    return callMember('decode', collection, 'byId', [id], path, expected)
   }
 
   /**

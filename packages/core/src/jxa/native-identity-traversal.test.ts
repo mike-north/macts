@@ -1,4 +1,7 @@
-/** Identity reads reject changed occupants of lazy host positions, including during hydration. */
+/**
+ * Identity reads reject changed occupants of lazy host positions while matching, and read a
+ * matched Session by identity afterwards, including during hydration.
+ */
 import { readFileSync } from 'node:fs'
 import { runInNewContext } from 'node:vm'
 import { expect, it } from 'vitest'
@@ -24,6 +27,17 @@ function lazyHost(change: 'traversal' | 'record' | 'later' | 'recordIdentity') {
   }
   const sessions = {
     length: 2,
+    // An identity specifier follows its Session to whatever position it holds.
+    byId: (id: string) =>
+      new Proxy(
+        {},
+        {
+          get: (_target, key) =>
+            key === 'exists'
+              ? () => ids.includes(id)
+              : (sessions.at(ids.indexOf(id)) as Record<string | symbol, () => unknown>)[key],
+        }
+      ),
     at: (index: number) =>
       new Proxy(
         {},
@@ -124,7 +138,7 @@ function evaluateBody(
   return result
 }
 
-it.each(['traversal', 'record', 'recordIdentity'] as const)(
+it.each(['traversal', 'recordIdentity'] as const)(
   'rejects identity substitution during operation %s reads',
   (change) => {
     const { app } = lazyHost(change)
@@ -134,6 +148,15 @@ it.each(['traversal', 'record', 'recordIdentity'] as const)(
     )
   }
 )
+
+/** Once matched, a Session is read by identity, so positions swapping mid-read substitute nothing. */
+it('reads the sought Session when positions swap during operation record reads', () => {
+  const { app } = lazyHost('record')
+  const body = buildNativeBody(manifest, { command: 'resolveSession', resource: 'Session' })
+  expect(evaluateBody(body, app, { windowId: 7, sessionId: 'a' }, environment(app))).toMatchObject({
+    id: 'a',
+  })
+})
 
 it('rejects a changed position before returning a decoded identity', () => {
   const { app } = lazyHost('traversal')
@@ -150,7 +173,7 @@ it.each(['record', 'later'] as const)(
     const target = createNativeCodecFunctions().decode(reference, plan, env)
     if (change === 'later') swap()
     const body = buildResolutionBody(manifest, 'Session', 'one')
-    expectCollectionChange(() => evaluateBody(body, app, { target }, env))
+    expect(evaluateBody(body, app, { target }, env)).toMatchObject({ id: 'a' })
   }
 )
 
@@ -235,3 +258,85 @@ it.each([
     expect(reads).toBe(4)
   }
 })
+
+/**
+ * A Window whose one Tab holds Sessions `a` (80 columns) and `b`. Position 0 is
+ * occupied by `c` (120 columns) once a match is made: transiently (only
+ * non-identity reads see `c`) or for good (`a` closes and `c` opens there).
+ * `sessions.byId` names a Session by identity, as the app's id specifier does.
+ */
+function shiftingHost(shift: 'transient' | 'closed') {
+  const columns: Record<string, number> = { a: 80, b: 100, c: 120 }
+  const ids = ['a', 'b']
+  let matched = false
+  const session = (occupant: () => string | undefined, positional: boolean) =>
+    new Proxy(
+      {},
+      {
+        get(_target, key) {
+          if (key === 'exists') return () => occupant() !== undefined
+          return () => {
+            if (key !== 'id' && !matched) {
+              matched = true
+              if (shift === 'closed') ids[0] = 'c'
+            }
+            const id =
+              positional && key !== 'id' && shift === 'transient' && occupant() === 'a'
+                ? 'c'
+                : occupant()
+            if (id === undefined)
+              throw Object.assign(new Error('No such object.'), { errorNumber: -1728 })
+            return key === 'id' ? id : key === 'columns' ? columns[id] : null
+          }
+        },
+      }
+    )
+  const sessions = {
+    length: 2,
+    at: (index: number) => session(() => ids[index], true),
+    byId: (id: string) => session(() => (ids.includes(id) ? id : undefined), false),
+  }
+  const tab = { exists: () => true, sessions }
+  const window = { exists: () => true, id: () => 7, tabs: { length: 1, at: () => tab } }
+  return { windows: { byId: () => window } }
+}
+
+/** A resolved match reads the sought Session or fails as missing; it never reads a later occupant. */
+function expectSoughtOrMissing(read: () => unknown, shift: 'transient' | 'closed'): void {
+  if (shift === 'transient') {
+    expect(read()).toMatchObject({ id: 'a', columns: 80 })
+    return
+  }
+  let caught: unknown
+  try {
+    read()
+  } catch (error) {
+    caught = error
+  }
+  expect(caught).toMatchObject({ errorNumber: -1728 })
+}
+
+it.each(['transient', 'closed'] as const)(
+  'anchors a Window-scoped resolve match by identity within its Tab (%s shift)',
+  (shift) => {
+    const app = shiftingHost(shift)
+    const body = buildNativeBody(manifest, { command: 'resolveSession', resource: 'Session' })
+    expectSoughtOrMissing(
+      () => evaluateBody(body, app, { windowId: 7, sessionId: 'a' }, environment(app)),
+      shift
+    )
+  }
+)
+
+it.each(['transient', 'closed'] as const)(
+  'anchors a decoded Window-scoped identity within its Tab (%s shift)',
+  (shift) => {
+    const app = shiftingHost(shift)
+    const env = environment(app)
+    const body = buildResolutionBody(manifest, 'Session', 'one')
+    expectSoughtOrMissing(() => {
+      const target = createNativeCodecFunctions().decode(reference, plan, env)
+      return evaluateBody(body, app, { target }, env)
+    }, shift)
+  }
+)

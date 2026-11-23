@@ -2824,7 +2824,9 @@ atomic snapshot.
 **iTerm Sessions.** A Session identity contains its `id` and its Window identity.
 The canonical identity get searches every Tab's Sessions in that Window: zero
 matches is `TargetNotFoundError`, multiple matches is `UnexpectedValueError`.
-It never searches another Window. Tab reorder, closure of an earlier Tab, or
+Once found, the match is read through its Session id within its Tab, so a later
+change of positions makes it missing rather than another occupant. It never
+searches another Window. Tab reorder, closure of an earlier Tab, or
 movement between Tabs in that Window does not change the reference's meaning.
 Movement to another Window makes the old reference missing. No persistence
 across restoration or relaunch is promised.

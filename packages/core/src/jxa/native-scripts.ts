@@ -440,10 +440,15 @@ function readOutputProperties(
     absentAsNull(resource, key)
       ? `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) { ${propagate}if (e && e.errorNumber === ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}) { ${member('obj', key)} = null; } }`
       : `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {${propagate}}`
+  const traversed = identityTraversed(manifest, source.key)
   return lines(
-    `var identity = typeof env !== "undefined" && env.identities ? env.identities.get(${itemLocal}) : undefined;`,
-    `function verifyIdentity(record) { if (identity && (${itemLocal}[identity.property]() !== identity.id || (record && record[${literal(resolveIdentifierTargeting(resource)?.property ?? 'id')}] !== undefined && record[${literal(resolveIdentifierTargeting(resource)?.property ?? 'id')}] !== identity.id))) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: "Identity traversal changed while reading." }; } }`,
-    'verifyIdentity();',
+    traversed
+      ? `var identity = typeof env !== "undefined" && env.identities ? env.identities.get(${itemLocal}) : undefined;`
+      : '',
+    traversed
+      ? `function verifyIdentity(record) { if (identity && (${itemLocal}[identity.property]() !== identity.id || (record && record[${literal(resolveIdentifierTargeting(resource)?.property ?? 'id')}] !== undefined && record[${literal(resolveIdentifierTargeting(resource)?.property ?? 'id')}] !== identity.id))) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: "Identity traversal changed while reading." }; } }`
+      : '',
+    traversed ? 'verifyIdentity();' : '',
     'var obj = {};',
     ...(separate
       ? keys.map(readOnItsOwn)
@@ -459,7 +464,7 @@ function readOutputProperties(
           ...keys.map(readOnItsOwn),
           '}',
         ]),
-    'verifyIdentity(obj);',
+    traversed ? 'verifyIdentity(obj);' : '',
     rooted && kindExpression !== undefined
       ? `${member('obj', ROOT_KIND_PROPERTY)} = ${kindExpression};`
       : '',
@@ -481,6 +486,24 @@ function readOutputProperties(
         (key) =>
           `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${markAbsentAsNull(member('obj', key))}; }`
       )
+  )
+}
+
+/**
+ * Whether an object of `resourceKey` can carry an expected identity from
+ * traversal addressing: the codec records one only when it finds an object
+ * through an identity lookup with containment traversal, which only format 1.1
+ * can declare. A record read verifies that identity only then, so reads of
+ * other resources, including every format 1.0 read, emit no check.
+ */
+function identityTraversed(manifest: AppManifest, resourceKey: string | undefined): boolean {
+  const addressing =
+    resourceKey === undefined ? undefined : referenceAddressing(manifest, resourceKey)
+  return (
+    addressing !== undefined &&
+    addressing.lookup !== 'byIndex' &&
+    addressing.lookup !== 'byRoot' &&
+    addressing.traversal !== undefined
   )
 }
 
@@ -2009,13 +2032,10 @@ function bindSelectedItem(
             itemParameter,
             manifest
           ),
-      parentScope === undefined
+      // Format 1.0 reads record no ancestor context: their nested containers stay unsupported.
+      parentScope === undefined || manifest.version === '1.0'
         ? ''
-        : `if (typeof env !== 'undefined' && env.contexts) { env.contexts.set(item, ${
-            manifest.version === '1.0'
-              ? `(env.contexts.get(parent) || []).concat([{ resource: ${literal(parentScope.parentResource)}, item: parent }])`
-              : `[${(command.parents ?? []).map((entry, index) => `{ resource: ${literal(entry.resource)}, item: ancestor${String(index)} }`).join(', ')}]`
-          }); }`
+        : `if (typeof env !== 'undefined' && env.contexts) { env.contexts.set(item, [${(command.parents ?? []).map((entry, index) => `{ resource: ${literal(entry.resource)}, item: ancestor${String(index)} }`).join(', ')}]); }`
     ),
     identifierArguments: identifierArgumentsOf(parentScope, itemParameter),
     parentParameter: parentScope?.parentIdParam,
@@ -2061,12 +2081,16 @@ function bindIdentityTraversal(
     'var matches = [];',
     'function visit(owner, edges) { var elements = owner[edges[0]]; var count = elements.length; for (var i = 0; i < count; i++) { var candidate = elements.at(i);',
     `if (!candidate.exists()) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity traversal changed.' }; }`,
-    `if (edges.length > 1) { visit(candidate, edges.slice(1)); } else if (candidate[${literal(nativePropertyName(resource, property))}]() === sought) { matches.push(candidate); }`,
+    `if (edges.length > 1) { visit(candidate, edges.slice(1)); } else if (candidate[${literal(nativePropertyName(resource, property))}]() === sought) { matches.push([candidate, elements]); }`,
     `} if (elements.length !== count) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity traversal changed.' }; } }`,
     `visit(parent, ${JSON.stringify([...nativeTraversal(manifest, command), collection])});`,
     `if (matches.length > 1) { throw { name: ${literal(NATIVE_CODEC_ERROR_NAME)}, direction: 'encode', path: [], message: 'Identity matched multiple objects within its declared container.' }; }`,
-    'var item = matches[0];',
-    `if (!item) { var missing = new Error('No such object.'); missing.errorNumber = ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}; throw missing; }`,
+    `if (!matches[0]) { var missing = new Error('No such object.'); missing.errorNumber = ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}; throw missing; }`,
+    `if (matches[0][0][${literal(nativePropertyName(resource, property))}]() !== sought) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity traversal changed while reading.' }; }`,
+    // The match is re-anchored by identity within its own collection, so a later shift of
+    // positions makes it a missing target rather than another occupant.
+    `var item = ${lookupInCollection(resource, 'matches[0][1]', 'sought')};`,
+    `if (!item.exists()) { var missing = new Error('No such object.'); missing.errorNumber = ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}; throw missing; }`,
     `function verifySelectedIdentity(record) { if (item[${literal(nativePropertyName(resource, property))}]() !== sought || (record && record[${literal(property)}] !== undefined && record[${literal(property)}] !== sought)) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity traversal changed while reading.' }; } }`,
     'verifySelectedIdentity();'
   )
