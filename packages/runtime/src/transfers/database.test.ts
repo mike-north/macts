@@ -21,7 +21,9 @@ import {
   mkdtempSync,
   readFileSync,
   rmSync,
+  lstatSync,
   statSync,
+  symlinkSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -158,6 +160,10 @@ describe('transfer database schema version', () => {
       expect(existsSync(`${file}-shm`)).toBe(false)
       // The database's own permissions are not changed either.
       expect(statSync(file).mode & 0o777).toBe(0o644)
+      // Nothing is added beside it: the uploads and copies directories exist
+      // only for an accepted database.
+      expect(existsSync(join(home, 'transfers', 'uploads'))).toBe(false)
+      expect(existsSync(join(home, 'transfers', 'copies'))).toBe(false)
     })
   })
 })
@@ -207,5 +213,50 @@ describe('opening while another process holds the lock', () => {
 
     expect(await exited).toBe(0)
     expect(schemaVersion(home)).toBe(1)
+  })
+})
+
+/**
+ * The uploads and copies directories hold bytes the store later deletes, and
+ * are made owner-only on every open. A symlink in either place would make the
+ * store change the mode of, stage bytes in, and delete files in a directory
+ * outside its own, so the store refuses to open instead.
+ */
+describe.each(['uploads', 'copies'])('a symlinked %s directory', (name) => {
+  let home: string
+  let outside: string
+
+  beforeEach(() => {
+    home = mkdtempSync(join(tmpdir(), 'macts-transfers-symlink-'))
+    outside = mkdtempSync(join(tmpdir(), 'macts-transfers-outside-'))
+    chmodSync(outside, 0o755)
+    mkdirSync(join(home, 'transfers'), { mode: 0o700 })
+    symlinkSync(outside, join(home, 'transfers', name))
+  })
+
+  afterEach(() => {
+    rmSync(home, { recursive: true, force: true })
+    rmSync(outside, { recursive: true, force: true })
+  })
+
+  it('is refused without changing the directory it points to', async () => {
+    await expect(createTransferStore({ home })).rejects.toThrow(
+      new RegExp(`${name} directory is not a real directory`)
+    )
+
+    // Nothing was followed: the target keeps its mode and holds nothing, and
+    // the link itself is still there.
+    expect(statSync(outside).mode & 0o777).toBe(0o755)
+    expect(existsSync(join(outside, 'x'))).toBe(false)
+    expect(lstatSync(join(home, 'transfers', name)).isSymbolicLink()).toBe(true)
+  })
+
+  it('does not put the path in the error message', async () => {
+    const error = await createTransferStore({ home }).then(
+      () => undefined,
+      (caught: unknown) => caught
+    )
+    expect(error).toBeInstanceOf(Error)
+    expect((error as Error).message).not.toContain(outside)
   })
 })

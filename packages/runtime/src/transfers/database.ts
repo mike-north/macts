@@ -1,15 +1,23 @@
 /**
  * On-disk layout and schema of the transfer store.
  *
- * Everything lives under `<home>/transfers/`, whose `transfers.db` is the
- * SQLite database of grants, download links, uploads, and temporary copies.
+ * Everything lives under `<home>/transfers/`:
  *
- * The directory is private to the user (0700) and the database is readable
- * only by the user (0600): it maps subjects to the files they were granted.
- * The directory's mode and the database file's mode are reasserted on every
- * open of an accepted database, so ones created by an older or misconfigured
- * process are tightened. Companion files (`-wal`, `-shm`) are created with the
- * database file's mode and live in the private directory.
+ * - `transfers.db` — the SQLite database of grants, download links, uploads,
+ *   and temporary copies;
+ * - `uploads/<uploadId>` — the received bytes of each upload;
+ * - `copies/<uuid>[.ext]` — temporary copies. The store mints every copy's
+ *   path itself, directly inside the canonical (symlink-free) path of this
+ *   directory, so it only ever deletes regular files it named.
+ *
+ * Directories are private to the user (0700) and files are readable only by
+ * the user (0600): uploaded bytes are caller content, and the database maps
+ * subjects to the files they were granted. The directories' modes and the
+ * database file's mode are reasserted on every open of an accepted database,
+ * so ones created by an older or misconfigured process are tightened.
+ * Companion files (`-wal`, `-shm`) are created with the database file's mode
+ * and live in the private directory. Upload bytes and temporary copies are
+ * created 0600 by the store itself.
  *
  * Timestamps are integer milliseconds since the Unix epoch. Tokens are never
  * stored, only their SHA-256 digests (see `tokens.ts`).
@@ -59,6 +67,10 @@ export interface TransferPaths {
   readonly root: string
   /** `<home>/transfers/transfers.db` */
   readonly database: string
+  /** `<home>/transfers/uploads` */
+  readonly uploads: string
+  /** `<home>/transfers/copies` */
+  readonly copies: string
 }
 
 /** Resolve the store's paths under `home`. */
@@ -67,6 +79,8 @@ export function transferPaths(home: string): TransferPaths {
   return {
     root,
     database: path.join(root, 'transfers.db'),
+    uploads: path.join(root, 'uploads'),
+    copies: path.join(root, 'copies'),
   }
 }
 
@@ -74,6 +88,31 @@ export function transferPaths(home: string): TransferPaths {
 function ensurePrivateDirectory(directory: string): void {
   fs.mkdirSync(directory, { recursive: true, mode: DIRECTORY_MODE })
   fs.chmodSync(directory, DIRECTORY_MODE)
+}
+
+/**
+ * Create `directory` if missing and make it owner-only, refusing to use one
+ * that is not a real directory: a symlink there would have its target
+ * re-moded, filled with upload bytes, and deleted from.
+ *
+ * @throws Error when `directory` exists and is not a real directory. The
+ *   message names the directory by `label`, never by path.
+ */
+function ensureRealPrivateDirectory(directory: string, label: string): void {
+  let stats: fs.Stats | undefined
+  try {
+    stats = fs.lstatSync(directory)
+  } catch (error) {
+    if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) {
+      throw error
+    }
+  }
+  if (stats !== undefined && !stats.isDirectory()) {
+    throw new Error(
+      `The transfer store's ${label} directory is not a real directory (it may be a symbolic link), so it cannot be used.`
+    )
+  }
+  ensurePrivateDirectory(directory)
 }
 
 /**
@@ -134,6 +173,8 @@ const SCHEMA = `
     created_at INTEGER NOT NULL,
     expires_at INTEGER NOT NULL,
     state TEXT NOT NULL CHECK (state IN ('awaiting', 'receiving', 'complete', 'failed')),
+    -- The outstanding-bytes reservation while the upload is receiving; the
+    -- exact size of the staged bytes once it is complete.
     received_bytes INTEGER NOT NULL DEFAULT 0,
     consumed_at INTEGER,
     released INTEGER NOT NULL DEFAULT 0
@@ -203,13 +244,14 @@ function prepareSchema(database: SqliteDatabase, version: number): void {
 }
 
 /**
- * Prepare the directory and open the database, creating the schema when
- * the database is fresh.
+ * Prepare the store's directory and open the database, creating the schema
+ * when the database is fresh.
  *
  * The busy timeout is set first, so a process opening the store while another
  * holds the lock waits instead of failing. The schema version is then read and
  * checked before anything is written: only an accepted database has its file
- * mode tightened, its journal mode switched to WAL, or its schema created.
+ * mode tightened, its uploads and copies directories created, its journal mode
+ * switched to WAL, or its schema created.
  *
  * The busy timeout does not cover the switch to WAL on a fresh database: when
  * several processes open it at once, each holding a read lock and needing the
@@ -236,6 +278,8 @@ export function openTransferDatabase(paths: TransferPaths): SqliteDatabase {
     const version = readSchemaVersion(database)
     assertKnownSchemaVersion(version)
     restrictFileToOwner(paths.database)
+    ensureRealPrivateDirectory(paths.uploads, 'uploads')
+    ensureRealPrivateDirectory(paths.copies, 'copies')
     retryWhileBusy(
       () => {
         database.exec('PRAGMA journal_mode = WAL')
@@ -248,6 +292,24 @@ export function openTransferDatabase(paths: TransferPaths): SqliteDatabase {
     throw error
   }
   return database
+}
+
+/** The directories the store deletes files in, as canonical paths. */
+export interface CanonicalTransferDirectories {
+  /** Canonical `<home>/transfers/uploads`. */
+  readonly uploads: string
+  /** Canonical `<home>/transfers/copies`. */
+  readonly copies: string
+}
+
+/**
+ * The canonical paths of the uploads and copies directories: every symlink
+ * in them resolved (on macOS, `/var/…` becomes `/private/var/…`). Upload
+ * bytes and temporary copies live directly inside them, and the store only
+ * ever deletes paths directly inside them.
+ */
+export function canonicalDirectories(paths: TransferPaths): CanonicalTransferDirectories {
+  return { uploads: fs.realpathSync(paths.uploads), copies: fs.realpathSync(paths.copies) }
 }
 
 /**
@@ -281,4 +343,10 @@ export function integerColumn(row: SqliteRow, column: string): number {
     throw new Error(`Transfer store column ${column} holds a non-integer value.`)
   }
   return value
+}
+
+/** Read a nullable `INTEGER` column; `NULL` becomes `undefined`. */
+export function optionalIntegerColumn(row: SqliteRow, column: string): number | undefined {
+  const value = row[column]
+  return value === null || value === undefined ? undefined : integerColumn(row, column)
 }

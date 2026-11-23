@@ -1,21 +1,29 @@
 /**
- * Binary transfers: the persistent, subject-bound record of file grants and
- * download links, with their lifetimes, and the limits every kind of transfer
- * is held to (phases/13, D8).
+ * Binary transfers: the persistent, subject-bound record of file grants,
+ * uploads, download links, and temporary copies, with their lifetimes and
+ * limits (phases/13, D8).
  *
  * @packageDocumentation
  */
 
 export {
   createTransferStore,
+  type AllocatedTemporaryCopy,
+  type AllocateTemporaryCopyOptions,
+  type ConsumedUpload,
+  type CreatedUpload,
   type CreateTransferStoreOptions,
+  type CreateUploadOptions,
   type DownloadLinkTarget,
   type FileGrantRecord,
   type GrantedFile,
   type IssuedDownloadLink,
   type IssuedFileGrant,
+  type ReceivedUpload,
+  type ReceiveUploadOptions,
   type TransferStore,
 } from './store.js'
+export type { UploadByteSource } from './byte-source.js'
 export {
   CONSUMED_UPLOAD_RETENTION_MS,
   DEFAULT_TRANSFER_LIMITS,
