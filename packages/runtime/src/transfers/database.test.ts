@@ -158,6 +158,10 @@ describe('transfer database schema version', () => {
       expect(existsSync(`${file}-shm`)).toBe(false)
       // The database's own permissions are not changed either.
       expect(statSync(file).mode & 0o777).toBe(0o644)
+      // Nothing is added beside it: the uploads and copies directories exist
+      // only for an accepted database.
+      expect(existsSync(join(home, 'transfers', 'uploads'))).toBe(false)
+      expect(existsSync(join(home, 'transfers', 'copies'))).toBe(false)
     })
   })
 })

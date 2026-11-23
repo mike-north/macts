@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { hashToken } from './tokens.js'
-import { ALICE, useTransferStore } from './transfer-test-helpers.js'
+import { ALICE, chunks, useTransferStore } from './transfer-test-helpers.js'
 
 const FILE = {
   app: 'finder',
@@ -26,13 +26,18 @@ function modeOf(target: string): number {
 describe('files on disk', () => {
   const fixture = useTransferStore()
 
-  it('creates its directory 0700 and the database files 0600', async () => {
+  it('creates its directories 0700 and the database and upload files 0600', async () => {
     // A write puts the write-ahead log and its index on disk too.
     await fixture.store.issueGrant(ALICE, FILE)
+    const { uploadId } = await fixture.store.createUpload(ALICE)
+    await fixture.store.receiveUpload(ALICE, uploadId, chunks('secret bytes'))
     const root = join(fixture.home, 'transfers')
 
     expect(modeOf(root)).toBe(0o700)
+    expect(modeOf(join(root, 'uploads'))).toBe(0o700)
+    expect(modeOf(join(root, 'copies'))).toBe(0o700)
     expect(modeOf(join(root, 'transfers.db'))).toBe(0o600)
+    expect(modeOf(join(root, 'uploads', uploadId))).toBe(0o600)
     for (const companion of readdirSync(root).filter((name) => name.startsWith('transfers.db-'))) {
       expect(modeOf(join(root, companion))).toBe(0o600)
     }
@@ -70,10 +75,12 @@ describe('files on disk', () => {
 describe('persistence', () => {
   const fixture = useTransferStore()
 
-  it('honors grants and links from a store opened on the same home', async () => {
+  it('honors grants, links, and uploads from a store opened on the same home', async () => {
     const first = fixture.store
     const grant = await first.issueGrant(ALICE, FILE)
     const link = await first.issueDownloadLink(ALICE, grant.token)
+    const { uploadId } = await first.createUpload(ALICE, { contentType: 'text/plain' })
+    await first.receiveUpload(ALICE, uploadId, chunks('persisted'))
     first.close()
 
     const second = await fixture.open()
@@ -86,6 +93,9 @@ describe('persistence', () => {
       app: FILE.app,
       path: FILE.path,
     })
+    const consumed = await second.consumeUpload(ALICE, uploadId)
+    expect(consumed.contentType).toBe('text/plain')
+    expect(readFileSync(consumed.path, 'utf8')).toBe('persisted')
   })
 
   it('shares records between stores open on the same home at once', async () => {
@@ -97,6 +107,17 @@ describe('persistence', () => {
     await expect(fixture.store.redeemDownloadLink(link.token)).resolves.toEqual({
       app: FILE.app,
       path: FILE.path,
+    })
+  })
+
+  it('shares single use across stores open on the same home at once', async () => {
+    const other = await fixture.open()
+    const { uploadId } = await fixture.store.createUpload(ALICE)
+    await fixture.store.receiveUpload(ALICE, uploadId, chunks('once'))
+
+    await other.consumeUpload(ALICE, uploadId)
+    await expect(fixture.store.consumeUpload(ALICE, uploadId)).rejects.toMatchObject({
+      details: { reason: 'unknown-transfer' },
     })
   })
 })

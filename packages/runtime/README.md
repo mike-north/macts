@@ -153,19 +153,27 @@ hide any other warning.
 ## Transfers
 
 `createTransferStore()` opens the transfer store at `<macts-home>/transfers/`:
-the persistent record of file grants and download links that remote file
-reads rely on.
+the persistent record of file grants, uploads, download links, and temporary
+copies that remote file reads and writes rely on.
 
-- A grant is bound to the subject it was issued to. Another subject
-  presenting one is told it does not exist (`TransferError`
-  `unknown-transfer`), exactly as for a token that was never issued.
+- Grants and uploads are bound to the subject that created them. Another
+  subject presenting one is told it does not exist (`TransferError`
+  `unknown-transfer`), exactly as for an id that was never issued.
 - A grant is reusable until it expires, and each exchange issues a fresh,
   short-lived download link. The link itself is the capability.
-- Grants last 15 minutes and download links 5 minutes; a sweep removes
-  expired ones. These and the upload and temporary-copy limits are exported
-  as named constants (`FILE_GRANT_TTL_MS`, `MAX_UPLOAD_BYTES`, and others).
+- Uploads are single-use and usable only once completely received. The staged
+  bytes are deleted after the consuming call, whether it succeeded or failed.
+  An interrupted or oversized receive leaves no partial file behind.
+- Grants, uploads, download links, and temporary copies expire, and a sweep
+  removes them with their files. Sizes and outstanding uploads per subject are
+  bounded. The limits are exported as named constants (`MAX_UPLOAD_BYTES`,
+  `FILE_GRANT_TTL_MS`, and others).
 - Tokens are stored only as SHA-256 hashes, never appear in error messages,
-  and are never logged.
+  and are never logged. Error messages never contain upload ids or staged file
+  paths either.
+- The store mints every temporary copy's path (`allocateTemporaryCopy()`) and
+  deletes only regular files it named, so cleanup never reaches outside
+  `<macts-home>/transfers/`.
 - A store created by a newer macts is refused, never downgraded.
 
 ## Requirements
