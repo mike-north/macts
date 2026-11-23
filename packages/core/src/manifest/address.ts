@@ -137,12 +137,15 @@ function ancestorContextMatches(
     expected.push({ resource: child.resource })
     children = child.children
   }
+  // Re-entering the same identified resource does not add an identity namespace.
+  // Other ancestors, including all required canonical context, must still agree.
+  const context = prefix.filter(({ resource, by }) => resource !== key || by !== 'identity')
   return (
-    expected.length === prefix.length &&
+    expected.length === context.length &&
     expected.every(
       (entry, index) =>
-        entry.resource === prefix[index]?.resource &&
-        (entry.by === undefined || entry.by === prefix[index].by)
+        entry.resource === context[index]?.resource &&
+        (entry.by === undefined || entry.by === context[index].by)
     )
   )
 }

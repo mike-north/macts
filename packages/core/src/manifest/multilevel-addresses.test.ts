@@ -10,6 +10,7 @@ import { panesManifest } from './test-support/panes-positional.js'
 import { generateConsolidatedPackages } from '../generator/orchestrate.js'
 import type { AppManifest } from './schemas/app.js'
 import { buildNativeBody } from '../jxa/native-scripts.js'
+import { createNativeCodecFunctions } from '../jxa/native-codec-functions.js'
 import { runInNewContext } from 'node:vm'
 
 /** A Session is reached through Window identity and Tab position, never app scope. */
@@ -453,4 +454,125 @@ it('refuses an ancestor whose resolving get requires omitted identity context, e
   expect(
     generateConsolidatedPackages(manifest, { appName: 'panes' }).errors.length
   ).toBeGreaterThan(0)
+})
+
+it('admits a finite explicit path that repeats an identified resource type', () => {
+  const base = panesManifest()
+  const manifest = { ...base, version: '1.1' as const }
+  // Identified folders may contain folders; this finite address is an input,
+  // and makes no recursive or positional reference-data claim.
+  manifest.resources['Folder'] = {
+    name: 'Folder',
+    plural: 'Folders',
+    description: 'An identified folder',
+    properties: {
+      id: { access: 'r', type: 'string', description: 'Folder id', code: 'ID  ', optional: false },
+    },
+    identifiers: [{ property: 'id', primary: true }],
+  }
+  manifest.resources['Document'] = {
+    name: 'Document',
+    plural: 'Documents',
+    description: 'An identified document',
+    properties: {
+      id: {
+        access: 'r',
+        type: 'string',
+        description: 'Document id',
+        code: 'ID  ',
+        optional: false,
+      },
+    },
+    identifiers: [{ property: 'id', primary: true }],
+  }
+  manifest.hierarchy.children['folders'] = {
+    resource: 'Folder',
+    access: 'r',
+    children: {
+      folders: {
+        resource: 'Folder',
+        access: 'r',
+        children: { documents: { resource: 'Document', access: 'r' } },
+      },
+    },
+  }
+  manifest.commands['getFolder'] = {
+    name: 'get',
+    scope: 'resource',
+    resourceType: 'Folder',
+    description: 'Get a folder by globally unique id',
+    parameters: [{ name: 'folderId', type: 'string', description: 'Folder id', required: true }],
+  }
+  manifest.commands['getDocument'] = {
+    name: 'get',
+    scope: 'resource',
+    resourceType: 'Document',
+    description: 'Read a document at an explicit finite address',
+    resolvesReferences: false,
+    parents: [
+      { resource: 'Folder', collection: 'folders', by: 'identity', parameter: 'outerId' },
+      { resource: 'Folder', collection: 'folders', by: 'identity', parameter: 'innerId' },
+    ],
+    item: { by: 'identity', parameter: 'documentId' },
+    parameters: ['outerId', 'innerId', 'documentId'].map((name) => ({
+      name,
+      type: 'string',
+      description: name,
+      required: true,
+    })),
+  }
+  const parsed = AppManifestSchema.safeParse(manifest)
+  expect(parsed.error?.issues).toBeUndefined()
+  expect(parsed.success).toBe(true)
+  expect(generateConsolidatedPackages(manifest, { appName: 'panes' }).errors).toEqual([])
+  // A finite operation path does not admit cyclic container data for its global identity.
+  const cyclic: Record<string, unknown> = {
+    resource: 'Folder',
+    form: 'identity',
+    cardinality: 'one',
+    id: 'folder',
+  }
+  cyclic['container'] = cyclic
+  expect(() =>
+    createNativeCodecFunctions().decode(
+      { reference: cyclic },
+      { kind: 'reference', resource: 'Folder', cardinality: 'one' },
+      {
+        app: {},
+        references: {
+          Folder: {
+            id: { kind: 'string' },
+            addressing: {
+              lookup: 'byId',
+              collection: 'folders',
+              property: 'id',
+            },
+          },
+        },
+      }
+    )
+  ).toThrow(/located through a container/)
+  const folderGet = manifest.commands['getFolder']
+  // A required Window namespace cannot be supplied by repeated Folder ancestors.
+  folderGet.parent = { resource: 'Window', parameter: 'windowId' }
+  folderGet.parameters.unshift({
+    name: 'windowId',
+    type: 'integer',
+    description: 'Window identity',
+    required: true,
+  })
+  const refused = AppManifestSchema.safeParse(manifest)
+  expect(refused.success).toBe(false)
+  expect(
+    refused.error?.issues.some(({ message }) => message.includes('different identity context'))
+  ).toBe(true)
+  // A recursive canonical reference namespace cannot be justified by a finite operation path.
+  folderGet.parent = { resource: 'Folder', parameter: 'parentFolderId' }
+  folderGet.parameters[0] = {
+    name: 'parentFolderId',
+    type: 'string',
+    description: 'Parent identity',
+    required: true,
+  }
+  expect(AppManifestSchema.safeParse(manifest).success).toBe(false)
 })
