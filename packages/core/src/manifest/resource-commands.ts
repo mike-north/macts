@@ -17,7 +17,8 @@
  */
 
 import type { AppManifest } from './schemas/app.js'
-import type { Command } from './schemas/command.js'
+import type { AddressParent, Command } from './schemas/command.js'
+import { resolveCollectionAccessor } from './native-accessor.js'
 import { isUnsupportedResourceKey, usableCommands } from './unsupported.js'
 
 /**
@@ -96,4 +97,23 @@ export function resolvingCommand(
 /** The identified container of a canonical resolving route. @internal */
 export function referenceParent(command: Command): string | undefined {
   return command.parent?.resource ?? command.parents?.at(-1)?.resource
+}
+
+/** Shared ancestor selections for navigation and output identity context. @internal */
+export function commandParents(manifest: AppManifest, command: Command): readonly AddressParent[] {
+  const parent = command.parent
+  return (
+    command.parents ??
+    (parent === undefined
+      ? []
+      : [
+          {
+            ...parent,
+            by: 'identity' as const,
+            collection: resolveCollectionAccessor(
+              manifest.resources[parent.resource] ?? { plural: parent.resource }
+            ),
+          },
+        ])
+  )
 }

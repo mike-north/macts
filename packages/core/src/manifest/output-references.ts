@@ -77,8 +77,7 @@ import { nestedOnlyResources } from './hierarchy-placement.js'
 import { isPositional } from './positional.js'
 import { resolvePrimaryIdentifier } from './primary-identifier.js'
 import { resolveRoots } from './roots.js'
-import { resolvingCommand, referenceParent } from './resource-commands.js'
-import { commandAddress } from './address.js'
+import { commandParents, resolvingCommand, referenceParent } from './resource-commands.js'
 import { usableCommands, usableProperties, usableResources } from './unsupported.js'
 import {
   createNameResolver,
@@ -221,7 +220,7 @@ export function omittedOutputReason(
     const context =
       sourceGet === undefined || sourceKey === undefined
         ? []
-        : commandAddress(manifest, sourceGet[1], sourceKey).parents
+        : commandParents(manifest, sourceGet[1])
     const available =
       parent === sourceKey ||
       (manifest.version === '1.1' &&

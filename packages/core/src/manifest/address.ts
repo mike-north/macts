@@ -14,7 +14,8 @@ import type { Resource } from './schemas/resource.js'
 import type { HierarchyChild } from './schemas/hierarchy.js'
 import { resolvePrimaryIdentifierProperty, resolveIdentifierTargeting } from './identifier.js'
 import { resolveCollectionAccessor } from './native-accessor.js'
-import { resourceCommandEntries } from './resource-commands.js'
+import { commandParents, resourceCommandEntries } from './resource-commands.js'
+import { outputProperties, outputPropertyContainer } from './output-references.js'
 import { resolveManifestRoutes } from './route.js'
 import { itemIdentifierParameter, selectsOneItem } from './item-selection.js'
 import { PropertySchema } from './schemas/property.js'
@@ -78,20 +79,7 @@ export function commandAddress(
   resourceKey: string
 ): CommandAddress {
   const resource = manifest.resources[resourceKey]
-  const parent = command.parent
-  const parents =
-    command.parents ??
-    (parent === undefined
-      ? []
-      : [
-          {
-            ...parent,
-            by: 'identity' as const,
-            collection: resolveCollectionAccessor(
-              manifest.resources[parent.resource] ?? { plural: parent.resource }
-            ),
-          },
-        ])
+  const parents = commandParents(manifest, command)
   let children = manifest.hierarchy.children
   if (command.parents !== undefined) {
     for (const segment of parents) children = children[segment.collection]?.children ?? {}
@@ -380,6 +368,21 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
       refuse(`target "${resourceType}" needs exactly one final containment edge.`)
     }
     if (command.item !== undefined) check(command.item, resourceType)
+    // A retained field's identity namespace must come from this read, never another route.
+    const resource = manifest.resources[resourceType]
+    if (resource !== undefined && ['get', 'list'].includes(command.name)) {
+      const context = commandAddress(manifest, command, resourceType).parents
+      for (const [name, property] of outputProperties(manifest, resourceType, resource)) {
+        const container = outputPropertyContainer(manifest, property)
+        if (
+          container !== undefined &&
+          container !== resourceType &&
+          !context.some(({ resource, by }) => resource === container && by === 'identity')
+        ) {
+          refuse(`field "${name}" requires identified container "${container}" in this read path.`)
+        }
+      }
+    }
   }
   return issues
 }

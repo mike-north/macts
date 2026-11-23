@@ -153,3 +153,53 @@ it.each(['wrong-type', 'nullable'] as const)(
     expect(generated.client.files).toEqual([])
   }
 )
+
+/** Alternate reads must carry the identity context of every advertised related field. */
+it('refuses an explicit Tab list without its current Session’s Window context at every boundary', () => {
+  const manifest = load()
+  const list = manifest.commands['listTabs']
+  const tabs = manifest.hierarchy.children['windows']?.children?.['tabs']
+  const window = manifest.resources['Window']
+  const get = manifest.commands['getWindow']
+  if (list === undefined || tabs === undefined || window === undefined || get === undefined) {
+    throw new Error('Missing Tab fixture')
+  }
+  manifest.resources['OtherWindow'] = { ...window, name: 'OtherWindow', plural: 'OtherWindows' }
+  manifest.commands['getOtherWindow'] = { ...get, resourceType: 'OtherWindow' }
+  manifest.hierarchy.children['otherWindows'] = {
+    resource: 'OtherWindow',
+    access: 'r',
+    children: { tabs },
+  }
+  delete list.parent
+  list.parents = [
+    { resource: 'OtherWindow', collection: 'otherWindows', by: 'identity', parameter: 'id' },
+  ]
+  list.parameters = get.parameters
+  list.resolvesReferences = false
+  const capture = (run: () => unknown): string => {
+    try {
+      run()
+      return 'accepted'
+    } catch (error) {
+      return error instanceof Error ? error.message : String(error)
+    }
+  }
+  const parsed = AppManifestSchema.safeParse(manifest)
+  const generated = generateConsolidatedPackages(manifest, { appName: 'iterm' })
+  const outcomes = {
+    parse: parsed.success ? 'accepted' : parsed.error.message,
+    generation: generated.errors.join(' '),
+    manifest: capture(() => operationsFromManifest(manifest)),
+    contract: capture(() => operationsFromContract(iTermContract, manifest)),
+  }
+  expect(
+    Object.fromEntries(
+      Object.entries(outcomes).map(([boundary, message]) => [
+        boundary,
+        ['listTabs', 'currentSession', 'Window'].every((word) => message.includes(word)),
+      ])
+    )
+  ).toEqual({ parse: true, generation: true, manifest: true, contract: true })
+  expect(generated.client.files).toEqual([])
+})
