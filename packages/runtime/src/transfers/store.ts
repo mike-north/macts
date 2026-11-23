@@ -245,8 +245,9 @@ class SqliteTransferStore implements TransferStore {
    * The sweep runs after the call so the call reports on the records it
    * found: a transfer that expired a moment ago is `expired` to this call,
    * and `unknown-transfer` only once a sweep has removed it. A failed
-   * opportunistic sweep never changes the call's outcome; the next one
-   * retries.
+   * opportunistic sweep never changes the call's outcome. The sweep time is
+   * recorded when a sweep starts, so a failed sweep is retried after the
+   * next full interval rather than by the next mutating call.
    */
   async #thenSweepIfDue<T>(call: () => T | Promise<T>): Promise<T> {
     try {
@@ -260,7 +261,7 @@ class SqliteTransferStore implements TransferStore {
             await this.sweep()
           }
         } catch {
-          // Cleanup is retried by the next sweep; the call's result stands.
+          // Cleanup is retried at the next due sweep; the call's result stands.
         }
       }
     }

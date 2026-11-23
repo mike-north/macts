@@ -210,7 +210,11 @@ function prepareSchema(database: SqliteDatabase, version: number): void {
  *
  * @throws Error when the database's schema version is not one this code
  *   understands (see the module documentation); the database is closed and
- *   left untouched.
+ *   left untouched. The one exception is a home that no version has opened
+ *   before: if another version creates its schema between the version read and
+ *   the journal-mode switch, that switch still happens before the transaction
+ *   re-checks the version and refuses. SQLite cannot change the journal mode
+ *   inside a transaction, so this window cannot be closed.
  */
 export function openTransferDatabase(paths: TransferPaths): SqliteDatabase {
   ensurePrivateDirectory(paths.root)
