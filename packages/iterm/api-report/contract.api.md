@@ -7,7 +7,6 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { ClientBrand } from '@macts/contracts';
-import { FileSource } from '@macts/contracts';
 import { IndexSelectorReference } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceData } from '@macts/contracts';
@@ -51,7 +50,6 @@ export interface iTermClient extends ClientBrand<iTermResources> {
     toggleHotkeyWindow(options?: CallOptions): Promise<void>;
     variable(named: string, options?: CallOptions): Promise<void>;
     readonly windows: WindowResourceClient;
-    write(contentsOfFile?: FileSource, text?: string, newline?: boolean, options?: CallOptions): Promise<void>;
 }
 
 // @public

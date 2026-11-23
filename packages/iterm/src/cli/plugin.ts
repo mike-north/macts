@@ -22,7 +22,6 @@ import { CreateHotkeyWindowWithProfileCommand } from './commands/create-hotkey-w
 import { LaunchAPIScriptNamedCommand } from './commands/launch-apiscript-named.js'
 import { InvokeAPIExpressionCommand } from './commands/invoke-apiexpression.js'
 import { CreateWindowWithDefaultProfileCommand } from './commands/create-window-with-default-profile.js'
-import { WriteCommand } from './commands/write.js'
 import { SelectCommand } from './commands/select.js'
 import { SplitVerticallyCommand } from './commands/split-vertically.js'
 import { SplitVerticallyWithDefaultProfileCommand } from './commands/split-vertically-with-default-profile.js'
@@ -66,7 +65,6 @@ export const plugin: CliPlugin = {
     LaunchAPIScriptNamedCommand,
     InvokeAPIExpressionCommand,
     CreateWindowWithDefaultProfileCommand,
-    WriteCommand,
     SelectCommand,
     SplitVerticallyCommand,
     SplitVerticallyWithDefaultProfileCommand,

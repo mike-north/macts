@@ -580,34 +580,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'iterm.app.write',
-    app: 'iterm',
-    appBundleId: 'com.googlecode.iterm2',
-    resource: 'app',
-    operation: 'write',
-    description: 'Send text as though it was typed.',
-    permission: 'iterm:app:write',
-    risk: 'write',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        contentsOfFile: {
-          description: 'Filename to send the contents of',
-          type: 'string',
-        },
-        text: {
-          description: 'Text to send',
-          type: 'string',
-        },
-        newline: {
-          description: 'If newline should be added to end of text (default: yes)',
-          type: 'boolean',
-        },
-      },
-      additionalProperties: false,
-    },
-  },
-  {
     name: 'iterm.sessions.getWithinTab',
     app: 'iterm',
     appBundleId: 'com.googlecode.iterm2',

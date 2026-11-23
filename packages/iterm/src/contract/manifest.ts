@@ -44,7 +44,6 @@ export const manifest: unknown = {
         'launchAPIScriptNamed',
         'invokeAPIExpression',
         'createWindowWithDefaultProfile',
-        'write',
         'select',
         'splitVertically',
         'splitVerticallyWithDefaultProfile',
@@ -1281,35 +1280,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'nwwn',
-    },
-    write: {
-      name: 'write',
-      description: 'Send text as though it was typed.',
-      scope: 'application',
-      parameters: [
-        {
-          name: 'contentsOfFile',
-          type: 'file',
-          description: 'Filename to send the contents of',
-          required: false,
-          code: 'Cofl',
-        },
-        {
-          name: 'text',
-          type: 'string',
-          description: 'Text to send',
-          required: false,
-          code: 'Text',
-        },
-        {
-          name: 'newline',
-          type: 'boolean',
-          description: 'If newline should be added to end of text (default: yes)',
-          required: false,
-          code: 'Wtnl',
-        },
-      ],
-      code: 'sntx',
     },
     select: {
       name: 'select',

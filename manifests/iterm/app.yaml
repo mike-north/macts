@@ -36,7 +36,6 @@ suites:
       - launchAPIScriptNamed
       - invokeAPIExpression
       - createWindowWithDefaultProfile
-      - write
       - select
       - splitVertically
       - splitVerticallyWithDefaultProfile
@@ -922,27 +921,6 @@ commands:
         description: Shell command to run
         required: false
         code: Nwcm
-  write:
-    name: write
-    description: Send text as though it was typed.
-    scope: application
-    code: sntx
-    parameters:
-      - name: contentsOfFile
-        type: file
-        description: Filename to send the contents of
-        required: false
-        code: Cofl
-      - name: text
-        type: string
-        description: Text to send
-        required: false
-        code: Text
-      - name: newline
-        type: boolean
-        description: 'If newline should be added to end of text (default: yes)'
-        required: false
-        code: Wtnl
   select:
     name: select
     description: Make receiver visible and selected.

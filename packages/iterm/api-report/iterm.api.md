@@ -6,7 +6,6 @@
 
 import { CallOptions } from '@macts/contracts';
 import { ClientBrand } from '@macts/contracts';
-import { FileSource } from '@macts/contracts';
 import { IndexSelectorReference } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import * as _macts_contracts from '@macts/contracts';
@@ -88,7 +87,6 @@ export class iTermClient {
     toggleHotkeyWindow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     variable(named: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly windows: WindowResourceClient;
-    write(contentsOfFile?: Parameters<iTermClient_2['write']>[0], text?: string, newline?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public

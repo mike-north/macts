@@ -24,7 +24,6 @@ import {
   type CallOptions,
   type ClientBrand,
   type ClientRuntime,
-  type FileSource,
   type IndexSelectorReference,
   type Integer,
   type ObjectReferenceData,
@@ -960,20 +959,6 @@ export interface iTermClient extends ClientBrand<iTermResources> {
    * @param command - Shell command to run. Does not accept null.
    */
   createWindowWithDefaultProfile(command?: string, options?: CallOptions): Promise<void>
-  /**
-   * Send text as though it was typed.
-   *
-   * @param contentsOfFile - Filename to send the contents of. Does not accept null.
-   * @param text - Text to send. Does not accept null.
-   * @param newline - If newline should be added to end of text (default: yes). Does not accept
-   * null.
-   */
-  write(
-    contentsOfFile?: FileSource,
-    text?: string,
-    newline?: boolean,
-    options?: CallOptions
-  ): Promise<void>
   /** Make receiver visible and selected. */
   select(options?: CallOptions): Promise<void>
   /**
@@ -2009,70 +1994,6 @@ const appCreateWindowWithDefaultProfileOperation: OperationDescriptor<
   },
 }
 
-const appWriteOperation: OperationDescriptor<
-  {
-    readonly contentsOfFile?: FileSource | undefined
-    readonly text?: string | undefined
-    readonly newline?: boolean | undefined
-  },
-  undefined
-> = {
-  id: 'iterm.app.write',
-  permission: 'iterm:app:write',
-  target: { command: 'write' },
-  description: 'Send text as though it was typed.',
-  input: t.record({
-    contentsOfFile: t.optional(t.fileSource({ description: 'Filename to send the contents of' })),
-    text: t.optional(t.string({ description: 'Text to send' })),
-    newline: t.optional(
-      t.boolean({ description: 'If newline should be added to end of text (default: yes)' })
-    ),
-  }),
-  output: t.none(),
-  inputJsonSchema: {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: {
-      contentsOfFile: {
-        type: 'object',
-        properties: {
-          fileSource: {
-            oneOf: [
-              {
-                type: 'object',
-                properties: {
-                  kind: { type: 'string', const: 'caller-owned-file' },
-                  path: { type: 'string', minLength: 1 },
-                },
-                required: ['kind', 'path'],
-                additionalProperties: false,
-              },
-              {
-                type: 'object',
-                properties: {
-                  kind: { type: 'string', const: 'uploaded-file' },
-                  uploadId: { type: 'string', minLength: 1 },
-                },
-                required: ['kind', 'uploadId'],
-                additionalProperties: false,
-              },
-            ],
-          },
-        },
-        required: ['fileSource'],
-        additionalProperties: false,
-        description: 'Filename to send the contents of',
-      },
-      text: { type: 'string', description: 'Text to send' },
-      newline: {
-        type: 'boolean',
-        description: 'If newline should be added to end of text (default: yes)',
-      },
-    },
-    additionalProperties: false,
-  },
-}
-
 const appSelectOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'iterm.app.select',
   permission: 'iterm:app:select',
@@ -2334,7 +2255,6 @@ const operations: AppContract<iTermClient>['operations'] = {
   'iterm.app.launchAPIScriptNamed': appLaunchAPIScriptNamedOperation,
   'iterm.app.invokeAPIExpression': appInvokeAPIExpressionOperation,
   'iterm.app.createWindowWithDefaultProfile': appCreateWindowWithDefaultProfileOperation,
-  'iterm.app.write': appWriteOperation,
   'iterm.app.select': appSelectOperation,
   'iterm.app.splitVertically': appSplitVerticallyOperation,
   'iterm.app.splitVerticallyWithDefaultProfile': appSplitVerticallyWithDefaultProfileOperation,
@@ -2399,8 +2319,6 @@ function bind(runtime: ClientRuntime): iTermClient {
     invokeAPIExpression: (options) => runtime.invoke(appInvokeAPIExpressionOperation, {}, options),
     createWindowWithDefaultProfile: (command, options) =>
       runtime.invoke(appCreateWindowWithDefaultProfileOperation, { command }, options),
-    write: (contentsOfFile, text, newline, options) =>
-      runtime.invoke(appWriteOperation, { contentsOfFile, text, newline }, options),
     select: (options) => runtime.invoke(appSelectOperation, {}, options),
     splitVertically: (withProfile, command, options) =>
       runtime.invoke(appSplitVerticallyOperation, { withProfile, command }, options),
