@@ -457,6 +457,11 @@ it('refuses an ancestor whose resolving get requires omitted identity context, e
   ).toBeGreaterThan(0)
 })
 
+/** Fixture selections use required string identities independently of their parameter names. */
+function identityParameter(name: string) {
+  return { name, type: 'string', required: true, description: 'Selected identity' }
+}
+
 /** A finite repeated Folder address retains distinct selectors for each physical ancestor. */
 function repeatedFolderFixture(): AppManifest {
   const base = panesManifest()
@@ -509,12 +514,7 @@ function repeatedFolderFixture(): AppManifest {
       { resource: 'Folder', collection: 'folders', by: 'identity', parameter: 'innerId' },
     ],
     item: { by: 'identity', parameter: 'documentId' },
-    parameters: ['outerId', 'innerId', 'documentId'].map((name) => ({
-      name,
-      type: 'string',
-      description: name,
-      required: true,
-    })),
+    parameters: ['outerId', 'innerId', 'documentId'].map(identityParameter),
   }
   return manifest
 }
@@ -670,12 +670,6 @@ it('executes a repeated-Folder list without substituting the outer reference con
     description: 'An Entry held by the same Folder',
     optional: false,
   }
-  const parameter = (name: string) => ({
-    name,
-    type: 'string',
-    required: true,
-    description: 'Selected identity',
-  })
   for (const name of ['Document', 'Entry']) {
     manifest.commands[`get${name}`] = {
       name: 'get',
@@ -683,7 +677,7 @@ it('executes a repeated-Folder list without substituting the outer reference con
       resourceType: name,
       description: 'Read within its Folder',
       parent: { resource: 'Folder', parameter: 'folderId' },
-      parameters: [parameter('folderId'), parameter('id')],
+      parameters: [identityParameter('folderId'), identityParameter('id')],
     }
   }
   for (const edge of [outerEdge, innerEdge])
@@ -699,7 +693,7 @@ it('executes a repeated-Folder list without substituting the outer reference con
     description: 'List within a nested Folder',
     resolvesReferences: false,
     parents,
-    parameters: parents.map(({ parameter: name }) => parameter(name)),
+    parameters: parents.map(({ parameter: name }) => identityParameter(name)),
   }
   expect(AppManifestSchema.safeParse(manifest).success).toBe(true)
   const entry = (label: string) => ({ exists: () => true, id: () => 'entry', label: () => label })
@@ -753,4 +747,128 @@ it('executes a repeated-Folder list without substituting the outer reference con
     },
   })
   expect(codec.decode(encoded, plan, env)).toBe(innerEntry)
+})
+
+/** Equivalent parent syntax must preserve every identified container of a row's related reference. */
+it('emits the same complete row identity from legacy and explicit list addresses', () => {
+  const manifest = repeatedFolderFixture()
+  const folderResource = manifest.resources['Folder'],
+    documentResource = manifest.resources['Document']
+  const getDocument = manifest.commands['getDocument']
+  if (!folderResource || !documentResource || !getDocument)
+    throw new Error('Missing Folder and Document fixture')
+  manifest.resources['Entry'] = { ...folderResource, name: 'Entry', plural: 'Entries' }
+  documentResource.properties['favorite'] = {
+    access: 'r',
+    type: { resource: 'Entry' },
+    description: 'An Entry inside this Document',
+    optional: false,
+  }
+  manifest.hierarchy.children['folders'] = {
+    resource: 'Folder',
+    access: 'r',
+    children: {
+      documents: {
+        resource: 'Document',
+        access: 'r',
+        children: { entries: { resource: 'Entry', access: 'r' } },
+      },
+    },
+  }
+  const folder = {
+    resource: 'Folder',
+    collection: 'folders',
+    by: 'identity' as const,
+    parameter: 'folderId',
+  }
+  const document = {
+    resource: 'Document',
+    collection: 'documents',
+    by: 'identity' as const,
+    parameter: 'documentId',
+  }
+  delete getDocument.resolvesReferences
+  getDocument.parents = [folder]
+  getDocument.parameters = [identityParameter('folderId'), identityParameter('documentId')]
+  manifest.commands['getEntry'] = {
+    name: 'get',
+    scope: 'resource',
+    resourceType: 'Entry',
+    description: 'Read within its Document',
+    parents: [folder, document],
+    item: { by: 'identity', parameter: 'id' },
+    parameters: [
+      identityParameter('folderId'),
+      identityParameter('documentId'),
+      identityParameter('id'),
+    ],
+  }
+  const entry = { exists: () => true, id: () => 'entry' }
+  const nativeDocument = {
+    exists: () => true,
+    id: () => 'document',
+    entries: { byId: () => entry },
+  }
+  const documents = new Proxy(() => [nativeDocument], {
+    get: (_target, key) =>
+      key === 'byId' ? () => nativeDocument : () => (key === 'id' ? ['document'] : [entry]),
+  })
+  const nativeFolder = { exists: () => true, id: () => 'folder', documents }
+  const app = { folders: { byId: () => nativeFolder } }
+  const references = (name: string) => {
+    const addressing = referenceAddressing(manifest, name)
+    if (addressing === undefined) throw new Error('Missing identified reference plan')
+    return { id: { kind: 'string' as const }, addressing }
+  }
+  const encoded = [false, true].map((explicit) => {
+    manifest.commands['listDocuments'] = {
+      name: 'list',
+      scope: 'resource',
+      resourceType: 'Document',
+      description: 'List within a Folder',
+      parameters: [identityParameter('folderId')],
+      ...(explicit
+        ? { parents: [folder] }
+        : { parent: { resource: 'Folder', parameter: 'folderId' } }),
+    }
+    expect(AppManifestSchema.safeParse(manifest).success).toBe(true)
+    const env: NativeCodecEnvironment = {
+      app,
+      contexts: new WeakMap(),
+      references: {
+        Folder: references('Folder'),
+        Document: references('Document'),
+        Entry: references('Entry'),
+      },
+    }
+    const body = buildNativeBody(manifest, { command: 'listDocuments', resource: 'Document' })
+    const rows = runInNewContext(`(function(app,args,env) { ${body} })(app,args,env)`, {
+      app,
+      args: { folderId: 'folder' },
+      env,
+    }) as { favorite: unknown }[]
+    const row = rows[0]
+    if (!row) throw new Error('Missing listed Document')
+    const codec = createNativeCodecFunctions()
+    const plan = { kind: 'reference', resource: 'Entry', cardinality: 'one' } as const
+    const result = codec.encode(row.favorite, plan, env)
+    expect(codec.decode(result, plan, env)).toBe(entry)
+    return result
+  })
+  const expected = {
+    reference: {
+      resource: 'Entry',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'entry',
+      container: {
+        resource: 'Document',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'document',
+        container: { resource: 'Folder', form: 'identity', cardinality: 'one', id: 'folder' },
+      },
+    },
+  }
+  expect(encoded).toEqual([expected, expected])
 })

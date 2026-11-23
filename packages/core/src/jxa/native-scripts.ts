@@ -85,6 +85,7 @@ import {
   outputPropertyContainer,
 } from '../manifest/output-references.js'
 import { isPositional } from '../manifest/positional.js'
+import { commandAddress } from '../manifest/address.js'
 import { resolvingCommand, referenceParent } from '../manifest/resource-commands.js'
 import { ROOT_KIND_PROPERTY, rootProperties } from '../manifest/roots.js'
 import { ABSENT_VALUE_ERROR_NUMBER, readsAbsentAsNull } from '../manifest/schemas/evidence.js'
@@ -1832,10 +1833,16 @@ function buildListBody(
       {}
     )
   }
+  // Format 1.1 rows retain the normalized parent and its earlier validated context.
+  // Format 1.0 keeps its established marker shape.
+  const addressedParent =
+    manifest.version === '1.1' && source.key !== undefined
+      ? commandAddress(manifest, command, source.key).parents.at(-1)
+      : undefined
   const ancestorContext =
-    command.parents === undefined
+    addressedParent === undefined
       ? undefined
-      : `[${command.parents.map((entry, at) => `{ resource: ${literal(entry.resource)}, item: ancestor${String(at)} }`).join(', ')}]`
+      : `(env.contexts.get(${PARENT_LOCAL}) || []).concat([{ resource: ${literal(addressedParent.resource)}, item: ${PARENT_LOCAL} }])`
   const recordFields = bestEffortProps.map((p, index) => {
     const value = `${columnLocal(index)}[i]`
     const property = resource?.properties[p]
