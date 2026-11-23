@@ -58,7 +58,9 @@ export class SessionResourceClient {
     )
   }
 
-  /** Read a session by id in the tab at a window position. */
+  /**
+   * Read a session by id in the tab at a window position.
+   */
   async get(
     windowId: string | number,
     tabIndex: string | number,
@@ -77,7 +79,9 @@ export class SessionResourceClient {
     )
   }
 
-  /** Read a session identity across all tabs of its Window. A move to another Window makes this identity missing. */
+  /**
+   * Read a session identity across all tabs of its Window. A move to another Window makes this identity missing.
+   */
   async resolve(
     windowId: string | number,
     sessionId: string,

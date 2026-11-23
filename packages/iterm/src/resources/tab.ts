@@ -57,7 +57,10 @@ export class TabResourceClient {
     )
   }
 
-  /** Get a tab of a window by its position */
+  /**
+   * Get a tab of a window by its position
+   * A tab has no id, so it is selected by its zero-based position within its window, which drifts when tabs open, close or move.
+   */
   async get(
     windowId: string | number,
     index: string | number,

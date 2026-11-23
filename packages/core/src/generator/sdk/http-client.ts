@@ -949,6 +949,7 @@ function docNoteLines(notes: readonly string[]): string {
  *
  * Integer identifiers are checked before the shared codec encodes them
  * ({@link bodyField}); other identifiers retain their declared addressing text.
+ * Every signature retains its positional-selection and first-match guidance.
  */
 function generateGetMethod(
   version: AppManifest['version'],
@@ -973,7 +974,9 @@ function generateGetMethod(
       selectors
     )
     return `
-  /** ${command.description} */
+  /**
+   * ${command.description}${docNoteLines(notes)}
+   */
   async ${methodName}(${signature}): Promise<${resourceName}> {
     return this.#http.invoke<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, ${bodyArg});
   }
