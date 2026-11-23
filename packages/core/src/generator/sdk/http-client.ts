@@ -1,3 +1,4 @@
+import { callableResourceCommand } from '../../manifest/callable-commands.js'
 import { referenceParent } from '../../manifest/resource-commands.js'
 import { addressNormalization } from '../../manifest/normalize-addresses.js'
 /**
@@ -642,7 +643,9 @@ function generateResourceClient(
   const nameWords = identifierWords(resource.name)
   const pluralWords = identifierWords(resource.plural)
 
-  const allCommands = resourceCommandEntries(manifest, resourceName)
+  const allCommands = resourceCommandEntries(manifest, resourceName).filter(
+    ([key]) => callableResourceCommand(manifest, resourceName, key) !== undefined
+  )
   // An operation whose required input admits no value gets no method, and
   // every other one takes only the parameters its operation takes.
   const available = (cmd: Command): boolean => isOperationAvailable(manifest, cmd, resourceName)
@@ -742,7 +745,7 @@ function generateResourceClient(
       .filter(
         ([key, command]) =>
           command.name === 'get' &&
-          command.identityTraversal !== undefined &&
+          callableResourceCommand(manifest, resourceName, key) !== undefined &&
           key !== getCmd?.[0] &&
           available(command)
       )
@@ -754,7 +757,7 @@ function generateResourceClient(
           resourceName,
           nameWords,
           notesOf(command, true),
-          safeIdentifier(command.routeName ?? key)
+          safeIdentifier(callableResourceCommand(manifest, resourceName, key) ?? key)
         )
       ),
   ]

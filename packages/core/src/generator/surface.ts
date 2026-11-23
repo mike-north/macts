@@ -41,6 +41,7 @@ import {
   type CrudOperation,
 } from '../manifest/resource-commands.js'
 import type { DeclaredType } from '../manifest/value-shapes.js'
+import { safeIdentifier } from '../manifest/callable-commands.js'
 
 // Which commands apply to a resource and which backs each CRUD shape are
 // manifest knowledge (../manifest/resource-commands.ts). They are re-exported
@@ -53,68 +54,7 @@ export {
   type CrudOperation,
 } from '../manifest/resource-commands.js'
 
-/**
- * Words that cannot name a JavaScript binding or method without escaping.
- */
-const RESERVED_WORDS: ReadonlySet<string> = new Set([
-  'arguments',
-  'break',
-  'case',
-  'catch',
-  'class',
-  'const',
-  'continue',
-  'debugger',
-  'default',
-  'delete',
-  'do',
-  'else',
-  'enum',
-  'eval',
-  'export',
-  'extends',
-  'false',
-  'finally',
-  'for',
-  'function',
-  'if',
-  'implements',
-  'import',
-  'in',
-  'instanceof',
-  'interface',
-  'let',
-  'new',
-  'null',
-  'of',
-  'package',
-  'private',
-  'protected',
-  'public',
-  'return',
-  'static',
-  'super',
-  'switch',
-  'this',
-  'throw',
-  'true',
-  'try',
-  'typeof',
-  'var',
-  'void',
-  'while',
-  'with',
-  'yield',
-])
-
-/**
- * The binding or method name a generated client uses for a manifest name: the
- * name itself, or the name prefixed with `_` when it is a reserved word (a
- * command named `delete` becomes the method `_delete`).
- */
-export function safeIdentifier(name: string): string {
-  return RESERVED_WORDS.has(name) ? `_${name}` : name
-}
+export { safeIdentifier } from '../manifest/callable-commands.js'
 
 /** Whether a command `name` is one of the standard CRUD shapes. */
 export function isCrudName(name: string): name is CrudOperation {

@@ -6,6 +6,7 @@
  * @packageDocumentation
  */
 import { addressNormalization } from '../../manifest/normalize-addresses.js'
+import { callableResourceCommand } from '../../manifest/callable-commands.js'
 
 import { join } from 'node:path'
 import type { AppManifest } from '../../manifest/index.js'
@@ -59,6 +60,7 @@ export function generateCliPlugin(
 
     // Generate commands for each hierarchy path
     const standardOps = new Set(['list', 'get', 'create', 'update', 'delete'])
+    const keyOf = new Map(Object.entries(manifest.commands).map(([key, command]) => [command, key]))
     for (const hierarchyPath of ctx.getHierarchyPaths()) {
       // Only emit a CRUD subcommand when the generated SDK actually exposes the
       // matching method — i.e. when the manifest declares a backing command for
@@ -70,11 +72,14 @@ export function generateCliPlugin(
       // gets no CLI command either: a command that always fails would only
       // mislead.
       const resourceCommands = ctx.getResourceCommands(hierarchyPath.resourceName)
+      const callable = (command: (typeof resourceCommands)[number]): boolean =>
+        callableResourceCommand(manifest, hierarchyPath.resourceName, keyOf.get(command) ?? '') !==
+        undefined
       const available = (c: (typeof resourceCommands)[number]): boolean =>
         ctx.isOperationAvailable(c, hierarchyPath.resourceName)
       const hasOp = (op: string): boolean => {
         const chosen = resourceCommands.find((c) => c.name === op)
-        return chosen !== undefined && available(chosen)
+        return chosen !== undefined && callable(chosen) && available(chosen)
       }
 
       // List command
@@ -102,13 +107,13 @@ export function generateCliPlugin(
         // A separate identity get is a declared read operation on every surface.
         if (
           cmd.name === 'get' &&
-          cmd.identityTraversal !== undefined &&
+          callable(cmd) &&
           cmd !== resourceCommands.find((command) => command.name === 'get') &&
           available(cmd)
         ) {
           commands.push(generateGetCommand(hierarchyPath, ctx, cmd))
         }
-        if (standardOps.has(cmd.name) || !available(cmd)) continue
+        if (standardOps.has(cmd.name) || !callable(cmd) || !available(cmd)) continue
         commands.push(generateResourceCommand(cmd, hierarchyPath, ctx))
       }
     }

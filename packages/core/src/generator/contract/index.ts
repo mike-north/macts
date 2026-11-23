@@ -23,6 +23,7 @@
  *
  * @packageDocumentation
  */
+import { callableResourceCommand } from '../../manifest/callable-commands.js'
 import { normalizeManifestAddresses } from '../../manifest/normalize-addresses.js'
 
 import { z } from 'zod'
@@ -1208,7 +1209,11 @@ class ContractBuilder {
       const methods: MethodModel[] = []
       const crud = (shape: CrudOperation): [Command, OperationModel] | undefined => {
         const found = findCrudCommand(commands, shape)
-        if (found === undefined) return undefined
+        if (
+          found === undefined ||
+          callableResourceCommand(this.#manifest, resourceKey, found[0]) === undefined
+        )
+          return undefined
         const operation = this.#callableOperation(this.#routeOf(found[0], resourceKey))
         return operation === undefined ? undefined : [found[1], operation]
       }
@@ -1225,20 +1230,21 @@ class ContractBuilder {
       for (const [commandKey, command] of commands) {
         // Identity retrieval remains callable when the ordinary get uses a
         // different explicit address, rather than being hidden as a second get.
+        const callable = callableResourceCommand(this.#manifest, resourceKey, commandKey)
         if (
           command.name === 'get' &&
-          command.identityTraversal !== undefined &&
+          callable !== undefined &&
           findCrudCommand(commands, 'get')?.[0] !== commandKey
         ) {
           const operation = this.#callableOperation(this.#routeOf(commandKey, resourceKey))
           if (operation !== undefined)
             methods.push({
               ...this.#getMethod(resource, command, operation),
-              name: safeIdentifier(command.routeName ?? commandKey),
+              name: safeIdentifier(callable),
               doc: this.#withFirstMatchNotes(command.description, command, resource),
             })
         }
-        if (isCrudName(command.name)) continue
+        if (isCrudName(command.name) || callable === undefined) continue
         const operation = this.#callableOperation(this.#routeOf(commandKey, resourceKey))
         if (operation !== undefined) methods.push(this.#commandMethod(command, operation, resource))
       }
