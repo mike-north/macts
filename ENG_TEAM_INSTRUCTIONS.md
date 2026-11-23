@@ -93,7 +93,20 @@ governability at the same time.
 - **Package manager:** `pnpm` (v10, see `packageManager`). Never `npx`/`npm`.
   Use `pnpm exec <bin>` or `./node_modules/.bin/<bin>`, never `pnpm dlx tsc`.
 - **Monorepo:** `nx` orchestrates targets. `pnpm build|test|lint|typecheck`
-  run across packages; filter with `pnpm --filter @macts/<pkg> <target>`.
+  run across packages. Nx caches `build`, `api-extractor`, `lint`,
+  `typecheck`, `test` and `test:types` locally in `.nx/cache`, so an unchanged
+  task replays in seconds.
+- **Iterate with the fast path, not the full suite.** While developing, run
+  `pnpm verify:affected`: build, lint, typecheck, test and type tests for the
+  projects your change touches (committed, uncommitted or untracked) and
+  everything that depends on them. For one package, `pnpm verify:project @macts/<pkg>`, or a
+  single target with `pnpm exec nx run @macts/<pkg>:typecheck`. Prefer these
+  over `pnpm --filter`, which bypasses the cache and does not build upstream
+  packages first. `verify:affected` widens to every project when a changed file
+  outside every project is not documentation, and names any extra gate the
+  change needs (for example `pnpm generate:check` after a manifest or
+  generator change). Run the full
+  gate in §8 before review; CI always runs it unfiltered.
 - **TypeScript:** strict (`tsconfig.base.json`), `noEmitOnError`. In libraries
   avoid `esModuleInterop`, `allowSyntheticDefaultImports`, `skipLibCheck`. Use
   `@ts-expect-error` (with a reason), never `@ts-ignore`.

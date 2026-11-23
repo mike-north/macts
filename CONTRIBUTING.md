@@ -52,12 +52,21 @@ pnpm typecheck        # Type-check all packages
 pnpm format           # Format with Prettier
 ```
 
-Individual packages can be targeted with pnpm's filter:
+While iterating, check only what your change affects. Nx caches each task
+locally, so anything unchanged replays from `.nx/cache`:
 
 ```bash
-pnpm --filter @macts/cli test
-pnpm --filter @macts/core build
+pnpm verify:affected                    # build, lint, typecheck, test, test:types for changed projects and their dependents
+pnpm verify:project @macts/cli          # the same targets for one package
+pnpm exec nx run @macts/cli:typecheck   # one target for one package
 ```
+
+`verify:affected` compares against `main` and includes uncommitted and untracked
+files. Pass `--targets typecheck,test` to narrow the targets or `--base <ref>` to
+change the comparison. It checks every project when a changed file outside every
+project is not documentation, and names any wider gate the change needs, such as
+`pnpm generate:check`.
+Run the full commands above before opening a pull request.
 
 ### Changesets
 
