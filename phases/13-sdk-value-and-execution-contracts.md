@@ -2829,7 +2829,10 @@ change of positions is never read as another occupant; a match that no longer
 exists in that Tab (closed, or moved to another Tab) is a retryable
 `CollectionChangedError`, not a missing target. It never
 searches another Window. Tab reorder, closure of an earlier Tab, or
-movement between Tabs in that Window does not change the reference's meaning.
+movement of a Session between Tabs of its Window does not change what a
+reference means between reads. If a Session closes or moves while a single read
+is in progress, that read fails closed, reporting either a missing target or a
+retryable `CollectionChangedError`, and never returns a different Session.
 Movement to another Window makes the old reference missing. No persistence
 across restoration or relaunch is promised.
 
