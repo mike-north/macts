@@ -12,7 +12,7 @@
 
 import { describe, expect, it, vi } from 'vitest'
 import * as fsp from 'node:fs/promises'
-import { chmodSync, existsSync, readdirSync, readFileSync, realpathSync } from 'node:fs'
+import { chmodSync, existsSync, readdirSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { Readable } from 'node:stream'
 import { RateLimitedError } from '@macts/contracts'
@@ -103,13 +103,13 @@ describe('createUpload', () => {
   })
 
   describe('contentType', () => {
-    it('accepts a hint of up to 255 characters (the longest media type RFC 6838 allows)', async () => {
+    it('accepts a hint of up to 255 UTF-16 code units (the longest media type RFC 6838 allows)', async () => {
       const contentType = `application/${'x'.repeat(255 - 'application/'.length)}`
       expect(contentType).toHaveLength(255)
       await expect(fixture.store.createUpload(ALICE, { contentType })).resolves.toBeDefined()
     })
 
-    it('rejects a hint longer than 255 characters, recording nothing', async () => {
+    it('rejects a hint longer than 255 UTF-16 code units, recording nothing', async () => {
       const error = await rejectionOf(
         fixture.store.createUpload(ALICE, { contentType: 'a'.repeat(256) })
       )
@@ -497,50 +497,93 @@ describe('receiveUpload', () => {
     }
   )
 
-  it('syncs the staged bytes to disk before the upload becomes complete', async () => {
-    const { uploadId } = await fixture.store.createUpload(ALICE)
-    const handle = await fsp.open(join(fixture.home, 'probe'), 'w')
-    const handlePrototype = Object.getPrototypeOf(handle) as {
-      sync: (this: unknown) => Promise<void>
+  /**
+   * Spy on every `FileHandle#sync`, classifying each call by what its handle
+   * refers to: the staged upload file, the uploads directory, or something
+   * else. A handle is recognized by its device and inode, so a sync of the
+   * directory can never stand in for a sync of the file. `failFile` makes
+   * only the staged file's sync fail.
+   */
+  async function spyOnSyncs(home: string, uploadId: string, options: { failFile?: boolean } = {}) {
+    const probe = await fsp.open(join(home, 'probe'), 'w')
+    const handlePrototype = Object.getPrototypeOf(probe) as {
+      sync: (this: fsp.FileHandle) => Promise<void>
     }
-    await handle.close()
+    await probe.close()
     const original = handlePrototype.sync
-    const statesAtSync: string[] = []
-    const spy = vi.spyOn(handlePrototype, 'sync').mockImplementation(function (this: unknown) {
-      statesAtSync.push(recordedState(fixture.home, uploadId))
+    const uploadsDirectory = join(home, 'transfers', 'uploads')
+    const calls: { target: 'file' | 'directory' | 'other'; state: string }[] = []
+    const spy = vi.spyOn(handlePrototype, 'sync').mockImplementation(async function (
+      this: fsp.FileHandle
+    ) {
+      const handleStats = await this.stat()
+      const same = (path: string): boolean => {
+        const stats = statSync(path, { throwIfNoEntry: false })
+        return stats?.ino === handleStats.ino && stats.dev === handleStats.dev
+      }
+      const target = same(join(uploadsDirectory, uploadId))
+        ? 'file'
+        : same(uploadsDirectory)
+          ? 'directory'
+          : 'other'
+      calls.push({ target, state: recordedState(home, uploadId) })
+      if (target === 'file' && options.failFile === true) {
+        throw Object.assign(new Error('EIO: /secret/path'), { code: 'EIO' })
+      }
       return original.call(this)
     })
+    return {
+      calls,
+      restore: () => {
+        spy.mockRestore()
+      },
+    }
+  }
+
+  it('syncs the staged file to disk before the upload becomes complete', async () => {
+    const { uploadId } = await fixture.store.createUpload(ALICE)
+    const syncs = await spyOnSyncs(fixture.home, uploadId)
     try {
       await fixture.store.receiveUpload(ALICE, uploadId, chunks('durable bytes'))
     } finally {
-      spy.mockRestore()
+      syncs.restore()
     }
 
-    // At least the staged file is synced, and every sync happens while the
-    // record still says the bytes are arriving: a `complete` record never
-    // describes bytes that were not yet durable.
-    expect(statesAtSync.length).toBeGreaterThanOrEqual(1)
-    expect(statesAtSync.every((state) => state === 'receiving')).toBe(true)
+    // The staged file's own handle is synced, while the record still says the
+    // bytes are arriving: a `complete` record never describes bytes that were
+    // not yet durable.
+    const fileSyncs = syncs.calls.filter((call) => call.target === 'file')
+    expect(fileSyncs).toHaveLength(1)
+    expect(fileSyncs[0]?.state).toBe('receiving')
     expect(recordedState(fixture.home, uploadId)).toBe('complete')
   })
 
-  it('fails the receive generically, leaving the upload receivable again, when syncing fails', async () => {
+  it('syncs the uploads directory so the staged file survives a power loss', async () => {
     const { uploadId } = await fixture.store.createUpload(ALICE)
-    const handle = await fsp.open(join(fixture.home, 'probe'), 'w')
-    const handlePrototype = Object.getPrototypeOf(handle) as {
-      sync: (this: unknown) => Promise<void>
+    const syncs = await spyOnSyncs(fixture.home, uploadId)
+    try {
+      await fixture.store.receiveUpload(ALICE, uploadId, chunks('durable bytes'))
+    } finally {
+      syncs.restore()
     }
-    await handle.close()
-    const spy = vi
-      .spyOn(handlePrototype, 'sync')
-      .mockRejectedValue(Object.assign(new Error('EIO: /secret/path'), { code: 'EIO' }))
+
+    const directorySyncs = syncs.calls.filter((call) => call.target === 'directory')
+    expect(directorySyncs).toHaveLength(1)
+    expect(directorySyncs[0]?.state).toBe('receiving')
+  })
+
+  it('fails the receive generically, leaving the upload receivable again, when syncing the file fails', async () => {
+    const { uploadId } = await fixture.store.createUpload(ALICE)
+    const syncs = await spyOnSyncs(fixture.home, uploadId, { failFile: true })
     let error: unknown
     try {
       error = await rejectionOf(fixture.store.receiveUpload(ALICE, uploadId, chunks('bytes')))
     } finally {
-      spy.mockRestore()
+      syncs.restore()
     }
 
+    // The directory sync succeeded; only the file's sync failed.
+    expect(syncs.calls.map((call) => call.target)).toEqual(['directory', 'file'])
     expect(error).toBeInstanceOf(Error)
     expect((error as Error).message).toBe('The transfer store could not stage the upload.')
     expect(stagedFiles(fixture.home)).toEqual([])

@@ -34,19 +34,28 @@ import { ALICE, MINUTE, rejectionOf, useTransferStore } from './transfer-test-he
 
 /**
  * Paths whose `unlink` the filesystem is made to refuse, with the error code
- * it refuses with. Everything else passes through to the real `node:fs/promises`.
+ * it refuses with and whether the path is a directory by then (the swap the
+ * refusal stands for). Everything else passes through to the real
+ * `node:fs/promises`.
  */
-const refusedUnlinks = vi.hoisted(() => new Map<string, string>())
+const refusedUnlinks = vi.hoisted(
+  () => new Map<string, { code: string; becomesDirectory: boolean }>()
+)
 
 vi.mock('node:fs/promises', async (importOriginal) => {
   const real = await importOriginal<typeof import('node:fs/promises')>()
   return {
     ...real,
-    unlink: (file: Parameters<typeof real.unlink>[0]) => {
-      const code = refusedUnlinks.get(String(file))
-      return code === undefined
-        ? real.unlink(file)
-        : Promise.reject(Object.assign(new Error(`${code}: refused`), { code }))
+    unlink: async (file: Parameters<typeof real.unlink>[0]) => {
+      const refusal = refusedUnlinks.get(String(file))
+      if (refusal === undefined) {
+        return real.unlink(file)
+      }
+      if (refusal.becomesDirectory) {
+        await real.unlink(file)
+        await real.mkdir(file)
+      }
+      throw Object.assign(new Error(`${refusal.code}: refused`), { code: refusal.code })
     },
   }
 })
@@ -281,17 +290,73 @@ describe.each(['EPERM', 'EISDIR'])(
 
     it('release() succeeds and forgets the record', async () => {
       const copy = await fixture.store.allocateTemporaryCopy(ALICE)
-      refusedUnlinks.set(copy.path, code)
+      refusedUnlinks.set(copy.path, { code, becomesDirectory: true })
       await expect(copy.release()).resolves.toBeUndefined()
       expect(recordedCopies(fixture.home)).toBe(0)
+      expect(lstatSync(copy.path).isDirectory()).toBe(true)
     })
 
     it('the sweep forgets the record instead of failing', async () => {
       const copy = await fixture.store.allocateTemporaryCopy(ALICE)
       fixture.clock.advance(61 * MINUTE)
-      refusedUnlinks.set(copy.path, code)
+      refusedUnlinks.set(copy.path, { code, becomesDirectory: true })
       await expect(fixture.store.sweep()).resolves.toBeUndefined()
       expect(recordedCopies(fixture.home)).toBe(0)
+    })
+  }
+)
+
+/**
+ * `unlink` of a regular file can also be refused (EPERM) by an immutable flag
+ * or a sandbox denial. The file is still there holding the caller's content,
+ * so the failure is reported generically and the record is kept: a later
+ * sweep retries, and the copy is never left on disk without a record.
+ */
+describe.each(['EPERM', 'EISDIR'])(
+  'a minted copy that stays a regular file when its deletion is refused (%s)',
+  (code) => {
+    const fixture = useTransferStore()
+
+    afterEach(() => {
+      refusedUnlinks.clear()
+    })
+
+    function recordedCopies(home: string): number {
+      const { DatabaseSync } = loadSqlite()
+      const database = new DatabaseSync(join(home, 'transfers', 'transfers.db'), { readOnly: true })
+      try {
+        const row = database.prepare('SELECT COUNT(*) AS count FROM temporary_copies').get()
+        return Number(row?.['count'])
+      } finally {
+        database.close()
+      }
+    }
+
+    it('release() rejects generically, keeping the record and the file', async () => {
+      const copy = await fixture.store.allocateTemporaryCopy(ALICE)
+      writeFileSync(copy.path, 'user content')
+      refusedUnlinks.set(copy.path, { code, becomesDirectory: false })
+      const error = await rejectionOf(copy.release())
+      expect(error).toBeInstanceOf(Error)
+      expect((error as Error).message).toBe(
+        'The transfer store could not delete the temporary copy.'
+      )
+      expect((error as Error).cause).toMatchObject({ code })
+      expect(recordedCopies(fixture.home)).toBe(1)
+      expect(readFileSync(copy.path, 'utf8')).toBe('user content')
+    })
+
+    it('the sweep keeps the record for the next sweep', async () => {
+      const copy = await fixture.store.allocateTemporaryCopy(ALICE)
+      writeFileSync(copy.path, 'user content')
+      fixture.clock.advance(61 * MINUTE)
+      refusedUnlinks.set(copy.path, { code, becomesDirectory: false })
+      await fixture.store.sweep()
+      expect(recordedCopies(fixture.home)).toBe(1)
+      refusedUnlinks.clear()
+      await fixture.store.sweep()
+      expect(recordedCopies(fixture.home)).toBe(0)
+      expect(existsSync(copy.path)).toBe(false)
     })
   }
 )

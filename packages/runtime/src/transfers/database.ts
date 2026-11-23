@@ -173,6 +173,8 @@ const SCHEMA = `
     created_at INTEGER NOT NULL,
     expires_at INTEGER NOT NULL,
     state TEXT NOT NULL CHECK (state IN ('awaiting', 'receiving', 'complete', 'failed')),
+    -- The outstanding-bytes reservation while the upload is receiving; the
+    -- exact size of the staged bytes once it is complete.
     received_bytes INTEGER NOT NULL DEFAULT 0,
     consumed_at INTEGER,
     released INTEGER NOT NULL DEFAULT 0

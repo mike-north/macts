@@ -110,7 +110,7 @@ export interface FileGrantRecord extends GrantedFile {
 export interface CreateUploadOptions {
   /**
    * The media type the caller says its bytes have: a string of at most 255
-   * characters, the longest media type RFC 6838 allows. A hint only: it is
+   * UTF-16 code units, the longest media type RFC 6838 allows. A hint only: it is
    * never verified, and consumers may ignore it.
    */
   readonly contentType?: string
@@ -390,7 +390,7 @@ function assertToken(token: string): void {
   }
 }
 
-/** Longest accepted content type hint, in characters: RFC 6838's 127 + 1 + 127. */
+/** Longest accepted content type hint, in UTF-16 code units: RFC 6838's 127 + 1 + 127. */
 const MAX_CONTENT_TYPE_LENGTH = 255
 
 /** A content type hint is optional, but when present it is a bounded string. */
@@ -403,7 +403,7 @@ function assertContentType(contentType: string | undefined): void {
   }
   if (contentType.length > MAX_CONTENT_TYPE_LENGTH) {
     throw new RangeError(
-      `An upload content type must be at most ${String(MAX_CONTENT_TYPE_LENGTH)} characters.`
+      `An upload content type must be at most ${String(MAX_CONTENT_TYPE_LENGTH)} UTF-16 code units.`
     )
   }
 }
@@ -537,6 +537,15 @@ function isDirectoryRefusal(error: unknown): boolean {
   return (
     error instanceof Error && 'code' in error && (error.code === 'EISDIR' || error.code === 'EPERM')
   )
+}
+
+/** Whether `file` is, right now, a regular file (not a link, directory, or absent). */
+async function isRegularFile(file: string): Promise<boolean> {
+  try {
+    return (await fsp.lstat(file)).isFile()
+  } catch {
+    return false
+  }
 }
 
 /** Message for any filesystem failure while writing an upload's bytes. */
@@ -1097,7 +1106,8 @@ class SqliteTransferStore implements TransferStore {
    * `unlink` never follows a symlink, so a swap after the check cannot reach
    * outside the store; a minted copy swapped for a symlink in that instant
    * has the link itself removed, and one swapped for a directory is refused
-   * by the filesystem (EISDIR or EPERM) and treated as `'refused'`.
+   * by the filesystem (EISDIR or EPERM) and treated as `'refused'`. A refusal
+   * while the path is still a regular file is a real failure and is thrown.
    *
    * @returns `'removed'` when the copy is gone (including when it already
    *   was), `'refused'` when the path is not one the store may delete.
@@ -1113,7 +1123,10 @@ class SqliteTransferStore implements TransferStore {
       }
       await fsp.unlink(copyPath)
     } catch (error) {
-      if (isDirectoryRefusal(error)) {
+      // EISDIR/EPERM only means "a directory took its place" when the path is
+      // no longer a regular file; an undeletable regular file (an immutable
+      // flag, a sandbox denial) is a failure whose record must be kept.
+      if (isDirectoryRefusal(error) && !(await isRegularFile(copyPath))) {
         return 'refused'
       }
       if (!isMissingFile(error)) {
