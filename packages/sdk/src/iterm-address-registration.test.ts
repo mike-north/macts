@@ -34,24 +34,85 @@ const load = () =>
     readFileSync(new URL('../../../manifests/iterm/app.yaml', import.meta.url), 'utf8')
   )
 
-/** Additional non-traversing gets have no second callable surface and must fail at admission. */
-it.each(['parent', 'parents'] as const)(
-  'refuses an additional %s get at every boundary',
-  (syntax) => {
+/** Additional CRUD declarations without complete callable surfaces must fail at admission. */
+it.each(
+  ['parent', 'parents'].flatMap((syntax) =>
+    ['get', 'list', 'create', 'update', 'delete'].map((kind) => ({ syntax, kind }))
+  )
+)('refuses an additional $syntax $kind at every boundary', ({ syntax, kind }) => {
+  const manifest = load()
+  const original = manifest.commands[kind === 'list' || kind === 'create' ? 'listTabs' : 'getTab']
+  if (original === undefined) throw new Error('Missing Tab get')
+  const command = {
+    ...structuredClone(original),
+    name: kind,
+    routeName: 'getAgain',
+    resolvesReferences: false,
+  }
+  if (syntax === 'parent') {
+    delete command.parents
+    delete command.item
+    command.parent = { resource: 'Window', parameter: 'windowId' }
+  }
+  manifest.commands['getTabAgain'] = command
+  const parsed = AppManifestSchema.safeParse(manifest)
+  const generated = generateConsolidatedPackages(manifest, { appName: 'iterm' })
+  const messages = [
+    parsed.success ? 'accepted' : parsed.error.message,
+    generated.errors.join(' '),
+    refusalMessage(() => operationsFromManifest(manifest)),
+    refusalMessage(() => operationsFromContract(iTermContract, manifest)),
+  ]
+  expect(
+    messages.every((message) => message.includes('getTabAgain') && message.includes('callable'))
+  ).toBe(true)
+  expect(generated.client.files).toEqual([])
+})
+
+/** Distinct operation routes cannot overwrite one callable name in the same namespace. */
+it.each(['get', 'list', '_export'])(
+  'refuses an additional identity get named %s at every boundary',
+  (name) => {
     const manifest = load()
-    const original = manifest.commands['getTab']
-    if (original === undefined) throw new Error('Missing Tab get')
-    const command = {
-      ...structuredClone(original),
-      routeName: 'getAgain',
-      resolvesReferences: false,
-    }
-    if (syntax === 'parent') {
-      delete command.parents
-      delete command.item
-      command.parent = { resource: 'Window', parameter: 'windowId' }
-    }
-    manifest.commands['getTabAgain'] = command
+    const resolve = manifest.commands['resolveSession']
+    if (resolve === undefined) throw new Error('Missing identity get')
+    resolve.routeName = name
+    const getSession = manifest.commands['getSession']
+    if (getSession === undefined) throw new Error('Missing Session get')
+    if (name === '_export')
+      manifest.commands['exportSession'] = {
+        ...getSession,
+        name: 'export',
+        routeName: 'exportSelected',
+      }
+    const parsed = AppManifestSchema.safeParse(manifest)
+    const generated = generateConsolidatedPackages(manifest, { appName: 'iterm' })
+    const messages = [
+      parsed.success ? 'accepted' : parsed.error.message,
+      generated.errors.join(' '),
+      refusalMessage(() => operationsFromManifest(manifest)),
+      refusalMessage(() => operationsFromContract(iTermContract, manifest)),
+    ]
+    // The later declaration is refused; a get named list also shares the list's route.
+    const refused = name === '_export' ? 'exportSession' : 'resolveSession'
+    expect(
+      messages.every(
+        (message) =>
+          message.includes(refused) && (message.includes('callable') || message.includes('route'))
+      )
+    ).toBe(true)
+    expect(generated.client.files).toEqual([])
+  }
+)
+
+/** Application methods share the client's top level with each other and with resource namespaces. */
+it.each(['hideHotkeyWindow', 'windows'])(
+  'refuses an application command named %s that another client member occupies',
+  (name) => {
+    const manifest = load()
+    const reveal = manifest.commands['revealHotkeyWindow']
+    if (reveal === undefined) throw new Error('Missing application command')
+    manifest.commands['revealAgain'] = { ...reveal, name }
     const parsed = AppManifestSchema.safeParse(manifest)
     const generated = generateConsolidatedPackages(manifest, { appName: 'iterm' })
     const messages = [
@@ -61,9 +122,7 @@ it.each(['parent', 'parents'] as const)(
       refusalMessage(() => operationsFromContract(iTermContract, manifest)),
     ]
     expect(
-      messages.every(
-        (message) => message.includes('getTabAgain') && message.includes('Additional get')
-      )
+      messages.every((message) => message.includes('revealAgain') && message.includes('callable'))
     ).toBe(true)
     expect(generated.client.files).toEqual([])
   }
