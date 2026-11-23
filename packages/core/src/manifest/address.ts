@@ -166,6 +166,24 @@ function ancestorContextMatches(
   )
 }
 
+/**
+ * Whether a command is a non-CRUD resource command acting on one item, which
+ * may select that item by the same scoped identity search an identity get
+ * declares. Such a command sends the found item to the app as its direct
+ * parameter, so its other inputs are action arguments rather than selectors.
+ * List, create, get, update and delete keep their dedicated selection shapes,
+ * and a property-backed convenience assigns through the update body, so none
+ * of them qualifies.
+ */
+function actsOnTraversedItem(command: Command): boolean {
+  return (
+    command.scope === 'resource' &&
+    command.assignsProperty === undefined &&
+    !['list', 'create', 'get', 'update', 'delete'].includes(command.name) &&
+    selectsOneItem(command)
+  )
+}
+
 /** Selection inputs are required, non-null and match the selected identifier or position domain. */
 function selectionParameterMatches(
   resource: Resource | undefined,
@@ -248,8 +266,9 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
       resourceType === undefined ? undefined : commandAddress(manifest, command, resourceType)
     const parents = address?.parents ?? commandParents(manifest, command)
     // Read inputs follow selection semantics, independently of the address spelling.
+    // An item command's action arguments are its own inputs, never selectors.
     if (
-      command.identityTraversal !== undefined ||
+      (command.identityTraversal !== undefined && !actsOnTraversedItem(command)) ||
       (command.name === 'list' && manifest.version === '1.1' && parents.length > 0)
     ) {
       const selectors = new Set([
@@ -308,7 +327,7 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
       }
       if (
         !valid ||
-        command.name !== 'get' ||
+        (command.name !== 'get' && !actsOnTraversedItem(command)) ||
         parent === undefined ||
         Object.values(children ?? {}).filter(({ resource }) => resource === resourceType).length !==
           1
