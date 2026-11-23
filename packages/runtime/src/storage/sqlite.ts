@@ -1,10 +1,9 @@
 /**
- * SQLite access for the runtime's persistent stores: the API-key store and the
- * transfer store.
+ * SQLite access for the runtime's persistent stores, such as the API-key store.
  *
- * Both stores run on Node's built-in `node:sqlite`, so no native addon is ever
+ * Every store runs on Node's built-in `node:sqlite`, so no native addon is ever
  * built or downloaded when macts is installed (phases/13, D1). This module is
- * the single place that module is referenced or loaded: the stores obtain the
+ * the single place that module is referenced or loaded: stores obtain the
  * module through {@link loadSqlite} and name its types through the aliases
  * below, and they share the one transaction primitive, {@link runInTransaction}.
  *

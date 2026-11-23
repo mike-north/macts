@@ -2,7 +2,7 @@
  * The runtime installs no native addon and references `node:sqlite` from one
  * module only (phases/13, D1).
  *
- * Both persistent stores share the one SQLite load site in
+ * Every persistent store shares the one SQLite load site in
  * `storage/sqlite.ts`, which keeps Node's experimental-warning filter in one
  * place. A second binding, a second load site, or a new runtime dependency
  * would each undo a guarantee, so the package's dependency list is pinned
