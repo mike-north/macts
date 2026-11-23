@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import * as os from 'node:os'
-import { loadSqlite } from './sqlite.js'
+import { loadSqlite } from '../storage/sqlite.js'
 import type { ApiKeyMetadata, GovernancePolicy, PolicyDisposition } from '@macts/core'
 import type { KeyMetadataUpdate } from './storage.js'
 
