@@ -12,6 +12,9 @@
  *   provider, per-key policy resolution, the governance context a call is
  *   enforced against, and `loadHostGovernance`, which composes them into this
  *   Mac's governance.
+ * - **Binary transfers** — the persistent, subject-bound transfer store:
+ *   expiring file grants and download links, and the documented size and
+ *   lifetime limits for every kind of transfer.
  * - **Shared host state** — where macts keeps its configuration and data
  *   (`MACTS_HOME`), and the process-wide structured logger.
  * - **Invocation** — the single pipeline every operation runs through
@@ -58,6 +61,9 @@ export { buildCommandSchema, buildSchemaRegistry } from './operations/request-sc
 
 // API keys: minting, verification, and the key store
 export * from './keys/index.js'
+
+// Binary transfers: file grants, download links, and transfer limits
+export * from './transfers/index.js'
 
 // Where macts keeps configuration and data
 export { getMactsHome } from './paths.js'

@@ -143,11 +143,30 @@ The signing secret lives at `<macts-home>/secrets/api-key-secret` (or comes from
 live in a SQLite database at `<macts-home>/api-keys.db`, with permissions and
 policies encrypted at rest.
 
-The database uses Node's built-in `node:sqlite`, so installing macts never
-builds or downloads a native addon. This is why the package requires
-Node.js 22.13.0 or later, the first release that loads `node:sqlite` without a
-flag. On Node versions that still label SQLite experimental, macts keeps that
-one-time notice off your stderr; it does not hide any other warning.
+The key and transfer databases use Node's built-in `node:sqlite`, so
+installing macts never builds or downloads a native addon. This is why the
+package requires Node.js 22.13.0 or later, the first release that loads
+`node:sqlite` without a flag. On Node versions that still label SQLite
+experimental, macts keeps that one-time notice off your stderr; it does not
+hide any other warning.
+
+## Transfers
+
+`createTransferStore()` opens the transfer store at `<macts-home>/transfers/`:
+the persistent record of file grants and download links that remote file
+reads rely on.
+
+- A grant is bound to the subject it was issued to. Another subject
+  presenting one is told it does not exist (`TransferError`
+  `unknown-transfer`), exactly as for a token that was never issued.
+- A grant is reusable until it expires, and each exchange issues a fresh,
+  short-lived download link. The link itself is the capability.
+- Grants last 15 minutes and download links 5 minutes; a sweep removes
+  expired ones. These and the upload and temporary-copy limits are exported
+  as named constants (`FILE_GRANT_TTL_MS`, `MAX_UPLOAD_BYTES`, and others).
+- Tokens are stored only as SHA-256 hashes, never appear in error messages,
+  and are never logged.
+- A store created by a newer macts is refused, never downgraded.
 
 ## Requirements
 

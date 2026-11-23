@@ -5,7 +5,9 @@
  * built or downloaded when macts is installed (phases/13, D1). This module is
  * the single place that module is referenced or loaded: stores obtain the
  * module through {@link loadSqlite} and name its types through the aliases
- * below, and they share the one transaction primitive, {@link runInTransaction}.
+ * below, and they share the one transaction primitive, {@link runInTransaction},
+ * and the one bounded retry for statements SQLite refuses as busy without
+ * waiting, {@link retryWhileBusy}.
  *
  * ## Why loading is centralized
  *
@@ -172,5 +174,86 @@ export function runInTransaction<T>(
       // SQLite already ended the transaction; the original error is what matters.
     }
     throw error
+  }
+}
+
+/** SQLite's primary result code for a lock held by another connection. */
+const SQLITE_BUSY = 5
+
+/**
+ * True when `error` is SQLite reporting that another connection holds a lock
+ * the statement needs (`SQLITE_BUSY`, or one of its extended codes).
+ *
+ * `node:sqlite` puts SQLite's result code on the thrown error as `errcode`.
+ * Extended result codes keep the primary code in their low byte, so
+ * `SQLITE_BUSY_RECOVERY` (261) and its siblings count as busy too.
+ */
+export function isSqliteBusyError(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null || !('errcode' in error)) {
+    return false
+  }
+  const { errcode } = error
+  return typeof errcode === 'number' && (errcode & 0xff) === SQLITE_BUSY
+}
+
+/** First pause, in milliseconds, after a busy failure. */
+const FIRST_BUSY_PAUSE_MS = 2
+
+/** Longest pause, in milliseconds, between two attempts. */
+const MAX_BUSY_PAUSE_MS = 50
+
+/** Block the calling thread for `ms` milliseconds. */
+function sleepSync(ms: number): void {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms)
+}
+
+/** When {@link retryWhileBusy} stops retrying, and how it keeps time. */
+export interface BusyRetryOptions {
+  /**
+   * The time, in milliseconds since the Unix epoch, after which a busy
+   * failure is rethrown instead of retried. No pause extends past it.
+   */
+  readonly deadline: number
+  /** The current time in epoch milliseconds; defaults to `Date.now`. */
+  readonly now?: () => number
+  /** Block for the given milliseconds; defaults to a synchronous sleep. */
+  readonly sleep?: (ms: number) => void
+}
+
+/**
+ * Run `operation`, retrying it while it fails with a busy error, until it
+ * succeeds or `options.deadline` passes.
+ *
+ * A connection's busy timeout covers most lock waits, but not all: when
+ * waiting could deadlock — for example, two connections that both read a
+ * database and then both need its exclusive lock to change its journal mode —
+ * SQLite returns `SQLITE_BUSY` at once without calling the busy handler. Such
+ * a statement is safe to run again once the other connection is done, so
+ * this helper does that, with a short, growing pause between attempts.
+ *
+ * `operation` must be synchronous and safe to repeat after a busy failure,
+ * and must not run inside a transaction the failure has left open.
+ *
+ * @param operation - The statement (or statements) to run.
+ * @param options - The deadline, and optionally the clock and sleep to use.
+ * @returns Whatever `operation` returns.
+ * @throws The operation's own error: at once when it is not a busy error, or
+ *   the last busy error once the deadline has passed.
+ */
+export function retryWhileBusy<T>(operation: () => T, options: BusyRetryOptions): T {
+  const now = options.now ?? Date.now
+  const sleep = options.sleep ?? sleepSync
+  let pause = FIRST_BUSY_PAUSE_MS
+  for (;;) {
+    try {
+      return operation()
+    } catch (error) {
+      const remaining = options.deadline - now()
+      if (!isSqliteBusyError(error) || remaining <= 0) {
+        throw error
+      }
+      sleep(Math.min(pause, remaining))
+      pause = Math.min(pause * 2, MAX_BUSY_PAUSE_MS)
+    }
   }
 }
