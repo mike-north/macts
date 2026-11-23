@@ -204,8 +204,8 @@ function deriveManifestOperations(manifest: AppManifest): ManifestOperation[] {
  * applies too: every resource-scoped command other than a list or create (a
  * get, update or delete, or a command such as `show` or `build` that the app
  * sends the item as its direct parameter), and a delete at application
- * scope, must declare a required parameter other than its parent's (the
- * parameter `command.parent` names). For a resource-scoped command that
+ * scope, must declare a required item input: the canonical address names it,
+ * or an unscoped/format 1.0 command uses its first required non-parent input. For a resource-scoped command that
  * parameter is the identifier its native body addresses the item by; an
  * application-scoped delete's body passes its declared parameters to the
  * app's delete (`planNativeInvocation` in `@macts/core`). Such a manifest is

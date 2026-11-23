@@ -9,8 +9,8 @@
  * (`null` for every other body).
  * The bodies encode live-app behavior that the manifest alone does not express:
  *
- * - a command on a nested resource reaches its target through the parent the
- *   manifest records for it (`command.parent`): the parent resource's
+ * - a command on a nested resource reaches its target through its recorded
+ *   ancestor path (one parent in format 1.0): each ancestor resource's
  *   collection, the parent item in it, then the resource's collection under
  *   that item (Calendar events exist only under a calendar, never as a
  *   collection of the application). The parent is never inferred from a
@@ -876,8 +876,8 @@ function addressingWithin(
 }
 
 /**
- * The parent scope of a command on a nested resource, from the parent the
- * manifest records for it (`command.parent`).
+ * The holding object and input bindings of a nested command, reached through
+ * its canonical ancestor path or its single format 1.0 parent.
  */
 interface ParentScope {
   /** Complete binding for format 1.1; format 1.0 retains its established body shape. */
@@ -975,13 +975,13 @@ function bindParent(parentScope: ParentScope): string {
 }
 
 /**
- * The parent scope of a command, from the parent the manifest records for it
- * (`command.parent`), or `undefined` for a command with none, whose resource
+ * The ancestor scope a command records for its resource's operations,
+ * or `undefined` for a command with none, whose resource
  * is addressed at the application.
  *
- * The parent item is addressed in its resource's collection
- * ({@link resolveCollectionAccessor}), by that resource's identifier targeting
- * ({@link buildTargetExpression}), so a calendar is matched by name. Nothing
+ * Each ancestor is addressed in its resource's collection
+ * ({@link resolveCollectionAccessor}), by its declared identity or position.
+ * Identity selection uses {@link buildTargetExpression}, so a calendar is matched by name. Nothing
  * about the parent is inferred: not from a parameter's name or position, and
  * not from the hierarchy.
  *

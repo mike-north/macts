@@ -48,10 +48,11 @@ interface ManifestIssue {
 }
 
 /**
- * The issues of every command's recorded parent (`command.parent`): a parent
+ * The issues of format 1.0 commands' recorded parents (`command.parent`): a parent
  * that names a resource the manifest does not declare, or names a parameter
  * that is not one of the command's required parameters, leaves a body nothing
- * to address the parent by. On a usable command, a parent resource marked
+ * to address the parent by. Format 1.1 ancestors are canonicalized before this
+ * pass and checked by address validation. On a usable command, a parent resource marked
  * unsupported is an issue too: no generated surface declares it, and the app
  * has no such collection to reach the target through.
  */

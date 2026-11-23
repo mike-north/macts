@@ -194,7 +194,7 @@ export function firstMatchNote(resource: Resource | undefined): string | undefin
  * The sentence a generated doc adds about parents that share the value an
  * operation looks its parent up by, or `undefined` when none can.
  *
- * A resource-scoped command that records a parent (`command.parent`) looks
+ * A resource-scoped command that records an identified parent looks
  * the parent up in its collection by the parent resource's identifier
  * targeting (phases/13 D10, command parents): a list, get, create, update or
  * delete, and any other resource command, which selects its item as a get
@@ -344,10 +344,10 @@ export function generationRefusals(
  * command that acts on one item: a get, update or delete, or any other
  * resource command but a list or create (`selectsOneItem`).
  *
- * A command on a nested resource records its parent (`command.parent`), and
- * the parent scope is the parameter it names (`calendarId` on `getEvent`).
- * The child identifier is the parameter `itemIdentifierParameter` selects:
- * the first other required parameter (`id`). A command that records no parent
+ * A command on a nested resource records its ancestors; this pair names the
+ * nearest parent input (`calendarId` on `getEvent`) and the item input selected
+ * by `itemIdentifierParameter`. Canonical paths name that item explicitly;
+ * unscoped and format 1.0 commands use the first required non-parent input. A command that records no parent
  * has no parent scope, whatever its parameters are named or however many are
  * required: nothing about the parent is inferred.
  *

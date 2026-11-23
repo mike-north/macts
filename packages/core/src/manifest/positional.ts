@@ -54,7 +54,7 @@ export interface PositionalIssue {
 }
 
 /**
- * A recorded parent supplies one identity, with no ancestor arguments. It must
+ * A format 1.0 recorded parent supplies one identity, with no ancestor arguments. It must
  * therefore be an ordinary identified collection item resolved at application
  * scope. Sparse placement is unknown; known nested-only placement contradicts
  * that address even when its get omits the missing ancestor. Conversely, an
@@ -232,11 +232,12 @@ function positionParameterIssue(
  * declaration order: a marked resource with a primary identifier, which is
  * found by that identifier instead, the issues of its commands
  * ({@link commandIssues}), and any executable command that records a positional
- * resource as its parent. A body binds its parent by the parent's identifier
+ * resource as its format 1.0 parent. A format 1.0 body binds its parent by the parent's identifier
  * (`recordedParentScope`), and a positional resource has none, so such a
  * command is refused until native binding supports positional parents. The
  * manifest schema reports them at their paths;
  * generation and registration refuse by them too ({@link positionalProblems}).
+ * Format 1.1 ancestor modes and complete namespaces are checked by address validation.
  *
  * @param manifest - The manifest, as validation reads it after flattening.
  */

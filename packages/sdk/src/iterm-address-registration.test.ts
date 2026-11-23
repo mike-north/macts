@@ -9,6 +9,7 @@ import {
   createNativeExecutor,
 } from '@macts/core'
 import { iTermContract } from '@macts/iterm/contract'
+import { EMPTY_RESOURCE_PLAN_TABLE } from '@macts/contracts'
 import {
   createRuntime,
   createBearerCredential,
@@ -308,6 +309,7 @@ it.each(['parent', 'parents'] as const)(
         input: { windowId: 7, index: -1 },
         inputPlan: { kind: 'passthrough' },
         outputPlan: { kind: 'passthrough' },
+        resourcePlans: EMPTY_RESOURCE_PLAN_TABLE,
       })
       .catch((e: unknown) => e)
     for (const descriptor of descriptors)
