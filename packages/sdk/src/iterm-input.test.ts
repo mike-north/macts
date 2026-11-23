@@ -91,7 +91,8 @@ function fixture(state: State): object {
       { exists: () => true, id: () => id, properties: () => ({ id }), window },
       {
         get(target, key) {
-          return Reflect.has(target, key) ? Reflect.get(target, key) : () => null
+          const value: unknown = Reflect.has(target, key) ? Reflect.get(target, key) : () => null
+          return value
         },
       }
     )
@@ -189,7 +190,7 @@ describe.each(['local', 'remote'] as const)('Session input via %s', (locality) =
   it('fails as a missing Session, and writes nothing, when the Session is in another Window', async () => {
     const { state, client } = await setup(locality)
     await expect(client.sessions.write(int(7), 'd', 'x')).rejects.toSatisfy(
-      (error) => error instanceof TargetNotFoundError && error.details['resource'] === 'Session'
+      (error) => error instanceof TargetNotFoundError && error.details.resource === 'Session'
     )
     expect(state.written).toEqual([])
   })
@@ -197,7 +198,7 @@ describe.each(['local', 'remote'] as const)('Session input via %s', (locality) =
   it('fails as a missing Window, and writes nothing, when the Window does not exist', async () => {
     const { state, client } = await setup(locality)
     await expect(client.sessions.write(int(99), 'a', 'x')).rejects.toSatisfy(
-      (error) => error instanceof TargetNotFoundError && error.details['resource'] === 'Window'
+      (error) => error instanceof TargetNotFoundError && error.details.resource === 'Window'
     )
     expect(state.written).toEqual([])
   })
@@ -213,10 +214,12 @@ describe.each(['local', 'remote'] as const)('Session input via %s', (locality) =
 
   it('rejects input without text before the app is reached', async () => {
     const { state, client } = await setup(locality)
-    const write: (...args: unknown[]) => Promise<void> = Reflect.get(client.sessions, 'write')
-    await expect(Reflect.apply(write, client.sessions, [int(7), 'a'])).rejects.toBeInstanceOf(
-      ValidationError
-    )
+    // Calls without typings, such as from plain JavaScript, may leave the text out.
+    const write = client.sessions.write.bind(client.sessions) as unknown as (
+      windowId: Integer,
+      sessionId: string
+    ) => Promise<void>
+    await expect(write(int(7), 'a')).rejects.toBeInstanceOf(ValidationError)
     expect(state.written).toEqual([])
   })
 

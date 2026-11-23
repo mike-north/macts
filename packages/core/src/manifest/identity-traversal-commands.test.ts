@@ -112,8 +112,10 @@ function standIn(windows: Record<number, string[][]>) {
   })
   const app = {
     windows: {
-      byId: (id: number) =>
-        windows[id] === undefined ? { exists: () => false } : window(id, windows[id]),
+      byId: (id: number) => {
+        const tabs = windows[id]
+        return tabs === undefined ? { exists: () => false } : window(id, tabs)
+      },
     },
     write: (item: { id: () => string }, named?: unknown) => {
       sent.push({ session: item.id(), named })
@@ -121,6 +123,16 @@ function standIn(windows: Record<number, string[][]>) {
     },
   }
   return { app, sent, reads }
+}
+
+/** The error a synchronous call threw, so its fields can be asserted. */
+function thrown(call: () => unknown): unknown {
+  try {
+    call()
+  } catch (error: unknown) {
+    return error
+  }
+  throw new Error('Expected the call to throw')
 }
 
 /** Run the generated body of the write command against a stand-in. */
@@ -152,9 +164,9 @@ describe('identity-traversal item commands', () => {
 
   it('fails as missing, and writes nothing, when the session is not in that window', () => {
     const { app, sent, reads } = standIn({ 7: [['a']], 8: [['z']] })
-    expect(() => run(sessionManifest(), app, { windowId: 7, sessionId: 'z', text: 'x' })).toThrow(
-      expect.objectContaining({ errorNumber: NO_SUCH_OBJECT })
-    )
+    expect(
+      thrown(() => run(sessionManifest(), app, { windowId: 7, sessionId: 'z', text: 'x' }))
+    ).toMatchObject({ errorNumber: NO_SUCH_OBJECT })
     expect(sent).toEqual([])
     // The search never broadens to another window.
     expect(reads.some((read) => read.startsWith('session:8:'))).toBe(false)
@@ -162,17 +174,17 @@ describe('identity-traversal item commands', () => {
 
   it('fails as missing, and writes nothing, when the window does not exist', () => {
     const { app, sent } = standIn({ 7: [['a']] })
-    expect(() => run(sessionManifest(), app, { windowId: 9, sessionId: 'a', text: 'x' })).toThrow(
-      expect.objectContaining({ errorNumber: NO_SUCH_OBJECT })
-    )
+    expect(
+      thrown(() => run(sessionManifest(), app, { windowId: 9, sessionId: 'a', text: 'x' }))
+    ).toMatchObject({ errorNumber: NO_SUCH_OBJECT })
     expect(sent).toEqual([])
   })
 
   it('refuses to write when the identity matches more than one session in the window', () => {
     const { app, sent } = standIn({ 7: [['a'], ['a']] })
-    expect(() => run(sessionManifest(), app, { windowId: 7, sessionId: 'a', text: 'x' })).toThrow(
-      expect.objectContaining({ direction: 'encode' })
-    )
+    expect(
+      thrown(() => run(sessionManifest(), app, { windowId: 7, sessionId: 'a', text: 'x' }))
+    ).toMatchObject({ direction: 'encode' })
     expect(sent).toEqual([])
   })
 

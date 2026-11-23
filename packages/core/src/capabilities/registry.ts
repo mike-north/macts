@@ -286,7 +286,12 @@ function deriveResourceCapability(
     cliSnippet: buildResourceCliSnippet(
       app,
       cliPath,
-      command === primaryGet || command.identityTraversal === undefined ? command.name : operation,
+      // Only an additional identity get is a CLI command named by its route;
+      // every other command, an item command with a traversal included, is
+      // named by its command name, as the generated CLI names it.
+      command !== primaryGet && command.name === 'get' && command.identityTraversal !== undefined
+        ? operation
+        : command.name,
       inputSchema,
       command,
       version
