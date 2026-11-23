@@ -259,10 +259,10 @@ describe('a resource marked unsupported', () => {
     expect(deriveCapabilities(viewer(true)).map((capability) => capability.name)).toEqual([
       'viewer.app.openURL',
       'viewer.sessions.close',
-      'viewer.sessions.list',
+      'viewer.sessions.listSessions',
       'viewer.speakers.close',
-      'viewer.speakers.get',
-      'viewer.speakers.list',
+      'viewer.speakers.getSpeaker',
+      'viewer.speakers.listSpeakers',
       'viewer.speakers.refresh',
     ])
   })

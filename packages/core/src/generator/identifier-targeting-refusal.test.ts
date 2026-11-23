@@ -158,6 +158,8 @@ describe('generateCapabilitiesModule refuses an untargeted identifier', () => {
   })
 
   it.each(ACCEPTED)('describes the app for %s', (_label, manifest) => {
-    expect(generateCapabilitiesModule(manifest)).toContain('"name": "notebook.documents.get"')
+    expect(generateCapabilitiesModule(manifest)).toContain(
+      '"name": "notebook.documents.getDocument"'
+    )
   })
 })

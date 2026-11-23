@@ -262,8 +262,8 @@ describe('capability discovery', () => {
     capabilities.find((capability) => capability.name === name)
 
   it('lists no capability for the unavailable operation', () => {
-    expect(named('jotter.notes.tag')).toBeUndefined()
-    expect(named('jotter.notes.move')).toBeDefined()
+    expect(named('jotter.notes.tagNote')).toBeUndefined()
+    expect(named('jotter.notes.moveNote')).toBeDefined()
   })
 
   it('leaves an omitted parameter out of the input schema', () => {
@@ -282,9 +282,13 @@ describe('capability discovery', () => {
   })
 
   it('leaves an omitted property out of the create and update schemas', () => {
-    expect(named('jotter.notes.create')?.inputSchema.properties).not.toHaveProperty('primaryTag')
-    expect(named('jotter.notes.update')?.inputSchema.properties).not.toHaveProperty('primaryTag')
-    expect(named('jotter.notes.create')?.inputSchema.properties).toHaveProperty('relatedTags')
+    expect(named('jotter.notes.createNote')?.inputSchema.properties).not.toHaveProperty(
+      'primaryTag'
+    )
+    expect(named('jotter.notes.updateNote')?.inputSchema.properties).not.toHaveProperty(
+      'primaryTag'
+    )
+    expect(named('jotter.notes.createNote')?.inputSchema.properties).toHaveProperty('relatedTags')
   })
 })
 

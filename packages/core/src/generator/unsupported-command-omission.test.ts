@@ -15,7 +15,7 @@
  * is never vacuous. Expected values are derived by hand from the fixture and
  * the naming rules: a route is `<app>.<resource segment>.<command key>` (or
  * `<app>.app.<command key>`), its permission the same with colons, a
- * capability `<app>.<resource segment>.<command name>`, and a CLI
+ * capability with that same resolved route identity, and a CLI
  * command `commands/<resource segment>/<command name in kebab case>.ts`.
  *
  * @see ../manifest/unsupported.ts
@@ -101,7 +101,7 @@ const NAMES = {
   getSpeaker: {
     route: 'viewer.speakers.getSpeaker',
     permission: 'viewer:speakers:getSpeaker',
-    capability: 'viewer.speakers.get',
+    capability: 'viewer.speakers.getSpeaker',
     // The resource client builds its route from its app and resource segments.
     sdkFile: 'client/src/resources/speaker.ts',
     sdkCall: '.getSpeaker`',
