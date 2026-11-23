@@ -576,3 +576,61 @@ it('admits a finite explicit path that repeats an identified resource type', () 
   }
   expect(AppManifestSchema.safeParse(manifest).success).toBe(false)
 })
+
+/** Location selectors and other admitted inputs share the same generated method signature. */
+it('declares and forwards required and optional explicit-get inputs in SDK order', () => {
+  const manifest = sessionFixture()
+  const command = manifest.commands['getSession']
+  if (command === undefined) {
+    throw new Error('Missing get')
+  }
+  command.parameters.push({
+    name: 'detail',
+    type: 'string',
+    description: 'View detail',
+    required: false,
+  })
+  const generated = generateConsolidatedPackages(manifest, { appName: 'panes' })
+  expect(generated.errors).toEqual([])
+  const content = generated.client.files.find(
+    ({ path }) => path === 'src/cli/commands/windows/tabs/sessions/get.ts'
+  )?.content
+  expect(content).toContain("action = Option.String('--action'")
+  expect(content).toContain("detail = Option.String('--detail'")
+  expect(content).toMatch(
+    /client.sessions.get\([^\n]*this.windowId[^\n]*this.tabIndex[^\n]*this.sessionId[^\n]*this.action[^\n]*this.detail/
+  )
+})
+
+it.each(['id', 'name'])(
+  'refuses separate-read authority on required identity property %s during parsing and generation',
+  (name) => {
+    const manifest = sessionFixture()
+    const session = manifest.resources['Session']
+    if (session === undefined) {
+      throw new Error('Missing Session')
+    }
+    session.properties['name'] = {
+      access: 'r',
+      type: 'string',
+      description: 'Lookup name',
+      optional: false,
+    }
+    session.identifiers = [
+      { property: 'id', primary: true, targeting: 'byProperty', runtimeProperty: 'name' },
+    ]
+    const property = session.properties[name]
+    if (property === undefined) {
+      throw new Error('Missing identity property')
+    }
+    property.separateRead = {
+      operation: 'readIdentity',
+      permission: 'panes:sessions:readIdentity',
+      reason: 'Separate identity authority',
+    }
+    expect(AppManifestSchema.safeParse(manifest).success).toBe(false)
+    expect(generateConsolidatedPackages(manifest, { appName: 'panes' }).errors.join(' ')).toMatch(
+      /separate|identity/i
+    )
+  }
+)

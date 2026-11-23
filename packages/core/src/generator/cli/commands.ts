@@ -422,6 +422,25 @@ export function generateGetCommand(
   )
   const parentOptions = generateListParamOptions(parentScopeParams)
   const identifier = addressingIdentifier(resource, getCommand)
+  // Explicit gets use the same admitted signature and collision handling as item commands.
+  const explicit =
+    getCommand.parents === undefined
+      ? undefined
+      : itemCommandInputs(
+          getCommand,
+          hierarchyPath,
+          resource,
+          `client.${resourceAccess}.${safeIdentifier(methodName)}`,
+          ctx
+        )
+  const inputs =
+    explicit?.inputs ?? `${parentOptions}\n${identifierPositional(idParamName, identifier)}`
+  const methodArgs =
+    explicit?.methodArgs ??
+    [
+      ...parentScopeParams.map((p) => `this.${safeParamProperty(p.name, 'list')}`),
+      `this.${idParamName}`,
+    ].join(', ')
   const summary =
     override?.description.replace(/\.$/, '') ??
     `Get ${withArticle(identifierWords(resource.name))} by ${identifierProse(identifier)}`
@@ -433,7 +452,7 @@ export function generateGetCommand(
     itemSelectionNote(ctx.manifest, hierarchyPath.resourceName),
   ])
 
-  const content = `import { Command, Option } from 'clipanion';
+  const content = `import { Command, Option } from 'clipanion';${inputs.includes('t.isEnum') ? "\nimport * as t from 'typanion';" : ''}
 import { getClient } from '${sdkImportPath}';
 import { createFormatter } from '${outputImportPath}';
 
@@ -448,15 +467,14 @@ export class ${toPascalCase(methodName)}${resource.name}Command extends Command 
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
-${parentOptions}
-${identifierPositional(idParamName, identifier)}
+${inputs}
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false);
 
     try {
       const client = getClient();
-      const item = await client.${resourceAccess}.${safeIdentifier(methodName)}(${[...parentScopeParams.map((p) => `this.${safeParamProperty(p.name, 'list')}`), `this.${idParamName}`].join(', ')});
+      const item = await client.${resourceAccess}.${safeIdentifier(methodName)}(${methodArgs});
 
       const output = formatter.format({
 ${generateListFieldMapping(ctx.manifest, hierarchyPath.resourceName, resource)}
@@ -676,7 +694,7 @@ interface ResourceCommandInputs {
 }
 
 /**
- * Expose exactly the operation's inputs in SDK order: recorded parent flag,
+ * Expose get and item-command inputs in SDK order: recorded parent flag,
  * one item positional labelled as get labels it, then other parameter flags.
  * Hierarchy alone supplies no parent flag or argument.
  */
@@ -711,14 +729,14 @@ function itemCommandInputs(
     )
     .join('\n')
   const methodArgs = signature
-    .map(({ parameter }, i) =>
-      sdkArgument(
-        parameter.name === childParam ? itemProperty : safeParamProperty(parameter.name, cmd.name),
-        methodRef,
-        i,
-        parameter
-      )
-    )
+    .map(({ parameter }, i) => {
+      const property =
+        parameter.name === childParam ? itemProperty : safeParamProperty(parameter.name, cmd.name)
+      // Get methods accept numeric text through SDK coercion, preserving their CLI input form.
+      return cmd.name === 'get'
+        ? `this.${property} as unknown as Parameters<typeof ${methodRef}>[${String(i)}]`
+        : sdkArgument(property, methodRef, i, parameter)
+    })
     .join(', ')
   return { inputs, methodArgs }
 }

@@ -6,7 +6,7 @@
 import type { AppManifest } from './schemas/app.js'
 import { CommandSchema, type Command, type AddressParent } from './schemas/command.js'
 import type { HierarchyChild } from './schemas/hierarchy.js'
-import { resolvePrimaryIdentifierProperty } from './identifier.js'
+import { resolvePrimaryIdentifierProperty, resolveIdentifierTargeting } from './identifier.js'
 import { resolveCollectionAccessor } from './native-accessor.js'
 import { resourceCommandEntries } from './resource-commands.js'
 import { resolveManifestRoutes } from './route.js'
@@ -184,7 +184,18 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
     }
   }
   for (const [key, resource] of Object.entries(manifest.resources)) {
+    const identityProperties = [
+      resolvePrimaryIdentifierProperty(resource),
+      resolveIdentifierTargeting(resource)?.property,
+    ]
     for (const [name, property] of Object.entries(resource.properties)) {
+      // Ordinary records require identity and effective targeting reads under their own authority.
+      if (property.separateRead !== undefined && identityProperties.includes(name)) {
+        issues.push({
+          path: ['resources', key, 'properties', name],
+          message: 'Identity and targeting properties cannot use separate-read authority.',
+        })
+      }
       if (property.separateRead !== undefined && !PropertySchema.safeParse(property).success) {
         issues.push({
           path: ['resources', key, 'properties', name],

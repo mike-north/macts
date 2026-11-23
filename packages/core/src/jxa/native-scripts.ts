@@ -1620,7 +1620,7 @@ function columnWindowReader(
 }
 
 /**
- * Statements that run `readAll()` until one attempt is consistent, at most
+ * Legacy lists run `readAll()` until one attempt is consistent, at most
  * twice, and classify a list whose two attempts both failed.
  *
  * A collection whose reads disagree during the first attempt is read again
@@ -1639,7 +1639,16 @@ function columnWindowReader(
  * attempts and are therefore reported as an unexpected value; that case is
  * accepted.
  */
-function listAttempts(): string {
+function listAttempts(retry: boolean): string {
+  // Explicit addresses expose an observed inconsistency immediately, without stabilization.
+  if (!retry) {
+    return lines(
+      'try { readAll(); } catch (e) {',
+      '  if (e instanceof Inconsistent) { if (e.changed) { collectionChanged(e.message); } unassemblable(e.message); }',
+      '  throw e;',
+      '}'
+    )
+  }
   return lines(
     'function attempt() {',
     '  try { readAll(); return null; } catch (e) {',
@@ -1717,7 +1726,8 @@ function pageReadOf(resource: Resource | undefined): PageRead {
  * Index assembly is only correct while every read describes the same items in
  * the same order. Every read is checked against the item count, and the
  * identifiers are read again after the properties and must not have changed
- * (see {@link attemptReader}). A collection that changes while it is read is
+ * (see {@link attemptReader}). An explicit address refuses the first observed
+ * inconsistency. A legacy collection that changes while it is read is
  * read once more from the start, and if the second read also disagrees the
  * list fails, as a changed collection when the items changed and as an
  * unexpected value when they did not (see {@link listAttempts}): never
@@ -1899,7 +1909,7 @@ function buildListBody(
           columnReads,
           pageRead
         ),
-    listAttempts(),
+    listAttempts(command.parents === undefined),
     'var result = [];',
     `for (var i = 0; i < ${COUNT_LOCAL}; i++) {`,
     'var obj = {};',

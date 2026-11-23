@@ -18,7 +18,6 @@ export class GetSessionCommand extends Command {
     required: true,
     description: 'Zero-based tab position',
   })
-
   sessionId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
@@ -26,7 +25,11 @@ export class GetSessionCommand extends Command {
 
     try {
       const client = getClient()
-      const item = await client.sessions.get(this.windowId, this.tabIndex, this.sessionId)
+      const item = await client.sessions.get(
+        this.windowId as unknown as Parameters<typeof client.sessions.get>[0],
+        this.tabIndex as unknown as Parameters<typeof client.sessions.get>[1],
+        this.sessionId as unknown as Parameters<typeof client.sessions.get>[2]
+      )
 
       const output = formatter.format({
         id: item.id,

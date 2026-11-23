@@ -42,3 +42,26 @@ it.each([
   tab.by = 'identity'
   expect(() => register(manifest)).toThrow(/identity|address/)
 })
+
+/** Identifier and effective lookup reads cannot require authority separate from ordinary listing. */
+it.each(['id', 'name'])(
+  'refuses separate identity reads for %s through both registrations',
+  (name) => {
+    const manifest = load()
+    const session = manifest.resources['Session']
+    const property = session?.properties[name]
+    if (session === undefined || property === undefined) {
+      throw new Error('Missing identity fixture')
+    }
+    session.identifiers = [
+      { property: 'id', primary: true, targeting: 'byProperty', runtimeProperty: 'name' },
+    ]
+    property.separateRead = {
+      operation: 'readIdentity',
+      permission: 'iterm:sessions:readIdentity',
+      reason: 'Separate identity authority',
+    }
+    expect(() => operationsFromManifest(manifest)).toThrow(/separate|identity/i)
+    expect(() => operationsFromContract(iTermContract, manifest)).toThrow(/separate|identity/i)
+  }
+)

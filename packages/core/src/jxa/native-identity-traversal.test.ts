@@ -151,3 +151,49 @@ it.each(['record', 'later'] as const)(
     expectCollectionChange(() => evaluateBody(body, app, { target }, env))
   }
 )
+
+/** Explicit addresses refuse the first observed change; legacy collections retain stabilization. */
+it('refuses a changed explicit list without changing legacy retry behavior', () => {
+  let reads = 0
+  let ids = ['a', 'b']
+  const sessions = new Proxy(() => [], {
+    get: (_target, key) => () => {
+      if (key === 'id') {
+        if (++reads === 2) {
+          ids.reverse()
+        }
+        return [...ids]
+      }
+      return ids.map(() => null)
+    },
+  })
+  const window = {
+    exists: () => true,
+    sessions,
+    tabs: { length: 1, at: () => ({ exists: () => true, sessions }) },
+  }
+  const app = { windows: { byId: () => window } }
+  const target = { command: 'listSessions', resource: 'Session' }
+  expectCollectionChange(() =>
+    evaluateBody(
+      buildNativeBody(manifest, target),
+      app,
+      { windowId: 7, tabIndex: 0 },
+      environment(app)
+    )
+  )
+  expect(reads).toBe(2)
+  const legacy = structuredClone(manifest)
+  const command = legacy.commands['listSessions']
+  if (command === undefined) {
+    throw new Error('Missing list')
+  }
+  delete command.parents
+  command.parent = { resource: 'Window', parameter: 'windowId' }
+  reads = 0
+  ids = ['a', 'b']
+  expect(
+    evaluateBody(buildNativeBody(legacy, target), app, { windowId: 7 }, environment(app))
+  ).toMatchObject([{ id: 'b' }, { id: 'a' }])
+  expect(reads).toBe(4)
+})
