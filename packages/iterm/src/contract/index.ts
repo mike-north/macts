@@ -840,6 +840,22 @@ export interface SessionResourceClient {
    * @param sessionId - Session identifier within the Window. Does not accept null.
    */
   resolve(windowId: Integer, sessionId: string, options?: CallOptions): Promise<Session>
+  /**
+   * Write text into a session, as though it was typed, optionally followed by a newline.
+   *
+   * @param windowId - Window identifier. Does not accept null.
+   * @param sessionId - Session identifier within the Window. Does not accept null.
+   * @param text - Text to write. Does not accept null.
+   * @param newline - Whether to add a newline after the text (the app adds one when this is
+   * omitted). Does not accept null.
+   */
+  write(
+    windowId: Integer,
+    sessionId: string,
+    text: string,
+    newline?: boolean,
+    options?: CallOptions
+  ): Promise<void>
 }
 
 /**
@@ -1480,6 +1496,62 @@ const sessionResolveSessionOperation: OperationDescriptor<
       sessionId: { type: 'string', description: 'Session identifier within the Window' },
     },
     required: ['windowId', 'sessionId'],
+    additionalProperties: false,
+  },
+}
+
+const sessionWriteSessionTextOperation: OperationDescriptor<
+  {
+    readonly windowId: Integer
+    readonly sessionId: string
+    readonly text: string
+    readonly newline?: boolean | undefined
+  },
+  undefined
+> = {
+  id: 'iterm.sessions.writeText',
+  permission: 'iterm:sessions:writeText',
+  target: { command: 'writeSessionText', resource: 'Session' },
+  address: {
+    parents: [{ resource: 'Window', collection: 'windows', by: 'identity', parameter: 'windowId' }],
+    traversal: ['tabs'],
+    collection: 'sessions',
+    item: { by: 'identity', parameter: 'sessionId' },
+  },
+  description:
+    'Write text into a session, as though it was typed, optionally followed by a newline.',
+  input: t.record({
+    windowId: t.integer({ description: 'Window identifier' }),
+    sessionId: t.string({ description: 'Session identifier within the Window' }),
+    text: t.string({ description: 'Text to write' }),
+    newline: t.optional(
+      t.boolean({
+        description:
+          'Whether to add a newline after the text (the app adds one when this is omitted)',
+      })
+    ),
+  }),
+  output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      windowId: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Window identifier',
+      },
+      sessionId: { type: 'string', description: 'Session identifier within the Window' },
+      text: { type: 'string', description: 'Text to write' },
+      newline: {
+        type: 'boolean',
+        description:
+          'Whether to add a newline after the text (the app adds one when this is omitted)',
+      },
+    },
+    required: ['windowId', 'sessionId', 'text'],
     additionalProperties: false,
   },
 }
@@ -2247,6 +2319,7 @@ const operations: AppContract<iTermClient>['operations'] = {
   'iterm.sessions.list': sessionListSessionsOperation,
   'iterm.sessions.getWithinTab': sessionGetSessionOperation,
   'iterm.sessions.resolve': sessionResolveSessionOperation,
+  'iterm.sessions.writeText': sessionWriteSessionTextOperation,
   'iterm.app.count': appCountOperation,
   'iterm.app.duplicate': appDuplicateOperation,
   'iterm.app.exists': appExistsOperation,
@@ -2295,6 +2368,12 @@ function bind(runtime: ClientRuntime): iTermClient {
         runtime.invoke(sessionGetSessionOperation, { windowId, tabIndex, sessionId }, options),
       resolve: (windowId, sessionId, options) =>
         runtime.invoke(sessionResolveSessionOperation, { windowId, sessionId }, options),
+      write: (windowId, sessionId, text, newline, options) =>
+        runtime.invoke(
+          sessionWriteSessionTextOperation,
+          { windowId, sessionId, text, newline },
+          options
+        ),
     },
     currentWindow: (options) => runtime.invoke(appCurrentWindowOperation, {}, options),
     count: (each, options) => runtime.invoke(appCountOperation, { each }, options),

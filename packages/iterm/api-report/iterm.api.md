@@ -187,6 +187,7 @@ export class SessionResourceClient {
     get(windowId: string | number, tabIndex: string | number, sessionId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Session>;
     list(windowId: number, tabIndex: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Session>>;
     resolve(windowId: string | number, sessionId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Session>;
+    write(windowId: number, sessionId: string, text: string, newline?: boolean, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public

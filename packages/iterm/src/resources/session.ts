@@ -94,4 +94,22 @@ export class SessionResourceClient {
       'Session'
     )
   }
+
+  /**
+   * Write text into a session, as though it was typed, optionally followed by a newline.
+   */
+  async write(
+    windowId: number,
+    sessionId: string,
+    text: string,
+    newline?: boolean,
+    __mactsOptions?: import('@macts/contracts').CallOptions
+  ): Promise<void> {
+    await this.#http.invoke<undefined>(
+      `${this.#app}.${this.#resource}.writeText`,
+      { windowId: __mactsIntegerInput(windowId), sessionId, text, newline },
+      __mactsOptions,
+      'Session'
+    )
+  }
 }

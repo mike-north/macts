@@ -170,6 +170,7 @@ export interface SessionResourceClient {
     get(windowId: Integer, tabIndex: Integer, sessionId: string, options?: CallOptions): Promise<Session>;
     list(windowId: Integer, tabIndex: Integer, options?: CallOptions): Promise<Page<Session>>;
     resolve(windowId: Integer, sessionId: string, options?: CallOptions): Promise<Session>;
+    write(windowId: Integer, sessionId: string, text: string, newline?: boolean, options?: CallOptions): Promise<void>;
 }
 
 // @public

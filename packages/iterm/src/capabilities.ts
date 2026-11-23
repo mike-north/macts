@@ -696,6 +696,41 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
+    name: 'iterm.sessions.writeText',
+    app: 'iterm',
+    appBundleId: 'com.googlecode.iterm2',
+    resource: 'sessions',
+    operation: 'writeText',
+    description:
+      'Write text into a session, as though it was typed, optionally followed by a newline.',
+    permission: 'iterm:sessions:writeText',
+    risk: 'write',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'number',
+        },
+        sessionId: {
+          description: 'Session identifier within the Window',
+          type: 'string',
+        },
+        text: {
+          description: 'Text to write',
+          type: 'string',
+        },
+        newline: {
+          description:
+            'Whether to add a newline after the text (the app adds one when this is omitted)',
+          type: 'boolean',
+        },
+      },
+      additionalProperties: false,
+      required: ['windowId', 'sessionId', 'text'],
+    },
+  },
+  {
     name: 'iterm.tabs.get',
     app: 'iterm',
     appBundleId: 'com.googlecode.iterm2',

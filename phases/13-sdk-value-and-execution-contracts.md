@@ -2853,7 +2853,12 @@ canonical reference routes. Its operation descriptor still advertises the full
 normalized `address`; the resource table's `get` names the identity resolver,
 and a mixed-path list supplies no selector-collection route. `identityTraversal`
 records plural `collections` and their evidence on an identity get, within its
-identified parent. `separateRead: { operation, permission, reason }` reserves a
+identified parent. A non-CRUD resource command that acts on one item (neither
+list, create, get, update, delete nor a property assignment) may declare the
+same traversal: it finds its item exactly as the identity get does and sends
+it to the app as the command's direct parameter. Its other declared inputs are
+action arguments, never selectors; an identity get still declares selection
+inputs only. `separateRead: { operation, permission, reason }` reserves a
 supported property for a separate read without publishing that operation yet.
 
 The schema, generators and both registration paths validate the same normalized
@@ -2912,9 +2917,21 @@ validated ancestor context, superseding the top-level-only emission limit.
 Session records hydrate every supported property except bulk screen text
 (`contents`, `text`). Those properties remain declared as deliberate separate
 reads, with explicit operation names and permissions to be delivered separately;
-they are neither unsupported nor inlined. Session operations here are reads.
-Write permissions do not follow from read access. Native behavior remains
-unverified until separately checked against the running app.
+they are neither unsupported nor inlined.
+
+Writing text into a Session (`iterm.sessions.writeText`, permission
+`iterm:sessions:writeText`, risk `write`) addresses the Session by the same
+Window-scoped identity as the canonical identity get, with the same missing,
+ambiguous and changed-collection outcomes, and no lookup outside that Window.
+It takes the text to write and, optionally, whether to add a newline; when the
+caller omits the choice, nothing is sent and the app's default applies. Write
+permissions do not follow from read access: no Session read, and neither
+screen-text read, authorizes writing, and the write permission authorizes no
+read. Any addressable Session may be targeted; callers restrict writing through
+policy, never through hidden exclusions. Sending a file's contents and key
+sequences the dictionary's `write` cannot express are outside this operation.
+Native behavior remains unverified until separately checked against the
+running app.
 
 ### Positional resources
 
