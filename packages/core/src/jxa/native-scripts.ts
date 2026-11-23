@@ -81,7 +81,6 @@ import {
 import { resolveCollectionAccessor, resolvePropertyAccessor } from '../manifest/native-accessor.js'
 import {
   containedOutputProperties,
-  omittedOutputProperties,
   outputProperties,
   outputPropertyContainer,
 } from '../manifest/output-references.js'
@@ -439,6 +438,9 @@ function readOutputProperties(
       ? `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) { ${propagate}if (e && e.errorNumber === ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}) { ${member('obj', key)} = null; } }`
       : `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {${propagate}}`
   return lines(
+    `var identity = typeof env !== "undefined" && env.identities ? env.identities.get(${itemLocal}) : undefined;`,
+    `function verifyIdentity(record) { if (identity && (${itemLocal}[identity.property]() !== identity.id || (record && record[${literal(resolveIdentifierTargeting(resource)?.property ?? 'id')}] !== undefined && record[${literal(resolveIdentifierTargeting(resource)?.property ?? 'id')}] !== identity.id))) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: "Identity traversal changed while reading." }; } }`,
+    'verifyIdentity();',
     'var obj = {};',
     ...(separate
       ? keys.map(readOnItsOwn)
@@ -454,6 +456,7 @@ function readOutputProperties(
           ...keys.map(readOnItsOwn),
           '}',
         ]),
+    'verifyIdentity(obj);',
     rooted && kindExpression !== undefined
       ? `${member('obj', ROOT_KIND_PROPERTY)} = ${kindExpression};`
       : '',
@@ -562,21 +565,21 @@ function itemReadKeys(
 }
 
 /**
- * The public keys a list body reads for each item: the list's output
- * properties ({@link resolveListOutputProperties}), less those the output
- * record leaves out (`omittedOutputProperties`). The identifier is never left
- * out, so it is always read.
+ * List reads use the same output eligibility as item reads, including separate
+ * authority. An undeclared identifier remains readable for legacy list targeting.
  */
 function listReadKeys(
   manifest: AppManifest,
   resourceKey: string | undefined,
   resource: Resource | undefined
 ): string[] {
-  const omitted: ReadonlyMap<string, unknown> =
-    resource === undefined || resourceKey === undefined
-      ? new Map()
-      : omittedOutputProperties(manifest, resourceKey, resource)
-  return resolveListOutputProperties(resource).filter((key) => !omitted.has(key))
+  if (resource === undefined || resourceKey === undefined) {
+    return resolveListOutputProperties(resource)
+  }
+  const included = new Set(itemReadKeys(manifest, resourceKey, resource))
+  return resolveListOutputProperties(resource).filter(
+    (key) => resource.properties[key] === undefined || included.has(key)
+  )
 }
 
 /** The record keys the native bodies read for one resource, by body. */
@@ -596,7 +599,7 @@ export interface NativeReadKeys {
  * They do while the resource's primary identifier is one of its usable
  * properties: a list also reads the identifier when it is not
  * ({@link resolveListOutputProperties}). Both leave out the same fields, the
- * ones the output record does not declare (`omittedOutputProperties`). A list
+ * ones the output record does not declare (`outputProperties`). A list
  * never reads a declared identifier its targeting matches by another
  * property, and a get's guarded read of it yields nothing, so that key is in
  * both sets yet in neither record.
@@ -2012,7 +2015,10 @@ function nativeTraversal(manifest: AppManifest, command: Command): string[] {
   })
 }
 
-/** Search every declared branch within one identity scope, rejecting duplicate identities. */
+/**
+ * Search only the declared identity scope. A positional match is provisional:
+ * record reads must still denote the sought identity after traversal and hydration.
+ */
 function bindIdentityTraversal(
   command: Command,
   resource: Resource | undefined,
@@ -2036,7 +2042,9 @@ function bindIdentityTraversal(
     `visit(parent, ${JSON.stringify([...nativeTraversal(manifest, command), collection])});`,
     `if (matches.length > 1) { throw { name: ${literal(NATIVE_CODEC_ERROR_NAME)}, direction: 'encode', path: [], message: 'Identity matched multiple objects within its declared container.' }; }`,
     'var item = matches[0];',
-    `if (!item) { var missing = new Error('No such object.'); missing.errorNumber = ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}; throw missing; }`
+    `if (!item) { var missing = new Error('No such object.'); missing.errorNumber = ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}; throw missing; }`,
+    `function verifySelectedIdentity(record) { if (item[${literal(nativePropertyName(resource, property))}]() !== sought || (record && record[${literal(property)}] !== undefined && record[${literal(property)}] !== sought)) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity traversal changed while reading.' }; } }`,
+    'verifySelectedIdentity();'
   )
 }
 
@@ -2057,6 +2065,7 @@ function buildGetBody(
   const body = lines(
     selected.statements,
     readOutputProperties(manifest, source, 'item', selected.kindLocal),
+    command.identityTraversal === undefined ? '' : 'verifySelectedIdentity(obj);',
     'return obj;'
   )
   return { body, identifierArguments: selected.identifierArguments }

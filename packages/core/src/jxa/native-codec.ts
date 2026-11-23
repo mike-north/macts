@@ -340,6 +340,8 @@ export type NativeReferenceTable = Readonly<Record<string, NativeReferencePlans>
  * which the script composes from {@link NATIVE_POSITION_READER}.
  */
 export interface NativeCodecEnvironment {
+  /** Expected identities of traversal matches, checked again when their records are read. */
+  readonly identities?: WeakMap<object, { readonly property: string; readonly id: unknown }>
   /** Validated ancestor provenance, retained while resolving and reading nested records. */
   readonly contexts?: WeakMap<
     object,

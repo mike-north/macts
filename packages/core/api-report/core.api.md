@@ -2463,6 +2463,10 @@ export interface NativeCodecEnvironment {
         readonly resource: string;
         readonly item: unknown;
     }[]>;
+    readonly identities?: WeakMap<object, {
+        readonly property: string;
+        readonly id: unknown;
+    }>;
     readonly positionOf?: (specifier: unknown, collection: string) => unknown;
     readonly references: NativeReferenceTable;
     readonly rgbChannels?: 'integer16' | 'normalized';

@@ -203,13 +203,13 @@ describe.each(['local', 'remote'] as const)('Session identity via %s', (locality
     })
     expect(result).not.toHaveProperty('contents')
     expect(result).not.toHaveProperty('text')
-    expect(state.reads).not.toContain('Session.properties')
-    expect(state.reads).not.toContain('Session.contents')
-    expect(state.reads).not.toContain('Session.text')
     expect((await client.sessions.list(int(7), int(0))).items.map(({ id }) => id)).toEqual([
       'a',
       'b',
     ])
+    expect(state.reads).not.toContain('Session.properties')
+    expect(state.reads).not.toContain('Session.contents')
+    expect(state.reads).not.toContain('Session.text')
   })
 
   it('captures Window identity and finds the same Session after reorder, close and in-Window move', async () => {

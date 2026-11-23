@@ -935,7 +935,14 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
           'Identity matched multiple objects within its declared container'
         )
       const match = matches[0]
-      return match ?? failMissing(path, resource)
+      if (match === undefined) return failMissing(path, resource)
+      // at(i) can re-evaluate to another occupant even when every count is unchanged.
+      if (callMember('decode', match, addressing.property, [], path, 'an identity') !== id) {
+        const error = new Error('Identity traversal changed while reading.')
+        error.name = 'MactsCollectionChanged'
+        throw error
+      }
+      return match
     }
     const expected =
       (addressing.within === undefined ? 'the application' : 'the container') +
@@ -1269,6 +1276,14 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         ? app
         : addressPending(app, pending.container, path.concat(['container']), env)
     const object = addressObject(owner, pending.addressing, pending.id, pending.resource, path)
+    if (
+      pending.addressing.lookup !== 'byIndex' &&
+      pending.addressing.lookup !== 'byRoot' &&
+      pending.addressing.traversal !== undefined
+    ) {
+      // Preserve the requested identity across the gap between decoding and record hydration.
+      env?.identities?.set(object, { property: pending.addressing.property, id: pending.id })
+    }
     if (pending.container !== undefined && env?.contexts !== undefined) {
       env.contexts.set(
         object,
