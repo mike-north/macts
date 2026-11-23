@@ -87,7 +87,9 @@ manifest before it can reinterpret a nested address as an application read.
 An address names containment edges outside-in, with identity or zero-based
 index selection and explicit parameter bindings. Identity references contain
 only identified containers; index ancestors remain explicit operation inputs.
-The legacy single `parent` remains available unchanged in both formats.
+The legacy single `parent` remains available in both formats with the same input
+and reference shapes. Format `1.1` validates its normalized scoped address by the
+same rules as `parents`; format `1.0` retains its existing validation.
 
 ```yaml
 version: '1.0'

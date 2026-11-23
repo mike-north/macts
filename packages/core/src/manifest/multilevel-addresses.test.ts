@@ -5,7 +5,9 @@
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import { AppManifestSchema } from './schemas/app.js'
+import { findAddressIssues } from './address.js'
 import { itemIdentifierParameter } from './item-selection.js'
+import { archiveManifest } from './test-support/archive-key-and-root.js'
 import { panesManifest } from './test-support/panes-positional.js'
 import { generateConsolidatedPackages } from '../generator/orchestrate.js'
 import type { AppManifest } from './schemas/app.js'
@@ -871,4 +873,95 @@ it('emits the same complete row identity from legacy and explicit list addresses
     },
   }
   expect(encoded).toEqual([expected, expected])
+})
+
+/** Both address spellings enforce the same selection, namespace and containment invariants. */
+it.each(['parent', 'parents'] as const)('validates normalized 1.1 %s addresses', (syntax) => {
+  const fixture = () => {
+    const manifest = repeatedFolderFixture()
+    const command = manifest.commands['getDocument']
+    const folders = manifest.hierarchy.children['folders']
+    if (command === undefined || folders === undefined) throw new Error('Missing Document fixture')
+    folders.children = { documents: { resource: 'Document', access: 'r' } }
+    command.parents = [
+      { resource: 'Folder', collection: 'folders', by: 'identity', parameter: 'folderId' },
+    ]
+    command.parameters = ['folderId', 'documentId'].map(identityParameter)
+    if (syntax === 'parent') {
+      delete command.parents
+      delete command.item
+      command.parent = { resource: 'Folder', parameter: 'folderId' }
+    }
+    return { manifest, command, folders }
+  }
+  expect(findAddressIssues(fixture().manifest)).toEqual([])
+  const outcomes: Record<string, boolean> = {}
+  for (const kind of [
+    'extra',
+    'parent-type',
+    'parent-null',
+    'item-type',
+    'item-null',
+    'context',
+    'edge',
+    'missing-item',
+    'malformed',
+  ]) {
+    const { manifest, command, folders } = fixture()
+    if (kind === 'extra') {
+      command.name = 'list'
+      delete command.item
+      command.parameters = [identityParameter('folderId'), identityParameter('extra')]
+    } else if (kind === 'malformed') {
+      delete command.resolvesReferences
+      const parent = command.parent ?? command.parents?.[0]
+      if (parent === undefined) throw new Error('Missing parent')
+      Object.assign(parent, { unexpected: true })
+    } else if (kind === 'context') {
+      const get = manifest.commands['getFolder']
+      if (get === undefined) throw new Error('Missing Folder get')
+      get.parent = { resource: 'Window', parameter: 'windowId' }
+      get.parameters.unshift({
+        name: 'windowId',
+        type: 'integer',
+        required: true,
+        description: 'Window identity',
+      })
+    } else if (kind === 'edge') folders.children = {}
+    else if (kind === 'missing-item') command.parameters.pop()
+    else {
+      const parameter = command.parameters[kind.startsWith('parent') ? 0 : 1]
+      if (parameter === undefined) throw new Error('Missing selector')
+      if (kind.endsWith('type')) parameter.type = 'integer'
+      else {
+        parameter.nullable = true
+        parameter.evidence = { nullable: { source: 'curated', note: 'Invalid nullable identity' } }
+      }
+    }
+    outcomes[kind] = findAddressIssues(manifest).some(({ path }) => path[1] === 'getDocument')
+  }
+  expect(outcomes).toEqual({
+    extra: true,
+    'parent-type': true,
+    'parent-null': true,
+    'item-type': true,
+    'item-null': true,
+    context: true,
+    edge: true,
+    'missing-item': true,
+    malformed: true,
+  })
+})
+
+/** Root-kind reads have no collection address; changing format does not invent one. */
+it('retains format 1.1 application-root reads', () => {
+  const manifest = { ...archiveManifest(), version: '1.1' as const }
+  manifest.commands = Object.fromEntries(
+    Object.entries(manifest.commands).filter(([, command]) => command.resourceType === 'Desk')
+  )
+  expect(Object.keys(manifest.commands)).toEqual(['getDesk', 'listDesks'])
+  const parsed = AppManifestSchema.safeParse(manifest)
+  expect(parsed.error?.issues).toBeUndefined()
+  expect(parsed.success).toBe(true)
+  expect(generateConsolidatedPackages(manifest, { appName: 'archive' }).errors).toEqual([])
 })

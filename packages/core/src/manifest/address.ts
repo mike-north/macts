@@ -164,15 +164,16 @@ function selectionParameterMatches(
 }
 
 /**
- * Validate only opted-in paths; existing single-parent contracts retain their
- * established validation. Raw-object consumers also reject malformed modes.
+ * Format 1.1 validates normalized selections independently of their spelling.
+ * Format 1.0 retains its established single-parent and sparse-hierarchy rules.
  * @public
  */
 export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
   const issues: AddressIssue[] = []
   for (const [key, command] of Object.entries(manifest.commands)) {
     if (
-      (command.parents !== undefined ||
+      (manifest.version === '1.1' ||
+        command.parents !== undefined ||
         command.item !== undefined ||
         command.identityTraversal !== undefined ||
         command.resolvesReferences !== undefined) &&
@@ -225,20 +226,23 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
   }
   for (const { commandKey, command, resourceType } of resolveManifestRoutes(manifest)) {
     if (!CommandSchema.safeParse(command).success) continue
-    // These read contracts admit selectors only, so no surface can silently lose action inputs.
+    const address =
+      resourceType === undefined ? undefined : commandAddress(manifest, command, resourceType)
+    // Read inputs follow selection semantics, independently of the address spelling.
     if (
       command.identityTraversal !== undefined ||
-      (command.name === 'list' && command.parents !== undefined)
+      (command.name === 'list' &&
+        (command.parents !== undefined ||
+          (manifest.version === '1.1' && address !== undefined && address.parents.length > 0)))
     ) {
       const selectors = new Set([
-        ...(command.parents?.map(({ parameter }) => parameter) ??
-          (command.parent === undefined ? [] : [command.parent.parameter])),
+        ...(address?.parents.map(({ parameter }) => parameter) ?? []),
         ...(command.name === 'get' ? [itemIdentifierParameter(command)?.name] : []),
       ])
       if (command.parameters.some(({ name }) => !selectors.has(name))) {
         issues.push({
           path: ['commands', commandKey, 'parameters'],
-          message: `Command "${commandKey}": identity-traversal reads and explicit-address lists cannot declare non-selection inputs.`,
+          message: `Command "${commandKey}": identity-traversal reads and scoped format 1.1 lists cannot declare non-selection inputs.`,
         })
       }
     }
@@ -298,7 +302,7 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
         })
       }
     }
-    if (command.parents === undefined && command.item === undefined) continue
+    const explicit = command.parents !== undefined || command.item !== undefined
     const base = ['commands', commandKey]
     const refuse = (message: string, field = 'parents'): void => {
       issues.push({
@@ -306,14 +310,37 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
         message: `Command "${commandKey}" address: ${message}`,
       })
     }
-    const shape = CommandSchema.safeParse(command)
-    if (!shape.success) {
-      refuse('unknown or malformed selection binding.')
-      continue
-    }
-    if (command.parent !== undefined) refuse('parent and parents are mutually exclusive.')
+    // A retained field's identity namespace must come from this read, never another route.
+    const resource = resourceType === undefined ? undefined : manifest.resources[resourceType]
     if (
-      command.parents?.some(({ by }) => by === 'index') &&
+      manifest.version === '1.1' &&
+      resourceType !== undefined &&
+      address !== undefined &&
+      resource !== undefined &&
+      ['get', 'list'].includes(command.name)
+    ) {
+      const context = address.parents
+      for (const [name, property] of outputProperties(manifest, resourceType, resource)) {
+        const container = outputPropertyContainer(manifest, property)
+        if (
+          container !== undefined &&
+          container !== resourceType &&
+          !context.some(({ resource, by }) => resource === container && by === 'identity')
+        ) {
+          refuse(`field "${name}" requires identified container "${container}" in this read path.`)
+        }
+      }
+    }
+    // Collection-path rules do not replace the separate contract of unscoped root reads.
+    if (
+      !explicit &&
+      (manifest.version !== '1.1' || address === undefined || address.parents.length === 0)
+    )
+      continue
+    if (command.parent !== undefined && command.parents !== undefined)
+      refuse('parent and parents are mutually exclusive.')
+    if (
+      address?.parents.some(({ by }) => by === 'index') &&
       command.resolvesReferences !== false &&
       ['get', 'list'].includes(command.name)
     ) {
@@ -324,12 +351,13 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
     if (
       command.scope !== 'resource' ||
       resourceType === undefined ||
-      command.parents === undefined
+      address === undefined ||
+      (explicit && command.parents === undefined)
     ) {
       refuse('explicit selection requires a resource command with parents.')
       continue
     }
-    if (selectsOneItem(command) !== (command.item !== undefined))
+    if (selectsOneItem(command) !== ((explicit ? command.item : address.item) !== undefined))
       refuse('item binding must be present exactly for an item operation.', 'item')
     const used = new Set<string>()
     const check = (selection: { by: string; parameter: string }, key: string): void => {
@@ -352,37 +380,24 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
       }
     }
     let children: Record<string, HierarchyChild> = manifest.hierarchy.children
-    for (const [index, segment] of command.parents.entries()) {
+    for (const [index, segment] of address.parents.entries()) {
       const edge = children[segment.collection]
       if (edge?.resource !== segment.resource)
         refuse(`edge "${segment.collection}" does not reach "${segment.resource}" in this order.`)
       check(segment, segment.resource)
-      if (!ancestorContextMatches(manifest, segment.resource, command.parents.slice(0, index))) {
+      if (!ancestorContextMatches(manifest, segment.resource, address.parents.slice(0, index))) {
         refuse(
           `ancestor "${segment.resource}" requires different identity context through its get.`
         )
       }
       children = edge?.children ?? {}
     }
+    for (const edge of address.traversal ?? []) children = children[edge]?.children ?? {}
     if (Object.values(children).filter(({ resource }) => resource === resourceType).length !== 1) {
       refuse(`target "${resourceType}" needs exactly one final containment edge.`)
     }
-    if (command.item !== undefined) check(command.item, resourceType)
-    // A retained field's identity namespace must come from this read, never another route.
-    const resource = manifest.resources[resourceType]
-    if (resource !== undefined && ['get', 'list'].includes(command.name)) {
-      const context = commandAddress(manifest, command, resourceType).parents
-      for (const [name, property] of outputProperties(manifest, resourceType, resource)) {
-        const container = outputPropertyContainer(manifest, property)
-        if (
-          container !== undefined &&
-          container !== resourceType &&
-          !context.some(({ resource, by }) => resource === container && by === 'identity')
-        ) {
-          refuse(`field "${name}" requires identified container "${container}" in this read path.`)
-        }
-      }
-    }
+    const item = command.item ?? address.item
+    if (item !== undefined) check(item, resourceType)
   }
   return issues
 }
