@@ -943,14 +943,18 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         error.name = 'MactsCollectionChanged'
         throw error
       }
-      // Re-anchored by identity within its own collection: a later shift of positions makes
-      // it a missing target rather than another occupant.
+      // Re-anchored by identity within its own collection. A match that no longer exists there
+      // was present moments ago (closed, or moved to another Tab of the scope), so it is a
+      // retryable collection change; only an identity never found is missing.
       const match = identityLookup(found[1], addressing, id, path, 'a collection')
       if (
         !isHostObject(match) ||
         callMember('decode', match, 'exists', [], path, 'an object') !== true
-      )
-        return failMissing(path, resource)
+      ) {
+        const error = new Error('Identity traversal changed while reading.')
+        error.name = 'MactsCollectionChanged'
+        throw error
+      }
       return match
     }
     const expected =

@@ -2087,10 +2087,11 @@ function bindIdentityTraversal(
     `if (matches.length > 1) { throw { name: ${literal(NATIVE_CODEC_ERROR_NAME)}, direction: 'encode', path: [], message: 'Identity matched multiple objects within its declared container.' }; }`,
     `if (!matches[0]) { var missing = new Error('No such object.'); missing.errorNumber = ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}; throw missing; }`,
     `if (matches[0][0][${literal(nativePropertyName(resource, property))}]() !== sought) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity traversal changed while reading.' }; }`,
-    // The match is re-anchored by identity within its own collection, so a later shift of
-    // positions makes it a missing target rather than another occupant.
+    // The match is re-anchored by identity within its own collection. A match that no longer
+    // exists there was present moments ago (closed, or moved to another Tab of the scope), so it
+    // is a retryable collection change; only a Session never found is missing.
     `var item = ${lookupInCollection(resource, 'matches[0][1]', 'sought')};`,
-    `if (!item.exists()) { var missing = new Error('No such object.'); missing.errorNumber = ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}; throw missing; }`,
+    `if (!item.exists()) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity traversal changed while reading.' }; }`,
     `function verifySelectedIdentity(record) { if (item[${literal(nativePropertyName(resource, property))}]() !== sought || (record && record[${literal(property)}] !== undefined && record[${literal(property)}] !== sought)) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity traversal changed while reading.' }; } }`,
     'verifySelectedIdentity();'
   )

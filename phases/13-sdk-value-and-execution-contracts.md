@@ -2825,7 +2825,9 @@ atomic snapshot.
 The canonical identity get searches every Tab's Sessions in that Window: zero
 matches is `TargetNotFoundError`, multiple matches is `UnexpectedValueError`.
 Once found, the match is read through its Session id within its Tab, so a later
-change of positions makes it missing rather than another occupant. It never
+change of positions is never read as another occupant; a match that no longer
+exists in that Tab (closed, or moved to another Tab) is a retryable
+`CollectionChangedError`, not a missing target. It never
 searches another Window. Tab reorder, closure of an earlier Tab, or
 movement between Tabs in that Window does not change the reference's meaning.
 Movement to another Window makes the old reference missing. No persistence

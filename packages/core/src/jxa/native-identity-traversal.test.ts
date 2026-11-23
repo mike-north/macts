@@ -301,7 +301,11 @@ function shiftingHost(shift: 'transient' | 'closed') {
   return { windows: { byId: () => window } }
 }
 
-/** A resolved match reads the sought Session or fails as missing; it never reads a later occupant. */
+/**
+ * A resolved match reads the sought Session or fails as missing; it never reads a later occupant.
+ * Here the Session closes while its properties are read, after the re-anchor found it, so the
+ * read itself reports the target missing.
+ */
 function expectSoughtOrMissing(read: () => unknown, shift: 'transient' | 'closed'): void {
   if (shift === 'transient') {
     expect(read()).toMatchObject({ id: 'a', columns: 80 })
@@ -340,3 +344,82 @@ it.each(['transient', 'closed'] as const)(
     }, shift)
   }
 )
+
+/**
+ * Window `7` holds Tabs `[a]` and `[b]`. In the `moved` scenario `a` moves to the second
+ * Tab (`[]`, `[b, a]`) on its second identity read, which is after the match and before the
+ * re-anchor in the first Tab. In the `absent` scenario `a` is in no Tab at all.
+ */
+function tabMoveHost(scenario: 'moved' | 'absent') {
+  const tabs: string[][] = scenario === 'moved' ? [['a'], ['b']] : [['x'], ['b']]
+  let identityReadsOfA = 0
+  const session = (occupant: () => string | undefined) =>
+    new Proxy(
+      {},
+      {
+        get(_target, key) {
+          if (key === 'exists') return () => occupant() !== undefined
+          return () => {
+            const id = occupant()
+            if (id === undefined)
+              throw Object.assign(new Error('No such object.'), { errorNumber: -1728 })
+            if (key === 'id' && id === 'a' && ++identityReadsOfA === 2) {
+              tabs[0] = []
+              tabs[1] = ['b', 'a']
+            }
+            return key === 'id' ? id : null
+          }
+        },
+      }
+    )
+  const tab = (index: number) => ({
+    exists: () => true,
+    sessions: {
+      get length() {
+        return tabs[index]?.length ?? 0
+      },
+      at: (position: number) => session(() => tabs[index]?.[position]),
+      byId: (id: string) => session(() => (tabs[index]?.includes(id) ? id : undefined)),
+    },
+  })
+  const window = { exists: () => true, id: () => 7, tabs: { length: 2, at: tab } }
+  return { windows: { byId: () => window } }
+}
+
+it('reports a collection change when a matched Session moves to another Tab of its Window (resolve)', () => {
+  const app = tabMoveHost('moved')
+  const body = buildNativeBody(manifest, { command: 'resolveSession', resource: 'Session' })
+  expectCollectionChange(() =>
+    evaluateBody(body, app, { windowId: 7, sessionId: 'a' }, environment(app))
+  )
+})
+
+it('reports a collection change when a decoded Session moves to another Tab of its Window (decode)', () => {
+  const app = tabMoveHost('moved')
+  expectCollectionChange(() =>
+    createNativeCodecFunctions().decode(reference, plan, environment(app))
+  )
+})
+
+it('still reports a Session absent from every Tab of its Window as missing (resolve)', () => {
+  const app = tabMoveHost('absent')
+  const body = buildNativeBody(manifest, { command: 'resolveSession', resource: 'Session' })
+  let caught: unknown
+  try {
+    evaluateBody(body, app, { windowId: 7, sessionId: 'a' }, environment(app))
+  } catch (error) {
+    caught = error
+  }
+  expect(caught).toMatchObject({ errorNumber: -1728 })
+})
+
+it('still reports a Session absent from every Tab of its Window as missing (decode)', () => {
+  const app = tabMoveHost('absent')
+  let caught: unknown
+  try {
+    createNativeCodecFunctions().decode(reference, plan, environment(app))
+  } catch (error) {
+    caught = error
+  }
+  expect(caught).toMatchObject({ missingResource: 'Session' })
+})
