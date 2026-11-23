@@ -16,7 +16,11 @@ function evaluate(source: string, dependency: (name: string) => unknown): Record
   const code = ts.transpileModule(source, {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText
-  runInThisContext(`(function(require,exports) { ${code} })`)(dependency, exports)
+  const execute = runInThisContext(`(function(require,exports) { ${code} })`) as (
+    dependency: (name: string) => unknown,
+    exports: Record<string, unknown>
+  ) => void
+  execute(dependency, exports)
   return exports
 }
 const requireCore = createRequire(import.meta.url)
@@ -52,9 +56,9 @@ function recordingResource(sdk: string) {
   const Constructor = SessionResourceClient as new (...args: unknown[]) => Resource
   const resource = new Constructor(
     {
-      invoke: async (...args: unknown[]) => {
+      invoke: (...args: unknown[]) => {
         calls.push(args)
-        return { id: 'a' }
+        return Promise.resolve({ id: 'a' })
       },
     },
     'iterm',
