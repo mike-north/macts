@@ -634,3 +634,20 @@ it.each(['id', 'name'])(
     )
   }
 )
+
+/** Legacy parent-scoped lists keep their established inputs without opting into explicit paths. */
+it('retains the format 1.0 parent-scoped list contract', () => {
+  const manifest = panesManifest()
+  expect(manifest.version).toBe('1.0')
+  expect(AppManifestSchema.safeParse(manifest).success).toBe(true)
+  const result = generateConsolidatedPackages(manifest, { appName: 'panes' })
+  expect(result.errors).toEqual([])
+  const source = (path: string) => result.client.files.find((file) => file.path === path)?.content
+  expect(source('src/contract/index.ts')).toContain(
+    'list(windowId: Integer, options?: CallOptions)'
+  )
+  expect(source('src/resources/tab.ts')).toContain('async list(windowId: number,')
+  expect(source('src/cli/commands/windows/tabs/list.ts')).toContain(
+    "windowId = Option.String('--window-id'"
+  )
+})

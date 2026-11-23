@@ -212,6 +212,23 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
   }
   for (const { commandKey, command, resourceType } of resolveManifestRoutes(manifest)) {
     if (!CommandSchema.safeParse(command).success) continue
+    // These read contracts admit selectors only, so no surface can silently lose action inputs.
+    if (
+      command.identityTraversal !== undefined ||
+      (command.name === 'list' && command.parents !== undefined)
+    ) {
+      const selectors = new Set([
+        ...(command.parents?.map(({ parameter }) => parameter) ??
+          (command.parent === undefined ? [] : [command.parent.parameter])),
+        ...(command.name === 'get' ? [itemIdentifierParameter(command)?.name] : []),
+      ])
+      if (command.parameters.some(({ name }) => !selectors.has(name))) {
+        issues.push({
+          path: ['commands', commandKey, 'parameters'],
+          message: `Command "${commandKey}": identity-traversal reads and explicit-address lists cannot declare non-selection inputs.`,
+        })
+      }
+    }
     if (command.identityTraversal !== undefined) {
       const parent = command.parent
       const roots = Object.values(manifest.hierarchy.children).filter(
