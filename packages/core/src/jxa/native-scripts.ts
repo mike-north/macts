@@ -460,17 +460,18 @@ function readOutputProperties(
     rooted && kindExpression !== undefined
       ? `${member('obj', ROOT_KIND_PROPERTY)} = ${kindExpression};`
       : '',
-    ...containedKeys(manifest, source).map(
-      (key) =>
-        `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${wrapContained(
-          member('obj', key),
-          'container',
-          source.resource?.properties[key] !== undefined &&
-            outputPropertyContainer(manifest, source.resource.properties[key]) !== source.key
-            ? `(env.contexts.get(${itemLocal}) || []).filter(function(entry) { return entry.resource === ${JSON.stringify(outputPropertyContainer(manifest, source.resource.properties[key]))}; }).slice(-1)[0].item`
-            : itemLocal
-        )}; }`
-    ),
+    ...containedKeys(manifest, source).map((key) => {
+      const property = source.resource?.properties[key]
+      const container =
+        property === undefined ? undefined : outputPropertyContainer(manifest, property)
+      return `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${wrapContained(
+        member('obj', key),
+        'container',
+        container !== undefined && container !== source.key
+          ? identityContainer(`env.contexts.get(${itemLocal})`, container)
+          : itemLocal
+      )}; }`
+    }),
     ...keys
       .filter((key) => marksAbsentAsNull(source, key))
       .map(
@@ -478,6 +479,11 @@ function readOutputProperties(
           `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${markAbsentAsNull(member('obj', key))}; }`
       )
   )
+}
+
+/** Related identities use the nearest matching ancestor in the validated outside-in read context. */
+function identityContainer(context: string, resource: string): string {
+  return `(${context} || []).filter(function(entry) { return entry.resource === ${literal(resource)}; }).slice(-1)[0].item`
 }
 
 /**
@@ -1826,28 +1832,24 @@ function buildListBody(
       {}
     )
   }
+  const ancestorContext =
+    command.parents === undefined
+      ? undefined
+      : `[${command.parents.map((entry, at) => `{ resource: ${literal(entry.resource)}, item: ancestor${String(at)} }`).join(', ')}]`
   const recordFields = bestEffortProps.map((p, index) => {
     const value = `${columnLocal(index)}[i]`
     const property = resource?.properties[p]
     const container =
       property === undefined ? undefined : outputPropertyContainer(manifest, property)
-    const ancestorIndex = command.parents?.findIndex(({ resource }) => resource === container)
     const held = !contained.has(p)
       ? value
       : container === source.key
-        ? wrapContained(
-            value,
-            'containerId',
-            `${IDS_LOCAL}[i]`,
-            command.parents === undefined
-              ? undefined
-              : `[${command.parents.map((entry, at) => `{ resource: ${literal(entry.resource)}, item: ancestor${String(at)} }`).join(', ')}]`
-          )
+        ? wrapContained(value, 'containerId', `${IDS_LOCAL}[i]`, ancestorContext)
         : wrapContained(
             value,
             'container',
-            ancestorIndex !== undefined && ancestorIndex >= 0
-              ? `ancestor${String(ancestorIndex)}`
+            ancestorContext !== undefined && container !== undefined
+              ? identityContainer(ancestorContext, container)
               : PARENT_LOCAL
           )
     const marked = marksAbsentAsNull(source, p) ? markAbsentAsNull(held) : held

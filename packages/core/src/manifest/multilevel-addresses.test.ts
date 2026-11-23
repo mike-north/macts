@@ -9,7 +9,8 @@ import { itemIdentifierParameter } from './item-selection.js'
 import { panesManifest } from './test-support/panes-positional.js'
 import { generateConsolidatedPackages } from '../generator/orchestrate.js'
 import type { AppManifest } from './schemas/app.js'
-import { buildNativeBody } from '../jxa/native-scripts.js'
+import { buildNativeBody, referenceAddressing } from '../jxa/native-scripts.js'
+import type { NativeCodecEnvironment } from '../jxa/native-codec.js'
 import { createNativeCodecFunctions } from '../jxa/native-codec-functions.js'
 import { runInNewContext } from 'node:vm'
 
@@ -456,34 +457,28 @@ it('refuses an ancestor whose resolving get requires omitted identity context, e
   ).toBeGreaterThan(0)
 })
 
-it('admits a finite explicit path that repeats an identified resource type', () => {
+/** A finite repeated Folder address retains distinct selectors for each physical ancestor. */
+function repeatedFolderFixture(): AppManifest {
   const base = panesManifest()
   const manifest = { ...base, version: '1.1' as const }
   // Identified folders may contain folders; this finite address is an input,
   // and makes no recursive or positional reference-data claim.
-  manifest.resources['Folder'] = {
-    name: 'Folder',
-    plural: 'Folders',
-    description: 'An identified folder',
-    properties: {
-      id: { access: 'r', type: 'string', description: 'Folder id', code: 'ID  ', optional: false },
-    },
-    identifiers: [{ property: 'id', primary: true }],
-  }
-  manifest.resources['Document'] = {
-    name: 'Document',
-    plural: 'Documents',
-    description: 'An identified document',
-    properties: {
-      id: {
-        access: 'r',
-        type: 'string',
-        description: 'Document id',
-        code: 'ID  ',
-        optional: false,
+  for (const name of ['Folder', 'Document']) {
+    manifest.resources[name] = {
+      name,
+      plural: `${name}s`,
+      description: `An identified ${name}`,
+      properties: {
+        id: {
+          access: 'r',
+          type: 'string',
+          description: `${name} id`,
+          code: 'ID  ',
+          optional: false,
+        },
       },
-    },
-    identifiers: [{ property: 'id', primary: true }],
+      identifiers: [{ property: 'id', primary: true }],
+    }
   }
   manifest.hierarchy.children['folders'] = {
     resource: 'Folder',
@@ -521,6 +516,11 @@ it('admits a finite explicit path that repeats an identified resource type', () 
       required: true,
     })),
   }
+  return manifest
+}
+
+it('admits a finite explicit path that repeats an identified resource type', () => {
+  const manifest = repeatedFolderFixture()
   const parsed = AppManifestSchema.safeParse(manifest)
   expect(parsed.error?.issues).toBeUndefined()
   expect(parsed.success).toBe(true)
@@ -553,6 +553,7 @@ it('admits a finite explicit path that repeats an identified resource type', () 
     )
   ).toThrow(/located through a container/)
   const folderGet = manifest.commands['getFolder']
+  if (folderGet === undefined) throw new Error('Missing Folder identity read')
   // A required Window namespace cannot be supplied by repeated Folder ancestors.
   folderGet.parent = { resource: 'Window', parameter: 'windowId' }
   folderGet.parameters.unshift({
@@ -650,4 +651,106 @@ it('retains the format 1.0 parent-scoped list contract', () => {
   expect(source('src/cli/commands/windows/tabs/list.ts')).toContain(
     "windowId = Option.String('--window-id'"
   )
+})
+
+/** Related identities from a nested list must resolve in the inner Folder, even when ids overlap. */
+it('executes a repeated-Folder list without substituting the outer reference container', () => {
+  const manifest = repeatedFolderFixture()
+  const folder = manifest.resources['Folder']
+  const document = manifest.resources['Document']
+  const parents = manifest.commands['getDocument']?.parents
+  const outerEdge = manifest.hierarchy.children['folders']
+  const innerEdge = outerEdge?.children?.['folders']
+  if (!folder || !document || !parents || !outerEdge || !innerEdge)
+    throw new Error('Missing repeated Folder fixture')
+  manifest.resources['Entry'] = { ...folder, name: 'Entry', plural: 'Entries' }
+  document.properties['favorite'] = {
+    access: 'r',
+    type: { resource: 'Entry' },
+    description: 'An Entry held by the same Folder',
+    optional: false,
+  }
+  const parameter = (name: string) => ({
+    name,
+    type: 'string',
+    required: true,
+    description: 'Selected identity',
+  })
+  for (const name of ['Document', 'Entry']) {
+    manifest.commands[`get${name}`] = {
+      name: 'get',
+      scope: 'resource',
+      resourceType: name,
+      description: 'Read within its Folder',
+      parent: { resource: 'Folder', parameter: 'folderId' },
+      parameters: [parameter('folderId'), parameter('id')],
+    }
+  }
+  for (const edge of [outerEdge, innerEdge])
+    edge.children = {
+      ...edge.children,
+      documents: { resource: 'Document', access: 'r' },
+      entries: { resource: 'Entry', access: 'r' },
+    }
+  manifest.commands['listNestedDocuments'] = {
+    name: 'list',
+    scope: 'resource',
+    resourceType: 'Document',
+    description: 'List within a nested Folder',
+    resolvesReferences: false,
+    parents,
+    parameters: parents.map(({ parameter: name }) => parameter(name)),
+  }
+  expect(AppManifestSchema.safeParse(manifest).success).toBe(true)
+  const entry = (label: string) => ({ exists: () => true, id: () => 'entry', label: () => label })
+  const innerEntry = entry('inner entry'),
+    outerEntry = entry('outer entry')
+  const documents = new Proxy(() => [], {
+    get: (_target, key) => () => (key === 'id' ? ['doc'] : [innerEntry]),
+  })
+  const inner = {
+    exists: () => true,
+    id: () => 'inner',
+    documents,
+    entries: { byId: () => innerEntry },
+  }
+  const outer = {
+    exists: () => true,
+    id: () => 'outer',
+    folders: { byId: () => inner },
+    entries: { byId: () => outerEntry },
+  }
+  const app = { folders: { byId: (id: string) => (id === 'inner' ? inner : outer) } }
+  const folderAddressing = referenceAddressing(manifest, 'Folder')
+  const entryAddressing = referenceAddressing(manifest, 'Entry')
+  if (!folderAddressing || !entryAddressing) throw new Error('Missing reference identity plans')
+  const env: NativeCodecEnvironment = {
+    app,
+    contexts: new WeakMap(),
+    references: {
+      Folder: { id: { kind: 'string' }, addressing: folderAddressing },
+      Entry: { id: { kind: 'string' }, addressing: entryAddressing },
+    },
+  }
+  const body = buildNativeBody(manifest, { command: 'listNestedDocuments', resource: 'Document' })
+  const rows = runInNewContext(`(function(app,args,env) { ${body} })(app,args,env)`, {
+    app,
+    args: { outerId: 'outer', innerId: 'inner' },
+    env,
+  }) as { favorite: unknown }[]
+  const row = rows[0]
+  if (row === undefined) throw new Error('Expected the inner Document')
+  const codec = createNativeCodecFunctions()
+  const plan = { kind: 'reference', resource: 'Entry', cardinality: 'one' } as const
+  const encoded = codec.encode(row.favorite, plan, env)
+  expect(encoded).toEqual({
+    reference: {
+      resource: 'Entry',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'entry',
+      container: { resource: 'Folder', form: 'identity', cardinality: 'one', id: 'inner' },
+    },
+  })
+  expect(codec.decode(encoded, plan, env)).toBe(innerEntry)
 })
