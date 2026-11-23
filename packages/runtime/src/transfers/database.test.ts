@@ -14,7 +14,15 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { spawn } from 'node:child_process'
-import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  statSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { loadSqlite, type SqliteDatabase } from '../storage/sqlite.js'
@@ -35,6 +43,17 @@ function schemaVersion(home: string): number {
   return withRawDatabase(home, (database) =>
     Number(database.prepare('PRAGMA user_version').get()?.['user_version'])
   )
+}
+
+/** The journal mode recorded in the database file, read without changing it. */
+function journalMode(file: string): string {
+  const { DatabaseSync } = loadSqlite()
+  const database = new DatabaseSync(file, { readOnly: true })
+  try {
+    return String(database.prepare('PRAGMA journal_mode').get()?.['journal_mode'])
+  } finally {
+    database.close()
+  }
 }
 
 function tableNames(home: string): string[] {
@@ -106,6 +125,40 @@ describe('transfer database schema version', () => {
       /schema version -1, which this version of macts does not recognize/
     )
     expect(schemaVersion(home)).toBe(-1)
+  })
+
+  describe.each([
+    { label: 'newer macts', version: 2 },
+    { label: 'unrecognized negative version', version: -1 },
+  ])('refusing a database from a $label', ({ version }) => {
+    /** Write a database in rollback-journal mode at `version`, with looser file modes. */
+    function writeForeignDatabase(): string {
+      const directory = join(home, 'transfers')
+      mkdirSync(directory, { recursive: true, mode: 0o700 })
+      const file = join(directory, 'transfers.db')
+      const { DatabaseSync } = loadSqlite()
+      const database = new DatabaseSync(file)
+      database.exec(
+        `PRAGMA journal_mode = DELETE; CREATE TABLE future (x); PRAGMA user_version = ${String(version)}`
+      )
+      database.close()
+      chmodSync(file, 0o644)
+      return file
+    }
+
+    it('leaves the file byte-identical, in rollback-journal mode, with no companion files', async () => {
+      const file = writeForeignDatabase()
+      const before = readFileSync(file)
+
+      await expect(createTransferStore({ home })).rejects.toThrow(/schema version/)
+
+      expect(readFileSync(file).equals(before)).toBe(true)
+      expect(journalMode(file)).toBe('delete')
+      expect(existsSync(`${file}-wal`)).toBe(false)
+      expect(existsSync(`${file}-shm`)).toBe(false)
+      // The database's own permissions are not changed either.
+      expect(statSync(file).mode & 0o777).toBe(0o644)
+    })
   })
 })
 

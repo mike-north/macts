@@ -6,8 +6,10 @@
  *
  * The directory is private to the user (0700) and the database is readable
  * only by the user (0600): it maps subjects to the files they were granted.
- * Modes are reasserted on every open so a directory created by an older or
- * misconfigured process is tightened.
+ * The directory's mode and the database file's mode are reasserted on every
+ * open of an accepted database, so ones created by an older or misconfigured
+ * process are tightened. Companion files (`-wal`, `-shm`) are created with the
+ * database file's mode and live in the private directory.
  *
  * Timestamps are integer milliseconds since the Unix epoch. Tokens are never
  * stored, only their SHA-256 digests (see `tokens.ts`).
@@ -72,12 +74,19 @@ function ensurePrivateDirectory(directory: string): void {
 }
 
 /**
- * Create the database file owner-only before SQLite opens it. SQLite gives
- * its `-wal` and `-shm` companions the database file's mode, so they are
- * owner-only too.
+ * Create the database file owner-only if it does not exist yet, so SQLite
+ * never creates it with a looser mode. An existing file is left as it is.
  */
-function ensurePrivateFile(file: string): void {
+function createPrivateFileIfMissing(file: string): void {
   fs.closeSync(fs.openSync(file, 'a', FILE_MODE))
+}
+
+/**
+ * Make the database file owner-only. SQLite gives its `-wal` and `-shm`
+ * companions the database file's mode, so they are owner-only too. Only
+ * called once the database is known to be one this code may use.
+ */
+function restrictFileToOwner(file: string): void {
   fs.chmodSync(file, FILE_MODE)
 }
 
@@ -165,15 +174,14 @@ function assertKnownSchemaVersion(version: number): void {
 }
 
 /**
- * Create the schema in a fresh database, or check an existing one's version.
+ * Create the schema in a database whose version is 0 (fresh); a database
+ * already at the current version is left as it is.
  *
- * The fresh-database step runs in one immediate transaction and re-reads the
- * version once it holds the write lock, so two processes opening a new home
- * at once create the schema exactly once.
+ * The step runs in one immediate transaction and re-reads the version once it
+ * holds the write lock, so two processes opening a new home at once create
+ * the schema exactly once.
  */
-function prepareSchema(database: SqliteDatabase): void {
-  const version = readSchemaVersion(database)
-  assertKnownSchemaVersion(version)
+function prepareSchema(database: SqliteDatabase, version: number): void {
   if (version === TRANSFER_SCHEMA_VERSION) {
     return
   }
@@ -195,9 +203,10 @@ function prepareSchema(database: SqliteDatabase): void {
  * Prepare the directory and open the database, creating the schema when
  * the database is fresh.
  *
- * The busy timeout is set before anything that takes a lock (switching to
- * WAL, creating the schema), so a process opening the store while another
- * holds the lock waits instead of failing.
+ * The busy timeout is set first, so a process opening the store while another
+ * holds the lock waits instead of failing. The schema version is then read and
+ * checked before anything is written: only an accepted database has its file
+ * mode tightened, its journal mode switched to WAL, or its schema created.
  *
  * @throws Error when the database's schema version is not one this code
  *   understands (see the module documentation); the database is closed and
@@ -205,14 +214,17 @@ function prepareSchema(database: SqliteDatabase): void {
  */
 export function openTransferDatabase(paths: TransferPaths): SqliteDatabase {
   ensurePrivateDirectory(paths.root)
-  ensurePrivateFile(paths.database)
+  createPrivateFileIfMissing(paths.database)
 
   const { DatabaseSync } = loadSqlite()
   const database = new DatabaseSync(paths.database)
   try {
     database.exec(`PRAGMA busy_timeout = ${String(BUSY_TIMEOUT_MS)}`)
+    const version = readSchemaVersion(database)
+    assertKnownSchemaVersion(version)
+    restrictFileToOwner(paths.database)
     database.exec('PRAGMA journal_mode = WAL')
-    prepareSchema(database)
+    prepareSchema(database, version)
   } catch (error) {
     database.close()
     throw error
