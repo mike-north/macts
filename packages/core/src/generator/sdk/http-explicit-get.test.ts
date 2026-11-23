@@ -156,48 +156,55 @@ it('keeps supplied optional integers and strict selector validation', async () =
   expect(calls).toHaveLength(1)
 })
 
-/** Canonical consumers are checked by TypeScript against emitted declarations and real value types. */
+/**
+ * Canonical consumers compile against real value types; loading the full dependency graph
+ * needs a separate finite budget on loaded runners, without skipping any diagnostics.
+ */
 it.each([
   "void client.sessions.get(Integer.validate(7), Integer.validate(0), 'a');",
   "void client.sessions.get(Integer.validate(7), Integer.validate(0), 'a', Integer.validate(5));",
   "void client.sessions.get(Integer.validate(7), Integer.validate(0), 'a', undefined, {});",
-])('compiles an optional canonical get argument: %s', (call) => {
-  const { generated } = generate(optionalInteger)
-  const directory = mkdtempSync(join(tmpdir(), 'macts-optional-get-'))
-  try {
-    for (const file of generated.client.files.filter(({ path }) =>
-      path.startsWith('src/contract/')
-    )) {
-      const path = join(directory, file.path)
-      mkdirSync(dirname(path), { recursive: true })
-      writeFileSync(path, file.content)
+])(
+  'compiles an optional canonical get argument: %s',
+  (call) => {
+    const { generated } = generate(optionalInteger)
+    const directory = mkdtempSync(join(tmpdir(), 'macts-optional-get-'))
+    try {
+      for (const file of generated.client.files.filter(({ path }) =>
+        path.startsWith('src/contract/')
+      )) {
+        const path = join(directory, file.path)
+        mkdirSync(dirname(path), { recursive: true })
+        writeFileSync(path, file.content)
+      }
+      writeFileSync(join(directory, 'package.json'), '{"type":"module"}')
+      const usage = join(directory, 'usage.ts')
+      writeFileSync(
+        usage,
+        `import { Integer } from '@macts/contracts';\nimport type { iTermClient } from './src/contract/index.js';\ndeclare const client: iTermClient;\n${call}\n`
+      )
+      const root = fileURLToPath(new URL('../../../../../', import.meta.url))
+      const program = ts.createProgram([usage], {
+        strict: true,
+        noEmit: true,
+        types: [],
+        module: ts.ModuleKind.NodeNext,
+        moduleResolution: ts.ModuleResolutionKind.NodeNext,
+        target: ts.ScriptTarget.ES2022,
+        baseUrl: root,
+        paths: { '@macts/contracts': [resolve(root, 'packages/contracts/dist/index.d.ts')] },
+      })
+      expect(
+        ts
+          .getPreEmitDiagnostics(program)
+          .map(
+            (diagnostic) =>
+              `TS${String(diagnostic.code)}: ${ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')}`
+          )
+      ).toEqual([])
+    } finally {
+      rmSync(directory, { recursive: true, force: true })
     }
-    writeFileSync(join(directory, 'package.json'), '{"type":"module"}')
-    const usage = join(directory, 'usage.ts')
-    writeFileSync(
-      usage,
-      `import { Integer } from '@macts/contracts';\nimport type { iTermClient } from './src/contract/index.js';\ndeclare const client: iTermClient;\n${call}\n`
-    )
-    const root = fileURLToPath(new URL('../../../../../', import.meta.url))
-    const program = ts.createProgram([usage], {
-      strict: true,
-      noEmit: true,
-      types: [],
-      module: ts.ModuleKind.NodeNext,
-      moduleResolution: ts.ModuleResolutionKind.NodeNext,
-      target: ts.ScriptTarget.ES2022,
-      baseUrl: root,
-      paths: { '@macts/contracts': [resolve(root, 'packages/contracts/dist/index.d.ts')] },
-    })
-    expect(
-      ts
-        .getPreEmitDiagnostics(program)
-        .map(
-          (diagnostic) =>
-            `TS${String(diagnostic.code)}: ${ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')}`
-        )
-    ).toEqual([])
-  } finally {
-    rmSync(directory, { recursive: true, force: true })
-  }
-})
+  },
+  60_000
+)
