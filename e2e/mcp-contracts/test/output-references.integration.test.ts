@@ -16,7 +16,8 @@
  *   a field of that parent's own record and the parent is a valid container:
  *   a reference read from the app carries, as its container, the record it
  *   was read through, so only there does it carry the container its get
- *   needs. A valid container is itself such a target, with no parent of its
+ *   needs. A validated read path also carries its identified ancestors.
+ *   A valid container is itself such a target, with no parent of its
  *   own;
  * - and it is not identified by a name its primary identifier does not claim
  *   unique, since such a reference does not pin the object the app returned.
@@ -70,7 +71,18 @@ function problem(app: RealApp, resource: string, source?: string): string | unde
   if (get === undefined) return `get ${descriptor.get} is not an operation`
   const parent = manifest.commands[get.target.command]?.parent?.resource
   if (parent !== undefined) {
-    if (parent !== source) return 'parent-scoped get, not read through its parent'
+    const sourceGet = source === undefined ? undefined : contract.resources[source]?.get
+    const sourceCommand =
+      sourceGet === undefined
+        ? undefined
+        : manifest.commands[contract.operations[sourceGet]?.target.command ?? '']
+    // A validated read path can carry an identified ancestor through a positional resource.
+    const inherited =
+      sourceCommand?.parent?.resource === parent ||
+      sourceCommand?.parents?.some(
+        (entry) => entry.resource === parent && entry.by === 'identity'
+      ) === true
+    if (parent !== source && !inherited) return 'parent-scoped get, not read through its parent'
     const why = problem(app, parent)
     if (why !== undefined) return `parent-scoped get, within a parent that is no container: ${why}`
   }
@@ -228,6 +240,8 @@ describe('output references in every real contract', () => {
       [
         'google-chrome Window.activeTab → Tab',
         'iterm Window.currentTab → Tab',
+        'iterm Window.currentSession → Session',
+        'iterm Tab.currentSession → Session',
         'microsoft-edge Window.activeTab → Tab',
         'photos Album.parent → Folder',
         'photos Folder.parent → Folder',
@@ -266,6 +280,10 @@ describe('output references in every real contract', () => {
         'iterm.app.currentWindow → Window',
         'iterm.windows.get → Tab',
         'iterm.windows.list → Tab',
+        'iterm.windows.get → Session',
+        'iterm.windows.list → Session',
+        'iterm.tabs.get → Session',
+        'iterm.tabs.list → Session',
         'microsoft-edge.windows.create → Tab',
         'microsoft-edge.windows.get → Tab',
         'microsoft-edge.windows.list → Tab',

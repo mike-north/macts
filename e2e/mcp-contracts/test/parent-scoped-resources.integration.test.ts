@@ -114,6 +114,7 @@ describe('the parents of resolving routes in every real contract', () => {
       [
         ...both.flatMap((pin) => byRoute(pin, ROUTES)),
         ...listOnly.flatMap((pin) => byRoute(pin, ['list'])),
+        'iterm Session get → Window',
       ].sort()
     )
   })
