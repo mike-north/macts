@@ -146,8 +146,9 @@ policies encrypted at rest.
 The key and transfer databases use Node's built-in `node:sqlite`, so
 installing macts never builds or downloads a native addon. This is why the
 package requires Node.js 22.13.0 or later, the first release that loads
-`node:sqlite` without a flag. On Node versions that still label SQLite experimental, macts keeps that
-one-time notice off your stderr; it does not hide any other warning.
+`node:sqlite` without a flag. On Node versions that still label SQLite
+experimental, macts keeps that one-time notice off your stderr; it does not
+hide any other warning.
 
 ## Transfers
 

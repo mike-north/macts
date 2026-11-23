@@ -9,9 +9,6 @@
  * - **Download links** — short-lived bearer capabilities that deliver one
  *   granted file over HTTP.
  *
- * The database already holds the tables for uploads and temporary copies
- * (see `database.ts`), so adding them does not change the schema version.
- *
  * ## Guarantees
  *
  * - **Subject binding.** A grant presented by any subject other than the one
@@ -148,7 +145,7 @@ export interface TransferStore {
   /** Remove expired grants and download links. */
   sweep(): Promise<void>
 
-  /** Close the database. Safe to call more than once; later calls fail. */
+  /** Close the database. Safe to call more than once; every other method fails once the store is closed. */
   close(): void
 }
 
@@ -185,6 +182,12 @@ function expiredTransfer(kind: TransferKind): TransferError {
 function assertSubject(subject: string): void {
   if (typeof subject !== 'string' || subject.length === 0) {
     throw new TypeError('A transfer subject must be a non-empty string.')
+  }
+}
+
+function assertToken(token: string): void {
+  if (typeof token !== 'string' || token.length === 0) {
+    throw new TypeError('A transfer token must be a non-empty string.')
   }
 }
 
@@ -265,9 +268,9 @@ class SqliteTransferStore implements TransferStore {
 
   /**
    * Run `work` in one transaction that takes the write lock at the start.
-   * Every store transaction reads and then writes based on what it read, so
-   * concurrent stores on the same home queue for the lock rather than fail
-   * on upgrading a concurrent read.
+   * Taking the write lock up front makes concurrent stores on the same home
+   * queue for it rather than fail when a read transaction later tries to
+   * upgrade to a write.
    */
   #transaction<T>(work: () => T): T {
     return runInTransaction(this.#database, work, { immediate: true })
@@ -330,6 +333,7 @@ class SqliteTransferStore implements TransferStore {
     return Promise.resolve().then(() => {
       this.#assertOpen()
       assertSubject(subject)
+      assertToken(token)
       return this.#findGrant(subject, token)
     })
   }
@@ -343,6 +347,7 @@ class SqliteTransferStore implements TransferStore {
   #issueDownloadLink(subject: string, grantToken: string): IssuedDownloadLink {
     this.#assertOpen()
     assertSubject(subject)
+    assertToken(grantToken)
 
     const grant = this.#findGrant(subject, grantToken)
     const expiresAt = this.#nowMs() + this.limits.downloadLinkTtlMs
@@ -360,6 +365,7 @@ class SqliteTransferStore implements TransferStore {
   redeemDownloadLink(token: string): Promise<DownloadLinkTarget> {
     return Promise.resolve().then(() => {
       this.#assertOpen()
+      assertToken(token)
       const row = this.#getRow(
         'SELECT app, path, expires_at FROM download_links WHERE token_hash = ?',
         hashToken(token)

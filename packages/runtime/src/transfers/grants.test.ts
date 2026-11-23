@@ -52,6 +52,19 @@ describe('issueGrant', () => {
   })
 })
 
+describe('tokens that are not non-empty strings', () => {
+  const fixture = useTransferStore()
+  const NOT_TOKENS = [null, undefined, 42, '']
+
+  it.each(NOT_TOKENS)('rejects %j as a programming error naming the token', async (bad) => {
+    const token = bad as unknown as string
+    const message = /A transfer token must be a non-empty string/
+    await expect(fixture.store.redeemGrant(ALICE, token)).rejects.toThrow(message)
+    await expect(fixture.store.issueDownloadLink(ALICE, token)).rejects.toThrow(message)
+    await expect(fixture.store.redeemDownloadLink(token)).rejects.toThrow(message)
+  })
+})
+
 describe('redeemGrant', () => {
   const fixture = useTransferStore()
 
