@@ -148,11 +148,13 @@ function ancestorContextMatches(
   const context = prefix.filter(({ resource, by }) => resource !== key || by !== 'identity')
   return (
     expected.length === context.length &&
-    expected.every(
-      (entry, index) =>
-        entry.resource === context[index]?.resource &&
-        (entry.by === undefined || entry.by === context[index].by)
-    )
+    expected.every((entry, index) => {
+      const selected = context.at(index)
+      if (selected === undefined) return false
+      return (
+        entry.resource === selected.resource && (entry.by === undefined || entry.by === selected.by)
+      )
+    })
   )
 }
 
