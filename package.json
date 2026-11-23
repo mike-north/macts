@@ -14,6 +14,8 @@
     "test": "nx run-many -t test",
     "test:types": "nx run-many -t test:types",
     "typecheck": "nx run-many -t typecheck",
+    "verify:project": "nx run-many -t build lint typecheck test --projects",
+    "verify:affected": "node scripts/verify-affected.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "generate": "node scripts/regenerate.mjs",
