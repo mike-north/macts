@@ -163,7 +163,7 @@ describe('multilevel address declarations', () => {
     if (selectedWindow === undefined) throw new Error('Missing Window')
     selectedWindow.plural = 'OwnedWindows'
     const reads: string[] = []
-    const session = { exists: () => true, properties: () => ({ id: 's2' }) }
+    const session = { exists: () => true, id: () => 's2', properties: () => ({ id: 's2' }) }
     const tab = {
       exists: () => true,
       sessions: {

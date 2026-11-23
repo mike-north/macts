@@ -2097,6 +2097,41 @@ function bindIdentityTraversal(
   )
 }
 
+/** A format 1.1 read by identity within explicit parents; format 1.0 bodies never carry the check. */
+function explicitIdentityGet(
+  command: Command,
+  resource: Resource | undefined,
+  manifest: AppManifest
+): boolean {
+  return (
+    manifest.version !== '1.0' &&
+    command.identityTraversal === undefined &&
+    resource?.roots === undefined &&
+    resource?.positional === undefined &&
+    recordedParentScope(command, manifest) !== undefined
+  )
+}
+
+/**
+ * Defines `verifyExplicitIdentity`, called after the property reads: an item that no longer
+ * exists is a missing target, and one answering with another identity is a collection change.
+ */
+function verifyExplicitIdentity(
+  command: Command,
+  resource: Resource | undefined,
+  identifierParam: string
+): string {
+  const property = resolveIdentifierTargeting(resource)?.property ?? 'id'
+  const native = literal(nativePropertyName(resource, property))
+  return lines(
+    `function verifyExplicitIdentity(record) {`,
+    failIfMissing('item'),
+    `  var sought = ${argumentValue(identifierParam, findParameter(command, identifierParam))};`,
+    `  if (item[${native}]() !== sought || (record && record[${literal(property)}] !== undefined && record[${literal(property)}] !== sought)) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity changed while reading.' }; }`,
+    '}'
+  )
+}
+
 /**
  * Read one item's usable properties into a record keyed by their public names
  * (see {@link readOutputProperties}). The item is selected by
@@ -2111,10 +2146,13 @@ function buildGetBody(
   manifest: AppManifest
 ): ResourceBody {
   const selected = bindSelectedItem(command, source.resource, resourcePlural, manifest)
+  const explicit = explicitIdentityGet(command, source.resource, manifest)
   const body = lines(
     selected.statements,
+    explicit ? verifyExplicitIdentity(command, source.resource, selected.itemParameter) : '',
     readOutputProperties(manifest, source, 'item', selected.kindLocal),
     command.identityTraversal === undefined ? '' : 'verifySelectedIdentity(obj);',
+    explicit ? 'verifyExplicitIdentity(obj);' : '',
     'return obj;'
   )
   return { body, identifierArguments: selected.identifierArguments }

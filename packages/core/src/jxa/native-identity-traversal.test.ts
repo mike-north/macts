@@ -423,3 +423,63 @@ it('still reports a Session absent from every Tab of its Window as missing (deco
   }
   expect(caught).toMatchObject({ missingResource: 'Session' })
 })
+
+/** Window `7`: Tab 0 holds Sessions `[a, b]`, Tab 1 none; `a` changes after its third read. */
+function midReadHost(change: 'closed' | 'moved' | 'answered' | 'none') {
+  const tabs: string[][] = [['a', 'b'], []]
+  let replaced = false
+  let reads = 0
+  const session = (occupant: () => string | undefined) =>
+    new Proxy(
+      {},
+      {
+        get(_target, key) {
+          if (key === 'exists') return () => occupant() !== undefined
+          return () => {
+            const id = occupant()
+            if (id === undefined)
+              throw Object.assign(new Error('No such object.'), { errorNumber: -1728 })
+            if (id === 'a' && ++reads === 3) {
+              if (change === 'closed' || change === 'moved') tabs[0] = ['b']
+              if (change === 'moved') tabs[1] = ['a']
+              if (change === 'answered') replaced = true
+            }
+            return key === 'id' ? (replaced && id === 'a' ? 'z' : id) : `${String(key)}-of-${id}`
+          }
+        },
+      }
+    )
+  const tab = (index: number) => ({
+    exists: () => true,
+    sessions: {
+      get length() {
+        return tabs[index]?.length ?? 0
+      },
+      at: (position: number) => session(() => tabs[index]?.[position]),
+      byId: (id: string) => session(() => (tabs[index]?.includes(id) ? id : undefined)),
+    },
+  })
+  return { windows: { byId: () => ({ exists: () => true, tabs: { length: 2, at: tab } }) } }
+}
+
+function runTabScopedGet(change: Parameters<typeof midReadHost>[0]): unknown {
+  const app = midReadHost(change)
+  const body = buildNativeBody(manifest, { command: 'getSession', resource: 'Session' })
+  try {
+    return evaluateBody(body, app, { windowId: 7, tabIndex: 0, sessionId: 'a' }, environment(app))
+  } catch (error) {
+    return { thrown: error }
+  }
+}
+
+it('tab-scoped get returns the record when nothing changes mid-read (control)', () => {
+  expect(runTabScopedGet('none')).toMatchObject({ id: 'a' })
+})
+
+it.each([
+  ['closed', { errorNumber: -1728 }],
+  ['moved', { errorNumber: -1728 }],
+  ['answered', { name: 'MactsCollectionChanged' }],
+] as const)('tab-scoped get fails closed when its Session %s mid-read', (change, expected) => {
+  expect(runTabScopedGet(change)).toMatchObject({ thrown: expected })
+})
