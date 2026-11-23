@@ -1,19 +1,13 @@
 /**
  * On-disk layout and schema of the transfer store.
  *
- * Everything lives under `<home>/transfers/`:
+ * Everything lives under `<home>/transfers/`, whose `transfers.db` is the
+ * SQLite database of grants, download links, uploads, and temporary copies.
  *
- * - `transfers.db` — the SQLite database of grants, download links, uploads,
- *   and temporary copies;
- * - `uploads/<uploadId>` — the received bytes of each upload;
- * - `copies/<uuid>[.ext]` — temporary copies. The store mints every copy's
- *   path itself, directly inside the canonical (symlink-free) path of this
- *   directory, so it only ever deletes regular files it named.
- *
- * Directories are private to the user (0700) and files are readable only by
- * the user (0600): uploaded bytes are caller content, and the database maps
- * subjects to the files they were granted. Modes are reasserted on every open
- * so a directory created by an older or misconfigured process is tightened.
+ * The directory is private to the user (0700) and the database is readable
+ * only by the user (0600): it maps subjects to the files they were granted.
+ * Modes are reasserted on every open so a directory created by an older or
+ * misconfigured process is tightened.
  *
  * Timestamps are integer milliseconds since the Unix epoch. Tokens are never
  * stored, only their SHA-256 digests (see `tokens.ts`).
@@ -60,10 +54,6 @@ export interface TransferPaths {
   readonly root: string
   /** `<home>/transfers/transfers.db` */
   readonly database: string
-  /** `<home>/transfers/uploads` */
-  readonly uploads: string
-  /** `<home>/transfers/copies` */
-  readonly copies: string
 }
 
 /** Resolve the store's paths under `home`. */
@@ -72,8 +62,6 @@ export function transferPaths(home: string): TransferPaths {
   return {
     root,
     database: path.join(root, 'transfers.db'),
-    uploads: path.join(root, 'uploads'),
-    copies: path.join(root, 'copies'),
   }
 }
 
@@ -204,7 +192,7 @@ function prepareSchema(database: SqliteDatabase): void {
 }
 
 /**
- * Prepare the directories and open the database, creating the schema when
+ * Prepare the directory and open the database, creating the schema when
  * the database is fresh.
  *
  * The busy timeout is set before anything that takes a lock (switching to
@@ -217,8 +205,6 @@ function prepareSchema(database: SqliteDatabase): void {
  */
 export function openTransferDatabase(paths: TransferPaths): SqliteDatabase {
   ensurePrivateDirectory(paths.root)
-  ensurePrivateDirectory(paths.uploads)
-  ensurePrivateDirectory(paths.copies)
   ensurePrivateFile(paths.database)
 
   const { DatabaseSync } = loadSqlite()
@@ -232,24 +218,6 @@ export function openTransferDatabase(paths: TransferPaths): SqliteDatabase {
     throw error
   }
   return database
-}
-
-/** The directories the store deletes files in, as canonical paths. */
-export interface CanonicalTransferDirectories {
-  /** Canonical `<home>/transfers/uploads`. */
-  readonly uploads: string
-  /** Canonical `<home>/transfers/copies`. */
-  readonly copies: string
-}
-
-/**
- * The canonical paths of the uploads and copies directories: every symlink
- * in them resolved (on macOS, `/var/…` becomes `/private/var/…`). Upload
- * bytes and temporary copies live directly inside them, and the store only
- * ever deletes paths directly inside them.
- */
-export function canonicalDirectories(paths: TransferPaths): CanonicalTransferDirectories {
-  return { uploads: fs.realpathSync(paths.uploads), copies: fs.realpathSync(paths.copies) }
 }
 
 /**
@@ -283,10 +251,4 @@ export function integerColumn(row: SqliteRow, column: string): number {
     throw new Error(`Transfer store column ${column} holds a non-integer value.`)
   }
   return value
-}
-
-/** Read a nullable `INTEGER` column; `NULL` becomes `undefined`. */
-export function optionalIntegerColumn(row: SqliteRow, column: string): number | undefined {
-  const value = row[column]
-  return value === null || value === undefined ? undefined : integerColumn(row, column)
 }

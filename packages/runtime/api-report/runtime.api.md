@@ -45,18 +45,6 @@ export class ActivePolicyError extends Error {
 }
 
 // @public
-export interface AllocatedTemporaryCopy {
-    readonly expiresAt: Date;
-    readonly path: string;
-    release(): Promise<void>;
-}
-
-// @public
-export interface AllocateTemporaryCopyOptions {
-    readonly extension?: string;
-}
-
-// @public
 export const ALLOW_ALL_POLICY: GovernancePolicy;
 
 export { ApiKeyMetadata }
@@ -116,14 +104,6 @@ export function closeKeyStore(): void;
 export const CONSUMED_UPLOAD_RETENTION_MS: number;
 
 // @public
-export interface ConsumedUpload {
-    readonly contentType?: string;
-    readonly path: string;
-    release(): Promise<void>;
-    readonly size: number;
-}
-
-// @public
 export function createApiKey(options: CreateApiKeyOptions, permissionsSection?: PermissionsSection): Promise<CreateApiKeyResult>;
 
 // @public
@@ -146,13 +126,6 @@ export function createApiKeySimple(options: CreateApiKeyOptions): Promise<Create
 
 // @public
 export function createBearerCredential(secret: string): Credential;
-
-// @public
-export interface CreatedUpload {
-    readonly expiresAt: Date;
-    readonly maxBytes: number;
-    readonly uploadId: string;
-}
 
 // @public
 export function createFullAccessKey(appName: string, name: string, expires?: Date | number | string): Promise<CreateApiKeyResult>;
@@ -203,11 +176,6 @@ export interface CreateTransferStoreOptions {
     readonly home?: string;
     readonly limits?: Partial<TransferLimits>;
     readonly now?: () => Date;
-}
-
-// @public
-export interface CreateUploadOptions {
-    readonly contentType?: string;
 }
 
 // @public
@@ -479,18 +447,6 @@ export interface RateLimiterOptions {
 }
 
 // @public
-export interface ReceivedUpload {
-    readonly expiresAt: Date;
-    readonly size: number;
-    readonly uploadId: string;
-}
-
-// @public
-export interface ReceiveUploadOptions {
-    readonly signal?: AbortSignal;
-}
-
-// @public
 export interface RegisteredOperation {
     readonly descriptor: AnyOperationDescriptor;
     readonly manifest: AppManifest;
@@ -542,14 +498,10 @@ export interface TransferLimits {
 
 // @public
 export interface TransferStore {
-    allocateTemporaryCopy(subject: string, options?: AllocateTemporaryCopyOptions): Promise<AllocatedTemporaryCopy>;
     close(): void;
-    consumeUpload(subject: string, uploadId: string): Promise<ConsumedUpload>;
-    createUpload(subject: string, options?: CreateUploadOptions): Promise<CreatedUpload>;
     issueDownloadLink(subject: string, grantToken: string): Promise<IssuedDownloadLink>;
     issueGrant(subject: string, file: GrantedFile): Promise<IssuedFileGrant>;
     readonly limits: TransferLimits;
-    receiveUpload(subject: string, uploadId: string, bytes: UploadByteSource, options?: ReceiveUploadOptions): Promise<ReceivedUpload>;
     redeemDownloadLink(token: string): Promise<DownloadLinkTarget>;
     redeemGrant(subject: string, token: string): Promise<FileGrantRecord>;
     sweep(): Promise<void>;
@@ -578,9 +530,6 @@ export function updateKeyMetadata(keyId: string, updates: KeyMetadataUpdate): Ap
 
 // @public
 export const UPLOAD_TTL_MS: number;
-
-// @public
-export type UploadByteSource = AsyncIterable<Uint8Array> | ReadableStream<Uint8Array>;
 
 // @public
 export function validateAndCheckPermission(token: string, requiredPermission: string, permissionHistory?: PermissionHistoryEntry[]): Promise<PermissionCheckResult & {

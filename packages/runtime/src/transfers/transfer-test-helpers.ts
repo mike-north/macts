@@ -1,14 +1,14 @@
 /**
  * Shared fixtures for transfer store tests: a throwaway macts home, a
- * controllable clock starting at a fixed instant, byte sources, and
- * assertions for structured transfer failures.
+ * controllable clock starting at a fixed instant, and assertions for
+ * structured transfer failures.
  */
 
 import { afterEach, beforeEach, expect } from 'vitest'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { RateLimitedError, TransferError } from '@macts/contracts'
+import { TransferError } from '@macts/contracts'
 import type { TransferLimits } from './limits.js'
 import { createTransferStore, type TransferStore } from './store.js'
 
@@ -106,19 +106,6 @@ export function useTransferStore(limits?: Partial<TransferLimits>): TransferStor
   }
 }
 
-/** An async source yielding each argument as one chunk (strings as UTF-8). */
-export async function* chunks(...parts: (string | Uint8Array)[]): AsyncGenerator<Uint8Array> {
-  for (const part of parts) {
-    await Promise.resolve()
-    yield typeof part === 'string' ? new TextEncoder().encode(part) : part
-  }
-}
-
-/** `count` chunks of `size` bytes each. */
-export function filledChunks(count: number, size: number): AsyncGenerator<Uint8Array> {
-  return chunks(...Array.from({ length: count }, () => new Uint8Array(size).fill(0x61)))
-}
-
 /** The rejection of `promise`; fails the test if it resolves. */
 export async function rejectionOf(promise: Promise<unknown>): Promise<unknown> {
   try {
@@ -141,16 +128,6 @@ export async function expectTransferError(
   }
   expect(error.code).toBe('TRANSFER_FAILED')
   expect(error.details).toEqual({ reason })
-  return error
-}
-
-/** Assert `promise` rejects with a `RateLimitedError`, and return it. */
-export async function expectRateLimited(promise: Promise<unknown>): Promise<RateLimitedError> {
-  const error = await rejectionOf(promise)
-  expect(error).toBeInstanceOf(RateLimitedError)
-  if (!(error instanceof RateLimitedError)) {
-    throw error
-  }
   return error
 }
 
