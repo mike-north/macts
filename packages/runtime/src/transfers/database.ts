@@ -91,6 +91,31 @@ function ensurePrivateDirectory(directory: string): void {
 }
 
 /**
+ * Create `directory` if missing and make it owner-only, refusing to use one
+ * that is not a real directory: a symlink there would have its target
+ * re-moded, filled with upload bytes, and deleted from.
+ *
+ * @throws Error when `directory` exists and is not a real directory. The
+ *   message names the directory by `label`, never by path.
+ */
+function ensureRealPrivateDirectory(directory: string, label: string): void {
+  let stats: fs.Stats | undefined
+  try {
+    stats = fs.lstatSync(directory)
+  } catch (error) {
+    if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) {
+      throw error
+    }
+  }
+  if (stats !== undefined && !stats.isDirectory()) {
+    throw new Error(
+      `The transfer store's ${label} directory is not a real directory (it may be a symbolic link), so it cannot be used.`
+    )
+  }
+  ensurePrivateDirectory(directory)
+}
+
+/**
  * Create the database file owner-only if it does not exist yet, so SQLite
  * never creates it with a looser mode. An existing file is left as it is.
  */
@@ -251,8 +276,8 @@ export function openTransferDatabase(paths: TransferPaths): SqliteDatabase {
     const version = readSchemaVersion(database)
     assertKnownSchemaVersion(version)
     restrictFileToOwner(paths.database)
-    ensurePrivateDirectory(paths.uploads)
-    ensurePrivateDirectory(paths.copies)
+    ensureRealPrivateDirectory(paths.uploads, 'uploads')
+    ensureRealPrivateDirectory(paths.copies, 'copies')
     retryWhileBusy(
       () => {
         database.exec('PRAGMA journal_mode = WAL')

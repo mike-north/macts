@@ -11,7 +11,7 @@
  * @see phases/13-sdk-value-and-execution-contracts.md (D8)
  */
 
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   chmodSync,
   existsSync,
@@ -31,6 +31,25 @@ import { tmpdir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
 import { loadSqlite } from '../storage/sqlite.js'
 import { ALICE, MINUTE, rejectionOf, useTransferStore } from './transfer-test-helpers.js'
+
+/**
+ * Paths whose `unlink` the filesystem is made to refuse, with the error code
+ * it refuses with. Everything else passes through to the real `node:fs/promises`.
+ */
+const refusedUnlinks = vi.hoisted(() => new Map<string, string>())
+
+vi.mock('node:fs/promises', async (importOriginal) => {
+  const real = await importOriginal<typeof import('node:fs/promises')>()
+  return {
+    ...real,
+    unlink: (file: Parameters<typeof real.unlink>[0]) => {
+      const code = refusedUnlinks.get(String(file))
+      return code === undefined
+        ? real.unlink(file)
+        : Promise.reject(Object.assign(new Error(`${code}: refused`), { code }))
+    },
+  }
+})
 
 const UUID_NAME = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 
@@ -232,3 +251,47 @@ describe('temporary copy confinement', () => {
     expect(readFileSync(join(copy.path, 'inner'), 'utf8')).toBe('kept')
   })
 })
+
+/**
+ * A minted copy can be swapped for a directory between the store's check and
+ * its `unlink`; the filesystem then refuses the unlink (EISDIR on Linux, EPERM
+ * on macOS). That is the same outcome as finding the directory at the check:
+ * the store refuses to delete it and forgets the record, rather than failing
+ * every release and sweep until someone removes the directory.
+ */
+describe.each(['EPERM', 'EISDIR'])(
+  'a minted copy swapped for a directory just before it is deleted (%s)',
+  (code) => {
+    const fixture = useTransferStore()
+
+    afterEach(() => {
+      refusedUnlinks.clear()
+    })
+
+    function recordedCopies(home: string): number {
+      const { DatabaseSync } = loadSqlite()
+      const database = new DatabaseSync(join(home, 'transfers', 'transfers.db'), { readOnly: true })
+      try {
+        const row = database.prepare('SELECT COUNT(*) AS count FROM temporary_copies').get()
+        return Number(row?.['count'])
+      } finally {
+        database.close()
+      }
+    }
+
+    it('release() succeeds and forgets the record', async () => {
+      const copy = await fixture.store.allocateTemporaryCopy(ALICE)
+      refusedUnlinks.set(copy.path, code)
+      await expect(copy.release()).resolves.toBeUndefined()
+      expect(recordedCopies(fixture.home)).toBe(0)
+    })
+
+    it('the sweep forgets the record instead of failing', async () => {
+      const copy = await fixture.store.allocateTemporaryCopy(ALICE)
+      fixture.clock.advance(61 * MINUTE)
+      refusedUnlinks.set(copy.path, code)
+      await expect(fixture.store.sweep()).resolves.toBeUndefined()
+      expect(recordedCopies(fixture.home)).toBe(0)
+    })
+  }
+)

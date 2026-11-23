@@ -38,7 +38,8 @@
  *   bytes at `uploads/<uploadId>`, and temporary copies at paths it minted
  *   directly inside the canonical copies directory. A copy is deleted only
  *   if it is still a regular file there; a symlink or directory found in its
- *   place is never followed or removed.
+ *   place is never followed, and neither is removed (a symlink swapped in
+ *   after that check is itself removed, never followed).
  * - **Bounded.** Upload size, outstanding uploads, and outstanding upload
  *   bytes per subject are limited (see `limits.ts`).
  *
@@ -108,8 +109,9 @@ export interface FileGrantRecord extends GrantedFile {
 /** Options for {@link TransferStore.createUpload}. */
 export interface CreateUploadOptions {
   /**
-   * The media type the caller says its bytes have. A hint only: it is never
-   * verified, and consumers may ignore it.
+   * The media type the caller says its bytes have: a string of at most 255
+   * characters, the longest media type RFC 6838 allows. A hint only: it is
+   * never verified, and consumers may ignore it.
    */
   readonly contentType?: string
 }
@@ -239,6 +241,9 @@ export interface TransferStore {
   /**
    * Create an upload slot for `subject`.
    *
+   * @throws TypeError when `options.contentType` is given and is not a string.
+   * @throws RangeError when `options.contentType` is longer than 255
+   *   characters.
    * @throws RateLimitedError when the subject already has the maximum number
    *   of outstanding uploads; `retryAfterSeconds` is the time until its
    *   oldest outstanding upload expires.
@@ -322,7 +327,12 @@ export interface TransferStore {
    */
   sweep(): Promise<void>
 
-  /** Close the database. Safe to call more than once; every other method fails once the store is closed. */
+  /**
+   * Close the database. Safe to call more than once; every other method fails
+   * once the store is closed. A receive still in flight is not waited for: it
+   * fails, and its upload stays `receiving` (like a process ending mid-receive)
+   * until it expires and the sweep removes it.
+   */
   close(): void
 }
 
@@ -380,6 +390,24 @@ function assertToken(token: string): void {
   }
 }
 
+/** Longest accepted content type hint, in characters: RFC 6838's 127 + 1 + 127. */
+const MAX_CONTENT_TYPE_LENGTH = 255
+
+/** A content type hint is optional, but when present it is a bounded string. */
+function assertContentType(contentType: string | undefined): void {
+  if (contentType === undefined) {
+    return
+  }
+  if (typeof contentType !== 'string') {
+    throw new TypeError('An upload content type must be a string.')
+  }
+  if (contentType.length > MAX_CONTENT_TYPE_LENGTH) {
+    throw new RangeError(
+      `An upload content type must be at most ${String(MAX_CONTENT_TYPE_LENGTH)} characters.`
+    )
+  }
+}
+
 /**
  * An upload id must at least be a string. Whether it names an upload is a
  * transfer outcome, decided against the store.
@@ -418,6 +446,19 @@ async function writeAll(handle: fsp.FileHandle, chunk: Uint8Array): Promise<void
 /** Delete a file, treating "already gone" as success. */
 async function removeFile(file: string): Promise<void> {
   await fsp.rm(file, { force: true })
+}
+
+/**
+ * Flush a directory's entries to disk, so a file created in it survives a
+ * power loss.
+ */
+async function syncDirectory(directory: string): Promise<void> {
+  const opened = await fsp.open(directory, 'r')
+  try {
+    await opened.sync()
+  } finally {
+    await opened.close()
+  }
 }
 
 /**
@@ -486,6 +527,16 @@ function onceSuccessful(work: () => Promise<void>): () => Promise<void> {
 /** Whether `error` is a filesystem "no such file or directory". */
 function isMissingFile(error: unknown): boolean {
   return error instanceof Error && 'code' in error && error.code === 'ENOENT'
+}
+
+/**
+ * Whether `error` is the filesystem refusing to `unlink` a directory: EISDIR
+ * on Linux, EPERM on macOS.
+ */
+function isDirectoryRefusal(error: unknown): boolean {
+  return (
+    error instanceof Error && 'code' in error && (error.code === 'EISDIR' || error.code === 'EPERM')
+  )
 }
 
 /** Message for any filesystem failure while writing an upload's bytes. */
@@ -668,6 +719,7 @@ class SqliteTransferStore implements TransferStore {
   #createUpload(subject: string, options: CreateUploadOptions): CreatedUpload {
     this.#assertOpen()
     assertSubject(subject)
+    assertContentType(options.contentType)
 
     const now = this.#nowMs()
     const { maxUploadBytes, maxOutstandingUploadsPerSubject, uploadTtlMs } = this.limits
@@ -815,6 +867,7 @@ class SqliteTransferStore implements TransferStore {
       await withoutPath(() => removeFile(file), STAGE_FAILED)
       handle = await withoutPath(() => fsp.open(file, 'wx', FILE_MODE), STAGE_FAILED)
       const opened = handle
+      await withoutPath(() => syncDirectory(path.dirname(file)), STAGE_FAILED)
       for await (const chunk of readChunks(bytes, options.signal)) {
         const next = received + chunk.length
         if (this.#nowMs() >= expiresAt) {
@@ -829,6 +882,10 @@ class SqliteTransferStore implements TransferStore {
         await withoutPath(() => writeAll(opened, chunk), STAGE_FAILED)
         received = next
       }
+      // The record below says the bytes are all here, and it is committed
+      // durably: the bytes must reach the disk first, or a power loss could
+      // leave a `complete` upload whose file is truncated.
+      await withoutPath(() => opened.sync(), STAGE_FAILED)
       handle = undefined
       await withoutPath(() => opened.close(), STAGE_FAILED)
 
@@ -851,7 +908,7 @@ class SqliteTransferStore implements TransferStore {
           // or swept meanwhile is left as it is.
           this.#run(
             `UPDATE uploads SET state = ?, received_bytes = 0
-             WHERE upload_id = ? AND state = 'receiving'`,
+             WHERE upload_id = ? AND state = 'receiving' AND consumed_at IS NULL`,
             isTooLarge(error) ? 'failed' : 'awaiting',
             uploadId
           )
@@ -1037,7 +1094,10 @@ class SqliteTransferStore implements TransferStore {
    * the store mints, that is still a regular file is deleted. A symlink or
    * directory in its place is neither followed nor removed (`'refused'`):
    * the record can be forgotten, but nothing outside the store is touched.
-   * `unlink` never follows a symlink, so a swap after the check is harmless.
+   * `unlink` never follows a symlink, so a swap after the check cannot reach
+   * outside the store; a minted copy swapped for a symlink in that instant
+   * has the link itself removed, and one swapped for a directory is refused
+   * by the filesystem (EISDIR or EPERM) and treated as `'refused'`.
    *
    * @returns `'removed'` when the copy is gone (including when it already
    *   was), `'refused'` when the path is not one the store may delete.
@@ -1053,6 +1113,9 @@ class SqliteTransferStore implements TransferStore {
       }
       await fsp.unlink(copyPath)
     } catch (error) {
+      if (isDirectoryRefusal(error)) {
+        return 'refused'
+      }
       if (!isMissingFile(error)) {
         throw error
       }

@@ -10,7 +10,8 @@
  * @see phases/13-sdk-value-and-execution-contracts.md (D8)
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import * as fsp from 'node:fs/promises'
 import { chmodSync, existsSync, readdirSync, readFileSync, realpathSync } from 'node:fs'
 import { join } from 'node:path'
 import { Readable } from 'node:stream'
@@ -38,6 +39,18 @@ function recordedBytes(home: string, uploadId: string): number {
       .prepare('SELECT received_bytes FROM uploads WHERE upload_id = ?')
       .get(uploadId)
     return Number(row?.['received_bytes'])
+  } finally {
+    database.close()
+  }
+}
+
+/** The `state` an upload has on record, read straight from the database. */
+function recordedState(home: string, uploadId: string): string {
+  const { DatabaseSync } = loadSqlite()
+  const database = new DatabaseSync(join(home, 'transfers', 'transfers.db'), { readOnly: true })
+  try {
+    const row = database.prepare('SELECT state FROM uploads WHERE upload_id = ?').get(uploadId)
+    return String(row?.['state'])
   } finally {
     database.close()
   }
@@ -87,6 +100,36 @@ describe('createUpload', () => {
     expect(upload.uploadId).toMatch(/^[0-9a-f-]{36}$/)
     expect(upload.maxBytes).toBe(104_857_600)
     expect(upload.expiresAt).toEqual(new Date('2026-01-15T10:15:00.000Z'))
+  })
+
+  describe('contentType', () => {
+    it('accepts a hint of up to 255 characters (the longest media type RFC 6838 allows)', async () => {
+      const contentType = `application/${'x'.repeat(255 - 'application/'.length)}`
+      expect(contentType).toHaveLength(255)
+      await expect(fixture.store.createUpload(ALICE, { contentType })).resolves.toBeDefined()
+    })
+
+    it('rejects a hint longer than 255 characters, recording nothing', async () => {
+      const error = await rejectionOf(
+        fixture.store.createUpload(ALICE, { contentType: 'a'.repeat(256) })
+      )
+      expect(error).toBeInstanceOf(RangeError)
+      // The rejected call did not take one of the subject's outstanding slots.
+      const created = await Promise.all(
+        Array.from({ length: 16 }, () => fixture.store.createUpload(ALICE))
+      )
+      expect(created).toHaveLength(16)
+    })
+
+    it.each([42, {}, ['text/plain'], null])(
+      'rejects a non-string hint (%j) with a TypeError',
+      async (contentType) => {
+        const error = await rejectionOf(
+          fixture.store.createUpload(ALICE, { contentType } as unknown as { contentType: string })
+        )
+        expect(error).toBeInstanceOf(TypeError)
+      }
+    )
   })
 
   it('creates a distinct id each time', async () => {
@@ -453,6 +496,68 @@ describe('receiveUpload', () => {
       ).resolves.toMatchObject({ size: 5 })
     }
   )
+
+  it('syncs the staged bytes to disk before the upload becomes complete', async () => {
+    const { uploadId } = await fixture.store.createUpload(ALICE)
+    const handle = await fsp.open(join(fixture.home, 'probe'), 'w')
+    const handlePrototype = Object.getPrototypeOf(handle) as {
+      sync: (this: unknown) => Promise<void>
+    }
+    await handle.close()
+    const original = handlePrototype.sync
+    const statesAtSync: string[] = []
+    const spy = vi.spyOn(handlePrototype, 'sync').mockImplementation(function (this: unknown) {
+      statesAtSync.push(recordedState(fixture.home, uploadId))
+      return original.call(this)
+    })
+    try {
+      await fixture.store.receiveUpload(ALICE, uploadId, chunks('durable bytes'))
+    } finally {
+      spy.mockRestore()
+    }
+
+    // At least the staged file is synced, and every sync happens while the
+    // record still says the bytes are arriving: a `complete` record never
+    // describes bytes that were not yet durable.
+    expect(statesAtSync.length).toBeGreaterThanOrEqual(1)
+    expect(statesAtSync.every((state) => state === 'receiving')).toBe(true)
+    expect(recordedState(fixture.home, uploadId)).toBe('complete')
+  })
+
+  it('fails the receive generically, leaving the upload receivable again, when syncing fails', async () => {
+    const { uploadId } = await fixture.store.createUpload(ALICE)
+    const handle = await fsp.open(join(fixture.home, 'probe'), 'w')
+    const handlePrototype = Object.getPrototypeOf(handle) as {
+      sync: (this: unknown) => Promise<void>
+    }
+    await handle.close()
+    const spy = vi
+      .spyOn(handlePrototype, 'sync')
+      .mockRejectedValue(Object.assign(new Error('EIO: /secret/path'), { code: 'EIO' }))
+    let error: unknown
+    try {
+      error = await rejectionOf(fixture.store.receiveUpload(ALICE, uploadId, chunks('bytes')))
+    } finally {
+      spy.mockRestore()
+    }
+
+    expect(error).toBeInstanceOf(Error)
+    expect((error as Error).message).toBe('The transfer store could not stage the upload.')
+    expect(stagedFiles(fixture.home)).toEqual([])
+    expect(recordedState(fixture.home, uploadId)).toBe('awaiting')
+  })
+
+  it('leaves an upload consumed mid-receive as it was, rather than resetting it to awaiting', async () => {
+    const { uploadId } = await fixture.store.createUpload(ALICE)
+    const paused = pausedSource(new Uint8Array([1]), new Uint8Array([2]))
+    const receiving = fixture.store.receiveUpload(ALICE, uploadId, paused.source)
+    await paused.firstYielded
+    await expectTransferError(fixture.store.consumeUpload(ALICE, uploadId), 'incomplete')
+    paused.release()
+    await expectTransferError(receiving, 'unknown-transfer')
+
+    expect(recordedState(fixture.home, uploadId)).toBe('receiving')
+  })
 
   it('rejects a chunk that is not a Uint8Array, leaving no partial file', async () => {
     const { uploadId } = await fixture.store.createUpload(ALICE)
