@@ -45,6 +45,18 @@ export class ActivePolicyError extends Error {
 }
 
 // @public
+export interface AllocatedTemporaryCopy {
+    readonly expiresAt: Date;
+    readonly path: string;
+    release(): Promise<void>;
+}
+
+// @public
+export interface AllocateTemporaryCopyOptions {
+    readonly extension?: string;
+}
+
+// @public
 export const ALLOW_ALL_POLICY: GovernancePolicy;
 
 export { ApiKeyMetadata }
@@ -101,6 +113,17 @@ export { checkPermissions }
 export function closeKeyStore(): void;
 
 // @public
+export const CONSUMED_UPLOAD_RETENTION_MS: number;
+
+// @public
+export interface ConsumedUpload {
+    readonly contentType?: string;
+    readonly path: string;
+    release(): Promise<void>;
+    readonly size: number;
+}
+
+// @public
 export function createApiKey(options: CreateApiKeyOptions, permissionsSection?: PermissionsSection): Promise<CreateApiKeyResult>;
 
 // @public
@@ -123,6 +146,13 @@ export function createApiKeySimple(options: CreateApiKeyOptions): Promise<Create
 
 // @public
 export function createBearerCredential(secret: string): Credential;
+
+// @public
+export interface CreatedUpload {
+    readonly expiresAt: Date;
+    readonly maxBytes: number;
+    readonly uploadId: string;
+}
 
 // @public
 export function createFullAccessKey(appName: string, name: string, expires?: Date | number | string): Promise<CreateApiKeyResult>;
@@ -166,6 +196,21 @@ export interface CreateRuntimeOptions {
 export function createStoredKeyPolicyResolver(options?: Omit<CreateKeyPolicyResolverOptions, 'load'>): KeyPolicyResolver;
 
 // @public
+export function createTransferStore(options?: CreateTransferStoreOptions): Promise<TransferStore>;
+
+// @public
+export interface CreateTransferStoreOptions {
+    readonly home?: string;
+    readonly limits?: Partial<TransferLimits>;
+    readonly now?: () => Date;
+}
+
+// @public
+export interface CreateUploadOptions {
+    readonly contentType?: string;
+}
+
+// @public
 export interface CredentialVerifier {
     verify(credential: Credential): Promise<Authority>;
 }
@@ -177,6 +222,9 @@ export function decrypt(ciphertext: string, key: Buffer): string;
 export const DEFAULT_KEY_POLICY_CACHE_TTL_MS = 5000;
 
 // @public
+export const DEFAULT_TRANSFER_LIMITS: Readonly<TransferLimits>;
+
+// @public
 export function deleteKeyMetadata(keyId: string): boolean;
 
 // @public
@@ -184,6 +232,15 @@ export function deleteKeyPolicy(keyId: string): boolean;
 
 // @public
 export function deriveEncryptionKey(signingSecret: string): Buffer;
+
+// @public
+export const DOWNLOAD_LINK_TTL_MS: number;
+
+// @public
+export interface DownloadLinkTarget {
+    readonly app: string;
+    readonly path?: string;
+}
 
 // @public
 export type DurationString = `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'M' | 'y'}`;
@@ -196,6 +253,14 @@ export function extractKeyIdFromToken(token: string): string | undefined;
 
 // @public
 export function extractPermissionsFromToken(token: string): string[] | undefined;
+
+// @public
+export const FILE_GRANT_TTL_MS: number;
+
+// @public
+export interface FileGrantRecord extends GrantedFile {
+    readonly expiresAt: Date;
+}
 
 // @public
 export function generateKeyId(): string;
@@ -251,10 +316,29 @@ export interface GovernanceContextWithoutApprovals extends GovernanceContextBase
     readonly writer?: AuditWriter | undefined;
 }
 
+// @public
+export interface GrantedFile {
+    readonly app: string;
+    readonly observedAt: Date;
+    readonly path?: string;
+}
+
 export { hasPermission }
 
 // @public @deprecated
 export function isKeyRevoked(keyId: string): boolean;
+
+// @public
+export interface IssuedDownloadLink {
+    readonly expiresAt: Date;
+    readonly token: string;
+}
+
+// @public
+export interface IssuedFileGrant {
+    readonly expiresAt: Date;
+    readonly token: string;
+}
 
 // @public
 export interface KeyMetadataUpdate extends Readonly<Partial<Record<Exclude<keyof ApiKeyMetadata, 'name'>, never>>> {
@@ -343,6 +427,15 @@ export interface MactsRuntime {
 }
 
 // @public
+export const MAX_OUTSTANDING_UPLOAD_BYTES_PER_SUBJECT: number;
+
+// @public
+export const MAX_OUTSTANDING_UPLOADS_PER_SUBJECT = 16;
+
+// @public
+export const MAX_UPLOAD_BYTES: number;
+
+// @public
 export class OperationRegistrationError extends Error {
     readonly name = "OperationRegistrationError";
 }
@@ -386,6 +479,18 @@ export interface RateLimiterOptions {
 }
 
 // @public
+export interface ReceivedUpload {
+    readonly expiresAt: Date;
+    readonly size: number;
+    readonly uploadId: string;
+}
+
+// @public
+export interface ReceiveUploadOptions {
+    readonly signal?: AbortSignal;
+}
+
+// @public
 export interface RegisteredOperation {
     readonly descriptor: AnyOperationDescriptor;
     readonly manifest: AppManifest;
@@ -421,6 +526,36 @@ export function setLogger(newLogger: pino.Logger): void;
 export function setSigningSecret(secret: string): Promise<void>;
 
 // @public
+export const TEMPORARY_COPY_TTL_MS: number;
+
+// @public
+export interface TransferLimits {
+    readonly consumedUploadRetentionMs: number;
+    readonly downloadLinkTtlMs: number;
+    readonly fileGrantTtlMs: number;
+    readonly maxOutstandingUploadBytesPerSubject: number;
+    readonly maxOutstandingUploadsPerSubject: number;
+    readonly maxUploadBytes: number;
+    readonly temporaryCopyTtlMs: number;
+    readonly uploadTtlMs: number;
+}
+
+// @public
+export interface TransferStore {
+    allocateTemporaryCopy(subject: string, options?: AllocateTemporaryCopyOptions): Promise<AllocatedTemporaryCopy>;
+    close(): void;
+    consumeUpload(subject: string, uploadId: string): Promise<ConsumedUpload>;
+    createUpload(subject: string, options?: CreateUploadOptions): Promise<CreatedUpload>;
+    issueDownloadLink(subject: string, grantToken: string): Promise<IssuedDownloadLink>;
+    issueGrant(subject: string, file: GrantedFile): Promise<IssuedFileGrant>;
+    readonly limits: TransferLimits;
+    receiveUpload(subject: string, uploadId: string, bytes: UploadByteSource, options?: ReceiveUploadOptions): Promise<ReceivedUpload>;
+    redeemDownloadLink(token: string): Promise<DownloadLinkTarget>;
+    redeemGrant(subject: string, token: string): Promise<FileGrantRecord>;
+    sweep(): Promise<void>;
+}
+
+// @public
 export class TtlCache<T> {
     constructor(defaultTtlMs: number);
     clear(): void;
@@ -440,6 +575,12 @@ export class UnexpandableCoarsePermissionError extends Error {
 
 // @public
 export function updateKeyMetadata(keyId: string, updates: KeyMetadataUpdate): ApiKeyMetadata | undefined;
+
+// @public
+export const UPLOAD_TTL_MS: number;
+
+// @public
+export type UploadByteSource = AsyncIterable<Uint8Array> | ReadableStream<Uint8Array>;
 
 // @public
 export function validateAndCheckPermission(token: string, requiredPermission: string, permissionHistory?: PermissionHistoryEntry[]): Promise<PermissionCheckResult & {
