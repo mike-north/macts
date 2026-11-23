@@ -207,6 +207,44 @@ describe('identity-traversal item commands', () => {
     expect(findAddressIssues(manifest).length).toBeGreaterThan(0)
   })
 
+  it('refuses a singular-parent item command with no explicit item binding', () => {
+    // Without `item`, the item would fall back to the first required input outside the
+    // parent. Here that is the action argument `text`, which would then select the session.
+    const manifest = sessionManifest()
+    const { item: _item, parents: _parents, ...rest } = writeCommand()
+    manifest.commands['writeSessionText'] = {
+      ...rest,
+      parent: { resource: 'Window', parameter: 'windowId' },
+      parameters: [
+        { name: 'windowId', type: 'integer', description: 'Window identity', required: true },
+        { name: 'text', type: 'string', description: 'Text to write', required: true },
+        { name: 'sessionId', type: 'string', description: 'Session identity', required: true },
+        { name: 'newline', type: 'boolean', description: 'Append a newline', required: false },
+      ],
+    }
+    const issues = findAddressIssues(manifest)
+    expect(
+      issues.some(
+        ({ path, message }) =>
+          path.join('.') === 'commands.writeSessionText.item' &&
+          message.includes('explicit item binding')
+      )
+    ).toBe(true)
+    const parsed = AppManifestSchema.safeParse(manifest)
+    expect(parsed.success ? '' : parsed.error.message).toContain('explicit item binding')
+    const generated = generateConsolidatedPackages(manifest, { appName: 'panes' })
+    expect(generated.errors.join(' ')).toContain('explicit item binding')
+  })
+
+  it('refuses a plural-parents item command with no explicit item binding', () => {
+    const manifest = sessionManifest()
+    const { item: _item, ...rest } = writeCommand()
+    manifest.commands['writeSessionText'] = rest
+    expect(
+      findAddressIssues(manifest).some(({ message }) => message.includes('explicit item binding'))
+    ).toBe(true)
+  })
+
   it('refuses an item command whose traversal path does not reach the target', () => {
     const manifest = sessionManifest()
     manifest.commands['writeSessionText'] = writeCommand({

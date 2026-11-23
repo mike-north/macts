@@ -282,6 +282,18 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
         })
       }
     }
+    // An item command's action arguments are not selectors, so the item is never inferred
+    // from the first required input; the manifest must name the input that selects it.
+    if (
+      command.identityTraversal !== undefined &&
+      command.name !== 'get' &&
+      command.item === undefined
+    ) {
+      issues.push({
+        path: ['commands', commandKey, 'item'],
+        message: `Command "${commandKey}": an identity-traversal item command requires an explicit item binding (item: { by: 'identity', parameter }); the item is not inferred from its inputs.`,
+      })
+    }
     if (command.identityTraversal !== undefined) {
       const parent = parents[0]
       const roots = Object.values(manifest.hierarchy.children).filter(

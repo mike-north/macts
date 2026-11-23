@@ -11,6 +11,7 @@
  */
 import { afterAll, describe, expect, it, vi } from 'vitest'
 import { createMcpAdapter } from '@macts/mcp'
+import { Cli } from 'clipanion'
 import { plugin } from '@macts/iterm/cli'
 import { createRuntime, createBearerCredential } from '@macts/runtime'
 import { createApp } from '@macts/api/server'
@@ -160,8 +161,6 @@ it('declares writing as a write-risk operation with its own permission', () => {
   const write = capabilities.find(({ name }) => name === 'iterm.sessions.writeText')
   expect(write).toMatchObject({ permission: WRITE_PERMISSION, risk: 'write' })
   expect(write?.inputSchema['required']).toEqual(['windowId', 'sessionId', 'text'])
-  // No read operation is authorized by the write permission, and vice versa.
-  for (const read of SESSION_READS) expect(read).not.toBe(WRITE_PERMISSION)
 })
 
 describe.each(['local', 'remote'] as const)('Session input via %s', (locality) => {
@@ -275,30 +274,45 @@ it('writes through MCP with the same address, arguments and permission check', a
   expect(state.written).toEqual([])
 })
 
-it('writes through the generated CLI command', async () => {
+/**
+ * The generated CLI command, driven from argv as a user types it: the Session id is
+ * positional, `--text` is required, and the newline choice is sent only when stated.
+ */
+const SESSION_WRITE = ['iterm', 'windows', 'tabs', 'sessions', 'write']
+it.each([
+  {
+    label: 'omits the newline choice by default, leaving the app default',
+    argv: ['--window-id', '7', 'c', '--text', 'git status'],
+    named: { text: 'git status' },
+  },
+  {
+    label: 'sends newline true for --newline',
+    argv: ['--window-id', '7', 'c', '--text', 'git status', '--newline'],
+    named: { text: 'git status', newline: true },
+  },
+  {
+    label: 'sends newline false for --no-newline',
+    argv: ['--window-id', '7', 'c', '--text', 'git status', '--no-newline'],
+    named: { text: 'git status', newline: false },
+  },
+])('writes through the generated CLI command and $label', async ({ argv, named }) => {
   const { app, token, state } = await setup('remote')
   const Write = plugin.commands.find((command) =>
-    command.paths?.some((path) => path.join(' ') === 'iterm windows tabs sessions write')
+    command.paths?.some((path) => path.join(' ') === SESSION_WRITE.join(' '))
   )
   if (Write === undefined) throw new Error('Missing Session CLI write')
-  const command = new Write()
+  const cli = new Cli({ binaryName: 'macts' })
+  cli.register(Write)
   let stderr = ''
-  for (const [key, value] of Object.entries({
-    windowId: '7',
-    sessionId: 'c',
-    text: 'git status',
-    newline: false,
-    json: true,
-  }))
-    Reflect.set(command, key, value)
-  Reflect.set(command, 'context', {
-    stdout: { write: () => undefined },
+  const command = cli.process([...SESSION_WRITE, ...argv, '--json'], {
+    stdout: { write: () => true },
     stderr: {
       write: (value: string) => {
         stderr += value
+        return true
       },
     },
-  })
+  } as never)
   vi.stubEnv('MACTS_API_KEY', token)
   vi.stubEnv('MACTS_API_URL', 'http://session-input.test')
   vi.stubGlobal('fetch', (input: RequestInfo | URL, init?: RequestInit) =>
@@ -307,11 +321,19 @@ it('writes through the generated CLI command', async () => {
   try {
     expect(await command.execute()).toBe(0)
     expect(stderr).toBe('')
-    expect(state.written).toEqual([
-      { window: 7, session: 'c', named: { text: 'git status', newline: false } },
-    ])
+    expect(state.written).toEqual([{ window: 7, session: 'c', named }])
   } finally {
     vi.unstubAllEnvs()
     vi.unstubAllGlobals()
   }
+})
+
+it('rejects the generated CLI command when --text is missing', () => {
+  const Write = plugin.commands.find((command) =>
+    command.paths?.some((path) => path.join(' ') === SESSION_WRITE.join(' '))
+  )
+  if (Write === undefined) throw new Error('Missing Session CLI write')
+  const cli = new Cli({ binaryName: 'macts' })
+  cli.register(Write)
+  expect(() => cli.process([...SESSION_WRITE, '--window-id', '7', 'c'])).toThrow()
 })

@@ -267,6 +267,40 @@ it.each(['wrong-type', 'nullable'] as const)(
   }
 )
 
+/** A traversal item command must name its item; the first required input is never assumed. */
+it('refuses a singular-parent traversal item command without an item binding at every boundary', () => {
+  const manifest = load()
+  const original = manifest.commands['writeSessionText']
+  if (original === undefined) throw new Error('Missing Session write')
+  const command = structuredClone(original)
+  delete command.parents
+  delete command.item
+  command.parent = { resource: 'Window', parameter: 'windowId' }
+  const byName = Object.fromEntries(command.parameters.map((p) => [p.name, p]))
+  command.parameters = ['windowId', 'text', 'sessionId', 'newline'].flatMap((name) => {
+    const parameter = byName[name]
+    return parameter === undefined ? [] : [parameter]
+  })
+  manifest.commands['writeSessionText'] = command
+  const parsed = AppManifestSchema.safeParse(manifest)
+  const generated = generateConsolidatedPackages(manifest, { appName: 'iterm' })
+  const outcomes = {
+    parse: parsed.success ? 'accepted' : parsed.error.message,
+    generation: generated.errors.join(' '),
+    manifest: refusalMessage(() => operationsFromManifest(manifest)),
+    contract: refusalMessage(() => operationsFromContract(iTermContract, manifest)),
+  }
+  expect(
+    Object.fromEntries(
+      Object.entries(outcomes).map(([boundary, message]) => [
+        boundary,
+        message.includes('explicit item binding'),
+      ])
+    )
+  ).toEqual({ parse: true, generation: true, manifest: true, contract: true })
+  expect(generated.client.files).toEqual([])
+})
+
 /** Alternate reads must carry the identity context of every advertised related field. */
 it.each(['parent', 'parents'] as const)(
   'refuses a %s Tab list without its current Session’s Window context at every boundary',
