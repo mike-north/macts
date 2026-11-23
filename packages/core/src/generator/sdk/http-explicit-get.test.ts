@@ -1,5 +1,8 @@
 /** Explicit reads preserve action-input contracts independently of their address selectors. */
-import { readFileSync } from 'node:fs'
+import { readFileSync, mkdirSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { createRequire } from 'node:module'
 import { runInThisContext } from 'node:vm'
 import * as ts from 'typescript'
@@ -41,7 +44,7 @@ function generate(parameter: CommandParameter) {
   const sdk = source('src/resources/session.ts')
   const cli = source('src/cli/commands/windows/tabs/sessions/get.ts')
   const contract = source('src/contract/index.ts')
-  return { sdk, cli, contract }
+  return { sdk, cli, contract, generated: result }
 }
 /** The evaluated method's inputs remain unknown here so runtime boundary cases can be exercised. */
 interface Resource {
@@ -151,4 +154,50 @@ it('keeps supplied optional integers and strict selector validation', async () =
   expect(calls[0]?.[1]).toEqual({ windowId: 7, tabIndex: 0, sessionId: 'a', limit: 5 })
   await expect(resource.get('07', '0', 'a', 5)).rejects.toBeInstanceOf(contracts.ValidationError)
   expect(calls).toHaveLength(1)
+})
+
+/** Canonical consumers are checked by TypeScript against emitted declarations and real value types. */
+it.each([
+  "void client.sessions.get(Integer.validate(7), Integer.validate(0), 'a');",
+  "void client.sessions.get(Integer.validate(7), Integer.validate(0), 'a', Integer.validate(5));",
+  "void client.sessions.get(Integer.validate(7), Integer.validate(0), 'a', undefined, {});",
+])('compiles an optional canonical get argument: %s', (call) => {
+  const { generated } = generate(optionalInteger)
+  const directory = mkdtempSync(join(tmpdir(), 'macts-optional-get-'))
+  try {
+    for (const file of generated.client.files.filter(({ path }) =>
+      path.startsWith('src/contract/')
+    )) {
+      const path = join(directory, file.path)
+      mkdirSync(dirname(path), { recursive: true })
+      writeFileSync(path, file.content)
+    }
+    writeFileSync(join(directory, 'package.json'), '{"type":"module"}')
+    const usage = join(directory, 'usage.ts')
+    writeFileSync(
+      usage,
+      `import { Integer } from '@macts/contracts';\nimport type { iTermClient } from './src/contract/index.js';\ndeclare const client: iTermClient;\n${call}\n`
+    )
+    const root = fileURLToPath(new URL('../../../../../', import.meta.url))
+    const program = ts.createProgram([usage], {
+      strict: true,
+      noEmit: true,
+      types: [],
+      module: ts.ModuleKind.NodeNext,
+      moduleResolution: ts.ModuleResolutionKind.NodeNext,
+      target: ts.ScriptTarget.ES2022,
+      baseUrl: root,
+      paths: { '@macts/contracts': [resolve(root, 'packages/contracts/dist/index.d.ts')] },
+    })
+    expect(
+      ts
+        .getPreEmitDiagnostics(program)
+        .map(
+          (diagnostic) =>
+            `TS${String(diagnostic.code)}: ${ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')}`
+        )
+    ).toEqual([])
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
 })

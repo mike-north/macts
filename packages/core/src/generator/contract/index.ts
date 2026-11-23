@@ -1241,11 +1241,12 @@ class ContractBuilder {
     return namespaces
   }
 
+  /** Positional placement preserves each field's declared presence, including optional get inputs. */
   #positional(fields: readonly FieldModel[]): MethodModel['params'] {
     return fields.map((field) => ({
       binding: safeIdentifier(field.name),
       type: this.#renderer.sdkType(field.shape, 'input'),
-      optional: false,
+      optional: field.optional,
       doc: fieldDoc(field, ' '),
     }))
   }
