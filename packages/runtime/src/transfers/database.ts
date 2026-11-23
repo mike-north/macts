@@ -30,6 +30,7 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 import {
   loadSqlite,
+  retryWhileBusy,
   runInTransaction,
   type SqliteDatabase,
   type SqliteRow,
@@ -44,6 +45,8 @@ export const FILE_MODE = 0o600
 /**
  * How long, in milliseconds, a statement waits for another connection's lock
  * before failing. The service and the CLI can open the same store at once.
+ * The switch to WAL, which SQLite may refuse as busy without waiting, is
+ * retried for at most this long too.
  */
 const BUSY_TIMEOUT_MS = 5000
 
@@ -208,6 +211,12 @@ function prepareSchema(database: SqliteDatabase, version: number): void {
  * checked before anything is written: only an accepted database has its file
  * mode tightened, its journal mode switched to WAL, or its schema created.
  *
+ * The busy timeout does not cover the switch to WAL on a fresh database: when
+ * several processes open it at once, each holding a read lock and needing the
+ * exclusive one, SQLite refuses some of them as busy immediately rather than
+ * risk a deadlock. That switch is therefore retried with a short pause until
+ * it succeeds or {@link BUSY_TIMEOUT_MS} has passed.
+ *
  * @throws Error when the database's schema version is not one this code
  *   understands (see the module documentation); the database is closed and
  *   left untouched. The one exception is a home that no version has opened
@@ -227,7 +236,12 @@ export function openTransferDatabase(paths: TransferPaths): SqliteDatabase {
     const version = readSchemaVersion(database)
     assertKnownSchemaVersion(version)
     restrictFileToOwner(paths.database)
-    database.exec('PRAGMA journal_mode = WAL')
+    retryWhileBusy(
+      () => {
+        database.exec('PRAGMA journal_mode = WAL')
+      },
+      { deadline: Date.now() + BUSY_TIMEOUT_MS }
+    )
     prepareSchema(database, version)
   } catch (error) {
     database.close()

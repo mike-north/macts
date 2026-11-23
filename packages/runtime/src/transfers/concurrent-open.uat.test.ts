@@ -12,6 +12,7 @@
  *
  * @see https://www.sqlite.org/pragma.html#pragma_busy_timeout
  * @see https://www.sqlite.org/wal.html
+ * @see https://www.sqlite.org/c3ref/busy_handler.html
  */
 
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
@@ -28,8 +29,12 @@ const here = dirname(fileURLToPath(import.meta.url))
 // packages/runtime/src/transfers → the package root is two levels up.
 const builtEntry = resolve(here, '../../dist/index.js')
 
-/** How many processes open the store at once. */
-const PROCESSES = 4
+/**
+ * How many processes open the store at once. More processes make it likelier
+ * that several contend for the exclusive lock the first switch to WAL needs,
+ * which SQLite can refuse as busy without waiting.
+ */
+const PROCESSES = 8
 
 describe('opening one fresh home from several processes at once (UAT)', () => {
   let workDir: string
