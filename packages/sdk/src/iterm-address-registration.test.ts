@@ -33,6 +33,42 @@ const load = () =>
   parseManifestYaml(
     readFileSync(new URL('../../../manifests/iterm/app.yaml', import.meta.url), 'utf8')
   )
+
+/** Additional non-traversing gets have no second callable surface and must fail at admission. */
+it.each(['parent', 'parents'] as const)(
+  'refuses an additional %s get at every boundary',
+  (syntax) => {
+    const manifest = load()
+    const original = manifest.commands['getTab']
+    if (original === undefined) throw new Error('Missing Tab get')
+    const command = {
+      ...structuredClone(original),
+      routeName: 'getAgain',
+      resolvesReferences: false,
+    }
+    if (syntax === 'parent') {
+      delete command.parents
+      delete command.item
+      command.parent = { resource: 'Window', parameter: 'windowId' }
+    }
+    manifest.commands['getTabAgain'] = command
+    const parsed = AppManifestSchema.safeParse(manifest)
+    const generated = generateConsolidatedPackages(manifest, { appName: 'iterm' })
+    const messages = [
+      parsed.success ? 'accepted' : parsed.error.message,
+      generated.errors.join(' '),
+      refusalMessage(() => operationsFromManifest(manifest)),
+      refusalMessage(() => operationsFromContract(iTermContract, manifest)),
+    ]
+    expect(
+      messages.every(
+        (message) => message.includes('getTabAgain') && message.includes('Additional get')
+      )
+    ).toBe(true)
+    expect(generated.client.files).toEqual([])
+  }
+)
+
 describe('versioned addresses at registration', () => {
   it.each([
     operationsFromManifest,

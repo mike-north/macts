@@ -415,9 +415,10 @@ export interface BodyField {
  * The positional signature and request body of a command method (an app
  * command, or a resource command that is not a CRUD shape).
  *
- * A resource command acts on one item, so its signature starts as a get's
- * does: the parent's identifier parameter, when the command records a
- * parent, then the item's ({@link resolveIdParams}). The other parameters
+ * A canonical resource address leads with its ordered ancestors and any item.
+ * A legacy resource item command leads with its parent and item
+ * ({@link resolveIdParams}); legacy collection and application commands retain
+ * required-first declaration order even when parent metadata is recorded. Other parameters
  * follow, required first, then optional ones, each in declaration order, with
  * reserved words escaped; an app command has only those, and so has a known
  * gap, which declares no item ({@link itemNotSentNote}). The body forwards
@@ -433,8 +434,11 @@ export function commandMethodParameters(command: Command): {
       ? itemIdentifierParameter(command)
       : undefined
   const parents =
-    command.parents?.map(({ parameter }) => parameter) ??
-    (command.parent === undefined ? [] : [command.parent.parameter])
+    command.scope === 'resource' && command.parents !== undefined
+      ? command.parents.map(({ parameter }) => parameter)
+      : item === undefined || command.parent === undefined
+        ? []
+        : [command.parent.parameter]
   const leading = [
     ...parents.map((name) => command.parameters.find((p) => p.name === name)),
     item,

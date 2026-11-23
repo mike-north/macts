@@ -33,7 +33,7 @@ import { usableHierarchyChildren } from '../manifest/unsupported.js'
 import { isOperationAvailable, omittedInputs } from '../generator/input-satisfiability.js'
 import { classifyCommandRisk } from './risk.js'
 import { commandMethodParameters } from '../generator/surface.js'
-import { itemIdentifierParameter } from '../manifest/item-selection.js'
+import { itemIdentifierParameter, selectsOneItem } from '../manifest/item-selection.js'
 import type { Capability, CapabilityRegistry } from './types.js'
 
 /**
@@ -155,7 +155,8 @@ function buildResourceCliSnippet(
 ): string {
   // Explicit selections use declared inputs, never parent flags invented from placement.
   if (version === '1.1') {
-    const item = itemIdentifierParameter(command)?.name
+    // Collection inputs are flags even when required; only item selection creates a positional.
+    const item = selectsOneItem(command) ? itemIdentifierParameter(command)?.name : undefined
     const inputs = commandMethodParameters(command)
       .signature.filter(({ parameter }) => parameter.required)
       .map(({ parameter: { name } }) =>

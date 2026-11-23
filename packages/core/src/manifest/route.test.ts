@@ -12,6 +12,7 @@ import { describe, it, expect } from 'vitest'
 import type { AppManifest } from './schemas/index.js'
 import type { Command } from './schemas/command.js'
 import { AppManifestSchema } from './schemas/index.js'
+import { panesManifest } from './test-support/panes-positional.js'
 import {
   normalizeAppRouteSegment,
   normalizeResourceRouteSegment,
@@ -22,6 +23,22 @@ import {
   resolveCommandRoutes,
   resolveManifestRoutes,
 } from './route.js'
+
+/** A public single-command consumer normalizes its argument without taking ownership of source data. */
+it.each([true, false])('canonicalizes a supplied 1.1 command (stored=%s)', (stored) => {
+  const source = { ...panesManifest(), version: '1.1' as const }
+  const command = source.commands['getTab']
+  if (command === undefined) throw new Error('Missing Tab get')
+  if (!stored) delete source.commands['getTab']
+  const before = structuredClone(source)
+  const route = resolveCommandRoutes(source, 'getTab', command)[0]
+  expect(route?.command.parent).toBeUndefined()
+  expect(route?.command.parents).toEqual([
+    { resource: 'Window', collection: 'windows', by: 'identity', parameter: 'windowId' },
+  ])
+  expect(route?.command.item).toEqual({ by: 'index', parameter: 'index' })
+  expect(source).toEqual(before)
+})
 
 const manifest: AppManifest = {
   version: '1.0',

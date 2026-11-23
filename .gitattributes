@@ -3,6 +3,9 @@ docs/** linguist-generated=true
 temp/** linguist-generated=true
 **/api-report/** linguist-generated=true
 
+# Pinned generator compatibility fingerprints
+packages/core/src/generator/test-support/format-1.0-source-digests.json linguist-generated=true
+
 # Build outputs
 **/dist/** linguist-generated=true
 

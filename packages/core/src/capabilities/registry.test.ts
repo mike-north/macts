@@ -14,6 +14,22 @@ import { deriveCapabilities, buildCapabilityRegistry } from './registry.js'
 import { loadManifest, parseManifestYaml } from '../manifest/loader.js'
 import { NOTEBOOK_MANIFEST_YAML, notebookManifest } from './test-fixtures.js'
 import type { AppManifest } from '../manifest/index.js'
+import { panesManifest } from '../manifest/test-support/panes-positional.js'
+
+/** Collection inputs remain flags; only an operation selecting an item has an item positional. */
+it('distinguishes an unscoped 1.1 list flag from the get item positional', () => {
+  const manifest = { ...panesManifest(), version: '1.1' as const }
+  const list = manifest.commands['listWindows']
+  if (list === undefined) throw new Error('Missing Window list')
+  list.parameters = [{ name: 'view', type: 'string', required: true, description: 'Selected view' }]
+  const caps = deriveCapabilities(manifest)
+  expect(caps.find(({ name }) => name === 'panes.windows.listWindows')?.cliSnippet).toBe(
+    'macts panes windows list --view <view>'
+  )
+  expect(caps.find(({ name }) => name === 'panes.windows.getWindow')?.cliSnippet).toBe(
+    'macts panes windows get <id>'
+  )
+})
 
 /** Repo-root-relative path to the calendar manifest (a real nested hierarchy). */
 const CALENDAR_MANIFEST = resolve(

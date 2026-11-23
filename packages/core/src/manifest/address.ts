@@ -15,7 +15,7 @@ import type { Resource } from './schemas/resource.js'
 import type { HierarchyChild } from './schemas/hierarchy.js'
 import { resolvePrimaryIdentifierProperty, resolveIdentifierTargeting } from './identifier.js'
 import { resolveCollectionAccessor } from './native-accessor.js'
-import { commandParents, resourceCommandEntries } from './resource-commands.js'
+import { commandParents, resourceCommandEntries, findCrudCommand } from './resource-commands.js'
 import { outputProperties, outputPropertyContainers } from './output-references.js'
 import { resolveManifestRoutes } from './route.js'
 import { itemIdentifierParameter, selectsOneItem } from './item-selection.js'
@@ -240,6 +240,19 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
   }
   for (const { commandKey, command, resourceType } of resolveManifestRoutes(manifest)) {
     if (!CommandSchema.safeParse(command).success) continue
+    // Only the primary get or an explicit identity traversal has a callable method on every surface.
+    if (
+      manifest.version === '1.1' &&
+      resourceType !== undefined &&
+      command.name === 'get' &&
+      command.identityTraversal === undefined &&
+      findCrudCommand(resourceCommandEntries(manifest, resourceType), 'get')?.[0] !== commandKey
+    ) {
+      issues.push({
+        path: ['commands', commandKey],
+        message: `Additional get "${commandKey}" for "${resourceType}" requires identityTraversal; other additional gets are not supported.`,
+      })
+    }
     const address =
       resourceType === undefined ? undefined : commandAddress(manifest, command, resourceType)
     const parents = address?.parents ?? commandParents(manifest, command)
