@@ -39,13 +39,13 @@
     "api-extractor": {
       "dependsOn": ["build"],
       "inputs": ["production", "^production", "{workspaceRoot}/api-extractor.base.json"],
-      "outputs": ["{projectRoot}/api-report", "{projectRoot}/temp"],
+      "outputs": ["{projectRoot}/api-report", "{projectRoot}/temp", "{projectRoot}/dist/*.d.ts"],
       "cache": true
     },
     "api-extractor:ci": {
       "dependsOn": ["build"],
       "inputs": ["production", "^production", "{workspaceRoot}/api-extractor.base.json"],
-      "outputs": ["{projectRoot}/api-report", "{projectRoot}/temp"],
+      "outputs": ["{projectRoot}/api-report", "{projectRoot}/temp", "{projectRoot}/dist/*.d.ts"],
       "cache": true
     },
     "lint": {
@@ -59,8 +59,8 @@
       "cache": true
     },
     "test": {
-      "dependsOn": ["build"],
-      "inputs": ["default", "^production"],
+      "dependsOn": ["build", "^build"],
+      "inputs": ["default", "^production", "{workspaceRoot}/vitest.config.ts"],
       "cache": true
     },
     "test:types": {
@@ -68,9 +68,9 @@
       "inputs": ["default", "^production"],
       "cache": true
     },
-    "type-check": {
-      "dependsOn": ["^build"],
-      "inputs": ["production", "^production"],
+    "typecheck": {
+      "dependsOn": ["^build", "^api-extractor"],
+      "inputs": ["default", "^production", "{workspaceRoot}/api-extractor.base.json"],
       "cache": true
     },
     "@nx/js:tsc": {
@@ -102,7 +102,7 @@
           "build",
           "lint",
           "test",
-          "type-check",
+          "typecheck",
           "api-extractor",
           "api-extractor:ci"
         ]
