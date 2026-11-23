@@ -16,6 +16,7 @@ import {
   resolveCanonicalIdentifierSource,
   resolveParameterNullability,
   commandRouteSegment,
+  itemIdentifierParameter,
 } from '../../manifest/index.js'
 import { usableResources } from '../../manifest/unsupported.js'
 import { outputProperties } from '../../manifest/output-references.js'
@@ -953,11 +954,22 @@ function generateGetMethod(
   methodName = 'get'
 ): string {
   if (command.parents !== undefined || methodName !== 'get') {
-    const params = commandMethodParameters(command).signature.map(({ parameter }) => parameter)
+    const selectors = new Set(
+      [
+        ...(command.parents?.map(({ parameter }) => parameter) ??
+          (command.parent === undefined ? [] : [command.parent.parameter])),
+        itemIdentifierParameter(command)?.name,
+      ].filter((name): name is string => name !== undefined)
+    )
+    const { signature, bodyArg } = buildParamsAndBody(
+      command,
+      `import('../contract/index.js').${resourceName}ResourceClient['${methodName}']`,
+      selectors
+    )
     return `
   /** ${command.description} */
-  async ${methodName}(${params.map((p) => `${p.name}: ${identifierType(command, p.name)}`).join(', ')}): Promise<${resourceName}> {
-    return this.#http.invoke<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${params.map((p) => identifierField(command, p.name)).join(', ')} });
+  async ${methodName}(${signature}): Promise<${resourceName}> {
+    return this.#http.invoke<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, ${bodyArg});
   }
 `
   }
@@ -1197,15 +1209,20 @@ function generateDeleteMethod(
  * Render a command method's signature and request-body argument from the shared
  * surface derivation (`commandMethodParameters`). Each parameter, a resource
  * command's item identifier included, is sent through {@link bodyField}.
+ * Explicit reads admit identifier text only for declared selectors; other
+ * inputs retain ordinary command typing, optionality and null semantics.
  */
 function buildParamsAndBody(
   command: Command,
-  canonicalMethod: string
+  canonicalMethod: string,
+  selectors: ReadonlySet<string> = new Set()
 ): { signature: string; bodyArg: string } {
   const { signature: signatureParams, body } = commandMethodParameters(command)
   const signature = signatureParams
     .map(({ parameter, bindingName, optional }, index) => {
-      const tsType = convenienceParameterType(parameter, canonicalMethod, index)
+      const tsType = selectors.has(parameter.name)
+        ? identifierType(command, parameter.name)
+        : convenienceParameterType(parameter, canonicalMethod, index)
       return `${bindingName}${optional ? '?' : ''}: ${tsType}`
     })
     .join(', ')
