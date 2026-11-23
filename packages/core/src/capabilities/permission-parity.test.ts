@@ -71,7 +71,7 @@ interface CapabilityPermission {
 function routeJoinKey(route: ManifestRoute): string {
   const scope =
     route.resource === undefined ? 'app' : normalizeResourceRouteSegment(route.resource.plural)
-  return `${scope}.${route.command.name}`
+  return `${scope}.${route.command.routeName ?? route.commandKey}`
 }
 
 function isCapabilityPermission(value: unknown): value is CapabilityPermission {

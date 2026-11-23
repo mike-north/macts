@@ -44,6 +44,7 @@ hierarchy:
 commands:
   listNotes:
     name: list
+    routeName: list
     description: List all notes
     scope: resource
     resourceType: Note
@@ -51,6 +52,7 @@ commands:
     permission: notebook:notes:list
   deleteNote:
     name: delete
+    routeName: delete
     description: Delete a note
     scope: resource
     resourceType: Note
@@ -242,6 +244,7 @@ hierarchy:
 commands:
   createNote:
     name: create
+    routeName: create
     description: Create a note
     scope: resource
     resourceType: Note
@@ -253,6 +256,7 @@ commands:
     permission: notebook:notes:create
   deleteNote:
     name: delete
+    routeName: delete
     description: Delete a note
     scope: resource
     resourceType: Note
@@ -264,6 +268,7 @@ commands:
     permission: notebook:notes:delete
   listNotes:
     name: list
+    routeName: list
     description: List all notes
     scope: resource
     resourceType: Note

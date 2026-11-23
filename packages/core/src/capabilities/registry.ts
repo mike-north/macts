@@ -13,7 +13,11 @@
  */
 
 import type { AppManifest, Command, Resource, HierarchyChild } from '../manifest/index.js'
-import { normalizeResourceRouteSegment, resolveManifestRoutes } from '../manifest/route.js'
+import {
+  commandRouteSegment,
+  normalizeResourceRouteSegment,
+  resolveManifestRoutes,
+} from '../manifest/route.js'
 import type { ManifestRoute } from '../manifest/route.js'
 import {
   generateAppCommandSchema,
@@ -27,6 +31,8 @@ import {
 import { usableHierarchyChildren } from '../manifest/unsupported.js'
 import { isOperationAvailable, omittedInputs } from '../generator/input-satisfiability.js'
 import { classifyCommandRisk } from './risk.js'
+import { commandMethodParameters } from '../generator/surface.js'
+import { itemIdentifierParameter } from '../manifest/item-selection.js'
 import type { Capability, CapabilityRegistry } from './types.js'
 
 /**
@@ -142,8 +148,19 @@ function buildResourceCliSnippet(
   app: string,
   cliPath: ResourceCliPath,
   operation: string,
-  inputSchema: JsonSchema
+  inputSchema: JsonSchema,
+  command: Command
 ): string {
+  // Explicit selections use declared inputs, never parent flags invented from placement.
+  if (command.parents !== undefined || command.identityTraversal !== undefined) {
+    const item = itemIdentifierParameter(command)?.name
+    const inputs = commandMethodParameters(command)
+      .signature.filter(({ parameter }) => parameter.required)
+      .map(({ parameter: { name } }) =>
+        name === item ? `<${name}>` : `--${toKebabCase(name)} <${name}>`
+      )
+    return ['macts', app, ...cliPath.segments, toKebabCase(operation), ...inputs].join(' ')
+  }
   const opSegment = toKebabCase(operation)
   const segments = ['macts', app, ...cliPath.segments, opSegment]
   const parentFlags = cliPath.parentFlags.map((flag) => `--${flag} <id>`)
@@ -167,13 +184,13 @@ function buildAppCliSnippet(app: string, operation: string, inputSchema: JsonSch
 }
 
 /**
- * Looks up the permission one command requires on one resource. The resource
+ * Looks up the resolved operation one command exposes on one resource. The resource
  * is `undefined` for an application-scoped command.
  */
-type RoutePermissionLookup = (command: Command, resource: Resource | undefined) => string
+type RouteLookup = (command: Command, resource: Resource | undefined) => ManifestRoute
 
 /**
- * Index the permission each of the manifest's resolved routes requires, by
+ * Index resolved operation identities and permissions by
  * command and targeted resource.
  *
  * A capability reports the permission the server router and the runtime
@@ -189,9 +206,9 @@ type RoutePermissionLookup = (command: Command, resource: Resource | undefined) 
  * the router disagree on which operations the manifest exposes.
  *
  * @param manifest - The app manifest
- * @returns The permission lookup
+ * @returns The resolved route lookup
  */
-function indexRoutePermissions(manifest: AppManifest): RoutePermissionLookup {
+function indexRoutes(manifest: AppManifest): RouteLookup {
   const byCommand = new Map<Command, ManifestRoute[]>()
   for (const route of resolveManifestRoutes(manifest)) {
     const routes = byCommand.get(route.command) ?? []
@@ -207,7 +224,7 @@ function indexRoutePermissions(manifest: AppManifest): RoutePermissionLookup {
         } has no resolved route, so its capability has no permission`
       )
     }
-    return route.permission
+    return route
   }
 }
 
@@ -227,40 +244,49 @@ function withoutInputs(schema: JsonSchema, omitted: ReadonlySet<string>): JsonSc
 }
 
 /**
- * Derive a single capability from a resource-scoped command.
+ * Derive a single capability from a resource-scoped command. The ordinary CLI
+ * get uses its verb; additional identity gets use their resolved route segment.
  */
 function deriveResourceCapability(
   app: string,
   bundleId: string,
   resource: Resource,
   command: Command,
+  primaryGet: Command | undefined,
   cliPath: ResourceCliPath,
-  permission: string,
+  route: ManifestRoute,
   omitted: ReadonlySet<string>
 ): Capability {
   const resourceName = normalizeResourceRouteSegment(resource.plural)
   const inputSchema = withoutInputs(generateResourceOperationSchema(command, resource), omitted)
-  const name = `${app}.${resourceName}.${command.name}`
+  const operation = commandRouteSegment(route.commandKey, command)
+  const name = route.route
 
   return {
     name,
     app,
     appBundleId: bundleId,
     resource: resourceName,
-    operation: command.name,
+    operation,
     description: command.description,
-    permission,
+    permission: route.permission,
     risk: classifyCommandRisk(command),
     inputSchema,
     outputSchema: undefined,
     keywords: deriveKeywords({
       app,
       resource: resourceName,
-      operation: command.name,
+      operation,
       description: command.description,
     }),
-    cliSnippet: buildResourceCliSnippet(app, cliPath, command.name, inputSchema),
-    mcpToolName: generateToolName(app, resourceName, command.name),
+    cliSnippet: buildResourceCliSnippet(
+      app,
+      cliPath,
+      command === primaryGet || command.identityTraversal === undefined ? command.name : operation,
+      inputSchema,
+      command
+    ),
+    mcpToolName: generateToolName(app, resourceName, operation),
   }
 }
 
@@ -271,31 +297,32 @@ function deriveAppCapability(
   app: string,
   bundleId: string,
   command: Command,
-  permission: string,
+  route: ManifestRoute,
   omitted: ReadonlySet<string>
 ): Capability {
   const inputSchema = withoutInputs(generateAppCommandSchema(command), omitted)
-  const name = `${app}.app.${command.name}`
+  const operation = commandRouteSegment(route.commandKey, command)
+  const name = route.route
 
   return {
     name,
     app,
     appBundleId: bundleId,
     resource: 'app',
-    operation: command.name,
+    operation,
     description: command.description,
-    permission,
+    permission: route.permission,
     risk: classifyCommandRisk(command),
     inputSchema,
     outputSchema: undefined,
     keywords: deriveKeywords({
       app,
       resource: 'app',
-      operation: command.name,
+      operation,
       description: command.description,
     }),
     cliSnippet: buildAppCliSnippet(app, command.name, inputSchema),
-    mcpToolName: generateToolName(app, 'app', command.name),
+    mcpToolName: generateToolName(app, 'app', operation),
   }
 }
 
@@ -316,7 +343,7 @@ export function deriveCapabilities(manifest: AppManifest): Capability[] {
   const app = manifest.app.name.replace(/\s+/g, '-').toLowerCase()
   const bundleId = manifest.app.bundleId
   const cliPaths = buildResourceCliPaths(manifest)
-  const permissionOf = indexRoutePermissions(manifest)
+  const routeOf = indexRoutes(manifest)
   const capabilities: Capability[] = []
 
   for (const resource of getResources(manifest)) {
@@ -335,8 +362,9 @@ export function deriveCapabilities(manifest: AppManifest): Capability[] {
           bundleId,
           resource,
           command,
+          commands.find((entry) => entry.name === 'get'),
           cliPath,
-          permissionOf(command, resource),
+          routeOf(command, resource),
           omittedInputs(manifest, command, resource.name)
         )
       )
@@ -350,7 +378,7 @@ export function deriveCapabilities(manifest: AppManifest): Capability[] {
         app,
         bundleId,
         command,
-        permissionOf(command, undefined),
+        routeOf(command, undefined),
         omittedInputs(manifest, command, undefined)
       )
     )
