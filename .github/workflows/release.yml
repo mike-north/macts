@@ -44,3 +44,54 @@ jobs:
           title: 'chore: version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Classify npm authentication failure
+        if: failure()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          try:
+              from pathlib import Path
+              import re
+
+              # Print bounded failure categories while retaining identity material privately.
+              try:
+                  files = sorted((Path.home() / '.npm/_logs').glob('*-debug-0.log'))
+              except Exception:
+                  print('npm debug log could not be read')
+                  files = []
+              found = False
+              for path in files:
+                  try:
+                      text = path.read_text(errors='replace')
+                  except Exception:
+                      print('npm debug log could not be read')
+                      continue
+                  if 'ENEEDAUTH' not in text:
+                      continue
+                  found = True
+                  print('npm publish ended without usable credentials')
+                  statuses = re.findall(
+                      r'\bPOST\s+([1-5][0-9]{2})\s+'
+                      r'https://registry\.npmjs\.org/-/npm/v1/oidc/token/exchange/',
+                      text,
+                  )
+                  for status in statuses:
+                      print('npm OIDC exchange HTTP status:', status)
+                  markers = {
+                      'Skipped because incorrect permissions for id-token': 'identity permissions unavailable',
+                      'Skipped because no id_token available': 'identity token unavailable',
+                      'Failed to fetch id_token from GitHub': 'identity retrieval failed',
+                      'Failed token exchange request': 'package credential exchange failed',
+                      'Failed because token exchange was missing': 'exchange response lacked credential',
+                      'Successfully retrieved and set token': 'credential was set before later failure',
+                      'oidc Failure with message:': 'OIDC helper caught another exception',
+                  }
+                  for marker, label in markers.items():
+                      if marker in text:
+                          print('npm OIDC category:', label)
+              if not found:
+                  print('No retained npm ENEEDAUTH debug log found')
+          except Exception:
+              print('npm debug log could not be read')
+          PY
