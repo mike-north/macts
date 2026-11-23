@@ -97,14 +97,15 @@ governability at the same time.
   `typecheck`, `test` and `test:types` locally in `.nx/cache`, so an unchanged
   task replays in seconds.
 - **Iterate with the fast path, not the full suite.** While developing, run
-  `pnpm verify:affected`: build, lint, typecheck and test for the projects your
-  change touches (committed, uncommitted or untracked) and everything that
-  depends on them. For one package, `pnpm verify:project @macts/<pkg>`, or a
+  `pnpm verify:affected`: build, lint, typecheck, test and type tests for the
+  projects your change touches (committed, uncommitted or untracked) and
+  everything that depends on them. For one package, `pnpm verify:project @macts/<pkg>`, or a
   single target with `pnpm exec nx run @macts/<pkg>:typecheck`. Prefer these
   over `pnpm --filter`, which bypasses the cache and does not build upstream
   packages first. `verify:affected` widens to every project when a changed file
-  belongs to none, and names any extra gate the change needs (for example
-  `pnpm generate:check` after a manifest or generator change). Run the full
+  outside every project is not documentation, and names any extra gate the
+  change needs (for example `pnpm generate:check` after a manifest or
+  generator change). Run the full
   gate in §8 before review; CI always runs it unfiltered.
 - **TypeScript:** strict (`tsconfig.base.json`), `noEmitOnError`. In libraries
   avoid `esModuleInterop`, `allowSyntheticDefaultImports`, `skipLibCheck`. Use

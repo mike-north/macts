@@ -27,6 +27,33 @@
       "{workspaceRoot}/tsconfig.base.json",
       "{workspaceRoot}/.eslintrc.json",
       "{workspaceRoot}/eslint.config.js"
+    ],
+    "testWorkspaceFiles": [
+      "{workspaceRoot}/vitest.config.ts",
+      "{workspaceRoot}/package.json",
+      "{workspaceRoot}/README.md",
+      "{workspaceRoot}/manifests/**/*",
+      "{workspaceRoot}/scripts/check-clean-tree.mjs",
+      "{workspaceRoot}/packages/*/.macts-generated.json",
+      "{workspaceRoot}/packages/*/.gitattributes",
+      {
+        "env": "MACTS_LIVE_APPS"
+      },
+      {
+        "env": "MACTS_PAGE_COST"
+      },
+      {
+        "env": "MACTS_PAGE_COST_RUNS"
+      },
+      {
+        "env": "MACTS_PAGE_COST_LISTS"
+      },
+      {
+        "env": "RUN_MACTS_UAT"
+      },
+      {
+        "runtime": "node --version"
+      }
     ]
   },
   "targetDefaults": {
@@ -49,9 +76,10 @@
       "cache": true
     },
     "lint": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "^api-extractor"],
       "inputs": [
         "default",
+        "^production",
         "{workspaceRoot}/.eslintrc.json",
         "{workspaceRoot}/eslint.config.js",
         "{workspaceRoot}/.eslintignore"
@@ -60,12 +88,12 @@
     },
     "test": {
       "dependsOn": ["build", "^build"],
-      "inputs": ["default", "^production", "{workspaceRoot}/vitest.config.ts"],
+      "inputs": ["default", "^production", "testWorkspaceFiles"],
       "cache": true
     },
     "test:types": {
       "dependsOn": ["api-extractor"],
-      "inputs": ["default", "^production"],
+      "inputs": ["default", "^production", "{workspaceRoot}/api-extractor.base.json"],
       "cache": true
     },
     "typecheck": {

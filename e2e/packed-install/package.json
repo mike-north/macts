@@ -25,7 +25,8 @@
     "targets": {
       "test": {
         "dependsOn": [
-          "^build"
+          "^build",
+          "^api-extractor"
         ]
       }
     }
