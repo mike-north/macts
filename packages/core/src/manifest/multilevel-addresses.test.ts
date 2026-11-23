@@ -906,13 +906,15 @@ it.each(['parent', 'parents'] as const)('validates normalized 1.1 %s addresses',
     'edge',
     'missing-item',
     'malformed',
+    'scope',
   ]) {
     const { manifest, command, folders } = fixture()
     if (kind === 'extra') {
       command.name = 'list'
       delete command.item
       command.parameters = [identityParameter('folderId'), identityParameter('extra')]
-    } else if (kind === 'malformed') {
+    } else if (kind === 'scope') command.scope = 'application'
+    else if (kind === 'malformed') {
       delete command.resolvesReferences
       const parent = command.parent ?? command.parents?.[0]
       if (parent === undefined) throw new Error('Missing parent')
@@ -950,6 +952,7 @@ it.each(['parent', 'parents'] as const)('validates normalized 1.1 %s addresses',
     edge: true,
     'missing-item': true,
     malformed: true,
+    scope: true,
   })
 })
 

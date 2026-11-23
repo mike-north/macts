@@ -228,15 +228,15 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
     if (!CommandSchema.safeParse(command).success) continue
     const address =
       resourceType === undefined ? undefined : commandAddress(manifest, command, resourceType)
+    const parents = address?.parents ?? commandParents(manifest, command)
     // Read inputs follow selection semantics, independently of the address spelling.
     if (
       command.identityTraversal !== undefined ||
       (command.name === 'list' &&
-        (command.parents !== undefined ||
-          (manifest.version === '1.1' && address !== undefined && address.parents.length > 0)))
+        (command.parents !== undefined || (manifest.version === '1.1' && parents.length > 0)))
     ) {
       const selectors = new Set([
-        ...(address?.parents.map(({ parameter }) => parameter) ?? []),
+        ...parents.map(({ parameter }) => parameter),
         ...(command.name === 'get' ? [itemIdentifierParameter(command)?.name] : []),
       ])
       if (command.parameters.some(({ name }) => !selectors.has(name))) {
@@ -332,11 +332,7 @@ export function findAddressIssues(manifest: AppManifest): AddressIssue[] {
       }
     }
     // Collection-path rules do not replace the separate contract of unscoped root reads.
-    if (
-      !explicit &&
-      (manifest.version !== '1.1' || address === undefined || address.parents.length === 0)
-    )
-      continue
+    if (!explicit && (manifest.version !== '1.1' || parents.length === 0)) continue
     if (command.parent !== undefined && command.parents !== undefined)
       refuse('parent and parents are mutually exclusive.')
     if (
