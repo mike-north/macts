@@ -47,3 +47,9 @@ Options for a client that runs operations on this Mac.
 
 </td></tr>
 </tbody></table>
+
+## Re-exports
+
+This entry point re-exports the public symbols of:
+
+- [@macts/contracts](./contracts.md)

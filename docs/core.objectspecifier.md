@@ -29,7 +29,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[app(bundleId)](./core.objectspecifier.app.md)
+[app(bundleId)](./core.objectspecifier.app-static.md)
 
 </td><td>
 

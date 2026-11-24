@@ -71,3 +71,9 @@ Default base URL for the macts API server.
 
 </td></tr>
 </tbody></table>
+
+## Re-exports
+
+This entry point re-exports the public symbols of:
+
+- [@macts/contracts](./contracts.md)
