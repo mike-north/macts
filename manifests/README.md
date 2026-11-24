@@ -1086,8 +1086,16 @@ an extension (System Events' `do folder action`, Safari's
 Either way, a marked command has no route, so no operation, tool, capability
 or derived permission, and the SDKs and the CLI omit it. The manifest keeps
 it, so the omission stays auditable. The marker is accepted under both format
-versions: a runtime that does not know a kind of evidence rejects the manifest
-rather than offering the command.
+versions.
+
+The command schema rejects any field it does not know, on the command, on its
+parameters and on its permission-history entries, so a runtime that does not
+know the `unsupported` marker, or a kind of evidence under it, rejects the
+manifest rather than offering the command. Releases before the one that made
+the schema strict (`@macts/core` 0.2.0 and earlier) drop unknown command fields
+instead. Such a runtime that derives routes straight from a manifest, without
+the contract's operation list, would offer a marked command. Shipped app
+packages are not affected: their operations come from the contract.
 
 **Schemas:** [`CommandUnsupportedSchema`](../packages/core/src/manifest/schemas/command.ts), [`LiveAbsenceEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts), [`DictionaryHandlerEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts)
 
