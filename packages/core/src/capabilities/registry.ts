@@ -33,6 +33,7 @@ import { usableHierarchyChildren } from '../manifest/unsupported.js'
 import { isOperationAvailable, omittedInputs } from '../generator/input-satisfiability.js'
 import { classifyCommandRisk } from './risk.js'
 import { commandMethodParameters } from '../generator/surface.js'
+import { commandCliSegments } from '../generator/cli/placement.js'
 import { itemIdentifierParameter, selectsOneItem } from '../manifest/item-selection.js'
 import type { Capability, CapabilityRegistry } from './types.js'
 
@@ -56,18 +57,15 @@ interface ResourceCliPath {
 }
 
 /**
- * Walk the manifest hierarchy and record, for each resource, the first CLI path
- * at which the CLI generator emits its commands. Mirrors
+ * Walk the manifest hierarchy and record, for each resource, every CLI path
+ * at which it appears, in depth-first, insertion order. Mirrors
  * `createCliGeneratorContext`'s `buildHierarchyPaths` so discovery snippets
- * match the generated CLI exactly.
- *
- * A resource appearing at multiple hierarchy paths keeps its first (depth-first,
- * insertion-order) path, which is deterministic. The entries of a resource
- * marked unsupported, and everything nested under them, are skipped, as the CLI
+ * match the generated CLI exactly. The entries of a resource marked
+ * unsupported, and everything nested under them, are skipped, as the CLI
  * generator skips them.
  */
-function buildResourceCliPaths(manifest: AppManifest): Map<string, ResourceCliPath> {
-  const paths = new Map<string, ResourceCliPath>()
+function buildResourceCliPaths(manifest: AppManifest): Map<string, ResourceCliPath[]> {
+  const paths = new Map<string, ResourceCliPath[]>()
 
   const walk = (
     children: Record<string, HierarchyChild>,
@@ -76,9 +74,9 @@ function buildResourceCliPaths(manifest: AppManifest): Map<string, ResourceCliPa
   ): void => {
     for (const [key, child] of usableHierarchyChildren(manifest, children)) {
       const nextSegments = [...segments, key]
-      if (!paths.has(child.resource)) {
-        paths.set(child.resource, { segments: nextSegments, parentFlags })
-      }
+      const entries = paths.get(child.resource) ?? []
+      entries.push({ segments: nextSegments, parentFlags })
+      paths.set(child.resource, entries)
       if (child.children) {
         const nextParentFlags = [...parentFlags, `${toKebabCase(child.resource)}-id`]
         walk(child.children, nextSegments, nextParentFlags)
@@ -88,6 +86,24 @@ function buildResourceCliPaths(manifest: AppManifest): Map<string, ResourceCliPa
 
   walk(manifest.hierarchy.children, [], [])
   return paths
+}
+
+/**
+ * The CLI path a discovery snippet names for one resource command: the first
+ * of the resource's hierarchy paths the command's address reaches, at the
+ * segments the CLI generator places it under (`../generator/cli/placement.ts`).
+ * A command no entry places keeps the resource's first path.
+ */
+function commandCliPath(
+  manifest: AppManifest,
+  command: Command,
+  entries: readonly ResourceCliPath[]
+): ResourceCliPath | undefined {
+  for (const entry of entries) {
+    const segments = commandCliSegments(manifest, command, entry.segments)
+    if (segments !== undefined) return { ...entry, segments }
+  }
+  return entries[0]
 }
 
 /**
@@ -359,14 +375,15 @@ export function deriveCapabilities(manifest: AppManifest): Capability[] {
 
   for (const resource of getResources(manifest)) {
     const commands = getResourceCommands(manifest, resource.name)
-    // Use the resource's hierarchy CLI path when present; fall back to the
-    // resource segment for resources not in the hierarchy.
-    const cliPath = cliPaths.get(resource.name) ?? {
-      segments: [normalizeResourceRouteSegment(resource.plural)],
-      parentFlags: [],
-    }
+    const entries = cliPaths.get(resource.name) ?? []
     for (const command of commands) {
       if (!isOperationAvailable(manifest, command, resource.name)) continue
+      // Use the command's placed hierarchy CLI path when present; fall back to
+      // the resource segment for resources not in the hierarchy.
+      const cliPath = commandCliPath(manifest, command, entries) ?? {
+        segments: [normalizeResourceRouteSegment(resource.plural)],
+        parentFlags: [],
+      }
       capabilities.push(
         deriveResourceCapability(
           app,

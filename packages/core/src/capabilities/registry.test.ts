@@ -286,18 +286,21 @@ it('discovers every Session operation by its operation identity and generated CL
     [
       'iterm.sessions.resolve',
       'macts__iterm__sessions_resolve',
-      'macts iterm windows tabs sessions resolve --window-id <windowId> <sessionId>',
+      // Addressed by its Window alone, searching every Tab of it, so it sits
+      // under the Window, not under a Tab.
+      'macts iterm windows sessions resolve --window-id <windowId> <sessionId>',
     ],
     // The write is named by its route on discovery and MCP, and by its command
-    // name on the CLI, as the generated CLI command is (`sessions write`).
+    // name on the CLI, as the generated CLI command is (`sessions write`). It
+    // has the same Window-scoped address as the resolve, so the same place.
     [
       'iterm.sessions.writeText',
       'macts__iterm__sessions_write_text',
-      'macts iterm windows tabs sessions write --window-id <windowId> <sessionId> --text <text>',
+      'macts iterm windows sessions write --window-id <windowId> <sessionId> --text <text>',
     ],
   ])
   delete manifest.commands['getSession']
   expect(
     deriveCapabilities(manifest).find(({ name }) => name === 'iterm.sessions.resolve')?.cliSnippet
-  ).toBe('macts iterm windows tabs sessions get --window-id <windowId> <sessionId>')
+  ).toBe('macts iterm windows sessions get --window-id <windowId> <sessionId>')
 })

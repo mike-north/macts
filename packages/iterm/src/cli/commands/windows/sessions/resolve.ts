@@ -1,12 +1,12 @@
 import { Command, Option } from 'clipanion'
-import { getClient } from '../../../../sdk.js'
-import { createFormatter } from '../../../../output/index.js'
+import { getClient } from '../../../sdk.js'
+import { createFormatter } from '../../../output/index.js'
 
 /**
  * Read a session identity across all tabs of its Window. A move to another Window makes this identity missing.
  */
 export class ResolveSessionCommand extends Command {
-  static override paths = [['iterm', 'windows', 'tabs', 'sessions', 'resolve']]
+  static override paths = [['iterm', 'windows', 'sessions', 'resolve']]
 
   static override usage = Command.Usage({
     description:

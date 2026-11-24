@@ -855,6 +855,22 @@ access of its nested entry. Reminders lists `reminders` both at the top level
 and under `lists`, and Automator lists `automatorActions` and `variables` both
 at the top level and under `workflows`.
 
+#### CLI command paths
+
+A resource's generated CLI commands sit under the hierarchy keys that lead to
+it: Calendar's event list is `macts calendar calendars events list`. In format
+`'1.1'`, a command that declares its ancestors (`parents`, or a `parent`
+normalized to them) sits under exactly those ancestors' collections, followed
+by its target's collection. A collection the command's `identityTraversal`
+searches is not part of the path, because the caller never selects an item in
+it. iTerm Sessions are elements of Tabs in Windows, so the Session list, which
+selects one Tab, is `macts iterm windows tabs sessions list`, while the
+Session resolve, addressed by its Window alone and searching every Tab of it,
+is `macts iterm windows sessions resolve`. Such a command is generated only
+from the hierarchy entry its address reaches. Commands that declare no
+ancestors, and every format `'1.0'` command, keep the hierarchy path. The
+discovery snippets of the capabilities name the same path.
+
 ---
 
 ### Relationships

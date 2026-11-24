@@ -1,6 +1,6 @@
 import { Command, Option } from 'clipanion'
-import { getClient } from '../../../../sdk.js'
-import { createFormatter } from '../../../../output/index.js'
+import { getClient } from '../../../sdk.js'
+import { createFormatter } from '../../../output/index.js'
 
 import {
   ValueTypes as __mactsValueTypes,
@@ -27,7 +27,7 @@ function __mactsParseIntegerOption(text: string): number {
  * Write text into a session, as though it was typed, optionally followed by a newline.
  */
 export class WriteSessionCommand extends Command {
-  static override paths = [['iterm', 'windows', 'tabs', 'sessions', 'write']]
+  static override paths = [['iterm', 'windows', 'sessions', 'write']]
 
   static override usage = Command.Usage({
     description:
