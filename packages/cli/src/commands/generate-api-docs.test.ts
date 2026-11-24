@@ -39,12 +39,15 @@ const GIT_ENV = {
 
 let workspace: string
 
+/** One member of a planted doc model, as API Extractor records it. */
+type ModelMember = Record<string, unknown>
+
 /**
- * A doc model declaring one public function, `<fn>`, in package `@x/<name>`.
+ * A doc model for package `@x/<name>` whose entry point declares `members`.
  * Every package API Extractor documents, root or subpath entry, is named after
  * its package.
  */
-function docModel(name: string, fn: string): string {
+function packageModel(name: string, members: ModelMember[]): string {
   const pkg = `@x/${name}`
   return JSON.stringify({
     metadata: {
@@ -69,26 +72,92 @@ function docModel(name: string, fn: string): string {
         canonicalReference: `${pkg}!`,
         name: '',
         preserveMemberOrder: false,
-        members: [
-          {
-            kind: 'Function',
-            canonicalReference: `${pkg}!${fn}:function(1)`,
-            docComment: `/**\n * Does ${fn}.\n */\n`,
-            excerptTokens: [
-              { kind: 'Content', text: `export declare function ${fn}(): ` },
-              { kind: 'Content', text: 'void' },
-              { kind: 'Content', text: ';' },
-            ],
-            returnTypeTokenRange: { startIndex: 1, endIndex: 2 },
-            releaseTag: 'Public',
-            overloadIndex: 1,
-            parameters: [],
-            name: fn,
-          },
-        ],
+        members,
       },
     ],
   })
+}
+
+/**
+ * A public function `<fn>` of package `@x/<name>`. Its return type is `void`,
+ * or a reference to another declaration (`returns.reference` is that
+ * declaration's canonical reference).
+ */
+function functionMember(
+  name: string,
+  fn: string,
+  returns?: { text: string; reference: string }
+): ModelMember {
+  return {
+    kind: 'Function',
+    canonicalReference: `@x/${name}!${fn}:function(1)`,
+    docComment: `/**\n * Does ${fn}.\n */\n`,
+    excerptTokens: [
+      { kind: 'Content', text: `export declare function ${fn}(): ` },
+      returns === undefined
+        ? { kind: 'Content', text: 'void' }
+        : { kind: 'Reference', text: returns.text, canonicalReference: returns.reference },
+      { kind: 'Content', text: ';' },
+    ],
+    returnTypeTokenRange: { startIndex: 1, endIndex: 2 },
+    releaseTag: 'Public',
+    overloadIndex: 1,
+    parameters: [],
+    name: fn,
+  }
+}
+
+/** A public interface `<type>` of package `@x/<name>`, with one `size` property. */
+function interfaceMember(name: string, type: string): ModelMember {
+  return {
+    kind: 'Interface',
+    canonicalReference: `@x/${name}!${type}:interface`,
+    docComment: `/**\n * Describes ${type}.\n */\n`,
+    excerptTokens: [{ kind: 'Content', text: `export interface ${type} ` }],
+    releaseTag: 'Public',
+    name: type,
+    preserveMemberOrder: false,
+    members: [
+      {
+        kind: 'PropertySignature',
+        canonicalReference: `@x/${name}!${type}#size:member`,
+        docComment: '',
+        excerptTokens: [
+          { kind: 'Content', text: 'size: ' },
+          { kind: 'Content', text: 'number' },
+          { kind: 'Content', text: ';' },
+        ],
+        isReadonly: false,
+        isOptional: false,
+        releaseTag: 'Public',
+        name: 'size',
+        propertyTypeTokenRange: { startIndex: 1, endIndex: 2 },
+      },
+    ],
+    extendsTokenRanges: [],
+  }
+}
+
+/** A public type alias `<type> = <aliased>` of package `@x/<name>`. */
+function typeAliasMember(name: string, type: string, aliased: string): ModelMember {
+  return {
+    kind: 'TypeAlias',
+    canonicalReference: `@x/${name}!${type}:type`,
+    docComment: `/**\n * Aliases ${aliased}.\n */\n`,
+    excerptTokens: [
+      { kind: 'Content', text: `export type ${type} = ` },
+      { kind: 'Content', text: aliased },
+      { kind: 'Content', text: ';' },
+    ],
+    releaseTag: 'Public',
+    name: type,
+    typeTokenRange: { startIndex: 1, endIndex: 2 },
+  }
+}
+
+/** A doc model declaring one public function, `<fn>`, in package `@x/<name>`. */
+function docModel(name: string, fn: string): string {
+  return packageModel(name, [functionMember(name, fn)])
 }
 
 /** One subpath entry point of a planted package, such as `./local`. */
@@ -176,6 +245,17 @@ async function pages(): Promise<string[]> {
   return readdir(join(workspace, 'docs'))
 }
 
+/** The text of one generated page. */
+async function page(file: string): Promise<string> {
+  return readFile(join(workspace, 'docs', file), 'utf-8')
+}
+
+/** The page a markdown link with exactly `text` points at, in `content`. */
+function linkTarget(content: string, text: string): string | undefined {
+  const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return new RegExp(`\\[${escaped}\\]\\(\\./([^)]+\\.md)\\)`).exec(content)?.[1]
+}
+
 function git(...args: string[]): void {
   const run = spawnSync('git', args, { cwd: workspace, env: GIT_ENV, encoding: 'utf-8' })
   if (run.status !== 0) throw new Error(`git ${args.join(' ')} failed: ${run.stderr}`)
@@ -255,6 +335,77 @@ describe('generate-api-docs', () => {
     expect(memberPage).not.toMatch(/@x\/widgets\\?_local/)
   })
 
+  it('gives members whose names differ only in case a page each, linked from every page that names them (case-only collision regression, issue 335)', async () => {
+    await plantPackage('widgets', undefined)
+    await writeFile(
+      join(workspace, 'packages', 'widgets', 'temp', 'widgets.api.json'),
+      packageModel('widgets', [
+        functionMember('widgets', 'widget', {
+          text: 'Widget',
+          reference: '@x/widgets!Widget:interface',
+        }),
+        interfaceMember('widgets', 'Widget'),
+        functionMember('widgets', 'spin'),
+      ])
+    )
+
+    expect(generate().status).toBe(0)
+
+    const entry = await page('widgets.md')
+    const fnPage = linkTarget(entry, 'widget()')
+    const typePage = linkTarget(entry, 'Widget')
+    if (fnPage === undefined || typePage === undefined) {
+      throw new Error(`the entry page does not link both members:\n${entry}`)
+    }
+    expect(fnPage).not.toBe(typePage)
+    expect(await page(fnPage)).toMatch(/^## widget\(\) function$/m)
+    expect(await page(typePage)).toMatch(/^## Widget interface$/m)
+    // A page that names the other member links to that member's own page.
+    expect(linkTarget(await page(fnPage), 'Widget')).toBe(typePage)
+    // The interface's own members are named under the interface's page.
+    const sizePage = linkTarget(await page(typePage), 'size')
+    if (sizePage === undefined) throw new Error('the interface page does not link its property')
+    expect(await page(sizePage)).toMatch(/^## Widget\.size property$/m)
+    // The rule: the spellings sort by code unit; the first keeps the name
+    // api-documenter gives it, the second has `-2` appended. A member whose
+    // name no other shares keeps its name.
+    expect(typePage).toBe('widgets.widget.md')
+    expect(fnPage).toBe('widgets.widget-2.md')
+    expect(linkTarget(entry, 'spin()')).toBe('widgets.spin.md')
+  })
+
+  it('links a subpath member to the subpath\'s own declaration of a name the root entry also declares', async () => {
+    await plantPackage('widgets', undefined, [{ path: 'local', fn: undefined }])
+    const temp = join(workspace, 'packages', 'widgets', 'temp')
+    await writeFile(
+      join(temp, 'widgets.api.json'),
+      packageModel('widgets', [typeAliasMember('widgets', 'Size', 'string')])
+    )
+    // API Extractor names a subpath model after its package, so the subpath's
+    // reference to its own `Size` reads `@x/widgets!Size`, like the root's.
+    await writeFile(
+      join(temp, 'local.api.json'),
+      packageModel('widgets', [
+        typeAliasMember('widgets', 'Size', 'number'),
+        functionMember('widgets', 'measure', { text: 'Size', reference: '@x/widgets!Size:type' }),
+      ])
+    )
+
+    expect(generate().status).toBe(0)
+
+    const index = await page('index.md')
+    const entryFile = linkTarget(index, '@x/widgets/local')
+    if (entryFile === undefined) throw new Error(`no @x/widgets/local entry in the index:\n${index}`)
+    const entry = await page(entryFile)
+    const subpathSize = linkTarget(entry, 'Size')
+    const measure = linkTarget(entry, 'measure()')
+    if (subpathSize === undefined || measure === undefined) {
+      throw new Error(`the subpath entry page does not link its members:\n${entry}`)
+    }
+    expect(linkTarget(await page('widgets.md'), 'Size')).not.toBe(subpathSize)
+    expect(linkTarget(await page(measure), 'Size')).toBe(subpathSize)
+  })
+
   it('fails, naming the config, when an entry point writes an API report but no doc model', async () => {
     await plantPackage('widgets', 'spin', [{ path: 'local', fn: undefined, docModel: false }])
 
@@ -286,6 +437,21 @@ describe('generate-api-docs', () => {
     await plantPackage('widgets', 'spin')
 
     const { status, stderr } = generate(['--root'], workspace)
+
+    expect(status).toBe(2)
+    expect(stderr).toContain('Usage:')
+    expect(existsSync(join(workspace, 'docs'))).toBe(false)
+    expect(existsSync(join(workspace, 'temp'))).toBe(false)
+  })
+
+  it.each([
+    ['--root=<dir>', (dir: string) => [`--root=${dir}`]],
+    ['an unknown flag', (dir: string) => ['--root', dir, '--verbose']],
+    ['a stray argument', (dir: string) => [dir]],
+  ])('stops with a usage error, writing nothing, given %s', async (_case, args) => {
+    await plantPackage('widgets', 'spin')
+
+    const { status, stderr } = generate(args(workspace), workspace)
 
     expect(status).toBe(2)
     expect(stderr).toContain('Usage:')

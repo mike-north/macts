@@ -42,9 +42,15 @@
  * deleted, instead of silently dropping that entry point's pages, because a
  * partial `docs/` is indistinguishable from a deliberate removal.
  *
+ * Page names. `api-documenter` lowercases page file names, so members whose
+ * names differ only in case would share a page. The script gives each its own,
+ * by a deterministic rule that leaves every other page's name unchanged; see
+ * `documentWithDistinctPageNames`.
+ *
  * Usage: `node scripts/generate-api-docs.mjs [--root <dir>]`. `--root` selects
- * the workspace to read and write (default: this repository); the
- * `api-documenter` binary always comes from this repository.
+ * the workspace to read and write (default: this repository); any other
+ * argument is a usage error. `api-documenter` always comes from this
+ * repository.
  *
  * Exit status: 0 on success, 1 when an entry point cannot be documented or
  * generation fails, 2 on a usage error.
@@ -61,18 +67,23 @@ const { ExtractorConfig } = createRequire(join(toolRoot, 'package.json'))(
   '@microsoft/api-extractor'
 )
 
-const args = process.argv.slice(2)
-const rootFlag = args.indexOf('--root')
-const rootValue = rootFlag === -1 ? undefined : args[rootFlag + 1]
-if (
-  rootFlag !== -1 &&
-  (rootValue === undefined || rootValue.startsWith('--') || rootValue === '')
-) {
+/**
+ * The command line: nothing, or exactly `--root <dir>`. Anything else (an
+ * unknown flag, `--root=<dir>`, a missing or empty directory) is a usage error
+ * reported before anything is read or written, so a mistyped root can never
+ * fall back to regenerating this repository's own `docs/`.
+ */
+function parseRoot(args) {
+  if (args.length === 0) return toolRoot
+  const [flag, value] = args
+  if (args.length === 2 && flag === '--root' && value !== '' && !value.startsWith('--')) {
+    return resolve(value)
+  }
   console.error('Usage: node scripts/generate-api-docs.mjs [--root <dir>]')
-  console.error('`--root` needs a directory.')
+  console.error(`Unexpected arguments: ${args.join(' ')}`)
   process.exit(2)
 }
-const root = rootValue === undefined ? toolRoot : resolve(rootValue)
+const root = parseRoot(process.argv.slice(2))
 
 /** Packages whose doc models are not published as library reference pages. */
 const EXCLUDED_FROM_DOCS = new Set(['cli', 'mcp'])
@@ -224,13 +235,106 @@ for (const { packageName, identity, model } of entryPoints) {
   writeFileSync(join(modelsDir, `${unscopedName(identity)}.api.json`), JSON.stringify(staged))
 }
 
-const run = spawnSync(
-  join(toolRoot, 'node_modules', '.bin', 'api-documenter'),
-  ['markdown', '-i', modelsDir, '-o', docsDir],
-  { cwd: root, stdio: 'inherit' }
-)
-if (run.error !== undefined || run.status !== 0) {
-  console.error(`api-documenter failed: ${run.error?.message ?? `exit ${String(run.status)}`}`)
+/**
+ * Page file names that stay distinct when member names differ only in case.
+ *
+ * `api-documenter` names a page after the path of names leading to its item
+ * (`core.coarsepermission.md`), each name lowercased with characters a file
+ * name cannot hold replaced by `_`. Two siblings whose names differ only in
+ * case, such as the function `coarsePermission` and the interface
+ * `CoarsePermission`, therefore get the same file: the page written last
+ * replaces the other, and every link to either opens it.
+ *
+ * The rule: among the members of one container (an entry point, interface,
+ * class, namespace, ...), the distinct names that map to the same file name
+ * segment are ordered by UTF-16 code unit (`CoarsePermission` before
+ * `coarsePermission`). The first keeps the plain segment; the n-th has `-n`
+ * appended (`core.coarsepermission-2.md`). `-` never occurs in a segment
+ * derived from a TypeScript identifier, so a suffixed name cannot meet another
+ * member's. A member whose segment no sibling shares keeps the name
+ * `api-documenter` gives it, so adding or removing an unrelated export moves
+ * no page. The segment carries over to the pages of the member's own members.
+ *
+ * `api-documenter` computes every page file and every link to a page through
+ * one method, so replacing that method keeps each link pointed at its page.
+ * The method is not public API; if it is missing, the run fails instead of
+ * silently writing colliding pages.
+ */
+function documentWithDistinctPageNames(inputFolder, outputFolder) {
+  // The documenter's own dependencies, so the model classes are the ones it uses.
+  const requireTool = createRequire(
+    createRequire(join(toolRoot, 'package.json')).resolve('@microsoft/api-documenter/package.json')
+  )
+  const { MarkdownDocumenter } = requireTool(
+    './lib/documenters/MarkdownDocumenter'
+  )
+  const { Utilities } = requireTool('./lib/utils/Utilities')
+  const { ApiDocumenterCommandLine } = requireTool(
+    './lib/cli/ApiDocumenterCommandLine'
+  )
+  const { ApiItemKind, ApiParameterListMixin } = requireTool('@microsoft/api-extractor-model')
+  const { PackageName } = requireTool('@rushstack/node-core-library')
+  if (typeof MarkdownDocumenter.prototype._getFilenameForApiItem !== 'function') {
+    throw new Error('this api-documenter version no longer names pages through _getFilenameForApiItem')
+  }
+
+  const safeName = (name) => Utilities.getSafeFilenameForName(name)
+  /** The file name segment of one item: its safe name, made distinct from its siblings'. */
+  const segment = (item) => {
+    const own = safeName(item.displayName)
+    const spellings = [
+      ...new Set(
+        (item.parent?.members ?? [])
+          .map((sibling) => sibling.displayName)
+          .filter((name) => safeName(name) === own)
+      ),
+    ].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
+    const rank = spellings.indexOf(item.displayName)
+    return rank > 0 ? `${own}-${String(rank + 1)}` : own
+  }
+  MarkdownDocumenter.prototype._getFilenameForApiItem = function (apiItem) {
+    if (apiItem.kind === ApiItemKind.Model) return 'index.md'
+    let baseName = ''
+    for (const item of apiItem.getHierarchy()) {
+      switch (item.kind) {
+        case ApiItemKind.Model:
+        case ApiItemKind.EntryPoint:
+        case ApiItemKind.EnumMember:
+          break
+        case ApiItemKind.Package:
+          baseName = safeName(PackageName.getUnscopedName(item.displayName))
+          break
+        default: {
+          let name = segment(item)
+          // Overloads share a name; `api-documenter` numbers all but the first.
+          if (ApiParameterListMixin.isBaseClassOf(item) && item.overloadIndex > 1) {
+            name += `_${String(item.overloadIndex - 1)}`
+          }
+          baseName += `.${name}`
+        }
+      }
+    }
+    return `${baseName}.md`
+  }
+
+  return new ApiDocumenterCommandLine().executeAsync([
+    'markdown',
+    '-i',
+    inputFolder,
+    '-o',
+    outputFolder,
+  ])
+}
+
+let documented
+try {
+  documented = await documentWithDistinctPageNames(modelsDir, docsDir)
+} catch (error) {
+  console.error(`api-documenter failed: ${error instanceof Error ? error.message : String(error)}`)
+  process.exit(1)
+}
+if (!documented) {
+  console.error('api-documenter failed')
   process.exit(1)
 }
 

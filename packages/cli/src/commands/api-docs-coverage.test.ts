@@ -7,7 +7,10 @@
  * `@macts/sdk/local`), and each has its own report, so the reference lists one
  * entry page per entry point. These tests read the committed tree: each
  * report's exports must all be members of one of its package's entry pages,
- * and every member link must name a page that exists. A subpath entry page is
+ * and every member link must name a page that documents that member: the page
+ * exists and its breadcrumb ends in the member's name. A link that merely
+ * resolves is not enough, because a page written for another member (one
+ * whose name differs only in case, say) would satisfy it. A subpath entry page is
  * titled with the subpath's import path, which must be one the package
  * declares in its `exports`.
  *
@@ -137,6 +140,19 @@ function entryMembers(page: string): Map<string, string> {
   return members
 }
 
+/**
+ * The member a page documents: the last segment of its breadcrumb
+ * (`[Home](./index.md) &gt; [@macts/core](./core.md) &gt; [Name](./core.name.md)`),
+ * or `undefined` for a missing page or one without a breadcrumb.
+ */
+function documentedMember(page: string): string | undefined {
+  const path = join(DOCS_DIR, page)
+  if (!existsSync(path)) return undefined
+  const breadcrumb = /^\[Home\]\(\.\/index\.md\).*$/m.exec(readFileSync(path, 'utf-8'))?.[0]
+  if (breadcrumb === undefined) return undefined
+  return [...breadcrumb.matchAll(/\[([^\]]+)\]\(\.\/[^)]+\.md\)/g)].at(-1)?.[1]
+}
+
 /** The entry pages of one package: its root (`@macts/x`) and its subpaths (`@macts/x/...`). */
 function packageEntryPages(name: string, pages: Map<string, string>): Map<string, string> {
   return new Map(
@@ -152,7 +168,7 @@ describe('API reference coverage', () => {
     expect(packages.length).toBeGreaterThan(0)
   })
 
-  it('gives every export of every API report a page on one of its package entry pages', () => {
+  it('gives every export of every API report a page of its own on one of its package entry pages', () => {
     const missing: string[] = []
     for (const pkg of packages) {
       const entries = [...packageEntryPages(pkg.name, pages).values()].map(entryMembers)
@@ -175,7 +191,7 @@ describe('API reference coverage', () => {
                 ? undefined
                 : entryMembers(sourcePage)
           const page = members?.get(entry.member)
-          if (page === undefined || !existsSync(join(DOCS_DIR, page))) {
+          if (page === undefined || documentedMember(page) !== entry.member) {
             missing.push(`${pkg.dir}/api-report/${report}: ${entry.name}`)
           }
         }
