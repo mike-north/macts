@@ -85,6 +85,12 @@ function fixture(state: State): object {
       return items().length
     },
     at: (index: number) => items()[index] ?? missing,
+    // Elements are resolved by id within their own collection, as the app does.
+    byId: (id: unknown) =>
+      items().find((item) => {
+        const getter: unknown = Reflect.get(item, 'id')
+        return typeof getter === 'function' && Reflect.apply(getter, item, []) === id
+      }) ?? missing,
   })
   /** A Session answers its id and a record read; every other property reads as no value. */
   const session = (window: number, id: string) =>

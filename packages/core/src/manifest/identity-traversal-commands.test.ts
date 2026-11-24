@@ -100,7 +100,17 @@ function standIn(windows: Record<number, string[][]>) {
       return id
     },
   })
-  const list = <T>(items: T[]) => ({ length: items.length, at: (index: number) => items[index] })
+  /** An element's id when it answers one; tabs and windows in this stand-in do not. */
+  const idOf = (item: object): unknown => {
+    const getter: unknown = Reflect.get(item, 'id')
+    return typeof getter === 'function' ? Reflect.apply(getter, item, []) : undefined
+  }
+  const list = <T extends object>(items: T[]) => ({
+    length: items.length,
+    at: (index: number) => items[index],
+    // The app resolves an element of a collection by its id; a missing one answers `exists() === false`.
+    byId: (id: string) => items.find((item) => idOf(item) === id) ?? { exists: () => false },
+  })
   const window = (id: number, tabs: string[][]) => ({
     exists: () => true,
     tabs: list(
