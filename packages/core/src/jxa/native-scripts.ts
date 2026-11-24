@@ -418,12 +418,13 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * collection and return within one read (a Session moved to another Tab and
  * back), so the final identity check alone would find the item where it began
  * and pass a record whose fields went missing while it was away. The checks
- * fail as a missing target or a collection change when the item is gone or
- * replaced at the re-check; an item still present with its identity keeps the
- * failure's usual meaning. An item that leaves and returns within a single
- * property read passes the re-check and can still yield an incomplete record
- * of its own data, which the output check reports as an unexpected value; a
- * read never returns another item's data. Reads with no
+ * fail as a missing target or a collection change when the item is gone,
+ * moved or replaced at the re-check; an item still present with its identity
+ * keeps the failure's usual meaning. An item that leaves and returns within a
+ * single property read passes the re-check and can still yield an incomplete
+ * record of its own data; a required field then fails the output check as an
+ * unexpected value, while an optional or absent-as-null field is omitted or
+ * null. A read never returns another item's data. Reads with no
  * identity check, including every format 1.0 read, name none and read as
  * before.
  *
