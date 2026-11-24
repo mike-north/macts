@@ -349,7 +349,8 @@ const original = MarkdownDocumenter.prototype._getFilenameForApiItem
 ${change}
 `
   )
-  const nodeOptions = `${process.env['NODE_OPTIONS'] ?? ''} --import ${preload}`.trim()
+  const nodeOptions =
+    `${process.env['NODE_OPTIONS'] ?? ''} --import ${JSON.stringify(preload)}`.trim()
   const run = spawnSync(process.execPath, [DOCS_SCRIPT, '--root', workspace], {
     encoding: 'utf-8',
     env: { ...process.env, NODE_OPTIONS: nodeOptions },
@@ -407,14 +408,171 @@ function checkDocs(): { status: number | null; stderr: string } {
 }
 
 beforeEach(async () => {
-  workspace = await mkdtemp(join(tmpdir(), 'macts-api-docs-'))
+  workspace = await mkdtemp(join(tmpdir(), 'macts api docs-'))
 })
 
 afterEach(async () => {
+  expect((await readdir(workspace)).filter((name) => name.startsWith('.docs-stage-'))).toEqual([])
   await rm(workspace, { recursive: true, force: true })
 })
 
 describe('generate-api-docs', () => {
+  it('reports an empty workspace before attempting documentation', async () => {
+    await mkdir(join(workspace, 'packages'))
+    const result = generate()
+    expect(result.status).toBe(1)
+    expect(result.stderr).toContain('no entry points to document')
+  })
+
+  it('preserves existing pages when the documenter fails after writing', async () => {
+    await plantPackage('widgets', 'spin')
+    await mkdir(join(workspace, 'docs'))
+    await writeFile(join(workspace, 'docs', 'kept.md'), 'original bytes\n')
+    const result = await generateWithDocumenterChange(`
+const execute = MarkdownDocumenter.prototype.generateFiles
+MarkdownDocumenter.prototype.generateFiles = function (...args) {
+  execute.apply(this, args)
+  throw new Error('injected documenter failure')
+}`)
+    expect(result.status).toBe(1)
+    expect(await pages()).toEqual(['kept.md'])
+    expect(await page('kept.md')).toBe('original bytes\n')
+  })
+
+  it('preserves existing pages when formatting fails', async () => {
+    await plantPackage('widgets', 'spin')
+    await mkdir(join(workspace, 'docs'))
+    await writeFile(join(workspace, 'docs', 'kept.md'), 'original bytes\n')
+    const result = await generateWithDocumenterChange(`
+const childProcess = (await import('node:child_process')).default
+const { syncBuiltinESMExports } = await import('node:module')
+const spawn = childProcess.spawnSync
+childProcess.spawnSync = function (command, ...args) {
+  if (String(command).endsWith('/prettier')) return { status: 1 }
+  return spawn.call(this, command, ...args)
+}
+syncBuiltinESMExports()`)
+    expect(result.status).toBe(1)
+    expect(result.stderr).toContain('prettier failed')
+    expect(await pages()).toEqual(['kept.md'])
+    expect(await page('kept.md')).toBe('original bytes\n')
+  })
+
+  it('rejects a package named index without replacing existing pages', async () => {
+    await plantPackage('index', 'spin')
+    await mkdir(join(workspace, 'docs'))
+    await writeFile(join(workspace, 'docs', 'kept.md'), 'original bytes\n')
+    const result = generate()
+    expect(result.status).toBe(1)
+    expect(result.stderr).toContain('index.md')
+    expect(await pages()).toEqual(['kept.md'])
+    expect(await page('kept.md')).toBe('original bytes\n')
+  })
+
+  it('links entry points to packages whose exports they re-export', async () => {
+    await plantPackage('widgets', 'spin', [{ path: 'local', fn: 'spin' }])
+    await plantPackage('shapes', 'outline')
+    await mkdir(join(workspace, 'packages', 'widgets', 'src'))
+    await writeFile(
+      join(workspace, 'packages', 'widgets', 'src', 'index.ts'),
+      "export * from '@x/shapes'\n"
+    )
+    await mkdir(join(workspace, 'packages', 'widgets', 'src', 'local'))
+    await writeFile(
+      join(workspace, 'packages', 'widgets', 'src', 'local', 'index.ts'),
+      "export * from '@x/shapes'\n"
+    )
+    expect(generate().status).toBe(0)
+    expect(linkTarget(await page('widgets.md'), '@x/shapes')).toBe('shapes.md')
+    expect(linkTarget(await page('widgets_local.md'), '@x/shapes')).toBe('shapes.md')
+  })
+
+  it('gives static and instance methods distinct linked pages', async () => {
+    await plantPackage('widgets', undefined)
+    const cls = classMember('widgets', 'Gizmo')
+    const instance = (cls['members'] as ModelMember[])[0]
+    if (instance === undefined) throw new Error('missing fixture method')
+    const staticMethod = {
+      ...instance,
+      isStatic: true,
+      canonicalReference: '@x/widgets!Gizmo.spin:member(1)',
+      excerptTokens: [
+        { kind: 'Content', text: 'static spin(): ' },
+        { kind: 'Content', text: 'void' },
+        { kind: 'Content', text: ';' },
+      ],
+    }
+    cls['members'] = [instance, staticMethod]
+    await writeFile(
+      join(workspace, 'packages', 'widgets', 'temp', 'widgets.api.json'),
+      packageModel('widgets', [cls])
+    )
+    expect(generate().status).toBe(0)
+    const targets = linkTargets(await page('widgets.gizmo.md'), /spin\([^)]*\)/).sort()
+    expect(targets).toEqual(['widgets.gizmo.spin-static.md', 'widgets.gizmo.spin.md'])
+    expect(await page('widgets.gizmo.spin-static.md')).toContain('static spin()')
+    expect(await page('widgets.gizmo.spin.md')).toContain('spin()')
+  })
+
+  it('rejects a documenter that bypasses the replacement for file names', async () => {
+    await plantPackage('widgets', 'spin')
+    await mkdir(join(workspace, 'docs'))
+    await writeFile(join(workspace, 'docs', 'kept.md'), 'original bytes\n')
+    const result = await generateWithDocumenterChange(`
+let inLink = false
+const link = MarkdownDocumenter.prototype._getLinkFilenameForApiItem
+MarkdownDocumenter.prototype._getLinkFilenameForApiItem = function (...args) {
+  inLink = true
+  try { return link.apply(this, args) } finally { inLink = false }
+}
+const write = MarkdownDocumenter.prototype._writeApiItemPage
+MarkdownDocumenter.prototype._writeApiItemPage = function (item) {
+  const replacement = this._getFilenameForApiItem
+  this._getFilenameForApiItem = function (target) {
+    return (inLink ? replacement : original).call(this, target)
+  }
+  try { return write.call(this, item) } finally { this._getFilenameForApiItem = replacement }
+}`)
+    expect(result.status).toBe(1)
+    expect(await pages()).toEqual(['kept.md'])
+  })
+
+  it('rejects a documenter that bypasses the replacement for links', async () => {
+    await plantPackage('widgets', 'spin')
+    await mkdir(join(workspace, 'docs'))
+    await writeFile(join(workspace, 'docs', 'kept.md'), 'original bytes\n')
+    const result = await generateWithDocumenterChange(`
+MarkdownDocumenter.prototype._getLinkFilenameForApiItem = function (item) {
+  return './' + original.call(this, item)
+}`)
+    expect(result.status).toBe(1)
+    expect(await pages()).toEqual(['kept.md'])
+    expect(await page('kept.md')).toBe('original bytes\n')
+  })
+
+  it('restores the previous reference if the new directory cannot be installed', async () => {
+    await plantPackage('widgets', 'spin')
+    await mkdir(join(workspace, 'docs'))
+    await writeFile(join(workspace, 'docs', 'kept.md'), 'original bytes\n')
+    const result = await generateWithDocumenterChange(`
+const fs = (await import('node:fs')).default
+const { syncBuiltinESMExports } = await import('node:module')
+const rename = fs.renameSync
+let rejected = false
+fs.renameSync = function (from, to) {
+  if (!rejected && String(from).includes('.docs-stage-') && String(from).endsWith('/docs')) {
+    rejected = true
+    throw new Error('injected rename failure')
+  }
+  return rename.call(this, from, to)
+}
+syncBuiltinESMExports()`)
+    expect(result.status).toBe(1)
+    expect(await pages()).toEqual(['kept.md'])
+    expect(await page('kept.md')).toBe('original bytes\n')
+    expect((await readdir(workspace)).filter((name) => name.startsWith('.docs-stage-'))).toEqual([])
+  })
+
   it('writes a page for each public export of each package', async () => {
     await plantPackage('widgets', 'spin')
 
@@ -623,10 +781,14 @@ describe('generate-api-docs', () => {
       ])
     )
 
+    await mkdir(join(workspace, 'docs'))
+    await writeFile(join(workspace, 'docs', 'kept.md'), 'original bytes\n')
     const { status, stderr } = generate()
 
     expect(status).toBe(1)
     expect(stderr).toContain('widgets.make_1.md')
+    expect(await pages()).toEqual(['kept.md'])
+    expect(await page('kept.md')).toBe('original bytes\n')
   })
 
   it('fails when this api-documenter version no longer has the method that names pages', async () => {
@@ -653,7 +815,7 @@ describe('generate-api-docs', () => {
     )
 
     expect(status).toBe(1)
-    expect(stderr).toContain('did not name any page through the replaced _getFilenameForApiItem')
+    expect(stderr).toContain('through the replaced _getFilenameForApiItem')
   })
 
   it("links a subpath member to the subpath's own declaration of a name the root entry also declares", async () => {

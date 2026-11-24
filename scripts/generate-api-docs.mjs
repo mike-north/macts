@@ -24,8 +24,8 @@
  * entry point. After documenting, that identity is replaced in the pages by
  * the real import path, which is what readers import.
  *
- * Output. `api-documenter` empties its output folder on every run, so `docs/`
- * always holds exactly the documented models. The models it reads are staged
+ * Output. A complete reference is generated beside `docs/` and replaces it
+ * only after documentation and formatting succeed. The models it reads are staged
  * in the root `temp/`, which this script resets first: a model left there by
  * an earlier run, for a package or entry point that no longer exists, would
  * otherwise come back as pages.
@@ -59,9 +59,18 @@
  */
 
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { createRequire } from 'node:module'
-import { dirname, join, relative, resolve } from 'node:path'
+import { basename, dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const toolRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -181,7 +190,14 @@ for (const entry of readdirSync(packagesDir, { withFileTypes: true }).sort((a, b
     const importPath = subpath === '.' ? manifest.name : `${manifest.name}/${subpath.slice(2)}`
     const identity =
       subpath === '.' ? manifest.name : `${manifest.name}_${subpath.slice(2).replaceAll('/', '_')}`
-    entryPoints.push({ packageName: manifest.name, importPath, identity, model })
+    entryPoints.push({
+      packageName: manifest.name,
+      importPath,
+      identity,
+      model,
+      packageDir,
+      entryPath,
+    })
   }
 }
 
@@ -202,6 +218,10 @@ if (missing.length > 0) {
 }
 for (const problem of problems) console.error(problem)
 if (missing.length > 0 || problems.length > 0) process.exit(1)
+if (entryPoints.length === 0) {
+  console.error('no entry points to document')
+  process.exit(1)
+}
 
 /**
  * A subpath doc model under its own identity. Every reference API Extractor
@@ -264,10 +284,12 @@ for (const { packageName, identity, model } of entryPoints) {
  *    interface or type alias, has `-<kind>` appended, the kind word the page's
  *    heading uses (`arc.arcclient-interface.md`, `contracts.integer-type.md`).
  *    This follows the case suffix (`count-2-type`).
- * 3. Overloads, which share both name and kind, keep `api-documenter`'s
- *    numbering: every overload after the first has `_<n - 1>` appended.
+ * 3. Static members have `-static` appended to distinguish them from
+ *    instance members of the same name and kind.
+ * 4. Overloads keep `api-documenter`'s numbering: every overload after the
+ *    first has `_<n - 1>` appended.
  *
- * A member whose name and kind no sibling shares keeps the name
+ * An instance member whose name and kind no sibling shares keeps the name
  * `api-documenter` gives it, so adding or removing an unrelated export moves
  * no page. The segment carries over to the pages of the member's own members.
  *
@@ -283,8 +305,8 @@ for (const { packageName, identity, model } of entryPoints) {
  *
  * `api-documenter` computes every page file and every link to a page through
  * one method, so replacing that method keeps each link pointed at its page.
- * The method is not public API; if it is missing, or the documenter never
- * calls it, the run fails instead of silently writing colliding pages. For
+ * The method is not public API; the run checks each page write and link
+ * against the replacement so an incompatible documenter fails closed. For
  * that reason `@microsoft/api-documenter` is pinned to an exact version in the
  * root `package.json` (a manifest cannot hold comments): a release that renamed
  * or stopped using the method would otherwise arrive with a routine install.
@@ -298,7 +320,7 @@ async function documentWithDistinctPageNames(inputFolder, outputFolder) {
   const { Utilities } = requireTool('./lib/utils/Utilities')
   const { ApiDocumenterCommandLine } = requireTool('./lib/cli/ApiDocumenterCommandLine')
   const { ApiItemKind, ApiParameterListMixin } = requireTool('@microsoft/api-extractor-model')
-  const { PackageName } = requireTool('@rushstack/node-core-library')
+  const { PackageName, FileSystem } = requireTool('@rushstack/node-core-library')
   if (typeof MarkdownDocumenter.prototype._getFilenameForApiItem !== 'function') {
     throw new Error(
       'this api-documenter version no longer names pages through _getFilenameForApiItem'
@@ -354,12 +376,67 @@ async function documentWithDistinctPageNames(inputFolder, outputFolder) {
     const caseSuffix = rank > 0 ? `-${String(rank + 1)}` : ''
     const kindSuffix =
       kinds.indexOf(item.kind) > 0 ? `-${KIND_WORDS[item.kind] ?? item.kind.toLowerCase()}` : ''
-    return `${own}${caseSuffix}${kindSuffix}`
+    const staticSuffix = item.isStatic ? '-static' : ''
+    return `${own}${caseSuffix}${kindSuffix}${staticSuffix}`
   }
   /** The item each page file was given to, so no file is given to two. */
   const owners = new Map()
+  // A page can recursively write child pages while rendering; keep each
+  // write paired with the filename requested for that specific item.
+  let namingLink = false
+  let frame
+  const writePage = MarkdownDocumenter.prototype._writeApiItemPage
+  MarkdownDocumenter.prototype._writeApiItemPage = function (item) {
+    const parent = frame
+    frame = { item, name: undefined }
+    try {
+      return writePage.call(this, item)
+    } finally {
+      frame = parent
+    }
+  }
+  const writeFile = FileSystem.writeFile
+  FileSystem.writeFile = function (path, ...args) {
+    if (dirname(path) === outputFolder && (frame === undefined || frame.name !== basename(path))) {
+      throw new Error(
+        `api-documenter did not name ${basename(path)} through the replaced _getFilenameForApiItem`
+      )
+    }
+    return writeFile.call(this, path, ...args)
+  }
+  // Links must also obtain their destination through the replacement, even
+  // when the documenter changes how it renders a page.
+  const linkFilename = MarkdownDocumenter.prototype._getLinkFilenameForApiItem
+  let calls = 0
+  MarkdownDocumenter.prototype._getLinkFilenameForApiItem = function (item) {
+    const before = calls
+    namingLink = true
+    let link
+    try {
+      link = linkFilename.call(this, item)
+    } finally {
+      namingLink = false
+    }
+    if (calls !== before + 1 || link !== `./${lastName}`) {
+      throw new Error(
+        'api-documenter did not name a link through the replaced _getFilenameForApiItem'
+      )
+    }
+    return link
+  }
+  let lastName
+
   MarkdownDocumenter.prototype._getFilenameForApiItem = function (apiItem) {
-    if (apiItem.kind === ApiItemKind.Model) return 'index.md'
+    calls++
+    if (apiItem.kind === ApiItemKind.Model) {
+      const previous = owners.get('index.md')
+      if (previous !== undefined && previous !== apiItem)
+        throw new Error('multiple items would be written to index.md')
+      owners.set('index.md', apiItem)
+      if (!namingLink && frame?.item === apiItem) frame.name = 'index.md'
+      lastName = 'index.md'
+      return lastName
+    }
     let baseName = ''
     for (const item of apiItem.getHierarchy()) {
       switch (item.kind) {
@@ -393,6 +470,8 @@ async function documentWithDistinctPageNames(inputFolder, outputFolder) {
       )
     }
     owners.set(fileName, owner)
+    if (!namingLink && frame?.item === apiItem) frame.name = fileName
+    lastName = fileName
     return fileName
   }
 
@@ -414,52 +493,131 @@ async function documentWithDistinctPageNames(inputFolder, outputFolder) {
   return documented
 }
 
-let documented
+// Build the complete replacement beside the published directory; no failed
+// generation step may alter the last successful reference.
+const stage = mkdtempSync(join(root, '.docs-stage-'))
+let preserveStage = false
+const stagedDocs = join(stage, 'docs')
 try {
-  documented = await documentWithDistinctPageNames(modelsDir, docsDir)
-} catch (error) {
-  console.error(`api-documenter failed: ${error instanceof Error ? error.message : String(error)}`)
-  process.exit(1)
-}
-if (!documented) {
-  console.error('api-documenter failed')
-  process.exit(1)
-}
-
-/**
- * Present each subpath under its import path instead of its page identity.
- * `api-documenter` writes markdown, so the identity can appear with its
- * punctuation escaped (`@macts/sdk\_local`), and its lines end in CRLF until
- * Prettier normalizes them.
- */
-const subpathEntries = entryPoints.filter(({ identity, packageName }) => identity !== packageName)
-if (subpathEntries.length > 0) {
-  /** A pattern for `text` as markdown may render it, each punctuation mark optionally escaped. */
-  const markdownPattern = (text) =>
-    [...text].map((char) => (/[A-Za-z0-9]/.test(char) ? char : `\\\\?\\${char}`)).join('')
-  const replacements = subpathEntries.map(({ identity, importPath }) => ({
-    heading: new RegExp(`^## ${markdownPattern(unscopedName(identity))} package(?=\\r?$)`, 'gm'),
-    headingText: `## ${importPath} entry point`,
-    name: new RegExp(`${markdownPattern(identity)}(?![\\w.-])`, 'g'),
-    importPath,
-  }))
-  for (const page of readdirSync(docsDir)) {
-    const path = join(docsDir, page)
-    const content = readFileSync(path, 'utf-8')
-    let next = content
-    for (const { heading, headingText, name, importPath } of replacements) {
-      next = next.replace(heading, () => headingText).replace(name, () => importPath)
-    }
-    if (next !== content) writeFileSync(path, next)
+  let documented
+  try {
+    documented = await documentWithDistinctPageNames(modelsDir, stagedDocs)
+  } catch (error) {
+    console.error(
+      `api-documenter failed: ${error instanceof Error ? error.message : String(error)}`
+    )
+    throw error
   }
-}
+  if (!documented) throw new Error('api-documenter failed')
 
-const format = spawnSync(
-  join(toolRoot, 'node_modules', '.bin', 'prettier'),
-  ['--config', join(toolRoot, 'prettier.config.js'), '--log-level', 'warn', '--write', docsDir],
-  { cwd: root, stdio: 'inherit' }
-)
-if (format.error !== undefined || format.status !== 0) {
-  console.error(`prettier failed: ${format.error?.message ?? `exit ${String(format.status)}`}`)
-  process.exit(1)
+  /**
+   * Present each subpath under its import path instead of its page identity.
+   * `api-documenter` writes markdown, so the identity can appear with its
+   * punctuation escaped (`@macts/sdk\_local`), and its lines end in CRLF until
+   * Prettier normalizes them.
+   */
+  const subpathEntries = entryPoints.filter(({ identity, packageName }) => identity !== packageName)
+  if (subpathEntries.length > 0) {
+    /** A pattern for `text` as markdown may render it, each punctuation mark optionally escaped. */
+    const markdownPattern = (text) =>
+      [...text].map((char) => (/[A-Za-z0-9]/.test(char) ? char : `\\\\?\\${char}`)).join('')
+    const replacements = subpathEntries.map(({ identity, importPath }) => ({
+      heading: new RegExp(`^## ${markdownPattern(unscopedName(identity))} package(?=\\r?$)`, 'gm'),
+      headingText: `## ${importPath} entry point`,
+      name: new RegExp(`${markdownPattern(identity)}(?![\\w.-])`, 'g'),
+      importPath,
+    }))
+    for (const page of readdirSync(stagedDocs)) {
+      const path = join(stagedDocs, page)
+      const content = readFileSync(path, 'utf-8')
+      let next = content
+      for (const { heading, headingText, name, importPath } of replacements) {
+        next = next.replace(heading, () => headingText).replace(name, () => importPath)
+      }
+      if (next !== content) writeFileSync(path, next)
+    }
+  }
+
+  /**
+   * The workspace builds each entry's `src/` path at the corresponding
+   * `dist/` path. Inspect its star exports so links follow the source rather
+   * than a separate list of package relationships.
+   */
+  const ts = createRequire(join(toolRoot, 'package.json'))('typescript')
+  for (const entry of entryPoints) {
+    const source = join(
+      entry.packageDir,
+      'src',
+      relative(join(entry.packageDir, 'dist'), entry.entryPath).replace(/\.d\.[cm]?ts$/, '.ts')
+    )
+    if (!existsSync(source)) continue
+    const tree = ts.createSourceFile(
+      source,
+      readFileSync(source, 'utf-8'),
+      ts.ScriptTarget.Latest,
+      true
+    )
+    const targets = new Set()
+    for (const statement of tree.statements) {
+      if (
+        ts.isExportDeclaration(statement) &&
+        !statement.exportClause &&
+        statement.moduleSpecifier &&
+        ts.isStringLiteral(statement.moduleSpecifier)
+      ) {
+        const target = entryPoints.find(
+          (candidate) => candidate.importPath === statement.moduleSpecifier.text
+        )
+        if (target) targets.add(target)
+      }
+    }
+    if (targets.size > 0) {
+      const path = join(stagedDocs, `${unscopedName(entry.identity)}.md`)
+      const links = [...targets]
+        .map((target) => `- [${target.importPath}](./${unscopedName(target.identity)}.md)`)
+        .join('\n')
+      writeFileSync(
+        path,
+        `${readFileSync(path, 'utf-8')}\n## Re-exports\n\nThis entry point re-exports the public symbols of:\n\n${links}\n`
+      )
+    }
+  }
+
+  const format = spawnSync(
+    join(toolRoot, 'node_modules', '.bin', 'prettier'),
+    [
+      '--config',
+      join(toolRoot, 'prettier.config.js'),
+      '--log-level',
+      'warn',
+      '--write',
+      stagedDocs,
+    ],
+    { cwd: root, stdio: 'inherit' }
+  )
+  if (format.error !== undefined || format.status !== 0) {
+    throw new Error(`prettier failed: ${format.error?.message ?? `exit ${String(format.status)}`}`)
+  }
+
+  const backup = join(stage, 'previous')
+  const hadDocs = existsSync(docsDir)
+  if (hadDocs) renameSync(docsDir, backup)
+  try {
+    renameSync(stagedDocs, docsDir)
+  } catch (error) {
+    if (hadDocs) {
+      try {
+        renameSync(backup, docsDir)
+      } catch (restoreError) {
+        preserveStage = true
+        throw new Error(`could not restore docs from ${backup}: ${String(restoreError)}`)
+      }
+    }
+    throw error
+  }
+} catch (error) {
+  console.error(error instanceof Error ? error.message : String(error))
+  process.exitCode = 1
+} finally {
+  if (!preserveStage) rmSync(stage, { recursive: true, force: true })
 }
