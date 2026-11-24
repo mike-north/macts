@@ -62,7 +62,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
           type: 'string',
         },
         language: {
-          description: 'The scripting language (AppleScript or JavaScript)',
+          description: 'The scripting language the document is written in',
           type: 'string',
         },
       },

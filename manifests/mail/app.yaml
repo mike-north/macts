@@ -644,7 +644,9 @@ resources:
       runScript:
         access: rw
         type: string
-        description: If rule matches, run this compiled AppleScript file. Set to empty string to disable this action
+        # The dictionary names the script's language, which shares its name
+        # with the automation mechanism; the rule runs a compiled script file.
+        description: If rule matches, run this compiled script file. Set to empty string to disable this action
         code: rras
       allConditionsMustBeMet:
         access: rw
@@ -1446,7 +1448,8 @@ commands:
     parameters: []
   performMailActionWithMessages:
     name: performMailActionWithMessages
-    description: Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of this handler is a list of messages being acted upon.
+    # The evidence below keeps the dictionary's own statement.
+    description: Script handler invoked by rules and menus that run scripts. The direct parameter of this handler is a list of messages being acted upon.
     scope: application
     code: cpma
     unsupported:

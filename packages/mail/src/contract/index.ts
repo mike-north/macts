@@ -614,8 +614,7 @@ export interface Rule {
    */
   replyText: string | null
   /**
-   * If rule matches, run this compiled AppleScript file. Set to empty string to disable this
-   * action.
+   * If rule matches, run this compiled script file. Set to empty string to disable this action.
    * Nullable. No evidence that the app always sets it.
    */
   runScript: string | null
@@ -1295,9 +1294,7 @@ export interface RuleCreateInput {
    * this action
    */
   replyText?: string
-  /**
-   * If rule matches, run this compiled AppleScript file. Set to empty string to disable this action
-   */
+  /** If rule matches, run this compiled script file. Set to empty string to disable this action */
   runScript?: string
   /** Indicates whether all conditions must be met for rule to execute */
   allConditionsMustBeMet?: boolean
@@ -1375,8 +1372,7 @@ export interface RuleUpdateInput {
    */
   replyText?: string
   /**
-   * If rule matches, run this compiled AppleScript file. Set to empty string to disable this
-   * action.
+   * If rule matches, run this compiled script file. Set to empty string to disable this action.
    * Cannot be reset: null is rejected.
    */
   runScript?: string

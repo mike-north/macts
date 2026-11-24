@@ -1759,8 +1759,7 @@ export interface MusicClient extends ClientBrand<MusicResources> {
   /**
    * Return the number of elements of a particular class within an object
    *
-   * @param each - the class of the elements to be counted. Keyword 'each' is optional in
-   * AppleScript. Does not accept null.
+   * @param each - the class of the elements to be counted. Does not accept null.
    */
   count(each: string, options?: CallOptions): Promise<void>
   /**
@@ -1774,8 +1773,7 @@ export interface MusicClient extends ClientBrand<MusicResources> {
   /**
    * Make a new element
    *
-   * @param _new - the class of the new element. Keyword 'new' is optional in AppleScript. Does not
-   * accept null.
+   * @param _new - the class of the new element. Does not accept null.
    * @param at - the location at which to insert the element. Does not accept null.
    * @param withProperties - the initial values for the properties of the element. Does not accept
    * null.
@@ -2209,21 +2207,14 @@ const appCountOperation: OperationDescriptor<{ readonly each: string }, undefine
   target: { command: 'count' },
   description: 'Return the number of elements of a particular class within an object',
   input: t.record({
-    each: t.string({
-      description:
-        "the class of the elements to be counted. Keyword 'each' is optional in AppleScript",
-    }),
+    each: t.string({ description: 'the class of the elements to be counted' }),
   }),
   output: t.none(),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: {
-      each: {
-        type: 'string',
-        description:
-          "the class of the elements to be counted. Keyword 'each' is optional in AppleScript",
-      },
+      each: { type: 'string', description: 'the class of the elements to be counted' },
     },
     required: ['each'],
     additionalProperties: false,
@@ -2272,9 +2263,7 @@ const appMakeOperation: OperationDescriptor<
   target: { command: 'make' },
   description: 'Make a new element',
   input: t.record({
-    new: t.string({
-      description: "the class of the new element. Keyword 'new' is optional in AppleScript",
-    }),
+    new: t.string({ description: 'the class of the new element' }),
     at: t.optional(t.string({ description: 'the location at which to insert the element' })),
     withProperties: t.optional(
       t.unknown({ description: 'the initial values for the properties of the element' })
@@ -2285,10 +2274,7 @@ const appMakeOperation: OperationDescriptor<
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: {
-      new: {
-        type: 'string',
-        description: "the class of the new element. Keyword 'new' is optional in AppleScript",
-      },
+      new: { type: 'string', description: 'the class of the new element' },
       at: { type: 'string', description: 'the location at which to insert the element' },
       withProperties: {
         allOf: [

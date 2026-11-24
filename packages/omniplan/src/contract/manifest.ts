@@ -31,7 +31,7 @@ export const manifest: unknown = {
     },
     {
       name: 'OmniPlan suite',
-      description: 'AppleScript commands and classes specific to OmniPlan',
+      description: 'Commands and classes specific to OmniPlan',
       code: 'OPLN',
       resources: [
         'Project',

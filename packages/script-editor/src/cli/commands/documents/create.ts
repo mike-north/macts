@@ -20,7 +20,7 @@ export class CreateDocumentCommand extends Command {
   })
   language = Option.String('--language', {
     required: true,
-    description: 'The scripting language (AppleScript or JavaScript)',
+    description: 'The scripting language the document is written in',
   })
 
   async execute(): Promise<number> {

@@ -42,7 +42,11 @@ resources:
       language:
         access: rw
         type: string
-        description: The scripting language (AppleScript or JavaScript)
+        # The dictionary names the two languages a document can be written in.
+        # One of them shares its name with the automation mechanism, which no
+        # macts surface names, so the description says what the value is and
+        # leaves the names to the value itself.
+        description: The scripting language the document is written in
         code: slng
         optional: false
       modified:

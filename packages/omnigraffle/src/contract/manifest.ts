@@ -366,7 +366,7 @@ export const manifest: unknown = {
         script: {
           access: 'rw',
           type: 'string',
-          description: 'Source of attached AppleScript',
+          description: 'Source of the attached script',
           code: 'scpt',
           optional: false,
         },

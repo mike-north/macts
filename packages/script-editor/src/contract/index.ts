@@ -50,7 +50,7 @@ export interface Document {
    */
   contents: string | null
   /**
-   * The scripting language (AppleScript or JavaScript).
+   * The scripting language the document is written in.
    * Nullable. No evidence that the app always sets it.
    */
   language: string | null
@@ -67,7 +67,7 @@ export interface DocumentCreateInput {
   name?: string
   /** Initial script contents */
   contents?: string
-  /** The scripting language (AppleScript or JavaScript) */
+  /** The scripting language the document is written in */
   language?: string
 }
 
@@ -84,7 +84,7 @@ export interface DocumentUpdateInput {
    */
   contents?: string
   /**
-   * The scripting language (AppleScript or JavaScript).
+   * The scripting language the document is written in.
    * Cannot be reset: null is rejected.
    */
   language?: string
@@ -122,7 +122,7 @@ const documentRecordType: ValueType<Document> = t.record(
     path: t.optional(t.nullable(t.string(), { description: 'The file path of the document' })),
     contents: t.nullable(t.string(), { description: 'The source code of the script' }),
     language: t.nullable(t.string(), {
-      description: 'The scripting language (AppleScript or JavaScript)',
+      description: 'The scripting language the document is written in',
     }),
     modified: t.nullable(t.boolean(), {
       description: 'Whether the document has been modified since last save',
@@ -135,7 +135,7 @@ const documentCreateInputType: ValueType<DocumentCreateInput> = t.record({
   name: t.optional(t.string({ description: 'The name of the document' })),
   contents: t.optional(t.string({ description: 'Initial script contents' })),
   language: t.optional(
-    t.string({ description: 'The scripting language (AppleScript or JavaScript)' })
+    t.string({ description: 'The scripting language the document is written in' })
   ),
 })
 
@@ -222,7 +222,7 @@ const documentCreateOperation: OperationDescriptor<DocumentCreateInput, Document
       contents: { type: 'string', description: 'Initial script contents' },
       language: {
         type: 'string',
-        description: 'The scripting language (AppleScript or JavaScript)',
+        description: 'The scripting language the document is written in',
       },
     },
     additionalProperties: false,

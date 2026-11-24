@@ -14,7 +14,7 @@ suites:
     description: Common classes and commands for all applications
   - name: OmniPlan suite
     code: OPLN
-    description: AppleScript commands and classes specific to OmniPlan
+    description: Commands and classes specific to OmniPlan
     resources:
       - Project
       - Task
