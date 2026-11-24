@@ -229,7 +229,7 @@ function entryMembers(page: string): Map<string, string> {
 function memberKinds(members: Map<string, string>): Map<string, DeclarationKind[]> {
   const kinds = new Map<string, DeclarationKind[]>()
   for (const key of members.keys()) {
-    const [name = '', kind] = key.split('|') as [string, DeclarationKind]
+    const [name, kind] = key.split('|') as [string, DeclarationKind]
     kinds.set(name, [...(kinds.get(name) ?? []), kind])
   }
   return kinds
