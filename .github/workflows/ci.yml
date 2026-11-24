@@ -45,7 +45,9 @@ jobs:
 
       # Guard against committed generated artifacts drifting from the generator.
       # Regenerates every package from its manifest and fails if the working tree
-      # changes — committed output must exactly match a fresh regeneration.
+      # changes — committed output must exactly match a fresh regeneration. It
+      # also re-extracts every package's public API and regenerates the API
+      # reference pages under docs/, so a stale page, or a missing one, fails here.
       - name: Generated artifacts are up to date
         run: pnpm generate:check
 

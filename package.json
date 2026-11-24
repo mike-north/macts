@@ -19,7 +19,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "generate": "node scripts/regenerate.mjs",
-    "generate:check": "node scripts/regenerate.mjs && node scripts/check-clean-tree.mjs packages",
+    "generate:check": "node scripts/regenerate.mjs && pnpm api-extractor && pnpm api-docs && node scripts/check-clean-tree.mjs packages docs",
     "changeset": "changeset",
     "version": "changeset version",
     "release": "pnpm build && changeset publish",
@@ -28,7 +28,7 @@
     "ci:publish": "pnpm release:plan-check && pnpm build && pnpm publish -r --access public --no-git-checks && changeset tag",
     "api-extractor": "nx run-many -t api-extractor",
     "api-extractor:ci": "nx run-many -t api-extractor:ci",
-    "api-docs": "mkdir -p temp && cp packages/*/temp/*.api.json temp/ && rm -f temp/cli.api.json temp/mcp.api.json && api-documenter markdown -i temp -o docs",
+    "api-docs": "node scripts/generate-api-docs.mjs",
     "api-docs:full": "pnpm build && pnpm api-extractor && pnpm api-docs"
   },
   "keywords": [],
