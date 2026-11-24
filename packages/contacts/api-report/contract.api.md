@@ -7,7 +7,6 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { ClientBrand } from '@macts/contracts';
-import { ObjectReferenceData } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
 import { ResourceDescriptor } from '@macts/contracts';
@@ -77,19 +76,15 @@ export interface AIMHandleUpdateInput {
 
 // @public
 export interface ContactsClient extends ClientBrand<ContactsResources> {
-    actionProperty(options?: CallOptions): Promise<string | null>;
-    actionTitle(_with: unknown, _for: ObjectReferenceData<string, 'Person'>, options?: CallOptions): Promise<string | null>;
     add(to: string, options?: CallOptions): Promise<void>;
     readonly addresses: AddressResourceClient;
     readonly emails: EmailResourceClient;
     readonly groups: GroupResourceClient;
     make(_new: string, at?: string, withData?: unknown, withProperties?: unknown, options?: CallOptions): Promise<void>;
     readonly people: PersonResourceClient;
-    performAction(_with: unknown, _for: ObjectReferenceData<string, 'Person'>, options?: CallOptions): Promise<boolean | null>;
     readonly phones: PhoneResourceClient;
     remove(from: string, options?: CallOptions): Promise<void>;
     save(options?: CallOptions): Promise<void>;
-    shouldEnableAction(_with: unknown, _for: ObjectReferenceData<string, 'Person'>, options?: CallOptions): Promise<boolean | null>;
 }
 
 // @public

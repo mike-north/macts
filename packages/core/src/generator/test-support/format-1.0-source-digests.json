@@ -201,7 +201,7 @@
     "contacts": {
       "sources": {
         "client/src/types.ts": "4816df0213881090a7560b93bfc0c0fbddd6dc056ccdc1703b06a666b48075b2",
-        "client/src/client.ts": "cf82ad55f736584f811b404311a4fbcc10ccaec99f580071c59ef8cbc1713adb",
+        "client/src/client.ts": "42c68e635f1923ec1ef09f17563cbd8ebccde3308c2967db4f4f3b21cfb4b439",
         "client/src/resources/address.ts": "30204f5295aee78029c7365789652dc6290cbed19b1d027e958369ce1238235a",
         "client/src/resources/email.ts": "aed0fe7e622f686efa2bf923620565586df4ca95e0ec670885aeee4b0686b4d1",
         "client/src/resources/group.ts": "72f2a8933fb40f04778c8fcade1eeab810d9424305c2cc283da8d77925810a1d",
@@ -232,16 +232,12 @@
         "client/src/cli/commands/add.ts": "3d5a35dd0ef828e5506ab93f103da2347a0389deab9bc128151ea2197258452c",
         "client/src/cli/commands/remove.ts": "6c2db5e81b4b9e36659f7ce3b56ac45a96a4c0c2d68a4af97b9d12763f64903a",
         "client/src/cli/commands/save.ts": "e8268df0a8e8146bae7a2ffc3f1a4159ce5543e693fdddd5accd2d7b3994068c",
-        "client/src/cli/commands/action-property.ts": "0476f638ebe799c02f46f817de7f31bf467d45623222d06685758f249ec83417",
-        "client/src/cli/commands/action-title.ts": "31478f3d762a38f471162bcdfcd0d7e5605ca8bf3cc2b1a3bcb1982208b34cc7",
-        "client/src/cli/commands/perform-action.ts": "38bedfd2399066d9c6b48814399fdcb94b8107584025eae61ca96254e5eee662",
-        "client/src/cli/commands/should-enable-action.ts": "5a13131a04e4766f068b6b2b8fb234600311e70be0ee8cad5734c7230f2c4cc6",
-        "client/src/cli/plugin.ts": "596598255ba2790f68d233176cbf1fd952ec0a058339c81de4e0c185dbd84de2",
+        "client/src/cli/plugin.ts": "b1e2f9ad48529e4e2a3b489c781be65cae26a18ca74f231c65f743c2ccdc9d2b",
         "client/src/cli/index.ts": "8111c5cdb1ac8590dd20de504304fbff4d4beb57e0235fd9114a1727f087cd76",
         "client/src/cli/sdk.ts": "a1de671e448f4f50bafc692a96305d31404b4f6e872a32e420dc7bd2326bc607",
         "client/src/cli/output/index.ts": "5a749ca35ef31085847940f756e06444594993718eb8c0962da00ca5ea4448da",
-        "client/src/contract/index.ts": "f0d9d9fc687e514cdb26b54a42997733f24541d98e0e36e6bfee90b7d2f4211b",
-        "client/src/contract/manifest.ts": "5996f32608451829ef2cac3f948bb8b19b83527f4edcb7d07656856321a61b1e",
+        "client/src/contract/index.ts": "cda8bff76aaad7b0f429d4ca39f40b54645cf4f145ea403ef13eb038fe4f486b",
+        "client/src/contract/manifest.ts": "5f6f8ae5778260412ce9cfe0753b9cba5ca6fc074da1a04cd6821a8533056bb1",
         "server/src/index.ts": "49d8a4328d44469063bf16ec929179896c61563b46f655241a7598515eba51c8"
       },
       "methods": {

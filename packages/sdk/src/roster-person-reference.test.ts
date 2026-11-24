@@ -1,18 +1,18 @@
 /**
- * Contacts' rollover actions given a person reference, through the local
- * client.
+ * Commands that take a person reference, through the local client.
  *
- * `actionTitle`, `performAction` and `shouldEnableAction` take a single person
- * reference at `for`. The macOS provider converts it: the native script finds
+ * The stand-in Roster app's `labelFor`, `confirm` and `isAllowed` take a single
+ * person reference at `for`. The macOS provider converts it: the native script finds
  * the person the reference names and passes that object to the app's command.
  * A person that does not exist fails as a missing target before any command
  * runs, and a reference form the provider cannot convert yet fails as an
  * internal error, never as the caller's invalid input.
  *
- * Each call runs through the local client with the real generated Contacts
- * contract, the real runtime registration and the real native executor. Only
- * the executor's transport is replaced: it evaluates the composed script
- * against a stand-in Contacts application in an isolated context, so the
+ * Each call runs through the local client with the stand-in Roster contract
+ * (no real app command takes a required person reference), the real runtime
+ * registration and the real native executor. Only the executor's transport is
+ * replaced: it evaluates the composed script against a stand-in application in
+ * an isolated context, so the
  * script's input plan, reference table and command body are the shipped ones.
  *
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md (D4, D7, D9)
@@ -32,10 +32,8 @@ import {
   InternalError,
   TargetNotFoundError,
   toWireErrorEnvelope,
-  type ObjectReferenceData,
   type OperationId,
 } from '@macts/contracts'
-import { contactsContract } from '@macts/contacts/contract'
 import {
   ALLOW_ALL_POLICY,
   closeKeyStore,
@@ -44,6 +42,7 @@ import {
   setLogger,
 } from '@macts/runtime'
 import { createClient } from './local-client.js'
+import { rosterContract, type RosterPersonReference } from './test-support/roster-fixture.js'
 
 // The key store resolves MACTS_HOME when its module loads, so the temporary
 // home must be in place before any import runs.
@@ -69,8 +68,8 @@ afterAll(async () => {
 const PERSON_ID = 'p-1'
 
 /** A reference to the stand-in app's person, as a caller builds one. */
-const PERSON: ObjectReferenceData<string, 'Person'> = {
-  app: 'contacts',
+const PERSON: RosterPersonReference = {
+  app: 'roster',
   resource: 'Person',
   form: 'identity',
   cardinality: 'one',
@@ -79,9 +78,9 @@ const PERSON: ObjectReferenceData<string, 'Person'> = {
 
 /** The actions whose required `for` is a person. */
 const ACTIONS = [
-  { method: 'performAction', id: 'contacts.app.performAction' },
-  { method: 'actionTitle', id: 'contacts.app.actionTitle' },
-  { method: 'shouldEnableAction', id: 'contacts.app.shouldEnableAction' },
+  { method: 'confirm', id: 'roster.app.confirm' },
+  { method: 'labelFor', id: 'roster.app.labelFor' },
+  { method: 'isAllowed', id: 'roster.app.isAllowed' },
 ] as const
 
 /** One command the stand-in app received: its name and its parameters. */
@@ -91,11 +90,11 @@ interface ReceivedCommand {
 }
 
 /**
- * A stand-in Contacts application with one person, found by identifier in its
+ * A stand-in Roster application with one person, found by identifier in its
  * `people` collection as the app's own id specifier finds it. Every command it
  * receives is recorded; finding a person is not a command.
  */
-function standInContacts() {
+function standInRoster() {
   const commands: ReceivedCommand[] = []
   const person = { exists: () => true, id: () => PERSON_ID, name: () => 'Ada' }
   const absent = { exists: () => false }
@@ -107,19 +106,19 @@ function standInContacts() {
     }
   const app = {
     people: { byId: (id: unknown) => (id === PERSON_ID ? person : absent) },
-    actionTitle: command('actionTitle', 'Title'),
-    performAction: command('performAction', true),
-    shouldEnableAction: command('shouldEnableAction', true),
+    labelFor: command('labelFor', 'Title'),
+    confirm: command('confirm', true),
+    isAllowed: command('isAllowed', true),
   }
   return { app, person, commands }
 }
 
-/** A Contacts client allowed to call `id`, whose executor uses `transport`. */
-async function contactsClient(id: OperationId, transport: NativeTransport) {
-  const permission = contactsContract.operations[id]?.permission
+/** A Roster client allowed to call `id`, whose executor uses `transport`. */
+async function rosterClient(id: OperationId, transport: NativeTransport) {
+  const permission = rosterContract.operations[id]?.permission
   if (permission === undefined) throw new Error(`no ${id} operation`)
   const key = await createApiKey({ name: 'Person reference test', permissions: [permission] })
-  return createClient(contactsContract, {
+  return createClient(rosterContract, {
     token: key.token,
     governance: { policy: ALLOW_ALL_POLICY },
     executor: createNativeExecutor({ transport }),
@@ -136,16 +135,16 @@ async function rejectionOf(promise: Promise<unknown>): Promise<unknown> {
   throw new Error('Expected the call to reject')
 }
 
-describe('a Contacts action given a person reference', () => {
-  it('actionTitle passes the addressed person to the command and decodes its result', async () => {
-    const { app, person, commands } = standInContacts()
+describe('a Roster command given a person reference', () => {
+  it('labelFor passes the addressed person to the command and decodes its result', async () => {
+    const { app, person, commands } = standInRoster()
     const scripts: NativeScript[] = []
-    const client = await contactsClient('contacts.app.actionTitle', standInTransport(app, scripts))
+    const client = await rosterClient('roster.app.labelFor', standInTransport(app, scripts))
 
-    // Contacts.sdef declares the menu title as text; addressing must not discard it.
-    await expect(client.actionTitle('value', PERSON)).resolves.toBe('Title')
+    // The command's text result must survive addressing.
+    await expect(client.labelFor('value', PERSON)).resolves.toBe('Title')
     expect(commands).toHaveLength(1)
-    expect(commands[0]?.name).toBe('actionTitle')
+    expect(commands[0]?.name).toBe('labelFor')
     expect(commands[0]?.params['with']).toBe('value')
     // The command received the app's own person object, not the wire form.
     expect(commands[0]?.params['for']).toBe(person)
@@ -154,7 +153,7 @@ describe('a Contacts action given a person reference', () => {
     // how the app finds a person: by identifier in `people`, a string.
     expect(scripts).toHaveLength(1)
     expect(scripts[0]?.inputPlan).toEqual(
-      contactsContract.operations['contacts.app.actionTitle']?.input.plan
+      rosterContract.operations['roster.app.labelFor']?.input.plan
     )
     expect(scripts[0]?.references).toEqual({
       Person: {
@@ -165,8 +164,8 @@ describe('a Contacts action given a person reference', () => {
   })
 
   it.each(ACTIONS)('$method passes the addressed person to the command', async ({ method, id }) => {
-    const { app, person, commands } = standInContacts()
-    const client = await contactsClient(id, standInTransport(app))
+    const { app, person, commands } = standInRoster()
+    const client = await rosterClient(id, standInTransport(app))
 
     await client[method]('value', PERSON)
 
@@ -175,14 +174,14 @@ describe('a Contacts action given a person reference', () => {
   })
 
   it('fails with TargetNotFoundError naming the person when none has the identifier', async () => {
-    const { app, commands } = standInContacts()
-    const client = await contactsClient('contacts.app.actionTitle', standInTransport(app))
+    const { app, commands } = standInRoster()
+    const client = await rosterClient('roster.app.labelFor', standInTransport(app))
 
-    const error = await rejectionOf(client.actionTitle('value', { ...PERSON, id: 'p-missing' }))
+    const error = await rejectionOf(client.labelFor('value', { ...PERSON, id: 'p-missing' }))
 
     expect(error).toBeInstanceOf(TargetNotFoundError)
     if (!(error instanceof TargetNotFoundError)) return
-    expect(error.message).toBe('Contacts has no Person matching the reference at `for`.')
+    expect(error.message).toBe('Roster has no Person matching the reference at `for`.')
     expect(error.details).toEqual({ resource: 'Person' })
     // The person was found missing before any command was sent.
     expect(commands).toEqual([])
@@ -194,10 +193,10 @@ describe('a Contacts action given a person reference', () => {
   it.each(ACTIONS)(
     '$method fails with InternalError, not ValidationError, for a selector person reference',
     async ({ method, id }) => {
-      const { app, commands } = standInContacts()
-      const client = await contactsClient(id, standInTransport(app))
-      const byName: ObjectReferenceData<string, 'Person'> = {
-        app: 'contacts',
+      const { app, commands } = standInRoster()
+      const client = await rosterClient(id, standInTransport(app))
+      const byName: RosterPersonReference = {
+        app: 'roster',
         resource: 'Person',
         form: 'selector',
         cardinality: 'one',
@@ -209,7 +208,7 @@ describe('a Contacts action given a person reference', () => {
       expect(error).toBeInstanceOf(InternalError)
       if (!(error instanceof InternalError)) return
       expect(error.message).toBe(
-        `The Contacts operation "${method}" takes a reference at \`for\` that the macOS provider cannot convert yet.`
+        `The Roster operation "${method}" takes a reference at \`for\` that the macOS provider cannot convert yet.`
       )
       expect(error.details).toEqual({})
       // A remote caller receives this message verbatim and nothing else: not
@@ -230,36 +229,36 @@ const NOT_INSTALLED_BUNDLE_ID = 'com.example.macts.not-installed'
 // behaviour: the application object is created before the input is decoded,
 // so a missing app is reported as missing whatever the input holds, and
 // nothing is sent to any app.
-describe('a Contacts action for an app that is not installed, in the real automation host (pins the existing AppUnavailableError; replaces the InternalError check for references)', () => {
+describe('a Roster command for an app that is not installed, in the real automation host (pins the existing AppUnavailableError; replaces the InternalError check for references)', () => {
   it.skipIf(process.platform !== 'darwin').each([
     ['a person reference it can convert', PERSON],
     [
       'a person reference it cannot convert yet',
       {
-        app: 'contacts',
+        app: 'roster',
         resource: 'Person',
         form: 'selector',
         cardinality: 'one',
         selector: { by: 'name', name: 'Ada' },
-      } satisfies ObjectReferenceData<string, 'Person'>,
+      } satisfies RosterPersonReference,
     ],
   ])(
     'fails with AppUnavailableError (not-installed), not InternalError, given %s',
     async (_label, reference) => {
-      const client = await contactsClient('contacts.app.actionTitle', {
+      const client = await rosterClient('roster.app.labelFor', {
         run: (script, options) =>
           runNativeScript({ ...script, bundleId: NOT_INSTALLED_BUNDLE_ID }, NATIVE_CODEC, {
             timeout: options.timeoutMs,
           }),
       })
 
-      const error = await rejectionOf(client.actionTitle('value', reference))
+      const error = await rejectionOf(client.labelFor('value', reference))
 
       expect(error).toBeInstanceOf(AppUnavailableError)
       expect(error).not.toBeInstanceOf(InternalError)
       if (!(error instanceof AppUnavailableError)) return
       expect(error.code).toBe('APP_UNAVAILABLE')
-      expect(error.details).toEqual({ app: 'Contacts', reason: 'not-installed' })
+      expect(error.details).toEqual({ app: 'Roster', reason: 'not-installed' })
     },
     30_000
   )

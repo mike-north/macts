@@ -1,12 +1,16 @@
 /**
- * Scalar command results cross the real generated contract, provider codec,
- * runtime and all client entry points. Both app and resource commands use
- * stand-in applications; HTTP is routed to an in-process API and never to a
- * socket. No real Mail or Contacts command can run through these fixtures.
+ * Scalar command results cross the contract, provider codec, runtime and
+ * client entry points. All applications are stand-ins; HTTP is routed to an
+ * in-process API and never to a socket. No real Mail or Contacts command can
+ * run through these fixtures.
  *
- * Expected results come from Mail.sdef send (boolean) and Contacts.sdef action
- * property/title (text), perform action/should enable action (boolean). No
- * dictionary claim establishes non-null results, so explicit null remains data.
+ * Mail's `send` (boolean, Mail.sdef) and Contacts' `save` (no result) run
+ * through the real generated contracts, clients and CLI. Text and further
+ * boolean results run through the stand-in Roster app, whose commands declare
+ * text (`currentLabel`, `labelFor`) and boolean (`confirm`, `isAllowed`)
+ * results, because no shipped app command takes a person reference and returns
+ * those kinds. No claim establishes non-null results, so explicit null remains
+ * data.
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AppManifestSchema, createNativeExecutor, type NativeScript } from '@macts/core'
@@ -28,6 +32,11 @@ import {
 } from '@macts/runtime'
 import { createClient as localClient } from './local-client.js'
 import { createClient as remoteClient } from './remote.js'
+import {
+  rosterContract,
+  ROSTER_MANIFEST,
+  ROSTER_PERMISSIONS,
+} from './test-support/roster-fixture.js'
 
 // Key storage captures its home at import time; isolation must precede imports.
 const { home, previousHome, previousSecret } = await vi.hoisted(async () => {
@@ -44,9 +53,9 @@ const { home, previousHome, previousSecret } = await vi.hoisted(async () => {
 
 /** The only origin accepted by the recording HTTP boundary. */
 const ORIGIN = 'http://scalar-results.test'
-/** Synthetic input person resolved only inside the Contacts stand-in. */
+/** Synthetic input person resolved only inside the Roster stand-in. */
 const PERSON: ObjectReferenceData<string, 'Person'> = {
-  app: 'contacts',
+  app: 'roster',
   resource: 'Person',
   form: 'identity',
   cardinality: 'one',
@@ -56,13 +65,18 @@ const PERSON: ObjectReferenceData<string, 'Person'> = {
 interface IScalarCalls {
   readonly name: string
   readonly send: () => Promise<unknown>
+  readonly save: () => Promise<unknown>
+}
+/** The stand-in app's calls, through the clients that can bind a hand-written contract. */
+interface IRosterCalls {
+  readonly name: string
   readonly property: () => Promise<unknown>
   readonly title: () => Promise<unknown>
   readonly perform: () => Promise<unknown>
   readonly enable: () => Promise<unknown>
-  readonly save: () => Promise<unknown>
 }
 let clients: readonly IScalarCalls[] = []
+let rosterClients: readonly IRosterCalls[] = []
 /** Stand-in return value, varied independently of the command's declared output type. */
 let result: unknown
 const scripts: NativeScript[] = []
@@ -88,19 +102,24 @@ beforeAll(async () => {
   /** Action input conversion must still hand the command its addressed person. */
   const action = (name: string) => (params: Readonly<Record<string, unknown>>) => {
     expect(params['for']).toBe(person)
-    commands.push(`contacts.${name}`)
+    commands.push(`roster.${name}`)
     return result
   }
-  const contacts = standInTransport(
+  const roster = standInTransport(
     {
       people: { byId: (id: unknown) => (id === 'person-7' ? person : absent) },
-      actionProperty() {
-        commands.push('contacts.actionProperty')
+      currentLabel() {
+        commands.push('roster.currentLabel')
         return result
       },
-      actionTitle: action('actionTitle'),
-      performAction: action('performAction'),
-      shouldEnableAction: action('shouldEnableAction'),
+      labelFor: action('labelFor'),
+      confirm: action('confirm'),
+      isAllowed: action('isAllowed'),
+    },
+    scripts
+  )
+  const contacts = standInTransport(
+    {
       save() {
         commands.push('contacts.save')
         return result
@@ -113,7 +132,8 @@ beforeAll(async () => {
       run(script, options) {
         if (script.bundleId === 'com.apple.mail') return mail.run(script, options)
         if (script.bundleId === 'com.apple.AddressBook') return contacts.run(script, options)
-        throw new Error('Only stand-in Mail and Contacts are available')
+        if (script.bundleId === ROSTER_MANIFEST.app.bundleId) return roster.run(script, options)
+        throw new Error('Only stand-in Mail, Contacts and Roster are available')
       },
     },
   })
@@ -121,16 +141,14 @@ beforeAll(async () => {
     name: 'Scalar result fixtures',
     permissions: [
       'mail:outgoingMessages:send',
-      'contacts:app:actionProperty',
-      'contacts:app:actionTitle',
-      'contacts:app:performAction',
-      'contacts:app:shouldEnableAction',
       'contacts:app:save',
+      ...Object.values(ROSTER_PERMISSIONS),
     ],
   })
   const options = { executor, governance: { policy: ALLOW_ALL_POLICY } }
   const mailManifest = AppManifestSchema.parse(await mailContract.loadManifest())
   const contactsManifest = AppManifestSchema.parse(await contactsContract.loadManifest())
+  const rosterManifest = AppManifestSchema.parse(await rosterContract.loadManifest())
   const api = createApp([], {
     ...options,
     cors: false,
@@ -139,6 +157,7 @@ beforeAll(async () => {
     register(registrar) {
       registrar.registerContract(mailContract, mailManifest)
       registrar.registerContract(contactsContract, contactsManifest)
+      registrar.registerContract(rosterContract, rosterManifest)
     },
   })
   const recordingFetch: typeof fetch = async (input, init) => {
@@ -162,33 +181,39 @@ beforeAll(async () => {
     url: ORIGIN,
     fetch: recordingFetch,
   })
+  const localRoster = localClient(rosterContract, { token, ...options })
+  const remoteRoster = remoteClient(rosterContract, { token, url: ORIGIN, fetch: recordingFetch })
   clients = [
     {
       name: 'generated',
       send: () => rootMail.outgoingMessages.send(7),
-      property: () => rootContacts.actionProperty(),
-      title: () => rootContacts.actionTitle('email', PERSON),
-      perform: () => rootContacts.performAction('email', PERSON),
-      enable: () => rootContacts.shouldEnableAction('email', PERSON),
       save: () => rootContacts.save(),
     },
     {
       name: 'local',
       send: () => localMail.outgoingMessages.send(Integer.validate(7)),
-      property: () => localContacts.actionProperty(),
-      title: () => localContacts.actionTitle('email', PERSON),
-      perform: () => localContacts.performAction('email', PERSON),
-      enable: () => localContacts.shouldEnableAction('email', PERSON),
       save: () => localContacts.save(),
     },
     {
       name: 'remote',
       send: () => remoteMail.outgoingMessages.send(Integer.validate(7)),
-      property: () => remoteContacts.actionProperty(),
-      title: () => remoteContacts.actionTitle('email', PERSON),
-      perform: () => remoteContacts.performAction('email', PERSON),
-      enable: () => remoteContacts.shouldEnableAction('email', PERSON),
       save: () => remoteContacts.save(),
+    },
+  ]
+  rosterClients = [
+    {
+      name: 'local',
+      property: () => localRoster.currentLabel(),
+      title: () => localRoster.labelFor('email', PERSON),
+      perform: () => localRoster.confirm('email', PERSON),
+      enable: () => localRoster.isAllowed('email', PERSON),
+    },
+    {
+      name: 'remote',
+      property: () => remoteRoster.currentLabel(),
+      title: () => remoteRoster.labelFor('email', PERSON),
+      perform: () => remoteRoster.confirm('email', PERSON),
+      enable: () => remoteRoster.isAllowed('email', PERSON),
     },
   ]
 })
@@ -218,7 +243,34 @@ describe.each(['generated', 'local', 'remote'])('%s scalar command parity', (nam
     if (found === undefined) throw new Error('Missing client fixture')
     return found
   }
-  it.each(['send', 'perform', 'enable'] as const)(
+  it('returns false from send as a successful boolean value', async () => {
+    result = false
+    await expect(client().send()).resolves.toBe(false)
+    expect(commands).toHaveLength(1)
+    if (name !== 'local') expect(responses).toEqual([{ result: false }])
+  })
+  it('retains explicit null for send without a non-null evidence claim', async () => {
+    result = null
+    await expect(client().send()).resolves.toBeNull()
+  })
+  it('rejects the wrong scalar type from send', async () => {
+    result = 'INVALID_SCALAR_SENTINEL'
+    await expect(client().send()).rejects.toBeInstanceOf(UnexpectedValueError)
+    if (name !== 'local') expect(responses).toMatchObject([{ error: { code: 'UNEXPECTED_VALUE' } }])
+  })
+  it('retains undefined for a void command', async () => {
+    result = false
+    await expect(client().save()).resolves.toBeUndefined()
+  })
+})
+
+describe.each(['local', 'remote'])('%s scalar command parity, stand-in app', (name) => {
+  const client = () => {
+    const found = rosterClients.find((candidate) => candidate.name === name)
+    if (found === undefined) throw new Error('Missing client fixture')
+    return found
+  }
+  it.each(['perform', 'enable'] as const)(
     'returns false from %s as a successful boolean value',
     async (method) => {
       result = false
@@ -234,14 +286,14 @@ describe.each(['generated', 'local', 'remote'])('%s scalar command parity', (nam
       await expect(client()[method]()).resolves.toBe('')
     }
   )
-  it.each(['send', 'property', 'title', 'perform', 'enable'] as const)(
+  it.each(['property', 'title', 'perform', 'enable'] as const)(
     'retains explicit null for %s without a non-null evidence claim',
     async (method) => {
       result = null
       await expect(client()[method]()).resolves.toBeNull()
     }
   )
-  it.each(['send', 'perform', 'enable'] as const)(
+  it.each(['perform', 'enable'] as const)(
     'rejects the wrong scalar type from %s',
     async (method) => {
       result = 'INVALID_SCALAR_SENTINEL'
@@ -250,18 +302,14 @@ describe.each(['generated', 'local', 'remote'])('%s scalar command parity', (nam
         expect(responses).toMatchObject([{ error: { code: 'UNEXPECTED_VALUE' } }])
     }
   )
-  it('retains undefined for a void command', async () => {
-    result = false
-    await expect(client().save()).resolves.toBeUndefined()
+  it.each(['property', 'title'] as const)('rejects a boolean from %s', async (method) => {
+    result = true
+    await expect(client()[method]()).rejects.toBeInstanceOf(UnexpectedValueError)
   })
 })
 
 /** Run an emitted CLI command with the option values Clipanion supplies. */
-async function cli(
-  app: 'mail' | 'contacts',
-  method: 'send' | 'action-property' | 'save',
-  json: boolean
-) {
+async function cli(app: 'mail' | 'contacts', method: 'send' | 'save', json: boolean) {
   const plugin = app === 'mail' ? mailCli : contactsCli
   const path = app === 'mail' ? ['mail', 'outgoingMessages', method] : ['contacts', method]
   const Command = plugin.commands.find((candidate) =>
@@ -299,13 +347,6 @@ describe.each([false, true])('shipped CLI scalar results (json=%s)', (json) => {
     expect(output.stderr).toBe('')
     if (json) expect(JSON.parse(output.stdout)).toEqual({ data: false })
     else expect(output.stdout).toBe('false\n')
-  })
-  it('outputs Contacts text through the same formatter', async () => {
-    result = 'email'
-    const output = await cli('contacts', 'action-property', json)
-    expect(output.code).toBe(0)
-    if (json) expect(JSON.parse(output.stdout)).toEqual({ data: 'email' })
-    else expect(output.stdout).toBe('email\n')
   })
   it('retains the existing success message for Contacts save', async () => {
     const output = await cli('contacts', 'save', json)
