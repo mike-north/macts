@@ -28,7 +28,12 @@ import { parsePolicy } from '@macts/core'
 import { getLogger } from '../logger.js'
 import { getMactsHome } from '../paths.js'
 import { deriveEncryptionKey, encrypt, decrypt } from './encryption.js'
-import { loadSqlite, runInTransaction, type SqliteDatabase } from '../storage/sqlite.js'
+import {
+  loadSqlite,
+  retryWhileBusy,
+  runInTransaction,
+  type SqliteDatabase,
+} from '../storage/sqlite.js'
 import { clearKeyStatusCache, invalidateKeyStatus } from './key-status-cache.js'
 
 /**
@@ -114,9 +119,22 @@ function getDb(): SqliteDatabase {
   const { DatabaseSync } = loadSqlite()
   db = new DatabaseSync(DB_FILE)
 
-  // Enable WAL mode for better concurrent access
-  db.exec('PRAGMA journal_mode = WAL')
+  // The busy timeout comes first so every later statement waits for another
+  // connection's lock instead of failing.
   db.exec(`PRAGMA busy_timeout = ${String(BUSY_TIMEOUT_MS)}`)
+
+  // WAL gives concurrent readers and a writer. The busy timeout does not cover
+  // this switch on a fresh database: when several processes open it at once,
+  // each holding a read lock and needing the exclusive one, SQLite refuses some
+  // as busy immediately rather than risk a deadlock. Retry until it succeeds or
+  // the busy timeout's worth of time has passed.
+  const database = db
+  retryWhileBusy(
+    () => {
+      database.exec('PRAGMA journal_mode = WAL')
+    },
+    { deadline: Date.now() + BUSY_TIMEOUT_MS }
+  )
 
   // Create table if it doesn't exist
   db.exec(`
