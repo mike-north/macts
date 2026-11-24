@@ -646,7 +646,7 @@ export const AppManifestSchema: z.ZodObject<{
             reason: z.ZodOptional<z.ZodString>;
         }, z.core.$strip>>>;
         unsupported: z.ZodOptional<z.ZodObject<{
-            evidence: z.ZodObject<{
+            evidence: z.ZodDiscriminatedUnion<[z.ZodObject<{
                 source: z.ZodLiteral<"live">;
                 observedAt: z.ZodISODateTime;
                 bundleId: z.ZodString;
@@ -654,7 +654,15 @@ export const AppManifestSchema: z.ZodObject<{
                 osVersion: z.ZodString;
                 expression: z.ZodString;
                 errorNumber: z.ZodNumber;
-            }, z.core.$strict>;
+            }, z.core.$strict>, z.ZodObject<{
+                source: z.ZodLiteral<"dictionary">;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                term: z.ZodString;
+                finding: z.ZodLiteral<"handler">;
+                statement: z.ZodString;
+            }, z.core.$strict>], "source">;
         }, z.core.$strict>>;
     }, z.core.$strip>>>;
     permissions: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodArray<z.ZodString>>>>;
@@ -1253,7 +1261,7 @@ export const CommandSchema: z.ZodObject<{
         reason: z.ZodOptional<z.ZodString>;
     }, z.core.$strip>>>;
     unsupported: z.ZodOptional<z.ZodObject<{
-        evidence: z.ZodObject<{
+        evidence: z.ZodDiscriminatedUnion<[z.ZodObject<{
             source: z.ZodLiteral<"live">;
             observedAt: z.ZodISODateTime;
             bundleId: z.ZodString;
@@ -1261,7 +1269,15 @@ export const CommandSchema: z.ZodObject<{
             osVersion: z.ZodString;
             expression: z.ZodString;
             errorNumber: z.ZodNumber;
-        }, z.core.$strict>;
+        }, z.core.$strict>, z.ZodObject<{
+            source: z.ZodLiteral<"dictionary">;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            term: z.ZodString;
+            finding: z.ZodLiteral<"handler">;
+            statement: z.ZodString;
+        }, z.core.$strict>], "source">;
     }, z.core.$strict>>;
 }, z.core.$strip>;
 
@@ -1277,9 +1293,31 @@ export const CommandScopeSchema: z.ZodEnum<{
 // @public (undocumented)
 export type CommandUnsupported = z.infer<typeof CommandUnsupportedSchema>;
 
+// @public (undocumented)
+export type CommandUnsupportedEvidence = z.infer<typeof CommandUnsupportedEvidenceSchema>;
+
+// @public
+export const CommandUnsupportedEvidenceSchema: z.ZodDiscriminatedUnion<[z.ZodObject<{
+    source: z.ZodLiteral<"live">;
+    observedAt: z.ZodISODateTime;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    expression: z.ZodString;
+    errorNumber: z.ZodNumber;
+}, z.core.$strict>, z.ZodObject<{
+    source: z.ZodLiteral<"dictionary">;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    term: z.ZodString;
+    finding: z.ZodLiteral<"handler">;
+    statement: z.ZodString;
+}, z.core.$strict>], "source">;
+
 // @public
 export const CommandUnsupportedSchema: z.ZodObject<{
-    evidence: z.ZodObject<{
+    evidence: z.ZodDiscriminatedUnion<[z.ZodObject<{
         source: z.ZodLiteral<"live">;
         observedAt: z.ZodISODateTime;
         bundleId: z.ZodString;
@@ -1287,7 +1325,15 @@ export const CommandUnsupportedSchema: z.ZodObject<{
         osVersion: z.ZodString;
         expression: z.ZodString;
         errorNumber: z.ZodNumber;
-    }, z.core.$strict>;
+    }, z.core.$strict>, z.ZodObject<{
+        source: z.ZodLiteral<"dictionary">;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        term: z.ZodString;
+        finding: z.ZodLiteral<"handler">;
+        statement: z.ZodString;
+    }, z.core.$strict>], "source">;
 }, z.core.$strict>;
 
 // @public
@@ -1466,6 +1512,20 @@ export const DictionaryAbsenceFindingSchema: z.ZodEnum<{
     "no-class": "no-class";
     "not-an-element": "not-an-element";
 }>;
+
+// @public (undocumented)
+export type DictionaryHandlerEvidence = z.infer<typeof DictionaryHandlerEvidenceSchema>;
+
+// @public
+export const DictionaryHandlerEvidenceSchema: z.ZodObject<{
+    source: z.ZodLiteral<"dictionary">;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    term: z.ZodString;
+    finding: z.ZodLiteral<"handler">;
+    statement: z.ZodString;
+}, z.core.$strict>;
 
 // @public (undocumented)
 export type DictionaryTermEvidence = z.infer<typeof DictionaryTermEvidenceSchema>;

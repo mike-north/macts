@@ -13,8 +13,9 @@
  *
  * Likewise a manifest keeps a resource the app cannot provide (its dictionary
  * has no collection for it, or every read of it fails), marked `unsupported`
- * with the evidence (see `./schemas/resource.ts`), and a command the running
- * app cannot carry out, marked `unsupported` with live evidence (see
+ * with the evidence (see `./schemas/resource.ts`), and a command no caller
+ * can have the app carry out, marked `unsupported` with live evidence or with
+ * dictionary evidence that the app sends it to scripts as a handler (see
  * `./schemas/command.ts`). Route resolution and every generator read a
  * manifest's resources, hierarchy and commands through this module, so a
  * marked resource, its hierarchy entries and everything nested under them,
@@ -105,8 +106,9 @@ export function usableHierarchyChildren(
 }
 
 /**
- * Whether a command is marked unsupported: declared by the manifest, but not
- * carried out by the running app, so without a route and left out of every
+ * Whether a command is marked unsupported: declared by the manifest, but one
+ * no caller can have the app carry out (the running app cannot, or the app
+ * sends it to scripts as a handler), so without a route and left out of every
  * generated surface.
  *
  * @param command - A command definition from the manifest.

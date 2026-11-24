@@ -602,8 +602,15 @@ describe('CommandSchema', () => {
 
 /**
  * The command-level `unsupported` marker. Expected outcomes are derived by
- * hand from phases/13 D10 (unsupported commands): the marker carries live
- * absence evidence only, strict, and nothing else.
+ * hand from phases/13 D10 (unsupported commands) and the manifest format's
+ * _Unsupported commands_ section: the marker carries exactly one piece of
+ * evidence, strict, and nothing else. The evidence is either a live absence
+ * observation, or a dictionary finding that the command is a handler the app
+ * sends to a script rather than one it carries out: the app build, the
+ * command's term, `finding: handler` and the dictionary's own statement, every
+ * text field non-empty.
+ *
+ * @see ../../../../../manifests/README.md
  */
 describe('CommandSchema unsupported marker', () => {
   const GET_SETTING = {
@@ -633,7 +640,7 @@ describe('CommandSchema unsupported marker', () => {
     expect(CommandSchema.parse(GET_SETTING).unsupported).toBeUndefined()
   })
 
-  it('rejects dictionary evidence: a command is shown unsupported only by observation', () => {
+  it('rejects dictionary absence evidence: a dictionary shows a command unsupported only as a handler', () => {
     const dictionary = {
       source: 'dictionary',
       bundleId: 'com.apple.Automator',
@@ -645,6 +652,77 @@ describe('CommandSchema unsupported marker', () => {
     expect(
       CommandSchema.safeParse({ ...GET_SETTING, unsupported: { evidence: dictionary } }).success
     ).toBe(false)
+  })
+
+  /** Mail 16.0's dictionary on macOS 27.3, which documents a handler Mail sends to scripts. */
+  const HANDLER = {
+    source: 'dictionary',
+    bundleId: 'com.apple.mail',
+    appVersion: '16.0',
+    osVersion: '27.3',
+    term: 'perform mail action with messages',
+    finding: 'handler',
+    statement:
+      'Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of this handler is a list of messages being acted upon.',
+  }
+  const PERFORM = {
+    name: 'performMailActionWithMessages',
+    description: 'Handle messages',
+    scope: 'application',
+    parameters: [],
+  }
+
+  it('accepts dictionary handler evidence on an application command', () => {
+    const parsed = CommandSchema.parse({ ...PERFORM, unsupported: { evidence: HANDLER } })
+    expect(parsed.unsupported).toEqual({ evidence: HANDLER })
+  })
+
+  it('accepts dictionary handler evidence on a resource command', () => {
+    const parsed = CommandSchema.parse({ ...GET_SETTING, unsupported: { evidence: HANDLER } })
+    expect(parsed.unsupported).toEqual({ evidence: HANDLER })
+  })
+
+  it.each(['bundleId', 'appVersion', 'osVersion', 'term', 'statement'] as const)(
+    'rejects handler evidence without %s',
+    (field) => {
+      const { [field]: _omitted, ...rest } = HANDLER
+      expect(CommandSchema.safeParse({ ...PERFORM, unsupported: { evidence: rest } }).success).toBe(
+        false
+      )
+    }
+  )
+
+  it.each(['bundleId', 'appVersion', 'osVersion', 'term', 'statement'] as const)(
+    'rejects handler evidence with an empty %s',
+    (field) => {
+      const evidence = { ...HANDLER, [field]: '' }
+      expect(CommandSchema.safeParse({ ...PERFORM, unsupported: { evidence } }).success).toBe(false)
+    }
+  )
+
+  it('rejects a dictionary finding other than handler', () => {
+    for (const finding of ['no-class', 'not-an-element', 'sent', '']) {
+      const evidence = { ...HANDLER, finding }
+      expect(CommandSchema.safeParse({ ...PERFORM, unsupported: { evidence } }).success).toBe(false)
+    }
+  })
+
+  it('rejects handler evidence with a field it does not define', () => {
+    for (const extra of [
+      { observedAt: '2026-11-23T00:00:00.000Z' },
+      { errorNumber: -1708 },
+      { reason: 'x' },
+    ]) {
+      const evidence = { ...HANDLER, ...extra }
+      expect(CommandSchema.safeParse({ ...PERFORM, unsupported: { evidence } }).success).toBe(false)
+    }
+  })
+
+  it('rejects live evidence that claims a dictionary finding', () => {
+    const evidence = { ...LIVE, finding: 'handler' }
+    expect(CommandSchema.safeParse({ ...GET_SETTING, unsupported: { evidence } }).success).toBe(
+      false
+    )
   })
 
   it('rejects a marker without evidence, or with an unknown field', () => {
