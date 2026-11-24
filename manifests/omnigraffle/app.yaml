@@ -264,7 +264,9 @@ resources:
       script:
         access: rw
         type: string
-        description: Source of attached AppleScript
+        # The dictionary names the script's language, which shares its name
+        # with the automation mechanism.
+        description: Source of the attached script
         code: scpt
       rankGroup:
         access: rw

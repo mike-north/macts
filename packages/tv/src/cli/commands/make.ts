@@ -13,10 +13,7 @@ export class MakeCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  new = Option.String('--new', {
-    required: true,
-    description: "the class of the new element. Keyword 'new' is optional in AppleScript",
-  })
+  new = Option.String('--new', { required: true, description: 'the class of the new element' })
   at = Option.String('--at', {
     required: false,
     description: 'the location at which to insert the element',

@@ -2137,8 +2137,7 @@ export const manifest: unknown = {
         {
           name: 'each',
           type: 'string',
-          description:
-            "the class of the elements to be counted. Keyword 'each' is optional in AppleScript",
+          description: 'the class of the elements to be counted',
           required: true,
           code: 'kocl',
         },
@@ -2175,7 +2174,7 @@ export const manifest: unknown = {
         {
           name: 'new',
           type: 'string',
-          description: "the class of the new element. Keyword 'new' is optional in AppleScript",
+          description: 'the class of the new element',
           required: true,
           code: 'kocl',
         },

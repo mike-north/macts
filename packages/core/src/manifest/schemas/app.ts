@@ -6,6 +6,7 @@ import { HierarchySchema, type HierarchyChild } from './hierarchy.js'
 import { RelationshipSchema } from './relationship.js'
 import { AppMetadataSchema, SuiteSchema, ExtractionMetadataSchema } from './metadata.js'
 import { findPositionalIssues } from '../positional.js'
+import { findMechanismTermIssues } from '../mechanism-terms.js'
 import { addressNormalization } from '../normalize-addresses.js'
 import { findAddressIssues } from '../address.js'
 import { itemIdentifierParameter } from '../item-selection.js'
@@ -203,6 +204,13 @@ export const AppManifestSchema = ManifestDeclarations.refine(
       ctx.addIssue({ code: 'custom', ...issue })
     }
     for (const issue of findSuperclassIssues(data.resources)) {
+      ctx.addIssue({ code: 'custom', ...issue })
+    }
+    // Every surface is derived from the manifest, so its text is where the
+    // automation mechanism is kept out of them (see `../mechanism-terms.ts`).
+    // Checked before superclass flattening, so an inherited declaration's text
+    // is reported once, where it is declared.
+    for (const issue of findMechanismTermIssues(data)) {
       ctx.addIssue({ code: 'custom', ...issue })
     }
   })

@@ -120,8 +120,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
       type: 'object',
       properties: {
         each: {
-          description:
-            "the class of the elements to be counted. Keyword 'each' is optional in AppleScript",
+          description: 'the class of the elements to be counted',
           type: 'string',
         },
       },
@@ -231,7 +230,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
       type: 'object',
       properties: {
         new: {
-          description: "the class of the new element. Keyword 'new' is optional in AppleScript",
+          description: 'the class of the new element',
           type: 'string',
         },
         at: {

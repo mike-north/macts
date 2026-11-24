@@ -31,7 +31,7 @@ export const manifest: unknown = {
     },
     {
       name: 'OmniFocus suite',
-      description: 'AppleScript commands and classes specific to OmniFocus',
+      description: 'Commands and classes specific to OmniFocus',
       code: 'OFOC',
       resources: ['Task', 'Project', 'Folder', 'Tag', 'InboxTask', 'Perspective'],
       commands: [

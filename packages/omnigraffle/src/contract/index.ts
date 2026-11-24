@@ -277,7 +277,7 @@ export interface Graphic {
    */
   url: string | null
   /**
-   * Source of attached AppleScript.
+   * Source of the attached script.
    * Nullable. No evidence that the app always sets it.
    */
   script: string | null
@@ -744,7 +744,7 @@ export interface GraphicCreateInput {
   tag?: string
   /** Web link for this graphic */
   url?: string
-  /** Source of attached AppleScript */
+  /** Source of the attached script */
   script?: string
   /** Rank group assigned to this graphic for hierarchical layout */
   rankGroup?: Integer
@@ -873,7 +873,7 @@ export interface GraphicUpdateInput {
    */
   url?: string
   /**
-   * Source of attached AppleScript.
+   * Source of the attached script.
    * Cannot be reset: null is rejected.
    */
   script?: string
@@ -1617,7 +1617,7 @@ const graphicRecordType: ValueType<Graphic> = t.record(
     userName: t.nullable(t.string(), { description: 'Name of a graphic' }),
     tag: t.nullable(t.string(), { description: 'Arbitrary string tag attached to this graphic' }),
     url: t.nullable(t.string(), { description: 'Web link for this graphic' }),
-    script: t.nullable(t.string(), { description: 'Source of attached AppleScript' }),
+    script: t.nullable(t.string(), { description: 'Source of the attached script' }),
     rankGroup: t.nullable(t.integer(), {
       description: 'Rank group assigned to this graphic for hierarchical layout',
     }),

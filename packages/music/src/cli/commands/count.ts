@@ -15,8 +15,7 @@ export class CountCommand extends Command {
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   each = Option.String('--each', {
     required: true,
-    description:
-      "the class of the elements to be counted. Keyword 'each' is optional in AppleScript",
+    description: 'the class of the elements to be counted',
   })
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

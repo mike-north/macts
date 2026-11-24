@@ -14,7 +14,7 @@ suites:
     description: Common classes and commands for all applications
   - name: OmniFocus suite
     code: OFOC
-    description: AppleScript commands and classes specific to OmniFocus
+    description: Commands and classes specific to OmniFocus
     resources:
       - Task
       - Project
