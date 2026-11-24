@@ -334,7 +334,6 @@ export class MailClient {
     readonly messages: MessageResourceClient;
     move(to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     readonly outgoingMessages: OutgoingMessageResourceClient;
-    performMailActionWithMessages(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
 }
 
 // @public

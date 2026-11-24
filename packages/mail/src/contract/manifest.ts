@@ -2080,6 +2080,18 @@ export const manifest: unknown = {
         },
       ],
       code: 'cpma',
+      unsupported: {
+        evidence: {
+          source: 'dictionary',
+          bundleId: 'com.apple.mail',
+          appVersion: '16.0',
+          osVersion: '27.3',
+          term: 'perform mail action with messages',
+          finding: 'handler',
+          statement:
+            'Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of this handler is a list of messages being acted upon.',
+        },
+      },
     },
     redirect: {
       name: 'redirect',

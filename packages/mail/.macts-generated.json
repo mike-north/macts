@@ -27,7 +27,6 @@
     "src/cli/commands/messageViewers/messages/reply.ts",
     "src/cli/commands/move.ts",
     "src/cli/commands/outgoingMessages/send.ts",
-    "src/cli/commands/perform-mail-action-with-messages.ts",
     "src/cli/index.ts",
     "src/cli/output/index.ts",
     "src/cli/plugin.ts",

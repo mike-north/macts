@@ -239,7 +239,6 @@ export interface MailClient extends ClientBrand<MailResources> {
     readonly messages: MessageResourceClient;
     move(to: string, options?: CallOptions): Promise<void>;
     readonly outgoingMessages: OutgoingMessageResourceClient;
-    performMailActionWithMessages(options?: CallOptions): Promise<void>;
 }
 
 // @public
