@@ -610,19 +610,15 @@ try {
     throw new Error(`prettier failed: ${format.error?.message ?? `exit ${String(format.status)}`}`)
   }
 
-  // Compare rendered links with the destinations named for that page. A valid
-  // filename alone cannot prove that a link names the intended declaration.
-  const markdown = createRequire(join(toolRoot, 'package.json'))('prettier/plugins/markdown')
-  // Record relative paths even in unexpected subdirectories, so no staged
-  // Markdown page can escape the page-write accounting.
+  // Every installed entry must be a recorded regular Markdown page; directories
+  // only organize pages. Other files and special entries have no documented role.
   const stagedPages = (directory, prefix = '') =>
     readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
       const name = prefix ? `${prefix}/${entry.name}` : entry.name
-      return entry.isDirectory()
-        ? stagedPages(join(directory, entry.name), name)
-        : entry.isFile() && name.endsWith('.md')
-          ? [name]
-          : []
+      if (entry.isDirectory()) return stagedPages(join(directory, entry.name), name)
+      if (!entry.isFile()) throw new Error(`unsupported staged entry ${name}`)
+      if (!name.endsWith('.md')) throw new Error(`unsupported staged file ${name}`)
+      return [name]
     })
   const files = new Set(stagedPages(stagedDocs))
   for (const file of files) {
@@ -632,16 +628,92 @@ try {
     if (!files.has(file)) throw new Error(`missing recorded page ${file}`)
   }
 
-  /** Extract anchor destinations from HTML nodes, respecting quoted tag attributes and comments. */
-  const htmlLinks = (html) => {
+  const requireRoot = createRequire(join(toolRoot, 'package.json'))
+  const markdown = requireRoot('prettier/plugins/markdown')
+  const html = requireRoot('prettier/plugins/html')
+
+  // HTML allows a defined set of named references without a semicolon. The
+  // attribute rule leaves them literal when followed by a letter, digit or =.
+  const legacyNames = new Set(
+    'Aacute aacute Acirc acirc acute AElig aelig Agrave agrave AMP amp Aring aring Atilde atilde Auml auml brvbar Ccedil ccedil cedil cent COPY copy curren deg divide Eacute eacute Ecirc ecirc Egrave egrave ETH eth Euml euml frac12 frac14 frac34 GT gt Iacute iacute Icirc icirc iexcl Igrave igrave iquest Iuml iuml laquo LT lt macr micro middot nbsp not Ntilde ntilde Oacute oacute Ocirc ocirc Ograve ograve ordf ordm Oslash oslash Otilde otilde Ouml ouml para plusmn pound QUOT quot raquo REG reg sect shy sup1 sup2 sup3 szlig THORN thorn times Uacute uacute Ucirc ucirc Ugrave ugrave uml Uuml uuml Yacute yacute yen yuml'.split(
+      ' '
+    )
+  )
+  // HTML maps these numeric references through the Windows-1252 replacements.
+  const numericReplacements = new Map([
+    [0x80, 0x20ac],
+    [0x82, 0x201a],
+    [0x83, 0x192],
+    [0x84, 0x201e],
+    [0x85, 0x2026],
+    [0x86, 0x2020],
+    [0x87, 0x2021],
+    [0x88, 0x2c6],
+    [0x89, 0x2030],
+    [0x8a, 0x160],
+    [0x8b, 0x2039],
+    [0x8c, 0x152],
+    [0x8e, 0x17d],
+    [0x91, 0x2018],
+    [0x92, 0x2019],
+    [0x93, 0x201c],
+    [0x94, 0x201d],
+    [0x95, 0x2022],
+    [0x96, 0x2013],
+    [0x97, 0x2014],
+    [0x98, 0x2dc],
+    [0x99, 0x2122],
+    [0x9a, 0x161],
+    [0x9b, 0x203a],
+    [0x9c, 0x153],
+    [0x9e, 0x17e],
+    [0x9f, 0x178],
+  ])
+  // The bundled HTML parser supplies the named reference table. Numeric
+  // references and semicolonless attribute syntax follow HTML's own rules.
+  const decodeAttribute = async (value) => {
+    let decoded = ''
+    let cursor = 0
+    const references = /&(?:#(?:[xX][0-9a-fA-F]+|[0-9]+);?|[a-zA-Z0-9]+;?)/g
+    for (const match of value.matchAll(references)) {
+      decoded += value.slice(cursor, match.index)
+      const reference = match[0]
+      let replacement = reference
+      if (reference.startsWith('&#')) {
+        const hex = reference[2]?.toLowerCase() === 'x'
+        let point = Number.parseInt(reference.slice(hex ? 3 : 2), hex ? 16 : 10)
+        point = numericReplacements.get(point) ?? point
+        if (point === 0 || point > 0x10ffff || (point >= 0xd800 && point <= 0xdfff)) point = 0xfffd
+        replacement = String.fromCodePoint(point)
+      } else {
+        const name = reference.slice(1).replace(/;$/, '')
+        const terminated = reference.endsWith(';')
+        const next = value[match.index + reference.length] ?? ''
+        if (terminated || (legacyNames.has(name) && !/[a-zA-Z0-9=]/.test(next))) {
+          try {
+            const tree = await html.parsers.html.parse(`<a href="&${name};"></a>`)
+            replacement = tree.children[0].attrs[0].valueTokens
+              .map((token) => token.parts[0])
+              .join('')
+          } catch {
+            // Unknown names are literal text under the HTML parsing rules.
+          }
+        }
+      }
+      decoded += replacement
+      cursor = match.index + reference.length
+    }
+    return decoded + value.slice(cursor)
+  }
+
+  /** Extract href values from HTML nodes while excluding comments and quoted tag text. */
+  const htmlLinks = (source) => {
     const destinations = []
-    // Tags may contain > inside quoted values; comments do not contain tags.
     const tags = /<!--[\s\S]*?(?:-->|$)|<([a-z][\w:-]*)\b((?:[^"'<>]|"[^"]*"|'[^']*')*)>/gi
-    for (const tag of html.matchAll(tags)) {
-      if (tag[1]?.toLowerCase() !== 'a') continue
-      const attributes = tag[2] ?? ''
+    for (const tag of source.matchAll(tags)) {
+      if (!tag[1]) continue
       const attribute = /([^\s=/'">]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s'"=<>`]+)))?/g
-      for (const match of attributes.matchAll(attribute)) {
+      for (const match of (tag[2] ?? '').matchAll(attribute)) {
         if (match[1].toLowerCase() === 'href') {
           destinations.push(match[2] ?? match[3] ?? match[4] ?? '')
           break
@@ -651,42 +723,56 @@ try {
     return destinations
   }
 
+  // Every local destination must resolve to a produced page and occur exactly
+  // as often as the naming method recorded it, after identical URL normalization.
+  const localPage = (destination, file) => {
+    const base = new URL(`file:///docs/${file}`)
+    const url = new URL(destination, base)
+    if (url.protocol !== base.protocol || url.host !== base.host) return undefined
+    if (destination.startsWith('#')) return undefined
+    if (url.href.split('#')[0].includes('?'))
+      throw new Error(`${file}: query in link ${destination}`)
+    const path = decodeURIComponent(url.pathname)
+    const target = path.startsWith('/docs/') ? path.slice('/docs/'.length) : path
+    if (!target.endsWith('.md') || !files.has(target) || !pageLinks.has(target)) {
+      throw new Error(`${file}: link ${destination} does not name a produced page`)
+    }
+    return target
+  }
+
   for (const file of files) {
     const expected = new Map()
     for (const link of pageLinks.get(file)) {
-      expected.set(link, (expected.get(link) ?? 0) + 1)
+      const target = localPage(link, file)
+      if (target !== undefined) expected.set(target, (expected.get(target) ?? 0) + 1)
     }
     const content = readFileSync(join(stagedDocs, file), 'utf-8')
     const tree = await markdown.parsers.markdown.parse(content)
     const definitions = new Map()
     const links = []
-    // Markdown reference definitions can follow their uses, so collect the
-    // destinations before resolving references.
+    const htmlDestinations = []
+    // Definitions are classified independently, including unused definitions.
     const visit = (node) => {
-      if (node.type === 'definition') definitions.set(node.identifier, node.url)
+      if (node.type === 'definition') {
+        definitions.set(node.identifier, node.url)
+        links.push(node.url)
+      }
       if (node.type === 'link') links.push(node.url)
-      if (node.type === 'html') links.push(...htmlLinks(node.value))
+      if (node.type === 'html') htmlDestinations.push(...htmlLinks(node.value))
       if (node.type === 'linkReference') links.push({ identifier: node.identifier })
       for (const child of node.children ?? []) visit(child)
     }
     visit(tree)
+    for (const value of htmlDestinations) links.push(await decodeAttribute(value))
     for (const destination of links) {
       const url =
         typeof destination === 'string' ? destination : definitions.get(destination.identifier)
-      if (url === undefined) continue
-      const link = url.split('#')[0]
-      if (!link.endsWith('.md') || /^(?:[a-z][a-z0-9+.-]*:|\/|#)/i.test(link)) continue
-      const target = resolve(stagedDocs, link)
-      if (
-        dirname(target) !== stagedDocs ||
-        !files.has(basename(target)) ||
-        !pageLinks.has(basename(target))
-      ) {
-        throw new Error(`${file}: link ${link} does not name a produced page`)
-      }
-      const count = expected.get(link) ?? 0
-      if (count === 0) throw new Error(`${file}: unexpected link ${link}`)
-      expected.set(link, count - 1)
+      if (url === undefined) throw new Error(`${file}: unresolved link reference`)
+      const target = localPage(url, file)
+      if (target === undefined) continue
+      const count = expected.get(target) ?? 0
+      if (count === 0) throw new Error(`${file}: unexpected link ${url}`)
+      expected.set(target, count - 1)
     }
     for (const [link, count] of expected) {
       if (count !== 0) throw new Error(`${file}: missing link ${link}`)

@@ -473,6 +473,66 @@ MarkdownDocumenter.prototype.generateFiles = function (...args) {
     expect(await page('kept.md')).toBe('original bytes\n')
   })
 
+  it.each([
+    ['encoded dot', '<a href="./widgets.spin&#46;md">extra</a>'],
+    ['encoded fragment', '<a href="./widgets.spin.md&#35;part">extra</a>'],
+    ['numeric reference without semicolon', '<a href="./widgets.spin&#46md">extra</a>'],
+    ['Markdown query', '[extra](./widgets.spin.md?view=1)'],
+    ['HTML query', '<a href="./widgets.spin.md?view=1">extra</a>'],
+    ['root relative path', '[extra](/docs/widgets.spin.md)'],
+    ['non Markdown path', '[extra](./asset.txt)'],
+    ['uppercase extension', '[extra](./widgets.spin.MD)'],
+  ])('rejects an unaccounted local destination: %s', async (_label, content) => {
+    await plantPackage('widgets', 'spin')
+    await mkdir(join(workspace, 'docs'))
+    await writeFile(join(workspace, 'docs', 'kept.md'), 'original bytes\n')
+    const result = await generateWithDocumenterChange(`
+const fs = (await import('node:fs')).default
+const execute = MarkdownDocumenter.prototype.generateFiles
+MarkdownDocumenter.prototype.generateFiles = function (...args) {
+  const result = execute.apply(this, args)
+  fs.appendFileSync(this._outputFolder + '/widgets.md', ${JSON.stringify(`\n${content}\n`)})
+  return result
+}`)
+    expect(result.status, result.stderr).toBe(1)
+    expect(await pages()).toEqual(['kept.md'])
+    expect(await page('kept.md')).toBe('original bytes\n')
+  })
+
+  it.each(['https&colon;//example.com/missing.md', 'https&#58//example.com/missing.md'])(
+    'accepts the encoded external HTML destination %s',
+    async (destination) => {
+      await plantPackage('widgets', 'spin')
+      const result = await generateWithDocumenterChange(`
+const fs = (await import('node:fs')).default
+const execute = MarkdownDocumenter.prototype.generateFiles
+MarkdownDocumenter.prototype.generateFiles = function (...args) {
+  const result = execute.apply(this, args)
+  fs.appendFileSync(this._outputFolder + '/widgets.md', ${JSON.stringify(`\n<a href="${destination}">external</a>\n`)})
+  return result
+}`)
+      expect(result.status, result.stderr).toBe(0)
+    }
+  )
+
+  it('rejects a staged symlink without replacing the reference', async () => {
+    await plantPackage('widgets', 'spin')
+    await mkdir(join(workspace, 'docs'))
+    await writeFile(join(workspace, 'docs', 'kept.md'), 'original bytes\n')
+    const result = await generateWithDocumenterChange(`
+const fs = (await import('node:fs')).default
+const execute = MarkdownDocumenter.prototype.generateFiles
+MarkdownDocumenter.prototype.generateFiles = function (...args) {
+  const result = execute.apply(this, args)
+  fs.symlinkSync('widgets.spin.md', this._outputFolder + '/extra.md')
+  return result
+}`)
+    expect(result.status, result.stderr).toBe(1)
+    expect(result.stderr).toContain('extra.md')
+    expect(await pages()).toEqual(['kept.md'])
+    expect(await page('kept.md')).toBe('original bytes\n')
+  })
+
   it('ignores HTML examples in code and external or fragment links', async () => {
     await plantPackage('widgets', 'spin')
     const content =
