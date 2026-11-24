@@ -68,7 +68,7 @@ for (const { code, path } of changes) {
   console.error(`  ${describe(code).padEnd(9)} ${path}`)
 }
 console.error(
-  '\nRegenerate with `pnpm generate` (packages) or `pnpm api-docs:full` (docs) and commit the result.'
+  '\nRegenerate with `pnpm generate` (generated packages) or `pnpm api-docs:full` (API reports and docs) and commit the result.'
 )
 
 const diff = git(['--no-pager', 'diff', '--', ...paths], root)
