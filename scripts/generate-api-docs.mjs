@@ -265,17 +265,15 @@ function documentWithDistinctPageNames(inputFolder, outputFolder) {
   const requireTool = createRequire(
     createRequire(join(toolRoot, 'package.json')).resolve('@microsoft/api-documenter/package.json')
   )
-  const { MarkdownDocumenter } = requireTool(
-    './lib/documenters/MarkdownDocumenter'
-  )
+  const { MarkdownDocumenter } = requireTool('./lib/documenters/MarkdownDocumenter')
   const { Utilities } = requireTool('./lib/utils/Utilities')
-  const { ApiDocumenterCommandLine } = requireTool(
-    './lib/cli/ApiDocumenterCommandLine'
-  )
+  const { ApiDocumenterCommandLine } = requireTool('./lib/cli/ApiDocumenterCommandLine')
   const { ApiItemKind, ApiParameterListMixin } = requireTool('@microsoft/api-extractor-model')
   const { PackageName } = requireTool('@rushstack/node-core-library')
   if (typeof MarkdownDocumenter.prototype._getFilenameForApiItem !== 'function') {
-    throw new Error('this api-documenter version no longer names pages through _getFilenameForApiItem')
+    throw new Error(
+      'this api-documenter version no longer names pages through _getFilenameForApiItem'
+    )
   }
 
   const safeName = (name) => Utilities.getSafeFilenameForName(name)

@@ -374,7 +374,7 @@ describe('generate-api-docs', () => {
     expect(linkTarget(entry, 'spin()')).toBe('widgets.spin.md')
   })
 
-  it('links a subpath member to the subpath\'s own declaration of a name the root entry also declares', async () => {
+  it("links a subpath member to the subpath's own declaration of a name the root entry also declares", async () => {
     await plantPackage('widgets', undefined, [{ path: 'local', fn: undefined }])
     const temp = join(workspace, 'packages', 'widgets', 'temp')
     await writeFile(
@@ -395,7 +395,8 @@ describe('generate-api-docs', () => {
 
     const index = await page('index.md')
     const entryFile = linkTarget(index, '@x/widgets/local')
-    if (entryFile === undefined) throw new Error(`no @x/widgets/local entry in the index:\n${index}`)
+    if (entryFile === undefined)
+      throw new Error(`no @x/widgets/local entry in the index:\n${index}`)
     const entry = await page(entryFile)
     const subpathSize = linkTarget(entry, 'Size')
     const measure = linkTarget(entry, 'measure()')
