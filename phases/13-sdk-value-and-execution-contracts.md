@@ -2909,7 +2909,10 @@ searches another Window. Tab reorder, closure of an earlier Tab, or
 movement of a Session between Tabs of its Window does not change what a
 reference means between reads. If a Session closes or moves while a single read
 is in progress, that read fails closed, reporting either a missing target or a
-retryable `CollectionChangedError`, and never returns a different Session.
+retryable `CollectionChangedError`, and never returns a different Session. That
+holds when the Session is back where it began before the read ends: a property
+the read could not reach while the Session was away is never passed off as a
+record with fields missing.
 Movement to another Window makes the old reference missing. No persistence
 across restoration or relaunch is promised.
 

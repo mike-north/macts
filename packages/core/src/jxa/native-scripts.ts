@@ -410,6 +410,22 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * to the codec together with the item, as the reference's container
  * ({@link wrapContained}).
  *
+ * An identity-checked read (a get or resolved reference that must denote one
+ * sought identity) names in `confirmIdentity` the checks, already defined in
+ * the body, that confirm the item still exists with that identity. A
+ * property read failing with "no such object" runs them before the failure is
+ * taken as an omitted field or an absent value. The item can leave its
+ * collection and return within one read (a Session moved to another Tab and
+ * back), so the final identity check alone would find the item where it began
+ * and pass a record whose fields went missing while it was away. The checks
+ * fail as a missing target or a collection change instead; an item still
+ * present with its identity keeps the failure's usual meaning. Reads with no
+ * identity check, including every format 1.0 read, name none and read as
+ * before.
+ *
+ * @param confirmIdentity - Names of the body's zero-argument identity checks
+ *   to run on a "no such object" property failure; each throws when the item
+ *   is gone or answers with another identity.
  * @throws `InternalError` when `source` reads a singleton root and no
  *   `kindExpression` is given.
  */
@@ -417,7 +433,8 @@ function readOutputProperties(
   manifest: AppManifest,
   source: RecordSource,
   itemLocal: string,
-  kindExpression?: string
+  kindExpression?: string,
+  confirmIdentity: readonly string[] = []
 ): string {
   const { resource } = source
   const rooted = resource?.roots !== undefined
@@ -436,10 +453,14 @@ function readOutputProperties(
   const propagate = separate
     ? `if (e && ${JSON.stringify(Object.values(COMMUNICATION_FAILURE_ERROR_NUMBERS))}.indexOf(e.errorNumber) >= 0) { throw e; } `
     : ''
+  const confirm = confirmIdentity.map((check) => `${check}(); `).join('')
+  const missingFailure = `e && e.errorNumber === ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}`
   const readOnItsOwn = (key: string): string =>
     absentAsNull(resource, key)
-      ? `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) { ${propagate}if (e && e.errorNumber === ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}) { ${member('obj', key)} = null; } }`
-      : `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {${propagate}}`
+      ? `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) { ${propagate}if (${missingFailure}) { ${confirm}${member('obj', key)} = null; } }`
+      : confirm === ''
+        ? `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {${propagate}}`
+        : `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {${propagate}if (${missingFailure}) { ${confirm}} }`
   const traversed = identityTraversed(manifest, source.key)
   return lines(
     traversed
@@ -2147,10 +2168,15 @@ function buildGetBody(
 ): ResourceBody {
   const selected = bindSelectedItem(command, source.resource, resourcePlural, manifest)
   const explicit = explicitIdentityGet(command, source.resource, manifest)
+  const confirmIdentity = [
+    ...(identityTraversed(manifest, source.key) ? ['verifyIdentity'] : []),
+    ...(command.identityTraversal === undefined ? [] : ['verifySelectedIdentity']),
+    ...(explicit ? ['verifyExplicitIdentity'] : []),
+  ]
   const body = lines(
     selected.statements,
     explicit ? verifyExplicitIdentity(command, source.resource, selected.itemParameter) : '',
-    readOutputProperties(manifest, source, 'item', selected.kindLocal),
+    readOutputProperties(manifest, source, 'item', selected.kindLocal, confirmIdentity),
     command.identityTraversal === undefined ? '' : 'verifySelectedIdentity(obj);',
     explicit ? 'verifyExplicitIdentity(obj);' : '',
     'return obj;'
@@ -2433,16 +2459,30 @@ export function buildResolutionBody(
   }
   const kinds = argument(RESOLUTION_KINDS_ARGUMENT)
   const rooted = resource.roots !== undefined
+  // A target decoded by identity carries that identity, which its record read confirms.
+  const confirmIdentity = identityTraversed(manifest, resourceKey) ? ['verifyIdentity'] : []
   if (cardinality === 'one') {
     return lines(
       `var item = ${argument(RESOLUTION_TARGET_ARGUMENT)};`,
-      readOutputProperties(manifest, source, 'item', rooted ? `${kinds}[0]` : undefined),
+      readOutputProperties(
+        manifest,
+        source,
+        'item',
+        rooted ? `${kinds}[0]` : undefined,
+        confirmIdentity
+      ),
       'return obj;'
     )
   }
   return lines(
     rooted ? 'function readRecord(item, i) {' : 'function readRecord(item) {',
-    readOutputProperties(manifest, source, 'item', rooted ? `${kinds}[i]` : undefined),
+    readOutputProperties(
+      manifest,
+      source,
+      'item',
+      rooted ? `${kinds}[i]` : undefined,
+      confirmIdentity
+    ),
     'return obj;',
     '}',
     `var targets = ${argument(RESOLUTION_ENTRIES_ARGUMENT)};`,
