@@ -185,22 +185,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'mail.app.performMailActionWithMessages',
-    app: 'mail',
-    appBundleId: 'com.apple.mail',
-    resource: 'app',
-    operation: 'performMailActionWithMessages',
-    description:
-      'Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of this handler is a list of messages being acted upon.',
-    permission: 'mail:app:performMailActionWithMessages',
-    risk: 'send',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-      additionalProperties: false,
-    },
-  },
-  {
     name: 'mail.messages.forward',
     app: 'mail',
     appBundleId: 'com.apple.mail',

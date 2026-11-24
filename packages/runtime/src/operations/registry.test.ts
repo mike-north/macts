@@ -133,6 +133,22 @@ const UNSUPPORTED = {
   },
 } as const
 
+/**
+ * An `unsupported` marker from the app's dictionary: the command is a handler
+ * the app sends to a user's script, not one it carries out, so it has no route.
+ */
+const HANDLER = {
+  evidence: {
+    source: 'dictionary',
+    bundleId: 'com.apple.iCal',
+    appVersion: '15.0',
+    osVersion: '27.3',
+    term: 'reload calendars handler',
+    finding: 'handler',
+    statement: 'Handler invoked by the calendar menu when it runs a user script.',
+  },
+} as const
+
 /** A second app whose name normalizes to the same route segment as {@link CALENDAR}. */
 const CALENDAR_IMPOSTOR: AppManifest = {
   ...CALENDAR,
@@ -446,6 +462,31 @@ describe('operationsFromManifest', () => {
       },
     }
     expect(operationsFromManifest(manifest)).toEqual([])
+  })
+
+  it('registers no operation for an application command the app sends as a handler', () => {
+    const manifest: AppManifest = {
+      ...CALENDAR,
+      commands: {
+        reloadCalendars: {
+          name: 'reloadCalendars',
+          description: 'Reload all calendars',
+          scope: 'application',
+          parameters: [],
+          unsupported: HANDLER,
+        },
+        switchView: {
+          name: 'switchView',
+          description: 'Switch the view',
+          scope: 'application',
+          parameters: [],
+        },
+      },
+    }
+    // Only the unmarked command beside it is registered.
+    expect(operationsFromManifest(manifest).map((op) => op.descriptor.id)).toEqual([
+      'calendar.app.switchView',
+    ])
   })
 
   it('refuses a declared permission that is not app:resource:operation', () => {

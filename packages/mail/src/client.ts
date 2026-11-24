@@ -260,17 +260,4 @@ export class MailClient {
   async mailto(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {
     await this.#httpClient.invoke<undefined>('mail.app.mailto', {}, __mactsOptions)
   }
-
-  /**
-   * Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of this handler is a list of messages being acted upon.
-   */
-  async performMailActionWithMessages(
-    __mactsOptions?: import('@macts/contracts').CallOptions
-  ): Promise<void> {
-    await this.#httpClient.invoke<undefined>(
-      'mail.app.performMailActionWithMessages',
-      {},
-      __mactsOptions
-    )
-  }
 }

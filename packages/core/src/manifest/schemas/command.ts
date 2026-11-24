@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import {
+  DictionaryHandlerEvidenceSchema,
   LiveAbsenceEvidenceSchema,
   NullabilityEvidenceSchema,
   checkNullabilityClaim,
@@ -95,21 +96,36 @@ export const PermissionHistoryEntrySchema = z.object({
 export type PermissionHistoryEntry = z.infer<typeof PermissionHistoryEntrySchema>
 
 /**
- * The marker on a command the running app cannot carry out: addressing what
- * the command reads failed in a live, read-only observation (a collection a
- * get command looks an item up in, say, that the app does not have at the
- * application).
+ * The evidence behind a command's `unsupported` marker, in one of two forms:
+ * the running app failed to address what the command reads
+ * ({@link LiveAbsenceEvidenceSchema}), or the app's dictionary documents the
+ * command as a handler the app sends to a script rather than one it carries
+ * out ({@link DictionaryHandlerEvidenceSchema}).
+ */
+export const CommandUnsupportedEvidenceSchema = z.discriminatedUnion('source', [
+  LiveAbsenceEvidenceSchema,
+  DictionaryHandlerEvidenceSchema,
+])
+export type CommandUnsupportedEvidence = z.infer<typeof CommandUnsupportedEvidenceSchema>
+
+/**
+ * The marker on a command no caller can have the app carry out, as its
+ * evidence shows: addressing what the command reads failed in a live,
+ * read-only observation (a collection a get command looks an item up in, say,
+ * that the app does not have at the application), or the app's dictionary
+ * documents the command as a handler the app itself sends to a user's script.
  *
- * The manifest keeps such a command, so the record of what macts expected
- * stays complete and the omission stays auditable; the command has no route,
- * and every generated surface (the operations behind routes, the contract,
- * SDKs, tools, the CLI, capabilities and derived permissions) leaves it out.
- * The marker is curated from the observation: no probe writes or changes it.
+ * The manifest keeps such a command, so the record of what the dictionary
+ * declares and what macts expected stays complete and the omission stays
+ * auditable; the command has no route, and every generated surface (the
+ * operations behind routes, the contract, SDKs, tools, the CLI, capabilities
+ * and derived permissions) leaves it out. The marker is curated from the
+ * evidence: no probe writes or changes it.
  */
 export const CommandUnsupportedSchema = z
   .object({
-    /** What the running app showed when the command's target was addressed. */
-    evidence: LiveAbsenceEvidenceSchema,
+    /** What shows that no caller can have the app carry out the command. */
+    evidence: CommandUnsupportedEvidenceSchema,
   })
   .strict()
 export type CommandUnsupported = z.infer<typeof CommandUnsupportedSchema>
@@ -251,7 +267,8 @@ export const CommandSchema = z.object({
    */
   permissionHistory: z.array(PermissionHistoryEntrySchema).optional(),
   /**
-   * Set when the running app cannot carry out the command, with the
+   * Set when no caller can have the app carry out the command (the running
+   * app cannot, or the app sends it to scripts as a handler), with the
    * evidence. A command marked unsupported has no route, and generated
    * surfaces omit it.
    */

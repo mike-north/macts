@@ -1610,11 +1610,6 @@ export interface MailClient extends ClientBrand<MailResources> {
   importMailMailbox(at: FileSource, options?: CallOptions): Promise<void>
   /** Opens a mailto URL. */
   mailto(options?: CallOptions): Promise<void>
-  /**
-   * Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of
-   * this handler is a list of messages being acted upon.
-   */
-  performMailActionWithMessages(options?: CallOptions): Promise<void>
 }
 
 /**
@@ -1917,25 +1912,6 @@ const appMailtoOperation: OperationDescriptor<Record<string, never>, undefined> 
   },
 }
 
-const appPerformMailActionWithMessagesOperation: OperationDescriptor<
-  Record<string, never>,
-  undefined
-> = {
-  id: 'mail.app.performMailActionWithMessages',
-  permission: 'mail:app:performMailActionWithMessages',
-  target: { command: 'performMailActionWithMessages' },
-  description:
-    'Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of this handler is a list of messages being acted upon.',
-  input: t.record({}),
-  output: t.none(),
-  inputJsonSchema: {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: {},
-    additionalProperties: false,
-  },
-}
-
 const messageRedirectOperation: OperationDescriptor<
   { readonly openingWindow?: boolean | undefined },
   undefined
@@ -2081,7 +2057,6 @@ const operations: AppContract<MailClient>['operations'] = {
   'mail.app.getURL': appGetURLOperation,
   'mail.app.importMailMailbox': appImportMailMailboxOperation,
   'mail.app.mailto': appMailtoOperation,
-  'mail.app.performMailActionWithMessages': appPerformMailActionWithMessagesOperation,
   'mail.messages.redirect': messageRedirectOperation,
   'mail.messages.reply': messageReplyOperation,
   'mail.outgoingMessages.send': outgoingMessageSendOperation,
@@ -2112,8 +2087,6 @@ function bind(runtime: ClientRuntime): MailClient {
     importMailMailbox: (at, options) =>
       runtime.invoke(appImportMailMailboxOperation, { at }, options),
     mailto: (options) => runtime.invoke(appMailtoOperation, {}, options),
-    performMailActionWithMessages: (options) =>
-      runtime.invoke(appPerformMailActionWithMessagesOperation, {}, options),
   }
 }
 

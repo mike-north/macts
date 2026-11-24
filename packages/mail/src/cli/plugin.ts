@@ -11,7 +11,6 @@ import { ExtractAddressFromCommand } from './commands/extract-address-from.js'
 import { GetURLCommand } from './commands/get-url.js'
 import { ImportMailMailboxCommand } from './commands/import-mail-mailbox.js'
 import { MailtoCommand } from './commands/mailto.js'
-import { PerformMailActionWithMessagesCommand } from './commands/perform-mail-action-with-messages.js'
 
 /**
  * CLI plugin for Mail.
@@ -32,6 +31,5 @@ export const plugin: CliPlugin = {
     GetURLCommand,
     ImportMailMailboxCommand,
     MailtoCommand,
-    PerformMailActionWithMessagesCommand,
   ],
 }
