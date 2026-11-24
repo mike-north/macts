@@ -424,6 +424,76 @@ describe('generate-api-docs', () => {
     expect(result.stderr).toContain('no entry points to document')
   })
 
+  it('warns and retains the previous pages if cleanup fails after installation', async () => {
+    await plantPackage('widgets', 'spin')
+    await mkdir(join(workspace, 'docs'))
+    await writeFile(join(workspace, 'docs', 'kept.md'), 'original bytes\n')
+    const result = await generateWithDocumenterChange(`
+const fs = (await import('node:fs')).default
+const { syncBuiltinESMExports } = await import('node:module')
+const remove = fs.rmSync
+fs.rmSync = function (path, ...args) {
+  if (String(path).includes('.docs-stage-') && fs.existsSync(String(path) + '/previous')) throw new Error('injected cleanup failure')
+  return remove.call(this, path, ...args)
+}
+syncBuiltinESMExports()`)
+    const stages = (await readdir(workspace)).filter((name) => name.startsWith('.docs-stage-'))
+    try {
+      expect(result.status, result.stderr).toBe(0)
+      expect(await page('widgets.spin.md')).toContain('spin()')
+      expect(stages).toHaveLength(1)
+      const stage = stages[0]
+      if (stage === undefined) throw new Error('missing retained stage')
+      expect(result.stderr).toContain('warning')
+      expect(result.stderr).toContain(stage)
+      expect(await readFile(join(workspace, stage, 'previous', 'kept.md'), 'utf-8')).toBe(
+        'original bytes\n'
+      )
+    } finally {
+      for (const stage of stages) await rm(join(workspace, stage), { recursive: true, force: true })
+    }
+  })
+
+  it('rejects a breadcrumb emitted without the naming method', async () => {
+    await plantPackage('widgets', undefined)
+    const cls = classMember('widgets', 'Gizmo')
+    const instance = (cls['members'] as ModelMember[])[0]
+    if (instance === undefined) throw new Error('missing fixture method')
+    cls['members'] = [
+      instance,
+      {
+        ...instance,
+        isStatic: true,
+        canonicalReference: '@x/widgets!Gizmo.spin:member(1)',
+        excerptTokens: [
+          { kind: 'Content', text: 'static spin(): ' },
+          { kind: 'Content', text: 'void' },
+          { kind: 'Content', text: ';' },
+        ],
+      },
+    ]
+    await writeFile(
+      join(workspace, 'packages/widgets/temp/widgets.api.json'),
+      packageModel('widgets', [cls])
+    )
+    await mkdir(join(workspace, 'docs'))
+    await writeFile(join(workspace, 'docs', 'kept.md'), 'original bytes\n')
+    const result = await generateWithDocumenterChange(`
+const tsdoc_1 = requireTool('@microsoft/tsdoc')
+const api_extractor_model_1 = requireTool('@microsoft/api-extractor-model')
+const breadcrumb = MarkdownDocumenter.prototype._writeBreadcrumb.toString()
+const edited = breadcrumb.replace(
+  'urlDestination: this._getLinkFilenameForApiItem(hierarchyItem)',
+  "urlDestination: (!skipped && hierarchyItem === apiItem && apiItem.isStatic ? (skipped = true, './' + original.call(this, hierarchyItem)) : this._getLinkFilenameForApiItem(hierarchyItem))"
+)
+if (edited === breadcrumb) throw new Error('breadcrumb fixture did not modify the documenter')
+MarkdownDocumenter.prototype._writeBreadcrumb = new Function('tsdoc_1', 'api_extractor_model_1', 'original', 'let skipped=false; return function ' + edited)(tsdoc_1, api_extractor_model_1, original)`)
+    expect(result.status, result.stderr).toBe(1)
+    expect(result.stderr).toContain('widgets.gizmo.spin-static.md')
+    expect(await pages()).toEqual(['kept.md'])
+    expect(await page('kept.md')).toBe('original bytes\n')
+  })
+
   it('preserves existing pages when the documenter fails after writing', async () => {
     await plantPackage('widgets', 'spin')
     await mkdir(join(workspace, 'docs'))

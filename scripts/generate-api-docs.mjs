@@ -381,6 +381,8 @@ async function documentWithDistinctPageNames(inputFolder, outputFolder) {
   }
   /** The item each page file was given to, so no file is given to two. */
   const owners = new Map()
+  // Destinations named while rendering each page, including repeated links.
+  const pageLinks = new Map()
   // A page can recursively write child pages while rendering; keep each
   // write paired with the filename requested for that specific item.
   let namingLink = false
@@ -388,7 +390,7 @@ async function documentWithDistinctPageNames(inputFolder, outputFolder) {
   const writePage = MarkdownDocumenter.prototype._writeApiItemPage
   MarkdownDocumenter.prototype._writeApiItemPage = function (item) {
     const parent = frame
-    frame = { item, name: undefined }
+    frame = { item, name: undefined, links: [] }
     try {
       return writePage.call(this, item)
     } finally {
@@ -402,6 +404,7 @@ async function documentWithDistinctPageNames(inputFolder, outputFolder) {
         `api-documenter did not name ${basename(path)} through the replaced _getFilenameForApiItem`
       )
     }
+    if (dirname(path) === outputFolder) pageLinks.set(basename(path), frame.links)
     return writeFile.call(this, path, ...args)
   }
   // Links must also obtain their destination through the replacement, even
@@ -422,6 +425,8 @@ async function documentWithDistinctPageNames(inputFolder, outputFolder) {
         'api-documenter did not name a link through the replaced _getFilenameForApiItem'
       )
     }
+    if (frame === undefined) throw new Error(`link ${link} was named outside a page`)
+    frame.links.push(link)
     return link
   }
   let lastName
@@ -490,25 +495,27 @@ async function documentWithDistinctPageNames(inputFolder, outputFolder) {
       'api-documenter did not name any page through the replaced _getFilenameForApiItem, so page names are not guaranteed distinct'
     )
   }
-  return documented
+  return { documented, pageLinks }
 }
 
 // Build the complete replacement beside the published directory; no failed
 // generation step may alter the last successful reference.
 const stage = mkdtempSync(join(root, '.docs-stage-'))
 let preserveStage = false
+let committed = false
 const stagedDocs = join(stage, 'docs')
 try {
-  let documented
+  let result
   try {
-    documented = await documentWithDistinctPageNames(modelsDir, stagedDocs)
+    result = await documentWithDistinctPageNames(modelsDir, stagedDocs)
   } catch (error) {
     console.error(
       `api-documenter failed: ${error instanceof Error ? error.message : String(error)}`
     )
     throw error
   }
-  if (!documented) throw new Error('api-documenter failed')
+  if (!result.documented) throw new Error('api-documenter failed')
+  const { pageLinks } = result
 
   /**
    * Present each subpath under its import path instead of its page identity.
@@ -574,7 +581,11 @@ try {
     if (targets.size > 0) {
       const path = join(stagedDocs, `${unscopedName(entry.identity)}.md`)
       const links = [...targets]
-        .map((target) => `- [${target.importPath}](./${unscopedName(target.identity)}.md)`)
+        .map((target) => {
+          const destination = `./${unscopedName(target.identity)}.md`
+          pageLinks.get(basename(path)).push(destination)
+          return `- [${target.importPath}](${destination})`
+        })
         .join('\n')
       writeFileSync(
         path,
@@ -599,11 +610,58 @@ try {
     throw new Error(`prettier failed: ${format.error?.message ?? `exit ${String(format.status)}`}`)
   }
 
+  // Compare rendered links with the destinations named for that page. A valid
+  // filename alone cannot prove that a link names the intended declaration.
+  const markdown = createRequire(join(toolRoot, 'package.json'))('prettier/plugins/markdown')
+  const files = new Set(readdirSync(stagedDocs))
+  for (const file of files) {
+    if (!file.endsWith('.md')) continue
+    const expected = new Map()
+    for (const link of pageLinks.get(file) ?? []) {
+      expected.set(link, (expected.get(link) ?? 0) + 1)
+    }
+    const content = readFileSync(join(stagedDocs, file), 'utf-8')
+    const tree = await markdown.parsers.markdown.parse(content)
+    const definitions = new Map()
+    const links = []
+    // Markdown reference definitions can follow their uses, so collect the
+    // destinations before resolving references.
+    const visit = (node) => {
+      if (node.type === 'definition') definitions.set(node.identifier, node.url)
+      if (node.type === 'link') links.push(node.url)
+      if (node.type === 'linkReference') links.push({ identifier: node.identifier })
+      for (const child of node.children ?? []) visit(child)
+    }
+    visit(tree)
+    for (const destination of links) {
+      const url =
+        typeof destination === 'string' ? destination : definitions.get(destination.identifier)
+      if (url === undefined) continue
+      const link = url.split('#')[0]
+      if (!link.endsWith('.md') || /^(?:[a-z][a-z0-9+.-]*:|\/|#)/i.test(link)) continue
+      const target = resolve(stagedDocs, link)
+      if (
+        dirname(target) !== stagedDocs ||
+        !files.has(basename(target)) ||
+        !pageLinks.has(basename(target))
+      ) {
+        throw new Error(`${file}: link ${link} does not name a produced page`)
+      }
+      const count = expected.get(link) ?? 0
+      if (count === 0) throw new Error(`${file}: unexpected link ${link}`)
+      expected.set(link, count - 1)
+    }
+    for (const [link, count] of expected) {
+      if (count !== 0) throw new Error(`${file}: missing link ${link}`)
+    }
+  }
+
   const backup = join(stage, 'previous')
   const hadDocs = existsSync(docsDir)
   if (hadDocs) renameSync(docsDir, backup)
   try {
     renameSync(stagedDocs, docsDir)
+    committed = true
   } catch (error) {
     if (hadDocs) {
       try {
@@ -619,5 +677,14 @@ try {
   console.error(error instanceof Error ? error.message : String(error))
   process.exitCode = 1
 } finally {
-  if (!preserveStage) rmSync(stage, { recursive: true, force: true })
+  if (!preserveStage) {
+    try {
+      rmSync(stage, { recursive: true, force: true })
+    } catch (error) {
+      // Once installed, cleanup cannot revoke the new reference; report the
+      // recovery directory while preserving a successful exit status.
+      if (!committed) throw error
+      console.warn(`warning: could not remove ${stage}: ${String(error)}`)
+    }
+  }
 }
