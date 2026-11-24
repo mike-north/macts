@@ -4,19 +4,28 @@
 
 ## AppManifestSchema variable
 
-Top-level manifest schema for a macOS application. This is the complete representation of an app's scriptable interface.
+The validated manifest, with one address representation for format 1.1 consumers.
 
 **Signature:**
 
 ```typescript
 AppManifestSchema: z.ZodObject<
   {
-    version: z.ZodLiteral<'1.0'>
+    version: z.ZodEnum<{
+      '1.0': '1.0'
+      1.1: '1.1'
+    }>
     app: z.ZodObject<
       {
         bundleId: z.ZodString
         name: z.ZodString
         displayName: z.ZodOptional<z.ZodString>
+        rgbChannels: z.ZodOptional<
+          z.ZodEnum<{
+            integer16: 'integer16'
+            normalized: 'normalized'
+          }>
+        >
         version: z.ZodOptional<z.ZodString>
         minMacOSVersion: z.ZodOptional<z.ZodString>
         icon: z.ZodOptional<z.ZodString>
@@ -277,6 +286,16 @@ AppManifestSchema: z.ZodObject<
                           },
                           z.core.$strict
                         >
+                      },
+                      z.core.$strict
+                    >
+                  >
+                  separateRead: z.ZodOptional<
+                    z.ZodObject<
+                      {
+                        operation: z.ZodString
+                        permission: z.ZodString
+                        reason: z.ZodString
                       },
                       z.core.$strict
                     >
@@ -843,7 +862,7 @@ AppManifestSchema: z.ZodObject<
                       >
                     >
                   },
-                  z.core.$strip
+                  z.core.$strict
                 >
               >
             >
@@ -856,7 +875,54 @@ AppManifestSchema: z.ZodObject<
                 z.core.$strict
               >
             >
+            parents: z.ZodOptional<
+              z.ZodArray<
+                z.ZodObject<
+                  {
+                    by: z.ZodEnum<{
+                      identity: 'identity'
+                      index: 'index'
+                    }>
+                    parameter: z.ZodString
+                    resource: z.ZodString
+                    collection: z.ZodString
+                  },
+                  z.core.$strict
+                >
+              >
+            >
+            item: z.ZodOptional<
+              z.ZodObject<
+                {
+                  by: z.ZodEnum<{
+                    identity: 'identity'
+                    index: 'index'
+                  }>
+                  parameter: z.ZodString
+                },
+                z.core.$strict
+              >
+            >
+            resolvesReferences: z.ZodOptional<z.ZodBoolean>
+            identityTraversal: z.ZodOptional<
+              z.ZodObject<
+                {
+                  collections: z.ZodArray<z.ZodString>
+                  evidence: z.ZodString
+                },
+                z.core.$strict
+              >
+            >
             returns: z.ZodOptional<z.ZodString>
+            assignsProperty: z.ZodOptional<
+              z.ZodObject<
+                {
+                  property: z.ZodString
+                  value: z.ZodUnion<readonly [z.ZodString, z.ZodNumber, z.ZodBoolean]>
+                },
+                z.core.$strict
+              >
+            >
             code: z.ZodOptional<z.ZodString>
             routeName: z.ZodOptional<z.ZodString>
             permission: z.ZodOptional<z.ZodString>
@@ -879,31 +945,48 @@ AppManifestSchema: z.ZodObject<
                     changed: z.ZodString
                     reason: z.ZodOptional<z.ZodString>
                   },
-                  z.core.$strip
+                  z.core.$strict
                 >
               >
             >
             unsupported: z.ZodOptional<
               z.ZodObject<
                 {
-                  evidence: z.ZodObject<
-                    {
-                      source: z.ZodLiteral<'live'>
-                      observedAt: z.ZodISODateTime
-                      bundleId: z.ZodString
-                      appVersion: z.ZodString
-                      osVersion: z.ZodString
-                      expression: z.ZodString
-                      errorNumber: z.ZodNumber
-                    },
-                    z.core.$strict
+                  evidence: z.ZodDiscriminatedUnion<
+                    [
+                      z.ZodObject<
+                        {
+                          source: z.ZodLiteral<'live'>
+                          observedAt: z.ZodISODateTime
+                          bundleId: z.ZodString
+                          appVersion: z.ZodString
+                          osVersion: z.ZodString
+                          expression: z.ZodString
+                          errorNumber: z.ZodNumber
+                        },
+                        z.core.$strict
+                      >,
+                      z.ZodObject<
+                        {
+                          source: z.ZodLiteral<'dictionary'>
+                          bundleId: z.ZodString
+                          appVersion: z.ZodString
+                          osVersion: z.ZodString
+                          term: z.ZodString
+                          finding: z.ZodLiteral<'handler'>
+                          statement: z.ZodString
+                        },
+                        z.core.$strict
+                      >,
+                    ],
+                    'source'
                   >
                 },
                 z.core.$strict
               >
             >
           },
-          z.core.$strip
+          z.core.$strict
         >
       >
     >

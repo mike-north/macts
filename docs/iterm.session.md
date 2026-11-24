@@ -363,21 +363,6 @@ The columns property. Nullable. No evidence that the app always sets it.
 </td></tr>
 <tr><td>
 
-[contents](./iterm.session.contents.md)
-
-</td><td>
-
-</td><td>
-
-string \| null
-
-</td><td>
-
-The currently visible contents of the session. Nullable. No evidence that the app always sets it.
-
-</td></tr>
-<tr><td>
-
 [cursorColor](./iterm.session.cursorcolor.md)
 
 </td><td>
@@ -543,23 +528,6 @@ The selectedTextColor property. Nullable. No evidence that the app always sets i
 </td><td>
 
 The selectionColor property. Nullable. No evidence that the app always sets it.
-
-</td></tr>
-<tr><td>
-
-[text](./iterm.session.text.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-string \| null
-
-</td><td>
-
-The currently visible contents of the session. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>

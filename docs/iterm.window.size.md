@@ -4,10 +4,10 @@
 
 ## Window.size property
 
-The width and height of the window. Nullable. No evidence that the app always sets it.
+Deprecated compatibility width and height of the window. Use bounds instead. Omitted when iTerm cannot report it. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-size: Point | null
+size?: Point | null;
 ```

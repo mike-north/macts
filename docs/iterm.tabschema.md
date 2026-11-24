@@ -11,6 +11,7 @@ Raw passthrough validator; typed SDK records use the canonical contract codec.
 ```typescript
 TabSchema: z.ZodObject<
   {
+    currentSession: z.ZodString
     index: z.ZodNumber
     title: z.ZodString
   },

@@ -14,6 +14,12 @@ AppMetadataSchema: z.ZodObject<
     bundleId: z.ZodString
     name: z.ZodString
     displayName: z.ZodOptional<z.ZodString>
+    rgbChannels: z.ZodOptional<
+      z.ZodEnum<{
+        integer16: 'integer16'
+        normalized: 'normalized'
+      }>
+    >
     version: z.ZodOptional<z.ZodString>
     minMacOSVersion: z.ZodOptional<z.ZodString>
     icon: z.ZodOptional<z.ZodString>

@@ -266,6 +266,17 @@ Create the production [KeyPolicyResolver](./runtime.keypolicyresolver.md)<!-- --
 </td></tr>
 <tr><td>
 
+[createTransferStore(options)](./runtime.createtransferstore.md)
+
+</td><td>
+
+Open the transfer store under `options.home` (default: the macts home), creating its directories and database when absent, and sweep it.
+
+Several stores, in one process or several, may be open on the same home at once; the database serializes their changes.
+
+</td></tr>
+<tr><td>
+
 [decrypt(ciphertext, key)](./runtime.decrypt.md)
 
 </td><td>
@@ -647,6 +658,24 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[AllocatedTemporaryCopy](./runtime.allocatedtemporarycopy.md)
+
+</td><td>
+
+A temporary copy the store minted, under the store's lifecycle.
+
+</td></tr>
+<tr><td>
+
+[AllocateTemporaryCopyOptions](./runtime.allocatetemporarycopyoptions.md)
+
+</td><td>
+
+Options for [TransferStore.allocateTemporaryCopy()](./runtime.transferstore.allocatetemporarycopy.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
 [ApprovalGateContext](./runtime.approvalgatecontext.md)
 
 </td><td>
@@ -654,6 +683,15 @@ Description
 The configured human-in-the-loop approval gate.
 
 Supplying one turns a `confirm-first` hold from "withhold the call and report it as pending" into "ask a human now, within a bounded wait".
+
+</td></tr>
+<tr><td>
+
+[ConsumedUpload](./runtime.consumedupload.md)
+
+</td><td>
+
+A consumed upload's staged bytes, owned by the consuming call.
 
 </td></tr>
 <tr><td>
@@ -676,6 +714,15 @@ Result of creating an API key.
 </td></tr>
 <tr><td>
 
+[CreatedUpload](./runtime.createdupload.md)
+
+</td><td>
+
+A freshly created upload slot.
+
+</td></tr>
+<tr><td>
+
 [CreateKeyPolicyResolverOptions](./runtime.createkeypolicyresolveroptions.md)
 
 </td><td>
@@ -694,11 +741,47 @@ What a runtime is constructed from.
 </td></tr>
 <tr><td>
 
+[CreateTransferStoreOptions](./runtime.createtransferstoreoptions.md)
+
+</td><td>
+
+Options for [createTransferStore()](./runtime.createtransferstore.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[CreateUploadOptions](./runtime.createuploadoptions.md)
+
+</td><td>
+
+Options for [TransferStore.createUpload()](./runtime.transferstore.createupload.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
 [CredentialVerifier](./runtime.credentialverifier.md)
 
 </td><td>
 
 Establishes who a caller is from the credential it presented.
+
+</td></tr>
+<tr><td>
+
+[DownloadLinkTarget](./runtime.downloadlinktarget.md)
+
+</td><td>
+
+The file a download link delivers.
+
+</td></tr>
+<tr><td>
+
+[FileGrantRecord](./runtime.filegrantrecord.md)
+
+</td><td>
+
+What a valid grant entitles its subject to fetch.
 
 </td></tr>
 <tr><td>
@@ -732,6 +815,33 @@ The audit writer is \*\*required\*\* on this arm. Seeking a human decision and t
 Governance state for a deployment with \*\*no\*\* approval channel configured.
 
 `confirm-first` calls are withheld and reported as pending. The audit writer is optional here: enforcement still runs without one, it just persists nothing.
+
+</td></tr>
+<tr><td>
+
+[GrantedFile](./runtime.grantedfile.md)
+
+</td><td>
+
+A file an authorized operation returned, as recorded by a grant.
+
+</td></tr>
+<tr><td>
+
+[IssuedDownloadLink](./runtime.issueddownloadlink.md)
+
+</td><td>
+
+A freshly issued download link token.
+
+</td></tr>
+<tr><td>
+
+[IssuedFileGrant](./runtime.issuedfilegrant.md)
+
+</td><td>
+
+A freshly issued file grant.
 
 </td></tr>
 <tr><td>
@@ -832,11 +942,47 @@ Configuration for [createRateLimiter()](./runtime.createratelimiter.md)<!-- -->.
 </td></tr>
 <tr><td>
 
+[ReceivedUpload](./runtime.receivedupload.md)
+
+</td><td>
+
+A completely received upload.
+
+</td></tr>
+<tr><td>
+
+[ReceiveUploadOptions](./runtime.receiveuploadoptions.md)
+
+</td><td>
+
+Options for [TransferStore.receiveUpload()](./runtime.transferstore.receiveupload.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
 [RegisteredOperation](./runtime.registeredoperation.md)
 
 </td><td>
 
 One operation the runtime can invoke.
+
+</td></tr>
+<tr><td>
+
+[TransferLimits](./runtime.transferlimits.md)
+
+</td><td>
+
+The bounds a transfer store enforces. Byte limits are in bytes, lifetimes in milliseconds.
+
+</td></tr>
+<tr><td>
+
+[TransferStore](./runtime.transferstore.md)
+
+</td><td>
+
+The persistent, subject-bound record of binary transfers. See the module documentation for its guarantees.
 
 </td></tr>
 </tbody></table>
@@ -865,6 +1011,15 @@ The allow-all policy used when no policy file is configured.
 </td></tr>
 <tr><td>
 
+[CONSUMED_UPLOAD_RETENTION_MS](./runtime.consumed_upload_retention_ms.md)
+
+</td><td>
+
+How long the bytes of a consumed upload are kept when the consuming call never releases them: 15 minutes from consumption.
+
+</td></tr>
+<tr><td>
+
 [DEFAULT_KEY_POLICY_CACHE_TTL_MS](./runtime.default_key_policy_cache_ttl_ms.md)
 
 </td><td>
@@ -876,11 +1031,83 @@ Short on purpose: a policy edit is a security-relevant change, and an operator t
 </td></tr>
 <tr><td>
 
+[DEFAULT_TRANSFER_LIMITS](./runtime.default_transfer_limits.md)
+
+</td><td>
+
+The default bounds, assembled from the named constants.
+
+</td></tr>
+<tr><td>
+
+[DOWNLOAD_LINK_TTL_MS](./runtime.download_link_ttl_ms.md)
+
+</td><td>
+
+How long a download link delivers the file: 5 minutes from issue.
+
+</td></tr>
+<tr><td>
+
+[FILE_GRANT_TTL_MS](./runtime.file_grant_ttl_ms.md)
+
+</td><td>
+
+How long a file grant can be exchanged for the file: 15 minutes from issue.
+
+</td></tr>
+<tr><td>
+
+[MAX_OUTSTANDING_UPLOAD_BYTES_PER_SUBJECT](./runtime.max_outstanding_upload_bytes_per_subject.md)
+
+</td><td>
+
+Most bytes one subject can have received across its outstanding uploads: 512 MiB.
+
+</td></tr>
+<tr><td>
+
+[MAX_OUTSTANDING_UPLOADS_PER_SUBJECT](./runtime.max_outstanding_uploads_per_subject.md)
+
+</td><td>
+
+Most uploads one subject can have outstanding at once: 16.
+
+</td></tr>
+<tr><td>
+
+[MAX_UPLOAD_BYTES](./runtime.max_upload_bytes.md)
+
+</td><td>
+
+Largest single upload, in bytes: 100 MiB.
+
+</td></tr>
+<tr><td>
+
 [RESERVED_APP_ROUTE_SEGMENTS](./runtime.reserved_app_route_segments.md)
 
 </td><td>
 
 Names that can never be an app's route segment.
+
+</td></tr>
+<tr><td>
+
+[TEMPORARY_COPY_TTL_MS](./runtime.temporary_copy_ttl_ms.md)
+
+</td><td>
+
+How long a temporary copy may remain after the caller stops using it: 60 minutes from registration.
+
+</td></tr>
+<tr><td>
+
+[UPLOAD_TTL_MS](./runtime.upload_ttl_ms.md)
+
+</td><td>
+
+How long an upload accepts bytes and can be consumed: 15 minutes from its creation.
 
 </td></tr>
 </tbody></table>
@@ -994,6 +1221,15 @@ Distributes over the union, so the approvals arm survives resolution: a resolved
 </td><td>
 
 The logging the runtime performs: operator-side diagnostics for denied and failed calls.
+
+</td></tr>
+<tr><td>
+
+[UploadByteSource](./runtime.uploadbytesource.md)
+
+</td><td>
+
+The bytes of one upload, in order.
 
 </td></tr>
 </tbody></table>

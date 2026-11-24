@@ -4,7 +4,7 @@
 
 ## NativeScript.body property
 
-Function body run as `(app, args, page)`<!-- -->.
+Function body run as `(app, args, page, env)`<!-- -->.
 
 **Signature:**
 

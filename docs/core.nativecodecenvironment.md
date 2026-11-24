@@ -54,6 +54,40 @@ The target application.
 </td></tr>
 <tr><td>
 
+[contexts?](./core.nativecodecenvironment.contexts.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+WeakMap&lt;object, readonly { readonly resource: string; readonly item: unknown; }\[\]&gt;
+
+</td><td>
+
+_(Optional)_ Validated ancestor provenance, retained while resolving and reading nested records.
+
+</td></tr>
+<tr><td>
+
+[identities?](./core.nativecodecenvironment.identities.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+WeakMap&lt;object, { readonly property: string; readonly id: unknown; }&gt;
+
+</td><td>
+
+_(Optional)_ Expected identities of traversal matches, checked again when their records are read.
+
+</td></tr>
+<tr><td>
+
 [positionOf?](./core.nativecodecenvironment.positionof.md)
 
 </td><td>
@@ -84,6 +118,23 @@ _(Optional)_ Reads the zero-based position an app object's own specifier gives w
 </td><td>
 
 The resources whose references convert.
+
+</td></tr>
+<tr><td>
+
+[rgbChannels?](./core.nativecodecenvironment.rgbchannels.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+'integer16' \| 'normalized'
+
+</td><td>
+
+_(Optional)_ The app's declared color interface from the invocation plan. Omission means 16-bit integer channels; normalized channels are never inferred.
 
 </td></tr>
 </tbody></table>

@@ -4,10 +4,6 @@
 
 ## GenerateCliPluginResult interface
 
-CLI plugin generator.
-
-Generates Clipanion-based CLI plugins from macts manifests.
-
 **Signature:**
 
 ```typescript

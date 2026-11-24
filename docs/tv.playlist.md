@@ -131,6 +131,23 @@ the total size of all tracks (in bytes). Nullable. No evidence that the app alwa
 </td></tr>
 <tr><td>
 
+[source](./tv.playlist.source.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Source](./tv.source.md)<!-- -->, string, 'Source'&gt;
+
+</td><td>
+
+The source that holds this playlist. Never null: A playlist belongs to a source; reading its source must return that containing object. An unreadable source is a failed read, not an empty relationship.
+
+</td></tr>
+<tr><td>
+
 [specialKind](./tv.playlist.specialkind.md)
 
 </td><td>

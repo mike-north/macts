@@ -11,6 +11,7 @@ Raw passthrough validator; typed SDK records use the canonical contract codec.
 ```typescript
 PlaylistSchema: z.ZodObject<
   {
+    source: z.ZodString
     id: z.ZodNumber
     persistentID: z.ZodString
     description: z.ZodString

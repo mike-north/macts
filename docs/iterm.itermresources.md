@@ -9,5 +9,28 @@ The type of the resource table in `iTermContract` (the app's `/contract` entry):
 **Signature:**
 
 ```typescript
-type iTermResources = Readonly<Record<never, never>>
+type iTermResources = Readonly<{
+  Window: ResourceDescriptor<Window, Integer> & {
+    readonly id: ValueType<Integer>
+    readonly get: 'iterm.windows.get'
+    readonly list: 'iterm.windows.list'
+  }
+  Tab: ResourceDescriptor<Tab> & {
+    readonly get: 'iterm.tabs.get'
+    readonly list: 'iterm.tabs.list'
+    readonly parents: {
+      readonly get: 'Window'
+      readonly list: 'Window'
+    }
+  }
+  Session: ResourceDescriptor<Session, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'iterm.sessions.resolve'
+    readonly parents: {
+      readonly get: 'Window'
+    }
+  }
+}>
 ```
+
+**References:** [ResourceDescriptor](./contracts.resourcedescriptor.md)<!-- -->, [Window](./iterm.window.md)<!-- -->, [Integer](./contracts.integer.md)<!-- -->, [ValueType](./contracts.valuetype.md)<!-- -->, [Tab](./iterm.tab.md)<!-- -->, [Session](./iterm.session.md)

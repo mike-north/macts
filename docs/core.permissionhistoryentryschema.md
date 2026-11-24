@@ -16,6 +16,6 @@ PermissionHistoryEntrySchema: z.ZodObject<
     changed: z.ZodString
     reason: z.ZodOptional<z.ZodString>
   },
-  z.core.$strip
+  z.core.$strict
 >
 ```

@@ -229,6 +229,16 @@ ResourceSchema: z.ZodObject<
                 z.core.$strict
               >
             >
+            separateRead: z.ZodOptional<
+              z.ZodObject<
+                {
+                  operation: z.ZodString
+                  permission: z.ZodString
+                  reason: z.ZodString
+                },
+                z.core.$strict
+              >
+            >
           },
           z.core.$strip
         >

@@ -4,7 +4,7 @@
 
 ## CommandParameterSchema variable
 
-Command parameter schema.
+Command parameter schema. Strict, like [CommandSchema](./core.commandschema.md)<!-- -->.
 
 **Signature:**
 
@@ -78,7 +78,7 @@ CommandParameterSchema: z.ZodObject<
       >
     >
   },
-  z.core.$strip
+  z.core.$strict
 >
 ```
 

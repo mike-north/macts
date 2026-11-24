@@ -6,7 +6,7 @@
 
 Resolve every canonical RPC route for a single manifest command.
 
-A command marked unsupported has no route, and a resource marked unsupported contributes none, so every surface built from these routes (the server router, the runtime's operation registry, the contract, capabilities, derived permissions) omits them.
+A command marked unsupported has no route, and a resource marked unsupported contributes none, so every surface built from these routes (the server router, the runtime's operation registry, the contract, capabilities, derived permissions) omits them. The supplied command may be outside manifest.commands; its format 1.1 bindings are canonicalized without taking ownership of the source declaration.
 
 **Signature:**
 

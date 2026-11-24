@@ -6,6 +6,8 @@
 
 Schema for a command definition.
 
+Strict by design: a key the schema does not know is a parse error, never silently dropped. A command may gain a field that withholds or restricts it (the `unsupported` marker is one); a runtime that predates the field must refuse the manifest rather than strip the field and offer the command. The same holds for the command's parameters and permission-history entries.
+
 **Signature:**
 
 ```typescript
@@ -89,7 +91,7 @@ CommandSchema: z.ZodObject<
               >
             >
           },
-          z.core.$strip
+          z.core.$strict
         >
       >
     >
@@ -102,7 +104,54 @@ CommandSchema: z.ZodObject<
         z.core.$strict
       >
     >
+    parents: z.ZodOptional<
+      z.ZodArray<
+        z.ZodObject<
+          {
+            by: z.ZodEnum<{
+              identity: 'identity'
+              index: 'index'
+            }>
+            parameter: z.ZodString
+            resource: z.ZodString
+            collection: z.ZodString
+          },
+          z.core.$strict
+        >
+      >
+    >
+    item: z.ZodOptional<
+      z.ZodObject<
+        {
+          by: z.ZodEnum<{
+            identity: 'identity'
+            index: 'index'
+          }>
+          parameter: z.ZodString
+        },
+        z.core.$strict
+      >
+    >
+    resolvesReferences: z.ZodOptional<z.ZodBoolean>
+    identityTraversal: z.ZodOptional<
+      z.ZodObject<
+        {
+          collections: z.ZodArray<z.ZodString>
+          evidence: z.ZodString
+        },
+        z.core.$strict
+      >
+    >
     returns: z.ZodOptional<z.ZodString>
+    assignsProperty: z.ZodOptional<
+      z.ZodObject<
+        {
+          property: z.ZodString
+          value: z.ZodUnion<readonly [z.ZodString, z.ZodNumber, z.ZodBoolean]>
+        },
+        z.core.$strict
+      >
+    >
     code: z.ZodOptional<z.ZodString>
     routeName: z.ZodOptional<z.ZodString>
     permission: z.ZodOptional<z.ZodString>
@@ -125,30 +174,47 @@ CommandSchema: z.ZodObject<
             changed: z.ZodString
             reason: z.ZodOptional<z.ZodString>
           },
-          z.core.$strip
+          z.core.$strict
         >
       >
     >
     unsupported: z.ZodOptional<
       z.ZodObject<
         {
-          evidence: z.ZodObject<
-            {
-              source: z.ZodLiteral<'live'>
-              observedAt: z.ZodISODateTime
-              bundleId: z.ZodString
-              appVersion: z.ZodString
-              osVersion: z.ZodString
-              expression: z.ZodString
-              errorNumber: z.ZodNumber
-            },
-            z.core.$strict
+          evidence: z.ZodDiscriminatedUnion<
+            [
+              z.ZodObject<
+                {
+                  source: z.ZodLiteral<'live'>
+                  observedAt: z.ZodISODateTime
+                  bundleId: z.ZodString
+                  appVersion: z.ZodString
+                  osVersion: z.ZodString
+                  expression: z.ZodString
+                  errorNumber: z.ZodNumber
+                },
+                z.core.$strict
+              >,
+              z.ZodObject<
+                {
+                  source: z.ZodLiteral<'dictionary'>
+                  bundleId: z.ZodString
+                  appVersion: z.ZodString
+                  osVersion: z.ZodString
+                  term: z.ZodString
+                  finding: z.ZodLiteral<'handler'>
+                  statement: z.ZodString
+                },
+                z.core.$strict
+              >,
+            ],
+            'source'
           >
         },
         z.core.$strict
       >
     >
   },
-  z.core.$strip
+  z.core.$strict
 >
 ```

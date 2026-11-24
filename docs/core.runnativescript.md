@@ -80,6 +80,6 @@ What the automation process reported.
 
 ## Remarks
 
-The script decodes `script.input` against `script.inputPlan`<!-- -->, invokes `script.body` as `(app, args, page)` with the target application, encodes the result against `script.outputPlan`<!-- -->, and reports a [NativeOutcome](./core.nativeoutcome.md)<!-- -->. Everything the app or the codec raises inside the process resolves as a failed outcome; it is not a rejection. A success whose value was dropped by serialization (a passthrough body returning `undefined`<!-- -->) resolves with `value: null`<!-- -->. Standard error output of a successful run is not reported.
+The script decodes `script.input` against `script.inputPlan`<!-- -->, invokes `script.body` as `(app, args, page, env)` with the target application, encodes the result against `script.outputPlan`<!-- -->, and reports a [NativeOutcome](./core.nativeoutcome.md)<!-- -->. Everything the app or the codec raises inside the process resolves as a failed outcome; it is not a rejection. A success whose value was dropped by serialization (a passthrough body returning `undefined`<!-- -->) resolves with `value: null`<!-- -->. Standard error output of a successful run is not reported.
 
 Rejections are always a [JxaExecutionError](./core.jxaexecutionerror.md)<!-- -->, whose `kind` says what happened (see [JxaFailureKind](./core.jxafailurekind.md)<!-- -->). A script that did not compile exits with a failure (`kind: 'exited'`<!-- -->); output that is not a well-formed outcome is `kind: 'unreadable-output'`<!-- -->.

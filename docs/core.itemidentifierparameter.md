@@ -4,7 +4,7 @@
 
 ## itemIdentifierParameter() function
 
-The declared parameter that identifies a command's item: its first required parameter, in declaration order, other than its parent's. A resource-scoped command's native body addresses the item by it; an application-scoped delete passes it to the app's delete with its other declared parameters.
+The required input that names an operation's item. Canonical scoped paths name it explicitly; unscoped commands and format 1.0 use the first required input outside the parent binding. Normalization uses that same declaration rule when converting a format 1.1 source parent. No input is invented.
 
 **Signature:**
 
@@ -37,13 +37,9 @@ command
 
 </td><td>
 
-A manifest command.
-
 </td></tr>
 </tbody></table>
 
 **Returns:**
 
 [CommandParameter](./core.commandparameter.md) \| undefined
-
-The identifier parameter, or `undefined` when the command declares no required parameter besides its parent's.
